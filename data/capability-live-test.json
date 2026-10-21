@@ -1,28 +1,28 @@
 {
- "at": "2026-10-21T14:14:37",
+ "at": "2026-10-21T14:17:21",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 309,
+  "ok": 310,
   "denied": 2,
   "needs_params": 24,
   "needs_auth": 0,
-  "needs_dependency": 6,
+  "needs_dependency": 5,
   "failed": 0,
   "timeout": 0,
   "exception": 0
  },
  "buckets": {
-  "ok": 309,
+  "ok": 310,
   "needs_input": 24,
-  "needs_dependency": 6,
+  "needs_dependency": 5,
   "needs_ticket": 2
  },
  "by_source": {
   "monitor": 216,
-  "ticket": 20,
+  "ticket": 19,
   "params": 16,
-  "remaining": 23,
+  "remaining": 24,
   "write": 66
  },
  "sources": {
@@ -983,9 +983,9 @@
    "note": "缺前置：无已物化产物可发布（先 pipeline 产物）"
   },
   "mirror_rewind": {
-   "bucket": "needs_dependency",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "缺前置：时间线无该版本"
+   "note": "真跑通过：一次性全量回滚成功（rolled_back_to=1）"
   },
   "mirror_scan": {
    "bucket": "ok",
@@ -1149,8 +1149,8 @@
   },
   "pipeline_rollback": {
    "bucket": "needs_input",
-   "src": "ticket",
-   "note": "缺输入：生产区无此产物（probe-none）"
+   "src": "remaining",
+   "note": "缺输入：生产区无此产物 probe（要先 pipeline_submit 一个产物）"
   },
   "pipeline_status": {
    "bucket": "ok",
