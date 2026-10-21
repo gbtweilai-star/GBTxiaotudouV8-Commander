@@ -1,10 +1,10 @@
 {
- "at": "2026-10-21T15:45:56",
+ "at": "2026-10-21T15:55:11",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 338,
-  "denied": 1,
+  "ok": 339,
+  "denied": 0,
   "needs_params": 1,
   "needs_auth": 0,
   "needs_dependency": 1,
@@ -13,9 +13,8 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 338,
+  "ok": 339,
   "needs_input": 1,
-  "needs_ticket": 1,
   "needs_dependency": 1
  },
  "by_source": {
@@ -1064,7 +1063,7 @@
   "offense_ops": {
    "bucket": "ok",
    "src": "offense",
-   "note": "本机回环目标（127.0.0.1）真跑 op=plan：五阶段 5 条 · 三条判据；只出计划不动手"
+   "note": "本机回环目标（127.0.0.1:8080）真跑 op=plan：五阶段 5 条 · 三条判据；只出计划不动手"
   },
   "offload_distill": {
    "bucket": "ok",
@@ -1137,9 +1136,9 @@
    "note": "监控账 90s 超时下真调通过（22ms）"
   },
   "pentest": {
-   "bucket": "needs_ticket",
+   "bucket": "ok",
    "src": "offense",
-   "note": "目标已登记（127.0.0.1），门只剩一张票：network_private —— 主人终端发 `auth grant --scope network_private` 即可，模型无权自给"
+   "note": "本机回环目标真跑 op=verify（已登记授权目标 127.0.0.1:8080）"
   },
   "pentest_distill": {
    "bucket": "ok",
