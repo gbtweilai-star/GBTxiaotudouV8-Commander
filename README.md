@@ -62,10 +62,11 @@
 | 1 | **335 题能力位基准 · PASS45 98.51%–99.10%**（两轮线上全量 + 零覆盖逐条复检） | [评测方法与逐项读数](docs/04-evaluation.md) |
 | 2 | **341 位能力全公开**，机器可读 JSON + 30 个域的逐位详解，不是一张截图 | [能力总表](docs/03-capabilities.md) · [capabilities.json](data/capabilities.json) |
 | 3 | **340 位逐位真跑通过**（只读空参 / 需参数带真参 / 写口隔离 store / 带票真跑 / 房间晋升 / 打断链 / 出图门），**失败 0** | [能力自证](docs/07-capability-proof.md) |
+| 4 | **只要密钥跟云端联通了，就能反向调用** —— 不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上 | [万能插 · 反向调用](docs/13-omni-plug.md) |
 
 ---
 
-## 实测证据（六张图，全部真跑，不是示意图）
+## 实测证据（七张图，全部真跑，不是示意图）
 
 | 图 | 证明什么 | 读数 |
 |---|---|---|
@@ -75,6 +76,7 @@
 | ![链路](assets/fig-chain.png) | **整链通** | 本地框架→云插件→端点→流式，五段真跑全绿 |
 | ![GBT天真](assets/fig-tianzhen.png) | **不装 ComfyUI 也能跑它的契约** | 原生算子 **27**（18 个与 ComfyUI 同名同契约）· 契约面 1495 · 校验正例过、反例被抓 |
 | ![多域监控](assets/fig-monitor.png) | **改一处不坏别处** | 29 域 236 位逐位真调：**221 通过 / 15 要票 / 回归 0 / 修好 0** |
+| ![电缆全通](assets/fig-cable-all.png) | **有钥就能反向调算力** | 四根电缆：我们的模型 `200 · 1.2s` · 出图 **3/3 · 29.7s** · 本机 CPU **321.1 GFLOP/s** · 出片 **云端 43s 出活** |
 
 细节页：[能力自证](docs/07-capability-proof.md) · [并发爆发力](docs/08-concurrency.md) · [镜像多维度空间](docs/09-mirror-space.md) · [GBT天真](docs/10-gbt-tianzhen.md) · [五维合一](docs/11-five-dim.md) · [多域监控](docs/12-multidomain-monitor.md) · [万能插（万物皆可插/可控·反向调云端算力）](docs/13-omni-plug.md) · [真实回执](docs/06-showcase.md)
 
