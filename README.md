@@ -1,3 +1,18 @@
+# GBT Xiaotudou V8 — The Commander Model
+
+> **A 7.6B Chinese "commander" LLM: it does not just chat — it routes a request to one of 341 audited capability bits, and refuses to write / spend / go online without a human ticket.**
+>
+> `341 capabilities · 30 domains` · `335-item benchmark PASS45 99.10%` · `341 bits live-tested: 340 pass / 0 fail` · `22-DoF bionic arm, 40-bone GLB included` · `Python client + 30-second demo, zero dependencies, no weights needed`
+
+```bash
+git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander && cd GBTxiaotudouV8-Commander
+python demo.py "turn this Markdown into a PPT"    # -> capability bit, gate status, exact command
+```
+
+<p><a href="README.en.md">🇬🇧 Full English README</a> · <a href="https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/">Project page</a> · <a href="arms/README.md">🦾 Omni-Arm (GLB)</a> · <a href="docs/13-omni-plug.md">Reverse-calling cloud compute</a></p>
+
+---
+
 # 🥔 GBT小土豆V8 · 总指挥大模型
 
 **GBTxiaotudouV8-Commander** —— 一个把"**指挥**"练进权重里的 7.6B 中文模型：它不只会聊天，它知道该派哪根触手、那根触手怎么调、什么时候必须先要授权。
@@ -8,6 +23,7 @@
   <img alt="caps" src="https://img.shields.io/badge/capability%20bits-341-8957e5?style=flat-square">
   <img alt="domains" src="https://img.shields.io/badge/domains-30-d29922?style=flat-square">
   <img alt="eval" src="https://img.shields.io/badge/335--cap%20PASS45-99.10%25-2ea043?style=flat-square">
+  <img alt="arm" src="https://img.shields.io/badge/omni--arm-40%20bones%20GLB-c9510e?style=flat-square">
   <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square">
   <img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square">
   <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/gbtweilai-star/GBTxiaotudouV8-Commander?style=flat-square"></a>
@@ -29,6 +45,24 @@ python demo.py "我要把 Markdown 变成 PPT"          # 离线：落点 + 门�
 python -m gbt_commander stats                      # 341 位 / 30 域 / 只读 262 / 要票 35
 python -m unittest discover -s tests -q            # 21 条判据（含"编造能力位必须被拒"的负对照）
 ```
+
+## 🦾 硬件腿：22 自由度手 + 9 骨手臂 + 2 万触手 3D（真 GLB，可直接下载）
+
+不是渲染图，是**绑好骨、带自检读数**的资产：`arms/omni-arm-rigged.glb`（**40 骨 / 1,080 顶点 / 60,444 B**，
+八条自检 8/8 过），外加一个自包含的 2 万触手 3D 看件页 `arms/tentacle3d.html`（双击即开）。
+
+<p align="center"><img src="arms/tentacle3d.png" width="720" alt="Omni-Arm · 2 万触手 3D 看件页"></p>
+
+| 现读 | 值 |
+|---|---|
+| 骨数（skin.joints） | **40**（nodes 42） |
+| 网格 / 蒙皮 | 1 / 1 |
+| 顶点 | **1,080**（未绑 0 · 权重非归一 0） |
+| 尺寸 | 高 **0.6002 m** |
+| 构建 | Blender **4.2.16 LTS** · `blender_rc=0` |
+| 文件 | `arms/omni-arm-rigged.glb` · `omni-arm-spec.json` · `omni-arm-report.json` · `tentacle3d.html` |
+
+细节与「设计稿不能直接跑」的老实话：**[arms/README.md](arms/README.md)**
 
 <p align="center"><img src="assets/fig-cable-all.png" width="760" alt="电缆全通实测表：只要密钥跟云端联通了，就能反向调用"></p>
 

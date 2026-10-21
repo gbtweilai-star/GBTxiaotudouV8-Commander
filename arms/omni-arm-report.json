@@ -1,0 +1,78 @@
+{
+ "ok": true,
+ "at": "2026-10-19T07:10:00+07:00",
+ "glb": "outputs/omni-arm/omni-arm-rigged.glb",
+ "bytes": 60444,
+ "spec": "outputs/omni-arm/omni-arm-spec.json",
+ "bones": 40,
+ "checks": [
+  {
+   "名": "GLB 已落盘",
+   "过": true,
+   "读数": "omni-arm-rigged.glb · 60444 字节"
+  },
+  {
+   "名": "骨数 = 40（skin.joints；nodes 另有网格+骨架根）",
+   "过": true,
+   "读数": "joints=40 nodes=42"
+  },
+  {
+   "名": "单网格 + 单蒙皮",
+   "过": true,
+   "读数": "meshes=1 skins=1"
+  },
+  {
+   "名": "蒙皮关节数 = 40",
+   "过": true,
+   "读数": "joints=40"
+  },
+  {
+   "名": "无未绑顶点（权重和>0）",
+   "过": true,
+   "读数": "未绑=0"
+  },
+  {
+   "名": "权重已归一（每顶点和≈1）",
+   "过": true,
+   "读数": "非归一化=0"
+  },
+  {
+   "名": "顶点数 > 300（真几何不是空壳）",
+   "过": true,
+   "读数": "verts=1080"
+  },
+  {
+   "名": "尺寸合理（0.2~2.0 m）",
+   "过": true,
+   "读数": "高=0.6002 m"
+  }
+ ],
+ "glb_check": {
+  "ok": true,
+  "nodes": 42,
+  "meshes": 1,
+  "skins": 1,
+  "joints": 40,
+  "verts": 1080,
+  "unweighted": 0,
+  "not_normalized": 0,
+  "bbox": {
+   "x": 0.117,
+   "y": 0.6002,
+   "z": 0.9911
+  },
+  "height_m": 0.6002,
+  "bytes": 60444
+ },
+ "blender": {
+  "ok": true,
+  "blender": "4.2.16 LTS",
+  "bones": 40,
+  "verts": 360,
+  "polys": 270,
+  "vertex_groups": 40,
+  "modifier": "ARMATURE",
+  "glb": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\outputs\\omni-arm\\omni-arm-rigged.glb",
+  "blender_rc": 0
+ }
+}
