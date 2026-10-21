@@ -1,0 +1,15 @@
+{
+ "at": "2026-10-21T16:32:02",
+ "schema": "cable-reverse-compute-v1",
+ "cable": "触手(pod_link/omni_plug) + 密钥(vault:agnes)",
+ "endpoint": "https://apihub.agnes-ai.com/v1",
+ "metaphor": "触手=电缆 · 密钥=通电 · 云端有算力⇒能通⇒可反向调用（energy_pool：模型=燃料，不是身份）",
+ "image_http": 200,
+ "mode": "url",
+ "ok": true,
+ "artifact": "outputs/cloud/agnes-compute/agnes-image-2.5-flash-20261021T163212.png",
+ "bytes": 1020163,
+ "sha256": "9bf150dbe0df81b0c899536c866d3698fdd66c26bf6497fd9a49c910ba774796",
+ "route": "reverse-compute-via-cable",
+ "note": "不是 LLM 文本回执：拿到的是**图像字节产物**（算力产出），走的是同一根电缆"
+}
