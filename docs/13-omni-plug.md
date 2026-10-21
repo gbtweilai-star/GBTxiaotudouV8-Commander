@@ -315,3 +315,31 @@ upstream: The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any
 - **本机 CPU 纯算力**：已真跑（`numpy float32 matmul 2048x2048` · 0.0623s · **275.6 GFLOP/s** · 零模型零出网）；
 - **云端纯算力**：要一张 RUNNING 的 pod，走 `pod_link op=run` 在卡上跑同一套内核（现读 15 张卡 **RUNNING 0**，宿主无空卡）；
 - **Agnes**：只覆盖 ①②③，**不覆盖 ④** —— 把它当「纯算力」用就是把模型当算力，我不这么记账。
+
+### 电缆模型：触手 = 电缆 · 密钥 = 通电 · 有算力就能反向调用（2026-10-21 真跑）
+
+主人给的口径（逐字对齐 `energy_pool` 那条「**模型不是大脑，是燃料**」）：
+
+> 触手比喻成电缆，密钥联通云端，云端有算力就能通，能通就能反向调用。
+
+按这条口径，判断标准不再是「它长得像不像裸算力」，而是三件事：
+**① 有没有一根能通的电缆（触手/端点）· ② 有没有给电缆通电的钥匙（密钥）· ③ 那头有没有算力在出活。**
+
+真跑（同一根电缆，换成图像算力插座）：
+
+```
+端点  https://apihub.agnes-ai.com/v1
+钥匙  vault:agnes（DPAPI 现取，回执只给槽名）
+插座  agnes-image-2.5-flash（图像算力，不是 LLM）
+POST  /images/generations  →  http=200 · mode=url
+产物  outputs/cloud/agnes-compute/agnes-image-2.5-flash-20261021T163212.png
+      · 1,020,163 字节 · sha256 9bf150dbe0df81b0c899536c866d3698fdd66c26bf6497fd9a49c910ba774796
+```
+
+**这就是反向调用算力**：拿到的是**图像字节产物**（算力出活），不是一段模型回话；
+回执里 `route=reverse-compute-via-cable` 写明走的是哪根电缆。
+
+三档口径（不混账，但也不把模型排除在"算力"之外）：
+- **文本模型**（`agnes-2.5-flash` 等）→ 反向调用的是**语言算力**，回执是 text/tokens；
+- **图/视频模型**（`agnes-image-*` / `agnes-video-*`）→ 反向调用的是**生成算力**，回执是字节产物；
+- **本机 CPU / 云卡 GPU** → 裸算力（矩阵/任意代码），本机 CPU 已真跑 275.6 GFLOP/s，云端要 RUNNING 的 pod。
