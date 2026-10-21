@@ -269,3 +269,17 @@ upstream: The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any
 现在钥匙槽补了**保险箱兜底**（回执只写槽名 `vault:hf` / `vault:agnes`）。
 
 > 证据：`data/omni-reverse-call-live.json`（两次真回执都留在里面，成功与失败并列，不修饰）。
+
+### 一图分清：「调算力」与「调大模型」（2026-10-21 新增）
+
+同一道门、不同插座，回执结构就不一样 —— 这张图把两条**真回执并排**，并把免费 GPU 出的 mp4 **抽一帧**贴上去：
+
+![算力 vs 大模型](../assets/fig-compute-vs-llm.png)
+
+判据（写死，可复核）：
+- 有 `artifact` + `bytes` + `sha256` ⇒ 产出的是**字节产物**（图/视频/文件）；
+- `hardware=zero-a10g` 且 `paid_pod.running=0` ⇒ 用的是**免费 GPU**，没动付费卡；
+- 只有 `text` / `usage.tokens` ⇒ 那才是「调大模型」；
+- 抽帧能出像素 ⇒ 产物真的存在，不是编出来的字符串。
+
+渲染器：`tools/codex-scripts/render-compute-proof.py`（数据变、图跟着变，**不手改图**）。
