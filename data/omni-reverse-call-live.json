@@ -1,0 +1,11 @@
+{
+ "at": "2026-10-21T16:17:37",
+ "schema": "omni-reverse-call-live-v1",
+ "call": "omni_plug op=run socket=ai target=https://router.huggingface.co/v1 do=chat",
+ "key_slot": "vault:hf",
+ "http": 400,
+ "ms": 611,
+ "upstream_original": "The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any provider you have enabled.",
+ "verdict": "反向调用链路本身通了（钥匙从保险箱取到、请求打到 HF 路由、上游原话完整带回）；卡在 HF 账号未启用 inference providers",
+ "fix_owner_side": "https://huggingface.co/settings/inference-providers 开一个 provider（免费额度即可），我这边一行不改即可复跑"
+}
