@@ -105,3 +105,9 @@ py -3.12 tools/codex-scripts/gen-capability-proof.py
 
 > 口径要点：**降级/拒绝/缺参都如实入账**；`信封 status=ok` 但本体 `ok=false` 不算通过；
 > 要票的位只有主人发票后才会转绿（`probe-with-tickets.py`），票用完即销的位不重复消费。
+
+## 七、已知未跑（逐位原因 + 机器回执，不是遮丑）
+> 本页所有数字都是"真跑过"的；下面这 6 位**没有跑通**，原因逐条列出，任何人可复跑复核。
+> 合计：**335 通过 / 1 要票 / 4 缺输入 / 1 缺依赖 / 0 高危未跑 / 0 失败 = 341**
+| 位 | 分类 | 机器回执 / 原因 ||---|---|---|| codex_interrupt | 缺输入 | {"status": "error", "kind": "codex_interrupt", "message": "turn/interrupt 失败: no active turn to interrupt"} || comfy_cloud | 缺依赖 | 云卡 status || figure_gate | 缺输入 | {"ok": false, "op": "verdict", "deliverable": false, "rounds": 0, "min_rounds": 4, "open_issues": [], "numbers": {}, "reasons": ["numbers_no || offense_ops | 缺输入 | 缺输入：need_target || one_key_deploy | 缺输入 | scan 2/3 · rehearse=None || pentest | 要票 | 目标未登记授权（需主人加入授权目标表） |
+> 复跑：py -3.12 tools/codex-scripts/gen-capability-proof.py（分桶合计≠341 直接退出）。
