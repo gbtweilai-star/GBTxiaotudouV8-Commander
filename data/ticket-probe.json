@@ -1,0 +1,212 @@
+{
+ "at": "2026-10-21T14:05:49",
+ "total": 21,
+ "counts": {
+  "ok": 11,
+  "needs_input": 9,
+  "failed": 1
+ },
+ "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_ticket_store_apsczpxf",
+ "口径": "主人已发票（window 可多次、one_shot 用掉即销）；刻意不跑 mirror_*（会碰交付区/排练区）",
+ "rows": [
+  {
+   "cap": "autopilot",
+   "payload": {
+    "goal": "列一条当前告警并给出一句建议"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 0.17
+  },
+  {
+   "cap": "think_loop",
+   "payload": {
+    "goal": "给一句今日提醒"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 0.11
+  },
+  {
+   "cap": "sec_llm",
+   "payload": {
+    "prompt": "回一个字：好",
+    "max_tokens": 64
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 1.96
+  },
+  {
+   "cap": "codex_chat",
+   "payload": {
+    "message": "只回一个字：好"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 7.64
+  },
+  {
+   "cap": "codex_interrupt",
+   "payload": {
+    "thread_id": "probe-none"
+   },
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "缺输入：turn/interrupt 需要 turnId",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "codex_turn_send",
+   "payload": {
+    "thread_id": "probe-none",
+    "text": "回一个字：好"
+   },
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "缺输入：thread_id 非法（probe-none）——要约时先 codex_thread_new",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "devour_github",
+   "payload": {
+    "repo": "https://github.com/octocat/Hello-World"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 1.49
+  },
+  {
+   "cap": "omni_web",
+   "payload": {
+    "url": "https://example.com"
+   },
+   "status": "ok",
+   "verdict": "failed",
+   "note": "仓库克隆失败: None",
+   "elapsed_s": 0.45
+  },
+  {
+   "cap": "tentacle",
+   "payload": {
+    "action": "available_actions"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "one_key_deploy",
+   "payload": {
+    "target": "probe-none-not-a-repo"
+   },
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：未声明落点（门/能力都在拒，这是设计：不许默认堆进生产）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "pipeline_rollback",
+   "payload": {
+    "name": "probe-none"
+   },
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：生产区无此产物（probe-none）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "codex_models",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "llm_chat",
+   "payload": {
+    "messages": [
+     {
+      "role": "user",
+      "content": "只回一个字：好"
+     }
+    ]
+   },
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "缺少 prompt：请给出要问其他 AI 的问题",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "mcp_call",
+   "payload": {},
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "需要 server 与 tool（参数放 arguments）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "mcp_connect",
+   "payload": {},
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "codex_thread_new",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 0.32
+  },
+  {
+   "cap": "devour_pulse",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 8.31
+  },
+  {
+   "cap": "bluetooth",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 5.47
+  },
+  {
+   "cap": "bt_control",
+   "payload": {},
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺少意图文本",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "vision",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "带票真跑通过",
+   "elapsed_s": 4.6
+  },
+  {
+   "cap": "voice",
+   "payload": {},
+   "status": "error",
+   "verdict": "needs_input",
+   "note": "缺少 text：要合成的文本",
+   "elapsed_s": 0.06
+  }
+ ]
+}

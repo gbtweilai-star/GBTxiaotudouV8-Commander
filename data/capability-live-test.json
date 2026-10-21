@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:01:56",
+ "at": "2026-10-21T14:06:13",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 286,
-  "denied": 32,
-  "needs_params": 14,
+  "ok": 297,
+  "denied": 12,
+  "needs_params": 23,
   "needs_auth": 8,
   "needs_dependency": 1,
   "failed": 0,
@@ -13,15 +13,16 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 286,
-  "needs_ticket": 32,
+  "ok": 297,
+  "needs_input": 23,
+  "needs_ticket": 12,
   "not_run_high_risk": 8,
-  "needs_input": 14,
   "needs_dependency": 1
  },
  "by_source": {
-  "monitor": 236,
-  "params": 26,
+  "monitor": 226,
+  "ticket": 20,
+  "params": 16,
   "write": 79
  },
  "sources": {
@@ -162,9 +163,9 @@
    "note": "监控账 90s 超时下真调通过（12ms）"
   },
   "autopilot": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：external_llm"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "awesome_tools_index": {
    "bucket": "ok",
@@ -192,9 +193,9 @@
    "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
   },
   "bluetooth": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "book_skill": {
    "bucket": "needs_input",
@@ -247,9 +248,9 @@
    "note": "真跑通过"
   },
   "bt_control": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺少意图文本"
   },
   "cad_distill": {
    "bucket": "ok",
@@ -337,19 +338,19 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "codex_chat": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：process_execute,external_llm"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "codex_interrupt": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：process_execute"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺输入：turn/interrupt 需要 turnId"
   },
   "codex_models": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "codex_status": {
    "bucket": "ok",
@@ -357,9 +358,9 @@
    "note": "监控账 90s 超时下真调通过（20ms）"
   },
   "codex_thread_new": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "codex_tools": {
    "bucket": "ok",
@@ -367,9 +368,9 @@
    "note": "监控账 90s 超时下真调通过（5ms）"
   },
   "codex_turn_send": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：process_execute,external_llm"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺输入：thread_id 非法（probe-none）——要约时先 codex_thread_new"
   },
   "collab_gateway": {
    "bucket": "ok",
@@ -517,14 +518,14 @@
    "note": "监控账 90s 超时下真调通过（138ms）"
   },
   "devour_github": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：data_export"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "devour_pulse": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "devour_reflect": {
    "bucket": "ok",
@@ -832,9 +833,9 @@
    "note": "监控账 90s 超时下真调通过（19ms）"
   },
   "llm_chat": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺少 prompt：请给出要问其他 AI 的问题"
   },
   "llm_redteam": {
    "bucket": "ok",
@@ -897,14 +898,14 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "mcp_call": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "需要 server 与 tool（参数放 arguments）"
   },
   "mcp_connect": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）"
   },
   "mcp_tools": {
    "bucket": "ok",
@@ -1097,9 +1098,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "one_key_deploy": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：deploy_publish,process_execute"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺输入：未声明落点（门/能力都在拒，这是设计：不许默认堆进生产）"
   },
   "one_shot": {
    "bucket": "ok",
@@ -1147,9 +1148,9 @@
    "note": "真跑通过"
   },
   "pipeline_rollback": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：deploy_publish"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺输入：生产区无此产物（probe-none）"
   },
   "pipeline_status": {
    "bucket": "ok",
@@ -1362,9 +1363,9 @@
    "note": "监控账 90s 超时下真调通过（1460ms）"
   },
   "sec_llm": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：external_llm"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "sec_scan": {
    "bucket": "ok",
@@ -1482,9 +1483,9 @@
    "note": "监控账 90s 超时下真调通过（8ms）"
   },
   "tentacle": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：desktop_control,privacy_read"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "tentacle_arm": {
    "bucket": "ok",
@@ -1547,9 +1548,9 @@
    "note": "判据工作正常：结论是 holo_pet/styles.css 未通过调色板检查（能力跑通，产物不过）"
   },
   "think_loop": {
-   "bucket": "needs_ticket",
-   "src": "params",
-   "note": "缺票：external_llm"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "tool_bay": {
    "bucket": "ok",
@@ -1637,9 +1638,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "vision": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体"
+   "bucket": "ok",
+   "src": "ticket",
+   "note": "带票真跑通过"
   },
   "vision_grounding": {
    "bucket": "ok",
@@ -1662,9 +1663,9 @@
    "note": "监控账 90s 超时下真调通过（8ms）"
   },
   "voice": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（audio_output）：让本机发声（TTS 合成/播放）或写入音频产物"
+   "bucket": "needs_input",
+   "src": "ticket",
+   "note": "缺少 text：要合成的文本"
   },
   "voice_orchestra": {
    "bucket": "ok",
