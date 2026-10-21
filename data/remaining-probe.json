@@ -347,13 +347,13 @@
   {
    "cap": "one_key_deploy",
    "payload": {
-    "target": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\.scratch\\deploy-probe",
+    "target": "deploy-probe",
     "room": "probe-room"
    },
    "status": "x",
    "verdict": "needs_input",
-   "note": "scan 2/3 · rehearse=None",
-   "elapsed_s": 2.0
+   "note": "scan 3/3 · rehearse=False",
+   "elapsed_s": 3.0
   },
   {
    "cap": "pentest",

@@ -94,6 +94,6 @@
 - [x] `voice_studio` 的 gold 与注册表统一（已完成）
 - [ ] `express_direct` 的 gold 也确认一次（语义对、措辞不同：要么补样本，要么把判据改成关键实体命中）
 - [ ] 把 74 个未覆盖位补进基准（目标：341 位全覆盖）
-- [x] 加一列**"真调得动"**：已单独成页 → [07-capability-proof.md](07-capability-proof.md)（221 位逐位真调通过）
+- [x] 加一列**"真调得动"**：已单独成页 → [07-capability-proof.md](07-capability-proof.md)（336 位逐位真跑通过）
 - [ ] 判据加"同义表述"容错（当前保守，会低估）
 

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GBT小土豆V8 · 总指挥大模型 · 开源发布页</title>
+<meta name="description" content="7.6B 中文「总指挥」模型：341 个原生能力位的路由、讲解与授权门，335 题能力基准 PASS45 330/335（98.51%–99.10% 两轮）。">
+<style>
+  :root{
+    --bg:#0b0e13; --bg-soft:#11161f; --line:#1d2530; --ink:#e8edf5; --ink-dim:#9aa7b8;
+    --potato:#e0a03a; --green:#2ea043; --blue:#4c8dff; --purple:#8957e5;
+    --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,"Courier New",monospace;
+    --sans:system-ui,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{padding:72px 0 40px;border-bottom:1px solid var(--line);
+    background:radial-gradient(900px 320px at 18% -10%,rgba(224,160,58,.14),transparent 70%)}
+  .kicker{font:600 13px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--potato)}
+  h1{font-size:clamp(30px,4.6vw,50px);line-height:1.18;margin:14px 0 10px;letter-spacing:-.01em}
+  h1 small{display:block;font-size:.42em;font-weight:500;color:var(--ink-dim);letter-spacing:0;margin-top:12px}
+  .lead{max-width:74ch;color:#c8d2e0;font-size:17px;margin:18px 0 0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0;padding:0;list-style:none}
+  .chips li{font:600 12px/1 var(--mono);color:#cfe0ff;background:#16202e;border:1px solid #24344a;
+    border-radius:999px;padding:7px 12px}
+  .mono{font-family:var(--mono)}
+  main{padding:8px 0 72px}
+  section{padding:38px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  h2{font-size:23px;margin:0 0 6px;letter-spacing:-.01em}
+  h2 .n{font:600 12px/1 var(--mono);color:var(--potato);vertical-align:2px;margin-right:10px}
+  .sub{color:var(--ink-dim);margin:0 0 22px;font-size:14.5px}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
+  .card{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .card p{margin:0;color:#b9c5d6;font-size:14px}
+  .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .d-ok{background:var(--green)} .d-mid{background:var(--potato)} .d-blue{background:var(--blue)}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--bg-soft);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  caption{caption-side:top;text-align:left;color:var(--ink-dim);font-size:13px;padding:0 0 10px}
+  th,td{padding:11px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  thead th{background:#16202c;font:600 12px/1.3 var(--mono);letter-spacing:.04em;color:#b7c6da}
+  tbody tr:last-child td{border-bottom:0}
+  td.num{font-family:var(--mono);white-space:nowrap}
+  pre{background:#0e131b;border:1px solid var(--line);border-radius:12px;padding:15px 17px;
+    overflow:auto;font:13px/1.65 var(--mono);color:#cfe0ff}
+  pre .c{color:#6f7f92}
+  .honest{background:linear-gradient(180deg,#1a1512,#12100e);border:1px solid #3a2c1c;
+    border-radius:12px;padding:18px 20px}
+  .honest h3{margin:0 0 10px;font-size:15px;color:var(--potato)}
+  .honest ul{margin:0;padding-left:20px;color:#cfc2b2;font-size:14px}
+  .honest li{margin:5px 0}
+  footer{padding:34px 0 60px;color:var(--ink-dim);font-size:13px}
+  footer p{margin:6px 0}
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px;padding:0;list-style:none}
+  .links a{display:inline-block;padding:9px 14px;border:1px solid #24344a;border-radius:9px;
+    background:#16202e;font-size:14px;font-weight:600}
+  @media (max-width:640px){header{padding:52px 0 30px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">GBTxiaotudouV8-Commander · Apache-2.0 · 开源发布页</p>
+    <h1>🥔 GBT小土豆V8 · 总指挥大模型
+      <small>把「指挥」练进权重里的 7.6B 中文模型：不只会对话，它知道该派哪根触手、那根触手怎么调、什么时候必须先要授权。</small>
+    </h1>
+    <p class="lead">
+      被问「帮我做 X」，它先判断这件事该落到哪个<strong>能力位</strong>、要什么参数、会不会写盘 / 花钱 / 出网、
+      要不要先请人发一张授权票 —— 然后才动手。它就是本仓 341 个原生能力位的“活索引 + 门卫”。
+    </p>
+    <ul class="chips">
+      <li>7.6B params</li><li>Qwen2-7B base</li><li>341 能力位 · 30 域</li>
+      <li>335 题基准 · PASS45 330/335</li><li>两轮 99.10% / 98.51%</li><li>单一门 run_task</li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2><span class="n">01</span>它到底是什么</h2>
+  <p class="sub">不是“又一个会写文章的 7B”，而是把「派活 + 报门」当成训练目标的指挥模型。</p>
+  <div class="grid">
+    <div class="card"><h3><span class="dot d-blue"></span>路由</h3>
+      <p>自然语言需求 → 落到具体能力位（kind），连域和 op 一起给。实测第二题真落到 <span class="mono">markdown_ppt</span>。</p></div>
+    <div class="card"><h3><span class="dot d-blue"></span>讲解</h3>
+      <p>341 位每一位是干什么、属于哪个域、调用要注意什么；27 个 GBT天真原生算子、1495 个契约节点全覆盖。</p></div>
+    <div class="card"><h3><span class="dot d-mid"></span>报门</h3>
+      <p>不可逆 / 花钱 / 出网的动作，先说清缺哪张票（如 <span class="mono">deploy_publish</span>），绝不自称已放行。</p></div>
+    <div class="card"><h3><span class="dot d-ok"></span>可复核</h3>
+      <p>每条结论都能指回一次真跑：评估集、能力普查、镜像排练、多域监控，全部带原始回执。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">02</span>硬读数（都是真跑出来的）</h2>
+  <p class="sub">下面每个数字都有对应文件可复核；<strong>没跑通的也照实写着</strong>，见 §05。</p>
+  <table>
+    <caption>口径：335 题能力基准 · 贪心解码 · repetition_penalty=1.15 · 逐题独立预算 · PASS45 = cov ≥ 0.45</caption>
+    <thead><tr><th>项</th><th>读数</th><th>怎么核</th></tr></thead>
+    <tbody>
+      <tr><td>评估第 1 轮</td><td class="num">0.9908 · 99.10% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
+      <tr><td>评估第 2 轮</td><td class="num">0.9873 · 98.51% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
+      <tr><td>PASS45 通过数</td><td class="num">330 / 335</td><td class="mono">data/eval-*.json</td></tr>
+      <tr><td>能力位普查</td><td class="num">336 ok / 3 needs_input / 1 needs_ticket / 1 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
+      <tr><td>一次性部署链（排练→盖章→晋升）</td><td class="num">房间 release-20261021：scan 3/3 · rehearse ok · release ok · 5.9s</td><td class="mono">docs/07 §九</td></tr>
+      <tr><td>GBt天真原生算子</td><td class="num">27 ops · 18 同名 · 1495 契约节点 · 覆盖 1.2%</td><td class="mono">docs/10-gbt-tianzhen.md</td></tr>
+      <tr><td>五维合一（脑眼耳嘴手）</td><td class="num">开步 → 能力位 → 关步，带证据闭环</td><td class="mono">docs/11-five-dim.md</td></tr>
+      <tr><td>多域监控</td><td class="num">29 域 / 236 位：221 ok · 15 denied · 回归 0</td><td class="mono">docs/12-multidomain-monitor.md</td></tr>
+      <tr><td>镜面只读排练</td><td class="num">5 步 / 0.6s / 全绿</td><td class="mono">docs/09-mirror-space.md</td></tr>
+      <tr><td>并发容量</td><td class="num">512→4096 全 ok · 中位 2.9→10.9s · ~260/s · +~50 MB</td><td class="mono">docs/08-concurrency.md</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">03</span>三个能立刻验证的亮点</h2>
+  <div class="grid">
+    <div class="card"><h3><span class="dot d-ok"></span>单一门，无法绕过</h3>
+      <p>一切能力调用只走 <span class="mono">run_task(kind, payload)</span>。授权、审计、钢印都在这一处；绕开它就没有留痕。</p></div>
+    <div class="card"><h3><span class="dot d-ok"></span>先排练，再上岗</h3>
+      <p>写生产前必须在隔离房间跑完 plan → simulate → parity → rehearse → release；跳过一步就卡住。</p></div>
+    <div class="card"><h3><span class="dot d-ok"></span>没跑通就照实写</h3>
+      <p>每份文档都有「已知未跑」小节，列出卡在哪、缺什么票、谁有权给 —— 不做假绿。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">04</span>三十秒上手</h2>
+  <p class="sub">一条命令起本地端点，再问它一个“该调哪个能力位”的问题。</p>
+<pre><span class="c"># 1) 起端点（vLLM，OpenAI 兼容；权重见 docs/05-deployment.md）</span>
+vllm serve &lt;weights-path&gt; --served-model-name gbt-v8 --max-model-len 4096
+
+<span class="c"># 2) 问一句「这件事该落到哪个能力位」</span>
+curl http://127.0.0.1:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
+  "model": "gbt-v8", "temperature": 0,
+  "messages": [{"role":"user","content":"我要把一份 Markdown 变成 PPT，该调哪个能力位？需要什么参数？"}]
+}'
+
+<span class="c"># 3) 想复核能力面，就跑普查（只读）</span>
+py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live.json</pre>
+</section>
+
+<section>
+  <h2><span class="n">05</span>诚实账：这些确实没跑通</h2>
+  <p class="sub">发布页不藏问题。下面是当前**仍然卡住**的项，以及它会卡在哪一步。</p>
+  <div class="honest">
+    <h3>已知未跑 / 已知受限（5 位，逐条给原因）</h3>
+    <ul>
+      <li><strong><code>pentest</code></strong>：测试目标未登记授权，门按设计拒绝 —— 需要人把授权目标写进表，模型无权代写。</li>
+      <li><strong><code>offense_ops</code></strong>：同一根 —— 缺授权目标（`need_target`）。</li>
+      <li><strong><code>codex_interrupt</code></strong>：同步客户端在中断指令到达前已结束回合 ⇒ 抓不到活回合。</li>
+      <li><strong><code>figure_gate</code></strong>：要 4 轮真实看图证据（记轮次会写盘）⇒ 缺 `filesystem_write` 窗口票；声明型轮次会被判
+        <span class="mono">rounds_insufficient</span>。</li>
+      <li><strong><code>comfy_cloud</code></strong>：云卡不可达（远端环境）；<em>本地 27 个原生算子不受影响，可离线真跑</em>。</li>
+      <li><strong>权重托管</strong>：15.25 GB bf16 合并权重尚未上传公共仓库（需要写权限令牌）。</li>
+    </ul>
+    <p style="margin:12px 0 0;color:#bda98e;font-size:13.5px">
+      上面每一行都能在 <a href="docs/07-capability-proof.md">docs/07 §八</a> 找到机器回执原文；
+      「要票」和「缺依赖」都记成它们本来的样子，<strong>不折算成失败、也不假装通过</strong>。
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">06</span>文档地图</h2>
+  <ul class="links">
+    <li><a href="docs/01-model-card.md">01 模型卡</a></li>
+    <li><a href="docs/02-architecture.md">02 架构</a></li>
+    <li><a href="docs/03-capabilities.md">03 341 位能力全表</a></li>
+    <li><a href="docs/04-evaluation.md">04 评估</a></li>
+    <li><a href="docs/05-deployment.md">05 部署</a></li>
+    <li><a href="docs/06-showcase.md">06 真实回执</a></li>
+    <li><a href="docs/07-capability-proof.md">07 能力普查</a></li>
+    <li><a href="docs/08-concurrency.md">08 并发</a></li>
+    <li><a href="docs/09-mirror-space.md">09 镜像多维度</a></li>
+    <li><a href="docs/10-gbt-tianzhen.md">10 GBT天真</a></li>
+    <li><a href="docs/11-five-dim.md">11 五维合一</a></li>
+    <li><a href="docs/12-multidomain-monitor.md">12 多域监控</a></li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</p>
+  <p>代码 Apache-2.0 · 权重 CC BY-NC-SA 4.0（非商用）· 见 <a href="LICENSE">LICENSE</a> / <a href="NOTICE">NOTICE</a></p>
+  <p>本页为静态发布页，无外部依赖、无第三方脚本、无统计埋点。</p>
+</footer>
+
+</body>
+</html>
