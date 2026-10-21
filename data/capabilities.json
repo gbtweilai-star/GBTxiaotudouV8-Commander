@@ -158,7 +158,7 @@
   {
    "name": "comfy_forge",
    "domain": "creation",
-   "desc": "**创作融合台**（主人令 2026-10-15「借助秋叶版的节点来融合她的创作能力」）：把秋叶版 ComfyUI 已抓下的 **962 把节点（带完整输入 schema）** 按**创作用途分族**，并说清每族饲哪些创作能力位（生图/控图预处理/视频/音频/3D/模型补丁）。读**盘上快照**（ComfyUI 本体未在跑也能用），并如实报采集时间与 mtime（快照≠现在连着）。不重造第四个控制器（已有 comfyui 全控 · comfy_native/GBT天真 · tentacle_comfy_bridge/1530）。只读、零作用域。op=families/map/find/evidence。",
+   "desc": "**创作融合台**（主人令 2026-10-15「借助秋叶版的节点来融合她的创作能力」）：把秋叶版 ComfyUI 已抓下的节点（**现读 1495 把**，带完整输入 schema；图鉴文案原写 962，以盘上快照为准）按**创作用途分族**，并说清每族饲哪些创作能力位（生图/控图预处理/视频/音频/3D/模型补丁）。读**盘上快照**（ComfyUI 本体未在跑也能用），并如实报采集时间与 mtime（快照≠现在连着）。不重造第四个控制器（已有 comfyui 全控 · comfy_native/GBT天真 · tentacle_comfy_bridge/1530）。只读、零作用域。op=families/map/find/evidence。",
    "readonly": true,
    "requires_params": false,
    "handler": "comfy_forge"
@@ -166,7 +166,7 @@
   {
    "name": "comfy_native",
    "domain": "creation",
-   "desc": "**GBT天真** —— 触手自己的 ComfyUI 能力（主人命名 2026-10-11「触手的 ComfyUI 我们取名叫 GBT天真」）。常用说法（人这么问就命得中）：**放大 / 锐化 / 高清 / 4K / 图片放大 / 传统放大 / 洗图 / 出图放大**。（触发词前置是好习惯；但**截断已不再影响路由** —— 2026-10-13 根修：图鉴把被切掉的尾巴另存 `desc_tail` 并接回打分语料，本位原来「放大」写在 300 字外命不中的那个坑已从根上堵掉。）ComfyUI 能力的**原生版**（主人令 2026-10-11「按照 ComfyUI 的节点连接个契约，同样拥有契约和触手连接，他行我们也行」）：不装重壳、不依赖 8188 外挂，把 ComfyUI 的**架构**长成自己的触手小算子 —— ① workflow.json 当契约（图就是活合同，可复跑可留证）② 节点=能力位白名单（每节点一根触手）③ 执行=拓扑序跑一遍。节点：upscale_4k（Pillow LANCZOS + USM 传统放大 · 显存 0 · 内存<300MB，8G 机样张）／copy／sha／info；图契约 {\"nodes\":[{\"id\",\"node\",\"inputs\"}],\"edges\":[{\"from\",\"to\",\"field\":\"out->image\"}]}。铁律：**闸是唯一真源**（产物不过闸 ⇒ 不许落盘）· **不编**（缺依赖回 needs_dependency）· 证据只追加（store/comfy_native/runs.jsonl）· **白名单 fail-closed**（与 ComfyUI 的\"任意 node\"相反，这是故意的）。边界如实：重生成模型（文生图／神经超分）本机 AMD 无 CUDA + 7.39G 内存 ⇒ 跑不动，**未接**。【R-H996 · 2026-10-15 主人令「就是要 ComfyUI 节点和契约做我们自己的原生能力，不要 ComfyUI 的厚重外壳」的落地】：把秋叶版已抓下的 **962 把节点 schema** 归一化成我们自己的契约，并把**传统算法面**用纯 CPU 小算子长出来 —— 现 **18 个原生算子**，其中 **13 个与 ComfyUI 同名同契约**（ImageScale/ImageCrop/ImageInvert/ImageBlur/ImageCompositeMasked/MaskToImage/ImageToMask/ImageBatch/EmptyImage/LoadImage/SaveImage/AddTextPrefix/AddTextSuffix）=> 她的 workflow.json 可以直接用 **ComfyUI 的节点名**，而**不需要** ComfyUI 在位。新增只读 op：**contract**（契约面 + 原生覆盖率 + 未接原因分类）·**validate**（用我们自己的契约离线校验任意图：未知节点/缺必填/成环）。未接如实分类：重生成与模型面 332 · 控图检测面 290 · 传统算法面 201（可原生，按需再长）· 云端 API 126。op=status/nodes/graph/gate/contract/validate（读面免门）/ run（写面过 filesystem_write）/ 单节点名直跑",
+   "desc": "**GBT天真** —— 触手自己的 ComfyUI 能力（主人命名 2026-10-11「触手的 ComfyUI 我们取名叫 GBT天真」）。常用说法（人这么问就命得中）：**放大 / 锐化 / 高清 / 4K / 图片放大 / 传统放大 / 洗图 / 出图放大**。（触发词前置是好习惯；但**截断已不再影响路由** —— 2026-10-13 根修：图鉴把被切掉的尾巴另存 `desc_tail` 并接回打分语料，本位原来「放大」写在 300 字外命不中的那个坑已从根上堵掉。）ComfyUI 能力的**原生版**（主人令 2026-10-11「按照 ComfyUI 的节点连接个契约，同样拥有契约和触手连接，他行我们也行」）：不装重壳、不依赖 8188 外挂，把 ComfyUI 的**架构**长成自己的触手小算子 —— ① workflow.json 当契约（图就是活合同，可复跑可留证）② 节点=能力位白名单（每节点一根触手）③ 执行=拓扑序跑一遍。节点：upscale_4k（Pillow LANCZOS + USM 传统放大 · 显存 0 · 内存<300MB，8G 机样张）／copy／sha／info；图契约 {\"nodes\":[{\"id\",\"node\",\"inputs\"}],\"edges\":[{\"from\",\"to\",\"field\":\"out->image\"}]}。铁律：**闸是唯一真源**（产物不过闸 ⇒ 不许落盘）· **不编**（缺依赖回 needs_dependency）· 证据只追加（store/comfy_native/runs.jsonl）· **白名单 fail-closed**（与 ComfyUI 的\"任意 node\"相反，这是故意的）。边界如实：重生成模型（文生图／神经超分）本机 AMD 无 CUDA + 7.39G 内存 ⇒ 跑不动，**未接**。【R-H996 · 2026-10-15 主人令「就是要 ComfyUI 节点和契约做我们自己的原生能力，不要 ComfyUI 的厚重外壳」的落地】：把秋叶版已抓下的节点 schema **归一化成我们自己的契约**，并把**传统算法面**用纯 CPU 小算子长出来 —— 现 **27 个原生算子**（2026-10-21 现读；图鉴文案原写 18，盘上已长到 27，以现读为准），其中 **18 个与 ComfyUI 同名同契约**（ImageScale/ImageCrop/ImageInvert/ImageBlur/ImageCompositeMasked/MaskToImage/ImageToMask/ImageBatch/EmptyImage/LoadImage/SaveImage/AddTextPrefix/AddTextSuffix 等）=> 她的 workflow.json 可以直接用 **ComfyUI 的节点名**，而**不需要** ComfyUI 在位；另有 9 个是我们自己的（ImageLevels/ImageHueSaturation/ImageTranspose/MaskBlur/upscale_4k/t2i_qwen/copy/sha/info）。新增只读 op：**contract**（契约面 + 原生覆盖率 + 未接原因分类）·**validate**（用我们自己的契约离线校验任意图：未知节点/缺必填/成环）。未接如实分类（契约面现读 1495 把）：传统算法面 809（可原生，按需再长）· 重生成/模型面 359 · 控图检测面 290 · 云端 API 19。op=status/nodes/graph/gate/contract/validate（读面免门）/ run（写面过 filesystem_write）/ 单节点名直跑",
    "readonly": true,
    "requires_params": false,
    "handler": "comfy_native"
@@ -1190,7 +1190,7 @@
   {
    "name": "warm_switch",
    "domain": "llm",
-   "desc": "**按需常驻开关**（主人 2026-10-12「可以通过隧道，你这么跳都一样」+「**触手就是最好的传输工具，比隧道还好**」）：开工挂热 / 收工放掉缩 0。口径：**心跳走本机桥（触手）**，不裸打云端 —— 走的同一条真实通路，顺带持续验链，协议差/门/审计全带上（裸隧道这些都没有）。实测口径：热时第一句 ~1 秒 / 冷时 ~300 秒；常驻期间 GPU 按秒计费 ≈$0.89/时（诚实标价，不替你决定）。op=status/cost/on/off",
+   "desc": "**按需常驻开关**（主人 2026-10-12「可以通过隧道，你这么跳都一样」+「**触手就是最好的传输工具，比隧道还好**」）：开工挂热 / 收工放掉缩 0。口径：**心跳走本机桥（触手）**，不裸打云端 —— 走的同一条真实通路，顺带持续验链，协议差/门/审计全带上（裸隧道这些都没有）。实测口径：热时第一句 ~1 秒 / 冷时 ~300 秒；常驻期间 GPU 按秒计费 ≈$0.89/时（诚实标价，不替你决定）。**2026-10-21 修**（主人令「没使用的时候绝不能消耗」）：旧版 off() 只杀本机心跳、不碰云端 worker，端点没人用仍按 $0.704/时烧（实测）。现 op=scale0 真打 `PATCH /v1/endpoints/<id>`：workersMin=0 + idleTimeout 301→5 + executionTimeoutMs 补 180000；off()=杀心跳**且**缩 0；status 增 `bleeding`（没人用还在烧）会自己喊。op=status/cost/config/scale0/on/off",
    "readonly": true,
    "requires_params": false,
    "handler": "warm_switch"
@@ -1208,7 +1208,7 @@
    "domain": "longrun",
    "desc": "长程任务层：提交任务（非LLM验收+重试+停滞升级，跨进程可续）",
    "readonly": true,
-   "requires_params": false,
+   "requires_params": true,
    "handler": "lr_submit"
   },
   {

@@ -1,0 +1,1194 @@
+{
+ "at": "2026-10-21T13:19:57",
+ "名称": "GBT天真（主人命名 2026-10-11「触手的 ComfyUI 我们取名叫 GBT天真」）",
+ "能力位": "comfy_native",
+ "域": "creation",
+ "status": {
+  "kind": "comfy_native",
+  "payload": {
+   "op": "status"
+  },
+  "denied": false,
+  "envelope": "ok",
+  "missing_scopes": null,
+  "reason": null,
+  "result": {
+   "ok": true,
+   "capability": "comfy_native",
+   "in_position": true,
+   "why": "本机 AMD 无 CUDA + 总内存 7.39 GB ⇒ ComfyUI 本体跑不动重模型；按其架构用轻量小算子自食其力（不装重壳、不下权重、不起 8188）",
+   "deps": {
+    "PIL": "12.3.0",
+    "kornia": "0.8.2",
+    "numpy": "2.4.6",
+    "torch": "2.14.1+cpu"
+   },
+   "nodes": [
+    "AddTextPrefix",
+    "AddTextSuffix",
+    "EmptyImage",
+    "ImageBatch",
+    "ImageBatchMulti",
+    "ImageBlend",
+    "ImageBlur",
+    "ImageCompositeMasked",
+    "ImageCrop",
+    "ImageHueSaturation",
+    "ImageInvert",
+    "ImageLevels",
+    "ImagePadForOutpaint",
+    "ImageRotate",
+    "ImageScale",
+    "ImageToMask",
+    "ImageTranspose",
+    "LoadImage",
+    "MaskBlur",
+    "MaskComposite",
+    "MaskToImage",
+    "SaveImage",
+    "copy",
+    "info",
+    "sha",
+    "t2i_qwen",
+    "upscale_4k"
+   ],
+   "read_ops": [
+    "status",
+    "nodes",
+    "graph",
+    "gate",
+    "contract",
+    "validate"
+   ],
+   "write_ops": [
+    "run"
+   ],
+   "able": [
+    "传统算法图算子（放大/裁剪/拼贴/格式转换/校验/哈希/锐化）—— 纯 CPU，内存 <300 MB"
+   ],
+   "unable": [
+    "任何重生成模型（文生图/图生图/神经超分）—— 要 GPU 或 ≥16 GB 内存"
+   ],
+   "honest": "神经超分（spandrel 那些权重）**未接**：要权重 + 内存，本机没有",
+   "runs_file": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\runs.jsonl"
+  },
+  "elapsed_s": 5.24
+ },
+ "contract": {
+  "ok": true,
+  "op": "contract",
+  "source": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\state\\comfyui_object_info.json",
+  "contract_nodes": 1495,
+  "native_nodes": [
+   "AddTextPrefix",
+   "AddTextSuffix",
+   "EmptyImage",
+   "ImageBatch",
+   "ImageBatchMulti",
+   "ImageBlend",
+   "ImageBlur",
+   "ImageCompositeMasked",
+   "ImageCrop",
+   "ImageHueSaturation",
+   "ImageInvert",
+   "ImageLevels",
+   "ImagePadForOutpaint",
+   "ImageRotate",
+   "ImageScale",
+   "ImageToMask",
+   "ImageTranspose",
+   "LoadImage",
+   "MaskBlur",
+   "MaskComposite",
+   "MaskToImage",
+   "SaveImage",
+   "copy",
+   "info",
+   "sha",
+   "t2i_qwen",
+   "upscale_4k"
+  ],
+  "native_also_in_contract": [
+   "AddTextPrefix",
+   "AddTextSuffix",
+   "EmptyImage",
+   "ImageBatch",
+   "ImageBatchMulti",
+   "ImageBlend",
+   "ImageBlur",
+   "ImageCompositeMasked",
+   "ImageCrop",
+   "ImageInvert",
+   "ImagePadForOutpaint",
+   "ImageRotate",
+   "ImageScale",
+   "ImageToMask",
+   "LoadImage",
+   "MaskComposite",
+   "MaskToImage",
+   "SaveImage"
+  ],
+  "native_only": [
+   "ImageHueSaturation",
+   "ImageLevels",
+   "ImageTranspose",
+   "MaskBlur",
+   "copy",
+   "info",
+   "sha",
+   "t2i_qwen",
+   "upscale_4k"
+  ],
+  "native_coverage_pct": 1.2,
+  "contract_only": 1477,
+  "not_native_by_reason": {
+   "传统算法面：**可原生**（未接的按需再长）": {
+    "count": 809,
+    "sample": [
+     "ADE_AnimateDiffKeyframe",
+     "ADE_AnimateDiffLoRALoader",
+     "ADE_AnimateDiffSamplingSettings",
+     "ADE_AnimateDiffUniformContextOptions",
+     "ADE_BatchedContextOptions",
+     "ADE_ContextExtras_ContextRef",
+     "ADE_ContextExtras_ContextRef_Keyframe",
+     "ADE_ContextExtras_ContextRef_KeyframeFromList"
+    ]
+   },
+   "重生成/模型面：要权重与 GPU（本机无 CUDA、内存 7.39GB）": {
+    "count": 359,
+    "sample": [
+     "ADE_AttachLoraHookToCLIP",
+     "ADE_AttachLoraHookToConditioning",
+     "ADE_CombineLoraHooks",
+     "ADE_CombineLoraHooksEight",
+     "ADE_CombineLoraHooksFour",
+     "ADE_ConditioningSetMask",
+     "ADE_LoraHookKeyframe",
+     "ADE_LoraHookKeyframeFromStrengthList"
+    ]
+   },
+   "控图/检测面：部分可原生（已接预处理），其余需权重": {
+    "count": 290,
+    "sample": [
+     "AIO_Preprocessor",
+     "AddMask",
+     "AnimalPosePreprocessor",
+     "AnimeFace_SemSegPreprocessor",
+     "AnimeLineArtPreprocessor",
+     "AnyLineArtPreprocessor_aux",
+     "AnyPipeToBasic",
+     "BAE-NormalMapPreprocessor"
+    ]
+   },
+   "云端 API 节点：要出网与凭据": {
+    "count": 19,
+    "sample": [
+     "AceStepAudioCodes",
+     "AceStepSettings",
+     "AceStepShowText",
+     "AceStepText2MusicGenParams",
+     "AceStepText2MusicServer",
+     "ByteDanceImageEditNode",
+     "IdeogramV1",
+     "IdeogramV2"
+    ]
+   }
+  },
+  "口径": "契约用它的（socket 名与类型），算子用我们的（纯 CPU）；「原生未接」不算失败，只不许假装能跑"
+ },
+ "nodes_count": 27,
+ "nodes": [
+  {
+   "node": "AddTextPrefix",
+   "in": [
+    "text",
+    "prefix"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "文本前缀（纯函数）"
+  },
+  {
+   "node": "AddTextSuffix",
+   "in": [
+    "text",
+    "suffix"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "文本后缀（纯函数）"
+  },
+  {
+   "node": "EmptyImage",
+   "in": [
+    "out",
+    "width?",
+    "height?",
+    "color?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "空画布"
+  },
+  {
+   "node": "ImageBatch",
+   "in": [
+    "image1",
+    "image2",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "上下拼接"
+  },
+  {
+   "node": "ImageBatchMulti",
+   "in": [
+    "out",
+    "image1",
+    "image2",
+    "image3?",
+    "image4?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "多张上下拼"
+  },
+  {
+   "node": "ImageBlend",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "blend_factor?",
+    "blend_mode?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "混合（normal/multiply/screen/add/subtract/difference）"
+  },
+  {
+   "node": "ImageBlur",
+   "in": [
+    "image",
+    "out",
+    "radius?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "高斯模糊"
+  },
+  {
+   "node": "ImageCompositeMasked",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "x?",
+    "y?",
+    "mask?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "带遮罩合成"
+  },
+  {
+   "node": "ImageCrop",
+   "in": [
+    "image",
+    "x",
+    "y",
+    "width",
+    "height",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "裁切"
+  },
+  {
+   "node": "ImageHueSaturation",
+   "in": [
+    "image",
+    "out",
+    "hue?",
+    "saturation?",
+    "value?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "色相/饱和度/明度"
+  },
+  {
+   "node": "ImageInvert",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "反相（保留 alpha）"
+  },
+  {
+   "node": "ImageLevels",
+   "in": [
+    "image",
+    "out",
+    "black?",
+    "white?",
+    "gamma?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "色阶（black/white/gamma）"
+  },
+  {
+   "node": "ImagePadForOutpaint",
+   "in": [
+    "image",
+    "out",
+    "left?",
+    "top?",
+    "right?",
+    "bottom?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "朩边（外绘预备）"
+  },
+  {
+   "node": "ImageRotate",
+   "in": [
+    "image",
+    "out",
+    "angle?",
+    "expand?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "旋转"
+  },
+  {
+   "node": "ImageScale",
+   "in": [
+    "image",
+    "width",
+    "height",
+    "out",
+    "upscale_method?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "所放（Pillow）：与 ComfyUI 同名同契约，纯 CPU"
+  },
+  {
+   "node": "ImageToMask",
+   "in": [
+    "image",
+    "out",
+    "channel?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "图→遮罩（单通道）"
+  },
+  {
+   "node": "ImageTranspose",
+   "in": [
+    "image",
+    "out",
+    "transpose?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "翻转/旋转 90°系"
+  },
+  {
+   "node": "LoadImage",
+   "in": [
+    "image",
+    "path?"
+   ],
+   "out": [
+    "IMAGE",
+    "MASK"
+   ],
+   "writes": false,
+   "desc": "读图（只读，回尺寸与哈希；image 与 path 两个名都认）"
+  },
+  {
+   "node": "MaskBlur",
+   "in": [
+    "mask",
+    "out",
+    "radius?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "遮罩模糊"
+  },
+  {
+   "node": "MaskComposite",
+   "in": [
+    "mask1",
+    "mask2",
+    "out",
+    "x?",
+    "y?",
+    "operation?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "遮罩运算"
+  },
+  {
+   "node": "MaskToImage",
+   "in": [
+    "mask",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "遮罩→图"
+  },
+  {
+   "node": "SaveImage",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "写盘（过闸才认账）"
+  },
+  {
+   "node": "copy",
+   "in": [
+    "src",
+    "out"
+   ],
+   "out": [
+    "out"
+   ],
+   "writes": true,
+   "desc": "原样落盘（图里做物化）"
+  },
+  {
+   "node": "info",
+   "in": [
+    "image"
+   ],
+   "out": [
+    "width",
+    "height"
+   ],
+   "writes": false,
+   "desc": "读图元信息（只读）"
+  },
+  {
+   "node": "sha",
+   "in": [
+    "path"
+   ],
+   "out": [
+    "sha256"
+   ],
+   "writes": false,
+   "desc": "算产物哈希（钉进证据链）"
+  },
+  {
+   "node": "t2i_qwen",
+   "in": [
+    "prompt",
+    "out",
+    "steps?",
+    "size?"
+   ],
+   "out": [
+    "out"
+   ],
+   "writes": true,
+   "desc": "文生图（Qwen-Image-2.1-Turbo · 8 步计划 · 同源 Qwen · 开放权重）—— 本机无 CUDA ⇒ 返 needs_dependency；要云"
+  },
+  {
+   "node": "upscale_4k",
+   "in": [
+    "image",
+    "out",
+    "size?",
+    "resample?",
+    "sharpen?",
+    "usm_radius?",
+    "usm_threshold?"
+   ],
+   "out": [
+    "out"
+   ],
+   "writes": true,
+   "desc": "传统算法放大（Pillow LANCZOS + USM）—— 8G 机样张，无 AI 模型"
+  }
+ ],
+ "validate_ok": {
+  "workflow": {
+   "nodes": [
+    {
+     "id": "n1",
+     "node": "LoadImage",
+     "inputs": {
+      "image": "holo_pet/assets/digital-human/standard/reference-front.jpg"
+     }
+    },
+    {
+     "id": "n2",
+     "node": "ImageScale",
+     "inputs": {
+      "width": 512,
+      "height": 512,
+      "upscale_method": "lanczos"
+     }
+    },
+    {
+     "id": "n3",
+     "node": "SaveImage",
+     "inputs": {
+      "filename_prefix": "state/comfy_native_livecheck/out"
+     }
+    }
+   ],
+   "edges": [
+    {
+     "from": "n1",
+     "to": "n2",
+     "field": "image->image"
+    },
+    {
+     "from": "n2",
+     "to": "n3",
+     "field": "image->image"
+    }
+   ]
+  },
+  "kind": "comfy_native",
+  "payload": {
+   "op": "validate",
+   "workflow": {
+    "nodes": [
+     {
+      "id": "n1",
+      "node": "LoadImage",
+      "inputs": {
+       "image": "holo_pet/assets/digital-human/standard/reference-front.jpg"
+      }
+     },
+     {
+      "id": "n2",
+      "node": "ImageScale",
+      "inputs": {
+       "width": 512,
+       "height": 512,
+       "upscale_method": "lanczos"
+      }
+     },
+     {
+      "id": "n3",
+      "node": "SaveImage",
+      "inputs": {
+       "filename_prefix": "state/comfy_native_livecheck/out"
+      }
+     }
+    ],
+    "edges": [
+     {
+      "from": "n1",
+      "to": "n2",
+      "field": "image->image"
+     },
+     {
+      "from": "n2",
+      "to": "n3",
+      "field": "image->image"
+     }
+    ]
+   }
+  },
+  "denied": false,
+  "envelope": "ok",
+  "missing_scopes": null,
+  "reason": null,
+  "result": {
+   "ok": true,
+   "op": "validate",
+   "nodes": 3,
+   "edges": 2,
+   "errors": [],
+   "warnings": [],
+   "native_used": [
+    "ImageScale",
+    "LoadImage",
+    "SaveImage"
+   ],
+   "contract_only_used": [],
+   "unknown_nodes": [],
+   "verdict": "可跑（全在原生表内）"
+  },
+  "elapsed_s": 0.02
+ },
+ "validate_bad": {
+  "workflow": {
+   "nodes": [
+    {
+     "id": "n1",
+     "node": "LoadImage",
+     "inputs": {}
+    },
+    {
+     "id": "n2",
+     "node": "ImageFantasy",
+     "inputs": {}
+    },
+    {
+     "id": "n3",
+     "node": "ImageScale",
+     "inputs": {
+      "width": 512
+     }
+    }
+   ],
+   "edges": [
+    {
+     "from": "n1",
+     "to": "n2",
+     "field": "image->image"
+    },
+    {
+     "from": "n2",
+     "to": "n1",
+     "field": "image->image"
+    }
+   ]
+  },
+  "kind": "comfy_native",
+  "payload": {
+   "op": "validate",
+   "workflow": {
+    "nodes": [
+     {
+      "id": "n1",
+      "node": "LoadImage",
+      "inputs": {}
+     },
+     {
+      "id": "n2",
+      "node": "ImageFantasy",
+      "inputs": {}
+     },
+     {
+      "id": "n3",
+      "node": "ImageScale",
+      "inputs": {
+       "width": 512
+      }
+     }
+    ],
+    "edges": [
+     {
+      "from": "n1",
+      "to": "n2",
+      "field": "image->image"
+     },
+     {
+      "from": "n2",
+      "to": "n1",
+      "field": "image->image"
+     }
+    ]
+   }
+  },
+  "denied": false,
+  "envelope": "ok",
+  "missing_scopes": null,
+  "reason": null,
+  "result": {
+   "ok": false,
+   "op": "validate",
+   "nodes": 3,
+   "edges": 2,
+   "errors": [
+    "未知节点（既不在原生表也不在契约）：ImageFantasy",
+    "n3(ImageScale) 缺必填输入：['height', 'image']",
+    "图成环（拓扑排不出来）"
+   ],
+   "warnings": [],
+   "native_used": [
+    "ImageScale",
+    "LoadImage"
+   ],
+   "contract_only_used": [],
+   "unknown_nodes": [
+    "ImageFantasy"
+   ],
+   "verdict": "有错"
+  },
+  "elapsed_s": 0.0
+ },
+ "run_ok": {
+  "workflow": {
+   "nodes": [
+    {
+     "id": "n1",
+     "node": "LoadImage",
+     "inputs": {
+      "image": "holo_pet/assets/digital-human/standard/reference-front.jpg"
+     },
+     "_out": {
+      "ok": true,
+      "image": "holo_pet/assets/digital-human/standard/reference-front.jpg",
+      "width": 736,
+      "height": 1248,
+      "mode": "RGB",
+      "sha256": "1f2635ede2b044dfc4388e548d699e1cfefc72f682566647fde92ae6e67a4c84"
+     }
+    },
+    {
+     "id": "n2",
+     "node": "ImageScale",
+     "inputs": {
+      "width": 256,
+      "height": 256,
+      "upscale_method": "lanczos"
+     },
+     "_out": {
+      "ok": true,
+      "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+      "width": 256,
+      "height": 256,
+      "method": "lanczos"
+     }
+    },
+    {
+     "id": "n3",
+     "node": "SaveImage",
+     "inputs": {
+      "filename_prefix": ".scratch/comfy-live-check/out"
+     },
+     "_out": {
+      "ok": true,
+      "out": ".scratch\\comfy-live-check\\out.png",
+      "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+     }
+    }
+   ],
+   "edges": [
+    {
+     "from": "n1",
+     "to": "n2",
+     "field": "image->image"
+    },
+    {
+     "from": "n2",
+     "to": "n3",
+     "field": "image->image"
+    }
+   ]
+  },
+  "kind": "comfy_native",
+  "payload": {
+   "op": "run",
+   "workflow": {
+    "nodes": [
+     {
+      "id": "n1",
+      "node": "LoadImage",
+      "inputs": {
+       "image": "holo_pet/assets/digital-human/standard/reference-front.jpg"
+      },
+      "_out": {
+       "ok": true,
+       "image": "holo_pet/assets/digital-human/standard/reference-front.jpg",
+       "width": 736,
+       "height": 1248,
+       "mode": "RGB",
+       "sha256": "1f2635ede2b044dfc4388e548d699e1cfefc72f682566647fde92ae6e67a4c84"
+      }
+     },
+     {
+      "id": "n2",
+      "node": "ImageScale",
+      "inputs": {
+       "width": 256,
+       "height": 256,
+       "upscale_method": "lanczos"
+      },
+      "_out": {
+       "ok": true,
+       "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+       "width": 256,
+       "height": 256,
+       "method": "lanczos"
+      }
+     },
+     {
+      "id": "n3",
+      "node": "SaveImage",
+      "inputs": {
+       "filename_prefix": ".scratch/comfy-live-check/out"
+      },
+      "_out": {
+       "ok": true,
+       "out": ".scratch\\comfy-live-check\\out.png",
+       "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+      }
+     }
+    ],
+    "edges": [
+     {
+      "from": "n1",
+      "to": "n2",
+      "field": "image->image"
+     },
+     {
+      "from": "n2",
+      "to": "n3",
+      "field": "image->image"
+     }
+    ]
+   }
+  },
+  "denied": false,
+  "envelope": "ok",
+  "missing_scopes": null,
+  "reason": null,
+  "result": {
+   "ok": true,
+   "products": [
+    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+    ".scratch\\comfy-live-check\\out.png"
+   ],
+   "trace": [
+    {
+     "id": "n1",
+     "node": "LoadImage",
+     "ok": true,
+     "ms": 56.9,
+     "out": {
+      "ok": true,
+      "image": "holo_pet/assets/digital-human/standard/reference-front.jpg",
+      "width": 736,
+      "height": 1248,
+      "mode": "RGB",
+      "sha256": "1f2635ede2b044dfc4388e548d699e1cfefc72f682566647fde92ae6e67a4c84"
+     }
+    },
+    {
+     "id": "n2",
+     "node": "ImageScale",
+     "ok": true,
+     "ms": 37.8,
+     "out": {
+      "ok": true,
+      "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+      "width": 256,
+      "height": 256,
+      "method": "lanczos"
+     },
+     "gate": {
+      "pass": true,
+      "problems": [],
+      "info": {
+       "path": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+       "exists": true,
+       "bytes": 73991,
+       "width": 256,
+       "height": 256,
+       "mode": "RGBA",
+       "format": "PNG",
+       "sha256": "3a6fb8cede62a1ff"
+      }
+     }
+    },
+    {
+     "id": "n3",
+     "node": "SaveImage",
+     "ok": true,
+     "ms": 0.0,
+     "out": {
+      "ok": true,
+      "out": ".scratch\\comfy-live-check\\out.png",
+      "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+     },
+     "gate": {
+      "pass": true,
+      "problems": [],
+      "info": {
+       "path": ".scratch\\comfy-live-check\\out.png",
+       "exists": true,
+       "bytes": 73991,
+       "width": 256,
+       "height": 256,
+       "mode": "RGBA",
+       "format": "PNG",
+       "sha256": "3a6fb8cede62a1ff"
+      }
+     }
+    }
+   ],
+   "seconds": 0.1,
+   "note": "证据已追加到 store/comfy_native/runs.jsonl"
+  },
+  "elapsed_s": 0.13
+ },
+ "run_bad": {
+  "workflow": {
+   "nodes": [
+    {
+     "id": "n1",
+     "node": "LoadImage",
+     "inputs": {}
+    },
+    {
+     "id": "n2",
+     "node": "ImageFantasy",
+     "inputs": {}
+    },
+    {
+     "id": "n3",
+     "node": "ImageScale",
+     "inputs": {
+      "width": 512
+     }
+    }
+   ],
+   "edges": [
+    {
+     "from": "n1",
+     "to": "n2",
+     "field": "image->image"
+    },
+    {
+     "from": "n2",
+     "to": "n1",
+     "field": "image->image"
+    }
+   ]
+  },
+  "kind": "comfy_native",
+  "payload": {
+   "op": "run",
+   "workflow": {
+    "nodes": [
+     {
+      "id": "n1",
+      "node": "LoadImage",
+      "inputs": {}
+     },
+     {
+      "id": "n2",
+      "node": "ImageFantasy",
+      "inputs": {}
+     },
+     {
+      "id": "n3",
+      "node": "ImageScale",
+      "inputs": {
+       "width": 512
+      }
+     }
+    ],
+    "edges": [
+     {
+      "from": "n1",
+      "to": "n2",
+      "field": "image->image"
+     },
+     {
+      "from": "n2",
+      "to": "n1",
+      "field": "image->image"
+     }
+    ]
+   }
+  },
+  "denied": false,
+  "envelope": "ok",
+  "missing_scopes": null,
+  "reason": null,
+  "result": {
+   "ok": false,
+   "error": "user_error: 白名单里没有这些节点：['ImageFantasy']",
+   "known": [
+    "AddTextPrefix",
+    "AddTextSuffix",
+    "EmptyImage",
+    "ImageBatch",
+    "ImageBatchMulti",
+    "ImageBlend",
+    "ImageBlur",
+    "ImageCompositeMasked",
+    "ImageCrop",
+    "ImageHueSaturation",
+    "ImageInvert",
+    "ImageLevels",
+    "ImagePadForOutpaint",
+    "ImageRotate",
+    "ImageScale",
+    "ImageToMask",
+    "ImageTranspose",
+    "LoadImage",
+    "MaskBlur",
+    "MaskComposite",
+    "MaskToImage",
+    "SaveImage",
+    "copy",
+    "info",
+    "sha",
+    "t2i_qwen",
+    "upscale_4k"
+   ]
+  },
+  "elapsed_s": 0.0
+ },
+ "写面门规约": "op=run 走同一道 run_task 门；按主人 2026-10-19 令，filesystem_write 已不再要票（auth_gate.ENFORCED_SCOPES 只留浏览器/桌面/设备/内网/隐私/进程/远端/发声/数据外发/外部大模型/生产发布/强制放行）⇒ 写面会真写盘，落点由 out/filename_prefix 决定，缺省落 store/comfy_native，并落审计与 runs.jsonl",
+ "runs_total": 122,
+ "runs_last": [
+  {
+   "at": "2026-10-18T06:53:38",
+   "nodes": 3,
+   "seconds": 8.97,
+   "products": [
+    "holo_pet\\assets\\digital-human\\standard\\tex\\_w\\4k.png",
+    "holo_pet/assets/digital-human/standard/tex/HERO-4096.png"
+   ],
+   "trace": [
+    {
+     "node": "LoadImage",
+     "ok": true,
+     "ms": 27.1,
+     "gate_pass": null,
+     "sha16": null
+    },
+    {
+     "node": "upscale_4k",
+     "ok": true,
+     "ms": 7958.3,
+     "gate_pass": true,
+     "sha16": "9ff91cefa4468fb5"
+    },
+    {
+     "node": "SaveImage",
+     "ok": true,
+     "ms": 19.5,
+     "gate_pass": true,
+     "sha16": "9ff91cefa4468fb5"
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21T13:18:26",
+   "nodes": 3,
+   "seconds": 0.1,
+   "products": [
+    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_506565.png",
+    ".scratch\\comfy-live-check\\out.png"
+   ],
+   "trace": [
+    {
+     "node": "LoadImage",
+     "ok": true,
+     "ms": 48.3,
+     "gate_pass": null,
+     "sha16": null
+    },
+    {
+     "node": "ImageScale",
+     "ok": true,
+     "ms": 37.5,
+     "gate_pass": true,
+     "sha16": "3a6fb8cede62a1ff"
+    },
+    {
+     "node": "SaveImage",
+     "ok": true,
+     "ms": 3.4,
+     "gate_pass": true,
+     "sha16": "3a6fb8cede62a1ff"
+    }
+   ]
+  },
+  {
+   "at": "2026-10-21T13:19:57",
+   "nodes": 3,
+   "seconds": 0.1,
+   "products": [
+    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+    ".scratch\\comfy-live-check\\out.png"
+   ],
+   "trace": [
+    {
+     "node": "LoadImage",
+     "ok": true,
+     "ms": 56.9,
+     "gate_pass": null,
+     "sha16": null
+    },
+    {
+     "node": "ImageScale",
+     "ok": true,
+     "ms": 37.8,
+     "gate_pass": true,
+     "sha16": "3a6fb8cede62a1ff"
+    },
+    {
+     "node": "SaveImage",
+     "ok": true,
+     "ms": 0.0,
+     "gate_pass": true,
+     "sha16": "3a6fb8cede62a1ff"
+    }
+   ]
+  }
+ ],
+ "口径": "只读面真跑；写面（op=run）真跑一次小图并把产物 sha256 记账；坏图跑一次证明 fail-closed；runs_last 是盘上既有生产流水（含 4K 放大）"
+}
