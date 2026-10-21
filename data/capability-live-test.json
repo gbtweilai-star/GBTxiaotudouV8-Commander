@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:39:07",
+ "at": "2026-10-21T14:42:24",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 332,
-  "denied": 3,
-  "needs_params": 3,
+  "ok": 333,
+  "denied": 1,
+  "needs_params": 4,
   "needs_auth": 0,
   "needs_dependency": 3,
   "failed": 0,
@@ -13,10 +13,10 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 332,
-  "needs_input": 3,
-  "needs_ticket": 3,
-  "needs_dependency": 3
+  "ok": 333,
+  "needs_input": 4,
+  "needs_dependency": 3,
+  "needs_ticket": 1
  },
  "by_source": {
   "monitor": 216,
@@ -1098,9 +1098,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "one_key_deploy": {
-   "bucket": "needs_ticket",
+   "bucket": "needs_input",
    "src": "remaining",
-   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe\", \"target\": \"C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8\\\\outputs\\\\open-source-release\\\\docs\","
   },
   "one_shot": {
    "bucket": "ok",
@@ -1148,9 +1148,9 @@
    "note": "真跑通过"
   },
   "pipeline_rollback": {
-   "bucket": "needs_ticket",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "note": "真跑通过：生产产物回滚成功"
   },
   "pipeline_status": {
    "bucket": "ok",
