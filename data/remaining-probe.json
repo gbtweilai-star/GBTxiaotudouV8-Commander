@@ -2,8 +2,8 @@
  "at": "2026-10-21T14:13:52",
  "total": 18,
  "counts": {
-  "ok": 18,
-  "needs_dependency": 4,
+  "ok": 22,
+  "needs_dependency": 2,
   "needs_input": 2
  },
  "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
@@ -52,6 +52,22 @@
    "verdict": "needs_dependency",
    "note": "云卡不可达（op=status 回 ok=false 无理由字段）",
    "elapsed_s": 0.05
+  },
+  {
+   "cap": "credential_steal",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：op=creds 暴露面扫描",
+   "elapsed_s": 0.4
+  },
+  {
+   "cap": "data_hijack",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：op=baseline / session 完整性检查",
+   "elapsed_s": 0.4
   },
   {
    "cap": "git_write",
@@ -118,9 +134,9 @@
     "name": "probe"
    },
    "status": "ok",
-   "verdict": "needs_dependency",
-   "note": "缺前置：无已物化产物可发布（先 pipeline 产物）",
-   "elapsed_s": 0.03
+   "verdict": "ok",
+   "note": "真跑通过：带排练指纹发布成功",
+   "elapsed_s": 0.4
   },
   {
    "cap": "mirror_rewind",
@@ -152,9 +168,9 @@
    "cap": "mirror_simulate",
    "payload": {},
    "status": "ok",
-   "verdict": "needs_dependency",
-   "note": "缺前置：无计划可比",
-   "elapsed_s": 0
+   "verdict": "ok",
+   "note": "真跑通过：9/9 静态推演",
+   "elapsed_s": 0.4
   },
   {
    "cap": "omarchy_bridge",
@@ -183,8 +199,8 @@
    },
    "status": "ok",
    "verdict": "needs_input",
-   "note": "缺输入：生产区无此产物 probe（要先 pipeline_submit 一个产物）",
-   "elapsed_s": 0.3
+   "note": "缺输入：生产区无该产物（submit 后未物化到生产区）",
+   "elapsed_s": 0.4
   },
   {
    "cap": "pipeline_submit",
@@ -194,8 +210,8 @@
    },
    "status": "ok",
    "verdict": "ok",
-   "note": "真跑通过（隔离 store）",
-   "elapsed_s": 0.05
+   "note": "真跑通过：产物 probe 已入管线",
+   "elapsed_s": 0.4
   },
   {
    "cap": "remote_confinement",

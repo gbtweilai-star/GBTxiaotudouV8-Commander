@@ -1,29 +1,28 @@
 {
- "at": "2026-10-21T14:17:21",
+ "at": "2026-10-21T14:20:58",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 310,
-  "denied": 2,
+  "ok": 314,
+  "denied": 0,
   "needs_params": 24,
   "needs_auth": 0,
-  "needs_dependency": 5,
+  "needs_dependency": 3,
   "failed": 0,
   "timeout": 0,
   "exception": 0
  },
  "buckets": {
-  "ok": 310,
+  "ok": 314,
   "needs_input": 24,
-  "needs_dependency": 5,
-  "needs_ticket": 2
+  "needs_dependency": 3
  },
  "by_source": {
   "monitor": 216,
   "ticket": 19,
   "params": 16,
-  "remaining": 24,
-  "write": 66
+  "remaining": 26,
+  "write": 64
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -448,9 +447,9 @@
    "note": "监控账 90s 超时下真调通过（6ms）"
   },
   "credential_steal": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：privacy_read"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：op=creds 暴露面扫描"
   },
   "cross_scan": {
    "bucket": "ok",
@@ -458,9 +457,9 @@
    "note": "监控账 90s 超时下真调通过（51508ms）"
   },
   "data_hijack": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：privacy_read"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：op=baseline / session 完整性检查"
   },
   "datakit": {
    "bucket": "ok",
@@ -978,9 +977,9 @@
    "note": "真跑通过：排练报告已生成（plan_sha 绑定）"
   },
   "mirror_release": {
-   "bucket": "needs_dependency",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "缺前置：无已物化产物可发布（先 pipeline 产物）"
+   "note": "真跑通过：带排练指纹发布成功"
   },
   "mirror_rewind": {
    "bucket": "ok",
@@ -998,9 +997,9 @@
    "note": "成形成功"
   },
   "mirror_simulate": {
-   "bucket": "needs_dependency",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "缺前置：无计划可比"
+   "note": "真跑通过：9/9 静态推演"
   },
   "mirror_status": {
    "bucket": "ok",
@@ -1150,7 +1149,7 @@
   "pipeline_rollback": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "缺输入：生产区无此产物 probe（要先 pipeline_submit 一个产物）"
+   "note": "缺输入：生产区无该产物（submit 后未物化到生产区）"
   },
   "pipeline_status": {
    "bucket": "ok",
@@ -1160,7 +1159,7 @@
   "pipeline_submit": {
    "bucket": "ok",
    "src": "remaining",
-   "note": "真跑通过（隔离 store）"
+   "note": "真跑通过：产物 probe 已入管线"
   },
   "pipeline_versions": {
    "bucket": "ok",
