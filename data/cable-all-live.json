@@ -68,5 +68,23 @@
   "gflops": 321.1,
   "artifacts": 0,
   "note": "裸算力：零模型、零出网、无产物文件（只出读数）"
+ },
+ "our_model": {
+  "ok": true,
+  "cable": "我们的模型（云端算力·不需要云卡）",
+  "socket": "agnes-2.5-flash",
+  "endpoint": "https://apihub.agnes-ai.com/v1/chat/completions",
+  "http": 200,
+  "elapsed_s": 2.0,
+  "key_slot": "vault:agnes",
+  "text": "\n\n我不确定这个术语的具体定义，能否提供更多上下文？",
+  "chars": 26,
+  "usage": {
+   "prompt": 295,
+   "completion": 160,
+   "total": 455
+  },
+  "artifacts": 0,
+  "note": "无产物文件（产物是文本回执）；用时 2.0s · 455 tokens"
  }
 }
