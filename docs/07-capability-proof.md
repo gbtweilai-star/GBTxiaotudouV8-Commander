@@ -161,6 +161,10 @@ stage ok · plan ok(auto) · scan 3/3 · rehearse ok(acceptance=py-syntax-sweep 
 | 3 | 「app-server 不推通知」 | **也没说全**：通知只是稀疏（0.28s 内一条 `mcpServer/startupStatus/updated`），但 turnId 根本不用通知拿 | ✅ 判断已纠正 |
 | 真因 | — | `interrupt` 请求在服务端**排了 19.3 秒**才被处理，那时回合已经跑完 ⇒ **上游是单 stdio 串行处理，回合期间不读新请求** | ⛔ 上游限制，不是我们的代码能改 |
 
+**票齐后复测（2026-10-21 15:52，主人刚发齐 `process_execute` + `external_llm`）**：
+`thread_new` ✓ · `turn_send` ✓（**0.15s** 拿到 turnId）· `interrupt` 仍 `no active turn to interrupt`。
+⇒ **门已经放行了，卡的是上游**：不是缺票，也不是我们没接线。回执见 `data/codex-interrupt-live.json`。
+
 所以这一位是「**上游不支持并发打断**」，不是「我们没实现」也不是「缺票」。
 真要让它在我们的口径里转绿，得等 app-server 支持并发请求（或换一条能并发写第二连接的传输），
 在那之前它就该如实挂在 `needs_input` —— 我不会为了好看去把它改成 ok。
