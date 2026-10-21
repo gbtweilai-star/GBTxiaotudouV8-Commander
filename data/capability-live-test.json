@@ -1,5 +1,5 @@
 {
- "at": "2026-10-21T14:34:40",
+ "at": "2026-10-21T14:36:19",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
@@ -20,10 +20,10 @@
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 48,
+  "remaining": 49,
   "ticket": 10,
   "params": 16,
-  "write": 51
+  "write": 50
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -345,7 +345,7 @@
   "codex_interrupt": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "turn/interrupt 失败: no active turn to interrupt"
+   "note": "turn/interrupt 失败: Invalid request: missing field `turnId`"
   },
   "codex_models": {
    "bucket": "ok",
@@ -370,7 +370,7 @@
   "codex_turn_send": {
    "bucket": "ok",
    "src": "remaining",
-   "note": "真跑通过：回合已发"
+   "note": "真跑通过：长回合已发"
   },
   "collab_gateway": {
    "bucket": "ok",
@@ -1039,8 +1039,8 @@
   },
   "n8n_wf": {
    "bucket": "needs_dependency",
-   "src": "write",
-   "note": "缺依赖：本机 n8n 未起（HTTP 0，端口 5678 无响应）"
+   "src": "remaining",
+   "note": "HTTP 0"
   },
   "notion_bridge": {
    "bucket": "ok",
