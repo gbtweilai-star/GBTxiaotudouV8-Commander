@@ -1,19 +1,18 @@
-# GBT Xiaotudou V8 — The Commander Model
+[![20k-tentacle 3D preview](assets/tentacle3d.gif)](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/arms/tentacle3d.html)
 
-> **A 7.6B Chinese "commander" LLM: it does not just chat — it routes a request to one of 341 audited capability bits, and refuses to write / spend / go online without a human ticket.**
->
-> `341 capabilities · 30 domains` · `335-item benchmark PASS45 99.10%` · `341 bits live-tested: 340 pass / 0 fail` · `22-DoF bionic arm, 40-bone GLB included` · `Python client + 30-second demo, zero dependencies, no weights needed`
+# GBT Xiaotudou V8 — Commander
 
-```bash
-git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander && cd GBTxiaotudouV8-Commander
-python demo.py "turn this Markdown into a PPT"    # -> capability bit, gate status, exact command
-```
+**7.6B Chinese Commander: routes a request to 341 audited capability bits — and blocks write / spend / network without a human ticket.**
+**22-DoF bionic hand, 40-bone GLB, and a live 20k-tentacle 3D preview → [open it](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/arms/tentacle3d.html)**
+`python demo.py "turn Markdown into PPT"` — zero deps, no weights, 30 seconds.
 
-<p><a href="README.en.md">🇬🇧 Full English README</a> · <a href="https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/">Project page</a> · <a href="arms/README.md">🦾 Omni-Arm (GLB)</a> · <a href="docs/13-omni-plug.md">Reverse-calling cloud compute</a></p>
+⭐ **If this helps you reverse-call cloud GPUs with nothing but a key, star it** — that's the trick most small-model builders miss.
 
-> **想看源码？** 门（`run_task` 契约层 + 遥测包装器）、作用域正表、审计账本、341 位注册表、万能插 —— **真源码在 [runtime/](runtime/README.md)**，
-> 附机械自检 `python runtime/static_check.py`（现读 **9 过 / 0 不过**；只读 AST，不执行引擎）。
-> 源码里 `run_task` 出现两次不是 bug：[runtime/README.md](runtime/README.md) 里讲清了为什么（`_run_task_base` 先快照原定义）。
+[3D preview](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/arms/tentacle3d.html) · [🇬🇧 English README](README.en.md) · [中文总文档](#-gbt小土豆v8--总指挥大模型) · [Runtime source code](runtime/README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/) · [Security & steering](docs/14-security-and-control.md) · [Reverse-calling cloud compute](docs/13-omni-plug.md)
+
+> **Want the source?** The gate (`run_task` contract layer + telemetry wrapper), the scope table, the audit ledger, the 341-bit registry and omni-plug live in **[runtime/](runtime/README.md)** —
+> with a machine-checked `python runtime/static_check.py` (currently **9 pass / 0 fail**, read-only AST, engine not executed).
+> `run_task` appears twice in `api.py` on purpose: `_run_task_base = run_task` snapshots the original before the telemetry wrapper — explained in [runtime/README.md](runtime/README.md).
 
 ---
 
