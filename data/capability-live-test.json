@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:20:58",
+ "at": "2026-10-21T14:23:30",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 314,
-  "denied": 0,
-  "needs_params": 24,
+  "ok": 325,
+  "denied": 2,
+  "needs_params": 11,
   "needs_auth": 0,
   "needs_dependency": 3,
   "failed": 0,
@@ -13,16 +13,17 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 314,
-  "needs_input": 24,
+  "ok": 325,
+  "needs_input": 11,
+  "needs_ticket": 2,
   "needs_dependency": 3
  },
  "by_source": {
   "monitor": 216,
-  "ticket": 19,
+  "ticket": 16,
   "params": 16,
-  "remaining": 26,
-  "write": 64
+  "remaining": 41,
+  "write": 52
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -197,9 +198,9 @@
    "note": "带票真跑通过"
   },
   "book_skill": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_source"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"book_skill\", \"source\": \"README.md\""
   },
   "brain_council": {
    "bucket": "ok",
@@ -247,9 +248,9 @@
    "note": "真跑通过"
   },
   "bt_control": {
-   "bucket": "needs_input",
-   "src": "ticket",
-   "note": "缺少意图文本"
+   "bucket": "needs_ticket",
+   "src": "remaining",
+   "note": "需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
   },
   "cad_distill": {
    "bucket": "ok",
@@ -283,8 +284,8 @@
   },
   "chart_html": {
    "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：缺少 data/路径（要转的数据文件）"
+   "src": "remaining",
+   "note": "argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'list'"
   },
   "claude_code": {
    "bucket": "ok",
@@ -648,8 +649,8 @@
   },
   "figure_gate": {
    "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：判据要求 4 轮打磨 + 先声明屏幕数字由谁算（它如实给了 reasons）"
+   "src": "remaining",
+   "note": "False"
   },
   "file_hygiene": {
    "bucket": "ok",
@@ -672,9 +673,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "forge_mastery": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_goal"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"forge_mastery\", \"goal\": \"做一个落地页\", "
   },
   "freebuff_term": {
    "bucket": "ok",
@@ -767,9 +768,9 @@
    "note": "监控账 90s 超时下真调通过（5ms）"
   },
   "humanizer": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：缺少 text 或 file"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"before_hits\": [], \"after_hits\": [], \"fixes\": [], \"text\":"
   },
   "image_scout": {
    "bucket": "ok",
@@ -832,9 +833,9 @@
    "note": "监控账 90s 超时下真调通过（19ms）"
   },
   "llm_chat": {
-   "bucket": "needs_input",
-   "src": "ticket",
-   "note": "缺少 prompt：请给出要问其他 AI 的问题"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"reply\": \"\\n\\n好\", \"provider\": \"agnes\", \"model\": \"agnes-2."
   },
   "llm_redteam": {
    "bucket": "ok",
@@ -967,9 +968,9 @@
    "note": "same_host 一致"
   },
   "mirror_plan": {
-   "bucket": "needs_input",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "需要先立计划（plan 不存在）"
+   "note": "真跑通过：{\"ok\": true, \"name\": \"default\", \"defined_at\": \"2026-09-19T08:07:05\", \""
   },
   "mirror_rehearse": {
    "bucket": "ok",
@@ -1022,9 +1023,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "music_auto": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_goal"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"music_auto\", \"goal\": \"做一段轻音乐\", \"st"
   },
   "music_intel": {
    "bucket": "ok",
@@ -1382,9 +1383,9 @@
    "note": "监控账 90s 超时下真调通过（11ms）"
   },
   "self_intake": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_topic"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"known\": false, \"topic\": \"AI 行业动态\", \"next_action\": \"intak"
   },
   "selfscan": {
    "bucket": "ok",
@@ -1397,14 +1398,14 @@
    "note": "监控账 90s 超时下真调通过（8ms）"
   },
   "shot_director": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_idea"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"shot_director\", \"idea\": \"咖啡店宣传\", \""
   },
   "showcase_ops": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_idea"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"concept\", \"kind\": \"showcase_ops\", \"idea\": \"能力位路由演示"
   },
   "signature_guard": {
    "bucket": "ok",
@@ -1412,14 +1413,14 @@
    "note": "监控账 90s 超时下真调通过（728ms）"
   },
   "skill_finder": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：缺少 q（一句需求）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"q\": \"找一个能做表格的技能\", \"count\": 12, \"candidates\": [{\"name\": \""
   },
   "skill_forge": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_subject"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：{\"ok\": true, \"op\": \"think\", \"kind\": \"skill_forge\", \"subject\": \"周报整理\", "
   },
   "skill_watch": {
    "bucket": "ok",
@@ -1443,8 +1444,8 @@
   },
   "spider_ops": {
    "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_target"
+   "src": "remaining",
+   "note": "need_scope"
   },
   "stigmergy": {
    "bucket": "ok",
@@ -1662,9 +1663,9 @@
    "note": "监控账 90s 超时下真调通过（8ms）"
   },
   "voice": {
-   "bucket": "needs_input",
-   "src": "ticket",
-   "note": "缺少 text：要合成的文本"
+   "bucket": "needs_ticket",
+   "src": "remaining",
+   "note": "需要人工授权（audio_output）：让本机发声（TTS 合成/播放）或写入音频产物"
   },
   "voice_orchestra": {
    "bucket": "ok",
