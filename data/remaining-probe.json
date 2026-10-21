@@ -4,7 +4,7 @@
  "counts": {
   "ok": 41,
   "needs_input": 2,
-  "needs_dependency": 2,
+  "needs_dependency": 3,
   "needs_ticket": 3
  },
  "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
@@ -77,12 +77,11 @@
   {
    "cap": "codex_interrupt",
    "payload": {
-    "thread_id": "01a15d62-0a3a-7771-8acc-6a945c4c6ac0",
-    "turn_id": "01a15d62-1a35-7252-a44f-682ea7f0c66d"
+    "thread_id": "01a15d63-a9fb-7430-aeb6-f477b1362157"
    },
    "status": "error",
    "verdict": "needs_input",
-   "note": "turn/interrupt 失败: no active turn to interrupt",
+   "note": "turn/interrupt 失败: Invalid request: missing field `turnId`",
    "elapsed_s": 0.5
   },
   {
@@ -96,12 +95,12 @@
   {
    "cap": "codex_turn_send",
    "payload": {
-    "thread_id": "01a15d62-0a3a-7771-8acc-6a945c4c6ac0",
-    "text": "只回一个字：好"
+    "thread_id": "01a15d63-a9fb-7430-aeb6-f477b1362157",
+    "text": "请用大约八百字详细解释能力位路由的工作原理，慢一点没关系。"
    },
    "status": "ok",
    "verdict": "ok",
-   "note": "真跑通过：回合已发",
+   "note": "真跑通过：长回合已发",
    "elapsed_s": 0.5
   },
   {
@@ -133,23 +132,26 @@
   {
    "cap": "figure_gate",
    "payload": {
-    "records": [
+    "deliverable": {
+     "kind": "html",
+     "path": "outputs/open-source-release/docs/index.html"
+    },
+    "rounds": [
      {
-      "round": 1
+      "n": 1
      },
      {
-      "round": 2
+      "n": 2
      },
      {
-      "round": 3
+      "n": 3
      },
      {
-      "round": 4
+      "n": 4
      }
     ],
     "numbers": {
-     "cost": 1,
-     "count": 2
+     "cost": "¥1"
     }
    },
    "status": "ok",
@@ -330,6 +332,16 @@
    "verdict": "ok",
    "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"music_auto\", \"goal\": \"做一段轻音乐\", \"st",
    "elapsed_s": 0.3
+  },
+  {
+   "cap": "n8n_wf",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "HTTP 0",
+   "elapsed_s": 0.5
   },
   {
    "cap": "omarchy_bridge",
