@@ -387,8 +387,7 @@
   {
    "cap": "pipeline_rollback",
    "payload": {
-    "name": "probe",
-    "to_version": "1"
+    "name": ".versions"
    },
    "status": "denied",
    "verdict": "needs_ticket",
