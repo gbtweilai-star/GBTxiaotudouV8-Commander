@@ -1,22 +1,22 @@
 {
- "at": "2026-10-21T14:42:24",
+ "at": "2026-10-21T14:49:47",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 333,
+  "ok": 335,
   "denied": 1,
   "needs_params": 4,
   "needs_auth": 0,
-  "needs_dependency": 3,
+  "needs_dependency": 1,
   "failed": 0,
   "timeout": 0,
   "exception": 0
  },
  "buckets": {
-  "ok": 333,
+  "ok": 335,
   "needs_input": 4,
-  "needs_dependency": 3,
-  "needs_ticket": 1
+  "needs_ticket": 1,
+  "needs_dependency": 1
  },
  "by_source": {
   "monitor": 216,
@@ -1038,9 +1038,9 @@
    "note": "监控账 90s 超时下真调通过（4ms）"
   },
   "n8n_wf": {
-   "bucket": "needs_dependency",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "HTTP 0"
+   "note": "真跑通过：n8n 应答"
   },
   "notion_bridge": {
    "bucket": "ok",
@@ -1068,9 +1068,9 @@
    "note": "监控账 90s 超时下真调通过（102ms）"
   },
   "omarchy_bridge": {
-   "bucket": "needs_dependency",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "宿主 PATH 无 omarchy（op=assess 已真跑：三根线都 absent）"
+   "note": "真跑通过：assess 现读三根线（宿主无 Omarchy，能力本身可用）"
   },
   "omission_detector": {
    "bucket": "ok",
@@ -1100,7 +1100,7 @@
   "one_key_deploy": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe\", \"target\": \"C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8\\\\outputs\\\\open-source-release\\\\docs\","
+   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe-clean\", \"files\": 2, \"steps\": {\"stage\": {\"ok\": true, \"files\": 2}, \"plan\": {\"ok\": true, \"auto\": fa"
   },
   "one_shot": {
    "bucket": "ok",

@@ -2,9 +2,9 @@
  "at": "2026-10-21T14:13:52",
  "total": 18,
  "counts": {
-  "ok": 42,
+  "ok": 44,
   "needs_input": 3,
-  "needs_dependency": 3,
+  "needs_dependency": 1,
   "needs_ticket": 1
  },
  "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
@@ -339,19 +339,19 @@
     "op": "status"
    },
    "status": "ok",
-   "verdict": "needs_dependency",
-   "note": "HTTP 0",
-   "elapsed_s": 0.5
+   "verdict": "ok",
+   "note": "真跑通过：n8n 应答",
+   "elapsed_s": 1.0
   },
   {
    "cap": "omarchy_bridge",
    "payload": {
-    "op": "status"
+    "op": "assess"
    },
    "status": "ok",
-   "verdict": "needs_dependency",
-   "note": "宿主 PATH 无 omarchy（op=assess 已真跑：三根线都 absent）",
-   "elapsed_s": 0.05
+   "verdict": "ok",
+   "note": "真跑通过：assess 现读三根线（宿主无 Omarchy，能力本身可用）",
+   "elapsed_s": 1.0
   },
   {
    "cap": "omni_web",
@@ -366,14 +366,14 @@
   {
    "cap": "one_key_deploy",
    "payload": {
-    "target": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\outputs\\open-source-release\\docs",
+    "target": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\.scratch\\deploy-probe",
     "room": "probe-room",
-    "name": "probe"
+    "name": "probe-clean"
    },
-   "status": "ok",
+   "status": "x",
    "verdict": "needs_input",
-   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe\", \"target\": \"C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8\\\\outputs\\\\open-source-release\\\\docs\",",
-   "elapsed_s": 0.8
+   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe-clean\", \"files\": 2, \"steps\": {\"stage\": {\"ok\": true, \"files\": 2}, \"plan\": {\"ok\": true, \"auto\": fa",
+   "elapsed_s": 1.5
   },
   {
    "cap": "pentest",
