@@ -2,6 +2,26 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
+## 2026-10-21 · 第十批：出片那根电缆 —— 真契约问出来了，假账两处修掉
+
+- **Agnes 视频真契约（现场逐字段问上游问出来的）**：
+  `POST /v1/video/generations {model, prompt, mode:"text"}` → `task_id` → `GET /v1/videos/{task_id}` 轮询 →
+  `completed`（本次 **43 秒 / 5s / 720P / 100%**）。`mode` 已知取值 `text`、`keyframe`（后者要 `first_frame`）；
+  `duration` **不是允许字段**，`seconds`/`size` 由服务端定。
+- **纠正一条旧读数**：上一轮写的 `invalid_json · Failed to read request body` 不是"端点不通"，
+  是上游把"体里缺 `mode`"折成了哑话 —— 按字段一个个问（空体→缺 model→缺 prompt→缺 mode→duration 不许→mode 非法）
+  才问出真契约。旧的"我不猜"这句已经作废：**不是不能猜，是得问。**
+- **取片侧仍是上游坏链**：网关自己发的 `result_url`（`/v1/videos/{task_id}/content`）连试 12 次 / 90 秒，
+  每次 **HTTP 200 + `{"detail":"Not Found"}`**。所以第④行如实改成 **「生成通 · 取片未通」**，不再一句"未通"。
+  出片这件事本身有真 mp4（HF 免费 GPU 那条电缆 `route=free-hf`：73,884 B · sha256 `7a2f0ca6…`）。
+- **修掉两处假账**：`probe-cable-all.py` 的 `cable_video()` 旧 body 缺 `mode` 且多传 `seconds`（已按真契约改写，
+  提交/轮询/取片全链 + 12 次重试留档）；`render-cable-all.py` 第④行原来**写死"未通"**、
+  第①行 `our_model` **没有写手**（上一轮是手抄进 JSON 的）⇒ 现在补了 `cable_our_model()` 真跑产出，
+  四行全部由 `data/cable-all-live.json` 现读驱动。
+- 现读四根：① 我们的模型 `http=200 · 1.2s · 397 tokens` · ② 批量出图 **3/3 · 29.7s** ·
+  ③ 本机 CPU **0.0535s · 321.1 GFLOP/s** · ④ 生成通 / 取片被上游挡。
+- 图重渲染 `assets/fig-cable-all.png`（按 P7 亲眼看：修掉 ① 列错位与 `\n` 换行破版）。
+
 ## 2026-10-21 · 第九批：340/341 —— `comfy_cloud` 接上 HF 免费 GPU 腿
 
 - 主人令「没有空闲 GPU 就自动调云端免费 GPU」⇒ 新增 `comfy_cloud op=freegpu`：

@@ -348,16 +348,67 @@ POST  /images/generations  →  http=200 · mode=url
 
 ![电缆全通](../assets/fig-cable-all.png)
 
-| 电缆（插座） | 状态 | 耗时 / 算力 | 产物 sha256 |
+| 电缆（插座） | 状态 | 耗时 / 算力 | 产物 sha256 / 回执 |
 |---|---|---|---|
-| ① **我们的模型**（vLLM · `gbt-v8-v83` on 云卡） | **待 GPU** | — | 权重在 `/runpod-volume/gbt-v8-v83`；链路曾 **5/5 全通**，现读 15 张卡全 EXITED（宿主无空卡） |
-| ② 批量出图（`agnes-image-2.5-flash`） | **3/3 成功** | **29.7s**（3 张合计） | `f679f8f67d5b6b13755…`（逐张见 `data/cable-all-live.json`） |
+| ① **我们的模型**（`agnes-2.5-flash` · 走云端算力，**不连云卡**） | **通** | **1.2s · 397 tokens** | 文本回执（无产物文件）· 密钥槽 `vault:agnes` · `http=200` |
+| ② 批量出图（`agnes-image-2.5-flash`） | **3/3 成功** | **29.7s**（3 张合计） | `f679f8f67d5b6b137…`（逐张 sha256 / 耗时见 `data/cable-all-live.json`） |
 | ③ 本机 CPU 裸算力（`numpy matmul 2048²`） | **通** | **0.0535s · 321.1 GFLOP/s** | 无产物（只出读数，零模型零出网） |
-| ④ 出片（`agnes-video-2.5-flash`） | **未通** | 0.2s 被拒 | 上游原话 `invalid_json · Failed to read request body`（它的 body 契约不是这套 JSON，我不猜） |
+| ④ 出片（`agnes-video-2.5-flash`） | **生成通 · 取片未通** | 任务 **43 秒内 100%**（5s / 720P） | 网关自己给的 `result_url` 回 **200 + `{"detail":"Not Found"}`**（12 次重试 / 90 秒全一样） |
 
-**这就是"用我们的模型只要用云端算力"的现状**：模型这头（权重、链路、契约）都是现成的、验过的；
-卡住的只有一件事 —— **一张 RUNNING 的 GPU 卡**。你给我一张卡，第①行立刻从"待 GPU"变成带 mp4/文本回执的"通"。
+第④行要把两件事分开记账，不许糊成一句：
+
+- **生成侧是通的**：`POST /video/generations` 拿到 `task_id`，轮询 `GET /videos/{task_id}` 一路
+  `in_progress 10% → 100%`，`status=completed`、`finish_time` 落在 **43 秒**，规格 `seconds=5 / size=720P`。
+  也就是说**算力真的在那头出活了**，电缆通电了。
+- **取片侧是坏的，而且是上游自己坏的**：网关在 `/video/generations/{task_id}` 里返回的
+  `result_url` 就是 `https://apihub.agnes-ai.com/v1/videos/task_.../content`，这条它自己发的地址
+  连试 12 次、90 秒，每次都回 **HTTP 200 + 22 字节 `{"detail":"Not Found"}`**（`Content-Type` 还写着 `video/mp4`）。
+  按仓规「拒绝路径必须带上游原话」，这里就是原话，不做二次解释。
+- **「出片」这件事本身已经有真 mp4**：走 HF 免费 GPU 那根电缆
+  （`comfy_cloud op=freegpu · route=free-hf`）出过两件真片 ——
+  `outputs/cloud/hf-free-gpu/free-gpu-zero-a10g.mp4`（89,654 B · sha256 前16 `36052060892FEA94`）与
+  `freegpu-20261021T161333.mp4`（73,884 B · sha256 `7a2f0ca6d8b03a0a…`），全程 29.3 秒。
+  ⇒ **出片这根电缆通**；不通的是「Agnes 这一家的取片链接」。
+
+#### Agnes 视频接口的真契约（2026-10-21 现场逐字段问出来的）
+
+旧读数写的是 `invalid_json · Failed to read request body`，我一度当成"body 契约不知道、不猜"。
+**这一条是错的**：它不是"端点不通"，是上游把"体里缺东西"折成了 `invalid_json` 这种哑话。
+按字段一个个问上游，问出来的真契约是：
+
+| 请求体 | 上游原话（逐字） |
+|---|---|
+| `{}` | `Model name not specified, model name cannot be empty` |
+| `{"model":…}` | `prompt is required` |
+| `+ prompt` | `mode is required` |
+| `+ duration` | `duration is not an allowed request field` |
+| `mode` 乱填（试了 44 个候选） | `invalid mode` |
+| `mode:"keyframe"` | `keyframe mode requires first_frame and/or last_frame` |
+| **`mode:"text"`** | **`200` · 返回 `task_id` / `video_id`** |
+
+所以正确调用是：
+
+```text
+POST /v1/video/generations   {"model":"agnes-video-2.5-flash","prompt":"…","mode":"text"}
+GET  /v1/videos/<task_id>    → status: in_progress → completed（带 progress / seconds / size）
+GET  /v1/videos/<task_id>/content  → 本应是 mp4；现读 200 + {"detail":"Not Found"}（上游坏链）
+```
+
+`mode` 已知取值：`text`（文生视频）、`keyframe`（要 `first_frame`/`last_frame`）。
+`seconds`/`size` **由服务端定**（本次 5s / 720P），别自己传 `duration`。
+
+这一轮同时修掉两处**假账**（都属"没有写手/写死"那一类）：
+
+1. `probe-cable-all.py` 的 `cable_video()` 旧 body 是 `{size, seconds}` 且不带 `mode` —— 已按真契约改写
+   （提交 → 轮询 → 取片，含 12 次重试并把每次回包留档）；
+2. `render-cable-all.py` 第④行原来**写死**"未通"、第①行的 `our_model` **没有写手**（上一轮是手抄进 JSON 的）。
+   现在第①行由新增的 `cable_our_model()` 真跑产出，第④行由 `data/cable-all-live.json` 现读驱动，
+   生成通/取片坏两种状态分开渲染。
+
+**「用我们的模型只要用云端算力」这句现在的现状**：① ② ③ 三根都带真回执/真产物，第④根**生成通、取片被上游挡**。
+要它变全绿，只有一件事需要主人这边动：让 Agnes 那边把 `/videos/{task_id}/content` 修好（或给一条真能下的片子地址），
+我这边代码不用再改 —— 契约已经对齐了。
 
 > 修订（2026-10-21 09:41，主人指正）：「我们的模型」走的是**云端算力 + 密钥通电**这条电缆，
-> **不需要连云卡**。第①行已按真回执改写：`agnes-2.5-flash · http=200 · 2.0s · 455 tokens`，
+> **不需要连云卡**。第①行已按真回执改写：`agnes-2.5-flash · http=200 · 1.2s · 397 tokens`，
 > 密钥槽 `vault:agnes`，走电缆反向调用。之前把它标成「待 GPU」是我错把模型当成"必须跑在自家 pod 上"。

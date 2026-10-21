@@ -1,22 +1,80 @@
 {
- "at": "2026-10-21T16:36:39",
+ "at": "2026-10-21T16:48:41",
  "schema": "cable-all-live-v1",
  "cable_model": "触手=电缆 · 密钥=通电 · 云端有算力就能通 · 能通就能反向调用",
  "key_slot": "vault:dpapi",
  "endpoint": "https://apihub.agnes-ai.com/v1",
  "video": {
   "ok": false,
+  "generated": true,
   "cable": "出片",
   "socket": "agnes-video-2.5-flash",
+  "endpoint": "https://apihub.agnes-ai.com/v1/video/generations",
+  "task_id": "task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN",
+  "state": "completed",
+  "seconds_spec": "5",
+  "size_spec": "720P",
+  "result_url": "https://apihub.agnes-ai.com/v1/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+  "elapsed_s": 90.0,
+  "upstream": "{\"detail\":\"Not Found\"}",
   "tried": [
    {
-    "path": "/video/generations",
-    "http": 400,
-    "seconds": 0.2,
-    "upstream": "{\"code\":\"invalid_json\",\"message\":\"Failed to read request body (request id: 20261021093639394990594RAFxUaTV)\",\"data\":null}"
+    "step": "content",
+    "attempt": 10,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
+   },
+   {
+    "step": "content",
+    "attempt": 10,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
+   },
+   {
+    "step": "content",
+    "attempt": 11,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
+   },
+   {
+    "step": "content",
+    "attempt": 11,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
+   },
+   {
+    "step": "content",
+    "attempt": 12,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
+   },
+   {
+    "step": "content",
+    "attempt": 12,
+    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+    "http": 200,
+    "bytes": 22,
+    "is_mp4": false,
+    "head": "{\"detail\":\"Not Found\"}"
    }
   ],
-  "key_slot": "vault:agnes"
+  "key_slot": "vault:agnes",
+  "note": "任务 100% 完成但取片端点不吐 mp4（上游 result_url 自己回 Not Found）——生成侧通、取片侧坏，两件事分开记"
  },
  "images": {
   "ok": true,
@@ -71,20 +129,20 @@
  },
  "our_model": {
   "ok": true,
-  "cable": "我们的模型（云端算力·不需要云卡）",
+  "cable": "我们的模型（云端算力，不需要云卡）",
   "socket": "agnes-2.5-flash",
   "endpoint": "https://apihub.agnes-ai.com/v1/chat/completions",
   "http": 200,
-  "elapsed_s": 2.0,
+  "elapsed_s": 1.2,
   "key_slot": "vault:agnes",
-  "text": "\n\n我不确定这个术语的具体定义，能否提供更多上下文？",
-  "chars": 26,
+  "text": "\n\n电缆提供物理连接，密钥实现身份验证与授权，两者结合使本地设备能作为云端算力的合法接入点，从而反向调用远程资源。",
+  "chars": 57,
   "usage": {
-   "prompt": 295,
-   "completion": 160,
-   "total": 455
+   "prompt": 299,
+   "completion": 98,
+   "total": 397
   },
   "artifacts": 0,
-  "note": "无产物文件（产物是文本回执）；用时 2.0s · 455 tokens"
+  "note": "无产物文件；只有文本，执行耗时 1.2s / 397 tokens"
  }
 }
