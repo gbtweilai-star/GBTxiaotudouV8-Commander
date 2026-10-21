@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GBT小土豆V8 · 总指挥大模型 · 开源发布页</title>
 <meta name="description" content="7.6B 中文「总指挥」模型：341 个原生能力位的路由、讲解与授权门，335 题能力基准 PASS45 330/335（98.51%–99.10% 两轮）。">
+<meta name="theme-color" content="#0b0e13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="小土豆V8">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <style>
   :root{
     --bg:#0b0e13; --bg-soft:#11161f; --line:#1d2530; --ink:#e8edf5; --ink-dim:#9aa7b8;
@@ -195,6 +203,16 @@ py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live
   <p>代码 Apache-2.0 · 权重 CC BY-NC-SA 4.0（非商用）· 见 <a href="LICENSE">LICENSE</a> / <a href="NOTICE">NOTICE</a></p>
   <p>本页为静态发布页，无外部依赖、无第三方脚本、无统计埋点。</p>
 </footer>
+
+<script>
+/* PWA：注册 Service Worker ⇒ iPhone「添加到主屏幕」/ Android「安装应用」后离线也能打开。
+   本站是纯静态页，SW 只缓存同源静态件；注册失败也不影响阅读（静默降级）。 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () { /* 静默：不影响页面 */ });
+  });
+}
+</script>
 
 </body>
 </html>
