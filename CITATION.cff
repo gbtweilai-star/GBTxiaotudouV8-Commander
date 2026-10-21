@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "引用本作品时请使用以下信息（Citation for this work）"
+title: "GBT小土豆V8 总指挥大模型（GBTxiaotudouV8 Commander）"
+abstract: >-
+  一个把「指挥」练进权重里的 7.6B 中文模型：能说清 341 个原生能力位（30 个域）每一个是做什么的、
+  属于哪个域、调用要注意什么，并把自然语言需求落到具体能力位；对写盘/花钱/出网类动作要求先取得人工授权。
+type: software
+authors:
+  - alias: "自由的风"
+    name: "自由的风"
+license: Apache-2.0
+repository-code: "https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander"
+url: "https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander"
+keywords:
+  - large language model
+  - capability routing
+  - tool use
+  - Chinese NLP
+  - Qwen2
+  - LoRA
+  - AI agent
+version: "v83"
+date-released: "2026-10-21"

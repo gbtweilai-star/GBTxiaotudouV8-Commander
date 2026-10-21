@@ -1,0 +1,16 @@
+# 财务 · `finance`（4 位）
+
+> 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出。
+
+| 能力位 | 类型 | 需参数 | 它做什么 |
+|---|---|---|---|
+| `quant` | 只读 | — | 量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口） |
+| `quant_backtest` | 只读 | — | 读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口） |
+| `quant_params` | 只读 | — | 读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech） |
+| `quant_strategy` | 只读 | — | 读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口） |
+
+> 表格里是**摘要**（超过 140 字截断）；完整原文见 [`data/capabilities.json`](../../data/capabilities.json) 的 `desc` 字段。
+
+---
+
+返回 [能力总表](../03-capabilities.md)
