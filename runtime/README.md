@@ -20,8 +20,10 @@ PASS  作用域门：机制层自保 · filesystem_write 在 MECHANISM_GATES 里
 PASS  票据：一次性票集合 · data_export、deploy_force、deploy_publish、owner_control、remote_device
 PASS  注册表：条数 341 · machine-readable
 PASS  注册表：341 个名字都能在 caps_registry.py 里找到 · 不是手抄的目录
+PASS  派活桥：真调走 run_task · 桥里是 `from gbt_allinone import run_task`
+PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / auth_gate 一律没直接导入
 
-9 过 / 0 不过
+11 过 / 0 不过
 ```
 
 ## 源码地图（哪份文件兑现哪条公开声明）
@@ -40,6 +42,7 @@ PASS  注册表：341 个名字都能在 caps_registry.py 里找到 · 不是手
 | `gbt_allinone/mirror_space.py` | 17 KB | 镜像多维度：shape → rehearse → release | 搜 `def ascend` |
 | `gbt_allinone/deployment_rehearsal.py` | 61 KB | 部署排练与晋升 | 搜 `def release` |
 | `gbt_allinone/signature.py` | 5 KB | 署名 / 钢印自检 | 搜 `def audit` |
+| `model_bridge.py` | 22 KB | **APP 上「派活」那一步的桥**：`/v1/route`（收窄候选→模型挑位）+ `/v1/dispatch`（**只调 `from gbt_allinone import run_task`**，缺票原样回缺）；钥只在桥里，页面拿不到明文 | 搜 `def _shortlist` 与 `def _dispatch` |
 
 ## 为什么 `api.py` 里 `run_task` 出现两次？（这条最容易被误读成 bug）
 
@@ -66,7 +69,7 @@ def run_task(kind, payload=None, stamp=True, safe=False, probe=False):   # 3067�
 | 没放 | 为什么 | 影响 |
 |---|---|---|
 | **7.6B 权重** | 权重几十 GB，不走 Git | 想跑模型看 `docs/05-deployment.md`（vLLM serve） |
-| **完整引擎（约 650 个 py，227 万行，含 3,134 个 vendored `.pylibs`）** | 依赖本机 `store/`、密钥、设备与大量第三方件；放进开源仓既跑不起来也读不完 | 这里放的是**门与核心 13 件**：能证明"单门/授权/审计/注册表/万能插"五条声明的全部关键代码 |
+| **完整引擎（约 650 个 py，227 万行，含 3,134 个 vendored `.pylibs`）** | 依赖本机 `store/`、密钥、设备与大量第三方件；放进开源仓既跑不起来也读不完 | 这里放的是**门与核心 13 件 + 派活桥 1 件（共 14 件）**：能证明"单门/授权/审计/注册表/万能插"五条声明的全部关键代码 |
 | `store/`、`state/`、密钥 | 含运行账本、本机路径与凭据（DPAPI 保险箱，永不入库） | 引擎无法直接 `python -m gbt_allinone` 跑起来 |
 
 **结论**：这份源码的用途是**审阅与对照**（"你说的门到底怎么写的"），不是 `pip install` 就能跑的发行包。

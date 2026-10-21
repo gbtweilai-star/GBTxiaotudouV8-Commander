@@ -20,6 +20,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 PKG = HERE / "gbt_allinone"
 ROOT = HERE.parent
 data_json = ROOT / "data" / "capabilities.json"
+BRIDGE = HERE / "model_bridge.py"
 
 FAILS: list[str] = []
 PASSES: list[str] = []
@@ -145,8 +146,33 @@ def check_registry() -> None:
         ok("注册表：341 个名字都能在 caps_registry.py 里找到", "不是手抄的目录")
 
 
+def check_bridge() -> None:
+    """声明⑤：APP 上的「派活」入口也走同一道门 —— 桥里不许绕过 run_task 直接调模块。"""
+    if not BRIDGE.is_file():
+        bad("派活桥：文件", "runtime/model_bridge.py 不在")
+        return
+    tree = parse(BRIDGE)
+    imported: set[str] = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.ImportFrom) and n.module == "gbt_allinone":
+            imported.update(a.name for a in n.names)
+        elif isinstance(n, ast.Import):
+            imported.update(a.name for a in n.names if a.name.startswith("gbt_allinone."))
+    if "run_task" in imported:
+        ok("派活桥：真调走 run_task", "桥里是 `from gbt_allinone import run_task`")
+    else:
+        bad("派活桥：调用口", "没导入 run_task（那它就没过门）")
+    banned = {"mirror_space", "qiankun", "room_space", "deployment_rehearsal",
+              "auth_gate", "security.policy", "gbt_allinone.mirror_space"}
+    hit = sorted(imported & banned)
+    if hit:
+        bad("派活桥：绕门风险", "直接导入了 %s —— 必须经 run_task" % "、".join(hit))
+    else:
+        ok("派活桥：没有绕门导入", "mirror_space / qiankun / room_space / auth_gate 一律没直接导入")
+
+
 def main() -> int:
-    for fn in (check_gate, check_scopes, check_one_shot, check_registry):
+    for fn in (check_gate, check_scopes, check_one_shot, check_registry, check_bridge):
         try:
             fn()
         except Exception as exc:                              # noqa: BLE001
