@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:23:30",
+ "at": "2026-10-21T14:26:12",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 325,
-  "denied": 2,
-  "needs_params": 11,
+  "ok": 326,
+  "denied": 3,
+  "needs_params": 9,
   "needs_auth": 0,
   "needs_dependency": 3,
   "failed": 0,
@@ -13,17 +13,17 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 325,
-  "needs_input": 11,
-  "needs_ticket": 2,
+  "ok": 326,
+  "needs_input": 9,
+  "needs_ticket": 3,
   "needs_dependency": 3
  },
  "by_source": {
   "monitor": 216,
-  "ticket": 16,
+  "remaining": 45,
+  "ticket": 13,
   "params": 16,
-  "remaining": 41,
-  "write": 52
+  "write": 51
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -359,8 +359,8 @@
   },
   "codex_thread_new": {
    "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
+   "src": "remaining",
+   "note": "真跑通过：新线程已建"
   },
   "codex_tools": {
    "bucket": "ok",
@@ -899,13 +899,13 @@
   },
   "mcp_call": {
    "bucket": "needs_input",
-   "src": "ticket",
-   "note": "需要 server 与 tool（参数放 arguments）"
+   "src": "remaining",
+   "note": "{'code': -32602, 'message': 'Tool add not found'}"
   },
   "mcp_connect": {
-   "bucket": "needs_input",
-   "src": "ticket",
-   "note": "需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：MCP 已连"
   },
   "mcp_tools": {
    "bucket": "ok",
@@ -1133,9 +1133,9 @@
    "note": "监控账 90s 超时下真调通过（22ms）"
   },
   "pentest": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺少 target"
+   "bucket": "needs_ticket",
+   "src": "remaining",
+   "note": "目标未登记授权:https://example.com"
   },
   "pentest_distill": {
    "bucket": "ok",

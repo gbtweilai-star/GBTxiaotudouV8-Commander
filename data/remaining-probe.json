@@ -2,9 +2,9 @@
  "at": "2026-10-21T14:13:52",
  "total": 18,
  "counts": {
-  "ok": 33,
-  "needs_ticket": 2,
-  "needs_input": 4,
+  "ok": 35,
+  "needs_ticket": 3,
+  "needs_input": 5,
   "needs_dependency": 2
  },
  "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
@@ -82,6 +82,14 @@
    "verdict": "ok",
    "note": "真跑通过（隔离 store）",
    "elapsed_s": 0.01
+  },
+  {
+   "cap": "codex_thread_new",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：新线程已建",
+   "elapsed_s": 0.4
   },
   {
    "cap": "comfy_cloud",
@@ -175,6 +183,36 @@
    "verdict": "ok",
    "note": "真跑通过：{\"ok\": true, \"reply\": \"\\n\\n好\", \"provider\": \"agnes\", \"model\": \"agnes-2.",
    "elapsed_s": 0.3
+  },
+  {
+   "cap": "mcp_call",
+   "payload": {
+    "server": "probe",
+    "tool": "add",
+    "arguments": {
+     "a": 1,
+     "b": 2
+    }
+   },
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "{'code': -32602, 'message': 'Tool add not found'}",
+   "elapsed_s": 0.4
+  },
+  {
+   "cap": "mcp_connect",
+   "payload": {
+    "server": "probe",
+    "command": [
+     "npx",
+     "-y",
+     "@modelcontextprotocol/server-everything"
+    ]
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：MCP 已连",
+   "elapsed_s": 0.4
   },
   {
    "cap": "mirror_ascend",
@@ -287,6 +325,16 @@
    "verdict": "ok",
    "note": "真跑通过：read_source 读了 octocat/Hello-World",
    "elapsed_s": 0.33
+  },
+  {
+   "cap": "pentest",
+   "payload": {
+    "target": "https://example.com"
+   },
+   "status": "ok",
+   "verdict": "needs_ticket",
+   "note": "目标未登记授权:https://example.com",
+   "elapsed_s": 0.4
   },
   {
    "cap": "pipeline_rollback",
