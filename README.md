@@ -15,6 +15,23 @@
 
 > English one-liner: **A 7.6B Chinese "commander" model that routes, explains and gates 341 native capability bits — with a measurable pass rate on a 335-item capability benchmark and a fully auditable single-gate runtime.**
 
+<p align="center"><b>🇨🇳 中文</b> · <a href="README.en.md">🇬🇧 English</a> · <a href="https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/">在线页</a></p>
+
+## 三行看懂
+
+> **它是什么**：7.6B 中文「总指挥」模型 —— 不只会聊，它把活**落到 341 位能力**上，写盘 / 花钱 / 出网的动作先过人闸。
+> **凭什么信**：335 题基准 PASS45 **99.10% / 98.51%**（两轮全量）；341 位**逐位真跑** 340 通过 / **0 失败**；每张图都有真回执文件。
+> **30 秒看到东西**：`python demo.py "我要把 Markdown 变成 PPT"` —— 不需要 GPU、不需要模型权重、**零第三方依赖**，当场给你落点能力位与该跑的命令。
+
+```bash
+git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander && cd GBTxiaotudouV8-Commander
+python demo.py "我要把 Markdown 变成 PPT"          # 离线：落点 + 门状态 + 该跑的命令
+python -m gbt_commander stats                      # 341 位 / 30 域 / 只读 262 / 要票 35
+python -m unittest discover -s tests -q            # 21 条判据（含"编造能力位必须被拒"的负对照）
+```
+
+<p align="center"><img src="assets/fig-cable-all.png" width="760" alt="电缆全通实测表：只要密钥跟云端联通了，就能反向调用"></p>
+
 ![架构](assets/architecture.svg)
 
 ![域分布](assets/domains.svg)

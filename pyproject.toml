@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=67"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gbt-commander"
+version = "1.0.0"
+description = "GBT小土豆V8 总指挥模型的最小客户端：读 341 位能力目录、按意图检索、把模型给的能力位名按目录校一遍"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "自由的风" }]
+keywords = ["llm", "tool-use", "capability-routing", "chinese", "audit"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander"
+Documentation = "https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/tree/main/docs"
+
+[project.scripts]
+gbt-commander = "gbt_commander.cli:main"
+
+[tool.setuptools]
+packages = ["gbt_commander"]
+
+[tool.setuptools.package-data]
+gbt_commander = ["../data/capabilities.json"]
