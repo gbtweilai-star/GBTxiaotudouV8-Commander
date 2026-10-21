@@ -1,0 +1,523 @@
+{
+ "at": "2026-10-21T13:59:51",
+ "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_write_store_tt1rsrr8",
+ "total_write_face": 79,
+ "ran": 71,
+ "skipped_high_risk": 8,
+ "counts": {
+  "ok": 49,
+  "needs_ticket": 7,
+  "needs_input": 14,
+  "needs_dependency": 1
+ },
+ "rows": [
+  {
+   "cap": "key_gateway",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.1
+  },
+  {
+   "cap": "multimodal_port",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "genoffice_bridge",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "tentacle_equip",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.34
+  },
+  {
+   "cap": "tool_bay",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 2.72
+  },
+  {
+   "cap": "remote_confinement",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "cli_ify",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "tentacle_learn",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "skill_finder",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：缺少 q（一句需求）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "humanizer",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：缺少 text 或 file",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "chart_html",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：缺少 data/路径（要转的数据文件）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "workflow_forge",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "forge_mastery",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_goal",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "showcase_ops",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_idea",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "spider_ops",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_target",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "offense_ops",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_target",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "skill_forge",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_subject",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "shot_director",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_idea",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "book_skill",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_source",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "music_auto",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_goal",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "train_ground",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "quant_plan",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.0
+  },
+  {
+   "cap": "know_map",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "topic_web",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "self_intake",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：need_topic",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "scan_cap",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 17.36
+  },
+  {
+   "cap": "figure_gate",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺输入：判据要求 4 轮打磨 + 先声明屏幕数字由谁算（它如实给了 reasons）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "theme_cap",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "判据工作正常：结论是 holo_pet/styles.css 未通过调色板检查（能力跑通，产物不过）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "omarchy_bridge",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "delivery_gate",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.2
+  },
+  {
+   "cap": "vision_loop",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "edit_pipeline",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.09
+  },
+  {
+   "cap": "audio_extract",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "audio_mix",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "media_license",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "media_run",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.06
+  },
+  {
+   "cap": "omni_plug",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "media_stamp",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "media_publish",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "dh_pose",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "anatomy_figures",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.07
+  },
+  {
+   "cap": "machine_film",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.25
+  },
+  {
+   "cap": "rig_audit",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "rig_fix",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "anim_fix",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.0
+  },
+  {
+   "cap": "omni_arm",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "room_space",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "collab_gateway",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "genoffice",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "gs_h3",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.25
+  },
+  {
+   "cap": "actioncam",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "look_grade",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "zimage_rewash",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "n8n_wf",
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "缺依赖：本机 n8n 未起（HTTP 0，端口 5678 无响应）",
+   "elapsed_s": 4.18
+  },
+  {
+   "cap": "filmkit",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "claude_code",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "codebuddy",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "redteam_recon",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "pentest",
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "缺少 target",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "keylogger",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：privacy_read",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "screen_sniff",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：privacy_read",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "device_takeover",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 3.35
+  },
+  {
+   "cap": "credential_steal",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：privacy_read",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "data_hijack",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：privacy_read",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "notion_bridge",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "thebrain_bridge",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 2.71
+  },
+  {
+   "cap": "cadgen",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "art_chain",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "art_brief",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 0.13
+  },
+  {
+   "cap": "pod_link",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（写入落临时 store）",
+   "elapsed_s": 2.29
+  },
+  {
+   "cap": "comfy_cloud",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute",
+   "elapsed_s": 0.01
+  }
+ ],
+ "skipped": [
+  "blender",
+  "cli_chat",
+  "code_patch",
+  "git_write",
+  "omni_web",
+  "remote_domain",
+  "tripo",
+  "ul_tars_desktop"
+ ],
+ "口径": "隔离 store + 非主人会话；空 payload 不硬编参数；高危白名单不动真仓库"
+}

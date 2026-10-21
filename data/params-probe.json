@@ -1,0 +1,357 @@
+{
+ "at": "2026-10-21T13:58:01",
+ "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_params_store_m3s72267",
+ "session": "非主人会话（GBT_OWNER_SESSION 已移除）",
+ "total": 29,
+ "counts": {
+  "needs_ticket": 11,
+  "ok": 18
+ },
+ "口径": "人写样本参数（不自动猜）；要票的当场 denied 并记缺哪张票；写盘/建工作流落临时 store；不部署、不推远端、不发消息",
+ "rows": [
+  {
+   "cap": "autopilot",
+   "why": "自主环",
+   "payload": {
+    "goal": "列一条当前告警"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：external_llm",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "brain_execute",
+   "why": "指定能力直跑",
+   "payload": {
+    "kind": "echo"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "brain_route",
+   "why": "语义路由：给意图，回最佳落点",
+   "payload": {
+    "intent": "统计一下这段话有多少个词"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.21
+  },
+  {
+   "cap": "brain_unify",
+   "why": "五维合一全链",
+   "payload": {
+    "goal": "统计一下这段话有多少个词"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 1.71
+  },
+  {
+   "cap": "browser",
+   "why": "开浏览器（要 browser_control 票）",
+   "payload": {
+    "url": "https://example.com"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.65
+  },
+  {
+   "cap": "code_patch",
+   "why": "改代码：dry_run 预览（apply=false，不落盘）",
+   "payload": {
+    "path": "gbt_allinone/api.py",
+    "find": "_run_task_base = run_task",
+    "replace": "_run_task_base = run_task  # probe",
+    "apply": false
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "codex_chat",
+   "why": "跟 Codex 说一句（要起进程）",
+   "payload": {
+    "message": "只回一个字：好"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute,external_llm",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "codex_interrupt",
+   "why": "打断一个不存在的线程",
+   "payload": {
+    "thread_id": "probe-none"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "codex_turn_send",
+   "why": "Codex 写操作",
+   "payload": {
+    "thread_id": "probe-none",
+    "text": "回一个字：好"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：process_execute,external_llm",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "deploy_queue",
+   "why": "部署队列列表（只读）",
+   "payload": {
+    "op": "list"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "devour_github",
+   "why": "吞一个公开仓库",
+   "payload": {
+    "repo": "https://github.com/octocat/Hello-World"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：data_export",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "git_write",
+   "why": "版本库写面：stage 一个已跟踪文件（已立刻 reset 复原，未 commit）",
+   "payload": {
+    "op": "stage",
+    "paths": [
+     "AGENTS.md"
+    ]
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过；reset 复原=True（未 commit）",
+   "elapsed_s": 0.19
+  },
+  {
+   "cap": "impact_check",
+   "why": "影响面检查（只读）",
+   "payload": {
+    "symbol": "run_task"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 2.55
+  },
+  {
+   "cap": "lr_submit",
+   "why": "提交长程任务（落临时 store）",
+   "payload": {
+    "description": "探针：证明长程任务能提交",
+    "kind": "echo",
+    "max_attempts": 1
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "omni_web",
+   "why": "读一个公网页面",
+   "payload": {
+    "url": "https://example.com"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：data_export",
+   "elapsed_s": 0.08
+  },
+  {
+   "cap": "one_key_deploy",
+   "why": "一键部署（要 deploy_publish 票）",
+   "payload": {
+    "target": "probe-none"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：deploy_publish,process_execute",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "osint_scan",
+   "why": "公网目标（不该被内网护栏挡）",
+   "payload": {
+    "target": "8.8.8.8"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 2.36
+  },
+  {
+   "cap": "persona_kernel",
+   "why": "人格内核：读宪章（只读）",
+   "payload": {
+    "op": "constitution"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "pipeline_rollback",
+   "why": "回滚（要 deploy_publish 票）",
+   "payload": {
+    "name": "probe-none"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：deploy_publish",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "pipeline_versions",
+   "why": "流水线版本列表（只读）",
+   "payload": {
+    "name": "gbt-potato-v8"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "record_grid",
+   "why": "行式记录画像（只读 op=profile）",
+   "payload": {
+    "op": "profile",
+    "text": "width: 10\nheight: 20"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.12
+  },
+  {
+   "cap": "sched_define",
+   "why": "建一条调度（落临时 store）",
+   "payload": {
+    "name": "probe_sched",
+    "workflow": "probe_wf",
+    "every_seconds": 3600
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "sec_llm",
+   "why": "黑客大脑（要 external_llm 票）",
+   "payload": {
+    "prompt": "回一个字：好",
+    "max_tokens": 64
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：external_llm",
+   "elapsed_s": 0.02
+  },
+  {
+   "cap": "tentacle",
+   "why": "触手：列出可用动作（只读）",
+   "payload": {
+    "action": "available_actions"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：desktop_control,privacy_read",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "think_loop",
+   "why": "思考环",
+   "payload": {
+    "goal": "给一句今日提醒"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "缺票：external_llm",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "topic_watch",
+   "why": "题材盯梢（只读路由）",
+   "payload": {
+    "need": "帮我盯着 AI 行业动态",
+    "op": "route"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.45
+  },
+  {
+   "cap": "wf_define",
+   "why": "定义工作流（落临时 store）",
+   "payload": {
+    "name": "probe_wf",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "echo",
+      "payload": {
+       "text": "hello"
+      }
+     }
+    ]
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "wf_resume",
+   "why": "续跑一个真存在的 run（先 define→run 拿 id）",
+   "payload": {
+    "run_id": "probe_wf2-1792565928824"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.08
+  },
+  {
+   "cap": "wf_run",
+   "why": "跑刚定义的工作流（真跑）",
+   "payload": {
+    "name": "probe_wf"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过",
+   "elapsed_s": 0.04
+  }
+ ],
+ "fixed_at": "2026-10-21T13:59:20",
+ "fix_note": "上轮 4 个 failed 是样本参数不对（不是能力坏）；本脚本按各自真契约重给了参数，git_write 只 stage 并立刻 reset"
+}
