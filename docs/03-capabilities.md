@@ -44,4 +44,6 @@
 
 另见：[万能插（万物皆可插/可控 · 反向调用云端算力）](13-omni-plug.md)
 
+另见：[防止 AI 攻击 与 方向控制（三道机械闸 · 谁在开车 · 已知缺口）](14-security-and-control.md)
+
 回到 [README](../../README.md)
