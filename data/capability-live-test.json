@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:32:15",
+ "at": "2026-10-21T14:34:40",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 331,
-  "denied": 1,
-  "needs_params": 6,
+  "ok": 332,
+  "denied": 3,
+  "needs_params": 3,
   "needs_auth": 0,
   "needs_dependency": 3,
   "failed": 0,
@@ -13,15 +13,15 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 331,
-  "needs_input": 6,
-  "needs_dependency": 3,
-  "needs_ticket": 1
+  "ok": 332,
+  "needs_input": 3,
+  "needs_ticket": 3,
+  "needs_dependency": 3
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 47,
-  "ticket": 11,
+  "remaining": 48,
+  "ticket": 10,
   "params": 16,
   "write": 51
  },
@@ -345,7 +345,7 @@
   "codex_interrupt": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "turn/interrupt 失败: invalid thread id: invalid character: expected an optional prefix of `urn:uuid:` followed b"
+   "note": "turn/interrupt 失败: no active turn to interrupt"
   },
   "codex_models": {
    "bucket": "ok",
@@ -368,9 +368,9 @@
    "note": "监控账 90s 超时下真调通过（5ms）"
   },
   "codex_turn_send": {
-   "bucket": "needs_input",
+   "bucket": "ok",
    "src": "remaining",
-   "note": "turn/start 失败: invalid thread id: invalid character: expected an optional prefix of `urn:uuid:` followed by [0"
+   "note": "真跑通过：回合已发"
   },
   "collab_gateway": {
    "bucket": "ok",
@@ -1098,9 +1098,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "one_key_deploy": {
-   "bucket": "needs_input",
-   "src": "ticket",
-   "note": "缺输入：未声明落点（门/能力都在拒，这是设计：不许默认堆进生产）"
+   "bucket": "needs_ticket",
+   "src": "remaining",
+   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
   },
   "one_shot": {
    "bucket": "ok",
@@ -1148,9 +1148,9 @@
    "note": "真跑通过"
   },
   "pipeline_rollback": {
-   "bucket": "needs_input",
+   "bucket": "needs_ticket",
    "src": "remaining",
-   "note": "生产区无此产物: probe"
+   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
   },
   "pipeline_status": {
    "bucket": "ok",

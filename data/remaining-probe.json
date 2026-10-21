@@ -2,10 +2,10 @@
  "at": "2026-10-21T14:13:52",
  "total": 18,
  "counts": {
-  "ok": 40,
-  "needs_input": 4,
+  "ok": 41,
+  "needs_input": 2,
   "needs_dependency": 2,
-  "needs_ticket": 1
+  "needs_ticket": 3
  },
  "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
  "口径": "隔离 store + 真授权账本副本；mirror_* 跑在临时镜像空间；git_write 只 stage 并立刻 reset；隐私类只跑 op=status（不真读屏幕/键盘内容）",
@@ -77,13 +77,13 @@
   {
    "cap": "codex_interrupt",
    "payload": {
-    "thread_id": "{'id': '01a15d5e-e1d4-73e1-af70-ca70a3c32ca9', 'environments': [{'environmentId': 'local', 'cwd': 'C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8', 'runtimeWorkspaceRoots': ['C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8']}], 'extra': None, 'sessionId': '01a15d5e-e1d4-73e1-af70-ca70a3c32ca9', 'forkedFromId': None, 'parentThreadId': None, 'preview': '', 'ephemeral': False, 'section': None, 'sectionEnteredAt': None, 'projectId': None, 'historyMode': 'paginated', 'modelProvider': 'gbt-potato', 'model': 'gbt-potato-v8', 'reasoningEffort': 'none', 'createdAt': 1792567865, 'updatedAt': 1792567865, 'recencyAt': 1792567865, 'status': {'type': 'idle'}, 'path': 'C:\\\\Users\\\\ADMIN\\\\.codex\\\\sessions\\\\2026\\\\10\\\\21\\\\rollout-2026-10-21T14-31-01-01a15d5e-e1d4-73e1-af70-ca70a3c32ca9.jsonl', 'cwd': 'C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8', 'cliVersion': '0.155.1', 'originator': 'gbt-xiaotudou-panel', 'source': 'vscode', 'canAcceptDirectInput': True, 'threadSource': None, 'agentNickname': None, 'agentRole': None, 'gitInfo': None, 'name': None, 'daybreakEnabled': None, 'turns': []}",
-    "turn_id": "t-probe"
+    "thread_id": "01a15d62-0a3a-7771-8acc-6a945c4c6ac0",
+    "turn_id": "01a15d62-1a35-7252-a44f-682ea7f0c66d"
    },
    "status": "error",
    "verdict": "needs_input",
-   "note": "turn/interrupt 失败: invalid thread id: invalid character: expected an optional prefix of `urn:uuid:` followed b",
-   "elapsed_s": 0.4
+   "note": "turn/interrupt 失败: no active turn to interrupt",
+   "elapsed_s": 0.5
   },
   {
    "cap": "codex_thread_new",
@@ -96,12 +96,12 @@
   {
    "cap": "codex_turn_send",
    "payload": {
-    "thread_id": "{'id': '01a15d5f-f791-7c21-9436-b8bb6ac5fe3f', 'environments': [{'environmentId': 'local', 'cwd': 'C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8', 'runtimeWorkspaceRoots': ['C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8']}], 'extra': None, 'sessionId': '01a15d5f-f791-7c21-9436-b8bb6ac5fe3f', 'forkedFromId': None, 'parentThreadId': None, 'preview': '', 'ephemeral': False, 'section': None, 'sectionEnteredAt': None, 'projectId': None, 'historyMode': 'paginated', 'modelProvider': 'gbt-potato', 'model': 'gbt-potato-v8', 'reasoningEffort': 'none', 'createdAt': 1792567935, 'updatedAt': 1792567935, 'recencyAt': 1792567935, 'status': {'type': 'idle'}, 'path': 'C:\\\\Users\\\\ADMIN\\\\.codex\\\\sessions\\\\2026\\\\10\\\\21\\\\rollout-2026-10-21T14-32-12-01a15d5f-f791-7c21-9436-b8bb6ac5fe3f.jsonl', 'cwd': 'C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8', 'cliVersion': '0.155.1', 'originator': 'gbt-xiaotudou-panel', 'source': 'vscode', 'canAcceptDirectInput': True, 'threadSource': None, 'agentNickname': None, 'agentRole': None, 'gitInfo': None, 'name': None, 'daybreakEnabled': None, 'turns': []}",
+    "thread_id": "01a15d62-0a3a-7771-8acc-6a945c4c6ac0",
     "text": "只回一个字：好"
    },
-   "status": "error",
-   "verdict": "needs_input",
-   "note": "turn/start 失败: invalid thread id: invalid character: expected an optional prefix of `urn:uuid:` followed by [0",
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：回合已发",
    "elapsed_s": 0.5
   },
   {
@@ -133,22 +133,29 @@
   {
    "cap": "figure_gate",
    "payload": {
-    "deliverable": true,
-    "rounds": [
-     1,
-     2,
-     3,
-     4
+    "records": [
+     {
+      "round": 1
+     },
+     {
+      "round": 2
+     },
+     {
+      "round": 3
+     },
+     {
+      "round": 4
+     }
     ],
     "numbers": {
-     "cost": "1",
-     "count": "2"
+     "cost": 1,
+     "count": 2
     }
    },
    "status": "ok",
    "verdict": "needs_input",
    "note": "",
-   "elapsed_s": 0.4
+   "elapsed_s": 0.5
   },
   {
    "cap": "forge_mastery",
@@ -345,6 +352,17 @@
    "elapsed_s": 0.33
   },
   {
+   "cap": "one_key_deploy",
+   "payload": {
+    "target": "docs",
+    "room": "probe-room"
+   },
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区",
+   "elapsed_s": 0.5
+  },
+  {
    "cap": "pentest",
    "payload": {
     "target": "https://example.com"
@@ -357,11 +375,12 @@
   {
    "cap": "pipeline_rollback",
    "payload": {
-    "name": "probe"
+    "name": "probe",
+    "to_version": "1"
    },
-   "status": "ok",
-   "verdict": "needs_input",
-   "note": "生产区无此产物: probe",
+   "status": "denied",
+   "verdict": "needs_ticket",
+   "note": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区",
    "elapsed_s": 0.5
   },
   {
