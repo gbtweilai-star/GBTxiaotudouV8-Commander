@@ -166,3 +166,36 @@ py -3.14 tools/codex-scripts/five-dim.py cap comfy_cloud '{"op":"status"}'
 ---
 
 返回 [能力总表](03-capabilities.md) · [README](../README.md)
+
+---
+
+## 七、"免费优先"这条口径：设计有，接线**还没有**（现读，2026-10-21）
+
+框架的原生口径写得很清楚（`energy_pool` 模块头，逐字）：
+
+> 能源池 —— **免费优先，但不拒绝付费**；**没有能源时如实报缺**。
+
+以及 `energy_scheduler` 的多源分配（每源并发上限 / 同源连败 3 次冷却 300s / least-load 公平）。
+按这条口径，"付费卡没空卡时自动改用免费算力"**本来就该是她的行为**。但今天把三处都量了一遍，
+结论是：**口径在，接线不在**：
+
+| 量的地方 | 现读 | 说明 |
+|---|---|---|
+| `energy_pool op=status` | 17 个能源在册 · `dpapi_on_disk` 16 个 · **`tier_known: []`** | 17 个全是 **LLM/API 钥匙**（agnes / kimi / moonshot / openai / deepseek / vision / tripo / freellmapi / imap …）——**没有一个是能跑 ComfyUI 的 GPU 源** |
+| `freellmapi op=status` | `up:false` · `URLError [WinError 10061]` | 免费池服务在 `127.0.0.1:31415`，**本机没起**（`%APPDATA%\FreeLLMAPI` 只剩数据与 config，无可执行件） |
+| `pod_link op=start` | `http=500` · `There are not enough free GPUs on the host machine` | 付费卡宿主机没空卡 |
+| `comfy_cloud` 的调用链 | 只走 `pod_link` | **从不查能源池** ⇒ "免费优先"在它这条路上**没有入口** |
+
+**这是缺口，不是"她没这个能力"**：能力位（`energy_pool` / `energy_scheduler` / `cloud_plugin`）都在、
+口径也是真写下的，缺的是 `comfy_cloud` → 能源池那条**腿**（本仓根因表 P2：新增能力必漏的接线腿之一）。
+
+修法（要主人先选源，因为每一条都要账号/令牌）：
+
+1. **接 HF 免费算力**（本仓已有 `hf_voice` 三臂轮询先例，HF token 在本机已配）→ 在 HF 上起一个 ComfyUI Space，
+   `comfy_cloud` 加 `hf` 分支：无空卡时改走 Space 的 `/gradio_api` 或 `/run`；
+2. **接免费池服务**：把 FreeLLMAPI 桌面件装上并起在本机 31415，`freellmapi` 就有 635 个免费端点
+   （但那是 **LLM** 池，只能替"写提示词/编排"，不能替 GPU 跑图）；
+3. **自带宿主**：换一台有卡的宿主 / 新开一张卡（付费，`pod_link op=create` 要 `confirm="主人已授权"`）。
+
+> 在选定之前，`comfy_cloud` 就**该**停在 `needs_dependency`，并把上面这张表当理由——
+> 这比"假装已经用免费 GPU 跑完了"诚实（本仓自律②：换不动就说换不动）。
