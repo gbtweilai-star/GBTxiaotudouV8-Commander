@@ -1,0 +1,72 @@
+{
+ "at": "2026-10-21T16:36:39",
+ "schema": "cable-all-live-v1",
+ "cable_model": "触手=电缆 · 密钥=通电 · 云端有算力就能通 · 能通就能反向调用",
+ "key_slot": "vault:dpapi",
+ "endpoint": "https://apihub.agnes-ai.com/v1",
+ "video": {
+  "ok": false,
+  "cable": "出片",
+  "socket": "agnes-video-2.5-flash",
+  "tried": [
+   {
+    "path": "/video/generations",
+    "http": 400,
+    "seconds": 0.2,
+    "upstream": "{\"code\":\"invalid_json\",\"message\":\"Failed to read request body (request id: 20261021093639394990594RAFxUaTV)\",\"data\":null}"
+   }
+  ],
+  "key_slot": "vault:agnes"
+ },
+ "images": {
+  "ok": true,
+  "cable": "批量出图",
+  "socket": "agnes-image-2.5-flash",
+  "endpoint": "https://apihub.agnes-ai.com/v1/images/generations",
+  "count": 3,
+  "ok_count": 3,
+  "total_seconds": 29.7,
+  "key_slot": "vault:agnes",
+  "rows": [
+   {
+    "n": 1,
+    "ok": true,
+    "http": 200,
+    "seconds": 9.1,
+    "prompt": "a calm potato on a wooden desk, soft window light",
+    "artifact": "outputs/cloud/cable-all/cable-image-1-20261021T163648.png",
+    "bytes": 1067628,
+    "sha256": "f679f8f67d5b6b137553645e1079cddf581ddd1c6bd9e9e1cc71748eec9091f1"
+   },
+   {
+    "n": 2,
+    "ok": true,
+    "http": 200,
+    "seconds": 9.9,
+    "prompt": "a potato wearing tiny glasses, studio photo",
+    "artifact": "outputs/cloud/cable-all/cable-image-2-20261021T163659.png",
+    "bytes": 1013562,
+    "sha256": "491ff89859309e0dc94fdfb071a02b200444cc9e9095593e07bb9afdd4f99cbf"
+   },
+   {
+    "n": 3,
+    "ok": true,
+    "http": 200,
+    "seconds": 10.7,
+    "prompt": "potato slices on a cutting board, top-down, warm light",
+    "artifact": "outputs/cloud/cable-all/cable-image-3-20261021T163710.png",
+    "bytes": 1355276,
+    "sha256": "6b5ce94a49b61726142dd9fb20512ba2d28080bdb73dc3330512502b3c132ba2"
+   }
+  ]
+ },
+ "cpu": {
+  "ok": true,
+  "cable": "本机 CPU",
+  "socket": "numpy float32 matmul 2048x2048",
+  "seconds": 0.0535,
+  "gflops": 321.1,
+  "artifacts": 0,
+  "note": "裸算力：零模型、零出网、无产物文件（只出读数）"
+ }
+}
