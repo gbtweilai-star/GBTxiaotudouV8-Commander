@@ -1,0 +1,9 @@
+GBT小土豆V8 总指挥大模型（GBTxiaotudouV8 Commander）
+Copyright 2026 自由的风
+
+This product includes software and documentation developed as described in
+docs/01-model-card.md. The base architecture follows Qwen2; the fine-tuning,
+capability registry, evaluation method and runtime design are original work of
+the author.
+
+开发者：自由的风 · 本署名不可删除、不可篡改归属。

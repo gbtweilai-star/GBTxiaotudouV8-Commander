@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img" aria-label="GBT小土豆V8 总指挥模型架构图">
+  <defs>
+    <style>
+      .box  { fill:#ffffff; stroke:#c9d1d9; stroke-width:1.5; rx:10; }
+      .box2 { fill:#f6f8fa; stroke:#c9d1d9; stroke-width:1.5; rx:10; }
+      .acc  { fill:#e8f5ee; stroke:#2ea043; stroke-width:1.6; rx:10; }
+      .gate { fill:#fff8e6; stroke:#d29922; stroke-width:1.8; rx:10; }
+      .deny { fill:#fdecec; stroke:#f85149; stroke-width:1.5; rx:10; }
+      .t    { font-family: "Microsoft YaHei","PingFang SC",sans-serif; font-size:15px; fill:#24292f; }
+      .ts   { font-family: "Microsoft YaHei","PingFang SC",sans-serif; font-size:12.5px; fill:#57606a; }
+      .tk   { font-family: Consolas,monospace; font-size:12.5px; fill:#24292f; }
+      .lbl  { font-family: "Microsoft YaHei","PingFang SC",sans-serif; font-size:12px; fill:#57606a; }
+      .line { stroke:#8b949e; stroke-width:1.6; fill:none; marker-end:url(#a); }
+      .lineg{ stroke:#2ea043; stroke-width:1.6; fill:none; marker-end:url(#ag); }
+      .liner{ stroke:#f85149; stroke-width:1.6; fill:none; marker-end:url(#ar); }
+    </style>
+    <marker id="a"  markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8b949e"/></marker>
+    <marker id="ag" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#2ea043"/></marker>
+    <marker id="ar" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#f85149"/></marker>
+  </defs>
+
+  <text x="30" y="36" class="t" style="font-size:19px;font-weight:600">GBT小土豆V8 · 总指挥模型：一个门，两条路，一本账</text>
+  <text x="30" y="58" class="ts">模型只负责判断落点；执行只有一个入口；权限写在注册表上，不写在提示词里。</text>
+
+  <!-- 人话 -->
+  <rect class="box2" x="30" y="86" width="190" height="58"/>
+  <text x="125" y="110" class="t" text-anchor="middle">人话 / 需求</text>
+  <text x="125" y="130" class="ts" text-anchor="middle">"把 Markdown 变成 PPT"</text>
+
+  <!-- 模型 -->
+  <rect class="box" x="270" y="76" width="240" height="78"/>
+  <text x="390" y="102" class="t" text-anchor="middle" style="font-weight:600">① 总指挥模型（7.6B）</text>
+  <text x="390" y="122" class="ts" text-anchor="middle">落到哪个能力位 / 要什么参数</text>
+  <text x="390" y="141" class="ts" text-anchor="middle">会不会写盘 · 花钱 · 出网</text>
+
+  <!-- 门 -->
+  <rect class="gate" x="560" y="76" width="300" height="78"/>
+  <text x="710" y="102" class="t" text-anchor="middle" style="font-weight:600">② 唯一门 run_task(kind, payload)</text>
+  <text x="710" y="122" class="ts" text-anchor="middle">没有旁路：不经过它，到不了底层</text>
+  <text x="710" y="141" class="tk" text-anchor="middle">authorization · audit · stamp</text>
+
+  <!-- 只读路 -->
+  <rect class="acc" x="600" y="208" width="240" height="66"/>
+  <text x="720" y="233" class="t" text-anchor="middle">③ 只读位 · 262 位</text>
+  <text x="720" y="253" class="ts" text-anchor="middle">不改状态 · 不出网 → 直接执行</text>
+
+  <!-- 授权路 -->
+  <rect class="box" x="330" y="208" width="230" height="66"/>
+  <text x="445" y="233" class="t" text-anchor="middle">④ 人工授权门（时段票）</text>
+  <text x="445" y="253" class="ts" text-anchor="middle">写盘 / 花钱 / 出网 · 79 位</text>
+
+  <!-- 拒绝 -->
+  <rect class="deny" x="60" y="208" width="220" height="66"/>
+  <text x="170" y="233" class="t" text-anchor="middle">拒绝 → 如实报缺</text>
+  <text x="170" y="253" class="ts" text-anchor="middle">缺哪个作用域 · 怎么发票</text>
+
+  <!-- 执行 -->
+  <rect class="box" x="330" y="330" width="230" height="60"/>
+  <text x="445" y="356" class="t" text-anchor="middle">执行</text>
+  <text x="445" y="376" class="ts" text-anchor="middle">（Gated 之后才动）</text>
+
+  <!-- 账本 -->
+  <rect class="box2" x="620" y="330" width="250" height="60"/>
+  <text x="745" y="356" class="t" text-anchor="middle">⑤ 审计账本（append-only）</text>
+  <text x="745" y="376" class="ts" text-anchor="middle">谁调的 · 哪位 · 成没成 · 耗时</text>
+
+  <!-- 箭头 -->
+  <path class="line" d="M220,115 L262,115"/>
+  <path class="line" d="M510,115 L552,115"/>
+  <path class="lineg" d="M700,154 L718,200"/>
+  <path class="line" d="M620,115 L500,200"/>
+  <path class="liner" d="M560,115 L300,200"/>
+  <path class="lineg" d="M445,274 L445,322"/>
+  <path class="line" d="M566,255 L610,215"/>
+  <path class="line" d="M560,360 L612,360"/>
+
+  <!-- 说明 -->
+  <text x="30" y="432" class="ts">读法：绿色 = 直接过；黄色 = 必须先拿票；红色 = 被拒也要把原因说清（"安静 ≠ 坏了 ≠ 被拒"）。</text>
+  <text x="30" y="456" class="ts">硬约束：AI 无权给自己发票 · 点火名车道不许静默换道 · 拒绝路径必须带上游原话。</text>
+  <text x="30" y="486" class="tk">github.com/gbtweilai-star/GBTxiaotudouV8moxing</text>
+  <text x="30" y="506" class="ts">开发者：自由的风 · 本署名不可删除、不可篡改归属</text>
+</svg>
