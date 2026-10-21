@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T15:09:48",
+ "at": "2026-10-21T15:33:05",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 336,
+  "ok": 337,
   "denied": 1,
-  "needs_params": 3,
+  "needs_params": 2,
   "needs_auth": 0,
   "needs_dependency": 1,
   "failed": 0,
@@ -13,18 +13,20 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 336,
-  "needs_input": 3,
+  "ok": 337,
+  "needs_input": 2,
   "needs_ticket": 1,
   "needs_dependency": 1
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 48,
+  "remaining": 46,
   "ticket": 10,
   "params": 16,
+  "chain": 1,
   "room": 1,
-  "write": 50
+  "write": 50,
+  "figure": 1
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -345,8 +347,8 @@
   },
   "codex_interrupt": {
    "bucket": "needs_input",
-   "src": "remaining",
-   "note": "{\"status\": \"error\", \"kind\": \"codex_interrupt\", \"message\": \"turn/interrupt 失败: no active turn to interrupt\"}"
+   "src": "chain",
+   "note": "同进程三步探针：断在 turn_send/interrupt —— 见 data/codex-interrupt-live.json（不是「没有这个功能」，是「打断活回合的前置不成立」，逐条原因见 data/codex-interrupt-live.json）"
   },
   "codex_models": {
    "bucket": "ok",
@@ -649,9 +651,9 @@
    "note": "监控账 90s 超时下真调通过（10ms）"
   },
   "figure_gate": {
-   "bucket": "needs_input",
-   "src": "remaining",
-   "note": "{\"ok\": false, \"op\": \"verdict\", \"deliverable\": false, \"rounds\": 0, \"min_rounds\": 4, \"open_issues\": [], \"numbers\": {}, \"reasons\": [\"numbers_no"
+   "bucket": "ok",
+   "src": "figure",
+   "note": "出图门自判可交付：4 轮看图 · 最新一轮未清 0 · 数已声明（tools/codex-scripts/render-test-figures.py）"
   },
   "file_hygiene": {
    "bucket": "ok",

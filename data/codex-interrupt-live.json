@@ -1,0 +1,45 @@
+{
+ "at": "2026-10-21T15:32:06",
+ "schema": "codex-interrupt-live-v1",
+ "ok": false,
+ "elapsed_s": 21.54,
+ "steps": {
+  "thread_new": {
+   "ok": true,
+   "thread_id": "01a15d96-7c61-7520-a7ab-6a6691aad7ab",
+   "error": null,
+   "denied": null,
+   "missing_scopes": null
+  },
+  "turn_send": {
+   "ok": false,
+   "turn_id": "",
+   "turn_started_method": null,
+   "notifications_seen": [],
+   "diag": {
+    "keys": [
+     "gbt_stamp",
+     "gbt_result",
+     "ok_source",
+     "ok",
+     "kind",
+     "result",
+     "error",
+     "status"
+    ],
+    "ok": true,
+    "status": "ok",
+    "error": null,
+    "result_keys": [
+     "status",
+     "kind",
+     "result",
+     "authorization"
+    ]
+   },
+   "note": "回合在后台线程里发起；turnId 由 app-server 的通知里抓到的，不是等 start_turn 返回（那要等回合跑完）",
+   "send_result": null
+  }
+ },
+ "law": "三步必须在**同一进程**里连做：shared app-server 是进程级缓存，跨 cap 调用会 thread not found。三跳各自都过 run_task 唯一门。"
+}
