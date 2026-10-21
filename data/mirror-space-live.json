@@ -1,0 +1,116 @@
+{
+ "at": "2026-10-21T12:40:37",
+ "readonly_runs": {
+  "mirror_status": {
+   "ok": true,
+   "elapsed_s": 0.3,
+   "status": "ok",
+   "missing_scopes": null,
+   "error": null,
+   "keys": [
+    "kind",
+    "result",
+    "status"
+   ],
+   "preview": "{\"status\": \"ok\", \"kind\": \"mirror_status\", \"result\": {\"ok\": true, \"dimension\": {\"files\": 25}, \"reality\": {\"files\": 25, \"version\": 32}, \"dimension_vs_reality\": [], \"reality_drift\": [], \"clean\": true, \"timelines\": 32, \"stage\": {\"files\": 25}, \"production\": {\"files\": 25, \"version\": 32}, \"stage_vs_prod\": "
+  },
+  "mirror_scan": {
+   "ok": true,
+   "elapsed_s": 0.0,
+   "status": "ok",
+   "missing_scopes": null,
+   "error": null,
+   "keys": [
+    "kind",
+    "result",
+    "status"
+   ],
+   "preview": "{\"status\": \"ok\", \"kind\": \"mirror_scan\", \"result\": {\"ok\": true, \"passed\": 5, \"total\": 5, \"checks\": {\"non_empty\": {\"ok\": true, \"detail\": \"25 文件\"}, \"no_empty_files\": {\"ok\": true, \"detail\": \"无\"}, \"signature\": {\"ok\": true, \"detail\": \"全部携带\"}, \"discipline\": {\"ok\": true, \"detail\": \"干净\"}, \"entry_point\": {\"ok"
+  },
+  "mirror_plan": {
+   "ok": true,
+   "elapsed_s": 0.0,
+   "status": "ok",
+   "missing_scopes": null,
+   "error": null,
+   "keys": [
+    "kind",
+    "result",
+    "status"
+   ],
+   "preview": "{\"status\": \"ok\", \"kind\": \"mirror_plan\", \"result\": {\"ok\": true, \"name\": \"default\", \"defined_at\": \"2026-09-19T08:07:05\", \"plan_sha\": \"fd01b97bd97a7ed3397fef2e5ad669df8c05ce59654788d5a81cf41c9ca8554a\", \"plan\": {\"goal\": \"面板部署排练（DD 乙 · 甲方案 v2）\", \"assumptions\": [{\"id\": \"A1\", \"statement\": \"沙盒与本次生产目标为同一主机、同"
+  },
+  "mirror_simulate": {
+   "ok": true,
+   "elapsed_s": 0.1,
+   "status": "ok",
+   "missing_scopes": null,
+   "error": null,
+   "keys": [
+    "authorization",
+    "kind",
+    "result",
+    "status"
+   ],
+   "preview": "{\"status\": \"ok\", \"kind\": \"mirror_simulate\", \"result\": {\"ok\": true, \"name\": \"default\", \"passed\": 9, \"total\": 9, \"checks\": {\"dimension_scan\": {\"ok\": true, \"detail\": \"5/5 镜像体检通过\", \"failed\": []}, \"assumptions_verified\": {\"ok\": true, \"detail\": \"假设 1 条：已验证 1\", \"assumptions\": [{\"id\": \"A1\", \"statement\": \"沙盒"
+  },
+  "mirror_parity": {
+   "ok": true,
+   "elapsed_s": 0.2,
+   "status": "ok",
+   "missing_scopes": null,
+   "error": null,
+   "keys": [
+    "authorization",
+    "kind",
+    "result",
+    "status"
+   ],
+   "preview": "{\"status\": \"ok\", \"kind\": \"mirror_parity\", \"result\": {\"ok\": true, \"name\": \"default\", \"mode\": \"same_host\", \"sandbox\": {\"captured_at\": \"2026-10-21T12:40:37\", \"platform\": \"win32\", \"os\": \"windows\", \"machine\": \"amd64\", \"python\": \"3.14\", \"python_implementation\": \"cpython\", \"python_executable\": \"C:\\\\Users\\\\"
+  }
+ },
+ "write_face": {
+  "mirror_rehearse": {
+   "denied": true,
+   "status": "denied",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "mirror_release": {
+   "denied": true,
+   "status": "denied",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "mirror_ascend": {
+   "denied": true,
+   "status": "denied",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "mirror_rewind": {
+   "denied": true,
+   "status": "denied",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "room_space": {
+   "denied": false,
+   "status": "ok",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "qiankun": {
+   "denied": false,
+   "status": "error",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  },
+  "one_key_deploy": {
+   "denied": true,
+   "status": "denied",
+   "missing_scopes": null,
+   "elapsed_s": 0.0
+  }
+ }
+}
