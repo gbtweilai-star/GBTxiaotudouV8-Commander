@@ -199,3 +199,29 @@ py -3.14 tools/codex-scripts/five-dim.py cap comfy_cloud '{"op":"status"}'
 
 > 在选定之前，`comfy_cloud` 就**该**停在 `needs_dependency`，并把上面这张表当理由——
 > 这比"假装已经用免费 GPU 跑完了"诚实（本仓自律②：换不动就说换不动）。
+
+## 七、"免费优先"这条口径：**已经真跑通一次**（2026-10-21 现读）
+
+框架的原生口径（`energy_pool` 模块头，逐字）：
+
+> 能源池 —— **免费优先，但不拒绝付费**；**没有能源时如实报缺**。
+
+这条口径此前**只在设计里**（付费卡没空卡就硬失败）。2026-10-21 补了 HF 这把钥并真跑了一次：
+
+| 步 | 读数 |
+|---|---|
+| ① 钥位 | 新增 `hf` 档进 DPAPI 保险箱（`store/secrets/hf_api.dpapi`，回执只给掩码 `hf_ue****`，**永不回显**） |
+| ② 身份验证 | `whoami-v2` → `name=xiaotudou-ai · type=user` |
+| ③ 免费 GPU 节点 | `Sneezemande/wan22-comfyui-demo` · **hardware=zero-a10g · stage=RUNNING**（免费 GPU，非付费卡） |
+| ④ 端点契约 | `/generate_video`（prompt / image / negative_prompt / seconds / height / width）· `/fit_image_dimensions` |
+| ⑤ 一次参数反例 | `seconds=1` → 服务端回 `Value 1 is less than minimum value 1.1` ⇒ **请求确实到达了节点**（不是连不上） |
+| ⑥ **真出片** | `seconds=2 · 480×480` → **22.2 秒**返回 mp4：`outputs/cloud/hf-free-gpu/free-gpu-zero-a10g.mp4`（**89,654 字节 · sha256 前16 = 36052060892FEA94**） |
+
+回执落账：`data/hf-free-gpu-live.json`（schema `hf-free-gpu-live-v1`）。
+
+**还差的一腿（如实说）**：上面这一步是"用 HF 免费 GPU 真出了一条片子"，
+但 `comfy_cloud` 这个**能力位**里还没有 `free` 分支 —— 要把这条免费路变成"她自己的能力"，
+需要给 `comfy_cloud` 加 `op=free`（或在 `status` 里加免费源探测）并登记作用域。
+作用域登记要动 `security/policy.py`，**那一步必须主人点头**（本仓红线：AI 不自改 policy）。
+
+---
