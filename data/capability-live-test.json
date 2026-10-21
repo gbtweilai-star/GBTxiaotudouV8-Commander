@@ -1,32 +1,32 @@
 {
- "at": "2026-10-21T15:55:11",
+ "at": "2026-10-21T16:13:42",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 339,
+  "ok": 340,
   "denied": 0,
   "needs_params": 1,
   "needs_auth": 0,
-  "needs_dependency": 1,
+  "needs_dependency": 0,
   "failed": 0,
   "timeout": 0,
   "exception": 0
  },
  "buckets": {
-  "ok": 339,
-  "needs_input": 1,
-  "needs_dependency": 1
+  "ok": 340,
+  "needs_input": 1
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 45,
+  "remaining": 44,
   "ticket": 10,
   "params": 16,
   "chain": 1,
   "room": 1,
   "write": 49,
   "offense": 2,
-  "figure": 1
+  "figure": 1,
+  "freegpu": 1
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -381,9 +381,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "comfy_cloud": {
-   "bucket": "needs_dependency",
-   "src": "remaining",
-   "note": "云卡 status"
+   "bucket": "ok",
+   "src": "freegpu",
+   "note": "免费 GPU 路真跑：route=free-hf · Sneezemande/wan22-comfyui-demo · 29.3s · 73884 字节 · sha256=7a2f0ca6d8b0…（付费卡 0/15 运行）"
   },
   "comfy_forge": {
    "bucket": "ok",

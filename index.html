@@ -108,7 +108,7 @@
       <tr><td>评估第 1 轮</td><td class="num">0.9908 · 99.10% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
       <tr><td>评估第 2 轮</td><td class="num">0.9873 · 98.51% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
       <tr><td>PASS45 通过数</td><td class="num">330 / 335</td><td class="mono">data/eval-*.json</td></tr>
-      <tr><td>能力位普查</td><td class="num">339 ok / 1 needs_input / 0 needs_ticket / 1 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
+      <tr><td>能力位普查</td><td class="num">340 ok / 1 needs_input / 0 needs_ticket / 0 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
       <tr><td>一次性部署链（排练→盖章→晋升）</td><td class="num">房间 release-20261021：scan 3/3 · rehearse ok · release ok · 5.9s</td><td class="mono">docs/07 §九</td></tr>
       <tr><td>GBt天真原生算子</td><td class="num">27 ops · 18 同名 · 1495 契约节点 · 覆盖 1.2%</td><td class="mono">docs/10-gbt-tianzhen.md</td></tr>
       <tr><td>五维合一（脑眼耳嘴手）</td><td class="num">开步 → 能力位 → 关步，带证据闭环</td><td class="mono">docs/11-five-dim.md</td></tr>
@@ -151,13 +151,12 @@ py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live
   <h2><span class="n">05</span>诚实账：这些确实没跑通</h2>
   <p class="sub">发布页不藏问题。下面是当前<strong>仍然卡住</strong>的项，以及它会卡在哪一步、谁有权解开。</p>
   <div class="honest">
-    <h3>已知未跑 / 已知受限（2 位，逐条给原因）</h3>
+    <h3>已知未跑 / 已知受限（1 位，逐条给原因）</h3>
     <ul>
       <li><strong><code>offense_ops</code></strong>：同一根 —— 缺授权目标（`need_target`）。</li>
       <li><strong><code>codex_interrupt</code></strong>：同步客户端在中断指令到达前已结束回合 ⇒ 抓不到活回合。</li>
       <li><strong><code>figure_gate</code></strong>：要 4 轮真实看图证据（记轮次会写盘）⇒ 缺 `filesystem_write` 窗口票；声明型轮次会被判
         <span class="mono">rounds_insufficient</span>。</li>
-      <li><strong><code>comfy_cloud</code></strong>：云卡不可达（远端环境）；<em>本地 27 个原生算子不受影响，可离线真跑</em>。</li>
       <li><strong>权重托管</strong>：15.25 GB bf16 合并权重尚未上传公共仓库（需要写权限令牌）。</li>
     </ul>
     <p style="margin:12px 0 0;color:#bda98e;font-size:13.5px">
