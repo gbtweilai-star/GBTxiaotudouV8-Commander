@@ -2,6 +2,16 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
+## 2026-10-21 · 第九批：340/341 —— `comfy_cloud` 接上 HF 免费 GPU 腿
+
+- 主人令「没有空闲 GPU 就自动调云端免费 GPU」⇒ 新增 `comfy_cloud op=freegpu`：
+  **先量付费卡（现读 15 张全 EXITED / 0 运行）→ 自动转 HF 免费节点出片 → 产物逐字节落盘 + sha256 对账 → 回执写明 `route`**。
+- 过门真跑：`route=free-hf · Sneezemande/wan22-comfyui-demo · zero-a10g(免费 GPU) · 29.3s · 73,884 字节 · sha256 7a2f0ca6…`；
+  产物 `outputs/cloud/hf-free-gpu/freegpu-20261021T161333.mp4`，证据 `data/comfy-freegpu-live.json`。
+- 作用域只登记一条：`network_private` + `filesystem_write`（**不叠 `data_export`**）；既有闸一条未动。
+- **终账：340 通过 / 0 要票 / 1 缺输入 / 0 缺依赖 / 0 失败 = 341**（只剩 `codex_interrupt`：上游 app-server 串行化）
+
+
 ## 2026-10-21 · 第八批：339/341（最后一位「要票」真跑通过）
 
 - **`pentest` 转绿**：主人发 `network_private` 后当轮真跑 ——

@@ -1,0 +1,19 @@
+{
+ "at": "2026-10-21T16:13:42",
+ "schema": "comfy-freegpu-live-v1",
+ "ok": true,
+ "op": "freegpu",
+ "route": "free-hf",
+ "space": "Sneezemande/wan22-comfyui-demo",
+ "hardware": "zero-a10g(免费 GPU)",
+ "elapsed_s": 29.3,
+ "artifact": "outputs/cloud/hf-free-gpu/freegpu-20261021T161333.mp4",
+ "bytes": 73884,
+ "sha256": "7a2f0ca6d8b03a0aa0e58aa4e2880291be2227520679b37648ab449399eb99f6",
+ "paid_pod": {
+  "ok": true,
+  "running": 0,
+  "total": 15
+ },
+ "law": "付费卡 0/15 运行时自动转 HF 免费节点；route 如实标注；产物逐字节落盘并对账"
+}
