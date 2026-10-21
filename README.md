@@ -11,6 +11,10 @@ python demo.py "turn this Markdown into a PPT"    # -> capability bit, gate stat
 
 <p><a href="README.en.md">🇬🇧 Full English README</a> · <a href="https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/">Project page</a> · <a href="arms/README.md">🦾 Omni-Arm (GLB)</a> · <a href="docs/13-omni-plug.md">Reverse-calling cloud compute</a></p>
 
+> **想看源码？** 门（`run_task` 契约层 + 遥测包装器）、作用域正表、审计账本、341 位注册表、万能插 —— **真源码在 [runtime/](runtime/README.md)**，
+> 附机械自检 `python runtime/static_check.py`（现读 **9 过 / 0 不过**；只读 AST，不执行引擎）。
+> 源码里 `run_task` 出现两次不是 bug：[runtime/README.md](runtime/README.md) 里讲清了为什么（`_run_task_base` 先快照原定义）。
+
 ---
 
 # 🥔 GBT小土豆V8 · 总指挥大模型
