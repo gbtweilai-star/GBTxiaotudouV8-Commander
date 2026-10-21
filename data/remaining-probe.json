@@ -1,0 +1,242 @@
+{
+ "at": "2026-10-21T14:13:52",
+ "total": 18,
+ "counts": {
+  "ok": 17,
+  "needs_dependency": 5,
+  "needs_input": 1
+ },
+ "store": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gbt_remaining_store_jckdnuu6",
+ "口径": "隔离 store + 真授权账本副本；mirror_* 跑在临时镜像空间；git_write 只 stage 并立刻 reset；隐私类只跑 op=status（不真读屏幕/键盘内容）",
+ "rows": [
+  {
+   "cap": "blender",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 1.4
+  },
+  {
+   "cap": "cli_chat",
+   "payload": {
+    "agent": "codebuddy",
+    "message": "只回一个字：好"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 1.05
+  },
+  {
+   "cap": "code_patch",
+   "payload": {
+    "path": "gbt_allinone/api.py",
+    "find": "_run_task_base = run_task",
+    "replace": "_run_task_base = run_task  # probe",
+    "apply": false
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "comfy_cloud",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "云卡不可达（op=status 回 ok=false 无理由字段）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "git_write",
+   "payload": {
+    "op": "stage",
+    "paths": [
+     "AGENTS.md"
+    ]
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.08
+  },
+  {
+   "cap": "keylogger",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 4.86
+  },
+  {
+   "cap": "mirror_ascend",
+   "payload": {
+    "name": "probe"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：晋升到 version 33 / 25 文件 + 护照",
+   "elapsed_s": 0.04
+  },
+  {
+   "cap": "mirror_parity",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "same_host 一致",
+   "elapsed_s": 0
+  },
+  {
+   "cap": "mirror_plan",
+   "payload": {},
+   "status": "ok",
+   "verdict": "needs_input",
+   "note": "需要先立计划（plan 不存在）",
+   "elapsed_s": 0
+  },
+  {
+   "cap": "mirror_rehearse",
+   "payload": {
+    "name": "probe"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：排练报告已生成（plan_sha 绑定）",
+   "elapsed_s": 0.07
+  },
+  {
+   "cap": "mirror_release",
+   "payload": {
+    "name": "probe"
+   },
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "缺前置：无已物化产物可发布（先 pipeline 产物）",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "mirror_rewind",
+   "payload": {
+    "name": "probe"
+   },
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "缺前置：时间线无该版本",
+   "elapsed_s": 0.03
+  },
+  {
+   "cap": "mirror_scan",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "5/5 全绿（真 store，25 文件）",
+   "elapsed_s": 0
+  },
+  {
+   "cap": "mirror_shape",
+   "payload": {},
+   "status": "ok",
+   "verdict": "ok",
+   "note": "成形成功",
+   "elapsed_s": 0
+  },
+  {
+   "cap": "mirror_simulate",
+   "payload": {},
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "缺前置：无计划可比",
+   "elapsed_s": 0
+  },
+  {
+   "cap": "omarchy_bridge",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "needs_dependency",
+   "note": "宿主 PATH 无 omarchy（op=assess 已真跑：三根线都 absent）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "omni_web",
+   "payload": {
+    "url": "https://example.com"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过：read_source 读了 octocat/Hello-World",
+   "elapsed_s": 0.33
+  },
+  {
+   "cap": "pipeline_submit",
+   "payload": {
+    "name": "probe",
+    "content": "x"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.05
+  },
+  {
+   "cap": "remote_confinement",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 3.28
+  },
+  {
+   "cap": "remote_domain",
+   "payload": {
+    "op": "list"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "screen_sniff",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.01
+  },
+  {
+   "cap": "tripo",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 2.85
+  },
+  {
+   "cap": "ul_tars_desktop",
+   "payload": {
+    "op": "status"
+   },
+   "status": "ok",
+   "verdict": "ok",
+   "note": "真跑通过（隔离 store）",
+   "elapsed_s": 0.05
+  }
+ ],
+ "fixed_at": "2026-10-21T14:15:00"
+}

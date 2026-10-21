@@ -1,29 +1,29 @@
 {
- "at": "2026-10-21T14:06:13",
+ "at": "2026-10-21T14:14:37",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 297,
-  "denied": 12,
-  "needs_params": 23,
-  "needs_auth": 8,
-  "needs_dependency": 1,
+  "ok": 309,
+  "denied": 2,
+  "needs_params": 24,
+  "needs_auth": 0,
+  "needs_dependency": 6,
   "failed": 0,
   "timeout": 0,
   "exception": 0
  },
  "buckets": {
-  "ok": 297,
-  "needs_input": 23,
-  "needs_ticket": 12,
-  "not_run_high_risk": 8,
-  "needs_dependency": 1
+  "ok": 309,
+  "needs_input": 24,
+  "needs_dependency": 6,
+  "needs_ticket": 2
  },
  "by_source": {
-  "monitor": 226,
+  "monitor": 216,
   "ticket": 20,
   "params": 16,
-  "write": 79
+  "remaining": 23,
+  "write": 66
  },
  "sources": {
   "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
@@ -188,9 +188,9 @@
    "note": "监控账 90s 超时下真调通过（14ms）"
   },
   "blender": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "bluetooth": {
    "bucket": "ok",
@@ -293,9 +293,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "cli_chat": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "cli_ify": {
    "bucket": "ok",
@@ -328,9 +328,9 @@
    "note": "监控账 90s 超时下真调通过（11ms）"
   },
   "code_patch": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "codebuddy": {
    "bucket": "ok",
@@ -378,9 +378,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "comfy_cloud": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：process_execute"
+   "bucket": "needs_dependency",
+   "src": "remaining",
+   "note": "云卡不可达（op=status 回 ok=false 无理由字段）"
   },
   "comfy_forge": {
    "bucket": "ok",
@@ -713,9 +713,9 @@
    "note": "监控账 90s 超时下真调通过（178ms）"
   },
   "git_write": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "god_view": {
    "bucket": "ok",
@@ -803,9 +803,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "keylogger": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：privacy_read"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "know_map": {
    "bucket": "ok",
@@ -958,49 +958,49 @@
    "note": "监控账 90s 超时下真调通过（11ms）"
   },
   "mirror_ascend": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：晋升到 version 33 / 25 文件 + 护照"
   },
   "mirror_parity": {
    "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（56ms）"
+   "src": "remaining",
+   "note": "same_host 一致"
   },
   "mirror_plan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
+   "bucket": "needs_input",
+   "src": "remaining",
+   "note": "需要先立计划（plan 不存在）"
   },
   "mirror_rehearse": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：排练报告已生成（plan_sha 绑定）"
   },
   "mirror_release": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "bucket": "needs_dependency",
+   "src": "remaining",
+   "note": "缺前置：无已物化产物可发布（先 pipeline 产物）"
   },
   "mirror_rewind": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "bucket": "needs_dependency",
+   "src": "remaining",
+   "note": "缺前置：时间线无该版本"
   },
   "mirror_scan": {
    "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（19ms）"
+   "src": "remaining",
+   "note": "5/5 全绿（真 store，25 文件）"
   },
   "mirror_shape": {
    "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（30ms）"
+   "src": "remaining",
+   "note": "成形成功"
   },
   "mirror_simulate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（60ms）"
+   "bucket": "needs_dependency",
+   "src": "remaining",
+   "note": "缺前置：无计划可比"
   },
   "mirror_status": {
    "bucket": "ok",
@@ -1068,9 +1068,9 @@
    "note": "监控账 90s 超时下真调通过（102ms）"
   },
   "omarchy_bridge": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：process_execute"
+   "bucket": "needs_dependency",
+   "src": "remaining",
+   "note": "宿主 PATH 无 omarchy（op=assess 已真跑：三根线都 absent）"
   },
   "omission_detector": {
    "bucket": "ok",
@@ -1088,9 +1088,9 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "omni_web": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过：read_source 读了 octocat/Hello-World"
   },
   "onboarding_gate": {
    "bucket": "ok",
@@ -1158,9 +1158,9 @@
    "note": "监控账 90s 超时下真调通过（39ms）"
   },
   "pipeline_submit": {
-   "bucket": "needs_ticket",
-   "src": "monitor",
-   "note": "缺票：需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "pipeline_versions": {
    "bucket": "ok",
@@ -1263,14 +1263,14 @@
    "note": "真跑通过（写入落临时 store）"
   },
   "remote_confinement": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：process_execute"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "remote_domain": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "render_evolution": {
    "bucket": "ok",
@@ -1348,9 +1348,9 @@
    "note": "监控账 90s 超时下真调通过（12ms）"
   },
   "screen_sniff": {
-   "bucket": "needs_ticket",
-   "src": "write",
-   "note": "缺票：privacy_read"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "sec_chain": {
    "bucket": "ok",
@@ -1598,9 +1598,9 @@
    "note": "监控账 90s 超时下真调通过（518ms）"
   },
   "tripo": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "truth_scan": {
    "bucket": "ok",
@@ -1618,9 +1618,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "ul_tars_desktop": {
-   "bucket": "not_run_high_risk",
-   "src": "write",
-   "note": "高危未跑（会写生产交付区/起进程/出网/改版本库/渲染大件）"
+   "bucket": "ok",
+   "src": "remaining",
+   "note": "真跑通过（隔离 store）"
   },
   "ux_doctrine": {
    "bucket": "ok",
