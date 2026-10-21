@@ -1,0 +1,15 @@
+{
+ "at": "2026-10-21T16:09:51",
+ "schema": "hf-free-gpu-live-v1",
+ "identity": "xiaotudou-ai",
+ "token_masked": null,
+ "space": "Sneezemande/wan22-comfyui-demo",
+ "hardware": "zero-a10g",
+ "api": "/generate_video",
+ "ok": true,
+ "seconds": 22.2,
+ "result": [
+  "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\gradio\\36052060892fea9425eeb898e6a29be86511edc5d28fdf8157cbec6e3a91018c\\tmpjxlu8t4d.mp4",
+  1852201500
+ ]
+}
