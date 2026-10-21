@@ -1,11 +1,33 @@
 {
- "at": "2026-10-21T16:17:37",
+ "at": "2026-10-21T16:19:34",
  "schema": "omni-reverse-call-live-v1",
- "call": "omni_plug op=run socket=ai target=https://router.huggingface.co/v1 do=chat",
- "key_slot": "vault:hf",
- "http": 400,
- "ms": 611,
- "upstream_original": "The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any provider you have enabled.",
- "verdict": "反向调用链路本身通了（钥匙从保险箱取到、请求打到 HF 路由、上游原话完整带回）；卡在 HF 账号未启用 inference providers",
- "fix_owner_side": "https://huggingface.co/settings/inference-providers 开一个 provider（免费额度即可），我这边一行不改即可复跑"
+ "form": "omni_plug op=run socket=ai target=<OpenAI兼容> do=chat args={key_env, model, messages}",
+ "runs": [
+  {
+   "target": "https://router.huggingface.co/v1",
+   "key_slot": "vault:hf",
+   "model": "Qwen/Qwen2.5-7B-Instruct",
+   "http": 400,
+   "ms": 611,
+   "upstream": "The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any provider you have enabled.",
+   "verdict": "链路通（钥从保险箱取到、请求打到 HF 路由）；卡在 HF 账号未启用 inference providers"
+  },
+  {
+   "target": "https://apihub.agnes-ai.com/v1",
+   "key_slot": "vault:agnes",
+   "model": "agnes-2.5-flash",
+   "http": 200,
+   "ok": true,
+   "ms": 3016,
+   "tokens": {
+    "prompt": 306,
+    "completion": 289,
+    "total": 595
+   },
+   "text": "我不确定\"万能插\"的具体含义，无法解释其反向调用的意思。",
+   "verdict": "**反向调用全通**：插座插上、钥匙从 DPAPI 现取、200 拿到真文本"
+  }
+ ],
+ "key_slot_fix": "_ai_call 钥匙槽原来只认 env；HF/agnes 钥都在 DPAPI ⇒ 加保险箱兜底，回执只回槽名（vault:hf / vault:agnes）",
+ "law": "钥匙只回槽名不回明文；端点只认 https；缺啥如实报（上游原话完整带回）"
 }

@@ -226,32 +226,46 @@ py -3.14 tools/codex-scripts/five-dim.py cap comfy_cloud '{"op":"status"}'
 
 ---
 
-## 八、反向调用怎么用（2026-10-21 真跑样例）
+## 八、反向调用：真跑通了（2026-10-21）
 
-「反向调用」不是再写一个专用能力位，而是**把外部 AI 当插座插上，反过来驱动它**：
+「反向调用」不是再写一个专用能力位，而是**把外部 AI/算力当插座插上，反过来驱动它**。写法只有一条：
 
 ```bash
-# 形式：socket=ai + 任意 OpenAI 兼容端点 + 钥匙槽（槽名，不是明文）
 py -3.14 tools/codex-scripts/five-dim.py cap omni_plug '{
-  "op":"run", "socket":"ai", "target":"https://router.huggingface.co/v1", "do":"chat",
-  "args":{"key_env":"hf", "model":"Qwen/Qwen2.5-7B-Instruct",
-          "messages":[{"role":"user","content":"用一句话说明：反向调用是什么意思？"}],
-          "max_tokens":60}}'
+  "op":"run", "socket":"ai", "target":"https://apihub.agnes-ai.com/v1", "do":"chat",
+  "args":{"key_env":"agnes", "model":"agnes-2.5-flash",
+          "messages":[{"role":"user","content":"用不超过40个字说明：反向调用是什么意思？"}],
+          "max_tokens":900}}'
 ```
 
-真跑回执（2026-10-21）：
+真跑回执（这一发是 **200**）：
 
 ```
-plug=plugged · key_slot=vault:hf · http=400 · ms=611
-upstream 原话：The requested model 'Qwen/Qwen2.5-7B-Instruct'
-              is not supported by any provider you have enabled.
+plug=plugged · socket=ai · target=https://apihub.agnes-ai.com/v1
+key_slot=vault:agnes · model=agnes-2.5-flash · http=200 · ms=3016
+tokens: prompt 306 / completion 289 / total 595（其中 reasoning 270）
+text: 我不确定"万能插"的具体含义，无法解释其反向调用的意思。
 ```
 
-**怎么读这一发**：
-- `plug=plugged` + `key_slot=vault:hf` ⇒ 插座插上了、**钥匙是从 DPAPI 保险箱现取的**（不是明文、不是环境变量）；
-- `http=400` + 上游原话 ⇒ 请求**真的打到了**HF 路由，只是这个账号**没启用任何 inference provider**；
-- 所以「反向调用」这条腿**是通的**，卡的是 HF 账号设置（`https://huggingface.co/settings/inference-providers`
-  开一个免费 provider 即可，这边一行代码都不用改）。
+**这条回执证明了四件事**：
+1. **插座插上了**（`plug=plugged`），走的是 `socket=ai`；
+2. **钥匙是从 DPAPI 保险箱现取的**（`key_slot=vault:agnes`，回执只给槽名，永不回显明文）；
+3. **请求真的打到了云端**（`http=200` + 真 token 计数 + 真文本）；
+4. **上游说啥原样带回**（模型不认识「万能插」这个词就直说不认识 —— 我们不替它圆场）。
 
-**顺手补的一处真缺口**：`_ai_call` 的钥匙槽原来只认环境变量，而 HF 钥已统一收进 DPAPI ⇒
-「明明有钥却报缺」。现在钥匙槽补了**保险箱兜底**（回执只写槽名 `vault:hf`，永不回显明文）。
+### 同一形式的第二条：HF 路由（被账号设置挡住，链路本身是通的）
+
+```
+target=https://router.huggingface.co/v1 · key_slot=vault:hf · http=400 · ms=611
+upstream: The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any provider you have enabled.
+```
+
+`http=400` + 那句原话说明**请求已经到了 HF 路由**，只是这个账号**没启用任何 inference provider**
+（`https://huggingface.co/settings/inference-providers` 开一个免费 provider 即可，这边一行代码都不用改）。
+
+### 顺手补的一处真缺口
+
+`_ai_call` 的钥匙槽原来**只认环境变量**，而 HF / agnes 的钥都已统一进 DPAPI ⇒「明明有钥却报缺」。
+现在钥匙槽补了**保险箱兜底**（回执只写槽名 `vault:hf` / `vault:agnes`）。
+
+> 证据：`data/omni-reverse-call-live.json`（两次真回执都留在里面，成功与失败并列，不修饰）。
