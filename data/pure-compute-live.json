@@ -1,0 +1,51 @@
+{
+ "at": "2026-10-21T16:23:49",
+ "schema": "pure-compute-live-v1",
+ "machine": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD"
+ },
+ "criterion": "回执只有 kernel/seconds/GFLOPs，没有 text/usage.tokens/model ⇒ 只调算力",
+ "cpu": {
+  "kernel": "numpy float32 matmul 2048x2048",
+  "seconds": 0.0623,
+  "gflops": 275.6,
+  "numpy": "2.4.6",
+  "llm_calls": 0,
+  "fields": [
+   "kernel",
+   "seconds",
+   "gflops"
+  ],
+  "note": "零出网、零模型：只做一次矩阵乘"
+ },
+ "gpu": {
+  "torch": "2.14.1+cpu",
+  "cuda_available": false,
+  "device_count": 0,
+  "note": "本机没有可用 CUDA 卡 ⇒ 本机 GPU 纯算力：无（如实报缺，不假装）"
+ },
+ "cloud_gpu": {
+  "pods": "15 张卡 · RUNNING 0",
+  "pod_status": [
+   {
+    "id": "t0t84yw5rvwe85",
+    "name": "gbt-dh-lip",
+    "state": "EXITED"
+   },
+   {
+    "id": "kgyyype5lvofl7",
+    "name": "gbt-dh-run2",
+    "state": "EXITED"
+   },
+   {
+    "id": "jwahwri8ryd86w",
+    "name": "gbt-dh-ssh",
+    "state": "EXITED"
+   }
+  ],
+  "start_result": "纯算力要一张 RUNNING 的卡；现读 0 张在跑 ⇒ 云端纯算力：无。（2026-10-21 那次 start 的上游原话：not enough free GPUs on the host machine）",
+  "not_counted": "免费 GPU 那条（Sneezemande/wan22-comfyui-demo）跑的是 **模型推理**（diffusion 出片），按本口径不算纯算力，故不计入本文件"
+ },
+ "note": "CPU 那一路零出网；GPU 那一路只连算力节点；模型推理不混进来充数"
+}

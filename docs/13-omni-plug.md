@@ -283,3 +283,19 @@ upstream: The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any
 - 抽帧能出像素 ⇒ 产物真的存在，不是编出来的字符串。
 
 渲染器：`tools/codex-scripts/render-compute-proof.py`（数据变、图跟着变，**不手改图**）。
+
+### 第二张：**只调算力（CPU/GPU）、不调用大模型**（2026-10-21 新增）
+
+![只调算力](../assets/fig-pure-compute.png)
+
+判据（写死、可复核）：**回执里只有 `kernel / seconds / GFLOPs`，没有 `text / usage.tokens / model`** ⇒ 那就是只调算力。
+
+| 路 | 现读 |
+|---|---|
+| 本机 CPU（真跑） | `numpy float32 matmul 2048x2048` · 0.0623s · **275.6 GFLOP/s** · 零出网、零模型 |
+| 本机 GPU | CUDA 不可用 · `device_count=0`（如实报缺，不假装） |
+| 云端 GPU 纯算力 | 付费卡 15 张 · **RUNNING 0** ⇒ 无（上游原话 `not enough free GPUs on the host machine`） |
+| 免费 GPU 那条（wan22） | 跑的是**模型推理**，回执里有 `model/space` ⇒ 按本口径**不算**纯算力，不混进来充数 |
+
+复跑：`py -3.12 tools/codex-scripts/probe-pure-compute.py`（写 `data/pure-compute-live.json`）
+渲染：`py -3.12 tools/codex-scripts/render-pure-compute.py`
