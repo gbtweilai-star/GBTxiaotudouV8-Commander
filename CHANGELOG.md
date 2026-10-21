@@ -2,6 +2,25 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
+## 2026-10-21 · 第七批：补上「万能插」这一页（万物皆可插 · 万物皆可控 · 反向调用云端算力）
+
+之前的能力总表只讲「341 位各是什么」，**没讲"她凭什么能插一切、控一切、还能反向烧云端 CPU/GPU"** —— 这一页补它：
+
+- **`docs/13-omni-plug.md`**：六类插座（`process` / `file` / `api` / `web` / `app` / `ai`）逐类写清
+  「能插什么 / 插上能干什么 / 要过哪道门」；三条铁律（不攻击 · 凭据只从 env 取且绝不回显 · 每插每跑都落账）。
+- **万物皆可控**的口径写死：341 位 + 触手 + 外部 CLI 助手 + MCP/浏览器/桌面，**全部过同一道门**，
+  「可控」= 有一道门 + 每次过门都有账，不是"能力声明"。
+- **反向调用云端算力（CPU/GPU）** 单独一节：
+  · `pod_link`（云卡触手）13 个 op：读类 `status/ls/where/logs/ports/account/gpus`、传类 `up/down`、
+    跑类 `run`（**在卡上真跑命令**）、花钱类 `create/start/stop`（必须 `confirm="主人已授权"`，缺 confirm fail-closed）；
+    走 JupyterLab HTTP 传文件 + **内核通道**（`POST /api/kernels` + `wss .../channels` 发 `execute_request`）跑命令。
+  · `comfy_cloud`：把卡上的 ComfyUI 包成她的器官（该在卡里跑的 Python 现拼 → `run` 递进去 → 产物落卡 → `down` 取回 + **两头 sha256 对账**）。
+  · `cloud_pc` 五原语 · `cloud_llm`（按 `external_llm` 收口）· `cloud_plugin`（10 个云源注册表，加一行即扩容）。
+- **今天的三条现读回执**（不修饰）：`omni_plug status → ok:true`（六类插座齐）·
+  `pod_link status → ok:true · key_configured:true · pod_count:15` · `pod_link gpus → denied`（看算力市场要票）·
+  `comfy_cloud status → ok:false`（云卡当前不可达；本地 27 个原生算子照常离线可跑）。
+
+
 ## 2026-10-21 · 第六批：338 通过 + 341 位逐位详解（6 位过短介绍补齐）
 
 ### 能力介绍补到底（这一批是「介绍清楚仔细」的交付）
