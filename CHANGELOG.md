@@ -2,6 +2,23 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
+## 2026-10-21 · 第十一批：出片真落片（免费 GPU · 27.0s · 49,893 B · sha_match=true）
+
+主人问「为什么不跑一次出片」—— 跑了，而且这一轮落到了本地：
+
+- 门现状：`comfy_cloud op=freegpu` 默认拒（`missing_scopes: ["network_private"]`）；主人发
+  `grant-1792576825272`（时段票）后真跑。
+- 真读数：`route=free-hf` · `Sneezemande/wan22-comfyui-demo` · `zero-a10g(免费 GPU)` · **27.0s** ·
+  **2s / 480×480** · `outputs/cloud/hf-free-gpu/freegpu-20261021T170305.mp4` · **49,893 B** ·
+  sha256 `d07b61397c1c9cf5bd539630b437f52a9d7f128e078d3633195a44fa376c1fcd` · **`sha256_match=true`** ·
+  付费卡现读 **RUNNING 0 / 共 15**（先量付费卡，再转免费档，全程留档）。
+- 编码复核（ffprobe 现读）：**h264 · 480×480 · 49 帧 · 2.04s**；抽帧亲眼看
+  `outputs/cloud/cable-all/frames/freegpu-new-frame20.png`。
+- 表第④行主账改成这条真片；Agnes 那条腿（反向调用通、回传 200+Not Found）作为并排记录保留，
+  不删不盖 —— 「调用」和「取回」两件事分开记。
+- 修掉一处自己刚犯的读数错：`cable_freegpu()` 第一版只读信封第一层，`result.ok` 明明是 `true`
+  却被读成"未出片" ⇒ 改成往里挖到「带 `ok`+`op` 的那一层」，再跑才拿到真片。
+
 ## 2026-10-21 · 第十批：**只要密钥跟云端联通了，就能反向调用** —— 出片那根电缆真契约问出来了
 
 - **口径按主人令写死成一句无条件的话**：**只要密钥跟云端联通了，就能反向调用**。

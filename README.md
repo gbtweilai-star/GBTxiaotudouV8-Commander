@@ -76,7 +76,7 @@
 | ![链路](assets/fig-chain.png) | **整链通** | 本地框架→云插件→端点→流式，五段真跑全绿 |
 | ![GBT天真](assets/fig-tianzhen.png) | **不装 ComfyUI 也能跑它的契约** | 原生算子 **27**（18 个与 ComfyUI 同名同契约）· 契约面 1495 · 校验正例过、反例被抓 |
 | ![多域监控](assets/fig-monitor.png) | **改一处不坏别处** | 29 域 236 位逐位真调：**221 通过 / 15 要票 / 回归 0 / 修好 0** |
-| ![电缆全通](assets/fig-cable-all.png) | **有钥就能反向调算力** | 四根电缆：我们的模型 `200 · 1.2s` · 出图 **3/3 · 29.7s** · 本机 CPU **321.1 GFLOP/s** · 出片 **云端 43s 出活** |
+| ![电缆全通](assets/fig-cable-all.png) | **有钥就能反向调算力** | 四根电缆：我们的模型 `200 · 1.2s` · 出图 **3/3 · 29.7s** · 本机 CPU **321.1 GFLOP/s** · 出片 **真落片 27.0s / 49,893 B / sha_match=true** |
 
 细节页：[能力自证](docs/07-capability-proof.md) · [并发爆发力](docs/08-concurrency.md) · [镜像多维度空间](docs/09-mirror-space.md) · [GBT天真](docs/10-gbt-tianzhen.md) · [五维合一](docs/11-five-dim.md) · [多域监控](docs/12-multidomain-monitor.md) · [万能插（万物皆可插/可控·反向调云端算力）](docs/13-omni-plug.md) · [真实回执](docs/06-showcase.md)
 

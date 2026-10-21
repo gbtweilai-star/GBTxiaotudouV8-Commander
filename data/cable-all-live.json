@@ -1,81 +1,102 @@
 {
- "at": "2026-10-21T16:51:36",
+ "at": "2026-10-21T17:02:36",
  "schema": "cable-all-live-v1",
  "cable_model": "触手=电缆 · 密钥=通电 · 云端有算力就能通 · 能通就能反向调用",
  "key_slot": "vault:dpapi",
  "endpoint": "https://apihub.agnes-ai.com/v1",
  "video": {
-  "ok": false,
-  "generated": true,
-  "cable": "出片",
-  "socket": "agnes-video-2.5-flash",
-  "endpoint": "https://apihub.agnes-ai.com/v1/video/generations",
-  "task_id": "task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN",
-  "state": "completed",
-  "seconds_spec": "5",
-  "size_spec": "720P",
-  "result_url": "https://apihub.agnes-ai.com/v1/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-  "finish_seconds": 43,
-  "elapsed_s": 84.8,
-  "upstream": "{\"detail\":\"Not Found\"}",
-  "tried": [
-   {
-    "step": "content",
-    "attempt": 10,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   },
-   {
-    "step": "content",
-    "attempt": 10,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   },
-   {
-    "step": "content",
-    "attempt": 11,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   },
-   {
-    "step": "content",
-    "attempt": 11,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   },
-   {
-    "step": "content",
-    "attempt": 12,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   },
-   {
-    "step": "content",
-    "attempt": 12,
-    "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
-    "http": 200,
-    "bytes": 22,
-    "is_mp4": false,
-    "head": "{\"detail\":\"Not Found\"}"
-   }
-  ],
-  "key_slot": "vault:agnes",
-  "note": "任务 100% 完成但取片端点不吐 mp4（上游 result_url 自己回 Not Found）——反向调用通、回传链接坏，两件事分开记"
+  "cable": "出片（免费 GPU）",
+  "socket": "comfy_cloud op=freegpu",
+  "agnes": {
+   "ok": false,
+   "generated": true,
+   "cable": "出片",
+   "socket": "agnes-video-2.5-flash",
+   "endpoint": "https://apihub.agnes-ai.com/v1/video/generations",
+   "task_id": "task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN",
+   "state": "completed",
+   "seconds_spec": "5",
+   "size_spec": "720P",
+   "result_url": "https://apihub.agnes-ai.com/v1/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+   "finish_seconds": 43,
+   "elapsed_s": 84.8,
+   "upstream": "{\"detail\":\"Not Found\"}",
+   "tried": [
+    {
+     "step": "content",
+     "attempt": 10,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    },
+    {
+     "step": "content",
+     "attempt": 10,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    },
+    {
+     "step": "content",
+     "attempt": 11,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    },
+    {
+     "step": "content",
+     "attempt": 11,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    },
+    {
+     "step": "content",
+     "attempt": 12,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    },
+    {
+     "step": "content",
+     "attempt": 12,
+     "path": "/videos/task_2zpoDbUZ2FI6xgDNeVKFB8N4q8EuyJzN/content",
+     "http": 200,
+     "bytes": 22,
+     "is_mp4": false,
+     "head": "{\"detail\":\"Not Found\"}"
+    }
+   ],
+   "key_slot": "vault:agnes",
+   "note": "任务 100% 完成但取片端点不吐 mp4（上游 result_url 自己回 Not Found）——反向调用通、回传链接坏，两件事分开记"
+  },
+  "ok": true,
+  "route": "free-hf",
+  "space": "Sneezemande/wan22-comfyui-demo",
+  "hardware": "zero-a10g(免费 GPU)",
+  "seconds_used": 2,
+  "size_spec": "480x480",
+  "elapsed_s": 27.0,
+  "artifact": "outputs/cloud/hf-free-gpu/freegpu-20261021T170305.mp4",
+  "bytes": 49893,
+  "sha256": "d07b61397c1c9cf5bd539630b437f52a9d7f128e078d3633195a44fa376c1fcd",
+  "sha256_match": true,
+  "paid_pod": {
+   "ok": true,
+   "running": 0,
+   "total": 15
+  },
+  "key_slot": "vault:hf"
  },
  "images": {
   "ok": true,
