@@ -47,5 +47,29 @@
   "start_result": "纯算力要一张 RUNNING 的卡；现读 0 张在跑 ⇒ 云端纯算力：无。（2026-10-21 那次 start 的上游原话：not enough free GPUs on the host machine）",
   "not_counted": "免费 GPU 那条（Sneezemande/wan22-comfyui-demo）跑的是 **模型推理**（diffusion 出片），按本口径不算纯算力，故不计入本文件"
  },
- "note": "CPU 那一路零出网；GPU 那一路只连算力节点；模型推理不混进来充数"
+ "note": "CPU 那一路零出网；GPU 那一路只连算力节点；模型推理不混进来充数",
+ "agnes_surface": {
+  "at": "2026-10-21T16:29:49",
+  "endpoint": "https://apihub.agnes-ai.com/v1",
+  "probe": "GET /v1/models -> 200",
+  "count": 9,
+  "text_llm": [
+   "agnes-2.5-flash",
+   "agnes-3.0-flash",
+   "agnes-2.5-pro-alpha",
+   "agnes-2.5-pro-beta"
+  ],
+  "image_diffusion": [
+   "agnes-image-2.0-flash",
+   "agnes-image-2.1-flash",
+   "agnes-image-2.5-flash"
+  ],
+  "video_diffusion": [
+   "agnes-video-2.5",
+   "agnes-video-2.5-flash"
+  ],
+  "bare_compute_endpoint": null,
+  "verdict": "Agnes 是模型网关：4 文本 + 3 图 + 2 视频，全部模型推理；没有裸算力端点（无代码解释器/矩阵算力接口）",
+  "where_pure_compute_lives": "本机 CPU 真跑 275.6 GFLOP/s（零模型）；云端纯算力要 RUNNING 的 pod 走 pod_link.run（现读 0 张在跑）"
+ }
 }
