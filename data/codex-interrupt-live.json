@@ -1,45 +1,35 @@
 {
- "at": "2026-10-21T15:32:06",
+ "at": "2026-10-21T15:45:19",
  "schema": "codex-interrupt-live-v1",
  "ok": false,
- "elapsed_s": 21.54,
+ "elapsed_s": 19.56,
  "steps": {
   "thread_new": {
    "ok": true,
-   "thread_id": "01a15d96-7c61-7520-a7ab-6a6691aad7ab",
+   "thread_id": "01a15da2-b420-76d3-a806-f22f7ab7b8db",
    "error": null,
    "denied": null,
    "missing_scopes": null
   },
   "turn_send": {
+   "ok": true,
+   "turn_id": "01a15da2-e75b-7510-8f2c-1acc6c4b29fb",
+   "seconds": 0.23,
+   "note": "start_turn 回执里直接带 turn.id（实测约 0.3s）⇒ 此刻回合还在跑，可以真打断",
+   "error": null,
+   "denied": null,
+   "missing_scopes": null
+  },
+  "interrupt": {
    "ok": false,
-   "turn_id": "",
-   "turn_started_method": null,
-   "notifications_seen": [],
-   "diag": {
-    "keys": [
-     "gbt_stamp",
-     "gbt_result",
-     "ok_source",
-     "ok",
-     "kind",
-     "result",
-     "error",
-     "status"
-    ],
-    "ok": true,
-    "status": "ok",
-    "error": null,
-    "result_keys": [
-     "status",
-     "kind",
-     "result",
-     "authorization"
-    ]
-   },
-   "note": "回合在后台线程里发起；turnId 由 app-server 的通知里抓到的，不是等 start_turn 返回（那要等回合跑完）",
-   "send_result": null
+   "error": "turn/interrupt 失败: no active turn to interrupt",
+   "denied": null,
+   "missing_scopes": null,
+   "result": {
+    "status": "error",
+    "message": "turn/interrupt 失败: no active turn to interrupt"
+   }
   }
  },
- "law": "三步必须在**同一进程**里连做：shared app-server 是进程级缓存，跨 cap 调用会 thread not found。三跳各自都过 run_task 唯一门。"
+ "law": "三步必须在**同一进程**里连做（shared app-server 是进程级缓存，跨 cap 调用会 thread not found）；turnId 取 start_turn 的返回值（它 ~0.3s 就回，回合还活着）；三跳各自都过 run_task 唯一门。"
 }
