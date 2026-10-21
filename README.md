@@ -144,6 +144,7 @@ flowchart LR
 ```
 
 - 15 条"未通过"按缺的票点名：`deploy_publish` 4 · `process_execute` 4 · `external_llm` 2 · `device_control` 2 · `data_export` 1 · `privacy_read` 1 · `audio_output` 1；
+- **连跑四轮里有一轮报了 1 条回归、下一轮同口径复跑为 0**（判为抖动，但**失败位名字没留住**——我的操作缺陷，已把量具改成每轮自动留档）；详见 [12 页 §4.2](docs/12-multidomain-monitor.md)，不藏；
 - `--strict` 有回归就非零退出；读不到基线**报"没有基线可比"并非零退出**，不假装全绿；
 - 方法与逐域读数：**[docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md)**。
 
