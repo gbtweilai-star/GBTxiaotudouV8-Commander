@@ -1,0 +1,78 @@
+{
+ "at": "2026-10-21T12:34:39",
+ "cap": "echo",
+ "note": "echo 为纯回显能力位：测并发调度骨架，不测外部依赖上限",
+ "memory_before": {
+  "total_gb": 7.39,
+  "avail_gb": 0.97,
+  "used_pct": 86
+ },
+ "rows": [
+  {
+   "n": 512,
+   "ok": 512,
+   "err": 0,
+   "wall_s": 5.47,
+   "median_ms": 2942.12,
+   "p95_ms": 3173.26,
+   "max_ms": 5437.12,
+   "mem_avail_before": 0.97,
+   "mem_avail_after": 0.79,
+   "mem_delta_gb": -0.18,
+   "throughput_per_s": 93.6
+  },
+  {
+   "n": 1024,
+   "ok": 1024,
+   "err": 0,
+   "wall_s": 3.79,
+   "median_ms": 2605.39,
+   "p95_ms": 3073.4,
+   "max_ms": 3112.65,
+   "mem_avail_before": 0.79,
+   "mem_avail_after": 0.76,
+   "mem_delta_gb": -0.03,
+   "throughput_per_s": 270.0
+  },
+  {
+   "n": 2048,
+   "ok": 2048,
+   "err": 0,
+   "wall_s": 7.78,
+   "median_ms": 5379.58,
+   "p95_ms": 6376.54,
+   "max_ms": 6499.72,
+   "mem_avail_before": 0.76,
+   "mem_avail_after": 0.66,
+   "mem_delta_gb": -0.1,
+   "throughput_per_s": 263.4
+  },
+  {
+   "n": 4096,
+   "ok": 4096,
+   "err": 0,
+   "wall_s": 15.79,
+   "median_ms": 10890.8,
+   "p95_ms": 12772.26,
+   "max_ms": 12998.07,
+   "mem_avail_before": 0.66,
+   "mem_avail_after": 0.61,
+   "mem_delta_gb": -0.05,
+   "throughput_per_s": 259.4
+  }
+ ],
+ "repeat": [
+  {
+   "n": 1024,
+   "ok": 1024,
+   "wall_s": 3.9,
+   "median_ms": 2731.51
+  },
+  {
+   "n": 2048,
+   "ok": 2048,
+   "wall_s": 9.51,
+   "median_ms": 6206.61
+  }
+ ]
+}

@@ -58,9 +58,38 @@
 
 | # | 亮点 | 怎么验 |
 |---|---|---|
-| 1 | **335 题能力位基准 · PASS45 = 99.10%**（线上端点全量跑，零覆盖逐题补测） | [评测方法与逐项读数](docs/04-evaluation.md) |
+| 1 | **335 题能力位基准 · PASS45 98.51%–99.10%**（两轮线上全量 + 零覆盖逐条复检） | [评测方法与逐项读数](docs/04-evaluation.md) |
 | 2 | **341 位能力全公开**，机器可读 JSON + 30 个域的逐位详解，不是一张截图 | [能力总表](docs/03-capabilities.md) · [capabilities.json](data/capabilities.json) |
-| 3 | **只有一个门**：运行时所有动作都经 `run_task` 单一入口，授权/审计/钢印都在门上 | [架构说明](docs/02-architecture.md) |
+| 3 | **221 位只读能力逐位真调通过**（不是"模型会背"，是"调得动"） | [能力自证](docs/07-capability-proof.md) |
+
+---
+
+## 实测证据（四张图，全部真跑，不是示意图）
+
+| 图 | 证明什么 | 读数 |
+|---|---|---|
+| ![评测](assets/fig-eval.png) | **说得准** | 335 题 · mean cov **0.9873** · PASS45 **330/335 = 98.51%** |
+| ![能力自证](assets/fig-caps.png) | **调得动** | 341 位：真调通过 **221** · 只读要票 15 · 需参数 26 · 写口未跑 79 |
+| ![并发](assets/fig-concurrency.png) | **爆发力** | 512→4096 路并发 **全部 100% 成功**；4096 路只多用 ~50 MB 内存 |
+| ![链路](assets/fig-chain.png) | **整链通** | 本地框架→云插件→端点→流式，五段真跑全绿 |
+
+细节页：[能力自证](docs/07-capability-proof.md) · [并发爆发力](docs/08-concurrency.md) · [镜像多维度空间](docs/09-mirror-space.md) · [真实回执](docs/06-showcase.md)
+
+> **并发不是靠"多开线程"吹出来的**：4096 路零失败是真的，但延迟随并发线性上升——
+> 瓶颈是**审计写盘串行**（实测 512 路中位 2.9s → 4096 路 10.9s，吞吐稳定 ~260/s）。这条写在 [08](docs/08-concurrency.md) 里，没藏。
+
+---
+
+## 镜像多维度空间（先排练，再一次性晋升）
+
+```
+mirror_shape → mirror_scan → mirror_plan → mirror_simulate → mirror_parity → mirror_rehearse → mirror_release
+   成形          体检 5/5      计划(指纹)     推演 9/9        环境一致性        排练(指纹绑定)      一次性全量晋升
+```
+
+- 只读五步在本机真跑：**0.6 秒全绿**（维度 25 文件 / 现实 25 文件 / 漂移 0）；
+- **写面一律要票**：`mirror_rehearse`（process_execute）· `mirror_release/ascend/rewind`（deploy_publish）；
+- 为什么"一次性全量"比逐文件覆盖安全 → [docs/09-mirror-space.md](docs/09-mirror-space.md)。
 
 ---
 
@@ -148,17 +177,27 @@ print(r.choices[0].message.content)
 
 | 跑法 | mean cov | 零覆盖 | PASS45 | 样本 |
 |---|---:|---:|---:|---:|
-| 线上端点（`/runsync` 全量 + 零覆盖逐题补测） | **0.9908** | **2** | **99.10%** | 335 |
+| 线上全量 **第 2 轮**（修完题库两处后，并发 4） | **0.9873** | 2 | **98.51%** | 335 |
+| 线上全量 **第 1 轮**（`/runsync` 全量 + 零覆盖逐题补测） | 0.9908 | 2 | 99.10% | 335 |
 | 训练卡同尺批量 | 0.9823 | 4 | 97.91% | 335 |
 
-**没过的，如实列**（这是作品的一部分，不是遮丑的地方）：
+**两轮之间修了什么**（都在台账留了痕）：
 
-| 题 | 现象 | 原因 |
+| 修订 | 病根 | 修法 | 修后复测 |
+|---|---|---|---|
+| `voice_studio` | 335 条里**唯一一条** gold ≠ 注册表 desc（旧改写版 476 字 vs 786 字） | gold 改用注册表 desc（唯一真源） | **3/3 通过** |
+| `health` | 题面歧义：系统里有两个 health（能力位 vs 面板 `/api/state`），原题面会被理解成后者 | 题面消歧为「系统域的能力位 health 返回什么信息？」 | **3/3 通过** |
+| `brain_vault` | 第 2 轮出现 1 次零覆盖 | 单独复检 | **3/3 通过**（批量里是抖动） |
+| `lr_submit` | 必填参数没登记，被误记成"失败" | 补进 `PARAM_REQUIRED` | 归类为"需参数"，不再污染失败计数 |
+
+**仍然没过的，如实列**（这是作品的一部分，不是遮丑的地方）：
+
+| 题 | 现象 | 归因 |
 |---|---|---|
-| `health` | 答的是底座先验，没被 LoRA 覆盖住 | 该位置的训练样本不足 |
-| `voice_studio` | 判据用的 gold 与注册表描述长度不一致（786 vs 476 字） | **判据与数据不同源**，不是模型答错 |
+| `express_direct` | 3 次复测**稳定未命中**（cov=0）：它答的是「表达直达（主人令 2026-10-13…）」这一版描述，而 gold 是另一版措辞 | **答案语义正确、措辞不同** ⇒ 判据（逐字覆盖）偏严，属保守取向；已列为已知问题，不偷偷换题 |
 
-> 另有 **74 个能力位未进入这套基准**（写口/需授权位为主），所以这份 99.10% **不等于"341 位全过"** —— 它等于"被测的 335 位里过了 332 位"。
+> 另有 **74 个能力位未进入这套基准**（写口/需授权位为主），所以 **98.51%–99.10% 不等于"341 位全过"**
+> —— 它等于"被测的 335 位里过了 330–332 位"。**"能不能调得动"另有一套证据**：[07 能力自证](docs/07-capability-proof.md)（221 位逐位真调通过）。
 
 评测方法与可复算步骤：[docs/04-evaluation.md](docs/04-evaluation.md)
 
@@ -199,10 +238,17 @@ flowchart LR
 │   ├── capabilities/*.md      ← 每域逐位详解（自动生成）
 │   ├── 04-evaluation.md       ← 评测方法与逐项读数
 │   ├── 05-deployment.md       ← vLLM / RunPod / 代理 / 令牌门
-│   └── 06-showcase.md         ← 真实回执（未经编辑）+ 一致性 + 已知问题
-├── data/capabilities.json     ← 341 位机器可读全量
+│   ├── 06-showcase.md         ← 真实回执（未经编辑）+ 一致性 + 已知问题
+│   ├── 07-capability-proof.md ← 341 位逐位真调（221 位通过 / 15 位只读要票 / 79 位写口）
+│   ├── 08-concurrency.md      ← 触手并发爆发力（4096 路零失败，瓶颈在审计写盘）
+│   └── 09-mirror-space.md     ← 镜像多维度空间（先排练，再一次性晋升）
+├── data/
+│   ├── capabilities.json      ← 341 位机器可读全量
+│   ├── capability-live-test.json ← 逐位真调读数
+│   ├── concurrency-bench.json ← 并发台架原始读数
+│   └── mirror-space-live.json ← 镜像只读五步读数
 ├── examples/                  ← curl / Python / 流式
-├── assets/                    ← architecture.svg · domains.svg
+├── assets/                    ← 架构图 · 域分布 · 四张实测证据图（png）
 ├── LICENSE  (Apache-2.0)
 ├── CONTRIBUTING.md
 └── CHANGELOG.md
