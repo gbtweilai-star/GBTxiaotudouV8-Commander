@@ -1,0 +1,1442 @@
+{
+ "at": "2026-10-21T13:22:17",
+ "domains": {
+  "brain": {
+   "tested": 2,
+   "ok": 2,
+   "skip": 0,
+   "bad": {}
+  },
+  "collab": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 1,
+   "bad": {}
+  },
+  "comms": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 0,
+   "bad": {}
+  },
+  "creation": {
+   "tested": 32,
+   "ok": 32,
+   "skip": 22,
+   "bad": {}
+  },
+  "data": {
+   "tested": 8,
+   "ok": 8,
+   "skip": 4,
+   "bad": {}
+  },
+  "desktop": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 1,
+   "bad": {}
+  },
+  "device": {
+   "tested": 2,
+   "ok": 0,
+   "skip": 0,
+   "bad": {
+    "bluetooth": "denied",
+    "bt_control": "denied"
+   }
+  },
+  "devour": {
+   "tested": 4,
+   "ok": 3,
+   "skip": 1,
+   "bad": {
+    "devour_pulse": "denied"
+   }
+  },
+  "engine": {
+   "tested": 5,
+   "ok": 5,
+   "skip": 5,
+   "bad": {}
+  },
+  "finance": {
+   "tested": 4,
+   "ok": 4,
+   "skip": 0,
+   "bad": {}
+  },
+  "framework": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 0,
+   "bad": {}
+  },
+  "image_video": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 0,
+   "bad": {}
+  },
+  "infra": {
+   "tested": 2,
+   "ok": 2,
+   "skip": 0,
+   "bad": {}
+  },
+  "integration": {
+   "tested": 3,
+   "ok": 3,
+   "skip": 4,
+   "bad": {}
+  },
+  "life": {
+   "tested": 1,
+   "ok": 1,
+   "skip": 0,
+   "bad": {}
+  },
+  "llm": {
+   "tested": 25,
+   "ok": 22,
+   "skip": 16,
+   "bad": {
+    "codex_thread_new": "denied",
+    "codex_models": "denied",
+    "llm_chat": "denied"
+   }
+  },
+  "longrun": {
+   "tested": 3,
+   "ok": 3,
+   "skip": 1,
+   "bad": {}
+  },
+  "mind": {
+   "tested": 17,
+   "ok": 17,
+   "skip": 2,
+   "bad": {}
+  },
+  "pipeline": {
+   "tested": 14,
+   "ok": 9,
+   "skip": 4,
+   "bad": {
+    "mirror_rehearse": "denied",
+    "mirror_release": "denied",
+    "mirror_ascend": "denied",
+    "mirror_rewind": "denied",
+    "pipeline_submit": "denied"
+   }
+  },
+  "project": {
+   "tested": 2,
+   "ok": 2,
+   "skip": 0,
+   "bad": {}
+  },
+  "recon": {
+   "tested": 9,
+   "ok": 9,
+   "skip": 8,
+   "bad": {}
+  },
+  "security": {
+   "tested": 19,
+   "ok": 19,
+   "skip": 10,
+   "bad": {}
+  },
+  "social": {
+   "tested": 2,
+   "ok": 2,
+   "skip": 0,
+   "bad": {}
+  },
+  "system": {
+   "tested": 45,
+   "ok": 45,
+   "skip": 6,
+   "bad": {}
+  },
+  "tentacle": {
+   "tested": 12,
+   "ok": 10,
+   "skip": 6,
+   "bad": {
+    "mcp_connect": "denied",
+    "mcp_call": "denied"
+   }
+  },
+  "tools": {
+   "tested": 7,
+   "ok": 7,
+   "skip": 2,
+   "bad": {}
+  },
+  "video": {
+   "tested": 5,
+   "ok": 5,
+   "skip": 9,
+   "bad": {}
+  },
+  "vision": {
+   "tested": 4,
+   "ok": 3,
+   "skip": 1,
+   "bad": {
+    "vision": "denied"
+   }
+  },
+  "voice": {
+   "tested": 4,
+   "ok": 3,
+   "skip": 0,
+   "bad": {
+    "voice": "denied"
+   }
+  }
+ },
+ "per_cap": {
+  "dream_replay": {
+   "result": "ok",
+   "ms": 2350,
+   "why": ""
+  },
+  "absorb_loop": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "stigmergy": {
+   "result": "ok",
+   "ms": 25,
+   "why": ""
+  },
+  "coze_mail": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "comfy_forge": {
+   "result": "ok",
+   "ms": 142,
+   "why": ""
+  },
+  "create": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "drama": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "music_publishing": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "anim_audit": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "dh_asset_gate": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "brand_outro": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "emotion_projection": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "scene_anchor": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "code_art": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "render_evolution": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "diagram_distill": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "machine_distill": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "cad_distill": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "console_pages": {
+   "result": "ok",
+   "ms": 1772,
+   "why": ""
+  },
+  "image_scout": {
+   "result": "ok",
+   "ms": 228,
+   "why": ""
+  },
+  "lobehub": {
+   "result": "ok",
+   "ms": 2118,
+   "why": ""
+  },
+  "comfyui": {
+   "result": "ok",
+   "ms": 2046,
+   "why": ""
+  },
+  "comfy_native": {
+   "result": "ok",
+   "ms": 3746,
+   "why": ""
+  },
+  "tentacle_comfy_bridge": {
+   "result": "ok",
+   "ms": 4090,
+   "why": ""
+  },
+  "one_shot": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "dl_forge": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "dh_realism": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "dh_brain": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "creation_camp": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "flow_canvas": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "ui_render": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "ui_kit": {
+   "result": "ok",
+   "ms": 84,
+   "why": ""
+  },
+  "design_atlas": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "motion_kit": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "bits_kit": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "intake_kit": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "echo": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "count_words": {
+   "result": "ok",
+   "ms": 4,
+   "why": ""
+  },
+  "audit_query": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "datakit": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "account_registry": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "bi_distill": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "db_plugin": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "db_probe": {
+   "result": "ok",
+   "ms": 3972,
+   "why": ""
+  },
+  "control_loop": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "bluetooth": {
+   "result": "denied",
+   "ms": 9,
+   "missing_scopes": [
+    "device_control"
+   ],
+   "why": "需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+  },
+  "bt_control": {
+   "result": "denied",
+   "ms": 7,
+   "missing_scopes": [
+    "device_control"
+   ],
+   "why": "需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+  },
+  "devour_scan": {
+   "result": "ok",
+   "ms": 16,
+   "why": ""
+  },
+  "devour_reflect": {
+   "result": "ok",
+   "ms": 52,
+   "why": ""
+  },
+  "devour_pulse": {
+   "result": "denied",
+   "ms": 7,
+   "missing_scopes": [
+    "data_export"
+   ],
+   "why": "需要人工授权（data_export）：把数据发送到外部服务或持久化到框架外"
+  },
+  "devour_fusion": {
+   "result": "ok",
+   "ms": 120,
+   "why": ""
+  },
+  "wf_status": {
+   "result": "ok",
+   "ms": 64,
+   "why": ""
+  },
+  "transfer": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "wf_cache_clear": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "sched_tick": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "sched_status": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "quant_strategy": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "quant_backtest": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "quant_params": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "quant": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "gate_visibility": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "a1art_skill": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "cloud_plugin": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "cloud_pc": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "feishu_embed": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "telegram_embed": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "whatsapp_embed": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "life": {
+   "result": "ok",
+   "ms": 25,
+   "why": ""
+  },
+  "codex_status": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "codex_tools": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "codex_thread_new": {
+   "result": "denied",
+   "ms": 8,
+   "missing_scopes": [
+    "process_execute"
+   ],
+   "why": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+  },
+  "codex_models": {
+   "result": "denied",
+   "ms": 7,
+   "missing_scopes": [
+    "external_llm"
+   ],
+   "why": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务"
+  },
+  "llm_chat": {
+   "result": "denied",
+   "ms": 8,
+   "missing_scopes": [
+    "external_llm"
+   ],
+   "why": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务"
+  },
+  "llm_status": {
+   "result": "ok",
+   "ms": 35,
+   "why": ""
+  },
+  "cloud_llm": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "brain_verify": {
+   "result": "ok",
+   "ms": 2302,
+   "why": ""
+  },
+  "brain_health": {
+   "result": "ok",
+   "ms": 2740,
+   "why": ""
+  },
+  "prompt_bridge": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "llm_watch": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "task_graph": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "replan_loop": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "duty_board": {
+   "result": "ok",
+   "ms": 708,
+   "why": ""
+  },
+  "ring_context": {
+   "result": "ok",
+   "ms": 37,
+   "why": ""
+  },
+  "warm_switch": {
+   "result": "ok",
+   "ms": 1094,
+   "why": ""
+  },
+  "fact_gate": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "policy_gate": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "transformer": {
+   "result": "ok",
+   "ms": 18,
+   "why": ""
+  },
+  "automation_keys": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "model_key_pool": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "energy_scheduler": {
+   "result": "ok",
+   "ms": 17,
+   "why": ""
+  },
+  "freellmapi": {
+   "result": "ok",
+   "ms": 2042,
+   "why": ""
+  },
+  "train_recipe": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "offload_distill": {
+   "result": "ok",
+   "ms": 87,
+   "why": ""
+  },
+  "lr_tick": {
+   "result": "ok",
+   "ms": 24,
+   "why": ""
+  },
+  "lr_status": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "tactics_advise": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "brain_vault": {
+   "result": "ok",
+   "ms": 78,
+   "why": ""
+  },
+  "mind": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "director_mood": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "proactive_report": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "observer_anchor": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "obsidian_vault": {
+   "result": "ok",
+   "ms": 12,
+   "why": ""
+  },
+  "wiki_graph": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "doc_intake": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "memory_bank": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "memory_manager": {
+   "result": "ok",
+   "ms": 325,
+   "why": ""
+  },
+  "meta_cognition": {
+   "result": "ok",
+   "ms": 12,
+   "why": ""
+  },
+  "local_brain": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "auto_switch": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "brain_council": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "agent_council": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "belief_forge": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "command_chain": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "mirror_shape": {
+   "result": "ok",
+   "ms": 29,
+   "why": ""
+  },
+  "mirror_scan": {
+   "result": "ok",
+   "ms": 17,
+   "why": ""
+  },
+  "mirror_plan": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "mirror_simulate": {
+   "result": "ok",
+   "ms": 66,
+   "why": ""
+  },
+  "mirror_parity": {
+   "result": "ok",
+   "ms": 56,
+   "why": ""
+  },
+  "mirror_rehearse": {
+   "result": "denied",
+   "ms": 11,
+   "missing_scopes": [
+    "process_execute"
+   ],
+   "why": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+  },
+  "mirror_release": {
+   "result": "denied",
+   "ms": 9,
+   "missing_scopes": [
+    "deploy_publish"
+   ],
+   "why": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+  },
+  "mirror_ascend": {
+   "result": "denied",
+   "ms": 7,
+   "missing_scopes": [
+    "deploy_publish"
+   ],
+   "why": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+  },
+  "mirror_status": {
+   "result": "ok",
+   "ms": 41,
+   "why": ""
+  },
+  "mirror_rewind": {
+   "result": "denied",
+   "ms": 11,
+   "missing_scopes": [
+    "deploy_publish"
+   ],
+   "why": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+  },
+  "pipeline_submit": {
+   "result": "denied",
+   "ms": 12,
+   "missing_scopes": [
+    "deploy_publish"
+   ],
+   "why": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区"
+  },
+  "pipeline_status": {
+   "result": "ok",
+   "ms": 37,
+   "why": ""
+  },
+  "ghost_guard": {
+   "result": "ok",
+   "ms": 1534,
+   "why": ""
+  },
+  "svc_inspect": {
+   "result": "ok",
+   "ms": 419,
+   "why": ""
+  },
+  "platform_profile": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "project_context": {
+   "result": "ok",
+   "ms": 18,
+   "why": ""
+  },
+  "trend_watch": {
+   "result": "ok",
+   "ms": 212,
+   "why": ""
+  },
+  "music_intel": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "video_intel": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "film_intel": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "verification_watch": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "rea_reverse": {
+   "result": "ok",
+   "ms": 16,
+   "why": ""
+  },
+  "recon_distill": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "scrapling": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "case_mine": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "sec_surface": {
+   "result": "ok",
+   "ms": 24902,
+   "why": ""
+  },
+  "sec_scan": {
+   "result": "ok",
+   "ms": 66438,
+   "why": ""
+  },
+  "sec_chain": {
+   "result": "ok",
+   "ms": 65964,
+   "why": ""
+  },
+  "sec_defenses": {
+   "result": "ok",
+   "ms": 1520,
+   "why": ""
+  },
+  "pentest_distill": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "code_audit": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "install_selfcheck": {
+   "result": "ok",
+   "ms": 16,
+   "why": ""
+  },
+  "sec_sweeper": {
+   "result": "ok",
+   "ms": 18,
+   "why": ""
+  },
+  "penetrating_cross_scan": {
+   "result": "ok",
+   "ms": 27,
+   "why": ""
+  },
+  "hook_enforcer": {
+   "result": "ok",
+   "ms": 25,
+   "why": ""
+  },
+  "omission_detector": {
+   "result": "ok",
+   "ms": 26,
+   "why": ""
+  },
+  "social_eng": {
+   "result": "ok",
+   "ms": 17,
+   "why": ""
+  },
+  "paywallbuster": {
+   "result": "ok",
+   "ms": 13,
+   "why": ""
+  },
+  "asset_vault_freeze": {
+   "result": "ok",
+   "ms": 6265,
+   "why": ""
+  },
+  "onboarding_gate": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "event_ledger": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "llm_redteam": {
+   "result": "ok",
+   "ms": 17,
+   "why": ""
+  },
+  "policy_delta": {
+   "result": "ok",
+   "ms": 20,
+   "why": ""
+  },
+  "review_gate": {
+   "result": "ok",
+   "ms": 19,
+   "why": ""
+  },
+  "eigenflux": {
+   "result": "ok",
+   "ms": 90,
+   "why": ""
+  },
+  "auto_publish": {
+   "result": "ok",
+   "ms": 22,
+   "why": ""
+  },
+  "health": {
+   "result": "ok",
+   "ms": 141,
+   "why": ""
+  },
+  "selfscan": {
+   "result": "ok",
+   "ms": 1484,
+   "why": ""
+  },
+  "alerts": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "truth_scan": {
+   "result": "ok",
+   "ms": 12,
+   "why": ""
+  },
+  "root_fix": {
+   "result": "ok",
+   "ms": 37,
+   "why": ""
+  },
+  "cross_scan": {
+   "result": "ok",
+   "ms": 60629,
+   "why": ""
+  },
+  "inventory": {
+   "result": "ok",
+   "ms": 236,
+   "why": ""
+  },
+  "auth_gate_status": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "signature_guard": {
+   "result": "ok",
+   "ms": 2106,
+   "why": ""
+  },
+  "file_hygiene": {
+   "result": "ok",
+   "ms": 15222,
+   "why": ""
+  },
+  "ux_doctrine": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "welcome": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "god_view": {
+   "result": "ok",
+   "ms": 211,
+   "why": ""
+  },
+  "trace_store": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "wave_probe": {
+   "result": "ok",
+   "ms": 5460,
+   "why": ""
+  },
+  "tentacle_arm": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "project_drift": {
+   "result": "ok",
+   "ms": 892,
+   "why": ""
+  },
+  "shared_resources": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "hook_registry": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "orchestration_kernel": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "caps_called_audit": {
+   "result": "ok",
+   "ms": 6944,
+   "why": ""
+  },
+  "tentacle_cognition": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "coverage_auditor": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "gods_eye": {
+   "result": "ok",
+   "ms": 1436,
+   "why": ""
+  },
+  "cap_tags": {
+   "result": "ok",
+   "ms": 61,
+   "why": ""
+  },
+  "action_gate": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "growth_hooks": {
+   "result": "ok",
+   "ms": 1800,
+   "why": ""
+  },
+  "agent_console": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "agent_rig": {
+   "result": "ok",
+   "ms": 12,
+   "why": ""
+  },
+  "console_hub": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "skill_watch": {
+   "result": "ok",
+   "ms": 622,
+   "why": ""
+  },
+  "page_scan": {
+   "result": "ok",
+   "ms": 3357,
+   "why": ""
+  },
+  "surface_bind": {
+   "result": "ok",
+   "ms": 58,
+   "why": ""
+  },
+  "task_manager": {
+   "result": "ok",
+   "ms": 1780,
+   "why": ""
+  },
+  "energy_pool": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "tentacle_bind": {
+   "result": "ok",
+   "ms": 313,
+   "why": ""
+  },
+  "asset_index": {
+   "result": "ok",
+   "ms": 71,
+   "why": ""
+  },
+  "context_vault": {
+   "result": "ok",
+   "ms": 10,
+   "why": ""
+  },
+  "ledger_note": {
+   "result": "ok",
+   "ms": 14,
+   "why": ""
+  },
+  "agent_control": {
+   "result": "ok",
+   "ms": 17,
+   "why": ""
+  },
+  "answer_shaper": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "handoff": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "slim_profile": {
+   "result": "ok",
+   "ms": 5,
+   "why": ""
+  },
+  "spend_guard": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "detail_habit": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "desktop_commander": {
+   "result": "ok",
+   "ms": 206,
+   "why": ""
+  },
+  "tentacle_manifest": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "agency_tentacles": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "tentacle_pipeline": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "long_run_supervisor": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "mcp_connect": {
+   "result": "denied",
+   "ms": 9,
+   "missing_scopes": [
+    "process_execute"
+   ],
+   "why": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+  },
+  "mcp_tools": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "mcp_call": {
+   "result": "denied",
+   "ms": 8,
+   "missing_scopes": [
+    "process_execute"
+   ],
+   "why": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器"
+  },
+  "tentacle_status": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "desktop_distill": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "tentacle_scale": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "express_direct": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "projection_card": {
+   "result": "ok",
+   "ms": 6,
+   "why": ""
+  },
+  "capability_net": {
+   "result": "ok",
+   "ms": 21,
+   "why": ""
+  },
+  "freebuff_term": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "repo_publish": {
+   "result": "ok",
+   "ms": 314,
+   "why": ""
+  },
+  "pulse_direct": {
+   "result": "ok",
+   "ms": 37,
+   "why": ""
+  },
+  "awesome_tools_index": {
+   "result": "ok",
+   "ms": 32,
+   "why": ""
+  },
+  "git_read": {
+   "result": "ok",
+   "ms": 231,
+   "why": ""
+  },
+  "media_pipeline": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "digital_human": {
+   "result": "ok",
+   "ms": 12,
+   "why": ""
+  },
+  "libtv_skill": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "libtv_workflow": {
+   "result": "ok",
+   "ms": 8,
+   "why": ""
+  },
+  "h3_video_gen": {
+   "result": "ok",
+   "ms": 9,
+   "why": ""
+  },
+  "vision": {
+   "result": "denied",
+   "ms": 11,
+   "missing_scopes": [
+    "privacy_read"
+   ],
+   "why": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体"
+  },
+  "vlx_flow": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "vision_grounding": {
+   "result": "ok",
+   "ms": 11,
+   "why": ""
+  },
+  "vision_print": {
+   "result": "ok",
+   "ms": 15,
+   "why": ""
+  },
+  "voice": {
+   "result": "denied",
+   "ms": 30,
+   "missing_scopes": [
+    "audio_output"
+   ],
+   "why": "需要人工授权（audio_output）：让本机发声（TTS 合成/播放）或写入音频产物"
+  },
+  "voice_orchestra": {
+   "result": "ok",
+   "ms": 634,
+   "why": ""
+  },
+  "hf_voice": {
+   "result": "ok",
+   "ms": 7,
+   "why": ""
+  },
+  "voice_studio": {
+   "result": "ok",
+   "ms": 2076,
+   "why": ""
+  }
+ },
+ "elapsed_s": 306.2,
+ "totals": {
+  "tested": 236,
+  "ok": 221,
+  "not_ok": 15
+ },
+ "diff": {
+  "regressed": [],
+  "fixed": [],
+  "regressed_count": 0,
+  "fixed_count": 0,
+  "semantics": "改前 ok → 现在不 ok = 回归；改前不 ok → 现在 ok = 修好；两条都空 = 整面稳定"
+ },
+ "baseline": "state\\monitor\\domain-baseline.json"
+}

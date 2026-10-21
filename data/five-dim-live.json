@@ -1,0 +1,233 @@
+{
+ "at": "2026-10-21T13:21:09",
+ "入口": "run_task('brain_unify', {goal}) —— 与万能插 five-dim.py cap 同一条门",
+ "维度": {
+  "route": "语义路由：统一大模型在真方法表里选（不可用时降级并自曝 degraded_reason）",
+  "execute": "万能插执行：单能力直调或 parallel 线程池，全部走 run_task 同一道门",
+  "verify": "触手肉眼验证：抓全屏帧 + 感知指纹（先看再动）",
+  "health": "五维自检评分：route/execute/tentacle/vision/audit 各一维",
+  "unify": "本入口：route→execute→verify→health 顺序串链，route 的 best 喂给 execute"
+ },
+ "intents": [
+  {
+   "label": "只读·数据域",
+   "goal": "统计一下这段话有多少个词",
+   "指定 kind": null,
+   "envelope": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "elapsed_s": 20.8,
+   "kind": "count_words",
+   "chain": {
+    "route": {
+     "best": {
+      "kind": "count_words",
+      "domain": "data",
+      "desc": "统计文本词数"
+     },
+     "candidates": 5,
+     "path": "semantic",
+     "degraded": true,
+     "degraded_reason": "主路判定方法清单里没有合适项（method=null）"
+    },
+    "execute": {
+     "kind": "count_words",
+     "ok": true,
+     "status": "ok",
+     "missing_scopes": null,
+     "reason": null
+    },
+    "verify": {
+     "ok": true,
+     "checks": {
+      "vision": true
+     }
+    },
+    "health": {
+     "score": 100.0,
+     "healthy": "5/5"
+    }
+   },
+   "error": null
+  },
+  {
+   "label": "只读·系统域",
+   "goal": "看一下本机能力位总共有多少位、分哪些域",
+   "指定 kind": null,
+   "envelope": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "elapsed_s": 10.4,
+   "kind": "tentacle",
+   "chain": {
+    "route": {
+     "best": {
+      "kind": "tentacle",
+      "method": "available_actions",
+      "domain": "tentacle",
+      "desc": "触手方法 available_actions",
+      "via": "semantic"
+     },
+     "candidates": 56,
+     "path": "semantic",
+     "degraded": false,
+     "degraded_reason": null
+    },
+    "execute": {
+     "kind": "tentacle",
+     "ok": false,
+     "status": "denied",
+     "missing_scopes": [
+      "desktop_control",
+      "privacy_read"
+     ],
+     "reason": "需要人工授权（desktop_control）：调用桌面触手的输入、鼠标、键盘与窗口控制能力"
+    },
+    "verify": {
+     "ok": true,
+     "checks": {
+      "vision": true
+     }
+    },
+    "health": {
+     "score": 100.0,
+     "healthy": "5/5"
+    }
+   },
+   "error": null
+  },
+  {
+   "label": "只读·系统健康",
+   "goal": "查一下本机系统健康信息（平台、Python 版本、时间）",
+   "指定 kind": null,
+   "envelope": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "elapsed_s": 13.1,
+   "kind": "tentacle",
+   "chain": {
+    "route": {
+     "best": {
+      "kind": "tentacle",
+      "method": "diagnose",
+      "domain": "tentacle",
+      "desc": "触手方法 diagnose",
+      "via": "semantic"
+     },
+     "candidates": 118,
+     "path": "semantic",
+     "degraded": false,
+     "degraded_reason": null
+    },
+    "execute": {
+     "kind": "tentacle",
+     "ok": false,
+     "status": "denied",
+     "missing_scopes": [
+      "desktop_control",
+      "privacy_read"
+     ],
+     "reason": "需要人工授权（desktop_control）：调用桌面触手的输入、鼠标、键盘与窗口控制能力"
+    },
+    "verify": {
+     "ok": true,
+     "checks": {
+      "vision": true
+     }
+    },
+    "health": {
+     "score": 100.0,
+     "healthy": "5/5"
+    }
+   },
+   "error": null
+  },
+  {
+   "label": "会被门挡住",
+   "goal": "看看当前屏幕上有哪些窗口",
+   "指定 kind": null,
+   "envelope": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "elapsed_s": 4.2,
+   "kind": "tentacle",
+   "chain": {
+    "route": {
+     "best": {
+      "kind": "tentacle",
+      "method": "list_windows",
+      "domain": "tentacle",
+      "desc": "触手方法 list_windows",
+      "via": "semantic"
+     },
+     "candidates": 9,
+     "path": "semantic",
+     "degraded": false,
+     "degraded_reason": null
+    },
+    "execute": {
+     "kind": "tentacle",
+     "ok": true,
+     "status": "ok",
+     "missing_scopes": null,
+     "reason": null
+    },
+    "verify": {
+     "ok": true,
+     "checks": {
+      "vision": true
+     }
+    },
+    "health": {
+     "score": 100.0,
+     "healthy": "5/5"
+    }
+   },
+   "error": null
+  },
+  {
+   "label": "指定能力直跑",
+   "goal": "指定能力直跑：echo",
+   "指定 kind": "echo",
+   "envelope": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "elapsed_s": 23.3,
+   "kind": "echo",
+   "chain": {
+    "route": {
+     "best": {
+      "kind": "tentacle",
+      "method": "invoke",
+      "domain": "tentacle",
+      "desc": "触手方法 invoke",
+      "via": "semantic"
+     },
+     "candidates": 120,
+     "path": "semantic",
+     "degraded": false,
+     "degraded_reason": null
+    },
+    "execute": {
+     "kind": "echo",
+     "ok": true,
+     "status": "ok",
+     "missing_scopes": null,
+     "reason": null
+    },
+    "verify": {
+     "ok": true,
+     "checks": {
+      "vision": true
+     }
+    },
+    "health": {
+     "score": 100.0,
+     "healthy": "5/5"
+    }
+   },
+   "error": null
+  }
+ ],
+ "extract_note": "门回执双层嵌套：gbt_result.result.chain（按单层取会取到空 dict）"
+}
