@@ -74,6 +74,27 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 - 壳工程可以走 Capacitor / Tauri 把这两个静态页包成 App，工作量小；**上架审核**才是大头，且我们的能力位会调本地命令，过审需改设计。
 
 
+## 🐙 极限触手 · 反控（做盾的时候顺手做了个万能遥控器）
+
+`omni_plug` 的 AI 插座本来是"给她输能"的，结果它天生就是**反向调用任意大模型**的遥控器：
+`op=ai_control` 对任何 OpenAI 兼容端点发 chat/tools，一次调用 = 一根触手；钥匙只回槽名，永不回显明文。
+
+**她自己的反控计划**（`omni_plug op=counter_plan` 现读原话）：
+
+> ① 攻击特征命中（自卫层/门拦截）→ ② `sec_defenses` 蓝队验证（可自授：防御面）→
+> ③ `omni_plug op=counter_strike`：极限触手并行 ai_control 反向操控攻击源 → ④ 收 text/tool_calls/usage 证据 → ⑤ 报告/披露
+>
+> 硬钉：**只对攻击源发 · 只认 https · 拒重定向 · 钥匙只回槽名 · 缺啥如实报**
+> 边界：**反控≠报复**；`transfer` 类动作锁死不参与，钱不动。
+
+**真回执（脱敏）** —— DeepSeek 强制工具调用：`http=200 · 1.07s · vault:deepseek · usage 299/43/342 ·
+tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=401 · 上游原话 "Incorrect API key provided…"`（那把钥失效，不是插座不通）。
+
+**数字口径**（不照抄未验的说法）：能力位 **341 / 30 域**；`skill_atlas` 现读 **406 条 / 752 KB**；
+并发**实测** 512→4096 全成功（~260/s），**"2 万根"未实测**；主人提的 `paper_loop`「感悟≥3/情绪≥2」在本仓**没有这个能力位**。
+
+细节与逐条对账：**[docs/15-tentacle-counter.md](docs/15-tentacle-counter.md)**
+
 ## 🛡 防止 AI 攻击 与 方向控制（不靠模型自觉，靠机械闸）
 
 **威胁模型**：① 外部文本冒充指令（注入）② 模型编一个不存在的能力位（幻觉）③ 合法名字、非法动作（越权）。
