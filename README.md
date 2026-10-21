@@ -46,6 +46,30 @@ python -m gbt_commander stats                      # 341 位 / 30 域 / 只读 2
 python -m unittest discover -s tests -q            # 21 条判据（含"编造能力位必须被拒"的负对照）
 ```
 
+<p align="center"><img src="assets/demo.gif" width="820" alt="python demo.py 实跑回放（15 秒）"></p>
+
+> 上面这段 GIF 是**真跑 stdout 的回放**（帧里自报「实跑回放 · stdout 原样」），生成器 `tools/codex-scripts/render-demo-gif.py` 只读那次真跑的原始输出，不合成内容。
+
+## 📱 手机版：iPhone / Android 都能「装到桌面」
+
+**现在给的是 PWA（渐进式网页应用），不是上架 App Store / Play 的原生包** —— 这一点先说清楚，免得你白找。
+
+| 平台 | 怎么装（10 秒） | 装完之后 |
+|---|---|---|
+| **iPhone / iPad** | Safari 打开 <https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/> → 底部「分享」→ **添加到主屏幕** | 桌面出现「小土豆V8」图标，全屏打开、**断网也能看**（Service Worker 缓存） |
+| **Android** | Chrome 打开同一地址 → 右上 ⋮ → **安装应用 / 添加到主屏幕** | 同上，可像 App 一样从桌面启动、离线可用 |
+| **看 2 万触手 3D** | 手机上打开 `arms/tentacle3d.html`（或 Pages 上的同名路径） | 手指拖动旋转、双指缩放（页面自带触摸事件） |
+
+已就位的手机要件：`manifest.webmanifest`（name/short_name/icons/shortcuts）· `sw.js`（HTML 网络优先、静态件缓存优先）·
+`icons/icon-192.png` · `icon-512.png` · `apple-touch-icon.png` · 两页都已加 `viewport` / `theme-color` / `apple-mobile-web-app-*`。
+
+**要真原生 App（.ipa / .apk）还差什么**（都不是技术活，是要花你的钱和账号）：
+
+- **iOS**：Apple Developer Program **$99/年** + 一台 Mac 签名，才能出 `.ipa` 并上架/内测（TestFlight）。
+- **Android**：Google Play 开发者账号 **$25 一次性**；本地出 `.apk` 不用账号，但装到别人手机上要引导"允许安装未知来源"。
+- 壳工程可以走 Capacitor / Tauri 把这两个静态页包成 App，工作量小；**上架审核**才是大头，且我们的能力位会调本地命令，过审需改设计。
+
+
 ## 🦾 硬件腿：22 自由度手 + 9 骨手臂 + 2 万触手 3D（真 GLB，可直接下载）
 
 不是渲染图，是**绑好骨、带自检读数**的资产：`arms/omni-arm-rigged.glb`（**40 骨 / 1,080 顶点 / 60,444 B**，

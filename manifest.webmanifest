@@ -1,0 +1,23 @@
+{
+  "name": "GBT小土豆V8 · 总指挥模型",
+  "short_name": "小土豆V8",
+  "description": "7.6B 中文总指挥模型：341 位能力 / 30 域 · 单门执行 · 写盘花钱出网先过人闸",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0d12",
+  "theme_color": "#0a0d12",
+  "categories": ["developer", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "能力目录", "short_name": "341 位", "url": "./docs/03-capabilities.md" },
+    { "name": "2 万触手 3D", "short_name": "Omni-Arm", "url": "./arms/tentacle3d.html" }
+  ]
+}
