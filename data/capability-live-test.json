@@ -1,5 +1,5 @@
 {
- "at": "2026-10-21T14:49:47",
+ "at": "2026-10-21T14:57:04",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
@@ -345,7 +345,7 @@
   "codex_interrupt": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "turn/interrupt 失败: Invalid request: missing field `turnId`"
+   "note": "{\"status\": \"error\", \"kind\": \"codex_interrupt\", \"message\": \"turn/interrupt 失败: no active turn to interrupt\"}"
   },
   "codex_models": {
    "bucket": "ok",
@@ -380,7 +380,7 @@
   "comfy_cloud": {
    "bucket": "needs_dependency",
    "src": "remaining",
-   "note": "云卡不可达（op=status 回 ok=false 无理由字段）"
+   "note": "云卡 status"
   },
   "comfy_forge": {
    "bucket": "ok",
@@ -650,7 +650,7 @@
   "figure_gate": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": ""
+   "note": "{\"ok\": false, \"op\": \"verdict\", \"deliverable\": false, \"rounds\": 0, \"min_rounds\": 4, \"open_issues\": [], \"numbers\": {}, \"reasons\": [\"numbers_no"
   },
   "file_hygiene": {
    "bucket": "ok",
@@ -1100,7 +1100,7 @@
   "one_key_deploy": {
    "bucket": "needs_input",
    "src": "remaining",
-   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe-clean\", \"files\": 2, \"steps\": {\"stage\": {\"ok\": true, \"files\": 2}, \"plan\": {\"ok\": true, \"auto\": fa"
+   "note": "scan 2/3 · rehearse=None"
   },
   "one_shot": {
    "bucket": "ok",
@@ -1135,7 +1135,7 @@
   "pentest": {
    "bucket": "needs_ticket",
    "src": "remaining",
-   "note": "目标未登记授权:https://example.com"
+   "note": "目标未登记授权（需主人加入授权目标表）"
   },
   "pentest_distill": {
    "bucket": "ok",

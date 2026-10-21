@@ -77,12 +77,13 @@
   {
    "cap": "codex_interrupt",
    "payload": {
-    "thread_id": "01a15d63-a9fb-7430-aeb6-f477b1362157"
+    "thread_id": "01a15d72-bf5c-7322-ba0a-bd4b652efa47",
+    "turn_id": "01a15d72-d0c8-7951-80a5-fe4d2d60f5b1"
    },
-   "status": "error",
+   "status": "x",
    "verdict": "needs_input",
-   "note": "turn/interrupt 失败: Invalid request: missing field `turnId`",
-   "elapsed_s": 0.5
+   "note": "{\"status\": \"error\", \"kind\": \"codex_interrupt\", \"message\": \"turn/interrupt 失败: no active turn to interrupt\"}",
+   "elapsed_s": 1.0
   },
   {
    "cap": "codex_thread_new",
@@ -108,10 +109,10 @@
    "payload": {
     "op": "status"
    },
-   "status": "ok",
+   "status": "x",
    "verdict": "needs_dependency",
-   "note": "云卡不可达（op=status 回 ok=false 无理由字段）",
-   "elapsed_s": 0.05
+   "note": "云卡 status",
+   "elapsed_s": 1.0
   },
   {
    "cap": "credential_steal",
@@ -132,32 +133,12 @@
   {
    "cap": "figure_gate",
    "payload": {
-    "deliverable": {
-     "kind": "html",
-     "path": "outputs/open-source-release/docs/index.html"
-    },
-    "rounds": [
-     {
-      "n": 1
-     },
-     {
-      "n": 2
-     },
-     {
-      "n": 3
-     },
-     {
-      "n": 4
-     }
-    ],
-    "numbers": {
-     "cost": "¥1"
-    }
+    "rounds": 4
    },
-   "status": "ok",
+   "status": "x",
    "verdict": "needs_input",
-   "note": "",
-   "elapsed_s": 0.5
+   "note": "{\"ok\": false, \"op\": \"verdict\", \"deliverable\": false, \"rounds\": 0, \"min_rounds\": 4, \"open_issues\": [], \"numbers\": {}, \"reasons\": [\"numbers_no",
+   "elapsed_s": 1.0
   },
   {
    "cap": "forge_mastery",
@@ -367,23 +348,22 @@
    "cap": "one_key_deploy",
    "payload": {
     "target": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\.scratch\\deploy-probe",
-    "room": "probe-room",
-    "name": "probe-clean"
+    "room": "probe-room"
    },
    "status": "x",
    "verdict": "needs_input",
-   "note": "{\"ok\": false, \"room_id\": \"probe-room\", \"name\": \"probe-clean\", \"files\": 2, \"steps\": {\"stage\": {\"ok\": true, \"files\": 2}, \"plan\": {\"ok\": true, \"auto\": fa",
-   "elapsed_s": 1.5
+   "note": "scan 2/3 · rehearse=None",
+   "elapsed_s": 2.0
   },
   {
    "cap": "pentest",
    "payload": {
-    "target": "https://example.com"
+    "target": "127.0.0.1"
    },
-   "status": "ok",
+   "status": "x",
    "verdict": "needs_ticket",
-   "note": "目标未登记授权:https://example.com",
-   "elapsed_s": 0.4
+   "note": "目标未登记授权（需主人加入授权目标表）",
+   "elapsed_s": 1.0
   },
   {
    "cap": "pipeline_rollback",
