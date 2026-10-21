@@ -167,6 +167,42 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 
 ---
 
+## 派活：一句话 → 真调一次 → 真回执（在 APP 里，不在 PPT 里）
+
+聊天框里有个 **派活 ⚡** 按钮。它不是"再问模型一遍"，而是三步串起来：
+
+```
+你的一句话
+  → ① 路由：本仓 gbt_commander 的检索先把 341 位收窄成 18 个候选，再让我们的模型在这 18 个里挑 1 个
+  → ② 真调：走唯一门 run_task(kind, payload) —— 授权、审计、钢印都在这一道门上
+  → ③ 回执：成功给结果原文；缺票说缺什么 + 给你要敲的那一行
+```
+
+> 为什么先收窄？实测过：让模型**直接面对 341 个名字**，它开始回 `py -3.14 tools/codex-scripts/release.py` 这种**命令行**（编的）；
+> 收窄到 18 个候选后，它才老老实实在"名字"这一层作答。**收窄用的是这个仓库里的 `gbt_commander`，不是另写一套**——
+> 也就是说：`pip install` 到的那份检索库，真的在给 APP 的派活入口供血。
+
+<table>
+<tr>
+<td width="50%"><img src="assets/fig-dispatch-ok.png" alt="派活成功"></td>
+<td width="50%"><img src="assets/fig-dispatch-denied.png" alt="门拒绝"></td>
+</tr>
+<tr>
+<td><b>「扫一下镜像有没有脏东西」</b><br>路由 → <code>mirror_scan</code>（1.63s）<br>回执：<code>passed 5/5 · 25 文件 · 24.6ms</code><br>全链 <b>1.71s</b></td>
+<td><b>「把这次发布推到生产」</b><br>路由 → <code>one_key_deploy</code>（0.90s）<br>门：<b>拒绝</b> · 缺 <code>deploy_publish</code>、<code>process_execute</code><br>并给出主人终端要敲的那一行</td>
+</tr>
+</table>
+
+**两条真的跑出来的回执**（`py -3.12 tools/model-bridge/verify-dispatch.py`，2/2 全绿，截图就是上面两张）：
+
+- 成功那条：`{"ok":true,"passed":5,"total":5,"checks":{"non_empty":{"ok":true,"detail":"25 文件"},"signature":{"ok":true,"detail":"全部携带"},"discipline":{"ok":true,"detail":"干净"}…},"elapsed_ms":24.6}`
+- 拒绝那条：`{"status":"denied","denied":true,"scopes":["deploy_publish","process_execute","filesystem_write"],"missing":["deploy_publish","process_execute"],"how_to_grant":["终端运行: python -m gbt_allinone auth grant --scope deploy_publish --ttl 600", …]}`
+
+> 右边这张图是这套东西**最该被看的一处**：它敢在界面上红着脸说"我没票，这是你要敲的命令"，
+> 而不是把失败包装成"稍后重试"。**缺票不是坏，说成成功才是坏。**
+
+---
+
 ## 这是什么
 
 大多数模型被问"帮我做 X"时，只能给你一段话。
