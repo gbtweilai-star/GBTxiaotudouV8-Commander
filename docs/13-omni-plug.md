@@ -225,3 +225,33 @@ py -3.14 tools/codex-scripts/five-dim.py cap comfy_cloud '{"op":"status"}'
 作用域登记要动 `security/policy.py`，**那一步必须主人点头**（本仓红线：AI 不自改 policy）。
 
 ---
+
+## 八、反向调用怎么用（2026-10-21 真跑样例）
+
+「反向调用」不是再写一个专用能力位，而是**把外部 AI 当插座插上，反过来驱动它**：
+
+```bash
+# 形式：socket=ai + 任意 OpenAI 兼容端点 + 钥匙槽（槽名，不是明文）
+py -3.14 tools/codex-scripts/five-dim.py cap omni_plug '{
+  "op":"run", "socket":"ai", "target":"https://router.huggingface.co/v1", "do":"chat",
+  "args":{"key_env":"hf", "model":"Qwen/Qwen2.5-7B-Instruct",
+          "messages":[{"role":"user","content":"用一句话说明：反向调用是什么意思？"}],
+          "max_tokens":60}}'
+```
+
+真跑回执（2026-10-21）：
+
+```
+plug=plugged · key_slot=vault:hf · http=400 · ms=611
+upstream 原话：The requested model 'Qwen/Qwen2.5-7B-Instruct'
+              is not supported by any provider you have enabled.
+```
+
+**怎么读这一发**：
+- `plug=plugged` + `key_slot=vault:hf` ⇒ 插座插上了、**钥匙是从 DPAPI 保险箱现取的**（不是明文、不是环境变量）；
+- `http=400` + 上游原话 ⇒ 请求**真的打到了**HF 路由，只是这个账号**没启用任何 inference provider**；
+- 所以「反向调用」这条腿**是通的**，卡的是 HF 账号设置（`https://huggingface.co/settings/inference-providers`
+  开一个免费 provider 即可，这边一行代码都不用改）。
+
+**顺手补的一处真缺口**：`_ai_call` 的钥匙槽原来只认环境变量，而 HF 钥已统一收进 DPAPI ⇒
+「明明有钥却报缺」。现在钥匙槽补了**保险箱兜底**（回执只写槽名 `vault:hf`，永不回显明文）。
