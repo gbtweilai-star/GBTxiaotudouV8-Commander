@@ -2,8 +2,11 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
-## 2026-10-21 · 第十批：出片那根电缆 —— 真契约问出来了，假账两处修掉
+## 2026-10-21 · 第十批：**只要密钥跟云端联通了，就能反向调用** —— 出片那根电缆真契约问出来了
 
+- **口径按主人令写死成一句无条件的话**：**只要密钥跟云端联通了，就能反向调用**。
+  不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上。写进了 `docs/13-omni-plug.md` 的
+  §三 与 §电缆模型、`README.md` 亮点第 4 条、以及 `assets/fig-cable-all.png` 的表头与页脚。
 - **Agnes 视频真契约（现场逐字段问上游问出来的）**：
   `POST /v1/video/generations {model, prompt, mode:"text"}` → `task_id` → `GET /v1/videos/{task_id}` 轮询 →
   `completed`（本次 **43 秒 / 5s / 720P / 100%**）。`mode` 已知取值 `text`、`keyframe`（后者要 `first_frame`）；
@@ -11,16 +14,16 @@
 - **纠正一条旧读数**：上一轮写的 `invalid_json · Failed to read request body` 不是"端点不通"，
   是上游把"体里缺 `mode`"折成了哑话 —— 按字段一个个问（空体→缺 model→缺 prompt→缺 mode→duration 不许→mode 非法）
   才问出真契约。旧的"我不猜"这句已经作废：**不是不能猜，是得问。**
-- **取片侧仍是上游坏链**：网关自己发的 `result_url`（`/v1/videos/{task_id}/content`）连试 12 次 / 90 秒，
-  每次 **HTTP 200 + `{"detail":"Not Found"}`**。所以第④行如实改成 **「生成通 · 取片未通」**，不再一句"未通"。
+- **反向调用是通的，坏的是"取回"**：网关自己发的 `result_url`（`/v1/videos/{task_id}/content`）连试 12 次 / 84.8 秒，
+  每次 **HTTP 200 + `{"detail":"Not Found"}`**。表第④行如实写 **「通（回传坏）」**——不许拿"取回不了"反过来说"调用没通"。
   出片这件事本身有真 mp4（HF 免费 GPU 那条电缆 `route=free-hf`：73,884 B · sha256 `7a2f0ca6…`）。
 - **修掉两处假账**：`probe-cable-all.py` 的 `cable_video()` 旧 body 缺 `mode` 且多传 `seconds`（已按真契约改写，
-  提交/轮询/取片全链 + 12 次重试留档）；`render-cable-all.py` 第④行原来**写死"未通"**、
+  提交/轮询/取片全链 + 12 次重试留档 + 记 `finish_seconds`）；`render-cable-all.py` 第④行原来**写死"未通"**、
   第①行 `our_model` **没有写手**（上一轮是手抄进 JSON 的）⇒ 现在补了 `cable_our_model()` 真跑产出，
   四行全部由 `data/cable-all-live.json` 现读驱动。
 - 现读四根：① 我们的模型 `http=200 · 1.2s · 397 tokens` · ② 批量出图 **3/3 · 29.7s** ·
-  ③ 本机 CPU **0.0535s · 321.1 GFLOP/s** · ④ 生成通 / 取片被上游挡。
-- 图重渲染 `assets/fig-cable-all.png`（按 P7 亲眼看：修掉 ① 列错位与 `\n` 换行破版）。
+  ③ 本机 CPU **0.0535s · 321.1 GFLOP/s** · ④ 出片 **云端 43s 出活** / 回传坏。
+- 图重渲染 `assets/fig-cable-all.png`（按 P7 亲眼看：修掉 ① 列错位、`\n` 破版、④ 状态挤字三处）。
 
 ## 2026-10-21 · 第九批：340/341 —— `comfy_cloud` 接上 HF 免费 GPU 腿
 

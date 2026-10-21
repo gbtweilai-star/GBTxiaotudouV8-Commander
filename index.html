@@ -115,12 +115,13 @@
       <tr><td>多域监控</td><td class="num">29 域 / 236 位：221 ok · 15 denied · 回归 0</td><td class="mono">docs/12-multidomain-monitor.md</td></tr>
       <tr><td>镜面只读排练</td><td class="num">5 步 / 0.6s / 全绿</td><td class="mono">docs/09-mirror-space.md</td></tr>
       <tr><td>并发容量</td><td class="num">512→4096 全 ok · 中位 2.9→10.9s · ~260/s · +~50 MB</td><td class="mono">docs/08-concurrency.md</td></tr>
+      <tr><td>反向调用云端算力（有钥就能调）</td><td class="num">模型 200 · 1.2s · 397 tokens ｜ 出图 3/3 · 29.7s ｜ 本机 CPU 321.1 GFLOP/s ｜ 出片云端 43s 出活</td><td class="mono">docs/13-omni-plug.md</td></tr>
     </tbody>
   </table>
 </section>
 
 <section>
-  <h2><span class="n">03</span>三个能立刻验证的亮点</h2>
+  <h2><span class="n">03</span>四个能立刻验证的亮点</h2>
   <div class="grid">
     <div class="card"><h3><span class="dot d-ok"></span>单一门，无法绕过</h3>
       <p>一切能力调用只走 <span class="mono">run_task(kind, payload)</span>。授权、审计、钢印都在这一处；绕开它就没有留痕。</p></div>
@@ -128,6 +129,8 @@
       <p>写生产前必须在隔离房间跑完 plan → simulate → parity → rehearse → release；跳过一步就卡住。</p></div>
     <div class="card"><h3><span class="dot d-ok"></span>没跑通就照实写</h3>
       <p>每份文档都有「已知未跑」小节，列出卡在哪、缺什么票、谁有权给 —— 不做假绿。</p></div>
+    <div class="card"><h3><span class="dot d-ok"></span>只要密钥跟云端联通了，就能反向调用</h3>
+      <p>不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上：电缆在手、钥匙在保险箱、那头有算力在出活，就通。</p></div>
   </div>
 </section>
 
