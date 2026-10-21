@@ -90,8 +90,12 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 **真回执（脱敏）** —— DeepSeek 强制工具调用：`http=200 · 1.07s · vault:deepseek · usage 299/43/342 ·
 tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=401 · 上游原话 "Incorrect API key provided…"`（那把钥失效，不是插座不通）。
 
+**并发（2026-10-21 实测，不再是口号）**：本机 7.4 GB 上把档位压到 **20,000 路同时调能力位 · 零失败 · 墙钟 135s**；
+吞吐峰值在 **1,000–6,000 档（321–340/s）**，20,000 档中位延迟 99s ⇒ **并发 ≠ 吞吐**（瓶颈是审计写盘串行）。
+口径：这一档测的是**调度骨架**（`echo` 纯回显）；"2 万根真插端点"= 2 万次出网，那时瓶颈是对端限流。表见 [docs/08 §五](docs/08-concurrency.md)。
+
 **数字口径**（不照抄未验的说法）：能力位 **341 / 30 域**；`skill_atlas` 现读 **406 条 / 752 KB**；
-并发**实测** 512→4096 全成功（~260/s），**"2 万根"未实测**；主人提的 `paper_loop`「感悟≥3/情绪≥2」在本仓**没有这个能力位**。
+主人提的 `paper_loop`「感悟≥3/情绪≥2」在本仓**没有这个能力位**。
 
 细节与逐条对账：**[docs/15-tentacle-counter.md](docs/15-tentacle-counter.md)**
 
