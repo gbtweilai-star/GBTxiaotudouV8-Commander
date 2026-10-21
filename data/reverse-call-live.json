@@ -1,0 +1,72 @@
+{
+ "at": "2026-10-21T17:48:24",
+ "schema": "reverse-call-live-v1",
+ "note": "走唯一门 run_task → omni_plug op=ai_control；钥匙只回槽名，已二次脱敏",
+ "rows": [
+  {
+   "provider": "deepseek",
+   "mode": "text",
+   "target": "https://api.deepseek.com/v1",
+   "model": "deepseek-chat",
+   "elapsed_s": 1.28,
+   "gate_envelope_keys": [
+    "error",
+    "gbt_result",
+    "gbt_stamp",
+    "kind",
+    "ok",
+    "ok_source",
+    "result",
+    "status"
+   ],
+   "ok": true,
+   "http": 200,
+   "key_slot": "vault:deepseek",
+   "model_returned": "deepseek-flash",
+   "text": "Markdown 转 PPT 应使用 **slides** 能力位，因为它专门负责生成演示文稿（PPT/幻灯片）。\n\n<tool_call name=\"get_capability\">\n{\"name\": \"slides\"}\n</tool_call>",
+   "tool_calls": [],
+   "usage": {
+    "prompt_tokens": 36,
+    "completion_tokens": 46,
+    "total_tokens": 82,
+    "prompt_tokens_details": {
+     "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 36
+   },
+   "upstream": null,
+   "reason": null,
+   "missing_scopes": null,
+   "how_to_grant": null
+  },
+  {
+   "provider": "openai",
+   "mode": "text",
+   "target": "https://api.openai.com/v1",
+   "model": "gpt-4o-mini",
+   "elapsed_s": 0.37,
+   "gate_envelope_keys": [
+    "error",
+    "gbt_result",
+    "gbt_stamp",
+    "kind",
+    "ok",
+    "ok_source",
+    "result",
+    "status"
+   ],
+   "ok": false,
+   "http": 401,
+   "key_slot": "vault:openai",
+   "model_returned": "gpt-4o-mini",
+   "text": "",
+   "tool_calls": [],
+   "usage": {},
+   "upstream": "Incorrect API key provided: sk-teamo*************************************************************6cb5. You can find your API key at https://platform.openai.com/account/api-keys.",
+   "reason": "Incorrect API key provided: sk-teamo*************************************************************6cb5. You can find your API key at https://platform.openai.com/account/api-keys.",
+   "missing_scopes": null,
+   "how_to_grant": null
+  }
+ ]
+}
