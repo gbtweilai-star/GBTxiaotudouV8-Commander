@@ -70,6 +70,29 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 - 壳工程可以走 Capacitor / Tauri 把这两个静态页包成 App，工作量小；**上架审核**才是大头，且我们的能力位会调本地命令，过审需改设计。
 
 
+## 🛡 防止 AI 攻击 与 方向控制（不靠模型自觉，靠机械闸）
+
+**威胁模型**：① 外部文本冒充指令（注入）② 模型编一个不存在的能力位（幻觉）③ 合法名字、非法动作（越权）。
+
+| 闸 | 它到底做什么 | 怎么验 |
+|---|---|---|
+| **① 目录校验** | 客户端只从模型回话里抠 JSON，拿 `capability` 去 `data/capabilities.json` 里查；**查不到就判幻觉、拒执行**，那段回话里的其它文字一律丢弃（绝不执行） | `python -m unittest discover -s tests -q` → `test_hallucinated_name_is_rejected` |
+| **② 作用域门** | 按**动作**要票，不按名字：`process_execute`/`network_private`/`browser_control`/`privacy_read`（G1）· `external_llm`/`data_export`（G2）· `deploy_publish`/`deploy_force`（G3）· `filesystem_write`（机制自保）。**票只有主人在终端能发**，时段票可复用、一次性票用掉即止 | 缺票时回执带 `missing_scopes` + 可直接复制的发票命令 |
+| **③ 审计留痕** | 一切调用只走 `run_task(kind, payload)`，绕开它就没有痕迹；授权消耗与调用都进只追加账本 | `py -3.14 tools/codex-scripts/five-dim.py cap auth_gate_status` |
+
+**方向控制（谁在开车）**：只有 Owner 能发令 → 每个动作有**作用域半径**（票扩半径，人发票）→ AI 无权自我扩权（`deploy_force` 旗标本身不带授权）→ `停止/STOP` 最高优先 → 事后可逐笔对账。
+
+**密钥**：DPAPI 保险箱，回执只给槽名与掩码（`hf_ue****`），永不回显明文。
+**攻击面自查也过同一道门**：`sec_surface`/`sec_scan`/`sec_chain`/`sec_defenses` 只读；`pentest` 要 `network_private` 票、
+**目标必须先登记**、只做非破坏性探测（实测 `tcp_reachable ok:true · 2.7ms`；未登记时给的是 `目标未登记授权:…`）。
+
+**我们自己的闸抓到过自己的漏**：`HUMAN_GATES` 写的是 `network_private`，而 `osint_scan` 加的是 `osint_private`，
+名字对不上 ⇒ 内网扫描被**静默放行**（实测 127.0.0.1 直接 ok）。补门后四条判据才转绿 —— 这条写进文档，是因为
+**判据会红、红要当真**。
+
+完整威胁模型 / 六条防注入做法 / 四条方向控制边界 / 已知缺口（含 `preflight` 异常 fail-open 这条**最高优先级安全债**）：
+**[docs/14-security-and-control.md](docs/14-security-and-control.md)**
+
 ## 🦾 硬件腿：22 自由度手 + 9 骨手臂 + 2 万触手 3D（真 GLB，可直接下载）
 
 不是渲染图，是**绑好骨、带自检读数**的资产：`arms/omni-arm-rigged.glb`（**40 骨 / 1,080 顶点 / 60,444 B**，
@@ -137,7 +160,7 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 | 1 | **335 题能力位基准 · PASS45 98.51%–99.10%**（两轮线上全量 + 零覆盖逐条复检） | [评测方法与逐项读数](docs/04-evaluation.md) |
 | 2 | **341 位能力全公开**，机器可读 JSON + 30 个域的逐位详解，不是一张截图 | [能力总表](docs/03-capabilities.md) · [capabilities.json](data/capabilities.json) |
 | 3 | **340 位逐位真跑通过**（只读空参 / 需参数带真参 / 写口隔离 store / 带票真跑 / 房间晋升 / 打断链 / 出图门），**失败 0** | [能力自证](docs/07-capability-proof.md) |
-| 4 | **只要密钥跟云端联通了，就能反向调用** —— 不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上 | [万能插 · 反向调用](docs/13-omni-plug.md) |
+| 4 | **只要密钥跟云端联通了，就能反向调用** —— 不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上 | [万能插 · 反向调用](docs/13-omni-plug.md) · [安全与方向控制](docs/14-security-and-control.md) |
 
 ---
 
