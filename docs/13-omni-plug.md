@@ -299,3 +299,19 @@ upstream: The requested model 'Qwen/Qwen2.5-7B-Instruct' is not supported by any
 
 复跑：`py -3.12 tools/codex-scripts/probe-pure-compute.py`（写 `data/pure-compute-live.json`）
 渲染：`py -3.12 tools/codex-scripts/render-pure-compute.py`
+
+### Agnes 端点的「算力面」现读（2026-10-21）
+
+`GET https://apihub.agnes-ai.com/v1/models → 200`，共 **9 个模型**，按三档分清：
+
+| 档 | 内容 | 算力性质 |
+|---|---|---|
+| ① 文本 | `agnes-2.5-flash` / `agnes-3.0-flash` / `agnes-2.5-pro-alpha` / `agnes-2.5-pro-beta` | **这就是「调大模型」** |
+| ② 图像 | `agnes-image-2.0-flash` / `2.1-flash` / `2.5-flash` | 扩散模型，**算力重活但不是 LLM** |
+| ③ 视频 | `agnes-video-2.5` / `agnes-video-2.5-flash` | 同上 |
+| ④ 裸算力 | **无** —— 没有代码解释器 / 矩阵算力端点 | 它替不了 CPU/GPU 纯算力那一档 |
+
+所以「只调算力不调大模型」这个口径下：
+- **本机 CPU 纯算力**：已真跑（`numpy float32 matmul 2048x2048` · 0.0623s · **275.6 GFLOP/s** · 零模型零出网）；
+- **云端纯算力**：要一张 RUNNING 的 pod，走 `pod_link op=run` 在卡上跑同一套内核（现读 15 张卡 **RUNNING 0**，宿主无空卡）；
+- **Agnes**：只覆盖 ①②③，**不覆盖 ④** —— 把它当「纯算力」用就是把模型当算力，我不这么记账。
