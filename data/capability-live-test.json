@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T14:57:04",
+ "at": "2026-10-21T15:09:48",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 335,
+  "ok": 336,
   "denied": 1,
-  "needs_params": 4,
+  "needs_params": 3,
   "needs_auth": 0,
   "needs_dependency": 1,
   "failed": 0,
@@ -13,16 +13,17 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 335,
-  "needs_input": 4,
+  "ok": 336,
+  "needs_input": 3,
   "needs_ticket": 1,
   "needs_dependency": 1
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 49,
+  "remaining": 48,
   "ticket": 10,
   "params": 16,
+  "room": 1,
   "write": 50
  },
  "sources": {
@@ -1098,9 +1099,9 @@
    "note": "监控账 90s 超时下真调通过（7ms）"
   },
   "one_key_deploy": {
-   "bucket": "needs_input",
-   "src": "remaining",
-   "note": "scan 2/3 · rehearse=None"
+   "bucket": "ok",
+   "src": "room",
+   "note": "房间 release-20261021 真跑全绿并晋升：acceptance=py-syntax-sweep 真执行 · reality 77 件 · 2026-10-21T15:04:41"
   },
   "one_shot": {
    "bucket": "ok",

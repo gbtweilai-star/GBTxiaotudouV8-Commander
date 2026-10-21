@@ -17,33 +17,22 @@
 
 每发调用带 **12 秒看门狗**；超时记 `timeout`（**不记 0、不记 ok**）。
 
-## 二、读数（三路真跑合成）
+## 二、读数（多路真跑合成 · 2026-10-21 现读）
 
-| 结果 | 位数 | 说明 |
+| 结果 | 位数 | 来源 / 说明 |
 |---|---:|---|
-| ✅ 真跑通过 | **335** | 只读 236（含 90s 超时下真调）+ 需参数 26（带真参）+ 写口 24（隔离 store）… 逐位见 JSON |
-| 🔒 要票未跑 | **4** | 门如实拒绝，并带回**缺哪个作用域**；票在主人手里 |
-| ⚙ 缺输入未跑 | **5** | 缺业务参数（缺 q / text / data / 轮次…），不瞎编 |
-| 🧩 缺依赖未跑 | **1** | `n8n_wf`：本机 n8n 没起（HTTP 0） |
-| 🚫 高危未跑 | **0** | 会写生产交付区/起进程/出网/改版本库/渲染大件 |
+| ✅ 真跑通过 | **336** | 监控账 216（90s 超时下真调）+ 写口 50（隔离 store）+ 隐私与流程 48 + 需参数 16（带真参）+ 带票 10（主人发票后真跑）+ 房间晋升 1 |
+| 🔒 要票未跑 | **1** | `pentest`：目标未登记授权（票在主人手里，不是模型能自给） |
+| ⚙ 缺输入未跑 | **3** | `codex_interrupt`（同步客户端抓不到活回合）· `figure_gate`（四轮看图证据要写盘，缺 `filesystem_write`）· `offense_ops`（缺授权目标） |
+| 🧩 缺依赖未跑 | **1** | `comfy_cloud`：云卡不可达（本地 27 个原生算子照常可跑） |
+| 🚫 高危未跑 | **0** | — |
 | ❌ 失败 | **0** | — |
 
-> 合计 310 + 2 + 24 + 5 + 0 = **341**，一位不多一位不少（生成器里写死这个断言，对不上就退出）。
+> 合计 336 + 1 + 3 + 1 + 0 + 0 = **341**，一位不多一位不少（生成器里写死这个断言，对不上就退出）。
 
-**"要票"那 2 位不是失败，是结构在生效**（要票的都是「会写生产交付区 / 读隐私载体」的位，逐位见 JSON）：
-
-```
-codex_models / llm_chat              → 缺 external_llm（把数据发给外部大模型）
-codex_thread_new / mcp_connect / mcp_call → 缺 process_execute（起进程/连终端）
-mirror_rehearse                      → 缺 process_execute
-mirror_release / mirror_ascend / mirror_rewind / pipeline_submit → 缺 deploy_publish
-vision                               → 缺 privacy_read（读屏幕/摄像头/麦克风）
-voice                                → 缺 audio_output（让本机发声）
-bluetooth / bt_control               → 缺 device_control
-devour_pulse                         → 缺 data_export
-```
-
-这正是 [架构页](02-architecture.md) 那条硬约束的实测证据：**写口/隐私/花钱的动作，AI 自己拿不到票。**
+**"要票"不是"失败"，是门在生效。** 那 10 位 `src=ticket` 的位就是活证据：主人在终端发票之前它们记 `needs_ticket`，
+发票之后同一条命令就跑通了（`probe-with-tickets.py`，票用完即销的位不重复消费）。现在只剩 `pentest`
+一张票——它要的不只是作用域，而是**授权目标先登记**（谁有权把"要打哪个目标"写进授权表，是人，不是模型）。
 
 ## 三、跑这一轮逮到的两个真问题（都已修）
 
@@ -83,11 +72,11 @@ py -3.14 tools/codex-scripts/probe-caps-live.py --limit 40 # 先试跑 40 位
 
 ## 六、边界（说清楚，不含糊）
 
-1. 只覆盖**只读**面；79 个写口位需要人发票才能测（那次测试的账是另一本）；
-2. `needs_params` 的 26 位没有真跑（不瞎编参数）；
+1. 写口位是在**隔离 store** 里真跑的（高危 8 位按名单跳过），不是在你的生产目录上跑；
+2. `needs_input` 的 3 位**没有瞎编参数**：缺什么就记什么，缺票就写缺哪张票；
 3. 并发上限是单独一页（[08-concurrency.md](08-concurrency.md)），别把两件事混成一句"都能跑"。
 
-## 六、自己复核（三条命令，不需要任何票）
+## 七、自己复核（五条命令，不需要任何票）
 
 ```bash
 # ① 只读位：空 payload 逐位真调（90s 超时；慢 ≠ 坏）
@@ -106,8 +95,42 @@ py -3.12 tools/codex-scripts/gen-capability-proof.py
 > 口径要点：**降级/拒绝/缺参都如实入账**；`信封 status=ok` 但本体 `ok=false` 不算通过；
 > 要票的位只有主人发票后才会转绿（`probe-with-tickets.py`），票用完即销的位不重复消费。
 
-## 七、已知未跑（逐位原因 + 机器回执，不是遮丑）
-> 本页所有数字都是"真跑过"的；下面这 6 位**没有跑通**，原因逐条列出，任何人可复跑复核。
-> 合计：**335 通过 / 1 要票 / 4 缺输入 / 1 缺依赖 / 0 高危未跑 / 0 失败 = 341**
-| 位 | 分类 | 机器回执 / 原因 ||---|---|---|| codex_interrupt | 缺输入 | {"status": "error", "kind": "codex_interrupt", "message": "turn/interrupt 失败: no active turn to interrupt"} || comfy_cloud | 缺依赖 | 云卡 status || figure_gate | 缺输入 | {"ok": false, "op": "verdict", "deliverable": false, "rounds": 0, "min_rounds": 4, "open_issues": [], "numbers": {}, "reasons": ["numbers_no || offense_ops | 缺输入 | 缺输入：need_target || one_key_deploy | 缺输入 | scan 2/3 · rehearse=None || pentest | 要票 | 目标未登记授权（需主人加入授权目标表） |
-> 复跑：py -3.12 tools/codex-scripts/gen-capability-proof.py（分桶合计≠341 直接退出）。
+## 八、已知未跑（逐位原因 + 机器回执，不是遮丑）
+
+> 本页所有数字都是"真跑过"的；下面这 **5 位**没有跑通，原因逐条列出，任何人可复跑复核。
+> 合计：**336 通过 / 1 要票 / 3 缺输入 / 1 缺依赖 / 0 高危未跑 / 0 失败 = 341**
+
+| 位 | 分类 | 机器回执 / 原因 |
+|---|---|---|
+| `pentest` | 要票 | 目标未登记授权 —— 需人把授权目标写进表，模型无权代写 |
+| `codex_interrupt` | 缺输入 | `turn/interrupt 失败: no active turn to interrupt`（同步客户端在中断到达前已结束回合） |
+| `figure_gate` | 缺输入 | `rounds_insufficient: 0/4`、`numbers_not_declared` —— 记轮次要写盘，缺 `filesystem_write` 窗口票 |
+| `offense_ops` | 缺输入 | `need_target` —— 与 `pentest` 同一根：授权目标未登记 |
+| `comfy_cloud` | 缺依赖 | 云卡 `status` 不可达（远端环境；本地 27 个原生算子不受影响） |
+
+> 复跑：`py -3.12 tools/codex-scripts/gen-capability-proof.py`（分桶合计 ≠ 341 直接退出）。
+
+## 九、2026-10-21 修的两处真缺陷（都是"假账"引信）
+
+跑 `one_key_deploy`（房间落点）第一次真跑时，回执是两条红：
+
+```
+scan 3/3 · rehearse=False · blockers=['静态推演未全绿', "未通过验收命令: ['py-syntax-sweep']"]
+```
+
+两个都不是"能力不行"，是**我们自己的判据在说假话**：
+
+| # | 现象 | 根因 | 修法 | 判据 |
+|---|---|---|---|---|
+| 1 | 静态推演永远报「未声明入口」，且不说什么算入口 | 入口名在 `scan` / `simulate` / `qiankun` **各抄了一份**四个字面量；而 `simulate` 只看计划里声明的 `entrypoints`，**根本没看树** ⇒ 任何没手填该字段的计划永远过不了 | 入口名收敛成**唯一定义** `room_space.ENTRY_NAMES`；`simulate` 在未声明时**按名字在维度树里真找一遍**（找不到才红，且把可识别名报出来）；`qiankun` 面对没有入口的树**当场如实拒绝**，不再立一份过不了的计划 | `tests/test_room_entry_contract.py` |
+| 2 | 验收命令**一次都没跑**，回执却写「未通过验收命令」 | `rehearse` 的执行条件是 `if execute and not blockers`：静态一红就跳过全部命令，但回执把没跑的用例照样列进"未通过" ⇒ 一次失败被记成两笔 | 拆成两句话：`验收命令未执行（前置未过：…）` vs `未通过验收命令`；结果里加 `commands_skipped` / `commands_skip_reason` | 同上（含负控：不许出现"未通过"） |
+
+修完重跑同一条命令（房间 `release-20261021`，77 件产物）：
+
+```
+stage ok · plan ok(auto) · scan 3/3 · rehearse ok(acceptance=py-syntax-sweep 真执行) · release ok · 5.9s
+```
+
+这一位（`one_key_deploy`）因此从"缺输入"转为"真跑通过"，本页数字由 335 升到 336
+—— **是靠修掉真缺陷扛上去的，不是靠改判据放行**（同上两条判据仍咬住"必须有入口""必须有验收命令真跑"）。
+
