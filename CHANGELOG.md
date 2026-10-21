@@ -2,6 +2,24 @@
 
 格式：`日期 · 版本 · 一句话`。只记**对外可见**的变化。
 
+## 2026-10-21 · 第三批：能力自证从「221 通过 / 79 未跑」到「297 通过 / 失败 0」
+
+### 修复（这一批都是真 bug，不是文案）
+- **内网护栏名不符实**：`policy.py` 的 `add()` 只认 `HUMAN_GATES`，而 `osint_scan` 声明 `osint_private`、表里写
+  `network_private`；`auth_gate.ENFORCED_SCOPES` 同病 ⇒ 内网扫描不打票就能跑（实测 `127.0.0.1 → ok`）。
+  两处补 `osint_private` 后实测 `denied · missing=['osint_private']`。**一条修复让 4 条红了很久的测试同时转绿。**
+
+### 证明（三路真跑，341 位一位一行）
+- 只读位空参真调（90s 超时口径）· 需参数位**带人写样本参数**真跑 · 写口位**隔离 store**真跑
+- 主人发票后又真跑 21 位（11 位转绿）：`autopilot` `think_loop` `sec_llm` `codex_chat` `devour_github`
+  `tentacle` `codex_models` `codex_thread_new` `devour_pulse` `bluetooth` `vision`
+- **终账：297 通过 / 要票 12 / 缺输入 23 / 缺依赖 1 / 高危未跑 8 / 失败 0**
+- 12 位要票的是生产写入与隐私载体（mirror_* · pipeline_submit · keylogger 等）——**被门挡住是设计**
+
+### 工具（都在 `tools/codex-scripts/`）
+`probe-caps-params.py` · `probe-caps-params-fix4.py` · `probe-caps-write.py` · `probe-with-tickets.py` ·
+`gen-capability-proof.py`（分桶合计 ≠ 341 直接退出）
+
 ## 2026-10-21 · 第二批公开（GBT天真 / 五维合一 / 多域监控）
 
 ### 新增文档（每页都有可复跑的数据源脚本，不是手抄）

@@ -10,6 +10,7 @@
   <img alt="eval" src="https://img.shields.io/badge/335--cap%20PASS45-99.10%25-2ea043?style=flat-square">
   <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-3776ab?style=flat-square">
   <img alt="license" src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square">
+  <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/gbtweilai-star/GBTxiaotudouV8-Commander?style=flat-square"></a>
 </p>
 
 > English one-liner: **A 7.6B Chinese "commander" model that routes, explains and gates 341 native capability bits — with a measurable pass rate on a 335-item capability benchmark and a fully auditable single-gate runtime.**
@@ -326,6 +327,8 @@ flowchart LR
 1. **权重本体（15.25 GB）**：GitHub 单文件上限 100 MB，放不下。发布方式见下节"权重怎么拿"。
 2. **训练语料的原始文本**：涉及私有工作流与个人信息，**不公开**；只公开配方与评测方法。
 3. **在线演示端点**：它跑在按秒计费的 GPU 上，公开一个不限流的地址等于送钱。需要试用请按下方方式申请。
+
+**发布**：本仓库有可引用的 Release —— [`v83-commander-2026-10-21`](https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/releases/tag/v83-commander-2026-10-21)（含本版读数与已知限制）。
 
 **已公开且可复核**：能力位全量清单（341 位）、评测方法、评测读数（含未过项）、部署路径、运行时的门与账设计、
 GBT天真的算子/契约现读读数、五维合一的五条真跑回执、多域监控的逐域读数与基线 diff。

@@ -86,3 +86,22 @@ py -3.14 tools/codex-scripts/probe-caps-live.py --limit 40 # 先试跑 40 位
 1. 只覆盖**只读**面；79 个写口位需要人发票才能测（那次测试的账是另一本）；
 2. `needs_params` 的 26 位没有真跑（不瞎编参数）；
 3. 并发上限是单独一页（[08-concurrency.md](08-concurrency.md)），别把两件事混成一句"都能跑"。
+
+## 六、自己复核（三条命令，不需要任何票）
+
+```bash
+# ① 只读位：空 payload 逐位真调（90s 超时；慢 ≠ 坏）
+py -3.14 tools/codex-scripts/probe-caps-live.py --timeout 90
+
+# ② 需参数位：带**人写样本参数**真跑（隔离 store；不自动猜参数）
+py -3.12 tools/codex-scripts/probe-caps-params.py
+
+# ③ 写口位：隔离 store 真跑（高危 8 位按名单跳过）
+py -3.12 tools/codex-scripts/probe-caps-write.py
+
+# ④ 合成一份账（分桶合计 ≠ 341 会直接退出，防止漏位）
+py -3.12 tools/codex-scripts/gen-capability-proof.py
+```
+
+> 口径要点：**降级/拒绝/缺参都如实入账**；`信封 status=ok` 但本体 `ok=false` 不算通过；
+> 要票的位只有主人发票后才会转绿（`probe-with-tickets.py`），票用完即销的位不重复消费。
