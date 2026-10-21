@@ -1,20 +1,20 @@
 {
- "at": "2026-10-21T15:45:19",
+ "at": "2026-10-21T15:52:25",
  "schema": "codex-interrupt-live-v1",
  "ok": false,
- "elapsed_s": 19.56,
+ "elapsed_s": 7.59,
  "steps": {
   "thread_new": {
    "ok": true,
-   "thread_id": "01a15da2-b420-76d3-a806-f22f7ab7b8db",
+   "thread_id": "01a15da9-4962-78d2-a38d-240ae275fc8f",
    "error": null,
    "denied": null,
    "missing_scopes": null
   },
   "turn_send": {
    "ok": true,
-   "turn_id": "01a15da2-e75b-7510-8f2c-1acc6c4b29fb",
-   "seconds": 0.23,
+   "turn_id": "01a15da9-64b3-7983-b43f-efe03e3f2062",
+   "seconds": 0.15,
    "note": "start_turn 回执里直接带 turn.id（实测约 0.3s）⇒ 此刻回合还在跑，可以真打断",
    "error": null,
    "denied": null,
