@@ -1,0 +1,126 @@
+{
+  "schema": "intent-lexicon-v1",
+  "note": "意图词表（人工维护，很小）。命中即给强权重，未命中退回按稀有度加权的全文检索。纪律：本文件里点到的每一个能力位名，都必须能在 data/capabilities.json 里查到 —— tests/test_catalog.py 会逐条校验，点错名字当场报红。",
+  "intents": [
+    {
+      "what": "把文档/表格/PPT 做出来或转格式",
+      "say": ["ppt", "幻灯片", "演示文稿", "汇报材料", "word", "docx", "xlsx", "表格", "转格式", "转成", "markdown"],
+      "caps": {"genoffice": 10, "genoffice_bridge": 4}
+    },
+    {
+      "what": "数一数有多少字",
+      "say": ["字数", "多少字", "词数", "统计词"],
+      "caps": {"count_words": 10}
+    },
+    {
+      "what": "查审计账 / 谁调了什么",
+      "say": ["审计", "查账", "谁调了", "调用记录", "留痕"],
+      "caps": {"audit_query": 10, "caps_called_audit": 4}
+    },
+    {
+      "what": "发布到生产 / 上线",
+      "say": ["发布", "上线", "推到生产", "晋升", "部署到生产", "放上线"],
+      "caps": {"one_key_deploy": 10}
+    },
+    {
+      "what": "回滚 / 退版本",
+      "say": ["回滚", "退版本", "上一个版本", "撤回去"],
+      "caps": {"pipeline_rollback": 10, "mirror_rewind": 6}
+    },
+    {
+      "what": "扫描镜像 / 看看有没有脏东西",
+      "say": ["镜像", "脏东西", "残留", "体检", "扫描一下", "清理旧"],
+      "caps": {"mirror_scan": 10, "cross_scan": 5, "file_hygiene": 5}
+    },
+    {
+      "what": "自检 / 现在健康吗",
+      "say": ["自检", "健康", "体检一下", "框架状态", "有没有坏"],
+      "caps": {"selfscan": 10, "health": 8}
+    },
+    {
+      "what": "出图 / 出片",
+      "say": ["出图", "画一张", "生图", "出片", "视频", "剪片", "成片", "渲染"],
+      "caps": {"comfy_cloud": 8, "media_pipeline": 8, "h3_video_gen": 5, "a1art_skill": 4}
+    },
+    {
+      "what": "浏览器打开 / 抓网页",
+      "say": ["打开网页", "抓网页", "浏览器", "截图网页", "搜索一下"],
+      "caps": {"browser": 10}
+    },
+    {
+      "what": "出声 / 念一段 / 听写",
+      "say": ["念一段", "朗读", "出声", "配音", "语音合成", "听写", "转写"],
+      "caps": {"voice": 10, "voice_orchestra": 5}
+    },
+    {
+      "what": "看一眼屏幕 / 识图",
+      "say": ["看一眼", "识图", "摄像头", "屏幕上的", "图里是什么"],
+      "caps": {"vision": 10}
+    },
+    {
+      "what": "扫漏洞 / 攻击面",
+      "say": ["漏洞", "攻击面", "渗透", "红队", "安全扫描"],
+      "caps": {"sec_scan": 10, "pentest": 6, "sec_surface": 5}
+    },
+    {
+      "what": "用云卡 / 云端算力",
+      "say": ["云卡", "云端算力", "免费gpu", "gpu", "反向调用", "算力"],
+      "caps": {"cloud_pc": 8, "comfy_cloud": 6, "cloud_llm": 6, "pod_link": 4}
+    },
+    {
+      "what": "长任务 / 无人值守 / 续跑",
+      "say": ["无人值守", "长任务", "续跑", "跑一晚上", "挂机跑", "定时"],
+      "caps": {"lr_submit": 10, "wf_run": 8, "sched_define": 5}
+    },
+    {
+      "what": "编工作流 / 编排 DAG",
+      "say": ["工作流", "编排", "dag", "串起来跑", "流水线编排"],
+      "caps": {"wf_define": 10, "wf_run": 8}
+    },
+    {
+      "what": "发邮件 / 看邮件",
+      "say": ["邮件", "收件箱", "发信", "回信"],
+      "caps": {"coze_mail": 10}
+    },
+    {
+      "what": "记一笔 / 回忆 / 看时光轴",
+      "say": ["记一笔", "记录下来", "回忆", "以前说过", "时光轴", "日记"],
+      "caps": {"life": 10}
+    },
+    {
+      "what": "Notion / 资料舱",
+      "say": ["notion", "资料舱", "我的笔记库"],
+      "caps": {"notion_bridge": 10}
+    },
+    {
+      "what": "看项目结构 / 这仓长什么样",
+      "say": ["项目结构", "目录树", "这仓", "仓库长什么样"],
+      "caps": {"project_context": 10, "platform_profile": 5}
+    },
+    {
+      "what": "改代码 / 打补丁",
+      "say": ["改代码", "打补丁", "patch", "提交改动", "git"],
+      "caps": {"code_patch": 10, "git_write": 6, "git_read": 4}
+    },
+    {
+      "what": "吞一个仓库 / 自我进化",
+      "say": ["吞一个", "吞天", "进化", "吸收这个仓库"],
+      "caps": {"devour_scan": 10, "absorb_loop": 5}
+    },
+    {
+      "what": "多条触手一起干 / 协作场",
+      "say": ["协作", "一起干", "信息素", "留个痕迹"],
+      "caps": {"stigmergy": 10, "collab_gateway": 6}
+    },
+    {
+      "what": "对外发布作品 / 结算收益",
+      "say": ["发布作品", "推广", "收益", "结算"],
+      "caps": {"auto_publish": 10}
+    },
+    {
+      "what": "登记 / 校验账号表",
+      "say": ["账号表", "登记账号", "校验账号"],
+      "caps": {"account_registry": 10}
+    }
+  ]
+}
