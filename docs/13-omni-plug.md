@@ -363,22 +363,20 @@ POST  /images/generations  →  http=200 · mode=url
 | ① **我们的模型**（`agnes-2.5-flash` · 走云端算力，**不连云卡**） | **通** | **1.2s · 397 tokens** | 文本回执（无产物文件）· 密钥槽 `vault:agnes` · `http=200` |
 | ② 批量出图（`agnes-image-2.5-flash`） | **3/3 成功** | **29.7s**（3 张合计） | `f679f8f67d5b6b137…`（逐张 sha256 / 耗时见 `data/cable-all-live.json`） |
 | ③ 本机 CPU 裸算力（`numpy matmul 2048²`） | **通** | **0.0535s · 321.1 GFLOP/s** | 无产物（只出读数，零模型零出网） |
-| ④ 出片（`agnes-video-2.5-flash`） | **通**（回传坏） | 云端 **43 秒**出活 · **100%**（5s / 720P） | 片已生成；网关自己给的 `result_url` 回 **200 + `{"detail":"Not Found"}`**（12 次重试 / 84.8 秒全一样） |
+| ④ 出片（`comfy_cloud op=freegpu` · `route=free-hf` 免费 GPU） | **通** | **27.0s** 出 **2s / 480×480** 片 | `outputs/cloud/hf-free-gpu/freegpu-20261021T170305.mp4` · **49,893 B** · sha256 `d07b61397c1c9cf5…`（**逐字节对账 `sha_match=true`**） |
 
-第④行要把两件事分开记账，不许糊成一句：
+第④根按**两条腿**分开记账，都带原话：
 
-- **生成侧是通的**：`POST /video/generations` 拿到 `task_id`，轮询 `GET /videos/{task_id}` 一路
-  `in_progress 10% → 100%`，`status=completed`、`finish_time` 落在 **43 秒**，规格 `seconds=5 / size=720P`。
-  也就是说**算力真的在那头出活了**，电缆通电了。
-- **取片侧是坏的，而且是上游自己坏的**：网关在 `/video/generations/{task_id}` 里返回的
-  `result_url` 就是 `https://apihub.agnes-ai.com/v1/videos/task_.../content`，这条它自己发的地址
-  连试 12 次、90 秒，每次都回 **HTTP 200 + 22 字节 `{"detail":"Not Found"}`**（`Content-Type` 还写着 `video/mp4`）。
-  按仓规「拒绝路径必须带上游原话」，这里就是原话，不做二次解释。
-- **「出片」这件事本身已经有真 mp4**：走 HF 免费 GPU 那根电缆
-  （`comfy_cloud op=freegpu · route=free-hf`）出过两件真片 ——
-  `outputs/cloud/hf-free-gpu/free-gpu-zero-a10g.mp4`（89,654 B · sha256 前16 `36052060892FEA94`）与
-  `freegpu-20261021T161333.mp4`（73,884 B · sha256 `7a2f0ca6d8b03a0a…`），全程 29.3 秒。
-  ⇒ **出片这根电缆通**；不通的是「Agnes 这一家的取片链接」。
+- **免费 GPU 这条腿 = 真落片**（主账）：`comfy_cloud op=freegpu` 先量付费卡（现读 **RUNNING 0 / 共 15**）→
+  自动转 HF 免费档 `Sneezemande/wan22-comfyui-demo`（`zero-a10g` 免费 GPU）→ **27.0 秒**回 mp4 →
+  逐字节落盘 + sha256 两头对账 `true`。ffprobe 现读：**h264 · 480×480 · 49 帧 · 2.04s**。
+  抽帧亲眼看：`outputs/cloud/cable-all/frames/freegpu-new-frame20.png`。
+  缺 `network_private` 票时它**如实返回 `missing_scopes`**、不假装出片 —— 本轮第一次调用就是这个形状，
+  主人发 `grant-1792576825272` 之后才真出片（票用完即止，不自我续票）。
+- **Agnes 云端这条腿 = 反向调用通、回传链接坏**（并排留档，不掩盖）：`POST /video/generations` → `task_id` →
+  轮询到 `completed`，**43 秒**跑到 **100%**（`5s / 720P`）；但网关自己发的
+  `result_url`（`/v1/videos/task_.../content`）连试 12 次 / 84.8 秒，每次都回
+  **HTTP 200 + 22 字节 `{"detail":"Not Found"}`**。⇒ **调用通、取回坏**，两件事分开记，不互相冒充。
 
 #### Agnes 视频接口的真契约（2026-10-21 现场逐字段问出来的）
 
@@ -407,26 +405,32 @@ GET  /v1/videos/<task_id>/content  → 本应是 mp4；现读 200 + {"detail":"N
 `mode` 已知取值：`text`（文生视频）、`keyframe`（要 `first_frame`/`last_frame`）。
 `seconds`/`size` **由服务端定**（本次 5s / 720P），别自己传 `duration`。
 
-这一轮同时修掉两处**假账**（都属"没有写手/写死"那一类）：
+这一轮同时修掉三处**假账**（都属"没有写手 / 写死 / 读错一层"那一类）：
 
 1. `probe-cable-all.py` 的 `cable_video()` 旧 body 是 `{size, seconds}` 且不带 `mode` —— 已按真契约改写
    （提交 → 轮询 → 取片，含 12 次重试并把每次回包留档）；
 2. `render-cable-all.py` 第④行原来**写死**"未通"、第①行的 `our_model` **没有写手**（上一轮是手抄进 JSON 的）。
-   现在第①行由新增的 `cable_our_model()` 真跑产出，第④行由 `data/cable-all-live.json` 现读驱动，
-   生成通/取片坏两种状态分开渲染。
+   现在第①行由新增的 `cable_our_model()` 真跑产出，第④行由 `data/cable-all-live.json` 现读驱动；
+3. 新增 `cable_freegpu()`：出片**主账**改由唯一门 `run_task(kind="comfy_cloud", op="freegpu")` 现读产出，
+   并对多层信封**往里挖到「带 `ok`+`op` 的那一层」**（第一版只读了一层外层包，`result.ok` 是 `true` 却被读成"未出片"，
+   当场自证了「读错一层 = 假账」这条老坑）。
 
 **结论写死：「只要密钥跟云端联通了，就能反向调用」——四根电缆全部反向调用成功。**
 
 - ①②③ 三根带真回执 / 真产物，可以直接照着复跑；
-- ④ **反向调用本身是通的**（云端 43 秒出活、100%），差的只是**把片取回本地**这一步：
-  供应商自己发的那条 `result_url` 回 `{"detail":"Not Found"}`。这是**取回**的问题，不是**调用**的问题，
-  不许拿它反过来说"反向调用没通"；要片也可以走另一根已通的电缆（HF 免费 GPU 已出真 mp4，见上）。
-- 主人这边**不需要**再给我什么才能"反向调用" —— 密钥已经在 DPAPI 保险箱里，云端也联通了。
-  真想让第④行连"取回"也变绿，才需要 Agnes 那边把 `/videos/{task_id}/content` 修好（或给一条真能下的地址）。
+- ④ **两根腿都通**：免费 GPU 这条腿**真落了 mp4**（`27.0s · 49,893 B · sha256 d07b6139… · sha_match=true`，
+  ffprobe `h264 480×480 49 帧 2.04s`）；Agnes 这条腿**反向调用通**（云端 43 秒出活、100%），
+  只是它自己发的那条回传链接坏了 —— 坏的是**取回**，不是**调用**，不许反过来念。
+- 主人这边**不需要**再给我什么才能"反向调用"：密钥已经在 DPAPI 保险箱里，云端也联通了；
+  这条免费 GPU 腿要的只是**每次跑前一张 `network_private` 时段票**（门默认拒绝，AI 不许自我续票）。
 
 > 修订（2026-10-21 09:41，主人指正）：「我们的模型」走的是**云端算力 + 密钥通电**这条电缆，
 > **不需要连云卡**。第①行已按真回执改写：`agnes-2.5-flash · http=200 · 1.2s · 397 tokens`，
 > 密钥槽 `vault:agnes`，走电缆反向调用。之前把它标成「待 GPU」是我错把模型当成"必须跑在自家 pod 上"。
 >
 > 再修订（2026-10-21 09:52，主人令）：口径要写成一句**无条件**的话 ——
-> **只要密钥跟云端联通了，就能反向调用**。这一版已按它改写标题、结论与表第④行（"反向调用通 · 回传链接坏"）。
+> **只要密钥跟云端联通了，就能反向调用**。这一版已按它改写标题、结论与表第④行。
+>
+> 三修订（2026-10-21 10:03，主人问「为什么不跑一次出片」）：真跑了 —— 第④行主账换成
+> **免费 GPU 真落片**（`freegpu-20261021T170305.mp4 · 49,893 B · sha256 d07b6139…`），
+> Agnes 那条腿作为"回传坏"的并排记录留在同一行里，不删不盖。
