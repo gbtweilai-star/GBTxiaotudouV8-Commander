@@ -1,11 +1,11 @@
 {
- "at": "2026-10-21T15:33:05",
+ "at": "2026-10-21T15:45:56",
  "schema": "capability-proof-v2",
  "total": 341,
  "counts": {
-  "ok": 337,
+  "ok": 338,
   "denied": 1,
-  "needs_params": 2,
+  "needs_params": 1,
   "needs_auth": 0,
   "needs_dependency": 1,
   "failed": 0,
@@ -13,19 +13,20 @@
   "exception": 0
  },
  "buckets": {
-  "ok": 337,
-  "needs_input": 2,
+  "ok": 338,
+  "needs_input": 1,
   "needs_ticket": 1,
   "needs_dependency": 1
  },
  "by_source": {
   "monitor": 216,
-  "remaining": 46,
+  "remaining": 45,
   "ticket": 10,
   "params": 16,
   "chain": 1,
   "room": 1,
-  "write": 50,
+  "write": 49,
+  "offense": 2,
   "figure": 1
  },
  "sources": {
@@ -348,7 +349,7 @@
   "codex_interrupt": {
    "bucket": "needs_input",
    "src": "chain",
-   "note": "同进程三步探针：断在 turn_send/interrupt —— 见 data/codex-interrupt-live.json（不是「没有这个功能」，是「打断活回合的前置不成立」，逐条原因见 data/codex-interrupt-live.json）"
+   "note": "同进程三步探针：断在 interrupt —— turn/interrupt 失败: no active turn to interrupt（不是「没有这个功能」，是「打断活回合的前置不成立」，逐条原因见 data/codex-interrupt-live.json）"
   },
   "codex_models": {
    "bucket": "ok",
@@ -1061,9 +1062,9 @@
    "note": "监控账 90s 超时下真调通过（15ms）"
   },
   "offense_ops": {
-   "bucket": "needs_input",
-   "src": "write",
-   "note": "缺输入：need_target"
+   "bucket": "ok",
+   "src": "offense",
+   "note": "本机回环目标（127.0.0.1）真跑 op=plan：五阶段 5 条 · 三条判据；只出计划不动手"
   },
   "offload_distill": {
    "bucket": "ok",
@@ -1137,8 +1138,8 @@
   },
   "pentest": {
    "bucket": "needs_ticket",
-   "src": "remaining",
-   "note": "目标未登记授权（需主人加入授权目标表）"
+   "src": "offense",
+   "note": "目标已登记（127.0.0.1），门只剩一张票：network_private —— 主人终端发 `auth grant --scope network_private` 即可，模型无权自给"
   },
   "pentest_distill": {
    "bucket": "ok",

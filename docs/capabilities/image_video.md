@@ -6,7 +6,20 @@
 |---|---|---|---|
 | `a1art_skill` | 只读 | — | a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报 |
 
-> 表格里是**摘要**（超过 140 字截断）；完整原文见 [`data/capabilities.json`](../../data/capabilities.json) 的 `desc` 字段。
+> 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
+
+---
+
+## 逐位详解
+
+### `a1art_skill`
+
+- **域**：`image_video`（图像/视频生成）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap a1art_skill '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ---
 

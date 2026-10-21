@@ -6,7 +6,20 @@
 |---|---|---|---|
 | `coze_mail` | 只读 | — | 通信域：对主人自有的单一地址（@coze.email）收发与整理；白名单默认空（全拒）、confirm_token 绑定内容、正文不入档、独立通道 coze_mail |
 
-> 表格里是**摘要**（超过 140 字截断）；完整原文见 [`data/capabilities.json`](../../data/capabilities.json) 的 `desc` 字段。
+> 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
+
+---
+
+## 逐位详解
+
+### `coze_mail`
+
+- **域**：`comms`（通信）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：通信域：对主人自有的单一地址（@coze.email）收发与整理；白名单默认空（全拒）、confirm_token 绑定内容、正文不入档、独立通道 coze_mail
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap coze_mail '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ---
 

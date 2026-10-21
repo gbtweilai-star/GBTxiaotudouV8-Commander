@@ -9,7 +9,47 @@
 | `quant_params` | 只读 | — | 读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech） |
 | `quant_strategy` | 只读 | — | 读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口） |
 
-> 表格里是**摘要**（超过 140 字截断）；完整原文见 [`data/capabilities.json`](../../data/capabilities.json) 的 `desc` 字段。
+> 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
+
+---
+
+## 逐位详解
+
+### `quant`
+
+- **域**：`finance`（财务）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口）
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap quant '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `quant_backtest`
+
+- **域**：`finance`（财务）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口）
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap quant_backtest '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `quant_params`
+
+- **域**：`finance`（财务）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech）
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap quant_params '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `quant_strategy`
+
+- **域**：`finance`（财务）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **它做什么**：读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口）
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap quant_strategy '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ---
 
