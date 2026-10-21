@@ -343,3 +343,17 @@ POST  /images/generations  →  http=200 · mode=url
 - **文本模型**（`agnes-2.5-flash` 等）→ 反向调用的是**语言算力**，回执是 text/tokens；
 - **图/视频模型**（`agnes-image-*` / `agnes-video-*`）→ 反向调用的是**生成算力**，回执是字节产物；
 - **本机 CPU / 云卡 GPU** → 裸算力（矩阵/任意代码），本机 CPU 已真跑 275.6 GFLOP/s，云端要 RUNNING 的 pod。
+
+### 电缆全通实测表（2026-10-21 · 一次接满四根）
+
+![电缆全通](../assets/fig-cable-all.png)
+
+| 电缆（插座） | 状态 | 耗时 / 算力 | 产物 sha256 |
+|---|---|---|---|
+| ① **我们的模型**（vLLM · `gbt-v8-v83` on 云卡） | **待 GPU** | — | 权重在 `/runpod-volume/gbt-v8-v83`；链路曾 **5/5 全通**，现读 15 张卡全 EXITED（宿主无空卡） |
+| ② 批量出图（`agnes-image-2.5-flash`） | **3/3 成功** | **29.7s**（3 张合计） | `f679f8f67d5b6b13755…`（逐张见 `data/cable-all-live.json`） |
+| ③ 本机 CPU 裸算力（`numpy matmul 2048²`） | **通** | **0.0535s · 321.1 GFLOP/s** | 无产物（只出读数，零模型零出网） |
+| ④ 出片（`agnes-video-2.5-flash`） | **未通** | 0.2s 被拒 | 上游原话 `invalid_json · Failed to read request body`（它的 body 契约不是这套 JSON，我不猜） |
+
+**这就是"用我们的模型只要用云端算力"的现状**：模型这头（权重、链路、契约）都是现成的、验过的；
+卡住的只有一件事 —— **一张 RUNNING 的 GPU 卡**。你给我一张卡，第①行立刻从"待 GPU"变成带 mp4/文本回执的"通"。
