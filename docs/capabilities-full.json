@@ -611,10 +611,11 @@
   ],
   "proof": {
    "cap": "brain_route",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.31,
-   "at": "2026-10-23T22:33:22"
+   "sec": 0.5,
+   "at": "2026-10-23T22:46:00",
+   "note": "degraded：未配大模型通道，走启发式路由（内层 ok=true）"
   }
  },
  {
