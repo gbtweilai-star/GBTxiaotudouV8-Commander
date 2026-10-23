@@ -6,17 +6,18 @@
 
     powershell -ExecutionPolicy Bypass -File .\install.ps1
 
-装依赖 → 下 3 个分片 → 合并成 gbt-v8-v82-q5_0.gguf → 起服务（:8792）。
+装依赖 → 按 1..9 探测下载分片 → 合并成 gbt-v8-v82-q5_0.gguf → 起服务（:8792）。
 
-## 分片
+## 已上传（Release v1.0.0）
 
-| 文件 | 大小 |
-|---|---|
-| gbt-v8-v82-q5_0.gguf.part1 | 1.63 GB |
-| gbt-v8-v82-q5_0.gguf.part2 | 1.63 GB |
-| gbt-v8-v82-q5_0.gguf.part3 | 1.63 GB |
+| 模型 | 分片 | 大小 | sha256 |
+|---|---|---|---|
+| gbt-v8-v82-q5_0.gguf | part1 1621MB · part2 1621MB · part3 1621MB · part4 136MB | 4.88 GB | 983f19a66928aa6927a6b42ae4ab28ac0889e015788e4553303df01c0fcd262f |
+| gbt-v8-v82-q4_0-fixed.gguf | 3 片 | 4.00 GB | 9801fbccbe7f23d849c65a59bed7fa6f56be86dd11ac9091d1aab238e2dc1de8 |
+| gbt-v8-v82-q8_0.gguf | 5 片 | 7.54 GB | 上传中 |
+| gbt-v8-v82-fp16-fixed.gguf | 9 片 | 14.19 GB | 上传中 |
 
-合并后 sha256 = 983f19a66928aa6927a6b42ae4ab28ac0889e015788e4553303df01c0fcd262f
+合并后自检：PowerShell 跑 Get-FileHash -Algorithm SHA256，比对上面那一列。
 
 ## 档位实测
 
