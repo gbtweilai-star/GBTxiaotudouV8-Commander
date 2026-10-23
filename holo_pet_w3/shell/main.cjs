@@ -1101,6 +1101,7 @@ let modelBridgeChild = null;
    ② 壳是唯一同时知道 ROOT、解释器、权重位置的地方。
    失败只打日志、不牵连壳启动；桥那边会自然落回 cfai（weights_ours=false）。 */
 const LOCAL_LLM_PORT = 8792;
+const GPU_LANE_PORT = 8793;   /* Vulkan 车道（实验）；壳退出时一并收掉 —— 本体不留后台 */
 const LOCAL_LLM_JS = path.join(ROOT, "tools", "model-bridge", "local_llm_server.py");
 const LOCAL_LLM_GGUF = path.join(ROOT, "state", "weights", "gbt-v8-v82-q5_0.gguf");
 let localLlmChild = null;
@@ -2764,8 +2765,10 @@ if (WIRE_ONLY) {
     /* 按需激活后，权重服务是**桥拉起的独立进程**（不在本进程的子进程表里），
        所以退出时按端口收：只收我们这条链的 :8792，不碰别人的进程。 */
     try {
-      const n = killListeners(LOCAL_LLM_PORT);
-      if (n) console.error("[w3] 已收掉按需加载的权重服务 " + n + " 个");
+      let n = killListeners(LOCAL_LLM_PORT);
+      /* 模型 + APP 是一体：壳一退，权重和 GPU 车道都不能留在后台占内存/显存。 */
+      n += killListeners(GPU_LANE_PORT);
+      if (n) console.error("[w3] 已收掉按需加载的权重/GPU 服务 " + n + " 个");
     } catch (err) { /* 收不掉不拖垮退出 */ }
     if (modelBridgeChild) {
       try { modelBridgeChild.kill(); } catch (err) { /* 已退：如实忽略 */ }
