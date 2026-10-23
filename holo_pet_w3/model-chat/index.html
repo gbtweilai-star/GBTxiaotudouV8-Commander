@@ -61,6 +61,7 @@
 <footer>
   <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
   <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活 ⚡</button>
+  <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（不占对话）；加载中显示已用秒数">🔥 预热</button>
   <button id="send">发送</button>
 </footer>
 <div class="hint" id="hint"></div>
@@ -112,6 +113,32 @@ async function health() {
 }
 health();
 setInterval(health, 15000);
+
+/* 预热：后台把权重加载好，不占对话。加载中按秒报数，就绪后自动复位。 */
+const warmBtn = document.getElementById("warm");
+let warmTimer = null;
+async function pollWarm() {
+  try {
+    const r = await fetch(BRIDGE + "/warm/status", {cache: "no-store"});
+    const j = await r.json();
+    if (j.ok) {
+      warmBtn.textContent = "✅ 已就绪";
+      clearInterval(warmTimer); warmTimer = null;
+      setTimeout(() => { warmBtn.textContent = "🔥 预热"; }, 4000);
+    } else if (j.state === "failed") {
+      warmBtn.textContent = "❌ 加载失败";
+      clearInterval(warmTimer); warmTimer = null;
+    } else {
+      warmBtn.textContent = "预热 " + Math.round(j.elapsed_s || 0) + "s…";
+    }
+  } catch (e) { /* 桥断了：下一次轮询再说 */ }
+}
+warmBtn.addEventListener("click", async () => {
+  if (warmTimer) return;
+  warmBtn.textContent = "预热 0s…";
+  try { await fetch(BRIDGE + "/warm", {cache: "no-store"}); } catch (e) { /* 失败由轮询体现 */ }
+  warmTimer = setInterval(pollWarm, 2000);
+});
 
 async function send() {
   if (busy) return;

@@ -121,6 +121,13 @@ _OURS_WEIGHTS = os.environ.get("GBT_OURS_WEIGHTS") or os.path.join(
     _REPO, "state", "weights", "gbt-v8-v82-q5_0.gguf")
 _OURS_IDLE = os.environ.get("GBT_SELFHOST_IDLE", "900")
 _OURS_PROC = [None]
+_WARM = {"started": 0.0, "state": "idle"}
+
+
+def warm_bg() -> None:
+    """后台预热：把权重加载好，但不发对话。"""
+    ok = ensure_selfhost()
+    _WARM["state"] = "ready" if ok else "failed"
 
 
 def _health_ok(url: str, timeout: float = 2.0) -> bool:
@@ -473,6 +480,22 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
+        if self.path.startswith("/warm"):
+            base = UPSTREAMS.get("selfhost", ("",))[0]
+            up = _health_ok(base) if base else False
+            if self.path.startswith("/warm/status"):
+                return self._json(200, {
+                    "ok": up, "state": "ready" if up else _WARM["state"],
+                    "elapsed_s": round(time.time() - _WARM["started"], 1) if _WARM["started"] else 0})
+            if up:
+                _WARM["state"] = "ready"
+                return self._json(200, {"ok": True, "state": "ready", "note": "已经就绪，无需预热"})
+            if _WARM["state"] != "warming":
+                _WARM["started"] = time.time()
+                _WARM["state"] = "warming"
+                threading.Thread(target=warm_bg, daemon=True).start()
+            return self._json(200, {"ok": True, "state": "warming",
+                                    "note": "后台加载 4.88 GB 权重，约 1–2 分钟"})
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
