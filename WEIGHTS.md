@@ -17,17 +17,15 @@
 | gbt-v8-v82-q8_0.gguf | 5 | 7.54 GB |
 | gbt-v8-v82-fp16-fixed.gguf | 9 | 14.19 GB |
 
-## 依赖包
+## 依赖包（Release v1.0.0）
 
 | 文件 | 片数 | 大小 | sha256 |
 |---|---|---|---|
 | _upstream.tar | 8 | 11.10 GB | dc2f2bd721331e6cefa3e297973058eee7c8bebe65586113c504735b8b3ca65a |
+| _deps.tar（.pylibs + vendor + third_party） | 3 | 3.41 GB | a0b76af68741b3571ff8d1e3e1d8a12ca4e6ee1277f0dc7a149b9a6c6413ffce |
 
-解包：把 8 片按序合并成 _upstream.tar，然后
-
-    tar -xf _upstream.tar
-
-会在仓库根生成 _upstream/（334,805 文件），78 个模块引用它。
+解包：把各片按序合并成 .tar，再 tar -xf 解到仓库根
+（_upstream/ 334,805 文件，78 个模块引用它；_deps/ 含 _pylibs·vendor·third_party）。
 
 ## 各模型 sha256
 
