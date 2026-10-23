@@ -103,11 +103,20 @@ class H(BaseHTTPRequestHandler):
             with LOCK:
                 if self.path.rstrip("/") == "/v1/chat/completions":
                     msgs = body.get("messages") or [{"role": "user", "content": ""}]
-                    out = LLM.create_chat_completion(
+                    kw = dict(
                         messages=msgs,
                         max_tokens=int(body.get("max_tokens") or 128),
                         temperature=float(body.get("temperature") if body.get("temperature") is not None else 0.0),
                     )
+                    # 采样后处理：细调模型在贪婪解码下容易滑进训练语料的套话（实测第 8 问跑题），
+                    # 所以允许页面显式调 repeat_penalty / top_p / stop。
+                    if body.get("repeat_penalty") is not None:
+                        kw["repeat_penalty"] = float(body["repeat_penalty"])
+                    if body.get("top_p") is not None:
+                        kw["top_p"] = float(body["top_p"])
+                    if body.get("stop"):
+                        kw["stop"] = body["stop"]
+                    out = LLM.create_chat_completion(**kw)
                 elif self.path.rstrip("/") == "/v1/completions":
                     out = LLM(body.get("prompt") or "",
                               max_tokens=int(body.get("max_tokens") or 128),
