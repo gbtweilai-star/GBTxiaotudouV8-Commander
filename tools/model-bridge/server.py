@@ -124,6 +124,39 @@ _OURS_PROC = [None]
 _WARM = {"started": 0.0, "state": "idle"}
 
 
+# ── 计算器：模型算数不稳（实测 120÷2 答 30、10-3+2 答 12），把算术交给确定性代码 ──
+# 只认四则与括号，其它一律拒；这是补模型短板的工具，不是通用 eval。
+def calc(expr: str) -> dict:
+    import ast as _ast
+    import operator as _op
+    OPS = {_ast.Add: _op.add, _ast.Sub: _op.sub, _ast.Mult: _op.mul,
+           _ast.Div: _op.truediv, _ast.Mod: _op.mod, _ast.Pow: _op.pow,
+           _ast.USub: _op.neg, _ast.UAdd: _op.pos}
+    src = (expr or "").replace("×", "*").replace("÷", "/").replace("＝", "=").strip()
+    node = _ast.parse(src, mode="eval").body
+    depth = [0]
+
+    def ev(n):
+        depth[0] += 1
+        if depth[0] > 40:
+            raise ValueError("表达式太深")
+        if isinstance(n, _ast.Constant) and isinstance(n.value, (int, float)):
+            return n.value
+        if isinstance(n, _ast.BinOp) and type(n.op) in OPS:
+            a, b = ev(n.left), ev(n.right)
+            if isinstance(n.op, _ast.Pow) and abs(b) > 12:
+                raise ValueError("幂太大")
+            return OPS[type(n.op)](a, b)
+        if isinstance(n, _ast.UnaryOp) and type(n.op) in OPS:
+            return OPS[type(n.op)](ev(n.operand))
+        raise ValueError("只支持数字与 + - * / % ** 和括号")
+
+    val = ev(node)
+    if isinstance(val, float) and val.is_integer():
+        val = int(val)
+    return {"ok": True, "expr": src, "value": val}
+
+
 def warm_bg() -> None:
     """后台预热：把权重加载好，但不发对话。"""
     ok = ensure_selfhost()
@@ -505,7 +538,7 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
-        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch")
+        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/v1/calc")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -514,6 +547,12 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:                              # noqa: BLE001
             return self._json(400, {"error": {"message": "请求体不是 JSON：%s" % exc}})
 
+        if self.path.startswith("/v1/calc"):
+            try:
+                return self._json(200, calc(str(body.get("expr") or "")))
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": "%s: %s"
+                                        % (type(exc).__name__, str(exc)[:120])})
         # ── 派活①：先问模型该落哪个能力位，再用目录校验（幻觉当场拒）────────────
         if self.path.startswith("/v1/route"):
             return self._route(body)

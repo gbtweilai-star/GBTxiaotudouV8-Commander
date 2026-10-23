@@ -49,7 +49,7 @@
     <option value="deepseek">deepseek-chat（通用模型）</option>
     <option value="openai">gpt-4o-mini（通用模型）</option>
   </select>
-  <input id="system" size="34" value="你是 GBT小土豆V8 总指挥：先判该落哪个能力位，再答；不确定就说不确定。">
+  <input id="system" size="34" value="你是严谨的中文助手。算术题必须一步步来：先写算式，再算结果，最后单独一行写「答案：X」。不要提方法论、框架或自我介绍。" title="系统提示：默认这条是实测出来的——它能修掉「跑题到三轴法」和算错的毛病；想让它扮演别的角色就直接改">
 </header>
 
 <main id="log">
@@ -116,6 +116,49 @@ async function health() {
 health();
 setInterval(health, 15000);
 
+/* 计算器补短板（两趟）：模型自己算数不稳（实测 120÷2 答 30、10-3+2 答 12），
+   但**它能把应用题写成算式**（实测 4/5 正确）。所以：
+     第 1 趟：让它只吐算式（max_tokens 24，几秒）；
+     第 2 趟：算式交给 /v1/calc 的确定性代码算，把结果作为系统注记喂回去。
+   只有像数学题的问题才触发，聊天不受影响。 */
+function looksLikeMath(t) {
+  return /\d/.test(t) && /[多少几求计算等于乘除加减平均剩共总每找零]/ .test(t);
+}
+function cleanExpr(s) {
+  const m = (s || "").replace(/[×xX]/g, "*").replace(/÷/g, "/").match(/[\d.+\-*/%() ]{3,60}/);
+  if (!m) return "";
+  const e = m[0].trim();
+  if (!/[+\-*/%]/.test(e) || (e.match(/\d+/g) || []).length < 2) return "";
+  return e;
+}
+async function calcNotes(text) {
+  if (!looksLikeMath(text)) return "";
+  try {
+    const r1 = await fetch(BRIDGE + "/v1/chat/completions", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        upstream: "selfhost", max_tokens: 24, temperature: 0,
+        messages: [
+          {role: "system", content: "把下面这道题写成一行算式，只输出算式本身（数字与 + - * / 括号），不要解释、不要算结果。"},
+          {role: "user", content: text}
+        ]
+      })
+    });
+    const j1 = await r1.json();
+    const expr = cleanExpr(((j1.choices || [{}])[0].message || {}).content || "");
+    if (!expr) return "";
+    const r2 = await fetch(BRIDGE + "/v1/calc", {method: "POST",
+      headers: {"Content-Type": "application/json"}, body: JSON.stringify({expr})});
+    const j2 = await r2.json();
+    if (!j2.ok || typeof j2.value !== "number" || Math.abs(j2.value) > 1e9) return "";
+    /* 实测：把结果放 system 里模型会无视（100-3×18 仍答 16），
+       放进**用户那句话的开头**才管用（2/2 正确）。所以返回的是前缀，不是系统注记。 */
+    return "（计算器： " + expr + " = " + j2.value + " ）";
+  } catch (err) {
+    return "";
+  }
+}
+
 /* 预热：后台把权重加载好，不占对话。加载中按秒报数，就绪后自动复位。 */
 const warmBtn = document.getElementById("warm");
 let warmTimer = null;
@@ -170,7 +213,8 @@ async function send() {
   try {
     const messages = [];
     if (sys) messages.push({role: "system", content: sys});
-    messages.push({role: "user", content: text});
+    const notes = await calcNotes(text);   // 形如「（计算器： 100 - 3 * 18 = 46 ）」
+    messages.push({role: "user", content: notes ? notes + text : text});
     /* 🔴 2026-10-24：改流式。900 token 的老上限 + 2 tok/s = 最坏 7 分钟才见第一个字；
        流式后 2–3 秒就出首字。兜底车道会自行去掉 stream（桥那边 pop 掉），所以两条路都要能收。 */
     /* 900 token × 1.7 tok/s = 最坏 9 分钟。默认降到 320，够一段完整回答；
