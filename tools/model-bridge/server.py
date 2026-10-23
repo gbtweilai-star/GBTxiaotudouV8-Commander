@@ -64,7 +64,8 @@ LANE_DEADLINE_S = int(os.environ.get("GBT_BRIDGE_PRIMARY_DEADLINE", "20"))
 # 车道总顺序：**我们自己的权重排最前**（ours 直连 RunPod → ours-alt → 云端拼网 cloud），
 # 只有它们都不回包时才落免费道（cfai=Workers AI、agnes），最后才是 deepseek。
 # 每条车道都有独立预算：自家车道 8s（GPU 起不来就该快速让位），免费道 20s。
-LANE_CHAIN = (["selfhost", "cfai", "agnes"] if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1"
+LANE_CHAIN = ((["selfhost_gpu"] if os.environ.get("GBT_ENABLE_GPU") == "1" else []) +
+              ["selfhost", "cfai", "agnes"] if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1"
               # 免费 GPU 上的**我们自己的权重**一旦就位，用这条开关把它排到最前
               else ["cfai", "agnes"])
 LANE_BUDGET = {"selfhost": 120, "gate": 45, "cfai": 20, "agnes": 12, "deepseek": 12}
@@ -101,13 +102,21 @@ UPSTREAMS = {
     "selfhost": (os.environ.get("GBT_OURS_BASE_URL", "").rstrip("/") or "https://__unset__/v1",
                  os.environ.get("GBT_OURS_MODEL", "gbt-v8"), "potato", 120),
 
+    # GPU 车道：llama.cpp Vulkan 后端（钉 b6000，见 gpu_lane.py）。
+    # 单开一条而不是替换 CPU：GPU 出过「快但乱码」的事故（b11840 回归），
+    # 所以它单独排队、起来先自检，自检不过桥就跳过它回落 CPU —— 宁可慢，不许答错。
+    "selfhost_gpu": (os.environ.get("GBT_GPU_BASE_URL", "http://127.0.0.1:8793/v1"),
+                     os.environ.get("GBT_GPU_MODEL", "gbt-v8"), "potato", 120),
+
     "cfai":     (_cfai_base(), "@cf/meta/llama-3.3-70b-instruct-fp8-fast", "custom", 60),  # 保险箱槽名固定，这把云 AI 令牌装 custom 槽
     "agnes":    ("https://apihub.agnes-ai.com/v1", "agnes-2.5-flash", "agnes", 180),
     "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat", "deepseek", 180),
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
 }
 # 默认 = 云插件路线（主人要的就是"云插件的GBT小土豆V8大模型"）；直连 RunPod 留作 `ours` 备用。
-DEFAULT = ("selfhost" if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1" else "cfai")
+DEFAULT = ("selfhost_gpu" if (os.environ.get("GBT_ENABLE_GPU") == "1" and
+                              os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1")
+           else ("selfhost" if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1" else "cfai"))
 
 # ── 按需激活：selfhost 没起来就现拉起来，用完按 idle 自动退 ────────────────
 # 主人令 2026-10-24「按需激活运行」：不要在开机时白占 5 GB 内存，
@@ -170,6 +179,31 @@ def _prewarm_caps() -> None:
         sys.stderr.write("[prewarm] 能力位目录已预热\n")
     except Exception as exc:                                    # noqa: BLE001
         sys.stderr.write("[prewarm] 跳过：%s\n" % str(exc)[:100])
+
+
+_GPU_TRIED = [False]
+
+
+def ensure_gpu(wait_s: int = 200) -> bool:
+    """起 GPU 车道并等它自检通过；不通过返回 False，桥回落 CPU。"""
+    if os.environ.get("GBT_ENABLE_GPU") != "1":
+        return False
+    base = UPSTREAMS.get("selfhost_gpu", ("",))[0]
+    if base and _health_ok(base):
+        return True
+    if _GPU_TRIED[0]:
+        return False
+    _GPU_TRIED[0] = True
+    try:
+        r = subprocess.run([_OURS_PY, os.path.join(_HERE, "gpu_lane.py"), "--start"],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=wait_s, cwd=_REPO)
+        tail = ((r.stdout or "").strip() or (r.stderr or "").strip())[-160:]
+        sys.stderr.write("[gpu] %s\n" % tail)
+        return r.returncode == 0
+    except Exception as exc:                                    # noqa: BLE001
+        sys.stderr.write("[gpu] 起不来：%s\n" % str(exc)[:120])
+        return False
 
 
 def warm_bg() -> None:
@@ -638,6 +672,8 @@ class Handler(BaseHTTPRequestHandler):
         for lane in chain:
             if lane == "selfhost":
                 ensure_selfhost()          # 按需激活：不在就现拉
+            if lane == "selfhost_gpu" and not ensure_gpu():
+                continue                   # GPU 不通就跳过，走 CPU 车道
             l_base, l_model, l_profile, l_timeout = UPSTREAMS[lane]
             l_key, l_slot = key_for(l_profile)
             if not l_key:
