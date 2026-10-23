@@ -1,9 +1,0 @@
-﻿# GBT 融合框架运行依赖（bundled python 被重置后按此重装）
-eth-account
-cryptography
-requests
-fastapi
-pydantic
-uvicorn
-httpx
-pytest
