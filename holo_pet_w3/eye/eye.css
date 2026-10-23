@@ -1,0 +1,206 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   GBT小土豆V8 · 触手视觉回传窗
+   ──────────────────────────────────────────────────────────────────────────
+   🔴 **本文件一个裸色值都不许出现**（连 `:root` 里也不许）。
+   原因不是洁癖：机检 `tools/codex-scripts/audit_skin.py` 的**准用色集**是从
+   `window.css` + `deck3d.css` + `**\/skin-*.css` **现算**出来的，`eye.css` 不在里面
+   ⇒ 这里每写一个 `#RRGGBB`，审计就报一次"混入旧皮肤"。
+   所以本窗只用**既有令牌**（`--gbt-*` / `--mc-*`）。这同时正好压住"AI 作品感"：
+   取景器的样子应当由**真帧 + 真遥测**撑起来，不是由配色撑起来。
+
+   设计立场（Owner 2026-09-23）：「像带个摄像头传回画面一样的逼真的视觉感」。
+   逼真 ≠ 加滤镜。真实监控画面的样子是：**画面本身占满、边缘有镜头暗角、
+   角上有烧进去的时间码、旁边滚着真实遥测**。假噪点、假扫描线一律不加 ——
+   那是"装作有信号"，而本窗存在的意义恰恰是**不装**。
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.eye-app { height: 100%; display: flex; flex-direction: column; }
+
+/* ── 顶栏 ───────────────────────────────────────────────────────────────── */
+.eye-mark {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gbt-cyan);
+  box-shadow: 0 0 0 3px var(--gbt-cyan-bg);
+  margin: 0 var(--mc-2) 0 var(--mc-1);
+}
+.eye-brand { display: flex; flex-direction: column; line-height: 1.15; }
+.eye-brand b { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+.eye-brand-sub { font: 400 10px/1 var(--mc-mono); color: var(--gbt-off); letter-spacing: .10em; }
+
+.eye-signal {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 500 11px/1 var(--mc-mono); letter-spacing: .06em;
+  color: var(--gbt-dim);
+  border: 1px solid var(--gbt-line); border-radius: var(--mc-r-pill);
+  padding: 4px 9px;
+}
+.eye-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gbt-off); flex: 0 0 auto;
+}
+/* 信号态只改**颜色**，不加动画：颜色编码状态，动画只留给"故障"这一类要抢注意力的。 */
+.eye-signal[data-state="live"]  { color: var(--gbt-ok);    border-color: var(--gbt-ok); }
+.eye-signal[data-state="live"] .eye-dot { background: var(--gbt-ok); }
+.eye-signal[data-state="stale"] { color: var(--gbt-warn);  border-color: var(--gbt-warn); }
+.eye-signal[data-state="stale"] .eye-dot { background: var(--gbt-warn); }
+.eye-signal[data-state="lost"]  { color: var(--gbt-fault); border-color: var(--gbt-fault); }
+.eye-signal[data-state="lost"] .eye-dot { background: var(--gbt-fault); }
+
+/* ── 主体：取景器 + 右栏 ─────────────────────────────────────────────────── */
+.eye-main {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) 292px;
+  gap: var(--mc-2); padding: var(--mc-2);
+}
+.eye-stage { display: flex; flex-direction: column; gap: var(--mc-2); min-height: 0; min-width: 0; }
+
+/* 取景器本体。底色用最深的 MC 背景 —— 画面之外的地方就该是"没信号的黑"。 */
+.eye-view {
+  position: relative; flex: 1 1 auto; min-height: 0;
+  background: var(--mc-bg);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--mc-r);
+  overflow: hidden;
+}
+/* object-fit: contain = **保住真实宽高比**（1920×1080 不许被拉成窗形）。
+   letterbox 出来的黑边是诚实的：那部分本来就没有画面。 */
+#shot {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
+
+/* 三分构图辅助线：极淡。辅助线是**取景器**的语法，不是装饰。 */
+.eye-thirds {
+  position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background-image:
+    linear-gradient(to right, var(--mc-border-subtle) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--mc-border-subtle) 1px, transparent 1px);
+  background-size: 33.3333% 33.3333%;
+  background-position: -1px -1px;
+}
+/* 中心准星 */
+.eye-cross {
+  position: absolute; left: 50%; top: 50%; width: 19px; height: 19px;
+  transform: translate(-50%, -50%); pointer-events: none; opacity: .8;
+}
+.eye-cross::before, .eye-cross::after {
+  content: ""; position: absolute; background: var(--gbt-cyan);
+}
+.eye-cross::before { left: 50%; top: 0; width: 1px; height: 100%; }
+.eye-cross::after  { top: 50%; left: 0; height: 1px; width: 100%; }
+
+/* 四角取景括号 */
+.eye-corner {
+  position: absolute; width: 19px; height: 19px; pointer-events: none;
+  border: 0 solid var(--gbt-cyan); opacity: .6;
+}
+.eye-corner.tl { left: 9px;  top: 9px;    border-left-width: 1px; border-top-width: 1px; }
+.eye-corner.tr { right: 9px; top: 9px;    border-right-width: 1px; border-top-width: 1px; }
+.eye-corner.bl { left: 9px;  bottom: 9px; border-left-width: 1px; border-bottom-width: 1px; }
+.eye-corner.br { right: 9px; bottom: 9px; border-right-width: 1px; border-bottom-width: 1px; }
+
+/* 镜头暗角：真镜头本来就有。用 --gbt-bg（不透明深底）做衰减终点，不引入新色。 */
+.eye-vig {
+  position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: radial-gradient(ellipse at center, transparent 56%, var(--gbt-bg) 100%);
+}
+
+/* OSD：烧进画面的时间码。字要压在任意画面上都读得清 ⇒ 用底色描边（text-shadow），
+   而不是加一块半透明底板 —— 底板会遮住真画面。 */
+.eye-osd {
+  position: absolute; left: 13px; bottom: 11px;
+  display: flex; align-items: center; gap: 7px;
+  font: 500 11px/1 var(--mc-mono); letter-spacing: .08em;
+  color: var(--gbt-text);
+  text-shadow: 0 1px 2px var(--gbt-bg), 0 0 6px var(--gbt-bg);
+  pointer-events: none;
+}
+.eye-rec { display: inline-flex; align-items: center; gap: 5px; color: var(--gbt-fault); }
+.eye-rec i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: block; }
+.eye-osd-sep { color: var(--gbt-off); }
+/* 回看时把 REC 熄掉并显式标注 —— **回看画面与实时画面必须一眼可分**，
+   否则这扇窗就在冒充"这是现在"。 */
+.eye-osd[data-live="false"] .eye-rec { color: var(--gbt-off); }
+.eye-osd-tag {
+  border: 1px solid var(--gbt-warn); color: var(--gbt-warn);
+  border-radius: var(--mc-r-pill); padding: 2px 5px; letter-spacing: .10em;
+}
+
+/* 无信号 / 静默：**明说**，不摆占位图。 */
+.eye-standby {
+  position: absolute; inset: 0; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--mc-2); text-align: center; padding: var(--mc-6);
+  background: var(--mc-bg);
+}
+.eye-view[data-state="empty"] .eye-standby,
+.eye-view[data-state="lost"]  .eye-standby { display: flex; }
+.eye-standby-title {
+  font: 600 15px/1.2 var(--mc-sans); color: var(--gbt-dim); letter-spacing: .06em;
+}
+.eye-view[data-state="lost"] .eye-standby-title { color: var(--gbt-fault); }
+.eye-standby-body {
+  font: 400 12px/1.6 var(--mc-sans); color: var(--gbt-off); max-width: 44ch;
+}
+.eye-standby-body code {
+  font-family: var(--mc-mono); color: var(--gbt-cyan);
+}
+
+/* ── 遥测带 ─────────────────────────────────────────────────────────────── */
+.eye-telemetry { flex: 0 0 auto; grid-template-columns: repeat(auto-fit, minmax(126px, 1fr)); }
+
+/* ── 右栏 ───────────────────────────────────────────────────────────────── */
+.eye-rail {
+  display: flex; flex-direction: column; gap: var(--mc-2);
+  min-height: 0; overflow: auto;
+}
+.eye-rail .mc-panel { flex: 0 0 auto; }
+.eye-rail-note { font: 400 10px/1 var(--mc-mono); color: var(--gbt-off); margin-left: auto; }
+
+/* 胶片条：**限高滚动**。
+   为什么要有 max-height（首屏渲图取证的）：12 张缩略图会把整条右栏撑满，
+   "这一帧的读数"和"这条通道"两块被顶到滚动区外 —— 而那两块才是这扇窗的**读数面**。
+   胶片是导航，不是主角。 */
+.eye-film {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  max-height: 274px; overflow-y: auto; padding-right: 2px;
+}
+.eye-thumb {
+  position: relative; display: block; padding: 0; cursor: pointer;
+  background: var(--mc-surface); border: 1px solid var(--mc-border);
+  border-radius: var(--mc-r); overflow: hidden; text-align: left;
+  font: 400 10px/1.3 var(--mc-mono); color: var(--gbt-dim);
+}
+.eye-thumb img {
+  display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  background: var(--mc-bg);
+}
+.eye-thumb span { display: block; padding: 3px 5px; letter-spacing: .04em; }
+.eye-thumb:hover { border-color: var(--gbt-cyan); }
+.eye-thumb[aria-current="true"] {
+  border-color: var(--gbt-cyan);
+  box-shadow: inset 0 0 0 1px var(--gbt-cyan);
+}
+.eye-thumb[aria-current="true"] span { color: var(--gbt-cyan); }
+
+/* 键值读数 */
+.eye-detail { display: flex; flex-direction: column; gap: 3px; }
+.eye-kv {
+  display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 6px;
+  font: 400 11px/1.45 var(--mc-mono);
+}
+.eye-kv dt { color: var(--gbt-off); }
+.eye-kv dd { margin: 0; color: var(--gbt-text); overflow-wrap: anywhere; }
+.eye-kv dd.dim { color: var(--gbt-dim); }
+
+.eye-empty { margin: 0; font: 400 11px/1.5 var(--mc-sans); color: var(--gbt-off); }
+.eye-note { margin: 0 0 5px; font: 400 11px/1.5 var(--mc-sans); color: var(--gbt-dim); }
+.eye-note code { font-family: var(--mc-mono); color: var(--gbt-cyan); overflow-wrap: anywhere; }
+.eye-note-hint { margin-bottom: 0; padding-top: 5px; border-top: 1px solid var(--mc-border-subtle); }
+
+/* 窄窗降级：右栏收到下面去，取景器仍然优先。 */
+@media (max-width: 900px) {
+  .eye-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .eye-rail { flex-direction: row; overflow-x: auto; }
+  .eye-rail .mc-panel { min-width: 250px; }
+}
