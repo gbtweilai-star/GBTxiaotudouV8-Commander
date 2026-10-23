@@ -10,7 +10,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "codex_status",
    "status": "ok",
@@ -30,7 +29,6 @@
    "gbt_allinone\\tests\\test_caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -44,7 +42,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "codex_thread_new",
    "status": "denied",
@@ -64,7 +61,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -78,7 +74,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -92,7 +87,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -106,7 +100,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -120,7 +113,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -133,8 +125,7 @@
    "gbt_allinone\\adapters\\workspace_adapter.py",
    "gbt_allinone\\api.py"
   ],
-  "runs": 12,
-  "last": "2026-10-17T16:20:00",
+  "runs": 13,
   "proof": {
    "cap": "health",
    "status": "ok",
@@ -153,8 +144,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -168,7 +158,6 @@
    "gbt_allinone\\autopilot.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "count_words",
    "status": "ok",
@@ -188,7 +177,6 @@
    "gbt_allinone\\autopilot.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "audit_query",
    "status": "ok",
@@ -208,7 +196,6 @@
    "gbt_allinone\\quant_tech.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -222,7 +209,6 @@
    "gbt_allinone\\quant_tech.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -236,7 +222,6 @@
    "gbt_allinone\\quant_tech.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -250,7 +235,6 @@
    "gbt_allinone\\quant_tech.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -264,7 +248,6 @@
    "gbt_allinone\\auth_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "osint_scan",
    "status": "error",
@@ -284,7 +267,6 @@
    "gbt_allinone\\record_grid.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -297,8 +279,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 2,
   "proof": null
  },
  {
@@ -311,8 +292,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 5,
-  "last": "2026-10-15T06:01:43+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -326,7 +306,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "wf_status",
    "status": "ok",
@@ -346,7 +325,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -360,7 +338,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -373,8 +350,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\app.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -388,7 +364,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "lr_status",
    "status": "ok",
@@ -407,8 +382,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\app.py"
   ],
-  "runs": 8,
-  "last": "2026-10-11T01:56:30",
+  "runs": 6,
   "proof": {
    "cap": "selfscan",
    "status": "ok",
@@ -427,8 +401,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\selfscan.py"
   ],
-  "runs": 3,
-  "last": "2026-10-11T05:08:00",
+  "runs": 1,
   "proof": null
  },
  {
@@ -442,7 +415,6 @@
    "gbt_allinone\\api.py"
   ],
   "runs": 43,
-  "last": "2026-10-11T03:05:57",
   "proof": null
  },
  {
@@ -455,8 +427,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\app.py"
   ],
-  "runs": 3,
-  "last": "2026-10-14T22:27:00+08:00",
+  "runs": 0,
   "proof": {
    "cap": "tentacle_manifest",
    "status": "ok",
@@ -475,8 +446,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 1,
-  "last": "2026-10-15T07:09:30+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -489,14 +459,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 2,
-  "last": "2026-10-11T02:40:51",
+  "runs": 5,
   "proof": {
    "cap": "sec_scan",
-   "status": "timeout",
+   "status": "ok",
    "denied": false,
-   "sec": 15,
-   "at": "2026-10-23T22:33:21"
+   "sec": 50.0,
+   "at": "2026-10-23T22:35:40"
   }
  },
  {
@@ -510,7 +479,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -523,8 +491,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -538,7 +505,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 2,
-  "last": "2026-10-15T03:31:13+08:00",
   "proof": null
  },
  {
@@ -552,7 +518,6 @@
    "gbt_allinone\\brain\\penetration_scan.py"
   ],
   "runs": 1,
-  "last": "2026-10-14T22:56:49+08:00",
   "proof": {
    "cap": "truth_scan",
    "status": "ok",
@@ -571,8 +536,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\auth_gate.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 2,
   "proof": null
  },
  {
@@ -585,8 +549,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 1,
-  "last": "2026-10-14T04:09:09+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -600,7 +563,6 @@
    "gbt_allinone\\llm\\bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "llm_status",
    "status": "ok",
@@ -619,8 +581,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain\\cognition.py"
   ],
-  "runs": 10,
-  "last": "2026-10-11T08:13:09",
+  "runs": 6,
   "proof": null
  },
  {
@@ -633,8 +594,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain\\penetration_scan.py"
   ],
-  "runs": 4,
-  "last": "2026-10-11T08:13:09",
+  "runs": 8,
   "proof": null
  },
  {
@@ -648,7 +608,6 @@
    "gbt_allinone\\llm\\genoffice_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -661,8 +620,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\llm\\genoffice_bridge.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -676,7 +634,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "brain_route",
    "status": "error",
@@ -696,7 +653,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -710,7 +666,6 @@
    "gbt_allinone\\brain_exec.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "brain_verify",
    "status": "ok",
@@ -730,7 +685,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "brain_health",
    "status": "ok",
@@ -750,7 +704,6 @@
    "gbt_allinone\\brain_exec.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -764,7 +717,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -778,13 +730,12 @@
    "gbt_allinone\\brain\\penetration_scan.py"
   ],
   "runs": 2,
-  "last": "2026-10-17T15:31:33",
   "proof": {
    "cap": "cross_scan",
-   "status": "timeout",
+   "status": "ok",
    "denied": false,
-   "sec": 15,
-   "at": "2026-10-23T22:33:42"
+   "sec": 56.3,
+   "at": "2026-10-23T22:36:36"
   }
  },
  {
@@ -798,7 +749,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -812,7 +762,6 @@
    "gbt_allinone\\brain_vault.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -826,7 +775,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -840,7 +788,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -854,7 +801,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -867,8 +813,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cross_scan.py"
   ],
-  "runs": 58,
-  "last": "2026-10-08T13:13:56",
+  "runs": 0,
   "proof": null
  },
  {
@@ -881,8 +826,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\mirror_space.py"
   ],
-  "runs": 1,
-  "last": "2026-10-08T07:45:25+08:00",
+  "runs": 0,
   "proof": {
    "cap": "mirror_scan",
    "status": "ok",
@@ -902,7 +846,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "mirror_plan",
    "status": "ok",
@@ -921,8 +864,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -936,7 +878,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -950,7 +891,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 4,
-  "last": "2026-10-11T01:05:37",
   "proof": null
  },
  {
@@ -963,8 +903,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 55,
   "proof": null
  },
  {
@@ -977,8 +916,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\mirror_space.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -991,8 +929,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\app.py"
   ],
-  "runs": 7,
-  "last": "2026-10-10T23:12:00",
+  "runs": 8,
   "proof": {
    "cap": "mirror_status",
    "status": "ok",
@@ -1012,7 +949,6 @@
    "gbt_allinone\\deployment_rehearsal.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1026,7 +962,6 @@
    "gbt_allinone\\tests\\test_caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "auth_gate_status",
    "status": "ok",
@@ -1045,8 +980,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\deploy\\panel_gate.py"
   ],
-  "runs": 3,
-  "last": "2026-10-08T04:31:17+08:00",
+  "runs": 1,
   "proof": null
  },
  {
@@ -1060,7 +994,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1074,7 +1007,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1087,8 +1019,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cross_scan.py"
   ],
-  "runs": 1,
-  "last": "2026-10-15T07:13:36+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -1102,7 +1033,6 @@
    "gbt_allinone\\devour.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "devour_scan",
    "status": "ok",
@@ -1122,7 +1052,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1135,8 +1064,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 2,
-  "last": "2026-10-10T04:06:01+08:00",
+  "runs": 1,
   "proof": null
  },
  {
@@ -1150,7 +1078,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1163,8 +1090,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 1,
-  "last": "2026-10-09T16:13:29+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -1178,7 +1104,6 @@
    "gbt_allinone\\cli_ify.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T03:15:10+08:00",
   "proof": null
  },
  {
@@ -1192,7 +1117,6 @@
    "gbt_allinone\\tentacle_learn.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1206,7 +1130,6 @@
    "gbt_allinone\\skill_finder.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "skill_finder",
    "status": "ok",
@@ -1226,7 +1149,6 @@
    "gbt_allinone\\humanizer.py"
   ],
   "runs": 1,
-  "last": "2026-10-17T22:28:30+08:00",
   "proof": null
  },
  {
@@ -1240,7 +1162,6 @@
    "gbt_allinone\\chart_html.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1254,7 +1175,6 @@
    "gbt_allinone\\tentacle_learn.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1268,7 +1188,6 @@
    "gbt_allinone\\forge_mastery.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1282,7 +1201,6 @@
    "gbt_allinone\\showcase_ops.py"
   ],
   "runs": 1,
-  "last": "2026-10-16T18:46:06+08:00",
   "proof": {
    "cap": "showcase_ops",
    "status": "ok",
@@ -1302,7 +1220,6 @@
    "gbt_allinone\\spider_ops.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T18:40:54+08:00",
   "proof": null
  },
  {
@@ -1316,7 +1233,6 @@
    "gbt_allinone\\offense_ops.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T17:43:27+08:00",
   "proof": null
  },
  {
@@ -1330,7 +1246,6 @@
    "gbt_allinone\\skill_forge.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T13:29:39+08:00",
   "proof": null
  },
  {
@@ -1344,7 +1259,6 @@
    "gbt_allinone\\shot_director.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T12:02:16+08:00",
   "proof": null
  },
  {
@@ -1358,7 +1272,6 @@
    "gbt_allinone\\book_skill.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T08:12:22+08:00",
   "proof": null
  },
  {
@@ -1372,7 +1285,6 @@
    "gbt_allinone\\music_auto.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T05:40:20+08:00",
   "proof": null
  },
  {
@@ -1386,7 +1298,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 2,
-  "last": "2026-10-16T04:41:53+08:00",
   "proof": null
  },
  {
@@ -1399,8 +1310,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\quant_plan.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 2,
   "proof": {
    "cap": "quant_plan",
    "status": "ok",
@@ -1419,8 +1329,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\know_map.py"
   ],
-  "runs": 2,
-  "last": "2026-10-16T01:21:35+08:00",
+  "runs": 3,
   "proof": {
    "cap": "know_map",
    "status": "ok",
@@ -1440,7 +1349,6 @@
    "gbt_allinone\\know_map.py"
   ],
   "runs": 3,
-  "last": "2026-10-15T23:47:21+08:00",
   "proof": null
  },
  {
@@ -1454,7 +1362,6 @@
    "gbt_allinone\\know_map.py"
   ],
   "runs": 2,
-  "last": "2026-10-15T23:34:13+08:00",
   "proof": null
  },
  {
@@ -1468,7 +1375,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 2,
-  "last": "2026-10-15T21:40:47+08:00",
   "proof": null
  },
  {
@@ -1482,13 +1388,12 @@
    "gbt_allinone\\scan_cap.py"
   ],
   "runs": 1,
-  "last": "2026-10-15T20:59:49+08:00",
   "proof": {
    "cap": "scan_cap",
-   "status": "timeout",
+   "status": "ok",
    "denied": false,
-   "sec": 15,
-   "at": "2026-10-23T22:34:00"
+   "sec": 16.8,
+   "at": "2026-10-23T22:36:53"
   }
  },
  {
@@ -1502,7 +1407,6 @@
    "gbt_allinone\\figure_gate.py"
   ],
   "runs": 1,
-  "last": "2026-10-15T20:27:31+08:00",
   "proof": null
  },
  {
@@ -1516,7 +1420,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 2,
-  "last": "2026-10-15T21:34:33+08:00",
   "proof": null
  },
  {
@@ -1530,7 +1433,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-15T19:36:08+08:00",
   "proof": null
  },
  {
@@ -1544,7 +1446,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 5,
-  "last": "2026-10-09T22:37:51",
   "proof": null
  },
  {
@@ -1558,7 +1459,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 4,
-  "last": "2026-10-10T17:44:13",
   "proof": null
  },
  {
@@ -1572,7 +1472,6 @@
    "gbt_allinone\\recon\\last30days\\engine\\youtube_yt.py"
   ],
   "runs": 6,
-  "last": "2026-10-11T00:42:47",
   "proof": null
  },
  {
@@ -1586,7 +1485,6 @@
    "gbt_allinone\\god_view.py"
   ],
   "runs": 7,
-  "last": "2026-10-10T05:42:10",
   "proof": {
    "cap": "god_view",
    "status": "ok",
@@ -1606,7 +1504,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1620,7 +1517,6 @@
    "gbt_allinone\\collab_gateway.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1633,8 +1529,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\comfy_forge.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -1647,8 +1542,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_chain_readiness.py"
   ],
-  "runs": 2,
-  "last": "2026-10-14T17:50:16+08:00",
+  "runs": 3,
   "proof": null
  },
  {
@@ -1662,7 +1556,6 @@
    "gbt_allinone\\tests\\test_tentacle_pipeline.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1676,7 +1569,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1690,7 +1582,6 @@
    "gbt_allinone\\devour.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1703,8 +1594,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 3,
-  "last": "2026-10-13T06:38:57+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -1717,8 +1607,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "runs": 1,
-  "last": "2026-10-14T01:44:32+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -1731,8 +1620,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_framework.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -1746,7 +1634,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1760,7 +1647,6 @@
    "gbt_allinone\\coze_mail_cap.py"
   ],
   "runs": 1,
-  "last": "2026-10-09T22:37:51",
   "proof": null
  },
  {
@@ -1773,8 +1659,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain\\deep_reasoner.py"
   ],
-  "runs": 15,
-  "last": "2026-10-10T23:31:41",
+  "runs": 9,
   "proof": null
  },
  {
@@ -1788,7 +1673,6 @@
    "gbt_allinone\\chain.py"
   ],
   "runs": 3,
-  "last": "2026-10-10T06:40:10",
   "proof": null
  },
  {
@@ -1802,7 +1686,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "tentacle_status",
    "status": "ok",
@@ -1822,7 +1705,6 @@
    "gbt_allinone\\tests\\test_framework.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1835,8 +1717,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\autopilot.py"
   ],
-  "runs": 1,
-  "last": "2026-10-08T11:47:44+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -1850,7 +1731,6 @@
    "gbt_allinone\\tests\\test_framework.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1864,7 +1744,6 @@
    "gbt_allinone\\pipeline.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1878,7 +1757,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "pipeline_status",
    "status": "ok",
@@ -1898,7 +1776,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1912,7 +1789,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1926,7 +1802,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -1940,7 +1815,6 @@
    "gbt_allinone\\tests\\test_framework.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "sched_status",
    "status": "ok",
@@ -1960,7 +1834,6 @@
    "gbt_allinone\\app.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "svc_inspect",
    "status": "ok",
@@ -1980,7 +1853,6 @@
    "gbt_allinone\\brain\\vision_tentacle.py"
   ],
   "runs": 30,
-  "last": "2026-10-17T13:39:18",
   "proof": null
  },
  {
@@ -1994,7 +1866,6 @@
    "gbt_allinone\\tests\\test_vlx_flow_intake.py"
   ],
   "runs": 2,
-  "last": "2026-10-11T02:56:44",
   "proof": null
  },
  {
@@ -2008,7 +1879,6 @@
    "gbt_allinone\\prompt_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2022,7 +1892,6 @@
    "gbt_allinone\\tests\\test_audio_extract.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2036,7 +1905,6 @@
    "gbt_allinone\\tests\\test_audio_mix.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2050,7 +1918,6 @@
    "gbt_allinone\\tests\\test_media_license.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2063,8 +1930,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\knowledge_lib.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -2077,8 +1943,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 9,
-  "last": "2026-10-10T23:26:34",
+  "runs": 10,
   "proof": null
  },
  {
@@ -2091,8 +1956,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cli_ify.py"
   ],
-  "runs": 8,
-  "last": "2026-10-23T08:17:07+08:00",
+  "runs": 9,
   "proof": null
  },
  {
@@ -2106,7 +1970,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-09T12:11:46+08:00",
   "proof": null
  },
  {
@@ -2119,8 +1982,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -2133,8 +1995,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\auth_gate.py"
   ],
-  "runs": 24,
-  "last": "2026-10-17T14:04:54",
+  "runs": 18,
   "proof": null
  },
  {
@@ -2147,8 +2008,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 1,
-  "last": "2026-10-15T05:17:46+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2161,8 +2021,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\auth_gate.py"
   ],
-  "runs": 9,
-  "last": "2026-10-10T23:09:55",
+  "runs": 13,
   "proof": null
  },
  {
@@ -2176,7 +2035,6 @@
    "gbt_allinone\\bluetooth_cap.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2190,7 +2048,6 @@
    "gbt_allinone\\bt_control.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2203,8 +2060,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\quant_plan.py"
   ],
-  "runs": 8,
-  "last": "2026-10-10T23:28:20",
+  "runs": 3,
   "proof": null
  },
  {
@@ -2218,7 +2074,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 1,
-  "last": "2026-10-08T07:49:06+08:00",
   "proof": null
  },
  {
@@ -2231,8 +2086,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 1,
-  "last": "2026-10-08T02:11:19+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2245,8 +2099,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "runs": 1,
-  "last": "2026-10-09T19:32:08",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2260,7 +2113,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2274,7 +2126,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2288,7 +2139,6 @@
    "gbt_allinone\\tests\\test_caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2301,8 +2151,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\security_brain.py"
   ],
-  "runs": 1,
-  "last": "2026-10-12T22:34:04+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2316,7 +2165,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "wave_probe",
    "status": "ok",
@@ -2336,7 +2184,6 @@
    "gbt_allinone\\tests\\test_dream_replay.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2350,7 +2197,6 @@
    "gbt_allinone\\tests\\test_orchestration_kernel.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2364,7 +2210,6 @@
    "gbt_allinone\\tests\\test_director_mood.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2378,7 +2223,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2391,8 +2235,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
-  "runs": 11,
-  "last": "2026-10-13T21:08:46+08:00",
+  "runs": 6,
   "proof": null
  },
  {
@@ -2405,8 +2248,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\preflight.py"
   ],
-  "runs": 1,
-  "last": "2026-10-19T05:19:57+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2419,8 +2261,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\preflight.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -2433,8 +2274,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\preflight.py"
   ],
-  "runs": 1,
-  "last": "2026-10-19T05:59:52+08:00",
+  "runs": 0,
   "proof": {
    "cap": "rig_audit",
    "status": "ok",
@@ -2454,7 +2294,6 @@
    "gbt_allinone\\preflight.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2467,8 +2306,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\preflight.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": {
    "cap": "anim_audit",
    "status": "ok",
@@ -2488,7 +2326,6 @@
    "gbt_allinone\\preflight.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2502,7 +2339,6 @@
    "gbt_allinone\\preflight.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2516,7 +2352,6 @@
    "gbt_allinone\\preflight.py"
   ],
   "runs": 1,
-  "last": "2026-10-19T08:09:39+08:00",
   "proof": null
  },
  {
@@ -2530,7 +2365,6 @@
    "gbt_allinone\\preflight.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2544,7 +2378,6 @@
    "gbt_allinone\\tools\\project_drift.py"
   ],
   "runs": 2,
-  "last": "2026-10-22T05:46:08+08:00",
   "proof": null
  },
  {
@@ -2558,7 +2391,6 @@
    "gbt_allinone\\tools\\impact_check.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "impact_check",
    "status": "ok",
@@ -2578,7 +2410,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2592,7 +2423,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2606,7 +2436,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2620,7 +2449,6 @@
    "gbt_allinone\\tentacle_equip.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "account_registry",
    "status": "ok",
@@ -2640,7 +2468,6 @@
    "gbt_allinone\\tests\\test_orchestration_kernel.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2654,7 +2481,6 @@
    "gbt_allinone\\tests\\test_orchestration_kernel.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2668,7 +2494,6 @@
    "gbt_allinone\\security\\security_brain.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2682,7 +2507,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2696,7 +2520,6 @@
    "gbt_allinone\\tests\\test_proactive_report.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "proactive_report",
    "status": "ok",
@@ -2716,7 +2539,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2730,7 +2552,6 @@
    "gbt_allinone\\mind_engine.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T02:07:59",
   "proof": null
  },
  {
@@ -2744,7 +2565,6 @@
    "gbt_allinone\\tentacle\\nav_etiology.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2758,7 +2578,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2772,7 +2591,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2786,7 +2604,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 2,
-  "last": "2026-10-10T11:49:36",
   "proof": null
  },
  {
@@ -2800,7 +2617,6 @@
    "gbt_allinone\\forge_mastery.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2813,8 +2629,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cross_scan.py"
   ],
-  "runs": 2,
-  "last": "2026-10-01T18:56:05",
+  "runs": 4,
   "proof": {
    "cap": "caps_called_audit",
    "status": "ok",
@@ -2834,7 +2649,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2848,7 +2662,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T01:52:01",
   "proof": {
    "cap": "coverage_auditor",
    "status": "ok",
@@ -2867,8 +2680,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_console_workspace.py"
   ],
-  "runs": 6,
-  "last": "2026-10-17T13:36:40",
+  "runs": 20,
   "proof": null
  },
  {
@@ -2882,7 +2694,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2895,8 +2706,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
-  "runs": 12,
-  "last": "2026-10-08T13:13:56",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2910,7 +2720,6 @@
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2924,7 +2733,6 @@
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T00:42:48",
   "proof": null
  },
  {
@@ -2937,8 +2745,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 3,
   "proof": null
  },
  {
@@ -2951,8 +2758,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\knowledge_lib.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 2,
   "proof": null
  },
  {
@@ -2965,8 +2771,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\knowledge_lib.py"
   ],
-  "runs": 2,
-  "last": "2026-10-13T11:07:07+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -2980,7 +2785,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -2994,7 +2798,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3007,8 +2810,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 1,
-  "last": "2026-10-13T10:57:44+08:00",
+  "runs": 2,
   "proof": {
    "cap": "replan_loop",
    "status": "ok",
@@ -3027,8 +2829,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 1,
-  "last": "2026-10-13T10:58:42+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3042,7 +2843,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 1,
-  "last": "2026-10-12T01:34:20+08:00",
   "proof": null
  },
  {
@@ -3056,7 +2856,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-12T02:30:27+08:00",
   "proof": null
  },
  {
@@ -3069,8 +2868,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3083,8 +2881,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\offense_ops.py"
   ],
-  "runs": 1,
-  "last": "2026-10-13T21:23:49+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3098,7 +2895,6 @@
    "gbt_allinone\\tools\\diagram_distill.py"
   ],
   "runs": 1,
-  "last": "2026-10-13T22:02:32+08:00",
   "proof": {
    "cap": "diagram_distill",
    "status": "ok",
@@ -3118,7 +2914,6 @@
    "gbt_allinone\\tools\\cad_distill.py"
   ],
   "runs": 1,
-  "last": "2026-10-13T22:05:41+08:00",
   "proof": null
  },
  {
@@ -3132,7 +2927,6 @@
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3146,7 +2940,6 @@
    "gbt_allinone\\tests\\test_native_growth_stack.py"
   ],
   "runs": 2,
-  "last": "2026-10-13T22:11:55+08:00",
   "proof": null
  },
  {
@@ -3160,7 +2953,6 @@
    "gbt_allinone\\tests\\test_distilled_ops.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3174,7 +2966,6 @@
    "gbt_allinone\\tests\\test_distilled_ops.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3188,7 +2979,6 @@
    "gbt_allinone\\offense_ops.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "code_audit",
    "status": "ok",
@@ -3208,7 +2998,6 @@
    "gbt_allinone\\tests\\test_distilled_ops.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3221,8 +3010,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_console_workspace.py"
   ],
-  "runs": 3,
-  "last": "2026-10-12T22:58:36+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -3235,8 +3023,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cross_scan.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3249,8 +3036,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cli_chat.py"
   ],
-  "runs": 1,
-  "last": "2026-10-10T05:42:11",
+  "runs": 2,
   "proof": null
  },
  {
@@ -3263,8 +3049,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\deepseek_key.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3277,8 +3062,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 4,
   "proof": null
  },
  {
@@ -3291,8 +3075,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\digital_human.py"
   ],
-  "runs": 7,
-  "last": "2026-10-20T04:54:38+08:00",
+  "runs": 13,
   "proof": null
  },
  {
@@ -3306,7 +3089,6 @@
    "gbt_allinone\\image_scout.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3319,8 +3101,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\install_selfcheck.py"
   ],
-  "runs": 1,
-  "last": "2026-10-18T04:40:54+08:00",
+  "runs": 0,
   "proof": {
    "cap": "install_selfcheck",
    "status": "ok",
@@ -3339,8 +3120,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\collab_gateway.py"
   ],
-  "runs": 3,
-  "last": "2026-10-18T07:28:06+08:00",
+  "runs": 4,
   "proof": null
  },
  {
@@ -3354,7 +3134,6 @@
    "gbt_allinone\\room_space.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3367,8 +3146,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_lobehub_surface.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3382,7 +3160,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 6,
-  "last": "2026-10-11T07:04:57",
   "proof": null
  },
  {
@@ -3395,8 +3172,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3410,7 +3186,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3424,7 +3199,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3438,7 +3212,6 @@
    "gbt_allinone\\semantic_route.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3452,7 +3225,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3466,7 +3238,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T23:56:06+08:00",
   "proof": null
  },
  {
@@ -3480,7 +3251,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 1,
-  "last": "2026-10-12T02:32:05+08:00",
   "proof": null
  },
  {
@@ -3494,7 +3264,6 @@
    "gbt_allinone\\tests\\test_warm_switch_scale0.py"
   ],
   "runs": 3,
-  "last": "2026-10-21T13:49:45+08:00",
   "proof": null
  },
  {
@@ -3508,7 +3277,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 2,
-  "last": "2026-10-12T22:15:28+08:00",
   "proof": {
    "cap": "page_scan",
    "status": "ok",
@@ -3528,7 +3296,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 2,
-  "last": "2026-10-12T01:20:11+08:00",
   "proof": null
  },
  {
@@ -3542,7 +3309,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T22:38:17+08:00",
   "proof": null
  },
  {
@@ -3556,7 +3322,6 @@
    "gbt_allinone\\auth_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3570,7 +3335,6 @@
    "gbt_allinone\\tests\\test_surface_bind.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3583,8 +3347,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tools\\agent_control.py"
   ],
-  "runs": 2,
-  "last": "2026-10-11T07:45:03",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3598,7 +3361,6 @@
    "gbt_allinone\\security\\security_brain.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3612,7 +3374,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3626,7 +3387,6 @@
    "gbt_allinone\\thebrain_bridge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3640,7 +3400,6 @@
    "gbt_allinone\\llm\\freellmapi.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3654,7 +3413,6 @@
    "gbt_allinone\\llm\\multimodal_port.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3668,7 +3426,6 @@
    "gbt_allinone\\positions.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3682,7 +3439,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3695,8 +3451,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\comfy_forge.py"
   ],
-  "runs": 1,
-  "last": "2026-10-10T02:50:30",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3709,8 +3464,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\llm\\multimodal_port.py"
   ],
-  "runs": 2,
-  "last": "2026-10-14T20:47:10+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3724,7 +3478,6 @@
    "gbt_allinone\\tentacle\\omni_tentacle.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3738,7 +3491,6 @@
    "gbt_allinone\\knowledge_lib.py"
   ],
   "runs": 1,
-  "last": "2026-10-14T17:39:07+08:00",
   "proof": null
  },
  {
@@ -3752,7 +3504,6 @@
    "gbt_allinone\\tentacle_equip.py"
   ],
   "runs": 35,
-  "last": "2026-10-11T06:20:53",
   "proof": null
  },
  {
@@ -3766,7 +3517,6 @@
    "gbt_allinone\\tests\\test_wiring_all_tentacles.py"
   ],
   "runs": 3,
-  "last": "2026-10-11T06:30:46",
   "proof": null
  },
  {
@@ -3779,8 +3529,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tests\\test_chain_readiness.py"
   ],
-  "runs": 1,
-  "last": "2026-10-13T17:48:19+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -3794,7 +3543,6 @@
    "gbt_allinone\\tools\\creation_camp.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3808,7 +3556,6 @@
    "gbt_allinone\\tools\\code_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "penetrating_cross_scan",
    "status": "ok",
@@ -3828,7 +3575,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3842,7 +3588,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "omission_detector",
    "status": "ok",
@@ -3861,8 +3606,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\image_scout.py"
   ],
-  "runs": 3,
-  "last": "2026-10-13T04:55:31+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -3876,7 +3620,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3889,8 +3632,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -3904,7 +3646,6 @@
    "gbt_allinone\\tests\\test_cap_bind_bidirectional.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3918,7 +3659,6 @@
    "gbt_allinone\\knowledge_lib.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3931,8 +3671,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\god_view.py"
   ],
-  "runs": 7,
-  "last": "2026-10-11T01:56:30",
+  "runs": 5,
   "proof": null
  },
  {
@@ -3946,7 +3685,6 @@
    "gbt_allinone\\tests\\test_awesome_tools_index.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3960,7 +3698,6 @@
    "gbt_allinone\\tests\\test_auto_switch.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -3973,8 +3710,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\know_map.py"
   ],
-  "runs": 3,
-  "last": "2026-10-15T23:10:13+08:00",
+  "runs": 5,
   "proof": null
  },
  {
@@ -3988,7 +3724,6 @@
    "gbt_allinone\\brain_exec.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4001,8 +3736,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
-  "runs": 1,
-  "last": "2026-10-16T01:51:04+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -4016,7 +3750,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4030,7 +3763,6 @@
    "gbt_allinone\\digital_human.py"
   ],
   "runs": 1,
-  "last": "2026-10-11T05:44:25",
   "proof": null
  },
  {
@@ -4044,7 +3776,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4058,7 +3789,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4072,7 +3802,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4086,7 +3815,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4099,8 +3827,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\positions.py"
   ],
-  "runs": 1,
-  "last": "2026-10-15T22:31:30+08:00",
+  "runs": 3,
   "proof": null
  },
  {
@@ -4114,7 +3841,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 1,
-  "last": "2026-10-08T19:36:37+08:00",
   "proof": null
  },
  {
@@ -4128,7 +3854,6 @@
    "gbt_allinone\\file_operation.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4142,7 +3867,6 @@
    "gbt_allinone\\comfy_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4156,7 +3880,6 @@
    "gbt_allinone\\tests\\test_absorb_loop.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4170,7 +3893,6 @@
    "gbt_allinone\\brain_exec.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4184,7 +3906,6 @@
    "gbt_allinone\\see_first.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4198,7 +3919,6 @@
    "gbt_allinone\\god_view.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4212,7 +3932,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4226,7 +3945,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4240,7 +3958,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4254,7 +3971,6 @@
    "gbt_allinone\\knowledge_lib.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "git_read",
    "status": "ok",
@@ -4274,7 +3990,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 2,
-  "last": "2026-10-13T05:00:19+08:00",
   "proof": null
  },
  {
@@ -4288,7 +4003,6 @@
    "gbt_allinone\\brain\\curiosity_engine.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4302,7 +4016,6 @@
    "gbt_allinone\\omni_web.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4316,7 +4029,6 @@
    "gbt_allinone\\cli_agents.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4330,7 +4042,6 @@
    "gbt_allinone\\cli_agents.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4344,7 +4055,6 @@
    "gbt_allinone\\cli_agents.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4358,7 +4068,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4371,8 +4080,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "runs": 1,
-  "last": "2026-10-13T10:17:16+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -4386,7 +4094,6 @@
    "gbt_allinone\\ghost_guard.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4399,8 +4106,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 2,
-  "last": "2026-10-10T13:08:41",
+  "runs": 1,
   "proof": null
  },
  {
@@ -4414,7 +4120,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-10T01:05:18",
   "proof": null
  },
  {
@@ -4428,7 +4133,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4442,7 +4146,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4456,7 +4159,6 @@
    "gbt_allinone\\ghost_guard.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4470,7 +4172,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4484,7 +4185,6 @@
    "gbt_allinone\\delivery_gate.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4498,7 +4198,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4512,7 +4211,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4526,7 +4224,6 @@
    "gbt_allinone\\tools\\agent_control.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4540,7 +4237,6 @@
    "gbt_allinone\\tools\\agent_control.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4554,7 +4250,6 @@
    "gbt_allinone\\semantic_route.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4568,7 +4263,6 @@
    "gbt_allinone\\tools\\belief_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4582,7 +4276,6 @@
    "gbt_allinone\\tools\\belief_forge.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4595,8 +4288,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cli_agents.py"
   ],
-  "runs": 3,
-  "last": "2026-10-22T09:11:42+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -4609,8 +4301,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tools\\command_chain.py"
   ],
-  "runs": 1,
-  "last": "2026-10-07T22:43:26+08:00",
+  "runs": 0,
   "proof": null
  },
  {
@@ -4624,7 +4315,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4638,7 +4328,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "db_probe",
    "status": "error",
@@ -4658,7 +4347,6 @@
    "gbt_allinone\\tools\\agent_control.py"
   ],
   "runs": 2,
-  "last": "2026-10-14T01:31:58+08:00",
   "proof": null
  },
  {
@@ -4672,7 +4360,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4686,7 +4373,6 @@
    "gbt_allinone\\tools\\agent_control.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4700,7 +4386,6 @@
    "gbt_allinone\\deepseek_key.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": {
    "cap": "freellmapi",
    "status": "ok",
@@ -4719,8 +4404,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\detail_habit.py"
   ],
-  "runs": 1,
-  "last": "2026-10-08T11:10:50+08:00",
+  "runs": 2,
   "proof": null
  },
  {
@@ -4733,8 +4417,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
-  "runs": 1,
-  "last": "2026-10-10T15:13:13",
+  "runs": 0,
   "proof": null
  },
  {
@@ -4748,7 +4431,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4762,7 +4444,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4776,7 +4457,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4790,7 +4470,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4804,7 +4483,6 @@
    "gbt_allinone\\knowledge_lib.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4818,7 +4496,6 @@
    "gbt_allinone\\cross_scan.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4832,7 +4509,6 @@
    "gbt_allinone\\codex_bridge.py"
   ],
   "runs": 2,
-  "last": "2026-10-10T11:49:39",
   "proof": null
  },
  {
@@ -4846,7 +4522,6 @@
    "gbt_allinone\\llm\\cloud_llm.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4859,8 +4534,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 2,
-  "last": "2026-10-08T13:14:49+08:00",
+  "runs": 1,
   "proof": {
    "cap": "review_gate",
    "status": "ok",
@@ -4880,7 +4554,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 1,
-  "last": "2026-10-12T22:18:35+08:00",
   "proof": null
  },
  {
@@ -4893,8 +4566,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\tentacle\\scale.py"
   ],
-  "runs": 0,
-  "last": "",
+  "runs": 1,
   "proof": null
  },
  {
@@ -4908,7 +4580,6 @@
    "gbt_allinone\\tools\\caps_called_audit.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4922,7 +4593,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4936,7 +4606,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 3,
-  "last": "2026-10-13T04:21:59+08:00",
   "proof": null
  },
  {
@@ -4950,7 +4619,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 4,
-  "last": "2026-10-13T06:15:40+08:00",
   "proof": null
  },
  {
@@ -4964,7 +4632,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-13T05:37:44+08:00",
   "proof": null
  },
  {
@@ -4978,7 +4645,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 0,
-  "last": "",
   "proof": null
  },
  {
@@ -4992,7 +4658,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 1,
-  "last": "2026-10-13T05:55:42+08:00",
   "proof": null
  },
  {
@@ -5006,7 +4671,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 2,
-  "last": "2026-10-13T06:06:46+08:00",
   "proof": null
  },
  {
@@ -5020,7 +4684,6 @@
    "gbt_allinone\\brain_supervisor.py"
   ],
   "runs": 2,
-  "last": "2026-10-13T06:23:58+08:00",
   "proof": null
  },
  {
@@ -5033,8 +4696,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "runs": 2,
-  "last": "2026-10-13T06:50:45+08:00",
+  "runs": 3,
   "proof": null
  },
  {
@@ -5048,7 +4710,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 2,
-  "last": "2026-10-13T07:16:42+08:00",
   "proof": null
  },
  {
@@ -5061,8 +4722,7 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\offense_ops.py"
   ],
-  "runs": 9,
-  "last": "2026-10-20T20:44:51+08:00",
+  "runs": 13,
   "proof": null
  },
  {
@@ -5076,7 +4736,6 @@
    "gbt_allinone\\security\\policy.py"
   ],
   "runs": 3,
-  "last": "2026-10-13T20:57:48+08:00",
   "proof": null
  }
 ]
