@@ -177,6 +177,11 @@ def _prewarm_caps() -> None:
         from gbt_allinone import run_task  # noqa: F401
         run_task("echo", {})
         sys.stderr.write("[prewarm] 能力位目录已预热\n")
+        # GPU 车道的自检在**启动时**做掉：它可能失败（这台机器就是），
+        # 失败要花 ~20s，不能摊到用户的第一条消息上。
+        if os.environ.get("GBT_ENABLE_GPU") == "1":
+            ok = ensure_gpu()
+            sys.stderr.write("[prewarm] GPU 车道 %s\n" % ("就绪" if ok else "不可用（回落 CPU）"))
     except Exception as exc:                                    # noqa: BLE001
         sys.stderr.write("[prewarm] 跳过：%s\n" % str(exc)[:100])
 
