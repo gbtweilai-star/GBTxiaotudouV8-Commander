@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GBT小土豆V8 · 三套自动化闭环 · 试听/试看</title>
+<!--
+  Visual Style Contract（风哥参考图1+图2）
+  控制台骨架=图1深空霓虹；试听区=图2暗紫音乐页（#241640 卡片、主紫 #8b5cf6、16px 圆角、底部播放条）
+  去AI味纪律：① 不用 emoji 当图标（全部 SVG 线性图标）② 只写仓里真实存在的数据（文件/体积/日期可核对）
+  ③ 不谎报进度（没做的写「未开稿」，做过的给可点开的确证）④ 文案用工作台口吻，不喊口号
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%;background:#0b0316;color:#e9e4f5;font-family:"Microsoft YaHei",sans-serif}
+  .hud{display:flex;justify-content:space-between;padding:14px 24px;font:600 11px Consolas,monospace;letter-spacing:2px}
+  .hud .live{color:#a855f7;animation:blink 1.6s infinite}@keyframes blink{50%{opacity:.25}}
+  header{text-align:center;padding:12px 0 4px}
+  header .kicker{color:#22d3ee;font:600 11px Consolas,monospace;letter-spacing:4px}
+  header h1{font-size:26px;font-weight:800;margin:8px 0 4px;
+    background:linear-gradient(90deg,#22d3ee,#a855f7 55%,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+  header p{color:#9b8fc0;font-size:12px}
+  .tabs{display:flex;justify-content:center;gap:12px;margin:16px 0 6px}
+  .tab{padding:9px 26px;border-radius:999px;border:1px solid #7c3aed55;background:#170a30cc;color:#b9aadf;cursor:pointer;font-size:13px;transition:.2s;display:flex;align-items:center;gap:7px}
+  .tab svg{width:13px;height:13px;fill:currentColor}
+  .tab.on{background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;border-color:transparent;box-shadow:0 0 24px #a855f744}
+  main{max-width:1120px;margin:0 auto;padding:14px 22px 60px}
+  section.panel{display:none} section.panel.on{display:block}
+  .loop{display:flex;align-items:stretch;gap:0;margin:14px 0 20px}
+  .stage{flex:1;background:#170a30cc;border:1px solid #7c3aed44;border-radius:12px;padding:12px 14px;position:relative;transition:.35s}
+  .stage+.stage{margin-left:34px}
+  .stage+.stage::before{content:"";position:absolute;left:-27px;top:50%;width:20px;height:2px;
+    background:linear-gradient(90deg,#7c3aed,#22d3ee);box-shadow:0 0 8px #a855f7aa}
+  .stage h4{font-size:13px;color:#d9c9ff;margin-bottom:5px}
+  .stage h4 em{font-style:normal;font:600 9.5px Consolas;margin-left:6px;padding:2px 7px;border-radius:999px}
+  .st-run em{background:#22d3ee22;color:#22d3ee}.st-gate em{background:#f59e0b22;color:#f59e0b}
+  .st-block em{background:#ec489922;color:#ec4899}.st-pay em{background:#34d39922;color:#34d399}
+  .stage p{font-size:11px;color:#8d80b5;line-height:1.75}
+  .stage p b{color:#22d3ee;font-weight:600}
+  .stage.hot{border-color:#22d3ee;box-shadow:0 0 26px #22d3ee33;transform:translateY(-2px)}
+  .stage.hot.st-block{border-color:#ec4899;box-shadow:0 0 26px #ec489933}
+  .stage.hot.st-pay{border-color:#34d399;box-shadow:0 0 26px #34d39933}
+  /* ── 试听区 ── */
+  .hero{display:flex;gap:18px;background:linear-gradient(135deg,#241640,#3b1d6e);border-radius:18px;padding:20px;align-items:center;box-shadow:0 10px 40px #a855f71f}
+  .hero .cover{width:132px;height:132px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px #a855f755}
+  .hero .cover svg{width:46px;height:46px;fill:#fff;opacity:.92}
+  .hero .tag{font:600 9.5px Consolas;letter-spacing:2px;color:#c4b5fd}
+  .hero h2{font-size:21px;margin:6px 0 2px}
+  .hero p.sub{color:#b9aadf;font-size:12px;line-height:1.7}
+  .hero button{margin-top:13px;background:#8b5cf6;border:0;color:#fff;padding:9px 24px;border-radius:999px;font-size:13px;cursor:pointer;box-shadow:0 6px 18px #8b5cf666;display:flex;align-items:center;gap:7px}
+  .hero button svg{width:12px;height:12px;fill:#fff}
+  .hero button:hover{filter:brightness(1.12)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+  .card{background:#241640;border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;border:1px solid transparent}
+  .card:hover{transform:translateY(-3px);border-color:#8b5cf655}
+  .card .ph{height:88px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3b1d6e,#241640)}
+  .card .ph svg{width:26px;height:26px;fill:#8b5cf6}
+  .card .meta{padding:9px 11px}
+  .card .meta b{font-size:12px;display:block;color:#e9e4f5;font-weight:600}
+  .card .meta span{font-size:10.5px;color:#8d80b5;font-variant-numeric:tabular-nums}
+  .card.empty{background:transparent;border:1px dashed #7c3aed55;cursor:default}
+  .card.empty .ph{background:none}
+  .card.empty .ph svg{fill:#5f5680}
+  .card.empty:hover{transform:none;border-color:#7c3aed88}
+  .rows{margin-top:18px;background:#1c1233;border-radius:14px;padding:6px 14px}
+  .rt{font:600 10.5px Consolas;letter-spacing:1px;color:#8d80b5;padding:8px 4px 2px}
+  .row{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid #ffffff0d;font-size:12px;cursor:pointer}
+  .row:last-child{border:0}.row:hover b{color:#c4b5fd}
+  .row .th{width:30px;height:30px;border-radius:8px;background:#3b1d6e;display:flex;align-items:center;justify-content:center}
+  .row .th svg{width:13px;height:13px;fill:#a855f7}
+  .row b{flex:1;font-weight:600}.row span{color:#8d80b5;font-size:11px;font-variant-numeric:tabular-nums}
+  /* ── 播放器 ── */
+  .player{background:#140b28;border-radius:18px;padding:18px;box-shadow:0 10px 40px #a855f71a}
+  video{width:100%;border-radius:12px;background:#000;max-height:430px}
+  .pbar{display:flex;align-items:center;gap:14px;margin-top:12px;font:11px Consolas;color:#8d80b5;font-variant-numeric:tabular-nums}
+  .pbar .btn{width:38px;height:38px;border-radius:50%;background:#8b5cf6;border:0;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .pbar .btn svg{width:13px;height:13px;fill:#fff}
+  .pbar .btn.alt{background:#3b1d6e}
+  .prog{flex:1;height:4px;border-radius:99px;background:#7c3aed33;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#22d3ee)}
+  .pl-list{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .ep{background:#241640;border-radius:12px;padding:11px 13px;font-size:12px;border:1px solid transparent;cursor:pointer}
+  .ep:hover{border-color:#8b5cf655}.ep b{display:block;color:#e9e4f5;margin-bottom:3px;font-weight:600}
+  .ep span{color:#8d80b5;font-size:10.5px;font-variant-numeric:tabular-nums}
+  .note{margin-top:16px;background:#170a30cc;border:1px solid #f59e0b44;border-radius:12px;padding:11px 15px;font-size:11.5px;color:#fbbf24;line-height:1.8}
+  .note b{color:#f59e0b}
+  .ok-note{border-color:#34d39944;color:#6ee7b7}.ok-note b{color:#34d399}
+  footer{text-align:center;color:#5f5680;font:10.5px Consolas;padding:18px 0 26px;letter-spacing:1px}
+  audio{display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head>
+<body>
+<div class="hud"><span>◈ SYS ACTIVE · AUTOMATION LOOP</span><span><span class="live">◉ LIVE</span> &nbsp; GBT-V8</span></div>
+<header>
+  <div class="kicker">—— 07 生产线 ——</div>
+  <h1>制作 · 审核 · 发布 · 变现</h1>
+  <p>三套闭环：能跑的段接的是仓里的真文件，没跑通的段原样标着——不留假数据</p>
+</header>
+<div class="tabs">
+  <div class="tab on" data-t="music"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>作品试听</div>
+  <div class="tab" data-t="short"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>短视频试看</div>
+  <div class="tab" data-t="movie"><svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4h-4z"/></svg>电影试看</div>
+</div>
+<main>
+
+<!-- ═══ ① 作品试听 ═══ -->
+<section class="panel on" id="p-music">
+  <div class="loop">
+    <div class="stage st-run"><h4>制作 <em>RUN</em></h4><p>词曲提示词走 <b>fal.ai queue</b>（等 FAL_KEY 配置）→ 成曲落 projects/music/。当前曲库里那支真声，来自 9·26 样片的原声轨。</p></div>
+    <div class="stage st-gate"><h4>审核 <em>GATE</em></h4><p>敏感过滤闸（social_life.redact）与内容审核闸，过闸记录只留掩码，不留原文。</p></div>
+    <div class="stage st-block"><h4>发布 <em>待授权</em></h4><p>平台适配器留位中。要点亮需要平台凭据，加一条 <b>data_export</b> 授权。</p></div>
+    <div class="stage st-pay"><h4>变现 <em>LEDGER</em></h4><p>播放与分成记进 state/ 收益台账，分账比例等你定。</p></div>
+  </div>
+  <div class="hero">
+    <div class="cover"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
+    <div style="flex:1">
+      <div class="tag">本地曲库 · 1 支可播</div>
+      <h2>免费样片 · 原声轨</h2>
+      <p class="sub">就是 9·26 那支样片里带的声——下面播放条放的是真文件，不是合成音。</p>
+      <button id="playTop"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>播放</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="pick(0)"><div class="ph"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div><div class="meta"><b>样片原声轨</b><span>成片 00:14 · 4.6 MB</span></div></div>
+    <div class="card" onclick="pick(1)"><div class="ph"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg></div><div class="meta"><b>剪辑演示 · 声轨</b><span>cut 产物 · 68 KB</span></div></div>
+    <div class="card" onclick="pick(2)"><div class="ph"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg></div><div class="meta"><b>动效演示 · 声轨</b><span>motion 产物 · 30 KB</span></div></div>
+    <div class="card empty"><div class="ph"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3 2 5.5 4 7v3h6v-3c2-1.5 4-4 4-7a7 7 0 0 0-7-7zm-2 16h4v2h-4z"/></svg></div><div class="meta"><b>曲位空置</b><span>FAL_KEY 接线后自动入列</span></div></div>
+  </div>
+  <div class="rows">
+    <div class="rt">产线记录 · 全部可核对</div>
+    <div class="row" onclick="pick(0)"><div class="th"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><b>20260926-免费样片 · 成片入库</b><span>05-publish · 4,603,033 字节</span></div>
+    <div class="row" onclick="pick(1)"><div class="th"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><b>video/cut.py 静音切除 · 演示片段</b><span>video-out/cut-demo.mp4 · 68 KB</span></div>
+    <div class="row" onclick="pick(2)"><div class="th"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><b>video/pipeline.py 渲染 · 动效片段</b><span>video-out/motion.mp4 · 30 KB</span></div>
+  </div>
+  <div class="player">
+    <div class="pbar">
+      <button class="btn" id="pp"><svg id="ppIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <span id="mTitle">免费样片 · 原声轨</span>
+      <div class="prog"><i id="mBar"></i></div>
+      <span id="mTime">--:-- / --:--</span>
+    </div>
+  </div>
+  <div class="note"><b>闭环现状：</b>制作段的工具都装好了（shortvideo-music-mcp、venice 备选），审核双闸在岗；发布这一段卡在凭据和授权上——给了就能点亮，我不会替你按那个按钮。</div>
+</section>
+
+<!-- ═══ ② 短视频试看 ═══ -->
+<section class="panel" id="p-short">
+  <div class="loop">
+    <div class="stage st-run"><h4>制作 <em>RUN</em></h4><p>样片已经产出，就在下面——点开就是成片本体，不是替身画面。</p></div>
+    <div class="stage st-gate"><h4>审核 <em>GATE</em></h4><p>敏感过滤+内容审核双闸，标题/口播/字幕逐项过，留痕不留原文。</p></div>
+    <div class="stage st-block"><h4>发布 <em>待授权</em></h4><p>抖音 / B站 / 视频号适配器留位。<b>browser_control</b> 授权后可自动投稿。</p></div>
+    <div class="stage st-pay"><h4>变现 <em>LEDGER</em></h4><p>星图/创作分成入台账。免费样片本来就该先当报价样品用。</p></div>
+  </div>
+  <div class="player">
+    <video id="sv" controls playsinline src="media/shortvideo-sample.mp4"></video>
+    <div class="pbar">
+      <button class="btn" onclick="document.getElementById('sv').play()"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="btn alt" onclick="document.getElementById('sv').pause()"><svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+      <span>免费样片 01 号 · 2026-09-26 产线产出</span>
+      <span style="margin-left:auto;color:#34d399">✔ 本机文件 · 4.6 MB</span>
+    </div>
+  </div>
+  <div class="pl-list">
+    <div class="ep" onclick="swap('media/shortvideo-sample.mp4',this)"><b>免费样片 01 号</b><span>成片本体 · 本页默认</span></div>
+    <div class="ep" onclick="swap('media/demo-cut.mp4',this)"><b>静音切除演示</b><span>video/cut.py 产物 · 68 KB</span></div>
+    <div class="ep" onclick="swap('media/demo-motion.mp4',this)"><b>动效渲染演示</b><span>video/pipeline.py 产物 · 30 KB</span></div>
+  </div>
+  <div class="note ok-note"><b>闭环现状：</b>制作段真跑通（证据就是本页这条视频）；审核双闸在岗；发布等平台授权——适配器就位，钥匙给了就能自动投稿。</div>
+</section>
+
+<!-- ═══ ③ 电影试看 ═══ -->
+<section class="panel" id="p-movie">
+  <div class="loop">
+    <div class="stage st-run"><h4>制作 <em>RUN</em></h4><p>剧本→分集→长渲染：remotion 与 video-pipeline 就位，长片按幕分批渲，避免把内存压垮。</p></div>
+    <div class="stage st-gate"><h4>审核 <em>GATE</em></h4><p>逐幕双闸，外加一道<b>主人终审</b>——长片发布必须人审，这条是红线。</p></div>
+    <div class="stage st-block"><h4>发布 <em>待授权</em></h4><p>B站 / YouTube 适配器留位，凭据与授权同前。</p></div>
+    <div class="stage st-pay"><h4>变现 <em>LEDGER</em></h4><p>充电、广告分成、付费点播，入同一本收益台账。</p></div>
+  </div>
+  <div class="player">
+    <video id="mv" controls playsinline src="media/demo-motion.mp4"></video>
+    <div class="pbar"><span>渲染管线验证片段（不是正片）</span><span style="margin-left:auto;color:#f59e0b">正片未开稿 · 不拿演示片充数</span></div>
+  </div>
+  <div class="pl-list">
+    <div class="ep"><b>第一幕</b><span>剧本未开稿 · 渲染管线已验证</span></div>
+    <div class="ep"><b>第二幕</b><span>未开稿 · 数字人资产（haru）在位</span></div>
+    <div class="ep"><b>第三幕</b><span>未开稿 · 场景内核（walkable_world）可复用</span></div>
+  </div>
+  <div class="note"><b>闭环现状：</b>三幕只有框架，剧本一个字都还没写——页面上放的是管线验证片段，等排期点头就开工。</div>
+</section>
+
+</main>
+<footer>GBT小土豆V8 · 三套自动化闭环 · 生成于 2026-09-26 · 开发者：自由的风</footer>
+<audio id="au" src="media/shortvideo-sample.mp4" preload="metadata"></audio>
+<script>
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on"); document.getElementById("p-"+t.dataset.t).classList.add("on");
+});
+const au=document.getElementById("au");
+const TRACKS=[
+  {src:"media/shortvideo-sample.mp4", name:"免费样片 · 原声轨"},
+  {src:"media/demo-cut.mp4",         name:"剪辑演示 · 声轨"},
+  {src:"media/demo-motion.mp4",      name:"动效演示 · 声轨"},
+];
+let cur=0;
+function pick(i){ cur=i; au.src=TRACKS[i].src; au.play();
+  document.getElementById("mTitle").textContent=TRACKS[i].name;
+  document.getElementById("ppIco").innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'; }
+function swap(src,el){ document.getElementById("sv").src=src; document.getElementById("sv").play();
+  document.querySelectorAll("#p-short .ep").forEach(x=>x.style.borderColor="transparent"); el.style.borderColor="#8b5cf6"; }
+document.getElementById("playTop").onclick=()=>pick(0);
+document.getElementById("pp").onclick=()=>{ au.paused?au.play():au.pause(); };
+au.onplay =()=>document.getElementById("ppIco").innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+au.onpause=()=>document.getElementById("ppIco").innerHTML='<path d="M8 5v14l11-7z"/>';
+function fmt(s){ if(!isFinite(s))return"--:--"; s=Math.floor(s);
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+au.ontimeupdate=()=>{ document.getElementById("mBar").style.width=(au.currentTime/au.duration*100||0)+"%";
+  document.getElementById("mTime").textContent=fmt(au.currentTime)+" / "+fmt(au.duration); };
+// 巡行能量：当前闭环段轮流爆亮
+let si=0;
+setInterval(()=>{
+  const cur=document.querySelector(".panel.on"); if(!cur) return;
+  const sts=cur.querySelectorAll(".stage"); if(!sts.length) return;
+  sts.forEach(s=>s.classList.remove("hot"));
+  sts[si%sts.length].classList.add("hot"); si++;
+},1400);
+</script>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body>
+</html>

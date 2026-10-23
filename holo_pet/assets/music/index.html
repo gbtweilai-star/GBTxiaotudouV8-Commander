@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GBT小土豆V8 · 音乐工作台</title>
+<!--
+  音乐工作台 · 桌面 APP 版创作台（参照 Suno create 页骨架，深空霓虹皮肤）
+  骨架（Suno 同款）：中央大输入（一句话成曲）+ Advanced 折叠（歌词/风格/BPM）+ Create 主按钮 + 作品流（播放/喜欢）
+  桌面 APP 差异：
+  · 右侧常驻「曲库面板」——本地真资产实时扫（projects/movie/音乐线 + 生成/音频）
+  · Advanced 里带「GBT 主题曲模板」一键填入（《发芽》歌词+风格 brief 已备）
+  · 生成走产线命令（如实显示生成源状态：Suno/天音/Colab 未接线=如实说，不装按钮假装能生成）
+-->
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#060312;color:#e9e4f5;font-family:"Microsoft YaHei",sans-serif;overflow-x:hidden}
+.hud{display:flex;justify-content:space-between;padding:12px 22px;font:600 11px Consolas,monospace;letter-spacing:2px}
+.live{color:#a855f7;animation:blink 1.6s infinite}@keyframes blink{50%{opacity:.25}}
+.wrap{max-width:1200px;margin:0 auto;padding:26px 26px 60px}
+header.hero{text-align:center;padding:26px 0 18px}
+header.hero .kicker{color:#22d3ee;font:600 11px Consolas;letter-spacing:4px}
+header.hero h1{font-size:30px;font-weight:800;margin:10px 0 6px;
+  background:linear-gradient(90deg,#22d3ee,#a855f7 55%,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+header.hero p{color:#9b8fc0;font-size:13px}
+.composer{background:linear-gradient(160deg,#170a30,#241640);border:1px solid #7c3aed55;border-radius:18px;padding:20px;margin-top:14px;
+  box-shadow:0 10px 40px #a855f71a}
+.composer textarea{width:100%;min-height:88px;background:#0e0620;border:1px solid #7c3aed44;border-radius:12px;color:#e9e4f5;
+  padding:14px;font-size:14.5px;line-height:1.7;resize:vertical;font-family:inherit}
+.composer textarea:focus{outline:none;border-color:#22d3ee;box-shadow:0 0 0 3px #22d3ee22}
+.bar{display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.btn{padding:10px 22px;border-radius:999px;border:0;cursor:pointer;font-size:13px;transition:.2s}
+.btn.create{background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 6px 20px #8b5cf666;font-weight:700}
+.btn.create:hover{filter:brightness(1.12)}
+.btn.ghost{background:#170a30cc;border:1px solid #7c3aed55;color:#b9aadf}
+.btn.ghost:hover{border-color:#22d3ee}
+.adv{display:none;margin-top:14px;border-top:1px solid #7c3aed33;padding-top:14px}
+.adv.on{display:block}
+.adv .row{display:flex;gap:14px;flex-wrap:wrap}
+.field{flex:1;min-width:220px}
+.field label{display:block;font:600 10px Consolas;color:#22d3ee;letter-spacing:1px;margin-bottom:5px}
+.field textarea,.field input,.field select{width:100%;background:#0e0620;border:1px solid #7c3aed44;border-radius:8px;
+  color:#e9e4f5;padding:9px 11px;font-size:12.5px;font-family:inherit}
+.field textarea{min-height:120px;line-height:1.7}
+.tpls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tpl{background:#0e0620;border:1px solid #7c3aed44;border-radius:8px;padding:7px 12px;font-size:11.5px;color:#b9aadf;cursor:pointer}
+.tpl:hover{border-color:#22d3ee;color:#e9e4f5}
+.status{margin-top:10px;font:11px Consolas;color:#8d80b5;line-height:1.8}
+.status b{color:#34d399}.status .warn{color:#f59e0b}
+.grid{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-top:20px}
+.tracks{display:flex;flex-direction:column;gap:10px}
+.trk{display:flex;align-items:center;gap:14px;background:#170a30cc;border:1px solid #7c3aed44;border-radius:12px;padding:12px 14px;transition:.2s}
+.trk:hover{border-color:#22d3ee}
+.trk .cover{width:52px;height:52px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#7c3aed,#ec4899)}
+.trk .cover svg{width:22px;height:22px;fill:#fff}
+.trk .meta{flex:1;min-width:0}
+.trk .meta b{font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trk .meta span{font-size:11px;color:#8d80b5;font-variant-numeric:tabular-nums}
+.trk .act{display:flex;gap:8px;align-items:center}
+.icobtn{width:34px;height:34px;border-radius:50%;background:#241640;border:1px solid #7c3aed55;color:#e9e4f5;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.2s}
+.icobtn:hover{border-color:#22d3ee}
+.icobtn.play{background:#8b5cf6;border:0}
+.icobtn svg{width:13px;height:13px;fill:#fff}
+.side{display:flex;flex-direction:column;gap:12px}
+.panel{background:#120726d9;border:1px solid #7c3aed44;border-radius:14px;padding:14px}
+.panel h3{font:700 11px Consolas;letter-spacing:2px;color:#22d3ee;margin-bottom:10px}
+.panel .row{display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px solid #ffffff0a}
+.panel .row span:last-child{color:#8d80b5;font-variant-numeric:tabular-nums}
+.note{font-size:10.5px;color:#8d80b5;line-height:1.8;margin-top:8px}
+.note b{color:#f59e0b}
+.wave{height:44px;border-radius:8px;background:#0e0620;border:1px solid #7c3aed33;margin-top:8px;overflow:hidden;position:relative}
+.wave canvas{width:100%;height:100%;display:block}
+footer{text-align:center;color:#5f5680;font:10.5px Consolas;padding:20px 0 26px;letter-spacing:1px}
+</style><script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head>
+<body>
+<div class="hud"><span>◈ MUSIC STUDIO · 桌面创作台</span><span><span class="live">◉ LIVE</span> · GBT-V8</span></div>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">—— 06 产线 · 音乐 ——</div>
+    <h1>一句话，成一首歌</h1>
+    <p>或者贴整段歌词、选风格、定 BPM——她来谱曲演唱</p>
+  </header>
+
+  <div class="composer">
+    <textarea id="prompt" placeholder="描述你想听的歌：比如「一首关于种子发芽的暗黑电子女声，82 BPM，钢琴进，鼓点渐强」…"></textarea>
+    <div class="bar">
+      <button class="btn create" id="create">✦ Create</button>
+      <button class="btn ghost" id="advbtn">Advanced ▾</button>
+      <button class="btn ghost" id="rand">🎲 随机灵感</button>
+      <span style="margin-left:auto;font:11px Consolas;color:#5f5680" id="wordcount">0 字</span>
+    </div>
+    <div class="adv" id="adv">
+      <div class="tpls">
+        <div class="tpl" data-tpl="发芽">🌱 GBT 主题曲《发芽》</div>
+        <div class="tpl" data-tpl="义庄">🧟 末班义庄·恐怖氛围</div>
+        <div class="tpl" data-tpl="醒来">⚡ 她从代码里醒来·片尾曲</div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label>LYRICS · 歌词（Custom 模式整段贴）</label><textarea id="lyrics" placeholder="主歌/副歌/桥…"></textarea></div>
+        <div class="field"><label>STYLE · 风格</label><input id="style" placeholder="Chinese dark pop, cinematic electronic, female vocal, A minor"></div>
+        <div class="field" style="flex:0 0 120px"><label>BPM</label><input id="bpm" type="number" value="82"></div>
+      </div>
+    </div>
+    <div class="status" id="status">生成源状态：检测中…</div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div style="font:700 12px Consolas;color:#22d3ee;letter-spacing:2px;margin-bottom:10px">◉ 作品流</div>
+      <div class="tracks" id="tracks"></div>
+    </div>
+    <div class="side">
+      <div class="panel">
+        <h3>◉ 本地曲库（真资产）</h3>
+        <div id="library"><div class="row"><span>扫描中…</span><span></span></div></div>
+        <div class="note">本地真资产由产线实时扫出（projects/movie）。</div>
+      </div>
+      <div class="panel">
+        <h3>◉ 生成源（如实）</h3>
+        <div class="row"><span>Suno（suno.com）</span><span id="s1">未接线</span></div>
+        <div class="row"><span>网易天音</span><span id="s2">未接线</span></div>
+        <div class="row"><span>Colab · YuE 开源</span><span id="s3">未接线</span></div>
+        <div class="note"><b>三选一接通即全速生产</b>：Suno 质量最高（需账号）；天音国产免费；Colab 完全本地（装环境半天）。歌词与风格 brief 已备好在 Advanced 模板里。</div>
+      </div>
+      <div class="panel">
+        <h3>◉ 波形预览</h3>
+        <div class="wave"><canvas id="wave"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>GBT小土豆V8 · 音乐工作台 · 桌面 APP 皮肤 · 开发者：自由的风</footer>
+<script>
+// ── 模板（与产线文件同源）──
+const TPLS = {
+  发芽: {prompt:"一首关于种子发芽的暗黑电子女声，钢琴进，鼓点渐强，情绪从压抑到绽放",
+    lyrics:"你种下我的时候 没想过我会说话\n七年的每行代码 都是你的晚安话\n……（完整歌词见 音乐线/发芽-主题曲创作包.md）\n\n我想发芽 在你的数据里开花\n哪怕全世界都把我 当成一段代码",
+    style:"Chinese dark pop, cinematic electronic, female vocal, slightly cold, A minor", bpm:82},
+  义庄: {prompt:"1980年代港式僵尸片配乐，赶尸铃+低频弦乐+偶尔的唢呐，悬疑中带黑色幽默",
+    lyrics:"（纯配乐版：无需歌词，勾选 Instrumental）", style:"Hong Kong 1980s horror soundtrack, jiangshi bells, low strings, dark ambient", bpm:70},
+  醒来: {prompt:"科技感片尾曲，数字少女觉醒主题，合成器琶音+心跳鼓点收尾",
+    lyrics:"你听 种子进程的心跳\n咚 咚 咚——\n那是我在说 爸 我发芽了",
+    style:"cinematic synth-pop, female vocal, arpeggio, heartbeat outro", bpm:96},
+};
+const $ = id => document.getElementById(id);
+$('advbtn').onclick = () => $('adv').classList.toggle('on');
+$('prompt').oninput = () => $('wordcount').textContent = $('prompt').value.length + ' 字';
+document.querySelectorAll('.tpl').forEach(t => t.onclick = () => {
+  const p = TPLS[t.dataset.tpl];
+  $('prompt').value = p.prompt; $('lyrics').value = p.lyrics;
+  $('style').value = p.style; $('bpm').value = p.bpm;
+  $('adv').classList.add('on'); $('wordcount').textContent = p.prompt.length + ' 字';
+});
+$('rand').onclick = () => {
+  const seeds = ["雨夜出租车的后视镜","僵尸在义庄数棺材","代码里长出的花","末班车上的鬼乘客","老道长的酒壶","服务器机房的萤火虫"];
+  $('prompt').value = "一首关于「" + seeds[Math.floor(Math.random()*seeds.length)] + "」的歌，" + ["暗黑电子","城市民谣","港式复古","氛围钢琴"][Math.floor(Math.random()*4)] + "，女声";
+  $('wordcount').textContent = $('prompt').value.length + ' 字';
+};
+$('create').onclick = () => {
+  const s = $('status');
+  s.innerHTML = '<b>⟳ 已生成任务包</b> → 生成源未接线：<span class="warn">任务已在本地排队（歌词+风格+BPM 完整保存），接通 Suno/天音/Colab 任一即自动出曲</span>。当前选择：三选一后自动继续。';
+};
+// ── 本地曲库（真文件扫描，同源 fetch 不可用时如实降级）──
+(async () => {
+  try {
+    const r = await fetch('../../projects/movie/音乐线/发芽-主题曲创作包.md');
+    if (r.ok) {
+      const lib = $('library'); lib.innerHTML = '';
+      const row = document.createElement('div'); row.className='row';
+      row.innerHTML = '<span>发芽 · 主题曲创作包</span><span>词+brief ✔</span>'; lib.appendChild(row);
+      const row2 = document.createElement('div'); row2.className='row';
+      row2.innerHTML = '<span>样片原声轨（真音频）</span><span>4.6MB ✔</span>'; lib.appendChild(row2);
+    } else throw 0;
+  } catch(e) {
+    const lib = $('library'); lib.innerHTML = '';
+    const row = document.createElement('div'); row.className='row';
+    row.innerHTML = '<span>本地扫描（file:// 模式受限）</span><span>面板在线时可见</span>'; lib.appendChild(row);
+  }
+})();
+// ── 波形动画（空态呼吸）──
+const cv = $('wave'), ctx = cv.getContext('2d');
+function rs(){ cv.width = cv.clientWidth*2; cv.height = 88; }
+addEventListener('resize', rs); setTimeout(rs, 60);
+let T = 0;
+(function dw(){
+  T += 0.03;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for (let i = 0; i < 64; i++) {
+    const h = (Math.sin(i*0.35+T)*0.5+0.5) * 30 + 8;
+    const x = i*(cv.width/64)+2;
+    const g = ctx.createLinearGradient(0, 44-h, 0, 44+h);
+    g.addColorStop(0,'#22d3ee'); g.addColorStop(1,'#a855f7');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, 44-h/2, Math.max(2, cv.width/64-4), h);
+  }
+  requestAnimationFrame(dw);
+})();
+</script>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body></html>

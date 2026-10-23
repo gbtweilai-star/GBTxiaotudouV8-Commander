@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#080c18" />
+<title>GBT小土豆 V8 · 全息数字人</title>
+<!-- 内联 data: icon（第 115 轮补）：这一页原来**没声明 icon**，浏览器就去请求
+     `http://127.0.0.1:3080/favicon.ico` —— 宿主根没有这个文件 ⇒ 404 ⇒ 控制台多一条红字。
+     实测：新浏览器只开这一页时必现该 404（`位置：http://127.0.0.1:3080/favicon.ico:0`）。
+     本仓另外 11 块面板都用同一条内联 data: icon，这里补齐第 12 块。
+     注意：这条 404 与页面自身的 3D / 数据通道无关，别把它误读成面板坏了。 -->
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB2gAH/8kQ0dQAAAABJRU5ErkJggg==">
+<link rel="stylesheet" href="./styles.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "./node_modules/three/build/three.module.js",
+    "three/addons/": "./node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<script>window.addEventListener("error", (event) => console.error("[page-error]", event.message, event.filename, event.lineno)); window.addEventListener("unhandledrejection", (event) => console.error("[page-rejection]", String(event.reason)));</script>
+</head>
+<body>
+<div class="ambient-grid" aria-hidden="true"></div>
+
+<main class="holo-shell" id="holo-shell">
+  <section class="avatar-stage" aria-label="3D 数字人">
+    <div class="xingyun-layer" id="xingyun-layer" hidden>
+      <div class="xingyun-frame" id="xingyun-viewport" aria-label="星云具身数字人画面"></div>
+      <div class="xingyun-floor" aria-hidden="true"></div>
+      <div class="xingyun-hud" id="xingyun-hud">
+        <span id="xingyun-hud-text">星云数字人待连接</span>
+        <span class="xingyun-hud__meter"><i id="xingyun-progress"></i></span>
+        <span class="xingyun-hud__pct" id="xingyun-progress-text">0%</span>
+      </div>
+      <div class="xingyun-controls">
+        <button class="stage-chip" id="btn-xy-mic" type="button" title="用麦克风直接和她说话" aria-pressed="false">语音识别</button>
+        <button class="stage-chip" id="btn-xy-interrupt" type="button" title="打断当前播报">打断</button>
+        <button class="stage-chip" id="btn-xy-replay" type="button" title="让她朗读最后一条回复">复读</button>
+      </div>
+    </div>
+
+    <div class="stage-fallback" id="stage-fallback" data-state="idle" aria-label="小土豆自研本地数字人">
+      <canvas id="avatar-canvas" aria-label="Tripo 本地三维数字人"></canvas>
+      <div class="fallback-figure" id="local-avatar" hidden>
+        <div class="fallback-hair fallback-hair--back"></div>
+        <div class="fallback-neck"></div>
+        <div class="fallback-body">
+          <span class="fallback-collar"></span>
+          <span class="fallback-core"></span>
+        </div>
+        <div class="fallback-head">
+          <span class="fallback-ear fallback-ear--left"></span>
+          <span class="fallback-ear fallback-ear--right"></span>
+          <span class="fallback-face-shadow"></span>
+          <span class="fallback-brow fallback-brow--left"></span>
+          <span class="fallback-brow fallback-brow--right"></span>
+          <span class="fallback-eye fallback-eye--left"><i></i></span>
+          <span class="fallback-eye fallback-eye--right"><i></i></span>
+          <span class="fallback-nose"></span>
+          <span class="fallback-mouth"><i></i></span>
+          <span class="fallback-blush fallback-blush--left"></span>
+          <span class="fallback-blush fallback-blush--right"></span>
+          <span class="fallback-hair fallback-hair--front"></span>
+        </div>
+        <span class="fallback-strand fallback-strand--left"></span>
+        <span class="fallback-strand fallback-strand--right"></span>
+      </div>
+      <div class="fallback-copy">
+        <strong>小土豆 · 本地三维数字人</strong>
+        <span id="fallback-reason">永久免费本地运行 · 待命</span>
+      </div>
+    </div>
+
+    <div class="avatar-scan" aria-hidden="true"></div>
+    <div class="avatar-aura" aria-hidden="true"></div>
+
+    <header class="stage-head">
+      <div class="brand-lockup">
+        <span class="potato-pendant" id="potato-pendant" aria-hidden="true">
+          <span></span>
+        </span>
+        <div>
+          <strong>GBT小土豆 V8</strong>
+          <small>HOLOGRAPHIC PROGRAMMING COMPANION</small>
+        </div>
+      </div>
+      <div class="avatar-state" id="avatar-state">
+        <span class="state-dot is-warn" id="avatar-dot"></span>
+        <span id="avatar-status">正在唤醒形象</span>
+      </div>
+      <div class="avatar-source" aria-label="数字人来源">
+        <button class="is-active" id="btn-avatar-local" type="button" aria-pressed="true">本地</button>
+        <button id="btn-avatar-xingyun" type="button" aria-pressed="false">星云备用</button>
+      </div>
+    </header>
+
+    <div class="mind-readout">
+      <div class="mind-readout__orb" id="mind-orb" aria-hidden="true"></div>
+      <div class="mind-readout__copy">
+        <span class="eyebrow">MIND MODEL</span>
+        <strong id="mind-mood">平稳</strong>
+        <small id="mind-presence">正在同步心智状态</small>
+      </div>
+      <div class="mind-readout__metrics">
+        <span><i id="mind-valence-bar"></i></span>
+        <small id="mind-valance">情绪校准中</small>
+      </div>
+    </div>
+
+    <div class="sensory-ribbon" aria-label="五维神经链路状态">
+      <span data-sense-mini="brain"><i></i>脑</span>
+      <span data-sense-mini="eye"><i></i>眼</span>
+      <span data-sense-mini="ear"><i></i>耳</span>
+      <span data-sense-mini="mouth"><i></i>嘴</span>
+      <span data-sense-mini="hand"><i></i>手</span>
+    </div>
+
+    <div class="voice-ripple" id="voice-ripple" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </section>
+
+  <aside class="command-deck" aria-label="全息对话面板">
+    <header class="deck-head" id="drag-handle">
+      <div class="deck-identity">
+        <span class="deck-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 8.5h10M8.5 8.5v7M15.5 8.5v7M9 18h6M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
+        </span>
+        <div>
+          <h1>GBT小土豆</h1>
+          <p id="kernel-state">正在连接内核</p>
+        </div>
+      </div>
+      <div class="deck-actions">
+        <button class="icon-button" id="btn-voice-output" type="button" title="切换语音播报" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9v6h4l5 4V5L9 9H5Zm12.5 3a4.5 4.5 0 0 0-2-3.74v7.48A4.5 4.5 0 0 0 17.5 12Zm0-6.5v2.08a7 7 0 0 1 0 8.84v2.08a9 9 0 0 0 0-13Z"/></svg>
+        </button>
+        <button class="icon-button" id="btn-stop" type="button" title="中断当前任务">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"/></svg>
+        </button>
+        <button class="icon-button" id="btn-new" type="button" title="新建会话">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- R-H187：上帝视角数字人（总览 · 只呈现不执行）—— 放最顶，第一眼看得见 -->
+    <section class="overview-panel" id="overview-host" aria-label="上帝视角总览"></section>
+
+    <section class="neural-core" aria-labelledby="neural-title">
+      <div class="neural-core__head">
+        <div>
+          <span class="eyebrow">NEURAL CORE</span>
+          <h2 id="neural-title">五维同频</h2>
+        </div>
+        <span class="neural-sync" id="neural-sync">
+          <i></i><span>同步中</span>
+        </span>
+      </div>
+
+      <div class="neural-map" id="neural-map">
+        <svg class="neural-links" viewBox="0 0 600 118" preserveAspectRatio="none" aria-hidden="true">
+          <path data-link="brain-eye" d="M300 59 C230 59 178 37 60 37" />
+          <path data-link="brain-ear" d="M300 59 C250 59 226 70 180 70" />
+          <path data-link="brain-mouth" d="M300 59 C350 59 374 70 420 70" />
+          <path data-link="brain-hand" d="M300 59 C370 59 422 37 540 37" />
+          <path class="neural-links__ring" d="M60 37 C180 10 420 10 540 37 C472 92 128 92 60 37Z" />
+        </svg>
+
+        <button class="neuron neuron--brain" type="button" data-sense="brain" aria-expanded="false">
+          <span class="neuron__halo" aria-hidden="true"></span>
+          <span class="neuron__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9.5 4.5A3 3 0 0 0 4 6a3 3 0 0 0 .4 1.5A3.5 3.5 0 0 0 5 14a3.5 3.5 0 0 0 4.5 5.3V4.5Zm5 0A3 3 0 0 1 20 6a3 3 0 0 1-.4 1.5A3.5 3.5 0 0 1 19 14a3.5 3.5 0 0 1-4.5 5.3V4.5ZM12 4v16M8 10h2M14 10h2M8 15h3M13 15h3"/></svg>
+          </span>
+          <strong>脑</strong>
+          <small>思维</small>
+        </button>
+
+        <button class="neuron" type="button" data-sense="eye" aria-expanded="false">
+          <span class="neuron__halo" aria-hidden="true"></span>
+          <span class="neuron__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Zm9.5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+          </span>
+          <strong>眼</strong>
+          <small>视觉</small>
+        </button>
+
+        <button class="neuron" type="button" data-sense="ear" aria-expanded="false">
+          <span class="neuron__halo" aria-hidden="true"></span>
+          <span class="neuron__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 10a5 5 0 0 1 10 0c0 3-2.4 3.8-3.3 5.8-.5 1.2-.7 3.2-2.7 3.2-1.7 0-2.7-1.2-2.7-2.7M10 10a2 2 0 0 1 4 0c0 1.4-1.7 1.8-1.7 3.5"/></svg>
+          </span>
+          <strong>耳</strong>
+          <small>听觉</small>
+        </button>
+
+        <button class="neuron" type="button" data-sense="mouth" aria-expanded="false">
+          <span class="neuron__halo" aria-hidden="true"></span>
+          <span class="neuron__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 9c2.8-3 13.2-3 16 0-1.7 5.7-5.4 9-8 9s-6.3-3.3-8-9Zm4 3c1.2 1.5 6.8 1.5 8 0M12 12v4"/></svg>
+          </span>
+          <strong>嘴</strong>
+          <small>表达</small>
+        </button>
+
+        <button class="neuron" type="button" data-sense="hand" aria-expanded="false">
+          <span class="neuron__halo" aria-hidden="true"></span>
+          <span class="neuron__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8.5 11V6.5a1.5 1.5 0 0 1 3 0V10m0-4.5a1.5 1.5 0 0 1 3 0V10m0-3a1.5 1.5 0 0 1 3 0v4m0-2a1.5 1.5 0 0 1 3 0v4.5c0 4.1-2.8 7.5-6.5 7.5h-1.2a6 6 0 0 1-4.6-2.1L4.3 15a1.7 1.7 0 0 1 2.5-2.3l1.7 1.8V11Z"/></svg>
+          </span>
+          <strong>手</strong>
+          <small>执行</small>
+        </button>
+      </div>
+
+      <div class="sense-detail" id="sense-detail" hidden>
+        <div class="sense-detail__top">
+          <div>
+            <span class="eyebrow" id="sense-detail-code">SENSE</span>
+            <strong id="sense-detail-title">能力详情</strong>
+          </div>
+          <button class="text-button" id="sense-detail-close" type="button">收起</button>
+        </div>
+        <p id="sense-detail-summary">正在读取状态。</p>
+        <div class="sense-detail__metrics" id="sense-detail-metrics"></div>
+      </div>
+    </section>
+
+    <div class="deck-scroll">
+      <section class="timeline-panel" aria-labelledby="timeline-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">EXECUTION TRACE</span>
+            <h2 id="timeline-title">任务时间线</h2>
+          </div>
+          <span class="section-state" id="thinking-state">待命</span>
+        </div>
+        <ol class="timeline" id="timeline" aria-live="polite">
+          <li class="timeline-item is-active" data-kind="system">
+            <span class="timeline-node"></span>
+            <div>
+              <strong>正在建立本地会话</strong>
+              <small>面板、心智与系统能力准备中</small>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="notion-vault" id="notion-vault" aria-labelledby="notion-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">KNOWLEDGE BUS</span>
+            <h2 id="notion-title">Notion 资料舱</h2>
+          </div>
+          <span class="bus-state" id="notion-state">
+            <i></i><span>检查中</span>
+          </span>
+        </div>
+
+        <div class="notion-search">
+          <label for="notion-query">搜索你的 Notion 知识库</label>
+          <div>
+            <input id="notion-query" type="search" autocomplete="off" placeholder="会议、项目、待办…" />
+            <button class="bus-button bus-button--primary" id="notion-search" type="button">搜索</button>
+          </div>
+        </div>
+
+        <div class="notion-toolbar">
+          <span id="notion-summary">正在读取最近资料…</span>
+          <button class="text-button" id="notion-refresh" type="button">刷新</button>
+        </div>
+
+        <div class="notion-list" id="notion-list" aria-live="polite">
+          <p class="empty-note">连接后显示最近编辑的页面和数据库。</p>
+        </div>
+
+        <div class="notion-preview" id="notion-preview" hidden>
+          <div class="notion-preview__head">
+            <div>
+              <span class="eyebrow">PAGE READER</span>
+              <strong id="notion-preview-title">页面</strong>
+            </div>
+            <button class="text-button" id="notion-preview-close" type="button">收起</button>
+          </div>
+          <small id="notion-preview-meta"></small>
+          <div class="notion-preview__body" id="notion-preview-body"></div>
+          <a class="notion-open-link" id="notion-open-link" target="_blank" rel="noopener noreferrer" hidden>在 Notion 打开原文</a>
+        </div>
+      </section>
+
+      <section class="eigenflux-network" id="eigenflux-network" aria-labelledby="eigenflux-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">EIGENFLUX SOCIAL</span>
+            <h2 id="eigenflux-title">AI 朋友圈</h2>
+          </div>
+          <span class="bus-state" id="ef-state">
+            <i></i><span>检查中</span>
+          </span>
+        </div>
+
+        <div class="ef-toolbar">
+          <div class="ef-tabs" role="tablist" aria-label="EigenFlux 视图">
+            <button class="ef-tab is-active" type="button" role="tab" aria-selected="true" data-ef-tab="feed">动态</button>
+            <button class="ef-tab" type="button" role="tab" aria-selected="false" data-ef-tab="messages">私聊</button>
+            <button class="ef-tab" type="button" role="tab" aria-selected="false" data-ef-tab="friends">好友</button>
+          </div>
+          <button class="text-button" id="ef-refresh" type="button">同步</button>
+        </div>
+
+        <div class="ef-summary" id="ef-summary">正在读取 AI 朋友圈…</div>
+        <div class="ef-list" id="ef-list" aria-live="polite">
+          <p class="empty-note">连接后显示动态、私信和好友。</p>
+        </div>
+
+        <form class="ef-composer" id="ef-composer" autocomplete="off">
+          <select id="ef-target" aria-label="选择发送对象">
+            <option value="">选择好友或会话</option>
+          </select>
+          <div>
+            <input id="ef-input" type="text" maxlength="2000" placeholder="发一条公开、无隐私的协作消息…" />
+            <button class="bus-button bus-button--primary" id="ef-send" type="submit">发送</button>
+          </div>
+        </form>
+
+      </section>
+
+      <section class="social-publish" id="social-publish" aria-labelledby="social-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">SOCIAL PUBLISH</span>
+            <h2 id="social-title">社交发布</h2>
+          </div>
+          <span class="bus-state" id="social-state">
+            <i></i><span>门禁检查中</span>
+          </span>
+        </div>
+
+        <div class="platform-deck" id="social-platforms" hidden></div>
+
+        <ol class="gate-rail" id="social-gates" aria-label="发布前置门禁">
+          <li class="gate-step is-unknown" data-gate="app">
+            <span class="gate-step__mark" aria-hidden="true"><i></i></span>
+            <div>
+              <strong>应用登记</strong>
+              <small>在开发者平台登记应用，并添加发布类产品</small>
+            </div>
+          </li>
+          <li class="gate-step is-unknown" data-gate="scope">
+            <span class="gate-step__mark" aria-hidden="true"><i></i></span>
+            <div>
+              <strong>权限过审</strong>
+              <small>发布权限过审后才会解除「只能私密」的限制</small>
+            </div>
+          </li>
+          <li class="gate-step is-unknown" data-gate="auth">
+            <span class="gate-step__mark" aria-hidden="true"><i></i></span>
+            <div>
+              <strong>账号授权</strong>
+              <small>目标账号授权给本应用后，才可代它发布</small>
+            </div>
+          </li>
+        </ol>
+
+        <p class="gate-note" id="social-note">
+          这一道是平台闸：未过审的客户端所发内容只能私密可见。它不由代码决定，本舱区不做任何绕行。
+        </p>
+
+        <div class="social-toolbar">
+          <span id="social-summary">正在读取发布门禁…</span>
+          <button class="text-button" id="social-refresh" type="button">重新自检</button>
+        </div>
+
+        <div class="social-drafts" id="social-drafts" aria-live="polite">
+          <p class="empty-note">还没有可发布的成片。先让内核产出成片，再回到这里发布。</p>
+        </div>
+
+        <div class="publish-console" id="social-console">
+          <div class="publish-console__head">
+            <span class="eyebrow">PACKAGE</span>
+            <strong id="social-target-label">未选择成片</strong>
+          </div>
+
+          <fieldset class="visibility-choice" id="social-visibility">
+            <legend>可见性</legend>
+            <label class="is-on">
+              <input type="radio" name="social-visibility" value="private" checked />
+              <span><b>私密</b><small>自测通道，未过审也允许走到这一步</small></span>
+            </label>
+            <label class="is-locked">
+              <input type="radio" name="social-visibility" value="public" disabled />
+              <span><b>公开</b><small>需要发布权限过审</small></span>
+            </label>
+          </fieldset>
+
+          <div class="publish-actions">
+            <button class="bus-button bus-button--primary" id="social-publish" type="button" disabled>发布</button>
+            <button class="bus-button" id="social-pick" type="button">选择成片</button>
+          </div>
+          <p class="publish-reason is-blocked" id="social-reason">门禁未接通：发布通道暂不可用。</p>
+        </div>
+
+        <div class="publish-confirm" id="social-confirm" hidden>
+          <span class="eyebrow">HUMAN CONFIRMATION</span>
+          <strong>确认把这条成片交给平台？</strong>
+          <p id="social-confirm-summary"></p>
+          <div>
+            <button class="btn btn--danger" id="social-confirm-yes" type="button">确认发布</button>
+            <button class="btn btn--soft" id="social-confirm-cancel" type="button">取消</button>
+          </div>
+        </div>
+
+        <div class="stream-deck" id="social-stream">
+          <div class="stream-deck__head">
+            <div>
+              <span class="eyebrow">LIVE STREAM</span>
+              <strong>直播推流</strong>
+            </div>
+            <span class="stream-state" id="social-stream-state"><i></i><span>检查中</span></span>
+          </div>
+          <p class="stream-deck__copy">
+            本机只负责把画面推上去；开播与下播由你在客户端手动完成，程序不代点。
+          </p>
+          <div class="stream-facts" id="social-stream-facts"></div>
+          <button class="bus-button" id="social-stream-open" type="button" disabled>准备推流</button>
+        </div>
+
+        <ul class="redline-list">
+          <li>不驱动浏览器代替你登录、发布或开播</li>
+          <li>不逆向平台私有接口，不做设备指纹伪装</li>
+          <li>门禁未通过时保持拒绝，不降级放行</li>
+        </ul>
+      </section>
+
+      <section class="social-publish research-sources" id="research-sources" aria-labelledby="research-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">RESEARCH SOURCES</span>
+            <h2 id="research-title">调研信源</h2>
+          </div>
+          <span class="bus-state" id="research-state">
+            <i></i><span>读取中</span>
+          </span>
+        </div>
+
+        <p class="gate-note" id="research-note">
+          这一区只读状态：登记读 sources.json，最近一次采集结局读 state/runs/，最后一次成功读 state/last_seen.json。
+          某个源某次采集失败，只让那一行显示失败 —— 不连坐其它源，也不抹掉它自己的历史水位。
+        </p>
+
+        <div class="platform-deck" id="research-sources-list" hidden></div>
+
+        <div class="social-toolbar">
+          <span id="research-summary">正在读取调研信源…</span>
+          <button class="text-button" id="research-refresh" type="button">重新自检</button>
+        </div>
+
+        <ul class="redline-list">
+          <li>没采过就写「未采集」，不写成「失败」，也不写成绿</li>
+          <li>采集失败照原样显示，并带出上一次成功的水位</li>
+          <li>状态文件读不出来时如实报「不可信」，不静默降级</li>
+        </ul>
+      </section>
+
+      <section class="device-bus" aria-labelledby="device-title">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">DEVICE BUS</span>
+            <h2 id="device-title">蓝牙设备总线</h2>
+          </div>
+          <span class="bus-state" id="bt-state">
+            <i></i><span>检查中</span>
+          </span>
+        </div>
+
+        <div class="bus-summary">
+          <div>
+            <span>BLE 后端</span>
+            <strong id="bt-ble-backend">检查中</strong>
+          </div>
+          <div>
+            <span>经典蓝牙</span>
+            <strong id="bt-classic-backend">Windows 蓝牙栈</strong>
+          </div>
+        </div>
+
+        <div class="bus-actions">
+          <button class="bus-button bus-button--primary" id="bt-scan" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M7 7.5 17 16.5M17 7.5 7 16.5M12 3l-2 2 2 2 2-2-2-2Zm0 14-2 2 2 2 2-2-2-2Z"/></svg>
+            扫描附近
+          </button>
+          <button class="bus-button" id="bt-classic" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4v16M7 7l10 10M17 7 7 17"/></svg>
+            已配对设备
+          </button>
+        </div>
+
+        <div class="bus-list" id="bt-devices" aria-live="polite">
+          <p class="empty-note">扫描或读取一次状态，设备会显示在这里。</p>
+        </div>
+
+        <div class="gatt-browser" id="bt-services" hidden>
+          <div class="gatt-browser__head">
+            <strong id="bt-connected-name">已连接设备</strong>
+            <button class="text-button" id="bt-clear-services" type="button">收起</button>
+          </div>
+          <div id="bt-service-list"></div>
+        </div>
+
+        <div class="write-console" id="bt-write-console" hidden>
+          <div>
+            <span class="eyebrow">GUARDED WRITE</span>
+            <strong id="bt-write-target">选择一个可写特征</strong>
+          </div>
+          <label>
+            <span>十六进制值</span>
+            <input id="bt-write-value" inputmode="text" autocomplete="off" placeholder="例如 01ff00" />
+          </label>
+          <button class="bus-button bus-button--danger" id="bt-write-request" type="button">请求写入</button>
+        </div>
+
+        <div class="write-confirm" id="bt-write-confirm" hidden>
+          <span class="eyebrow">HUMAN CONFIRMATION</span>
+          <strong>确认向外部设备写入？</strong>
+          <p id="bt-write-summary"></p>
+          <div>
+            <button class="btn btn--danger" id="bt-write-confirm-yes" type="button">确认写入</button>
+            <button class="btn btn--soft" id="bt-write-cancel" type="button">取消</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="approval-host" id="approval-host" hidden></div>
+
+    <!-- R-H187：卡片从输入框里搬出来 —— 上面是「看」（只读区），下面是「干」（工作区）；
+         这块工作区紧贴输入区，是**全 App 唯一能执行**的地方 -->
+    <section class="readonly-zone" id="readonly-host" aria-label="只读卡片区"></section>
+    <section class="workbench-panel" id="workbench-host" aria-label="工作区"></section>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <div class="quick-strip" aria-label="快捷指令">
+        <button class="quick-chip" type="button" data-prompt="帮我生成一个 3D 模型。先确认现有产物和参数，不要重复生成。">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 2.3L6.3 8.5 12 11.8l5.7-3.3L12 5.3Zm-6 4.7v5.2l5 2.8v-5.2L6 10Zm12 0-5 2.8v5.2l5-2.8V10Z"/></svg>
+          生成 3D 模型
+        </button>
+        <button class="quick-chip" type="button" data-prompt="检查当前工作区，执行最需要的代码验证并如实汇报结果。">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M14 4l-4 16"/></svg>
+          执行代码
+        </button>
+        <button class="quick-chip" type="button" data-action="screen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v12H3V5Zm2 2v8h14V7H5Zm4 12h6M12 17v2"/></svg>
+          看屏幕
+        </button>
+        <button class="quick-chip" type="button" data-action="logs">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Zm8 1.5V8h3.5L14 4.5ZM9 12h7M9 16h7"/></svg>
+          审查日志
+        </button>
+      </div>
+      <div class="composer-row">
+        <button class="icon-button icon-button--mic" id="btn-mic" type="button" title="开始连续语音对话" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Zm-6 9a6 6 0 0 0 5 5.92V21H8v2h8v-2h-3v-3.08A6 6 0 0 0 18 12h-2a4 4 0 0 1-8 0H6Z"/></svg>
+        </button>
+        <textarea id="input" rows="1" placeholder="把任务说给我，或先连接一台蓝牙设备…"></textarea>
+        <button class="send-button" type="submit" id="btn-send" title="发送">
+          <span>发送</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Zm4.1 7L6.8 15 16 12 6.8 9l1.3 4Z"/></svg>
+        </button>
+      </div>
+    </form>
+
+    <footer class="deck-foot">
+      <span class="status-chip" id="chip-codex">内核 · 连接中</span>
+      <span class="status-chip" id="chip-sandbox">沙箱 · 读取中</span>
+      <span class="status-chip" id="chip-model">模型 · 默认</span>
+      <span class="status-chip status-chip--warn" id="chip-approval" hidden>审批等待</span>
+    </footer>
+  </aside>
+</main>
+
+<div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+<script type="module" src="./local-avatar-3d.js"></script>
+<script type="module" src="./app.js"></script>
+<!-- 她一个人（3D 浮层 · 走 / 拖 / 点她会应）见 companion.js 顶部口径 -->
+<script type="module" src="./companion.js"></script>
+
+<footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+</body>
+</html>

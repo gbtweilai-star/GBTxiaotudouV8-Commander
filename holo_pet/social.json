@@ -1,0 +1,60 @@
+{
+  "drafts_dir": "../outputs/drafts",
+  "_note": "本文件**显式登记 18 家平台**（现行形状）—— panel_server.py 的 _social_status 优先级第 1 条就是「social.json 写了 platforms 就以它为准」，所以**删掉 platforms 会改变现行行为**（会掉到第 2 条、改用 sources.json 的 channels 兜底）。另外登记成片目录 drafts_dir。要改平台表就改这里，别去改 sources.json 的 channels。",
+  "platforms": {
+    "telegram": {
+      "label": "Telegram"
+    },
+    "discord": {
+      "label": "Discord"
+    },
+    "github": {
+      "label": "GitHub"
+    },
+    "x": {
+      "label": "X (Twitter)"
+    },
+    "reddit": {
+      "label": "Reddit"
+    },
+    "youtube": {
+      "label": "YouTube Shorts"
+    },
+    "tiktok": {
+      "label": "TikTok"
+    },
+    "instagram": {
+      "label": "Instagram Reels"
+    },
+    "wechat_mp": {
+      "label": "微信公众号"
+    },
+    "linkedin": {
+      "label": "LinkedIn"
+    },
+    "weibo": {
+      "label": "微博"
+    },
+    "douyin": {
+      "label": "抖音"
+    },
+    "kuaishou": {
+      "label": "快手"
+    },
+    "bilibili": {
+      "label": "B 站"
+    },
+    "xiaohongshu": {
+      "label": "小红书"
+    },
+    "wechat_channels": {
+      "label": "微信视频号"
+    },
+    "zhihu": {
+      "label": "知乎"
+    },
+    "substack": {
+      "label": "Substack"
+    }
+  }
+}

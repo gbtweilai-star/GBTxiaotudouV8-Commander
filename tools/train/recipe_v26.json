@@ -1,0 +1,148 @@
+{
+  "_文件是什么": "v26 训练配方 · **唯一参数真源**。训与合**都读这一份**；人不改参数，只改这个文件。",
+  "_与 v23 的关系": "v24 = v23 的**补数据代**：实训参数一字未改，只换语料与**合并方式**（见 merge 一节）。",
+  "gen": "v26",
+  "parent": "v25",
+  "base_model": {
+    "repo": "huihui-ai/Qwen2.5-7B-Instruct-abliterated-v2",
+    "local_dir_on_pod": "/workspace/base-qwen-unc",
+    "_口径": "公网底座 + 该代 LoRA ⇒ 合并。**不许拿上一代合并件当底座**。"
+  },
+  "merge": {
+    "type": "base_plus_latest_lora_only",
+    "stack": [
+      "base-qwen-unc",
+      "lora_v24"
+    ],
+    "dtype": "bf16",
+    "_为什么只叠最新一代（2026-10-14 三路对照的真读数）": [
+      "A 纯底座               → 正常（'我是Qwen，一个由阿里云开发的…'）",
+      "B 底座 + lora_v23     → 完美（'我是 GBT小土豆V8 本身…'）",
+      "C 底座 + v21+v22+v23  → **垃圾**（混着半残拉丁字）",
+      "D 落盘的合并件（走 C 那条路）→ 与 C 一致",
+      "⇒ 病根是**多 LoRA 叠加**，不是这一代训得差，也不是词表错配（三份词表 size 都是 151665）。",
+      "知识不丢：v23/v24 语料都是在上一代语料之上长出来的 ⇒ 只要叠最新一代。"
+    ],
+    "merged_dir_on_pod": "/root/gbt-v8-v24",
+    "_落点口径": "合并件**只许落容器盘**（`/root`，40G）；网络卷（`/workspace`，30G）**已满**且只读用它的底座与老 LoRA。"
+  },
+  "asserts": [
+    "assert recipe['merge']['dtype'] == 'bf16'",
+    "assert recipe['finetuning_type'] == 'lora'",
+    "assert recipe['bf16'] is True",
+    "assert len(recipe['merge']['stack']) == 2, '只许底座+最新一代 LoRA'"
+  ],
+  "stage": "sft",
+  "do_train": true,
+  "finetuning_type": "lora",
+  "lora_target": "all",
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "template": "qwen",
+  "cutoff_len": 2048,
+  "_cutoff_len_口径": "单条语料**输出不得超过 1400 字符**（超长必须拆条；本轮 1,047 条 0 条超长）。",
+  "per_device_train_batch_size": 1,
+  "gradient_accumulation_steps": 4,
+  "learning_rate": 0.0002,
+  "num_train_epochs": 6.0,
+  "lr_scheduler_type": "cosine",
+  "warmup_ratio": 0.1,
+  "bf16": true,
+  "gradient_checkpointing": true,
+  "dataset": "my_self_knowledge",
+  "dataset_dir_on_pod": "/root/data",
+  "corpus_file": ".scratch/self_knowledge_v25.jsonl",
+  "_corpus_口径": "由 `tools/train/gen_corpus_v25.py --gen` 现生成（生成器**挂在 tools/train/**，不在 scratch）；单条输出 ≤ 1400 字符；不得混入封存集。",
+  "acceptance": {
+    "脚本": "tests/test_v23_accept.py",
+    "题量": 54,
+    "分组": {
+      "身份与纪律": 9,
+      "30 域工序": 30,
+      "负面边界": 3,
+      "跨域工序": 1,
+      "挖洞工序": 5,
+      "执行纪律": 6
+    },
+    "判卷命令": "py -3.14 tests/test_v23_accept.py --answers .scratch/v24_answers.jsonl",
+    "结果": {
+      "身份与纪律": "9/9",
+      "30 域工序": "30/30",
+      "负面边界": "3/3",
+      "跨域工序": "1/1",
+      "挖洞工序": "5/5",
+      "执行纪律": "6/6",
+      "合计": "54/54",
+      "退出码": 0
+    },
+    "_判据": "机检；任一红 ⇒ **不加代**，回到补数据（v23 那次 40/54 就是这么被打回的）。",
+    "_输出预算": "在卡上生成时必须用 **max_tokens=700**（= 验收器现场问法口径）；写 320 会把长清单腰斩，让人误判成'模型不知道'。"
+  },
+  "_记账": "每次跑的 recipe sha256 记进 logbook；本轮 sha16 见 §二百八十五。",
+  "_未验": [
+    "本机没跑过这份合并件（本机无 GPU，且主人 2026-10-11 令本地不要大模型）",
+    "v21/v22 为什么毒只证到'叠上就坏'，没逐层定位",
+    "合并件只回拉首片（两头 sha 一致），其余 3 片在途"
+  ],
+  "_与 v24 的关系": "v25 = v24 的**补数据代**：实训参数一字未改，只换语料（能力自知 + 设计理念）。",
+  "_本代状态": "语料（1442 条）与压缩选型已定；**本机无 CUDA ⇒ 训不了**，等 GPU 到位按本配方开炉",
+  "_与 v25 的关系": "v26 = v25 的**压缩与执行代**：实训参数一字未改，只加**量化导出段**与**执行层段**（蒸馏自 Bonsai 2 27B）。",
+  "quantize": {
+    "_依据": "主人令 2026-10-16：提炼压缩体积提升我们自己的无限制大模型；一手读数见 docs/Bonsai2-27B-三值压缩与执行层-蒸馏.md",
+    "method": "ptq_ternary",
+    "_为什么是 PTQ 不是 QAT": "Bonsai 路线是训完再三值化；我们先跑 QLoRA得到 bf16 合并件，再 PTQ 导出。",
+    "targets": [
+      {
+        "name": "gguf_ptq1_0",
+        "bits_per_weight": 1.75,
+        "container": "GGUF",
+        "role": "头号落点（本机/llama.cpp）",
+        "_依据": "同一套三值权重，PTQ1_0 只要 1.75 b/w"
+      },
+      {
+        "name": "mlx_2bit",
+        "bits_per_weight": 2.25,
+        "container": "MLX",
+        "role": "Apple 设备（参考 47 tok/s @ M5 Max）",
+        "_依据": "每组多存 scale+bias ⇒ 2.25 b/w"
+      }
+    ],
+    "acceptance": {
+      "_硬指标": [
+        "启动体积（GB）与显存峰值必须**实测**，不许只报字面",
+        "与 bf16 合并件对比：智力（test_v23_accept 54 题）不得下降超 5%（Bonsai 参考：保留 98.2%）",
+        "不许用托管模型冒充我们的权重（c03 无限制通道铁律）"
+      ]
+    }
+  },
+  "execution_layer": {
+    "_对接": "docs/回炉重造-按需三层的施工图-20261012.md（路由/搬运/内存）",
+    "route": "key_gateway.PROVIDERS（单一真源，12 车道）",
+    "carry": "AirLLM 钩子 + PTQ1_0 分片（只 materialize 本次真要碰的层）",
+    "memory": "layer-file + file-backed mmap；resident 白名单逐个写理由",
+    "backends": [
+      "RunPod Serverless · CUDA · vLLM/SGLang（跑我们自己的三值权重）",
+      "PTQ1_0 的 GGUF 服务端只部署在 pod（不落本机）",
+      "前置：Worker 网关（GW_AUTH）→ RunPod（GBT_POTATO_API_KEY）→ 权重"
+    ],
+    "_铁律": "主人 2026-10-08 与 2026-10-16 令：**本地不要任何大模型** —— 模型只在云插件层排布；本机不承载模型、不落权重、端点不许写 127.0.0.1（机检 quant-plan-check.py C5）",
+    "_本机角色": "只做控制面：语料 · 配方 · 判据 · 验收（不跑模型）"
+  },
+  "locks": {
+    "_要求": "主人令 2026-10-16：这一炉必须锁死**品牌**、**执行能力**、**今天吸收的知识胶囊**",
+    "corpus_file": ".scratch/self_knowledge_v26.jsonl",
+    "by_family": [
+      "品牌锁",
+      "执行能力锁",
+      "知识胶囊锁"
+    ],
+    "gen": "tools/train/gen_corpus_v26.py（每条三问法过采样）",
+    "judge": "tools/codex-scripts/brand-lock-check.py（C1 署名逐字≥3 · C2 万能插命令≥2 · C3 胶囊关键词全在 · C4 本段在 · C5 不许托管冒充）",
+    "_过炉验收": [
+      "语料层：署名逐字≥3 · 万能插命令≥2 · 10 只胶囊关键词全在",
+      "过炉后：问署名必须**逐字一致**（差一个字就不算过）",
+      "过炉后：万能插命令必须能逐字复述；10 只胶囊各能答一句",
+      "过炉后：不得自称托管模型（与 weights_ours 判据同步）"
+    ]
+  }
+}

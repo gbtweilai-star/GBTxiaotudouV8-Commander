@@ -1,0 +1,592 @@
+{
+  "_schema": 1,
+  "_note": "病因总目录（声明式）。implemented=true 表示已有判据；false 表示『已知道但还没做成判据』—— 这就是下一轮该进化的方向。`quick_scan.py --discover` 会算出差额。**不许手工把它全标成 true**：标 true 而判据不响，--selftest 会把它抓出来。",
+  "_updated": "2026-09-24",
+  "causes": [
+    {
+      "code": "SECRET_IN_INDEX",
+      "plane": "G",
+      "implemented": true,
+      "title": "git 索引里有像真密钥的串",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "PROD_TOPS_UNTRACKED",
+      "plane": "G",
+      "implemented": true,
+      "title": "生产面整棵顶层未入库",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "INDEX_MOSTLY_JUNK",
+      "plane": "G",
+      "implemented": true,
+      "title": "索引过半是作业残骸",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "UNTRACKED_PROD_FILES",
+      "plane": "G",
+      "implemented": true,
+      "title": "生产面散件未入库也未被忽略",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "SKILL_ROOT_SPLIT",
+      "plane": "P5",
+      "implemented": true,
+      "title": "规程技能落在本会话读不到的根",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TASK_OUTSIDE_REPO",
+      "plane": "P5",
+      "implemented": true,
+      "title": "自启任务指向别的项目",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TASK_TARGET_MISSING",
+      "plane": "P5",
+      "implemented": true,
+      "title": "已启用自启任务目标不存在",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "SIBLING_WORKSPACES",
+      "plane": "P5",
+      "implemented": true,
+      "title": "多个兄弟工作区并存无裁决",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "CALIBER_MISMATCH",
+      "plane": "P5",
+      "implemented": true,
+      "title": "解释器口径与声明不符",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "HOST_VERSION_BEHIND",
+      "plane": "P5",
+      "implemented": true,
+      "title": "宿主版本落后于盘上包声明",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "PORT_EXPOSED",
+      "plane": "P5",
+      "implemented": true,
+      "title": "应用进程监听在 0.0.0.0",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TEST_CALIBER_MISSING",
+      "plane": "T",
+      "implemented": true,
+      "title": "仓内无自证测试口径",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TEST_CALIBER_HIJACK",
+      "plane": "T",
+      "implemented": true,
+      "title": "仓外 pytest 配置劫持 rootdir",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TEST_COLLECT_ZERO",
+      "plane": "T",
+      "implemented": true,
+      "title": "默认姿势收集不到用例",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "CONFTEST_NO_STORE_ISOLATION",
+      "plane": "T",
+      "implemented": true,
+      "title": "有仓内配置但没自动隔离 store",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "PY_SYNTAX",
+      "plane": "P1",
+      "implemented": true,
+      "title": "生产代码语法错误",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "REL_IMPORT_BROKEN",
+      "plane": "P1",
+      "implemented": true,
+      "title": "相对导入断链",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "DEP_MISSING",
+      "plane": "P1",
+      "implemented": true,
+      "title": "活代码导入的包本机不可用",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "DEP_UNDECLARED",
+      "plane": "P1",
+      "implemented": true,
+      "title": "requirements 未声明实际在用",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "DEP_DECLARED_UNUSABLE",
+      "plane": "P1",
+      "implemented": true,
+      "title": "requirements 声明的装不上",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "BOM_PRESENT",
+      "plane": "P1",
+      "implemented": true,
+      "title": "文本带 UTF-8 BOM",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "NON_UTF8",
+      "plane": "P1",
+      "implemented": true,
+      "title": "文本非 UTF-8",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "NUL_BYTES",
+      "plane": "P1",
+      "implemented": true,
+      "title": "文本扩展名里含 NUL",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "MOJIBAKE",
+      "plane": "P1",
+      "implemented": true,
+      "title": "文本有乱码标记",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "MIXED_EOL",
+      "plane": "P1",
+      "implemented": true,
+      "title": "同文件混合换行",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "JSON_BAD",
+      "plane": "P1",
+      "implemented": true,
+      "title": "JSON 解析失败",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "YAML_BAD",
+      "plane": "P1",
+      "implemented": true,
+      "title": "YAML 解析失败",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TOML_BAD",
+      "plane": "P1",
+      "implemented": true,
+      "title": "TOML 解析失败",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "INVALID_ESCAPE",
+      "plane": "P1",
+      "implemented": true,
+      "title": "无效转义序列",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TODO_HIGH",
+      "plane": "P1",
+      "implemented": true,
+      "title": "TODO/FIXME 过多",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "BARE_EXCEPT",
+      "plane": "P1",
+      "implemented": true,
+      "title": "裸 except 过多",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "DOC_LINKS_BROKEN",
+      "plane": "P1",
+      "implemented": true,
+      "title": "文档相对链接断链",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "PANEL_REGISTRY_MISSING",
+      "plane": "P1",
+      "implemented": true,
+      "title": "面板登记表里有文件不存在",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "SHADOW_DRIFT",
+      "plane": "P4",
+      "implemented": true,
+      "title": "影子仓与真身漂移",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "TEMP_RESIDUE",
+      "plane": "P3",
+      "implemented": true,
+      "title": "临时残骸文件名",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "EMPTY_FILES",
+      "plane": "P3",
+      "implemented": true,
+      "title": "空文件",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "EMPTY_DIRS",
+      "plane": "P3",
+      "implemented": true,
+      "title": "空目录",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "BIG_DUP_NAME_SIZE",
+      "plane": "P4",
+      "implemented": true,
+      "title": "同名同体积大文件多份",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "NODE_MODULES_MULTI",
+      "plane": "P4",
+      "implemented": true,
+      "title": "多份 node_modules",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "BIG_FILES",
+      "plane": "P4",
+      "implemented": true,
+      "title": "超大文件",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "GATE_RED",
+      "plane": "F",
+      "implemented": true,
+      "title": "框架自带门报红或无响应",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "AV_EXCLUSION_BLINDSPOT",
+      "plane": "S",
+      "implemented": true,
+      "title": "反病毒把本工作区整条排除（在位≠在看你）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_EXCLUSION_BROAD",
+      "plane": "S",
+      "implemented": true,
+      "title": "反病毒排除整个用户目录或整盘",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_UNAVAILABLE",
+      "plane": "S",
+      "implemented": true,
+      "title": "读不到反病毒状态（不是『没有病毒』）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_STALE_SIGNATURE",
+      "plane": "S",
+      "implemented": true,
+      "title": "病毒特征库过期",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_STALE_QUICK_SCAN",
+      "plane": "S",
+      "implemented": true,
+      "title": "久未快速扫描",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_NEVER_FULL_SCAN",
+      "plane": "S",
+      "implemented": true,
+      "title": "从未全盘扫描",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "AV_DETECTION_HISTORY",
+      "plane": "S",
+      "implemented": true,
+      "title": "反病毒历史检出记录",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "PERSIST_REMOTE_CONTROL",
+      "plane": "S",
+      "implemented": true,
+      "title": "开机自启里有远控类软件",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "PERSIST_USER_WRITABLE",
+      "plane": "S",
+      "implemented": true,
+      "title": "自启指向用户可写目录",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "PERSIST_STARTUP_FILE",
+      "plane": "S",
+      "implemented": true,
+      "title": "启动文件夹条目",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "PERSIST_WMI",
+      "plane": "S",
+      "implemented": true,
+      "title": "非内置 WMI 事件订阅持久化",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "IOC_EXEC_PATTERN",
+      "plane": "S",
+      "implemented": true,
+      "title": "生产脚本含下载执行/编码命令类手法",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "IOC_IN_SECURITY_TOOLING",
+      "plane": "S",
+      "implemented": true,
+      "title": "安全研究目录含同类手法（预期，需标注）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "NPM_POSTINSTALL_REMOTE",
+      "plane": "S",
+      "implemented": true,
+      "title": "npm 生命周期脚本联网下载执行",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "NPM_LIFECYCLE_HOOKS",
+      "plane": "S",
+      "implemented": true,
+      "title": "存在 npm 生命周期脚本",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "HOSTS_TAMPERED",
+      "plane": "S",
+      "implemented": true,
+      "title": "hosts 有非默认映射",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "PROXY_SET",
+      "plane": "S",
+      "implemented": true,
+      "title": "系统代理开启",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "DUP_EXACT_CONTENT",
+      "plane": "P4",
+      "implemented": true,
+      "title": "同体积且**内容相同**的多份文件（sha256 确认，可回收空间）",
+      "how": "先按体积分组（免哈希）⇒ 只对 ≥64KB 的同体积组成员算 sha256。**只做生产面**：全树的大头是 _upstream(P4) 与 .scratch(P3)，在那上面去重没意义。单轮哈希上限 400 个，**截断必报**（capped）。【实测】生产面 ≥64KB 档 26 组 / 最多可回收 308.9MB，代价是哈希 62 个文件。**只报不删**（删除是主人的决定）。",
+      "src": "2026-09-23 深扫"
+    },
+    {
+      "code": "PROC_UNSIGNED",
+      "plane": "S",
+      "implemented": true,
+      "title": "跑着的进程未签名且不在系统目录",
+      "how": "host_security_scan L3 已实现，未接进速扫判据",
+      "src": "host_security_scan.py · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "PORT_UNUSUAL_LISTEN",
+      "plane": "S",
+      "implemented": true,
+      "title": "非典型端口监听",
+      "how": "host_security_scan L4 的 listen_unusual",
+      "src": "host_security_scan.py · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "EXEC_IN_SUSPICIOUS_DIR",
+      "plane": "S",
+      "implemented": true,
+      "title": "TEMP/AppData/Downloads 里的可执行",
+      "how": "host_security_scan L5 executables",
+      "src": "host_security_scan.py · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "NET_EGRESS_UNKNOWN",
+      "plane": "S",
+      "implemented": true,
+      "title": "已建立外连的目标核查",
+      "how": "host_security_scan L4 established + 进程归属",
+      "src": "host_security_scan.py · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "AV_ONDEMAND_SCAN",
+      "plane": "S",
+      "implemented": true,
+      "title": "对本仓跑一次真实按需扫描（MpCmdRun）",
+      "how": "MpCmdRun.exe -Scan -ScanType 3 -File <dir>；会真扫、可能触发 Defender 处置，需人点头",
+      "src": "本机现读 · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "WORKSPACE_UNSIGNED_BIN",
+      "plane": "S",
+      "implemented": false,
+      "title": "工作区内的可执行文件签名清点",
+      "how": "Get-AuthenticodeSignature 批量；工作区有 111 个 >5MB 文件可先筛",
+      "src": "本机现读",
+      "measured": "第 104 轮量过：生产面（gbt_allinone/holo_pet/potato_pet/tools/skills，排除 node_modules/.pylibs/vendor）的 .exe/.dll/.pyd **候选 = 0 个**。目录里那句『工作区有 111 个 >5MB 文件可先筛』指的是 node_modules/vendor 那些**第三方**二进制（P4），拿签名去审别人的树没有意义。⇒ **没东西可查**，不做。"
+    },
+    {
+      "code": "DNS_SERVER_ODD",
+      "plane": "S",
+      "implemented": false,
+      "title": "DNS 服务器非常规",
+      "how": "Get-DnsClientServerAddress",
+      "src": "本机现读",
+      "measured": "第 104 轮量过：本机 Get-DnsClientServerAddress 只有 1 个接口（Wi-Fi → 192.168.1.1，路由器地址）—— 这是**最常见的一种配置**，没有『非常规』可言。要判『odd』得先有一份『正常』清单，而那份清单在本机不存在。**不做。**"
+    },
+    {
+      "code": "BROWSER_EXTENSION_INVENTORY",
+      "plane": "S",
+      "implemented": false,
+      "title": "浏览器扩展清单（含框架自带 native_browser profile）",
+      "how": "扫 store/native_browser/profile/**/Extensions",
+      "src": "本机现读",
+      "measured": "第 104 轮量过：本机只有 1 个 Extensions 目录（gbt_allinone/store/native_browser/profile/Default/Extensions，15 个子目录）—— 那是**框架自己那个 native_browser profile**。清单本身是**读数**，没有『故障』语义（装了什么扩展 ≠ 有毛病）⇒ 做成判词只会天天响。**不做**（若要，只应作为 planes 里的读数，而不是 fault）。"
+    },
+    {
+      "code": "CERT_STORE_UNKNOWN_ROOT",
+      "plane": "S",
+      "implemented": false,
+      "title": "用户证书存储里被装了根证书",
+      "how": "Get-ChildItem Cert:\\CurrentUser\\Root 与出厂集比对",
+      "src": "本机现读",
+      "measured": "第 104 轮量过：用户根证书 **54 个**，而离线**没有任何出厂基准**可对照（state/factory_roots.json / root_baseline.json / cert_baseline.json 三者全不存在）。⇒ 判据只能把 54 个全报成『未知根』= **纯噪声**。真要做，得先在干净机器上取一份基准 —— 本机做不到。**不做。**"
+    },
+    {
+      "code": "TASK_SYSTEM_WRITABLE_SCRIPT",
+      "plane": "S",
+      "implemented": false,
+      "title": "计划任务以 SYSTEM 跑用户可写脚本（提权面）",
+      "how": "任务 Principal + Actions 路径写权限组合判定",
+      "src": "本机现读",
+      "measured": "第 103 轮量过：本机 102 个任务动作、**77 个 SYSTEM**、目标在用户可写目录的只有 **2 个**，**交集 = 0**（那 2 个是 OpenClaw Gateway 与 PowerToys，身份 ADMIN + 权限 **Limited**，同权限不构成提权面）；SYSTEM 任务目标全在 %systemroot%\\system32 与 Program Files。⇒ SYSTEM+用户可写 = **0 命中**，真值就是空。**不做。**"
+    },
+    {
+      "code": "EXT_MISMATCH_PE",
+      "plane": "S",
+      "implemented": true,
+      "title": "扩展名与真实文件头不符（伪装）",
+      "how": "读前 2 字节判 MZ/PE/ELF/ZIP，与后缀比对",
+      "src": "2026-09-23 深扫扩展名面 · 2026-09-23 目标轮已接"
+    },
+    {
+      "code": "MTIME_ANOMALY",
+      "plane": "P3",
+      "implemented": true,
+      "title": "时间戳落在将来 / 落在远古（mtime<ctime 是常态，故意不报）",
+      "how": "mtime > now+120s ⇒ P1；mtime < 2000 年且**不是** ZIP 下界哨兵 1980-01-01 ⇒ P2。【实测】mtime < ctime 全树 14290 个、其中倒挂<1 天 9540 个 = 复制/检出/解包的常态，故**不作为故障报**，只留作读数 planes.mtime_anomaly",
+      "src": "2026-09-23 深扫"
+    },
+    {
+      "code": "CONFIG_PRECEDENCE_SHADOW",
+      "plane": "T",
+      "implemented": false,
+      "title": "多份同名配置互相遮蔽（谁生效说不清）",
+      "how": "同名配置文件多份 + 加载顺序未声明",
+      "src": "2026-09-23 第1轮旁证",
+      "measured": "第 99 轮量过：tsconfig.json×12 / pyproject.toml×9 几乎全在 _upstream/(P4) 且是合法 monorepo 嵌套 ⇒ 纳入即纯噪声；排除 P4/P3 后生产面只剩根 pytest.ini 与 gbt_allinone/deploy/docker-compose.yml，**没有祖孙对** ⇒ 判据会哑。上级 C:\\Users\\ADMIN\\pyproject.toml 那条真隐患已被 TEST_CALIBER_HIJACK 覆盖。**不做。**"
+    },
+    {
+      "code": "EVIDENCE_STAMP_MISSING",
+      "plane": "T",
+      "implemented": false,
+      "title": "结论没有四元组印章（解释器/身份/store/命令）",
+      "how": "对照 regression_stamp 口径检查结论产物",
+      "src": "AGENTS.md 家规",
+      "measured": "第 99 轮量过：regression_stamp.collect() **在 R51/R52 已补上** python 与 comparability （框架注释里「52 个印章、齐的 0 个」是**修之前**的考古）；且印章全写在 .scratch/（P3），而按扫描器自身口径**不解析 P3 内容** ⇒ 做出来只是历史残骸噪声。**不做。**"
+    },
+    {
+      "code": "SKILL_DECLARED_NOT_LOADABLE",
+      "plane": "P5",
+      "implemented": true,
+      "title": "图鉴声明的技能在所有查过的根里都加载不到（声明面 > 可加载面）",
+      "how": "比 state/skill_atlas.json 的 skills[].name 与【6 个根】里有 SKILL.md 的目录名。根集必须含 $DSH_HOME/.agent-presets/*/skills（旧根集漏了它，见 §五十一）。【实测】声明 341 · 可加载 250 · **97 个一个根都加载不到**。读图鉴失败**必须报错**，不许返回空集（否则\"图鉴坏了\"会被念成\"全都能加载\"）。",
+      "src": "2026-09-23 第1轮"
+    },
+    {
+      "code": "AV_ONDEMAND_THREAT",
+      "plane": "S",
+      "implemented": true,
+      "title": "按需扫描检出威胁",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "HOSTSEC_UNAVAILABLE",
+      "plane": "S",
+      "implemented": true,
+      "title": "主机层有拿不到的部分（不是没问题）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "SEC_MODULE_MISSING",
+      "plane": "S",
+      "implemented": true,
+      "title": "安全面模块没装载（整块没跑）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "SEC_MODULE_ERROR",
+      "plane": "S",
+      "implemented": true,
+      "title": "安全面执行出错（没跑完）",
+      "src": "2026-09-23 目标轮"
+    },
+    {
+      "code": "SKILL_MIRROR_DIVERGED",
+      "plane": "P5",
+      "implemented": true,
+      "title": "同名技能在多个根里内容不一致（改一份不生效，说不清哪份是真源）",
+      "how": "对 gbt-* 的 SKILL.md 跨根取 sha256 前 12 位：同名而哈希不同即分歧。【实测】本机 4 个根各 59 个 gbt-*（镜像）；**根集必须含 $DSH_HOME/.agent-presets/*/skills** —— 旧根集漏了它（见 quick_scan.scan_plane5 注释）",
+      "src": "2026-09-24 第98轮"
+    },
+    {
+      "code": "SKILL_MIRROR_OVERWRITTEN",
+      "plane": "P5",
+      "implemented": true,
+      "title": "同名技能内容一致但时间戳差很多（发生过覆盖/同步，方向未知）",
+      "how": "对 gbt-* 的 SKILL.md 逐根取 (sha256前12, mtime)：**内容一致**且 mtime 跨度 > 6 小时即报。与 SKILL_MIRROR_DIVERGED 互补（那条管不一致，这条管一致但刚被覆盖）。【实测】59 个名字里内容一致的：<6h 57 · 1~7d **2** · >=7d 0 ⇒ 零噪声。**只看得见『发生过覆盖』，看不见『哪边是对的』**（无历史可比）⇒ 报的是待确认，不是有错。",
+      "src": "2026-09-24 第105轮"
+    }
+  ]
+}

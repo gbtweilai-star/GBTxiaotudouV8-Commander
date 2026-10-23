@@ -1,0 +1,3136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 手写页 · 无生成器（全仓无写它的脚本）· 不参与新鲜度判 · 2026-10-11 声明 -->
+<meta charset="utf-8" />
+
+<!--
+  CSP · 离线自包含的<b>硬保证</b>（与 holo_pet_w3/eye/index.html、brain/index.html 同一条口径）
+    default-src 'none'  ⇒ 什么都默认不许
+    script-src 'unsafe-inline' ⇒ 只许本页内联的<b>经典脚本</b>（本页不引任何外部 js，也不用 module）
+    img-src 'self' data: ⇒ 只许同目录的图（reference-02.jpg）与内联 data 图
+    connect-src 'none' ⇒ <b>任何网络取数原语都被浏览器当场拒绝</b>（取数、长连接、信标，一条都不放过）
+  为什么必须是这条：主人令「页面自包含：零远端引用、零网络取数原语」。上面这一行不是承诺，是<b>运行时执法</b>。
+  ⚠️ 本页<b>不用模块脚本</b>：file:// 下 ES 模块会被 CORS 挡掉（本仓 eye 页实测 net::ERR_FAILED，页面静默空白）。全页只有<b>经典脚本</b>。
+-->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; font-src 'none'; connect-src 'none'; media-src 'none'" />
+<title>GBT小土豆V8 · 数字人（绑骨全肢体 + 语音交互）</title>
+<style>
+:root{
+  --bg:#060b14; --panel:#0e1626; --panel2:#111c30; --line:#1d3355; --line2:#152238;
+  --ink:#e8eef8; --dim:#8896ab; --gold:#f5b041; --cyan:#26d3e8; --violet:#a78bfa;
+  --ok:#22c55e; --bad:#f87171; --miss:#f5b041; --off:#6b7280;
+  --okbg:#0f2a20; --badbg:#2a1414; --missbg:#2a2010; --offbg:#161a21; --inkbg:#0d1b2c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+   radial-gradient(1200px 600px at 18% -10%, #10203a 0%, transparent 60%),
+   radial-gradient(900px 500px at 100% 0%, #16283f 0%, transparent 55%), var(--bg);
+  color:var(--ink);font:13px/1.62 "Segoe UI","Microsoft YaHei UI",system-ui,sans-serif}
+code,kbd{font-family:ui-monospace,Consolas,"Cascadia Mono",monospace;color:var(--cyan)}
+h2{margin:0 0 8px;font-size:12.5px;color:var(--dim);font-weight:700;letter-spacing:.5px}
+a{color:var(--cyan)}
+
+/* ── 顶栏 ── */
+.bar{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--line);
+ background:linear-gradient(90deg,#070d16,#0b1424 60%,#0a1220);flex-wrap:wrap;position:sticky;top:0;z-index:20}
+.mark{width:18px;height:18px;border:2px solid var(--gold);border-radius:5px;flex:0 0 auto}
+.brand{font-weight:800;letter-spacing:.4px}
+.brand b{color:var(--gold)}
+.sub{color:var(--dim);font-size:11.5px}
+.chips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:11px;color:var(--dim);background:#0a1220}
+.chip b{color:var(--cyan);font-variant-numeric:tabular-nums}
+.chip.ok{border-color:#1d5c45;color:var(--ok)} .chip.ok b{color:var(--ok)}
+.chip.bad{border-color:#6b2a2a;color:var(--bad)} .chip.bad b{color:var(--bad)}
+.chip.miss{border-color:#6b5320;color:var(--miss)} .chip.miss b{color:var(--miss)}
+
+/* ── 布局 ── */
+.wrap{padding:12px;display:grid;grid-template-columns:minmax(430px,1.02fr) minmax(430px,1fr);gap:12px;align-items:start}
+@media (max-width:1080px){.wrap{grid-template-columns:1fr}}
+.col{display:grid;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 12px;min-width:0}
+.card.tight{padding:9px 10px}
+.hd{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+.hd h2{margin:0}
+.hd .tag{margin-left:auto;font-size:11px;color:var(--dim)}
+.hr{height:1px;background:var(--line2);margin:9px 0}
+
+/* ── 舞台 ── */
+.stage{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;
+ background:
+  radial-gradient(58% 46% at 50% 34%, #6a7280 0%, #4a515c 42%, #23272e 78%, #14171c 100%),
+  linear-gradient(180deg,#2a2f37 0%,#1a1e24 55%,#0c0f13 100%)}
+#rigsvg{display:block;width:100%;height:clamp(420px,74vh,780px)}
+.stage .hint{position:absolute;left:10px;top:8px;font-size:11px;color:#9fb0c6;text-shadow:0 1px 2px #000}
+.stage .sig{position:absolute;right:10px;bottom:7px;font-size:10.5px;color:#8fa1b8}
+
+/* 动作按钮排 */
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+button{cursor:pointer;font:inherit;font-size:12px;color:var(--ink);background:#132039;
+ border:1px solid #24406b;border-radius:6px;padding:4px 10px}
+button:hover{background:#18294a}
+button.on{background:#1c3a2c;border-color:#2f7d55;color:#c8ffdf}
+button.ghost{background:#0d1626}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.sm{padding:2px 8px;font-size:11.5px}
+
+/* 表 */
+table{border-collapse:collapse;width:100%;font-size:11px}
+th,td{border:1px solid var(--line2);padding:2px 6px;text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:700;background:#0a1018}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.mono{font-family:ui-monospace,Consolas,monospace;font-size:10.5px}
+tr.hl td{background:#12233a}
+.scroll{max-height:238px;overflow:auto;border:1px solid var(--line2);border-radius:6px}
+.scroll.tall{max-height:300px}
+
+/* 状态标 */
+.st{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 6px;font-size:11px;background:var(--offbg);color:var(--off)}
+.st.ok{background:var(--okbg);border-color:#1d5c45;color:var(--ok)}
+.st.bad{background:var(--badbg);border-color:#6b2a2a;color:var(--bad)}
+.st.miss{background:var(--missbg);border-color:#6b5320;color:var(--miss)}
+.st.ink{background:var(--inkbg);border-color:#2b4f7d;color:var(--cyan)}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 8px;font-size:11.5px}
+.kv b{color:var(--dim);font-weight:600}
+.why{color:#f6a5a5}
+.note{color:var(--dim);font-size:11px}
+.warn{background:var(--missbg);border:1px solid #6b5320;border-radius:6px;padding:7px 9px;font-size:11.5px;color:#ffe2ab}
+.bad-box{background:var(--badbg);border:1px solid #6b2a2a;border-radius:6px;padding:7px 9px;font-size:11.5px;color:#ffd0d0}
+.ok-box{background:var(--okbg);border:1px solid #1d5c45;border-radius:6px;padding:7px 9px;font-size:11.5px;color:#c8ffdf}
+pre{margin:0;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;color:#bcd2ea;
+ background:#070d17;border:1px solid var(--line2);border-radius:6px;padding:7px 8px;overflow:auto;max-height:190px;white-space:pre-wrap;word-break:break-all}
+
+/* 输入行 */
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+input[type=text]{flex:1 1 190px;min-width:150px;font:inherit;font-size:12px;color:var(--ink);
+ background:#0a1424;border:1px solid #24406b;border-radius:6px;padding:5px 8px}
+input[type=text]::placeholder{color:#5d6f87}
+input[type=range]{width:118px;vertical-align:middle}
+
+/* 参考对照 */
+.refwrap{position:relative;width:236px;flex:0 0 auto;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#151a20}
+.refwrap img{display:block;width:100%}
+.refwrap svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.refside{display:flex;gap:10px;flex-wrap:wrap}
+
+/* 动图条 */
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.cell{flex:0 0 auto;border:1px solid var(--line2);border-radius:6px;background:#0b1220;padding:3px}
+.cell svg{display:block;width:96px;height:auto}
+.cell .cap{font-size:10px;color:var(--dim);text-align:center;font-variant-numeric:tabular-nums}
+.cell.hot .cap{color:var(--gold)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin:4px 0 0}
+.legend i{font-style:normal;color:var(--cyan)}
+
+/* 窄栏里的"逐条卡"：本列只有 ~430px，四列表会被挤成一行一个字，改成卡片读起来才顺 */
+.dist{border:1px solid var(--line2);border-radius:6px;padding:7px 8px;margin-bottom:7px;background:#0b1424}
+.dist:last-child{margin-bottom:0}
+.dist .dt{font-weight:700;color:var(--cyan);font-size:11.5px;margin-bottom:4px}
+.dist .dl{font-size:11px;line-height:1.55;color:#c3d4e8;margin:2px 0}
+.dist .dl b{color:var(--gold);font-weight:600}
+.dist .dv{margin-top:5px}
+</style>
+<script src="rig-data.js"></script>
+</head>
+<body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="bar">
+  <span class="mark" aria-hidden="true"></span>
+  <span class="brand">GBT<b>小土豆V8</b> · 数字人</span>
+  <span class="sub">绑骨全肢体 · 语音交互 · 离线自包含（CSP 焊死网络）</span>
+  <span class="chips" id="topchips"></span>
+</header>
+
+<div class="wrap">
+  <!-- ══════════ 左列：舞台 + 动作 + 动作取证 ══════════ -->
+  <div class="col">
+    <div class="card">
+      <div class="hd"><h2>① 数字人舞台（SVG 骨骼层级，非切图/非位移贴图）</h2>
+        <span class="tag" id="ragtag">关节 —</span></div>
+      <div class="stage">
+        <div class="hint" id="stagehint">就绪</div>
+        <div class="sig">骨架 L/R = <b>她自己的</b>左/右（她的右手在画面左）· 底部跑马读数：当前动作 / 帧号 / 髋位移</div>
+        <div id="rigslot"></div>
+      </div>
+      <div class="acts" id="actbar"></div>
+      <div class="row" style="margin-top:8px">
+        <label class="note"><input type="checkbox" id="tkBones" /> 显示骨骼（把层级画出来）</label>
+        <label class="note"><input type="checkbox" id="tkPivot" /> 显示关节坐标</label>
+        <span class="note">帧率读数 <b id="fps">—</b></span>
+        <span class="note">当前动作 <b id="curAct">—</b></span>
+        <span class="note">相位 <b id="phase">—</b></span>
+      </div>
+      <pre id="poseDump">（每帧真实角度/位移会落在这里）</pre>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>② 动作取证：连续帧 + 逐帧真实角度/位移 + 基线判决</h2>
+        <span class="tag" id="proofTag">未跑</span></div>
+      <div class="note">判据（「真在动」四条，全过才算）：① 幅度 = 相对 t=0 的最大角偏移 &gt; 5°；② 连续性 = 相邻帧最大 |Δ角| &gt; 0.2°（防"跳变换图"）；③ 位移 = 关节世界坐标相对 t=0 的位移 &gt; 2px；④ 上述两项都要 &gt; <b>2 × 现量基线</b> —— 基线是<b>现量</b>的（同一套 41 点采样跑 idle 得到），不是拍脑袋常数。任一不满足 ⇒ 判「没真动」并贴数字。表里多一行 <b>root</b>（伪关节：角度=yaw、位置=根位移）—— 转身/走动/蹲起的驱动量在它身上，去掉它转身会被误判成没动。</div>
+      <div class="hr"></div>
+      <div class="strip" id="strip"></div>
+      <div class="legend">
+        <span>图条 = <i>同一个 rig</i> 在 t=0 / .2 / .4 / .6 / .8 / 1.0 六个采样点上重画（不是预渲染贴图）</span>
+        <span>金色标题 = 该帧相对 t=0 有 &gt;3° 变化</span>
+      </div>
+      <div class="hr"></div>
+      <div class="scroll tall"><table id="proofTbl"><thead><tr>
+        <th>关节</th><th>侧</th><th>t0 角°</th><th class="n">幅度Δ°<br />(相对t0)</th><th class="n">单帧Δ°</th><th class="n">位移px</th><th>真在动?</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div id="verdict" class="note">（跑一个动作后出判决）</div>
+    </div>
+  </div>
+
+  <!-- ══════════ 右列：语音链路 + 骨架 + 参考图 + 蒸馏 ══════════ -->
+  <div class="col">
+    <div class="card">
+      <div class="hd"><h2>③ 形象参考（1:1 目视对照 · 副本在页面同目录）</h2>
+        <span class="tag">reference-02.jpg</span></div>
+      <div class="refside">
+        <div class="refwrap" id="refwrap">
+          <img id="refimg" src="reference-02.jpg" alt="形象参考：黑底黄绑带战术连体装（胸前 02）· 过膝黑皮靴" />
+          <svg id="refoverlay" viewBox="0 0 736 1248" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div style="flex:1 1 200px;min-width:190px">
+          <div class="note">把<b>同一条骨架</b>叠在参考图上，用来核比例（不是另画一张）。滑杆可微调对齐。</div>
+          <div style="margin-top:6px">
+            <label class="note">缩放 <input type="range" id="rScale" min="1.4" max="3.4" step="0.01" value="2.41" /></label><br />
+            <label class="note">上下 <input type="range" id="rY" min="-700" max="300" step="1" value="-250" /></label><br />
+            <label class="note">左右 <input type="range" id="rX" min="-400" max="400" step="1" value="-66" /></label><br />
+            <label class="note">骨架透明 <input type="range" id="rA" min="0" max="1" step="0.02" value="0.85" /></label>
+          </div>
+          <div class="hr"></div>
+          <div class="note" id="refRead">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>④ 语音链路（每一环都贴实测状态与失败原文）</h2>
+        <span class="tag" id="chainTag">—</span></div>
+
+      <table id="chainTbl"><tbody>
+        <tr><td style="width:104px">① 壳桥</td><td id="c1">—</td></tr>
+        <tr><td>② 麦克风</td><td id="c2">—</td></tr>
+        <tr><td>③ 听写</td><td id="c3">—</td></tr>
+        <tr><td>④ 文本入框</td><td id="c4">—</td></tr>
+        <tr><td>⑤ 面板桥</td><td id="c5">—</td></tr>
+        <tr><td>⑥ TTS 出声</td><td id="c6">—</td></tr>
+        <tr><td>⑦ 嘴型/动作</td><td id="c7">—</td></tr>
+      </tbody></table>
+
+      <div class="hr"></div>
+      <div class="row">
+        <button id="btnMic">🎤 说话（开始真听）</button>
+        <button id="btnStop" class="ghost" disabled>■ 停止听</button>
+        <button id="btnSayLocal">🔊 试嗓（本机离线嗓）</button>
+        <button id="btnSayGate" class="ghost">门内 TTS（如实报缺授权）</button>
+        <button id="btnStatus" class="ghost">刷新三腿读数</button>
+      </div>
+      <div class="row" style="margin-top:7px">
+        <input type="text" id="sayText" placeholder="听写结果会落进这里；也可直接打字" />
+        <button id="btnSend">送出（走面板桥）</button>
+        <button id="btnClear" class="ghost sm">清空</button>
+      </div>
+      <div class="row" style="margin-top:7px">
+        <span class="note">TTS 臂</span>
+        <select id="ttsArm" style="font:inherit;font-size:12px;background:#0a1424;color:var(--ink);border:1px solid #24406b;border-radius:6px;padding:4px">
+          <option value="local">A · 本机离线嗓（speechSynthesis / 系统 SAPI）</option>
+          <option value="gate">B · 门内 SAPI（gbtW3.intercom say，需 audio_output 授权）</option>
+          <option value="hf">C · 云臂 hf_voice.py（需 HF 密钥、会出网 —— 本页只显示状态，不调）</option>
+        </select>
+        <label class="note">话速 <input type="range" id="rate" min="0.6" max="1.6" step="0.05" value="1" /> <b id="rateRead">rate=1</b></label>
+        <span class="note">当前嗓：<b id="curVoice">—</b></span>
+      </div>
+      <div class="hr"></div>
+      <div class="kv">
+        <b>嘴型同步</b><span id="mouthLive">—</span>
+        <b>说到的字</b><span id="boundaryLive">—</span>
+        <b>出声证据</b><span id="speakEvidence">—</span>
+      </div>
+      <div class="hr"></div>
+      <!-- 采集链（照白龙马口径）· 每一格都是现读；失败留原文，不拿"打开了"冒充"采到了" -->
+      <div class="kv">
+        <b>采集链</b><span id="capChain">—</span>
+        <b>diagCaptureMode</b><span id="capMode">—</span>
+        <b>音频约束</b><span id="capConstraints">—</span>
+        <b>AudioContext</b><span id="capCtx">—</span>
+        <b>采到的字节</b><span id="capBytes">—</span>
+        <b>PCM 出站</b><span id="capSink">—</span>
+      </div>
+      <div class="row" style="margin-top:7px">
+        <button id="btnCapture" class="sm">🎙 采集链自测（枚举→约束→回退→Worklet/ScriptProcessor）</button>
+        <button id="btnCaptureStop" class="ghost sm" disabled>■ 停采集</button>
+        <button id="btnSynth" class="ghost sm">🧪 采集流水自检（合成源 · 不开麦）</button>
+      </div>
+      <pre id="voiceLog">（语音链路日志）</pre>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>⑤ 骨架结构与对称性（左右对称的现读读数）</h2>
+        <span class="tag" id="symTag">—</span></div>
+      <div class="scroll"><table id="jointTbl"><thead><tr>
+        <th>#</th><th>关节</th><th>父</th><th>侧</th><th class="n">局部偏移</th><th class="n">骨长</th><th class="n">静息角°</th><th>镜像对</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div id="symRead" class="note">—</div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>⑥ 白龙马语音蒸馏（做法与参数口径 → 我们的等价实现）</h2>
+        <span class="tag">不搬代码</span></div>
+      <div class="scroll" id="blmList"></div>
+      <div class="hr"></div>
+      <div class="hd"><h2>⑦ 本仓语音坑 → 本页对应处置</h2></div>
+      <div class="scroll" id="pitList"></div>
+    </div>
+
+    <div class="card tight">
+      <div class="hd"><h2>⑧ 自包含自审（本页自己数自己）</h2><span class="tag" id="auditTag">—</span></div>
+      <div id="auditRead" class="note">—</div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>⑨ 语音→操控（路由表 · 每格：能力位/动作/票/现状）</h2>
+        <span class="tag" id="vcTag">—</span></div>
+      <div class="note">主人令「数字人语音交互就可以操控整台电脑的任意APP，浏览器以及所有能调试，调节蓝牙，无线网全部都能操作」——
+        <b>本页只算路由，不许自己动手</b>（本页网络面为零、无进程口、无动态求值）。动手永远走：意图 → 唯一门 → 能力位 → 授权门。</div>
+      <!-- 窄栏逐条卡（不用五列表：这一列只有 ~430px，五列表会被挤成一行一个字 —— 本页第 ⑫ 条自踩坑的处置同款） -->
+      <div class="scroll tall" id="vcList"></div>
+      <div id="vcLive" class="note">—</div>
+      <div class="hr"></div>
+      <div class="row">
+        <input type="text" id="vcIn" placeholder="打一句自然语言（例：把记事本打开 / 帮页面执行这段脚本 / 断开无线 / 打开显示设置）" />
+        <button id="vcRoute">算路由（只看不发）</button>
+        <button id="vcSelf" class="ghost sm">路由自检（带负对照）</button>
+      </div>
+      <div id="vcOut" class="note">（路由结果落在这里：命中面 → 能力位/动作/票/能不能用；不认识就如实报「未命中」，不猜。）</div>
+      <pre id="vcLog">（路由日志）</pre>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>⑩ 我对主人的了解（用户模型 · 观察 vs 推断分开列）</h2>
+        <span class="tag" id="omTag">—</span></div>
+      <div class="note">「越用越懂用户」不是另建一套记忆：<b>读</b>走原生心智引擎 <code>mind pulse</code>，
+        <b>写</b>走面板桥每轮天然的 <code>mind_engine.observe</code>（本页送出的每一句都进它）——
+        数据落在框架唯一台账 <code>store/mind_state.json</code>，并镜像进生命档案与审计。</div>
+      <div class="scroll"><table id="omTbl"><thead><tr>
+        <th>字段</th><th>值</th><th>列别（观察到的 / 推断未证实的）</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div id="omRead" class="note">—</div>
+      <div class="hr"></div>
+      <div class="kv">
+        <b>读回口</b><span id="omReadPath">—</span>
+        <b>写入口</b><span id="omWritePath">—</span>
+        <b>记什么</b><span id="omRecord">—</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>⑪ 高清形象 · 全肢体动作（3D 绑定渲染成件）</h2>
+        <span class="tag">Blender 离线渲染</span></div>
+      <div class="note">图与片都是<b>绑骨后的真渲染</b>（19 骨 · 6 动画 · 342 通道；出处
+        <code>docs/数字人-绑骨与全肢体动作.md</code>）——本页零远端取数，全部读本目录文件。</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <figure style="margin:0"><img src="digital-human-hero-front.jpg" alt="HD 英雄静帧 · 正面" style="width:100%;border-radius:6px;display:block" /><figcaption class="note" style="margin:3px 0 0">正面 · 1536×1920</figcaption></figure>
+        <figure style="margin:0"><img src="digital-human-hero-3q.jpg" alt="HD 英雄静帧 · 三分之四侧" style="width:100%;border-radius:6px;display:block" /><figcaption class="note" style="margin:3px 0 0">三分之四侧</figcaption></figure>
+        <figure style="margin:0"><img src="digital-human-hero-face.jpg" alt="HD 英雄静帧 · 面部特写" style="width:100%;border-radius:6px;display:block" /><figcaption class="note" style="margin:3px 0 0">面部特写</figcaption></figure>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px">
+        <figure style="margin:0"><video src="act-01-breath.mp4" muted loop autoplay playsinline style="width:100%;border-radius:6px;display:block"></video><figcaption class="note" style="margin:3px 0 0">呼吸（待机循环 · 关键帧抽样 5fps · 2s）</figcaption></figure>
+        <figure style="margin:0"><video src="act-03-walk.mp4" muted loop autoplay playsinline style="width:100%;border-radius:6px;display:block"></video><figcaption class="note" style="margin:3px 0 0">走两步（全肢体位移 · 同一采样口径）</figcaption></figure>
+        <figure style="margin:0"><video src="act-04-turn.mp4" muted loop autoplay playsinline style="width:100%;border-radius:6px;display:block"></video><figcaption class="note" style="margin:3px 0 0">转身（真偏航 · 原地 · 头颈/膝姿态修正）</figcaption></figure>
+      </div>
+      <div class="hr"></div>
+      <div class="note">采样口径（不许当「流畅成片」看）：<b>每 5 帧取 1 帧的关键帧连播（5fps）</b>——
+        真在动的证据是四末端位移读数（见上方动作取证），不是帧率。
+        转身已按<b>根因修复</b>上页（hips 轴换算一行修正 + 腿部 IK 修正 + 头颈前倾修正 36.8°→6.0°；10 帧全在干净尺内）。
+        打招呼 / 蹲起 / 伸懒腰 三条仍因<b>源网格熔接（手贴髋）</b>在大角度时产生拉伸残留，<b>未上页</b> ——
+        原件在 <code>projects/digital-human/out/clips/</code>，待拆壳封边后重渲补上（同见上述文档「做不到的」清单）。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     GBT-RIG-SPEC-BEGIN
+     骨架规格（严格 JSON —— 让 Python 机检件能独立解析去做对称性/真在动的复核）
+     约定：
+       · 每个关节一根骨：骨在<b>本关节局部坐标</b>里从 (0,0) 画到 (0,len)，宽 w，两端圆角。
+       · off=[dx,dy] 是<b>相对父关节</b>的平移（在父的局部坐标系里）。
+       · rest 是静息角（度）。SVG rotate 正角 ⇒ 骨尖朝 <b>-x</b>（屏幕左）。
+       · side: L/R = <b>她自己的</b>左/右（她的右手在画面左 ⇒ L 在 +x）。
+       · 镜像律：rest_L == -rest_R；任何对称动作的增量也必须 delta_L == -delta_R。
+         机检件 dh-rig-check.py 就是拿这条去红的（负对照：故意把一侧取反 ⇒ 必须报红）。
+     ══════════════════════════════════════════════════════════════════════ -->
+<script id="rigSpec" type="text/x-gbt-rig">/* GBT-RIG-SPEC-BEGIN */
+{
+  "viewBox": [0, 0, 360, 680],
+  "root": [180, 300],
+  "ground": 610,
+  "figure": {"headTopY": 116, "soleY": 607.4, "heightPx": 491.4,
+             "proportion": "头高 56 / 全身 491 ≈ 1:8.8；腿(髋→底) 307 ≈ 62% —— 照参考图的长腿比例定"},
+  "joints": [
+    {"n":"pelvis",   "p":null,      "off":[0,0],     "len":30,  "w":40, "rest":0,   "side":"C", "cn":"髋"},
+    {"n":"spine",    "p":"pelvis",  "off":[0,-32],   "len":30,  "w":34, "rest":0,   "side":"C", "cn":"脊"},
+    {"n":"chest",    "p":"spine",   "off":[0,-30],   "len":30,  "w":44, "rest":0,   "side":"C", "cn":"胸"},
+    {"n":"neck",     "p":"chest",   "off":[0,-52],   "len":14,  "w":16, "rest":0,   "side":"C", "cn":"颈"},
+    {"n":"head",     "p":"neck",    "off":[0,-14],   "len":-56, "w":44, "rest":0,   "side":"C", "cn":"头"},
+    {"n":"jaw",      "p":"head",    "off":[0,24],    "len":18,  "w":20, "rest":0,   "side":"C", "cn":"下颌"},
+
+    {"n":"clavicleL","p":"chest",   "off":[12,-40],  "len":26,  "w":14, "rest":-90, "side":"L", "cn":"肩(锁骨)"},
+    {"n":"upperArmL","p":"clavicleL","off":[0,26],   "len":56,  "w":13, "rest":83,  "side":"L", "cn":"上臂"},
+    {"n":"foreArmL", "p":"upperArmL","off":[0,56],   "len":52,  "w":11, "rest":3,   "side":"L", "cn":"前臂"},
+    {"n":"handL",    "p":"foreArmL","off":[0,52],    "len":22,  "w":10, "rest":2,   "side":"L", "cn":"手"},
+
+    {"n":"clavicleR","p":"chest",   "off":[-12,-40], "len":26,  "w":14, "rest":90,  "side":"R", "cn":"肩(锁骨)"},
+    {"n":"upperArmR","p":"clavicleR","off":[0,26],   "len":56,  "w":13, "rest":-83, "side":"R", "cn":"上臂"},
+    {"n":"foreArmR", "p":"upperArmR","off":[0,56],   "len":52,  "w":11, "rest":-3,  "side":"R", "cn":"前臂"},
+    {"n":"handR",    "p":"foreArmR","off":[0,52],    "len":22,  "w":10, "rest":-2,  "side":"R", "cn":"手"},
+
+    {"n":"hipL",     "p":"pelvis",  "off":[14,0],    "len":0,   "w":20, "rest":-2,  "side":"L", "cn":"髋(腿根)"},
+    {"n":"thighL",   "p":"hipL",    "off":[0,0],     "len":130, "w":22, "rest":0,   "side":"L", "cn":"大腿"},
+    {"n":"shinL",    "p":"thighL",  "off":[0,130],   "len":130, "w":16, "rest":0,   "side":"L", "cn":"小腿"},
+    {"n":"footL",    "p":"shinL",   "off":[0,130],   "len":34,  "w":15, "rest":-10, "side":"L", "cn":"脚(踝)"},
+    {"n":"toeL",     "p":"footL",   "off":[0,34],    "len":16,  "w":14, "rest":-16, "side":"L", "cn":"脚掌"},
+
+    {"n":"hipR",     "p":"pelvis",  "off":[-14,0],   "len":0,   "w":20, "rest":2,   "side":"R", "cn":"髋(腿根)"},
+    {"n":"thighR",   "p":"hipR",    "off":[0,0],     "len":130, "w":22, "rest":0,   "side":"R", "cn":"大腿"},
+    {"n":"shinR",    "p":"thighR",  "off":[0,130],   "len":130, "w":16, "rest":0,   "side":"R", "cn":"小腿"},
+    {"n":"footR",    "p":"shinR",   "off":[0,130],   "len":34,  "w":15, "rest":10,  "side":"R", "cn":"脚(踝)"},
+    {"n":"toeR",     "p":"footR",   "off":[0,34],    "len":16,  "w":14, "rest":16,  "side":"R", "cn":"脚掌"}
+  ],
+  "pairs": [["clavicleL","clavicleR"],["upperArmL","upperArmR"],["foreArmL","foreArmR"],["handL","handR"],
+            ["hipL","hipR"],["thighL","thighR"],["shinL","shinR"],["footL","footR"],["toeL","toeR"]],
+  "required": [["髋","pelvis"],["脊","spine"],["胸","chest"],["颈","neck"],["头","head"],
+               ["肩","clavicleL"],["上臂","upperArmL"],["前臂","foreArmL"],["手","handL"],
+               ["腿根","hipL"],["大腿","thighL"],["小腿","shinL"],["脚","footL"],["脚掌","toeL"]]
+}
+/* GBT-RIG-SPEC-END */</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     动作规格（同样是严格 JSON，供独立机检）
+       d = 各关节角<b>增量</b>（度，0 = 静息）；mouth = 嘴开朗度 0..1；
+       yaw = 转身角（0..360，2.5D 表示）；rootX/rootY = 根位移(px)；breath = 呼吸 0..1。
+       sym = true 表示"该动作左右对称"⇒ 机检要求每个镜像对 delta_L == -delta_R。
+     ══════════════════════════════════════════════════════════════════════ -->
+<script id="actSpec" type="text/x-gbt-act">/* GBT-ACT-SPEC-BEGIN */
+{
+  "idle": {"cn":"常态呼吸+微重心漂移","sym":true,"dur":4.0,"loop":true,"keys":[
+    {"t":0.0,  "d":{"breath":0.0,"rootY":0.0}},
+    {"t":0.25, "d":{"chest":1.2,"neck":-1.0,"head":-1.2,"upperArmL":1.4,"upperArmR":-1.4,"breath":0.55,"rootY":-1.6,"rootX":1.2}},
+    {"t":0.5,  "d":{"chest":0.0,"neck":0.6,"head":1.0,"upperArmL":-1.0,"upperArmR":1.0,"breath":0.15,"rootY":0.8,"rootX":0.0}},
+    {"t":0.75, "d":{"chest":-1.0,"neck":0.8,"head":0.8,"upperArmL":1.2,"upperArmR":-1.2,"breath":0.4,"rootY":-1.0,"rootX":-1.2}},
+    {"t":1.0,  "d":{"breath":0.0,"rootY":0.0}}
+  ]},
+  "talk": {"cn":"说话：嘴型+点头+手势","sym":true,"dur":2.6,"loop":true,"keys":[
+    {"t":0.00, "d":{"mouth":0.0,"head":0.0,"neck":0.0}},
+    {"t":0.09, "d":{"mouth":0.85,"neck":-3.4,"head":2.2,"clavicleL":-5,"clavicleR":5,"upperArmL":10,"upperArmR":-10,"foreArmL":-30,"foreArmR":30,"handL":-26,"handR":26}},
+    {"t":0.19, "d":{"mouth":0.10,"neck":2.6,"head":-1.6,"clavicleL":-2,"clavicleR":2,"upperArmL":3,"upperArmR":-3,"foreArmL":-8,"foreArmR":8,"handL":-6,"handR":6}},
+    {"t":0.29, "d":{"mouth":0.70,"neck":-2.4,"head":1.6,"clavicleL":-6,"clavicleR":6,"upperArmL":12,"upperArmR":-12,"foreArmL":-36,"foreArmR":36,"handL":-30,"handR":30}},
+    {"t":0.39, "d":{"mouth":0.05,"neck":1.8,"head":-1.2,"clavicleL":-2,"clavicleR":2,"upperArmL":3,"upperArmR":-3,"foreArmL":-9,"foreArmR":9,"handL":-7,"handR":7}},
+    {"t":0.50, "d":{"mouth":0.90,"neck":-3.2,"head":2.0,"clavicleL":-7,"clavicleR":7,"upperArmL":14,"upperArmR":-14,"foreArmL":-40,"foreArmR":40,"handL":-34,"handR":34}},
+    {"t":0.61, "d":{"mouth":0.20,"neck":2.2,"head":-1.4,"clavicleL":-2,"clavicleR":2,"upperArmL":4,"upperArmR":-4,"foreArmL":-10,"foreArmR":10,"handL":-8,"handR":8}},
+    {"t":0.72, "d":{"mouth":0.62,"neck":-2.0,"head":1.2,"clavicleL":-5,"clavicleR":5,"upperArmL":10,"upperArmR":-10,"foreArmL":-30,"foreArmR":30,"handL":-24,"handR":24}},
+    {"t":0.84, "d":{"mouth":0.08,"neck":1.4,"head":-0.8,"clavicleL":-1,"clavicleR":1,"upperArmL":2,"upperArmR":-2,"foreArmL":-6,"foreArmR":6,"handL":-5,"handR":5}},
+    {"t":1.00, "d":{"mouth":0.0,"head":0.0,"neck":0.0}}
+  ]},
+  "wave": {"cn":"抬手打招呼","sym":false,"dur":2.8,"loop":false,"keys":[
+    {"t":0.00, "d":{}},
+    {"t":0.18, "d":{"clavicleR":8,"upperArmR":110,"foreArmR":5,"handR":5,"head":3,"chest":1,"upperArmL":-4}},
+    {"t":0.32, "d":{"clavicleR":12,"upperArmR":133,"foreArmR":16,"handR":12,"head":-3,"upperArmL":-3}},
+    {"t":0.44, "d":{"clavicleR":12,"upperArmR":133,"foreArmR":-16,"handR":-12,"head":3,"upperArmL":-3}},
+    {"t":0.56, "d":{"clavicleR":12,"upperArmR":133,"foreArmR":16,"handR":12,"head":-3,"upperArmL":-3}},
+    {"t":0.68, "d":{"clavicleR":12,"upperArmR":133,"foreArmR":-16,"handR":-12,"head":3,"upperArmL":-3}},
+    {"t":0.78, "d":{"clavicleR":12,"upperArmR":132,"foreArmR":8,"handR":6,"head":1}},
+    {"t":0.90, "d":{"clavicleR":4,"upperArmR":40,"foreArmR":8,"head":1}},
+    {"t":1.00, "d":{}}
+  ]},
+  "walk": {"cn":"走动两步（3/4 视角）","sym":false,"dur":2.4,"loop":false,"keys":[
+    {"t":0.00, "d":{"yaw":30,"thighR":-18,"shinR":-30,"footR":-12,"thighL":10,"shinL":4,"upperArmL":-18,"upperArmR":18,"rootY":0,"rootX":0}},
+    {"t":0.12, "d":{"yaw":30,"thighR":-6,"shinR":-12,"thighL":0,"shinL":14,"upperArmL":-4,"upperArmR":4,"rootY":-6,"rootX":3}},
+    {"t":0.25, "d":{"yaw":30,"thighR":10,"shinR":4,"thighL":-18,"shinL":-30,"footL":-12,"upperArmL":18,"upperArmR":-18,"rootY":0,"rootX":6}},
+    {"t":0.37, "d":{"yaw":30,"thighR":0,"shinR":14,"thighL":-6,"shinL":-12,"upperArmL":4,"upperArmR":-4,"rootY":-6,"rootX":9}},
+    {"t":0.50, "d":{"yaw":30,"thighR":-18,"shinR":-30,"footR":-12,"thighL":10,"shinL":4,"upperArmL":-18,"upperArmR":18,"rootY":0,"rootX":12}},
+    {"t":0.62, "d":{"yaw":30,"thighR":-6,"shinR":-12,"thighL":0,"shinL":14,"upperArmL":-4,"upperArmR":4,"rootY":-6,"rootX":15}},
+    {"t":0.75, "d":{"yaw":30,"thighR":10,"shinR":4,"thighL":-18,"shinL":-30,"footL":-12,"upperArmL":18,"upperArmR":-18,"rootY":0,"rootX":18}},
+    {"t":0.87, "d":{"yaw":30,"thighR":0,"shinR":14,"thighL":-6,"shinL":-12,"rootY":-5,"rootX":21}},
+    {"t":1.00, "d":{"yaw":30,"rootX":24,"rootY":0}}
+  ]},
+  "turn": {"cn":"转身一整圈（2.5D）","sym":true,"dur":3.0,"loop":false,"keys":[
+    {"t":0.00, "d":{"yaw":0}},
+    {"t":0.14, "d":{"yaw":34,"upperArmL":-8,"upperArmR":8,"chest":2}},
+    {"t":0.34, "d":{"yaw":122,"upperArmL":-10,"upperArmR":10,"chest":2}},
+    {"t":0.50, "d":{"yaw":180,"upperArmL":-9,"upperArmR":9,"head":-4}},
+    {"t":0.66, "d":{"yaw":238,"upperArmL":-10,"upperArmR":10,"chest":2}},
+    {"t":0.86, "d":{"yaw":326,"upperArmL":-8,"upperArmR":8}},
+    {"t":1.00, "d":{"yaw":360}}
+  ]},
+  "crouch": {"cn":"蹲下再起","sym":true,"dur":3.4,"loop":false,"keys":[
+    {"t":0.00, "d":{}},
+    {"t":0.20, "d":{"rootY":18,"thighL":30,"thighR":-30,"shinL":-58,"shinR":58,"footL":36,"footR":-36,"chest":6,"upperArmL":-14,"upperArmR":14}},
+    {"t":0.46, "d":{"rootY":70,"thighL":43,"thighR":-43,"shinL":-86,"shinR":86,"footL":53,"footR":-53,"chest":14,"head":6,"upperArmL":-30,"upperArmR":30,"foreArmL":-12,"foreArmR":12}},
+    {"t":0.62, "d":{"rootY":70,"thighL":43,"thighR":-43,"shinL":-86,"shinR":86,"footL":53,"footR":-53,"chest":14,"head":6,"upperArmL":-30,"upperArmR":30,"foreArmL":-12,"foreArmR":12}},
+    {"t":0.86, "d":{"rootY":12,"thighL":16,"thighR":-16,"shinL":-30,"shinR":30,"footL":20,"footR":-20,"chest":3}},
+    {"t":1.00, "d":{}}
+  ]},
+  "stretch": {"cn":"伸懒腰","sym":true,"dur":3.2,"loop":false,"keys":[
+    {"t":0.00, "d":{}},
+    {"t":0.22, "d":{"upperArmL":-96,"upperArmR":96,"foreArmL":-24,"foreArmR":24,"clavicleL":-12,"clavicleR":12,"chest":-3,"head":-5}},
+    {"t":0.44, "d":{"upperArmL":-152,"upperArmR":152,"foreArmL":-8,"foreArmR":8,"clavicleL":-16,"clavicleR":16,"chest":-6,"spine":-4,"head":-11,"mouth":0.55}},
+    {"t":0.60, "d":{"upperArmL":-158,"upperArmR":158,"foreArmL":-4,"foreArmR":4,"clavicleL":-17,"clavicleR":17,"chest":-7,"spine":-5,"head":-13,"mouth":0.9}},
+    {"t":0.80, "d":{"upperArmL":-58,"upperArmR":58,"foreArmL":-10,"foreArmR":10,"clavicleL":-6,"clavicleR":6,"chest":-2,"head":-3,"mouth":0.2}},
+    {"t":1.00, "d":{}}
+  ]},
+  "refpose": {"cn":"照参考图的姿势（一手抬到头发）","sym":false,"dur":0,"loop":false,"keys":[
+    {"t":0.00, "d":{"yaw":8,"rootX":4,"rootY":-2,"clavicleR":10,"upperArmR":111,"foreArmR":120,"handR":20,
+                   "clavicleL":2,"upperArmL":4,"foreArmL":6,"handL":4,"head":4,"neck":3,"chest":-2,"hipR":-4,"mouth":0.12}}
+  ]}
+}
+/* GBT-ACT-SPEC-END */</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     语音→操控 路由表 + 用户模型 快照（严格 JSON，供独立机检与页面自读）
+       · 来源 = tools/codex-scripts/voice-control-route.py --check --emit-state（**只读探针**）
+       · 每格四要素：能力位 / 动作（读·写） / 票 / 现状（现探快照，带 at 与证据）
+       · 🔴 本页**只算路由，不动手**：加这个块 = 把"探针结果"搬进页面看，不是把能力搬进页面
+     ══════════════════════════════════════════════════════════════════════════ -->
+<script id="vcSpec" type="text/x-gbt-voice-control">/* GBT-VOICE-CTRL-BEGIN */
+{
+ "at": "2026-10-08T10:02:57",
+ "src": "tools/codex-scripts/voice-control-route.py --check --emit-state（只读探针 · 唯一门 api.run_task）",
+ "faces": [
+  {
+   "id": "app",
+   "face": "任意 APP",
+   "cn": "启动 / 结束 / 切窗 / 控件穿透读写",
+   "cap": "tentacle（备线：desktop_commander 终端触手）",
+   "read": [
+    "see",
+    "read_text",
+    "list_windows",
+    "process_list",
+    "active_window",
+    "find_text"
+   ],
+   "write": [
+    "launch",
+    "kill",
+    "focus_window",
+    "act_window",
+    "click",
+    "type",
+    "hotkey",
+    "domain_act",
+    "domain_type",
+    "type_to_window",
+    "dismiss_dialog"
+   ],
+   "ticket": "desktop_control",
+   "status": "读取免卡（现探到 13 个窗）· 动手需 desktop_control：有票 2 张（window）",
+   "evidence": "只读窗口枚举现读 13 个窗（例：GBT小土豆, C:\\Python310\\pyt, ZCode）· 触手总纲 3414 字",
+   "probe": "run tentacle {\"action\":\"list_windows\"}（免卡只读） + run tentacle_manifest {}",
+   "at": "2026-10-08T10:02:14",
+   "voice": "「把记事本打开」「把那个窗口关掉」「切到浏览器」—— bridge.py 的 89 动作词典做意图命中"
+  },
+  {
+   "id": "browser",
+   "face": "浏览器",
+   "cn": "CDP 直连系统 Chrome（不是自动化框架开关）",
+   "cap": "browser",
+   "read": [
+    "dom_query",
+    "get_cookies",
+    "get_text",
+    "get_title",
+    "get_url",
+    "intercept_events"
+   ],
+   "write": [
+    "launch",
+    "ensure",
+    "navigate",
+    "click_element",
+    "type_text",
+    "set_cookies",
+    "intercept_requests",
+    "reload",
+    "create_tab",
+    "close_tab",
+    "pin_window"
+   ],
+   "ticket": "browser_control",
+   "status": "读类免卡（但**现在没有开着的调试口**：cdp_available=False ⇒ 先得 launch，而 launch 要 browser_control）· 有票 2 张（window）",
+   "evidence": "status=needs_browser_debug · cdp_available=False · endpoint=http://127.0.0.1:9222 · 动作面 29 个（读类 9 / 写类 20）",
+   "probe": "run browser {\"op\":\"native\",\"action\":\"status\"}（免卡只读）",
+   "at": "2026-10-08T10:02:20",
+   "voice": "「打开某网页」「把页面上的按钮点一下」「读一下这个页面的正文」"
+  },
+  {
+   "id": "devtools",
+   "face": "可调试的（DevTools / CDP）",
+   "cn": "所有能调试的：脚本注入 / 请求拦截 / 页面操控",
+   "cap": "browser（op=native 同一条 CDP 通道）",
+   "read": [
+    "get_cookies",
+    "dom_query",
+    "get_text",
+    "intercept_events",
+    "intercept_status"
+   ],
+   "write": [
+    "execute_script",
+    "inject_script",
+    "intercept_requests",
+    "intercept_stop",
+    "privacy_mode",
+    "screenshot(另需 filesystem_write)"
+   ],
+   "ticket": "browser_control",
+   "status": "动作面在位（execute_script/inject_script/intercept_requests 都在 29 个 CDP 动作里）· 需 browser_control：有票 2 张（window） · screenshot 另需 filesystem_write",
+   "evidence": "status=needs_browser_debug · cdp_available=False · endpoint=http://127.0.0.1:9222 · 动作面 29 个（读类 9 / 写类 20）",
+   "probe": "run browser {\"op\":\"native\",\"action\":\"status\"}（免卡只读）",
+   "at": "2026-10-08T10:02:20",
+   "voice": "「页面里帮我执行这段脚本」「拦截这个页面的请求」—— 这就是主人说的『所有能调试』"
+  },
+  {
+   "id": "bluetooth",
+   "face": "蓝牙",
+   "cn": "扫地机/灯/空调/音箱等 BLE 与经典蓝牙",
+   "cap": "bluetooth + bt_control",
+   "read": [
+    "status",
+    "scan",
+    "list",
+    "classic",
+    "identify",
+    "parse_intent"
+   ],
+   "write": [
+    "connect",
+    "read",
+    "write",
+    "control"
+   ],
+   "ticket": "device_control",
+   "status": "scan/status 免卡 · connect/write/control 需 device_control：有票 2 张（window）",
+   "evidence": "ble_backend=bleak · classic=win-bluetooth-stack · bluetooth ops=['scan', 'connect', 'read', 'write', 'classic', 'status'] · bt_control ops=['control', 'smart_scan', 'parse_intent', 'identify'] · 协议库 8 条",
+   "probe": "run bluetooth {\"op\":\"status\"} + run bt_control {\"op\":\"status\"}（免卡只读）",
+   "at": "2026-10-08T10:02:24",
+   "voice": "「扫一下附近的蓝牙设备」「把灯调暗一点」"
+  },
+  {
+   "id": "wifi",
+   "face": "无线网",
+   "cn": "Wi-Fi 连接/断开/配置（主人点的『调节无线网』）",
+   "cap": null,
+   "read": [
+    "netsh wlan show *（读类键，show 子键 17 把）"
+   ],
+   "write": [],
+   "ticket": null,
+   "status": "**无能力位路由（诚实：这是缺的那一格）**。现状三件分开说：① 可控制键已探到 **43 把**（网卡 Wi-Fi state=connected）；② 已登记进 surface_bind（netsh_registered=True · bound_to=tentacle · 清单 state/surfaces/netsh.json）；③ **执行按键的能力位仍未建** —— surface_bind 的正向『每个键都能经唯一门执行』对 netsh 这一段**尚不成立**；唯一沾边的替代路是 desktop_commander 起进程（吃 process_execute 票：有票 2 张（window）），但它 server=desktop_commander · connected=False · remote_running=False ⇒ **当前未连接**（connect 要 process_execute 票）。",
+   "evidence": "WLAN 可控制键：顶层 15 + show 子键 17 + set 子键 11 = **43 把**；网卡=Wi-Fi(RZ608 Wi-Fi 6E 80MHz) state=connected ssid=BenHouse_5GHz",
+   "probe": "cmd /c .scratch/_probe_netsh_wlan.cmd（自探·只读：netsh wlan help / show ? / set ? / show interfaces）",
+   "at": "2026-10-08T10:02:28",
+   "voice": "「把 Wi-Fi 连到某某网络」「断开无线」—— 键探到了、登记了，但**还差一条能走门的执行位**（未建）"
+  },
+  {
+   "id": "settings",
+   "face": "本机设置面",
+   "cn": "系统设置窗 / 显示 / 声音 等本机设置",
+   "cap": "tentacle（launch ms-settings:… + act_window/domain_act 操作设置窗）",
+   "read": [
+    "list_windows",
+    "window_info",
+    "see_active_window",
+    "read_text",
+    "domain_read"
+   ],
+   "write": [
+    "launch",
+    "focus_window",
+    "act_window",
+    "domain_act",
+    "domain_type",
+    "type"
+   ],
+   "ticket": "desktop_control",
+   "status": "只读窗口枚举免卡（现读 13 窗，本机『设置』窗在列）· 打开/操作设置面需 desktop_control：有票 2 张（window）",
+   "evidence": "只读窗口枚举现读 13 个窗（例：GBT小土豆, C:\\Python310\\pyt, ZCode）· 触手总纲 3414 字",
+   "probe": "run tentacle {\"action\":\"list_windows\"}（免卡只读） + run tentacle_manifest {}",
+   "at": "2026-10-08T10:02:14",
+   "voice": "「打开显示设置」「把系统音量调低」"
+  }
+ ],
+ "tickets": {
+  "process_execute": {
+   "grants": 2,
+   "mode": "window"
+  },
+  "filesystem_write": {
+   "grants": 2,
+   "mode": "window"
+  },
+  "network_private": {
+   "grants": 2,
+   "mode": "window"
+  },
+  "browser_control": {
+   "grants": 2,
+   "mode": "window"
+  },
+  "desktop_control": {
+   "grants": 2,
+   "mode": "window"
+  },
+  "device_control": {
+   "grants": 2,
+   "mode": "window"
+  }
+ },
+ "grant_how": [
+  "CLI 交互确认（auth grant：终端手打 YES）",
+  "主人手写 store/auth_grants.jsonl 追加一行（AI 无发放路径 · ai_can_grant=false）"
+ ],
+ "asr": {
+  "recognizer_ready": true,
+  "recognizers_zh": [
+   "MS-2052-80-DESK | zh-CN"
+  ],
+  "wavein_devices": 0,
+  "capture_ready": false,
+  "wav_leg": "可用（真 WAV 喂进去真识别）",
+  "device_leg": "死的（wavein_devices=0 ⇒ SetInputToDefaultAudioDevice 必抛原文）",
+  "how_to_enable_mic": "只有主人能做：设置 → 系统 → 声音 → 录制 → 显示禁用的设备 → 启用；我（AI）不代劳、不改系统设置",
+  "evidence": "识别器=MS-2052-80-DESK | zh-CN · wavein_devices=0 ⇒ 能听 WAV（真跑 heard=True text='特许' conf=0.256）· 不能听麦（打不开默认录音设备：调用“SetInputToDefaultAudioDevice”并传入“0”个参数时发生异常：“Cannot find ）",
+  "wav_run": {
+   "text": "特许",
+   "confidence": 0.256,
+   "recognizer": "MS-2052-80-DESK",
+   "heard": true,
+   "status": null
+  }
+ },
+ "owner": {
+  "state": "focused",
+  "emotion": "专注",
+  "energy": 0.72,
+  "focus": "deep",
+  "urgency": 0.12,
+  "current_need": "保持低干扰，把细节收束到结论",
+  "confidence": 0.36,
+  "evidence": [
+   "专注:deep",
+   "时段:上午"
+  ],
+  "rule": "这是带置信度的推断，不冒充主人真实想法。"
+ },
+ "owner_demo": {
+  "at": "2026-10-08T09:54:46",
+  "what": "把主人 2026-10-08 的令（原话）走 mind observe（零票）写进用户模型，再独立读回",
+  "before": {
+   "confidence": 0.36,
+   "evidence": [
+    "专注:deep",
+    "时段:上午"
+   ]
+  },
+  "after": {
+   "confidence": 0.68,
+   "evidence": [
+    "信号:praise",
+    "专注:deep",
+    "时段:上午"
+   ]
+  },
+  "audit": "{\"iso\":\"2026-10-08T09:54:46\",\"event\":\"mind_event\",\"meta\":{\"event\":\"user_message\",\"signals\":[\"praise\"],\"mood\":\"开心\",\"owner_confidence\":0.68,\"importance\":0.8}}",
+  "readback": "run mind {\"op\":\"pulse\"} 独立再读（当时）：confidence=0.68",
+  "after_idle": "09:55:26 引擎 idle_reflection 重算推断 → confidence 回 0.36（history 里 09:54:46 user_message 仍在；owner_model 是每轮重算的推断，不是累加分数）"
+ },
+ "owner_paths": {
+  "read_path": "run mind '{\"op\":\"pulse\"}'（CLI·只读）· 面板桥 POST /api/quick {\"action\":\"mind_pulse\"}（holo_pet/panel_server.py:2314）",
+  "write_path": "面板桥 Bridge.send() 每轮已天然 observe：'user_message'（panel_server.py:1372）→ 回合完成 'task_succeeded'/'task_finished'（:1571）→ mind_engine.observe → owner_model",
+  "memory_store": "gbt_allinone/store/mind_state.json（框架唯一心智台账；**不另建第二套记忆**）",
+  "mirror": "重要心智事件镜像进原生生命档案 life_archive（mind_engine.observe 内联，失败不反打断）",
+  "audit": "store/audit.jsonl 事件 mind_event（每轮带 owner_state/owner_confidence）"
+ },
+ "owner_record": [
+  "意图（原话进 mind observe 的 text）",
+  "路由面（本轮落到哪个能力位/动作）",
+  "成没成（task_succeeded / task_failed / task_finished）",
+  "主人纠正了什么（corrected / mistake + lesson → remember_lesson）"
+ ],
+ "honesty": [
+  "六类面里：APP / 浏览器 / 调试（CDP）/ 蓝牙 / 设置面 五面**有路由**（读类畅通；动手类现在**有票**：process_execute, filesystem_write, network_private, browser_control, desktop_control, device_control）",
+  "无线网：**没有能力位**（不是没电没键 —— 键探到 43 把、已登记进 surface_bind）⇒ 差的是**一条能走门的执行位**；直接跑 netsh 改状态=绕门，本件不做",
+  "麦克风：活动录音端点 0 ⇒ 离线识别器**能听 WAV**（真跑出文本）、**不能听麦**；启用被禁用的录音设备只有主人能做（设置→系统→声音→录制→显示禁用的设备）",
+  "本件**不申领任何授权、不跑任何动手动作**（只读探测）；页面只发意图，不许自己动手、不许绕门"
+ ],
+ "check": {
+  "ok": true,
+  "n": 9
+ },
+ "intent": [
+  {
+   "id": "devtools",
+   "words": [
+    "调试",
+    "脚本",
+    "注入",
+    "拦截",
+    "devtools",
+    "cdp",
+    "开发者工具",
+    "控制台"
+   ]
+  },
+  {
+   "id": "wifi",
+   "words": [
+    "无线",
+    "wifi",
+    "wi-fi",
+    "联网",
+    "网络",
+    "热点",
+    "ssid",
+    "断开无线",
+    "连网"
+   ]
+  },
+  {
+   "id": "bluetooth",
+   "words": [
+    "蓝牙",
+    "配对",
+    "灯",
+    "空调",
+    "音箱",
+    "家电",
+    "ble",
+    "手环"
+   ]
+  },
+  {
+   "id": "browser",
+   "words": [
+    "浏览器",
+    "网页",
+    "页面",
+    "网址",
+    "标签页",
+    "chrome",
+    "搜索",
+    "上网"
+   ]
+  },
+  {
+   "id": "settings",
+   "words": [
+    "设置",
+    "控制面板",
+    "音量",
+    "亮度",
+    "显示",
+    "电源",
+    "系统"
+   ]
+  },
+  {
+   "id": "app",
+   "words": [
+    "打开",
+    "启动",
+    "运行",
+    "关掉",
+    "结束",
+    "杀掉",
+    "切到",
+    "窗口",
+    "点击",
+    "输入",
+    "按键",
+    "快捷键",
+    "记事本",
+    "微信",
+    "程序",
+    "应用",
+    "软件"
+   ]
+  }
+ ]
+}
+/* GBT-VOICE-CTRL-END */</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════════
+   数字人页 · 主脚本（<b>经典脚本</b>，零 module / 零网络取数原语 / 零动态求值）
+   作者：AI 执行层（deepseek-flash）· 归属：GBT小土豆V8 / 自由的风
+   ══════════════════════════════════════════════════════════════════════════════ */
+(function () {
+"use strict";
+
+/* ───────────────────────── 0. 小工具 ───────────────────────── */
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, attrs, kids) {
+  var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (var k in (attrs || {})) n.setAttribute(k, attrs[k]);
+  (kids || []).forEach(function (c) { n.appendChild(c); });
+  return n;
+}
+function h(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = String(text);
+  return n;
+}
+function pad(v, n) { v = String(v); while (v.length < n) v = " " + v; return v; }
+function f2(v) { return (Math.round(Number(v) * 100) / 100).toFixed(2); }
+function jstr(o) { return JSON.stringify(o); }
+
+/* ───────────────────────── 1. 规格装载（严格 JSON） ─────────────────────────
+   为什么用 <script type="text/x-gbt-rig"> 而不是在 JS 里写对象字面量：
+     ① 这是<b>数据</b>（零可执行），不是逻辑；
+     ② 保持严格 JSON ⇒ `tools/codex-scripts/dh-rig-check.py` 能<b>独立解析同一份规格</b>，
+        用它自己的实现重算一遍正向运动学 —— 两套实现互相对账，比我自证强。 */
+function readSpec(id) {
+  var node = $(id);
+  if (!node) return null;
+  var raw = node.textContent;
+  /* 去掉 /* … *​/ 形式的头注释（只为可读，JSON 本体不许有注释） */
+  raw = raw.replace(/\/\*[\s\S]*?\*\//g, "");
+  return JSON.parse(raw);
+}
+var RIG = readSpec("rigSpec");
+/* ── 骨架真相源（主人令 2026-10-09：「安装专业化多功能骨架绑定工具，别自己手搓」）──────
+   若 rig-data.js 在（由 Blender **Rigify 标准人形 metarig** 生成），就用它**覆盖手搓表的位置/
+   长度/静息角**；页面多出来的骨（如 jaw）保留，免得打断动作代码。
+   rig-data.js 不在 ⇒ 退回手搓表，并在页上如实标「兜底」。 */
+if (window.GBT_RIG && window.GBT_RIG.骨 && window.GBT_RIG.骨.length) {
+  var _byName = {};
+  RIG.joints.forEach(function (j) { _byName[j.n] = j; });
+  var _hit = 0;
+  window.GBT_RIG.骨.forEach(function (b) {
+    var j = _byName[b.n];
+    if (j) { j.off = b.off; j.len = b.len; j.w = b.w; j.rest = b.rest; j.p = b.p; _hit++; }
+  });
+  RIG.figure = RIG.figure || {};
+  RIG.figure.proportion = "Blender Rigify 标准人形骨架（rig-data.js）· 髋到足底占全高 " +
+    (window.GBT_RIG.比例 ? window.GBT_RIG.比例["髋到足底占全高"] : "?") + " · 覆盖 " + _hit + "/" +
+    RIG.joints.length + " 根 · 手搓表降级为兜底";
+  RIG.rigSource = window.GBT_RIG.来源;
+}
+var ACT = readSpec("actSpec");
+if (!RIG || !ACT) { document.body.textContent = "规格块读不到（rigSpec / actSpec）"; return; }
+
+var BY = {};                        /* name -> joint */
+RIG.joints.forEach(function (j) { BY[j.n] = j; });
+var ORDER = RIG.joints.map(function (j) { return j.n; });
+
+function rot(a) { var r = a * Math.PI / 180; return { c: Math.cos(r), s: Math.sin(r) }; }
+/* ───────────────────────── 2. 正向运动学（唯一真相 = 矩阵链） ─────────────────
+   关节世界位姿 = 父世界位姿 · translate(off) · rotate(a)。
+   角度 a = rest + Σ增量。
+   🔴 这里必须把<b>渲染时施加的同样两个根变换</b>算进来，否则"读数"和"画出来的"会不一致 —— 实测踩过：
+     ① 根平移 rootX/rootY（蹲下时髋要真的下降 70px）；
+     ② yaw 的水平前缩 sx=cos(yaw)（转身时两肩要真的向中轴收拢）。
+   不补这两条，蹲下会被量成"髋没动"、转身会被量成"没动" —— 那正是"坐标合法但看起来没动"的坑。 */
+function fk(pose, rx, ry, yaw) {
+  var CX = RIG.root[0] + (rx || 0);
+  var cy = Math.cos(((yaw || 0)) * Math.PI / 180);
+  var sx = (Math.abs(cy) < 0.28) ? (cy < 0 ? -0.28 : 0.28) : cy;
+  var world = {};
+  ORDER.forEach(function (n) {
+    var j = BY[n], a = j.rest + (pose[n] || 0);
+    var p = j.p ? world[j.p] : null;
+    var base = p ? p : { x: CX, y: RIG.root[1] + (ry || 0), a: 0 };
+    var r0 = rot(base.a);
+    var ex = { x: r0.c, y: r0.s }, ey = { x: -r0.s, y: r0.c };
+    var x = base.x + j.off[0] * ex.x + j.off[1] * ey.x;
+    var y = base.y + j.off[0] * ex.y + j.off[1] * ey.y;
+    var aTot = base.a + a;
+    /* 与 SVG 里 rigG 的 `translate(root) scale(sx,1)` 同一件事：绕根的中轴做水平前缩 */
+    x = CX + (x - CX) * sx;
+    world[n] = { x: x, y: y, a: aTot,
+                 dx: -Math.sin(aTot * Math.PI / 180) * sx, dy: Math.cos(aTot * Math.PI / 180),
+                 sx: sx, j: j };
+  });
+  return world;
+}
+function tipOf(w) { var j = w.j; return { x: w.x + w.dx * j.len, y: w.y + w.dy * j.len }; }
+
+/* ───────────────────────── 3. 动作求值（线性插值 + 段内缓动） ───────────────── */
+function poseAt(actName, t) {
+  var A = ACT[actName];
+  if (!A) return { pose: {}, mouth: 0, yaw: 0, rootX: 0, rootY: 0, breath: 0, t: t };
+  var ks = A.keys;
+  if (A.dur === 0 || ks.length === 1) return pack(ks[0].d, 0);
+  var u = (A.loop ? ((t % 1) + 1) % 1 : Math.min(1, Math.max(0, t)));
+  for (var i = 0; i < ks.length - 1; i++) {
+    var a = ks[i], b = ks[i + 1];
+    if (u >= a.t && u <= b.t) {
+      var span = (b.t - a.t) || 1;
+      var k = (u - a.t) / span;
+      k = k * k * (3 - 2 * k);                       /* smoothstep（只影响观感，不影响取证口径） */
+      var mix = {};
+      var names = {};
+      [a.d, b.d].forEach(function (o) { for (var q in o) names[q] = 1; });
+      for (var q in names) {
+        var va = (a.d[q] || 0), vb = (b.d[q] || 0);
+        mix[q] = va + (vb - va) * k;
+      }
+      return pack(mix, u);
+    }
+  }
+  return pack(ks[ks.length - 1].d, u);
+  function pack(d, u2) {
+    return { pose: d, mouth: d.mouth || 0, yaw: d.yaw || 0, rootX: d.rootX || 0,
+             rootY: d.rootY || 0, breath: d.breath || 0, t: u2 };
+  }
+}
+function jointPose(poseObj) {          /* 只取关节角（供 fk） */
+  var out = {};
+  ORDER.forEach(function (n) { if (poseObj[n]) out[n] = poseObj[n]; });
+  return out;
+}
+/* 世界位姿（把根平移与 yaw 前缩一并算进来 —— 与画面上施加的变换同源） */
+function worldAt(actName, t) {
+  var s = poseAt(actName, t);
+  return { world: fk(jointPose(s.pose), s.rootX, s.rootY, s.yaw), s: s };
+}
+
+/* ───────────────────────── 4. 造型（按参考图配色与比例） ─────────────────────
+   配色取自 holo_pet_w3/digital-human/reference-02.jpg：黑连体装 + 黄绑带 + 青蓝刻线 + 02 标；
+   大腿露肤、过膝黑皮靴带绑带；短黑发；灰影棚背景。 */
+var COL = {
+  skin: "#f0c9ad", skin2: "#e2b295", suit: "#14161c", suit2: "#20242e",
+  gold: "#e8c04a", gold2: "#c9a334", cyan: "#3fd0e8", boot: "#111318", boot2: "#1c2029",
+  hair: "#14161a", hair2: "#22262e", line: "#2a2f3a", eye: "#2a2d36"
+};
+/* 造型统一走下面的 shapeFor()：每个关节按自己的骨长/骨宽现画，不再用"通用圆角骨"占位 */
+function shapeFor(name, j) {
+  var g = el("g", {});
+  function add(node, fill, stroke, sw, op) {
+    if (fill) node.setAttribute("fill", fill);
+    if (stroke) { node.setAttribute("stroke", stroke); node.setAttribute("stroke-width", sw || 1); }
+    if (op != null) node.setAttribute("opacity", op);
+    g.appendChild(node); return node;
+  }
+  function P(d, fill, stroke, sw, op, ty) {
+    var n = el("path", { d: d, "stroke-linejoin": "round", "stroke-linecap": "round" });
+    if (ty) n.setAttribute("transform", "translate(0," + ty + ")");
+    return add(n, fill, stroke, sw, op);
+  }
+  function R(x, y, w2, h2, fill, rx) {
+    return add(el("rect", { x: x, y: y, width: w2, height: h2, rx: rx || 0 }), fill);
+  }
+  var L, W = j.w, len = j.len;
+  switch (name) {
+    /* —— 躯干 —— */
+    case "pelvis":                                  /* 髋/连体短裤（黑 + 黄腰带 + 02） */
+      P("M -20 -16 L 20 -16 L 23 10 L 14 26 L -14 26 L -23 10 Z", COL.suit);
+      R(-21, 1.5, 42, 5.4, COL.gold, 1);
+      R(-7, 1, 14, 6.6, COL.gold2, 1.5);
+      add(el("text", { x: 0, y: 6.8, "text-anchor": "middle", "font-size": 5.2,
+                       fill: "#0d0f14", "font-weight": "700" }), null).textContent = "02";
+      break;
+    case "spine":                                   /* 腹部：镂空露肤 + 青色斜刻线（参考图设计） */
+      P("M -16 0 L 16 0 L 19 30 L -19 30 Z", COL.suit);
+      P("M -7 2 q 7 -3 14 0 l 4 26 q -11 4 -22 0 Z", COL.skin);
+      P("M -2.6 8 l 6.6 5 l -2 6.6 l -5.8 -4.4 Z", COL.cyan, null, 0, 0.9);
+      break;
+    case "chest":                                   /* 胸：黑战术装 + 黄绑带 + 胸口环 + 02 */
+      P("M -22 -44 L 22 -44 L 19 -6 L 16 30 L -16 30 L -19 -6 Z", COL.suit);
+      add(el("ellipse", { cx: -21, cy: -42, rx: 5.4, ry: 5 }), COL.suit);
+      add(el("ellipse", { cx: 21, cy: -42, rx: 5.4, ry: 5 }), COL.suit);
+      P("M -20 -41 L -4 -18", null, COL.gold, 3.6);          /* 左绑带 */
+      P("M 20 -41 L 4 -18", null, COL.gold, 3.6);            /* 右绑带 */
+      P("M -11 -45 L -13 -30", null, COL.gold, 2.6);
+      P("M 11 -45 L 13 -30", null, COL.gold, 2.6);
+      add(el("circle", { cx: 0, cy: -18, r: 5.8, fill: "none" }), null, COL.gold2, 2.4);
+      P("M -10 -6 L 10 -6 L 12.6 9 L -12.6 9 Z", COL.suit2);  /* 胸甲板 */
+      add(el("text", { x: 0, y: 6.2, "text-anchor": "middle", "font-size": 6.6,
+                       fill: COL.cyan, "font-weight": "700" }), null).textContent = "02";
+      P("M -10 -46 q 10 4.5 20 0 l -1.6 6.4 q -8.4 3.4 -16.8 0 Z", COL.suit2);   /* 领口 */
+      break;
+    case "neck":
+      P("M -7 -2 h 14 v 16 h -14 Z", COL.skin2);
+      break;
+    case "head":                                    /* 脸 + 短黑发（中分·及下颌） */
+      add(el("ellipse", { cx: 0, cy: -22, rx: 18.6, ry: 23 }), COL.skin);
+      P("M -20 -19 q -3.4 -30.5 20 -30.5 q 23.4 0 20 30.5 q -6 -12.5 -20 -12.5 q -14 0 -20 12.5 Z", COL.hair);
+      P("M -20 -21 q -5 11 -6 23 q 6.4 -3 7 -11.6 Z", COL.hair2);
+      P("M 20 -21 q 5 11 6 23 q -6.4 -3 -7 -11.6 Z", COL.hair2);
+      add(el("ellipse", { cx: -7.2, cy: -24, rx: 2.9, ry: 1.9 }), "#fff");
+      add(el("ellipse", { cx: 7.2, cy: -24, rx: 2.9, ry: 1.9 }), "#fff");
+      add(el("circle", { cx: -7.0, cy: -24, r: 1.55 }), COL.eye);
+      add(el("circle", { cx: 7.4, cy: -24, r: 1.55 }), COL.eye);
+      P("M -10.6 -29.4 q 3.4 -2.2 6.8 0", null, COL.hair, 1.5);
+      P("M 3.8 -29.4 q 3.4 -2.2 6.8 0", null, COL.hair, 1.5);
+      P("M 0 -20 q 1.5 2.4 0 3.6", null, COL.skin2, 1.1);
+      g.setAttribute("data-mouth", "1");
+      break;
+    case "jaw":
+      add(el("ellipse", { cx: 0, cy: -4, rx: 10.6, ry: 6.4 }), COL.skin2);
+      P("M -7 -2.4 q 7 4.6 14 0", null, COL.skin, 1.2);
+      break;
+    /* —— 手臂 —— */
+    case "upperArmL": case "upperArmR":
+      P("M -7.4 0 L 7.4 0 L 6 41 L 0 56 L -6 41 Z", COL.suit);
+      break;
+    case "foreArmL": case "foreArmR":
+      P("M -6 0 L 6 0 L 4.9 30 L 0 52 L -4.9 30 Z", COL.suit);
+      R(-6.5, 8, 13, 4.5, COL.gold, 1);
+      R(-6.3, 17, 12.6, 3.3, COL.gold, 1);
+      break;
+    case "handL": case "handR":
+      add(el("ellipse", { cx: 0, cy: 9, rx: 5.2, ry: 9.6 }), COL.skin);
+      add(el("ellipse", { cx: 0, cy: 17.5, rx: 3.9, ry: 4.4 }), COL.skin2);
+      break;
+    /* —— 腿：大腿露肤；过膝黑皮靴（膝上就起，一直包到脚）；脚掌 = 靴头 —— */
+    case "thighL": case "thighR":
+      P("M -10.2 0 L 10.2 0 L 8.8 46 L -8.8 46 Z", COL.skin);          /* 大腿上段露肤 */
+      P("M -10.6 43 L 10.6 43 L 8.2 132 L -8.2 132 Z", COL.boot);      /* 靴筒（过膝） */
+      R(-10.4, 47, 20.8, 4.4, COL.gold2, 1);
+      break;
+    case "shinL": case "shinR":
+      P("M -8 0 L 8 0 L 6.6 130 L -6.6 130 Z", COL.boot);
+      R(-7.4, 12, 14.8, 4, COL.gold2, 1);
+      R(-7.2, 70, 14.4, 4, COL.gold2, 1);
+      P("M -6 30 l 12 0 M -6 46 l 12 0", null, COL.boot2, 1.4);
+      break;
+    case "footL": case "footR":
+      P("M -7.6 0 L 7.6 0 L 8.4 24 L -8.4 30 Z", COL.boot);
+      R(-8.6, 26, 17.2, 7, COL.boot2, 2);                              /* 鞋跟 */
+      break;
+    case "toeL": case "toeR":
+      P("M -8.6 2 q 8.6 -4 17.2 0 l 0 10 q -8.6 4 -17.2 0 Z", COL.boot2);
+      break;
+    default:
+      P("M " + (-W / 2) + " 0 L " + (W / 2) + " 0 L " + (W / 2 - 2) + " " + Math.max(len, 4) +
+        " L " + (-W / 2 + 2) + " " + Math.max(len, 4) + " Z", COL.suit2);
+  }
+  return g;
+}
+
+/* ───────────────────────── 5. 建 rig（层级 g，非切图） ───────────────────────── */
+var slot = $("rigslot");
+/* viewBox 收在"人物活动范围"上：抬臂最高到 y≈78、两臂展开最远到 x≈91/269；
+   背景（影棚灰）交给 CSS，所以 SVG 里不画底 —— 这样 SVG 按高度铺满时两侧不会出现一个"盒子"。 */
+var VB = [20, 55, 320, 610];
+var svg = el("svg", { id: "rigsvg", viewBox: VB.join(" "), preserveAspectRatio: "xMidYMid meet",
+                      xmlns: "http://www.w3.org/2000/svg" });
+var defs = el("defs", {});
+defs.appendChild(el("radialGradient", { id: "gFloor", cx: "0.5", cy: "0.5", r: "0.5" },
+  [el("stop", { offset: "0", "stop-color": "#000", "stop-opacity": "0.55" }),
+   el("stop", { offset: "1", "stop-color": "#000", "stop-opacity": "0" })]));
+svg.appendChild(defs);
+svg.appendChild(el("ellipse", { cx: 180, cy: RIG.ground + 4, rx: 78, ry: 13, fill: "url(#gFloor)" }));
+
+var rigG = el("g", { id: "rig" });
+svg.appendChild(rigG);
+slot.appendChild(svg);
+
+var JN = {};                        /* name -> <g class=j> */
+var SHAPES = {};                    /* name -> shape <g> */
+var BONEG = {};                     /* name -> bone overlay */
+function buildRig() {
+  ORDER.forEach(function (n) {
+    var j = BY[n];
+    var g = el("g", { class: "j", id: "j-" + n, "data-j": n });
+    var shp = shapeFor(n, j);
+    SHAPES[n] = shp;
+    g.appendChild(shp);
+    JN[n] = g;
+    /* 关节轴点（可选显示） */
+    g.appendChild(el("circle", { class: "piv", cx: 0, cy: 0, r: 1.9, fill: "#ff4d4d", opacity: "0" }));
+    /* 骨（可选显示） */
+    if (j.len !== 0) {
+      var bg = el("g", { class: "boneg", opacity: "0" });
+      bg.appendChild(el("line", { x1: 0, y1: 0, x2: 0, y2: j.len, stroke: "#5ef1a8", "stroke-width": 1.4 }));
+      bg.appendChild(el("circle", { cx: 0, cy: 0, r: 2.4, fill: "#5ef1a8" }));
+      bg.appendChild(el("circle", { cx: 0, cy: j.len, r: 1.7, fill: "#5ef1a8" }));
+      BONEG[n] = bg; g.appendChild(bg);
+    }
+    if (j.p) JN[j.p].appendChild(g); else rigG.appendChild(g);   /* 根关节（pelvis）必须挂到 rig 上 */
+  });
+}
+buildRig();
+
+/* 嘴型：head 组里的一枚 path，每帧按 mouth(0..1) 重画（真几何变化，不是换贴图） */
+var mouthPath = el("path", { d: "M -6 0 q 6 2 12 0 q -6 3 -12 0 Z", fill: "#8d3b45", stroke: "#5d222a", "stroke-width": 1 });
+var mouthG = el("g", { transform: "translate(0,-11)" });
+mouthG.appendChild(mouthPath);
+JN["head"].appendChild(mouthG);
+
+/* ───────────────────────── 6. 逐帧渲染 ───────────────────────── */
+var poseNow = {}, lastFrame = null, talkPhase = 0;
+function render(s) {
+  var world = fk(jointPose(s.pose), s.rootX, s.rootY, s.yaw);
+  /* 根：yaw 用<b>水平前缩</b> + 深度换序表示（2.5D，诚实标注，不是真 3D） */
+  var yawRad = s.yaw * Math.PI / 180, cs = Math.cos(yawRad);
+  var sx = (Math.abs(cs) < 0.28) ? (cs < 0 ? -0.28 : 0.28) : cs;
+  rigG.setAttribute("transform",
+    "translate(" + (RIG.root[0] + s.rootX) + "," + (RIG.root[1] + s.rootY) + ") scale(" + f2(sx) + ",1)");
+  /* 每个关节：translate(off) rotate(rest+Δ)。这就是"骨骼层级驱动"。 */
+  ORDER.forEach(function (n) {
+    var j = BY[n], a = j.rest + (s.pose[n] || 0);
+    JN[n].setAttribute("transform", "translate(" + j.off[0] + "," + j.off[1] + ") rotate(" + f2(a) + ")");
+  });
+  /* 嘴型：真几何重画（宽度与开口都随 mouth 变化），并同步下颌角 */
+  var m = Math.max(0, Math.min(1, s.mouth));
+  var gap = 1 + 8.4 * m, wide = -0.6 + 1.4 * m;
+  mouthPath.setAttribute("d",
+    "M " + (-6.4 + 0.4 * m) + " -1.2 q " + (6.4 * wide * 0.36) + " " + (-2.4 * m) + " " + (12.6 * wide * 0.72) + " 0" +
+    " q " + (-2.2 * wide) + " " + (gap + 1.6) + " " + (-6.3 * wide) + " " + gap +
+    " q " + (-4.1 * wide) + " -0.4 " + (-6.3 * wide) + " " + (-gap) + " Z");
+  mouthPath.setAttribute("opacity", String(0.35 + 0.65 * (1 - m)));
+  /* 深度换序：只在<b>转到侧面/背面</b>（yaw 90~270）时把 R 臂塞到躯干后面；其余时候两臂都在前 */
+  var y = ((s.yaw % 360) + 360) % 360;
+  var chest = JN["chest"], torso = SHAPES["chest"];
+  if (y > 90 && y < 270) {
+    chest.insertBefore(JN["clavicleR"], torso);
+    chest.appendChild(JN["clavicleL"]);
+  } else {
+    chest.appendChild(JN["clavicleR"]);
+    chest.appendChild(JN["clavicleL"]);
+  }
+  /* 呼吸：胸整体微缩放（真几何变化，量级很小，只做"活着"的观感） */
+  SHAPES["chest"].setAttribute("transform", "scale(" + f2(1 + 0.016 * (s.breath || 0)) + ",1)");
+  poseNow = s;
+  return { world: world, s: s };
+}
+function boneView(on) {
+  ORDER.forEach(function (n) { if (BONEG[n]) BONEG[n].setAttribute("opacity", on ? "0.95" : "0"); });
+  ORDER.forEach(function (n) {
+    var c = JN[n].querySelector(".piv"); if (c) c.setAttribute("opacity", on ? "0.95" : "0");
+  });
+}
+
+/* ───────────────────────── 7. 播放器 ───────────────────────── */
+var player = { act: "idle", t: 0, playing: true, fps: 0, frames: 0, t0: 0 };
+function setAct(name) {
+  player.act = name; player.t = 0; player.playing = true; player.t0 = performance.now();
+  $("curAct").textContent = BY && ACT[name] ? (name + " · " + ACT[name].cn) : name;
+  Array.prototype.forEach.call($("actbar").children, function (b) {
+    b.classList.toggle("on", b.getAttribute("data-act") === name);
+  });
+  buildStrip(name);
+  runProof(name);
+}
+var actbar = $("actbar");
+Object.keys(ACT).forEach(function (name) {
+  var b = h("button", "", name + " " + ACT[name].cn);
+  b.setAttribute("data-act", name);
+  b.onclick = function () { setAct(name); };
+  actbar.appendChild(b);
+});
+function loop(now) {
+  if (!lastFrame) lastFrame = now;
+  var dt = now - lastFrame; lastFrame = now;
+  if (dt > 0) player.fps = Math.round(1000 / dt);
+  var A = ACT[player.act];
+  if (player.playing) {
+    if (A.dur > 0) player.t += dt / (A.dur * 1000);
+    if (player.t >= 1) { if (A.loop) player.t -= 1; else { player.t = 1; player.playing = false; } }
+  }
+  var s = poseAt(player.act, player.t);
+  /* 说话时：把 talk 的<b>增量叠加</b>在当前动作之上（不替换动作）—— 嘴型/点头/手势都从骨骼角来 */
+  if (speaking) {
+    var tp = poseAt("talk", (now / 1000) % 1);
+    for (var q in tp.pose) { if (q !== "mouth") s.pose[q] = (s.pose[q] || 0) + tp.pose[q]; }
+    s.mouth = tp.mouth; talkPhase = tp.t;
+  }
+  if (s.mouth) s.pose.jaw = 3.4 * s.mouth;
+  var r = render(s);
+  player.frames++;
+  var w = r.world;
+  $("poseDump").textContent =
+    "动作=" + player.act + "  t=" + f2(player.t) + "  帧=" + player.frames + "  fps=" + player.fps + "\n" +
+    "髋(pelvis) 世界=(" + f2(w.pelvis.x) + "," + f2(w.pelvis.y) + ")  髋位移Δ=(" + f2(w.pelvis.x - RIG.root[0]) + "," + f2(w.pelvis.y - RIG.root[1]) + ")\n" +
+    "头(head) 角=" + f2(w.head.a) + "°  右肩(clavicleR)=" + f2(w.clavicleR.a) + "°  左上臂(upperArmL)=" + f2(w.upperArmL.a) + "°  左大腿(thighL)=" + f2(w.thighL.a) + "°\n" +
+    "嘴开=" + f2(s.mouth) + "  下颌(jaw)=" + f2(w.jaw.a) + "°  yaw=" + f2(s.yaw) + "°  呼吸=" + f2(s.breath) +
+    (speaking ? "  [说话中·臂=" + speaking + "·talk相位=" + f2(talkPhase) + "]" : "");
+  $("phase").textContent = f2(player.t);
+  $("fps").textContent = player.fps;
+  $("stagehint").textContent = "动作 " + player.act + " · t=" + f2(player.t) +
+      (speaking ? " · 说话中（嘴型+点头+手势叠加）" : "");
+  if (speaking) {
+    $("mouthLive").textContent = "嘴开朗度 " + f2(s.mouth) + " · 下颌角 " + f2(w.jaw.a) + "° · 点头 " +
+      f2(s.pose.head || 0) + "° · talk 相位 " + f2(talkPhase) + " · 臂 " + speaking;
+    chain(7, '<span class="st ok">同步中</span> 嘴型(m=' + f2(s.mouth) + ") + 点头(" + f2(s.pose.head || 0) +
+      "°) + 手势(" + f2(s.pose.foreArmR || 0) + "°) 已<b>叠加</b>在动作 " + player.act + " 之上", "");
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ───────────────────────── 8. 动作取证（真在动 + 基线） ───────────────────────── */
+var SAMPLES = 41;
+function sample(actName) {
+  var rows = [];
+  for (var i = 0; i < SAMPLES; i++) {
+    var t = i / (SAMPLES - 1);
+    var r = worldAt(actName, t);
+    rows.push({ t: t, w: r.world, s: r.s });
+  }
+  return rows;
+}
+/* 取证量（三个，各管一件事 —— 不用一个数硬扛）：
+     d1   单帧最大 |Δ角|   → 「真在动」：相邻帧之间确实在变（不是摆一个静态姿势）
+     d2   相对 t=0 的最大角偏移 → 「幅度」：慢慢转身这种"每帧很小、总量很大"的动作靠它才算得出来
+     disp 关节世界坐标相对 t=0 的最大位移(px)
+   root 是<b>伪关节</b>：它没有骨头，但角度=yaw、位置=根位移 —— 转身/走动/蹲起的驱动量就在这儿；
+   不把它算进来，转身会被误判成"没动"（它每帧只转几度，但总量 360°）。 */
+var MJOINTS = ORDER.concat(["root"]);
+function mpoint(row, n) {
+  if (n === "root") {
+    return { a: row.s.yaw, x: RIG.root[0] + row.s.rootX, y: RIG.root[1] + row.s.rootY, pseudo: true };
+  }
+  var w = row.w[n];
+  return { a: w.a, x: w.x, y: w.y };
+}
+function metric(rows) {
+  var base = {}, prev = {}, per = {};
+  MJOINTS.forEach(function (n) {
+    base[n] = mpoint(rows[0], n); prev[n] = base[n];
+    per[n] = { d1: 0, d2: 0, disp: 0 };
+  });
+  var maxD1 = 0, whoD1 = "", maxD2 = 0, whoD2 = "", maxDisp = 0, whoDisp = "";
+  rows.forEach(function (row, i) {
+    MJOINTS.forEach(function (n) {
+      var p = mpoint(row, n);
+      if (i > 0) {
+        var d = Math.abs(p.a - prev[n].a);
+        if (d > per[n].d1) per[n].d1 = d;
+        if (d > maxD1) { maxD1 = d; whoD1 = n; }
+      }
+      var d2 = Math.abs(p.a - base[n].a);
+      if (d2 > per[n].d2) per[n].d2 = d2;
+      if (d2 > maxD2) { maxD2 = d2; whoD2 = n; }
+      var dx = p.x - base[n].x, dy = p.y - base[n].y, dd = Math.sqrt(dx * dx + dy * dy);
+      if (dd > per[n].disp) per[n].disp = dd;
+      if (dd > maxDisp) { maxDisp = dd; whoDisp = n; }
+      prev[n] = p;
+    });
+  });
+  return { maxD1: maxD1, whoD1: whoD1, maxD2: maxD2, whoD2: whoD2, maxDisp: maxDisp, whoDisp: whoDisp,
+           per: per, rows: rows };
+}
+var BASELINE = null;
+function baseline() {
+  if (!BASELINE) BASELINE = metric(sample("idle"));
+  return BASELINE;
+}
+var motionEvidence = {};
+function runProof(name) {
+  var m = metric(sample(name));
+  var b = baseline();
+  motionEvidence[name] = m;
+  var tb = $("proofTbl").querySelector("tbody");
+  while (tb.firstChild) tb.removeChild(tb.firstChild);
+  var hotJ = 0;
+  MJOINTS.forEach(function (n) {
+    var j = BY[n], p = m.per[n], t0a = mpoint(m.rows[0], n).a;
+    var real = (p.d2 > 5) && (p.d1 > 0.2);
+    if (real) hotJ++;
+    var tr = h("tr", real ? "hl" : "");
+    tr.appendChild(h("td", "mono", n === "root" ? n + "（根·朝向/位移）" : n + " " + j.cn));
+    tr.appendChild(h("td", "", n === "root" ? "伪" : (j.side || "C")));
+    tr.appendChild(h("td", "n", f2(t0a)));
+    tr.appendChild(h("td", "n", f2(p.d2)));
+    tr.appendChild(h("td", "n", f2(p.d1)));
+    tr.appendChild(h("td", "n", f2(p.disp)));
+    tr.appendChild(h("td", "", real ? "是" : "否"));
+    tb.appendChild(tr);
+  });
+  var isIdle = (name === "idle");
+  var isStatic = (name === "refpose");
+  var ok1 = m.maxD2 > 5;                                  /* 幅度：慢动作也吃得到 */
+  var ok2 = m.maxD1 > 0.2;                                /* 连续性：不是"跳变换图" */
+  var ok3 = m.maxDisp > 2;                                /* 位移：真几何变化 */
+  var ok4 = (m.maxD2 > 2 * b.maxD2) && (m.maxDisp > 2 * b.maxDisp);   /* 超过现量基线 */
+  var pass = ok1 && ok2 && ok3 && ok4;
+  var baseOk = b.maxD2 <= 5 && b.maxDisp <= 8;
+  var d = $("verdict");
+  d.className = isStatic ? "warn" : (isIdle ? (baseOk ? "ok-box" : "bad-box") : (pass ? "ok-box" : "bad-box"));
+  if (isStatic) {
+    d.innerHTML = "动作 <b>refpose（照参考图的姿势）</b> —— <b>这是一个「摆出来的静态姿势」，不是动作</b>：它 dur=0、只有一个关键帧，「不动」是对的。<br />" +
+      "所以这里<b>如实标它静态、不放进「真在动」的判决里</b>（硬凑成「在动」才是假绿）。要看去掉的姿势：点它的按钮，" +
+      "「重心/肩/前臂」这些读数就在上面表里（现在全是 0，因为它是单帧）。<br />" +
+      "<span class='note'>它的用途是给第 ③ 卡（1:1 对照）和一个「模仿参考图」的定妆镜 —— 与「动作取证」是两件事。</span>";
+  } else if (isIdle) {
+    d.innerHTML = "动作 <b>idle（常态呼吸+微重心漂移）</b> —— <b>它本身就是基线</b>，判据反过来：常态应当只有「呼吸级」微动。<br />" +
+      "现量基线：幅度 <b>" + f2(b.maxD2) + "°</b>（" + b.whoD2 + "）· 单帧 <b>" + f2(b.maxD1) + "°</b> · 位移 <b>" + f2(b.maxDisp) +
+      "px</b>（" + b.whoDisp + "） ⇒ " + (baseOk ? "<b>量级正确（≤5°/≤8px）</b>，可当被测动作的对照底数" :
+        "<b>偏大：检查是不是把动作混进了 idle</b>") + "<br />" +
+      "<span class='note'>那条「动作 &gt; 2× 基线」对 idle 自己当然不成立 —— 这正是设计：<b>基线不许自证为信号</b>。" +
+      "点上排任一动作（wave/walk/turn/crouch/stretch 都是全身动作），看它是不是真的超过这个现量底数。</span>";
+  } else {
+    d.innerHTML = "动作 <b>" + name + "（" + ACT[name].cn + "）</b> · 判决 <b>" + (pass ? "真在动" : "没真动") + "</b><br />" +
+      "① 幅度（相对 t=0 最大角偏移）= <b>" + f2(m.maxD2) + "°</b>（" + m.whoD2 + "）" + (ok1 ? " &gt; 5° ✔" : " ≤ 5° ✘") + "<br />" +
+      "② 连续性（相邻帧最大 |Δ角|）= <b>" + f2(m.maxD1) + "°</b>（" + m.whoD1 + "）" + (ok2 ? " &gt; 0.2° ✔" : " ≤ 0.2° ✘") + "<br />" +
+      "③ 位移（相对 t=0 最大关节位移）= <b>" + f2(m.maxDisp) + "px</b>（" + m.whoDisp + "）" + (ok3 ? " &gt; 2px ✔" : " ≤ 2px ✘") + "<br />" +
+      "④ 现量基线对比：幅度 " + f2(m.maxD2) + "° vs 基线 " + f2(b.maxD2) + "°（须 ≥2×）· 位移 " + f2(m.maxDisp) +
+      "px vs 基线 " + f2(b.maxDisp) + "px（须 ≥2×） ⇒ " + (ok4 ? "已超 ✔" : "未超 ✘") + "<br />" +
+      "有真实变化的关节数：<b>" + hotJ + " / " + MJOINTS.length + "</b>" +
+      (name === "turn" ? "<br /><span class='note'>转身是 <b>2.5D</b>：yaw 0→360 用水平前缩(scaleX 1→-1) + 深度换序表达，不是真 3D 旋转 —— 如实标注；它的驱动量在表里的 <b>root</b> 行（yaw 那一列）。</span>" : "");
+  }
+  $("proofTag").textContent = name + " · " + (isStatic ? "静态姿势" : (isIdle ? "现量基线" : (pass ? "真在动" : "未达门")));
+  var cm = $("chipMotion");
+  if (cm) {
+    cm.className = "chip " + (isStatic ? "ink" : (isIdle ? "ink" : (pass ? "ok" : "bad")));
+    cm.innerHTML = "动作 <b>" + name + (isStatic ? " 静态 " : (isIdle ? " 基线 " + f2(b.maxD2) + "°" : (pass ? " 真在动 " + f2(m.maxD2) + "°" : " 未达门 "))) + "</b>";
+  }
+}
+
+/* 连续帧图条：同一 rig 在 6 个采样点各重画一遍（证明"每一帧都是真的不同姿态"） */
+function buildStrip(name) {
+  var box = $("strip");
+  while (box.firstChild) box.removeChild(box.firstChild);
+  var p0 = poseAt(name, 0);
+  [0, 0.2, 0.4, 0.6, 0.8, 1.0].forEach(function (t) {
+    var s = poseAt(name, t);
+    var cell = h("div", "cell");
+    var sv = el("svg", { viewBox: "20 90 320 550", xmlns: "http://www.w3.org/2000/svg" });
+    sv.appendChild(el("rect", { x: 20, y: 90, width: 320, height: 550, fill: "#0b1220" }));
+    var yawRad = s.yaw * Math.PI / 180, cs = Math.cos(yawRad);
+    var sx = (Math.abs(cs) < 0.28) ? (cs < 0 ? -0.28 : 0.28) : cs;
+    var root = el("g", { transform: "translate(" + (RIG.root[0] + s.rootX) + "," + (RIG.root[1] + s.rootY) +
+      ") scale(" + f2(sx) + ",1)" });
+    var nodes = {};                       /* 迷你 rig：同一套层级，只是画法换成"细线 + 关节点" */
+    ORDER.forEach(function (n) {
+      var j = BY[n], a = j.rest + (s.pose[n] || 0);
+      var g2 = el("g", { transform: "translate(" + j.off[0] + "," + j.off[1] + ") rotate(" + f2(a) + ")" });
+      if (j.len !== 0) {
+        g2.appendChild(el("line", { x1: 0, y1: 0, x2: 0, y2: j.len, "stroke-width": 2.6,
+          stroke: (j.side === "L" ? "#7dd3fc" : j.side === "R" ? "#fca5a5" : "#a7f3d0") }));
+      }
+      g2.appendChild(el("circle", { cx: 0, cy: 0, r: 2.7, fill: "#f5b041" }));
+      nodes[n] = g2;
+      if (j.p) nodes[j.p].appendChild(g2); else root.appendChild(g2);
+    });
+    sv.appendChild(root);
+    /* 该帧相对 t=0 的<b>最大关节角变化</b>（用同一套角度定义现算） */
+    var mx = 0;
+    ORDER.forEach(function (n) {
+      var a0 = BY[n].rest + (p0.pose[n] || 0), a1 = BY[n].rest + (s.pose[n] || 0);
+      mx = Math.max(mx, Math.abs(a1 - a0));
+    });
+    cell.appendChild(sv);
+    cell.appendChild(h("div", "cap", "t=" + f2(t) + " · maxΔ " + f2(mx) + "°"));
+    if (mx > 3 && t > 0) cell.className = "cell hot";
+    box.appendChild(cell);
+  });
+}
+
+/* ───────────────────────── 9. 骨架表 + 对称读数 ───────────────────────── */
+function boneRigSymmetry() {
+  var w = fk({});
+  var cx = 2 * RIG.root[0];              /* 镜像轴 = 根的中线（静息位 rootX=0 ⇒ x=180） */
+  var worst = 0, worstPair = "", bad = [];
+  RIG.pairs.forEach(function (p) {
+    var L = w[p[0]], R = w[p[1]];
+    var ex = Math.abs(L.x + R.x - cx), ey = Math.abs(L.y - R.y);
+    var d = Math.max(ex, ey);
+    if (d > worst) { worst = d; worstPair = p[0] + " / " + p[1]; }
+    if (d > 0.5) bad.push(p[0] + ":" + f2(d) + "px");
+  });
+  return { worst: worst, worstPair: worstPair, bad: bad, world: w };
+}
+function jointTable() {
+  var tb = $("jointTbl").querySelector("tbody");
+  while (tb.firstChild) tb.removeChild(tb.firstChild);
+  var pairMap = {};
+  RIG.pairs.forEach(function (p) { pairMap[p[0]] = p[1]; pairMap[p[1]] = p[0]; });
+  ORDER.forEach(function (n, i) {
+    var j = BY[n];
+    var tr = h("tr", "");
+    tr.appendChild(h("td", "n", i + 1));
+    tr.appendChild(h("td", "", n + " " + j.cn));
+    tr.appendChild(h("td", "mono", j.p || "—(根)"));
+    tr.appendChild(h("td", "", j.side));
+    tr.appendChild(h("td", "n", "[" + j.off[0] + ", " + j.off[1] + "]"));
+    tr.appendChild(h("td", "n", j.len));
+    tr.appendChild(h("td", "n", j.rest));
+    tr.appendChild(h("td", "mono", pairMap[n] || "—"));
+    tb.appendChild(tr);
+  });
+  var s = boneRigSymmetry();
+  var sr = $("symRead");
+  sr.className = s.bad.length ? "bad-box" : "ok-box";
+  sr.innerHTML = "静息位（全部动作为空）下逐对镜像核验：<b>" + RIG.pairs.length + "</b> 对 · " +
+    "最大镜像误差 <b>" + f2(s.worst) + "px</b>（" + s.worstPair + "）· " +
+    (s.bad.length ? ("<b>有 " + s.bad.length + " 对超 0.5px：" + s.bad.join(" · ") + "</b>") : "全部 ≤ 0.5px ⇒ <b>左右对称</b>") +
+    "<br />镜像是<b>算出来的</b>（同一套 fk 走两遍），不是画的时候手动对齐的。" +
+    "关节总数 <b>" + ORDER.length + "</b>（含下颌）+ 镜像对 <b>" + RIG.pairs.length + "</b>。";
+  $("symTag").textContent = s.bad.length ? "不对称!" : "对称 (" + f2(s.worst) + "px)";
+  $("ragtag").textContent = "关节 " + ORDER.length + " · 镜像对 " + RIG.pairs.length;
+  /* 参考图上的骨架叠加（同一条骨架，不同缩放） */
+  drawRefOverlay(s);
+  return s;
+}
+function drawRefOverlay(s) {
+  var ov = $("refoverlay");
+  while (ov.firstChild) ov.removeChild(ov.firstChild);
+  /* 叠加用的坐标系 = <b>参考图的像素坐标系</b>（736×1248），所以骨架和照片是 1:1 叠在一起；
+     滑杆只做对齐微调，<b>不改比例本身</b>。 */
+  var sc = Number($("rScale").value), oy = Number($("rY").value), ox = Number($("rX").value),
+      al = Number($("rA").value);
+  var w = fk({});
+  var g2 = el("g", { opacity: al, "stroke-linecap": "round",
+                     transform: "translate(" + ox + "," + oy + ") scale(" + sc + ")" });
+  ORDER.forEach(function (n) {
+    var j = BY[n], o = w[n];
+    if (j.len !== 0) {
+      g2.appendChild(el("line", { x1: o.x, y1: o.y, x2: o.x + o.dx * j.len, y2: o.y + o.dy * j.len,
+        stroke: (j.side === "L" ? "#7dd3fc" : j.side === "R" ? "#fca5a5" : "#a7f3d0"),
+        "stroke-width": f2(1.15 / sc * 2.41) }));
+    }
+    g2.appendChild(el("circle", { cx: o.x, cy: o.y, r: f2(3.0 * 2.41 / sc), fill: "#f5b041" }));
+  });
+  ov.appendChild(g2);
+  var f = RIG.figure;
+  $("refRead").innerHTML =
+    "骨架自身比例：头高 <b>56</b> · 全身 <b>" + f2(f.heightPx) + "</b>（视图单位）⇒ 约 <b>1:" + f2(f.heightPx / 56) + "</b>；" +
+    "腿（髋→底）<b>" + f2(RIG.ground - RIG.root[1]) + "</b> ≈ 全高的 <b>" +
+    Math.round((RIG.ground - RIG.root[1]) / f.heightPx * 100) + "%</b>。<br />" +
+    "参考图原始像素 <b>736×1248</b>（页面里的副本 reference-02.jpg，58,648 字节 · sha256 a7a81952c738d454…）。" +
+    "叠上去的是<b>同一条骨架</b>（" + ORDER.length + " 关节 · " + RIG.pairs.length + " 对镜像），当前对齐：缩放 " + f2(sc) +
+    " · 平移(" + ox + "," + oy + ") · 透明 " + f2(al) + "。滑杆只做对齐，<b>不改骨架比例</b>。";
+}
+function chips(live) {
+  var box = $("topchips");
+  if (!box.getAttribute("data-built")) {
+    box.setAttribute("data-built", "1");
+    box.innerHTML =
+      '<span class="chip" id="chipJoints">关节 <b>—</b></span>' +
+      '<span class="chip" id="chipSym">对称 <b>—</b></span>' +
+      '<span class="chip" id="chipMotion">动作 <b>—</b></span>' +
+      '<span class="chip" id="chipVoice">语音 <b>—</b></span>' +
+      '<span class="chip" id="chipNet">网络 <b>0</b></span>';
+  }
+  var s = boneRigSymmetry();
+  $("chipJoints").innerHTML = "关节 <b>" + ORDER.length + "</b>";
+  var cs = $("chipSym");
+  cs.className = "chip " + (s.bad.length ? "bad" : "ok");
+  cs.innerHTML = "对称 <b>" + (s.bad.length ? "否" : "是 " + f2(s.worst) + "px") + "</b>";
+}
+
+/* ───────────────────────── 10. 语音链路 ───────────────────────── */
+/* 10.0 实测快照（<b>真跑出来的</b>，标死时间与来源；不是实时，绝不当实时用） */
+var SNAPSHOT = {
+  at: "2026-10-08T07:47:50+08:00",
+  src: "tools/codex-scripts/intercom.py status（本机真跑）",
+  tts: "edge-tts（神经语音 · 默认台湾腔）+ win-sapi（回退）",
+  asr_cloud: "needs_dependency",
+  listen_local: "win-speech（离线可用）",
+  recognizers_zh: ["zh-CN|MS-2052-80-DESK"],
+  wavein_devices: 0,
+  listen_input: "wavein 可见 0 个输入设备",
+  listen_note: "wavein_devices = 0 ⇒ 设备直连那条腿在本机是死的（与插不插麦克风无关）",
+  capture_ready: false,
+  tts_gate: { denied: true, missing_scopes: ["audio_output"],
+    how_to_grant: ["终端运行: python -m gbt_allinone auth grant --scope audio_output --ttl 600"] }
+};
+var PROBES = {
+  sapi: { at: "2026-10-08 07:49", src: "PowerShell System.Speech GetInstalledVoices()",
+    read: ["Microsoft Huihui Desktop | zh-CN | Female | enabled=True",
+           "Microsoft Zira Desktop | en-US | Female | enabled=True",
+           "Microsoft David Desktop | en-US | Male | enabled=True"] },
+  electronWin: { at: "2026-10-08 07:52", src: "npx electron 探针 · 独立 BrowserWindow（本仓 electron）",
+    firstLen: 0, waited: "voiceschanged", len: 0, speak: "onstart→onend（用系统默认嗓）",
+    devices: ["videoinput", "audiooutput", "audiooutput", "audiooutput"],
+    gumErr: "NotFoundError: Requested device not found" },
+  electronWv: { at: "2026-10-08 07:54", src: "npx electron 探针 · <webview> 内嵌",
+    firstLen: 0, waited: "voiceschanged", len: 0, speak: "onstart→onend",
+    gumErr: "NotFoundError: Requested device not found" },
+  dict: { at: "2026-10-08 07:48", src: "py -3.14 tools/codex-scripts/intercom.py watch --seconds 3 --jsonl --rounds 1",
+    status: "no_input",
+    reason: "打不开默认录音设备：调用“SetInputToDefaultAudioDevice”并传入“0”个参数时发生异常：“Cannot find the requested data item, such as a data key or value.”" },
+  bridge: { at: "2026-10-08 07:48", src: "GET http://127.0.0.1:8765/api/state（本机回环·设计内依赖）",
+    status: 200, bytes: 9723 }
+};
+var BRIDGE_URL = "http://127.0.0.1:8765/api/message";
+function shell() { return (typeof window.gbtW3 === "object" && window.gbtW3) ? window.gbtW3 : null; }
+function log(msg, cls) {
+  var pre = $("voiceLog");
+  var line = "[" + new Date().toTimeString().slice(0, 8) + "] " + msg;
+  pre.textContent = (line + "\n" + pre.textContent).slice(0, 6000);
+  pre.scrollTop = 0;
+}
+function st(html, cls) { return '<span class="st ' + (cls || "") + '">' + html + "</span>"; }
+function chain(n, html, cls) { $("c" + n).innerHTML = html; }
+
+function refreshStatus() {
+  var s = shell();
+  if (!s || typeof s.intercom !== "function") {
+    var why = "未接壳（window.gbtW3 不存在）⇒ 用<b>实测快照</b>（" + SNAPSHOT.at + "）";
+    chain(1, st("未接壳", "miss") + " " + why, "");
+    /* ② 麦克风这一环**统一**由 renderMicChain 渲染（Chromium 层现读 + 壳侧腿/快照两层分开摆），
+       不再在这里另写一份 —— 两处各写一份必漂。 */
+    renderMicChain(null);
+    chain(3, st("未实测(实时)", "miss") + " 离线识别器快照：<code>" + SNAPSHOT.recognizers_zh.join(", ") + "</code> · " +
+      SNAPSHOT.listen_local + " · <b>wavein_devices=" + SNAPSHOT.wavein_devices + "</b>（" + SNAPSHOT.listen_input + "）· capture_ready=<b>" +
+      SNAPSHOT.capture_ready + "</b><br /><span class='note'>" + SNAPSHOT.listen_note + "</span>", "");
+    chain(5, bridgeStage(), "");
+    chain(6, st("待点", "ink") + " 本机离线嗓臂<b>不受授权门管</b>：点「试嗓」即真出声（下面的实测读数会写进来）。", "");
+    voiceChip(false);
+    return;
+  }
+  chain(1, st("已接壳", "ok") + " gbtW3 在（Electron preload）。三腿读数走 <code>intercom('status')</code>。", "");
+  s.intercom("status", {}).then(function (r) {
+    var d = (r && r.data) || r || {};
+    var legs = d.legs || {};
+    $("chipVoice").innerHTML = "语音 <b>" + (legs.listen_local || "?") + "</b>";
+    chain(1, st("已接壳", "ok") + " 三腿：" + JSON.stringify({ tts: legs.tts, asr_cloud: legs.asr_cloud,
+      listen_local: legs.listen_local }).replace(/,/g, ", "), "");
+    /* ② 麦克风这一环**统一**由 renderMicChain 渲染（Chromium 层现读 + 壳侧三腿现读，两层分开摆） */
+    renderMicChain(legs);
+    chain(3, st(SNAPSHOT.recognizers_zh.length ? "识别器在位" : "缺识别器", "ink") + " " +
+      (legs.recognizers_zh || []).join(", ") + " · " + (legs.listen_local || "—"), "");
+    chain(5, bridgeStage(), "");
+    var g = legs.tts_gate || {};
+    chain(6, st(g.denied ? "门内 TTS 缺授权" : "门内 TTS 授权在位", g.denied ? "miss" : "ok") +
+      (g.denied ? " missing_scopes=<b>" + JSON.stringify(g.missing_scopes) + "</b><br /><span class='note'>" +
+        (g.how_to_grant || []).join(" · ") + "</span>" : "") +
+      "<br />本机离线嗓臂（speechSynthesis）另走，不受此门管。", "");
+    log("壳内三腿读数已刷新", "ok");
+  }).catch(function (e) {
+    chain(1, st("壳在但读数取不到", "bad") + " intercom('status') 失败：<span class='why'>" + String(e && e.message || e) + "</span>", "");
+    log("intercom status 失败：" + String(e && e.message || e), "bad");
+  });
+}
+
+/* ⑤ 面板桥：本页零网络取数原语 ⇒ 只能走壳开的 IPC 口。
+   壳侧已落 `w3:message`（preload：`gbtW3.message({text})`，目标在壳里写死 127.0.0.1:8765/api/message，
+   页面改不了它 —— 防 SSRF 的正解：本页的<b>网络面保持零</b>）。壳外（浏览器直开）就拿不到这个口，如实报。 */
+function bridgeStage() {
+  var s = shell();
+  if (s && typeof s.message === "function") {
+    return st("壳口就绪 gbtW3.message()", "ok") + " 目标（写在壳里、页面改不了）<code>" + BRIDGE_URL + "</code>";
+  }
+  return st("壳外无此口", "miss") +
+    " 目标 <code>" + BRIDGE_URL + "</code>。<br />" +
+    "<b>实测</b>：该桥<b>在服务</b>（" + PROBES.bridge.at + " · " + PROBES.bridge.src +
+    " ⇒ HTTP " + PROBES.bridge.status + " · " + PROBES.bridge.bytes + " 字节）。<br />" +
+    "<b>缺的是「本页→桥」这条口</b>，不是桥死了：本页是<b>离线自包含</b>（CSP <code>connect-src 'none'</code>）⇒ " +
+    "任何网络取数原语都被浏览器当场拒绝。<br />" +
+    "<span class='note'>出路<b>已采纳（①）</b>：壳侧加一条 <code>w3:message</code> IPC 口、目标写死在壳里转发到该桥 —— " +
+    "<b>页面的网络面一个字节都没放宽</b>（主人令：不要动 CSP、不要放开页面的网络面）。这条口只在 Electron 壳里存在；" +
+    "用浏览器直开本页时它必然拿不到，这里如实标「壳外无此口」，不伪造成功。</span>";
+}
+
+/* ② 麦克风 —— Chromium 层采集链（照白龙马 BaiLongma 的 voice-core.js 口径；独立于壳）
+   ────────────────────────────────────────────────────────────────────────────────
+   白龙马拿麦的做法逐条对齐到本页：
+     · 约束 makeAudioConstraints(deviceId)：{ echoCancellation:true, noiseSuppression:true }
+       （deviceId 有值才加 { deviceId:{ exact } }）；
+     · **回退链**：带 deviceId → 失败 ⇒ **去掉 deviceId 再试一次** → 再失败 ⇒ 如实报错原文（不掩盖）；
+     · AudioContext：**显式 sampleRate=48000**；拿不到就如实报实际值（不假装拿到了）；
+     · 采集两条路：**AudioWorklet（Blob URL 懒加载）** → 失败退回 **ScriptProcessor**；
+       diagCaptureMode 记录**实际走了哪条**（失败原因也留在页面里）；
+     · PCM 分块出站：本机现无可用流式 ASR 后端 ⇒ 如实标「采到了但没后端」；
+       出站只留**一个函数** PCM_SINK.toShell()，接线时只改它（配方写在它的注释里）。
+   ⚠️ 实测（2026-10-08 · npx electron 探针，同一条 CSP）：本页 CSP 会拒 Blob worklet ——
+      原文 `Loading the script 'blob:file:///…' violates the following Content Security Policy
+      directive: "script-src 'unsafe-inline'"` + `AbortError: Unable to load a worklet's module.`
+      ⇒ 首试仍然发（白龙马同款懒加载），失败**如实记账**再退 ScriptProcessor。
+      **CSP 不动**（主人令：不要放开页面的网络面 —— worklet 要让也让"壳给口"，不改页面 CSP）。 */
+var CAP = {
+  at: null,                      /* 本轮采集链现读时刻 */
+  devices: null,                 /* enumerateDevices 现读 */
+  constraints: [],               /* 试过的约束（逐次原文） */
+  gum: null,                     /* getUserMedia 结果（含原文） */
+  stream: null, settings: null,  /* 流与 getSettings() 现读 */
+  wantRate: 48000, ctxRate: null, ctxState: null, ctxErr: null,
+  diagCaptureMode: null, modeWhy: null, workletErr: null,
+  bytes: 0, chunks: 0, lastChunkAt: null, startedAt: null,
+  err: null, running: false, hold: false, sourceKind: "mic",
+  stopTimer: null, uiTick: null, lastRender: 0
+};
+var lastLegs = null;             /* refreshStatus 拿到的壳侧三腿（壳不在时 null），给 renderMicChain 用 */
+
+function makeAudioConstraints(deviceId) {
+  /* 与白龙马 voice-core.makeAudioConstraints 同口径；deviceId 可选 */
+  var c = { echoCancellation: true, noiseSuppression: true };
+  if (deviceId) c.deviceId = { exact: deviceId };
+  return c;
+}
+function capOneLine() {
+  var dev = CAP.devices || {}, s = "";
+  if (!CAP.devices) s += "枚举中…（enumerateDevices 还没回）；"; 
+  else if (dev.err) s += "enumerateDevices 失败 ⇒ <span class='why'>" + dev.err + "</span>；";
+  else s += "audioinput <b>" + dev.audioinput + "</b> 个" +
+    (dev.audioinput && dev.inputLabels && dev.inputLabels.length ? "（" + dev.inputLabels.join(" · ") + "）" : "（0 个 ⇒ 无 label 可读）") +
+    " · audiooutput " + dev.audiooutput + " · videoinput " + dev.videoinput + "；";
+  if (CAP.gum) {
+    s += CAP.gum.ok
+      ? "getUserMedia <b>成功</b>（轨道 " + CAP.gum.tracks.join(", ") + "；试次 " + CAP.gum.attempts.join(" → ") + "）"
+      : "getUserMedia <b>失败</b> ⇒ <span class='why'>" + CAP.gum.err + "</span>（试次 " + CAP.gum.attempts.join(" → ") + "）";
+  } else if (CAP.err) {
+    s += CAP.err;
+  }
+  return s;
+}
+/* chain ② 的渲染**收口在一个函数**（refreshStatus 与采集链都调它，避免互踩） */
+function renderMicChain(legs) {
+  if (legs !== undefined) lastLegs = legs;
+  var parts = [];
+  if (CAP.at) {
+    var probeRunning = !CAP.gum && !CAP.devices && !CAP.err;
+    parts.push(st(CAP.gum && CAP.gum.ok ? "Chromium 现探·可采" : (probeRunning ? "Chromium 现探·进行中" : "Chromium 现探·不可采"),
+      CAP.gum && CAP.gum.ok ? "ok" : (probeRunning ? "ink" : "bad")) + " " + capOneLine());
+  } else {
+    parts.push(st("未实测(实时)", "miss") + " 本页 Chromium 采集口还没跑 —— 点「🎙 采集链自测」或「说话」即跑实时探针。" +
+      "（快照 " + PROBES.electronWin.at + " · " + PROBES.electronWin.src + "：enumerateDevices 3 个 audiooutput、<b>0 个 audioinput</b>；" +
+      "getUserMedia ⇒ <span class='why'>" + PROBES.electronWin.gumErr + "</span>）");
+  }
+  if (lastLegs) {
+    parts.push("<span class='note'>壳侧腿（intercom status 现读）：wavein_devices=<b>" + lastLegs.wavein_devices +
+      "</b> · capture_ready=<b>" + lastLegs.capture_ready + "</b>（" + (lastLegs.listen_input || "—") +
+      "）—— 壳侧腿走 SAPI 直连设备那条路，与上面 Chromium 层<b>是两层，分开看</b>。</span>");
+  } else {
+    parts.push("<span class='note'>未接壳 ⇒ 壳侧三腿用实测快照（" + SNAPSHOT.at + " · " + SNAPSHOT.src +
+      "）：wavein_devices=<b>" + SNAPSHOT.wavein_devices + "</b> · capture_ready=<b>" + SNAPSHOT.capture_ready + "</b>。</span>");
+  }
+  chain(2, parts.join("<br />"), "");
+}
+/* 采集链现读写进 ④ 卡的诊断格（不替主人做判断：数字与原文都摆出来） */
+function capLine() {
+  $("capChain").innerHTML = CAP.at ? capOneLine() : "—（还没跑采集链自测）";
+  $("capMode").innerHTML = CAP.diagCaptureMode
+    ? ("<b>" + CAP.diagCaptureMode + "</b>" + (CAP.modeWhy ? "<br /><span class='note'>" + CAP.modeWhy + "</span>" : ""))
+    : "—";
+  $("capConstraints").innerHTML = CAP.constraints.length
+    ? CAP.constraints.map(function (c, i) { return "试 " + (i + 1) + "：" + c; }).join("<br />")
+    : "—";
+  $("capCtx").innerHTML = CAP.ctxRate
+    ? ("请求 <b>" + CAP.wantRate + "</b> ⇒ 实际 <b>" + CAP.ctxRate + "</b>" +
+       (Number(CAP.ctxRate) === Number(CAP.wantRate) ? "（一致）" : "（<b>拿不到 48k</b>，如实报实际值）") +
+       " · state=" + CAP.ctxState + (CAP.ctxErr ? "<br /><span class='why'>" + CAP.ctxErr + "</span>" : ""))
+    : "—";
+  $("capBytes").innerHTML = (CAP.chunks
+    ? ("<b>" + CAP.bytes + "</b> 字节 · " + CAP.chunks + " 块 · 源=" +
+       (CAP.sourceKind === "synth" ? "合成源（440Hz，不开麦）" : "真麦流") +
+       (CAP.lastChunkAt ? " · 最后一块 " + CAP.lastChunkAt : ""))
+    : (CAP.running ? "在采但还没拿到块…" : "0 字节（未采集）"));
+  $("capSink").innerHTML = PCM_SINK.stateHtml();
+  var b = $("btnCaptureStop"); if (b) b.disabled = !CAP.running;
+}
+function setCapAt() { CAP.at = new Date().toTimeString().slice(0, 8); }
+
+/* 枚举设备（现读；加权限前后各读一次就靠它 —— 页面上比较的是"现值 vs 上一轮值"） */
+function probeAudioInputs() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    CAP.devices = { err: "本环境没有 navigator.mediaDevices（非安全上下文？）" };
+    capLine(); return Promise.resolve(CAP.devices);
+  }
+  return navigator.mediaDevices.enumerateDevices().then(function (list) {
+    var n = { audioinput: 0, audiooutput: 0, videoinput: 0 }, labels = [], ids = [];
+    list.forEach(function (d) {
+      if (n[d.kind] === undefined) return;
+      n[d.kind]++;
+      if (d.kind === "audioinput") {
+        labels.push(d.label || "(空标签)");
+        ids.push(d.deviceId || "");          /* 全文留着试约束；只显示前 12 位 */
+      }
+    });
+    CAP.devices = { at: new Date().toTimeString().slice(0, 8), total: list.length,
+      audioinput: n.audioinput, audiooutput: n.audiooutput, videoinput: n.videoinput,
+      inputLabels: labels, inputIds: ids };
+    capLine(); renderMicChain();
+    return CAP.devices;
+  }).catch(function (e) {
+    CAP.devices = { err: ((e && e.name) || "?") + ": " + String((e && e.message) || e) };
+    capLine(); renderMicChain();
+    return CAP.devices;
+  });
+}
+
+/* getMedia 回退链：带 deviceId → 去掉 deviceId 重试 → 两次都失败＝如实报最后一条原文。
+   🔴 时序实测（2026-10-08 · 裸 Electron 探针）：本机**第一次 getUserMedia ≈ 0.9s 就回**，
+      而**第一次 enumerateDevices ≈ 2.9s**（之后两件都被缓存、毫秒级）。所以：
+        · 冷启动（还不知道 deviceId）⇒ 第一枪只能是**裸 audio**（如实标注，不假装带过 deviceId）；
+        · 枚举回来后若拿到了 id 且裸试失败 ⇒ **补一枪「带 deviceId」**（如实记第二枪）；
+        · 非冷启动（上一轮已知 id）⇒ 走标准顺序：**带 deviceId 先试**，失败再裸试。
+     两边都把每一次的**原名原文**记进 CAP.attempts/CAP.gum，谁在先如实写谁。 */
+function gumWithFallback(idsHint) {
+  var ids = idsHint || (CAP.devices && CAP.devices.inputIds) || [];
+  var tries = [];
+  if (ids.length) { tries.push(makeAudioConstraints(ids[0])); CAP.usedPinned = true; }
+  tries.push(makeAudioConstraints(""));
+  CAP.constraints = tries.map(function (c) { return JSON.stringify(c); });
+  capLine();
+  var i = 0;
+  function step(lastErr) {
+    if (i >= tries.length) {
+      var name = (lastErr && lastErr.name) || "?", msg = (lastErr && lastErr.message) || String(lastErr);
+      CAP.gum = { ok: false, err: name + ": " + msg, attempts: CAP.attemptNames || [] };
+      CAP.err = name + ": " + msg;
+      log("getUserMedia 失败（原文·全链走完）：" + name + ": " + msg, "bad");
+      capLine(); renderMicChain();
+      return Promise.resolve(null);
+    }
+    var c = tries[i], how = c.deviceId ? ("带 deviceId（" + String(c.deviceId.exact).slice(0, 12) + "…）")
+                                       : (CAP.usedPinned ? "去掉 deviceId 回退" : "裸 audio" + (ids.length ? "" : "（设备表还没回，冷启动先裸试）"));
+    i++;
+    CAP.attemptNames = (CAP.attemptNames || []).slice(0, i - 1); CAP.attemptNames.push(how);
+    log("getUserMedia 试 " + i + "/" + tries.length + "：" + how + " " + JSON.stringify(c));
+    return navigator.mediaDevices.getUserMedia({ audio: c }).then(function (stream) {
+      var tracks = stream.getAudioTracks();
+      CAP.gum = { ok: true, tracks: tracks.map(function (t) { return (t.label || "(空标签)"); }),
+                  attempts: CAP.attemptNames.slice(), usedConstraint: JSON.stringify(c) };
+      log("Chromium 采集口真的开起来了（" + how + "）", "ok");
+      return stream;
+    }).catch(function (e) {
+      log("试 " + i + " 失败（原文）：" + ((e && e.name) || "?") + ": " + ((e && e.message) || String(e)), "bad");
+      return step(e);
+    });
+  }
+  return step(null);
+}
+/* 补一枪：冷启动时先裸试；枚举回来后拿到 id 而裸试又失败 ⇒ 按白龙马口径补「带 deviceId」一枪 */
+function gumWithPinned(id) {
+  var c = makeAudioConstraints(id);
+  CAP.constraints = (CAP.constraints || []).concat([JSON.stringify(c)]);
+  CAP.attemptNames = (CAP.attemptNames || []).concat(["带 deviceId（枚举回来补一枪）"]);
+  capLine();
+  log("补一枪：设备表已回（有 audioinput）⇒ 再试一次『带 deviceId』" + JSON.stringify(c));
+  return navigator.mediaDevices.getUserMedia({ audio: c }).then(function (stream) {
+    CAP.usedPinned = true;
+    CAP.gum = { ok: true, tracks: stream.getAudioTracks().map(function (t) { return (t.label || "(空标签)"); }),
+                attempts: CAP.attemptNames.slice(), usedConstraint: JSON.stringify(c) };
+    return stream;
+  }).catch(function (e) {
+    var name = (e && e.name) || "?", msg = (e && e.message) || String(e);
+    log("补枪也失败（原文）：" + name + ": " + msg, "bad");
+    CAP.gum = { ok: false, err: name + ": " + msg, attempts: CAP.attemptNames.slice() };
+    CAP.err = name + ": " + msg;
+    capLine(); renderMicChain();
+    return null;
+  });
+}
+
+/* AudioWorklet：Blob URL 懒加载（白龙马同款）→ 失败如实记账，退 ScriptProcessor */
+var WORKLET_SRC =
+  "class GbtPcmTap extends AudioWorkletProcessor {" +
+  "  process(inputs) {" +
+  "    var ch = inputs[0] && inputs[0][0];" +
+  "    if (ch && ch.length) { var copy = ch.slice(); this.port.postMessage(copy, [copy.buffer]); }" +
+  "    return true;" +
+  "  }" +
+  "}" +
+  "registerProcessor('gbt-pcm-tap', GbtPcmTap);";
+function tryWorklet(ctx, srcNode) {
+  return new Promise(function (resolve) {
+    if (!ctx.audioWorklet || !ctx.audioWorklet.addModule) {
+      CAP.workletErr = "本环境没有 AudioWorklet（ctx.audioWorklet 不在）";
+      return resolve(null);
+    }
+    var url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: "text/javascript" }));
+    ctx.audioWorklet.addModule(url).then(function () {
+      var node = new AudioWorkletNode(ctx, "gbt-pcm-tap", { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
+      node.port.onmessage = function (ev) { onPcmChunk(ev.data); };
+      srcNode.connect(node);
+      var sink = ctx.createGain(); sink.gain.value = 0;      /* 0 增益到 destination：图活着但不出声（防回声自激） */
+      node.connect(sink); sink.connect(ctx.destination);
+      CAP.diagCaptureMode = "audioworklet";
+      CAP.modeWhy = "Blob URL 懒加载成功（addModule 过）⇒ 走 AudioWorklet，PCM 经 port.postMessage 分块";
+      resolve({ node: node, sink: sink });
+    }).catch(function (e) {
+      CAP.workletErr = ((e && e.name) || "?") + ": " + String((e && e.message) || e);
+      try { URL.revokeObjectURL(url); } catch (e2) { /* 收不掉也不致命 */ }
+      resolve(null);
+    });
+  });
+}
+/* ScriptProcessor 回退（deprecated 但在位；白龙马也是这条退路） */
+function useScriptProcessor(ctx, srcNode) {
+  var proc = ctx.createScriptProcessor(4096, 1, 1);
+  proc.onaudioprocess = function (e) {
+    var ch = e.inputBuffer.getChannelData(0), copy = new Float32Array(ch.length);
+    copy.set(ch);
+    onPcmChunk(copy);
+  };
+  srcNode.connect(proc);
+  var sink = ctx.createGain(); sink.gain.value = 0;          /* 同上：0 增益，不出声 */
+  proc.connect(sink); sink.connect(ctx.destination);
+  CAP.diagCaptureMode = "scriptprocessor";
+  CAP.modeWhy = "AudioWorklet 未成 ⇒ 退回 ScriptProcessor（4096 帧/块）。worklet 失败原文：" +
+    (CAP.workletErr || "(未知)");
+  return { node: proc, sink: sink };
+}
+function onPcmChunk(arr) {
+  if (!arr || !arr.length) return;
+  if (!CAP.chunks) {
+    /* 第一块到手：此刻才算"真在采"。context 冷启动/等 resume 的那段空档不该算进采样窗
+       —— 实测：离屏窗口里 AudioContext 起来要等一拍，早先那版 1.2s 窗只吃到 2 块（32768 字节）。
+       现在：**第一块起算**，把窗重新计时（windowMs），字节数才是"一个完整采样窗"的读数。 */
+    CAP.firstChunkAt = new Date().toTimeString().slice(0, 8);
+    if (CAP.startedMs) CAP.firstChunkDelayMs = Math.round(performance.now() - CAP.startedMs);
+    if (CAP.stopTimer) {
+      clearTimeout(CAP.stopTimer);
+      CAP.stopTimer = setTimeout(function () { stopCapture("采样窗结束（" + CAP.windowMs + "ms，第一块起算）"); }, CAP.windowMs || 1500);
+    }
+  }
+  CAP.bytes += arr.length * 4;                                /* Float32 = 4 字节/样本 */
+  CAP.chunks++;
+  CAP.lastChunkAt = new Date().toTimeString().slice(0, 8);
+  PCM_SINK.toShell(arr);                                      /* 出站单点（现无后端 ⇒ 如实不发送） */
+  var now = performance.now();
+  if (now - CAP.lastRender > 350) {                           /* 节流重绘，别每块都刷 DOM */
+    CAP.lastRender = now; capLine();
+  }
+}
+/* 建 AudioContext（显式 48k；拿不到就如实报实际值） */
+function openCtx() {
+  var ctx = null;
+  try { ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: CAP.wantRate }); }
+  catch (e) {
+    CAP.ctxErr = "显式 sampleRate=" + CAP.wantRate + " 建不出来（" + ((e && e.name) || "?") + ": " +
+      String((e && e.message) || e) + "）⇒ 退回默认采样率";
+    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e2) { ctx = null; }
+  }
+  if (!ctx) { CAP.ctxErr = (CAP.ctxErr || "") + " 默认 AudioContext 也建不出来"; return null; }
+  CAP.ctxRate = ctx.sampleRate;
+  CAP.ctxState = ctx.state;
+  if (ctx.state === "suspended") {
+    try { ctx.resume(); } catch (e3) { /* resume 失败照实记账 */ }
+    CAP.ctxState = ctx.state + "（已请求 resume，有用户手势后即恢复）";
+  }
+  return ctx;
+}
+/* 等 AudioContext 进 running（隐藏/离屏窗口里 Chromium 会让它先 suspended，且 resume 要等一拍；
+   实测：不等就开采样窗，1.2s 窗只吃到 2 块 —— 所以"起采"以 running 为准，等不到就如实说）。 */
+function waitCtxRunning(ctx, ms) {
+  return new Promise(function (resolve) {
+    var t0 = performance.now();
+    (function poll() {
+      if (ctx.state === "running") return resolve(true);
+      if (performance.now() - t0 > ms) return resolve(false);
+      try { ctx.resume(); } catch (e) { /* 失败照实走超时 */ }
+      setTimeout(poll, 120);
+    })();
+  });
+}
+/* 一条链：源 → worklet/ScriptProcessor → 计数 → 出站单点 */
+function wireCapture(ctx, srcNode) {
+  return tryWorklet(ctx, srcNode).then(function (w) {
+    if (w) return w;
+    return useScriptProcessor(ctx, srcNode);
+  }).then(function (h) {
+    CAP.hook = h;                       /* 收好句柄，停采集时按它拆图 */
+    CAP.running = true;
+    CAP.startedMs = performance.now();
+    CAP.startedAt = new Date().toTimeString().slice(0, 8);
+    capLine();
+    return h;
+  });
+}
+function stopCapture(reason) {
+  CAP.running = false;
+  CAP.hold = false;
+  if (CAP.stopTimer) { clearTimeout(CAP.stopTimer); CAP.stopTimer = null; }
+  try { if (CAP.hook && CAP.hook.node && CAP.hook.node.disconnect) CAP.hook.node.disconnect(); } catch (e) { /* 已断 */ }
+  try { if (CAP.hook && CAP.hook.sink && CAP.hook.sink.disconnect) CAP.hook.sink.disconnect(); } catch (e) { /* 已断 */ }
+  try { if (CAP.source && CAP.source.disconnect) CAP.source.disconnect(); } catch (e) { /* 已断 */ }
+  try { if (CAP.stream) CAP.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) { /* 已停 */ }
+  try { if (CAP.ctx && CAP.ctx.close) CAP.ctx.close(); } catch (e) { /* 已关 */ }
+  CAP.stream = null; CAP.source = null; CAP.hook = null;
+  capLine(); renderMicChain();
+  log("采集已停" + (reason ? "（" + reason + "）" : "") + "：共 " + CAP.chunks + " 块 / " + CAP.bytes + " 字节", "");
+}
+
+/* ② 主入口：probeMic()（链 ② 与「说话」都走它）—— 真麦整条链，失败如实报原文 */
+function probeMic() {
+  setCapAt();
+  if (CAP.running) stopCapture("重开（先停上一轮）");
+  CAP.err = null; CAP.gum = null; CAP.sourceKind = "mic"; CAP.devices = null;
+  CAP.usedPinned = false; CAP.attemptNames = [];
+  capLine(); renderMicChain();          /* 立刻把「进行中」写上 —— 早于探针出结果就截图的场合（page-shot 1.2s）也看得见它在跑 */
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    CAP.err = "本环境没有 navigator.mediaDevices（非安全上下文？）";
+    capLine(); renderMicChain();
+    return Promise.resolve({ ok: false, why: CAP.err });
+  }
+  /* 🔴 两件**并行**发（时序实测：第一次 gUM ≈0.9s、第一次 enumerate ≈2.9s；**gUM 先发**——
+     实测这个顺序两件都更快回；先发枚举再发 gUM 会让枚举被拉长到 7s+）。
+     冷启动（上一轮没留 id）先裸试；枚举回来后若真有 audioinput 而裸试失败 ⇒ 补一枪带 deviceId（如实记顺序）。 */
+  var chainP = gumWithFallback(null);
+  var enumP = probeAudioInputs();
+  return Promise.all([enumP, chainP]).then(function (rs) {
+    var stream = rs[1];
+    var idsNow = (CAP.devices && CAP.devices.inputIds) || [];
+    if (!stream && idsNow.length && !CAP.usedPinned) return gumWithPinned(idsNow[0]);
+    return stream;
+  }).then(function (stream) {
+    if (!stream) { capLine(); renderMicChain(); return { ok: false, why: CAP.err }; }
+    CAP.stream = stream;
+    var track = stream.getAudioTracks()[0];
+    var s = {};
+    try { s = track.getSettings ? track.getSettings() : {}; } catch (e) { s = { err: String(e) }; }
+    CAP.settings = {
+      sampleRate: s.sampleRate === undefined ? null : s.sampleRate,
+      channelCount: s.channelCount === undefined ? null : s.channelCount,
+      deviceId: s.deviceId ? (String(s.deviceId).slice(0, 12) + "…") : null,
+      echoCancellation: s.echoCancellation === undefined ? null : s.echoCancellation,
+      noiseSuppression: s.noiseSuppression === undefined ? null : s.noiseSuppression,
+      autoGainControl: s.autoGainControl === undefined ? null : s.autoGainControl,
+      label: track.label || "(空标签)"
+    };
+    var ctx = openCtx();
+    if (!ctx) { capLine(); renderMicChain(); stopCapture("AudioContext 建不起来"); return { ok: true, tracks: CAP.gum.tracks, bytes: 0, why: CAP.ctxErr }; }
+    CAP.ctx = ctx;
+    CAP.source = ctx.createMediaStreamSource(stream);
+    return waitCtxRunning(ctx, 2500).then(function (running) {
+      if (!running) CAP.ctxState = ctx.state + "（2.5s 内没进 running）";
+      return wireCapture(ctx, CAP.source);
+    }).then(function () {
+      /* 默认短窗取证字节数；hold=true（「采集链自测」按钮）不自动停。
+         计时语义：这个 timer 是"一块都没来"的兜底；**第一块到手后**由 onPcmChunk
+         按 CAP.windowMs 重新计时（采样窗 = 第一块起算的一个完整窗）。 */
+      CAP.windowMs = 1600;
+      if (!CAP.hold) {
+        CAP.stopTimer = setTimeout(function () { stopCapture("短窗探针：一个采样窗内一块都没来（1.6s）"); }, 1600);
+      }
+      log("采集链就绪：mode=" + CAP.diagCaptureMode + " · ctx=" + CAP.ctxRate + " · settings=" +
+        JSON.stringify(CAP.settings), "ok");
+      capLine(); renderMicChain();
+      return { ok: true, tracks: CAP.gum.tracks, mode: CAP.diagCaptureMode, bytes: CAP.bytes };
+    });
+  }).catch(function (e) {
+    CAP.err = ((e && e.name) || "?") + ": " + String((e && e.message) || e);
+    log("采集链异常（原文）：" + CAP.err, "bad");
+    capLine(); renderMicChain();
+    return { ok: false, why: CAP.err };
+  });
+}
+
+/* 🧪 采集流水自检（合成源 440Hz，**不开麦**）：证明"计数 + Worklet/ScriptProcessor + 出站单点"
+   这段**器械**是活的 —— 与"真麦能不能开"是两件事，分开报（真麦失败原文在链 ②）。 */
+function selfTestCapture() {
+  setCapAt();
+  CAP.sourceKind = "synth";
+  CAP.bytes = 0; CAP.chunks = 0; CAP.firstChunkAt = null; CAP.firstChunkDelayMs = null;
+  /* 不清 CAP.err / CAP.gum —— 那两个字段属于「真麦那条链」，合成源自检不许动它们 */
+  var ctx = openCtx();
+  if (!ctx) { capLine(); log("合成源自检：AudioContext 建不出来（" + CAP.ctxErr + "）", "bad"); return Promise.resolve({ ok: false, why: CAP.ctxErr }); }
+  CAP.ctx = ctx;
+  return waitCtxRunning(ctx, 2500).then(function (running) {
+    CAP.ctxState = ctx.state + (running ? "" : "（2.5s 内没进 running：隐藏窗口节流？如实标，不假装）");
+    var osc = ctx.createOscillator();
+    osc.frequency.value = 440;
+    try { osc.start(); } catch (e) { /* 已启动 */ }
+    CAP.source = osc;
+    return wireCapture(ctx, osc).then(function () {
+      CAP.hold = false;
+      CAP.windowMs = 1500;
+      CAP.stopTimer = setTimeout(function () { stopCapture("合成源自检：一块都没来（兜底 3s）"); }, 3000);
+      log("合成源自检就绪：mode=" + CAP.diagCaptureMode + " · ctx=" + CAP.ctxRate + "（440Hz，不出声）", "ok");
+      capLine();
+      return { ok: true, mode: CAP.diagCaptureMode, ctxRate: CAP.ctxRate, ctxRunning: running };
+    });
+  });
+}
+
+/* PCM 出站**单点**（接线时只改这一个函数）—— 现无后端 ⇒ 如实标「采到了但没后端」，不发送 */
+var PCM_SINK = {
+  envelope: "GBT-PCM/1",
+  state: { at: null, why: "" },
+  /* 🔴 现状（2026-10-08 现读；读数要与源一起看）：
+     ① 无本机流式 ASR 后端：127.0.0.1:3721（白龙马的 ASR 代理口）**无监听**（netstat 现读）；
+     ② 面板桥 :8765 有 /api/message（对话受理 → panel_server.py:3494 bridge.send(text)，**聊天语义**）
+        与 /api/observer/voice（出声），**没有** 音频上行路由；
+     ③ 壳侧唯一"受理口" gbtW3.message 是**文本口**：壳内写死 maxChars=4000（main.cjs W3_MSG_TARGET）
+        —— 装不下 PCM 分块；拿它当音频口 = 往大脑对话里灌 base64（既失真又绕门）。
+     ⇒ 采到了但没后端：**不发送**，只记账。接线配方（可复跑）：
+       ① 机侧起本机 ASR 代理监听 127.0.0.1:3721（流式 PCM）；或给面板桥加一条 /api/asr 上行路由；
+       ② preload.cjs 加一个"只送音频字节"的口 + main.cjs 收口把字节转给**写死的** 127.0.0.1:3721
+          （与 w3:message 同款纪律：目标写死 · 限额 · 失败带原文）—— ⚠️ 本轮红线不许动 preload.cjs，未动；
+       ③ 把本函数体换成那个口（页面内单点，其余代码不用动）。 */
+  toShell: function (chunk) {
+    if (!this.state.at) {
+      this.state.at = new Date().toTimeString().slice(0, 8);
+      this.state.why = "无后端：:3721 无监听 / 桥无音频路由 / 受理口是文本口（maxChars=4000）";
+      log("PCM 出站：本机无可用流式 ASR 后端 ⇒ 「采到了但没后端」，不发送（配方见 PCM_SINK 注释）", "miss");
+      capLine();
+    }
+    return { ok: false, why: this.state.why };
+  },
+  stateHtml: function () {
+    return this.state.at
+      ? ('<span class="st miss">采到了但没后端</span> <span class="note">' + this.state.why +
+         ' ⇒ 不发送（接线单点 PCM_SINK.toShell()，配方在注释里）</span>')
+      : "未触发（还没采到块）";
+  }
+};
+
+/* ③ 听写：壳内 intercom 真听（本机离线 SAPI 路线） */
+var listSess = null;
+function startListen() {
+  var s = shell();
+  if (!s || typeof s.intercom !== "function") {
+    chain(3, st("不能真听", "bad") + " 未接壳 ⇒ 本机离线听写这条路（intercom.py → five-dim cap voice → asr-listen.ps1）拉不起来。<br />" +
+      "实测快照（" + PROBES.dict.at + " · " + PROBES.dict.src + "）：status=<b>" + PROBES.dict.status + "</b> · 原文：<span class='why'>" +
+      PROBES.dict.reason + "</span>", "");
+    log("听写需要壳：页面自己不能起子进程（自包含），这是设计内的边界，不是故障", "miss");
+    return;
+  }
+  chain(3, st("在听…", "ink") + " 已请求壳开始听写循环（随页面生灭，无开关）。", "");
+  log("请求 intercom('start')（壳侧跑 tools/codex-scripts/intercom.py watch）");
+  s.intercom("start", {}).then(function (r) {
+    var d = (r && r.data) || r || {};
+    listSess = d;
+    chain(3, st(d.listening ? "在听" : "没起来", d.listening ? "ink" : "bad") + " " +
+      JSON.stringify({ rounds: d.rounds, heard: d.heard, status: d.status }).replace(/,/g, ", "), "");
+  }).catch(function (e) {
+    chain(3, st("起不来", "bad") + " <span class='why'>" + String(e && e.message || e) + "</span>", "");
+  });
+  if (s.onIntercom) {
+    s.onIntercom(function (m) {
+      if (!m) return;
+      if (m.text) {
+        $("sayText").value = m.text;
+        chain(4, st("已识别", "ok") + " 「" + m.text + "」已入框（可改可送）", "");
+        log("听写命中：" + m.text, "ok");
+      }
+      if (m.status) {
+        chain(3, st(m.status === "no_input" ? "不可用" : "在听", m.status === "no_input" ? "bad" : "ink") +
+          " 第 " + (m.round || "?") + " 轮 status=<b>" + m.status + "</b>" +
+          (m.reason ? "<br /><span class='why'>" + m.reason + "</span>" : ""), "");
+        if (m.status !== "heard") log("听写轮：" + JSON.stringify(m), m.status === "no_input" ? "bad" : "");
+      }
+    });
+  }
+}
+function stopListen() {
+  var s = shell();
+  if (s && typeof s.intercom === "function") s.intercom("stop", {});
+  chain(3, st("已停", "miss") + " 已请求壳停止听写循环。", "");
+  log("请求 intercom('stop')");
+}
+
+/* ⑥ TTS：臂 A 本机离线嗓；臂 B 门内 SAPI；臂 C 云臂（只显示状态） */
+var speaking = null, voiceReady = false, voiceList = [], speakDiag = {};
+function pickVoice() {
+  if (!window.speechSynthesis) return null;
+  var now = window.speechSynthesis.getVoices() || [];
+  if (now.length) voiceList = now;                 /* 每次出声前再取一次：列表可能刚装填好 */
+  var zh = voiceList.filter(function (v) { return /^zh/i.test(v.lang); });
+  var lc = zh.filter(function (v) { return v.localService !== false; });
+  return lc[0] || zh[0] || voiceList[0] || null;
+}
+function initVoices() {
+  if (!window.speechSynthesis) {
+    $("curVoice").textContent = "无 speechSynthesis（本环境不支持）";
+    chain(6, st("不可用", "bad") + " 本环境没有 window.speechSynthesis", "");
+    voiceChip(false); return;
+  }
+  voiceList = window.speechSynthesis.getVoices() || [];
+  /* 🔴 嗓表是真的异步：本机实测 —— voiceschanged <b>到得了</b>，但那一刻 getVoices() 仍是 0，
+     真正装填更晚（后续再问就有 Microsoft Huihui / zh-CN 了）。所以：事件 + <b>轮询</b>双保险，
+     并且每次出声前再取一次。超时也<b>不报"没有嗓"</b>，只报"没等到装填"。 */
+  var waited = "immediate", tries = 0;
+  if (!voiceList.length) {
+    waited = "waiting";
+    window.speechSynthesis.onvoiceschanged = function () {
+      waited = (waited === "waiting") ? "voiceschanged" : waited;
+      pollVoice();
+    };
+    var timer = setInterval(pollVoice, 400);
+    setTimeout(function () { clearInterval(timer); if (!voiceList.length) afterVoice("timeout-未装填(将每次出声前再取一次)"); }, 6000);
+  } else { afterVoice(waited); }
+  function pollVoice() {
+    var v = window.speechSynthesis.getVoices() || [];
+    if (v.length) {
+      voiceList = v;
+      if (waited === "waiting") waited = "poll";
+      clearInterval(timer);                       /* 拿到就停：不然每 400ms 刷一次日志 */
+      var t2 = null;
+      afterVoice(waited);
+      return true;
+    }
+    return false;
+  }
+  function afterVoice(how) {
+    var v = pickVoice();
+    voiceReady = !!v;
+    $("curVoice").textContent = v ? (v.name + " / " + v.lang + (v.localService === false ? "（非本地?）" : "（本地）"))
+      : (voiceList.length ? voiceList[0].name : "枚举不到嗓 ⇒ 用系统默认嗓");
+    $("speakEvidence").textContent = "voiceschanged 等待结果=" + how + " · getVoices()=" + voiceList.length +
+      " · pickVoice=" + (v ? v.name + "/" + v.lang : "null");
+    chain(6, st("离线嗓就绪", "ok") + " 枚举到 <b>" + voiceList.length + "</b> 条嗓（等待：" + how + "）" +
+      (v ? " · 选定 <b>" + v.name + " / " + v.lang + "</b>" : " · <b>枚举不到嗓</b>，speak 会走系统默认嗓") +
+      "<br /><span class='note'>本机 SAPI 现读（" + PROBES.sapi.at + " · " + PROBES.sapi.src + "）：" +
+      PROBES.sapi.read.join(" ／ ") + "</span>", "");
+    log("嗓表：getVoices=" + voiceList.length + " 等待=" + how + " 选中=" + (v ? v.name : "默认"), "");
+    voiceChip(true);
+  }
+}
+function speakLocal(text, opts) {
+  opts = opts || {};
+  /* 🔴 2026-10-18 主人令：「把 digital-human 那扇窗的嘴也换成神经嗓」。
+     优先走**框架能力位**（壳桥 w3:say → cap voice op=speak，edge-tts zh-TW），
+     拿不到才退回 SAPI，并且**在链路上如实标注**那是机器音（不冒充神经嗓）。 */
+  if (!opts.__fallback && window.gbtW3 && typeof window.gbtW3.say === "function") {
+    window.gbtW3.say({ text: String(text) }).then(function (r) {
+      if (r && r.ok === true && r.spoken === true) {
+        speaking = "N · 神经嗓";
+        chain(6, st("在说（真出声）", "ok") + " 臂 N **神经嗓** · voice=<b>" + (r.voice || "?") + "</b> · backend=" +
+          (r.backend || "?") + " · auth=" + (r.auth_consumed || "-") + " · spoken=true", "");
+        log("神经嗓真出声：voice=" + (r.voice || "?"), "ok");
+        if (opts.onStart) opts.onStart();
+        var dur = Math.max(1200, String(text).length * 180);
+        setTimeout(function () {
+          speaking = null;
+          $("speakEvidence").textContent = "神经嗓 · voice=" + (r.voice || "?") + " · 约 " + dur + "ms";
+          if (opts.onEnd) opts.onEnd();
+        }, dur);
+      } else {
+        chain(6, st("神经嗓不可用", "miss") + " " + String((r && (r.error || r.reason)) || "未读到原因") +
+          " ⇒ **退 SAPI（机器音，如实标注）**", "");
+        log("神经嗓不可用，退 SAPI：" + String((r && (r.error || r.reason)) || ""), "miss");
+        var o2 = {}; for (var k in opts) o2[k] = opts[k]; o2.__fallback = true;
+        speakLocal(text, o2);
+      }
+    }).catch(function (e) {
+      log("壳桥 say 调用异常，退 SAPI：" + String(e && e.message || e), "miss");
+      var o3 = {}; for (var k2 in opts) o3[k2] = opts[k2]; o3.__fallback = true;
+      speakLocal(text, o3);
+    });
+    return;
+  }
+  if (!window.speechSynthesis) { chain(6, st("不可用", "bad") + " 无 speechSynthesis", ""); return; }
+  try { window.speechSynthesis.cancel(); } catch (e) { /* 无 cancel 也不致命 */ }
+  var u = new SpeechSynthesisUtterance(String(text));
+  var v = pickVoice();
+  if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = "zh-CN"; }
+  u.rate = Number($("rate").value) || 1;
+  var started = false, ended = false, ev = { atStarted: 0, boundary: 0 };
+  var guard = setTimeout(function () {
+    if (ended || !speaking) return;
+    if (!started) {
+      /* 两种失败要分开：被自动播放策略拦 vs 嗓不存在 */
+      chain(6, st("没出声", "miss") +
+        " speak() 已调用但 <b>既没有 onstart 也没有 onerror</b> ⇒ 判为<b>被自动播放策略拦</b>（Chromium 要求先有用户手势）。" +
+        "<br /><span class='note'>本页已按壳的按窗开关工作：注册进壳时<b>需要</b> <code>\"audio_autoplay\": true</code>（由主人登记，我没改注册表）。" +
+        "没有它时：<b>待主人第一次点击后自动恢复</b>（点任意按钮即解锁，后续不必再点）。</span>", "");
+      log("speak 未触发 onstart（疑自动播放策略拦）；用户手势后即恢复", "miss");
+      speaking = null;
+    }
+  }, 2200);
+  u.onstart = function () {
+    started = true; ev.atStarted = performance.now();
+    speaking = (opts.arm || "A") + " · " + (v ? v.name : "系统默认嗓");
+    chain(6, st("在说（真出声）", "ok") + " 臂 A 本机离线嗓 · 嗓=" + (v ? v.name + "/" + v.lang : "系统默认" ) +
+      " · rate=" + u.rate + " · onstart 已触发", "");
+    log("onstart：真的开始出声（这是「真出声」的硬证据，不是「调用了 API」）", "ok");
+    if (opts.onStart) opts.onStart();
+  };
+  u.onboundary = function (e) {
+    ev.boundary++;
+    $("boundaryLive").textContent = "第 " + ev.boundary + " 个边界 · charIndex=" + (e.charIndex != null ? e.charIndex : "?") +
+      "「" + text.slice(e.charIndex || 0, (e.charIndex || 0) + 6) + "」";
+  };
+  u.onerror = function (e) {
+    var ec = (e && e.error) || "?";
+    chain(6, st("出声失败", ec === "not-allowed" ? "miss" : "bad") + " onerror=<b>" + ec + "</b>" +
+      (ec === "not-allowed" ? " ⇒ 被自动播放策略拦（与「嗓不存在」是两件事）" : ""), "");
+    log("speak onerror：" + ec, "bad");
+    speaking = null;
+  };
+  u.onend = function () {
+    ended = true; clearTimeout(guard);
+    var dur = ev.atStarted ? Math.round(performance.now() - ev.atStarted) : 0;
+    chain(6, st("说完", "ok") + " onstart→onend 完整 · 时长 ≈ <b>" + dur + "ms</b> · 边界回调 " + ev.boundary + " 次" +
+      " · 结论：<b>真出声</b>（两个事件都到齐）", "");
+    $("speakEvidence").textContent = "onstart→onend 完整 · " + dur + "ms · boundary=" + ev.boundary +
+      " · 嗓=" + (v ? v.name : "系统默认");
+    log("onend：说完了（" + dur + "ms）", "ok");
+    speaking = null;
+    chain(7, '<span class="st miss">待说</span> 已停 ⇒ 嘴闭合、下颌归零、动作回到自己的曲线', "");
+    $("mouthLive").textContent = "嘴开朗度 0 · 未在说";
+    if (opts.onEnd) opts.onEnd();
+  };
+  speaking = "A · 起音中";
+  window.speechSynthesis.speak(u);
+  log("已调用 speak()，等 onstart / onerror / 超时三选一（不假装在说）");
+}
+function speakGate(text) {
+  var s = shell();
+  if (!s || typeof s.intercom !== "function") {
+    chain(6, st("不可用", "miss") + " 未接壳 ⇒ 门内 TTS（intercom say）无法调用。实测快照门读数：denied=<b>" +
+      SNAPSHOT.tts_gate.denied + "</b> · missing_scopes=<b>" + JSON.stringify(SNAPSHOT.tts_gate.missing_scopes) +
+      "</b><br />原文 how_to_grant：<span class='note'>" + SNAPSHOT.tts_gate.how_to_grant.join(" · ") + "</span>", "");
+    return;
+  }
+  log("请求门内 TTS：intercom('say')");
+  s.intercom("say", { text: String(text) }).then(function (r) {
+    var d = (r && r.data) || r || {};
+    var denied = (d.status === "denied") || (d.missing_scopes && d.missing_scopes.length);
+    if (denied) {
+      chain(6, st("门内 TTS 被拒（缺授权）", "miss") + " 原文：<code>" + JSON.stringify({ status: d.status,
+        missing_scopes: d.missing_scopes }) + "</code><br />" +
+        (d.how_to_grant ? "<span class='note'>" + (Array.isArray(d.how_to_grant) ? d.how_to_grant.join(" · ") : d.how_to_grant) + "</span>" : ""), "");
+    } else {
+      chain(6, st("门内 TTS 返回", "ink") + " " + JSON.stringify(d).slice(0, 400), "");
+    }
+    log("门内 TTS 返回：" + JSON.stringify(d).slice(0, 260), denied ? "miss" : "ok");
+  }).catch(function (e) {
+    chain(6, st("门内 TTS 出错", "bad") + " <span class='why'>" + String(e && e.message || e) + "</span>", "");
+  });
+}
+/* ⑦ 嘴型同步的<b>读数</b>（真正的几何变化发生在主循环里：talk 增量叠加 + jaw 角 + 嘴型 path） */
+function mouthFromSpeech(m) { talkPhase = m; }
+function voiceChip(hasSS) {
+  var box = $("chipVoice");
+  if (!box) return;
+  var okA = !!window.speechSynthesis;
+  box.className = "chip " + (okA ? "ok" : "bad");
+  box.innerHTML = "离线嗓 <b>" + (okA ? (voiceList.length ? voiceList.length + " 条" : "默认嗓") : "无") + "</b>";
+}
+
+/* ⑧ 桥：送出（走壳口 gbtW3.message；壳外则如实说"无此口"，不伪造） */
+function pickReadable(reply) {
+  /* 桥可能回结构化 JSON：能解析就挑可读字段，不能解析就<b>原样显示文本</b>（绝不因解析失败显示空白） */
+  var raw = String(reply == null ? "" : reply);
+  var t = raw.trim();
+  if (t.charAt(0) !== "{" && t.charAt(0) !== "[") return { kind: "文本", text: raw };
+  try {
+    var d = JSON.parse(t);
+    var keys = ["reply", "text", "answer", "message", "content", "output", "result", "data"];
+    for (var i = 0; i < keys.length; i++) {
+      var v = d[keys[i]];
+      if (typeof v === "string" && v.trim()) return { kind: "JSON·" + keys[i], text: v };
+      if (v && typeof v === "object") return { kind: "JSON·" + keys[i] + "(对象)", text: JSON.stringify(v) };
+    }
+    return { kind: "JSON(无可读字段)", text: raw };
+  } catch (e) {
+    return { kind: "JSON 解析失败⇒原样显示", text: raw };
+  }
+}
+function sendToBridge() {
+  var text = $("sayText").value.trim();
+  if (!text) { log("输入框是空的，不发", "miss"); return; }
+  var s = shell();
+  if (!s || typeof s.message !== "function") {
+    chain(5, bridgeStage(), "");
+    chain(4, st("已入框（未发出）", "miss") + "「" + text + "」在本页里，<b>没有</b>发出去 —— 原因见第 ⑤ 环（壳外无对话口；本页网络面为零，不许绕）。", "");
+    log("未发出：壳外无 w3:message 口（浏览器直开）。桥实测在服务 HTTP " + PROBES.bridge.status +
+        "；缺的是本页→桥那条口", "miss");
+    chain(6, st("本机回读（非大脑回复）", "ink") +
+      " 桥不通 ⇒ 不做「假装收到回复」的动作。下面这声只是<b>本机嗓回读你输入的原话</b>，用来自证「离线嗓这条路真的通」。", "");
+    speakLocal(text, { arm: "A" });
+    return;
+  }
+  chain(5, st("已发（壳口 gbtW3.message）", "ink") + " 文本 " + text.length + " 字 ⇒ 壳转发到 " + BRIDGE_URL, "");
+  log("经壳口 gbtW3.message() 发往桥：" + text.slice(0, 40));
+  Promise.resolve(s.message({ text: text })).then(function (r) {
+    var d = (r && r.data) || r || {};
+    if (d.ok && (d.reply != null && String(d.reply) !== "")) {
+      var pk = pickReadable(d.reply);
+      chain(5, st("桥已回（HTTP " + d.status + "）", "ok") + " 解析=" + pk.kind + " · " + pk.text.length + " 字<br />" +
+        "<b>回包</b>：" + pk.text.slice(0, 700).replace(/</g, "&lt;"), "");
+      chain(4, st("已发并收到回复", "ok") + " 输入 " + text.length + " 字 ⇒ 回 " + pk.text.length + " 字", "");
+      log("桥回包（" + pk.kind + "）：" + pk.text.slice(0, 120), "ok");
+      speakLocal(pk.text, { arm: "A" });          /* 收到回复就出声 + 同步嘴型/动作 */
+    } else {
+      chain(5, st("桥调用失败", "bad") + " <span class='why'>" + String(d.error || JSON.stringify(d)).slice(0, 600) + "</span>" +
+        "<br /><span class='note'>回包形状 = {ok:" + d.ok + ", status:" + d.status + ", error:…}；原样贴出，不编。</span>", "");
+      log("桥调用失败原文：" + String(d.error || JSON.stringify(d)).slice(0, 200), "bad");
+    }
+  }).catch(function (e) {
+    chain(5, st("壳口抛异常", "bad") + " <span class='why'>" + String(e && e.message || e) + "</span>", "");
+  });
+}
+
+/* 按钮接线 */
+$("btnMic").onclick = function () { unlockGesture(); CAP.hold = false; probeMic().then(function () { startListen(); }); };
+$("btnStop").onclick = function () { stopListen(); };
+$("btnCapture").onclick = function () { unlockGesture(); CAP.hold = true; probeMic(); };
+$("btnCaptureStop").onclick = function () { stopCapture("主人点了停"); };
+$("btnSynth").onclick = function () { unlockGesture(); selfTestCapture(); };
+$("btnSayLocal").onclick = function () {
+  unlockGesture();
+  var t = $("sayText").value.trim() || "你好，我是GBT小土豆的数字人，现在用本机离线嗓说话。";
+  speakLocal(t, { arm: "A" });
+};
+$("btnSayGate").onclick = function () { unlockGesture(); speakGate($("sayText").value.trim() || "授权探针"); };
+$("btnStatus").onclick = function () { refreshStatus(); };
+$("btnSend").onclick = function () { unlockGesture(); sendToBridge(); };
+$("btnClear").onclick = function () { $("sayText").value = ""; chain(4, "已清空", ""); };
+$("tkBones").onchange = function () { boneView(this.checked); };
+$("tkPivot").onchange = function () { boneView(this.checked || $("tkBones").checked); };
+["rScale", "rY", "rX", "rA"].forEach(function (id) {
+  $(id).oninput = function () { drawRefOverlay(boneRigSymmetry()); };
+});
+$("rate").oninput = function () { $("rateRead").textContent = "rate=" + f2(this.value); };
+/* 用户手势解锁（自动播放策略）：第一次点击后即恢复，后续不再需要 */
+var gestured = false;
+function unlockGesture() {
+  if (gestured) return; gestured = true;
+  try {
+    if (window.speechSynthesis) {
+      var u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0; window.speechSynthesis.speak(u);
+    }
+  } catch (e) { /* 解锁失败不影响真实发声路径 */ }
+  log("已获得用户手势 ⇒ 自动播放策略解锁（若壳开了 audio_autoplay，则本来就不需要这一步）");
+}
+
+/* ───────────────────────── 11. 蒸馏表 + 坑表 + 自审 ───────────────────────── */
+var BLM = [
+  ["ASR 路线（云端为主）",
+   "src/voice/cloud-asr.js：四家云端 ASR 全是 <b>wss:// 流式长连接</b>——阿里 dashscope wss://…/inference（16k 单声道 PCM、按 sentence_end/definite 分句去重替换：definite→final 入档、非 definite→interim 上屏）、讯飞 rtasr（slice_type===2 才算 final）、火山 bigmodel_async（rate 16000）。",
+   "我们不搬云端：走<b>本机离线</b> System.Speech（MS-2052-80-DESK zh-CN，零密钥零安装），入口 tools/codex-scripts/asr-listen.ps1；页面经壳 gbtW3.intercom 拉起，随页面生灭。",
+   "做得到（离线）；做不到：流式 interim 上屏（离线识别器是<b>整段/定长</b>返回，没有 partial）"],
+  ["ASR 本地腿",
+   "src/voice/whisper_server.py + manager.js：本地 Whisper + VAD，流式服务钉在 <b>127.0.0.1:3723</b>，模型档 small；打包后优先跑 whisper_server.exe。",
+   "本机不跑 Whisper（零算力、无 CUDA ⇒ 2B/8B 级跑不动；whisper 依赖也未装）⇒ 用系统识别器替代；页面把「谁在听」显式写出来。",
+   "做不到（本机零算力；装 Whisper 需另装并下模型 —— 需主人同意）"],
+  ["VAD / 静默判定（参数口径）",
+   "whisper_server.py：SAMPLE_RATE 16000；chunk = SAMPLE_RATE//4（0.25s）；SILENCE_RMS_THRESHOLD 0.005、NEAR_SPEECH_RMS_THRESHOLD 0.010、MIN_UTTERANCE_PEAK_RMS 0.015、MIN_UTTERANCE_VOICED_CHUNKS 2；静默 SILENCE_CHUNKS_TO_FLUSH <b>8 个 chunk（≈2s）</b> 才切句，MAX_BUFFER_SECONDS 25；还有 hallucination 过滤表（「请订阅/感谢收看/字幕…」）。",
+   "参数口径<b>借过来</b>：我们的听写用 3s 定长窗（asr-listen.ps1 -Seconds），静默即 heard=false 且<b>不写成错误</b>；识别器不产生 Whisper 式幻觉 ⇒ 过滤表用不上。噪声门限用<b>现量基线</b>：本页动作取证的基线是「同一套采样跑 idle」，语音面的底噪基线取历史最小值（见坑表）。",
+   "部分做得到：RMS 三阈值/2s 切句/幻觉过滤表这几条<b>没接</b>（离线识别器不吃这些参数）"],
+  ["TTS（多家云端 + 参数）",
+   "src/voice/tts-providers.js：5 家（doubao/minimax/openai/elevenlabs/volcano）；doubao 走 audio_params{format:mp3,sample_rate:24000}，语速 speech_rate 限幅 <b>-50~100</b>（0=正常，100=2×）；minimax voice_setting{speed,emotion:'neutral',vol:1} + audio_setting{sample_rate:32000,bitrate:128000}；volcano {pitch_ratio:1.0, operation:'query'}；tts-defaults.js 默认 provider=doubao、默认音色 zh_male_m191_uranus_bigtts、默认语速 20（normalize 到 ±50/100）。",
+   "本机免费离线优先：页面臂 A = speechSynthesis（底下就是系统 SAPI 嗓；PowerShell 现读 Microsoft Huihui Desktop zh-CN Female）；臂 B = 门内 SAPI（需 audio_output 授权）。语速保留滑杆（<b>归一化到 0.6~1.6</b>，与 doubao 的 -50~100 不是同一刻度，如实标注）。",
+   "做得到（离线嗓）；做不到：情绪/音色设计/流式音频分片（离线嗓无 emotion 参数）"],
+  ["打断与主循环接线",
+   "cloud-asr.js 是一个 session 对象（onTranscript(text,isFinal) / onEvent / close()），manager 起停子进程；README 明写「语音回复只在发起该次语音输入的窗口播放，其他客户端只同步文字」。",
+   "我们：页面 = session（onIntercom 事件回流，页面关闭即 stop，无开关）；回声自激用「<b>服务端别出声</b>」这条纪律防（见坑表）。",
+   "做不到：真·barge-in（说话中打断）——离线识别器没有「边说边听」能力，且本机无采集端点"],
+  ["平台旁路",
+   "src/voice/macos-speech.js：macOS 上走原生 Speech.framework（编译 native-speech-recognizer，或 swift 直跑 macos-speech.swift），并请求麦克风权限。",
+   "我们是 Windows：等价物就是 System.Speech（同一类「OS 自带识别器」）。",
+   "不适用（平台不同）"],
+  ["云臂（备选）",
+   "——（白龙马没有 HF 路线）",
+   "本仓另有一条 gbt_allinone/tools/hf_voice.py：HF 歌声/语音，3 臂轮询 + 冷却，只许 https 且主机白名单（api-inference/router.huggingface.co），候选项在代码里<b>全标 verified=false</b>（缺 token 未验）。",
+   "未验（缺 HF 密钥；会出网）⇒ 页面<b>只显示状态，不默认调用</b>"]
+];
+var PITS = [
+  ["麦克风三坑之一：默认输入是 -1",
+   "wasapi-record.py 里 `default_input_device >= 0` 才是真默认端点；本机现读<b>默认录音设备不存在</b>（GetDefaultAudioEndpoint(eCapture) 抛 ERROR_NOT_FOUND）。本页不假设有默认麦：先 enumerateDevices 数 audioinput（现读 0 个），再 getUserMedia 实测，失败就贴原文（NotFoundError）。"],
+  ["麦克风三坑之二：设备只吃原生采样率（44.1k / 48k）",
+   "在办清单二十八·二：Realtek 引脚报 44100，PortAudio 的 WDM-KS 只吃回调式。本页不碰采样率（Chromium 采集自己协商）；真录制那条腿在 tools/codex-scripts/wasapi-record.py（已改回调式 + 设备原生采样率 + 录后重采样 16k）。"],
+  ["麦克风三坑之三：SAPI 结果键叫 text",
+   "asr-listen.ps1 输出契约 {ok,heard,text,confidence,culture,seconds,reason} —— 本页读的就是 <b>text</b>；没听到时 heard=false 且 text=\"\"，页面据此显示「安静（不是坏）」，绝不把空串当识别结果。"],
+  ["SAPI 听写循环 Recognize 读完会抛异常",
+   "asr-listen.ps1 把 Recognize 包在 try/catch 里：文件模式用无参 Recognize() 整段跑完，设备模式用 Recognize(TimeSpan)；两条路都把异常原文带出（status=error/no_input + reason）。intercom.py watch 因此<b>一轮一进程</b>地跑，不在一个进程里反复 Recognize。"],
+  ["噪声基线取历史最小值",
+   "本页把它落成<b>可机检的口径</b>：\"被测\"必须超过\"现量基线\"的 2 倍才算数 —— 动作取证的基线是同一套 41 点采样跑 idle 得到的（现量，不是常数）；语音面的门限同理应取历史最小值（本机当前无采集端点，这条<b>未能实测</b>，如实标注）。"],
+  ["服务端别出声",
+   "白龙马 README 也踩过这条：语音回复只在<b>发起那次输入的窗口</b>播放（否则多端齐响）。本页遵守：只有本页按钮触发才 speak；且<b>页面加载时不自动说话</b>（静默加载）——既守这条，也顺带不撞自动播放策略。"],
+  ["安静 ≠ 坏了 ≠ 被门拒（本仓第 66 轮实错）",
+   "本页三条状态分开显示：status=heard / quiet（无输入）/ no_input（没设备）/ denied（缺授权），各有各的原文；不合并成一句\"语音不可用\"。"],
+  ["授权台账为 0 ⇒ 需授权的作用域一律不试",
+   "本页只做<b>只读探测</b>：intercom('status') 会由壳自己探一次门并报缺什么（这是它既有的行为），我不额外去要授权；门内 TTS 只在<b>主人点按钮</b>时才调一次，缺票就把 missing_scopes 与 how_to_grant 原文贴出来。"],
+  ["AudioWorklet 的 Blob URL 被本页 CSP 拒（2026-10-08 实测）",
+   "本页 CSP（script-src 'unsafe-inline'）会拒 Blob worklet —— 探针原文：`Loading the script 'blob:file:///…' violates the following Content Security Policy directive: \"script-src 'unsafe-inline'\"` + `AbortError: Unable to load a worklet's module.`。本页照白龙马口径<b>首试仍然发</b>（Blob URL 懒加载），失败如实记账（diagCaptureMode 里带原文）再退 ScriptProcessor —— 采集照样在跑。**CSP 不动**（主人令：不要放开页面的网络面）；要让 worklet 真跑，走\"壳给口\"那条路，不改页面 CSP。"],
+  ["PCM 出站没有现成口（实测三查）",
+   "① 127.0.0.1:3721（白龙马的 ASR 代理口）本机无监听；② 面板桥只有 /api/message（对话受理→bridge.send(text)，聊天语义）与 /api/observer/voice（出声），没有音频上行路由；③ 壳侧唯一受理口 gbtW3.message 是文本口（壳内写死 maxChars=4000）——装不下 PCM。⇒ 页面如实标「采到了但没后端」，出站只留单点 PCM_SINK.toShell()，接线配方写在它的注释里（第一步是机侧起 3721 代理，第二步才是动 preload —— 本轮红线未动）。"]
+];
+
+function fillTables() {
+  /* 白龙马蒸馏表：逐条卡（面 / 白龙马怎么做 / 我们怎么等价 / 做得到吗） */
+  var box = $("blmList");
+  while (box.firstChild) box.removeChild(box.firstChild);
+  BLM.forEach(function (r) {
+    var d = h("div", "dist");
+    d.appendChild(h("div", "dt", r[0]));
+    var a = h("div", "dl"); a.innerHTML = "<b>白龙马</b>：" + r[1]; d.appendChild(a);
+    var b = h("div", "dl"); b.innerHTML = "<b>我们</b>：" + r[2]; d.appendChild(b);
+    var m = /^(做得到|做不到|部分做得到|未验|不适用)/.exec(r[3]);
+    var label = m ? m[1] : "—";
+    var rest = m ? r[3].slice(m[1].length).replace(/^[（(]/, "").replace(/[）)]\s*$/, "") : r[3];
+    var cls = (label === "做得到" || label === "部分做得到") ? "ok" : (label === "不适用" ? "ink" : "miss");
+    var dv = h("div", "dv");
+    dv.innerHTML = '<span class="st ' + cls + '">' + label + '</span> ' +
+                   '<span class="note">' + rest + "</span>";
+    d.appendChild(dv);
+    box.appendChild(d);
+  });
+  /* 坑表：逐条卡（坑（出处）/ 本页处置） */
+  var box2 = $("pitList");
+  while (box2.firstChild) box2.removeChild(box2.firstChild);
+  PITS.forEach(function (r) {
+    var d = h("div", "dist");
+    d.appendChild(h("div", "dt", r[0]));
+    var a = h("div", "dl"); a.innerHTML = r[1]; d.appendChild(a);
+    box2.appendChild(d);
+  });
+}
+function selfAudit() {
+  var links = document.querySelectorAll("link[rel=stylesheet]").length;
+  var scr = document.querySelectorAll("script[src]").length;
+  var mod = 0;
+  Array.prototype.forEach.call(document.querySelectorAll("script"), function (sc) {
+    /* 不用选择器写 type=[module]：这里按属性现读，免得自审本身就带一个"module"字样的假命中 */
+    if ((sc.getAttribute("type") || "") === "module") mod++;
+  });
+  var ifr = document.querySelectorAll("iframe").length;
+  var imgs = document.querySelectorAll("img").length;
+  var csp = "";
+  var meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+  if (meta) csp = meta.getAttribute("content") || "";
+  var canvas = document.querySelectorAll("canvas").length;
+  var inline = document.querySelectorAll("script:not([src])").length;
+  $("auditRead").innerHTML =
+    "外链样式表 <b>" + links + "</b> · 外链脚本 <b>" + scr + "</b> · module 脚本 <b>" + mod + "</b> · iframe <b>" + ifr +
+    "</b> · &lt;img&gt; <b>" + imgs + "</b>（全部同目录本地）· canvas <b>" + canvas + "</b> · 内联经典脚本 <b>" + inline + "</b><br />" +
+    "CSP = <code>" + csp + "</code><br />" +
+    "<span class='note'>这一格不是声明，是<b>运行时执法</b>：CSP 里 <code>connect-src 'none'</code> 由浏览器执行 ⇒ 本页的任何网络取数原语都会被当场拒绝（不需要我自觉）。" +
+    "上表里除 <code>reference-02.jpg</code> 外没有任何外部资源。</span>";
+  $("auditTag").textContent = "外链 " + (links + scr) + " · module " + mod + " · iframe " + ifr;
+}
+
+/* ───────────────────────── 13. 语音→操控路由（⑨）+ 我对主人的了解（⑩） ─────────────
+   数据 = vcSpec（严格 JSON，由 tools/codex-scripts/voice-control-route.py 的**只读探针**生成，
+   带 at 与逐格证据）。本页在这两个面板里的角色：
+     · ⑨ 把一句自然语言**算成路由**（纯本地字符串匹配；零网络、零执行、零动态求值）；
+     · ⑩ 把用户模型的**观察到的 / 推断未证实的**分开摆出来（数据来自原生心智引擎）。
+   🔴 页面只发意图：路由 ≠ 执行；真要动手，走第 ④/⑤ 条口（壳 → 面板桥），由大脑在门口过唯一门。 */
+var VC = readSpec("vcSpec");
+function vcMd(s) {                     /* 面板里只做两件事：转义 + 把 **x** 变粗体 */
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+}
+function vcFace(id) { for (var i = 0; i < VC.faces.length; i++) { if (VC.faces[i].id === id) return VC.faces[i]; } return null; }
+function vcTicketCell(f) {
+  if (!f.ticket) return { cls: "miss", text: "（无路由 ⇒ 无票可吃）" };
+  var t = VC.tickets[f.ticket];
+  if (t) return { cls: "ok", text: f.ticket + " · 有票 " + t.grants + " 张（" + t.mode + "）" };
+  return { cls: "miss", text: f.ticket + " · <b>缺票</b>（0 张）· 谁能给：只有主人（" + VC.grant_how.join(" / ") + "）" };
+}
+function renderVoiceControl() {
+  var box = $("vcList");
+  while (box.firstChild) box.removeChild(box.firstChild);
+  VC.faces.forEach(function (f) {
+    var d = h("div", "dist");
+    var dt = h("div", "dt", f.face + " · " + f.cn);
+    d.appendChild(dt);
+    var tk = vcTicketCell(f);
+    var l1 = h("div", "dl");
+    l1.innerHTML = "<b>能力位</b>：" + vcMd(f.cap || "（未找到能力位）") +
+      ' <span class="st ' + tk.cls + '">' + (f.ticket || "无票") + "</span> " + tk.text;
+    d.appendChild(l1);
+    var l2 = h("div", "dl");
+    l2.innerHTML = "<b>动作</b>：读 <span class='mono'>" + f.read.join(", ") + "</span>" +
+      (f.write.length ? "<br />写 <span class='mono'>" + f.write.join(", ") + "</span>" : "");
+    d.appendChild(l2);
+    var l3 = h("div", "dl");
+    l3.innerHTML = "<b>现状</b>：" + vcMd(f.status) +
+      "<br /><span class='note'>证据（at " + f.at + " · " + vcMd(f.probe) + "）：" + vcMd(f.evidence) + "</span>";
+    d.appendChild(l3);
+    var l4 = h("div", "dl");
+    l4.innerHTML = "<span class='note'>语音示例：" + vcMd(f.voice) + "</span>";
+    d.appendChild(l4);
+    box.appendChild(d);
+  });
+  var tk6 = Object.keys(VC.tickets).length;
+  var gs = Object.keys(VC.tickets).map(function (k) { return VC.tickets[k].grants; });
+  var gmin = gs.length ? Math.min.apply(null, gs) : 0, gmax = gs.length ? Math.max.apply(null, gs) : 0;
+  var gtxt = (gmin === gmax) ? (gmin + " 张") : (gmin + "~" + gmax + " 张");
+  $("vcTag").textContent = "快照 " + VC.at + " · 机检 " + VC.check.n + " 条" + (VC.check.ok ? " 全绿" : " 有红") + " · 有票作用域 " + tk6;
+  $("vcLive").innerHTML = "路由表来源：<code>" + VC.src + "</code>（<b>只读探针</b>；本页不联网、不执行）。" +
+    "票（授权门）现读：<b>" + tk6 + "</b> 个作用域各 " + gtxt + "（" + Object.keys(VC.tickets).join(", ") + "）。" +
+    "发放只有两条合法路：" + VC.grant_how.join(" · ") + "。<br />" +
+    "<span class='note'>红线：本页<b>只发意图</b> —— 算路由只是字符串匹配；真要动手走第 ④⑤ 条口（壳替页面 POST 到本机面板桥），" +
+    "由大脑在门口过唯一门/授权门。页面不许自己动手、不许绕门，也不许替主人发授权。</span>";
+}
+
+/* 意图 → 路由（确定性匹配，命中顺序即优先级：调试 > 无线 > 蓝牙 > 浏览器 > 设置 > APP） */
+function routeIntent(text) {
+  var s = String(text == null ? "" : text).toLowerCase().trim();
+  if (!s) return { ok: false, why: "空句子：没东西可路由" };
+  var hit = null;
+  VC.intent.forEach(function (m) {
+    if (hit) return;
+    for (var i = 0; i < m.words.length; i++) {
+      if (s.indexOf(String(m.words[i]).toLowerCase()) >= 0) { hit = m; return; }
+    }
+  });
+  if (!hit) {
+    return { ok: false, why: "**未命中任何路由** —— 本页如实报「未命中」，不猜、不兜底（负对照：伪造的动作名/面名也必然落这里）", text: text };
+  }
+  var f = vcFace(hit.id);
+  var tk = vcTicketCell(f);
+  var canNow = f.ticket
+    ? ("路由在 ⇒ 动手前吃这张票（现探：" + tk.text + "）" +
+       (/cdp_available=False/.test(f.evidence) ? "；⚠ CDP 调试口当前没开（要先 launch，而 launch 也要吃这张票）" : ""))
+    : "**没有执行位** ⇒ 这句只能「说出来」，落不下去（缺的那一格已如实登记在上面表里）";
+  return { ok: true, text: text, id: hit.id, face: f.face, cn: f.cn, cap: f.cap, read: f.read, write: f.write,
+           ticket: f.ticket, ticketText: tk.text, ticketCls: tk.cls, status: f.status,
+           evidence: f.evidence, probe: f.probe, at: f.at, canNow: canNow,
+           next: f.ticket
+             ? "下一步：把这句话送出去（第 ④ 条文本口 → 第 ⑤ 条壳口 gbtW3.message），由大脑/能力位在门口执行；本页不算完。"
+             : "下一步：要么请主人点头建一个能力位（本页无权建），要么先用读类键（netsh wlan show * 这种只读端）。" };
+}
+function vcRouteShow(r) {
+  var out = $("vcOut");
+  if (!r.ok) {
+    out.className = "warn";
+    out.innerHTML = '<span class="st miss">未命中</span> ' + vcMd(r.why);
+    log("路由未命中：「" + String(r.text || "").slice(0, 30) + "」（如实报，不猜）", "miss");
+    return;
+  }
+  out.className = "ok-box";
+  out.innerHTML =
+    '<span class="st ok">命中 ' + r.face + '</span> <span class="note">' + r.cn + "</span><br />" +
+    "<b>能力位</b>：" + r.cap + " · <b>动作</b>：读[" + r.read.join(", ") + "]" +
+    (r.write.length ? " 写[" + r.write.join(", ") + "]" : "（写面为空）") + "<br />" +
+    "<b>票</b>：<span class='st " + r.ticketCls + "'>" + (r.ticket || "无") + "</span> " + r.ticketText + "<br />" +
+    "<b>能不能用</b>：" + vcMd(r.canNow) + "<br />" +
+    "<span class='note'>" + vcMd(r.next) + "</span>";
+  $("vcLog").textContent = ("[" + new Date().toTimeString().slice(0, 8) + "] 路由「" + String(r.text).slice(0, 40) +
+    "」→ " + r.face + " · 能力位=" + r.cap + " · 票=" + (r.ticket || "无") + "\n" + $("vcLog").textContent).slice(0, 4000);
+}
+/* 路由自检：正样本 + 两条负对照（伪造的动作名/不存在的能力位必须报红） */
+function vcSelfCheck() {
+  var cases = [
+    ["把记事本打开", "app"], ["帮我把这个页面里的脚本注入一下", "devtools"],
+    ["把灯调暗一点", "bluetooth"], ["断开无线网", "wifi"], ["打开显示设置", "settings"],
+    ["把页面上的按钮点一下", "browser"], ["飞向月球", null]
+  ];
+  var rows = [], bad = 0;
+  cases.forEach(function (c) {
+    var r = routeIntent(c[0]);
+    var got = r.ok ? r.id : null;             /* 比 id（不是显示名）—— 自检自己踩过：拿 face 显示名比 id，六条全假红 */
+    var want = c[1];
+    var pass = (want === null) ? (!r.ok) : (r.ok && r.id === want);
+    if (!pass) bad++;
+    rows.push((pass ? "OK  " : "RED ") + "「" + c[0] + "」→ " + (r.ok ? (r.face + "（" + r.id + "）") : "未命中") +
+      "（期望 " + (want || "未命中") + "）");
+  });
+  /* 负对照·数据面：伪造的动作名与不存在的能力位名，必须一个都查不到 */
+  var forgedAction = "fly_to_moon", forgedCap = "wifi_control", hitA = 0, hitC = 0;
+  VC.faces.forEach(function (f) {
+    if (f.write.indexOf(forgedAction) >= 0 || f.read.indexOf(forgedAction) >= 0) hitA++;
+    if (String(f.cap || "").indexOf(forgedCap) >= 0) hitC++;
+  });
+  if (hitA) bad++;
+  if (hitC) bad++;
+  rows.push((hitA ? "RED " : "OK  ") + "负对照·伪造动作名「" + forgedAction + "」在路由表命中数 = " + hitA + "（必须 0）");
+  rows.push((hitC ? "RED " : "OK  ") + "负对照·不存在的能力位「" + forgedCap + "」命中数 = " + hitC + "（必须 0；无线网那格如实写「未找到能力位」）");
+  var out = $("vcOut");
+  out.className = bad ? "bad-box" : "ok-box";
+  out.innerHTML = "<b>路由自检</b>（" + cases.length + " 个正样本 + 2 条负对照）：<b>" + (bad ? bad + " 条报红" : "全绿") + "</b><br />" +
+    rows.map(function (x) { return vcMd(x); }).join("<br />");
+  log("路由自检：" + (bad ? bad + " 条报红" : "全绿（含 2 条负对照）"), bad ? "bad" : "ok");
+}
+
+/* ⑩ 我对主人的了解：观察到的（证据）与推断未证实的**分开列** */
+function renderOwnerPanel() {
+  var o = VC.owner || {};
+  var tb = $("omTbl").querySelector("tbody");
+  while (tb.firstChild) tb.removeChild(tb.firstChild);
+  function row(field, value, col, cls) {
+    var tr = h("tr", cls || "");
+    tr.appendChild(h("td", "mono", field));
+    var v = h("td", "");
+    v.innerHTML = vcMd(value);
+    tr.appendChild(v);
+    var c = h("td", "");
+    c.innerHTML = '<span class="st ' + (col === "观察" ? "ink" : "miss") + '">' + col + "</span>";
+    tr.appendChild(c);
+    tb.appendChild(tr);
+  }
+  (o.evidence || []).forEach(function (e, i) {
+    row(i === 0 ? "evidence[0…]（证据）" : "evidence[" + i + "]", e, "观察", "");
+  });
+  row("state（主人状态）", o.state + "（置信度 " + o.confidence + "）", "推断未证实");
+  row("emotion（情绪）", o.emotion, "推断未证实");
+  row("energy（精力）", String(o.energy), "推断未证实");
+  row("focus（专注面）", o.focus, "推断未证实");
+  row("urgency（紧迫度）", String(o.urgency), "推断未证实");
+  row("current_need（此刻需要的）", o.current_need, "推断未证实");
+  $("omTag").textContent = "观察 " + ((o.evidence || []).length) + " 条 · 推断 6 项（置信度 " + o.confidence + "）";
+  $("omRead").innerHTML = "规则（模型自带、原样照登）：<b>" + vcMd(o.rule) + "</b><br />" +
+    "边界（模型自设）：" + (o.boundaries || []).map(function (b) { return vcMd(b); }).join("；") + "。<br />" +
+    "<span class='note'>「观察到的」= 模型从真实事件里采到的证据（原文照登）；「推断未证实的」= 由证据算出的带置信度判断 —— " +
+    "两列<b>不合并</b>：推断不许冒充主人真实想法（这条写在模型的 rule 里）。</span>" +
+    (VC.owner_demo ? ("<br /><b>本轮真跑过一轮写入</b>（" + VC.owner_demo.at + " · " + vcMd(VC.owner_demo.what) + "）：<br />" +
+      "写前 confidence <b>" + VC.owner_demo.before.confidence + "</b>，证据 " + VC.owner_demo.before.evidence.join(" / ") + "<br />" +
+      "写后 confidence <b>" + VC.owner_demo.after.confidence + "</b>，证据 " + VC.owner_demo.after.evidence.join(" / ") + "<br />" +
+      "读回（独立再读）：<span class='mono'>" + vcMd(VC.owner_demo.readback) + "</span><br />" +
+      "随后（活的引擎）：<span class='mono'>" + vcMd(VC.owner_demo.after_idle || "—") + "</span><br />" +
+      "审计原文（store/audit.jsonl · 这一行就是「可核」）<br /><span class='mono'>" + vcMd(VC.owner_demo.audit) + "</span>") : "");
+  $("omReadPath").innerHTML = vcMd(VC.owner_paths.read_path) + "<br /><span class='note'>+ " + vcMd(VC.owner_paths.memory_store) + " · " + vcMd(VC.owner_paths.audit) + "</span>";
+  $("omWritePath").innerHTML = vcMd(VC.owner_paths.write_path) + "<br /><span class='note'>" + vcMd(VC.owner_paths.mirror) + "</span>";
+  $("omRecord").innerHTML = VC.owner_record.map(function (x) { return vcMd(x); }).join("；") + "。";
+}
+
+/* ⑨⑩ 按钮接线（只算路由 / 只显示读数 —— 都不动手、不出网） */
+$("vcRoute").onclick = function () { unlockGesture(); vcRouteShow(routeIntent($("vcIn").value)); };
+$("vcSelf").onclick = function () { unlockGesture(); vcSelfCheck(); };
+$("vcIn").onkeydown = function (e) { if (e && e.key === "Enter") { vcRouteShow(routeIntent($("vcIn").value)); } };
+
+/* ───────────────────────── 12. 启动 ───────────────────────── */
+jointTable();            /* 骨架表 + 对称读数 + 参考图叠加 */
+fillTables();            /* 蒸馏表 + 坑表 */
+selfAudit();             /* 自包含自审（自己数自己） */
+renderVoiceControl();    /* ⑨ 语音→操控路由表（快照 → 面板；只显示，不执行） */
+renderOwnerPanel();      /* ⑩ 我对主人的了解（观察 vs 推断分开列） */
+chips(false);            /* 先建顶栏读数格（voiceChip 要往里写） */
+refreshStatus();         /* 语音链路：有壳走壳，无壳用实测快照 + 如实说明 */
+/* ② 采集链**加载即自动跑一轮**（Chromium 现读：枚举 → 约束/回退 → Worklet/ScriptProcessor → 字节数）：
+   本页的立页口径就是"每一环贴实测"，麦克风这一环不点也该看得见真读数；真麦若在，短窗 1.6s 即停。 */
+probeMic();
+initVoices();            /* 嗓表异步装填（等 voiceschanged） */
+setAct("idle");          /* 起手常态呼吸 */
+requestAnimationFrame(loop);
+log("页面启动：骨架 " + ORDER.length + " 关节 · 动作 " + Object.keys(ACT).length +
+    " 个 · 零网络取数原语（CSP connect-src 'none' 由浏览器执法）");
+
+/* 给无头取证用的探针口（只读；page-shot / 自验脚本可调） */
+window.__dhProbe = {
+  joints: function () { return ORDER.slice(); },
+  spec: function () { return RIG; },
+  actions: function () { return Object.keys(ACT); },
+  worldAt: function (act, t) { var w = worldAt(act, t).world, o = {}; ORDER.forEach(function (n) { o[n] = { a: w[n].a, x: w[n].x, y: w[n].y }; }); return o; },
+  symmetry: function () { var s = boneRigSymmetry(); return { worst: s.worst, worstPair: s.worstPair, bad: s.bad }; },
+  metric: function (act) { var m = metric(sample(act));
+    return { maxD1: m.maxD1, whoD1: m.whoD1, maxD2: m.maxD2, whoD2: m.whoD2, maxDisp: m.maxDisp, whoDisp: m.whoDisp }; },
+  motionTable: function (act) {
+    var m = motionEvidence[act] || metric(sample(act));
+    var out = {};
+    MJOINTS.forEach(function (n) { out[n] = { d1: m.per[n].d1, d2: m.per[n].d2, disp: m.per[n].disp,
+      t0a: mpoint(m.rows[0], n).a, pseudo: n === "root" }; });
+    return out;
+  },
+  verdict: function (act) {
+    var m = motionEvidence[act] || metric(sample(act)), b = baseline();
+    var isStatic = (act === "refpose"), isIdle = (act === "idle");
+    var pass = (m.maxD2 > 5) && (m.maxD1 > 0.2) && (m.maxDisp > 2) &&
+               (m.maxD2 > 2 * b.maxD2) && (m.maxDisp > 2 * b.maxDisp);
+    return { act: act, maxD1: m.maxD1, whoD1: m.whoD1, maxD2: m.maxD2, whoD2: m.whoD2,
+             maxDisp: m.maxDisp, whoDisp: m.whoDisp,
+             baseD2: b.maxD2, baseD1: b.maxD1, baseDisp: b.maxDisp,
+             verdict: isStatic ? "静态姿势" : (isIdle ? "现量基线" : (pass ? "真在动" : "未达门")), pass: pass };
+  },
+  voice: function () {
+    return { shell: !!shell(), sh: window.gbtW3 ? Object.keys(window.gbtW3) : [],
+             speechSynthesis: !!window.speechSynthesis, voices: voiceList.length,
+             voicePicked: (function () { var v = pickVoice(); return v ? v.name + "/" + v.lang : null; })(),
+             speaking: speaking, snapshotAt: SNAPSHOT.at, bridge: BRIDGE_URL,
+             captureReady: SNAPSHOT.capture_ready };
+  },
+  speakLocal: function (t) { unlockGesture(); speakLocal(t || "自验一句话"); },
+  /* 取证用：把播放器**冻在**某个动作的某个相位（只改内存里的 t，不写任何东西）——
+     给无头取证器拍"连续帧对比图"用。playing 置 false，拍完不影响页面正常播放。 */
+  freeze: function (act, t) {
+    if (!ACT[act]) return false;
+    player.act = act; player.t = Number(t) || 0; player.playing = false;
+    var st = poseAt(act, player.t);
+    if (st.mouth) st.pose.jaw = 3.4 * st.mouth;
+    render(st);
+    $("curAct").textContent = act + " · " + ACT[act].cn + "（冻在 t=" + f2(player.t) + "）";
+    return true;
+  },
+  unfreeze: function (name) { setAct(name || "idle"); return true; },
+  strip: function () { return document.querySelectorAll("#strip .cell").length; },
+  /* ⑨⑩ 的取证口（只读）：路由表与用户模型的两块面板，无头也能核 */
+  voiceControl: function () {
+    return { at: VC.at, src: VC.src, faces: VC.faces.map(function (f) { return f.id; }),
+             tickets: VC.tickets, check: VC.check, owner: VC.owner,
+             owner_paths: VC.owner_paths, honesty: VC.honesty };
+  },
+  /* ② 采集链读数（只读；无头取证器读它拿"真读数"）+ 两个动作口（取证/自检用，都在本页内、零网络） */
+  mic: function () {
+    return { at: CAP.at, devices: CAP.devices, constraints: CAP.constraints, gum: CAP.gum,
+             settings: CAP.settings, ctxRate: CAP.ctxRate, wantRate: CAP.wantRate, ctxState: CAP.ctxState,
+             ctxErr: CAP.ctxErr, diagCaptureMode: CAP.diagCaptureMode, modeWhy: CAP.modeWhy,
+             workletErr: CAP.workletErr, bytes: CAP.bytes, chunks: CAP.chunks, lastChunkAt: CAP.lastChunkAt,
+             firstChunkAt: CAP.firstChunkAt, firstChunkDelayMs: CAP.firstChunkDelayMs || null,
+             windowMs: CAP.windowMs || null, startedAt: CAP.startedAt || null,
+             running: CAP.running, sourceKind: CAP.sourceKind, err: CAP.err,
+             sink: { at: PCM_SINK.state.at, why: PCM_SINK.state.why, envelope: PCM_SINK.envelope },
+             chain2: ($("c2") ? $("c2").innerText : "") };
+  },
+  micChain: function (opts) { CAP.hold = !!(opts && opts.hold); return probeMic(); },
+  micSelfTest: function () { return selfTestCapture(); },
+  micStop: function () { stopCapture("探针停"); return { bytes: CAP.bytes, chunks: CAP.chunks }; },
+  routeIntent: function (t) { var r = routeIntent(t); return r; },
+  vcSelfCheck: function () { vcSelfCheck(); return $("vcOut").innerHTML.slice(0, 400); }
+};
+})();
+</script>
+
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+</body>
+</html>

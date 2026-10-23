@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+<meta charset="utf-8" />
+
+<title>GBT小土豆V8 · 语音剧场（设计稿 v1）</title>
+<!--
+  GBT小土豆V8 · 数字人语音交互 · 全屏对话剧场（设计稿 v1）
+  开发者：自由的风 · 本署名不可删除、不可篡改归属
+
+  这一版是**可看的设计稿**，不是已接通的产品形态。诚实边界（页面右下角也常驻显示）：
+    · 波形与光晕：由**她本人的欢迎语音**（holo_pet_w3/digital-human/welcome-gbt-v8-zh.wav）
+      经 WebAudio AnalyserNode 实时驱动 —— 是真音频，不是随机动画；
+    · 语音输入：会真尝试 getUserMedia；本机现读 **0 个录音端点** ⇒ 会如实显示
+      「无输入端点」，并自动落到键盘输入，不伪造"我在听"；
+    · 回复语音：本稿复用同一个本地样本，**未接真实 TTS**（TTS 需 audio_output 授权）；
+    · ASR：未接（离线 win-speech 在 Python 侧，需壳桥）。
+  设计口径（对齐 holo_pet_w3/window.css 的品牌 token，不另造一套皮）：
+    土豆金 #F5B041 主强调 · 赛博青 #00E5FF 状态冷色 · 深空紫 #7C4DFF 仅用于分隔线
+    底色 #050711 · 文字 #E8ECF8
+  三条交互铁律（写进状态机）：① 任何状态都能被打断；② 状态灯只反映真实状态；
+    ③ 没有能力时明说，不让界面装出「能用」。
+-->
+<style>
+  :root {
+    --gbt-gold: #F5B041;
+    --gbt-cyan: #00E5FF;
+    --gbt-violet: #7C4DFF;
+    --gbt-ok: #22C55E;
+    --gbt-warn: #F5B041;
+    --gbt-fault: #EF4444;
+    --gbt-off: #6B7280;
+    --gbt-bg: #050711;
+    --gbt-text: #E8ECF8;
+    --gbt-dim: rgba(232, 236, 248, .56);
+    --gbt-faint: rgba(232, 236, 248, .32);
+    --hair: rgba(232, 236, 248, .08);
+    --hair-soft: rgba(232, 236, 248, .04);
+    --stage-vignette: radial-gradient(120% 90% at 50% 12%, rgba(124, 77, 255, .10), transparent 62%);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--gbt-bg);
+    color: var(--gbt-text);
+    font-family: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ── 舞台 ───────────────────────────────────────────────────────────── */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) 300px;
+    grid-template-rows: minmax(0, 1fr) auto;
+    background:
+      var(--stage-vignette),
+      radial-gradient(80% 60% at 50% 100%, rgba(245, 176, 65, .06), transparent 70%),
+      var(--gbt-bg);
+  }
+
+  /* 左：状态轨 */
+  .rail {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    border-right: 1px solid var(--hair-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    padding: 24px 0;
+  }
+  .rail__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--gbt-faint);
+    transition: color .25s ease;
+  }
+  .rail__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(232, 236, 248, .14);
+    box-shadow: none;
+    transition: background .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .rail__item[data-on="1"] { color: var(--gbt-text); }
+  .rail__item[data-on="1"] .rail__dot { transform: scale(1.5); }
+  .rail__item[data-tone="idle"][data-on="1"] .rail__dot { background: var(--gbt-off); }
+  .rail__item[data-tone="listen"][data-on="1"] .rail__dot { background: var(--gbt-cyan); box-shadow: 0 0 14px rgba(0, 229, 255, .8); }
+  .rail__item[data-tone="think"][data-on="1"] .rail__dot { background: var(--gbt-gold); box-shadow: 0 0 14px rgba(245, 176, 65, .8); }
+  .rail__item[data-tone="speak"][data-on="1"] .rail__dot { background: var(--gbt-gold); box-shadow: 0 0 20px rgba(245, 176, 65, .95); }
+
+  /* 中：她 */
+  .scene {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    position: relative;
+    min-height: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .scene__halo {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: min(74vh, 620px);
+    height: min(74vh, 620px);
+    translate: -50% -50%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(245, 176, 65, .16), rgba(245, 176, 65, .05) 42%, transparent 66%),
+      radial-gradient(circle at 50% 80%, rgba(0, 229, 255, .08), transparent 58%);
+    filter: blur(2px);
+    transform: scale(var(--breathe, 1));
+    transition: opacity .5s ease;
+    pointer-events: none;
+  }
+  .scene__ring {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: min(62vh, 520px);
+    height: min(62vh, 520px);
+    translate: -50% -50%;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 176, 65, .18);
+    box-shadow: inset 0 0 60px rgba(245, 176, 65, .05);
+    pointer-events: none;
+  }
+  .scene__ring::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid var(--hair-soft);
+  }
+  /* 3D 舞台：**真模型**（assets/dh-v2-rigged.glb · 65 骨骼 · idle/walk 两段动作），不是静态立绘。
+     2026-10-18 主子令「推到重做·按源码实现」后换的 —— 上一版是一张 JPG，人不动。 */
+  .stage3d {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  #dh3d, #dh2d { display: block; width: 100%; height: 100%; }
+  .stage3d__status {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    translate: -50% 0;
+    width: min(760px, 84%);
+    text-align: center;
+    font-size: 11.5px;
+    line-height: 1.65;
+    letter-spacing: .02em;
+    color: rgba(232, 236, 248, .5);
+    z-index: 4;
+    margin: 0;
+  }
+  .stage3d__status[data-tone="ok"] { color: rgba(122, 232, 184, .58); }
+  .stage3d__status[data-tone="fault"] { color: rgba(255, 138, 138, .88); }
+  /* 舞台纱幕：把摄影棚灰底压进夜幕，只留人和一小池光 */
+  .scene__veil {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 46% 52% at 50% 46%, transparent 34%, rgba(5, 7, 17, .26) 64%, rgba(5, 7, 17, .62) 82%, var(--gbt-bg) 95%),
+      linear-gradient(to bottom, rgba(5, 7, 17, .14) 0%, transparent 16%, transparent 88%, rgba(5, 7, 17, .40) 98%);
+    pointer-events: none;
+  }
+  /* 身前那层光：压在她身上，让光晕真的看得见 */
+  .scene__glow {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 42%;
+    width: min(58vh, 470px);
+    height: min(58vh, 470px);
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245, 176, 65, .16), rgba(0, 229, 255, .06) 48%, transparent 70%);
+    mix-blend-mode: screen;
+    transform: scale(var(--breathe, 1));
+    opacity: var(--glow, .55);
+    filter: blur(14px);
+    pointer-events: none;
+    transition: opacity .35s ease;
+  }
+  .scene__floor {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    translate: -50% 0;
+    width: 62%;
+    height: 90px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(245, 176, 65, .18), transparent 70%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+
+  /* 右：体检 */
+  .side {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    border-left: 1px solid var(--hair-soft);
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    overflow: auto;
+  }
+  .side__title {
+    font-size: 11.5px;
+    letter-spacing: .24em;
+    color: rgba(232, 236, 248, .5);
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .probe {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 5px 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hair-soft);
+  }
+  .probe__k { color: rgba(232, 236, 248, .68); }
+  .probe__v { color: var(--gbt-text); text-align: right; font-variant-numeric: tabular-nums; }
+  .probe__v[data-tone="ok"] { color: var(--gbt-ok); }
+  .probe__v[data-tone="warn"] { color: var(--gbt-warn); }
+  .probe__v[data-tone="fault"] { color: var(--gbt-fault); }
+  .probe__note {
+    grid-column: 1 / -1;
+    color: rgba(232, 236, 248, .38);
+    font-size: 11.5px;
+    line-height: 1.7;
+    margin-top: 2px;
+  }
+
+  /* 下：控制台 */
+  .console {
+    grid-column: 2 / 4;
+    grid-row: 2 / 3;
+    border-top: 1px solid var(--hair-soft);
+    padding: 18px 34px 26px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 14px 26px;
+    background: linear-gradient(to top, rgba(5, 7, 17, .92), rgba(5, 7, 17, .55));
+  }
+
+  .waveWrap {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    position: relative;
+    height: 46px;
+  }
+  #wave { width: 100%; height: 100%; display: block; }
+
+  .subtitle {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    min-height: 62px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .subtitle__who {
+    font-size: 11px;
+    letter-spacing: .22em;
+    color: var(--gbt-gold);
+    opacity: .8;
+  }
+  .subtitle__text {
+    font-size: clamp(17px, 1.6vw, 22px);
+    line-height: 1.55;
+    color: var(--gbt-text);
+    max-width: 62ch;
+    min-height: 1.55em;
+  }
+  .subtitle__text .caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    translate: 0 3px;
+    background: var(--gbt-gold);
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .talk {
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .orb {
+    --size: 84px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    border: 1px solid rgba(245, 176, 65, .34);
+    background: radial-gradient(circle at 50% 38%, rgba(245, 176, 65, .22), rgba(245, 176, 65, .04) 62%, transparent 72%);
+    color: var(--gbt-text);
+    font-size: 12px;
+    letter-spacing: .16em;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    position: relative;
+    transition: transform .16s ease, border-color .25s ease, box-shadow .25s ease;
+    box-shadow: 0 0 0 0 rgba(245, 176, 65, .18);
+  }
+  .orb:hover { border-color: rgba(245, 176, 65, .62); }
+  .orb:active, .orb[data-pressed="1"] { transform: scale(.96); }
+  .orb[data-live="1"] {
+    border-color: rgba(0, 229, 255, .7);
+    box-shadow: 0 0 32px rgba(0, 229, 255, .28), inset 0 0 18px rgba(0, 229, 255, .16);
+  }
+  .orb__hint {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    translate: -50% 0;
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    color: var(--gbt-faint);
+    white-space: nowrap;
+  }
+
+  .composer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 260px;
+  }
+  .composer__row { display: flex; gap: 8px; }
+  .composer input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: rgba(232, 236, 248, .04);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    color: var(--gbt-text);
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .composer input:focus {
+    outline: none;
+    border-color: rgba(245, 176, 65, .5);
+    background: rgba(245, 176, 65, .05);
+  }
+  .composer button {
+    background: transparent;
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    color: var(--gbt-dim);
+    padding: 9px 12px;
+    font-size: 12px;
+    letter-spacing: .06em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .composer button:hover { color: var(--gbt-text); border-color: rgba(245, 176, 65, .42); }
+  .composer__hint {
+    font-size: 11px;
+    color: var(--gbt-faint);
+    line-height: 1.5;
+  }
+
+  /* 设计稿水印：诚实标注（放在左上空白处，不压控制台） */
+  .draft {
+    position: fixed;
+    left: 108px;
+    top: 18px;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    color: rgba(232, 236, 248, .3);
+    line-height: 1.7;
+    pointer-events: none;
+  }
+
+  /* 窄屏：把右侧体检收进抽屉，保证「她」还在画面里 */
+  @media (max-width: 1080px) {
+    .stage { grid-template-columns: 72px minmax(0, 1fr); }
+    .side { display: none; }
+    .console { grid-column: 2 / 3; padding: 16px 20px 22px; }
+    .talk { flex-direction: column; }
+    .composer { min-width: 200px; }
+  }
+  /* 🔴 仓里会自动往每页注入「直达」全站链接条（tools/codex-scripts/page-reach.py：几百个链接挤在一行）。
+     在别的数据页它有用，在**全屏剧场**它把整块画面盖成一片蓝字横条（第一版实拍就是这个病）。
+     ⇒ 收成 24px 一条、悬停展开：**链接一个不少**（全页可达的约定不破），静止时不许挡人。 */
+  #gbt-direct-nav {
+    max-height: 24px;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: .42;
+    transition: max-height .18s ease, opacity .18s ease;
+  }
+  #gbt-direct-nav:hover {
+    max-height: 44vh;
+    overflow: auto;
+    white-space: normal;
+    opacity: 1;
+  }
+
+  /* 🔴 2026-10-18 主人令逐字：「按照我们现在这个对话框设计然后加装我们的能力以及语音交互」。
+     所以主区改成**跟这个对话框一样**：左边消息流（谁说的、说了什么、工具回执卡片）+ 下边输入条，
+     她（3D 数字人）收到右侧一列；语音仍走同一个状态机（待机/在听/在想/在说）。 */
+  .stage { grid-template-columns: 88px minmax(0, 1fr) 420px; }
+  .stage > .console { grid-column: 2 / 4; }
+  .chat {
+    grid-column: 2 / 3; grid-row: 1 / 2;
+    display: flex; flex-direction: column; min-height: 0;
+    border-right: 1px solid var(--hair-soft);
+  }
+  .chat__head {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 18px 24px 12px; border-bottom: 1px solid var(--hair-soft);
+  }
+  .chat__title { font-size: 13px; letter-spacing: .18em; color: var(--gbt-text); }
+  .chat__sub { font-size: 11.5px; color: rgba(232, 236, 248, .42); }
+  .chat__list {
+    flex: 1 1 auto; overflow: auto; padding: 18px 24px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .msg { max-width: 80%; display: flex; flex-direction: column; gap: 5px; }
+  .msg--her { align-self: flex-start; }
+  .msg--me { align-self: flex-end; align-items: flex-end; }
+  .msg__who { font-size: 10.5px; letter-spacing: .16em; color: rgba(232, 236, 248, .38); }
+  .msg__body {
+    font-size: 14px; line-height: 1.75; padding: 10px 14px; border-radius: 12px;
+    background: rgba(255, 255, 255, .03); border: 1px solid var(--hair-soft);
+    color: var(--gbt-text); white-space: pre-wrap; word-break: break-word;
+  }
+  .msg--me .msg__body { background: rgba(245, 176, 65, .10); border-color: rgba(245, 176, 65, .28); }
+  .msg--tool .msg__body {
+    font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.6;
+    color: rgba(232, 236, 248, .72); max-height: 240px; overflow: auto;
+  }
+  .msg--err .msg__body { border-color: rgba(255, 120, 120, .45); color: rgba(255, 176, 176, .9); }
+  .mcap { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 14px; }
+  .mcap__btn {
+    font: 12px/1 ui-monospace, Consolas, monospace; padding: 7px 10px; border-radius: 9px;
+    background: rgba(0, 229, 255, .06); border: 1px solid rgba(0, 229, 255, .22);
+    color: rgba(160, 235, 255, .92); cursor: pointer;
+  }
+  .mcap__btn:hover { background: rgba(0, 229, 255, .13); }
+  /* 右列：她（3D）+ 体检（可滚） */
+  .presence {
+    grid-column: 3 / 4; grid-row: 1 / 2; min-height: 0;
+    display: grid; grid-template-rows: minmax(0, 58%) minmax(0, 42%);
+  }
+  .presence .scene, .presence .side { grid-column: auto; grid-row: auto; }
+  .presence .side { border-left: 0; border-top: 1px solid var(--hair-soft); padding: 14px 18px; overflow: auto; }
+</style>
+</head>
+<body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div class="stage">
+
+  <!-- 左：状态轨（只反映真实状态） -->
+  <nav class="rail" aria-label="对话状态">
+    <div class="rail__item" data-state="idle" data-tone="idle" data-on="1">
+      <span class="rail__dot"></span><span>待机</span>
+    </div>
+    <div class="rail__item" data-state="listen" data-tone="listen" data-on="0">
+      <span class="rail__dot"></span><span>在听</span>
+    </div>
+    <div class="rail__item" data-state="think" data-tone="think" data-on="0">
+      <span class="rail__dot"></span><span>在想</span>
+    </div>
+    <div class="rail__item" data-state="speak" data-tone="speak" data-on="0">
+      <span class="rail__dot"></span><span>在说</span>
+    </div>
+  </nav>
+
+  <!-- 中：对话（照我们现在这个对话框：消息流 + 工具回执卡 + 下边输入条） -->
+  <section class="chat" aria-label="对话">
+    <div class="chat__head">
+      <span class="chat__title">对话</span>
+      <span class="chat__sub" id="chatSub">本地三条通道 · 打字直连 / 按住光球说 / 能力位回执</span>
+    </div>
+    <div class="chat__list" id="chatList"></div>
+    <div class="mcap" id="mcap">
+      <button class="mcap__btn" data-cap="health">健康</button>
+      <button class="mcap__btn" data-cap="selfscan">自检</button>
+      <button class="mcap__btn" data-cap="alerts">异常</button>
+      <button class="mcap__btn" data-cap="inventory">清点</button>
+    </div>
+  </section>
+
+  <div class="presence">
+
+  <!-- 中：她 -->
+  <section class="scene" aria-label="数字人">
+    <div class="scene__halo" id="halo"></div>
+    <div class="scene__ring"></div>
+    <div class="stage3d"><canvas id="dh2d" data-crop-h="0.66" aria-label="数字人"></canvas></div>
+    <div class="scene__glow" id="glow"></div>
+    <div class="scene__veil"></div>
+    <div class="scene__floor"></div>
+    <p class="stage3d__status" id="dh3dStatus" data-tone="warn">数字人 · 载入中…（assets/dh2d/atlas.js）</p>
+  </section>
+
+  <!-- 右：体检（现读，不装饰） -->
+  <aside class="side" aria-label="语音链路体检">
+    <p class="side__title">语音链路 · 现读</p>
+
+    <div class="probe">
+      <span class="probe__k">录音端点</span>
+      <span class="probe__v" id="pMic" data-tone="fault">—</span>
+      <span class="probe__note" id="pMicNote">正在枚举…</span>
+    </div>
+
+    <div class="probe">
+      <span class="probe__k">出声（TTS）</span>
+      <span class="probe__v" data-tone="warn">待授权</span>
+      <span class="probe__note">edge-tts 神经语音 + win-sapi 回退已装；调用要 <code>audio_output</code> 授权（只有主人能发）。</span>
+    </div>
+
+    <div class="probe">
+      <span class="probe__k">离线识别</span>
+      <span class="probe__v" data-tone="ok">在位</span>
+      <span class="probe__note">win-speech · zh-CN|MS-2052-80-DESK；尚未接进页面（需壳桥）。</span>
+    </div>
+
+    <div class="probe">
+      <span class="probe__k">本稿波形源</span>
+      <span class="probe__v" data-tone="ok" id="pSrc">真音频</span>
+      <span class="probe__note" id="pSrcNote">分析她本人的神经嗓（edge-tts zh-TW-HsiaoChenNeural）· AnalyserNode 实时包络，不是随机动画；旧样本 welcome-gbt-v8-zh.wav 仍在盘上。</span>
+    </div>
+
+    <div class="probe">
+      <span class="probe__k">解码状态</span>
+      <span class="probe__v" data-tone="warn" id="pReady">载入中…</span>
+      <span class="probe__note">只有 WebAudio 真解码成功才会变「已就绪」；失败会写明原因，不假装能放。
+        注：无头浏览器截图里它会停在「载入中…」（无头不跑异步任务），真浏览器里会变。</span>
+    </div>
+
+    <div class="probe">
+      <span class="probe__k">打断</span>
+      <span class="probe__v" data-tone="ok">随时</span>
+      <span class="probe__note">Esc / 点光球 / 直接开始输入 —— 三种都能立即停。</span>
+    </div>
+  </aside>
+  </div><!-- /.presence -->
+
+  <!-- 下：控制台 -->
+  <footer class="console">
+    <div class="waveWrap"><canvas id="wave"></canvas></div>
+
+    <div class="subtitle">
+      <span class="subtitle__who" id="who">GBT小土豆V8</span>
+      <div class="subtitle__text" id="caption">按住光球说话，或直接在右边打字。</div>
+    </div>
+
+    <div class="talk">
+      <button class="orb" id="orb" data-pressed="0" data-live="0" aria-label="按住说话">
+        按住说
+        <span class="orb__hint">松开即发送</span>
+      </button>
+      <div class="composer">
+        <div class="composer__row">
+          <input id="say" placeholder="或者在这里打字…" autocomplete="off" />
+          <button id="send">发送</button>
+          <button id="stop" title="打断（Esc）">停</button>
+        </div>
+        <div class="composer__hint" id="hint">状态灯只反映真实状态；没有的能力会明说，不装能用。</div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div class="draft">
+  设计稿 v1 · 全屏对话剧场<br />
+  波形=她的真实欢迎语音 · 3D=工程里的绑骨骼模型（idle/walk 真动作）· 输入/ASR 未接 · 回复未接真 TTS
+</div>
+
+<!-- 真 3D 数字人：壳里已 vendor 的 three（零 CDN）+ GLTFLoader，吃 assets/dh-v2-rigged.glb。
+     必须经典脚本、且按依赖序：three → BufferGeometryUtils → GLTFLoader → 本页舞台（file:// 下 ESM 走不通）。 -->
+<script src="assets/dh2d/atlas.js"></script>
+<script src="chat-ui.js"></script>
+<!-- 触手活动 → 她的动作（主人令 2026-10-18）：读真账本尾部，翻成骨骼偏移，叠在状态姿态之上 -->
+<script src="motion.js"></script>
+<!-- 点站内链接**不跳窗**：同窗拉起抽屉 iframe（主人令 2026-10-18「一体式，别点一下再跳转」） -->
+<script src="nav-drawer.js"></script>
+<script src="dh2d.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* 2026-10-18：换成**她的神经嗓真产物**（edge-tts zh-TW-HsiaoChenNeural，走能力位 op=speak 真出声后落盘，
+     sha16=979762ecd928e58f / 65,520 B）。旧样本 welcome-gbt-v8-zh.wav 仍在盘上，可用 ?audio= 指回去。 */
+  var SAMPLE = "assets/voice-greet-zh-tw.mp3";
+
+  /* 🔴 真链路接入点（2026-10-18）：本页**不自己合成语音**（那要 audio_output 授权），
+     而是接受**框架真跑出来的 TTS 产物**：
+        voice-theater/index.html?audio=<指向那个 wav 的地址>
+     不给参数就是默认样本（她的欢迎语音）—— 两种都能驱动同一套波形/光晕，
+     差别只写在体检里（样本 / 真实产物），不伪装。 */
+  var QS = (function () {
+    try { return new URLSearchParams(location.search); } catch (e) { return null; }
+  })();
+  var AUDIO_QUERY = QS ? QS.get("audio") : null;
+  var AUDIO_SRC = AUDIO_QUERY || SAMPLE;
+  var IS_SAMPLE = !AUDIO_QUERY;
+
+  var state = "idle";
+  var audio = {
+    ctx: null, buf: null, src: null, analyser: null, data: null,
+    ready: false, err: null
+  };
+
+  var el = {
+    rail: Array.prototype.slice.call(document.querySelectorAll(".rail__item")),
+    halo: document.getElementById("halo"),
+    glow: document.getElementById("glow"),
+    orb: document.getElementById("orb"),
+    caption: document.getElementById("caption"),
+    who: document.getElementById("who"),
+    wave: document.getElementById("wave"),
+    say: document.getElementById("say"),
+    send: document.getElementById("send"),
+    stop: document.getElementById("stop"),
+    hint: document.getElementById("hint"),
+    pMic: document.getElementById("pMic"),
+    pMicNote: document.getElementById("pMicNote")
+  };
+
+  /* ── 状态机：唯一改状态的地方 ───────────────────────────────────────── */
+  function setState(next) {
+    if (state === next) return;
+    state = next;
+    el.rail.forEach(function (item) {
+      item.setAttribute("data-on", item.getAttribute("data-state") === next ? "1" : "0");
+    });
+    el.orb.setAttribute("data-live", next === "listen" ? "1" : "0");
+    if (next !== "speak") stopSpeaking();
+    /* 数字人跟同一台状态机（只在真载入后转发；没载入就是没载入，不假装） */
+    if (window.GBT_DH3D && window.GBT_DH3D.setState) window.GBT_DH3D.setState(next);
+    if (window.GBT_DH2D && window.GBT_DH2D.setState) window.GBT_DH2D.setState(next);
+  }
+
+  function caption(text, who) {
+    if (typeof who === "string") el.who.textContent = who;
+    el.caption.textContent = "";
+    var i = 0;
+    var caret = document.createElement("span");
+    caret.className = "caret";
+    el.caption.appendChild(caret);
+    var timer = setInterval(function () {
+      if (i >= text.length) { clearInterval(timer); caret.remove(); return; }
+      el.caption.insertBefore(document.createTextNode(text.charAt(i)), caret);
+      i += 1;
+    }, 26);
+    captionTimer && clearInterval(captionTimer);
+    captionTimer = timer;
+  }
+  var captionTimer = null;
+
+  /* ── 真音频引擎：解音频源（默认=她的欢迎语音；给了 ?audio= 就用真 TTS 产物）── */
+  function ensureAudio() {
+    if (audio.ready) return Promise.resolve(true);
+    audio.err = null;                    /* 换源后允许重试（2026-10-19：波形要能换成"这一句"） */
+
+    /* 取法：先按原样取；仍失败且是**相对路径**时，再按"仓根绝对路径"试一次。
+       起因（2026-10-18 实测）：`?audio=holo_pet_w3/…` 会被浏览器解析成
+       `holo_pet/assets/voice-theater/holo_pet_w3/…` ⇒ HTTP 404（页面右下角如实报过）。
+       两种写法都兼容，且**实际用的是哪个**会写进 hint，不假装。 */
+    var candidates = [AUDIO_SRC];
+    if (!/^(https?:|\/\/|\/)/i.test(AUDIO_SRC)) candidates.push("/" + AUDIO_SRC);
+
+    var pick = function (i) {
+      if (i >= candidates.length) {
+        return Promise.reject(new Error("两次都取不到：" + candidates.join(" · ")));
+      }
+      return fetch(candidates[i]).then(function (r) {
+        if (!r.ok) {
+          var e = new Error("HTTP " + r.status + " → " + candidates[i]);
+          e.next = i + 1;
+          throw e;
+        }
+        AUDIO_SRC = candidates[i];
+        return r.arrayBuffer();
+      }).catch(function (e) {
+        if (typeof e.next === "number") return pick(e.next);
+        throw e;
+      });
+    };
+
+    return pick(0)
+      .then(function (ab) {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!audio.ctx) audio.ctx = new Ctx();          /* 换源时复用同一个 AudioContext */
+        return audio.ctx.decodeAudioData(ab);
+      })
+      .then(function (buf) {
+        audio.buf = buf;
+        audio.analyser = audio.ctx.createAnalyser();
+        audio.analyser.fftSize = 1024;
+        audio.analyser.smoothingTimeConstant = 0.72;
+        audio.data = new Uint8Array(audio.analyser.frequencyBinCount);
+        audio.ready = true;
+        var ready = document.getElementById("pReady");
+        if (ready) { ready.textContent = "已就绪"; ready.setAttribute("data-tone", "ok"); }
+        el.hint.textContent = (IS_SAMPLE ? "样本已就绪：" : "产物已就绪：")
+          + String(AUDIO_SRC).split("/").pop() + "（按光球即可试放）";
+        return true;
+      })
+      .catch(function (e) {
+        audio.err = String(e && e.message || e);
+        var ready = document.getElementById("pReady");
+        if (ready) { ready.textContent = "解码失败"; ready.setAttribute("data-tone", "fault"); }
+        el.hint.textContent = "音频读不到（" + audio.err + "）⇒ 波形退化为静默。"
+          + "请从仓根起静态服务，或给 ?audio= 一个绝对地址。";
+        return false;
+      });
+  }
+
+  function speak() {
+    return ensureAudio().then(function (ok) {
+      if (!ok) { setState("idle"); return; }
+      if (audio.ctx.state === "suspended") audio.ctx.resume();
+      var src = audio.ctx.createBufferSource();
+      src.buffer = audio.buf;
+      src.connect(audio.analyser);
+      audio.analyser.connect(audio.ctx.destination);
+      src.onended = function () {
+        if (state === "speak") setState("idle");
+      };
+      audio.src = src;
+      src.start(0);
+      setState("speak");
+    });
+  }
+
+  function stopSpeaking() {
+    if (audio.src) {
+      try { audio.src.onended = null; audio.src.stop(); } catch (e) { /* 已停 */ }
+      audio.src = null;
+    }
+  }
+
+  /* 🔴 2026-10-19（主人令「波形要跟着她这一次真说的话走」）：
+     接口给 chat-ui：她说完一句话、回执里带回落盘路径时，把波形源换成**这一句的真音频**，
+     解码 → 播放 → AnalyserNode 吃的就是这句话本身。换不成（文件不在/解码失败）如实标红，
+     不许继续拿样本冒充"这一句"。 */
+  window.GBT_AUDIO = {
+    speakFile: function (url) {
+      if (!url) return Promise.resolve(false);
+      AUDIO_SRC = String(url);
+      IS_SAMPLE = false;
+      audio.ready = false;
+      audio.err = null;
+      var ready = document.getElementById("pReady");
+      if (ready) { ready.textContent = "载入中…"; ready.setAttribute("data-tone", "warn"); }
+      return ensureAudio().then(function (ok) {
+        if (!ok) return false;
+        return speak().then(function () { return true; });
+      });
+    },
+    info: function () {
+      return { src: AUDIO_SRC, sample: IS_SAMPLE, ready: audio.ready, err: audio.err };
+    }
+  };
+
+  /* ── 波形：真实包络 + 静默时的极细基线 ──────────────────────────────── */
+  var canvas = el.wave;
+  var cctx = canvas.getContext("2d");
+  var bars = 72;
+
+  function sizeCanvas() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(canvas.clientWidth * dpr);
+    canvas.height = Math.floor(canvas.clientHeight * dpr);
+    cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", sizeCanvas);
+
+  function draw() {
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    cctx.clearRect(0, 0, w, h);
+    var mid = h / 2;
+    var live = state === "speak" && audio.analyser;
+
+    if (live) audio.analyser.getByteFrequencyData(audio.data);
+
+    var bw = w / bars;
+    for (var i = 0; i < bars; i += 1) {
+      var t = i / (bars - 1);
+      var envelope = Math.sin(Math.PI * t); // 中间高、两端收，像呼吸
+      var amp;
+      if (live) {
+        var idx = Math.floor(Math.pow(t, 1.35) * (audio.data.length * 0.42));
+        amp = (audio.data[idx] / 255);
+      } else {
+        amp = 0.045 + 0.02 * Math.sin(Date.now() / 900 + i * 0.35);
+      }
+      var bh = Math.max(1.2, amp * envelope * (h * 0.86));
+      var x = i * bw + bw * 0.28;
+      var bwid = Math.max(1.2, bw * 0.42);
+      cctx.fillStyle = live
+        ? "rgba(245,176,65," + (0.30 + amp * 0.62).toFixed(3) + ")"
+        : "rgba(232,236,248,.14)";
+      cctx.fillRect(x, mid - bh / 2, bwid, bh);
+    }
+
+    // 呼吸光晕跟着真实音量走
+    var lvl = 0;
+    if (live) {
+      var sum = 0;
+      for (var k = 0; k < audio.data.length; k += 8) sum += audio.data[k];
+      lvl = sum / (audio.data.length / 8) / 255;
+      el.halo.style.setProperty("--breathe", (1 + lvl * 0.30).toFixed(3));
+      el.halo.style.opacity = (0.55 + lvl * 0.45).toFixed(3);
+      el.glow.style.setProperty("--breathe", (1 + lvl * 0.34).toFixed(3));
+      el.glow.style.setProperty("--glow", (0.42 + lvl * 0.55).toFixed(3));
+    } else {
+      var b = 1 + 0.012 * Math.sin(Date.now() / 1400);
+      el.halo.style.setProperty("--breathe", b.toFixed(3));
+      el.halo.style.opacity = "0.6";
+      el.glow.style.setProperty("--breathe", b.toFixed(3));
+      el.glow.style.setProperty("--glow", "0.34");
+    }
+    /* 数字人的"在说"幅度吃**这一个真音量**（不是随机数）：嘴型由它驱动 */
+    if (window.GBT_DH3D && window.GBT_DH3D.level) window.GBT_DH3D.level(lvl);
+    if (window.GBT_DH2D && window.GBT_DH2D.level) window.GBT_DH2D.level(lvl);
+
+    requestAnimationFrame(draw);
+  }
+
+  /* ── 麦克风：真去申请，拿不到就如实说，不装「在听」────────────────── */
+  function probeMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      el.pMic.textContent = "不可用";
+      el.pMic.setAttribute("data-tone", "fault");
+      el.pMicNote.textContent = "本环境没有 mediaDevices（非安全上下文或壳未放权）。";
+      return;
+    }
+    navigator.mediaDevices.enumerateDevices().then(function (list) {
+      var mic = list.filter(function (d) { return d.kind === "audioinput"; });
+      el.pMic.textContent = mic.length + " 个";
+      el.pMic.setAttribute("data-tone", mic.length ? "ok" : "fault");
+      el.pMicNote.textContent = mic.length
+        ? "已枚举到输入设备；按住光球会真申请。"
+        : "系统报 0 个输入端点（与插不插麦无关）⇒ 按住说话会退到键盘输入。";
+    }).catch(function (e) {
+      el.pMic.textContent = "读取失败";
+      el.pMic.setAttribute("data-tone", "warn");
+      el.pMicNote.textContent = String(e && e.message || e);
+    });
+  }
+
+  function tryListen() {
+    setState("listen");
+    caption("…（若本机无输入端点，这里不会假装听到）", "GBT小土豆V8");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      el.hint.textContent = "没有 mediaDevices ⇒ 这条按住说话用不了，请直接打字。";
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
+      .then(function (stream) {
+        el.hint.textContent = "麦克风已打开（轨道 " + stream.getAudioTracks().length + " 条）。松开即认为说完。";
+        window.__stream = stream;
+      })
+      .catch(function (e) {
+        el.hint.textContent = "拿不到麦克风（原文：" + (e && e.name || "Error") + "：" + (e && e.message || "") +
+          "）⇒ 这条腿不通，键盘可用。";
+        setState("idle");
+      });
+  }
+
+  function endListen() {
+    if (state !== "listen") return;
+    if (window.__stream) {
+      window.__stream.getTracks().forEach(function (t) { t.stop(); });
+      window.__stream = null;
+    }
+    setState("think");
+    caption("（在想…）", "GBT小土豆V8");
+    setTimeout(function () {
+      caption("这一步本该由真实回复填充 —— 现在用的是她本地欢迎语音做包络，好让你先看形态。", "GBT小土豆V8");
+      speak();
+    }, 780);
+  }
+
+  /* ── 事件 ──────────────────────────────────────────────────────────── */
+  el.orb.addEventListener("pointerdown", function (ev) {
+    ev.preventDefault();
+    el.orb.setAttribute("data-pressed", "1");
+    tryListen();
+  });
+  window.addEventListener("pointerup", function () {
+    if (el.orb.getAttribute("data-pressed") === "1") {
+      el.orb.setAttribute("data-pressed", "0");
+      endListen();
+    }
+  });
+
+  el.orb.addEventListener("click", function () {
+    // 点一下（不是按住）：直接演示一次说话，给"先看形态"用
+    if (state === "idle") {
+      caption("这是设计稿的形态演示：波形由她本人语音驱动。", "GBT小土豆V8");
+      speak();
+    } else {
+      setState("idle");
+      caption("已打断。", "GBT小土豆V8");
+    }
+  });
+
+  el.send.addEventListener("click", submit);
+  el.say.addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
+
+  function submit() {
+    var text = el.say.value.trim();
+    if (!text) return;
+    el.say.value = "";
+    setState("think");
+    caption("（在想…）", "GBT小土豆V8");
+    setTimeout(function () {
+      caption("收到：" + text + " ｜ 设计稿未接真实回复，先用一段她的语音演示形态。", "GBT小土豆V8");
+      speak();
+    }, 700);
+  }
+
+  el.stop.addEventListener("click", interrupt);
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") interrupt();
+  });
+
+  function interrupt() {
+    stopSpeaking();
+    setState("idle");
+    caption("已打断。", "GBT小土豆V8");
+  }
+
+  /* ── 启动 ──────────────────────────────────────────────────────────── */
+  sizeCanvas();
+  requestAnimationFrame(draw);
+  probeMic();
+
+  /* 波形源如实标注：默认样本 vs 真实 TTS 产物（不把样本说成"她在说话"） */
+  (function labelSource() {
+    try {
+      var elSrc = document.getElementById("pSrc");
+      var elNote = document.getElementById("pSrcNote");
+      if (!elSrc || !elNote) return;
+      var base = String(AUDIO_SRC).split("/").pop();
+      if (IS_SAMPLE) {
+        elSrc.textContent = "真音频 · 样本";
+        elNote.textContent = base + " · AnalyserNode 实时包络，不是随机动画；"
+          + "接真 TTS 时用 ?audio=<产物地址> 换掉这一条。";
+      } else {
+        elSrc.textContent = "真音频 · TTS 产物";
+        elNote.textContent = base + " —— 这是框架真跑出来的语音（?audio= 指定），不是样本。";
+        // 一眼可辨：接上真产物时字幕先说明来路，不冒充"她刚说的"
+        caption("已接入外部语音产物：" + base + "（按光球即可试放）", "GBT小土豆V8");
+      }
+    } catch (e) {
+      // 标注失败不许拖垮整页（本仓 P31：失败要带原因，但不许把主链一起吞掉）
+      try { el.hint.textContent = "波形源标注失败：" + String(e && e.message || e); } catch (e2) { /* 连 hint 都没有就放弃 */ }
+    }
+  })();
+
+  // 预解码，但**不自动播放**（浏览器策略 + 不该吓人）
+  ensureAudio();
+})();
+</script>
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+<script src="../shell/live-badge.js" defer></script>
+<script src="../shell/tentacle-kit.js" defer></script>
+</body>
+</html>
+
+
+

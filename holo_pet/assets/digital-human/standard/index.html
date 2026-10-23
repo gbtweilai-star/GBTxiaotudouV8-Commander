@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GBT小土豆V8 · 标准形象（02）</title>
+<!--
+  GBT小土豆V8 · 标准形象页（第一刀：换外观 + 科幻外壳）
+  ────────────────────────────────────────────────────
+  依据：
+    · holo_pet/assets/digital-human/standard/CHARACTER-SPEC.json（形象契约 · 唯一基准）
+    · 主人令 2026-10-18：「这张是数字人形象标准」「必须要有未来科幻的感觉」
+  口径：
+    · **不动骨架**：现役 GLB 是 65 骨 / 42 手指骨（mixamorig），这套拓扑保下来；
+      本页只在渲染层换外观（材质/配色/光/HUD），不重做出图，也不改 skin。
+    · **两色制**：青 #3EC8D4 走线，琥珀 #F2B705 只给标识与警示，不许第三种高饱和色。
+    · 全靠结构出科幻感：四角括角 / 扫描线 / 全息栅格 / 环状刻度 / 状态读数列。
+  开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+-->
+<style>
+  :root{
+    /* 2026-10-18：project-bind.py 会往页里注入一条「全项目索引」导航条，
+       它用的是 --cb-* 四个变量。这里给它们配色，让注入条长进科幻壳里（不改注入器）。 */
+    --cb-bg:rgba(5,11,20,.86); --cb-ink:#8FA6B8; --cb-line:rgba(62,200,212,.30); --cb-link:#3EC8D4;
+    --void:#050B14; --shell:#12141A; --shell2:#0B0D12;
+    --trim:#F2B705; --trim2:#B98A00; --hud:#3EC8D4;
+    --ink:#DCEAF2; --dim:#7C8FA3; --line:rgba(62,200,212,.34); --soft:rgba(62,200,212,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--void);color:var(--ink);
+    font:13px/1.5 -apple-system,"Segoe UI","Noto Sans SC",system-ui,sans-serif;overflow:hidden}
+  #stage{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ── 全息地台：栅格 + 地平线 ───────────────────────────────── */
+  .floor{position:fixed;left:0;right:0;bottom:0;height:38%;pointer-events:none;
+    background:
+      radial-gradient(60% 90% at 50% 100%, rgba(62,200,212,.18), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(62,200,212,.14) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(62,200,212,.10) 0 1px, transparent 1px 44px);
+    transform:perspective(420px) rotateX(62deg);transform-origin:50% 100%;
+    mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.85) 55%,#000);
+    -webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.85) 55%,#000)}
+  .glow{position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(46% 46% at 50% 38%, rgba(62,200,212,.16), transparent 72%)}
+
+  /* ── 扫描线 ───────────────────────────────────────────────── */
+  .scan{position:fixed;left:0;right:0;height:120px;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(62,200,212,.10),transparent);
+    animation:scan 7.5s linear infinite}
+  @keyframes scan{0%{top:-140px}100%{top:100%}}
+
+  /* ── HUD 四角括角 ─────────────────────────────────────────── */
+  .br{position:fixed;width:34px;height:34px;border:2px solid var(--hud);opacity:.75;pointer-events:none}
+  .br.tl{top:18px;left:18px;border-right:0;border-bottom:0}
+  .br.tr{top:18px;right:18px;border-left:0;border-bottom:0}
+  .br.bl{bottom:18px;left:18px;border-right:0;border-top:0}
+  .br.brr{bottom:18px;right:18px;border-left:0;border-top:0}
+
+  /* ── 顶部条 ───────────────────────────────────────────────── */
+  .top{position:fixed;top:20px;left:64px;right:64px;display:flex;align-items:center;gap:12px;pointer-events:none}
+  .badge{font:800 22px/1 "Segoe UI",sans-serif;letter-spacing:2px;color:var(--trim);
+    border:1px solid var(--trim);border-radius:6px;padding:4px 10px;
+    box-shadow:0 0 18px rgba(242,183,5,.28),inset 0 0 12px rgba(242,183,5,.10)}
+  .ttl{font-weight:800;letter-spacing:1.2px;color:var(--ink)}
+  .ttl small{display:block;font-weight:500;font-size:11px;letter-spacing:.4px;color:var(--dim);margin-top:2px}
+  .grow{flex:1}
+
+  /* ── 右侧状态读数列 ───────────────────────────────────────── */
+  .reads{position:fixed;top:70px;right:64px;width:236px;pointer-events:none;text-align:right}
+  .reads .row{display:flex;justify-content:flex-end;gap:10px;padding:3px 0;
+    border-bottom:1px dashed rgba(62,200,212,.16)}
+  .reads .k{color:var(--dim);font-size:11px;letter-spacing:.5px}
+  .reads .v{color:var(--hud);font-variant-numeric:tabular-nums;font-size:12px}
+  .reads .v.hot{color:var(--trim)}
+
+  /* ── 环状刻度（人物脚下的目标环）─────────────────────────── */
+  .ring{position:fixed;left:50%;bottom:11%;width:340px;height:340px;margin-left:-170px;
+    border-radius:50%;border:1px solid rgba(62,200,212,.30);pointer-events:none;
+    box-shadow:0 0 40px rgba(62,200,212,.14) inset}
+  .ring::before,.ring::after{content:"";position:absolute;inset:14px;border-radius:50%;
+    border:1px dashed rgba(62,200,212,.22);animation:spin 26s linear infinite}
+  .ring::after{inset:34px;border-style:solid;border-color:rgba(242,183,5,.16);animation-duration:44s;animation-direction:reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── 底部：形象契约 + 署名 ────────────────────────────────── */
+  .foot{position:fixed;left:64px;right:64px;bottom:20px;display:flex;gap:14px;align-items:flex-end;pointer-events:none}
+  .spec{font-size:11px;color:var(--dim);line-height:1.7;max-width:52%}
+  .spec b{color:var(--hud);font-weight:600}
+  .swatches{display:flex;gap:6px;margin-top:6px}
+  .sw{width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,.18)}
+  .sign{flex:1;text-align:right;font-size:11px;color:var(--dim);opacity:.85}
+
+  /* ── 观感切换（只换渲染外观，不动骨架；给主人现场比）─────── */
+  .looks{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:8px;z-index:5}
+  .looks button{background:rgba(5,11,20,.72);border:1px solid var(--line);color:var(--ink);
+    border-radius:999px;padding:5px 12px;font-size:11px;cursor:pointer;letter-spacing:.4px}
+  .looks button.on{border-color:var(--hud);color:var(--hud);box-shadow:0 0 14px rgba(62,200,212,.28)}
+  .looks .sep{width:1px;height:18px;background:rgba(62,200,212,.28);margin:0 4px}
+  .looks .now{font-size:11px;color:var(--dim);letter-spacing:.4px}
+  .looks .now b{color:var(--hud);font-weight:600}
+  .looks input[type=range]{width:96px;accent-color:#3EC8D4;background:transparent;border:0}
+  .looks button.l {
+    border-color:rgba(242,183,5,.45);
+  }
+  .looks button.l.on {
+    border-color:var(--trim);color:var(--trim);box-shadow:0 0 14px rgba(242,183,5,.3);
+  }
+  .err{position:fixed;inset:auto 0 40% 0;text-align:center;color:var(--trim);font-size:13px;display:none;z-index:9}
+  .err.show{display:block}
+</style>
+<!-- 她一个人（3D 浮层）：跨页面常驻；module 必须放在 importmap 之后（顺序错了就整页不挂） -->
+</head>
+<body>
+<div id="stage"></div>
+<div class="glow"></div>
+<div class="floor"></div>
+<div class="scan"></div>
+<div class="br tl"></div><div class="br tr"></div><div class="br bl"></div><div class="br brr"></div>
+<div class="ring"></div>
+
+<div class="top">
+  <div class="badge">02</div>
+  <div class="ttl">GBT小土豆V8 · 标准形象
+    <small>战术赛博 / 黑哑光壳 + 琥珀饰带 · HUD 青</small></div>
+  <div class="grow"></div>
+</div>
+
+<div class="reads" id="reads"></div>
+
+<div class="foot">
+  <div class="spec">
+    <div>骨架 <b>65</b> 骨（mixamorig）· 手指 <b>42</b> 骨 · 五指四节 · <b>骨架未动</b></div>
+    <div>材质：金属度 <b>0</b> · 粗糙度 <b>0.55</b> · 油光只在饰带与扣环</div>
+    <div class="swatches">
+      <i class="sw" style="background:#12141A" title="壳 #12141A"></i>
+      <i class="sw" style="background:#0B0D12" title="壳暗 #0B0D12"></i>
+      <i class="sw" style="background:#F2B705" title="琥珀 #F2B705"></i>
+      <i class="sw" style="background:#3EC8D4" title="HUD 青 #3EC8D4"></i>
+      <i class="sw" style="background:#F3D9CC" title="肤色 #F3D9CC"></i>
+    </div>
+  </div>
+  <div class="sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</div>
+</div>
+
+<div class="looks" id="looks">
+  <button data-clip="idle" class="on">站立 idle</button>
+  <button data-clip="walk">行走 walk</button>
+  <span class="sep"></span>
+  <span class="now">动作 <b id="clipNow">idle</b></span>
+  <input id="speed" type="range" min="0.4" max="1.6" step="0.05" value="0.85">
+  <span class="now" id="speedNow">0.85×</span>
+  <span class="sep"></span>
+  <button data-look="tactical" class="l on">战术黑琥珀</button>
+  <button data-look="hologram" class="l">全息青</button>
+  <button data-look="steel" class="l">冷钢白</button>
+</div>
+<div class="err" id="err"></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "../../../node_modules/three/build/three.module.js",
+  "three/addons/": "../../../node_modules/three/examples/jsm/"
+} }
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../../companion.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* 模型：现役 65 骨含 42 手指骨的那一具（**不动骨架**）；?model= 可换变体 */
+const q = new URLSearchParams(location.search);
+const MODEL = q.get('model') || 'rig/model-rigged-anim.glb';
+const URL_MODEL = '/gbt-master/fs/holo_pet/assets/digital-human/raw/' + MODEL;
+
+const host = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+host.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+/* 🔴 高清的第一因：**PBR 没有环境光就必然发闷**。
+   实测：同一具身（贴图 4096×4096）在没有 envMap 时皮肤与黑壳全糊成一片灰。
+   这里用 three 自带的 RoomEnvironment 生成 IBL（不发一个外部请求）。 */
+const pmrem = new THREE.PMREMGenerator(renderer);
+pmrem.compileEquirectangularShader();
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, .05, 60);
+camera.position.set(0, 1.34, 3.05);
+camera.lookAt(0, 1.18, 0);
+
+/* 光：青侧逆光 + 琥珀主光 —— 两色制，别再加 */
+const key = new THREE.DirectionalLight(0xFFF3D6, 2.1); key.position.set(1.6, 2.6, 2.2); scene.add(key);
+const rim = new THREE.DirectionalLight(0x3EC8D4, 2.6); rim.position.set(-2.2, 1.9, -1.8); scene.add(rim);
+const amber = new THREE.PointLight(0xF2B705, 12, 6.2, 2); amber.position.set(0, .18, 1.1); scene.add(amber);
+scene.add(new THREE.HemisphereLight(0x24405A, 0x050B14, .85));
+
+/* 外观三档：只改材质参数与光，不碰骨架/贴图文件 */
+const LOOKS = {
+  tactical: { body:[0x12141A, 0.55, 0.0], trim:[0xF2B705, 0.34, 0.10], skin:[0xF3D9CC, 0.62, 0.0], rim:0x3EC8D4, amb:0xF2B705 },
+  hologram: { body:[0x0A2230, 0.42, 0.15], trim:[0x3EC8D4, 0.28, 0.55], skin:[0x7FE6F2, 0.40, 0.10], rim:0x6FF0FF, amb:0x3EC8D4 },
+  steel:    { body:[0x2A3038, 0.38, 0.20], trim:[0xD8E2EA, 0.30, 0.06], skin:[0xE8D7CE, 0.50, 0.0], rim:0xAFC6D6, amb:0x9FD8E2 },
+};
+let look = 'tactical';
+const meshes = [];
+
+function applyLook(name) {
+  look = name;
+  const L = LOOKS[name];
+  for (const m of meshes) {
+    const n = (m.name || '').toLowerCase();
+    const isTrim = /trim|belt|strap|buckle|ring|band|logo|emblem|clasp/.test(n);
+    const isSkin = /skin|face|head|body_skin|arm|leg/.test(n) && !isTrim;
+    const pick = isTrim ? L.trim : isSkin ? L.skin : L.body;
+    (Array.isArray(m.material) ? m.material : [m.material]).forEach((mat) => {
+      if (!mat) return;
+      if (mat.color) mat.color.setHex(pick[0]);
+      mat.roughness = pick[1];
+      mat.metalness = pick[2];                 // 契约：金属度必须为 0（hologram/steel 档按档给）
+      mat.envMapIntensity = 0.9;
+      mat.needsUpdate = true;
+    });
+  }
+  rim.color.setHex(L.rim); amber.color.setHex(L.amb);
+  renderer.toneMappingExposure = (name === 'hologram') ? 1.28 : 1.15;
+  document.querySelectorAll('#looks button[data-look]').forEach((b) => {
+    b.classList.toggle('on', b.dataset.look === name);
+  });
+}
+
+/* 右列状态读数：**只报真实拿到的数**，拿不到就写「未读到」，不编 */
+const reads = document.getElementById('reads');
+function readout(rows) {
+  reads.innerHTML = rows.map(([k, v, hot]) =>
+    '<div class="row"><span class="k">' + k + '</span><span class="v' + (hot ? ' hot' : '') + '">' + v + '</span></div>'
+  ).join('');
+}
+readout([['模型', '载入中…']]);
+
+const loader = new GLTFLoader();
+loader.load(URL_MODEL, (gltf) => {
+  const root = gltf.scene;
+  root.traverse((o) => {
+    if (o.isMesh) {
+      meshes.push(o); o.frustumCulled = false;
+      /* 高清第三因：各向异性过滤（斜视时的纹理糊就靠它）+ sRGB */
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      mats.forEach((m) => {
+        if (!m) return;
+        ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap'].forEach((k) => {
+          if (m[k]) {
+            m[k].anisotropy = renderer.capabilities.getMaxAnisotropy();
+            m[k].colorSpace = (k === 'map' || k === 'emissiveMap')
+              ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+            m[k].needsUpdate = true;
+          }
+        });
+      });
+    }
+    if (o.isSkinnedMesh && o.skeleton) {
+      const bones = o.skeleton.bones || [];
+      const fingers = bones.filter((b) => /hand(index|middle|ring|pinky|thumb)/i.test(b.name || ''));
+      readout([
+        ['骨架', bones.length + ' 骨'],
+        ['手指骨', fingers.length + ' 根', true],
+        ['网格', meshes.length + ' 件'],
+        ['形态', (q.get('model') || 'rigged-anim')],
+        ['外观', look === 'tactical' ? '战术黑琥珀' : look === 'hologram' ? '全息青' : '冷钢白'],
+      ]);
+    }
+  });
+  scene.add(root);
+  applyLook(look);
+
+  /* 🔴 动作自然的第一因：**必须播模型自带的动画**，不是晃容器。
+     实测这七具身里都带两条真动画：idle 8.00s（65 通道）/ walk 1.10s（66 通道）。
+     这里用 AnimationMixer + 交叉淡入：站立 ↔ 行走 切换不闪、不抽搐；
+     timeScale 可调速（0.4–1.6），默认 0.85 让它别显得赶。 */
+  let mixer = null, actions = {}, activeClip = null;
+  if (gltf.animations && gltf.animations.length) {
+    mixer = new THREE.AnimationMixer(root);
+    gltf.animations.forEach((clip) => {
+      const a = mixer.clipAction(clip);
+      a.enabled = true;
+      a.setEffectiveWeight(0);
+      a.play();
+      actions[clip.name] = a;
+    });
+    const first = actions.idle ? 'idle' : gltf.animations[0].name;
+    playClip(first, 0);
+  } else {
+    const err = document.getElementById('err');
+    err.textContent = '模型里没有动画轨 —— 不拿"晃容器"冒充动作';
+    err.classList.add('show');
+  }
+  window.__gbtClips = Object.keys(actions);
+
+  function playClip(name, fade) {
+    if (!actions[name] || activeClip === name) return;
+    const prev = activeClip ? actions[activeClip] : null;
+    const next = actions[name];
+    next.reset().setEffectiveWeight(1).play();
+    if (prev && fade > 0) { prev.crossFadeTo(next, fade, false); }
+    else if (prev) { prev.setEffectiveWeight(0); }
+    activeClip = name;
+    const el = document.getElementById('clipNow');
+    if (el) el.textContent = name;
+    document.querySelectorAll('[data-clip]').forEach((b) =>
+      b.classList.toggle('on', b.dataset.clip === name));
+  }
+  document.querySelectorAll('[data-clip]').forEach((b) => {
+    b.addEventListener('click', () => playClip(b.dataset.clip, 0.45));
+  });
+  const sp = document.getElementById('speed');
+  if (sp) sp.addEventListener('input', () => {
+    const v = parseFloat(sp.value);
+    Object.values(actions).forEach((a) => { a.timeScale = v; });
+    document.getElementById('speedNow').textContent = v.toFixed(2) + '×';
+  });
+
+  /* 待机呼吸：只给**位移级**微动（不动骨），动作由 mixer 驱动 */
+  const clock = new THREE.Clock();
+  (function tick() {
+    const dt = clock.getDelta();
+    const t = clock.elapsedTime;
+    root.position.y = Math.sin(t * 0.9) * 0.004;
+    camera.position.x = Math.sin(t * 0.18) * 0.05;
+    camera.lookAt(0, 1.16, 0);
+    if (mixer) mixer.update(dt);
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  })();
+}, undefined, (e) => {
+  const err = document.getElementById('err');
+  err.textContent = '模型载入失败：' + MODEL + '（' + String((e && e.message) || e).slice(0, 80) + '）—— 不拿占位件顶替';
+  err.classList.add('show');
+});
+
+document.querySelectorAll('#looks button').forEach((b) => {
+  b.addEventListener('click', () => applyLook(b.dataset.look));
+});
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

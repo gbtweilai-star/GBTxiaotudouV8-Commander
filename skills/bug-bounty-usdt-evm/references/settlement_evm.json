@@ -1,0 +1,35 @@
+{
+  "_note": "结算配置：只放公开的『收款地址』，私钥 / 助记词永不落盘（红线，见 AGENTS.md §5 凭据纪律）",
+  "developer": "自由的风",
+  "guardian": "公主土豆",
+  "main_wallet_address": "0x12113c1904342B7aD20b38271840C1B0e4962957",
+  "address_verified_by": "skills/bug-bounty-usdt-evm/scripts/validate_evm.py",
+  "address_verify_readout": {
+    "shape_ok": true,
+    "checksum": "valid",
+    "verdict": "ok_checksummed",
+    "_verified_at": "2026-10-14",
+    "_verified_with": "py -3.14 -X utf8 …/validate_evm.py 0x12113c1904342B7aD20b38271840C1B0e4962957"
+  },
+  "settlement": {
+    "evm_only": true,
+    "supported_chains": [
+      "Arbitrum One",
+      "Ethereum Mainnet",
+      "Base",
+      "Optimism",
+      "Polygon PoS"
+    ],
+    "preferred": "Arbitrum One",
+    "preferred_reason": "EVM 同地址通用、gas 低 —— 只是偏好，不是硬性；最终看对方平台支持哪条链",
+    "not_supported": "TRC20（T 开头地址）—— 非 EVM、地址体系不同，转进去可能找不回",
+    "accept_token": "USDT（该链上的 ERC-20 版本）",
+    "before_accepting": "收款前**在链上自核**该链上 USDT 的合约地址与 chainId（本件未联网核，不许照抄别处的合约地址）"
+  },
+  "security": {
+    "private_key_never_on_disk": true,
+    "audit_log_records_only": "地址 + 动作 + 时间，不记私钥 / 助记词 / 签名原文",
+    "never_paste_key_into_chat": true
+  },
+  "scope_of_this_file": "只做『钱收到哪个地址』这一件事；不派生地址、不代替签名、不碰私钥"
+}

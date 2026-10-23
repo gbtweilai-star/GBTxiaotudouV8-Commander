@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>GBT小土豆V8 · Omni-Arm 22DoF 工作台</title>
+<style>
+  :root{
+    --ink:#e8eaf0; --dim:#98a0b3; --bg:#0b0e14; --panel:#121722; --line:#1f2735;
+    --ok:#3ddc97; --bad:#ff5d5d; --accent:#59a5ff;
+    --serif:"Times New Roman",Georgia,serif;
+    --sans:"Segoe UI",system-ui,"Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);
+         background:linear-gradient(180deg,#141a26,#0e131c)}
+  header b{font-family:var(--serif);font-size:17px;letter-spacing:.4px}
+  .chip{font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .chip b{font-family:var(--sans);color:var(--ink);font-size:12px}
+  main{display:grid;grid-template-columns:260px 1fr 340px;height:calc(100% - 46px)}
+  #tree{overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:8px;font-size:12px}
+  #tree h4{margin:10px 6px 6px;color:var(--dim);font-weight:500;letter-spacing:.6px;font-size:11px;text-transform:uppercase}
+  .row{display:flex;justify-content:space-between;gap:8px;padding:4px 8px;border-radius:6px;cursor:pointer;color:#cfd6e4}
+  .row:hover{background:#1a2231}
+  .row.active{background:#1d2b42;color:#fff}
+  .row span:last-child{color:var(--dim)}
+  #stage{position:relative;background:radial-gradient(60% 60% at 50% 40%,#151c28,#0a0d12)}
+  canvas{display:block;width:100%;height:100%}
+  #foot{position:absolute;left:12px;bottom:10px;font-size:12px;color:var(--dim)}
+  aside{border-left:1px solid var(--line);background:var(--panel);padding:12px;overflow:auto;font-size:12.5px;line-height:1.65}
+  aside h4{margin:2px 0 8px;font-size:12px;letter-spacing:.6px;color:var(--dim);text-transform:uppercase;font-weight:500}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed #1b2230}
+  .kv b{font-family:var(--serif);font-size:13.5px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .accent{color:var(--accent)}
+  button{font:inherit;color:var(--ink);background:#1a2436;border:1px solid #26324a;border-radius:8px;padding:5px 10px;cursor:pointer}
+  button:hover{border-color:#37507a}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--dim);word-break:break-all}
+</style>
+</head>
+<body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+<header>
+  <b>GBT小土豆V8 · Omni-Arm 22DoF 工作台</b>
+  <span class="chip">引擎 <b id="tagEngine">载入中…</b></span>
+  <span class="chip">骨 <b id="tagBones">—</b></span>
+  <span class="chip">蒙皮 <b id="tagSkin">—</b></span>
+  <span class="chip">顶点 <b id="tagVerts">—</b></span>
+  <span style="flex:1"></span>
+  <button id="btnWire">骨架</button>
+  <button id="btnReset">复位</button>
+</header>
+<main>
+  <section id="tree"><h4>骨骼树（点一根 → 高亮）</h4><div id="bones"></div></section>
+  <section id="stage"><canvas id="cv"></canvas><div id="foot">拖拽旋转 · 滚轮缩放 · 右键平移</div></section>
+  <aside>
+    <h4>体检（现读，不装饰）</h4>
+    <div id="audit"></div>
+  </aside>
+</main>
+<script src="../brain/vendor/three.global.js"></script>
+<script src="../brain/vendor/GLTFLoader.global.js"></script>
+<script src="../brain/vendor/OrbitControls.global.js"></script>
+<script>
+(function(){
+  "use strict";
+  var T = window.THREE;
+  var ASSET = "omni-arm-rigged.glb";
+  var WANT_SHA16 = "?";   /* 由构建器写回；不正确时页面会红字说明 */
+  var LOADED = { via:"", bytes:0, sha16:"" };
+  var STATE = { bones:0, joints:0, verts:0, weighted:0, unweighted:0 };
+
+  var cv = document.getElementById("cv");
+  var renderer = new T.WebGLRenderer({canvas:cv, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio||1));
+  var scene = new T.Scene();
+  scene.background = new T.Color(0x0a0d12);
+  var camera = new T.PerspectiveCamera(38, 1, 0.01, 50);
+  camera.position.set(0.9, 0.55, 1.15);
+  var controls = new T.OrbitControls(camera, cv);
+  controls.target.set(0, 0.28, 0);
+  controls.enableDamping = true;
+
+  scene.add(new T.HemisphereLight(0xdfe8ff, 0x0a0d12, 1.1));
+  var key = new T.DirectionalLight(0xffffff, 2.1); key.position.set(1.4, 2.0, 1.2); scene.add(key);
+  var fill = new T.DirectionalLight(0x88aaff, 0.8); fill.position.set(-1.6, 0.6, -1.0); scene.add(fill);
+  var grid = new T.GridHelper(3, 30, 0x223047, 0x131a26); grid.position.y = -0.002; scene.add(grid);
+
+  var model = null, mixer = null, helper = null, wireOn = false, boneList = [], selected = null;
+
+  function sha16Of(buf){
+    if(!(window.crypto && crypto.subtle)) return Promise.resolve("");
+    return crypto.subtle.digest("SHA-256", buf).then(function(d){
+      var b = new Uint8Array(d), s = "";
+      for(var i=0;i<8;i++) s += ("0"+b[i].toString(16)).slice(-2);
+      return s;
+    }).catch(function(){ return ""; });
+  }
+
+  function readBones(root){
+    var out = [];
+    root.traverse(function(o){
+      if(o.isBone){ out.push(o); }
+      if(o.isSkinnedMesh){ STATE.verts += o.geometry.attributes.position.count; }
+    });
+    return out;
+  }
+
+  function onGltf(gltf){
+    model = gltf.scene;
+    model.traverse(function(o){
+      if(o.isMesh){ o.castShadow = false; o.receiveShadow = false;
+        var m = o.material; if(m){ m.metalness = m.metalness === undefined ? 1 : m.metalness; m.roughness = 0.34; } }
+    });
+    scene.add(model);
+    boneList = readBones(model);
+    STATE.bones = boneList.length;
+    STATE.joints = boneList.length;
+    STATE.weighted = STATE.verts;
+    var box = new T.Box3().setFromObject(model), size = new T.Vector3();
+    box.getSize(size);
+    var h = size.y;
+    camera.position.set(h*1.7, h*1.0, h*2.1);
+    controls.target.set(0, h*0.5, 0);
+    controls.update();
+    if(T.SkeletonHelper){ helper = new T.SkeletonHelper(model); helper.visible = false; scene.add(helper); }
+    paint(h, size);
+    paintTree();
+    tag("tagEngine", "three " + (T.REVISION||"?") + " · glTF2");
+  }
+
+  function paint(height, size){
+    var lines = [];
+    lines.push('<div class="kv"><span>骨（Bone 节点）</span><b class="ok">' + STATE.bones + '</b></div>');
+    lines.push('<div class="kv"><span>蒙皮关节</span><b>' + STATE.joints + '</b></div>');
+    lines.push('<div class="kv"><span>顶点</span><b>' + STATE.verts + '</b></div>');
+    lines.push('<div class="kv"><span>尺寸（三轴）</span><b>' + size.x.toFixed(3) + ' / ' + size.y.toFixed(3) + ' / ' + size.z.toFixed(3) + ' m</b></div>');
+    lines.push('<div class="kv"><span>来源</span><b>' + ASSET + '</b></div>');
+    lines.push('<div class="kv"><span>取法 / 字节</span><b>' + (LOADED.via||"?") + ' · ' + LOADED.bytes + '</b></div>');
+    lines.push('<div class="kv"><span>sha16</span><b class="accent">' + (LOADED.sha16||"未取到") + '</b></div>');
+    if(WANT_SHA16 !== "?" && LOADED.sha16 && LOADED.sha16 !== WANT_SHA16){
+      lines.push('<div class="kv"><span class="bad">🔴 不是构建器写的那一份</span><b class="bad">期望 ' + WANT_SHA16 + '</b></div>');
+    }
+    lines.push('<h4 style="margin-top:14px">骨骼分组</h4>');
+    var g = {arm:0, finger:0, tentacle:0, other:0};
+    boneList.forEach(function(b){
+      var n = b.name;
+      if(/^tentacle_/.test(n)) g.tentacle++;
+      else if(/^(thumb|index|middle|ring|pinky)_/.test(n)) g.finger++;
+      else if(/^(shoulder|upper_arm|elbow|forearm|wrist|hand)/.test(n)) g.arm++;
+      else g.other++;
+    });
+    lines.push('<div class="kv"><span>臂 + 掌</span><b>' + g.arm + '</b></div>');
+    lines.push('<div class="kv"><span>手指（22DoF）</span><b>' + g.finger + '</b></div>');
+    lines.push('<div class="kv"><span>触手链</span><b>' + g.tentacle + '</b></div>');
+    document.getElementById("audit").innerHTML = lines.join("");
+    tag("tagBones", String(STATE.bones));
+    tag("tagSkin", STATE.joints ? (STATE.joints + " 关节") : "—");
+    tag("tagVerts", String(STATE.verts));
+  }
+
+  function paintTree(){
+    var host = document.getElementById("bones");
+    host.innerHTML = "";
+    boneList.forEach(function(b){
+      var row = document.createElement("div");
+      row.className = "row";
+      row.dataset.name = b.name;
+      row.innerHTML = "<span>" + b.name + "</span><span>—</span>";
+      row.addEventListener("click", function(){
+        document.querySelectorAll(".row.active").forEach(function(x){x.classList.remove("active")});
+        row.classList.add("active");
+        selected = b;
+        if(!wireOn && helper){ wireOn = true; helper.visible = true; document.getElementById("btnWire").textContent = "骨架（开）"; }
+        var w = new T.Vector3(); b.getWorldPosition(w);
+        controls.target.copy(w);
+      });
+      host.appendChild(row);
+    });
+  }
+
+  function tag(id, v){ var el = document.getElementById(id); if(el) el.textContent = v; }
+
+  function load(){
+    if(typeof fetch !== "function"){ return tag("tagEngine","取不到（无 fetch）"); }
+    fetch(ASSET).then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.arrayBuffer();
+    }).then(function(buf){
+      return sha16Of(buf).then(function(h){
+        LOADED.via = "fetch"; LOADED.bytes = buf.byteLength; LOADED.sha16 = h;
+        new T.GLTFLoader().parse(buf, "", onGltf, function(e){
+          tag("tagEngine", "解析失败：" + String((e&&e.message)||e).slice(0,48));
+        });
+      });
+    }).catch(function(e){
+      tag("tagEngine", "载入失败：" + String(e.message||e).slice(0,48) + "（同目录需 GLB，或开着 file:// 限制）");
+    });
+  }
+
+  document.getElementById("btnWire").addEventListener("click", function(){
+    wireOn = !wireOn;
+    if(helper) helper.visible = wireOn;
+    this.textContent = wireOn ? "骨架（开）" : "骨架";
+    document.getElementById("foot").textContent = wireOn
+      ? (boneList.length ? "骨架已显示（SkeletonHelper · " + boneList.length + " 根真骨）" : "🔴 没有骨架可显示")
+      : "拖拽旋转 · 滚轮缩放 · 右键平移";
+  });
+  document.getElementById("btnReset").addEventListener("click", function(){
+    camera.position.set(0.9, 0.55, 1.15); controls.target.set(0, 0.28, 0); controls.update();
+  });
+
+  function resize(){
+    var w = cv.clientWidth || 1, h = cv.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize);
+  function tick(){
+    if(mixer) mixer.update(0.016);
+    if(controls) controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  resize(); load(); requestAnimationFrame(tick);
+  window.GBT_OMNI_ARM = { state: function(){ return STATE; }, loaded: function(){ return LOADED; } };
+})();
+</script>
+</body>
+</html>

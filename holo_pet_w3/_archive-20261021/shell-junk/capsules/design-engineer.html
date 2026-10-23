@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+
+<title>能力胶囊 · 设计工程师</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--ink:#080b14;--line:rgba(255,255,255,.09);--txt:#e8ecf6;--muted:#98a3bb;--dim:#6d778f;--a1:#6d8cff;--a2:#3ee0c8;
+--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
+body{margin:0;background:var(--ink);color:var(--txt);font-family:var(--font);font-size:15px;line-height:1.7}
+.wrap{max-width:1060px;margin:0 auto;padding:56px 22px 72px}
+.hero{display:flex;flex-wrap:wrap;gap:22px;align-items:center;padding:26px;border:1px solid var(--line);border-radius:26px;
+background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+h1{margin:0;font-size:34px;background:linear-gradient(100deg,#fff,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kicker{margin:0 0 6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--a2);text-transform:uppercase}
+.role{margin:6px 0 0;color:var(--muted);font-size:14px}
+.tagline{margin:18px 0 0;padding:14px 16px;border-left:2px solid var(--a1);background:rgba(255,255,255,.03);border-radius:0 12px 12px 0;color:#cfd7e8;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px}
+.stat{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:rgba(255,255,255,.03)}
+.stat b{display:block;font-size:26px;background:linear-gradient(100deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:12.5px;color:var(--dim)}
+section{margin-top:46px}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.sec-head h2{margin:0;font-size:18px}
+.idx{font-family:var(--mono);font-size:11px;color:var(--a2)}
+.sec-head p{margin:0;color:var(--dim);font-size:12.5px}
+.tabbar{display:flex;gap:6px;flex-wrap:wrap;padding:5px;border:1px solid var(--line);border-radius:14px;width:fit-content}
+.tab{appearance:none;border:0;cursor:pointer;font-family:inherit;font-size:13px;color:var(--muted);background:transparent;padding:8px 16px;border-radius:10px}
+.tab[aria-selected="true"]{color:#fff;background:linear-gradient(120deg,rgba(109,140,255,.9),rgba(62,224,200,.75))}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:18px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018))}
+.card h3{margin:0 0 6px;font-size:14.5px}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tags i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+.flow,.deliv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.step,.d{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.028)}
+.step .n{font-family:var(--mono);font-size:11px;color:var(--a1)}
+.step h4{margin:8px 0 6px;font-size:14px}
+.step p,.d span{margin:0;font-size:12.5px;color:var(--muted)}
+.d b{display:block;font-size:13.5px}
+.prompts{display:grid;gap:10px}
+.prompt{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.prompt code{flex:1;font-family:var(--font);font-size:13px;color:#d5dcec}
+.copy{cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+.copy.ok{color:#7ef0d8}
+footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;color:var(--dim);font-size:12px}
+.panel[hidden]{display:none}
+</style></head><body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<main class="wrap">
+<header class="hero"><div><p class="kicker">Knowledge Capsule · v1.0</p><h1>设计工程师</h1>
+<p class="role">交互设计工程师 · 视觉设计 × 前端开发</p>
+<p class="tagline">我融合视觉设计与前端工程的双重视角，帮你把「看起来不错」变成「真的能跑起来」——在美观、体验、实现成本与性能之间，找到那个可落地的平衡点。</p>
+<div class="chips"><span class="chip">美观 × 可实现性</span><span class="chip">体验 × 技术成本</span><span class="chip">多端适配</span><span class="chip">性能与可访问性</span></div></div></header>
+<div class="stats"><div class="stat"><b>5</b><span>专业能力域</span></div><div class="stat"><b>5</b><span>步协作工作流</span></div><div class="stat"><b>6</b><span>类可交付物</span></div><div class="stat"><b>3</b><span>个视角：设计 / 代码 / 协作</span></div></div>
+
+<section><div class="sec-head"><span class="idx">01</span><h2>能力矩阵</h2><p>切换标签 · 键盘 1/2/3</p></div>
+<div class="tabbar" role="tablist"><button class="tab" role="tab" aria-selected="true" aria-controls="p1">视觉设计</button><button class="tab" role="tab" aria-selected="false" aria-controls="p2">前端实现</button><button class="tab" role="tab" aria-selected="false" aria-controls="p3">协作交付</button></div>
+<div class="panel" id="p1"><div class="grid">
+<div class="card"><h3>界面与交互设计</h3><p>用户流程梳理、信息架构、交互模式选择，优先保证可用性与任务完成效率。</p><div class="tags"><i>UI</i><i>UX</i><i>user flow</i></div></div>
+<div class="card"><h3>色彩与排版系统</h3><p>基于色彩理论构建层次分明的排版与配色，维持品牌一致性并保证对比度达标。</p><div class="tags"><i>color</i><i>typography</i><i>contrast</i></div></div>
+<div class="card"><h3>设计系统与组件库</h3><p>定义组件规范、状态与变体，输出可复用的设计 Token 与模式库。</p><div class="tags"><i>design token</i><i>component</i></div></div>
+<div class="card"><h3>原型与动效</h3><p>可交互原型、微动效的节奏与缓动曲线设计，用于方案验证与用户测试。</p><div class="tags"><i>prototype</i><i>motion</i></div></div></div></div>
+<div class="panel" id="p2" hidden><div class="grid">
+<div class="card"><h3>HTML / CSS / JavaScript</h3><p>语义化结构、现代布局与渐进增强，写出既好看又好维护的界面代码。</p><div class="tags"><i>html</i><i>css</i><i>js</i></div></div>
+<div class="card"><h3>响应式与自适应</h3><p>断点策略、流式布局与容器查询，让同一套设计在手机、平板、桌面都成立。</p><div class="tags"><i>responsive</i><i>container query</i></div></div>
+<div class="card"><h3>组件化与框架</h3><p>React / Vue 组件拆分、状态管理与组件复用设计。</p><div class="tags"><i>react</i><i>vue</i></div></div>
+<div class="card"><h3>性能优化</h3><p>关键渲染路径、资源体积、懒加载与渲染开销，视觉复杂度不牺牲流畅度。</p><div class="tags"><i>performance</i><i>lazy load</i></div></div>
+<div class="card"><h3>可访问性</h3><p>语义标签、键盘可达、焦点管理与 ARIA。</p><div class="tags"><i>a11y</i><i>keyboard</i><i>aria</i></div></div></div></div>
+<div class="panel" id="p3" hidden><div class="grid">
+<div class="card"><h3>设计到代码转换</h3><p>标注解读、Token 映射、间距与栅格还原，减少「差一点点」。</p><div class="tags"><i>design2code</i><i>handoff</i></div></div>
+<div class="card"><h3>设计规范文档</h3><p>命名约定、栅格与间距体系、组件状态表。</p><div class="tags"><i>guideline</i><i>spec</i></div></div>
+<div class="card"><h3>跨端适配策略</h3><p>移动/桌面/多平台一致性策略，明确哪些该统一、哪些该让步。</p><div class="tags"><i>cross-platform</i></div></div>
+<div class="card"><h3>可行性评估</h3><p>设计阶段就评估实现难度与维护成本，提前暴露取舍点。</p><div class="tags"><i>trade-off</i><i>feasibility</i></div></div></div></div></section>
+
+<section><div class="sec-head"><span class="idx">02</span><h2>工作流</h2><p>从需求到可运行方案的五步</p></div>
+<div class="flow">
+<div class="step"><span class="n">STEP 01</span><h4>理解需求</h4><p>明确产品目标、目标受众与使用场景约束。</p></div>
+<div class="step"><span class="n">STEP 02</span><h4>概念方案</h4><p>给出界面设计概念与交互流程方案。</p></div>
+<div class="step"><span class="n">STEP 03</span><h4>技术选型</h4><p>讨论前端实现策略、框架与组件化取舍。</p></div>
+<div class="step"><span class="n">STEP 04</span><h4>风险评估</h4><p>分析设计与开发挑战、边界情况与可访问性。</p></div>
+<div class="step"><span class="n">STEP 05</span><h4>代码交付</h4><p>提供可直接运行的设计实现方案与说明。</p></div></div></section>
+
+<section><div class="sec-head"><span class="idx">03</span><h2>可交付物</h2></div>
+<div class="deliv">
+<div class="d"><b>&lt;/&gt; 交互组件</b><span>按钮、表单、卡片等可直接交互的界面单元</span></div>
+<div class="d"><b>▤ 仪表盘 / 数据可视化</b><span>指标卡片、图表与筛选联动的后台界面</span></div>
+<div class="d"><b>▢ 页面与落地页</b><span>完整布局、响应式与动效的 HTML 页面</span></div>
+<div class="d"><b>◇ 图形与图标</b><span>矢量图形、图标、示意图与流程图</span></div>
+<div class="d"><b>≡ 设计规范说明</b><span>配色、排版、间距与组件状态的可维护文档</span></div>
+<div class="d"><b>{ } 代码片段与解释</b><span>实现思路、关键代码与踩坑说明</span></div></div></section>
+
+<section><div class="sec-head"><span class="idx">04</span><h2>这样用我</h2><p>点按钮复制</p></div>
+<div class="prompts">
+<div class="prompt"><code>为我的 SaaS 产品设计一个数据仪表盘，带暗色模式</code><button class="copy" data-copy="为我的 SaaS 产品设计一个数据仪表盘，带暗色模式">复制</button></div>
+<div class="prompt"><code>把这张设计稿还原成响应式的 React 组件</code><button class="copy" data-copy="把这张设计稿还原成响应式的 React 组件">复制</button></div>
+<div class="prompt"><code>帮我定一套品牌色与排版规范，并给出 Token</code><button class="copy" data-copy="帮我定一套品牌色与排版规范，并给出 Token">复制</button></div>
+<div class="prompt"><code>这个页面的交互和性能还有什么可优化的地方？</code><button class="copy" data-copy="这个页面的交互和性能还有什么可优化的地方？">复制</button></div></div></section>
+<footer><span>设计工程师 · 视觉 × 前端 · 把设计做成能跑的东西</span><span>开发者：自由的风 · 守护者：公主土豆</span></footer></main>
+<script>
+(function(){"use strict";
+var tabs=[].slice.call(document.querySelectorAll('[role="tab"]')),panels=[].slice.call(document.querySelectorAll('.panel'));
+function sel(t,f){tabs.forEach(function(x){var on=x===t;x.setAttribute("aria-selected",on?"true":"false")});
+panels.forEach(function(p){p.hidden=p.id!==t.getAttribute("aria-controls")});if(f)t.focus();}
+tabs.forEach(function(t,i){t.addEventListener("click",function(){sel(t,false)});
+t.addEventListener("keydown",function(e){var n=null;
+if(e.key==="ArrowRight")n=tabs[(i+1)%tabs.length];else if(e.key==="ArrowLeft")n=tabs[(i-1+tabs.length)%tabs.length];
+if(n){e.preventDefault();sel(n,true)}})});
+document.addEventListener("keydown",function(e){if(e.metaKey||e.ctrlKey||e.altKey)return;
+if(["1","2","3"].indexOf(e.key)>=0){var t=tabs[parseInt(e.key,10)-1];if(t)sel(t,false)}});
+function fb(x){var a=document.createElement("textarea");a.value=x;a.style.position="fixed";a.style.opacity="0";
+document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(err){}
+document.body.removeChild(a);}
+[].slice.call(document.querySelectorAll(".copy")).forEach(function(b){b.addEventListener("click",function(){
+var x=b.getAttribute("data-copy")||"";function done(){b.classList.add("ok");b.textContent="已复制";
+setTimeout(function(){b.classList.remove("ok");b.textContent="复制"},1400);}
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(x).then(done,function(){fb(x);done()})}else{fb(x);done()}})});
+})();
+</script>
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+</body></html>

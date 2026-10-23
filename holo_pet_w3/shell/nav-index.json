@@ -1,0 +1,119 @@
+{
+  "schema": "gbt-nav/v1",
+  "links": [
+    {
+      "path": "panel/index.html",
+      "label": "GBT小土豆V8 · 控制面板",
+      "group": "窗",
+      "id": "panel"
+    },
+    {
+      "path": "index.html",
+      "label": "GBT小土豆V8 · 上帝视角",
+      "group": "窗",
+      "id": "godview"
+    },
+    {
+      "path": "eigenflux/index.html",
+      "label": "GBT小土豆V8 · AI 朋友圈",
+      "group": "窗",
+      "id": "eigenflux"
+    },
+    {
+      "path": "h1/index.html",
+      "label": "GBT小土豆V8 · 赏金台",
+      "group": "窗",
+      "id": "h1"
+    },
+    {
+      "path": "shell/connect.html",
+      "label": "GBT小土豆V8 · 对话",
+      "group": "窗",
+      "id": "dsh-chat"
+    },
+    {
+      "path": "plugins-mesh/index.html",
+      "label": "GBT小土豆V8 · 云插件互绑拓扑",
+      "group": "窗",
+      "id": "plugins-mesh"
+    },
+    {
+      "path": "code-deck/index.html",
+      "label": "GBT小土豆V8 · 代码台",
+      "group": "窗",
+      "id": "code-deck"
+    },
+    {
+      "path": "eye/index.html",
+      "label": "GBT小土豆V8 · 触手视觉回传",
+      "group": "窗",
+      "id": "eye"
+    },
+    {
+      "path": "logbook/index.html",
+      "label": "GBT小土豆V8 · 记录本",
+      "group": "窗",
+      "id": "logbook"
+    },
+    {
+      "path": "blueprint/index.html",
+      "label": "GBT小土豆V8 · 项目蓝图",
+      "group": "窗",
+      "id": "blueprint"
+    },
+    {
+      "path": "cloud-plugins/index.html",
+      "label": "GBT小土豆V8 · 云插件独立页",
+      "group": "窗",
+      "id": "cloud-plugins"
+    },
+    {
+      "path": "cloud-status/index.html",
+      "label": "GBT小土豆V8 · 连接状态",
+      "group": "窗",
+      "id": "cloud-status"
+    },
+    {
+      "path": "shell/connect.html",
+      "label": "GBT小土豆V8 · 对话（DSH Web）",
+      "group": "窗",
+      "id": "dsh-chat"
+    },
+    {
+      "path": "db-fleet/index.html",
+      "label": "GBT小土豆V8 · 数据库编队",
+      "group": "窗",
+      "id": "db-fleet"
+    },
+    {
+      "path": "capabilities/index.html",
+      "label": "GBT小土豆V8 · 能力统计",
+      "group": "窗",
+      "id": "capabilities"
+    },
+    {
+      "path": "energy/index.html",
+      "label": "GBT小土豆V8 · 能量与绑定",
+      "group": "窗",
+      "id": "energy"
+    },
+    {
+      "path": "digital-human/index.html",
+      "label": "GBT小土豆V8 · 数字人",
+      "group": "窗",
+      "id": "digital-human"
+    },
+    {
+      "path": "capability-bar/index.html",
+      "label": "GBT小土豆V8 · 能力栏",
+      "group": "窗",
+      "id": "capability-bar"
+    },
+    {
+      "path": "voice-theater/index.html",
+      "label": "GBT小土豆V8 · 语音剧场",
+      "group": "窗",
+      "id": "voice-theater"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>GLB 隔离台：只加载模型，不跑 companion.js</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0a0f1a; }
+  #wrap { position: fixed; inset: 0; }
+  #info { position: fixed; left: 12px; top: 12px; color: #9ff; font: 13px/1.5 Consolas, monospace; white-space: pre; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="wrap"></div>
+<div id="info">loading…</div>
+<script type="module">
+// 隔离台的目的：把"模型/three 的问题"和"companion.js 的问题"分开。
+// 只做三件事：加载 → 可选播 idle → 固定机位拍全身。全部读数写进 window.__t。
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const wrap = document.getElementById("wrap");
+const info = document.getElementById("info");
+const T = { stage: "start" };
+window.__t = T;
+const play = new URLSearchParams(location.search).get("play") || "none";   // none | idle | walk
+T.play = play;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(1);
+renderer.setSize(520, 780);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+wrap.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0f1a);
+const camera = new THREE.PerspectiveCamera(24, 520 / 780, 0.01, 100);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x223344, 1.2));
+const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(2, 4, 4); scene.add(key);
+
+let mixer = null, model = null;
+
+new GLTFLoader().load("./assets/digital-human/raw/rig/avatar-hd.glb", (gltf) => {
+  model = gltf.scene;
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  T.rawSize = { x: +size.x.toFixed(3), y: +size.y.toFixed(3), z: +size.z.toFixed(3) };
+  model.position.sub(box.getCenter(new THREE.Vector3()));
+  model.position.y = -size.y * 0.34;
+  model.scale.setScalar(1.65 / Math.max(size.y, 0.01));   // 跟 companion.js 同一口径
+  scene.add(model);
+
+  if (play !== "none") {
+    const clip = THREE.AnimationClip.findByName(gltf.animations, play);
+    if (clip) { mixer = new THREE.AnimationMixer(model); mixer.clipAction(clip).play(); T.clip = clip.name; }
+    else { T.clip = "NOT FOUND: " + gltf.animations.map(a => a.name).join(","); }
+  }
+  const bone = (n) => { let f = null; model.traverse(o => { if (!f && o.isBone && o.name.replace(/[^A-Za-z0-9]/g, "").toLowerCase() === n.replace(/[^A-Za-z0-9]/g, "").toLowerCase()) f = o; }); return f; };
+  T.bones = { head: !!bone("mixamorig:Head"), foot: !!bone("mixamorig:LeftFoot"), hand: !!bone("mixamorig:LeftHand") };
+  T.stage = "ready";
+  info.textContent = "ready play=" + play + " size=" + JSON.stringify(T.rawSize);
+}, undefined, (e) => { T.stage = "failed"; T.err = String(e && e.message || e); info.textContent = "FAILED " + T.err; });
+
+const clock = new THREE.Clock();
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = clock.getDelta();
+  if (mixer) mixer.update(dt);
+  if (model) {
+    const b = new THREE.Box3().setFromObject(model);
+    T.bbox = { minY: +b.min.y.toFixed(3), maxY: +b.max.y.toFixed(3),
+               minX: +b.min.x.toFixed(3), maxX: +b.max.x.toFixed(3) };
+    camera.position.set(0, 0.95, 4.9);
+    camera.lookAt(0, 0.88, 0);
+  }
+  renderer.render(scene, camera);
+}
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数字人 · 云投射到 APP</title>
+<style>
+  :root{--fg:#e8f4ff;--dim:rgba(220,240,255,.62);--line:rgba(120,210,255,.18);--bg:#070d14;--card:rgba(14,28,42,.72)}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at 50% 0%,#12283c,#070d14 62%);color:var(--fg);
+       font:14px/1.65 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;padding:28px}
+  h1{font-size:19px;margin:0 0 4px;letter-spacing:.02em}
+  .sub{color:var(--dim);font-size:12px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:22px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  /* 云容器投射位：画幅就是片子画幅 1472×2496，不裁不拉伸 */
+  .stage{position:relative;width:100%;aspect-ratio:1472/2496;max-height:70vh;margin:0 auto;
+         border-radius:10px;overflow:hidden;background:#000;border:1px solid var(--line)}
+  .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+  .fallback{position:absolute;inset:0;display:none;place-content:center;text-align:center;padding:18px;gap:10px;
+            color:var(--dim);font-size:12px}
+  .stage.offline .fallback{display:grid}
+  .stage.offline iframe{display:none}
+  .hint{margin-top:10px;color:var(--dim);font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid rgba(120,210,255,.10);vertical-align:top}
+  th{color:var(--dim);font-weight:500;white-space:nowrap}
+  .note{margin-top:14px;color:var(--dim);font-size:12px;line-height:1.7}
+  code{background:rgba(120,210,255,.10);padding:1px 5px;border-radius:5px;font-size:12px;word-break:break-all}
+  a{color:#7fd6ff}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head>
+<body data-kind="digital_human">
+  <h1>数字人 · 云投射到 APP</h1>
+  <div class="sub">这一页是 <code>digital_human</code> 能力位的落地页。画面<b>不抄进本地</b>：直接把云动作库的投射页嵌进来，
+    新片一发布这里就自动是新的 —— 本地不再手抄任何读数。</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="stage" id="stage">
+        <iframe id="proj" title="云动作库投射" allow="autoplay; fullscreen; picture-in-picture"
+                referrerpolicy="no-referrer"></iframe>
+        <div class="fallback">
+          <div><b style="color:#ffb4b4">没连上云</b></div>
+          <div>云端投射页没加载出来（断网 / 桶不可达）。<br>本地母版仍可看：
+            <a href="https://pub-3b817fc945aa4e1c8d7cce0ea93fa725.r2.dev/motions/clips/fullbody-tw-v5.mp4" target="_blank" rel="noopener">直链打开</a></div>
+        </div>
+      </div>
+      <div class="hint">静音自动播 = 面板里她一直在动；想听声音，点画面里那条再点喇叭。</div>
+    </div>
+
+    <div class="card">
+      <table>
+        <tr><th>画面从哪来</th><td>云公网桶 <code>gbt-motion</code> 的 <code>index.html?embed=1</code>（同一个桶里放 manifest 与片子，同源取数，不吃 CORS）</td></tr>
+        <tr><th>播哪一条</th><td>manifest 里<b>最新在役</b>那条（标题带「【旧版…】」的一律跳过），新片进库即自动切换</td></tr>
+        <tr><th>读数在哪</th><td>云页里随片带出（画质/头动/闪烁/嘴对齐 r 与 lag/负对照）</td></tr>
+        <tr><th>云页直开</th><td><a id="cloudlink" href="#" target="_blank" rel="noopener">在浏览器里打开云动作库</a></td></tr>
+      </table>
+      <div class="note">
+        <b>怎么做出来的</b>：一张图 + 台湾腔配音 → SadTalker 头部驱动 → GFPGAN upscale×2 → 1472×2496 →
+        逐行重心摆动 → 一次编码 + 字幕 → 三口径验收 → 只过线才上云。<br><br>
+        <b>还差什么</b>：身体大动作（抬手/转身/教瑜伽/手指）—— 一条照片做不出来，需 3D 骨骼那条线。
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  // 破缓存：每次打开都带新 ts，避免边缘缓存把旧投射页喂给面板（本仓栽过：缓存让修好的页看着还是红的）
+  // 2026-10-21 Owner 选 A（收工）：面板主画面回到**已过五门验收**的 v5 视频库
+  // 2.5D 实时页与拆件纸片人只作实验件保留（URL 记在 journal §81/§86），不占面板主位
+  var BUCKET = 'https://pub-3b817fc945aa4e1c8d7cce0ea93fa725.r2.dev';
+  var CLOUD = BUCKET + '/index.html';
+  var src = CLOUD + '?embed=1&autoplay=1&t=' + Date.now();
+  var stage = document.getElementById('stage');
+  var fr = document.getElementById('proj');
+  document.getElementById('cloudlink').href = CLOUD;
+  var decided = false;
+  function offline(why) {
+    if (decided) return;
+    decided = true;
+    stage.classList.add('offline');
+    stage.setAttribute('data-why', why);
+  }
+  fr.src = src;
+  // 兜底必须靠**真探测**，不能靠 iframe 的 load 事件：
+  // 断网/被墙时 Chrome 会把错误页塞进 iframe 并照常 fire load —— 用 load 判活等于兜底是死的（2026-10-20 实测踩过）。
+  // no-cors 探测：拿不到内容（没 ACAO），但只要网络通就会 resolve；网络断会 reject。
+  var ctl = new AbortController();
+  var timer = setTimeout(function () { try { ctl.abort(); } catch (e) {} offline('timeout'); }, 7000);
+  fetch(BUCKET + '/manifest.json?probe=1&t=' + Date.now(), { mode: 'no-cors', cache: 'no-store', signal: ctl.signal })
+    .then(function () { clearTimeout(timer); if (!decided) { decided = true; stage.classList.remove('offline'); } })
+    .catch(function (e) { clearTimeout(timer); offline('fetch:' + (e && e.name || 'error')); });
+})();
+</script>
+</body>
+</html>

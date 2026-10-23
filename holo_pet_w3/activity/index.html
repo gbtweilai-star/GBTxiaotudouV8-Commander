@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="utf-8" />
+<title>GBT小土豆V8 · 触手活动流</title>
+<!-- GBT小土豆V8 · 触手活动流（主人令 2026-10-04：「触手她都不活动的吗？」）
+     干什么：读**真账本**（gbt_allinone/store/audit.jsonl）尾部 —— 谁在动、动了几次、成没成；
+     并给一个**心跳派活**开关（按轮换给只读能力位派活，让触手真动起来、账本可见）。
+     口径：**不编活动**（没调用就如实显「静默」）；写类能力永不自动派（要票的活只由主人发）。
+     开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属 -->
+<style>
+:root{--bg:#06080c;--pan:#0c1118;--line:#1c2634;--ink:#e7eef8;--dim:#8794a6;--cy:#22d3ee;--or:#f5b041;--ok:#34d399;--bad:#f87171}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI",system-ui,sans-serif}
+.top{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.mark{width:16px;height:16px;flex:0 0 auto;background:url(../build/tray-logo-32.png) center/contain no-repeat}
+.brand{font-weight:700}.brand b{color:var(--or)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:#0e141d;color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+.btn.on{border-color:#2f7d5c;color:var(--ok)}
+.wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+.card{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:12px}
+h2{margin:0 0 8px;font-size:12.5px;color:var(--dim);font-weight:600}
+.stat{display:flex;gap:20px;flex-wrap:wrap;margin:4px 0 10px}
+.stat b{display:block;font-size:22px;color:var(--cy);font-variant-numeric:tabular-nums}
+.stat i{font-style:normal;color:var(--dim);font-size:11.5px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{border-bottom:1px solid var(--line);padding:3px 6px;text-align:left}
+th{color:var(--dim);font-weight:600}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.dim{color:var(--dim)}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+.bar{height:6px;background:#12202c;border-radius:3px;overflow:hidden;min-width:70px;display:inline-block;vertical-align:middle}
+.bar i{display:block;height:100%;background:var(--cy)}
+</style></head><body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div class="top">
+  <span class="mark"></span><span class="brand">GBT<b>小土豆</b>V8 · 触手活动流</span>
+  <span class="dim" id="src">真账本：gbt_allinone/store/audit.jsonl</span>
+  <span class="grow"></span>
+  <button class="btn" id="hb">● 心跳派活（关）</button>
+</div>
+<div class="wrap">
+  <div class="card">
+    <h2>// 01 — 总量与活跃位（近 400 条账本）</h2>
+    <div class="stat" id="stats"></div>
+    <table><thead><tr><th>能力位</th><th>调用数</th><th>占比</th></tr></thead><tbody id="counts"></tbody></table>
+  </div>
+  <div class="card">
+    <h2>// 02 — 最近活动（账本尾部 · 实时刷新）</h2>
+    <table><thead><tr><th>时刻</th><th>能力位</th><th>事件</th><th>结果</th></tr></thead><tbody id="tail"></tbody></table>
+    <p class="dim" id="note">没活动就是静默 —— 这里**不编**。</p>
+  </div>
+</div>
+<script>
+(function () {
+  var api = window.gbtW3;
+  var stats = document.getElementById("stats"), counts = document.getElementById("counts");
+  var tail = document.getElementById("tail"), note = document.getElementById("note");
+  var src = document.getElementById("src"), hbBtn = document.getElementById("hb");
+  var hbOn = false, lastRound = null;
+
+  function esc(s) { return String(s == null ? "" : s); }
+
+  function refresh() {
+    if (!api || typeof api.capActivity !== "function") {
+      note.textContent = "壳动作口没加载（不在面板里？）"; return;
+    }
+    api.capActivity().then(function (d) {
+      if (!d || !d.ok) { note.textContent = "读账本失败（如实报）：" + ((d && d.error) || "未知"); return; }
+      src.textContent = "真账本：" + d.ledger + " · 现读 " + d.at.slice(11, 19);
+      var total = d.total || 0, rowsN = (d.tail || []).length;
+      var activeKinds = (d.counts || []).filter(function (c) { return c.n > 0; }).length;
+      stats.innerHTML =
+        "<div><b>" + total.toLocaleString() + "</b><i>账本总条数</i></div>" +
+        "<div><b>" + activeKinds + "</b><i>近 400 条里有活动的位</i></div>" +
+        "<div><b>" + ((d.counts[0] && d.counts[0].kind) || "—") + "</b><i>最活跃</i></div>";
+      var max = (d.counts[0] && d.counts[0].n) || 1;
+      counts.innerHTML = (d.counts || []).map(function (c) {
+        var w = Math.round(100 * c.n / max);
+        return "<tr><td class='mono'>" + esc(c.kind) + "</td><td>" + c.n + "</td>" +
+               "<td><span class='bar'><i style='width:" + w + "%'></i></span> " + w + "%</td></tr>";
+      }).join("") || "<tr><td colspan=3 class='dim'>近 400 条里没有任何带 kind 的调用</td></tr>";
+      tail.innerHTML = rowsN ? (d.tail || []).map(function (r) {
+        var res = r.ok === null ? "<span class='dim'>—</span>"
+                : (r.ok ? "<span class='ok'>ok</span>" : "<span class='bad'>失败</span>");
+        return "<tr><td class='mono'>" + esc((r.iso || "").slice(11, 19)) + "</td>" +
+               "<td class='mono'>" + (r.kind ? "<span class='pulse'></span>" + esc(r.kind) : "<span class='dim'>—</span>") + "</td>" +
+               "<td>" + esc(r.event) + "</td><td>" + res + "</td></tr>";
+      }).join("") : "<tr><td colspan=4 class='dim'>账本尾部读不到</td></tr>";
+      note.textContent = hbOn
+        ? "心跳在跑（只派**只读**能力位：health / llm_status / tentacle见 / task_manager / selfscan）—— 这里应能看到新条目滚动。"
+        : "心跳关着：活动只来自真实调用（例如「触手视觉回传」页每 1.2 秒取一帧）。要主动派活就点右上角。";
+    }).catch(function (e) { note.textContent = "异常：" + e; });
+  }
+
+  if (hbBtn) hbBtn.addEventListener("click", function () {
+    if (!api || typeof api.heartbeat !== "function") { note.textContent = "壳动作口没加载"; return; }
+    hbOn = !hbOn;
+    hbBtn.className = "btn" + (hbOn ? " on" : "");
+    hbBtn.textContent = hbOn ? "● 心跳派活（开）" : "● 心跳派活（关）";
+    api.heartbeat({ on: hbOn }).then(function (r) {
+      note.textContent = r && r.on ? ("心跳已开 · 轮换：" + (r.caps || []).join(" / "))
+                                   : "心跳已停";
+      refresh();
+    });
+  });
+
+  refresh();
+  setInterval(refresh, 2500);
+})();
+</script>
+
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+<script src="../shell/live-badge.js" defer></script>
+<script src="../shell/tentacle-kit.js" defer></script>
+</body></html>

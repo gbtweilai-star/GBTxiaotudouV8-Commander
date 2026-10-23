@@ -1,0 +1,59 @@
+{
+ "schema": "gbt-character-spec/v1",
+ "name": "GBT小土豆V8 · 标准形象",
+ "status": "标准（唯一基准）· 2026-10-18 定",
+ "reference": {
+  "front": "reference-front.jpg",
+  "note": "主人 2026-10-18 指定：以这一张为标准，其余模型一律按此收口"
+ },
+ "identity": {
+  "codename": "02",
+  "motif": ["胸前圆形扣环", "腰侧斜纹警示条", "胸腹 02 铭牌", "袖口环状战术扣"],
+  "silhouette": "短发 bob · 立领长袖 · 高叉连体战术装 · 过膝系带作战靴"
+ },
+ "palette": {
+  "shell": "#12141A",
+  "shellAlt": "#0B0D12",
+  "trim": "#F2B705",
+  "trimDeep": "#B98A00",
+  "skin": "#F3D9CC",
+  "hair": "#0E1015",
+  "hud": "#3EC8D4",
+  "void": "#050B14",
+  "note": "深黑哑光壳 + 琥珀战术带；HUD 只用青色，不许出现第三种高饱和色"
+ },
+ "materials": {
+  "metalness": 0.0,
+  "roughness": 0.55,
+  "trimEmissive": 0.18,
+  "rule": "金属度必须为 0（台账已定）；油光只许出现在 Trim 与扣环，皮肤区不许高光斑"
+ },
+ "sciFi": {
+  "required": ["全息栅格地台", "扫描线", "四角 HUD 括角", "环状 segmentation 刻度", "状态读数列"],
+  "accentPolicy": "青 #3EC8D4 走线，琥珀 #F2B705 只给标识与警示 —— 两色之外不加色",
+  "forbidden": ["霓虹紫渐变", "玻璃拟态卡堆叠", "无意义的数字雨"],
+  "reason": "主人令 2026-10-18：「必须要有未来科幻的感觉」；本仓另有 AI 味禁令，故科幻感靠结构与光，不靠配色堆叠"
+ },
+ "rig": {
+  "status": "已在（不需重建）",
+  "bones": 65,
+  "fingerBones": 42,
+  "naming": "mixamorig",
+  "fingers": "五指 × 四节 × 双手（Index/Middle/Ring/Pinky/Thumb）",
+  "evidence": "7 个 GLB 逐一解析 skin.joints 得 65 骨 / 42 手指骨（2026-10-18 实测）"
+ },
+ "acceptance": {
+  "must": [
+   "金属度 0（不靠手感，读材质值）",
+   "手指骨 ≥ 40（逐模型读 skin.joints）",
+   "只出现 青/琥珀/黑/肤色 四类色相",
+   "HUD 四件（括角/扫描线/栅格/读数列）都在",
+   "署名行在，且不可删"
+  ],
+  "notYet": [
+   "原生图→真 3D（dl_forge 八段链未建；tripo 401 且主人指定不用外部）",
+   "本契约的 3D 重建版必须过 dh_realism 12 项 + tpose-check + walk-check 才许替换现役"
+  ]
+ },
+ "signature": "开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属"
+}

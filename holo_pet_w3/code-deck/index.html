@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN" data-data-kind="快照" data-data-at="2026-10-23T17:46:38"><head><meta charset="utf-8" />
+<meta name="color-scheme" content="dark" />
+<title>GBT小土豆V8 · 代码台</title>
+<link rel="stylesheet" href="../deck3d.css" />
+<style>
+  /* 本页只写**版式**，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
+  .two > .gbt-card{margin:0}
+  ul.cm{margin:0;padding-left:18px}
+  ul.cm li{margin:3px 0;font-size:12.5px;color:var(--gbt-dim)}
+  /* F 工作回路：只用版式，颜色一律取自视觉层 token（裸色值不在这出现） */
+  ol.loop{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+  ol.loop > li.stage{border-left:2px solid var(--gbt-dim);padding:1px 0 1px 11px}
+  ol.loop h3{margin:0 0 5px;font-size:13px}
+  div.cmd{margin:3px 0 0}
+  div.cmd code{font-size:11.5px;word-break:break-all}
+  @media (max-width:900px){.two{grid-template-columns:1fr}}
+</style></head>
+<body class="gbt-stage">
+<div class="gbt-board">
+
+  <div class="gbt-head">
+    <div class="gbt-core" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="gbt-core-cast"></span></div>
+    <div class="gbt-title">
+      <h1>代码台 · 这个仓现在长什么样</h1>
+      <div class="sub">
+        快照 <b>2026-10-23T17:46:38</b> ｜ 结构面 <b>gbt_allinone</b> ｜ 账本今次读取已走门
+        <code>run_task</code> ｜ 立体视觉层 <code>../deck3d.css</code> 已就位
+      </div>
+    </div>
+  </div>
+
+  <div class="gbt-card z-near">
+    <h2>F · 工作回路 —— 一次专业级改动怎么走完</h2>
+    <p class="kv">读 → 看改动面 → 试改 → 真改 → 验证 → 登记 ｜ 每一步的能力位都<strong>现查</strong> caps_registry.BENIGN_CAPS / UNIMPLEMENTED_CAPS（现查）。真身全部命中。</p>
+    <ol class="loop"><li class=stage><h3>1 · 读</h3><ul class=cm><li><b>看代码结构</b> <span class=mono>project_context</span> <span class="pill ok">免卡直跑</span></li><li><b>看依赖</b> <span class=mono>project_context</span> <span class="pill ok">免卡直跑</span></li><li><b>看调用关系</b> <span class=mono>project_context</span> <span class="pill ok">免卡直跑</span></li></ul></li><li class=stage><h3>2 · 看改动面</h3><ul class=cm><li><b>看改了哪些文件</b> <span class=mono>git_read</span> <span class="pill ok">免卡直跑</span></li></ul></li><li class=stage><h3>3 · 试改</h3><ul class=cm><li><b>试改（只出预览，不落盘）</b> <span class=mono>code_patch</span> <span class="pill ok">免卡直跑</span></li></ul></li><li class=stage><h3>4 · 真改</h3><ul class=cm><li><b>真改一个文件</b> <span class=mono>code_patch</span> <span class="pill warn">要 filesystem_write</span><div class=cmd><code>py -3.14 -m gbt_allinone auth grant --scope filesystem_write --ttl 600</code></div></li></ul></li><li class=stage><h3>5 · 验证</h3><ul class=cm><li><b>跑测试与四元组印章（判「改完还是不是好的」）</b> <span class=mono>（不是能力位）</span> <span class="pill fault">不是能力位</span><div class=cmd><code>py -3.14 tools/codex-scripts/run-tests.py</code></div><div class=cmd><code>py -3.14 -m gbt_allinone.tools.regression_stamp run --expect-python 3.14 --store fresh -- &lt;命令&gt;</code></div></li></ul></li><li class=stage><h3>6 · 登记</h3><ul class=cm><li><b>把改动登记进版本（stage/commit）</b> <span class=mono>git_write</span> <span class="pill warn">要 filesystem_write</span><div class=cmd><code>py -3.14 -m gbt_allinone auth grant --scope filesystem_write --ttl 600</code></div></li></ul></li></ol>
+    <p class="kv" style="margin-top:10px">第 ⑤ 步「验证」<strong>不是能力位</strong> —— 这一步是本回路唯一没被统一门罩住的一格，已在页上写明原因与补救条件（要主人改 policy.py）。</p>
+  </div>
+
+  <div class="gbt-card z-near">
+    <h2>A · 代码结构</h2>
+    <p class="kv">文件 <b>653</b> ｜ 符号 <b>5895</b> ｜ 解析不了的文件 <b>0</b></p>
+    <table><tr><th>定义最多的文件</th><th>defs</th></tr><tr><td class=mono>gbt_allinone/recon/last30days/engine/render.py</td><td class=n>60</td></tr><tr><td class=mono>gbt_allinone/native_browser.py</td><td class=n>58</td></tr><tr><td class=mono>gbt_allinone/life_archive.py</td><td class=n>51</td></tr><tr><td class=mono>gbt_allinone/tools/comfy_native.py</td><td class=n>49</td></tr><tr><td class=mono>gbt_allinone/tests/test_omni_web.py</td><td class=n>48</td></tr><tr><td class=mono>gbt_allinone/room_space.py</td><td class=n>46</td></tr></table>
+    <p class="kv" style="margin-top:9px">要动手：<code>py -3.14 -c "from gbt_allinone import api;
+      print(api.run_task('project_context',{'op':'symbols','name':'&lt;名字&gt;'}))"</code></p>
+  </div>
+
+  <div class="two">
+    <div class="gbt-card z-mid">
+      <h2>B · 依赖网</h2>
+      <p class="kv">内部边 <b>1503</b> ｜ 解析不了 <b>0</b></p>
+      <table><tr><th>外部依赖（按出现文件数）</th><th>次数</th></tr><tr><td class=mono>pathlib</td><td class=n>521</td></tr><tr><td class=mono>__future__</td><td class=n>485</td></tr><tr><td class=mono>sys</td><td class=n>382</td></tr><tr><td class=mono>json</td><td class=n>381</td></tr><tr><td class=mono>time</td><td class=n>237</td></tr><tr><td class=mono>os</td><td class=n>226</td></tr></table>
+    </div>
+
+    <div class="gbt-card z-mid">
+      <h2>C · 测试接得住吗</h2>
+      <p class="kv">源模块 <b>453</b> ｜ 测试文件 <b>1057</b> ｜
+        被提到 <b>43</b> ｜ <b>393</b> 没被提到（占 <b>86.8%</b>）</p>
+      <table><tr><th>没被任何测试提到的模块（示例）</th></tr><tr><td class=mono>gbt_allinone/adapters/workspace_adapter.py</td></tr><tr><td class=mono>gbt_allinone/auth_gate.py</td></tr><tr><td class=mono>gbt_allinone/autopilot.py</td></tr><tr><td class=mono>gbt_allinone/bluetooth_cap.py</td></tr><tr><td class=mono>gbt_allinone/book_skill.py</td></tr><tr><td class=mono>gbt_allinone/brain/brain_council.py</td></tr></table>
+      <p class="kv" style="margin-top:9px">边界：这是<strong>提到过</strong>的代理，<strong>不是行覆盖</strong> ——
+        没被提到 ≠ 没被测，被提到 ≠ 测得好。</p>
+    </div>
+  </div>
+
+  <div class="gbt-card z-far">
+    <h2>D · 版本与改动面</h2>
+    <p class="kv">分支 <b>—</b> ｜ 改动文件 <b>—</b> ｜
+      分支数 <b>5</b> ｜ stash <b>0</b></p>
+    <div class="kv">改动面 <b>—</b> 个文件未收敛
+      （过 200 该看一眼、过 1000 说明工作树已经不成形）——
+      `git status` 本身是只读免卡的，收敛与否是<strong>卫生读数</strong>，不是本页的判决。</div>
+    <div class="two" style="margin-top:11px">
+      <div>
+        <p class="kv">最近提交</p><ul class="cm"><li class=mono>ec45af0 2026-10-20T09:00:55+07:00 docs(dh): 全程记录第十四节 —— 逐行 S 形重心转移两档对比 + 广播坑; 技能③同步升级</li><li class=mono>5b59a37 2026-10-20T08:59:39+07:00 feat(dh): body-motion 逐行 S 形重心转移(比整帧仿射像人) 并换进无人值守收尾; 1s 试片帧差 0.131→0.399</li><li class=mono>1089966 2026-10-20T08:57:57+07:00 fix(motion): 逮到并更正一条假账 —— 库里两条片的 voice 标成台灣腔，实测音轨相关 1.0000 是普通话; fix 子命令只追加更正</li><li class=mono>30c9853 2026-10-20T08:50:33+07:00 docs(dh): 全程记录 —— 十条要求→三次尺子纠错→三组对照→v3定档→微动→云库→全身线→GPU五试五败(含原话)→13条坑册→成本账</li><li class=mono>682b9a1 2026-10-20T08:48:54+07:00 feat(dh): finish-clip 无人值守收尾(等片→微动→交付→三条验收→上云) + 把整条生成流程写成技能 gbt-digital-human-video</li><li class=mono>b4a042a 2026-10-20T08:35:27+07:00 feat(motion): 动作库发布件 —— 成片+manifest+自包含播放页一起进公网桶(零部署), 每条公网回读比 sha</li></ul>
+      </div>
+      <div>
+        <p class="kv">改动样例（前 8 条）</p>
+        <table><tr><td class=mono> M .cluster/five-dim-ultimate/report_v1_backup.html</td></tr><tr><td class=mono> M .digihuman/ledger.json</td></tr><tr><td class=mono> M AGENTS.md</td></tr><tr><td class=mono> M CHARTER.md</td></tr><tr><td class=mono> M CODING_DISCIPLINE.md</td></tr><tr><td class=mono> M README.md</td></tr><tr><td class=mono> M SOUL.md</td></tr><tr><td class=mono> M "V22 GBT\345\260\217\345\234\237\350\261\206V8-\345\217\257\344\272\244\344\272\222\345\216\237\345\236\213.html"</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="gbt-card z-far">
+    <h2>E · 要动手得先过哪道门（现算，非抄写）</h2>
+    <table><tr><th>动作</th><th>能力位</th><th>门</th></tr><tr><td>看代码结构</td><td class=mono>project_context.structure</td><td><span class="pill ok">免卡直跑</span></td></tr><tr><td>看依赖</td><td class=mono>project_context.deps</td><td><span class="pill ok">免卡直跑</span></td></tr><tr><td>看调用关系</td><td class=mono>project_context.calls</td><td><span class="pill ok">免卡直跑</span></td></tr><tr><td>看改了哪些文件</td><td class=mono>git_read.status</td><td><span class="pill ok">免卡直跑</span></td></tr><tr><td>试改（只出预览，不落盘）</td><td class=mono>code_patch.dry_run</td><td><span class="pill ok">免卡直跑</span></td></tr><tr><td>真改一个文件</td><td class=mono>code_patch.apply</td><td><span class="pill warn">要 filesystem_write</span></td></tr><tr><td>把改动登记进版本（stage/commit）</td><td class=mono>git_write.commit</td><td><span class="pill warn">要 filesystem_write</span></td></tr></table>
+    <div class="warnbox" style="margin-top:10px">本页<strong>不报</strong>「现在有没有授权」—— 探一次会消耗一次性人工授权，所以只报要什么。缺什么由真跑那一刻的返回值说了算。</div>
+    <p class="kv" style="margin-top:9px">要动手（改文件先出预览，不落盘）：
+      <code>py -3.14 -c "from gbt_allinone import api;print(api.run_task('code_patch',{'op':'dry_run','path':'&lt;文件&gt;','old':'…','new':'…'}))"</code></p>
+  </div>
+
+  <div class="gbt-card z-foot">
+    <h2>需要人看</h2><ul class=att><li>改动面没收敛：1781 个文件（过 1000 说明工作树已不成形）</li><li><strong>超一半</strong>源模块（87%）没被任何测试提到</li></ul>
+  </div>
+
+  <div class="gbt-foot">
+    快照 <b>2026-10-23T17:46:38</b> ｜ 这是<strong>快照</strong>，不是实时。要新读数：
+    <code>py -3.14 tools/codex-scripts/code-deck.py --html holo_pet_w3/code-deck/index.html</code><br />
+    开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+  </div>
+</div>
+</body></html>

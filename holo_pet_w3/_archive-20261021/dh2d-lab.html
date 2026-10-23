@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>2.5D 数字人 · 试机台</title>
+<style>
+  html,body{margin:0;height:100%;background:#05070c;overflow:hidden;font:12px/1.5 "Segoe UI",system-ui,sans-serif}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  /* 舞台：一块很暗的环光地台，专门用来验"她站在这里"而不是"贴了一张图" */
+  #stage::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(58% 46% at 50% 74%, rgba(240,183,5,.10), rgba(62,200,212,.06) 42%, rgba(5,7,12,0) 72%)}
+  #floor{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    width:min(78%,520px);height:26%;border-radius:50%;
+    background:radial-gradient(50% 50% at 50% 50%, rgba(62,200,212,.16), rgba(62,200,212,0) 70%);
+    filter:blur(6px)}
+  #dh2d{position:relative;width:min(72vh,420px);height:96vh;display:block}
+  #hud{position:fixed;left:10px;top:8px;color:#7f8a9b;z-index:9;white-space:pre}
+  #hud b{color:#f2b705}
+</style>
+</head>
+<body>
+<script src="../shell/nav-compact.js"></script>
+
+<div id="stage">
+  <div id="floor"></div>
+  <canvas id="dh2d" data-crop-h="0.74" data-band-top="0" data-cx="0.5"></canvas>
+</div>
+<div id="hud">boot…</div>
+
+<script src="assets/dh2d/atlas.js"></script>
+<script src="dh2d.js"></script>
+<script>
+/* 试机台：用 URL 参数冻结一组姿态，方便截图逐张对比（业务页面不用这段） */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var hud = document.getElementById('hud');
+  function apply() {
+    var S = window.GBT_DH2D;
+    if (!S || !S.ready || !S.ready()) { setTimeout(apply, 60); return; }
+    var o = {};
+    ['jaw', 'blink', 'breath', 'sway', 'tilt', 'nod', 'look'].forEach(function (k) {
+      if (q.has(k)) o[k] = parseFloat(q.get(k));
+    });
+    o.freeze = true;
+    S.set(o);
+    S.setState(q.get('state') || 'idle');
+    if (q.has('level')) S.level(parseFloat(q.get('level')));
+    if (q.has('play')) S._frozen(false);
+    var i = S.info();
+    hud.textContent = 'ok=' + i.ok + ' status=' + i.status + ' frames=' + i.frames +
+      '\njaw=' + i.jawNow + ' blink=' + i.blinkNow +
+      '\n' + (i.gl || '') + (i.why ? '\nwhy=' + i.why : '');
+    window.__DH2D_READY = true;
+  }
+  apply();
+})();
+</script>
+</body>
+</html>

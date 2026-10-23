@@ -1,0 +1,502 @@
+{
+ "version": 1,
+ "shell": "holo_pet_w3",
+ "registry_note": "窗口注册表数据。已登记窗口见 windows[]（不在本句里写死数量——写死一次就过期一次）；窗口号 N 指位置、批次号 W<n> 指施工序，两套编号见《holo_pet多窗口架构设计.md》§11.1.1。",
+ "id_convention": "窗口 N 指位置，W<n> 指施工批次（术语表见《holo_pet多窗口架构设计.md》§11.1.1）",
+ "windows": [
+  {
+   "id": "panel",
+   "title": "GBT小土豆V8 · 控制面板",
+   "role": "child",
+   "file": "../panel/index.html",
+   "webviewTag": true,
+   "alwaysOnTop": false,
+   "transparent": false,
+   "frame": true,
+   "resizable": true,
+   "default": {
+    "x": 120,
+    "y": 60,
+    "w": 1440,
+    "h": 900,
+    "visible": false
+   },
+   "note": "窗口 0 · **APP 面板本体**（主人令 2026-10-04：「要固定在 APP 面板上」，不要开一推窗）：左栏 = 页面清单，右侧内容区 = `<webview>` 内嵌 —— 顶栏 chips / 左侧清单点哪一页，就**在面板内**切成哪一页，**不再新建 OS 窗**。本窗是启动唯一默认可见窗；其余窗默认隐藏（托盘/菜单仍可按需单独开）。⚠️ 2026-10-08 起**启动唯一可见窗已移交 digital-human**（主人令：打开 APP 直接进数字人语音交互页），本窗改由托盘/菜单按需单开。安全：webviewTag 只在本窗开（注册表显式声明），内容区只载本树 file:// 与本机回环。",
+   "data_source": {
+    "generator": "手写页（holo_pet_w3/panel/index.html）· 页面清单与注册表同源",
+    "switch": "w3:panel-goto（壳 IPC：只认注册表窗 id → 发 panel:goto 给本窗 → 内容区切页）"
+   }
+  },
+  {
+   "id": "godview",
+   "title": "GBT小土豆V8 · 上帝视角",
+   "file": "../index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": true,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 120,
+    "y": 80,
+    "w": 1120,
+    "h": 720,
+    "visible": false
+   },
+   "note": "主控台 W1 仍在生产树 holo_pet/，本壳不动它；关一扇不影响其他（V4）。**2026-10-04 主人令「不要一下跳出来这么多页」**：启动只开对话窗（dsh-chat），本窗与其余窗一律由托盘按需唤起。"
+  },
+  {
+   "id": "eigenflux",
+   "title": "GBT小土豆V8 · AI 朋友圈",
+   "file": "../eigenflux/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": true,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 560,
+    "y": 120,
+    "w": 900,
+    "h": 640,
+    "visible": false
+   },
+   "note": "窗口 5 · 批次 W7（D2）。默认不开：由托盘菜单或口令唤起（《宿主不打扰律》）。同级置顶（风哥 2026-09-17 拍：甲案 true）。"
+  },
+  {
+   "id": "h1",
+   "title": "GBT小土豆V8 · 赏金台",
+   "file": "../h1/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": true,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 700,
+    "y": 160,
+    "w": 980,
+    "h": 660,
+    "visible": false
+   },
+   "config": {
+    "binary_path": "%LOCALAPPDATA%\\gbt_allinone\\bin\\h1mcp.exe",
+    "drafts_path": "%APPDATA%\\h1mcp\\drafts"
+   },
+   "note": "窗口 6 · 批次 W8。阶段一只读：默认不开，由托盘菜单唤起（《宿主不打扰律》，与 eigenflux 同款）。"
+  },
+  {
+   "id": "dsh-chat",
+   "title": "GBT小土豆V8 · 对话",
+   "role": "child",
+   "file": "../shell/connect.html",
+   "alwaysOnTop": false,
+   "transparent": false,
+   "frame": true,
+   "resizable": true,
+   "default": {
+    "x": 140,
+    "y": 90,
+    "w": 1200,
+    "h": 820,
+    "visible": false
+   },
+   "note": "窗口 A · 批次 W9。**2026-10-04 定性改道**：直载 chat.deepseek.com 的版本被 DeepSeek 风控判「客户端环境异常」（Electron 内核；无痕与持久档**同弹**，对照实验见 shell/chat-probe.cjs）⇒ 该扇窗改回**GBT 自家对话面**（connect.html → 面板桥 :8765 /api/message）。DeepSeek 对话面移到**主人自己的 Chrome**（官方环境），驱动用 Nanobrowser 扩展，执行侧仍走 deepseek_bridge（run_task 唯一门）。**默认隐藏**（主人令：一扇窗=一个面板，页面都在 panel 里看）；托盘/菜单/顶栏 chips 可按需单独开。",
+   "auto_dsh": {
+    "enabled": true,
+    "port": 3080,
+    "since": "2026-10-07",
+    "why": "主人令「把 DeepSeek Harness 接进本壳」。壳自己拉起 `dsh web --no-open`，读它就绪时打印的那一行（`dsh web: http://127.0.0.1:3080/?token=…`），交给**同一个** w3ConnectDsh 载进本窗 —— 主人不再需要手动复制粘贴那条带 token 的 URL。接线在 main.cjs 的 createWindow 里，解析/脱敏在 shell/dsh-launch.cjs（单测 tests/test_dsh_launch.cjs）。",
+    "fallback": "3080 已在听（可能是我这边上次被硬杀留下的孤儿）⇒ **不去动它**，改用 OS 分配的端口（`--port 0`）另起一个自己接上；`dsh` 不在 PATH / 起不来 ⇒ 停在 connect.html，主人仍可手贴带 token 的 URL —— 原路一个字节没删。",
+    "measured": "2026-10-07 端到端实测第一次就撞上孤儿占 3080：旧写法（「已在听⇒不自起」）会让壳**永远**接不上（孤儿的 token 是进程内的，谁也拿不到）⇒ 改成换端口另起。这一条是实测逼出来的，不是推演。",
+    "hygiene": "URL 只在内存里交给 loadURL：不写注册表、不写布局、不进日志（日志只出 host 与脱敏行）；回执仍只有 host 与时间。"
+   },
+   "constraint": {
+    "measured": "2026-10-04 双组对照：无痕（内存 partition）与持久档均 HTTP 200 + 同一张「使用环境异常」弹窗；同期窗内 CF 403（BKK50-P2）。⇒ 拦的是客户端内核，不是 IP/档/无痕。",
+    "rule": "外部 url 只走**点名白名单**（url-policy.cjs EXTERNAL_ALLOWED_HOSTS，与 desktop-shell-guard B6 同名单互绑）；本窗现为本地页，白名单保留给将来的官方许可入口。",
+    "dsh_legacy": "DSH token 路没删：connect.html 与 main.cjs w3:connect-dsh 原样保留。"
+   }
+  },
+  {
+   "id": "plugins-mesh",
+   "title": "GBT小土豆V8 · 云插件互绑拓扑",
+   "role": "child",
+   "file": "../plugins-mesh/index.html",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 120,
+    "y": 60,
+    "w": 1400,
+    "h": 900,
+    "visible": false
+   },
+   "note": "窗口 G · 批次 W14（主人令 2026-10-04）：**一页看全云插件互绑网** —— 中心触手（1 根串联全部插件）+ N 条双向互绑臂 + 插件间全互联（N×(N-1) 处有向连接点）+ N×N 连接矩阵（每格一处连接点，逐格可点）+ 资源共享分组 + 每插件的 op 门表（节点锁定=捷径直达）。由 tools/codex-scripts/cloud-plugins.py gen 从单一真源 deploy/cloud-10/mesh.json 生成（**生成期静态落图**：无脚本也看得见，脚本只管高亮）；表加到 N 个就自动出 N 个节点。默认不开（宿主不打扰律），由托盘/菜单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/cloud-plugins.py gen",
+    "verify": "py -3.14 tools/codex-scripts/cloud-plugins.py verify（8 条判据：连接点数恒等/驱动在册/自包含/逐连接点元素…）",
+    "refresh": "跑上面那条 gen（页与台账就地覆盖）"
+   }
+  },
+  {
+   "id": "code-deck",
+   "title": "GBT小土豆V8 · 代码台",
+   "file": "../code-deck/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": true,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 300,
+    "y": 150,
+    "w": 940,
+    "h": 720,
+    "visible": false
+   },
+   "note": "窗口 D · 批次 W11。**快照，不是实时** —— 页上写着生成时刻与重生成命令。数据源：tools/codex-scripts/code-deck.py（只汇总不重算，五块各有单一来源）。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/code-deck.py --html holo_pet_w3/code-deck/index.html",
+    "why_snapshot": "同窗 C：改成页面去 fetch 新路由就得改 panel_server.py 并重启它（正在 8765 跑），为一个视图动产品面 + 重启服务，量级不对。",
+    "refresh": "手动跑上面那条命令（快照文件就地覆盖）"
+   },
+   "visual": {
+    "layer": "../deck3d.css",
+    "note": "立体视觉层**与窗 C 共用同一份**（一处定义、两页引用）。真实透视 + 分层 translateZ + 自转 + 6 面真立方体 + 3D 网格地面，**全部 CSS，零脚本**。"
+   },
+   "capability": {
+    "reads_via": "run_task（唯一门）—— 读动作落审计账本，审计格可复查本页每一次读取",
+    "read_kinds": [
+     "project_context",
+     "git_read"
+    ],
+    "write_path": "code_patch（dry_run 免卡；apply 要 filesystem_write）→ git_write（要 filesystem_write）",
+    "note": "本页**不试探授权**：探一次会消耗一次性人工授权，所以只报「要什么作用域」与主人该敲哪条命令。见 tools/codex-scripts/code-deck.py 模块头。"
+   }
+  },
+  {
+   "id": "eye",
+   "title": "GBT小土豆V8 · 触手视觉回传",
+   "file": "../eye/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 200,
+    "y": 110,
+    "w": 1180,
+    "h": 760,
+    "visible": false
+   },
+   "note": "窗口 F · 批次 W13（Owner 2026-09-23：「专门设立一个独立窗口来显示触手看到的东西，就像带个摄像头传回画面」）。**画面是真帧，不是画的** —— `cap tentacle {\"action\":\"see\"}` 是 DXGI 直读显卡帧缓冲，**与显示屏同源**；经 run_task 唯一门取回后逐字节落盘，本窗只负责显示。默认不开（《宿主不打扰律》），由托盘菜单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/eye-feed.py --loop",
+    "why_snapshot": "同窗 E：走 file:// + `connect-src 'none'`，页面 fetch 不到本地 json ⇒ 帧以**真图像文件**落 `frames/`（环形覆盖，不删文件），清单走**经典脚本** `frames.js`。",
+    "refresh": "跑上面那条命令（frames/ 与 frames.js 就地覆盖；页面每 1.2s 换 query 重读，实测换 query 能绕开 file:// 缓存）"
+   },
+   "capability": {
+    "reads_via": "run_task（唯一门）—— 在 sync_exec 信封内取帧，账本记 synced:true · entry:outer",
+    "scope": "取帧（see）**只读，不需作用域**。本窗**不做任何输入 / 鼠标 / 键盘动作** ⇒ 绝不触碰 desktop_control。",
+    "honest": "取不到帧就写 `ok:false` + 真原因，页面标 `lost`；**不写占位图、不拿旧帧冒充新帧**。过期（>4s 无新帧）标 `静默 Ns`，回看旧帧时 REC 熄灭并打「回看」标 —— 实时与回看必须一眼可分。"
+   }
+  },
+  {
+   "id": "logbook",
+   "title": "GBT小土豆V8 · 记录本",
+   "file": "../logbook/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 220,
+    "y": 120,
+    "w": 1240,
+    "h": 800,
+    "visible": false
+   },
+   "note": "窗口 L · 批次 W15（2026-10-07 主人令）：「给她设计一个记录本，不管做什么都要在里面有记录，防止重启之后大模型不知道，比如每天扫描扫过哪里、修改过哪里、新增了哪里，全部都要有记录。」⇒ 本窗是**记录本的可视面**：链状态（自链哈希）+ 扫描史（扫到/未变/新增/改动/删除）+ 最近动作。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/logbook.py render",
+    "source": "state/logbook.jsonl（**只追加** · 每条带 prev_hash→hash 自链）",
+    "refresh": "跑上面那条命令（logbook/logbook-data.js 与 state/logbook-digest.md 就地覆盖）",
+    "why_js_not_json": "同窗 E/F：页面走 file:// ，`connect-src 'none'`，fetch 读不到本地 json ⇒ 数据以**经典脚本**内嵌（本仓已有做法）。"
+   },
+   "capability": {
+    "write": "**只有 logbook.py 一个写入口**（append 续链）；任何人别直接往 jsonl 里写 —— 那会断链，verify 会当场报出第几行。",
+    "scan": "`logbook.py scan` 走真盘取文件指纹（size+mtime_ns）与上次快照比对：**扫过哪里/改了什么/新增了什么/删了什么**都是现算的，不是回忆；首扫如实标「建基线」，触顶如实标「被截断」。",
+    "check": "`logbook.py check` 7 条判据（含负对照：改一个字符必须断链）—— 只报绿的判据等于没有判据。"
+   }
+  },
+  {
+   "id": "blueprint",
+   "title": "GBT小土豆V8 · 项目蓝图",
+   "file": "../blueprint/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 160,
+    "y": 90,
+    "w": 1360,
+    "h": 860,
+    "visible": false
+   },
+   "note": "窗口 M · 批次 W16（2026-10-07 主人令「项目蓝图可视化面板」）。把**蓝图本身**画出来，不是示意图：§一 边界环（不可动摇的主从 / 允许自动化 / 明确禁止自动化）· §二 DAG · 树登记表（state/tree-registry.json 现读）· 窗口登记表（windows.json 现读）· §六 落地顺序 Phase 0–5 · §五 风险 R · §九 故障 F / Q · 装机回执读数。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/blueprint-feed.py",
+    "verdicts": "py -3.14 tools/codex-scripts/blueprint-feed.py --check（14 条，含 4 条负对照：空模型/坏蓝图/带外链的页/掏空的数据件都必须报红）",
+    "source": "PROJECT_BLUEPRINT.md（1976 行 · 取章节骨架与边界/Phase/风险/故障）+ state/tree-registry.json + shell/windows.json + state/desktop-install-receipt.json",
+    "honest": "数字全部现算：树 44 棵（不是手抄的 43）· 窗口 11 扇 是**生成时刻**的读数；回执那格与现行口径不同，页上明写「不混算」，不拿旧读数冒充现在。"
+   }
+  },
+  {
+   "id": "cloud-plugins",
+   "title": "GBT小土豆V8 · 云插件独立页",
+   "file": "../cloud-plugins/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 180,
+    "y": 100,
+    "w": 1320,
+    "h": 840,
+    "visible": false
+   },
+   "note": "窗口 N · 批次 W17（2026-10-07 主人令「把云插件独立页面……都要设计上」）。**每个云插件在这里都有自己的一段（带锚点 #c01…）**：id / 名称 / 角色 / 端点 `/rpc/<id>/<op>` / 能力 op 与门 / 云资源 / 本机驱动 / 与其余 9 位互绑（带链接）/ 当前三态。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/cloud-status.py render",
+    "source": "deploy/cloud-10/mesh.json（**现役**：10 个真模块，带 ops/op_gates）+ state/cloud-status.json（探测台账）",
+    "honest": "**现役 vs 蓝图分开说**：同目录的 plugins50.json 是 50 槽蓝图（30 指派 + 20 备用，无 ops、无端点）—— 页上明标「蓝图·未部署」，**不进探测**。姊妹件是窗 G 的 plugins-mesh（拓扑图）。"
+   }
+  },
+  {
+   "id": "model-align",
+   "title": "GBT小土豆V8 · 模型版本对齐",
+   "file": "../model-align/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 180,
+    "y": 100,
+    "w": 1320,
+    "h": 840,
+    "visible": false
+   },
+   "note": "窗口 N · 批次 W17（2026-10-07 主人令「把云插件独立页面……都要设计上」）。**每个云插件在这里都有自己的一段（带锚点 #c01…）**：id / 名称 / 角色 / 端点 `/rpc/<id>/<op>` / 能力 op 与门 / 云资源 / 本机驱动 / 与其余 9 位互绑（带链接）/ 当前三态。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/cloud-status.py render",
+    "source": "deploy/cloud-10/mesh.json（**现役**：10 个真模块，带 ops/op_gates）+ state/cloud-status.json（探测台账）",
+    "honest": "**现役 vs 蓝图分开说**：同目录的 plugins50.json 是 50 槽蓝图（30 指派 + 20 备用，无 ops、无端点）—— 页上明标「蓝图·未部署」，**不进探测**。姊妹件是窗 G 的 plugins-mesh（拓扑图）。"
+   }
+  },
+  {
+   "id": "model-chat",
+   "title": "GBT小土豆V8 · 模型对话",
+   "file": "../model-chat/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 180,
+    "y": 100,
+    "w": 1180,
+    "h": 820,
+    "visible": false
+   },
+   "note": "窗口 P · 2026-10-21（主人令「把云插件的GBT小土豆V8大模型接入到原生APP里面使用」）。原生 APP ⇄ 原生大模型的对话面：页面只连本机桥 127.0.0.1:8791（壳启动时自动拉，见 main.cjs ensureModelBridge），钥匙在桥里（DPAPI 保险箱），页面零凭据。默认上游 = ☁️ 云插件路线（gbt-potato-v8 经云端 10 云插件拼网 c01-llm-gateway 的 /v1 面，网关钥 GW_AUTH）；「直连 RunPod」为备用。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "bridge": "tools/model-bridge/server.py（只监听 127.0.0.1；钥只从 DPAPI 取；上游 4xx/5xx 原话带回；不落聊天内容）",
+    "upstreams": "cloud（云插件 c01-llm-gateway · gbt-potato-v8）· ours / ours-alt（直连 RunPod · 自报 /runpod-volume/gbt-v8-v83）· local · agnes · deepseek · openai",
+    "honest": "回包 gbt.weights_ours 逐发可见：true = 自托管在线；false = 按设计回落 Workers AI 托管兜底 —— 不许念成恒 true。无服务器冷启动几十秒不是故障。"
+   }
+  },
+  {
+   "id": "cloud-status",
+   "title": "GBT小土豆V8 · 连接状态",
+   "file": "../cloud-status/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 200,
+    "y": 110,
+    "w": 1360,
+    "h": 860,
+    "visible": false
+   },
+   "note": "窗口 O · 批次 W18（2026-10-07 主人令「……可视化连接状态面板都要设计上」）。**画的是状态，不是示意图**：探针台账（通/不通/超时/被拦/未探测）· 环形拓扑按三态着色 · 10×10 连接矩阵（每格一条有向连接）· 90 条连接明细（探于何时 / 延迟 / 原始 status / 失败原因原文）。**三态图例写死含义**：绿=HTTP200 且 ok=true，红=真发过但失败，灰=没跑过 probe 或被 host 拦下。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/cloud-status.py probe && py -3.14 tools/codex-scripts/cloud-status.py render",
+    "verdicts": "py -3.14 tools/codex-scripts/cloud-status.py --check（判据 12 条 + 负对照 5 条）",
+    "source": "state/cloud-status.json（真发请求的台账）+ mesh.json",
+    "guard": "**发请求前先校 host**：只许 http/https，回环/私网/保留地址一律**不发请求**直接记 `blocked`（13 例单测：127.0.0.1 · localhost · 10.x · 172.16.x · 192.168.x · 169.254.169.254 元数据 · [::1] · [fd00::1] · ftp: · file: · x.local · 127.0.0.0 · 0.0.0.0）。",
+    "honest": "**不许假绿**：没探过就是「未探测」（灰），不画成通；不通必须带原始 status/错误串（判据 C9/C10 钉住，负对照各一条）。2026-10-07 首探真读数：10 位全通（221ms/450ms/44ms…）。"
+   }
+  },
+  {
+   "id": "db-fleet",
+   "title": "GBT小土豆V8 · 数据库编队",
+   "file": "../db-fleet/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 190,
+    "y": 105,
+    "w": 1340,
+    "h": 850,
+    "visible": false
+   },
+   "note": "窗口 P · 批次 W19（2026-10-07 主人令「以设计云插件的方式部署上最大内存和最稳定的免费数据库插件，也一样排布好对应使用的指向，备注好都是存的什么东西」）。7 个免费库逐条：额度（带出处）/ 凭什么说它稳 / 存什么 / 互绑 / 开通缺什么；另有指向表（哪类数据走哪个库、谁是写主）与来源清单。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/db-fleet.py render",
+    "verdicts": "py -3.14 tools/codex-scripts/db-fleet.py check（8 条 · 含 2 条负对照：status 写「已部署」、指向不存在的库，都必须报红）",
+    "needs": "py -3.14 tools/codex-scripts/db-fleet.py needs（缺什么、谁有权给）",
+    "source": "deploy/cloud-10/db-fleet.json（单一真源）+ docs/免费数据库编队-设计.md",
+    "honest": "🔴 **7 个库全部 `未开通`** —— 这是真读数，不是装饰。注册账号/开库/拿 token 只有主人能做（要实名/支付/二次验证），我没有凭据也不代持。判据 D4 + 负对照 N1 专门钉死「不许把设计写成已部署」。额度与稳定性**逐条带出处**（官网现读，取证 2026-10-07）；官网没列的字段留 null 并注明「不补数」。",
+    "选型口径": "「最大内存」= 免费额度总量最大（含可开库数）；「最稳」在免费档里只能相对而言 ⇒ 只有当 ①不因闲置被暂停 ②有版本化/回滚面 两条都满足才配当**主**（Neon / TiDB / Turso），其余降为备（D1 / Upstash / Supabase / R2）。Supabase 因「闲置 1 周会暂停」被明确写成**绝不能当主库**。"
+   }
+  },
+  {
+   "id": "capabilities",
+   "title": "GBT小土豆V8 · 能力统计",
+   "file": "../capabilities/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 150,
+    "y": 95,
+    "w": 1400,
+    "h": 880,
+    "visible": false
+   },
+   "note": "窗口 Q · 批次 W20（2026-10-07 主人令「排查清楚所有的能力都连接好了没有，做一个能力统计面板」）。**303 项逐个真探**：框架能力位 241 · 云插件 11 · 桌面壳窗 15 · 面板清单页 16 · 面板桥 1 · DSH 接入 1 · 本机依赖服务 7 · 生成产物 11。四态：接上 / 断连（真探过、失败，带原始错误串）/ 缺失（清单说有、实物不在）/ 未探测（没条件探，写清为什么）。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/capability-audit.py",
+    "verdicts": "py -3.14 tools/codex-scripts/capability-audit.py --check（判据含负对照；其中一条钉死「没探过的项不许显示成接上」）",
+    "source": "state/capability-audit.json（真探台账）+ 各域自己的登记表（caps_registry / mesh.json / windows.json / panel PAGES）",
+    "honest": "首轮真读数（2026-10-07 23:12）：总 303 · 接上 292 · **断连 7** · 缺失 3→0 · 未探测 1。断连里 2 条是**生成产物陈旧**（记录本数据件与速读 md 比源件旧）——已当场重跑生成器修掉；另 5 条是**本机依赖服务没在跑**（ollama / FreeLLMAPI / autoglm-token / cliproxy / 小土豆口），如实报断连，不画成绿。",
+    "四态口径": "断连 ≠ 坏了：它只说明「真探过一次、这次没通」，带原始错误串与探活时刻；未探测 ≠ 没问题：它说明没条件探并写明原因（例如 50 槽蓝图未部署、按纪律不探）。"
+   }
+  },
+  {
+   "id": "energy",
+   "title": "GBT小土豆V8 · 能量与绑定",
+   "file": "../energy/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 170,
+    "y": 100,
+    "w": 1380,
+    "h": 870,
+    "visible": false
+   },
+   "note": "窗口 R · 批次 W21（主人令 2026-10-08：「必须把所有能力都接入，不能有任何遗漏，把全部能量使用触手双向绑定好，确保随时能够感应到所有能量状态」）。三边双向绑定：**能力 241 × 触手 10 域 × 能量 13 通道**；页上同时给出正向（能力→承载载体）与反向（触手域/能量通道→承载哪些能力）两张表并互校。默认不开（《宿主不打扰律》），由托盘/菜单/面板清单唤起。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/capability-bindings.py render",
+    "feel": "py -3.14 tools/codex-scripts/capability-bindings.py feel（「随时可感」读数：无时钟字段 ⇒ 复跑应逐字一致）",
+    "verdicts": "py -3.14 tools/codex-scripts/capability-bindings.py --check（判据 15 条 + 负对照 10 条）",
+    "source": "state/cap-bindings.json（单一真源台账，只由本工具写）+ 只读探测（能力注册表 / 触手总纲 / key_gateway 能量）",
+    "honest": "首轮真读数（2026-10-08）：能力 **240 条零遗漏**（触手承载 9 · 直连 231 · 未绑 0）；触手 10 域 121 能力项；能量 **13 通道可用 9**、活跃 nvidia-flash、链序与 cloud_llm 同源、TTL=0；双向互校 **0 不一致**。**未探测不画成通**（4 条不可用通道承载数一律记 0）；解析数与声明数对不上的地方**如实留痕不抹平**（如「进程」声明 14 实列 9）。",
+    "与资产层的关系": "本件管**能力层**；`state/asset_bindings.json(.jsonl)` 管**资产层**（由 tentacle_bind.py 维护），本件只读；两层经**触手标签**衔接（现读 270 条有效标签）。"
+   }
+  },
+  {
+   "id": "digital-human",
+   "title": "GBT小土豆V8 · 数字人",
+   "file": "../digital-human/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 180,
+    "y": 95,
+    "w": 1400,
+    "h": 880,
+    "visible": true
+   },
+   "audio_autoplay": true,
+   "media_capture": true,
+   "media_capture_why": "为什么只给这一扇窗：数字人要真听主人说话（getUserMedia → PCM），而 Chromium 默认不给页面麦克风（enumerateDevices 数不到 audioinput、getUserMedia ⇒ NotFoundError）。照白龙马口径，main.cjs 在 createWindow 里给**注册表显式声明 media_capture 的窗**（或 id=digital-human）装 setPermissionRequestHandler + setPermissionCheckHandler：**只放 media、其余一律 callback(false)**，且处理器里再核对请求方必须是这扇窗自己的 webContents。别的窗一个字节不加 —— 采集面严格按窗开口，不全局放开。⚠️ 只解决「许可」层：设备层（WASAPI 当前活动录音端点 0）仍会如实落 NotFoundError，页面照贴原文。",
+   "note": "窗口 S · 批次 W22（主人令 2026-10-08：「数字人页面也做好，数字人以语音交互做…记得把数字人绑骨全肢体动作」）。**全肢体 SVG 骨架**（24 关节 · 左右对称 0.00px）+ 八段动作（呼吸/说话/打招呼/走两步/转身/蹲起/伸懒腰/照参考图摆姿）+ **参考图 1:1 叠加骨架对照** + **语音链路每一环带实测状态与失败原文**。2026-10-08 补卡 ⑪「高清形象 · 全肢体动作」：3 张 HD 英雄静帧 + 3 条干净动作片段（呼吸/走两步/转身——转身经根因修复：hips 轴换算一行修正 + 腿部 IK 修正 + 头颈前倾修正 36.8°→6.0°，10 帧全在干净尺内；关键帧抽样 5fps；另 3 条因源网格手贴髋熔接未上页，原件在 projects/digital-human/out/clips/）。`audio_autoplay: true`：数字人要「有话就说」，不必每次先点一下（这是壳里按窗开的开关，见 main.cjs 的 webPreferences 注释）；`media_capture: true`：麦克风采集许可**也只给这一扇**（同段注释，窄口径）。**启动唯一可见窗**（主人令 2026-10-08：打开 APP 直接就是数字人语音交互页，照白龙马口径）——启动段强显+聚焦，其余窗不唤。",
+   "data_source": {
+    "generator": "手写页（holo_pet_w3/digital-human/index.html）+ 参考图副本 digital-human/reference-02.jpg",
+    "reference": "主人给的形象照（桌面那张 736×1248 jpg）**1:1** 作比例与配色依据；页面右上提供叠加对照与缩放/平移微调 —— **不另画一张**",
+    "speech": "语音链路两条腿：① 本机离线 SAPI（`audio_speak`/speechSynthesis 与 zh-CN 识别器）② 壳外无此口时如实标注。文本→桥走壳侧受理口 `gbtW3.message`（main.cjs 的 w3:message：目标写死本机桥、页面网络面保持为零）",
+    "honest": "页面每环都贴实测：**活动录音端点 0**（在册 5：禁用 1/不存在 3/未插 1）⇒ 麦克风这一环拿不到就如实报；离线识别器**在位**但 `wavein_devices=0`、`capture_ready=false`；壳外打开时面板桥如实标「壳外无此口」。"
+   }
+  },
+  {
+   "id": "capability-bar",
+   "title": "GBT小土豆V8 · 能力栏",
+   "file": "../capability-bar/index.html",
+   "role": "child",
+   "alwaysOnTop": true,
+   "transparent": false,
+   "frame": false,
+   "resizable": true,
+   "default": {
+    "x": 160,
+    "y": 105,
+    "w": 1360,
+    "h": 860,
+    "visible": false
+   },
+   "note": "窗口 T · 批次 W23（主人令 2026-10-08：「记得能力栏精细设计一下」）。**族 × 三态一屏可读**：241 位按域聚 30 族，默认只出「族 × 三态计数 + 逐位一格」，点「明细」才展开条目（不许一上来铺几百行）。五处精细（照页头原文）：① 一屏可读；② **三态一色**（接上=青 / 断连=金 / 未探测=紫，不引第四色；「缺失」=金+虚线；**未探测绝不画成通**）；③ 每个数字带**来源 + 时刻**，年龄按《数据新鲜度契约》上色；④ 零打扰（无 emoji · 无外链 · 零远端取数 · 裸色值只在 :root）；⑤ 可点到处（每族/每类给详页或**调用法**，给不出就明写「无对应页」）。三态证据=**运行记录**（账本近 24h 该位最后一次记录），不是「已绑」——把已绑画成接上就是假绿。默认不开（《宿主不打扰律》）。",
+   "data_source": {
+    "generator": "py -3.14 tools/codex-scripts/capability-bar-check.py refresh",
+    "evidence": "run-evidence.js（本目录 · 生成器产出：每位三态的运行证据快照）",
+    "source": "只读探测（能力注册表 / api.py 分派 / 绑定台账）+ ../energy/energy-data.js 与 ../capabilities/capabilities-data.js（均为既有生成物，只读）",
+    "verdicts": "py -3.14 tools/codex-scripts/capability-bar-check.py（判据 + 负对照：未探测画成通 ⇒ 红）",
+    "honest": "数字全部现读现算：能力位 241（2026-10-08 补 review_gate 后在册）。审计四态为 capabilities-data.js 既有生成物读数，页上标来源与时刻，不抹平。"
+   }
+  },
+  {
+   "id": "voice-theater",
+   "title": "GBT小土豆V8 · 语音剧场",
+   "role": "child",
+   "file": "../voice-theater/index.html",
+   "alwaysOnTop": false,
+   "transparent": false,
+   "frame": true,
+   "resizable": true,
+   "default": {
+    "x": 160,
+    "y": 80,
+    "w": 1440,
+    "h": 900,
+    "visible": true
+   },
+   "note": "窗口 20 · **数字人语音交互新形态**（A·全屏对话剧场，主人 2026-10-18 点头挂载）。页面自包含、无外网面（CSP 不放开）：四个状态（待机/在听/在想/在说）只反映真实状态，波形由真 AnalyserNode 驱动，默认音源是她的欢迎语音 welcome-gbt-v8-zh.wav（仓内相对路径），真 TTS 产物用 ?audio=<地址> 传入 —— **页面不自己合成**（那要 audio_output 票）。右侧“语音链路·现读”逐条贴实测：录音端点/出声引擎/离线识别/波形源/解码状态/打断，取不到就写未读到，**不假装能说能听**。default.visible=true 的理由：主人 2026-10-18 要求“重启后直接在壳里看到”⇒ 启动时与 digital-human 并列可见；想改回“托盘按需单开”只需把这一项改 false（启动唯一可见窗仍是 digital-human，那条 2026-10-08 的话没动）。打包面：package.json 的 extraResources 已登记 voice-theater/**/*（否则打包件里这扇窗会是空白）。"
+  }
+ ]
+}

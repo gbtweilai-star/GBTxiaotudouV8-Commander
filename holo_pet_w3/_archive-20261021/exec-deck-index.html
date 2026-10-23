@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN" data-data-kind="快照" data-data-at="2026-10-20T12:17:29"><head><meta charset="utf-8" />
+<meta name="color-scheme" content="dark" />
+<title>GBT小土豆V8 · 执行面</title>
+<link rel="stylesheet" href="../deck3d.css" />
+<style>
+  /* 本页只写**版式**，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
+  @media (max-width:900px){.two{grid-template-columns:1fr}}
+</style></head>
+<body class="gbt-stage">
+<div class="gbt-board">
+
+  <div class="gbt-head">
+    <div class="gbt-core" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="gbt-core-cast"></span></div>
+    <div class="gbt-title">
+      <h1>执行面 · 三条主道与欠的活</h1>
+      <div class="sub">快照 <b>2026-10-20T12:17:29</b> ｜ 装钩子 2026-09-23T04:08:38 ｜ 账本 974886 行 ｜ 立体视觉层 <code>../deck3d.css</code> 已就位</div>
+    </div>
+  </div>
+
+  <div class="gbt-card z-near"><h2>A · 信封覆盖</h2>
+    <p class="kv">全史 brainless_ratio <b>0.0</b> ｜ cap_calls_total <b>1627</b></p>
+    <p class="kv">装钩子后（整段·含改动前旧账，只作对照）<b>309926/310259（rate 0.9989）</b></p>
+    <div class="warnbox"><b>改动后窗口</b>（按 <code>synced_entry</code> 存在与否切，<b>这才是该看的数</b>）：
+      <b>309913/310125（rate 0.9993）</b> ｜ entry 分格 <span class="mono">{'outer': 160115, 'auto': 149798, 'off': 212}</span></div>
+    <p class="kv" style="margin-top:9px">为什么要两个窗口：`auto_envelope` 是中途才落的，
+      拿整段算会把改动前的旧账算进分子分母。</p>
+  </div>
+
+  <div class="gbt-card z-mid"><h2>B · 三条主道谁在干活</h2>
+    <table><tr><th>事件</th><th>全史</th><th>装钩子后</th></tr><tr><td>call（唯一门）</td><td class=n>444851</td><td class=n>310258</td></tr><tr><td>brain_enter（五维）</td><td class=n>3341</td><td class=n>3310</td></tr><tr><td>brain_unify（真链入口）</td><td class=n>49</td><td class=n>12</td></tr><tr><td>sync_ear（开步/耳）</td><td class=n>6832</td><td class=n>6780</td></tr><tr><td>sync_eye（眼）</td><td class=n>6820</td><td class=n>6784</td></tr><tr><td>sync_mouth（嘴）</td><td class=n>6820</td><td class=n>6784</td></tr><tr><td>sync_check（真机检）</td><td class=n>21</td><td class=n>0</td></tr><tr><td>sync_abort（耳中止）</td><td class=n>0</td><td class=n>0</td></tr></table>
+  </div>
+
+  <div class="gbt-card z-mid"><h2>C · 欠的活（未收步）</h2>
+    <p class="kv">未收 <b>1</b> ｜ 超 6h <b>0</b> ｜ 超 48h <b>1</b></p>
+    <table><tr><th>step</th><th>开了(h)</th><th>目标</th></tr><tr><td class=mono>3f0bf550e915</td><td class=n>62.2</td><td>cap:comfy_native</td></tr></table>
+  </div>
+
+  <div class="gbt-card z-far"><h2>D · 能力卡点</h2>
+    <p class="kv">只登记未实现 <b>0</b> ｜ 自标骨架 <b>44</b> ｜ 无分派分支 <b>0</b> ｜ 技能真桩 <b>0</b></p>
+    <p class="kv">全能力位探针 <span class="mono">{"why": "**没有探针产物** —— 全能力位覆盖这轮没跑（别读成 0 问题）"}</span></p>
+  </div>
+
+  <div class="gbt-card z-foot"><h2>需要人看</h2><ul class=att><li>悬空步 1 步超过 48h（欠的活没人收）</li></ul></div>
+
+  <div class="gbt-foot">
+    快照 <b>2026-10-20T12:17:29</b> ｜ 这是<b>快照</b>，不是实时。要新读数：
+    <code>py -3.14 tools/codex-scripts/exec-deck.py --html holo_pet_w3/exec-deck/index.html</code><br />
+    开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,757 @@
+{
+ "workflow": "数字人（可绑骨 · 自然活动）",
+ "single_source_of_truth": true,
+ "updated": "2026-09-25",
+ "stage": "Phase 2 打磨（响应 Owner AI 味禁令逐条对照）：**金属度归零 ✓ · 去油光(T区/唇) ✓ · 面板 IBL ✓ · 头皮肤纹理 ✓** · 剩：SSS(技术不可达)/眼球(输入受限)/减面(待定)",
+ "pipeline": {
+  "module": "gbt_allinone/tripo.py（已从 git 恢复 · 10.6KB · 语法通过）",
+  "flow": "image_to_model(样板) → rig_check(免费预检) → rig(biped · 25 积分) → animate(idle/walk · 10 积分/个)",
+  "credential": "TRIPO_API_KEY（本会话未配置；无 key 时如实回 needs_dependency，不假装）",
+  "gap": "该能力当前不在活目录（/api/capabilities 158 项里 0 处 tripo）→ 要能被调用需先挂回目录"
+ },
+ "quality_gates_phase2": [
+  "关节数 ≥ 20（髋/脊/胸/颈/头/双肩/双上臂/双前臂/双手/双腿/双脚）",
+  "骨名可映射（Tripo 若给 Left_Limb_N 这类名，绑骨后必须做骨名规范化）",
+  "绑定姿势可判（T 或 A，且能量出角度）",
+  "蒙皮权重归一 · 无破面"
+ ],
+ "naturalness_phase3": [
+  "绑定姿势校正 + 根位移按身高缩放（现在两段动作正是栽在这）",
+  "加性微动作：呼吸 / 眨眼 / 重心漂移 / 扫视，按角色种子错开",
+  "弹簧骨：头发 + 裙摆（three-vrm Spring Bone 那套思路）",
+  "状态机 + 交叉淡入（idle↔走路↔说话，禁硬切）"
+ ],
+ "tools": [
+  "plugins/gbt-master/tools/audit-avatar-baseline.py（骨架/绑定姿势/蒙皮/动作/体量逐项验收）",
+  "plugins/gbt-master/tools/skeleton-viewer.html + shot-skeleton.py（把骨架画出来截图存证；坏读数退 1 · --negctl 常驻负控）",
+  "plugins/gbt-master/tools/serve-digital-human.mjs + shot-digital-human.py（3D 出没出来）"
+ ],
+ "rules": [
+  "动手前先出步骤规划、Owner 点头再动",
+  "专业精细：毛坯 = 废品，不交、也不拿毛坯当基线",
+  "做完顺手清理：只删被取代/会误导的，不动别人的东西；清后台四步=认端口→认命令行→杀→复核"
+ ],
+ "state_injection": "已接入 systemPrompt.context（name=gbt-digital-human · order 501）；进程外正负对照通过（正：读出阶段/判定/下一步；负：文件缺失时如实报读不到）；宿主半边下次重启装载",
+ "samples_prepared": {
+  "dir": "holo_pet/assets/digital-human/samples/",
+  "items": [
+   "Day2-JK黑白甜酷-清图.png（站立·正面·全身 → 推荐首选）",
+   "Day4-JK海军蓝-清图.png（坐姿扶凳，姿势对建模不利）",
+   "OL四套职场-清图.png（从四人合照裁出，边缘最不干净）"
+  ],
+  "spec": "1024² · 单主体（只留最大连通块）· 去背透明 · 居中 · 高度占 89%",
+  "tool": "plugins/gbt-master/tools/clean-samples.py",
+  "note": "v1 曾因虚线/标签残留把主体缩到 13%（判定不合格），v2 只留最大连通块后达 89%"
+ },
+ "polish_pass": {
+  "tool": "plugins/gbt-master/tools/polish-samples.py（零依赖：cv2/numpy/PIL）",
+  "distilled_from": [
+   "Real-ESRGAN / SwinIR → 感知层：CLAHE 局部对比 + 非锐化掩蔽（原模型需 CUDA，本地跑不动）",
+   "GFPGAN / CodeFormer → 保边思想：频率分离（低频光影 / 高频纹理）+ 双边只在肤色掩码内轻磨皮",
+   "BiRefNet / RMBG-2.0 → 最难那层：color decontamination F=(C−(1−α)B)/α 去边缘背景污染"
+  ],
+  "readings": "Laplacian 12533→15202（+21%，比原图更利）· 亮边 0.6→0.2（−67%）· 主体色 R/B 1.12→1.14（暖调保住）· 耗时 1.4s",
+  "rejected": "v3 不合格：全局 bilateral(9,45) 把图磨糊（Laplacian 12518→11656）、灰世界白平衡把肤色抹灰（R/B→1.01）、halo 指标无判别力；已打回重做",
+  "outputs": [
+   "Day2-JK黑白甜酷-精修-透明.png（进管线用）",
+   "Day2-JK黑白甜酷-精修-影棚.png（看效果用）",
+   "Day2-JK黑白甜酷-精修对照.png"
+  ],
+  "next": "第二刀（可选）：pip install onnxruntime + Real-ESRGAN 蒸馏版 ONNX → 真超分；前提先腾内存（当前空闲 0.78GB）"
+ },
+ "rig_routes_inventory": {
+  "checked_at": "2026-09-22",
+  "local_blender": "本机没装（PATH / Program Files / LOCALAPPDATA 全无）；那件 GLB 的 \"Khronos glTF Blender I/O v4.5.51\" 导出签名来自云端，不是这台",
+  "routes": [
+   "① Tripo 云（我们已有 gbt_allinone/tripo.py）：rig_check 免费预检 → rig(biped) 25 积分；需 TRIPO_API_KEY；素材上传第三方",
+   "② 本地 Blender + Rigify：需先下载安装 ~300MB；当前空闲内存 <1GB；75 万顶点自动权重很重 —— 第二选择",
+   "③ Mixamo（免费网页，自动绑骨 + 动作库）：无需本地算力，但要 Adobe 账号并上传模型，且对含道具/非人形网格常失败"
+  ],
+  "recommendation": "Phase 1 网格生成必须云端（本地无 CUDA，TRELLIS/Hunyuan3D 跑不动）；绑骨优先 Tripo（预检先过），Blender 本地化留作备选需 Owner 批下载",
+  "gate_before_rig": "必须先满足 quality_gates_phase2 四条，否则又出毛坯"
+ },
+ "phase1_runner": "holo_pet/assets/digital-human/phase1-generate.py（一条命令跑完：读注册表钥匙 → balance → image_to_model → 轮询 → 下载 + glTF 魔数校验 + sha256 留痕 → 更新本状态源）",
+ "route_decision": "按 Owner 精修后的**写实样板**直接走 Tripo 图生 3D；不预设二次元风格。出正视图后由 Owner 决定是否再走 C 双轨（先落地、再打样对比）。风险已知：Tripo 对写实人脸会掉质，故 Phase 1 必须**先给 Owner 看正视图**再往下。",
+ "tripo_credential_diagnosis": {
+  "injected_by_owner": "TRIPO_API_KEY (HKCU\\Environment) 前缀 tcli_… 长度 37 · TRIPO_BASE_URL=https://openapi.tripo3d.com/v3",
+  "verdict": "那不是 API Key，是 **Tripo CLI 登录令牌**；两个站点实测均 401 Invalid API key",
+  "real_source": "官方 CLI 已登录：~/.tripo/config.json → profiles.default.api_key = tsk_…（47 位）· region=ov → base=https://openapi.tripo3d.ai/v3",
+  "balance": "905 积分（frozen 0）· whoami 实测",
+  "fix": "生成器改为以 CLI 凭据源为唯一真相源（key 与 region 一起读，站点天然对齐）"
+ },
+ "repo_pipeline_drift": "gbt_allinone/tripo.py 落后于 v3 接口：上传返回 data.file_token，模块读的是 data.image_token ⇒ 误判\"上传失败\"。已改走官方 CLI（必然与 API 同步），模块待按官方文档修正后再并入。",
+ "phase1": {
+  "phase": 1,
+  "sample": "Day2-JK黑白甜酷-精修-白底.png",
+  "task_id": "5c44c9c7-c61e-4f0f-93ab-c0b828bdb744",
+  "url_field": "model_url",
+  "url": "https://tripo-data.rg1.data.tripo3d.com/tcli_cc5ef6fa7566485e870fa6676fd9dc27/20260925/5c44c9c7-c61e-4f0f-93ab-c0b828bdb744/tripo_pbr_model_5c44c9c7-c61e-4f0f-93ab-c0b828bdb744.glb?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly90cmlwby1kYXRhLnJnMS5kYXRhLnRyaXBvM2QuY29tL3RjbGlfY2M1ZWY2ZmE3NTY2NDg1ZTg3MGZhNjY3NmZkOWRjMjcvMjAyNjA5MjUvNWM0NGM5YzctYzYxZS00ZjBmLTkzYWItYzBiODI4YmRiNzQ0L3RyaXBvX3Bicl9tb2RlbF81YzQ0YzljNy1jNjFlLTRmMGYtOTNhYi1jMGI4MjhiZGI3NDQuZ2xiIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzkwNDAzMDcyfX19XX0_&Signature=W38tkBG7mQn-qIhaNeYj186Avmm1ro1eXwRp9kZuDRp1RnZqJBwaoiU0PiDuRTQpluvR7QMAX5FQuWJBDkusfRK9DwTJfKeCClK8Z19XXRo0v2~-pG1H5I4ct7MaTpY~7BjwhHtsX8vuqQ4SrFxjnwq2cOPGtSikcvftyZUcyHUof8Ob9C1j5YLJl6d60wVwxtBbF97NqFuQ2TtW3kIt9UIaYyEPx~AvgkpDPEt~6HniAJFKpgWJfqTUMJi~SX2vj~yJ1e-87sx3IWwwi3v-GhteIQ2u-RzEF2aoPWlQSKn8GtnRZReNC7tIyvS0PHnl2fFE3DipbUdjybfpC1~76Q__&Key-Pair-Id=K1676C64NMVM2J",
+  "bytes": 42697716,
+  "sha256": "45afaf7a4a39e077b162fb42a672634a04e4db356f31a8de8f61e5546f6eebca",
+  "at": "2026-09-25 13:11:12"
+ },
+ "face_fidelity": {
+  "verdict": "脸不像她 —— 根因在**源信息量**，不在渲染端",
+  "evidence": [
+   "原始素材 736×981 → 脸约 150–206 px（唯一一张她的全身照就是这个分辨率）",
+   "真 albedo（baseColor=image[1]，2048²）里的脸岛偏软小 —— 已实证（紫图是法线，按材质槽位解析纠正）",
+   "Phase 1（单图）与 Phase 1.5（多视图 10+30+10 积分）脸都在同一水平 → 多视图没救回脸"
+  ],
+  "attempted": "朴素投影式换脸（自写 UV 反向映射 + 正交投影）：命中 107,618 三角形 / 写入 224,204 texel / 覆盖 5.28%",
+  "failed_because": "缺 UV 岛级对齐 · 缺遮挡（深度）判断 · 缺接缝修补 ⇒ 结果被拉花，判定不合格，已作废并删除产物",
+  "next_options": [
+   "A 换更强的源：给我一张**她的脸部清晰照**（≥512px 脸）→ 重新生成/贴图，这是唯一能真正\"像她\"的路",
+   "B 重做投影：改用 **GPU 渲染到贴图（camera projection bake）**——先烘 UV+深度，再按深度采样参考图，天然处理遮挡与接缝（本地免费，但要写一个 bake pass）",
+   "C 装 onnxruntime + 人脸修复模型（~365MB，CPU 慢）→ 对 albedo 脸岛做修复：只能提细节，**不能变回她**"
+  ],
+  "spent_total": 90,
+  "balance": 815
+ },
+ "phase2_route_a": {
+  "status": "Tripo 自家 rig 门限不过（14 关节）⇒ 改走 Mixamo；输入件已备好，等 Owner 上传",
+  "chain": [
+   "T-pose 转换 generate_image · 5 积分 · task 5f7e4533",
+   "T-pose 模型 image_to_model 30 + texture 10 · task 7d442f00/874a319a · 762,209 顶点 / 44.43MB",
+   "减面 highpoly_to_lowpoly 30 · task 90b444d5 · 16,017 顶点 / 2.79MB（47.6× 缩减）",
+   "转 FBX convert_model 5 · task 181c7c72 · model.fbx 1.75MB（Mixamo 上传件）",
+   "转 GLB 验收 convert_model 5 · task 16d8db89"
+  ],
+  "artifacts": {
+   "T-pose 参考": "raw/phase2a-tpose/T-pose参考-规范化.png",
+   "减面 GLB（给我们自己看）": "raw/mixamo-input/model-lowpoly.glb",
+   "高保真 T-pose 模型": "raw/phase2a/model.glb（762,209 顶点）",
+   "Mixamo 上传件": "raw/mixamo-input/model.fbx（1.75MB · T-pose · 12,836 三角形）"
+  },
+  "renders": [
+   "render/减面版-正面.png",
+   "render/减面版-脸.png",
+   "render/减面版-四方对照.png"
+  ],
+  "credits_route_a": 85,
+  "balance": 705,
+  "gate_expectation_for_mixamo": "标准人形 65 骨（mixamorig:*）→ 关节数≥20 ✓ / 骨名可映射 ✓ / 绑定姿势可判 ✓ / 权重归一待验",
+  "next": "Owner 上传 model.fbx 到 Mixamo 自动绑骨 → 下回一条或两条动作 FBX（Idle/Walking）→ 我接手验门限并做 Phase 3 自然度"
+ },
+ "phase2_local_rig": {
+  "status": "✅ 本地自制绑骨完成 —— 四门全过 + 形变验收通过（零积分 · 不上传 · 骨名标准可对接动作库）",
+  "tool": "tools/codex-scripts/autorig-skeleton.py（量骨架）+ autorig-skin.py（权重 + 导出 + 姿态测试）",
+  "gate": {
+   "joints": "22 ≥ 20 ✅",
+   "weights": "和恒 1.0000 · JOINTS_0/WEIGHTS_0 齐 ✅ · 布料归髋 2031 顶点",
+   "bind_pose": "Shoulder→Hand +2.1° · Arm→ForeArm +1.6° ⇒ 标准 T-pose ✅",
+   "bone_names": "mixamorig:Shoulder/Arm/ForeArm/Hand/UpLeg/Leg/Foot/ToeBase + Spine/Neck/Head ✅"
+  },
+  "artifacts": {
+   "rigged": "raw/rig/model-rigged.glb（3.17MB · 22 关节 · skin）",
+   "skeleton": "raw/rig/skeleton.json",
+   "pose_test": "raw/rig/model-pose-test.glb（抬左臂 45° 形变测试）"
+  },
+  "renders": [
+   "render/绑骨-绑定姿势Tpose.png",
+   "render/绑骨-姿态测试-抬左臂45.png",
+   "render/绑骨-形变验收.png",
+   "render/绑骨-骨架落在实体上.png"
+  ],
+  "bugs_fixed": [
+   "glTF 层级里子节点平移写成绝对坐标 ⇒ 绑定姿势算成 A-pose（-38.8°）；改正为相对父节点后 +2.1° ✅",
+   "GLB 写出未做 4 字节对齐 ⇒ 加载器解析崩；已加规范写出函数",
+   "深拷贝后仍往原 J 追加 bufferView ⇒ accessor 指向越界索引；已改为写进副本（并用 validate-glb.py 定位）"
+  ],
+  "next": "Phase 3 自然度（现在可全本地做，不再依赖 Mixamo）：自制 idle/walk 关键帧 + 加性微动作（呼吸/眨眼/重心/扫视）+ 弹簧骨（发/裙）+ 状态机交叉淡入"
+ },
+ "phase2_local_rig_hi": {
+  "status": "✅ 高模也绑上同一套骨架 —— \"打磨好的样子\"与\"能动\"兼得",
+  "why": "低模是拿外形换实时/绑骨便利；高模要保住打磨后的外观。两者同一次生成、同一坐标系，权重可精确迁移",
+  "evidence": "bbox 尺度比 高/低 = 1.0009 · 未命中 0 顶点 · 权重和 1.0000/1.0000 · 平均活跃骨 3.68",
+  "artifacts": {
+   "高模绑骨": "raw/rig/model-rigged-hi.glb（61.88MB · 762,209 顶点 · 1,474,581 三角形 · 22 关节 · skin）",
+   "低模绑骨": "raw/rig/model-rigged.glb（3.17MB · 16,017 顶点 · 用于网页/实时）",
+   "高模姿态测试": "raw/rig/model-rigged-hi-pose.glb（抬左臂 45° · 受影响 305,007 顶点 · 最大位移 0.230）"
+  },
+  "gate_hi": "22 关节 ✅ · 父链无环 ✅ · 骨名 12/12 ✅ · 绑定姿势 2.1°/1.6° T-pose ✅ · JOINTS_0/WEIGHTS_0 齐 ✅",
+  "renders": [
+   "render/高模绑骨-三方对照.png",
+   "render/高模绑骨-Tpose.png",
+   "render/高模绑骨-抬左臂45.png"
+  ],
+  "lessons": [
+   "大网格（>10 万顶点）脚本必须**分块 + float32**：曾用 (n,4,4,4) 张量打爆内存，导致宿主连子进程都起不来（0xC0000142）",
+   "层级只由 skeleton.json 的 PARENT 表**重建**，绝不复制索引（复制来的 children 偏 1 ⇒ 自环 ⇒ 求解死循环）",
+   "凡\"求父链/求世界坐标\"的代码必须带**环保护上限**，坏数据要报错而不是把机器转死"
+  ]
+ },
+ "skill_solidified": {
+  "path": "C:\\Users\\ADMIN\\.openclaw-autoclaw\\skills\\digihuman-pipeline\\",
+  "files": [
+   "SKILL.md（9 阶段 + 判据 + 硬规则）",
+   "scripts\\run-pipeline.ps1（一键编排，支持分阶段/DryRun）",
+   "references\\pitfalls.md（13 条踩坑实证）"
+  ],
+  "usage": "pwsh -File <skill>\\scripts\\run-pipeline.ps1 -Stage all -Ref <参考图> -Name <角色>",
+  "verified": "空跑自检通过：无副作用（不启停服务）· -Ref 路径正确注入 · 渲染阶段命令逐条打印",
+  "source": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\skills\\digihuman-pipeline\\（源稿 · 2026-09-22 从托管目录抢救回来，两处同哈希）",
+  "installed_roots": [
+   "C:\\Users\\ADMIN\\.openclaw-autoclaw\\skills\\digihuman-pipeline\\（托管根 · AutoClaw 口径）"
+  ],
+  "not_loadable_in_dsh": "本机 DSH 的技能扫描根不含 ~/.openclaw-autoclaw/skills（现读：dsh-skill-filesystem 只扫 <项目>/.dsh/skills · <项目>/.agents/skills · preset/skills · $DSH_HOME/skills · ~/.agents/skills） ⇒ 本件目前只能**按路径读**；要在本会话里被自动加载需镜像到 <仓>/.dsh/skills/（主人 2026-09-22 只授权了设计维度那 16 条，本件不在其中）",
+  "drift_gate": "tools/codex-scripts/audit-skill-roots.py ⑤ 查「我们自己的单根件」（孤本 / 没装机）；宿主插件另有 plugins/gbt-master/tools/verify-all.mjs 三道门",
+  "readings_gate": "tools/codex-scripts/audit-dh-status.py —— 现读本文件引用到的**每一个文件**在不在盘、括号里的大小声明对不对（2026-09-22 首跑：45 个引用全在盘 · 10 条大小声明全对得上）；加 --strict 时「文件不在」算硬失败。⚠️ 本文件是**每轮会话上下文**的来源，改它等于改下一轮模型看到的事实 —— 别手改数字，改完跑这道门。"
+ },
+ "clarity_gauge_void": "清晰度读数作废：自动 ROI 取到了 HUD 文字区（非背景即被判为前景），测的不是人脸。已写入技能 pitfalls 1.1：ROI 必须自证（肤色占比 + 排除 HUD + 输出裁图供人眼复核）。SSAA 机制本身已证（缓冲 760→2280）。",
+ "phase3_motion": {
+  "status": "✅ idle + walk 已烘焙并验收（本地、零积分）",
+  "clips": "idle 8.0s / 22 通道 · walk 1.10s / 23 通道",
+  "readings": "两条 clip 循环闭合误差均为 0.00000 · 步幅/身高 0.550",
+  "key_fix": "T-pose 绑定 ⇒ 必须有\"手臂自然下垂\"的基准姿势基底（BASE：上臂 74°、肘微屈、膝不锁死）；缺了它，走路像平举着腿走",
+  "artifacts": "raw/rig/model-rigged-anim.glb（3.22MB · 2 段动画）",
+  "renders": [
+   "render/动画条-walk.png（4 帧）",
+   "render/动画条-idle.png（4 帧）"
+  ],
+  "tools": "anim-make.py（烘焙）· compose-strip.py（逐帧拼条）· view-glb.html 支持 clip/strip/t/inplace/ss/beauty",
+  "next": "状态机交叉淡入（idle↔walk 禁硬切）+ 脚部锁定（防滑步）+ 次级动力学（发/裙弹簧骨）"
+ },
+ "credential": "Tripo CLI 已登录（~/.tripo/config.json，tsk_ 开头）；**不需要**再给 TRIPO_API_KEY",
+ "assets_now": {
+  "实时档": "raw/rig/model-rigged-anim.glb（3.22MB · 16,017 顶点 · 22 骨 · idle/walk 循环闭合 0.00000）",
+  "出图档_4K": "raw/rig/model-rigged-4k.glb（86.65MB · 762,209 顶点 · 4096² PNG · 22 骨 · 四门全过）",
+  "出图档_头肩": "raw/portrait-bust.glb（43.69MB · 755,556 顶点 · 五官清楚=审美合格）",
+  "面板档_半身": "raw/portrait-bust-low-rigged.glb（4.09MB · 5 骨 · 但减面破相，判不合格）",
+  "嫁接件": "raw/rig/model-rigged-4k-graft.glb（114.46MB · 身体+新头 2 primitive）"
+ },
+ "aesthetic_verdict": "人类审美四档对照：唯一合格=胸像(出图档)；①②④ 短板都在脸",
+ "graft_failure": "第一刀：头沉进胸腔 —— 身体颈线启发式失真（全身模型越靠头顶几何越少 ⇒'最窄'取到头顶）。修法：先取肩峰(顶部30%最宽)，再在其上取最窄=颈。修法已写清，脚本补丁待重打。",
+ "next": "① 重打 head-graft 颈线补丁 → 重跑 → 审美复核；② 合格后再做体→实时档的分区减面（保头部密度）",
+ "discipline": "每任务必走五维合一（tools/codex-scripts/five-dim.py: open/check/close/ruler）+ 万能插 run_task 唯一门",
+ "current_asset_verdict": {
+  "verdict": "面板档合格(带7弹簧骨) · 出图档合格(v10 4K 脸审美合格) · 中景档搁置(需 DCC)",
+  "joints": 29,
+  "verts": 16017,
+  "textures_mb": 4.0,
+  "verification": {
+   "tool": "plugins/gbt-master/tools/audit-avatar-baseline.py（本会话修好：默认路径原先指向**已作废的** tripo-human.glb ⇒ 一跑就崩）",
+   "run_at": "2026-09-22",
+   "panel_asset": {
+    "path": "raw/rig/model-rigged-anim.glb",
+    "mb": 3.22,
+    "generator": "Tripo",
+    "joints": 22,
+    "skins": 1,
+    "T_pose_angle_deg": 1.6,
+    "vertices": 16017,
+    "actions": "idle 8.00s（22 旋转轨 · 无髋位移=原地）· walk 1.10s（有髋位移轨）",
+    "textures": "3 张 / 2.23 MB",
+    "spring_bones_in_this_file": 0
+   },
+   "spring_asset": {
+    "path": "raw/rig/model-springs-hair.glb",
+    "mb": 3.96,
+    "joints": 29,
+    "spring_bones": [
+     "mixamorig:SkirtF",
+     "mixamorig:SkirtB",
+     "mixamorig:SkirtL",
+     "mixamorig:SkirtR",
+     "mixamorig:HairB",
+     "mixamorig:HairL",
+     "mixamorig:HairR"
+    ],
+    "count": 7,
+    "note": "「带7弹簧骨」这句由此得到**机器可复核**的证据：7 = 4 裙摆 + 3 头发；形象页 avatar.html 读这份，并按 VRMC_springBone 口径做模拟（§131 起）。"
+   },
+   "skeleton_evidence": {
+    "tool": "plugins/gbt-master/tools/shot-skeleton.py（viewer = tools/skeleton-viewer.html；负控 = 同脚本 --negctl）",
+    "run_at": "2026-09-22 晚",
+    "why": "**第二条独立取证链**：上面那条走 Python 解析 GLB；这条走浏览器真加载 + three.js 真渲染，两边读数必须一致才算数。",
+    "readings": {
+     "panel_asset": "22 关节 ✅ · 16017 顶点 ✅ · 0 弹簧骨 ✅（三张：静止态 / idle / walk）",
+     "spring_asset": "29 关节 ✅ · 16017 顶点 ✅ · 7 弹簧骨 ✅（两张：静止态 / idle · 走 body=0 只画骨架不画皮）"
+    },
+    "images": [
+     "render/骨架复核-数字人静止态.png",
+     "render/骨架复核-数字人idle.png",
+     "render/骨架复核-数字人walk.png",
+     "render/骨架复核-弹簧档静止态.png",
+     "render/骨架复核-弹簧档idle.png"
+    ],
+    "exit_code": "0（5 张全正读数）· --negctl 负控也 0（坏路径红字报出、不落 __shot）",
+    "bugs_fixed": [
+     "viewer 里模型路径写死**已作废**的 tripo-human.glb ⇒ 每次都在空场景上截图，图上还印着「关节数 —」；已改指真身 model-rigged-anim.glb",
+     "shot-skeleton.py 去开 .scratch/_skeleton_viewer.html 那份**早已不存在的副本** ⇒ 工具根本跑不起来；已改为直接服务工具真身 + 自起随机端口只读静态服务",
+     "静默出图：加载失败也只 print 一句就退出 0，图和读数照旧落盘；已改为坏读数 ⇒ 退出码 1，并配 --negctl 常驻负控",
+     "定心+缩放顺序写错（position 该用 -k·center，旧稿是 -center）⇒ 偏移 center·(k-1)，模型被推出画面右下角；已修",
+     "旧的 骨架复核-*.png 其实是**10 关节老骨架**的图，却顶着一个「骨架存证」的名字；已用真身按 22/29 关节重出（同名覆盖）"
+    ],
+    "name_note": "viewer 显示的是 three.js **净化过**的骨名（GLTFLoader 的 sanitizeNodeName 会去掉 [ ] . : /）⇒ 显示 `mixamorigSkirtF`，而 GLB 原始节点名是 `mixamorig:SkirtF`。已直接读 GLB 的 JSON chunk 核对：31 节点 / 7 命中 / 29 个名字带冒号。**别把净化名当原始骨名引用。**"
+   }
+  }
+ },
+ "next_step": "如需中景档：装 Blender 用原生 Decimate Collapse；否则主线已交付完毕",
+ "blocked_on_owner": [],
+ "phase1_owner": {
+  "phase": 1,
+  "route": "multiview-to-model(正/侧/背 3视图)",
+  "model": "v3.1-20260211",
+  "views": [
+   "Owner-三视图-正面.png",
+   "Owner-三视图-侧面.png",
+   "Owner-三视图-背面.png",
+   "Owner-三视图-侧面-镜像.png"
+  ],
+  "right_view_note": "右视图由左侧视图水平镜像合成（转面图只给了正/左/背三张）",
+  "task_id": "a6b65d1a-d7e3-427d-a2f5-eab7232929da",
+  "url_field": "model_url",
+  "url": "https://tripo-data.rg1.data.tripo3d.com/tcli_cc5ef6fa7566485e870fa6676fd9dc27/20260925/a6b65d1a-d7e3-427d-a2f5-eab7232929da/tripo_pbr_model_a6b65d1a-d7e3-427d-a2f5-eab7232929da.glb?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly90cmlwby1kYXRhLnJnMS5kYXRhLnRyaXBvM2QuY29tL3RjbGlfY2M1ZWY2ZmE3NTY2NDg1ZTg3MGZhNjY3NmZkOWRjMjcvMjAyNjA5MjUvYTZiNjVkMWEtZDdlMy00MjdkLWEyZjUtZWFiNzIzMjkyOWRhL3RyaXBvX3Bicl9tb2RlbF9hNmI2NWQxYS1kN2UzLTQyN2QtYTJmNS1lYWI3MjMyOTI5ZGEuZ2xiIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzkwNDA1NjY2fX19XX0_&Signature=QQNBHKZNLjJc03Kx44KO6eDjcmvk2qW0H7cFlueU0jI~9ikvhgbGP8iXhhiPTYIWN09Q~EwK7h3ftKDTQAoquVKKc~SCjbRc1MiTxYCCpLaKKgQ7F2IuCvwLvCHNLl-4dcQ5f66NeS~~4wAjt4E8Pp46MdFwr9-pjOrQcTzKYFA9IElobB-KxTGoy6UjOtRJ9ZXTNGXizEbMlf7OaDS8OrWKTIc4J0b-p~LDBIYaY35uSexEbRfPx1Ovq4Q~Taa4lkSYTC3YhqMtnlVrWb4a1Mt4s2AkLYHBXMkj3D6PW5lGVq7X~PMJet2rgI1mTJQTxZHrpkMx34fEFpdYNyRvng__&Key-Pair-Id=K1676C64NMVM2J",
+  "bytes": 43743076,
+  "sha256": "ebfaaea785935790d687199e5cf5d4d2aa2fe7bdebb2802e1bdfa74684a66760",
+  "at": "2026-09-25 13:54:27"
+ },
+ "owner_sample": {
+  "source_image": "samples/Owner-三视图-原图.png（Owner 提供 · 正/侧/背三视图）",
+  "views_cleaned": [
+   "Owner-三视图-正面.png",
+   "Owner-三视图-侧面.png",
+   "Owner-三视图-背面.png"
+  ],
+  "cleaner": "plugins/gbt-master/tools/split-turnaround.py（色度判据去背 + 砍展示台 + 只留最大连通块）",
+  "route": "Tripo multiview-to-model（4 视图：正/左/背/右镜像）→ 定向归一 → Tripo 服务端减面 → 自研绑骨",
+  "note": "右视图由左侧视图水平镜像合成（原图只给 3 张）"
+ },
+ "mesh_pipeline": {
+  "multiview_task": "a6b65d1a-d7e3-427d-a2f5-eab7232929da",
+  "highpoly": "raw/phase1-owner/model.glb（749175 顶点 · 41.72 MB）",
+  "oriented": "raw/avatarmesh/model-facing.glb（肩轴→X · 正面→Z · 由 avatar-orient.py 自校验）",
+  "lowpoly": "raw/avatarmesh/avatar-lowpoly.glb（28382 顶点 · 3.47 MB · 三贴图 · UV 干净）",
+  "lowpoly_sha16": "6477dd6d1d46ec50",
+  "decimate_route": "Tripo 服务端 highpoly_to_lowpoly（30 积分 + convert 10 积分）—— 本地 QEM 两条路实测都会毁 UV"
+ },
+ "rig_pass": {
+  "tool": "tools/codex-scripts/autorig-skeleton.py + autorig-skin.py（**本仓自研 · 零积分**）",
+  "joints": 26,
+  "skin": "raw/rig/avatar-rigged.glb（4.13 MB · 权重和 1.0000）",
+  "rigged_sha16": "f4f0ae641deb21b6",
+  "key_fix": "旧稿四肢定位按**臂轴跨度**分段 ⇒ 只在 T-pose 成立。本轮样板是自然站姿（手垂身侧），旧法把四个手臂关节全挤在肩高。已改为**沿表面测地线追踪**（位置焊接 → Dijkstra → 回溯路径按长度定关节），站姿/平伸都不影响。",
+  "pose_test": "raw/rig/avatar-pose-test.glb（抬左臂 45° · 影响 6809 顶点 · 最大位移 0.145）→ 渲染可见手臂抬起",
+  "head_joint_fix": "旧稿把 Head 关节放在**头顶质心**（y=0.485）⇒ Head 骨段只剩 0.485→0.500 一小截，蒙皮按到骨段距离分权时整张脸更近 Neck（实测 Head 只 300 顶点 / Neck 4756）⇒ 头一转脸不跟。已改：Head 放**颅底**（0.095H · y=0.405），HeadTop 才在 0.5。修后 Head 2871 顶点。"
+ },
+ "springs_pass": {
+  "tool": "tools/codex-scripts/spring-hair.py（**不写死坐标**：头发由蒙皮权重认，链方位由顶点质心算）",
+  "why_rewrite": "仓里 spring-bones.py 的裙摆坐标写死给上一代模型（Y_ROOT/Y_TIP、LEG_Z=0.041、方向表前=+X），本代定向归一后正面是 +Z、肩轴是 X，直接跑必错位；且本角色是长发无裙摆。",
+  "chains": [
+   "Hair0",
+   "Hair1",
+   "Hair2",
+   "Hair3"
+  ],
+  "hair_vertices": 5035,
+  "output": "raw/rig/avatar-springs.glb",
+  "sha16": "87c7f7f56e4706bf",
+  "checks": "关节 26 · 权重和 1.0000 · IBM 条数与关节数一致 · 包围盒回到 [0.256,1,0.194] 中心 [0,0,0]",
+  "bug_fixed": "弹簧骨 translation 写成绝对坐标会被父级 Head 再累加一次（实测包围盒 1.000→1.086、中心上移 0.043）；已改为相对父节点。"
+ },
+ "realism_pass": {
+  "procedure_doc": "holo_pet/assets/digital-human/REALISM.md（八步流程 + AI 味禁令 + 机检命令 + 诚实账）",
+  "sources": "three.js 官方 MeshPhysicalMaterial 源码/文档（web_fetch 取到）· web_search 端点坏（返回非 JSON）已如实记",
+  "done": [
+   "IBL 环境 RoomEnvironment+PMREM（无外部 HDRI 依赖）",
+   "影棚光照配比 1.10/0.30/0.65/0.30",
+   "皮肤材质：metalness 0（源实测 0.127）· ior 1.4 · specularIntensity 0.42 · diffuseRoughness 0.65 · sheen 0.12 · clearcoat 0.05",
+   "ACES 色调映射 + sRGB 输出"
+  ],
+  "gap": {
+   "面部几何": "全身 28382 顶点，脸约 2-3k；需脸部单独 10k+",
+   "面部贴图": "全身 2048 一张；脸有效分辨率远低于 1024",
+   "面部专件": "眼球/睫毛/眉/牙齿 = 0 件（眼是贴图画的）",
+   "皮肤微细节": "仅 1024 全身 normal 一张，无毛孔/细纹 detail normal",
+   "真 SSS": "three examples 无 MeshSSSNodeMaterial（已探测）；现用 diffuseRoughness 近似"
+  },
+  "verdict": "靠当前 Tripo 多视图单件 + 参数调优只能到『干净的 CG 角色』；到『真人逼真』必须补面部专件+4K脸贴图+微细节，且需 DCC（Blender）或等价工具",
+  "evidence": [
+   "render/真人化-前-正面.png",
+   "render/真人化-后-正面.png",
+   "render/真人化-后-四分之三.png"
+  ]
+ },
+ "eye_experiment": {
+  "status": "**未验收 · 不晋升**（毛坯=废品，不交）",
+  "artifact": "raw/rig/avatar-eyes.glb（5.04 MB · 3 primitive · 眼球绑 Head · 自检三项过）",
+  "tool": "tools/codex-scripts/add-eyes.py（位置从网格+贴图量，不写死）",
+  "what_worked": [
+   "程序化虹膜贴图（巩膜/径向纤维/瞳孔/角膜缘环）512²",
+   "眼球球体几何 + 全顶点绑 Head 骨 + 权重和=1",
+   "按 UV 采样底色贴图**认出皮肤**（11812/28382）后再量脸宽，改掉第一版把头发算进脸宽的错"
+  ],
+  "why_not_accepted": "眼窝 z=0.0577 vs 正面 98 分位 z=0.0651，只差 0.0074 —— **源网格根本没有眼窝凹陷**，眼球没有窝可嵌，怎么放都像『贴在脸上的球』。这不是摆放参数问题，是**面部几何不合格**。",
+  "verdict": "在补上面部几何（眼睑/眼窝/唇形）之前，眼球这条路走不通；先把这一件如实挂起，等有 DCC 或更高保真的面部重建再继续。"
+ },
+ "skin_detail_pass": {
+  "tool": "tools/codex-scripts/skin-detail.py（零外部依赖：numpy+scipy+PIL）",
+  "method": "随机高度场(wrap 高斯 ⇒ 天然可平铺) + 9000 毛孔凹点 + 各向异性细纹 → 法线；只在**皮肤区**(按底色采样判暖色且够亮，50.0% 纹素)用 **whiteout blend** 合成",
+  "readings": "detail 1024² · 法线 1024²→**2048²** · 皮肤区 50.0% · 输出 9.07 MB",
+  "output": "raw/rig/avatar-skin.glb",
+  "sha16": "c84787c226a27590",
+  "bug_fixed": "第一版换图后**没给尾部 bufferView 加偏移** ⇒ image1/image2 立刻读不回（自检抓到）；已改为整体平移 (新图+对齐) - 旧图长 = +4503922 字节，并把'3 张图全部读回'做成硬自检",
+  "evidence": [
+   "render/皮肤微细节-前-正面.png",
+   "render/皮肤微细节-后-正面.png",
+   "render/皮肤微细节-detail.png"
+  ]
+ },
+ "root_cause": "原根因『源网格面部几何不合格（脸 2610 顶点 · 无眼窝 · 无眼睑）』**已解除**：面部特写单独重建后，几何 283×、贴图 4K、眼窝比值 12.2%→16.0%。现在的问题是**工程量**：定向归一 → 减面 → 头身缝合 → 重绑骨，四步接进现有管线。",
+ "head_route_pass": {
+  "breakthrough": "换了**输入**而不是加工具：把 Owner 图的**脸部特写**单独交给 Tripo 重建，全部面数给头 ⇒ 面部几何从 2610 顶点涨到 737459（约 **283×**），头发出现真实发丝、鼻/唇/下巴/下颌线成形。**零安装**，只换输入。",
+  "credits": "20（texture:detailed）+ 5（convert）= 25 积分",
+  "output": "raw/head-hi/tripo-out/owner-脸-特写-png-convert-81c54599/model.glb",
+  "size_mb": 53.45,
+  "sha16": "ca0f06876be9c1ed",
+  "bbox": "x ±0.287 · y ±0.5 · z ±0.369（头+胸像，含长发）",
+  "orientation": "实测**正面朝 +X**（与身上那件归一前的朝向相同）⇒ 可直接走 tools/codex-scripts/avatar-orient.py 归一",
+  "evidence": [
+   "render/专用头模-正面.png",
+   "render/专用头模-四分之三.png"
+  ],
+  "next_steps": [
+   "avatar-orient.py 定向归一（肩轴→X · 正面→Z）",
+   "mesh-decimate.py / Tripo decimate 减到可用面数",
+   "head-graft.py 把专用头缝到身上（仓里既有工具）",
+   "重跑自研绑骨（autorig-skeleton → autorig-skin）",
+   "再做眼球/睫毛/牙齿（此时脸已有窝可嵌）"
+  ],
+  "measured": {
+   "皮肤顶点": "187255 / 737459（按材质 baseColorTexture 索引取底色图，**不能按尺寸猜** —— 这次三张图都是 4096²，按尺寸会取到法线图）",
+   "贴图": "**3 张全是 4096×4096**（底色 jpeg / 法线 jpeg / 金属粗糙 png）⇒ REALISM.md §5 的『面部贴图』缺口在**源头**上关掉了",
+   "眼窝凹陷": "占半宽 **16.0%**（frac 0.30 处：半宽 0.1405 · 正面 x(p98) 0.1909 · 眼位 x(p70) 0.1685 · 凹陷 0.0225）",
+   "对照": "身上那件是 12.2%（0.0074 / 0.0607）—— 比值只小涨，但**形体定义**（鼻/唇/下巴/下颌线/发丝）是数量级的差别，见 render/专用头模-正面.png"
+  }
+ },
+ "skin_remake_pass": {
+  "tool": "tools/codex-scripts/skin-tone.py（零依赖）",
+  "what": "①压掉底色里**烘焙的镜面高光**（p90=185，压掉最大 41）②按真人血色重上色 （皮肤均值 (191,166,147)→(185,150,131)，向 R:G:B=1.00:0.80:0.70 混 58%）③低频斑驳 ±7（σ=22 可平铺）④皮肤粗糙度夹到真人带 [0.45,0.62]",
+  "why": "源图是**光泽人偶**审美，PBR 只会忠实渲染它 ⇒ 必须**重新诠释**皮肤而不是照抄",
+  "output": "raw/rig/avatar-real.glb · 11.21 MB",
+  "sha16": "86a74ffee8c22521",
+  "bugs_fixed": [
+   "自检的**参照图**从被改过的 J/BIN 读 ⇒ 自检自己撒谎（报 image 读不回，其实是参照坏）",
+   "BIN 块尾部没做 4 字节对齐 ⇒ GLB 畸形（自检抓到）",
+   "掩码没跟着缩到 1024 的金属粗糙网格（底色 2048）⇒ 广播报错"
+  ],
+  "note": "新图**追加到缓冲区末尾**（不动其他偏移，正确性不依赖累加推导）；代价是旧图字节冗余 ~2MB",
+  "evidence": [
+   "render/皮肤重制-前-正面.png",
+   "render/皮肤重制-后-正面.png",
+   "render/皮肤重制-对照.png"
+  ]
+ },
+ "head_orient_attempt": {
+  "status": "✅ **已修正并通过**（上一轮的失败件 head-facing.REJECTED.glb 已被取代）",
+  "tool": "tools/codex-scripts/head-orient.py",
+  "fix": "换判据：不再问『谁凸得更远』，改问『**同一根轴的正反两侧，哪一侧是窄脊**』——后脑是一大片、鼻尖是窄脊。实测 **X 轴 0.0540(+) / 0.2721(-) = 比值 5.04**，次选 Z 轴仅 1.08 ⇒ 深度轴 = X，较窄的一向 = 正面。",
+  "extra_fixes": [
+   "皮肤掩码收紧到 R>150 且 R>G+8（排除棕发）",
+   "**加不确定闸**：深度轴比值 <2.0 就判『不确定』停手，不硬选（上一轮就是靠 0.0008 的优势硬选才转反的）"
+  ],
+  "selfcheck": "肩轴=X ✅ · 鼻尖沿+Z ✅（z hi=+0.1915 / lo=-0.0720 —— **2.7× 不对称**，上一轮失败时是 0.1914/-0.1929 几乎对称；不对称本身就是转对了的证据）",
+  "output": "raw/head-hi/head-facing.glb · 70.33 MB · sha16 9a34f00c1013e128",
+  "evidence": "render/头模-定向后-正面.png（**首次渲出像人的脸**：鼻/唇/眉/眼形全成形，头发有真实发丝）"
+ },
+ "local_decimate_verdict": {
+  "verdict": "本地 QEM 减面在本项目**不可用**（第二次独立验证 · 已 REJECTED）",
+  "evidence": "render/头模-减面后-正面.png —— 同一副放射状碎块，与身体那件 render/_test-pf-正面.png 症状完全一致",
+  "artifact": "raw/head-hi/head-low.REJECTED.glb（58822 面 · 19.23 MB · 自检全过但渲染一眼假）",
+  "why": "顶点 59160 拆点后变 124655（每顶点 2.1 个 UV）—— 大量面在 UV 缝上挑到了对侧的源三角。逐面投影在自投影对照里误差是 0（数学对），但 QEM 会把缝两侧的重复顶点合并，合并后哪个源三角才属于该面就没有唯一答案了：这是方法层限制，不是实现 bug。",
+  "conclusion": "UV 保真的减面只有两条路：服务端减面（Tripo，已验证干净，30-40 积分）或 Blender 原生 Decimate Collapse（免费，需装约 300MB）。本地自研这条路到此为止。",
+  "lesson": "自检三项全过（引用合法/UV 在域内/网格非空）**仍然是废品** —— 又一次印证：读数过了不等于对，必须有渲染人眼复核。已写进 REALISM.md 第 4 节的机检流程。"
+ },
+ "graft_plan": {
+  "status": "几何账已算出（零成本）· 待执行工具",
+  "coordinate_frame": "两件**同一约定**：都是身高归一 1.0、y 范围 -0.5..+0.5、居中 ⇒ 可直接做刚体对齐",
+  "measured": {
+   "身体": {
+    "头顶点 y": "+0.5000",
+    "Neck 关节 y": "+0.3631",
+    "Head 关节 y": "+0.4048",
+    "Spine1 y": "+0.2201",
+    "头高占比": "0.1369（0.5000-0.3631）",
+    "肩带(f=0.15)皮肤宽": "0.1820"
+   },
+   "专用头": {
+    "头顶点 y": "+0.5000",
+    "最窄带(颈) y": "约 +0.1000（宽 0.1576）",
+    "头高占比": "0.4000（0.5000-0.1000）",
+    "胸像底(f=0.60)宽": "0.6783"
+   }
+  },
+  "transform": "**缩放 0.342**（0.1369/0.4000），再把头顶点对齐到 y=+0.5、中轴对齐到身体中轴 x",
+  "cut_plane": "颈线处切：身体切在 y=+0.3631、专用头切在其 y=+0.1000（缩放后重合）",
+  "remaining_risk": [
+   "接缝处**拓扑不同**（头是高模、身是低模）⇒ 需要一条过渡带做权重/位置融合，不能硬焊",
+   "颈部皮肤色差（两件贴图分辨率与来源不同：头 4096² / 身 2048²）",
+   "头模的**头发是一整块高模**，接到低模身体上会有密度落差"
+  ],
+  "blocked_on": "执行工具：Blender（缝合+减面）或服务端减面（只能减面、不能缝）"
+ },
+ "graft_pass": {
+  "status": "完成 · 已过自检 + 人眼复核",
+  "tool": "tools/codex-scripts/head-graft-np.py（**纯 numpy · 零依赖 · 零积分**）",
+  "method": "**重叠壳**而不是焊接：焊接要求两件拓扑一致（头 737k / 身 28k 不同）必然破面；两件都是不透明实体 ⇒ 让『新头+一截颈』**盖住**身体原有的脖子，接缝被遮住而非焊住。",
+  "params": "缩放 0.342 · 头顶点对齐 y=+0.5 · 中轴对齐 · 切面 y>0.33 · Head 权重 0.35→1.0 根部混 Neck",
+  "readings": "保留三角 492089/1415420（34.8%）· 顶点 255569 · 权重和 1.0000 · 输出 45.24 MB · 2 primitive",
+  "output": "raw/rig/avatar-grafted.glb",
+  "sha16": "3f5244cf1e0a6d6d",
+  "evidence": [
+   "render/缝合-近景-正面.png",
+   "render/缝合-近景-四分之三.png",
+   "render/缝合-全身-正面.png"
+  ]
+ },
+ "self_correction": "**我对『必须装工具』的判断连续错了两次**：第 4 轮断言『必须装 Blender 才能修面部几何』→ 第 5 轮被『换输入』推翻；第 11 轮断言『零成本走完、缝合必须 Blender』→ 第 13 轮被『重叠壳法』推翻。同一个毛病：把『我一时没想到办法』说成了『没有办法』。**规矩**：说『必须装 X』之前，先列出已排除的方案清单，不许凭感觉下结论。",
+ "remaining": [
+  "表情/口型（语音对讲；**注意：blink 需要眼位，而眼位在当前输入下定位失败** ⇒ 优先做口型）",
+  "说话手势动作",
+  "减面（需服务端或 DCC，要 Owner 定）",
+  "（可选）换真实照片输入以突破『重妆人偶』天花板"
+ ],
+ "eye_attempt_2": {
+  "status": "失败 · 已标记 REJECTED · 不晋升（第二次做眼球，仍失败）",
+  "artifact": "raw/rig/avatar-eyes2.REJECTED.glb（自检全过 · 渲染一眼假：眼球飘在额头上且太靠中间）",
+  "evidence": "render/眼球-缝合件-正面.png",
+  "what_worked": [
+   "脚本改造成能**在缝合件的头部 primitive 上定位**（选顶点最多的那一份）",
+   "底色图按**该 primitive 自己的材质**取（缝合件里身/头各一套贴图，按尺寸猜会取错）",
+   "修了『拿头部 primitive 高度(0.170)当全身高』的错 → 改用**整体 bbox** 的 1.000",
+   "修了自检里写死的 primitive 数（缝合件原有 2 个，加 2 眼 = 4）"
+  ],
+  "why_rejected": "读数早就预警，我没把它当回事：x=±0.0123（应在 ±0.025 左右）、y=+0.4340（应在 ~0.405）。根因两条：① 量『脸半宽』的那一带**基本是头发**（皮肤掩码在头模上只捞到中央一条，半宽 0.0384 偏小）；② 眼线比例 0.066 是**身体**口径，不是**头模**口径 —— 头模的取景与身体不同。",
+  "next_method": "换**从贴图反查**：底色的 4096² 里那对深色虹膜斑是可定位的，找到它们的 UV 再映射回 3D ⇒ 眼位来自**同一张图**，不存在『比例口径』问题。这比继续调比例稳。"
+ },
+ "eye_attempt_3": {
+  "status": "未写盘（**被解剖期望闸拦下**）—— 这是闸**第一次真正拦住坏摆放**",
+  "method_tried": "几何反查：眼白 = 脸上『高亮度 + 低色度』区域，按 x 分左右两簇取簇心",
+  "reading": "左眼心 [0.0044, 0.3964, 0.0987] · 右眼心 [-0.0229, 0.3831, 0.101]",
+  "gate_verdict": "span_ok=False ⇒ 拒绝写盘",
+  "why": "两眼 x 一个 0.0044、一个 -0.0229 —— **都挤在中轴附近、不成对**。说明『高亮+低色度』捞到的是**额头上的镜面高光**（源图是光泽人偶，额头高光又亮又中性），不是眼白。阈值从 185/26 放宽到 170/38 才够数量，放宽后高光混了进来。",
+  "gate_added": "**解剖期望闸**（本轮新增 · 第三类错的闸）：眼位这类『有解剖期望值』的量，必须落在期望区间内（眼线 y ∈ [头顶-0.20H, 头顶-0.05H]、左右成对 18%~82%），超区间**直接拒绝写盘**，而不是打完日志往下走。—— 上一轮就是『读数明显不对却照样写出去了』，这一类错到这一轮才补上闸。",
+  "next_method": "高光与眼白的区别在于**高光在贴图上无结构、眼白有结构**（眼白是被虹膜和眼睑包围的封闭亮区）。下一轮改用**连通域**：在贴图空间找『亮区且被暗区环绕』的封闭斑，而不是靠单点阈值。"
+ },
+ "eye_attempt_4": {
+  "status": "未写盘（诊断阶段即判定此路不通）",
+  "method": "连通域：贴图空间找『暗斑且被亮区（眼白）环绕』的封闭斑，不靠单点阈值",
+  "reading": "暗斑连通域 146 个 · 圆形+尺寸筛过 64 个 · 最佳候选『外圈亮占比』仅 **0.44**（其余 ≤0.36）",
+  "verdict": "**没有一个是『被亮区环绕的暗斑』** ⇒ 判据不成立，不进摆放阶段",
+  "root_cause": "**源图眼妆很重**（浓眼线 + 烟熏眼影），眼睛周围整圈都是暗的，把『眼白包围虹膜』这个可供定位的信号**吃掉了**。",
+  "three_methods_failed": {
+   "比例法": "靠人形比例 ⇒ 头模取景口径与身体不同，眼线/脸宽都偏",
+   "几何反查": "靠『眼白=高亮低色度』 ⇒ 额头**镜面高光**同特征，捞到的是高光",
+   "连通域": "靠『暗斑被亮区环绕』 ⇒ **浓眼妆**把眼白吃了"
+  },
+  "conclusion": "三种方法**同一个根源**失败：**源图是「重妆光泽人偶」**。不是方法不够好，是这张图里没有干净的解剖信号可供定位。",
+  "viable_paths": [
+   "① 人工给定眼位（最省事、最可靠：从渲染图上量一次 UV/坐标，写进配置）",
+   "② 换**素颜/淡妆**的正面照片当输入（同时能解掉皮肤蜡感问题）",
+   "③ 先不做独立眼球：把眼白/虹膜画进**4K 贴图**（比现在 2K 那张精细得多），先拿到收益"
+  ],
+  "recommend": "③ → ①：先靠 4K 贴图把眼睛画细（零风险、当轮可见收益），眼位再走人工给定。"
+ },
+ "eye_verdict": {
+  "verdict": "🔴 **当前输入下不该做独立眼球**（5 次尝试全部失败 · 全部标记 REJECTED · 不晋升）",
+  "attempts": [
+   "① 比例法（身体口径套头模）→ 飘在额头",
+   "② 几何反查（眼白=高亮低色度）→ 捞到额头镜面高光",
+   "③ 连通域（暗斑被亮区环绕）→ 浓眼妆吃掉眼白，判据不成立",
+   "④ 人工给定 y=0.395 → 落到脸颊（过低）",
+   "⑤ 人工给定 y=0.415/x=0.027 → 偏外，落在颞部/发际",
+   "⑥ 人工给定 y=0.420/x=0.020 → 位置接近但仍呈**悬浮白球**"
+  ],
+  "core_conclusion": "**不是位置问题，是『没有眼睑几何』** —— 球体直接凸在脸上，眼白成了一枚白圆盘，读起来比贴图上画的眼睛**更难看**。独立眼球要成立，前提是**眼窝凹陷 + 上下眼睑 + 睫毛**这套几何；而源图是重妆人偶，既定位不了、也没有可供雕刻的眼睑细节。",
+  "decision": "**停止做独立眼球**。4K 贴图上画的眼在观看距离内已经可用，而悬浮球是**退步**。按仓里口径『毛坯=废品，不交』——不拿退步的东西上线。",
+  "what_was_gained": [
+   "脚本本身已改造好（可在缝合件头部定位 / 贴图按材质取 / 整体身高 / 自检不写死常数）",
+   "**人工给定接口** --manual-eye=x,y,z + 解剖期望闸（人工值超区间也拒绝写盘）",
+   "删掉了已判定无效的自动检测块，留说明与守卫（不给参数就拒绝瞎放）",
+   "确认了『三种自动定位方法同一根源失败』这一事实"
+  ],
+  "revisit_when": "有**素颜/淡妆的真实照片**输入时再做 —— 那时眼白与眼睑信号都在，定位与雕刻都有依据。"
+ },
+ "hair_rebind_pass": {
+  "status": "完成 · 自检 + 渲染双通过",
+  "tool": "tools/codex-scripts/hair-rebind.py（零依赖）",
+  "why": "缝合后新头的头发**不受弹簧骨驱动**（head-graft-np.py 把它直接赋权给 Head/Neck），摆动时头与身会脱节。Owner 要的是『**把所有部位都绑上**』，这一片不能漏。",
+  "readings": "新头头发候选 61647 / 255569 顶点 → 全部分到已有的 4 条链 · 关节总数 26 未变 · 输出 51.09 MB",
+  "method": "与 spring-hair.py 同判据：主导骨=Head 且低于头关节；按**绕头竖轴方位角**分到方位最近的链（不写死标签）；权重=沿链深度^1.5×0.9，余量留 Head",
+  "output": "raw/rig/avatar-final.glb",
+  "sha16": "ce6578805e82e88f",
+  "evidence": "render/终件-检查-正面.png（覆盖 82.7% · 近黑 0% · 无报错）",
+  "known_mismatch": "⚠️ **链的几何不匹配**：4 条链的链尖在 y≈0.22（那是**给身体那片头发**算的），而缝合后新头的头发只到 y≈0.33 ⇒ 权重对了、但**驱动它的骨长度对不上**，摆动幅度会偏大。下一步应**按新头发的实际范围重算链尖**。"
+ },
+ "hair_retip_attempt": {
+  "status": "🔴 未晋升（自检过，但**底层判据有缺陷**）· 已 REJECTED",
+  "artifact": "raw/rig/avatar-final2.REJECTED.glb",
+  "what_it_did": "按新头发范围重算 4 条链尖：+0.2202/+0.2417/+0.2358/+0.2241 → 全部 ≈ **+0.3815**；BIN 未动（纯 JSON 改动）",
+  "defect_found": "头发顶点只有 41457 个、y 范围 **+0.3813..+0.3998（仅 0.0185 厚）** —— 而新头真正的头发是 0.33..0.50 一大片。**判据漏掉了绝大部分头发。**",
+  "root_cause": "`head-graft-np.py` 给缝合头赋权时切面处是 **Head 0.35 / Neck 0.65**、向上渐变到 Head 1.0 ⇒ **中下部头发的主导骨是 Neck，不是 Head**。而 `hair-rebind.py` / `hair-retip.py` 都用『主导骨=Head』这条判据 ⇒ 只捞到颅底一带。",
+  "key_lesson": "**两轮用同一套有缺陷的判据，会『一致地错』** —— 交叉验证失效。链尖确实和『被驱动的顶点』对齐了，但**被驱动的顶点本身选错了**。这跟前面几轮的教训同族：自检全过 **不等于** 对。",
+  "fix_next": "判据改为『主导骨 ∈ {Head, Neck} 且**高于颈部切面**(y>0.33)』，并把链尖按**新头发的真实纵向范围(0.33..0.50)**重算；重绑与重算**同一次运行里完成**，避免再出现两次一致地错。"
+ },
+ "hair_final_pass": {
+  "status": "完成 · 自检 + 双视角渲染复核通过",
+  "tool": "tools/codex-scripts/hair-final.py（认头发→分链→定权重→算链尖 **一次运行完成**）",
+  "criterion_fix": "判据从『主导骨=Head』改为『主导骨 ∈ {Head, Neck} 且高于颈部切面(y>0.334)』",
+  "readings": {
+   "头发顶点": "41457 → **249032**（6×）",
+   "纵向跨度": "0.0185 → **0.1660**（9×）",
+   "链尖": "0.2202/0.2417/0.2358/0.2241 → **0.3354/0.3367/0.3382/0.3354**",
+   "挂链覆盖率": "**80.9%**（分母只算该被驱动的垂发）",
+   "改权顶点": 105810,
+   "输出": "51.09 MB"
+  },
+  "gate_fixed_twice": "覆盖率闸**连续两次判错**：① 把**头皮**算进分母（头皮载在颅骨上，不该跟弹簧摆）⇒ 误判 38.1%；② 把**根部带**算进分母（发根必须跟头走，否则头发会从头皮撕开）⇒ 误判 79.5%。两次都是**闸的分母不对，不是产物不对** —— 与上一轮『两轮一致地错』相对：这次是**闸自己错了两轮**。教训：闸的分母必须写清『哪些本来就该排除』。",
+  "output": "raw/rig/avatar-final.glb",
+  "sha16": "a9f146b0cfcdc50a",
+  "evidence": [
+   "render/终件2-检查-正面.png",
+   "render/终件2-检查-四分之三.png"
+  ]
+ },
+ "release_check": {
+  "tool": "tools/codex-scripts/release-check.py（**出厂闸**：六组硬检，任一项不过即退出 1，不许晋升）",
+  "verdict": "**RELEASE: PASS**",
+  "readings": {
+   "A 容器": "glTF 2 · JSON 8192 B · BIN 53562516 B · 两 chunk 均 4 字节对齐 · 文件 51.09 MB",
+   "B 引用": "accessor 18 · bufferView 24 · primitive 2 · 三角 516788 · 无越界",
+   "C 蒙皮": "2 个 primitive 全带 JOINTS_0+WEIGHTS_0 · **权重和 1.0000~1.0000**",
+   "D 关节": "**26 个** · 父链无自环无环",
+   "E 贴图": "6 张全部解码成功 · 身 2048²/2048²/1024² · **头 4096²×3**",
+   "F 几何": "顶点 283951 · 身高 1.0000 · bbox x±0.128 z±0.116 · accessor.min 与实际一致"
+  },
+  "artifact": "raw/rig/avatar-final.glb",
+  "sha16": "a9f146b0cfcdc50a"
+ },
+ "idle_anim_pass": {
+  "status": "完成 · 自检 + 出厂闸双通过",
+  "tool": "tools/codex-scripts/anim-idle.py（程序化 · 零依赖）",
+  "why": "数字人在语音对讲里『是不是活的』，一半靠**无意识微动**（呼吸起伏、重心漂移、头部轻摆）。静止的 A-pose 再逼真也像假人。这一段**不依赖眼位、不依赖贴图**，是独立可做的一项。",
+  "spec": "idle · **6 通道** · 41 帧（步长 0.1s）· 时长 **4.0s** · 驱动 Hips/Spine/Spine1/Neck/Head(×2 轴)",
+  "self_check": "四元数模长 = 1 · **首末帧逐位相等（循环闭合）** · 通道目标均为 skin 关节",
+  "release_check": "**RELEASE: PASS**（六组硬检全过 · 容器 9700 B JSON / 53566616 B BIN · 26 关节 · 权重和 1.0000 · 贴图 6 张 · 身高 1.0000）",
+  "output": "raw/rig/avatar-anim.glb · 51.09 MB",
+  "sha16": "5cb416c0943d69ee",
+  "note": "渲染静帧看不出动，所以本项的验证靠**两条机检**（循环闭合 + 出厂闸），已在读数里写明"
+ },
+ "talk_anim_pass": {
+  "status": "完成 · 自检 + 出厂闸双通过",
+  "tool": "tools/codex-scripts/anim-talk.py（程序化 · 零依赖）",
+  "division_of_labor": "idle 管**无意识微动**（呼吸/重心/头轻摆 · 躯干骨）；talk 管**说话手势**（双臂小幅抬起-收回/手腕轻转/头随语气点动 · 四肢骨）。两条由运行时**交叉淡入**混（禁硬切）⇒ 各自必须能无缝循环。",
+  "spec": "talk · **8 通道** · 61 帧 · 时长 **6.0s** · 驱动 双上臂/双前臂/双手/Neck/Head",
+  "self_check": "四元数模长=1 · **首末帧逐位相等** · 目标均为 skin 关节 · **左右镜像对称**（同轴反号）",
+  "bug_fixed": "自检的对称判据第一版写成闭包取变量 ⇒ 生成器里的 `nm` 取到外层列表推导**残留的最后一个值**，永远匹配不上、恒判『不对称』。改用**字典直接查**，不靠闭包变量。（这是我这个项目第 N 次栽在『闸自己写错』上 —— 已形成固定反射：闸报红先怀疑闸。）",
+  "release_check": "**RELEASE: PASS**",
+  "output": "raw/rig/avatar-talk.glb · 51.10 MB · **2 段动画（idle + talk）**",
+  "sha16": "da2628fb62e24ec3",
+  "note": "静帧看不出动；本项验证靠**循环闭合 + 左右对称 + 出厂闸**三条机检"
+ },
+ "final_delivery": {
+  "owner_decision": "Owner 回复「0」⇒ 无真人照片可用 ⇒ 不作『真人逼真』承诺，按**精致的 CG 角色**交付",
+  "artifact": "raw/rig/avatar-talk.glb",
+  "sha16": "da2628fb62e24ec3",
+  "size_mb": 51.1,
+  "joints": 26,
+  "animations": [
+   "idle",
+   "talk"
+  ],
+  "release_check": "PASS（六组硬检）",
+  "ceiling": "**真人级逼真不可达**，根因：源图为『重妆光泽人偶』（皮肤蜡 / 额头高光冒充眼白 / 浓眼妆吃掉眼睑 / 理想化比例 / 无干净解剖信号）。PBR 只能忠实渲染输入，不能凭空造出真人的皮相。",
+  "to_break_ceiling": "需 Owner 提供真实人物照片（素颜或淡妆 · 正面清晰 · 自然光 · 原图不美颜）",
+  "evidence": [
+   "render/最终交付-全身-正面.png",
+   "render/最终交付-正面.png（脸部近景）",
+   "render/最终交付-四分之三.png（脸部近景）"
+  ],
+  "deferred": [
+   "口型 morph（零成本但会再增重，而轻量化取向未表态）",
+   "减面（本地两路已判不可用；需服务端积分或 Blender，未获授权）",
+   "独立眼球（5 次全败，判定当前输入下不该做）"
+  ],
+  "evidence_limit": "静帧渲不出动画；idle/talk 的验证靠**循环闭合 + 左右镜像 + 出厂闸**三条机检（非人眼）"
+ },
+ "specular_fix": {
+  "status": "完成 · 自检 + 出厂闸双通过 · **资产级修复**",
+  "tool": "tools/codex-scripts/skin-specular.py（零依赖 · 支持 --prim= 指定 primitive）",
+  "trigger": "Owner 贴回本仓 AI 味禁令逐条对照，指出两条**资产级**真缺陷（我此前只在取景器材质里改了参数 —— 换个渲染器就露馅）",
+  "defects_fixed": {
+   "❌ 金属度非零": "**身体 MR 贴图金属度 0.127 → 0.0000**（真人皮肤必须为 0，否则发灰失血色）",
+   "❌ 全脸均匀油光": "**头的材质原本根本没有 MR 贴图** ⇒ 粗糙度是全场均匀 0.55（这正是『均匀油光』的来源）。本步**新建 MR**：唇 0.34 / T 区 0.44 / 一般皮肤 0.60（栅格化到 2048²，94.2% 纹素靠最近邻补洞 + σ=2 模糊）",
+   "身体粗糙度": "原贴图均值 **0.721**（偏哑）→ 夹进真人带后均值 **0.583**（0.380~0.600）"
+  },
+  "readings": "头：皮肤 33458 顶点 · 唇 547 · T 区 13591 · 新 MR 92 KB。身：T 区 1730 · 新 MR 144 KB。两件自检金属度均 **0.0000** · 全部贴图可读 · BIN 4 字节对齐",
+  "output": "raw/rig/avatar-specl2.glb · **51.33 MB** · 出厂闸 PASS",
+  "sha16": "64cdb0c6ce39e32b",
+  "evidence": "render/去油光-后-正面.png",
+  "honest_note": "本步改的是**资产数据**（贴图），不是取景器参数 —— 所以任何渲染器（three/VRM 运行时/Unity/UE）都会受益。视觉变化在取景器里**偏微妙**（取景器 specularIntensity 已压到 0.42），但资产层面是对的。",
+  "remaining_from_checklist": {
+   "❌ 无环境光": "取景器已有 IBL；**面板运行时是否用 IBL 未查**（需查 holo_pet 接线）",
+   "❌ 眼睛是贴图画的": "5 次全败，判定当前输入下不该做",
+   "❌ 明暗交界线生硬（缺 SSS）": "只在取景器用 diffuseRoughness 近似；**资产级 SSS three 不支持（无 MeshSSSNodeMaterial）**",
+   "皮肤无纹理": "已加 detail normal（身 2048²）· **头那片是否吃到未单独核实**"
+  }
+ },
+ "panel_runtime_fix": {
+  "status": "完成 · 真实面板实测通过（avatar=ready · 本地数字人在线）",
+  "file": "holo_pet/local-avatar-3d.js",
+  "defects_found": {
+   "❌ 无环境光的纯方向光打光（Owner 清单第 3 条）": "面板**只有半球光 2.4 + 方向光 3.4/2.2，没有任何环境贴图** —— 正是该条禁令",
+   "资产代次": "面板加载的还是**上一代** model-rigged-anim.glb（3.22 MiB · 22 骨），本代新件根本没进面板"
+  },
+  "fixes": [
+   "加 RoomEnvironment + PMREMGenerator（程序化影棚环境 · 无外部 HDRI 依赖）",
+   "光照配比 2.4/3.4/2.2 → **0.30/1.15/0.65**（加 IBL 后必须压，否则过曝）",
+   "面板资产换代：model-rigged-anim.glb → **avatar-hd.glb**（26 关节 · idle/talk · 头 3×4096²）"
+  ],
+  "verification": "serve-digital-human.mjs + shot-digital-human.py 实测：`avatar: ready` · `本地数字人在线` · canvas 844×702（503 全是 /api/* 后端未起，与 3D 无关）",
+  "evidence": "render/数字人面板-当前.png（面板里能看到新的数字人）"
+ },
+ "head_detail_fix": {
+  "trigger": "Owner 清单第 7 条『皮肤无纹理 —— 放大即塑料感』：**头的法线贴图还是 Tripo 原图**，我此前只给**身体**那套加了毛孔/细纹 detail（头是最显眼的部分，却漏了）",
+  "fix": "skin-detail.py 加 --mat= 参数 → 对**头材质**合成 detail normal",
+  "readings": "头法线 4096² · 皮肤区 **27.8%** 纹粒长毛孔 · 9000 毛孔点 + 各向异性细纹 · 图 738 KB → 3823 KB",
+  "output": "raw/rig/avatar-hd.glb · **54.35 MB** · 出厂闸 PASS",
+  "sha16": "399129f12eb56d56"
+ },
+ "release_gate_catch": {
+  "what": "**出厂闸抓到一次真缺陷**：skin-detail.py 的输出 `BIN 块长度 56976445 不是 4 的倍数` ⇒ GLB 畸形。",
+  "why_missed": "skin-detail.py **自己的自检没查 BIN 对齐**（我在 skin-tone.py 里加了这条，写 skin-detail 时漏了）",
+  "significance": "这正是出厂闸存在的意义 —— **单步自检会漏，出厂闸不会**。已补对齐并重跑，PASS。",
+  "lesson": "每加一个改缓冲区的脚本，必须同步补『BIN 4 字节对齐』这条；最好由出厂闸统一兜住（现已兜住）。"
+ },
+ "skintokens_loop": {
+  "status": "**加载端已通 · Blender 桥被 DLL 级冲突卡住**（不是配置问题）",
+  "打通的部分": {
+   "Blender": "4.2.16 LTS 已装（winget）· 已入用户 PATH · 无头 Python 可跑（BLENDER_PY_OK 4.2.16 LTS 3.11.7）",
+   "SkinTokens 注册": "已进 custom_nodes · **节点 962→966**：SkinTokensModelLoader / SkinTokensLoadMesh / SkinTokensGenerator / SkinTokensRigPreviewer · 加载 3.0s · 无 IMPORT FAILED",
+   "模型权重": "已从 HF **VAST-AI/SkinTokens** 下齐：grpo_1400.ckpt **1079.2 MB** + last.ckpt **464.7 MB** → models/skintoken/experiments/... · Qwen3-0.6B config 已下",
+   "Blender 侧依赖": "bottle / open3d / scipy / trimesh / dill / transformers 已装进 **Blender 自带 python 3.11.7**"
+  },
+  "我为通关做的四处修复（都留痕、都可复核）": [
+   "① numpy 冲突：SkinTokens 要 <2.0、ComfyUI 是 2.5.2 —— 用约束文件让 pip 拒绝安装，再逐个装并把 numpy 摘出清单 ⇒ **复核 numpy 仍 2.5.2，ComfyUI 未被弄坏**",
+   "② flash_attn（CUDA-only，PyPI 无 CPU 轮子）：照抄项目自己在 attention_processor.py:13-27 的回退写法做 CPU 垫片（scaled_dot_product_attention）",
+   "③ 无条件 CUDA 调用：michelangelo/utils/misc.py:123 模块顶层调 torch.cuda.get_device_name(0) ⇒ 加守卫回 'cpu'",
+   "④ 写死 flash_attention_2 两处（tokenrig.py:109 / spec.py:85）⇒ 改为 CUDA 可用才用，否则 sdpa"
+  ],
+  "卡住的确切位置": {
+   "命令": "blender --background --python bpy_server.py",
+   "报错": "OSError [WinError 1114] 动态链接库(DLL)初始化例程失败 · Error loading ...torch\\lib\\c10.dll",
+   "已排除的解释": [
+    "不是缺包：Blender python 里 torch **单独跑得通**（2.14.0+cpu）",
+    "不是 CUDA 版：已卸 CUDA 版换 **+cpu** 版，同样崩",
+    "不是搜索路径：已在 import torch 之前用 os.add_dll_directory 注入 torch/lib，同样崩"
+   ],
+   "判断": "**Blender 进程 × PyTorch 的 DLL 级冲突**（Blender 启动时已加载 TBB —— 日志里可见 'TBBmalloc: skip allocation functions replacement'，而 torch 也自带 TBB/MKL，静态初始化打架）。属 WinError 1114 的典型成因，**不是配置能解的**。"
+  },
+  "下一步可选（未做）": [
+   "A. 换更老的 torch 进 Blender python（如 2.2.x/2.3.x+cpu，与 Blender 4.2 同期，DLL 冲突可能不存在）——**最可能有效**",
+   "B. 干脆不用 headless 模式：SkinTokens 另有 EMBEDDED 模式（bpy 模块跑在 ComfyUI venv 里），但要给 venv 装 bpy",
+   "C. 接受现状：节点已就位、权重已就位，等有 NVIDIA 机器时直接可用"
+  ],
+  "纪律": "未擅自改框架文件；未擅自装除 Blender 外的系统级软件；所有补丁都在 SkinTokens/垫片内，ComfyUI 本体未被破坏"
+ }
+}

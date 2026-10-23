@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>GBT小土豆V8 · 数字人 · 形象</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 内联 data: icon：不依赖路径（DSH 宿主 / 本机 8765 / file:// 都成立），
+     顺带消掉浏览器自动请求 /favicon.ico 得到的那条 404 控制台红字。 -->
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB2gAH/8kQ0dQAAAABJRU5ErkJggg==">
+<style>
+  :root { --gold:#F5B041; --cyan:#00E5FF; --violet:#7C4DFF; --ink:#0f131b; }
+  html,body { margin:0; height:100%; background:linear-gradient(180deg,#232c3d,#0d1017 70%); color:#E8ECF8;
+              font:13px/1.6 system-ui,"Microsoft YaHei",sans-serif; overflow:hidden; }
+  #stage { position:absolute; inset:0; }
+  .hud { position:absolute; left:14px; top:12px; z-index:9; padding:10px 13px; border-radius:12px;
+         background:rgba(10,13,22,.72); border:1px solid rgba(124,77,255,.42); backdrop-filter:blur(4px); }
+  .hud b { color:var(--cyan); }
+  .hud .row { white-space:nowrap; }
+  .brand { position:absolute; right:14px; top:12px; z-index:9; text-align:right; font-size:12px; opacity:.92; }
+  .brand .logo { display:inline-block; width:26px; height:26px; border-radius:8px; vertical-align:-8px; margin-right:7px;
+                 background:radial-gradient(circle at 35% 35%, var(--gold), #b8791d); box-shadow:0 0 14px rgba(245,176,65,.45); }
+  .brand .n { font-weight:700; letter-spacing:.4px; }
+  .brand .n i { color:var(--cyan); font-style:normal; }
+  .dock { position:absolute; left:50%; bottom:16px; transform:translateX(-50%); z-index:9; display:flex; gap:8px;
+          padding:8px 10px; border-radius:14px; background:rgba(10,13,22,.72); border:1px solid rgba(0,229,255,.28); }
+  button { font:12px/1 system-ui,"Microsoft YaHei",sans-serif; color:#E8ECF8; background:rgba(124,77,255,.18);
+           border:1px solid rgba(124,77,255,.5); border-radius:9px; padding:8px 12px; cursor:pointer; }
+  button:hover { background:rgba(0,229,255,.2); border-color:var(--cyan); }
+  button.on { background:rgba(0,229,255,.26); border-color:var(--cyan); color:#fff; }
+  .sig { position:absolute; right:14px; bottom:12px; z-index:9; font-size:11px; opacity:.55; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/gbt-master/fs/holo_pet/node_modules/three/build/three.module.js",
+  "three/addons/": "/gbt-master/fs/holo_pet/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div style="position:absolute;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse 62% 58% at 50% 40%, rgba(0,0,0,0) 42%, rgba(0,0,0,.42) 100%)"></div>
+<div class="hud">
+  <div class="row">数字人 · <b id="clip">—</b> · 状态机 <b id="blend">—</b> · FPS <b id="fps">—</b></div>
+  <div class="row">顶点 <b id="verts">—</b> · 三角形 <b id="tris">—</b> · 关节 <b id="joints">—</b> · 动作 <b id="anims">—</b></div>
+  <div class="row">环境 <b>IBL(RoomEnvironment)</b> · 色调 <b>PBR Neutral</b> · 阴影 <b>PCFSoft+接触</b> · 皮肤 <b>暖轮廓光</b></div>
+</div>
+<div class="brand"><span class="logo"></span><span class="n">GBT<i>小土豆</i>V8</span><div style="font-size:11px;opacity:.7">数字人 · 形象</div></div>
+<div class="dock">
+  <button id="bIdle" class="on">站立 idle</button>
+  <button id="bWalk">走路 walk</button>
+  <button id="bAuto" class="on">自动演示</button>
+  <button id="bMotion">带位移</button>
+  <button id="bFront">正面</button>
+  <button id="bSide">侧 45°</button>
+  <button id="bBust">半身</button>
+  <button id="bFull">全身</button>
+</div>
+<div class="sig">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</div>
+
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const QS = new URLSearchParams(location.search);
+const MODE = QS.get("model") || "full";
+const GLB = QS.get("glb") || (MODE === "bust"
+  ? "/gbt-master/fs/holo_pet/assets/digital-human/raw/rig/model-rigged-anim.glb"   /* 2026-10-18 修：原指向 portrait-bust-low-rigged.glb，**该文件不存在**（悬空引用）；
+      改用正牌 model-rigged-anim.glb（65 骨 / 42 手指骨 / idle 8.00s / walk 1.10s） */
+  : "/gbt-master/fs/holo_pet/assets/digital-human/raw/rig/model-springs-hair.glb");
+const SS = Math.min(3, Math.max(1, parseFloat(new URLSearchParams(location.search).get("ss") || "2")));
+
+// ── 渲染器：超采样 + PBR Neutral + PCFSoft 软阴影 ──
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(SS);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping ?? THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.06;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.getElementById("stage").appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const bg = document.createElement("canvas"); bg.width = 4; bg.height = 256;
+const bx = bg.getContext("2d"), grd = bx.createLinearGradient(0, 0, 0, 256);
+grd.addColorStop(0, "#2b3446"); grd.addColorStop(.55, "#1b2130"); grd.addColorStop(1, "#0d1017");
+bx.fillStyle = grd; bx.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(bg);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+if ("environmentIntensity" in scene) scene.environmentIntensity = 1.15;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.01, 200);
+// 三点布光 + 皮肤暖色轮廓（SSS 近似：用暖色背光把边缘"透"出来）+ 眼神光
+const key = new THREE.DirectionalLight(0xfff6ee, 2.05); key.position.set(2.0, 3.4, 2.6);   // 主光稍柔 key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.near = .5; key.shadow.camera.far = 20;
+key.shadow.camera.left = -1.6; key.shadow.camera.right = 1.6; key.shadow.camera.top = 1.6; key.shadow.camera.bottom = -1.6;
+key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xffb98a, 0.75); rim.position.set(-3.0, 2.4, -2.6); scene.add(rim);  // 暖轮廓=假次表面（给大会把黑衣提成褐色）
+const rim2 = new THREE.DirectionalLight(0x9fd8ff, 0.85); rim2.position.set(1.2, 1.0, -3.2); scene.add(rim2); // 冷轮廓拉边
+const fill = new THREE.DirectionalLight(0xffe6c8, 0.5); fill.position.set(-2.4, 1.2, 2.6); scene.add(fill);
+const eye = new THREE.DirectionalLight(0xfff2e0, 0.30); eye.position.set(0.8, 1.5, 2.4); scene.add(eye);   // 眼神光
+const faceFill = new THREE.DirectionalLight(0xffe8d8, 0.55); faceFill.position.set(1.6, 1.1, 1.6); scene.add(faceFill);  // 面部补光（跟相机同侧）
+scene.add(new THREE.HemisphereLight(0xffe9d6, 0x2a2118, 0.30));
+const topSoft = new THREE.DirectionalLight(0xffffff, 0.55); topSoft.position.set(0.4, 3.2, 0.6); scene.add(topSoft);  // 顶部柔光（发丝高光）
+
+// 运行时肤色遮罩：白=皮肤（sheen 生效）· 黑=非皮肤（保持原样，黑衣不被洗）
+function skinMask(map) {
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const g = c.getContext("2d"); g.drawImage(map.image, 0, 0, 256, 256);
+  const d = g.getImageData(0, 0, 256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const r = d.data[i], gg = d.data[i + 1], b = d.data[i + 2];
+    const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+    const lum = (r + gg + b) / 3;
+    const isSkin = r > 95 && gg > 40 && b > 20 && (mx - mn) > 15 && Math.abs(r - gg) > 12 && r > gg && gg >= b && lum < 235;
+    const v = isSkin ? 255 : 0;
+    d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255;
+  }
+  g.putImageData(d, 0, 0);
+  const up = document.createElement("canvas"); up.width = up.height = 512;        // 放大回去（双线性=平滑）
+  up.getContext("2d").drawImage(c, 0, 0, 512, 512);
+  const tex = new THREE.CanvasTexture(up);
+  tex.colorSpace = THREE.NoColorSpace; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
+}
+
+
+// ── ③ 弹簧骨模拟（VRMC_springBone 口径：目标位→回正→阻尼→重力→投影回骨长→构造朝向）──
+const springs = [];
+function initSprings(root) {
+  const names = ["SkirtF", "SkirtB", "SkirtL", "SkirtR", "HairB", "HairL", "HairR"];
+  for (const nm of names) {
+    const b = root.getObjectByName("mixamorig" + nm) || root.getObjectByName("mixamorig:" + nm);
+    if (!b) continue;
+    const ex = (b.userData && b.userData.springBone) || {};
+    const restDir = new THREE.Vector3(...(ex.tail || [0, -1, 0])).sub(b.position).normalize();
+    springs.push({ bone: b, restQuat: b.quaternion.clone(), restDir,
+                   cur: restDir.clone(), vel: new THREE.Vector3(),
+                   stiffness: ex.stiffness ?? 0.45, drag: ex.dragForce ?? 0.35, gravity: ex.gravityPower ?? 0.25 });
+  }
+  if (springs.length) document.getElementById("anims").textContent += ` · 弹簧骨 ${springs.length}`;
+}
+function stepSprings(dt) {
+  const k = Math.min(dt, 0.05) * 60;
+  for (const s of springs) {
+    // 目标方向：父骨当前的变换把静止方向带过去（这里用世界四元数近似）
+    const parentQ = s.bone.parent ? s.bone.parent.getWorldQuaternion(new THREE.Quaternion())
+                                  : new THREE.Quaternion();
+    const target = s.restDir.clone().applyQuaternion(parentQ).normalize();
+    s.vel.addScaledVector(target.clone().sub(s.cur), s.stiffness * k * 0.15);
+    s.vel.multiplyScalar(Math.max(0, 1 - s.drag * k * 0.12));
+    s.vel.y -= s.gravity * k * 0.002;
+    s.cur.addScaledVector(s.vel, k);
+    s.cur.normalize();                                  // 投影：方向硬约束（长度不变）
+    s.bone.quaternion.copy(s.restQuat).multiply(
+      new THREE.Quaternion().setFromUnitVectors(s.restDir, s.cur));
+  }
+  window.__springMax = springs.reduce((m, s) => Math.max(m, s.restDir.angleTo(s.cur)), 0);
+}
+
+let mixer = null, actions = {}, current = null, model = null, hips = null, hipsRestX = 0, jointCount = 0;
+let withMotion = false, auto = true, clock = new THREE.Clock();
+const loader = new GLTFLoader();
+loader.load(GLB, (gltf) => {
+  model = gltf.scene;
+  let verts = 0, tris = 0;
+  model.traverse((o) => {
+    if (!o.isMesh) return;
+    o.frustumCulled = false; o.castShadow = true; o.receiveShadow = true;
+    if (o.isSkinnedMesh && o.skeleton) jointCount = Math.max(jointCount, o.skeleton.bones.length);
+    verts += o.geometry.attributes.position.count;
+    tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3;
+    // ── 材质策略（**两次实证**得出的最终口径）──
+    //  实测 1：重建材质 + sheen 1.0（无遮罩）→ 黑衣被洗成褐色 ✗
+    //  实测 2：重建材质 + sheen 0.6 + 肤色遮罩 → 皮肤/衣服满身雪花噪点 ✗
+    //  ⇒ 这件资产的贴图是 1024² JPEG，**任何重建/加强都会把压缩噪点放大**。
+    //  结论（可复现）：**不重建材质**，只在原材质上加环境反射强度这一项。
+    for (const m of (Array.isArray(o.material) ? o.material : [o.material])) {
+      if (!m) continue;
+      m.envMapIntensity = 1.0;
+      m.needsUpdate = true;
+    }
+  });
+  document.getElementById("verts").textContent = verts.toLocaleString();
+  document.getElementById("tris").textContent = Math.round(tris).toLocaleString();
+  document.getElementById("joints").textContent = String(jointCount);
+
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+  model.position.sub(center);
+  const radius = Math.max(size.x, size.y, size.z) * 0.5;
+  const dist = radius / Math.sin((camera.fov * Math.PI / 180) / 2) * 1.28;
+  camera.position.set(dist * 0.88, dist * 0.34, dist * 0.42);   // 3/4 人像机位（略高、略偏）
+  camera.lookAt(0, -size.y * 0.02, 0);
+  scene.add(model);
+  const findBone = (n) => model.getObjectByName(n) || model.getObjectByName(n.replace(":", ""));  // three 会洗掉冒号
+  hips = findBone("mixamorig:Hips"); hipsRestX = hips ? hips.position.x : 0;
+
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({ opacity: 0.42 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -size.y * 0.5 - 0.002; floor.receiveShadow = true; scene.add(floor);
+
+  mixer = new THREE.AnimationMixer(model);
+  for (const clip of gltf.animations || []) actions[clip.name] = mixer.clipAction(clip);
+  document.getElementById("anims").textContent = Object.keys(actions).join(",") || "无";
+  if (MODE === "bust") { document.getElementById("bWalk").style.display = "none"; document.getElementById("bMotion").style.display = "none"; document.getElementById("anims").textContent += " · 半身模式"; }
+  play("idle", 0);
+  initSprings(model);
+  // 调试口：探针用（动画有没有应用 / 材质有没有贴图）
+  window.__model = model; window.__sceneRef = scene;
+  window.__bones = () => { const out = []; model.traverse((o) => { if (o.isBone) out.push(o.name); }); return out.slice(0, 8); };
+  window.__dbg = () => {
+    const arm = model.getObjectByName("mixamorig:LeftArm");
+    let mat = null;
+    model.traverse((o) => { if (o.isMesh && !mat) mat = o.material; });
+    return {
+      mixerTime: mixer ? +mixer.time.toFixed(3) : null,
+      actions: Object.keys(actions),
+      idleRunning: actions.idle ? actions.idle.isRunning() : null,
+      idleWeight: actions.idle ? +actions.idle.getEffectiveWeight().toFixed(3) : null,
+      armQuat: arm ? arm.quaternion.toArray().map((x) => +x.toFixed(3)) : null,
+      matType: mat ? mat.type : null,
+      hasMap: !!(mat && mat.map),
+      mapSize: mat && mat.map && mat.map.image ? [mat.map.image.width, mat.map.image.height] : null,
+      color: mat && mat.color ? mat.color.getHexString() : null,
+      sheen: mat && mat.sheen !== undefined ? mat.sheen : null,
+    };
+  };
+  window.__ready = true;
+}, undefined, (e) => { console.error(e); window.__err = String(e); });
+
+function play(name, fade = 0.45) {
+  const next = actions[name];
+  if (!next || next === current) return;
+  next.reset().setEffectiveWeight(1).play();
+  if (current) current.crossFadeTo(next, fade, false);     // 交叉淡入，禁硬切
+  current = next;
+  document.getElementById("clip").textContent = name;
+  document.getElementById("blend").textContent = current ? `淡入 ${fade}s` : "—";
+  document.getElementById("bIdle").classList.toggle("on", name === "idle");
+  document.getElementById("bWalk").classList.toggle("on", name === "walk");
+  window.__clip = name;
+}
+
+// ── 状态机：自动演示 idle ↔ walk，来回切换（含交叉淡入）──
+let autoTimer = 0, inWalk = false;
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = clock.getDelta();
+  if (mixer) mixer.update(dt);
+  if (springs.length) stepSprings(dt);
+  if (hips && withMotion && window.__clip === "walk") model.position.x = -(hips.position.x - hipsRestX);
+  else if (hips && window.__clip !== "walk") model.position.x = 0;
+  if (springs.length) document.getElementById("blend").textContent = `弹簧偏角 ${(window.__springMax*57.3||0).toFixed(1)}°`;
+  if (auto && mixer) {
+    autoTimer += dt;
+    if (!inWalk && autoTimer > 6.0) { play("walk", 0.6); inWalk = true; autoTimer = 0; }
+    else if (inWalk && autoTimer > 4.5) { play("idle", 0.7); inWalk = false; autoTimer = 0; }
+  }
+  renderer.render(scene, camera);
+  if ((frameNo++ % 15) === 0) paintCheck();
+  fpsTick(dt);
+}
+let fAcc = 0, fN = 0, frameNo = 0;
+const _probe = document.createElement("canvas"); _probe.width = _probe.height = 24;
+function paintCheck() {
+  try {
+    const c2 = _probe.getContext("2d"); c2.drawImage(renderer.domElement, 0, 0, 24, 24);
+    const d = c2.getImageData(0, 0, 24, 24).data; let mn = 255, mx = 0;
+    for (let i = 0; i < d.length; i += 4) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; if (l < mn) mn = l; if (l > mx) mx = l; }
+    window.__spread = mx - mn; window.__painted = (mx - mn) > 12;
+  } catch (e) { window.__paintErr = String(e); }
+}
+function fpsTick(dt) {
+  fAcc += dt; fN++;
+  if (fAcc >= 0.5) { document.getElementById("fps").textContent = String(Math.round(fN / fAcc)); fAcc = 0; fN = 0; }
+}
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+document.getElementById("bIdle").onclick = () => { auto = false; document.getElementById("bAuto").classList.remove("on"); play("idle", 0.5); };
+document.getElementById("bWalk").onclick = () => { auto = false; document.getElementById("bAuto").classList.remove("on"); play("walk", 0.5); };
+document.getElementById("bAuto").onclick = (e) => { auto = !auto; e.target.classList.toggle("on", auto); };
+document.getElementById("bMotion").onclick = (e) => { withMotion = !withMotion; e.target.classList.toggle("on", withMotion); if (!withMotion && model) model.position.x = 0; };
+document.getElementById("bFront").onclick = () => { camera.position.set(1.85, 0.42, 0.62); camera.lookAt(0, 0.02, 0); };
+document.getElementById("bSide").onclick = () => { camera.position.set(1.15, 0.45, 1.45);
+document.getElementById("bBust").onclick = () => { location.search = "?model=bust"; };
+document.getElementById("bFull").onclick = () => { location.search = "?model=full"; }; camera.lookAt(0, 0.02, 0); };
+tick();
+</script>
+</body>
+</html>
