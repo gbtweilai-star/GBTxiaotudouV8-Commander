@@ -95,10 +95,10 @@
   ],
   "proof": {
    "cap": "codex_chat",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.0,
-   "at": "2026-10-23T22:48:11"
+   "sec": 7.6,
+   "at": "2026-10-23T22:49:10"
   }
  },
  {
@@ -509,10 +509,10 @@
   ],
   "proof": {
    "cap": "sec_llm",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.0,
-   "at": "2026-10-23T22:48:12"
+   "sec": 3.3,
+   "at": "2026-10-23T22:48:50"
   }
  },
  {
@@ -563,10 +563,10 @@
   ],
   "proof": {
    "cap": "llm_chat",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.0,
-   "at": "2026-10-23T22:48:12"
+   "sec": 6.0,
+   "at": "2026-10-23T22:49:03"
   }
  },
  {
