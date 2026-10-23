@@ -573,6 +573,46 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
+        if self.path.startswith("/v1/unit"):
+            # 本体：大模型和 APP 是一件事，不是两个进程两本账。
+            # 这里把「壳 / 桥 / 权重 / 显卡」四段合成一个状态，一次性说清：
+            # 谁在跑、占多少内存、用的是哪条车道、下一问要等多久。
+            import subprocess as _sp
+            def _ws(name, pat):
+                """按**进程名 + 命令行**取工作集。
+                2026-10-24 踩坑：只按命令行匹配时，探针自己的命令行里就含那个词，
+                于是每次都把自己算进去（报 84 MB 的「壳」其实探针自己）。"""
+                try:
+                    o = _sp.run(["powershell","-NoProfile","-c",
+                        "(Get-CimInstance Win32_Process -Filter \"Name='%s'\" | "
+                        "Where-Object { $_.CommandLine -like '*%s*' } | "
+                        "ForEach-Object { (Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue).WorkingSet64 })" % (name, pat)],
+                        capture_output=True, text=True, timeout=20)
+                    vals = [int(x) for x in (o.stdout or "").split() if x.isdigit()]
+                    return round(sum(vals)/1048576) if vals else 0
+                except Exception:                                # noqa: BLE001
+                    return 0
+            model_up = _health_ok(UPSTREAMS["selfhost"][0]) if UPSTREAMS.get("selfhost") else False
+            gpu_up = _health_ok(UPSTREAMS["selfhost_gpu"][0]) if UPSTREAMS.get("selfhost_gpu") else False
+            return self._json(200, {
+                "ok": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "unit": "GBT小土豆V8 · 指挥官模型 + APP（一体）",
+                "parts": {
+                    "shell":   {"role": "壳（Electron）", "mem_mb": _ws("electron.exe", "holo_pet_w3")},
+                    "bridge":  {"role": "桥（唯一出口）", "state": "up", "port": 8791, "mem_mb": _ws("python.exe", "server.py --port 8791")},
+                    "weights": {"role": "自有权重 Q5_0", "state": "warm" if model_up else "cold",
+                                "port": 8792, "mem_mb": _ws("python.exe", "local_llm_server"),
+                                "idle_exit_s": int(_OURS_IDLE)},
+                    "gpu":     {"role": "Vulkan 车道（实验）", "state": "up" if gpu_up else "off", "mem_mb": _ws("llama-server.exe", "llama-vulkan"),
+                                "port": int(urlsplit(UPSTREAMS.get("selfhost_gpu", ("http://127.0.0.1:8793",))[0]).port or 8793),
+                                "gate": "严判自检：不过不上生产"},
+                },
+                "lifecycle": {
+                    "policy": "按需激活：首问现拉权重 → 闲置 %ss 自退 → 下次再拉" % _OURS_IDLE,
+                    "quit": "壳退出时按端口收掉 8791/8792，不留后台进程",
+                },
+                "default_lane": DEFAULT,
+            })
         if self.path.startswith("/v1/body"):
             # 身体：装在哪台设备上，就把那台设备的感官/动作现读成身体。
             # 走**独立进程 + 3.12**：mss/cv2/sounddevice/pycaw 都装在那边，
