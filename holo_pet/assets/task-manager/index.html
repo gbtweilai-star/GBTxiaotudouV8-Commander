@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>任务管理器 · GBT小土豆V8</title>
+<style>
+ :root{{--bg:#0b0f14;--panel:#121a23;--line:#1f2b38;--ink:#dbe6f2;--dim:#7f93a8;--cyan:#33c9dc;--orange:#f0a03c}}
+ *{{box-sizing:border-box}} body{{margin:0;background:var(--bg);color:var(--ink);
+ font:14px/1.6 "Segoe UI","Microsoft YaHei",sans-serif}}
+ header{{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}}
+ h1{{font-size:17px;margin:0;font-weight:600;letter-spacing:.5px}}
+ .meta{{color:var(--dim);font-size:12px;margin-left:auto}}
+ table{{width:100%;border-collapse:collapse}}
+ th,td{{padding:9px 14px;border-bottom:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums}}
+ th{{color:var(--dim);font-weight:500;font-size:12px;letter-spacing:.6px}}
+ tr:hover td{{background:#151f29}}
+ .own{{color:var(--cyan)}} .own.unknown{{color:var(--dim)}}
+ .num{{text-align:right}} .port{{color:var(--orange)}}
+ .bar{{height:6px;background:#1b2734;border-radius:3px;overflow:hidden;min-width:70px}}
+ .bar i{{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--orange))}}
+ footer{{padding:14px 22px;color:var(--dim);font-size:12px;border-top:1px solid var(--line)}}
+</style><script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head><body>
+<header>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#33c9dc" stroke-width="1.7">
+    <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+  <h1>任务管理器</h1>
+  <span class="meta">快照 <b id="at">-</b> · 共 <b id="n">-</b> 条 · 按 CPU 降序</span>
+</header>
+<table><thead><tr>
+  <th>任务</th><th>归属</th><th class="num">内存占用</th><th class="num">CPU</th><th>端口</th><th class="num">进程 ID</th>
+</tr></thead><tbody id="tb"></tbody></table>
+<footer id="ft">口径：端口列是**它占着的端口**（不是流量 —— 本机取不到 per-process 流量，不编）。停任务要过 process_execute 门。</footer>
+<script>
+const INLINE = {"ok": true, "op": "list", "at": "2026-09-27T20:42:32", "count": 349, "rows": [{"pid": 11736, "name": "ZCode.exe", "mem_mb": 497.8, "cpu": 121.3, "ports": [], "owner": "浏览器", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\ZCode\\ZCode.exe --type=renderer --user-data-dir=C:\\Users\\ADMIN\\AppData\\Roaming\\ZCode --standard-schemes=zcode-me"}, {"pid": 20292, "name": "LobeHub.exe", "mem_mb": 650.1, "cpu": 110.3, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\LobeHub\\LobeHub.exe --type=renderer --user-data-dir=C:\\Users\\ADMIN\\AppData\\Roaming\\LobeHub --standard-schemes=ap"}, {"pid": 4, "name": "System", "mem_mb": 0.0, "cpu": 101.3, "ports": [139, 445], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 5232, "name": "python.exe", "mem_mb": 19.4, "cpu": 73.8, "ports": [], "owner": "框架服务", "cmd": "C:\\Python312\\python.exe -c \nimport importlib.util\nsp = importlib.util.spec_from_file_location('tm','gbt_allinone/tools/task_manager.py')\nm = importlib"}, {"pid": 1912, "name": "dwm.exe", "mem_mb": 27.4, "cpu": 49.7, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 20240, "name": "LobeHub.exe", "mem_mb": 28.1, "cpu": 49.3, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\LobeHub\\LobeHub.exe --type=gpu-process --user-data-dir=C:\\Users\\ADMIN\\AppData\\Roaming\\LobeHub --gpu-preferences="}, {"pid": 24036, "name": "WmiPrvSE.exe", "mem_mb": 17.7, "cpu": 23.2, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 5788, "name": "ZCode.exe", "mem_mb": 97.0, "cpu": 14.7, "ports": [], "owner": "浏览器", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\ZCode\\ZCode.exe --type=gpu-process --user-data-dir=C:\\Users\\ADMIN\\AppData\\Roaming\\ZCode --gpu-preferences=SAAAAA"}, {"pid": 5124, "name": "MsMpEng.exe", "mem_mb": 195.5, "cpu": 11.0, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 4440, "name": "freebuff.exe", "mem_mb": 51.2, "cpu": 6.2, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\.config\\manicode\\freebuff.exe"}, {"pid": 1652, "name": "svchost.exe", "mem_mb": 28.7, "cpu": 5.3, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 4648, "name": "explorer.exe", "mem_mb": 90.0, "cpu": 4.8, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\WINDOWS\\Explorer.EXE"}, {"pid": 12928, "name": "TextInputHost.exe", "mem_mb": 37.0, "cpu": 3.7, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\WINDOWS\\SystemApps\\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\\TextInputHost.exe -ServerName:InputApp.AppXk0k6mrh4r2q0ct33a9wgbez0x7v9cz5y.mca"}, {"pid": 13256, "name": "ctfmon.exe", "mem_mb": 36.0, "cpu": 3.7, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "/QuitInfo:000000000000035C;0000000000000360;"}, {"pid": 12716, "name": "python.exe", "mem_mb": 0.9, "cpu": 3.7, "ports": [15995], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Python310\\python.exe brain\\gbt_chat_server.py"}, {"pid": 4796, "name": "svchost.exe", "mem_mb": 13.3, "cpu": 3.4, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 18952, "name": "ZCode.exe", "mem_mb": 102.5, "cpu": 2.9, "ports": [], "owner": "浏览器", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\ZCode\\ZCode.exe"}, {"pid": 27748, "name": "ZCode.exe", "mem_mb": 543.2, "cpu": 2.2, "ports": [], "owner": "浏览器", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\ZCode\\ZCode.exe C:\\Users\\ADMIN\\AppData\\Local\\Programs\\ZCode\\resources\\glm\\zcode.cjs app-server --stdio --surface"}, {"pid": 9196, "name": "Telegram.exe", "mem_mb": 106.0, "cpu": 2.2, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\AppData\\Roaming\\Telegram Desktop\\Telegram.exe"}, {"pid": 7900, "name": "ChatGPT.exe", "mem_mb": 103.6, "cpu": 2.2, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.924.2738.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe"}, {"pid": 19832, "name": "ChatGPT.exe", "mem_mb": 68.4, "cpu": 2.2, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.924.2738.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe --type=renderer --standard-schemes=app,codex-sandbox --serv"}, {"pid": 14688, "name": "ChatGPT.exe", "mem_mb": 45.4, "cpu": 1.5, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Program Files\\WindowsApps\\OpenAI.Codex_26.924.2738.0_x64__2p2nqsd0c76g0\\app\\ChatGPT.exe --type=gpu-process --gpu-recent-crash-count=0 --no-pre-read"}, {"pid": 14328, "name": "WeChatAppEx.exe", "mem_mb": 11.2, "cpu": 1.5, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\AppData\\Roaming\\Tencent\\WeChat\\XPlugin\\Plugins\\RadiumWMPF\\14315\\extracted\\runtime\\WeChatAppEx.exe --log-level=2 --helper-handle-value=2"}, {"pid": 1360, "name": "csrss.exe", "mem_mb": 1.8, "cpu": 1.3, "ports": [], "owner": "未知（不在我们的标记里）", "cmd": ""}, {"pid": 13528, "name": "chrome.exe", "mem_mb": 111.2, "cpu": 0.7, "ports": [], "owner": "浏览器", "cmd": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"}, {"pid": 11368, "name": "chrome.exe", "mem_mb": 71.1, "cpu": 0.7, "ports": [9222], "owner": "浏览器", "cmd": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe --remote-debugging-port=9222 --remote-allow-origins=* --user-data-dir=C:\\Users\\ADMIN\\Desktop\\GBT"}, {"pid": 13848, "name": "chrome.exe", "mem_mb": 69.3, "cpu": 0.7, "ports": [], "owner": "浏览器", "cmd": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe --type=renderer --user-data-dir=C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\native_browse"}, {"pid": 2332, "name": "WorkBuddyAI.exe", "mem_mb": 45.4, "cpu": 0.7, "ports": [18488], "owner": "未知（不在我们的标记里）", "cmd": "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\WorkBuddyAI\\WorkBuddyAI.exe"}, {"pid": 13820, "name": "chrome.exe", "mem_mb": 30.4, "cpu": 0.7, "ports": [], "owner": "浏览器", "cmd": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe --type=gpu-process --gpu-recent-crash-count=0 --no-pre-read-main-dll --gpu-preferences=WAAAAAAAA"}, {"pid": 6656, "name": "chrome.exe", "mem_mb": 27.5, "cpu": 0.7, "ports": [], "owner": "浏览器", "cmd": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe --type=renderer --extension-process --no-pre-read-main-dll --video-capture-use-gpu-memory-buffer"}], "_口径": {"列": "任务 / 内存占用(MB) / CPU / 端口 / 进程ID", "网络列的真实含义": "**是端口不是流量** —— per-process 流量本机取不到，不编", "归属": "**先按进程名认**（浏览器/Node 一眼认得），再退到命令行标记；认不出写『未知』，不猜", "剔除的噪声行": "System Idle / MemCompression / Registry / Secure System —— 它们不是任务"}};
+function render(d){
+  try{
+    document.getElementById('at').textContent = d.at || '-';
+    document.getElementById('n').textContent = d.count || 0;
+    const mx = Math.max(1, ...d.rows.map(x=>x.mem_mb||0));
+    document.getElementById('tb').innerHTML = (d.rows||[]).map(x=>{
+      const w = Math.round(100*(x.mem_mb||0)/mx);
+      const cls = (x.owner||'').startsWith('未知') ? 'own unknown' : 'own';
+      return `<tr><td>${x.name}<div style="color:#7f93a8;font-size:11px">${(x.cmd||'').slice(0,70)}</div></td>
+        <td class="${cls}">${x.owner}</td>
+        <td class="num">${x.mem_mb} MB<div class="bar"><i style="width:${w}%"></i></div></td>
+        <td class="num">${x.cpu}</td>
+        <td class="port">${(x.ports||[]).join(', ')||'-'}</td>
+        <td class="num">${x.pid}</td></tr>`;
+    }).join('');
+  }catch(e){document.getElementById('ft').textContent='读不到快照：'+e.message+'（先跑 run_task(\'task_manager\',{\'op\':\'list\'})）';}
+}
+load(); setInterval(load, 5000);
+</script>
+<footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body></html>

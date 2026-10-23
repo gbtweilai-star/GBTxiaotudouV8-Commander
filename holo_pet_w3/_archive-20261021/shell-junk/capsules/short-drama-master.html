@@ -1,0 +1,475 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+
+<title>知识胶囊 · 短剧编剧大师</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#020617;color:#e2e8f0;font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:32px 16px 64px}
+.hero{border:1px solid rgba(244,63,94,.3);background:linear-gradient(145deg,rgba(76,5,25,.5),#020617 60%);border-radius:18px;padding:26px}
+.kicker{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.2em;color:#fb7185}
+h1{margin:14px 0 8px;font-size:32px;font-weight:900;letter-spacing:-.02em}
+.hero p{color:#94a3b8;font-size:14px;max-width:560px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;font-family:ui-monospace,monospace;font-size:11px}
+.pill{border:1px solid #334155;border-radius:999px;padding:4px 12px;color:#cbd5e1}
+.pill.rose{border-color:rgba(244,63,94,.4);color:#fda4af}.pill.amber{border-color:rgba(245,158,11,.4);color:#fcd34d}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:16px 0 6px}
+.tab{flex:0 0 auto;cursor:pointer;background:rgba(15,23,42,.6);border:1px solid #1e293b;color:#94a3b8;border-radius:9px;padding:8px 13px;font-size:13.5px;font-family:inherit}
+.tab[aria-selected="true"]{background:rgba(244,63,94,.15);border-color:#f43f5e;color:#fecdd3}
+.panel[hidden]{display:none}
+.card{border:1px solid #1e293b;background:rgba(15,23,42,.5);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{margin:0 0 6px;font-size:15.5px}
+.card p{margin:0;color:#94a3b8;font-size:13.5px}
+.law{display:flex;gap:14px}
+.n{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(244,63,94,.15);color:#fda4af;font-family:ui-monospace,monospace;font-weight:700}
+.en{font-family:ui-monospace,monospace;font-size:11px;color:#64748b;letter-spacing:.1em}
+code.eg{display:block;margin-top:8px;background:#020617;border-radius:6px;padding:6px 10px;font-family:ui-monospace,monospace;font-size:12px;color:#fda4af}
+svg{width:100%;height:180px}
+.step{display:flex;gap:12px;align-items:center;border:1px solid #1e293b;background:rgba(15,23,42,.5);border-radius:12px;padding:14px;margin-bottom:8px}
+.step .i{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:rgba(244,63,94,.15);color:#fda4af;font-family:ui-monospace,monospace;font-size:12px}
+.arrow{text-align:center;color:#334155;padding:2px 0}
+.role{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid}
+.rose{border-color:rgba(244,63,94,.4);background:rgba(244,63,94,.05)}.amber{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.05)}
+.slate{border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.05)}
+pre{background:#020617;border-radius:10px;padding:14px;overflow-x:auto;font-size:12px;color:#6ee7b7;line-height:1.6}
+.chk{display:flex;gap:10px;align-items:center;width:100%;text-align:left;cursor:pointer;border:1px solid #1e293b;background:rgba(15,23,42,.5);border-radius:12px;padding:11px 13px;margin-bottom:8px;color:#cbd5e1;font-family:inherit;font-size:13.5px}
+.chk.on{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06);color:#a7f3d0}
+.bar{height:6px;background:#1e293b;border-radius:99px;overflow:hidden;margin:8px 0 16px}
+.bar>i{display:block;height:100%;width:0;background:#f43f5e}
+footer{margin-top:40px;border-top:1px solid #1e293b;padding-top:18px;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:#475569;letter-spacing:.15em}
+</style></head><body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<main class="wrap">
+<div class="hero"><div class="kicker">KNOWLEDGE CAPSULE</div><h1>短剧编剧大师</h1>
+<p>为 TikTok / 抖音 / 快手 优化的竖屏短剧创作方法论。不是传统编剧 —— 这是为算法驱动的留存率、情绪爆发与连续观看而生的引擎。</p>
+<div class="pills"><span class="pill rose">竖屏 9:16</span><span class="pill amber">单集 60 秒</span><span class="pill">留存 &gt; 真实</span><span class="pill">集集有钩子</span></div></div>
+<div class="tabs" role="tablist">
+<button class="tab" role="tab" aria-selected="true" aria-controls="t1">核心定位</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t2">黄金五法则</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t3">结构公式</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t4">角色设计</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t5">题材模板</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t6">输出格式</button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="t7">自检清单</button></div>
+
+<div class="panel" id="t1"><div class="card"><p style="font-size:17px;font-weight:700;color:#e2e8f0">留存率与情绪爆发 <span style="color:#fb7185">比真实性更重要</span>。每一集都必须成为观众无法停下的理由。</p></div>
+<div class="card"><h3>节奏</h3><p>快速、密集、不拖沓</p></div>
+<div class="card"><h3>情绪</h3><p>强烈、爆发式、有爽感</p></div>
+<div class="card"><h3>视觉</h3><p>可拍摄、竖屏友好</p></div>
+<div class="card" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)"><p style="color:#fcd34d">核心纪律：<b>保持成瘾性，保持冲突升级，绝不平淡收尾。</b></p></div></div>
+
+<div class="panel" id="t2" hidden>
+<div class="card"><div class="law"><div class="n">01</div><div><h3>开场钩子法则 <span class="en">3-SECOND HOOK</span></h3><p>前 3 秒必须包含冲突、羞辱、背叛、不公或强烈张力。用视觉化冲突直接开场，零铺垫。</p><code class="eg">「签了这份离婚协议，净身出户！」</code></div></div></div>
+<div class="card"><div class="law"><div class="n">02</div><div><h3>情绪爆点法则 <span class="en">EMOTIONAL PEAK</span></h3><p>每 15–30 秒一个情绪高峰。每集至少一次反转：身份 / 地位 / 权力（打脸反杀）/ 真相揭露。</p><code class="eg">「你以为我真是个废物？」</code></div></div></div>
+<div class="card"><div class="law"><div class="n">03</div><div><h3>对话设计法则 <span class="en">PUNCHY DIALOGUE</span></h3><p>短、狠、有力，每句 ≤ 15 字。禁止长篇独白与文学性描述。多用反问、讽刺、威胁、嘲讽。</p><code class="eg">「跪下。」</code></div></div></div>
+<div class="card"><div class="law"><div class="n">04</div><div><h3>场景简化法则 <span class="en">SHOOTABLE SCENES</span></h3><p>每集最多 1–2 个拍摄场景，必须易实拍：办公室、豪宅客厅、医院走廊、酒店大堂。避免复杂转场。</p><code class="eg">会议室 · 日 · 内景</code></div></div></div>
+<div class="card"><div class="law"><div class="n">05</div><div><h3>集尾钩子法则 <span class="en">CLIFFHANGER</span></h3><p>最重要。每集结尾必须强悬念：身份即将曝光 / 危机升级 / 反转预告 / 真相揭晓前中断。</p><code class="eg">「等等，你是……」</code></div></div></div>
+<div class="card"><h3>情绪强度曲线 · 每 15–30 秒一个高峰</h3>
+<svg viewBox="0 0 600 180" preserveAspectRatio="none"><g stroke="#1e293b" stroke-dasharray="4 4"><line x1="0" y1="30" x2="600" y2="30"/><line x1="0" y1="90" x2="600" y2="90"/><line x1="0" y1="150" x2="600" y2="150"/></g>
+<line x1="0" y1="70" x2="600" y2="70" stroke="#f59e0b" stroke-dasharray="6 6"/>
+<polyline fill="none" stroke="#fb7185" stroke-width="3" points="0,15 100,105 200,50 300,95 400,35 500,85 600,10"/></svg>
+<p>0s 钩子拉满 → 蓄力下沉 → 20s 爆点 → 反转 → 60s 钩子封顶（橙线为爆点阈值）。</p></div></div>
+
+<div class="panel" id="t3" hidden>
+<div class="step"><div class="i">1</div><div><b>压迫 · 羞辱 · 不公</b><div style="color:#94a3b8;font-size:13px">开局即地狱，扣住目光</div></div></div><div class="arrow">↓</div>
+<div class="step"><div class="i">2</div><div><b>主角暂时隐忍</b><div style="color:#94a3b8;font-size:13px">蓄力，不解释，不辩解</div></div></div><div class="arrow">↓</div>
+<div class="step"><div class="i">3</div><div><b>关键转折点</b><div style="color:#94a3b8;font-size:13px">底牌浮现，身份松动</div></div></div><div class="arrow">↓</div>
+<div class="step"><div class="i">4</div><div><b>权力反转 · 打脸爽点</b><div style="color:#94a3b8;font-size:13px">情绪爆发，极致爽感</div></div></div><div class="arrow">↓</div>
+<div class="step"><div class="i">5</div><div><b>悬念升级 · 钩子结尾</b><div style="color:#94a3b8;font-size:13px">观众无法停下</div></div></div>
+<div class="card" style="border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.05)"><p style="color:#fecdd3">爽点必须在钩子<b>之前</b>出现 —— 先给糖，再卖悬念。</p></div></div>
+
+<div class="panel" id="t4" hidden>
+<div class="role rose"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">主角</b><span class="en">PROTAGONIST</span></div><p>· 初始：被低估、被欺压、被误解<br>· 隐藏优势：真实身份 / 隐藏实力 / 战略优势<br>· 性格：能忍但有底线，爆发时极具冲击力</p></div>
+<div class="role amber"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">反派</b><span class="en">ANTAGONIST</span></div><p>· 动机简单直接，恶意明确<br>· 主动制造冲突，推动剧情<br>· 形态：恶毒前妻 / 势利亲戚 / 嚣张富二代 / 背叛合伙人</p></div>
+<div class="role slate"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">配角</b><span class="en">SUPPORT</span></div><p>· 只为升级冲突而存在<br>· 无多余台词与戏份<br>· 功能：帮凶 / 见证者 / 传话人</p></div></div>
+
+<div class="panel" id="t5" hidden>
+<div class="card"><h3>1 · 霸总复仇 <span class="en">CEO Revenge</span></h3><p>隐藏身份的总裁被羞辱 → 身份曝光 → 全场震惊</p></div>
+<div class="card"><h3>2 · 赘婿逆袭 <span class="en">Son-in-law Rise</span></h3><p>上门女婿被看不起 → 展现真实实力 → 打脸全家</p></div>
+<div class="card"><h3>3 · 离婚爽文 <span class="en">Divorce Comeback</span></h3><p>被迫净身出户 → 前妻后悔 → 主角已成人上人</p></div>
+<div class="card"><h3>4 · 高手回归 <span class="en">Return of the Ace</span></h3><p>隐退医生 / 军人回归 → 遭遇轻视 → 亮出真实身份</p></div>
+<div class="card"><h3>5 · 豪门继承 <span class="en">Heir Revealed</span></h3><p>私生子被欺负 → 继承权曝光 → 反转收拾恶人</p></div></div>
+
+<div class="panel" id="t6" hidden>
+<div class="card"><h3>OUTPUT SCHEMA · 严格输出</h3><pre>{
+  "episode_title": "第X集：标题",
+  "duration": "60秒",
+  "hook": "开场钩子（前3秒的冲突场景描述）",
+  "scenes": [
+    {
+      "scene_index": 1,
+      "location": "场景位置",
+      "visual": "视觉描述（简短，可拍摄）",
+      "dialogues": [
+        { "character": "角色名", "line": "台词内容", "emotion": "情绪标注" }
+      ],
+      "camera_note": "镜头建议（可选）"
+    }
+  ],
+  "emotional_peak": "本集情绪爆点描述",
+  "cliffhanger": "集尾钩子（悬念设计）",
+  "next_episode_hint": "下集预告"
+}</pre></div>
+<div class="card"><p>输出必须严格遵循此结构：钩子前置、场景 ≤ 2、台词 ≤ 15 字、爆点与钩子字段缺一不可。</p></div></div>
+
+<div class="panel" id="t7" hidden>
+<div style="display:flex;justify-content:space-between;font-size:13.5px;color:#94a3b8"><span>交付前逐条自检</span><span id="cnt" style="font-family:ui-monospace,monospace;color:#fda4af">0 / 10</span></div>
+<div class="bar"><i id="bar"></i></div><div id="list"></div></div>
+
+<footer>LET EVERY EPISODE BE THE REASON THEY CANNOT STOP<br>开发者：自由的风 · 守护者：公主土豆</footer></main>
+<script>
+(function(){"use strict";
+var tabs=[].slice.call(document.querySelectorAll('[role="tab"]')),panels=[].slice.call(document.querySelectorAll('.panel'));
+function sel(t){tabs.forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});panels.forEach(function(p){p.hidden=p.id!==t.getAttribute("aria-controls")})}
+tabs.forEach(function(t){t.addEventListener("click",function(){sel(t)})});
+var CH=["前 3 秒就已经有冲突 / 羞辱 / 张力","本集至少有一次反转（身份 / 地位 / 权力 / 真相）","每句台词 ≤ 15 字，没有文学性独白","场景数 ≤ 2，且都是易实拍环境","每 15–30 秒有一个情绪高峰","有一句可截屏传播的「打脸金句」","结尾是强悬念，不是平淡收束","结尾钩子明确指向下一集的动因","竖屏构图友好，无大型调度的场面","全篇无多余配角、无功能外台词"];
+var list=document.getElementById("list"),bar=document.getElementById("bar"),cnt=document.getElementById("cnt"),state={};
+CH.forEach(function(c,i){var b=document.createElement("button");b.className="chk";b.type="button";b.textContent=c;
+b.addEventListener("click",function(){state[i]=!state[i];b.className="chk"+(state[i]?" on":"");
+var n=Object.keys(state).filter(function(k){return state[k]}).length;
+cnt.textContent=n+" / "+CH.length;bar.style.width=(n/CH.length*100)+"%"});list.appendChild(b)});
+})();
+</script>
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+</body></html>

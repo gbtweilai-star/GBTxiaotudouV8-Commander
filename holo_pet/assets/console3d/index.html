@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBT小土豆V8 · 大脑执行层 3D 控制台</title>
+<!--
+  Visual Style Contract（源自风哥参考图1：深空霓虹控制台风）
+  底色 #0b0316 / 卡片 #170a30 · 主辉光紫 #a855f7 · 副辉光青 #22d3ee · 点缀粉 #ec4899
+  v3 画质轮：DPR 高分屏渲染 · 发光精灵 · 加法混合 · 经纬晶格 · 暗角星云 · 悬停铭牌 · 点节点点火 · 拖拽惯性 · 脉冲速率表
+  数据源：caps_registry.BENIGN_CAPS（172 位原生能力，构建时注入 [{"k":"codex_status","d":"llm","s":true},{"k":"codex_tools","d":"llm","s":true},{"k":"codex_thread_new","d":"llm","s":true},{"k":"codex_turn_send","d":"llm","s":true},{"k":"codex_interrupt","d":"llm","s":true},{"k":"codex_chat","d":"llm","s":true},{"k":"codex_models","d":"llm","s":true},{"k":"desktop_commander","d":"tentacle","s":true},{"k":"health","d":"system","s":true},{"k":"echo","d":"data","s":true},{"k":"count_words","d":"data","s":true},{"k":"audit_query","d":"data","s":true},{"k":"quant_strategy","d":"finance","s":true},{"k":"quant_backtest","d":"finance","s":true},{"k":"platform_profile","d":"project","s":true},{"k":"quant_params","d":"finance","s":true},{"k":"osint_scan","d":"recon","s":true},{"k":"record_grid","d":"data","s":true},{"k":"wf_define","d":"engine","s":true},{"k":"wf_run","d":"engine","s":true},{"k":"wf_status","d":"engine","s":true},{"k":"wf_resume","d":"engine","s":true},{"k":"lr_submit","d":"longrun","s":true},{"k":"lr_tick","d":"longrun","s":true},{"k":"lr_status","d":"longrun","s":true},{"k":"selfscan","d":"system","s":true},{"k":"alerts","d":"system","s":true},{"k":"tentacle","d":"tentacle","s":true},{"k":"tentacle_manifest","d":"tentacle","s":true},{"k":"sec_surface","d":"security","s":true},{"k":"sec_scan","d":"security","s":true},{"k":"sec_chain","d":"security","s":true},{"k":"sec_defenses","d":"security","s":true},{"k":"sec_llm","d":"security","s":true},{"k":"truth_scan","d":"system","s":true},{"k":"autopilot","d":"llm","s":true},{"k":"llm_chat","d":"llm","s":true},{"k":"llm_status","d":"llm","s":true},{"k":"brain_route","d":"llm","s":true},{"k":"brain_execute","d":"llm","s":true},{"k":"brain_verify","d":"llm","s":true},{"k":"brain_health","d":"llm","s":true},{"k":"brain_unify","d":"llm","s":true},{"k":"root_fix","d":"system","s":true},{"k":"cross_scan","d":"system","s":true},{"k":"inventory","d":"system","s":true},{"k":"brain_vault","d":"mind","s":true},{"k":"think_loop","d":"llm","s":true},{"k":"one_key_deploy","d":"pipeline","s":true},{"k":"deploy_queue","d":"pipeline","s":true},{"k":"mirror_shape","d":"pipeline","s":true},{"k":"mirror_scan","d":"pipeline","s":true},{"k":"mirror_plan","d":"pipeline","s":true},{"k":"mirror_simulate","d":"pipeline","s":true},{"k":"mirror_parity","d":"pipeline","s":true},{"k":"mirror_rehearse","d":"pipeline","s":true},{"k":"mirror_release","d":"pipeline","s":true},{"k":"mirror_ascend","d":"pipeline","s":true},{"k":"mirror_status","d":"pipeline","s":true},{"k":"mirror_rewind","d":"pipeline","s":true},{"k":"auth_gate_status","d":"system","s":true},{"k":"transfer","d":"engine","s":true},{"k":"wf_cache_clear","d":"engine","s":true},{"k":"signature_guard","d":"system","s":true},{"k":"file_hygiene","d":"system","s":true},{"k":"devour_scan","d":"devour","s":true},{"k":"devour_github","d":"devour","s":true},{"k":"agency_tentacles","d":"tentacle","s":true},{"k":"media_pipeline","d":"video","s":true},{"k":"edit_pipeline","d":"video","s":false},{"k":"tentacle_pipeline","d":"tentacle","s":true},{"k":"long_run_supervisor","d":"tentacle","s":true},{"k":"devour_reflect","d":"devour","s":true},{"k":"devour_pulse","d":"devour","s":true},{"k":"mcp_connect","d":"tentacle","s":true},{"k":"mcp_tools","d":"tentacle","s":true},{"k":"mcp_call","d":"tentacle","s":true},{"k":"coze_mail","d":"comms","s":true},{"k":"create","d":"creation","s":true},{"k":"drama","d":"creation","s":true},{"k":"tentacle_status","d":"tentacle","s":true},{"k":"tactics_advise","d":"longrun","s":true},{"k":"pipeline_submit","d":"pipeline","s":true},{"k":"pipeline_versions","d":"pipeline","s":true},{"k":"pipeline_rollback","d":"pipeline","s":true},{"k":"pipeline_status","d":"pipeline","s":true},{"k":"ghost_guard","d":"pipeline","s":true},{"k":"sched_define","d":"engine","s":true},{"k":"sched_tick","d":"engine","s":true},{"k":"sched_status","d":"engine","s":true},{"k":"svc_inspect","d":"pipeline","s":true},{"k":"vision","d":"vision","s":true},{"k":"prompt_bridge","d":"llm","s":true},{"k":"audio_extract","d":"video","s":false},{"k":"audio_mix","d":"video","s":false},{"k":"media_license","d":"video","s":false},{"k":"datakit","d":"data","s":true},{"k":"media_run","d":"video","s":false},{"k":"media_publish","d":"video","s":false},{"k":"voice","d":"voice","s":true},{"k":"voice_orchestra","d":"voice","s":true},{"k":"browser","d":"automation","s":true},{"k":"bluetooth","d":"device","s":true},{"k":"bt_control","d":"device","s":true},{"k":"quant","d":"finance","s":true},{"k":"life","d":"life","s":true},{"k":"mind","d":"mind","s":true},{"k":"project_context","d":"project","s":true},{"k":"topic_watch","d":"recon","s":true},{"k":"trend_watch","d":"recon","s":true},{"k":"projection_card","d":"tools","s":true},{"k":"trace_store","d":"system","s":true},{"k":"wave_probe","d":"system","s":true},{"k":"dream_replay","d":"brain","s":true},{"k":"capability_net","d":"tools","s":true},{"k":"director_mood","d":"mind","s":true},{"k":"music_publishing","d":"creation","s":true},{"k":"music_intel","d":"recon","s":true},{"k":"video_intel","d":"recon","s":true},{"k":"film_intel","d":"recon","s":true},{"k":"account_registry","d":"data","s":true},{"k":"verification_watch","d":"recon","s":true},{"k":"shared_resources","d":"system","s":true},{"k":"brand_outro","d":"creation","s":true},{"k":"emotion_projection","d":"creation","s":true},{"k":"proactive_report","d":"mind","s":true},{"k":"observer_anchor","d":"mind","s":true},{"k":"persona_kernel","d":"mind","s":true},{"k":"hook_registry","d":"system","s":true},{"k":"scene_anchor","d":"creation","s":true},{"k":"code_art","d":"creation","s":true},{"k":"orchestration_kernel","d":"system","s":true},{"k":"render_evolution","d":"creation","s":true},{"k":"caps_called_audit","d":"system","s":true},{"k":"tentacle_cognition","d":"system","s":true},{"k":"coverage_auditor","d":"system","s":true},{"k":"model_key_pool","d":"llm","s":true},{"k":"meta_cognition","d":"mind","s":true},{"k":"libtv_skill","d":"video","s":true},{"k":"a1art_skill","d":"image_video","s":true},{"k":"energy_pool","d":"system","s":true},{"k":"local_brain","d":"mind","s":true},{"k":"auto_switch","d":"mind","s":true},{"k":"context_vault","d":"system","s":true},{"k":"feishu_embed","d":"integration","s":true},{"k":"libtv_workflow","d":"video","s":true},{"k":"gate_visibility","d":"framework","s":true},{"k":"h3_video_gen","d":"video","s":true},{"k":"absorb_loop","d":"brain","s":true},{"k":"cloud_pc","d":"infra","s":true},{"k":"auto_publish","d":"social","s":true},{"k":"awesome_tools_index","d":"tools","s":true},{"k":"stigmergy","d":"collab","s":true},{"k":"ledger_note","d":"system","s":true},{"k":"code_patch","d":"tools","s":false},{"k":"git_read","d":"tools","s":true},{"k":"git_write","d":"tools","s":false},{"k":"ul_tars_desktop","d":"desktop","s":false},{"k":"claude_code","d":"llm","s":false},{"k":"codebuddy","d":"llm","s":false},{"k":"redteam_recon","d":"security","s":false},{"k":"pentest","d":"security","s":false},{"k":"keylogger","d":"security","s":false},{"k":"screen_sniff","d":"security","s":false},{"k":"remote_domain","d":"security","s":false},{"k":"device_takeover","d":"security","s":false},{"k":"credential_steal","d":"security","s":false},{"k":"data_hijack","d":"security","s":false},{"k":"social_eng","d":"security","s":true},{"k":"paywallbuster","d":"security","s":true},{"k":"asset_vault_freeze","d":"security","s":true},{"k":"onboarding_gate","d":"security","s":true}]）
+-->
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; background:#0b0316; color:#e9e4f5; font-family:"Microsoft YaHei",sans-serif; overflow:hidden; }
+  .hud { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; padding:14px 22px; font:600 11px Consolas,monospace; letter-spacing:2px; z-index:9; }
+  .hud .dot { color:#22d3ee; } .hud .live { color:#a855f7; animation:blink 1.6s infinite; }
+  @keyframes blink { 50%{opacity:.25} }
+  .frame { position:fixed; inset:10px; border:1px solid #7c3aed33; pointer-events:none; z-index:8; }
+  .frame i { position:absolute; width:18px; height:18px; border:2px solid #a855f7; }
+  .frame i:nth-child(1){top:-2px;left:-2px;border-right:0;border-bottom:0}
+  .frame i:nth-child(2){top:-2px;right:-2px;border-left:0;border-bottom:0}
+  .frame i:nth-child(3){bottom:-2px;left:-2px;border-right:0;border-top:0}
+  .frame i:nth-child(4){bottom:-2px;right:-2px;border-left:0;border-top:0}
+  .scan { position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent 0 3px,#a855f706 3px 4px); pointer-events:none; z-index:7; }
+  header { text-align:center; padding:34px 0 6px; }
+  header .kicker { color:#22d3ee; font:600 11px Consolas,monospace; letter-spacing:4px; }
+  header h1 { font-size:30px; font-weight:800; margin-top:8px;
+    background:linear-gradient(90deg,#22d3ee,#a855f7 60%,#ec4899); -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 30px #a855f744; }
+  header p { color:#9b8fc0; font-size:12.5px; margin-top:6px; }
+  .stage { position:relative; height:calc(100% - 262px); min-height:380px; }
+  #space { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .layers { position:fixed; left:50%; transform:translateX(-50%); bottom:118px; display:flex; gap:14px; z-index:9; }
+  .lcard { width:200px; background:#170a30cc; border:1px solid #7c3aed55; border-radius:12px; padding:12px 14px; cursor:pointer;
+    box-shadow:0 0 24px #a855f71e, inset 0 0 18px #a855f70d; transition:.2s; }
+  .lcard:hover,.lcard.on { border-color:#22d3ee; box-shadow:0 0 30px #22d3ee33; transform:translateY(-3px); }
+  .lcard .no { float:right; color:#7c3aed88; font:800 20px Georgia; }
+  .lcard .ic { display:inline-flex; vertical-align:-2px; }
+  .lcard b { display:block; margin:5px 0 3px; color:#d9c9ff; font-size:13.5px; }
+  .lcard span { color:#22d3ee; font-size:11px; }
+  .lcard u { display:block; text-decoration:none; color:#8d80b5; font-size:10.5px; margin-top:3px; }
+  .pulse-panel { position:fixed; left:22px; bottom:26px; width:308px; background:#120726e6; border:1px solid #7c3aed55; border-radius:12px; z-index:9; overflow:hidden; }
+  .pulse-panel h3 { font:700 11px Consolas,monospace; letter-spacing:2px; color:#22d3ee; padding:9px 12px; border-bottom:1px solid #7c3aed33; display:flex; align-items:center; }
+  .pulse-panel h3 em { margin-left:auto; font-style:normal; color:#7c3aed; }
+  #meter { width:44px; height:3px; border-radius:99px; background:#7c3aed33; overflow:hidden; margin:0 8px; }
+  #meter span { display:block; height:100%; width:0; background:linear-gradient(90deg,#22d3ee,#ec4899); transition:width .3s; }
+  #feed { height:128px; overflow:hidden; padding:6px 12px; font:11px/1.9 Consolas,monospace; }
+  #feed div { color:#b9aadf; white-space:nowrap; animation:fin .3s; }
+  #feed b { color:#ec4899; font-weight:600; } #feed i { color:#22d3ee; font-style:normal; }
+  @keyframes fin { from{opacity:0; transform:translateY(-4px)} }
+  .stats { position:fixed; right:22px; bottom:26px; text-align:right; font:10.5px/2 Consolas,monospace; color:#8d80b5; z-index:9; }
+  .stats b { color:#e9e4f5; font-size:13px; } .stats .g { color:#34d399; }
+  .tip { position:fixed; top:118px; right:26px; color:#8d80b5; font-size:11px; z-index:9; }
+  .boombtn{position:fixed;top:72px;right:26px;z-index:9;background:#170a30cc;border:1px solid #ec489966;color:#ec4899;
+    font:700 12px Consolas,monospace;letter-spacing:1px;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.2s}
+  .boombtn:hover{box-shadow:0 0 18px #ec489955;border-color:#ec4899}
+  body.boom .boombtn{background:linear-gradient(90deg,#7c3aed,#ec4899);color:#fff;border-color:transparent;box-shadow:0 0 26px #ec489966}
+  body.boom .scan{background:repeating-linear-gradient(0deg,transparent 0 3px,#ec48990a 3px 4px)}
+  /* ✨ 扫掠线：自上而下每 9s 扫一遍（CSS 层，零画布开销） */
+  .sweep{position:fixed;left:0;right:0;top:-8%;height:96px;pointer-events:none;z-index:6;
+    background:linear-gradient(180deg,transparent,#22d3ee14 45%,#22d3ee30 50%,#22d3ee14 55%,transparent);
+    animation:sweep 9s linear infinite}
+  @keyframes sweep{0%{top:-10%}100%{top:108%}}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head>
+<body>
+<div class="frame"><i></i><i></i><i></i><i></i></div>
+<div class="scan"></div>
+<div class="sweep"></div>
+<div class="hud"><span><span class="dot">◈</span> SYS ACTIVE · GBT-V8 CORE</span><span><span class="live">◉ LIVE</span> &nbsp; UPDATE</span></div>
+<header>
+  <div class="kicker">—— 03 内核 · 大脑执行层 ——</div>
+  <h1>不是一个模型干所有事，而是分工协作</h1>
+  <p id="subline">原生能力位按源码注册表归位 · 30 域成簇 · 每一次 run_task 都是一道看得见的脉冲</p>
+</header>
+<div class="stage"><canvas id="space"></canvas></div>
+<div class="tip">拖动旋转 · 滚轮缩放 · 悬停看铭牌 · 点节点手动点火</div>
+<button class="boombtn" id="boom">⚡ 爆发模式 · OFF</button>
+<div class="layers">
+  <div class="lcard" data-layer="decision"><span class="no">1</span><span class="ic"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#22d3ee"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span><b>决策层</b><span>判断与调度</span><u id="n-decision">— 位</u></div>
+  <div class="lcard on" data-layer="all"><span class="no">2</span><span class="ic"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#a855f7"><path d="M3 17h18v2H3zm4-6h10v2H7zm-4-6h18v2H3z"/></svg></span><b>通用层</b><span>理解与执行</span><u id="n-all">— 位</u></div>
+  <div class="lcard" data-layer="local"><span class="no">3</span><span class="ic"><svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#ec4899"><path d="M4 5h16v4H4zm0 6h16v4H4zm0 6h16v4H4z" opacity=".9"/></svg></span><b>本地层</b><span>高频任务承压</span><u id="n-local">— 位</u></div>
+</div>
+<div class="pulse-panel">
+  <h3><span style="white-space:nowrap">◉ 万能插 · 脉冲流</span><i id="meter"><span></span></i><em id="mode" style="white-space:nowrap">演示态</em></h3>
+  <div id="feed"></div>
+</div>
+<div class="stats">
+  能力位 <b id="st-caps">0</b> · 域 <b id="st-dom">0</b><br>
+  脉冲累计 <b id="st-pulse">0</b> · 平均 <b id="st-ms">—</b><br>
+  授权门 <b class="g">DPAPI · auth_gate 在岗</b>
+</div>
+<script>
+const CAPS = [{"k":"a1art_skill","d":"image_video","s":true,"h":"a1art_skill","t":"a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAP"},{"k":"absorb_loop","d":"brain","s":true,"h":"absorb_loop","t":"吞天闭环（只读骨架）：蒸馏 DISTILL → 提炼 REFINE → 吸收 ABSORB + 回灌 FED_BACK；四条机械闸（stage_"},{"k":"account_registry","d":"data","s":true,"h":"account_registry","t":"AI 账号登记表只读校验：一人一号（不共用账号/不共用凭证/只记路径/不许无主账号）"},{"k":"agency_tentacles","d":"tentacle","s":true,"h":"agency_tentacles","t":"职业触手中枢：吸收 Agency Agents 职业资料；每根触手独立统一大模型会话与隔离镜像房间；支持并发汇总"},{"k":"alerts","d":"system","s":true,"h":"alerts","t":"框架声带：近期异常摘要+根源线索（按能力聚合）"},{"k":"asset_vault_freeze","d":"security","s":true,"h":"asset_vault_freeze","t":"资产单点损失**体检**（防御侧）：卷影副本/防篡改开关/BitLocker/关键资产清单，不加密不冻结"},{"k":"audio_extract","d":"video","s":false,"h":"audio_extract","t":"从视频里取出声音（本机 ffmpeg，**零出网**）：probe/tracks 读流与音轨（只读）；extract 真出音频件（mp3/aac"},{"k":"audio_mix","d":"video","s":false,"h":"audio_mix","t":"混音与母带（本机 ffmpeg，**零出网**）：`mix` 多轨合成（amix，逐路音量，显式 normalize=0）；`master` 响"},{"k":"audit_query","d":"data","s":true,"h":"audit_query","t":"只读查询统一数据后台日志"},{"k":"auth_gate_status","d":"system","s":true,"h":"auth_gate_status","t":"人工授权门状态：各作用域可用授权数（只读；授权只能人发放）"},{"k":"auto_publish","d":"social","s":true,"h":"auto_publish","t":"社交推广 / 发布作品 / 收益平台·**全自动执行**（只读骨架·门）：五原语 PLAN/COMPOSE/PUBLISH/TRACK/SETT"},{"k":"auto_switch","d":"mind","s":true,"h":"auto_switch","t":"自动化切换引擎（只读骨架·内调）：意图分析(L1解析+L2交叉验证+L3置信度)→任务分级→模型切换→原生执行→验证审计；接线点只有 Inten"},{"k":"autopilot","d":"llm","s":true,"h":"autopilot","t":"自主编排环：目标→LLM拆解→本地校验→执行→自检→修复循环（轮数上限防失控）"},{"k":"awesome_tools_index","d":"tools","s":true,"h":"awesome_tools_index","t":"Awesome Tools 蒸馏索引（只读骨架·地图）：四原语 INDEX/LOOKUP/MAP/VERIFY；三条带牙判据（**索引只读** "},{"k":"blender","d":"creation","s":false,"h":"blender","t":"三维电影引擎（Blender 4.2.16 LTS·本机）：Cycles 电影级光追/EEVEE 实时/几何节点/VSE 剪辑/bpy 全脚本自"},{"k":"bluetooth","d":"device","s":true,"h":"bluetooth","t":"蓝牙设备控制：扫描附近 BLE 设备、连接读写 GATT 特征（操控空调/灯/音箱等家居设备）、经典蓝牙状态报告"},{"k":"brain_execute","d":"llm","s":true,"h":"brain_execute","t":"大脑执行层·执行维：单能力直调或多能力并行（万能插线程池）"},{"k":"brain_health","d":"llm","s":true,"h":"brain_health","t":"大脑执行层·健康维：五维自检评分（路由/执行/触手/视觉/审计）"},{"k":"brain_route","d":"llm","s":true,"h":"brain_route","t":"大脑执行层·路由维：意图→能力动态路由（语义匹配+备选建议）"},{"k":"brain_unify","d":"llm","s":true,"h":"brain_unify","t":"大脑执行层·五维合一：一次跑完 route → execute → verify → health（**是顺序串链，数据顺着走**：route "},{"k":"brain_vault","d":"mind","s":true,"h":"brain_vault","t":"脑库接入：Obsidian 记忆库的读（recall=记忆总纲+收集箱）/ 写（remember=追加一条）/ 体检（status）—— 追加式"},{"k":"brain_verify","d":"llm","s":true,"h":"brain_verify","t":"大脑执行层·验证维：触手肉眼验证现实（视觉指纹+UIA穿透读回）"},{"k":"brand_outro","d":"creation","s":true,"h":"brand_outro","t":"品牌片尾只读渲染：署名/自述/致谢三层 + 四条红线（署名不造假·致谢不套话·承诺可追溯·观众不当流量）"},{"k":"browser","d":"automation","s":true,"h":"browser","t":"浏览器自动化入口（良性子集）。op=open/search/fetch/automate 走 browser_cap 三级后端；op=nativ"},{"k":"bt_control","d":"device","s":true,"h":"bt_control","t":"AI 智能蓝牙操控：自然语言意图→扫描识别设备→协议匹配→组装指令→写入执行→验证（协议库只收公开文档协议，未知如实报告）"},{"k":"capability_net","d":"tools","s":true,"h":"capability_net","t":"穿透网七栏只读读数：indexed/entry_known/reachable/verified×2/has_test/penetrate_re"},{"k":"caps_called_audit","d":"system","s":true,"h":"caps_called_audit","t":"能力位调用点审计（只读）：动态算 called_by，列出零调用点孤儿清单（同名模块自称不算接线）"},{"k":"claude_code","d":"llm","s":false,"h":"claude_code","t":"Claude Code CLI: official Anthropic coding agent"},{"k":"cloud_pc","d":"infra","s":true,"h":"cloud_pc","t":"云电脑独立窗口（只读骨架·门）：面板加一个**独立窗口**给她（数字人）**安装**云电脑（卡片 + 触手，**不是 iframe**）；五原语"},{"k":"code_art","d":"creation","s":true,"h":"code_art","t":"代码艺术内核（只读骨架）：INDEX/SEED/CANVAS/LAYER/EXPORT 五原语；无种子不许导出"},{"k":"code_patch","d":"tools","s":false,"h":"code_patch","t":"**改代码的唯一过门入口**（2026-09-23 接）：此前 agent 直接 edit/write 落盘 ⇒ **不过门、没审计、没信封、没"},{"k":"codebuddy","d":"llm","s":false,"h":"codebuddy","t":"CodeBuddy CLI: AI coding assistant"},{"k":"codex_chat","d":"llm","s":true,"h":"codex_chat","t":"官方 Codex 同步对话：跑完一个回合并返回文本（需 process_execute + external_llm 授权）"},{"k":"codex_interrupt","d":"llm","s":true,"h":"codex_interrupt","t":"官方 Codex 写操作：中断当前回合（需 process_execute 授权）"},{"k":"codex_models","d":"llm","s":true,"h":"codex_models","t":"官方 Codex 只读：可用模型清单（需 external_llm 授权）"},{"k":"codex_status","d":"llm","s":true,"h":"codex_status","t":"官方 Codex 只读状态：进程/会话/并发上限(1)/空闲回收(600s)"},{"k":"codex_thread_new","d":"llm","s":true,"h":"codex_thread_new","t":"官方 Codex 写操作：新建线程（需 process_execute 授权）"},{"k":"codex_tools","d":"llm","s":true,"h":"codex_tools","t":"官方 Codex 只读：可用动态工具清单（gbt_* **十个**）"},{"k":"codex_turn_send","d":"llm","s":true,"h":"codex_turn_send","t":"官方 Codex 写操作：发送回合并流式回传（需 process_execute 授权，并发上限 1）"},{"k":"context_vault","d":"system","s":true,"h":"context_vault","t":"上下文归档库（只读骨架·内调）：**索引+检索层，不是第四处存储**（只引用不复制正文）；内存多大上下文就多长（按**可用**内存算预算，不足则"},{"k":"count_words","d":"data","s":true,"h":"count_words","t":"统计文本词数"},{"k":"coverage_auditor","d":"system","s":true,"h":"coverage_auditor","t":"触手覆盖审计（只读骨架）：八短板↔八触手组 + 覆盖率读数 + 死角登记 + 五条红线"},{"k":"coze_mail","d":"comms","s":true,"h":"coze_mail","t":"通信域：对主人自有的单一地址（@coze.email）收发与整理；白名单默认空（全拒）、confirm_token 绑定内容、正文不入档、独立通"},{"k":"create","d":"creation","s":true,"h":"create","t":"创作出口：创作意图/产物登记 ＋ 仅限 outputs/ 的文本写入；文本出口待接线（如实报 pending、不发网络请求）、覆盖必带 conf"},{"k":"credential_steal","d":"security","s":false,"h":"credential_steal","t":"凭据**暴露面**审计（防御侧）：只报位置/体积/权限与风险，**绝不读取或导出文件内容**"},{"k":"cross_scan","d":"system","s":true,"h":"cross_scan","t":"扫描一下/扫一下/深度扫描/交叉扫描/穿透式扫描/全框架扫：深度穿透式交叉验证（注册↔路由↔导入↔断链↔运行时↔多扫描器互证，十维），扫描器互相"},{"k":"data_hijack","d":"security","s":false,"h":"data_hijack","t":"会话/数据**完整性**检测（防御侧）：本地会话 + 浏览器凭据库落点 + 文件树指纹漂移"},{"k":"datakit","d":"data","s":true,"h":"datakit","t":"本地数据工具（**只读**）：html→markdown · html→表格结构 · xlsx 字节→JSON · JSON 美化/排序 · 多"},{"k":"deploy_queue","d":"pipeline","s":true,"h":"deploy_queue","t":"AI 接管部署队列：submit 入队 / tick 部署下一个（完一个自动下一个）/ status 全景"},{"k":"desktop_commander","d":"tentacle","s":true,"h":"desktop_commander","t":"桌面指挥官（Desktop Commander MCP）：终端+文件系统全能力触手；支持本地 stdio 与 remote 设备模式"},{"k":"device_takeover","d":"security","s":false,"h":"device_takeover","t":"本机设备接管定位与校验：只在本机 PnP 清单里找目标，接管指令交回既有 device_control 底座（不并存第二条接管路径）"},{"k":"devour_github","d":"devour","s":true,"h":"devour_github","t":"吞天：吞噬 GitHub 仓库为知识胶囊（自我进化的核心——吸收外部能力）"},{"k":"devour_pulse","d":"devour","s":true,"h":"devour_pulse","t":"吞天：完整认知循环（吞噬→反思→消化→重组→进化）"},{"k":"devour_reflect","d":"devour","s":true,"h":"devour_reflect","t":"吞天：反思（回顾吞噬历史学习模式，发现弱能力与重组机会）"},{"k":"devour_scan","d":"devour","s":true,"h":"devour_scan","t":"吞天：能力缺口扫描（域覆盖对照+进化方向）"},{"k":"director_mood","d":"mind","s":true,"h":"director_mood","t":"导演 AI 情绪内核（只读）：七情六欲 + 半衰期；情绪只改『怎么看』，不改『看到什么』"},{"k":"drama","d":"creation","s":true,"h":"drama","t":"剧本转分镜/拆分镜/分镜/短剧/故事板/剧本理解：剧本 → 结构化镜头表（景别·运镜·时长·情绪·角色位置·描述），字段齐全度与时长和逐条如实报"},{"k":"dream_replay","d":"brain","s":true,"h":"dream_replay","t":"做梦技能只读重演：五原语闭环，不写盘、不执行（巩固默认不开）"},{"k":"echo","d":"data","s":true,"h":"echo","t":"回显传入数据，用于联调"},{"k":"edit_pipeline","d":"video","s":false,"h":"edit_pipeline","t":"剪辑引擎（蒸馏剪映时间线语义）：轨道→片段→目标/源时间区间→变速/音量/转场/文本，真渲染 1080x1920 成片（ffmpeg + lib"},{"k":"emotion_projection","d":"creation","s":true,"h":"emotion_projection","t":"情感投射只读骨架：叙事四问 → 投射细节 → 四项校验；『身临其境』只有人能判"},{"k":"energy_pool","d":"system","s":true,"h":"energy_pool","t":"能源池（只读骨架·内调）：模型=燃料不是身份；能源抽象 EnergySource + 原生衍生器 + 按需分配；五条红线（模型非身份/能源可换栈"},{"k":"feishu_embed","d":"integration","s":true,"h":"feishu_embed","t":"飞书镶嵌窗口（只读骨架·门）：面板卡⑥，**走浏览器触手不用 API**；四条红线（飞书是副本本地是源/凭据不许明文/不绕验证/每次操作留痕 s"},{"k":"file_hygiene","d":"system","s":true,"h":"file_hygiene","t":"文件卫生层：按 LAYOUT.md 家规自检乱放+自动归位（散落/空壳/越界数据/缓存）"},{"k":"film_intel","d":"recon","s":true,"h":"film_intel","t":"影视情报组（只读骨架）：六维覆盖；情报是输入不是指令（生成端仍有过目权）"},{"k":"gate_visibility","d":"framework","s":true,"h":"gate_visibility","t":"门可见性审计（只读骨架·门）：三态=已纳入/显式不纳入/未决定 —— 回答『门看得见什么、看不见什么』（坑册 §60）；可见范围只从 frame"},{"k":"genoffice","d":"creation","s":false,"h":"genoffice","t":"办公文档（GenOffice CLI 0.10+·local-first）：pptx/xlsx/docx/pdf/md/html/csv 创建·"},{"k":"ghost_guard","d":"pipeline","s":true,"h":"ghost_guard","t":"防复发检测：幽灵目录/备份散件/攻击残留/注册表冲突扫描"},{"k":"git_read","d":"tools","s":true,"h":"git_read","t":"**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff"},{"k":"git_write","d":"tools","s":false,"h":"git_write","t":"**版本库写面**（只两个 op，且**永远要点名路径**）：stage（`git add -- <paths>`）· commit（**pat"},{"k":"h3_video_gen","d":"video","s":true,"h":"h3_video_gen","t":"H3mini 视频生成（只读骨架·门）：四原语 T2VA/I2VA/FL2VA/Ref2VA + 三条带牙用例（密钥不走明文 / 结果必须落盘 "},{"k":"health","d":"system","s":true,"h":"health","t":"系统健康信息（平台/Python/时间）"},{"k":"hook_registry","d":"system","s":true,"h":"hook_registry","t":"钩子矩阵只读注册表：50 钩子/六类/三层 + 三条红线（L3 不许挂触手内·失败隔离·链可中断）"},{"k":"inventory","d":"system","s":true,"h":"inventory","t":"全息盘点：一次输出你的视图+框架的视图（归属四分类：框架/环境/数据/异物）——对齐两个世界"},{"k":"keylogger","d":"security","s":false,"h":"keylogger","t":"本机输入活动记录：只写本地 jsonl、有 pid 可停、可列可取走，模块内无任何出网路径"},{"k":"ledger_note","d":"system","s":true,"h":"ledger_note","t":"**台账登记**（R-H600 立）：三原语 RULES（读七道硬闸）/ PREVIEW（只读预演，不落盘）/ APPEND（**唯一写原语**"},{"k":"libtv_skill","d":"video","s":true,"h":"libtv_skill","t":"LibTV 技能（只读骨架·门）：Agent 创作平台入口（会话进展/增量轮询 + 切项目 + 批量下载）；密钥走 model_key_pool"},{"k":"libtv_workflow","d":"video","s":true,"h":"libtv_workflow","t":"LibTV 节点式工作流（只读骨架·门）：五动作 create_node/connect/set_params/run/batch_run + "},{"k":"life","d":"life","s":true,"h":"life","t":"生命档案：事件记录、时光轴、每日回顾、章节、承诺、习惯、反思与 Vault 导出（写框架 store，不出网）"},{"k":"llm_chat","d":"llm","s":true,"h":"llm_chat","t":"操控其他AI：推理对话（DeepSeek/Kimi/OpenAI 密钥链自动路由，输出是数据不是指令）"},{"k":"llm_status","d":"llm","s":true,"h":"llm_status","t":"LLM网关状态：密钥链配置情况（不调LLM）"},{"k":"local_brain","d":"mind","s":true,"h":"local_brain","t":"本地原生脑（只读骨架·内调）：本地模型=脑皮层（可换）·主机=纪律层（不可换）；五层链路（模型只做意图解析与结果解释）；五条红线（不许直接执行命"},{"k":"long_run_supervisor","d":"tentacle","s":true,"h":"long_run_supervisor","t":"长程无人值守任务监督：租约、心跳、检查点、有界重试、断点续作和主人升级"},{"k":"lr_status","d":"longrun","s":true,"h":"lr_status","t":"长程任务层：任务图进度与详情"},{"k":"lr_submit","d":"longrun","s":true,"h":"lr_submit","t":"长程任务层：提交任务（非LLM验收+重试+停滞升级，跨进程可续）"},{"k":"lr_tick","d":"longrun","s":true,"h":"lr_tick","t":"长程任务层：推进任务图（执行→验收→完成/重试/停滞）"},{"k":"mcp_call","d":"tentacle","s":true,"h":"mcp_call","t":"触手契约层：按契约调用已连接服务器的任意工具"},{"k":"mcp_connect","d":"tentacle","s":true,"h":"mcp_connect","t":"触手契约层：连接任意 MCP 工具服务器（学会契约协议=接入整个 MCP 生态）"},{"k":"mcp_tools","d":"tentacle","s":true,"h":"mcp_tools","t":"触手契约层：列出已连接服务器的工具契约清单（名称+参数 schema）"},{"k":"media_license","d":"video","s":false,"h":"media_license","t":"素材许可账（三方向流程台「家规第 2 条：没有许可的素材不许进成品格」的数据源）：`register` 逐件登记（**现算 sha256** +"},{"k":"media_pipeline","d":"video","s":true,"h":"media_pipeline","t":"AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布"},{"k":"media_publish","d":"video","s":false,"h":"media_publish","t":"三方向**发布到赚钱平台**的准备与授权门：`platforms <方向>` 读平台口径（**音乐复用能力位 `music_publishing"},{"k":"media_run","d":"video","s":false,"h":"media_run","t":"三方向自动化工作流**执行器**：一次调用把一条链从头走到尾，每步落真件 + 同批登记许可。链取自 `media_pipeline.KINDS`"},{"k":"meta_cognition","d":"mind","s":true,"h":"meta_cognition","t":"元认知循环（只读骨架）：自省→查内部→查外部→问主人→沉淀 + 五条红线（自省不是自责/不许硬猜/先查后问/问完沉淀/大脑也自省）"},{"k":"mind","d":"mind","s":true,"h":"mind","t":"心智引擎：开工前预演 pre_work、评估、内部状态、经验召回与反思（写框架 store，不出网）"},{"k":"mirror_ascend","d":"pipeline","s":true,"h":"mirror_ascend","t":"镜像空间：跨维晋升（验证全绿才放行；一次性全量写入现实+护照+时间线；现实零修改）"},{"k":"mirror_parity","d":"pipeline","s":true,"h":"mirror_parity","t":"镜像空间：沙盒与生产环境契约一致性（平台/Python/依赖/工具/密钥存在性/路径）"},{"k":"mirror_plan","d":"pipeline","s":true,"h":"mirror_plan","t":"镜像空间：生产前排练计划（假设/架构/步骤/服务与环境契约/验收/回滚）"},{"k":"mirror_rehearse","d":"pipeline","s":true,"h":"mirror_rehearse","t":"镜像空间：生产前排练（静态推演→环境一致性→沙盒闭环→指纹绑定报告）"},{"k":"mirror_release","d":"pipeline","s":true,"h":"mirror_release","t":"镜像空间：排练全绿后一次性全量晋升生产（树/计划指纹绑定，失败即阻断）"},{"k":"mirror_rewind","d":"pipeline","s":true,"h":"mirror_rewind","t":"镜像空间：时间线回滚（回到过去的时间线，同样一次性全量替换）"},{"k":"mirror_scan","d":"pipeline","s":true,"h":"mirror_scan","t":"镜像空间：维度体检（完整性/署名/纪律/入口——跨维晋升前置）"},{"k":"mirror_shape","d":"pipeline","s":true,"h":"mirror_shape","t":"镜像空间：维度成形（假设/架构虚拟/反复打磨全在镜像维度，现实无感知）"},{"k":"mirror_simulate","d":"pipeline","s":true,"h":"mirror_simulate","t":"镜像空间：静态推演（文件/依赖图/端口/入口/契约/闭环定义，不碰生产）"},{"k":"mirror_status","d":"pipeline","s":true,"h":"mirror_status","t":"镜像空间：维度状态（镜像/现实指纹、现实漂移检测、时间线史）"},{"k":"model_key_pool","d":"llm","s":true,"h":"model_key_pool","t":"模型密钥池（只读骨架）：按 owner_ai_id 分池、触手只借不拥有、DPAPI 只存路径、超限只上报"},{"k":"music_intel","d":"recon","s":true,"h":"music_intel","t":"音乐情报组（只读骨架）：合规红线/过审/流量/画像/竞品/**禁区清单** 六维覆盖"},{"k":"music_publishing","d":"creation","s":true,"h":"music_publishing","t":"AI 音乐发布平台三层只读归位（生成端/Agent 原生端/分发端）；全部标『未核实』"},{"k":"observer_anchor","d":"mind","s":true,"h":"observer_anchor","t":"观察者锚点律只读骨架：三公理 + 六短板补齐 + 五条红线（同一方不许既扫又报/审计器必须被审/递归封顶/终止点只能由人设/关键节点人在场）"},{"k":"onboarding_gate","d":"security","s":true,"h":"onboarding_gate","t":"未接线能力上手指引门：如实报「登记了但没实现」的缺口，并给出三处接线配方"},{"k":"one_key_deploy","d":"pipeline","s":true,"h":"one_key_deploy","t":"一指定江山乾坤换位：抓取(GitHub/本地)→镜像→验证→晋升一条命令，一次性上线零修改"},{"k":"orchestration_kernel","d":"system","s":true,"h":"orchestration_kernel","t":"编排内核（三源蒸馏）：状态/动作空间 + 角色/流程 + 可存储图/挂起恢复；只读能力真执行"},{"k":"osint_scan","d":"recon","s":true,"h":"osint_scan","t":"OSINT 扫描（DNS/WHOIS/子域名/端口/指纹/邮箱/IP归属/社交；拒绝内网目标）"},{"k":"paywallbuster","d":"security","s":true,"h":"paywallbuster","t":"内容门**检测**（防御侧）：离线判定页面是否被付费墙/同意门挡住，只判不绕（不伪装 UA、不伪造 cookie）"},{"k":"pentest","d":"security","s":false,"h":"pentest","t":"授权渗透验证：只对**已登记授权**的目标做非破坏性检查（TCP 可达/TLS 握手/安全响应头），未登记目标一律拒"},{"k":"persona_kernel","d":"mind","s":true,"h":"persona_kernel","t":"性格内核 v4.0：外温表达十律 + 内刚四基石（止损/主动/洞察/静待）+ 十条机械红线；四大基石原文一字不差；evolve 是唯一写口（驱动"},{"k":"pipeline_rollback","d":"pipeline","s":true,"h":"pipeline_rollback","t":"生产管线：回滚产物到历史版本（回滚也走审计留痕）"},{"k":"pipeline_status","d":"pipeline","s":true,"h":"pipeline_status","t":"生产管线：查发布记录（发布/阻断全留痕）"},{"k":"pipeline_submit","d":"pipeline","s":true,"h":"pipeline_submit","t":"生产管线：镜像多维度空间→门禁审计→生产写入（唯一交付通道）"},{"k":"pipeline_versions","d":"pipeline","s":true,"h":"pipeline_versions","t":"生产管线：产物版本历史与当前指纹（.versions/ 链）"},{"k":"platform_profile","d":"project","s":true,"h":"platform_profile","t":"读取量化项目结构（真实测绘；外部业务模块 quant_tech，未挂载则如实报缺口）"},{"k":"proactive_report","d":"mind","s":true,"h":"proactive_report","t":"主动汇报引擎只读判据层：四类汇报（新奇发现/主人需要/记忆命中/赚钱机会）+ 四维打分 + 不打扰门（静默时段/预算/去重/及格线）+ 短律成句"},{"k":"project_context","d":"project","s":true,"h":"project_context","t":"项目上下文：**文档面**（blueprint 蓝图 / brief 简报 / search 只读检索 / status）＋ **代码结构四面*"},{"k":"projection_card","d":"tools","s":true,"h":"projection_card","t":"空间投射只读卡片：5 原语全标未核实 + ARM ≠ LIVE 红线（只呈现不执行）"},{"k":"prompt_bridge","d":"llm","s":true,"h":"prompt_bridge","t":"提示词转化挂件（只读/纯本地）：大白话 -> 四段结构化提示词；compile / passthrough / status"},{"k":"quant","d":"finance","s":true,"h":"quant","t":"量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口）"},{"k":"quant_backtest","d":"finance","s":true,"h":"quant_backtest","t":"读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口）"},{"k":"quant_params","d":"finance","s":true,"h":"quant_params","t":"读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech）"},{"k":"quant_strategy","d":"finance","s":true,"h":"quant_strategy","t":"读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口）"},{"k":"record_grid","d":"data","s":true,"h":"record_grid","t":"行式记录网格：陌生文本结构画像/草案骨架/逐行解析/回写自证/词表校验（op=profile|draft|parse|emit|verify|v"},{"k":"redteam_recon","d":"security","s":false,"h":"redteam_recon","t":"本机侦察面（只读枚举）：监听端口/防火墙三档/本地账号/自启动项/自动服务/凭据落点"},{"k":"remote_domain","d":"security","s":false,"h":"remote_domain","t":"自有设备中继登记：**公网端点一律拒**，只服务本机/内网设备的中继"},{"k":"render_evolution","d":"creation","s":true,"h":"render_evolution","t":"渲染进化内核（只读骨架）：五原语 + 三闭环 + 六红线；帕累托前沿机器画、人点"},{"k":"root_fix","d":"system","s":true,"h":"root_fix","t":"根治环：症状五问诊断/补丁债量化/根治铁律——她自己必须懂的根源追踪纪律"},{"k":"scene_anchor","d":"creation","s":true,"h":"scene_anchor","t":"场景锚定只读骨架：8 大类场景 + 灵魂四要素 + 钩子锚场景不锚情绪（作品是为场景做的）"},{"k":"sched_define","d":"engine","s":true,"h":"sched_define","t":"定时触发器：定义调度（工作流 + 间隔），无人值守自动执行"},{"k":"sched_status","d":"engine","s":true,"h":"sched_status","t":"定时触发器：查调度状态（上次执行/结果）"},{"k":"sched_tick","d":"engine","s":true,"h":"sched_tick","t":"定时触发器：扫描到期调度并执行（可由循环/计划任务驱动）"},{"k":"scrapling","d":"recon","s":true,"h":"scrapling","t":"网页抓取（Scrapling 0.4）：自适应选择器+反爬对抗；只抓公网（每个 URL 过 net_guard 边界，内网一律拒）；缺库如实报缺"},{"k":"screen_sniff","d":"security","s":false,"h":"screen_sniff","t":"本机屏幕采集：只写本地 PNG、可列可删，不做出网/OCR/内容解析"},{"k":"sec_chain","d":"security","s":true,"h":"sec_chain","t":"黑客大脑：利用链构建（从漏洞清单推演攻击路径+影响评估）"},{"k":"sec_defenses","d":"security","s":true,"h":"sec_defenses","t":"黑客大脑：蓝队防御验证（检查防御措施是否真实生效）"},{"k":"sec_llm","d":"security","s":true,"h":"sec_llm","t":"黑客大脑推理引擎（独立大模型+独立密钥）：abliteration.ai 无限制模型，专用通道不与其他能力混用"},{"k":"sec_scan","d":"security","s":true,"h":"sec_scan","t":"黑客大脑：漏洞扫描（OWASP Top 10 + CWE 模式库，扫描自有代码）"},{"k":"sec_surface","d":"security","s":true,"h":"sec_surface","t":"黑客大脑：攻击面测绘（用户输入/网络/文件操作/入口点向量分析+风险评分）"},{"k":"selfscan","d":"system","s":true,"h":"selfscan","t":"体检一下/自检/查毛病/有没有问题/哪里有问题/框架健康：五维扫描（路由/模块/存储/审计/桩缺口），P0断连第一时间报警"},{"k":"shared_resources","d":"system","s":true,"h":"shared_resources","t":"共享资源池（只读骨架）：虚拟号/邮箱按需租借——资源可共享、身份不共享、每次调用留痕"},{"k":"signature_guard","d":"system","s":true,"h":"signature_guard","t":"署名守卫：扫描全框架页面开发者署名完整性，缺失即报可按需自动补回（禁止删除）"},{"k":"social_eng","d":"security","s":true,"h":"social_eng","t":"钓鱼**识别**（防御侧）：12 条规则加权打分 + 落点分类，只判不造、不自动点链接"},{"k":"stigmergy","d":"collab","s":true,"h":"stigmergy","t":"**协作层的间接通道**：Stigmergy（共识主动性 / 信息素场地）。四原语 DEPOSIT/READ/DECAY/FORAGE；只有 D"},{"k":"svc_inspect","d":"pipeline","s":true,"h":"svc_inspect","t":"服务巡检：探活已登记服务端口并落审计（只看不动）"},{"k":"tactics_advise","d":"longrun","s":true,"h":"tactics_advise","t":"察言观色层：识别沟通信号→给出表达分寸（只调怎么说，不改事实）"},{"k":"tentacle","d":"tentacle","s":true,"h":"tentacle","t":"触手/眼睛/双手/手：默认调本体原生能力，给意图自动命中，不给方法名也行；桌面动作见 see/read_text/click/type/list"},{"k":"tentacle_cognition","d":"system","s":true,"h":"tentacle_cognition","t":"触手认知包（只读骨架）：任务上下文/角色边界/自检三问/不确定上报/操作留痕 + 五条零容忍红线"},{"k":"tentacle_manifest","d":"tentacle","s":true,"h":"tentacle_manifest","t":"触手能力总纲：66 项能力 + 三通道感官 + 六铁律（注入大脑上下文）"},{"k":"tentacle_pipeline","d":"tentacle","s":true,"h":"tentacle_pipeline","t":"触手自动化流水线：四层七步、三公理、五红线；隔离执行、逐层汇报、dry-run 读数、终审只判不改、发布带回滚"},{"k":"tentacle_status","d":"tentacle","s":true,"h":"tentacle_status","t":"触手自诊断：硬件层就绪度 + 依赖分层 + 邻域覆盖"},{"k":"think_loop","d":"llm","s":true,"h":"think_loop","t":"推演环：理解需求→镜像维度推演→调用工具执行→自我纠错→反向延伸→反思进取→整理结果（完整心智循环）"},{"k":"topic_watch","d":"recon","s":true,"h":"topic_watch","t":"话题追踪：追踪/盯着/有变化/告诉/话题/持续关注/每天给我/早报/动态/最新/行业/新闻/股价/行情/视频。追踪你关心的话题，梳理最新动态，有"},{"k":"trace_store","d":"system","s":true,"h":"trace_store","t":"痕迹库只读读数：五张表（wave_samples/traces/trace_links/promotes/obsessions）条数"},{"k":"transfer","d":"engine","s":true,"h":"transfer","t":"数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子"},{"k":"trend_watch","d":"recon","s":true,"h":"trend_watch","t":"爆火作品观察/热门爆款/热搜/点赞高/涨粉快/用户喜欢什么/什么受欢迎/偏好：每日观测爆火作品的细微点，落成用户偏好台账（作品·平台·热度·细微"},{"k":"truth_scan","d":"system","s":true,"h":"truth_scan","t":"真实性审计层：逐能力验证真执行，零假执行铁律（probe 模式含副作用探针）"},{"k":"ul_tars_desktop","d":"desktop","s":false,"h":"ul_tars_desktop","t":"Ul-TARS Desktop desktop agent"},{"k":"verification_watch","d":"recon","s":true,"h":"verification_watch","t":"人机验证情报台账（只读）：不主动绕做成机械闸；三部门各一张空台账"},{"k":"video_intel","d":"recon","s":true,"h":"video_intel","t":"短视频情报组（只读骨架）：六维覆盖；禁区清单优先于流量趋势"},{"k":"vision","d":"vision","s":true,"h":"vision","t":"视觉/图像识别入口（良性子集，需外部依赖时留待接入）"},{"k":"voice","d":"voice","s":true,"h":"voice","t":"语音合成/识别入口（良性子集）"},{"k":"voice_orchestra","d":"voice","s":true,"h":"voice_orchestra","t":"语音技能中枢（多维度场景编排，只读）：技能原子检索 / 场景 Pipeline / 本机可跑性；今日挂 tools tab，升格条件见模块 do"},{"k":"wave_probe","d":"system","s":true,"h":"wave_probe","t":"痕迹触手只读量一次波动（默认只量不写；trigger_mode 与盲区一并回报）"},{"k":"wf_cache_clear","d":"engine","s":true,"h":"wf_cache_clear","t":"万能插：清空传输缓存（同输入复用的节点结果缓存）"},{"k":"wf_define","d":"engine","s":true,"h":"wf_define","t":"万能插执行引擎：定义工作流（DAG，校验环/依赖/能力合法性）"},{"k":"wf_resume","d":"engine","s":true,"h":"wf_resume","t":"万能插执行引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的）"},{"k":"wf_run","d":"engine","s":true,"h":"wf_run","t":"万能插执行引擎：分层并行执行工作流，节点结果如实落盘"},{"k":"wf_status","d":"engine","s":true,"h":"wf_status","t":"万能插执行引擎：查运行记录（可按工作流名过滤）"}];   // [{k:kind, d:domain, s:safe}]
+const LAYER = dom => (["llm","security","audit"].includes(dom) ? "decision"
+                     : ["system","data","local"].includes(dom) ? "local" : "all");
+const COL = { decision:"#22d3ee", all:"#a855f7", local:"#ec4899" };
+const cv = document.getElementById("space"), ctx = cv.getContext("2d");
+// ✨ Bloom 后期缓冲（半分辨率，模糊回叠用）
+const bloomCv = document.createElement("canvas");
+const bctx = bloomCv.getContext("2d");
+let W,H,D=340,rotX=-0.35,rotY=0.6,velY=0.0035,baseVel=0.0035,focus="all";
+// ── 高分屏：按 DPR 渲染，坐标仍用 CSS 像素 ──
+function rs(){
+  const d=Math.min(2,window.devicePixelRatio||1);
+  W=innerWidth; H=cv.parentElement.clientHeight;
+  cv.width=W*d; cv.height=H*d;
+  ctx.setTransform(d,0,0,d,0,0);
+  bloomCv.width=Math.max(2,W>>1); bloomCv.height=Math.max(2,H>>1);
+}
+addEventListener("resize",rs); rs();
+// ── 发光精灵（离屏预渲染，画节点/核又亮又快）──
+function sprite(color,r){
+  const c=document.createElement("canvas"); c.width=c.height=r*2;
+  const g=c.getContext("2d"), gr=g.createRadialGradient(r,r,0,r,r,r);
+  gr.addColorStop(0,"#ffffff"); gr.addColorStop(.22,color); gr.addColorStop(1,color+"00");
+  g.fillStyle=gr; g.fillRect(0,0,r*2,r*2); return c;
+}
+const SPR={ decision:sprite("#22d3ee",24), all:sprite("#a855f7",24),
+            local:sprite("#ec4899",24), core:sprite("#c084fc",44) };
+// ── 结构化布点（按源码注册表部署）：域=星簇 · 层=壳层（决策内环/通用中环/本地外环）──
+const N = CAPS.length, pts=[], domCenter={};
+const GA = Math.PI*(3-Math.sqrt(5));
+const LR = { decision:0.62, all:1.0, local:1.34 };   // 三层壳半径（内环近核=决策）
+const byDom = {};
+CAPS.forEach(c=>{ (byDom[c.d]=byDom[c.d]||[]).push(c); });
+const layerDoms = { decision:[], all:[], local:[] };
+Object.keys(byDom).sort().forEach(d=>layerDoms[LAYER(d)].push(d));
+let _seed = 20260926;
+const _rnd = ()=> (_seed = (_seed*16807)%2147483647) / 2147483647;
+for(const layer of ["decision","all","local"]){
+  const doms = layerDoms[layer];
+  doms.forEach((d, di)=>{
+    // 簇心方向：本层内斐波那契均匀 + 层间错相；壳半径按层
+    const y = 1-((di+0.5)/doms.length)*2, rr = Math.sqrt(Math.max(0,1-y*y));
+    const th = GA*di + (layer==="all"?2.1:layer==="local"?4.2:0);
+    const C = { x:Math.cos(th)*rr*LR[layer], y:y*LR[layer], z:Math.sin(th)*rr*LR[layer] };
+    domCenter[d] = C;
+    for(const cp of byDom[d]){
+      let h=0; for(const ch of cp.k) h=(h*31+ch.charCodeAt(0))>>>0;
+      const j=()=>(_rnd()+_rnd()+_rnd()-1.5)*.34;       // 簇内散布（域保持成簇可见）
+      let vx=C.x+j(), vy=C.y+j(), vz=C.z+j();
+      const L=Math.hypot(vx,vy,vz)||1;
+      pts.push({k:cp.k, dom:d, safe:cp.s, h:cp.h||"", t:cp.t||"", layer,
+                x:vx/L*LR[layer], y:vy/L*LR[layer], z:vz/L*LR[layer], glow:0,
+                r:1.25+(h%10)/9, tw:Math.random()*6.28});
+    }
+  });
+}
+document.getElementById("st-caps").textContent=N;
+document.getElementById("subline").textContent = N + " 个原生能力位按源码注册表归位 · 30 域成簇 · 每一次 run_task 都是一道看得见的脉冲";
+document.getElementById("st-dom").textContent=new Set(CAPS.map(c=>c.d)).size;
+const cnt=l=>CAPS.filter(c=>LAYER(c.d)===l).length;
+document.getElementById("n-decision").textContent=cnt("decision")+" 位";
+document.getElementById("n-local").textContent=cnt("local")+" 位";
+document.getElementById("n-all").textContent=cnt("all")+" 位";
+// ── 交互：拖拽（带惯性）· 缩放 · 悬停 · 点击点火 ──
+let drag=null,dragV=0,mouse={x:-1,y:-1},hoverP=null,moved=0;
+cv.onmousedown=e=>{ drag={x:e.clientX,y:e.clientY}; moved=0; };
+addEventListener("mousemove",e=>{
+  mouse={x:e.clientX,y:e.clientY};
+  if(!drag)return;
+  const dx=e.clientX-drag.x; moved+=Math.abs(dx)+Math.abs(e.clientY-drag.y);
+  rotY+=dx*.006; dragV=dx*.0011;
+  rotX+=(e.clientY-drag.y)*.006; rotX=Math.max(-1.4,Math.min(1.4,rotX));
+  drag={x:e.clientX,y:e.clientY};
+});
+addEventListener("mouseup",()=>{
+  if(drag && moved<4 && hoverP) fire(hoverP.k,hoverP);   // 点节点=手动点火
+  if(drag) velY=Math.max(-.045,Math.min(.045,dragV));    // 惯性
+  drag=null;
+});
+cv.onwheel=e=>{ D=Math.max(200,Math.min(560,D+e.deltaY*.4)); e.preventDefault(); };
+document.querySelectorAll(".lcard").forEach(el=>el.onclick=()=>{
+  document.querySelectorAll(".lcard").forEach(x=>x.classList.remove("on"));
+  el.classList.add("on"); focus=el.dataset.layer;
+});
+// ── 万能插脉冲：真数据探针 → 打不通如实进演示态 ──
+let REAL=false, pulses=[], shocks=[], parts=[], stars=[],
+    shake=0, combo=0, comboT=0, coreFlash=0, BOOM=false, fireTimes=[],
+    total=0, msSum=0;
+for(let i=0;i<110;i++) stars.push({x:Math.random(),y:Math.random(),z:.25+Math.random()*.75,tw:Math.random()*6.28});
+function burst(q,col,n,pow){
+  for(let i=0;i<n;i++){ const a=Math.random()*6.283, v=(1.5+Math.random()*3.5)*pow;
+    parts.push({x:q.sx,y:q.sy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,col}); }
+  shocks.push({x:q.sx,y:q.sy,r:4,l:1,col});
+}
+const feed=document.getElementById("feed");
+function feedLine(kind,ms,real){
+  const d=document.createElement("div");
+  d.innerHTML=`<i>${new Date().toLocaleTimeString('zh-CN',{hour12:false})}</i> run_task(<b>${kind}</b>) ${ms}ms ${real?'':'<span style="color:#7c3aed">·demo</span>'}`;
+  feed.prepend(d); while(feed.children.length>7) feed.lastChild.remove();
+}
+function fire(kind,pOpt){
+  const cand=(pOpt?[pOpt]:pts.filter(p=>focus==="all"||p.layer===focus));
+  const p=pOpt||cand[Math.floor(Math.random()*cand.length)]||pts[0];
+  p.glow=1; pulses.push({p, t:0, kind});
+  coreFlash=1; if(BOOM) shake=Math.max(shake,1.6);
+  const now=performance.now(); fireTimes.push(now);
+  fireTimes=fireTimes.filter(t=>now-t<5000);
+  document.getElementById("meter").firstElementChild.style.width=
+    Math.min(40,fireTimes.length*7)+"px";
+  const ms=(8+Math.random()*90)|0; total++; msSum+=ms;
+  document.getElementById("st-pulse").textContent=total;
+  document.getElementById("st-ms").textContent=(msSum/total).toFixed(0)+"ms";
+  feedLine(kind,ms,REAL);
+}
+async function tryReal(){
+  for(const url of ["../../panel_api/events","/gbt-master/api/events","http://127.0.0.1:3080/gbt-master/api/events"]){
+    try{ const r=await fetch(url,{signal:AbortSignal.timeout(1500)}); if(r.ok){ REAL=true; break; } }catch(e){}
+  }
+  const m=document.getElementById("mode");
+  m.textContent=REAL?"实况态":"演示态"; m.style.color=REAL?"#34d399":"#7c3aed";
+}
+tryReal();
+const DEMO_KINDS=CAPS.map(c=>c.k);
+(function demoLoop(){
+  fire(DEMO_KINDS[Math.floor(Math.random()*DEMO_KINDS.length)]);
+  if(BOOM && Math.random()<.45){
+    setTimeout(()=>fire(DEMO_KINDS[Math.floor(Math.random()*DEMO_KINDS.length)]),120);
+    setTimeout(()=>fire(DEMO_KINDS[Math.floor(Math.random()*DEMO_KINDS.length)]),260);
+  }
+  setTimeout(demoLoop, BOOM?(160+Math.random()*420):(500+Math.random()*1100));
+})();
+document.getElementById("boom").onclick=function(){
+  BOOM=!BOOM; this.textContent=BOOM?"⚡ 爆发模式 · MAX":"⚡ 爆发模式 · OFF";
+  document.body.classList.toggle("boom",BOOM);
+  if(BOOM){ shake=6; coreFlash=1;
+    burst({sx:W/2,sy:H/2},"#a855f7",26,2.2);
+    shocks.push({x:W/2,y:H/2,r:8,l:1,col:"#a855f7"}); }
+};
+// ── 投影 ──
+const R=150;
+function proj(p){
+  const cy=Math.cos(rotY),sy=Math.sin(rotY),cx=Math.cos(rotX),sx=Math.sin(rotX);
+  const x=p.x*cy+p.z*sy, z=-p.x*sy+p.z*cy, y=p.y;
+  const y2=y*cx-z*sx, z2=y*sx+z*cx;
+  const s=D/(D+z2*R);
+  return {sx:W/2+x*R*s, sy:H/2+y2*R*s, s, z:z2};
+}
+let run=true; document.addEventListener("visibilitychange",()=>run=!document.hidden);
+let T=0;
+(function draw(){
+  requestAnimationFrame(draw);
+  if(!run) return;
+  T+=.016;
+  ctx.clearRect(0,0,W,H);
+  // ✨ 全息地网：透视网格沉在球下方（科技台面）
+  const hy=H*.80;
+  ctx.strokeStyle="#22d3ee07"; ctx.lineWidth=1;
+  for(let i=-12;i<=12;i++){
+    ctx.beginPath(); ctx.moveTo(W/2+i*46,H+8); ctx.lineTo(W/2+i*9,hy); ctx.stroke();
+  }
+  for(let r=1;r<=7;r++){
+    const yy=H-(H-hy)*Math.pow(r/7,1.7);
+    ctx.globalAlpha=.16*(1-r/8);
+    ctx.beginPath(); ctx.moveTo(0,yy); ctx.lineTo(W,yy); ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+  // 光池：球体在地面的投影辉光
+  const pool=ctx.createRadialGradient(W/2,H*.8,0,W/2,H*.8,R*.9);
+  pool.addColorStop(0,"#a855f71c"); pool.addColorStop(1,"#a855f700");
+  ctx.fillStyle=pool;
+  ctx.beginPath(); ctx.ellipse(W/2,H*.8,R*.95,R*.22,0,0,7); ctx.fill();
+  // 星野
+  for(const s of stars){
+    s.tw+=.03;
+    ctx.globalAlpha=.18+.38*Math.abs(Math.sin(s.tw))*s.z;
+    ctx.fillStyle="#cbb8ff";
+    ctx.fillRect(s.x*W, s.y*H, s.z<.6?1:2, s.z<.6?1:2);
+  }
+  ctx.globalAlpha=1;
+  // 星云薄雾（两团极低alpha，撑深度）
+  let nb=ctx.createRadialGradient(W*.3,H*.4,0,W*.3,H*.4,300);
+  nb.addColorStop(0,"#7c3aed0d"); nb.addColorStop(1,"#7c3aed00");
+  ctx.fillStyle=nb; ctx.fillRect(0,0,W,H);
+  nb=ctx.createRadialGradient(W*.74,H*.62,0,W*.74,H*.62,260);
+  nb.addColorStop(0,"#22d3ee09"); nb.addColorStop(1,"#22d3ee00");
+  ctx.fillStyle=nb; ctx.fillRect(0,0,W,H);
+  // 屏震坐标系
+  ctx.save();
+  if(shake>.05){ ctx.translate((Math.random()-.5)*shake*2,(Math.random()-.5)*shake*2); shake*=.86; }
+  // 经纬晶格（随球转动，撑立体感）
+  ctx.strokeStyle="#a855f716"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.ellipse(W/2,H/2,R+16,(R+16)*Math.abs(Math.cos(rotX)),0,0,7); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(W/2,H/2,(R+16)*Math.abs(Math.sin(rotY)),R+16,0,0,7); ctx.stroke();
+  ctx.strokeStyle="#7c3aed22"; ctx.beginPath(); ctx.arc(W/2,H/2,R+16,0,7); ctx.stroke();
+  // 核（发光精灵 + 充能闪 + 呼吸）
+  const breathe=1+Math.sin(T*1.4)*.045;
+  ctx.globalCompositeOperation="lighter";
+  ctx.drawImage(SPR.core, W/2-64*breathe, H/2-64*breathe, 128*breathe, 128*breathe);
+  if(coreFlash>.03){
+    ctx.globalAlpha=coreFlash*.6;
+    ctx.drawImage(SPR.core, W/2-(64+coreFlash*30), H/2-(64+coreFlash*30),
+                  (64+coreFlash*30)*2, (64+coreFlash*30)*2);
+    ctx.globalAlpha=1;
+  }
+  ctx.globalCompositeOperation="source-over";
+  ctx.fillStyle="#f1ecfb"; ctx.font="700 12px Consolas"; ctx.textAlign="center";
+  ctx.fillText("GBT · CORE",W/2,H/2+4);
+  // 节点（远→近，精灵发光 + 微闪）
+  const arr=pts.map(p=>({p,q:proj(p)})).sort((a,b)=>a.q.z-b.q.z);
+  hoverP=null; let hd=15;
+  for(const {p,q} of arr){
+    const dim=(focus!=="all"&&p.layer!==focus);
+    const tw=.82+.18*Math.sin(T*2+p.tw);
+    const a=dim?.10:(.4+.6*((q.z+R)/(2*R)))*tw;
+    const rr=(p.r*2.4*q.s+.6)*(p.glow>0?1+p.glow*.5:1);
+    ctx.globalAlpha=dim?.12:a;
+    ctx.globalCompositeOperation="lighter";
+    ctx.drawImage(SPR[p.layer], q.sx-rr*2.2, q.sy-rr*2.2, rr*4.4, rr*4.4);
+    ctx.globalCompositeOperation="source-over";
+    if(p.glow>0){ p.glow=Math.max(0,p.glow-.02); }
+    ctx.globalAlpha=1;
+    if(!dim && !drag){
+      const d2=Math.hypot(mouse.x-q.sx, mouse.y-q.sy);
+      if(d2<hd && q.z>-40){ hd=d2; hoverP=p; }
+    }
+  }
+  // 域标签（星簇铭牌：只在正面且未聚焦过滤时显示）
+  ctx.font="600 7.5px Consolas"; ctx.textAlign="center";
+  for(const d in domCenter){
+    if(focus!=="all" && LAYER(d)!==focus) continue;
+    const dq=proj(domCenter[d]);
+    if(dq.z>0.15 || dq.s<0.85) continue;
+    ctx.globalAlpha=.42*dq.s; ctx.fillStyle="#9b8fc0";
+    ctx.fillText(d, dq.sx, dq.sy-10);
+  }
+  ctx.globalAlpha=1;
+  // 悬停铭牌（含源码 handler 与描述 —— 按注册表如实）
+  if(hoverP){
+    cv.style.cursor="pointer";
+    const q=proj(hoverP);
+    const txt=hoverP.k;
+    const sub=(hoverP.h?("§"+hoverP.h+" · "):"")+hoverP.dom+" · "+(hoverP.safe?"免卡直连":"过授权门");
+    ctx.font="700 10.5px Consolas";
+    const tw1=ctx.measureText(txt).width;
+    ctx.font="9px Consolas";
+    const tw2=ctx.measureText(sub).width;
+    const dsc=(hoverP.t||"").slice(0,46);
+    ctx.font="8.5px 'Microsoft YaHei'";
+    const tw3=ctx.measureText(dsc).width;
+    const bw=Math.max(tw1,tw2,tw3)+20, bh=hoverP.t?56:42;
+    let bx=q.sx+12, by=q.sy-58;
+    if(bx+bw>W-14) bx=q.sx-bw-12;
+    if(by<8) by=q.sy+14;
+    ctx.fillStyle="#120726f2"; ctx.strokeStyle=COL[hoverP.layer]; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#f1ecfb"; ctx.font="700 10.5px Consolas"; ctx.textAlign="left";
+    ctx.fillText(txt,bx+10,by+16);
+    ctx.fillStyle="#22d3ee"; ctx.font="9px Consolas";
+    ctx.fillText(sub,bx+10,by+30);
+    if(hoverP.t){
+      ctx.fillStyle="#9b8fc0"; ctx.font="8.5px 'Microsoft YaHei'";
+      ctx.fillText(dsc+((hoverP.t||"").length>46?"…":""),bx+10,by+46);
+    }
+  } else { cv.style.cursor="grab"; }
+  // 脉冲弹道（加法混合发光）
+  ctx.globalCompositeOperation="lighter";
+  for(let i=pulses.length-1;i>=0;i--){
+    const pu=pulses[i]; pu.t+=.022;
+    if(pu.t>=1){ pulses.splice(i,1);
+      const q2=proj(pu.p), col2=COL[pu.p.layer];
+      burst(q2,col2,BOOM?16:9,BOOM?1.6:1);
+      pu.p.glow=1.5; shake=Math.max(shake,BOOM?4.5:2.2);
+      combo++; comboT=1;
+      continue; }
+    const q=proj(pu.p), col=COL[pu.p.layer];
+    const hx=W/2+(q.sx-W/2)*pu.t, hy=H/2+(q.sy-H/2)*pu.t;
+    const tx=W/2+(q.sx-W/2)*Math.max(0,pu.t-.16), ty=H/2+(q.sy-H/2)*Math.max(0,pu.t-.16);
+    const tg=ctx.createLinearGradient(tx,ty,hx,hy);
+    tg.addColorStop(0,col+"00"); tg.addColorStop(1,col+"dd");
+    ctx.strokeStyle=tg; ctx.lineWidth=BOOM?3.2:2.2; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(hx,hy); ctx.stroke();
+    ctx.drawImage(SPR[pu.p.layer], hx-(BOOM?14:10), hy-(BOOM?14:10), (BOOM?14:10)*2, (BOOM?14:10)*2);
+  }
+  // 冲击波（双环）
+  for(let i=shocks.length-1;i>=0;i--){ const s=shocks[i]; s.r+=BOOM?5.5:3.6; s.l-=.05;
+    if(s.l<=0){ shocks.splice(i,1); continue; }
+    const a1=Math.round(s.l*150).toString(16).padStart(2,"0");
+    ctx.strokeStyle=s.col+a1; ctx.lineWidth=2*s.l+.4;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,7); ctx.stroke();
+    ctx.strokeStyle=s.col+Math.round(s.l*70).toString(16).padStart(2,"0");
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*.62,0,7); ctx.stroke();
+  }
+  // 爆裂粒子
+  for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=.94; p.vy*=.94; p.l-=.03;
+    if(p.l<=0){ parts.splice(i,1); continue; }
+    ctx.globalAlpha=p.l; ctx.fillStyle=p.col;
+    ctx.beginPath(); ctx.arc(p.x,p.y,1.5+p.l*1.6,0,7); ctx.fill(); }
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation="source-over";
+  // 连击弹字（上飘渐隐）
+  if(comboT>0){ comboT-=.03; if(comboT<=0) combo=0;
+    if(combo>=3){ const cs=1+Math.max(0,comboT)*.5;
+      ctx.save(); ctx.translate(W/2,H/2-96-(1-comboT)*16); ctx.scale(cs,cs);
+      ctx.font="800 15px Consolas"; ctx.textAlign="center";
+      ctx.fillStyle="#ec4899"; ctx.shadowColor="#ec4899"; ctx.shadowBlur=14;
+      ctx.fillText("COMBO ×"+combo,0,0); ctx.shadowBlur=0; ctx.restore(); } }
+  ctx.restore();                               // 屏震坐标系结束（场景完成）
+  // ✨ Bloom：半分辨率模糊回叠（加法混合）—— 整个场景泛起渲染器级辉光
+  bctx.clearRect(0,0,bloomCv.width,bloomCv.height);
+  bctx.filter="blur(5px)";
+  bctx.drawImage(cv,0,0,bloomCv.width,bloomCv.height);
+  bctx.filter="none";
+  ctx.globalCompositeOperation="lighter"; ctx.globalAlpha=.5;
+  ctx.drawImage(bloomCv,0,0,W,H);
+  ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
+  // 暗角（bloom 之后再压，边缘保持干净）
+  const vg=ctx.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.85);
+  vg.addColorStop(0,"#00000000"); vg.addColorStop(1,"#05000f66");
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  coreFlash*=.9;
+  if(!drag){ velY+= (baseVel-velY)*.02; rotY+=velY; }   // 惯性回落到匀速自转
+})();
+</script>
+
+<footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body>
+</html>

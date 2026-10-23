@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GBT小土豆V8 · 模型对话</title>
+<style>
+  :root{--bg:#080b11;--card:#111823;--line:#1e2937;--ink:#e9eef7;--dim:#93a3b8;
+        --green:#3fb950;--blue:#6aa8ff;--amber:#f0b24c;--red:#ff7a7a}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 500px at 50% -10%,#122033,#080b11 60%);
+       color:var(--ink);font:14px/1.6 system-ui,"Segoe UI","Microsoft YaHei",sans-serif;height:100vh;display:flex;flex-direction:column}
+  header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:600}
+  .badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+  .badge.ok{color:var(--green);border-color:rgba(63,185,80,.4)}
+  .badge.bad{color:var(--red);border-color:rgba(255,122,122,.4)}
+  header select,header input{background:var(--card);color:var(--ink);border:1px solid var(--line);
+       border-radius:8px;padding:5px 8px;font-size:12px}
+  header .sp{flex:1}
+  main{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:min(760px,92%);padding:10px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
+  .me{align-self:flex-end;background:#1b2b42;border:1px solid #24405f}
+  .ai{align-self:flex-start;background:var(--card);border:1px solid var(--line)}
+  .meta{font-size:11px;color:var(--dim);margin-top:6px}
+  .err{color:var(--red);border-color:rgba(255,122,122,.35)}
+  footer{border-top:1px solid var(--line);padding:12px 18px;display:flex;gap:10px;align-items:flex-end}
+  textarea{flex:1;min-height:52px;max-height:160px;resize:vertical;background:var(--card);color:var(--ink);
+           border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit}
+  button{background:var(--green);color:#04120a;border:0;border-radius:10px;padding:10px 18px;
+         font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--amber);border:1px solid rgba(240,178,76,.5)}
+  button:disabled{opacity:.5;cursor:default}
+  .hint{padding:0 18px 10px;font-size:11px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧠 模型对话</h1>
+  <span class="badge" id="bridge">桥：检查中…</span>
+  <span class="sp"></span>
+  <select id="upstream" title="选上游（默认就是我们自己的原生指挥官模型；钥只在桥里）">
+    <option value="ours">🧠 我们的原生指挥官 gbt-v8（自报 /runpod-volume/gbt-v8-v83）</option>
+    <option value="ours-alt">🧠 我们的原生指挥官（备用端点）</option>
+    <option value="local">🧠 本地 vLLM（127.0.0.1:8000）</option>
+    <option value="agnes">agnes-2.5-flash（云端算力 · 通用模型）</option>
+    <option value="deepseek">deepseek-chat（通用模型）</option>
+    <option value="openai">gpt-4o-mini（通用模型）</option>
+  </select>
+  <input id="system" size="34" value="你是 GBT小土豆V8 总指挥：先判该落哪个能力位，再答；不确定就说不确定。">
+</header>
+
+<main id="log">
+  <div class="msg ai">原生指挥官模型的对话面：页面只连本机桥 127.0.0.1:8791，钥匙在桥里（DPAPI 保险箱 vault:potato），页面永远拿不到明文。
+默认上游 = 我们自己的 gbt-v8（vLLM on RunPod 无服务器，回包自报 /runpod-volume/gbt-v8-v83）。
+启桥：py -3.14 -X utf8 tools/model-bridge/server.py
+无服务器会睡，第一次调用可能要几十秒；怀疑它挂了先看桥的 health 徽标，别把冷启动当故障。</div>
+</main>
+
+<footer>
+  <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
+  <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活 ⚡</button>
+  <button id="send">发送</button>
+</footer>
+<div class="hint" id="hint"></div>
+
+<script>
+const BRIDGE = "http://127.0.0.1:8791";
+const log = document.getElementById("log");
+const badge = document.getElementById("bridge");
+const hint = document.getElementById("hint");
+let busy = false;
+
+function add(role, text, meta) {
+  const d = document.createElement("div");
+  d.className = "msg " + (role === "user" ? "me" : "ai");
+  d.textContent = text;
+  if (meta) {
+    const m = document.createElement("div");
+    m.className = "meta";
+    m.textContent = meta;
+    d.appendChild(m);
+  }
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+  return d;
+}
+
+async function health() {
+  try {
+    const r = await fetch(BRIDGE + "/health", {cache: "no-store"});
+    const j = await r.json();
+    const ups = j.upstreams || [];
+    const ready = ups.filter(u => u.key_ready).map(u => u.name);
+    badge.className = "badge ok";
+    badge.textContent = "桥：在线 · 就绪 " + ready.join("/");
+    hint.textContent = "上游数 " + ups.length + " · 钥只在桥里 · 页面零凭据";
+  } catch (e) {
+    badge.className = "badge bad";
+    badge.textContent = "桥：连不上";
+    hint.textContent = "先在终端跑：py -3.14 -X utf8 tools/model-bridge/server.py";
+  }
+}
+health();
+setInterval(health, 15000);
+
+async function send() {
+  if (busy) return;
+  const box = document.getElementById("input");
+  const text = box.value.trim();
+  if (!text) return;
+  const upstream = document.getElementById("upstream").value;
+  const sys = document.getElementById("system").value.trim();
+  box.value = "";
+  add("user", text);
+  const node = add("assistant", "…");
+  busy = true;
+  document.getElementById("send").disabled = true;
+  const t0 = performance.now();
+  try {
+    const messages = [];
+    if (sys) messages.push({role: "system", content: sys});
+    messages.push({role: "user", content: text});
+    const r = await fetch(BRIDGE + "/v1/chat/completions", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({upstream, messages, max_tokens: 900})
+    });
+    const j = await r.json();
+    const dt = ((performance.now() - t0) / 1000).toFixed(2);
+    if (j.ok === false || j.error) {
+      node.className = "msg ai err";
+      node.textContent = "调用失败（" + upstream + "）：" + JSON.stringify(j.error || j.upstream_error || j, null, 0).slice(0, 600);
+      return;
+    }
+    const msg = (j.choices && j.choices[0] && j.choices[0].message) || {};
+    node.textContent = (msg.content || "(空回包)");
+    const m = document.createElement("div");
+    m.className = "meta";
+    m.textContent = upstream + " · " + (j.model || "") + " · " + dt + "s · usage " +
+                    JSON.stringify(j.usage || {});
+    node.appendChild(m);
+  } catch (e) {
+    node.className = "msg ai err";
+    node.textContent = "连不上桥（" + e.message + "）。终端跑：py -3.14 -X utf8 tools/model-bridge/server.py";
+  } finally {
+    busy = false;
+    document.getElementById("send").disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+// 派活：① 我们自己的模型从 341 位里挑一位（桥先用 gbt_commander.search 收窄候选，再让模型挑）
+//       ② 走唯一门 run_task 真调一次 ③ 回执原样贴出来（成功给结果，缺票给缺什么 + 怎么发）
+async function dispatch() {
+  if (busy) return;
+  const box = document.getElementById("input");
+  const text = box.value.trim();
+  if (!text) return;
+  const upstream = document.getElementById("upstream").value;
+  box.value = "";
+  add("user", text);
+  const node1 = add("assistant", "① 问我们自己的模型：这句话该落哪个能力位…");
+  busy = true;
+  document.getElementById("send").disabled = true;
+  document.getElementById("dispatch").disabled = true;
+  const t0 = performance.now();
+  try {
+    const r1 = await fetch(BRIDGE + "/v1/route", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: text, upstream})
+    });
+    const rt = await r1.json();
+    if (!rt.ok) {
+      node1.className = "msg ai err";
+      node1.textContent = "① 路由失败：" + JSON.stringify(rt.error || rt).slice(0, 500);
+      return;
+    }
+    const short = rt.shortlist || [];
+    node1.textContent = "① 路由 → " + rt.capability + "\n"
+      + "   命中方式 " + rt.match + " · 候选收窄 " + (rt.shortlist_by || "?") + "（" + short.length + " 选 1）\n"
+      + "   域 " + (rt.domain || "?") + " · 只读 " + (rt.readonly === true ? "是" : "否")
+      + " · 静态作用域 " + (rt.scopes_static || "—")
+      + (rt.requires_params ? "\n   ⚠ 这位要参数：" + (rt.params_hint || "") : "");
+    const m1 = document.createElement("div");
+    m1.className = "meta";
+    m1.textContent = "路由耗时 " + rt.elapsed_s + "s · 模型 " + (rt.model || rt.upstream)
+      + " · usage " + JSON.stringify(rt.usage || {});
+    node1.appendChild(m1);
+
+    const node2 = add("assistant", "② 派活中：走唯一门 run_task…");
+    const r2 = await fetch(BRIDGE + "/v1/dispatch", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({capability: rt.capability, args: {}})
+    });
+    const d = await r2.json();
+    const dt = ((performance.now() - t0) / 1000).toFixed(2);
+    if (d.denied) {
+      // 门拒绝**不是**坏了：如实报缺什么票，并把主人要跑的那一行原样给出
+      node2.className = "msg ai err";
+      const miss = (d.missing_scopes || []).join("、") || "（上游没报，见底下信封）";
+      const how = Array.isArray(d.how_to_grant) ? d.how_to_grant.join("\n      ") : (d.how_to_grant || "");
+      node2.textContent = "② 门拒绝了 —— 这不是坏了，是缺票\n"
+        + "   缺作用域：" + miss + "\n"
+        + "   门的原话：" + (d.message || "（未带原因）")
+        + (how ? "\n   怎么发（只能主人终端发）：\n      " + how : "");
+    } else if (!d.ok) {
+      node2.className = "msg ai err";
+      node2.textContent = "② 跑了但没成功 · status=" + d.status + "\n"
+        + JSON.stringify(d.envelope || d).slice(0, 900);
+    } else {
+      const inner = ((d.envelope || {}).result) || {};
+      const body = inner.result !== undefined ? inner.result : inner;
+      node2.textContent = "② 派活成功 · " + d.capability + " · status=" + d.status + "\n"
+        + "   回执：" + JSON.stringify(body).slice(0, 900);
+    }
+    const m2 = document.createElement("div");
+    m2.className = "meta";
+    m2.textContent = "全链 " + dt + "s · 门 = run_task（唯一门，已落审计）";
+    node2.appendChild(m2);
+  } catch (e) {
+    node1.className = "msg ai err";
+    node1.textContent = "连不上桥（" + e.message + "）。终端跑：py -3.14 -X utf8 tools/model-bridge/server.py";
+  } finally {
+    busy = false;
+    document.getElementById("send").disabled = false;
+    document.getElementById("dispatch").disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+document.getElementById("send").onclick = send;
+document.getElementById("dispatch").onclick = dispatch;
+document.getElementById("input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+});
+</script>
+</body>
+</html>

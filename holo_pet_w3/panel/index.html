@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="utf-8" />
+<title>GBT小土豆V8 · 控制面板</title>
+<!-- GBT小土豆V8 · 一体面板（主人令 2026-10-04：「要固定在 APP 面板上」，不再开一推窗）
+     口径：**一扇窗 = 一个面板**。左边是页面清单，右边是内容区（<webview> 内嵌），
+     点哪一页就在**面板内**切成哪一页 —— 不再新建任何 OS 窗口。
+     安全：内容区只许载**本树 file:// 页面**或**本机回环 http**（白名单在壳的 preload/openExternal 同源口径）。
+     开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属 -->
+<style>
+:root{--bg:#06080c;--pan:#0c1118;--line:#1c2634;--ink:#e7eef8;--dim:#8794a6;
+ --cy:#22d3ee;--or:#f5b041;--ok:#34d399;--bad:#f87171}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:13px/1.55 "Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#0a0f16,#0c1118)}
+.mark{width:16px;height:16px;flex:0 0 auto;background:url(../build/tray-logo-32.png) center/contain no-repeat}
+.brand{font-weight:700}.brand b{color:var(--or)}
+.grow{flex:1}
+.chip{border:1px solid var(--line);background:#0e141d;color:var(--dim);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:12px}
+.chip.on{border-color:#2b6b7d;color:var(--cy)}
+.main{flex:1;display:grid;grid-template-columns:220px 1fr;min-height:0}
+.rail{border-right:1px solid var(--line);overflow:auto;background:#0a0f16}
+.rail h3{margin:10px 12px 4px;font-size:11px;color:var(--dim);letter-spacing:.6px;font-weight:600}
+/* 折叠区（「更多」）：默认收起。2026-10-21 之前这 40 条是平铺的 ⇒ 一屏塞不下。 */
+.rail details.more{margin-top:8px;border-top:1px solid var(--line)}
+.rail details.more>summary{cursor:pointer;list-style:none;padding:8px 12px;font-size:12px;color:var(--dim);letter-spacing:.5px}
+.rail details.more>summary::-webkit-details-marker{display:none}
+.rail details.more>summary::before{content:"\25B8  "}
+.rail details.more[open]>summary::before{content:"\25BE  "}
+.rail details.more h3{margin:8px 12px 2px;font-size:11px;color:var(--dim);letter-spacing:.6px;font-weight:600}
+.item{display:block;width:100%;text-align:left;padding:7px 12px;border:0;background:none;color:var(--ink);cursor:pointer;font-size:12.5px;border-left:2px solid transparent}
+.item:hover{background:#0e141d}
+.item.on{background:#101a24;border-left-color:var(--or);color:#fff}
+.item small{display:block;color:var(--dim);font-size:11px}
+.stage{display:flex;flex-direction:column;min-width:0}
+.bar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);color:var(--dim);font-size:11.5px}
+.bar button{border:1px solid var(--line);background:#0e141d;color:var(--ink);border-radius:6px;padding:2px 9px;cursor:pointer;font-size:11.5px}
+.bar button:hover{border-color:#2b6b7d}
+.frame{flex:1;position:relative;min-height:0}
+webview{position:absolute;inset:0;width:100%;height:100%;border:0;background:#06080c}
+.empty{padding:26px;color:var(--dim)}
+</style>
+</head>
+<body>
+<script>window.GBT_NAV_DISABLE = true;</script>
+<!-- 本页**不挂**顶部那条紧凑导航：控制面板自己的左栏就是它的导航。
+     两套导航同时在页头 = 2026-10-21 主人指出的「一堆东西推挤在一起」的直接成因。 -->
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+  <div class="top">
+    <span class="mark"></span>
+    <span class="brand">GBT<b>小土豆</b>V8 · 控制面板</span>
+    <span class="chip" id="bridge">面板桥：探测中…</span>
+    <span class="grow"></span>
+    <span class="chip" id="hint">一扇窗 = 一个面板：页面在面板内切换，不再开新窗</span>
+  </div>
+  <div class="main">
+    <nav class="rail" id="rail"><h3>页面</h3></nav>
+    <section class="stage">
+      <div class="bar">
+        <button id="back" title="返回上一页（面板内历史）">← 返回</button>
+        <button id="reload" title="重载当前页">⟳ 重载</button>
+        <button id="browser" title="在系统浏览器打开（本机回环）">在浏览器打开</button>
+        <span id="where" class="grow"></span>
+      </div>
+      <div class="frame" id="frame"><div class="empty">左边点一页，内容就装进这里。</div></div>
+    </section>
+  </div>
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   页面清单（2026-10-21 重排：主人令「那么多垃圾堆挤在一起」）
+   ──────────────────────────────────────────────────────────────────────────
+   改前：**40 个按钮一次性平铺**在左栏，每条还带一行说明 —— 一屏塞不下，
+         要滚三屏才看得到底；而且里面混了两种东西：
+           ① 本壳（holo_pet_w3）自己的窗页 22 页
+           ② 另一棵树（holo_pet/assets）的旧页 18 页
+         还夹着 2 条**已经没有了**的（brain / exec-deck —— 盘上根本没 index.html，
+         点进去就是空白，2026-10-21 实测确认）。
+   改后：**7 个主入口常显**，其余全部收进一个折叠的「更多」里，按来源分组。
+         一条都不删（页面都还在，点得到）；只是不再一次性怼到脸上。
+   ⚠️ 这份清单仍是**手写**（不是自动扫盘），所以每加一页要来这里补一行 ——
+      补完跑 `py -3.14 ../tools/codex-scripts/app-page-audit.py` 对一遍。
+   ══════════════════════════════════════════════════════════════════════════ */
+const PAGES = [
+  /* ── 主入口（常显 7 条） ── */
+  { id: "digital-human",  name: "她 · 数字人", what: "全肢体骨架 · 语音链路逐环实测",        rel: "../digital-human/index.html",   primary: true },
+  { id: "dsh-chat",       name: "对话",        what: "我们的对话面（引擎由壳拉起）",          rel: "../shell/dsh-embed.html",       primary: true },
+  { id: "capability-bar", name: "能力栏",      what: "每一位一屏可读 · 三态一色 · 带调用法",  rel: "../capability-bar/index.html",  primary: true },
+  { id: "capabilities",   name: "能力统计",    what: "逐个真探 · 接上/断连/缺失/未探测",      rel: "../capabilities/index.html",    primary: true },
+  { id: "energy",         name: "能量与绑定",  what: "能力 × 触手 × 能量通道（双向）",        rel: "../energy/index.html",          primary: true },
+  { id: "logbook",        name: "记录本",      what: "谁在什么时候改了什么（只追加 · 自链）", rel: "../logbook/index.html",         primary: true },
+  { id: "blueprint",      name: "项目蓝图",    what: "边界 / DAG / 树 / 窗 / Phase / 风险",   rel: "../blueprint/index.html",       primary: true },
+
+  /* ── 更多 · 本壳窗（15） ── */
+  { id: "godview",        name: "上帝视角",    what: "四视图控制台",                          rel: "../index.html",                 group: "本壳窗" },
+  { id: "welcome",        name: "启动欢迎语",  what: "启动一屏：名字 + 开发者",               rel: "../welcome/index.html",         group: "本壳窗" },
+  { id: "voice-theater",  name: "语音剧场",    what: "四态对话剧场 · 波形由真音源驱动",        rel: "../voice-theater/index.html",   group: "本壳窗" },
+  { id: "eye",            name: "触手视觉回传", what: "真帧回传（DXGI 直读）",                rel: "../eye/index.html",             group: "本壳窗" },
+  { id: "activity",       name: "触手活动流",  what: "谁在动 · 账本尾实时",                   rel: "../activity/index.html",        group: "本壳窗" },
+  { id: "ai-board",       name: "AI 工作面板", what: "30 职位 · 工作中/休息中",               rel: "../ai-board/index.html",        group: "本壳窗" },
+  { id: "plugins-mesh",   name: "云插件互绑拓扑", what: "触手串联 · 每处连接点可见",          rel: "../plugins-mesh/index.html",    group: "本壳窗" },
+  { id: "cloud-plugins",  name: "云插件独立页", what: "每个插件一体（端点 · op · 三态）",     rel: "../cloud-plugins/index.html",   group: "本壳窗" },
+  { id: "cloud-status",   name: "连接状态",    what: "通/不通/未探测 + 连接明细",             rel: "../cloud-status/index.html",    group: "本壳窗" },
+  { id: "model-align",    name: "模型版本对齐", what: "卷/端点/云插件/钥匙 四环现读（红就是红）", rel: "../model-align/index.html",     group: "本壳窗" },
+  { id: "model-chat",     name: "模型对话",    what: "☁️ 云插件 GBT小土豆V8 大模型 · 默认走 c01 网关", rel: "../model-chat/index.html",      group: "本壳窗" },
+  { id: "db-fleet",       name: "数据库编队",  what: "7 个免费库 · 指向 · 存什么",            rel: "../db-fleet/index.html",        group: "本壳窗" },
+  { id: "code-deck",      name: "代码台",      what: "回路与门的读数（快照）",                rel: "../code-deck/index.html",       group: "本壳窗" },
+  { id: "health-ledger",  name: "框架总账",    what: "六本子账汇总：真坏/缺依赖/未配置",      rel: "../health-ledger/index.html",   group: "本壳窗" },
+  { id: "eigenflux",      name: "AI 朋友圈",   what: "朋友圈流",                             rel: "../eigenflux/index.html",       group: "本壳窗" },
+  { id: "h1",             name: "赏金台",      what: "赏金与草稿",                            rel: "../h1/index.html",              group: "本壳窗" },
+  { id: "connect",        name: "对话（连宿主）", what: "手贴 token 连 DSH 的备用口",         rel: "../shell/connect.html",         group: "本壳窗" },
+
+  /* ── 更多 · 旧树 holo_pet/assets（18）· 待迁 ──
+     这些页不在本壳树里（README §0 已把 holo_pet_w3 定为唯一权威树），
+     但都是做好的真页，所以**保留可达**、单独分组标「旧树」，
+     不跟本壳的窗混在一起。迁进本壳或判定废弃之前，不许从清单里悄悄删掉。 */
+  { id: "legacy-console",     name: "总控台",        what: "能力矩阵 · 云插件连接器 · 编队群", rel: "../../holo_pet/assets/console/index.html",     group: "旧树 holo_pet" },
+  { id: "legacy-home",        name: "工作空间首页",  what: "中央对话框",                       rel: "../../holo_pet/assets/home/index.html",        group: "旧树 holo_pet" },
+  { id: "legacy-gallery",     name: "页面卡库",      what: "全部页面一屏看全",                 rel: "../../holo_pet/assets/gallery/index.html",     group: "旧树 holo_pet" },
+  { id: "legacy-workbench",   name: "Bento 工作台",  what: "九部件 · 拖拽编排",                rel: "../../holo_pet/assets/workbench/index.html",   group: "旧树 holo_pet" },
+  { id: "legacy-tentacle3d",  name: "触手 3D 全景",  what: "域→能力→绑定 + 运行脉冲",          rel: "../../holo_pet/assets/tentacle3d/index.html",  group: "旧树 holo_pet" },
+  { id: "legacy-console3d",   name: "总控台 3D",     what: "三维能力矩阵",                     rel: "../../holo_pet/assets/console3d/index.html",   group: "旧树 holo_pet" },
+  { id: "legacy-structure",   name: "结构图",        what: "目录与依赖结构",                   rel: "../../holo_pet/assets/structure/index.html",   group: "旧树 holo_pet" },
+  { id: "legacy-task",        name: "任务管理",      what: "长任务状态与队列",                 rel: "../../holo_pet/assets/task-manager/index.html", group: "旧树 holo_pet" },
+  { id: "legacy-health",      name: "健康面板",      what: "服务与资源读数",                   rel: "../../holo_pet/assets/health-panel/index.html", group: "旧树 holo_pet" },
+  { id: "legacy-automation",  name: "自动化",        what: "自动化编排与运行记录",             rel: "../../holo_pet/assets/automation/index.html",  group: "旧树 holo_pet" },
+  { id: "legacy-music",       name: "音乐台",        what: "曲库与生成",                       rel: "../../holo_pet/assets/music/index.html",       group: "旧树 holo_pet" },
+  { id: "legacy-keys",        name: "钥匙台",        what: "凭据引用总览（只出引用名）",       rel: "../../holo_pet/assets/keys/index.html",        group: "旧树 holo_pet" },
+  { id: "legacy-freebuff",    name: "免费算力",      what: "免费通道与额度",                   rel: "../../holo_pet/assets/freebuff/index.html",    group: "旧树 holo_pet" },
+  { id: "legacy-godview",     name: "上帝视角页",    what: "四视图（页面版）",                 rel: "../../holo_pet/assets/godview/index.html",     group: "旧树 holo_pet" },
+  { id: "legacy-wf-short",    name: "短视频流水线",  what: "48 步 · 每步判据与产物",           rel: "../../holo_pet/assets/wf-short-video/index.html", group: "旧树 holo_pet" },
+  { id: "legacy-wf-movie",    name: "电影流水线",    what: "48 步 · 分镜到成片",               rel: "../../holo_pet/assets/wf-movie/index.html",    group: "旧树 holo_pet" },
+  { id: "legacy-wf-music",    name: "音乐流水线",    what: "48 步 · 词曲到母带",               rel: "../../holo_pet/assets/wf-music/index.html",    group: "旧树 holo_pet" },
+  { id: "legacy-wf-film",     name: "影片流水线",    what: "48 步 · 长片编排",                 rel: "../../holo_pet/assets/wf-film/index.html",     group: "旧树 holo_pet" },
+  /* 原先每页顶上那条「全项目索引 · 全页可达」细横条（#gbt-project-nav）已于 2026-10-21 清掉，
+     入口收在这里一条 —— 1500 页的索引照样点得到，但不再每扇窗头顶挂一条。
+     🔴 2026-10-22 主人令（截图 + 逐字「把这页删了，你自己看看这种东西都能做出来？」）：
+     **连这条入口一起摘掉** —— 那页是一堵 340 位能力 + 34 个域的文字墙，糊、挤、还半截切断，
+     本来就不该给人看。页面文件已移到 state/legacy/（可回滚，不在 APP 里可达）。 */
+];
+
+const rail = document.getElementById("rail");
+const frame = document.getElementById("frame");
+const where = document.getElementById("where");
+const hist = [];
+
+function absUrl(rel){ return new URL(rel, location.href).toString(); }
+
+function load(url, push) {
+  const wv = document.createElement("webview");
+  wv.setAttribute("src", url);
+  wv.setAttribute("allowpopups", "");            /* 允许页面自己开窗请求（壳的会拦） */
+  /* 🔴 **webview 不继承宿主窗的 preload**（实测踩过：页面里 window.gbtW3 是空的 ⇒
+     触手视觉的活体取帧守卫直接返回、画面永远空）。显式挂上壳的 preload，
+     页面才拿得到 gbtW3（capFrame/panelGoto/openExternal…）。 */
+  try { wv.setAttribute("preload", new URL("../shell/preload.cjs", location.href).toString()); }
+  catch (e) { /* 拿不到就照旧（页面自己降级） */ }
+  wv.setAttribute("webpreferences", "contextIsolation=yes,nodeIntegration=no");
+  wv.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#06080c";
+  frame.replaceChildren(wv);
+  where.textContent = url.replace(/^file:\/\/\/[^/]*/, "").slice(0, 90);
+  if (push !== false) hist.push(url);
+  [...rail.querySelectorAll(".item")].forEach((b) => b.classList.toggle("on", absUrl(b.dataset.rel) === url));
+}
+function pick(p){
+  /* `external:true` 的项**不载进 webview**：改开壳自己的窗（如 dsh-chat —— 官方对话面，
+     带 token 的 URL 只由壳交给那扇窗；面板里不嵌外部 URL）。没宿主就如实说，不假装开过。 */
+  /* 🔴 2026-10-09 主人令「不许跳转，全部内镶嵌」：
+     external 项**若背后是本地页（有 rel）就照常嵌进内容区**；
+     只有"确实没有可嵌页面"的项才回退到开窗（并如实说明）。 */
+  if (p && p.external && p.rel) { load(absUrl(p.rel)); return; }
+  if (p && p.external) {
+    const api = window.gbtW3;
+    if (api && typeof api.showWindow === "function") {
+      Promise.resolve(api.showWindow({ id: p.id })).catch(() => {});
+      where.textContent = "已开「" + p.name + "」窗（壳的窗，不嵌进面板）";
+    } else {
+      where.textContent = "壳动作口没加载（showWindow 不可用）——「" + p.name + "」请从顶栏芯片/托盘开";
+    }
+    return;
+  }
+  load(absUrl(p.rel));
+}
+
+function railItem(p) {
+  const b = document.createElement("button");
+  b.className = "item"; b.dataset.rel = p.rel;
+  b.innerHTML = p.name + "<small>" + p.what + "</small>";
+  b.addEventListener("click", () => pick(p));
+  return b;
+}
+/* 左栏只常显 7 个主入口；其余收进「更多」里按来源分组（折叠 · 一条不丢）。 */
+const primaries = PAGES.filter((p) => p.primary);
+const restPages = PAGES.filter((p) => !p.primary);
+primaries.forEach((p) => rail.appendChild(railItem(p)));
+if (restPages.length) {
+  const det = document.createElement("details");
+  det.className = "more";
+  const sum = document.createElement("summary");
+  sum.textContent = "更多（" + restPages.length + "）";
+  det.appendChild(sum);
+  const groups = {};
+  restPages.forEach((p) => { const g = p.group || "其他"; (groups[g] = groups[g] || []).push(p); });
+  Object.keys(groups).forEach((g) => {
+    const h = document.createElement("h3"); h.textContent = g; det.appendChild(h);
+    groups[g].forEach((p) => det.appendChild(railItem(p)));
+  });
+  rail.appendChild(det);
+}
+window.__GBT_PANEL = { total: PAGES.length, primary: primaries.length, more: restPages.length };
+
+document.getElementById("back").addEventListener("click", () => {
+  if (hist.length > 1) { hist.pop(); load(hist.pop(), true); hist.push(hist[hist.length - 1]); }
+  else load(hist[0] || absUrl(PAGES[0].rel), false);
+});
+document.getElementById("reload").addEventListener("click", () => load(hist[hist.length - 1] || absUrl(PAGES[0].rel), false));
+document.getElementById("browser").addEventListener("click", async () => {
+  const cur = hist[hist.length - 1] || "";
+  const api = window.gbtW3;
+  const url = /^file:/.test(cur) ? "http://127.0.0.1:8765/assets/home/index.html" : cur;
+  if (api && typeof api.openExternal === "function") {
+    const r = await api.openExternal({ url });
+    where.textContent = r && r.ok ? "已在浏览器打开（" + (r.host || "") + "）" : ("打开失败：" + ((r && r.error) || ""));
+  } else { where.textContent = "壳动作口没加载"; }
+});
+
+/* 面板桥状态（只读一次探测；失败如实显示） */
+fetch("http://127.0.0.1:8765/api/state", { method: "GET" })
+  .then((r) => r.json())
+  .then((d) => { const el = document.getElementById("bridge");
+    el.textContent = "面板桥：" + (d && d.ok ? "在线" : "异常");
+    el.className = "chip" + (d && d.ok ? " on" : ""); })
+  .catch(() => { const el = document.getElementById("bridge");
+    el.textContent = "面板桥：离线"; el.className = "chip"; });
+
+/* 壳的顶栏 chips 点某页 ⇒ 在**本面板内**切页（不再开新窗） */
+if (window.gbtW3 && typeof window.gbtW3.onPanelGoto === "function") {
+  window.gbtW3.onPanelGoto((msg) => {
+    const id = msg && msg.id;
+    const p = PAGES.filter((x) => x.id === id)[0];
+    if (p) pick(p);
+    else where.textContent = "面板里还没有「" + id + "」这一页的入口（可在左侧清单里点）";
+  });
+}
+
+/* 默认开第一页（总控台）：**等本页自己载完再装 webview**。
+   实测 2026-10-08（.scratch/diag-load.cjs）：parse 阶段就 attach webview，
+   宿主的 isLoading 要拖到宾客页（console）载完才落 ⇒ 重载机器上真启动预演
+   S:loaded 会把面板窗读成「仍在载入」（15s 有界等待被吃光）。推迟到 load 之后装。 */
+function firstPick() { pick(PAGES[0]); }
+if (document.readyState === "complete") firstPick();
+else window.addEventListener("load", firstPick, { once: true });
+</script>
+
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+</body>
+</html>

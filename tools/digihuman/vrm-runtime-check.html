@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><title>VRM 运行时验收（three-vrm 官方实现）</title>
+<style>
+ body{margin:0;background:#0b0e14;color:#e8eef7;font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif}
+ #hud{position:fixed;left:12px;top:12px;background:rgba(10,14,22,.86);border:1px solid #223;
+      border-radius:10px;padding:10px 12px;white-space:pre-wrap;max-width:640px;z-index:9}
+ #log{position:fixed;left:12px;bottom:12px;background:rgba(10,14,22,.86);border:1px solid #223;
+      border-radius:10px;padding:10px 12px;white-space:pre-wrap;max-width:900px;font-size:12px}
+ canvas{display:block}
+</style></head><body>
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="hud">VRM 运行时验收 · 载入中…</div>
+<div id="log"></div>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/",
+  "@pixiv/three-vrm": "https://unpkg.com/@pixiv/three-vrm@3/lib/three-vrm.module.js"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+let VRMLoaderPlugin, VRMUtils
+try { ({ VRMLoaderPlugin, VRMUtils } = await import('@pixiv/three-vrm')) }
+catch (e) { window.__vrmReport = { ok:false, err:'three-vrm 导入失败: '+e }; document.getElementById('hud').textContent='❌ three-vrm 导入失败: '+e; throw e }
+
+const q = new URLSearchParams(location.search)
+const url = q.get('vrm') || '/gbt-master/fs/holo_pet/assets/digital-human/raw/rig/avatar.vrm'
+const out = (s) => { document.getElementById('log').textContent += s + '\n' }
+
+const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(1)
+document.body.appendChild(renderer.domElement)
+renderer.outputColorSpace = THREE.SRGBColorSpace
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0e14)
+scene.add(new THREE.HemisphereLight(0xffffff, 0x223344, 2.2))
+const dl = new THREE.DirectionalLight(0xffffff, 1.4); dl.position.set(1, 2, 1.6); scene.add(dl)
+const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.01, 100)
+
+const loader = new GLTFLoader()
+loader.register((parser) => new VRMLoaderPlugin(parser))     // ← 官方 VRM 插件
+loader.load(url, (gltf) => {
+  const vrm = gltf.userData.vrm
+  renderer.domElement.dataset.painted = '0'
+  const r = { ok: false }
+  if (!vrm) { out('❌ 不是 VRM（userData.vrm 不存在）'); window.__vrmReport = { ok: false, err: 'not a VRM' }; return }
+  try { VRMUtils.removeUnnecessaryVertices(gltf.scene); VRMUtils.combineSkeletons(gltf.scene) } catch (e) {}
+  scene.add(vrm.scene)
+  // ── 运行时读数（官方实现自己算出来的）──
+  const hb = vrm.humanoid ? vrm.humanoid.humanBones : {}
+  const mapped = Object.keys(hb).filter((k) => hb[k] && hb[k].node)
+  const exprs = vrm.expressionManager ? Object.keys(vrm.expressionManager.expressionMap) : []
+  const springs = vrm.springBoneManager ? vrm.springBoneManager.joints.size : 0
+  const meta = vrm.meta || {}
+  r.ok = mapped.length >= 15
+  r.humanoid = mapped.length; r.expressions = exprs.length; r.springJoints = springs
+  r.meta = { name: meta.name, authors: meta.authors, licenseUrl: meta.licenseUrl }
+  r.bones = mapped.slice(0, 60)
+  document.getElementById('hud').textContent =
+    `VRM 运行时验收（three-vrm 官方实现）\n` +
+    `humanoid 已映射骨  ${mapped.length}\n` +
+    `expressions        ${exprs.length}  ${exprs.slice(0, 8).join(',')}\n` +
+    `springBone 关节    ${springs}\n` +
+    `meta.name          ${meta.name || '—'}\n` +
+    `meta.authors       ${(meta.authors || []).join(' / ') || '—'}\n` +
+    `meta.licenseUrl    ${meta.licenseUrl || '—'}`
+  // 取景 + 画一帧
+  const box = new THREE.Box3().setFromObject(vrm.scene)
+  const size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3())
+  const d = Math.max(size.x, size.y, size.z) * 1.9
+  camera.position.set(c.x + d * 0.55, c.y + size.y * 0.16, c.z + d * 0.75)
+  camera.lookAt(c)
+  renderer.render(scene, camera)
+  renderer.domElement.dataset.painted = '1'
+  window.__vrmReport = r
+  out('✅ 官方运行时读取成功：' + JSON.stringify({ humanoid: mapped.length, expressions: exprs.length, springs }))
+}, undefined, (e) => {
+  out('❌ 载入失败: ' + e)
+  window.__vrmReport = { ok: false, err: String(e) }
+})
+window.__ready = true
+</script></body></html>

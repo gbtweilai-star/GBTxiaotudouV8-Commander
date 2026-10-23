@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="utf-8">
+<title>GBT小土豆V8 · 数据库编队（7 个免费库 · 指向 · 存什么 · 全部未开通）</title>
+<!--
+  数据库编队面板 · 窗口 P · 批次 W19 · 2026-10-07
+  主人令：「在以设计云插件的方式部署上最大内存和最稳定的免费数据库插件，
+    也一样排布好对应使用的指向，备注好都是存的什么东西。」
+  本页只说三件事：① 每个免费库是什么、额度多大、凭什么说它稳 ② 哪类数据指向哪个库 ③ 每个库存什么。
+  🔴 页面上的「未开通」是真读数，不是装饰 —— 这些库一个都还没开通（真源 status 就是它）。
+  数据：db-fleet-data.js（db-fleet.py render 生成）。完整来源链接在 docs/免费数据库编队-设计.md 里。
+-->
+<style>
+:root{--bg:#07090d;--pan:#0d1117;--line:#1d2635;--ink:#e6edf7;--dim:#8b97a8;
+ --cy:#22d3ee;--or:#f5b041;--ok:#34d399;--bad:#f87171;--brand-or:#f5b041;--brand-cy:#22d3ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.65 "Segoe UI",system-ui,sans-serif}
+.gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
+ background:linear-gradient(90deg,#0b1017,#0d1117);flex-wrap:wrap}
+.mark{width:18px;height:18px;flex:0 0 auto;background:url(../build/tray-logo-32.png) center/contain no-repeat}
+.brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--brand-or)}
+.note{color:var(--dim);font-size:11.5px}
+.wrap{padding:14px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:12px}
+h2{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.4px}
+.stats{display:flex;gap:18px;flex-wrap:wrap}
+.stat{min-width:96px}.stat b{display:block;font-size:24px;color:var(--brand-cy);font-variant-numeric:tabular-nums}
+.stat i{font-style:normal;color:var(--dim);font-size:12px}
+.warn{border:1px solid #5c4a1e;background:#1a1508;color:#f5d391;border-radius:8px;padding:9px 11px;font-size:12.5px}
+.warn b{color:var(--brand-or)}
+table{border-collapse:collapse;width:100%;font-size:11.5px}
+th,td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:600;background:#0b1017}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:12px}
+.db{border:1px solid var(--line);border-radius:10px;background:#0b1017;padding:11px}
+.db h3{margin:0 0 4px;font-size:14px}
+.db h3 .id{color:var(--brand-cy);font-family:ui-monospace,Consolas,monospace}
+.db h3 .rk{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:0 7px;margin-left:6px;color:var(--dim)}
+.db h3 .rk.main{border-color:#5a4a1e;color:var(--brand-or)}
+.db h3 .rk.back{border-color:#333c4d;color:var(--dim)}
+.db .st{float:right;font-size:11px;border:1px solid #5a4a1e;border-radius:999px;padding:0 8px;color:var(--brand-or);background:#1a1508}
+.row{display:flex;gap:8px;margin:3px 0}
+.row .k{color:var(--dim);min-width:74px;flex:none}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.q{color:var(--brand-cy)}
+.cav{color:var(--bad)}
+.srcid{font-size:10.5px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:0 6px}
+ul{margin:4px 0 0;padding-left:17px}li{margin:2px 0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style></head><body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div class="gbt-topbar"><span class="mark"></span>
+ <span class="brand">GBT<b>小土豆</b>V8 · 数据库编队</span>
+ <span class="note" id="gen">…</span></div>
+
+<div class="wrap">
+  <div class="card"><h2>纪律（先说清楚：这些库一个都还没开通）</h2><div id="honesty" class="warn">…</div></div>
+
+  <div class="card"><h2>总量</h2><div class="stats" id="stats"></div></div>
+
+  <div class="card">
+    <h2>指向表（哪类数据走哪个库 —— 一个数据类只有一个写主）</h2>
+    <div id="ptrs"></div>
+  </div>
+
+  <div class="card"><h2>编队（每个库：额度 / 凭什么稳 / 存什么 / 互绑 / 开通缺什么）</h2>
+    <div class="grid" id="fleet"></div>
+  </div>
+
+  <div class="card"><h2>来源（额度与稳定性逐条带出处；完整链接见 docs/免费数据库编队-设计.md）</h2>
+    <div id="srcs"></div>
+  </div>
+
+  <div class="card"><h2>口径约定</h2><div id="conv"></div></div>
+</div>
+
+<script src="db-fleet-data.js"></script>
+<script>
+(function () {
+  var D = window.GBT_DB_FLEET;
+  var $ = function (id) { return document.getElementById(id); };
+  if (!D) { $("honesty").textContent = "读不到 db-fleet-data.js —— 跑 db-fleet.py render 重新生成"; return; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function host(u) { return String(u || "").replace(/^https?:\/\//, ""); }
+
+  $("gen").textContent = "生成 " + D.generated_at + " · 源 " + D.source
+    + " · 重生成 " + D.regen + " · 判据 " + D.check;
+
+  $("honesty").innerHTML = "<b>🔴 未开通</b> —— " + (D.honesty || []).map(function (h) {
+    return "<div>· " + esc(h) + "</div>";
+  }).join("");
+
+  var t = D.totals;
+  $("stats").innerHTML = [["库", t["库"]], ["主", t["主"]], ["备", t["备"]], ["指向", t["指向"]], ["未开通", t["未开通"]]]
+    .map(function (p) { return '<div class="stat"><b>' + p[1] + '</b><i>' + p[0] + "</i></div>"; }).join("");
+
+  $("ptrs").innerHTML = '<table><thead><tr><th>数据类</th><th>写主</th><th>读源</th><th>为什么这么排</th></tr></thead><tbody>'
+    + (D.pointers.map || []).map(function (p) {
+        return "<tr><td>" + esc(p.data) + '</td><td class="mono q">' + esc(p.write_to) + "</td><td class=\"mono\">"
+          + (p.read_from || []).map(esc).join(" · ") + "</td><td>" + esc(p.why) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  $("ptrs").insertAdjacentHTML("beforeend", '<div class="note" style="margin-top:6px">' + esc(D.pointers.note) + "</div>");
+
+  $("fleet").innerHTML = (D.fleet || []).map(function (x) {
+    var q = x.quota || {}, s = x.stability || {}, n = x.needs || {};
+    var qrows = Object.keys(q).map(function (k) {
+      var v = q[k];
+      return '<div class="row"><span class="k">' + esc(k) + "</span><span class=\"q\">"
+        + (v === null ? "官网未列（不补数）" : esc(v)) + "</span></div>";
+    }).join("");
+    return '<div class="db" id="' + esc(x.id) + '">'
+      + '<span class="st">' + esc(x.status) + "</span>"
+      + '<h3><span class="id">' + esc(x.id) + '</span><span class="rk ' + (x.rank === "主" ? "main" : "back") + '">' + esc(x.rank)
+      + "</span></h3>"
+      + '<div class="row"><span class="k">服务</span><span>' + esc(x.provider) + " · " + esc(x.engine) + "</span></div>"
+      + '<div class="row"><span class="k">角色</span><span>' + esc(x.role) + "</span></div>"
+      + '<div class="row"><span class="k">端点</span><span class="mono note">' + esc(x.endpoint) + "</span></div>"
+      + '<div class="row"><span class="k">凭据</span><span class="mono">' + esc(x.apiKeyEnv) + "</span></div>"
+      + '<div class="row"><span class="k">额度</span><span class="srcid">出处 ' + esc(x.quota_source) + "</span></div>"
+      + qrows
+      + '<div class="row"><span class="k">凭什么稳</span><span>' + esc(s.why) + ' <span class="srcid">' + esc(s["来源"]) + "</span></span></div>"
+      + (s.caveat ? '<div class="row"><span class="k">保留</span><span class="cav">' + esc(s.caveat) + "</span></div>" : "")
+      + '<div class="row"><span class="k">存什么</span><span>' + esc(x.stores) + "</span></div>"
+      + '<div class="row"><span class="k">互绑</span><span class="mono">' + (x.binds || []).map(esc).join(" · ") + "</span></div>"
+      + '<div class="row"><span class="k">开通缺</span><span>' + esc(n["缺什么"]) + " —— 谁有权给：<b>" + esc(n["谁有权给"]) + "</b></span></div>"
+      + "</div>";
+  }).join("");
+
+  $("srcs").innerHTML = '<table><thead><tr><th>id</th><th>用于</th><th>来源</th><th>取证</th><th>原文（节选）</th></tr></thead><tbody>'
+    + (D.sources || []).map(function (s) {
+        return "<tr><td class=\"mono\">" + esc(s.id) + "</td><td class=\"mono\">" + esc(s.on) + "</td><td>"
+          + esc(s.name) + '<div class="mono note">' + esc(host(s.url)) + "</div></td><td class=\"mono\">"
+          + esc(s.fetched) + "</td><td>" + esc(s.quote) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+
+  var c = D.conventions || {};
+  $("conv").innerHTML = "<ul>" + Object.keys(c).map(function (k) {
+    return "<li><b>" + esc(k) + "</b>：" + esc(c[k]) + "</li>";
+  }).join("") + "</ul>";
+})();
+</script>
+
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+<script src="../shell/live-badge.js" defer></script>
+<script src="../shell/tentacle-kit.js" defer></script>
+</body></html>

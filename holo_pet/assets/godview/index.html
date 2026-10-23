@@ -1,0 +1,80 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>上帝之眼 · GBT小土豆V8</title><style>
+ :root{--bg:#080b10;--panel:#101822;--line:#1d2836;--ink:#dfe9f4;--dim:#7d90a6;--cyan:#33c9dc;--orange:#f0a03c;--red:#e5484d;--green:#3fb950;--violet:#a371f7}
+ *{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#0d1723,#080b10);color:var(--ink);font:14px/1.6 "Segoe UI","Microsoft YaHei",sans-serif}
+ header{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:center}
+ h1{font-size:18px;margin:0;font-weight:600;letter-spacing:.5px}
+ .sub{color:var(--dim);font-size:12px}.meta{margin-left:auto;color:var(--dim);font-size:12px}
+ .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;padding:20px 24px}
+ .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+ .card h2{font-size:13px;margin:0 0 10px;color:var(--dim);font-weight:500;letter-spacing:.6px}
+ .item{padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+ .item:first-child{border-top:0}
+ .src{color:var(--dim);font-size:11px}
+ .ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--orange)}.adv{color:var(--violet)}
+ table{width:100%;border-collapse:collapse}th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;font-size:12.5px}
+ th{color:var(--dim);font-weight:500}
+ footer{padding:14px 24px;color:var(--dim);font-size:12px;border-top:1px solid var(--line)}
+</style><script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head><body>
+<header>
+ <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#33c9dc" stroke-width="1.6"><path d="M12 5c-5 0-9 4.5-9 7s4 7 9 7 9-4.5 9-7-4-7-9-7z"/><circle cx="12" cy="12" r="3"/></svg>
+ <h1>上帝之眼</h1><span class="sub">看得见创作页面 · 两位顾问 · 每日汇报 · 计划与决策</span>
+ <span class="meta" id="at">-</span>
+</header>
+<div class="wrap">
+ <div class="card"><h2>创 作 页 面（眼睛能看到）</h2><div id="pages"></div></div>
+ <div class="card"><h2>四 岗 分 工 · 谁 拍 板</h2><div id="roles"></div></div>
+ <div class="card"><h2>最 近 决 策（Jev）</h2><div id="decisions"></div></div>
+ <div class="card"><h2>两 位 顾 问 · 权 限</h2><div id="adv"></div></div>
+ <div class="card"><h2>缺 点</h2><div id="gaps"></div></div>
+ <div class="card"><h2>短 板 / 卡 点</h2><div id="short"></div><div id="block" style="margin-top:10px"></div></div>
+</div>
+<footer>口径：每条都带来源（哪个读数文件/哪个能力位）；页面=真读文件，服务=真连端口；**由 Jev 拍板**（克劳德只出意见；Codex 编程；DeepSeek 执行层；主体编排留痕）。</footer>
+<script>
+const INLINE = {"ok": true, "op": "daily", "at": "2026-09-28T04:56:03", "探针汇报": {"available": true, "deliverables": ["AI三大方向创意前置层蒸馏提案_2026-09-28.html", "小土豆记忆大脑结构规划_2026-09-28.html"], "evidence": ["media_run_runnable_steps_2026-09-28.txt", "小土豆大脑截图转录_2026-09-28.txt", "扫通执行"], "ledger_tail": "\n1. **1–4 号外部抓取原件均未落盘** —— 抓取发生在立规前，只把结论写进了报告，**原始快照已不可复现**。\n   → 后续严格执行：抓到即存 `04-调研/<日期>/`，再写结论。\n2. **口径不一致风险** —— 3 号（总星）与 1 号（stars today）口径不同，曾导致误读风险。台账已并列标注，勿混用。"}, "全量扫描": {"缺点": [{"item": "未清故障 10 条（['F3', 'F5', 'F9', 'F11', 'F12']）", "src": "state/排查台账.json"}], "短板": [{"item": "未实现登记 1 条（['unimplemented']）", "src": "state/unimplemented.json"}, {"item": "密钥槽未就位 3 个（['claude', 'free_pool', 'sec_llm']）", "src": "automation_keys.status"}, {"item": "吞入未融合 3 条（三件不齐 ⇒ 还不算融合）", "src": "devour_fusion.audit"}, {"item": "最短板[故障] 未清故障 10 条：['F3', 'F5', 'F9', 'F11', 'F12']", "src": "state/排查台账.json"}, {"item": "最短板[未实现] 未实现登记 1 条：['unimplemented']", "src": "state/unimplemented.json"}], "卡点": [{"item": "主人未许可的 owner 类能力位 64 个（要用时按名单批）", "src": "cap_tags.audit", "how": "python -m gbt_allinone.tools.cap_tags permit --tag <TAG> --ttl 600"}, {"item": "顾问（claude）**要授权才能问**：['process_execute', 'external_llm'] 现在 0 张 ⇒ 意见取不到", "src": "auth_gate.status（只读）", "how": "python -m gbt_allinone auth grant --scope process_execute --ttl 600"}, {"item": "ComfyUI 跑在 CPU（0.37.0）⇒ 出片慢（不是不能出）", "src": "gods_eye.daily/comfyui.status"}]}, "计数": {"缺点": 1, "短板": 5, "卡点": 3, "探针可用": true}, "_口径": "每一条都带 `src`（哪个读数文件/哪个能力位）—— **不许编**；探针汇报读的是探针工作区的真文件", "顾问": {"claude": {"role": "意见建议（架构 · 方向 · 评审）", "may": ["出意见", "出建议", "评审与挑刺", "商量架构与方向"], "may_not": ["决策（决策权在主体）", "直接改主项目"], "capability": "claude_code", "must_install": "npm i -g @anthropic-ai/claude-code", "available": true, "evidence": "C:\\Users\\ADMIN\\AppData\\Roaming\\npm\\claude.CMD"}, "codebuddy": {"role": "杂事（服从安排 · 随时候命）", "may": ["杂事：路径排查", "日志整理", "取数/搜索", "跑腿"], "may_not": ["对主项目有执行权", "决策", "改主项目文件"], "capability": "codebuddy", "main_project_paths": ["projects/", "gbt_allinone/", "skills/", "tools/", "state/"], "available": true, "evidence": "C:\\Users\\ADMIN\\AppData\\Local\\codebuddy\\bin\\codebuddy.EXE"}}, "分工": {"jev": {"role": "决策（拍板）", "may": ["拍板", "裁决", "在候选里选一个", "否掉不成熟的提案", "定优先级"], "may_not": ["绕过授权门", "**无证据拍板**", "自己动手执行", "替编程/执行层干活"], "how": "快慢双脑（蒸馏自 Jev/TypeSafe System One）：快脑出候选+置信度；置信度不够才升慢脑；慢脑没有或回话解析不出候选 ⇒ **挂起**，绝不硬猜", "protocol": "tools/control_loop.py（同一套 Jev 协议：枚举动作 · 两查 · DONE 要独立验证）", "probe": null, "slow_brain": ["llm_chat（DeepSeek/Kimi/OpenAI 密钥链）", "local_brain（本地模型）"]}, "claude": {"role": "意见建议 + 商量（不给决策）", "may": ["出意见", "出建议", "评审与挑刺", "商量架构与方向"], "may_not": ["决策（拍板是 Jev 的活）", "直接改主项目"], "capability": "claude_code", "probe": {"kind": "claude_code", "op": "status"}, "must_install": "npm i -g @anthropic-ai/claude-code"}, "codex": {"role": "专注编程", "may": ["写码", "改码", "重构", "评审代码", "跑测试"], "may_not": ["决策（拍板是 Jev 的活）", "跳过判据直接改生产"], "capability": "codex_chat", "probe": {"kind": "codex_status", "op": "status"}, "how": "codex_chat（同步对话）/ codex_turn_send（回合并流式回传）· 并发上限 1，需 process_execute+external_llm"}, "deepseek": {"role": "专注执行层（DeepSeek Harness）", "may": ["执行动作", "跑链", "调能力位落地", "批量作业"], "may_not": ["决策（拍板是 Jev 的活）", "自作主张改方向"], "capability": "llm_chat", "probe": {"kind": "automation_keys", "op": "status"}, "how": "llm_chat 的 DeepSeek 密钥链（automation_keys 的 deepseek 槽）+ 大脑执行层 brain_execute"}}, "决策人": "**Jev（推理模型）拍板** —— 意见与建议来自克劳德（可商量）；Codex 专注编程；DeepSeek Harness 专注执行层；主体（GBT小土豆V8）负责编排、留痕与兜底。Jev 挂起时**决策也挂起**（不许谁替它拍）", "最近决策": [{"at": "2026-09-28T04:53:37", "choice": "修未清故障", "path": "fast", "decider": "Jev（推理模型）", "question": "先干哪个？"}, {"at": "2026-09-28T04:53:37", "choice": null, "path": "blocked", "decider": "Jev（推理模型）", "question": "选哪种蓝？"}, {"at": "2026-09-28T04:53:37", "choice": "修未清故障", "path": "fast", "decider": "Jev（推理模型）", "question": "先做哪个？"}]};
+const PAGES = [{"page": "console3d", "why": "3D 大脑执行层（172+ 能力位球面 / run_task 脉冲流）", "exists": true, "kb": 61.3, "open": "holo_pet/assets/console3d/index.html"}, {"page": "automation", "why": "三套自动化闭环（音乐试听 / 短视频试看 / 电影分幕）", "exists": true, "kb": 17.0, "open": "holo_pet/assets/automation/index.html"}, {"page": "structure", "why": "框架结构浏览器（三栏）", "exists": true, "kb": 46.7, "open": "holo_pet/assets/structure/index.html"}, {"page": "godview", "why": "上帝之眼（本页）", "exists": true, "kb": 11.5, "open": "holo_pet/assets/godview/index.html"}, {"page": "health-panel", "why": "健康面板（安全棒读数 · 异常报警）", "exists": true, "kb": 7.9, "open": "holo_pet/assets/health-panel/index.html"}, {"page": "task-manager", "why": "任务管理器（真进程 · 归属/内存/CPU/端口）", "exists": true, "kb": 10.1, "open": "holo_pet/assets/task-manager/index.html"}, {"page": "music", "why": "音乐线面板", "exists": true, "kb": 12.3, "open": "holo_pet/assets/music/index.html"}];
+function li(x){return '<div class="item">'+x+'</div>';}
+function render(d){
+  document.getElementById('at').textContent = (d && d.at) || '-';
+  document.getElementById('pages').innerHTML = (PAGES||[]).map(p=>li(
+    '<b>'+p.page+'</b> <span class="'+(p.exists?'ok':'bad')+'">'+(p.exists?'可见':'缺')+'</span> · '+
+    '<span class="src">'+p.why+'</span>')).join('') +
+    '<div class="item"><span class="src">服务：'+((d&&d.services)||[]).map(s=>s.what.split('（')[0]+(s.listening?' 🟢':' ⚪')).join(' · ')+'</span></div>';
+  const R=(d&&d.分工)||{};
+  document.getElementById('roles').innerHTML = Object.entries(R).map(([k,v])=>li(
+    '<b class="adv">'+k+'</b> <span class="src">'+v.role+'</span><br>'+
+    '<span class="src">可：'+(v.may||[]).join(' / ')+'<br>不可：'+(v.may_not||[]).join(' / ')+'</span>')).join('')
+    + li('<span class="src">'+(d&&d.决策人||'')+'</span>');
+  const D=(d&&d.最近决策)||[];
+  document.getElementById('decisions').innerHTML = D.length ? D.map(x=>li(
+    '<b>'+(x.path==='blocked'?'⏸ 挂起':'✔ '+(x.choice||'-'))+'</b> <span class="src">'+x.path+'</span><br>'+
+    '<span class="src">'+(x.question||'')+'　·　'+x.at+'</span>')).join('')
+    : li('<span class="src">还没有决策记录（跑 run_task(\'gods_eye\', {\'op\':\'decide\', …})）</span>');
+  const A=(d&&d.顾问)||{};
+  document.getElementById('adv').innerHTML = Object.entries(A).map(([k,v])=>li(
+    '<b class="adv">'+k+'</b> <span class="'+(v.available?'ok':'warn')+'">'+(v.available?'可用':'不可用')+'</span> · '+
+    '<span class="src">'+v.role+'</span><br><span class="src">可：'+v.may.join(' / ')+'<br>不可：'+v.may_not.join(' / ')+'</span>')).join('')
+    + li('<span class="src">决策：'+(d&&d.decider||'-')+'</span>');
+  const S=(d&&d.全量扫描)||{};
+  document.getElementById('gaps').innerHTML = ((S.缺点||[]).map(x=>li('<span class="bad">'+x.item+'</span><br><span class="src">'+x.src+'</span>')).join('')) || li('<span class="ok">无</span>');
+  document.getElementById('short').innerHTML = ((S.短板||[]).map(x=>li('<span class="warn">'+x.item+'</span><br><span class="src">'+x.src+'</span>')).join('')) || li('<span class="ok">无</span>');
+  document.getElementById('block').innerHTML = ((S.卡点||[]).map(x=>li('<span class="bad">'+x.item+'</span><br><span class="src">'+x.src+'</span>')).join(''));
+}
+render(INLINE);
+async function refresh(){try{const r=await fetch('state/gods_eye.json',{cache:'no-store'});render(await r.json());}catch(e){}}
+setInterval(refresh, 15000);
+</script>
+<footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body></html>

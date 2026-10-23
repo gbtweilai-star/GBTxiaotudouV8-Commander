@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 数据由 tools/codex-scripts/model-align.py probe 生成，本页零远端请求、只读本机数据件。
+     重建：py -3.14 -X utf8 tools/codex-scripts/model-align.py probe
+     判据：py -3.14 -X utf8 tools/codex-scripts/model-align.py --check -->
+<title>GBT小土豆V8 · 模型版本对齐（四环）</title>
+<style>
+:root{--bg:#07090d;--pan:#0d1117;--line:#1d2635;--ink:#e6edf7;--dim:#8b97a8;
+ --ok:#34d399;--bad:#f87171;--off:#6b7280;--cy:#22d3ee;--or:#f5b041;
+ --ok-bg:#0f2a20;--bad-bg:#2a1414;--off-bg:#16181d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI",system-ui,sans-serif}
+.gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
+ background:linear-gradient(90deg,#0b1017,#0d1117);flex-wrap:wrap}
+.mark{width:18px;height:18px;border:2px solid var(--or);border-radius:4px}
+.brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--or)}
+.note{color:var(--dim);font-size:11.5px}
+.wrap{padding:14px;display:grid;gap:14px;max-width:1180px}
+.card{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:12px}
+h2{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.4px}
+.hero{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero .big{font-size:22px;font-weight:700}
+.hero .big.ok{color:var(--ok)}.hero .big.bad{color:var(--bad)}
+.ring{display:grid;grid-template-columns:26px 210px 1fr;gap:8px;align-items:start;
+ border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin:8px 0;background:#0b1017}
+.ring.ok{border-color:#1d5c45}.ring.bad{border-color:#6b2a2a;background:var(--bad-bg)}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:5px}
+.dot.ok{background:var(--ok);box-shadow:0 0 8px #34d39980}.dot.bad{background:var(--bad);box-shadow:0 0 8px #f8717180}
+.rname{font-weight:600}
+.rread{color:var(--ink);font-size:12px;word-break:break-all}
+.rsrc{color:var(--dim);font-size:11px;margin-top:2px}
+.mono,code{font-family:ui-monospace,Consolas,monospace}
+code{color:var(--cy)}
+.hr{height:1px;background:var(--line);margin:10px 0}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:3px 10px;font-size:12px}
+.kv dt{color:var(--dim)}.kv dd{margin:0;word-break:break-all}
+.todo li{margin:2px 0}
+.todo b{color:var(--or)}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--dim);text-decoration:none}
+.nav a:hover{border-color:var(--or);color:var(--ink)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin:2px 4px 2px 0;color:var(--dim);font-size:11px}
+.pill.ok{border-color:#1d5c45;color:var(--ok)}.pill.bad{border-color:#6b2a2a;color:var(--bad)}
+.foot{border-top:1px solid var(--line);margin-top:12px;padding:10px 16px;color:var(--dim);font-size:11.5px}
+</style></head><body>
+<div class="gbt-topbar"><span class="mark"></span><span class="brand">GBT<b>小土豆</b>V8</span>
+<span class="note">模型版本对齐 ｜ 现读 <span id="at">—</span> ｜ 重建 <code>model-align.py probe</code> ｜ 判据 <code>model-align.py --check</code></span></div>
+
+<div class="wrap">
+  <div class="card">
+    <h2>// 00 — 一句话：云上答话的是不是这一版权重</h2>
+    <div class="hero">
+      <div class="big" id="verdict">—</div>
+      <div class="note" id="want"></div>
+    </div>
+    <div class="hr"></div>
+    <div class="note" id="gist"></div>
+  </div>
+
+  <div class="card">
+    <h2>// 01 — 四环（缺一条就是没对齐；红就是红，不许念成通）</h2>
+    <div id="rings"></div>
+  </div>
+
+  <div class="card">
+    <h2>// 02 — 还没对齐的（记着没修，不是不知道）</h2>
+    <ul class="todo" id="todo"></ul>
+  </div>
+
+  <div class="card">
+    <h2>// 03 — 互通（这页与其它页互指；全页可达在面板左栏，不再每页挂横条）</h2>
+    <div class="nav">
+      <a href="../digital-human/index.html">她 · 数字人</a>
+      <a href="../capability-bar/index.html">能力栏</a>
+      <a href="../capabilities/index.html">能力统计</a>
+      <a href="../cloud-plugins/index.html">云插件独立页</a>
+      <a href="../cloud-status/index.html">连接状态</a>
+      <a href="../health-ledger/index.html">框架总账</a>
+      <a href="../energy/index.html">能量与绑定</a>
+      <a href="../logbook/index.html">记录本</a>
+      <a href="../panel/index.html">面板（全页可达）</a>
+    </div>
+    <div class="hr"></div>
+    <dl class="kv">
+      <dt>本页数据件</dt><dd class="mono">holo_pet_w3/model-align/model-align-data.js</dd>
+      <dt>账（判据读它）</dt><dd class="mono">state/model-deploy/cloud-align.json</dd>
+      <dt>写手</dt><dd class="mono">tools/codex-scripts/model-align.py probe</dd>
+      <dt>换版时</dt><dd>改 <code>state/weights/ACTIVE.json</code> 的 active_artifact/agg → 跑 probe → 本页自动跟着变</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="foot">GBT小土豆V8 · 模型版本对齐页 · 开发者：自由的风 · 本页只读本机数据件，不连远端</div>
+
+<script src="./model-align-data.js"></script>
+<script>
+(function () {
+  var D = globalThis.GBT_MODEL_ALIGN || null;
+  function el(id) { return document.getElementById(id); }
+  if (!D) {
+    el("verdict").textContent = "没有数据件";
+    el("verdict").className = "big bad";
+    el("gist").textContent = "跑一次 py -3.14 -X utf8 tools/codex-scripts/model-align.py probe 就有了。";
+    return;
+  }
+  el("at").textContent = D.at || "—";
+  el("verdict").textContent = D.all_ok ? "四环全绿 · 云上跑的就是这一版" : "有环没对齐";
+  el("verdict").className = "big " + (D.all_ok ? "ok" : "bad");
+  el("want").textContent = "现役：" + (D.want_model || "—");
+  el("gist").textContent = D.note || "";
+
+  var box = el("rings");
+  (D.rings || []).forEach(function (r) {
+    var d = document.createElement("div");
+    d.className = "ring " + (r.ok ? "ok" : "bad");
+    var dot = document.createElement("span");
+    dot.className = "dot " + (r.ok ? "ok" : "bad");
+    var nm = document.createElement("div");
+    nm.className = "rname";
+    nm.textContent = r.ring + " ";
+    var badge = document.createElement("span");
+    badge.className = "pill " + (r.ok ? "ok" : "bad");
+    badge.textContent = r.ok ? "已对齐" : "没对齐";
+    nm.appendChild(badge);
+    var rd = document.createElement("div");
+    var rr = document.createElement("div");
+    rr.className = "rread mono";
+    rr.textContent = r.读 || "";
+    var rs = document.createElement("div");
+    rs.className = "rsrc";
+    rs.textContent = "来源：" + (r.来源 || "—");
+    rd.appendChild(rr); rd.appendChild(rs);
+    d.appendChild(dot); d.appendChild(nm); d.appendChild(rd);
+    box.appendChild(d);
+  });
+
+  var td = el("todo");
+  var list = D.todo || [];
+  if (!list.length) {
+    var li0 = document.createElement("li");
+    li0.textContent = "没有登记在案的待修项。";
+    td.appendChild(li0);
+  } else {
+    list.forEach(function (t) {
+      var li = document.createElement("li");
+      var b = document.createElement("b");
+      b.textContent = t.cap || t.type || "待办";
+      li.appendChild(b);
+      li.appendChild(document.createTextNode(
+        "（" + (t.type || "") + "）" + (t.why || "") +
+        " · 修法：" + (t.fix || "—") + " · 成本：" + (t.cost || "—") +
+        " · 现状：" + (t.status || "—")));
+      td.appendChild(li);
+    });
+  }
+})();
+</script>
+<script src="../shell/live-badge.js" defer></script>
+<script src="../shell/tentacle-kit.js" defer></script>
+</body></html>

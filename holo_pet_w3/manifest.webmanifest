@@ -1,0 +1,10 @@
+{
+ "name": "GBT小土豆V8",
+ "short_name": "小土豆V8",
+ "start_url": "./capabilities/index.html",
+ "display": "standalone",
+ "background_color": "#0b0d10",
+ "theme_color": "#0b0d10",
+ "orientation": "any",
+ "icons": []
+}

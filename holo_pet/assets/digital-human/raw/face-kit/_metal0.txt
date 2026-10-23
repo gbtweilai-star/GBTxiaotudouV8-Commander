@@ -1,0 +1,14 @@
+  ✓ model-rigged-anim.glb        [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 model-rigged-anim.glb.bak-metal0-20261015-225547 · 6561608 B → 6561608 B
+  ✓ model-rigged.glb             [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 model-rigged.glb.bak-metal0-20261015-225547 · 6403948 B → 6403948 B
+  ✓ avatar-hd.glb                [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 avatar-hd.glb.bak-metal0-20261015-225547 · 6561608 B → 6561608 B
+  ✓ model-expressions.glb        [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 model-expressions.glb.bak-metal0-20261015-225547 · 7658324 B → 7658324 B
+  ✓ model-springs-hair.glb       [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 model-springs-hair.glb.bak-metal0-20261015-225547 · 12895424 B → 12895424 B
+  ✓ model-springs-chains.glb     [('tripo_mat_c94e5edc', 1.0)] → [('tripo_mat_c94e5edc', 0.0)] · 备份 model-springs-chains.glb.bak-metal0-20261015-225547 · 7002704 B → 7002704 B
+
+═══ 复核：GLB 还能被解析吗（魔数 + chunk 对齐 + 读回材质）═══
+  ✓ model-rigged-anim.glb        ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65
+  ✓ model-rigged.glb             ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65
+  ✓ avatar-hd.glb                ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65
+  ✓ model-expressions.glb        ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65
+  ✓ model-springs-hair.glb       ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65
+  ✓ model-springs-chains.glb     ver=2 · 材质 metallic=[0.0] · 三角 20543 · 关节 65

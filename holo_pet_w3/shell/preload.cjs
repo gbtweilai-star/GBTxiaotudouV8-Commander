@@ -1,0 +1,119 @@
+/* GBT小土豆V8 · 上帝视角 · preload（W3 / W9）
+ * 只暴露只读 IPC：渲染进程**没有任何数据写口**（V6）—— 不写文件、不发网络、不碰 store。
+ *
+ * W9 补记：新增一个**动作口** `summon`（数字人召唤）。它不写任何数据，
+ * 只让主进程起一个本机窗口；不 kill 任何进程。除它以外全部仍是只读口，
+ * 所以 `readonly: true` 的语义限定为"数据面只读"，动作面另立一行如实登记：
+ * `non_readonly_capability`。谁要再加动作口，必须同步改这一行，不许悄悄放宽。
+ *
+ * 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+ */
+"use strict";
+
+const { contextBridge, ipcRenderer } = require("electron");
+
+const invoke = (channel, payload) => ipcRenderer.invoke(channel, payload);
+
+/* ── 云账号授权面（主人令 2026-10-23：「直接在APP上做好我自己点击登入授权」）──
+   三个口：status（现读会话）/ login（起一轮浏览器授权，指定槽位）/ deploy（把网格节点部署到当前账号）。
+   红线：这条面**不发凭据**，只回邮箱、账号掩码与部署地址 —— 任何 token 都不经这里。 */
+contextBridge.exposeInMainWorld("gbtCloud", {
+  status: () => invoke("cf:status"),
+  login: (slot) => invoke("cf:login", { slot: String(slot) }),
+  deploy: () => invoke("cf:deploy"),
+  install: (slot, token) => invoke("cf:install", { slot: String(slot), token: String(token) }),
+  verify: (slot, token) => invoke("cf:verify", { slot: String(slot), token: String(token) }),
+  meshSync: () => invoke("mesh:sync"),
+  onLoginUrl: (cb) => {
+    if (typeof cb !== "function") return () => {};
+    const handler = (_e, url) => { try { cb(String(url)); } catch (_err) { /* 页面自己兜 */ } };
+    ipcRenderer.on("cf:login-url", handler);
+    return () => ipcRenderer.removeListener("cf:login-url", handler);
+  },
+});
+
+contextBridge.exposeInMainWorld("gbtW3", {
+  readonly: true,
+  non_readonly_capability: "summon（只起一个本机窗口：不写文件、不发网络、不 kill 进程）"
+    + " · connectDsh（把主人**运行时**给的对话面 URL 交给窗口加载：只放行本机回环；"
+    + "URL 只在内存，**不落盘、不回显**，返回值只给 host）"
+    + " · openExternal（把**本机回环**页面交给系统浏览器打开：只放行回环，不落盘、只回 host）"
+    + " · panelGoto（**面板内跳页**：让面板窗切到某注册窗的页面，不开新窗）"
+    + " · capFrame（**取一帧触手视野**：走面板桥真调 tentacle see；只在内存回传，不落盘）"
+    + " · heartbeat（**触手心跳派活**：按轮换给只读能力位派活，账本自己会记；关掉即停）"
+    + " · showWindow（一体式 App 铬的跨窗跳转：**只认注册表里已有的窗 id**；"
+    + "只改窗口可见性/焦点，不写文件、不出网、不 kill 进程）"
+    + " · intercom（**开麦克风采集 + 让本机出声**。第 58 轮加。"
+    + "口径：监听随页面生灭、不设开关；真跑的是 intercom.py，它走唯一门 run_task；"
+    + "主进程不直接碰 voice_cap、不读凭据、不写文件；关页面即 kill 该子进程）",
+  config: () => invoke("w3:config"),
+  state: () => invoke("w3:state"),
+  tasks: () => invoke("w3:tasks"),
+  env: () => invoke("w3:env"),
+  ledger: () => invoke("w3:ledger"),
+  health: () => invoke("w3:health"),
+  matrix: () => invoke("w3:matrix"),
+  mindmap: () => invoke("w3:mindmap"),
+  selfcheck: () => invoke("w3:selfcheck"),
+  introspect: () => invoke("w3:introspect"),
+  tools: () => invoke("w3:tools"),
+  h1: () => invoke("w3:h1"),
+  pets: (payload) => invoke("w3:pets", payload),
+  summon: (payload) => invoke("w3:summon", payload),
+  connectDsh: (payload) => invoke("w3:connect-dsh", payload),
+  /* 🔴 2026-10-09 主人令「必须镶嵌进去……统一品牌和Logo，我们是把她集成进我们」：
+     取**对话引擎入口**给自己的本地页用（品牌框架页 / 面板内嵌页），
+     这样引擎跑在**我们的门面**里，而不是她的整窗界面。
+     口径不变：只放行本机回环；没有就如实说"还没接上"，不假装。 */
+  dshEntry: () => invoke("w3:dsh-entry"),
+  /* 数字人页的「文本→桥」受理口（2026-10-08）：页面是**离线自包含**的
+     （CSP `connect-src 'none'`，自己发不出任何请求），所以由**壳替它跑这一趟**：
+     页面只给文本，**目标由壳写死**（只可能打到本机面板桥 :8765 的 /api/message）
+     ⇒ 页面构造不出别的地址，也就不用放开它的网络面。失败**带原文**回来，不静默。 */
+  message: (payload) => invoke("w3:message", payload),
+  /* 让她念一句（动作口，2026-10-18 主人令「digital-human 那扇窗的嘴也换成神经嗓」）：
+     壳替页面跑一次**能力位**调用 `cap voice op=speak`（单一门、授权/审计都在门上），
+     回执原样回（spoken / 被拒 missing_scopes / no_taiwan_lane 全带原因）。不写文件、不发声不假报。 */
+  say: (payload) => invoke("w3:say", payload),
+  /* 让她**自己动手**（2026-10-18「下一步：她 → 触手」）：调一个**白名单内的只读能力位**。
+     白名单写在壳里（main.cjs `CAP_READONLY`），页面传什么都不可能越界；
+     需要票的、会写盘的、会出网的**一律不放**，被拒时把门的原话带回来。 */
+  cap: (payload) => invoke("w3:cap", payload),
+  showWindow: (payload) => invoke("w3:show-window", payload),
+  /* 在系统浏览器里打开**本机回环**页面（动作口，2026-10-04）：页面固定的配套 ——
+     窗不上跳，显式意图走浏览器。只放行回环；URL 只进内存，返回只有 host。 */
+  openExternal: (payload) => invoke("w3:open-external", payload),
+  /* 面板内跳页（主人令 2026-10-04「固定在 APP 面板上」）：让**面板窗**在内容区里切页，
+     不再新建 OS 窗。只认得注册表里的窗 id（壳侧解析成页面路径）。 */
+  panelGoto: (payload) => invoke("w3:panel-goto", payload),
+  /* 触手视野**活体取帧**（动作口，2026-10-04）：真调 tentacle see 取一帧，
+     只在内存回给页面渲染（不落盘、不缓存、不回显路径）。 */
+  capFrame: () => invoke("w3:cap-frame"),
+  /* 触手活动流（只读账本尾）与心跳派活开关（动作口：按轮换给**只读**能力位派活）。 */
+  capActivity: () => invoke("w3:cap-activity"),
+  heartbeat: (payload) => invoke("w3:heartbeat", payload),
+  onPanelGoto: (handler) => ipcRenderer.on("panel:goto", (_e, msg) => handler(msg)),
+  eigenflux: () => invoke("w3:eigenflux"),
+  /* R-H295 新接的两只**只读**审计器（欠账：「覆盖审计接进上帝视角」「零调用点清单接进上帝视角」）。
+     两者都是**实时现跑** —— 主进程侧走 /api/capability 真调框架审计器再等 cap_result，
+     不是读快照、不是硬编码数字。仍然全部只读，`readonly: true` 语义不变。 */
+  coverage: () => invoke("w3:coverage"),
+  orphans: () => invoke("w3:orphans"),
+  gene: () => invoke("w3:gene"),
+  onEvent: (handler) => ipcRenderer.on("w3:event", (_e, msg) => handler(msg)),
+  onStreamState: (handler) => ipcRenderer.on("w3:stream", (_e, st) => handler(st)),
+  /* 实时流的**现状**（只读拉取 · 2026-09-23 第 45 轮加）。
+     上面那个 `onStreamState` 是**推**：只在状态变化时来一次。而窗口可能**在连接之后**才建
+     （`startSse` 跑在建窗之前 —— 数据面先立那条规矩），推的那一次就没人听得到。
+     ⇒ 补一个拉取口，谁建的窗都能问现状。**只读**，所以不进 `non_readonly_capability`。 */
+  streamState: () => invoke("w3:stream-state"),
+  /* W3 · **语音对讲**（2026-09-23 第 58 轮加）。这是**动作口**，不是数据面只读：
+     它会①开麦克风采集、②让本机出声（TTS）。两件都不是"读"，所以**必须**
+     同步登记进上面 `non_readonly_capability` 那一行，不许悄悄放宽。
+     口径（主人令）：「打开页面就自动监听，关闭她也跟着关闭」⇒ **不设开关**；
+     监听随**页面**生灭，不随进程常驻（大脑后台另算）。
+     真跑的是 `tools/codex-scripts/intercom.py`，它内部走唯一门（`five-dim.py cap voice`
+     = `api.run_task`）；**主进程不直接碰 voice_cap、不读凭据、不写数据**。 */
+  intercom: (op, args) => invoke("w3:intercom", { op: op, args: args || {} }),
+  onIntercom: (handler) => ipcRenderer.on("w3:intercom-event", (_e, msg) => handler(msg)),
+});

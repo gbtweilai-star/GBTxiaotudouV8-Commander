@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>GBT 棚拍渲染器 · GLB 预览</title>
+<style>html,body{margin:0;height:100%;background:#0f131b;overflow:hidden}
+#hud{position:fixed;left:12px;top:10px;z-index:9;color:#E8ECF8;font:12px/1.6 system-ui,"Microsoft YaHei",sans-serif;
+     background:rgba(10,13,22,.74);border:1px solid rgba(124,77,255,.4);border-radius:10px;padding:8px 12px}
+b{color:#00E5FF}
+#err{position:fixed;left:12px;bottom:12px;color:#F5B041;font:12px/1.5 monospace;max-width:92vw}
+</style>
+<script type="importmap">
+{"imports":{"three":"/holo_pet/node_modules/three/build/three.module.js","three/addons/":"/holo_pet/node_modules/three/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="hud">
+  GLB 棚拍 · <b id="f">—</b> · 顶点 <b id="v">—</b> · 三角形 <b id="t">—</b> · 贴图 <b id="tx">—</b> · 动作 <b id="an">—</b><br>
+  环境 <b id="env">—</b> · 色调 <b id="tm">—</b> · 阴影 <b id="sh">—</b> · 帧 <b id="fr">0</b>
+</div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const q = new URLSearchParams(location.search);
+const file = q.get("glb") || "/assets/treasure-chest.glb";
+const rot = parseFloat(q.get("rot") || "0.6");
+const SIZE = parseInt(q.get("size") || "760", 10);
+const focus = q.get("focus") || "";        // focus=head → 按头部构图（做脸部级对照用）
+const clipName = q.get("clip") || "";      // 指定播放/抽帧的动画名
+const strip = parseInt(q.get("strip") || "0", 10);
+const inplace = q.get("inplace") === "1";  // 抵消根位移（走路看姿势用）
+const ss = Math.max(1, Math.min(3, parseFloat(q.get("ss") || "1")));   // 超采样倍数
+const beauty = q.get("beauty") === "1";                               // 眼神光/脸部补光
+
+/* 蒸馏自当下最热的三样（见 README 出处）：
+   ① IBL：RoomEnvironment + PMREM —— 金属/塑料没有环境反射就是黑块
+   ② 色调映射：Khronos PBR Neutral —— 专为产品级真色，不把亮黄/绿/青洗白（ACES 会）
+   ③ 阴影：PCFSoft 软阴影 + ShadowMaterial 接触阴影 —— 没有落地阴影物体就"飘"着 */
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, powerPreference: "low-power" });
+renderer.setPixelRatio(ss);   // 超采样：渲染 ss× 再降采样，边缘更锐利但不锯齿
+renderer.setSize(SIZE, SIZE);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const TONE = (THREE.NeutralToneMapping !== undefined) ? THREE.NeutralToneMapping : THREE.ACESFilmicToneMapping;
+renderer.toneMapping = TONE;
+renderer.toneMappingExposure = 1.25;   // 曝光：PBR Neutral 下略提，避免整体偏暗
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+
+// 背景：竖向渐变（棚拍背景纸），比纯色更像影棚
+const bg = document.createElement("canvas"); bg.width = 4; bg.height = 256;
+const bx = bg.getContext("2d"), grd = bx.createLinearGradient(0, 0, 0, 256);
+grd.addColorStop(0, "#2b3446"); grd.addColorStop(0.55, "#1b2130"); grd.addColorStop(1, "#0d1017");
+bx.fillStyle = grd; bx.fillRect(0, 0, 4, 256);
+scene.background = new THREE.CanvasTexture(bg);
+
+// ① IBL
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+if ("environmentIntensity" in scene) scene.environmentIntensity = 1.45;   // 环境强度：IBL 是主要照亮来源
+
+const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
+// 三点布光：主光（带阴影）+ 侧补 + 背轮廓（IBL 已提供大部分环境光，所以这里给得克制）
+const key = new THREE.DirectionalLight(0xffffff, 2.7);
+key.position.set(2.6, 4.2, 3.2);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+key.shadow.camera.near = 0.5; key.shadow.camera.far = 20;
+key.shadow.camera.left = -2; key.shadow.camera.right = 2;
+key.shadow.camera.top = 2; key.shadow.camera.bottom = -2;
+key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x9fd8ff, 1.05); rim.position.set(-3.5, 2.2, -3.0); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffe6c8, 0.55); fill.position.set(-2.5, 1.2, 2.5); scene.add(fill);
+if (beauty) {
+  // 眼神光：从相机方向略上方打一盏低强度暖光，让眼球/角膜出现高光点（专业人像必备）
+  const eye = new THREE.DirectionalLight(0xfff2e0, 0.55); eye.position.set(1.2, 1.6, 2.2); scene.add(eye);
+  // 皮肤补光：抬高暗部，避免脸部糊成一片
+  const bounce = new THREE.HemisphereLight(0xffe9d6, 0x2a2118, 0.35); scene.add(bounce);
+}
+
+let ground = null, frames = 0;
+function loop() {
+  renderer.render(scene, camera);
+  frames++;
+  document.getElementById("fr").textContent = String(frames);
+  if (frames % 15 === 0) checkPainted();
+  requestAnimationFrame(loop);
+}
+
+const probe = document.createElement("canvas");
+probe.width = probe.height = 24;
+function checkPainted() {
+  try {
+    const c2 = probe.getContext("2d");
+    c2.drawImage(renderer.domElement, 0, 0, 24, 24);
+    const d = c2.getImageData(0, 0, 24, 24).data;
+    let mn = 255, mx = 0;
+    for (let i = 0; i < d.length; i += 4) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; if (l < mn) mn = l; if (l > mx) mx = l; }
+    window.__spread = mx - mn;
+    window.__painted = window.__shot === true && (mx - mn) > 12;
+  } catch (e) { window.__paintErr = String(e); }
+}
+renderer.domElement.addEventListener("webglcontextrestored", () => { frames = 0; window.__restored = (window.__restored || 0) + 1; });
+
+new GLTFLoader().load(file, (gltf) => {
+  const m = gltf.scene;
+  let verts = 0, tris = 0, tex = 0;
+  m.traverse((o) => {
+    if (!o.isMesh) return;
+    o.frustumCulled = false;
+    o.castShadow = true; o.receiveShadow = true;
+    const g = o.geometry;
+    verts += g.attributes.position.count;
+    tris += (g.index ? g.index.count : g.attributes.position.count) / 3;
+    for (const mm of (Array.isArray(o.material) ? o.material : [o.material])) if (mm && mm.map) tex++;
+  });
+  if (rot) m.rotation.y = rot;                                  // 先转
+  const box = new THREE.Box3().setFromObject(m);                // 再量（顺序错了就会切底）
+  const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+  m.position.sub(center);
+  const headSpan = size.y * 0.17;
+  const target = (focus === "head")
+    ? new THREE.Vector3(0, (box.max.y - headSpan * 0.5) - center.y, 0)   // 头顶往下 17% 的中心
+    : new THREE.Vector3(0, -size.y * 0.03, 0);
+  const frameR = (focus === "head") ? Math.max(size.x, headSpan) * 0.5 : Math.max(size.x, size.y, size.z) * 0.5;
+  const dist = frameR / Math.sin((camera.fov * Math.PI / 180) / 2) * ((focus === "head") ? 1.15 : 1.45);
+  if (focus === "head") camera.position.set(target.x + dist * 0.16, target.y + dist * 0.06, target.z + dist * 0.98);
+  else camera.position.set(target.x + dist * 0.68, target.y + dist * 0.52, target.z + dist * 0.82);
+  camera.lookAt(target);
+  scene.add(m);
+
+  // ③ 接触阴影：透明影子捕捉面，放在模型底部
+  ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: 0.42 }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -size.y * 0.5 - 0.001;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // 主光的阴影相机贴合模型尺寸（不然阴影糊或丢）
+  const r = Math.max(size.x, size.y, size.z);
+  key.shadow.camera.left = -r * 1.2; key.shadow.camera.right = r * 1.2;
+  key.shadow.camera.top = r * 1.2; key.shadow.camera.bottom = -r * 1.2;
+  key.shadow.camera.updateProjectionMatrix();
+
+  // ── 动画：播放指定 clip；strip=N 时抽 N 帧拼成一条（验收用）──
+  const anims = gltf.animations || [];
+  const anim = clipName ? THREE.AnimationClip.findByName(anims, clipName) : anims[0];
+  if (anim) {
+    const mixer = new THREE.AnimationMixer(m);
+    mixer.clipAction(anim).play();
+    // t=<秒>：定位到该帧（逐帧渲染后再拼条，比页内 drawImage 抓 WebGL 缓冲可靠）
+    const seek = q.get("t");
+    if (seek !== null) mixer.setTime(parseFloat(seek));
+    const hips = m.getObjectByName("mixamorig:Hips");
+    const hipsRestX = hips ? hips.position.x : 0;
+    if (strip > 0) {
+      const fw = 240, fh = 340, cols = strip;
+      const grid = document.createElement("canvas");
+      grid.width = cols * fw; grid.height = fh;
+      const g = grid.getContext("2d");
+      g.fillStyle = "#0d1017"; g.fillRect(0, 0, grid.width, grid.height);
+      renderer.setSize(fw, fh);
+      camera.aspect = fw / fh; camera.updateProjectionMatrix();
+      for (let i = 0; i < cols; i++) {
+        const tt = anim.duration * i / cols;
+        mixer.setTime(tt);
+        if (inplace && hips) m.position.x = -(hips.position.x - hipsRestX);
+        renderer.render(scene, camera);
+        g.drawImage(renderer.domElement, i * fw, 0, fw, fh);
+        g.fillStyle = "rgba(0,0,0,.45)"; g.fillRect(i * fw, fh - 22, fw, 22);
+        g.fillStyle = "#00E5FF"; g.font = "12px monospace";
+        g.fillText(`${anim.name} t=${tt.toFixed(2)}s`, i * fw + 6, fh - 7);
+        g.strokeStyle = "rgba(124,77,255,.5)"; g.strokeRect(i * fw + 0.5, 0.5, fw - 1, fh - 1);
+      }
+      document.body.appendChild(grid);
+      window.__strip = true;
+    }
+    window.__anim = anim.name;
+    window.__animDur = anim.duration;
+  }
+  document.getElementById("f").textContent = file.split("/").pop();
+  document.getElementById("v").textContent = String(verts);
+  document.getElementById("t").textContent = String(Math.round(tris));
+  document.getElementById("tx").textContent = String(tex);
+  document.getElementById("an").textContent = (anims.map((a) => a.name).join(",") || "无") + (strip > 0 ? " · 已抽帧" : "");
+  document.getElementById("env").textContent = "IBL(RoomEnvironment)";
+  document.getElementById("tm").textContent = (TONE === THREE.NeutralToneMapping) ? "PBR Neutral" : "ACESFilmic";
+  document.getElementById("sh").textContent = "PCFSoft + 接触阴影";
+  window.__shot = true;
+  loop();
+}, undefined, (e) => {
+  document.getElementById("err").textContent = "加载失败: " + (e && e.message ? e.message : e);
+  window.__err = String(e);
+});
+</script>
+</body>
+</html>

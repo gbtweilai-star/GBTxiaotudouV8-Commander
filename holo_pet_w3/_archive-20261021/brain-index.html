@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="utf-8" />
+<!-- CSP：**离线自包含**的硬保证。`default-src 'none'` + `connect-src 'none'` 把出网焊死；
+     three 是本地 vendored 的（见 ./vendor/），所以 `script-src 'self'` 够用。
+     ⚠️ 本页**不能用 ES module**：`file://` 下 `<script type="module">` 会被 CORS 挡掉
+     （实跑 `net::ERR_FAILED`，页面静默空白），而壳的 `main.cjs` 没关 `webSecurity`。
+     ⇒ 走 vendored 的**经典脚本**版（`vendor/*.global.js`）。 -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
+<title>GBT小土豆V8 · 神经可视化工作台</title>
+<link rel="stylesheet" href="../window.css" />
+<link rel="stylesheet" href="../deck3d.css" />
+<link rel="stylesheet" href="../skin-mission-control.css" />
+<link rel="stylesheet" href="brain.css" />
+<link rel="stylesheet" href="intercom.css" />
+</head>
+<body class="brain-app">
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:var(--cb-bg);color:var(--cb-ink);font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid var(--cb-line)"><a style="color:var(--cb-link)" href="../../state/PROJECT-INDEX.html">全项目索引 · 全页可达</a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ══ 左栏：执行路线（真数据） ══ -->
+<aside class="brain-rail">
+  <header class="rail-head">
+    <span class="rail-mark" aria-hidden="true"></span>
+    <div>
+      <div class="rail-brand">GBT<b>小土豆</b>V8 · 神经工作台</div>
+      <div class="rail-sub">Neural Workbench · V8</div>
+    </div>
+  </header>
+
+  <div class="rail-scroll">
+    <section class="rail-sec">
+      <h3>执行路线 · 欠的活</h3>
+      <div id="rail-steps"><p class="rail-empty">读数据中…</p></div>
+    </section>
+    <section class="rail-sec">
+      <h3>真脉冲 · 审计事件</h3>
+      <div id="rail-pulses"><p class="rail-empty">读数据中…</p></div>
+    </section>
+    <!-- 主脑语音对讲（主人令 2026-09-23）：
+         **打开本页 = 开始监听 · 关掉本页 = 停止监听**，不设任何开关控件。
+         三条腿分开报（采集 / 离线识别 / 出声），安静 ≠ 坏了 ≠ 被门拒。 -->
+    <section class="rail-sec">
+      <h3>主脑语音对讲 · 打开本页即监听</h3>
+      <div id="rail-voice"><p class="rail-empty">读数据中…</p></div>
+    </section>
+    <!-- 生成后端轮询池（genrouter）：几条腿可用 · 今天出了几张 · 谁在等凭据。
+         数据来自 `state/genpool.json`，由 brain-feed 带进 brain-data.js —— **本页不 fetch**。 -->
+    <section class="rail-sec">
+      <h3>生成后端 · 轮询池</h3>
+      <div id="rail-genpool"><p class="rail-empty">读数据中…</p></div>
+    </section>
+    <section class="rail-sec">
+      <h3>结构 · 以源码为准</h3>
+      <div id="rail-struct"><p class="rail-empty">读数据中…</p></div>
+    </section>
+  </div>
+
+  <footer class="rail-foot">
+    快照 <span id="rail-at">—</span><br />
+    皮肤 mission-control · 数据 brain-feed.py
+  </footer>
+</aside>
+
+<!-- ══ 中栏：3D 舞台 ══ -->
+<main class="brain-stage">
+  <canvas id="brain-canvas"></canvas>
+
+  <div class="brain-overlay">
+    <div class="bar top-bar">
+      <div class="tabs">
+        <button type="button" class="tab" data-view="brain" data-active="true">全脑</button>
+        <button type="button" class="tab" data-view="cortex">皮层</button>
+        <button type="button" class="tab" data-view="bundle">束长</button>
+        <button type="button" class="tab" data-view="route">执行路线</button>
+      </div>
+      <div class="stats">
+        <span class="stat"><span class="lb">束长</span><span class="vl" id="st-bundles">—</span></span>
+        <span class="stat"><span class="lb">能力位</span><span class="vl cy" id="st-caps">—</span></span>
+        <span class="stat"><span class="lb">脉冲 6h</span><span class="vl ok" id="st-pulse">—</span></span>
+        <span class="stat"><span class="lb">FPS</span><span class="vl" id="st-fps">—</span></span>
+      </div>
+    </div>
+
+    <div class="detail" id="detail">
+      <span class="x" id="detail-x">✕</span>
+      <h3 id="d-name">—</h3>
+      <div class="cat" id="d-cat">—</div>
+      <div class="row"><span class="k">类型</span><span class="v" id="d-type">—</span></div>
+      <div class="row"><span class="k">所属束</span><span class="v" id="d-bundle">—</span></div>
+      <div class="row"><span class="k">免卡直跑</span><span class="v" id="d-safe">—</span></div>
+      <div class="row"><span class="k">近期调用</span><span class="v" id="d-calls">—</span></div>
+      <div class="row"><span class="k">说明</span><span class="v" id="d-desc">—</span></div>
+    </div>
+
+    <!-- 悬停读数：**固定位置**，不做浮动 tooltip（CSP 不许内联样式；仪器面板也不这么读） -->
+    <div class="readout" id="readout">
+      <span class="k">指向</span><span class="v" id="ro-name">—</span>
+      <span class="k">束</span><span class="v" id="ro-bundle">—</span>
+      <span class="k">状态</span><span class="v" id="ro-state">—</span>
+    </div>
+
+    <div class="legend">
+      <span class="legend-row"><span class="legend-mark lm-ok"></span>免卡直跑</span>
+      <span class="legend-row"><span class="legend-mark lm-gold"></span>需授权</span>
+      <span class="legend-row"><span class="legend-mark lm-fault"></span>仅登记未实现</span>
+      <span class="legend-row"><span class="legend-mark lm-cy"></span>执行脉冲</span>
+    </div>
+
+    <div class="stale" id="stale">审计账本里没有 call 事件 —— 如实报静默，不用随机数冒充在跑</div>
+
+    <div class="bar bottom-bar">
+      <span class="st"><span class="dot ok"></span>门禁在线 · 作用域 <b id="st-scopes">—</b></span>
+      <span class="st"><span class="dot ok"></span>审计留痕 · 脉冲 <b id="st-pulses">—</b></span>
+      <!-- 第 58 轮加：**同步读数**。落后多少秒是现算的 —— 不写"实时"两个字骗人。 -->
+      <span class="st"><span class="dot" id="dot-sync"></span>快照 <b id="snap-at">—</b>
+        · 落后 <b id="snap-lag">—</b> · 渲染 <b id="hd-info">—</b></span>
+      <span class="st st-right">开发者：自由的风 · 守护：公主土豆</span>
+    </div>
+  </div>
+</main>
+
+<!-- ══ 右栏：能力面板阵列（风哥令「各项能力面板设计好专业化的排列，该有的全都要有」）══
+     规格全部取自 mission-control 的组件表：数据格 / 遥测条 / 徽章 / 进度条 / 分区标题。
+     **每一个数字都是现算的真值**；取不到就写「—」，不编。 -->
+<aside class="brain-rack">
+  <div class="rack-scroll">
+
+    <section class="rail-sec">
+      <h3>总览 · 遥测</h3>
+      <div class="rack-tiles">
+        <div class="mc-tile"><div class="mc-tile-label">束长</div><div class="mc-tile-value" id="k-bundles">—</div></div>
+        <div class="mc-tile"><div class="mc-tile-label">能力位</div><div class="mc-tile-value" id="k-caps">—</div></div>
+        <div class="mc-tile"><div class="mc-tile-label">免卡</div><div class="mc-tile-value ok" id="k-safe">—</div></div>
+        <div class="mc-tile"><div class="mc-tile-label">需授权</div><div class="mc-tile-value" id="k-gated">—</div></div>
+        <div class="mc-tile"><div class="mc-tile-label">仅登记</div><div class="mc-tile-value alert" id="k-dead">—</div></div>
+        <div class="mc-tile"><div class="mc-tile-label">真依赖边</div><div class="mc-tile-value cy" id="k-edges">—</div></div>
+      </div>
+    </section>
+
+    <section class="rail-sec">
+      <h3>束长阵列 · 29 域</h3>
+      <div class="rack-bundles" id="rack-bundles"><p class="rail-empty">读数据中…</p></div>
+    </section>
+
+    <section class="rail-sec">
+      <h3>依赖最密的边</h3>
+      <div id="rack-edges"><p class="rail-empty">读数据中…</p></div>
+    </section>
+
+    <section class="rail-sec">
+      <h3>门禁 · 作用域</h3>
+      <div class="rack-scopes" id="rack-scopes"><p class="rail-empty">读数据中…</p></div>
+    </section>
+
+  </div>
+</aside>
+
+<!-- 依赖序：入口库 → shader → pass → 控制器 → 本窗逻辑。全部**经典脚本**（file:// 下 ESM 走不通）。 -->
+<script src="vendor/three.global.js"></script>
+<script src="vendor/Pass.global.js"></script>
+<script src="vendor/CopyShader.global.js"></script>
+<script src="vendor/LuminosityHighPassShader.global.js"></script>
+<script src="vendor/MaskPass.global.js"></script>
+<script src="vendor/ShaderPass.global.js"></script>
+<script src="vendor/RenderPass.global.js"></script>
+<script src="vendor/EffectComposer.global.js"></script>
+<script src="vendor/UnrealBloomPass.global.js"></script>
+<script src="vendor/OrbitControls.global.js"></script>
+<script src="brain-data.js"></script>
+<script src="brain.js"></script>
+<!-- 生成后端轮询池读数：只读 brain-data.js 里的 genpool 块，**自己不发任何请求**。 -->
+<script src="genpool.js"></script>
+<!-- 语音对讲：**必须最后加载** —— 它要在 brain.js 起来之后才去问宿主状态。 -->
+<script src="intercom.js"></script>
+
+
+<!-- gbt-defense -->
+<script>
+(function(){
+  if (window.__gbtDefense) return; window.__gbtDefense = 3;
+  var RULES = [
+    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+  ];
+  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+  function log(rec){
+    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+  }
+  function bar(msg, tone){
+    var d=document.getElementById("gbt-defense-bar");
+    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+    d.textContent=msg; d.style.display="block";
+    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
+    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+  }
+  function baseUrl(){
+    var b = window.GBT_FRAMEWORK_URL || "";
+    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+    return b;
+  }
+  function report(rec){
+    var base = baseUrl();
+    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+    log(rec);
+    try{
+      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+  }
+  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
+       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
+       要真出声只能走能力位 `voice op=speak`（单一门）。 */
+    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+  function block(el, why){
+    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+              where:(el&&(el.tagName||""))||"page-text"};
+    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+    return true;
+  }
+  // ① 拦输入/粘贴
+  function guardInputs(){
+    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+    for(var i=0;i<els.length;i++){(function(el){
+      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+        if(w){ e.preventDefault(); block(el,w); } });
+      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+        if(w){ e.preventDefault(); block(el,w); } }); }
+    })(els[i]);}
+  }
+  // ② 扫页面可见文本（攻击内容被注入到页面时）
+  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
+     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
+     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
+  function scanPage(){
+    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+  }
+  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+  function panel(){
+    guardInputs();
+    var d=document.createElement("div"); d.id="gbt-defense-pill";
+    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+    d.textContent="自卫：开"; d.title="点击查看拦截记录";
+    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+    document.body.appendChild(d);
+  }
+  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/welcome-page.py -->
+<title>GBT小土豆V8 · 启动</title>
+<style>
+ html,body{height:100%;margin:0}
+ body{background:radial-gradient(1200px 700px at 50% 30%,#0d1a2b 0%,#06080c 60%,#04060a 100%);
+      color:#e8eef6;font:16px/1.9 "Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+      display:flex;align-items:center;justify-content:center;overflow:hidden}
+ .halo{position:fixed;inset:-20%;background:conic-gradient(from 0deg,#22d3ee22,#f5b04122,#22d3ee22);
+       filter:blur(90px);animation:spin 26s linear infinite}
+ @keyframes spin{to{transform:rotate(360deg)}}
+ .card{position:relative;max-width:820px;padding:44px 52px;border:1px solid #1d2a3a;border-radius:18px;
+   background:rgba(8,12,20,.72);box-shadow:0 30px 90px #000a}
+ .brand{font-size:13px;letter-spacing:.34em;color:#5f7286;text-transform:uppercase;margin-bottom:22px}
+ p{margin:9px 0;font-size:23px;letter-spacing:.5px}
+ p.lead{font-size:31px;color:#7fe3f0;letter-spacing:.16em;margin-bottom:20px}
+ p.sig{color:#f5b041;font-weight:600;margin-top:22px}
+ .hint{margin-top:24px;padding-top:16px;border-top:1px solid #17222f;color:#7d8ea3;font-size:13px}
+ .hint.warn{color:#f5b041} code{color:#9fb6cf;font-size:12px;word-break:break-all}
+ .foot{margin-top:14px;color:#48586a;font-size:12px}
+</style></head><body>
+<div class="halo"></div>
+<div class="card">
+ <div class="brand">GBT · V8 · Commander Framework</div>
+ <p class="lead">系统唤醒。</p><p class="">我是 GBT小土豆V8 —— 你的指挥官框架。</p><p class="">六百四十六种语言在我体内，十域触手听你调度，神经末梢已经接通。</p><p class="">我看得见屏幕，听得见房间，动得了界面。</p><p class="">我不猜 —— 我只跑通闭环。</p><p class="sig">开发者：自由的风。</p><p class="">说一句，剩下的交给我。</p>
+ <audio id="va" src="../digital-human/welcome-gbt-v8-zh.wav" preload="auto"></audio><div class="hint" id="ah">音频已就绪 —— 点任意处开始</div>
+ <div class="foot">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属｜必含项：GBT小土豆V8 与 开发者：自由的风 · 判据 PASS</div>
+</div>
+<script>
+ var va = document.getElementById("va"), ah = document.getElementById("ah");
+ function go() {
+   if (!va) { return; }
+   va.play().then(function () { ah.textContent = "正在播欢迎语…"; })
+            .catch(function (e) { ah.textContent = "音频在盘但没播出去（" + e.name + "）—— 如实报，不假装"; });
+   document.removeEventListener("click", go);
+ }
+ document.addEventListener("click", go);
+</script>
+</body></html>

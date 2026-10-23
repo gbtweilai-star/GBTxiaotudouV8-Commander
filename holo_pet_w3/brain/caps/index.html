@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<!-- 🔴 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
+<title>全部能力页 · GBT小土豆V8</title>
+<link rel="stylesheet" href="../../window.css" />
+<link rel="stylesheet" href="../../deck3d.css" />
+<link rel="stylesheet" href="../../skin-mission-control.css" />
+<link rel="stylesheet" href="../cap.css" />
+</head>
+<body class="cap-page">
+<div class="cap-top">
+  <span class="crumb"><a href="../../index.html">神经工作台</a> / <span class="here">全部能力页</span></span>
+  <span class="spacer"></span>
+  <span class="mc-badge" id="ix-at">—</span>
+</div>
+<header class="cap-hero">
+  <h1 class="cap-id">全部能力页</h1>
+  <p class="cap-desc">每一条能力位**各自一页**（不是挤在一张卡里）。点任一进入它的独立页。</p>
+</header>
+<main class="cap-body">
+  <section class="cap-sec"><h2>按束分组<span class="n" id="ix-n">—</span></h2><div id="ix-groups"></div></section>
+</main>
+<footer class="foot">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+<script src="../brain-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = globalThis.GBT_BRAIN;
+  if (!D) return;
+  document.getElementById("ix-at").textContent = D.at;
+  var nodes = D.nodes || [], bundles = D.bundles || [];
+  document.getElementById("ix-n").textContent = nodes.length + " 页";
+  var host = document.getElementById("ix-groups");
+  function link(n) {
+    return '<a href="' + encodeURIComponent(n.id) + '.html">' + n.id + "</a>";
+  }
+  host.innerHTML = bundles.map(function (b) {
+    var list = nodes.filter(function (n) { return n.impl && n.bundle === b.id; });
+    if (!list.length) return "";
+    return '<div class="kv"><span class="k">' + b.label + "（" + b.id + "）</span>" +
+           '<span class="v"><span class="nav-grid">' + list.map(link).join("") + "</span></span></div>";
+  }).join("") +
+  '<div class="kv"><span class="k">仅登记未实现</span><span class="v"><span class="nav-grid">' +
+  nodes.filter(function (n) { return !n.impl; }).map(link).join("") + "</span></span></div>";
+})();
+</script>
+</body>
+</html>

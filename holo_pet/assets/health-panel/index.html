@@ -1,0 +1,77 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>健康面板 · GBT小土豆V8</title><style>
+ :root{--bg:#0b0f14;--panel:#121a23;--line:#1f2b38;--ink:#dbe6f2;--dim:#7f93a8;--cyan:#33c9dc;--orange:#f0a03c;--red:#e5484d;--green:#3fb950}
+ *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Segoe UI","Microsoft YaHei",sans-serif}
+ header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
+ h1{font-size:17px;margin:0;font-weight:600}
+ .pill{margin-left:auto;padding:3px 10px;border-radius:11px;font-size:12px;border:1px solid var(--line)}
+ .ok{color:var(--green);border-color:#1d3a26;background:#0f1c14} .bad{color:var(--red);border-color:#4a1d1f;background:#1c0f10}
+ .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;padding:18px 22px}
+ .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+ .card h2{font-size:13px;margin:0 0 8px;color:var(--dim);font-weight:500;letter-spacing:.5px}
+ .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+ .alerts{margin:8px 0 0;padding:0;list-style:none}
+ .alerts li{color:var(--red);font-size:12.5px;padding:4px 0;border-top:1px solid #241a1b}
+ table{width:100%;border-collapse:collapse;margin-top:6px}
+ th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:12.5px}
+ th{color:var(--dim);font-weight:500} .num{text-align:right}
+ .reuse{color:var(--dim)} .warn{color:var(--orange)}
+ footer{padding:14px 22px;color:var(--dim);font-size:12px;border-top:1px solid var(--line)}
+</style><script type="importmap">
+{
+  "imports": {
+    "three": "../../node_modules/three/build/three.module.js",
+    "three/addons/": "../../node_modules/three/examples/jsm/"
+  }
+}
+</script>
+<!-- 她一个人（3D 浮层）：跨页面常驻，见 companion.js 顶部口径 -->
+<script type="module" src="../../companion.js"></script>
+</head><body>
+<header>
+ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#33c9dc" stroke-width="1.7"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+ <h1>健康面板 · 安全棒</h1>
+ <span class="pill" id="verdict">-</span>
+</header>
+<div class="wrap">
+ <div class="card"><h2>本 次 扫 描</h2><div class="big" id="scanned">-</div>
+   <div id="reuse"></div>
+   <div class="card" style="margin-top:10px;background:#0e151d"><h2>能 源 / 密 钥</h2><div id="ek"></div></div>
+ </div>
+ <div class="card" style="grid-column:span 2"><h2>异 常 报 警</h2><ul class="alerts" id="alerts"></ul>
+   <table><thead><tr><th>树</th><th class="num">单元</th><th class="num">覆盖</th><th class="num">未钩住</th><th class="num">需人核</th><th>状态</th></tr></thead>
+   <tbody id="tb"></tbody></table>
+ </div>
+</div>
+<footer id="ft">口径：健康=无报警；**覆盖必须 1.0**；排除项带理由（.git/_upstream/vendor/dist/.fleet/.trash/.backups）。</footer>
+<script>
+const INLINE = {"ok": true, "at": "2026-09-27T20:51:00", "energy": {"sources": 9, "free_pool": false}, "keys_ready": 2, "keys_total": 6, "trees": {"gbt_allinone": {"fp": {"exists": true, "files": 9543, "bytes": 1528518301, "newest_mtime": 1790517046.1}, "units": 870, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 20, "ok": true, "at": "2026-09-27T20:50:54", "reused": false}, "tools": {"fp": {"exists": true, "files": 627, "bytes": 6492778, "newest_mtime": 1790515644.3}, "units": 581, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 30, "ok": true, "at": "2026-09-27T20:50:56", "reused": false}, "skills": {"fp": {"exists": true, "files": 360, "bytes": 4638149, "newest_mtime": 1790516601.7}, "units": 360, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 1, "ok": true, "at": "2026-09-27T20:50:42", "reused": true}, "docs": {"fp": {"exists": true, "files": 29, "bytes": 377856, "newest_mtime": 1790496586.5}, "units": 29, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:41", "reused": true}, "state": {"fp": {"exists": true, "files": 206, "bytes": 11678296, "newest_mtime": 1790517056.8}, "units": 0, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:56", "reused": false}, "memory": {"fp": {"exists": true, "files": 58, "bytes": 3965398, "newest_mtime": 1790515707.5}, "units": 58, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:41", "reused": true}, "deploy": {"fp": {"exists": true, "files": 153, "bytes": 5258302, "newest_mtime": 1790374492.0}, "units": 151, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 3, "ok": true, "at": "2026-09-27T20:50:57", "reused": false}, "projects": {"fp": {"exists": true, "files": 412, "bytes": 973416859, "newest_mtime": 1790484669.4}, "units": 404, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:57", "reused": false}, "holo_pet": {"fp": {"exists": true, "files": 80, "bytes": 19273624, "newest_mtime": 1790516552.6}, "units": 79, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 1, "ok": true, "at": "2026-09-27T20:50:58", "reused": false}, "holo_pet_w3": {"fp": {"exists": true, "files": 252, "bytes": 6175573, "newest_mtime": 1790368099.0}, "units": 252, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 3, "ok": true, "at": "2026-09-27T20:50:58", "reused": false}, "plugins": {"fp": {"exists": true, "files": 42, "bytes": 370782, "newest_mtime": 1790386817.6}, "units": 42, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 1, "ok": true, "at": "2026-09-27T20:50:59", "reused": false}, "config": {"fp": {"exists": true, "files": 5, "bytes": 9453, "newest_mtime": 1790437661.3}, "units": 0, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:41", "reused": true}, "potato_pet": {"fp": {"exists": true, "files": 93, "bytes": 4534028, "newest_mtime": 1790198389.4}, "units": 93, "coverage": 1.0, "missing": 0, "sec_needs_human": 0, "sec_flagged": 0, "ok": true, "at": "2026-09-27T20:50:59", "reused": false}}, "alerts": [], "scanned": 9, "reused": 4, "_口径": "健康=无报警；报警项逐条写清（树/覆盖/未钩住/需人核）"};
+function render(d){
+  if(!d || !d.at){document.getElementById('ft').textContent='还没有健康账 —— 先跑 run_task(\'sec_sweeper\',{\'op\':\'start\'})';return;}
+  const ok = !!d.ok;
+  const v = document.getElementById('verdict');
+  v.textContent = ok ? '正常' : ('报警 ' + (d.alerts||[]).length + ' 项');
+  v.className = 'pill ' + (ok ? 'ok' : 'bad');
+  document.getElementById('scanned').textContent = (d.scanned ?? '-') + ' 棵真扫';
+  document.getElementById('reuse').innerHTML = '<span class="reuse">复用上下文（指纹未变）' + (d.reused ?? 0) + ' 棵 —— 没重扫</span>';
+  const e = d.energy || {};
+  document.getElementById('ek').innerHTML = '能源源 <b>' + (e.sources ?? '-') + '</b> · 免费池 ' +
+    (e.free_pool ? '<span style="color:var(--green)">可达</span>' : '<span class="warn">不可达</span>') +
+    '<br>密钥就绪 <b>' + (d.keys_ready ?? '-') + '</b>/' + (d.keys_total ?? '-') + ' 槽';
+  const al = d.alerts || [];
+  document.getElementById('alerts').innerHTML = al.length ? al.map(x=>'<li>'+x+'</li>').join('') : '<li style="color:var(--green)">无报警</li>';
+  document.getElementById('tb').innerHTML = Object.entries(d.trees||{}).map(([k,r])=>{
+    const warn = (r.coverage ?? 1) < 1 || (r.sec_needs_human||0) > 0;
+    return '<tr><td>'+k+'</td><td class="num">'+(r.units ?? '-')+'</td><td class="num'+(warn?' warn':'')+'">'+(r.coverage ?? '-')+
+      '</td><td class="num">'+(r.missing ?? 0)+'</td><td class="num">'+(r.sec_needs_human ?? 0)+
+      '</td><td>'+(r.reused ? '<span class="reuse">复用</span>' : '真扫')+(r.error ? ' <span class="warn">'+((''+r.error).slice(0,40))+'</span>' : '')+'</td></tr>';
+  }).join('');
+}
+render(INLINE);
+async function refresh(){ try{ const r = await fetch('state/health.json', {cache:'no-store'}); render(await r.json()); }catch(e){} }
+setInterval(refresh, 10000);
+</script>
+<footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+<script src="../../../holo_pet_w3/shell/live-badge.js" defer></script>
+<script src="../../../holo_pet_w3/shell/tentacle-kit.js" defer></script>
+</body></html>

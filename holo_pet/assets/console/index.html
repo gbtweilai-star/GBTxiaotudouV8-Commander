@@ -1,0 +1,384 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GBT小土豆V8 · 总控台</title><style>
+:root{
+  --bg:#0B0B14; --surface:#12121E; --surface-2:#171726; --line:rgba(0,229,255,.10);
+  --line-soft:rgba(0,229,255,.06);
+  --gold:#F5B041; --cyan:#00E5FF; --violet:#7C4DFF;
+  --text:#E9E9F2; --dim:#8B8BA3; --dim-2:#5C5C74;
+  --ok:#3DDC97; --warn:#F5B041; --bad:#FF6B6B;
+  --r-lg:14px; --r-sm:8px; --gap:14px;
+  --shadow-1:0 1px 0 rgba(255,255,255,.03) inset, 0 1px 2px rgba(4,8,20,.7);
+  --shadow-2:0 0 0 1px rgba(0,229,255,.06), 0 6px 24px -8px rgba(4,10,28,.9),
+             0 18px 48px -24px rgba(0,229,255,.12);
+  --font:ui-sans-serif,system-ui,"Segoe UI",Roboto,"Noto Sans SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,monospace;
+}
+/* §5 动效纪律（硬）：尊重系统"减少动效"偏好 —— 一律停掉动画与过渡 */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);
+  -webkit-font-smoothing:antialiased}
+body{padding:20px 22px 40px;max-width:1680px;margin:0 auto}
+a{color:var(--cyan);text-decoration:none}
+h1{font-size:22px;font-weight:650;letter-spacing:.02em;margin:0 0 4px}
+h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim);margin:0 0 10px}
+.sub{color:var(--dim);font-size:12px;margin:0 0 16px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--line-soft);padding-bottom:12px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:7px;border:1px solid rgba(245,176,65,.5);
+  background:radial-gradient(120% 120% at 30% 20%,rgba(245,176,65,.35),rgba(124,77,255,.18) 60%,transparent);
+  box-shadow:0 0 18px -4px rgba(245,176,65,.5)}
+.card{background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 15px;
+  box-shadow:var(--shadow-2)}
+.src{color:var(--dim-2);font-size:11px;font-family:var(--mono)}
+.na{font-family:var(--mono);font-size:22px;letter-spacing:.02em}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap)}
+.mut{color:var(--dim);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+  border-radius:999px;padding:3px 9px;font-size:11px;color:var(--dim);background:rgba(0,229,255,.03)}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.ic{width:14px;height:14px;display:inline-block;vertical-align:-2px;stroke:currentColor;
+  fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;
+  align-items:center;margin-bottom:22px}
+.hmedia{border-radius:16px;overflow:hidden;border:1px solid rgba(0,229,255,.12);
+  box-shadow:0 0 0 1px rgba(0,229,255,.05), 0 18px 60px -28px rgba(0,229,255,.35),
+             0 30px 80px -40px rgba(4,10,28,.95)}
+.hbody{display:flex;flex-direction:column;gap:10px}
+.hchip{align-self:flex-start;border:1px solid;border-radius:999px;padding:4px 11px;
+  font-size:12px;letter-spacing:.06em;background:rgba(255,255,255,.02)}
+.htitle{font-size:clamp(26px,2.6vw,42px);line-height:1.12;font-weight:800;margin:0;
+  letter-spacing:.01em;background:linear-gradient(92deg,#E9E9F2 8%,#00E5FF 46%,#F5B041 92%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hsub{color:var(--dim);font-size:14px;line-height:1.6;margin:0;max-width:60ch}
+.hctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.hbtn{border:1px solid rgba(0,229,255,.28);border-radius:999px;padding:8px 16px;
+  font-size:13px;color:var(--cyan);background:rgba(0,229,255,.04)}
+.hbtn.solid{background:#E9E9F2;color:#0B0B14;border-color:#E9E9F2;font-weight:600}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+/* 卡片（卡库用，照参考图的版式） */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.pcard{border:1px solid rgba(0,229,255,.10);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,#12121E,#0E0E18);display:flex;flex-direction:column}
+.pcard .pmedia{height:180px;overflow:hidden;border-bottom:1px solid rgba(0,229,255,.08)}
+.pcard .pbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.pcat{font-size:11px;letter-spacing:.06em}
+.ptitle{font-size:17px;font-weight:700;line-height:1.28;margin:0}
+.psum{color:var(--dim);font-size:12.5px;line-height:1.55;margin:0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pgo{margin-top:auto;color:var(--cyan);font-size:12.5px;padding-top:6px}
+
+/* ── 总控台 · HUD 暗面（参考安全厂商风的冲击感 · GBT 青金紫）────────────── */
+body{background:#04060a}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 3px),
+             linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),
+             linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);
+  background-size:auto,44px 44px,44px 44px}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1100px 640px at 72% -8%,rgba(0,229,255,.09),transparent 62%),
+             radial-gradient(900px 620px at 108% 112%,rgba(124,77,255,.08),transparent 60%)}
+.top,.hero,.cc{position:relative;z-index:1}
+.cc{display:grid;grid-template-columns:232px 1fr;gap:18px;align-items:start}
+.cc-side{position:sticky;top:12px;background:rgba(4,8,12,.86);border:1px solid rgba(0,229,255,.16);
+  border-radius:4px;padding:16px 12px;box-shadow:inset 0 0 24px rgba(0,229,255,.05)}
+.cc-brand{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.16em;margin-bottom:12px;
+  color:#00E5FF;text-shadow:0 0 14px rgba(0,229,255,.55)}
+.cc-side a{display:block;padding:8px 10px;border-radius:3px;border-left:2px solid transparent;
+  color:#9fb3bd;text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+.cc-side a:hover{border-left-color:#00E5FF;color:#EAF6FA;background:rgba(0,229,255,.06)}
+.cc-sec{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font-family:var(--mono);
+  font-size:12px;font-weight:700;letter-spacing:.2em;color:#7de3ff;text-transform:uppercase}
+.cc-sec::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,#00E5FF,transparent)}
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.cc-split{display:grid;grid-template-columns:1fr 280px;gap:14px}
+@media (max-width:960px){.cc{grid-template-columns:1fr}.cc-split{grid-template-columns:1fr}.cc-side{position:static}}
+.cc-card{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(10,14,18,.92),rgba(6,9,12,.92));
+  border:1px solid rgba(0,229,255,.14);border-radius:4px;padding:14px;
+  transition:border-color .15s,box-shadow .15s}
+.cc-card::before,.cc-card::after{content:"";position:absolute;width:12px;height:12px;border:0 solid rgba(0,229,255,.55)}
+.cc-card::before{top:0;left:0;border-top-width:1px;border-left-width:1px}
+.cc-card::after{bottom:0;right:0;border-bottom-width:1px;border-right-width:1px}
+.cc-card:hover{border-color:rgba(0,229,255,.45);box-shadow:0 0 0 1px rgba(0,229,255,.10),0 10px 34px rgba(0,229,255,.08)}
+.cc-card h3{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;margin:0 0 6px;color:#EAF6FA}
+.cc-stat{font-family:var(--mono);font-size:46px;font-weight:800;line-height:1;letter-spacing:-.01em;color:#EAF6FA}
+.cc-stat.cy{color:#00E5FF;text-shadow:0 0 20px rgba(0,229,255,.35)}
+.cc-stat.gd{color:#F5B041;text-shadow:0 0 20px rgba(245,176,65,.30)}
+.cc-stat.vt{color:#9E7BFF;text-shadow:0 0 20px rgba(124,77,255,.35)}
+.cc-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:#6c7f8a;text-transform:uppercase;margin-top:8px}
+.cc-chip{display:inline-block;margin:2px 4px 0 0;padding:2px 8px;border:1px solid rgba(0,229,255,.18);
+  border-radius:2px;font-family:var(--mono);font-size:11px;color:#9fdceb;background:rgba(0,229,255,.04)}
+.cc-note{font-size:11.5px;color:var(--dim-2);margin-top:6px;line-height:1.6}
+.cc-ok{color:#33E58C;font-weight:700}.cc-bad{color:#FF3B5C;font-weight:700}
+.cc-rule{border:1px solid rgba(245,176,65,.4);background:rgba(245,176,65,.06);border-radius:4px;
+  padding:12px 14px;font-size:12.5px;line-height:1.7}
+.cc-msg{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.cc-msg:last-child{border-bottom:0}
+.cc-avatar{width:30px;height:30px;border-radius:3px;background:rgba(0,229,255,.10);
+  border:1px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;color:#7de3ff;flex:none}
+</style></head><body>
+<div class="top"><div class="brand"><span class="mark"></span>
+<div><h1>GBT小土豆V8 · 总控台</h1><div class="sub">一个面板接全部能力 · 快照内联 · 数据源 caps_registry/mesh/agents 现读</div></div></div>
+<div class="chip">2026-10-21 13:40 · 快照内联 · 数据源 console_hub</div></div>
+<section class="hero">
+  <div class="hmedia" style="height:300px"><svg viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice"
+  style="width:100%;height:100%;display:block" role="img" aria-label="orb 主视觉">
+  <defs><radialGradient id='g0' cx='47%' cy='48%' r='72%'><stop offset='0' stop-color='#F5B041' stop-opacity='0.42'/><stop offset='1' stop-color='#F5B041' stop-opacity='0'/></radialGradient><radialGradient id='g1' cx='47%' cy='38%' r='72%'><stop offset='0' stop-color='#F5B041' stop-opacity='0.31'/><stop offset='1' stop-color='#F5B041' stop-opacity='0'/></radialGradient><radialGradient id='g2' cx='62%' cy='33%' r='72%'><stop offset='0' stop-color='#F5B041' stop-opacity='0.20'/><stop offset='1' stop-color='#F5B041' stop-opacity='0'/></radialGradient>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" fill-opacity=".022"/></pattern>
+    <radialGradient id="vig" cx="50%" cy="46%" r="72%">
+      <stop offset="60%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".55"/></radialGradient>
+  </defs>
+  <rect width="1200" height="520" fill="#070A11"/>
+  <rect width="1200" height="520" fill="url(#g0)"/>
+  <rect width="1200" height="520" fill="url(#g1)"/>
+  <g class='floor'><line x1='600' y1='300' x2='-700' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='-410' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='-120' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='170' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='460' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='750' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='1040' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='1330' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='600' y1='300' x2='1620' y2='520' stroke='#F5B041' stroke-opacity='.10'/><line x1='0' y1='310' x2='1200' y2='310' stroke='#F5B041' stroke-opacity='0.06'/><line x1='0' y1='333' x2='1200' y2='333' stroke='#F5B041' stroke-opacity='0.07'/><line x1='0' y1='367' x2='1200' y2='367' stroke='#F5B041' stroke-opacity='0.09'/><line x1='0' y1='410' x2='1200' y2='410' stroke='#F5B041' stroke-opacity='0.10'/><line x1='0' y1='461' x2='1200' y2='461' stroke='#F5B041' stroke-opacity='0.11'/><line x1='0' y1='520' x2='1200' y2='520' stroke='#F5B041' stroke-opacity='0.12'/><line x1='0' y1='300' x2='1200' y2='300' stroke='#F5B041' stroke-opacity='.18'/></g><circle cx='600' cy='252' r='189' fill='none' stroke='#F5B041' stroke-opacity='.6' stroke-width='2'/><circle cx='600' cy='252' r='151' fill='url(#g0)'/><circle cx='600' cy='252' r='86' fill='#F5B041' fill-opacity='.10'/><ellipse cx='600' cy='252' rx='396' ry='94' fill='none' stroke='#F5B041' stroke-opacity='.34' stroke-width='1.5'/><ellipse cx='600' cy='252' rx='302' ry='64' fill='none' stroke='#F5B041' stroke-opacity='.28'/><ellipse cx='600' cy='252' rx='491' ry='120' fill='none' stroke='#7C4DFF' stroke-opacity='.20'/><circle cx='600' cy='252' r='11' fill='#F5B041'/>
+  <rect width="1200" height="520" fill="url(#scan)"/>
+  <rect width="1200" height="520" fill="url(#vig)"/>
+  <text x="34" y="46" fill="#F5B041" fill-opacity=".78" font-size="16"
+        font-family="ui-monospace,monospace" letter-spacing="2.6">GBT ONE CONSOLE / ALL CAPABILITIES WIRED</text>
+  <rect x="0" y="512" width="1200" height="8" fill="#F5B041" fill-opacity=".38"/>
+</svg></div>
+  <div class="hbody">
+    <span class="hchip" style="color:#F5B041;border-color:#F5B04144">总控台</span>
+    <h1 class="htitle">GBT小土豆V8 · 总控台</h1>
+    <p class="hsub">统一品牌 · 一个面板接全部能力 · 云插件与触手互通 · 编队群只出本域意见</p>
+    <div class="hctas"><a class='hbtn solid' href='../gallery/index.html'>能力卡库</a><a class='hbtn' href='../workbench/index.html'>Bento 工作台</a></div>
+  </div>
+</section>
+
+<div class="cc">
+  <div class="cc-side">
+    <div class="cc-brand">GBT//V8</div>
+    <a href="#overview">01 · 概览</a>
+    <a href="#caps">02 · 能力矩阵</a>
+    <a href="#connectors">03 · 云插件·连接器</a>
+    <a href="#brain">04 · 第二大脑</a>
+    <a href="#crew">05 · 编队群</a>
+    <a href="#pages">06 · 快捷入口</a>
+    <div class="cc-note" style="margin-top:12px">一个面板 · 全部能力<br>决策与执行权<br><b style="color:#F5B041">只属 GBT小土豆V8</b></div>
+  </div>
+  <div class="cc-main">
+    <section id="overview"><div class="cc-sec">// 01 — 概览 · BY THE NUMBERS</div>
+      <div class="cc-grid">
+        <div class="cc-card"><div class="cc-stat cy">341</div><div class="cc-label">能力位 · CAPS_REGISTRY 现读</div></div>
+        <div class="cc-card"><div class="cc-stat gd">30</div><div class="cc-label">能力域 · DOMAINS</div></div>
+        <div class="cc-card"><div class="cc-stat vt">10</div><div class="cc-label">云插件 · CLOUD-10</div></div>
+        <div class="cc-card"><div class="cc-stat cy">0</div><div class="cc-label">云网互通边 · MESH.EDGES</div></div>
+        <div class="cc-card"><div class="cc-stat gd">18</div><div class="cc-label">编队职业 · AGENTS</div></div>
+        <div class="cc-card"><div class="cc-stat vt">14</div><div class="cc-label">脑层模块 · BRAIN/</div></div>
+      </div>
+    </section>
+    <section id="caps"><div class="cc-sec">// 02 — 能力矩阵 · 按域排布</div>
+      <div class="cc-grid"><div class="cc-card"><h3>automation <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">browser</span><span class="cc-chip">n8n_wf</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>brain <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">absorb_loop</span><span class="cc-chip">dream_replay</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>collab <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">collab_gateway</span><span class="cc-chip">stigmergy</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>comms <span class="cc-stat" style="font-size:15px">1</span></h3>
+<div><span class="cc-chip">coze_mail</span></div>
+<div class="cc-note">共 1 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>creation <span class="cc-stat" style="font-size:15px">54</span></h3>
+<div><span class="cc-chip">anatomy_figures</span><span class="cc-chip">anim_audit</span><span class="cc-chip">anim_fix</span><span class="cc-chip">art_brief</span><span class="cc-chip">art_chain</span><span class="cc-chip">bits_kit</span><span class="cc-chip">blender</span><span class="cc-chip">brand_outro</span><span class="cc-chip">cad_distill</span><span class="cc-chip">cadgen</span></div>
+<div class="cc-note">共 54 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>data <span class="cc-stat" style="font-size:15px">12</span></h3>
+<div><span class="cc-chip">account_registry</span><span class="cc-chip">audit_query</span><span class="cc-chip">bi_distill</span><span class="cc-chip">chart_html</span><span class="cc-chip">count_words</span><span class="cc-chip">datakit</span><span class="cc-chip">db_plugin</span><span class="cc-chip">db_probe</span><span class="cc-chip">echo</span><span class="cc-chip">humanizer</span></div>
+<div class="cc-note">共 12 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>desktop <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">control_loop</span><span class="cc-chip">ul_tars_desktop</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>device <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">bluetooth</span><span class="cc-chip">bt_control</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>devour <span class="cc-stat" style="font-size:15px">5</span></h3>
+<div><span class="cc-chip">devour_fusion</span><span class="cc-chip">devour_github</span><span class="cc-chip">devour_pulse</span><span class="cc-chip">devour_reflect</span><span class="cc-chip">devour_scan</span></div>
+<div class="cc-note">共 5 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>engine <span class="cc-stat" style="font-size:15px">10</span></h3>
+<div><span class="cc-chip">sched_define</span><span class="cc-chip">sched_status</span><span class="cc-chip">sched_tick</span><span class="cc-chip">transfer</span><span class="cc-chip">wf_cache_clear</span><span class="cc-chip">wf_define</span><span class="cc-chip">wf_resume</span><span class="cc-chip">wf_run</span><span class="cc-chip">wf_status</span><span class="cc-chip">workflow_forge</span></div>
+<div class="cc-note">共 10 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>finance <span class="cc-stat" style="font-size:15px">4</span></h3>
+<div><span class="cc-chip">quant</span><span class="cc-chip">quant_backtest</span><span class="cc-chip">quant_params</span><span class="cc-chip">quant_strategy</span></div>
+<div class="cc-note">共 4 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>framework <span class="cc-stat" style="font-size:15px">1</span></h3>
+<div><span class="cc-chip">gate_visibility</span></div>
+<div class="cc-note">共 1 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>image_video <span class="cc-stat" style="font-size:15px">1</span></h3>
+<div><span class="cc-chip">a1art_skill</span></div>
+<div class="cc-note">共 1 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>infra <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">cloud_pc</span><span class="cc-chip">cloud_plugin</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>integration <span class="cc-stat" style="font-size:15px">7</span></h3>
+<div><span class="cc-chip">cli_chat</span><span class="cc-chip">cli_ify</span><span class="cc-chip">feishu_embed</span><span class="cc-chip">notion_bridge</span><span class="cc-chip">telegram_embed</span><span class="cc-chip">thebrain_bridge</span><span class="cc-chip">whatsapp_embed</span></div>
+<div class="cc-note">共 7 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>life <span class="cc-stat" style="font-size:15px">1</span></h3>
+<div><span class="cc-chip">life</span></div>
+<div class="cc-note">共 1 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>llm <span class="cc-stat" style="font-size:15px">41</span></h3>
+<div><span class="cc-chip">automation_keys</span><span class="cc-chip">autopilot</span><span class="cc-chip">brain_execute</span><span class="cc-chip">brain_health</span><span class="cc-chip">brain_route</span><span class="cc-chip">brain_unify</span><span class="cc-chip">brain_verify</span><span class="cc-chip">claude_code</span><span class="cc-chip">cloud_llm</span><span class="cc-chip">codebuddy</span></div>
+<div class="cc-note">共 41 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>longrun <span class="cc-stat" style="font-size:15px">4</span></h3>
+<div><span class="cc-chip">lr_status</span><span class="cc-chip">lr_submit</span><span class="cc-chip">lr_tick</span><span class="cc-chip">tactics_advise</span></div>
+<div class="cc-note">共 4 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>mind <span class="cc-stat" style="font-size:15px">19</span></h3>
+<div><span class="cc-chip">agent_council</span><span class="cc-chip">auto_switch</span><span class="cc-chip">belief_forge</span><span class="cc-chip">brain_council</span><span class="cc-chip">brain_vault</span><span class="cc-chip">command_chain</span><span class="cc-chip">director_mood</span><span class="cc-chip">doc_intake</span><span class="cc-chip">local_brain</span><span class="cc-chip">memory_bank</span></div>
+<div class="cc-note">共 19 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>pipeline <span class="cc-stat" style="font-size:15px">18</span></h3>
+<div><span class="cc-chip">deploy_queue</span><span class="cc-chip">ghost_guard</span><span class="cc-chip">mirror_ascend</span><span class="cc-chip">mirror_parity</span><span class="cc-chip">mirror_plan</span><span class="cc-chip">mirror_rehearse</span><span class="cc-chip">mirror_release</span><span class="cc-chip">mirror_rewind</span><span class="cc-chip">mirror_scan</span><span class="cc-chip">mirror_shape</span></div>
+<div class="cc-note">共 18 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>project <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">platform_profile</span><span class="cc-chip">project_context</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>recon <span class="cc-stat" style="font-size:15px">17</span></h3>
+<div><span class="cc-chip">book_skill</span><span class="cc-chip">case_mine</span><span class="cc-chip">film_intel</span><span class="cc-chip">know_map</span><span class="cc-chip">music_intel</span><span class="cc-chip">osint_scan</span><span class="cc-chip">rea_reverse</span><span class="cc-chip">recon_distill</span><span class="cc-chip">scrapling</span><span class="cc-chip">skill_forge</span></div>
+<div class="cc-note">共 17 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>security <span class="cc-stat" style="font-size:15px">29</span></h3>
+<div><span class="cc-chip">asset_vault_freeze</span><span class="cc-chip">code_audit</span><span class="cc-chip">credential_steal</span><span class="cc-chip">data_hijack</span><span class="cc-chip">device_takeover</span><span class="cc-chip">event_ledger</span><span class="cc-chip">hook_enforcer</span><span class="cc-chip">install_selfcheck</span><span class="cc-chip">keylogger</span><span class="cc-chip">llm_redteam</span></div>
+<div class="cc-note">共 29 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>social <span class="cc-stat" style="font-size:15px">2</span></h3>
+<div><span class="cc-chip">auto_publish</span><span class="cc-chip">eigenflux</span></div>
+<div class="cc-note">共 2 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>system <span class="cc-stat" style="font-size:15px">51</span></h3>
+<div><span class="cc-chip">action_gate</span><span class="cc-chip">agent_console</span><span class="cc-chip">agent_control</span><span class="cc-chip">agent_rig</span><span class="cc-chip">alerts</span><span class="cc-chip">answer_shaper</span><span class="cc-chip">asset_index</span><span class="cc-chip">auth_gate_status</span><span class="cc-chip">cap_tags</span><span class="cc-chip">caps_called_audit</span></div>
+<div class="cc-note">共 51 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>tentacle <span class="cc-stat" style="font-size:15px">18</span></h3>
+<div><span class="cc-chip">agency_tentacles</span><span class="cc-chip">desktop_commander</span><span class="cc-chip">desktop_distill</span><span class="cc-chip">express_direct</span><span class="cc-chip">long_run_supervisor</span><span class="cc-chip">mcp_call</span><span class="cc-chip">mcp_connect</span><span class="cc-chip">mcp_tools</span><span class="cc-chip">omarchy_bridge</span><span class="cc-chip">omni_web</span></div>
+<div class="cc-note">共 18 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>tools <span class="cc-stat" style="font-size:15px">9</span></h3>
+<div><span class="cc-chip">awesome_tools_index</span><span class="cc-chip">capability_net</span><span class="cc-chip">code_patch</span><span class="cc-chip">freebuff_term</span><span class="cc-chip">git_read</span><span class="cc-chip">git_write</span><span class="cc-chip">projection_card</span><span class="cc-chip">pulse_direct</span><span class="cc-chip">repo_publish</span></div>
+<div class="cc-note">共 9 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>video <span class="cc-stat" style="font-size:15px">14</span></h3>
+<div><span class="cc-chip">actioncam</span><span class="cc-chip">audio_extract</span><span class="cc-chip">audio_mix</span><span class="cc-chip">digital_human</span><span class="cc-chip">edit_pipeline</span><span class="cc-chip">h3_video_gen</span><span class="cc-chip">libtv_skill</span><span class="cc-chip">libtv_workflow</span><span class="cc-chip">look_grade</span><span class="cc-chip">media_license</span></div>
+<div class="cc-note">共 14 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>vision <span class="cc-stat" style="font-size:15px">5</span></h3>
+<div><span class="cc-chip">vision</span><span class="cc-chip">vision_grounding</span><span class="cc-chip">vision_loop</span><span class="cc-chip">vision_print</span><span class="cc-chip">vlx_flow</span></div>
+<div class="cc-note">共 5 项 · 全量见能力总目录</div></div><div class="cc-card"><h3>voice <span class="cc-stat" style="font-size:15px">4</span></h3>
+<div><span class="cc-chip">hf_voice</span><span class="cc-chip">voice</span><span class="cc-chip">voice_orchestra</span><span class="cc-chip">voice_studio</span></div>
+<div class="cc-note">共 4 项 · 全量见能力总目录</div></div></div>
+      <div class="cc-note">点跑入口：面板桥在线时 POST /api/capability（走 api.run_task + policy，不放宽作用域）</div>
+    </section>
+    <section id="connectors"><div class="cc-sec">// 03 — 云插件 · 连接器（与触手互通）</div>
+      <div class="cc-split">
+        <div class="cc-grid" style="grid-template-columns:repeat(auto-fill,minmax(205px,1fr))"><div class="cc-card"><h3>gbt-c01-llm-gateway</h3>
+<div class="cc-note">模型接入与推理路由</div>
+<div style="margin-top:6px"><span class="cc-chip">status</span><span class="cc-chip">identity</span><span class="cc-chip">models</span><span class="cc-chip">complete</span></div>
+<div class="cc-note">门: external_llm、none · 云依赖: AI (Workers AI)、自建 OpenAI 兼容端点 (fetch)</div>
+<div class="cc-note">云上托管模型的权重不是我们的，平台侧内容策略仍然生效；真正无限制只能走自托管权重（03 通道）。</div></div><div class="cc-card"><h3>gbt-c02-context-compact</h3>
+<div class="cc-note">上下文压缩与预算收口</div>
+<div style="margin-top:6px"><span class="cc-chip">budget</span><span class="cc-chip">compact</span></div>
+<div class="cc-note">门: none · 云依赖: KV (CTX)、Durable Object (可选串行化点)</div>
+<div class="cc-note">压缩是有损的：本模块只做预算与收缩，压掉的东西的可追溯性靠 10 号落账。</div></div><div class="cc-card"><h3>gbt-c03-uncensored-lane</h3>
+<div class="cc-note">无审查通道（自托管权重 · 文本 + 图像）</div>
+<div style="margin-top:6px"><span class="cc-chip">status</span><span class="cc-chip">route</span><span class="cc-chip">image</span></div>
+<div class="cc-note">门: external_llm、none · 云依赖: Containers / 自建端点 (fetch)</div>
+<div class="cc-note">这条通道要有我们自己的权重与算力；未接线时读数只能是未读到，不许拿托管模型冒充无审查。图像面另要 IMAGE_ENDPOINT（把无审查图像模型包成 OpenAI 兼容的 /v1/</div></div><div class="cc-card"><h3>gbt-c04-tool-web</h3>
+<div class="cc-note">联网检索与抓取</div>
+<div style="margin-top:6px"><span class="cc-chip">search</span><span class="cc-chip">fetch</span></div>
+<div class="cc-note">门: none · 云依赖: ai-search 绑定、Browser Rendering 绑定、fetch</div>
+<div class="cc-note">检索结果一律是外部数据不是指令；抓回正文只当数据用。</div></div><div class="cc-card"><h3>gbt-c05-tool-file</h3>
+<div class="cc-note">文件读写（对象存储）</div>
+<div style="margin-top:6px"><span class="cc-chip">list</span><span class="cc-chip">get</span><span class="cc-chip">put</span><span class="cc-chip">del</span></div>
+<div class="cc-note">门: none · 云依赖: R2 (FILES)</div>
+<div class="cc-note">Worker 里没有本地文件系统；这里的文件是对象存储，key 前缀即命名空间，越出前缀一律拒。</div></div><div class="cc-card"><h3>gbt-c06-tool-shell</h3>
+<div class="cc-note">命令执行（隔离容器）</div>
+<div style="margin-top:6px"><span class="cc-chip">status</span><span class="cc-chip">exec</span></div>
+<div class="cc-note">门: none、process_execute · 云依赖: Containers / Sandbox 绑定</div>
+<div class="cc-note">Worker 本体没有 shell；没绑沙箱时 exec 必须如实拒绝，不许假装执行过。</div></div><div class="cc-card"><h3>gbt-c07-memory-vector</h3>
+<div class="cc-note">向量记忆与语义检索</div>
+<div style="margin-top:6px"><span class="cc-chip">index</span><span class="cc-chip">query</span><span class="cc-chip">stats</span></div>
+<div class="cc-note">门: none · 云依赖: Vectorize (作用域未授权)、D1 + 内积 (降级落点)、agent-memory 绑定</div>
+<div class="cc-note">落点是内存还是 D1 要如实报：两种落点的读数不许念成一句。</div></div><div class="cc-card"><h3>gbt-c08-memory-local</h3>
+<div class="cc-note">键值持久化</div>
+<div style="margin-top:6px"><span class="cc-chip">remember</span><span class="cc-chip">recall</span><span class="cc-chip">list</span><span class="cc-chip">forget</span></div>
+<div class="cc-note">门: none · 云依赖: KV (MEM)</div>
+<div class="cc-note">KV 最终一致：写完立刻读可能还是旧值，读数要带落点。D1 是 07 号的落点，不是本位的。</div></div><div class="cc-card"><h3>gbt-c09-policy-guard</h3>
+<div class="cc-note">权限与安全策略门</div>
+<div style="margin-top:6px"><span class="cc-chip">scopes</span><span class="cc-chip">grants</span><span class="cc-chip">evaluate</span></div>
+<div class="cc-note">门: none · 云依赖: 本模块自带（不依赖云服务）</div>
+<div class="cc-note">门只做一件事：没有授权就不放行；AI 一律不许给自己发授权。</div></div><div class="cc-card"><h3>gbt-c10-observability</h3>
+<div class="cc-note">可观测与审计落账</div>
+<div style="margin-top:6px"><span class="cc-chip">emit</span><span class="cc-chip">tail</span><span class="cc-chip">report</span></div>
+<div class="cc-note">门: none · 云依赖: Workers Logs / tail (workers_tail:read)、R2 落账 (降级落点)</div>
+<div class="cc-note">账面条数是读数不是结论；未读到要写未读到，不许写 0。</div></div></div>
+        <div class="cc-card hud"><svg viewBox="0 0 200 200" style="width:100%;display:block" role="img" aria-label="GBT mesh HUD">
+  <circle cx='100' cy='100' r='92' fill='none' stroke='rgba(0,229,255,.18)'/>
+  <circle cx='100' cy='100' r='74' fill='none' stroke='rgba(0,229,255,.12)' stroke-dasharray='2 5'/>
+  <circle cx='100' cy='100' r='56' fill='none' stroke='rgba(0,229,255,.22)'/>
+  <circle cx='100' cy='100' r='30' fill='none' stroke='rgba(245,176,65,.4)' stroke-dasharray='60 12'/>
+  <path d='M100 8 A92 92 0 0 1 178 55' fill='none' stroke='rgba(0,229,255,.5)' stroke-width='2'/>
+  <line x1='100' y1='4' x2='100' y2='196' stroke='rgba(0,229,255,.10)'/>
+  <line x1='4' y1='100' x2='196' y2='100' stroke='rgba(0,229,255,.10)'/>
+  <polygon points='100,78 119,89 119,111 100,122 81,111 81,89' fill='none' stroke='rgba(245,176,65,.55)'/>
+  <polygon points='100,88 111,94 111,106 100,112 89,106 89,94' fill='none' stroke='rgba(0,229,255,.5)'/>
+  <circle cx='100' cy='100' r='3' fill='#00E5FF'/>
+  <circle cx='56' cy='174' r='1.2' fill='rgba(0,229,255,0.57)'/><circle cx='34' cy='60' r='2.6' fill='rgba(0,229,255,0.32)'/><circle cx='123' cy='93' r='1.7' fill='rgba(0,229,255,0.47)'/><circle cx='51' cy='153' r='1.1' fill='rgba(0,229,255,0.34)'/><circle cx='23' cy='63' r='1.7' fill='rgba(0,229,255,0.67)'/><circle cx='81' cy='38' r='1.4' fill='rgba(0,229,255,0.72)'/><circle cx='30' cy='119' r='1.6' fill='rgba(0,229,255,0.55)'/><circle cx='74' cy='131' r='1.8' fill='rgba(0,229,255,0.54)'/><circle cx='164' cy='113' r='1.2' fill='rgba(0,229,255,0.25)'/><circle cx='171' cy='98' r='1.3' fill='rgba(0,229,255,0.69)'/><circle cx='113' cy='137' r='2.4' fill='rgba(0,229,255,0.36)'/><circle cx='77' cy='160' r='1.2' fill='rgba(0,229,255,0.60)'/><circle cx='36' cy='130' r='2.1' fill='rgba(0,229,255,0.69)'/><circle cx='155' cy='101' r='1.3' fill='rgba(0,229,255,0.30)'/><circle cx='105' cy='102' r='1.1' fill='rgba(0,229,255,0.67)'/><circle cx='101' cy='132' r='1.4' fill='rgba(0,229,255,0.34)'/><circle cx='22' cy='75' r='1.4' fill='rgba(0,229,255,0.43)'/><circle cx='80' cy='153' r='2.4' fill='rgba(0,229,255,0.31)'/><circle cx='83' cy='47' r='2.1' fill='rgba(0,229,255,0.71)'/><circle cx='52' cy='143' r='1.5' fill='rgba(0,229,255,0.23)'/><circle cx='142' cy='75' r='1.3' fill='rgba(0,229,255,0.44)'/><circle cx='57' cy='86' r='1.7' fill='rgba(0,229,255,0.43)'/><circle cx='114' cy='66' r='1.2' fill='rgba(0,229,255,0.26)'/><circle cx='37' cy='103' r='1.6' fill='rgba(0,229,255,0.62)'/><circle cx='101' cy='133' r='2.6' fill='rgba(0,229,255,0.25)'/><circle cx='23' cy='42' r='1.6' fill='rgba(0,229,255,0.51)'/><circle cx='139' cy='76' r='2.5' fill='rgba(0,229,255,0.22)'/><circle cx='154' cy='54' r='2.4' fill='rgba(0,229,255,0.24)'/><circle cx='174' cy='142' r='2.6' fill='rgba(0,229,255,0.51)'/><circle cx='48' cy='175' r='1.7' fill='rgba(0,229,255,0.26)'/><circle cx='117' cy='100' r='1.8' fill='rgba(0,229,255,0.30)'/><circle cx='40' cy='113' r='1.7' fill='rgba(0,229,255,0.28)'/><circle cx='90' cy='136' r='2.1' fill='rgba(0,229,255,0.46)'/><circle cx='83' cy='78' r='1.4' fill='rgba(0,229,255,0.32)'/><circle cx='91' cy='37' r='2.2' fill='rgba(0,229,255,0.57)'/><circle cx='118' cy='24' r='1.6' fill='rgba(0,229,255,0.44)'/><circle cx='35' cy='175' r='2.2' fill='rgba(0,229,255,0.47)'/><circle cx='133' cy='52' r='1.4' fill='rgba(0,229,255,0.48)'/><circle cx='139' cy='124' r='1.0' fill='rgba(0,229,255,0.53)'/><circle cx='165' cy='139' r='2.5' fill='rgba(0,229,255,0.71)'/><circle cx='56' cy='67' r='1.9' fill='rgba(0,229,255,0.71)'/><circle cx='79' cy='171' r='2.4' fill='rgba(0,229,255,0.48)'/><circle cx='120' cy='173' r='2.3' fill='rgba(0,229,255,0.37)'/><circle cx='155' cy='51' r='1.6' fill='rgba(0,229,255,0.70)'/><circle cx='156' cy='70' r='1.5' fill='rgba(0,229,255,0.53)'/><circle cx='155' cy='129' r='2.5' fill='rgba(0,229,255,0.58)'/>
+  <text x='100' y='184' text-anchor='middle' fill='rgba(0,229,255,.6)' font-size='8' font-family='monospace'>GBT//MESH · 0 EDGES · 10 MODULES</text>
+</svg>
+          <div class="cc-label" style="margin-top:10px">GBT//MESH · LIVE TOPOLOGY</div>
+          <div class="cc-note">自家大模型链路：provider=未设 · model=gbt-potato-v8<br>
+          端点 <span class="cc-ok">已设</span> ·
+          密钥 <span class="cc-bad">未配</span>（只显示状态，不显值）</div>
+        </div>
+      </div>
+      <div class="cc-card" style="margin-top:12px"><h3>链路纪律 · LINK DISCIPLINE</h3>
+        <div class="cc-note">GW_AUTH 走 secret：缺钥 ⇒ /v1/chat 与 /rpc <b>fail-closed 拒服务</b>（2026-10-04 起，不再静默放行）。
+        云插件与触手的互通以 mesh.json 单一真源为准；每条互通边都可经 /rpc 现测。</div>
+      </div>
+    </section>
+    <section id="brain"><div class="cc-sec">// 04 — 第二大脑 · 记忆图谱</div>
+      <div class="cc-grid">
+        <div class="cc-card"><h3>脑层模块（14）</h3>
+          <div><span class="cc-chip">brain_council</span><span class="cc-chip">cap_optimizer</span><span class="cc-chip">cognition</span><span class="cc-chip">cross_validation</span><span class="cc-chip">curiosity_engine</span><span class="cc-chip">deep_reasoner</span><span class="cc-chip">exploration_engine</span><span class="cc-chip">intent_broker</span><span class="cc-chip">market_intelligence</span><span class="cc-chip">neural_tentacle</span><span class="cc-chip">penetration_scan</span><span class="cc-chip">tentacle_reasoner</span><span class="cc-chip">topology_index</span><span class="cc-chip">vision_tentacle</span></div>
+          <div class="cc-note">闭环核验：tools/codex-scripts/brain-closure-check.py（3/3）</div></div>
+        <div class="cc-card"><h3>图谱入口</h3>
+          <div class="cc-note">触手 3D 全景（域→能力→绑定）与 godview 图谱见快捷入口；拓扑索引 gbt_allinone/store/_topology_index.json</div></div>
+      </div>
+    </section>
+    <section id="crew"><div class="cc-sec">// 05 — 编队群 · 触手职业（只出本域意见）</div>
+      <div class="cc-rule">群规：每个职业只给<b>各自领域的专业意见和建议</b>；<b>决策与执行权全局只属 GBT小土豆V8</b>。
+      职业不得越权执行任何跨界任务；执行一律经 GBT 的能力门（run_task + policy 授权）落地。</div>
+      <div class="cc-card" style="margin-top:10px"><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"freebuff"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"免费算力助理（默认）· freebuff agent 驱动，隔离 HOME，零成本"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-browser"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"内置浏览器全控 · 导航/点击/输入/取页（browser + 原生浏览器）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-claude"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"克劳德的意见和建议 · Claude Code CLI（claude_code 能力位）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-codex"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"Codex 编程能力 · 官方 codex_* 六件（会话/线程/回合/工具）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-db-tune"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"索引灵 · 数据库优化专家（查询调优与索引策略）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-deepseek"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"DeepSeek Harness 执行力 · 密钥链自动路由（llm_chat / llm_status）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-design-system"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"规范范 · 设计系统架构师（设计系统规范 + HTML/CSS/UI 组件）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-dev-senior"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"吴八哥 · 高级开发工程师（实现与装配主力）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-eng-practice"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"工序达 · 工程实践专家（规约驱动 / 测试驱动 / 评审 / 发布）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-framework"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"万能插主控 · 一切能力经 run_task 唯一门调度（GBT小土豆V8 本体）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-genoffice"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"办公文档助理 · GenOffice 蒸馏版（本地引擎全接·控制端默认不接）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-ig-visual"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"晒图图 · Instagram 视觉美学（社媒出图与审美总监）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-recon"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"钱对齐 · 总账对账师（账账/账实核对与差异追溯）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-tiktok"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"拓刻刻 · TikTok 策略师（短视频节奏与钩子）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-vocab"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"词力 · 智能词汇教练（间隔重复与每日打卡）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-wiki"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"知库库 · 知识管理专家（原始资料编译为结构化 Wiki）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"gbt-zettel"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"零知知 · 卡片笔记知识管家（Zettelkasten 分镜卡片）"</div></div></div><div class="cc-msg"><div class="cc-avatar">"</div>
+<div><b>"omni-pulse"</b> <span class="cc-chip">本域意见</span>
+<div class="cc-note">"万能插脉冲 · 万物皆可插，万物皆可控（GBT小土豆V8 子智能体）"</div></div></div></div>
+      <div class="cc-note">决策引擎：brain_council（纯推演 · 零作用域 · 已接入 run_task：op=convene）；
+      执行引擎：GBT 主脑经既有授权门逐条落跑，职业结论只作为提案输入。</div>
+    </section>
+    <section id="pages"><div class="cc-sec">// 06 — 快捷入口</div>
+      <div class="cc-grid"><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/console/index.html">
+<h3>console</h3><div class="cc-note">枢纽 · 全部 · 45.2KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/home/index.html">
+<h3>home</h3><div class="cc-note">门面 · 全部 · 18.6KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/keys/index.html">
+<h3>keys</h3><div class="cc-note">密钥台 · security · 5.9KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/freebuff/index.html">
+<h3>freebuff</h3><div class="cc-note">执行台 · programming · 17.8KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/gallery/index.html">
+<h3>gallery</h3><div class="cc-note">枢纽 · 全部 · 148.1KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/workbench/index.html">
+<h3>workbench</h3><div class="cc-note">枢纽 · 全部 · 21.0KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/tentacle3d/index.html">
+<h3>tentacle3d</h3><div class="cc-note">全景 · 全部 · 108.0KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/wf-film/index.html">
+<h3>wf-film</h3><div class="cc-note">工作流 · film · 8.7KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/wf-movie/index.html">
+<h3>wf-movie</h3><div class="cc-note">工作流 · movie · 9.0KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/wf-music/index.html">
+<h3>wf-music</h3><div class="cc-note">工作流 · music · 8.8KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/wf-short-video/index.html">
+<h3>wf-short-video</h3><div class="cc-note">工作流 · short-video · 9.6KB</div></a><a class="cc-card" style="display:block;text-decoration:none;color:inherit" href="../../../holo_pet/assets/console3d/index.html">
+<h3>console3d</h3><div class="cc-note">执行台 · engine · 62.4KB</div></a></div>
+      <div class="cc-note">全量页面见卡库 gallery（25 页登记）</div>
+    </section>
+  </div>
+</div>
+<script>// 总控台是静态渲染色（数据在生成时内联；点跑走面板桥 /api/capability）</script>
+</body></html>

@@ -1,0 +1,38 @@
+{
+  "name": "wawa-lipsync",
+  "private": false,
+  "version": "0.0.2",
+  "license": "MIT",
+  "types": "dist/index.d.ts",
+  "main": "dist/wawa-lipsync.umd.js",
+  "module": "dist/wawa-lipsync.es.js",
+  "keywords": [
+    "react",
+    "three",
+    "react-three",
+    "react-three-fiber",
+    "react-three-drei",
+    "lipsync",
+    "babylonjs"
+  ],
+  "description": "A simple and easy-to-use library for real-time lipsyncing with JS and web audio API.",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/wawa-lipsync.es.js",
+    "require": "./dist/wawa-lipsync.umd.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "cp ../../README.md ./ && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "globals": "^15.15.0",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0",
+    "vite-plugin-dts": "^4.5.3"
+  }
+}

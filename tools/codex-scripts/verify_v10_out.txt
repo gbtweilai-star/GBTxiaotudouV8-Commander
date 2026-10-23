@@ -1,0 +1,70 @@
+==============================================================================
+V10 交付前自检 · 项目树进上帝视角
+==============================================================================
+
+[1] 文件 / 版本 / 归档
+  PASS  V10 GBT小土豆V8-无限画布.html · 98995 B
+  PASS  V10 GBT小土豆V8-可交互原型.html · 230519 B
+  PASS  版本一致（V10）
+  PASS  archive/ 历史 18 份（V1-V9 各 2）
+  PASS  根目录只留活跃版本
+
+[2] JS 语法
+  PASS  V10 GBT小土豆V8-无限画布.html 语法（76390 字符）
+  PASS  V10 GBT小土豆V8-可交互原型.html 语法（177852 字符）
+
+[3] 核对：项目树确实进了上帝视角
+  PASS  实现 treeCard()
+  PASS  treeCard() 被 renderGod 调用（在上帝视角内，非独立面板）
+  PASS  上帝视角内含「项目树」标题
+  PASS  未新增导航项（按指令留在上帝视角内）
+
+[4] 树数据真读数
+  PASS  根层 40/70 项（应 40/70）
+  PASS  根层标 truncated=True（应 True）
+  PASS  预展开目录 4 个
+  PASS  条目类型仅三态：['directory', 'file']
+  PASS  dotfiles 与普通条目同列（如 .git/.scratch）
+  PASS  目录优先排序
+  PASS  文件条目带字节数
+  PASS  存在已展开层（4 个）
+
+[5] 规格一致性（逐条对照官方 README）
+  PASS  标注真实接口 workspaceFiles.list(sessionId, path)
+  PASS  标注返回结构 DirectoryListing
+  PASS  规格：目录优先 → 自然序不分大小写
+  PASS  规格：dotfiles 与其他条目一样显示
+  PASS  规格：other 灰显不可点（aria-disabled）
+  PASS  规格：maxEntries 上限
+  PASS  规格：truncated 标记
+  PASS  规格：空层如实说明
+  PASS  规格：失败按错误码展示
+  PASS  规格：已知限制（只有一个根）
+  PASS  规格：已知限制（只有列目录）
+  PASS  规格：标题行右端重新读取控件
+  PASS  规格默认 maxEntries=2000 记录在案
+  PASS  规格：本服务不提供修改操作
+
+[6] 交互
+  PASS  树行带 data-tree / data-kind
+  PASS  目录展开态 + treeBody 容器
+  PASS  重新读取按钮已接线
+  PASS  文件大小人性化显示
+
+[7] 面板与画布
+  PASS  面板函数 20 个（应仍为 20，未新增导航项）
+  PASS  画布标注「01 项目背景」
+  PASS  画布标注「02 设计系统」
+  PASS  画布标注「03 设计稿」
+  PASS  Row 3 页面 23 个
+  PASS  画布含「上帝视角 · 项目树」
+  PASS  画布记录了核对结论
+
+[8] 反 slop
+  PASS  V10 GBT小土豆V8-无限画布.html emoji 无
+  PASS  V10 GBT小土豆V8-可交互原型.html emoji 无
+  PASS  无 lorem ipsum
+  PASS  原型 225 KB
+
+[9] 结果
+  PASS 48 · WARN 0 · FAIL 0
