@@ -131,8 +131,14 @@ def warm_bg() -> None:
 
 
 def _health_ok(url: str, timeout: float = 2.0) -> bool:
+    """探活。上游 base 是 .../v1，而 /health 挂在根上 —— 必须先剥掉 /v1。
+    2026-10-24 实测踩坑：拼成 /v1/health 恒 404 ⇒ 明明起来了还在等 150s，
+    把「冷启动 2 秒」误读成「冷启动 160 秒」。"""
     try:
-        req = urllib.request.Request(url.rstrip("/") + "/health", headers={"User-Agent": UA})
+        root = url.rstrip("/")
+        if root.endswith("/v1"):
+            root = root[:-3]
+        req = urllib.request.Request(root + "/health", headers={"User-Agent": UA})
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return r.status == 200
     except Exception:                                             # noqa: BLE001
