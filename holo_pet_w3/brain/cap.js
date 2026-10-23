@@ -107,3 +107,158 @@
 
   $("cap-at").textContent = D.at;
 })();
+
+/* ── 互通层（2026-10-24）：任意能力页都能「调任意能力位」，Ctrl+K 跳任意页 ──
+   两件事都走本地桥 http://127.0.0.1:8791；桥不在就如实说桥不在，不装死。 */
+(function () {
+  "use strict";
+  var BRIDGE = "http://127.0.0.1:8791";
+  var kind = document.body.dataset.kind || "";
+  var CACHE = "gbt.caps.v1";
+
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  function getCaps() {
+    var raw = sessionStorage.getItem(CACHE);
+    if (raw) { try { return Promise.resolve(JSON.parse(raw)); } catch (e) { /* 坏了就重取 */ } }
+    return fetch(BRIDGE + "/v1/caps").then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.caps) { sessionStorage.setItem(CACHE, JSON.stringify(j.caps)); }
+        return (j && j.caps) || [];
+      })
+      .catch(function () { return []; });
+  }
+
+  /* ── ① 调用面板：本页就能跑任何能力位 ── */
+  var panel = el("div", "gbt-call");
+  panel.style.cssText = "position:fixed;right:14px;bottom:14px;z-index:2147483000;width:340px;"
+    + "font:13px/1.5 system-ui,'Microsoft YaHei',sans-serif;background:rgba(10,14,22,.92);"
+    + "color:#e8eefc;border:1px solid rgba(120,170,255,.35);border-radius:12px;padding:10px 12px;"
+    + "box-shadow:0 10px 30px rgba(0,0,0,.45)";
+  var head = el("div", null, "⛓ 调用能力位 ");
+  head.style.cssText = "font-weight:600;margin-bottom:6px;cursor:pointer";
+  var body = el("div");
+  body.style.display = "none";
+  var sel = el("select");
+  sel.style.cssText = "width:100%;margin:4px 0;background:#0d1420;color:#e8eefc;border:1px solid #2a3a55;border-radius:8px;padding:4px";
+  var ta = el("textarea");
+  ta.value = "{}";
+  ta.rows = 3;
+  ta.style.cssText = "width:100%;box-sizing:border-box;background:#0d1420;color:#e8eefc;border:1px solid #2a3a55;border-radius:8px;padding:6px;font-family:ui-monospace,Consolas,monospace";
+  var run = el("button", null, "运行");
+  run.style.cssText = "margin-top:6px;background:#2b6cff;color:#fff;border:0;border-radius:8px;padding:6px 14px;cursor:pointer";
+  var out = el("pre", null, "");
+  out.style.cssText = "max-height:180px;overflow:auto;background:#0a0f18;border:1px solid #1d2b42;border-radius:8px;padding:8px;margin:8px 0 0;white-space:pre-wrap;word-break:break-all;font:12px/1.45 ui-monospace,Consolas,monospace";
+  head.appendChild(el("span", null, "· Ctrl+K 跳页"));
+  body.appendChild(sel); body.appendChild(ta); body.appendChild(run); body.appendChild(out);
+  panel.appendChild(head); panel.appendChild(body);
+  document.body.appendChild(panel);
+  head.addEventListener("click", function () {
+    body.style.display = body.style.display === "none" ? "block" : "none";
+    if (body.style.display === "block") { loadSelect(); }
+  });
+  var selectLoaded = false;
+  function loadSelect() {
+    if (selectLoaded) { return; }
+    selectLoaded = true;
+    sel.appendChild(el("option", null, "（读能力名册…）"));
+    getCaps().then(function (caps) {
+      sel.innerHTML = "";
+      if (!caps.length) { sel.appendChild(el("option", null, "桥没起（:8791 不通）")); return; }
+      caps.forEach(function (c) {
+        var o = el("option", null, c.name + " · " + (c.domain || ""));
+        o.value = c.name;
+        sel.appendChild(o);
+      });
+      if (kind) { sel.value = kind; }
+    });
+  }
+  run.addEventListener("click", function () {
+    var cap = sel.value || kind;
+    var args;
+    try { args = JSON.parse(ta.value || "{}"); } catch (e) {
+      out.textContent = "payload 不是合法 JSON：" + e.message; return;
+    }
+    out.textContent = "调用 " + cap + " …";
+    var t0 = performance.now();
+    fetch(BRIDGE + "/v1/dispatch", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({capability: cap, args: args})
+    }).then(function (r) { return r.json(); })
+      .then(function (j) {
+        var ms = Math.round(performance.now() - t0);
+        out.textContent = "// " + ms + " ms\n" + JSON.stringify(j, null, 1).slice(0, 4000);
+      })
+      .catch(function (e) { out.textContent = "桥连不上（" + BRIDGE + "）：" + e.message; });
+  });
+
+  /* ── ② 命令面板：Ctrl+K 搜 341 个能力位，回车跳页 ── */
+  var pal = el("div", "gbt-pal");
+  pal.style.cssText = "position:fixed;inset:0;z-index:2147483001;display:none;"
+    + "background:rgba(4,8,14,.72);backdrop-filter:blur(3px)";
+  var box = el("div");
+  box.style.cssText = "position:absolute;left:50%;top:14%;transform:translateX(-50%);width:min(640px,92vw);"
+    + "background:#0b1220;border:1px solid #26374f;border-radius:14px;overflow:hidden;"
+    + "box-shadow:0 24px 60px rgba(0,0,0,.6)";
+  var inp = el("input");
+  inp.placeholder = "搜能力位 / 页面名…（Esc 关，Enter 打开）";
+  inp.style.cssText = "width:100%;box-sizing:border-box;padding:14px 16px;border:0;outline:0;"
+    + "background:#0b1220;color:#e8eefc;font:15px system-ui,'Microsoft YaHei',sans-serif";
+  var list = el("div");
+  list.style.cssText = "max-height:52vh;overflow:auto";
+  box.appendChild(inp); box.appendChild(list);
+  pal.appendChild(box);
+  document.body.appendChild(pal);
+
+  var all = [];
+  var sel2 = 0;
+  function paint() {
+    var q = inp.value.trim().toLowerCase();
+    var hits = all.filter(function (c) {
+      return !q || (c.name + " " + (c.domain || "") + " " + (c.desc || "")).toLowerCase().indexOf(q) >= 0;
+    }).slice(0, 60);
+    list.innerHTML = "";
+    if (!hits.length) {
+      var e2 = el("div", null, all.length ? "没有匹配" : "桥没起（:8791 不通），拿不到名册");
+      e2.style.cssText = "padding:16px;color:#8ea2c0";
+      list.appendChild(e2); return;
+    }
+    if (sel2 >= hits.length) { sel2 = 0; }
+    hits.forEach(function (c, i) {
+      var row = el("div");
+      row.style.cssText = "padding:9px 16px;cursor:pointer;border-top:1px solid #16233a;"
+        + (i === sel2 ? "background:#16233a;" : "");
+      row.innerHTML = "<b>" + c.name + "</b> <span style='color:#7f93b3'>· " + (c.domain || "")
+        + "</span><br><span style='color:#9db0cc;font-size:12px'>" + (c.desc || "") + "</span>";
+      row.addEventListener("click", function () { location.href = c.page; });
+      list.appendChild(row);
+    });
+  }
+  function openPal() {
+    sel2 = 0; inp.value = ""; pal.style.display = "block"; inp.focus();
+    if (all.length) { paint(); return; }
+    list.innerHTML = "<div style='padding:16px;color:#8ea2c0'>读名册…</div>";
+    getCaps().then(function (caps) { all = caps; paint(); });
+  }
+  function closePal() { pal.style.display = "none"; }
+  inp.addEventListener("input", function () { sel2 = 0; paint(); });
+  inp.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown") { sel2 = Math.min(sel2 + 1, 59); paint(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { sel2 = Math.max(sel2 - 1, 0); paint(); e.preventDefault(); }
+    else if (e.key === "Enter") {
+      var q = inp.value.trim().toLowerCase();
+      var hits = all.filter(function (c) {
+        return !q || (c.name + " " + (c.domain || "") + " " + (c.desc || "")).toLowerCase().indexOf(q) >= 0;
+      });
+      if (hits[sel2]) { location.href = hits[sel2].page; }
+    } else if (e.key === "Escape") { closePal(); }
+  });
+  pal.addEventListener("click", function (e) { if (e.target === pal) { closePal(); } });
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) { e.preventDefault(); openPal(); }
+  });
+})();
