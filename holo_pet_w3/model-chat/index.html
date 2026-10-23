@@ -62,6 +62,7 @@
   <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
   <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活 ⚡</button>
   <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（约 2 秒，不占对话）；加载中按秒报数">🔥 预热</button>
+  <button id="stop" class="ghost" disabled title="停止生成：已经收到的字会留着">■ 停止</button>
   <button id="send">发送</button>
 </footer>
 <div class="hint" id="hint"></div>
@@ -72,6 +73,7 @@ const log = document.getElementById("log");
 const badge = document.getElementById("bridge");
 const hint = document.getElementById("hint");
 let busy = false;
+let abort = () => {};
 let stopWake = () => {};   /* 每个请求自己覆盖；没覆盖就是空操作（派活那条路不加载权重） */
 
 function add(role, text, meta) {
@@ -133,6 +135,8 @@ async function pollWarm() {
     }
   } catch (e) { /* 桥断了：下一次轮询再说 */ }
 }
+const stopBtn = document.getElementById("stop");
+stopBtn.addEventListener("click", () => { try { abort(); } catch (e) { /* 没在生成 */ } });
 warmBtn.addEventListener("click", async () => {
   if (warmTimer) return;
   warmBtn.textContent = "预热 0s…";
@@ -152,6 +156,7 @@ async function send() {
   const node = add("assistant", "…");
   busy = true;
   document.getElementById("send").disabled = true;
+  document.getElementById("stop").disabled = false;
   /* 🔴 2026-10-24 按需激活：权重冷着时，第一次请求要 1–2 分钟加载 4.88 GB。
      页面必须把这段时间说清楚，否则用户以为卡死（实测冷启 170s）。 */
   /* 2026-10-24 实测修正：模型加载只有 2.07s（mmap），之前「160 秒冷启动」
@@ -168,10 +173,15 @@ async function send() {
     messages.push({role: "user", content: text});
     /* 🔴 2026-10-24：改流式。900 token 的老上限 + 2 tok/s = 最坏 7 分钟才见第一个字；
        流式后 2–3 秒就出首字。兜底车道会自行去掉 stream（桥那边 pop 掉），所以两条路都要能收。 */
+    /* 900 token × 1.7 tok/s = 最坏 9 分钟。默认降到 320，够一段完整回答；
+       要更长的答案自己说「详细点」，或者把 320 调大。 */
+    const ctrl = new AbortController();
+    abort = () => ctrl.abort();
     const r = await fetch(BRIDGE + "/v1/chat/completions", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({upstream, messages, max_tokens: 900, stream: true})
+      body: JSON.stringify({upstream, messages, max_tokens: 320, stream: true}),
+      signal: ctrl.signal
     });
     const ctype = r.headers.get("Content-Type") || "";
     const lane = r.headers.get("x-gbt-lane") || "?";
@@ -245,6 +255,10 @@ async function send() {
     if (!ours) m.style.color = "#f0b24c";
     node.appendChild(m);
   } catch (e) {
+    if (e && e.name === "AbortError") {
+      if (!node.textContent || node.textContent.startsWith("…")) node.textContent = "(已停止)";
+      return;
+    }
     node.className = "msg ai err";
     node.textContent = "连不上桥（" + e.message + "）。在 APP 里打开会自动启桥；单独开本页时先跑：py -3.14 -X utf8 tools/model-bridge/server.py";
   } finally {
@@ -268,6 +282,7 @@ async function dispatch() {
   const node1 = add("assistant", "① 问我们自己的模型：这句话该落哪个能力位…");
   busy = true;
   document.getElementById("send").disabled = true;
+  document.getElementById("stop").disabled = false;
   document.getElementById("dispatch").disabled = true;
   const t0 = performance.now();
   try {
