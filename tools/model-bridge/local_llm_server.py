@@ -30,6 +30,8 @@ from llama_cpp import Llama
 LOCK = threading.Lock()
 LLM = None
 INFO = {}
+LAST_HIT = time.time()      # 最后一次被调用；空闲自动退出用（按需激活的另一半）
+IDLE_EXIT = 0               # 秒；0 = 不自动退
 
 
 def load(model: str, n_ctx: int, threads: int) -> None:
@@ -73,6 +75,8 @@ class H(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        global LAST_HIT
+        LAST_HIT = time.time()
         if self.path.rstrip("/") in ("/health", ""):
             self._json(200, {"ok": True, **INFO})
         elif self.path.rstrip("/") == "/v1/models":
@@ -82,6 +86,8 @@ class H(BaseHTTPRequestHandler):
             self._json(404, {"error": "not found"})
 
     def do_POST(self):
+        global LAST_HIT
+        LAST_HIT = time.time()
         n = int(self.headers.get("Content-Length") or 0)
         try:
             body = json.loads(self.rfile.read(n) or b"{}")
@@ -161,8 +167,21 @@ def main() -> int:
     ap.add_argument("--port", type=int, default=8792)
     ap.add_argument("--ctx", type=int, default=512)
     ap.add_argument("--threads", type=int, default=8)   # 6 核/12 线程实测比 4 线程快约 10–20%
+    ap.add_argument("--idle-exit", type=int, default=0,
+                    help="空闲多少秒后自动退出（0=不退）；配合桥的按需激活，用完就把内存还回去")
     a = ap.parse_args()
+    global IDLE_EXIT
+    IDLE_EXIT = max(0, a.idle_exit)
     load(a.model, a.ctx, a.threads)
+    if IDLE_EXIT > 0:
+        def _watch():
+            while True:
+                time.sleep(min(30, IDLE_EXIT))
+                if time.time() - LAST_HIT >= IDLE_EXIT:
+                    sys.stderr.write("[idle] %ds 无请求，退出（内存还给系统）\n" % IDLE_EXIT)
+                    os._exit(0)
+        threading.Thread(target=_watch, daemon=True).start()
+        sys.stderr.write("[ok] 空闲 %ds 自动退出已启用\n" % IDLE_EXIT)
     srv = ThreadingHTTPServer((a.host, a.port), H)
     print("[ok] http://%s:%d  (/health · /v1/chat/completions)" % (a.host, a.port), flush=True)
     try:

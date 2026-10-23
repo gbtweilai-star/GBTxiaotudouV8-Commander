@@ -29,11 +29,13 @@ import argparse
 import json
 import os
 import pathlib
+import subprocess
 import sys
 import threading
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -106,6 +108,60 @@ UPSTREAMS = {
 }
 # 默认 = 云插件路线（主人要的就是"云插件的GBT小土豆V8大模型"）；直连 RunPod 留作 `ours` 备用。
 DEFAULT = ("selfhost" if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1" else "cfai")
+
+# ── 按需激活：selfhost 没起来就现拉起来，用完按 idle 自动退 ────────────────
+# 主人令 2026-10-24「按需激活运行」：不要在开机时白占 5 GB 内存，
+# 第一次真正要用我们的权重时才加载；闲置 N 秒后进程自己退出把内存还回去。
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_REPO = os.path.dirname(os.path.dirname(_HERE))
+_OURS_PY = os.environ.get("GBT_LLM_PY") or (
+    r"C:\Python312\python.exe" if os.path.exists(r"C:\Python312\python.exe") else sys.executable)
+_OURS_SCRIPT = os.path.join(_HERE, "local_llm_server.py")
+_OURS_WEIGHTS = os.environ.get("GBT_OURS_WEIGHTS") or os.path.join(
+    _REPO, "state", "weights", "gbt-v8-v82-q5_0.gguf")
+_OURS_IDLE = os.environ.get("GBT_SELFHOST_IDLE", "900")
+_OURS_PROC = [None]
+
+
+def _health_ok(url: str, timeout: float = 2.0) -> bool:
+    try:
+        req = urllib.request.Request(url.rstrip("/") + "/health", headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.status == 200
+    except Exception:                                             # noqa: BLE001
+        return False
+
+
+def ensure_selfhost(wait_s: int = 150) -> bool:
+    """selfhost 不在就拉起来；已在则秒回 True。返回是否就绪。"""
+    base = UPSTREAMS.get("selfhost", ("",))[0]
+    if not base:
+        return False
+    if _health_ok(base):
+        return True
+    proc = _OURS_PROC[0]
+    if proc is not None and proc.poll() is None:
+        pass                                  # 已经在起了，等它
+    else:
+        if not os.path.isfile(_OURS_WEIGHTS):
+            sys.stderr.write("[activate] 权重不在：%s\n" % _OURS_WEIGHTS)
+            return False
+        flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+        cmd = [_OURS_PY, "-X", "utf8", _OURS_SCRIPT, "--model", _OURS_WEIGHTS,
+               "--port", str(urlsplit(base).port or 8792), "--ctx",
+               os.environ.get("GBT_SELFHOST_CTX", "256"), "--threads",
+               os.environ.get("GBT_SELFHOST_THREADS", "8"), "--idle-exit", _OURS_IDLE]
+        sys.stderr.write("[activate] 按需加载自有权重：%s\n" % " ".join(cmd[1:]))
+        _OURS_PROC[0] = subprocess.Popen(cmd, cwd=_REPO, creationflags=flags,
+                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    t0 = time.perf_counter()
+    while time.perf_counter() - t0 < wait_s:
+        if _health_ok(base):
+            sys.stderr.write("[activate] 就绪，用时 %.1fs\n" % (time.perf_counter() - t0))
+            return True
+        time.sleep(2)
+    sys.stderr.write("[activate] %ds 内没起来\n" % wait_s)
+    return False
 # 主人令 2026-10-24「使用我们自己的权重」：启用 selfhost 车道时**默认就是自有权重**；
 # 起不来才按 LANE_CHAIN 落免费道，回包 gbt.weights_ours=false 明示是别人的模型。
 UA = "gbt-v8/model-bridge"
@@ -460,6 +516,8 @@ class Handler(BaseHTTPRequestHandler):
         attempts = []
         used = name
         for lane in chain:
+            if lane == "selfhost":
+                ensure_selfhost()          # 按需激活：不在就现拉
             l_base, l_model, l_profile, l_timeout = UPSTREAMS[lane]
             l_key, l_slot = key_for(l_profile)
             if not l_key:

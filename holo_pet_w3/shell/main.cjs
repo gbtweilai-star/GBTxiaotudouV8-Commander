@@ -2686,15 +2686,15 @@ if (WIRE_ONLY) {
     /* 🔴 2026-10-21（主人令）：**建窗之前**确保模型桥在跑 ——
        「模型对话」页只连 127.0.0.1:8791，桥不起 = 云插件的大模型在 APP 里用不上。
        失败只打日志、不牵连壳启动（与面板桥同向）。 */
+    /* 🔴 2026-10-24（主人令「按需激活运行」）：**启动时不再加载 4.88 GB 权重**。
+       第一次真要用我们的模型时，由桥的 ensure_selfhost() 现拉；闲置
+       GBT_SELFHOST_IDLE（默认 900s）后服务自己退出，把内存还给系统。
+       所以这里只留一句日志，不做任何加载动作。 */
     try {
-      const ll = await ensureLocalLLM();
-      if (ll.ok !== true) {
-        console.error("[w3] 本机权重服务未就绪（不牵连壳启动）:", ll.reason);
-      } else if (ll.already !== true) {
-        console.error("[w3] 本机权重服务已拉起（等了 " + ll.waited_ms + " ms）");
-      }
+      console.error("[w3] 按需激活模式：权重在首次对话时才加载（闲置 "
+        + (process.env.GBT_SELFHOST_IDLE || "900") + "s 自动退）");
     } catch (err) {
-      console.error("[w3] 本机权重服务确保失败（不牵连壳启动）:", err);
+      console.error("[w3] 按需激活模式（日志失败不影响启动）:", err);
     }
 
     try {
@@ -2761,6 +2761,12 @@ if (WIRE_ONLY) {
       try { localLlmChild.kill(); } catch (err) { /* 已退：如实忽略 */ }
       localLlmChild = null;
     }
+    /* 按需激活后，权重服务是**桥拉起的独立进程**（不在本进程的子进程表里），
+       所以退出时按端口收：只收我们这条链的 :8792，不碰别人的进程。 */
+    try {
+      const n = killListeners(LOCAL_LLM_PORT);
+      if (n) console.error("[w3] 已收掉按需加载的权重服务 " + n + " 个");
+    } catch (err) { /* 收不掉不拖垮退出 */ }
     if (modelBridgeChild) {
       try { modelBridgeChild.kill(); } catch (err) { /* 已退：如实忽略 */ }
       modelBridgeChild = null;
