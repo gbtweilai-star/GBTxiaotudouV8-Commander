@@ -57,7 +57,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "codex_turn_send",
+   "status": "error",
+   "denied": false,
+   "sec": 4.3,
+   "at": "2026-10-23T22:48:11"
+  }
  },
  {
   "name": "codex_interrupt",
@@ -69,7 +75,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "codex_interrupt",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:11"
+  }
  },
  {
   "name": "codex_chat",
@@ -81,7 +93,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "codex_chat",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:11"
+  }
  },
  {
   "name": "codex_models",
@@ -93,7 +111,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "codex_models",
+   "status": "ok",
+   "denied": false,
+   "sec": 0.3,
+   "at": "2026-10-23T22:48:12"
+  }
  },
  {
   "name": "desktop_commander",
@@ -483,7 +507,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\cross_scan.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "sec_llm",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:12"
+  }
  },
  {
   "name": "truth_scan",
@@ -531,7 +561,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "llm_chat",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:12"
+  }
  },
  {
   "name": "llm_status",
@@ -748,7 +784,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "think_loop",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:12"
+  }
  },
  {
   "name": "one_key_deploy",
@@ -760,7 +802,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "one_key_deploy",
+   "status": "denied",
+   "denied": true,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:12"
+  }
  },
  {
   "name": "deploy_queue",
@@ -856,7 +904,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "mirror_rehearse",
+   "status": "ok",
+   "denied": false,
+   "sec": 2.1,
+   "at": "2026-10-23T22:48:14"
+  }
  },
  {
   "name": "mirror_release",
@@ -868,7 +922,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\brain_supervisor.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "mirror_release",
+   "status": "denied",
+   "denied": true,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:14"
+  }
  },
  {
   "name": "mirror_ascend",
@@ -1042,7 +1102,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "remote_confinement",
+   "status": "ok",
+   "denied": false,
+   "sec": 12.1,
+   "at": "2026-10-23T22:48:26"
+  }
  },
  {
   "name": "cli_ify",
@@ -1366,7 +1432,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "omarchy_bridge",
+   "status": "ok",
+   "denied": false,
+   "sec": 0.1,
+   "at": "2026-10-23T22:48:26"
+  }
  },
  {
   "name": "delivery_gate",
@@ -1516,7 +1588,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\codex_bridge.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "devour_pulse",
+   "status": "denied",
+   "denied": true,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:26"
+  }
  },
  {
   "name": "mcp_connect",
@@ -1528,7 +1606,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "mcp_connect",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:26"
+  }
  },
  {
   "name": "mcp_tools",
@@ -1552,7 +1636,13 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\delivery_gate.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "mcp_call",
+   "status": "error",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:26"
+  }
  },
  {
   "name": "coze_mail",
@@ -4504,6 +4594,12 @@
    "gbt_allinone\\api.py",
    "gbt_allinone\\security\\policy.py"
   ],
-  "proof": null
+  "proof": {
+   "cap": "comfy_cloud",
+   "status": "ok",
+   "denied": false,
+   "sec": 0.0,
+   "at": "2026-10-23T22:48:26"
+  }
  }
 ]
