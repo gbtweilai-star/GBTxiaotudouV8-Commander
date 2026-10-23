@@ -59,10 +59,11 @@
   ],
   "proof": {
    "cap": "codex_turn_send",
-   "status": "error",
+   "status": "blocked",
    "denied": false,
-   "sec": 4.3,
-   "at": "2026-10-23T22:48:11"
+   "sec": 0.0,
+   "at": "2026-10-23T22:51:01",
+   "note": "无活动线程（codex_status.connected=false），不可测"
   }
  },
  {
@@ -77,10 +78,11 @@
   ],
   "proof": {
    "cap": "codex_interrupt",
-   "status": "error",
+   "status": "blocked",
    "denied": false,
    "sec": 0.0,
-   "at": "2026-10-23T22:48:11"
+   "at": "2026-10-23T22:51:01",
+   "note": "无活动线程（codex_status.connected=false），不可测"
   }
  },
  {
@@ -786,10 +788,10 @@
   ],
   "proof": {
    "cap": "think_loop",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.0,
-   "at": "2026-10-23T22:48:12"
+   "sec": 10.0,
+   "at": "2026-10-23T22:51:01"
   }
  },
  {
@@ -1608,10 +1610,10 @@
   ],
   "proof": {
    "cap": "mcp_connect",
-   "status": "error",
+   "status": "ok",
    "denied": false,
-   "sec": 0.0,
-   "at": "2026-10-23T22:48:26"
+   "sec": 0.1,
+   "at": "2026-10-23T22:51:01"
   }
  },
  {
@@ -1638,10 +1640,10 @@
   ],
   "proof": {
    "cap": "mcp_call",
-   "status": "error",
+   "status": "ok",
    "denied": false,
    "sec": 0.0,
-   "at": "2026-10-23T22:48:26"
+   "at": "2026-10-23T22:51:01"
   }
  },
  {
