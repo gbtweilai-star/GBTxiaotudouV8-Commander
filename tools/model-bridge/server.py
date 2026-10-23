@@ -105,7 +105,9 @@ UPSTREAMS = {
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
 }
 # 默认 = 云插件路线（主人要的就是"云插件的GBT小土豆V8大模型"）；直连 RunPod 留作 `ours` 备用。
-DEFAULT = "cfai"   # 主人令 2026-10-24「使用我们自己的权重」：默认直奔自有权重；起不来才落免费道（会明示）
+DEFAULT = ("selfhost" if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1" else "cfai")
+# 主人令 2026-10-24「使用我们自己的权重」：启用 selfhost 车道时**默认就是自有权重**；
+# 起不来才按 LANE_CHAIN 落免费道，回包 gbt.weights_ours=false 明示是别人的模型。
 UA = "gbt-v8/model-bridge"
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
