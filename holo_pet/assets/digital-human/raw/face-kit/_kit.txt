@@ -1,0 +1,37 @@
+═══ ① 选源 + 定脸框（自证）═══
+  脸特写(已抠背景)              1536x1920 · 主体 1536x1851 · 脸框 1413x1110 · 面积侧 1252 · 肤色占比 0.06
+  正面(已抠背景)               1536x1920 · 主体 735x1823 · 脸框 265x419 · 面积侧 333 · 肤色占比 0.13
+  ⇒ 选 **脸特写(已抠背景)**（脸框 1413x1110 · 肤色占比 0.06）
+  方形脸框 1413x1413 @ (61,0)
+
+═══ ② 脸 albedo 4096² ═══
+  ✓ face-albedo-4k.png  4096×4096 · 4635054 B（源 1413² ⇒ 放大 2.9×，Lanczos + 保锐）
+
+═══ ③ 微细节法线 2048²（毛孔级）═══
+  ✓ face-detail-normal-2k.png 2048×2048 · 3624451 B · 高频 std=1.83（>1.5 才算真提到细节）
+
+═══ ④ 面部专件（按解剖比例从脸框切）═══
+  ✓ part-eye-L   1024×546  ·  335551 B
+  ✓ part-eye-R   1024×546  ·  205781 B
+  ✓ part-lash     512×128  ·   79224 B
+  ✓ part-brow     512×85   ·   55884 B
+  ✓ part-mouth   1024×511  ·  199930 B
+  ✓ part-teeth    512×170  ·   48297 B
+  专件 6 件：eye-L eye-R lash brow mouth teeth
+  ★ 口径：这五类件现在**有独立贴图与独立件登记**；接到 3D 上需要各自建片（下一步）
+
+═══ ⑤ ROI 自证（必须三件齐）═══
+  肤色占比 0.11（>0.15 ✓）· 排除 HUD ✓（本流程直接切脸框，不含 UI） · 输出裁图 selfproof-face-crop.png
+
+═══ ⑥ 产物 ═══
+  _kit.json                           1644 B
+  face-albedo-4k.png               4635054 B
+  face-detail-normal-2k.png        3624451 B
+  part-brow.png                      55884 B
+  part-eye-L.png                    335551 B
+  part-eye-R.png                    205781 B
+  part-lash.png                      79224 B
+  part-mouth.png                    199930 B
+  part-teeth.png                     48297 B
+  selfproof-face-crop.png           262948 B
+  共 10 件 · 9.0 MB

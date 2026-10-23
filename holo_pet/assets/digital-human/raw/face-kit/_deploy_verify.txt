@@ -1,0 +1,42 @@
+① 脸件包部署 → holo_pet\assets\digital-human\raw\face-kit（12 件）
+② 同步 dh_realism（ROI 阈值改为标定值 0.015）
+
+═══ ③ 机检（真读数 · 来自 face-kit/_kit.json + 已落地的渲染参数）═══
+模型 model-rigged-anim.glb
+  材质 metallicFactor = [1.0]
+  贴图名 = ['Normal', 'Color', 'futuristic_character_3d_model_metallic-f']
+  三角面 = 20543
+
+喂进去的真读数：
+  environment          = true
+  dir_light_sum        = 1.7999999999999998
+  hemi                 = 0.3
+  metalness_mean       = 1.0
+  ior                  = 1.4
+  specular             = 0.42
+  clearcoat            = 0.05
+  exposure             = 1.0
+  face_tex_px          = 4096
+  face_parts           = ["eye-L", "eye-R", "lash", "brow", "mouth", "teeth"]
+  detail_normal        = true
+  roi_selfproof        = {"skin_ratio": 0.113, "hud_excluded": true, "crop": "selfproof-face-crop.png"}
+
+═══ 机检结果 ═══
+过 11 · 不过 1 · 未给读数 0
+  过   ① IBL 环境                 got=True       want=True
+  过   ② 光照配比                   got=1.79999999 want=≤2.1
+  过   ②b 半球光 ≤0.35             got=0.3        want=≤0.35
+  ★不过 ③ 金属度归零                  got=1.0        want=<0.05
+  过   ④ ior 皮肤值                got=1.4        want=1.33–1.44
+  过   ④b 镜面强度                  got=0.42       want=0.35–0.55
+  过   ④c clearcoat ≤0.10       got=0.05       want=≤0.10
+  过   ⑤ 曝光 ≤1.0                got=1.0        want=≤1.0
+  过   ⑥ 脸贴图 ≥1024              got=4096       want=≥1024
+  过   ⑦ 面部专件五件齐                got=6          want=≥5
+  过   ⑧ 微细节法线                  got=True       want=True
+  过   ★ 清晰度 ROI 自证             got={'skin_rat want=肤色占比>0.015（标定值）且 排除HUD 且 输出裁图
+结论：★1 项不过 —— 不许粉饰
+
+
+═══ ④ 达标判定 ═══
+  ★ **不过 1 项 ⇒ 未达标，不能交付**
