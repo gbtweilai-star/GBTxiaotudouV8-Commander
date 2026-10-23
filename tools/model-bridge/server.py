@@ -120,6 +120,9 @@ _OURS_SCRIPT = os.path.join(_HERE, "local_llm_server.py")
 _OURS_WEIGHTS = os.environ.get("GBT_OURS_WEIGHTS") or os.path.join(
     _REPO, "state", "weights", "gbt-v8-v82-q5_0.gguf")
 _OURS_IDLE = os.environ.get("GBT_SELFHOST_IDLE", "900")
+# 身体要用装得起 mss/cv2/sounddevice/pycaw 的那个解释器（本机是 3.12）
+BODY_PY = os.environ.get("GBT_BODY_PY") or (
+    r"C:\Python312\python.exe" if os.path.exists(r"C:\Python312\python.exe") else sys.executable)
 _OURS_PROC = [None]
 _WARM = {"started": 0.0, "state": "idle"}
 
@@ -155,6 +158,18 @@ def calc(expr: str) -> dict:
     if isinstance(val, float) and val.is_integer():
         val = int(val)
     return {"ok": True, "expr": src, "value": val}
+
+
+def _prewarm_caps() -> None:
+    """桥一起来就把能力目录与 run_task 预热好。
+    实测：冷桥第一次 /v1/dispatch 要 4.3s（全在 import），预热后 20–80ms。"""
+    try:
+        sys.path.insert(0, _REPO)
+        from gbt_allinone import run_task  # noqa: F401
+        run_task("echo", {})
+        sys.stderr.write("[prewarm] 能力位目录已预热\n")
+    except Exception as exc:                                    # noqa: BLE001
+        sys.stderr.write("[prewarm] 跳过：%s\n" % str(exc)[:100])
 
 
 def warm_bg() -> None:
@@ -519,6 +534,18 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
+        if self.path.startswith("/v1/body"):
+            # 身体：装在哪台设备上，就把那台设备的感官/动作现读成身体。
+            # 走**独立进程 + 3.12**：mss/cv2/sounddevice/pycaw 都装在那边，
+            # 桥自己（3.14）不背这些依赖，也就不用为了读个电量去装一堆包。
+            try:
+                out = subprocess.run([BODY_PY, os.path.join(_HERE, "body.py")],
+                                     capture_output=True, text=True, encoding="utf-8",
+                                     errors="replace", timeout=60, cwd=_REPO)
+                return self._json(200, json.loads(out.stdout or "{}"))
+            except Exception as exc:                      # noqa: BLE001
+                return self._json(200, {"ok": False, "error": "%s: %s"
+                                        % (type(exc).__name__, str(exc)[:150])})
         if self.path.startswith("/v1/caps"):
             # 页面互通的口：341 个能力位 + 各自页面地址，一次给全（前端缓存）
             try:
@@ -552,7 +579,7 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
-        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/v1/calc")
+        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/v1/calc", "/v1/body/act")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -561,6 +588,17 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:                              # noqa: BLE001
             return self._json(400, {"error": {"message": "请求体不是 JSON：%s" % exc}})
 
+        if self.path.startswith("/v1/body/act"):
+            try:
+                out = subprocess.run(
+                    [BODY_PY, os.path.join(_HERE, "body.py"), "--act",
+                     str(body.get("limb") or ""), json.dumps(body.get("args") or {}, ensure_ascii=False)],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace",
+                    timeout=120, cwd=_REPO)
+                return self._json(200, json.loads(out.stdout or "{}"))
+            except Exception as exc:                      # noqa: BLE001
+                return self._json(200, {"ok": False, "error": "%s: %s"
+                                        % (type(exc).__name__, str(exc)[:150])})
         if self.path.startswith("/v1/calc"):
             try:
                 return self._json(200, calc(str(body.get("expr") or "")))
@@ -715,6 +753,7 @@ class Handler(BaseHTTPRequestHandler):
 
 def serve(port: int) -> int:
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    threading.Thread(target=_prewarm_caps, daemon=True).start()
     print("模型桥已起：http://127.0.0.1:%d  （只在回环；Ctrl-C 停）" % port)
     try:
         srv.serve_forever()
@@ -726,6 +765,7 @@ def serve(port: int) -> int:
 def self_test(port: int) -> int:
     """起一个线程跑桥，打一发真请求，打印读数后退出（证明桥真能用，不是写完就算）。"""
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    threading.Thread(target=_prewarm_caps, daemon=True).start()
     th = threading.Thread(target=srv.serve_forever, daemon=True)
     th.start()
     time.sleep(0.3)
