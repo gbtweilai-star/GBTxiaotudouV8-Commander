@@ -519,6 +519,20 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
+        if self.path.startswith("/v1/caps"):
+            # 页面互通的口：341 个能力位 + 各自页面地址，一次给全（前端缓存）
+            try:
+                import json as _json
+                cbp = os.path.join(_REPO, "state", "cap-bindings.json")
+                caps = _json.load(open(cbp, encoding="utf-8")).get("caps") or []
+                out = [{"name": c.get("name"), "domain": c.get("domain"),
+                        "desc": (c.get("desc") or "")[:120],
+                        "page": "/holo_pet_w3/brain/caps/%s.html" % c.get("name")}
+                       for c in caps if c.get("name")]
+                return self._json(200, {"ok": True, "count": len(out), "caps": out})
+            except Exception as exc:                      # noqa: BLE001
+                return self._json(200, {"ok": False, "error": "%s: %s"
+                                        % (type(exc).__name__, str(exc)[:120])})
         if self.path.startswith("/warm"):
             base = UPSTREAMS.get("selfhost", ("",))[0]
             up = _health_ok(base) if base else False
