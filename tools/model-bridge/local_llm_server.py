@@ -34,7 +34,7 @@ LAST_HIT = time.time()      # 最后一次被调用；空闲自动退出用（�
 IDLE_EXIT = 0               # 秒；0 = 不自动退
 
 
-def load(model: str, n_ctx: int, threads: int) -> None:
+def load(model: str, n_ctx: int, threads: int, n_batch: int = 64) -> None:
     global LLM, INFO
     _orig = lc.llama_model_default_params
 
@@ -48,7 +48,7 @@ def load(model: str, n_ctx: int, threads: int) -> None:
         internals.llama_model_default_params = patched
 
     t0 = time.time()
-    LLM = Llama(model_path=model, n_ctx=n_ctx, n_threads=threads, n_batch=64,
+    LLM = Llama(model_path=model, n_ctx=n_ctx, n_threads=threads, n_batch=n_batch,
                 verbose=False, use_mmap=True)
     eos = int(LLM.token_eos())
     bos = int(LLM.token_bos())
@@ -167,12 +167,13 @@ def main() -> int:
     ap.add_argument("--port", type=int, default=8792)
     ap.add_argument("--ctx", type=int, default=512)
     ap.add_argument("--threads", type=int, default=8)   # 6 核/12 线程实测比 4 线程快约 10–20%
+    ap.add_argument("--batch", type=int, default=64, help="n_batch（prompt 分块大小，影响首字延迟）")
     ap.add_argument("--idle-exit", type=int, default=0,
                     help="空闲多少秒后自动退出（0=不退）；配合桥的按需激活，用完就把内存还回去")
     a = ap.parse_args()
     global IDLE_EXIT
     IDLE_EXIT = max(0, a.idle_exit)
-    load(a.model, a.ctx, a.threads)
+    load(a.model, a.ctx, a.threads, a.batch)
     if IDLE_EXIT > 0:
         def _watch():
             while True:
