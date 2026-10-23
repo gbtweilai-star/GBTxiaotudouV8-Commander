@@ -135,6 +135,22 @@ try:
 except Exception as exc:                                        # noqa: BLE001
     add(5, "本机显卡", WARN, str(exc)[:80])
 
+# ── 6 身体（设备即本体） ───────────────────────────────────
+try:
+    b = get("/v1/body", timeout=90)
+    sc = b.get("score") or {}
+    okn, tot = sc.get("senses_ok", 0), sc.get("senses_total", 0)
+    add(6, "身体：感官可用", OK if tot and okn == tot else (WARN if okn else BAD),
+        "%d/%d 可用 · 动作 %d 个" % (okn, tot, sc.get("actuators", 0)))
+    bad_limbs = [s["limb"] for s in b.get("senses", []) if s.get("state") != "ok"]
+    if bad_limbs:
+        add(6, "缺失的肢体", WARN, ",".join(bad_limbs))
+    lim = post("/v1/body/act", {"limb": "volume", "args": {}}, timeout=60)
+    add(6, "动作可执行（读音量）", OK if lim.get("ok") else BAD,
+        "level=%s" % lim.get("level"))
+except Exception as exc:                                        # noqa: BLE001
+    add(6, "身体接口", BAD, str(exc)[:100])
+
 # ── 计分 ─────────────────────────────────────────────────
 bad = sum(1 for r in rows if r["state"] == BAD)
 warn = sum(1 for r in rows if r["state"] == WARN)
@@ -145,7 +161,7 @@ p = None
 for r in rows:
     if r["pillar"] != p:
         p = r["pillar"]
-        print("\n[%d] %s" % (p, ["", "双向绑定", "互通", "秒级响应", "按需激活/内存", "算力(GPU)"][p]))
+        print("\n[%d] %s" % (p, ["", "双向绑定", "互通", "秒级响应", "按需激活/内存", "算力(GPU)", "身体(设备即本体)"][p]))
     print("   %-4s %-22s %s" % (r["state"], r["check"], r["detail"]))
 print("\n" + "-" * 74)
 print("合计 %d 项：绿 %d · 黄 %d · 红 %d" % (len(rows), len(rows) - bad - warn, warn, bad))
