@@ -84,11 +84,21 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 > 一句话：**花钱训练的模型，在自己的手机上、用自己的芯片跑起来了。**
 > 限制照实说：iOS 把 App 切到后台就断服务，所以那 3 条问题是「让它开着别切走」跑完的 —— 这是系统约束，不是没做到。
 
-**要真原生 App（.ipa / .apk）还差什么**（都不是技术活，是要花你的钱和账号）：
+**要真原生包？走全免费路径**（不需要 $99 的 Apple Developer，也不需要 $25 的 Play Console）：
 
-- **iOS**：Apple Developer Program **$99/年** + 一台 Mac 签名，才能出 `.ipa` 并上架/内测（TestFlight）。
-- **Android**：Google Play 开发者账号 **$25 一次性**；本地出 `.apk` 不用账号，但装到别人手机上要引导"允许安装未知来源"。
-- 壳工程可以走 Capacitor / Tauri 把这两个静态页包成 App，工作量小；**上架审核**才是大头，且我们的能力位会调本地命令，过审需改设计。
+| 目标 | 免费做法 | 代价 |
+|---|---|---|
+| **Android APK** | 本地 Gradle 出包 + 自签 keystore，挂 GitHub Releases 分发 | 装 JDK17 + Android SDK（约 **1.5–2 GB**，全免费） |
+| **iPhone .ipa** | 免费 Apple ID 自签（Sideloadly / AltStore） | **7 天过期**要续签；编译需 macOS（或免费 macOS CI runner） |
+| 上架 App Store / Play | 只能付费 | 你要免费 ⇒ 这条路不走 |
+
+脚手架、脚本与「装到手机上会坏哪几位」的说明都在 **[`mobile/`](mobile/README.md)**：
+`mobile/setup-android.ps1`（一键装工具链）· `mobile/build-apk.ps1`（出 APK）·
+`mobile/github-actions-mobile.yml`（免费 macOS runner 编 iOS 未签名 ipa）。
+
+口径照实：**手机壳能「看 + 问 + 指挥」，不能替你执行本机命令** ——
+`process_execute` / 读本机文件 / 依赖 DPAPI 与 `store/` 账本的能力位在手机上**不工作**，
+它们需要你那台电脑。这不是阉割，是设备边界。
 
 
 ## 🐙 极限触手 · 反控（做盾的时候顺手做了个万能遥控器）
