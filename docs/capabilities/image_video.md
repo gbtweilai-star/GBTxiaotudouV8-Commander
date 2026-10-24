@@ -4,7 +4,7 @@
 
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
-| `a1art_skill` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报 |
+| `a1art_skill` | 只读 | — | —（注册表：无必填） | `user_error` | a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报 |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
 
@@ -17,7 +17,7 @@
 - **域**：`image_video`（图像/视频生成）
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap a1art_skill '<json>'`

@@ -5,15 +5,15 @@
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
 | `sched_define` | 只读 | 是 | `name`、`workflow`、`every_seconds` | `user_error` | 定时触发器：定义调度（工作流 + 间隔），无人值守自动执行 |
-| `sched_status` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | 定时触发器：查调度状态（上次执行/结果） |
-| `sched_tick` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | 定时触发器：扫描到期调度并执行（可由循环/计划任务驱动） |
-| `transfer` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | 数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子 |
-| `wf_cache_clear` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | 万能插：清空传输缓存（同输入复用的节点结果缓存） |
+| `sched_status` | 只读 | — | —（注册表：无必填） | `user_error` | 定时触发器：查调度状态（上次执行/结果） |
+| `sched_tick` | 只读 | — | —（注册表：无必填） | `user_error` | 定时触发器：扫描到期调度并执行（可由循环/计划任务驱动） |
+| `transfer` | 只读 | — | —（注册表：无必填） | `user_error` | 数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子 |
+| `wf_cache_clear` | 只读 | — | —（注册表：无必填） | `user_error` | 万能插：清空传输缓存（同输入复用的节点结果缓存） |
 | `wf_define` | 只读 | 是 | `name`、`nodes` | `user_error` | 万能插执行引擎：定义工作流（DAG，校验环/依赖/能力合法性） |
 | `wf_resume` | 只读 | 是 | `run_id` | `user_error` | 万能插执行引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的） |
 | `wf_run` | 只读 | 是 | `name` | `user_error` | 万能插执行引擎：分层并行执行工作流，节点结果如实落盘 |
-| `wf_status` | 只读 | — | —（空载荷走该位默认 op） | `user_error` | 万能插执行引擎：查运行记录（可按工作流名过滤） |
-| `workflow_forge` | **需授权** | — | —（空载荷走该位默认 op） | `user_error` / `failed` | **工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语… |
+| `wf_status` | 只读 | — | —（注册表：无必填） | `user_error` | 万能插执行引擎：查运行记录（可按工作流名过滤） |
+| `workflow_forge` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
 
@@ -37,7 +37,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：定时触发器：查调度状态（上次执行/结果）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap sched_status '<json>'`
@@ -48,7 +48,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：定时触发器：扫描到期调度并执行（可由循环/计划任务驱动）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap sched_tick '<json>'`
@@ -59,7 +59,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap transfer '<json>'`
@@ -70,7 +70,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：万能插：清空传输缓存（同输入复用的节点结果缓存）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap wf_cache_clear '<json>'`
@@ -114,7 +114,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：万能插执行引擎：查运行记录（可按工作流名过滤）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap wf_status '<json>'`
@@ -125,7 +125,7 @@
 - **域**：`engine`（引擎（工作流/定时））
 - **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
-- **必填载荷**：无必填（空载荷落到该位默认 op；位内更细的 op 参数见模块）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
 - **它做什么**：**工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语表与决策记录）④ **arch_review**（结构体检与重构机会，不动手）⑤ **browser_ops**（点/填/抽，先看后动）⑥ **tdd_loop**（红-绿-重构，没先红不算 TDD）⑦ **setup_rules**（状态/标签/文档规则一次定死）⑧ **style**（先定视觉契约）⑨ **handoff**（现状+资料位置+下一步）⑩ **triage**（四档分类与状态推进，不下模棱两可）。**不重造**：真执行走既有位（browser/code_audit/aesthetic）；**先看后动**（第 37 条）。op=grill/grill_docs/find_skill/arch_review/browser_ops/tdd_loop/setup_rules/style/handoff/triage/check/route（**全只读·零作用域）。
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap workflow_forge '<json>'`
