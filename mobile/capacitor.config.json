@@ -1,0 +1,15 @@
+{
+  "appId": "io.github.gbtweilai.commander",
+  "appName": "GBT小土豆V8",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}

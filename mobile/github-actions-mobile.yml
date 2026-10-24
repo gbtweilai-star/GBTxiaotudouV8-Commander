@@ -1,0 +1,40 @@
+# 免费编 iOS（不需要 $99 账号）：用 GitHub 的 macOS runner 出未签名 .ipa，
+# 下载后到 Windows 用 Sideloadly + 免费 Apple ID 签装（7 天有效）。
+# 用法：本文件复制到仓的 .github/workflows/mobile-ios.yml
+name: mobile-ios-unsigned
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 依赖与 web 资源
+        working-directory: mobile
+        run: |
+          npm install
+          npm run sync:web
+          npx cap add ios || true
+          npx cap sync ios
+      - name: 未签名编译
+        working-directory: mobile
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
+            -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath build build
+      - name: 打 ipa（Payload/App.app → zip）
+        working-directory: mobile
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qry App-unsigned.ipa Payload
+          ls -lh App-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: App-unsigned-ipa
+          path: mobile/App-unsigned.ipa

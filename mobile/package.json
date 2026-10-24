@@ -1,0 +1,22 @@
+{
+  "name": "gbt-commander-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GBT小土豆V8 免费手机壳（Capacitor）：Android APK 自签 / iOS 免费 Apple ID 自签",
+  "type": "module",
+  "scripts": {
+    "sync:web": "node scripts/copy-web.mjs",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "sync": "npm run sync:web && npx cap sync",
+    "apk": "powershell -ExecutionPolicy Bypass -File build-apk.ps1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0"
+  }
+}
