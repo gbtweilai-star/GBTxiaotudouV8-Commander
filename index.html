@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GBT小土豆V8 · 总指挥大模型 · 开源发布页</title>
-<meta name="description" content="7.6B 中文「总指挥」模型：341 个原生能力位的路由、讲解与授权门，335 题能力基准 PASS45 330/335（98.51%–99.10% 两轮）。">
+<meta name="description" content="7.6B 中文「总指挥」模型：348 个原生能力位的路由、讲解与授权门，335 题能力基准 PASS45 330/335（98.51%–99.10% 两轮）。">
 <meta name="theme-color" content="#0b0e13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -84,10 +84,10 @@
     </h1>
     <p class="lead">
       被问「帮我做 X」，它先判断这件事该落到哪个<strong>能力位</strong>、要什么参数、会不会写盘 / 花钱 / 出网、
-      要不要先请人发一张授权票 —— 然后才动手。它就是本仓 341 个原生能力位的“活索引 + 门卫”。
+      要不要先请人发一张授权票 —— 然后才动手。它就是本仓 348 个原生能力位的“活索引 + 门卫”。
     </p>
     <ul class="chips">
-      <li>7.6B params</li><li>Qwen2-7B base</li><li>341 能力位 · 30 域</li>
+      <li>7.6B params</li><li>Qwen2-7B base</li><li>348 能力位 · 30 域</li>
       <li>335 题基准 · PASS45 330/335</li><li>两轮 99.10% / 98.51%</li><li>单一门 run_task</li>
     </ul>
   </div>
@@ -102,7 +102,7 @@
     <div class="card"><h3><span class="dot d-blue"></span>路由</h3>
       <p>自然语言需求 → 落到具体能力位（kind），连域和 op 一起给。实测第二题真落到 <span class="mono">markdown_ppt</span>。</p></div>
     <div class="card"><h3><span class="dot d-blue"></span>讲解</h3>
-      <p>341 位每一位是干什么、属于哪个域、调用要注意什么；27 个 GBT天真原生算子、1495 个契约节点全覆盖。</p></div>
+      <p>348 位每一位是干什么、属于哪个域、调用要注意什么；27 个 GBT天真原生算子、1495 个契约节点全覆盖。</p></div>
     <div class="card"><h3><span class="dot d-mid"></span>报门</h3>
       <p>不可逆 / 花钱 / 出网的动作，先说清缺哪张票（如 <span class="mono">deploy_publish</span>），绝不自称已放行。</p></div>
     <div class="card"><h3><span class="dot d-ok"></span>可复核</h3>
@@ -120,7 +120,7 @@
       <tr><td>评估第 1 轮</td><td class="num">0.9908 · 99.10% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
       <tr><td>评估第 2 轮</td><td class="num">0.9873 · 98.51% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
       <tr><td>PASS45 通过数</td><td class="num">330 / 335</td><td class="mono">data/eval-*.json</td></tr>
-      <tr><td>能力位普查</td><td class="num">340 ok / 1 needs_input / 0 needs_ticket / 0 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
+      <tr><td>能力位普查（341 快照）</td><td class="num">340 ok / 1 needs_input / 0 needs_ticket / 0 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
       <tr><td>一次性部署链（排练→盖章→晋升）</td><td class="num">房间 release-20261021：scan 3/3 · rehearse ok · release ok · 5.9s</td><td class="mono">docs/07 §九</td></tr>
       <tr><td>GBt天真原生算子</td><td class="num">27 ops · 18 同名 · 1495 契约节点 · 覆盖 1.2%</td><td class="mono">docs/10-gbt-tianzhen.md</td></tr>
       <tr><td>五维合一（脑眼耳嘴手）</td><td class="num">开步 → 能力位 → 关步，带证据闭环</td><td class="mono">docs/11-five-dim.md</td></tr>
@@ -202,7 +202,7 @@ py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live
   <ul class="links">
     <li><a href="docs/01-model-card.md">01 模型卡</a></li>
     <li><a href="docs/02-architecture.md">02 架构</a></li>
-    <li><a href="docs/03-capabilities.md">03 341 位能力全表</a></li>
+    <li><a href="docs/03-capabilities.md">03 348 位能力全表</a></li>
     <li><a href="docs/04-evaluation.md">04 评估</a></li>
     <li><a href="docs/05-deployment.md">05 部署</a></li>
     <li><a href="docs/06-showcase.md">06 真实回执</a></li>
