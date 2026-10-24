@@ -51,7 +51,7 @@
 
 ## 五、能力覆盖
 
-- **341 个能力位 / 30 个域**（全量清单见 [`../data/capabilities.json`](../data/capabilities.json)，逐位说明见 [`03-capabilities.md`](03-capabilities.md)）；
+- **348 个能力位 / 30 个域**（全量清单见 [`../data/capabilities.json`](../data/capabilities.json)，逐位说明见 [`03-capabilities.md`](03-capabilities.md)）；
 - 其中 **262 位只读**（不改状态、不出网）、**79 位会改状态或出网**（调用前需人工授权）；
 - 模型被要求对这些位的**说明、域归属、调用注意点**答得准 —— 这是"总指挥"的地基。
 
@@ -69,7 +69,7 @@
 1. **不是通用聊天模型**：问它"今天天气"，它可能答得像能力位条目。它的训练语料偏"能力位问答"这一型；
 2. **中文为主**：英文能力可用但未系统评测；
 3. **有 2 个已知不过的题**：`health`（LoRA 未覆盖住底座先验）、`voice_studio`（**判据与数据不同源**，不是模型错）；
-4. **74 个位未进这套基准**（以写口/需授权位为主）⇒ 99.10% **不等于** "341 位全过"；
+4. **74 个位未进这套基准**（以写口/需授权位为主）⇒ 99.10% **不等于** "348 位全过"；
 5. **权重未随仓库发布**（15.25 GB，GitHub 放不下），按 [README 的"权重怎么拿"](../README.md#权重怎么拿) 走；
 6. **无线上 SLA**：演示端点跑在按秒计费的 GPU 上，冷启动约 107 秒（实测），热态首字约 1.1 秒。
 
@@ -86,7 +86,7 @@
   title  = {GBT小土豆V8 总指挥大模型（GBTxiaotudouV8-Commander）},
   author = {自由的风},
   year   = {2026},
-  note   = {7.6B capability-routing model, 341 capability bits, 30 domains},
+  note   = {7.6B capability-routing model, 348 capability bits, 30 domains},
   url    = {https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander}
 }
 ```
