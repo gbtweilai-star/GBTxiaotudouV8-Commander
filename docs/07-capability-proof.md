@@ -204,3 +204,10 @@ artifact = outputs/cloud/hf-free-gpu/freegpu-20261021T161333.mp4
 
 作用域登记（只加这一条，不动既有闸）：`network_private`（出网打 HF）+ `filesystem_write`（产物落本机），**不叠 `data_export`**。
 实现口径：`gradio_client` 只装在 py3.12 ⇒ 用 `py -3.12` 子进程调（**不假装 3.14 能跑**）；回执里 `route` 必带，换源不静默。
+
+
+### 边界类缺口的「下一动作」（2026-10-25 补）
+
+- `codex_interrupt`（`needs_input`）：**边界在上游** —— 同步客户端在中断指令到达前已结束回合，抓不到活回合。
+  下一动作：① 上游侧需提供「可中断的活会话句柄」；② 我方侧可把同步客户端换成可取消的长轮询（代码改动），
+  在此之前它只能如实回 `needs_input`，**不折算成 failed、也不写成通过**。
