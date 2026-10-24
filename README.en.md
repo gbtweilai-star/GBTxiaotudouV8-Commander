@@ -62,6 +62,20 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 Every figure above has a raw JSON receipt under `data/` and a figure under `assets/`.
 Where something did **not** work, the doc says so in the same table (see the "known gaps" section of `docs/07`).
 
+## On a phone (real screenshots, not mockups)
+
+The repo's mobile story has two separate paths. **PWA** = add the Pages URL to the home screen and it opens offline.
+**On-device weights** = load our own GGUF **`gbt-v8-v82-q5_0` (4.88 GB)** in **LM Pocket** on an iPhone and infer locally.
+The three shots below are from **2026-10-24, 00:26 / 00:28 / 00:30** on a real device; every number on screen is **self-reported by the page**, not recomputed here.
+
+| Shot | What is on screen | What it shows |
+|---|---|---|
+| ![iPhone chat](assets/mobile-lm-pocket-chat.png) | model chip `gbt-v8-v82-q5_0` · ctx 64/4,096 · **8.0 tok/s**; the reply carries the full signature | the phone is running **our** q5_0, and it **knows who it is** |
+| ![worker queue](assets/mobile-ios-worker-queue.png) | "worker restarted · 3 queued · waiting for the port (40 min window)"; next step: load q5_0 in LM Pocket and **do not switch away** | phones are not limited to manual chat: **queue + on-disk receipt** works too |
+| ![run recap](assets/mobile-ios-run-recap.png) | Q4_0's 9% quantization noise amplified layer-by-layer over 28 layers (0.22 → 605) · Q5_0/Q8_0 stable (6.19) · weights 339/339 tensors, all 28 layers faithful · A19 direct 8–11.7 tok/s · iOS kills services on background | what was broken was **that Q4_0 build**, not the weights or the model — same direction as the five-way quantization comparison in [`docs/APP-自有权重.md`](docs/APP-自有权重.md) §11 |
+
+Known limit, stated plainly: iOS drops services when the app goes to background, so those 3 questions ran with the app kept in the foreground. That is a platform constraint, not an unfinished feature.
+
 ## Architecture in one picture
 
 ![architecture](assets/architecture.svg)

@@ -5,7 +5,7 @@
  *   · 静态资源（png/svg/gif/webmanifest）：cache-first（省流量、打开快）
  *   · 只缓存**同源 GET**，别碰能力位 API（这里没有 API，别以后误加）
  */
-const VERSION = 'gbt-v8-v1';
+const VERSION = 'gbt-v8-v2';
 const SHELL = [
   './',
   './index.html',

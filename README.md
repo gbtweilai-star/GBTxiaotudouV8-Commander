@@ -66,6 +66,22 @@ python -m unittest discover -s tests -q            # 21 条判据（含"编造�
 已就位的手机要件：`manifest.webmanifest`（name/short_name/icons/shortcuts）· `sw.js`（HTML 网络优先、静态件缓存优先）·
 `icons/icon-192.png` · `icon-512.png` · `apple-touch-icon.png` · 两页都已加 `viewport` / `theme-color` / `apple-mobile-web-app-*`。
 
+### 手机实拍（不是上面的 PWA）：iPhone 上直接跑我们自己的 GGUF
+
+下面三张是 **2026-10-24 深夜的真机截图**（iPhone · 00:26 / 00:28 / 00:30），不是渲染稿：
+手机端用 **LM Pocket** 直接加载我们自己的 **`gbt-v8-v82-q5_0`（GGUF · 4.88 GB）**，在本机芯片上推理。
+中间那张里的「工作器」把 3 条问题排好队，端口一通就依次跑完、结果落到 `/tmp/a19_done.jsonl` —— 人不用守着。
+**截图里的速率、张量数、放大倍数都是页面自报**，本仓没有替它重算。
+
+| 截图 | 画面上的东西 | 它说明什么 |
+|---|---|---|
+| ![iPhone 对话：问「你是谁」](assets/mobile-lm-pocket-chat.png) | 输入框上的模型 chip 自报 `gbt-v8-v82-q5_0`（上下文 64/4,096）· **8.0 tok/s**；回答带完整署名 | 手机上加载的就是**我们那份 q5_0**，而且它**知道自己是谁** |
+| ![工作器重启与 3 条队列](assets/mobile-ios-worker-queue.png) | 「工作器已重启（无缓冲）· 队列 3 条 · 等端口…（窗口 40 分钟）」；下一步是打开 LM Pocket 加载 q5_0 后**别切走** | 手机上不只是手动聊：**排队 + 自动落盘回执**这条路也通 |
+| ![今晚这一整轮的账](assets/mobile-ios-run-recap.png) | Q4_0 的 9% 量化噪声被 28 层逐层放大（0.22 → 605）· Q5_0/Q8_0 激活值稳定（6.19）· 权重 339/339 张量、28 层全覆盖逐层忠实 · A19 直连 8–11.7 tok/s · iOS 一切后台服务就断 | 坏的不是权重、也不是模型，**是那份 Q4_0**；换 Q5_0 就通顺 —— 方向与 [`docs/APP-自有权重.md`](docs/APP-自有权重.md) §十一 的实测对照一致 |
+
+> 一句话：**花钱训练的模型，在自己的手机上、用自己的芯片跑起来了。**
+> 限制照实说：iOS 把 App 切到后台就断服务，所以那 3 条问题是「让它开着别切走」跑完的 —— 这是系统约束，不是没做到。
+
 **要真原生 App（.ipa / .apk）还差什么**（都不是技术活，是要花你的钱和账号）：
 
 - **iOS**：Apple Developer Program **$99/年** + 一台 Mac 签名，才能出 `.ipa` 并上架/内测（TestFlight）。
