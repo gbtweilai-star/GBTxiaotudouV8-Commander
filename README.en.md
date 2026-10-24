@@ -89,7 +89,7 @@ Bypassing it means bypassing audit, which the project treats as the failure mode
 |---|---|
 | [01 model card](docs/01-model-card.md) | base model, training target, limits |
 | [02 architecture](docs/02-architecture.md) | single gate, ticket model, audit ledger |
-| [03 capabilities](docs/03-capabilities.md) | 341 bits across 30 domains |
+| [03 capabilities](docs/03-capabilities.md) | 348 bits across 30 domains |
 | [04 evaluation](docs/04-evaluation.md) | benchmark construction, greedy decoding, PASS45 |
 | [05 deployment](docs/05-deployment.md) | vLLM serve, packaging |
 | [06 showcase](docs/06-showcase.md) | verbatim receipts (unedited) |
