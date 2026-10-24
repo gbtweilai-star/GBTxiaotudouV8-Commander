@@ -18,8 +18,8 @@ PASS  门：契约层三件套齐全 · 信封归一 / 结果校验 / 产出即�
 PASS  作用域门：HUMAN_GATES 覆盖 14 个作用域 · 含 G1/G2/G3 关键项
 PASS  作用域门：机制层自保 · filesystem_write 在 MECHANISM_GATES 里
 PASS  票据：一次性票集合 · data_export、deploy_force、deploy_publish、owner_control、remote_device
-PASS  注册表：条数 341 · machine-readable
-PASS  注册表：341 个名字都能在 caps_registry.py 里找到 · 不是手抄的目录
+PASS  注册表：条数 348 · machine-readable
+PASS  注册表：348 个名字都能在 caps_registry.py 里找到 · 不是手抄的目录
 PASS  派活桥：真调走 run_task · 桥里是 `from gbt_allinone import run_task`
 PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / auth_gate 一律没直接导入
 
@@ -33,7 +33,7 @@ PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / au
 | `gbt_allinone/api.py` | 177 KB | **一切调用只走 `run_task` 这一个门**；信封归一、结果校验、产出即绑 | `def run_task`（文件里有**两处**，先看下面那段说明） |
 | `gbt_allinone/security/policy.py` | 67 KB | **写盘 / 花钱 / 出网必须人工授权**；`HUMAN_GATES` 是那张正表 | 搜 `HUMAN_GATES` 与 `MECHANISM_GATES` |
 | `gbt_allinone/auth_gate.py` | 23 KB | **票只有主人能发**；时段票 vs 一次性票 | 搜 `ONE_SHOT` |
-| `gbt_allinone/caps_registry.py` | 239 KB | **341 位能力**的注册表本体（不是手抄清单） | 搜任一能力位名 |
+| `gbt_allinone/caps_registry.py` | 239 KB | **348 位能力**的注册表本体（不是手抄清单） | 搜任一能力位名 |
 | `gbt_allinone/omni_plug.py` | 47 KB | **万能插**：六类插座 + 反向调用 | 搜 `socket` / `_ai_call` |
 | `gbt_allinone/preflight.py` | 44 KB | 调用前的**预检层**（已知缺口：抛异常时 fail-open，见 `docs/14` §六） | 搜 `def preflight` |
 | `gbt_allinone/store.py` | 13 KB | **审计账本**（`audit()`）；只追加 | 搜 `def audit` |
