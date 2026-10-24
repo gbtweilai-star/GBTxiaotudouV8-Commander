@@ -139,7 +139,7 @@ App 回前台 → 工作器每秒探端口 → 一通就把队列批量跑完
       -d '{"messages":[{"role":"user","content":"你是谁"}],"max_tokens":80}'
 
     # 4) 参考实现（不依赖 llama.cpp，独立验证权重）
-    python3 ref_forward_multi.py "105043,100165,11319,11622,105321,102104"
+    python3 tools/ref_forward_gguf.py "105043,100165,11319,11622,105321,102104"
     #   环境变量 GGUF_PATH 指定文件；支持 Q4_0 / Q5_0 / Q8_0
 
 ---
