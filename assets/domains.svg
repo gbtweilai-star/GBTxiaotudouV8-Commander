@@ -5,7 +5,7 @@
     .vl { font-family:Consolas,monospace; font-size:12px; fill:#57606a; }
     .lg { font-family:"Microsoft YaHei","PingFang SC",sans-serif; font-size:12px; fill:#57606a; }
   </style>
-  <text x="12" y="26" class="ti">能力位域分布（共 341 位 / 30 域 · 绿=只读 · 橙=需授权）</text>
+  <text x="12" y="26" class="ti">能力位域分布（共 348 位 / 30 域 · 绿=只读 · 橙=需授权）</text>
   <text x="12" y="69" class="lb">创作</text>
 <rect x="150" y="57" width="290" height="16" rx="4" fill="#2ea043"/>
 <rect x="440" y="57" width="200" height="16" rx="4" fill="#d29922"/>
@@ -50,18 +50,18 @@
 <rect x="150" y="317" width="81" height="16" rx="4" fill="#2ea043"/>
 <rect x="231" y="317" width="9" height="16" rx="4" fill="#d29922"/>
 <text x="248" y="330" class="vl">10（只读 9）</text>
-<text x="12" y="355" class="lb">工具与改代码</text>
-<rect x="150" y="343" width="63" height="16" rx="4" fill="#2ea043"/>
-<rect x="213" y="343" width="18" height="16" rx="4" fill="#d29922"/>
-<text x="239" y="356" class="vl">9（只读 7）</text>
-<text x="12" y="381" class="lb">集成（飞书/Notion/CLI）</text>
-<rect x="150" y="369" width="27" height="16" rx="4" fill="#2ea043"/>
-<rect x="177" y="369" width="36" height="16" rx="4" fill="#d29922"/>
-<text x="221" y="382" class="vl">7（只读 3）</text>
-<text x="12" y="407" class="lb">吞天（自我进化）</text>
-<rect x="150" y="395" width="45" height="16" rx="4" fill="#2ea043"/>
-<rect x="195" y="395" width="0" height="16" rx="4" fill="#d29922"/>
-<text x="203" y="408" class="vl">5（只读 5）</text>
+<text x="12" y="355" class="lb">设备</text>
+<rect x="150" y="343" width="81" height="16" rx="4" fill="#2ea043"/>
+<rect x="231" y="343" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="239" y="356" class="vl">9（只读 9）</text>
+<text x="12" y="381" class="lb">工具与改代码</text>
+<rect x="150" y="369" width="63" height="16" rx="4" fill="#2ea043"/>
+<rect x="213" y="369" width="18" height="16" rx="4" fill="#d29922"/>
+<text x="239" y="382" class="vl">9（只读 7）</text>
+<text x="12" y="407" class="lb">集成（飞书/Notion/CLI）</text>
+<rect x="150" y="395" width="27" height="16" rx="4" fill="#2ea043"/>
+<rect x="177" y="395" width="36" height="16" rx="4" fill="#d29922"/>
+<text x="221" y="408" class="vl">7（只读 3）</text>
   <rect x="12" y="432" width="12" height="12" rx="3" fill="#2ea043"/><text x="30" y="440" class="lg">只读（不改状态/不出网）</text>
   <rect x="210" y="432" width="12" height="12" rx="3" fill="#d29922"/><text x="228" y="440" class="lg">需授权（写盘/花钱/出网）</text>
 </svg>
