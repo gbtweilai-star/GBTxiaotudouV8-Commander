@@ -13,6 +13,50 @@ UNIMPLEMENTED_CAPS 里的名字**只有名字、没有实现**：调用会得到
 """
 
 BENIGN_CAPS = {
+    # ── 身体（设备即本体 · 2026-10-24）：六个动作各是一条能力位 ──
+    # 装到哪台设备，这六根就长在那台设备上；库在 3.12，所以由 body_bridge 转发。
+    "body_map": {
+        "domain": 'device',
+        "desc": '身体·清单：现读这台设备的七根感官与六根动作（零作用域，只读）',
+        "handler": 'body_map',
+        "safe": True,
+    },
+    "body_see": {
+        "domain": 'device',
+        "desc": '身体·看：截当前屏幕落 png（可选 monitor 序号）',
+        "handler": 'body_see',
+        "safe": True,
+    },
+    "body_say": {
+        "domain": 'device',
+        "desc": '身体·说：系统 TTS 念一句（参数 text，可调 rate）',
+        "handler": 'body_say',
+        "safe": True,
+    },
+    "body_type": {
+        "domain": 'device',
+        "desc": '身体·打字：向前台窗口键入文本（参数 text）',
+        "handler": 'body_type',
+        "safe": True,
+    },
+    "body_click": {
+        "domain": 'device',
+        "desc": '身体·点：按坐标点按（参数 x,y,clicks）',
+        "handler": 'body_click',
+        "safe": True,
+    },
+    "body_volume": {
+        "domain": 'device',
+        "desc": '身体·音量：读或设主音量（参数 level 0~1；不传则只读）',
+        "handler": 'body_volume',
+        "safe": True,
+    },
+    "body_open": {
+        "domain": 'device',
+        "desc": '身体·打开：用系统默认程序打开文件/网址（参数 target）',
+        "handler": 'body_open',
+        "safe": True,
+    },
     # ── 官方 Codex 能力化（B 档 · 风哥 2026-09-15 批准）──
     # 只读：状态与工具清单；写：线程/回合/中断（由 policy 按 process_execute 作用域守护）
     "codex_status": {

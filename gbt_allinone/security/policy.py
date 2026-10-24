@@ -232,6 +232,16 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
 
     # ── 主人 2026-10-19「最终答复」：三处同型兜底 + 未知 kind 写动词兜底 ──
     # 1) record_grid：补**真票**（通用写）。只读侧黑名单放行，其余一律要票。
+    # ── 身体（设备即本体）：真动手的那几根必须过门 ──
+    if kind in ("body_see", "body_say", "body_type", "body_click", "body_volume", "body_open"):
+        if kind == "body_see":
+            add("filesystem_write")        # 截屏落盘
+        elif kind == "body_open":
+            add("process_execute")         # 起外部程序
+        elif kind in ("body_type", "body_click"):
+            add("desktop_control")         # 代替人操作前台（G1）
+        else:
+            add("audio_output")            # 出声 / 改音量
     if kind == "record_grid":
         if op not in ("", "parse", "read", "preview", "status"):
             add("filesystem_write")
