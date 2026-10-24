@@ -2,7 +2,7 @@
 
 **English** · [中文](README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/)
 
-> **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 341 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
+> **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 348 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
 >
 > **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (1 needs an extra input); every figure in this repo comes with a real receipt file.
 >
@@ -28,7 +28,7 @@ whether it writes to disk / spends money / goes online, and whether a human tick
 
 Three properties are trained into the weights, not bolted on with prompts:
 
-1. **Every one of the 341 bits is describable** — what it does, which of the 30 domains it belongs to, what it needs.
+1. **Every one of the 348 bits is describable** — what it does, which of the 30 domains it belongs to, what it needs.
 2. **Requests land on a concrete bit**, not on a vague suggestion (and the runtime **verifies the name against the catalog** — a hallucinated bit is rejected, not executed).
 3. **Irreversible / billable / outbound actions ask first.** The runtime gate, not the model, is what actually refuses.
 
@@ -39,7 +39,7 @@ Three properties are trained into the weights, not bolted on with prompts:
 This repo is not only a model card. It ships a small, dependency-free Python client and a CLI:
 
 ```bash
-python -m gbt_commander stats                 # 341 bits · 30 domains · 262 read-only · 35 gated
+python -m gbt_commander stats                 # 348 bits · 30 domains · 262 read-only · 35 gated
 python -m gbt_commander catalog --domain pipeline
 python -m gbt_commander search "roll back to the previous version"
 python -m gbt_commander route "ship this to production" --endpoint http://127.0.0.1:8000/v1 --model gbt-v8
