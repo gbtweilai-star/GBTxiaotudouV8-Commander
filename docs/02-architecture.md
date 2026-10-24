@@ -59,7 +59,7 @@
 
 ```
 caps_registry（唯一真源）
-├── 341 位 × 30 域
+├── 348 位 × 30 域
 ├── 每位：name / domain / desc / handler / safe / requires_params
 ├── 分型：只读（直接跑） / 写口（过票） / 未实现（只有名字，调用如实报 unknown）
 └── 派生：图鉴、触手库、绑定账、授权表、本仓库的 capabilities.json
