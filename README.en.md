@@ -39,7 +39,7 @@ Three properties are trained into the weights, not bolted on with prompts:
 This repo is not only a model card. It ships a small, dependency-free Python client and a CLI:
 
 ```bash
-python -m gbt_commander stats                 # 348 bits · 30 domains · 262 read-only · 35 gated
+python -m gbt_commander stats                 # 348 bits · 30 domains · 269 read-only · 41 gated
 python -m gbt_commander catalog --domain pipeline
 python -m gbt_commander search "roll back to the previous version"
 python -m gbt_commander route "ship this to production" --endpoint http://127.0.0.1:8000/v1 --model gbt-v8
