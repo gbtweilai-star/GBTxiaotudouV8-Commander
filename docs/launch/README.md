@@ -24,7 +24,7 @@
 
 ### ① Hacker News · Show HN（英文，工作日美东 8–10 点发，标题决定 80% 成败）
 
-**标题**：`Show HN: 7.6B Chinese model that routes requests to 341 gated capabilities`
+**标题**：`Show HN: 7.6B Chinese model that routes requests to 348 gated capabilities`
 
 **正文**：
 
@@ -48,7 +48,7 @@ Happy to answer anything about the routing benchmark or the gate design.
 
 ### ② Reddit · r/LocalLLaMA（英文，标题温和一点，正文放图）
 
-**标题**：`A 7.6B Chinese "commander" model: 341 capability bits, one gate, and a live-run proof for every bit`
+**标题**：`A 7.6B Chinese "commander" model: 348 capability bits, one gate, and a live-run proof for every bit`
 
 **正文**（在 HN 版本基础上加两段）：
 
@@ -66,7 +66,7 @@ compute (text, image, video, and a local CPU baseline), with sha256 of every art
 1/ Most models answer "how do I do X". This one answers "X belongs to capability #217,
    it needs these args, and it will write to disk, so ask a human first." 7.6B, Chinese, open.
 
-2/ 341 capability bits · 30 domains · every bit live-tested (340 pass / 0 fail / 1 needs input)
+2/ 348 capability bits · 30 domains · every bit live-tested (340 pass / 0 fail / 1 needs input)
    335-item benchmark: PASS45 99.10% · single gate `run_task` — auth+audit can't be bypassed
    No weights needed to try it: `python demo.py "..."`
 
