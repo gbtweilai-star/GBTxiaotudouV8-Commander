@@ -48,6 +48,9 @@
 git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander && cd GBTxiaotudouV8-Commander
 python demo.py "我要把 Markdown 变成 PPT"          # 离线：落点 + 门状态 + 该跑的命令
 python -m gbt_commander stats                      # 348 位 / 30 域 / 只读 269（要票数见 CLI 现读）
+python -m gbt_commander catalog --domain pipeline     # 只列某个域（30 个域任选）
+python -m gbt_commander search "回滚到上一个版本"        # **按人话/关键词搜能力位** ← 找不到能力就先敲这个
+python -m gbt_commander route "把这次上线发出去" --endpoint http://127.0.0.1:8000/v1 --model gbt-v8
 python -m unittest discover -s tests -q            # 21 条判据（含"编造能力位必须被拒"的负对照）
 ```
 
