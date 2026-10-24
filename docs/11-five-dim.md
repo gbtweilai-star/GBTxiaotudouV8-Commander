@@ -94,4 +94,4 @@ py -3.14 tools/codex-scripts/five-dim.py cap brain_unify '{"goal":"看看当前�
 2. **路由会抖动**：同一句话不同轮次可能落到不同能力位（本页第二节第 2 条已实证），所以它适合"给个落点建议"，
    需要确定性时**显式传 `kind`**。
 3. **`verify` 只证明"看得见"**，不证明"做对了"；业务正确性要靠各能力位自己的 `ok` 与产物闸。
-4. **`health=5/5` 是执行层自检**，不等于"341 位能力全健康" —— 那是多域监控（[12](12-multidomain-monitor.md)）与能力自证（[07](07-capability-proof.md)）各自的事。
+4. **`health=5/5` 是执行层自检**，不等于"348 位能力全健康" —— 那是多域监控（[12](12-multidomain-monitor.md)）与能力自证（[07](07-capability-proof.md)）各自的事。
