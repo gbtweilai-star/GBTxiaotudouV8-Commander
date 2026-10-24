@@ -2,7 +2,7 @@
 
 # GBT Xiaotudou V8 — Commander
 
-**7.6B Chinese Commander: routes a request to 341 audited capability bits — and blocks write / spend / network without a human ticket.**
+**7.6B Chinese Commander: routes a request to 348 audited capability bits — and blocks write / spend / network without a human ticket.**
 **22-DoF bionic hand, 40-bone GLB, and a live 20k-tentacle 3D preview → [open it](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/arms/tentacle3d.html)**
 `python demo.py "turn Markdown into PPT"` — zero deps, no weights, 30 seconds.
 
@@ -10,7 +10,7 @@
 
 [3D preview](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/arms/tentacle3d.html) · [🇬🇧 English README](README.en.md) · [中文总文档](#-gbt小土豆v8--总指挥大模型) · [Runtime source code](runtime/README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/) · [Security & steering](docs/14-security-and-control.md) · [Reverse-calling cloud compute](docs/13-omni-plug.md)
 
-> **Want the source?** The gate (`run_task` contract layer + telemetry wrapper), the scope table, the audit ledger, the 341-bit registry and omni-plug live in **[runtime/](runtime/README.md)** —
+> **Want the source?** The gate (`run_task` contract layer + telemetry wrapper), the scope table, the audit ledger, the 348-bit registry and omni-plug live in **[runtime/](runtime/README.md)** —
 > with a machine-checked `python runtime/static_check.py` (currently **9 pass / 0 fail**, read-only AST, engine not executed).
 > `run_task` appears twice in `api.py` on purpose: `_run_task_base = run_task` snapshots the original before the telemetry wrapper — explained in [runtime/README.md](runtime/README.md).
 
@@ -23,7 +23,7 @@
 <p>
   <img alt="params" src="https://img.shields.io/badge/params-7.6B-2ea043?style=flat-square">
   <img alt="base" src="https://img.shields.io/badge/base-Qwen2--7B-1f6feb?style=flat-square">
-  <img alt="caps" src="https://img.shields.io/badge/capability%20bits-341-8957e5?style=flat-square">
+  <img alt="caps" src="https://img.shields.io/badge/capability%20bits-348-8957e5?style=flat-square">
   <img alt="domains" src="https://img.shields.io/badge/domains-30-d29922?style=flat-square">
   <img alt="eval" src="https://img.shields.io/badge/335--cap%20PASS45-99.10%25-2ea043?style=flat-square">
   <img alt="arm" src="https://img.shields.io/badge/omni--arm-40%20bones%20GLB-c9510e?style=flat-square">
@@ -32,20 +32,22 @@
   <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/gbtweilai-star/GBTxiaotudouV8-Commander?style=flat-square"></a>
 </p>
 
-> English one-liner: **A 7.6B Chinese "commander" model that routes, explains and gates 341 native capability bits — with a measurable pass rate on a 335-item capability benchmark and a fully auditable single-gate runtime.**
+> English one-liner: **A 7.6B Chinese "commander" model that routes, explains and gates 348 native capability bits — with a measurable pass rate on a 335-item capability benchmark and a fully auditable single-gate runtime.**
 
 <p align="center"><b>🇨🇳 中文</b> · <a href="README.en.md">🇬🇧 English</a> · <a href="https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/">在线页</a></p>
 
 ## 三行看懂
 
-> **它是什么**：7.6B 中文「总指挥」模型 —— 不只会聊，它把活**落到 341 位能力**上，写盘 / 花钱 / 出网的动作先过人闸。
-> **凭什么信**：335 题基准 PASS45 **99.10% / 98.51%**（两轮全量）；341 位**逐位真跑** 340 通过 / **0 失败**；每张图都有真回执文件。
+> **它是什么**：7.6B 中文「总指挥」模型 —— 不只会聊，它把活**落到 348 位能力**上，写盘 / 花钱 / 出网的动作先过人闸。
+> **凭什么信**：335 题基准 PASS45 **99.10% / 98.51%**（两轮全量）；341 位（发布快照）**逐位真跑** 340 通过 / **0 失败**；每张图都有真回执文件。
+
+> 📌 **两套数，不是一个数**：**341** = 2026-10-21 权重发布快照；**注册表现读 348** —— 多出的 7 位是 `body_*`（`device` 域身体桥：see/say/open/click/type/map/volume，2026-10-24 之后补），**不在这 341 之内**。对照表见 [`docs/03-capabilities.md`](docs/03-capabilities.md)。
 > **30 秒看到东西**：`python demo.py "我要把 Markdown 变成 PPT"` —— 不需要 GPU、不需要模型权重、**零第三方依赖**，当场给你落点能力位与该跑的命令。
 
 ```bash
 git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander && cd GBTxiaotudouV8-Commander
 python demo.py "我要把 Markdown 变成 PPT"          # 离线：落点 + 门状态 + 该跑的命令
-python -m gbt_commander stats                      # 341 位 / 30 域 / 只读 262 / 要票 35
+python -m gbt_commander stats                      # 348 位 / 30 域 / 只读 269（要票数见 CLI 现读）
 python -m unittest discover -s tests -q            # 21 条判据（含"编造能力位必须被拒"的负对照）
 ```
 
@@ -109,7 +111,7 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 吞吐峰值在 **1,000–6,000 档（321–340/s）**，20,000 档中位延迟 99s ⇒ **并发 ≠ 吞吐**（瓶颈是审计写盘串行）。
 口径：这一档测的是**调度骨架**（`echo` 纯回显）；"2 万根真插端点"= 2 万次出网，那时瓶颈是对端限流。表见 [docs/08 §五](docs/08-concurrency.md)。
 
-**数字口径**（不照抄未验的说法）：能力位 **341 / 30 域**；`skill_atlas` 现读 **406 条 / 752 KB**；
+**数字口径**（不照抄未验的说法）：能力位 **348 / 30 域**（发布快照 341）；`skill_atlas` 现读 **406 条 / 752 KB**；
 主人提的 `paper_loop`「感悟≥3/情绪≥2」在本仓**没有这个能力位**。
 
 细节与逐条对账：**[docs/15-tentacle-counter.md](docs/15-tentacle-counter.md)**
@@ -189,12 +191,12 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 
 ```
 你的一句话
-  → ① 路由：本仓 gbt_commander 的检索先把 341 位收窄成 18 个候选，再让我们的模型在这 18 个里挑 1 个
+  → ① 路由：本仓 gbt_commander 的检索先把 348 位收窄成 18 个候选，再让我们的模型在这 18 个里挑 1 个
   → ② 真调：走唯一门 run_task(kind, payload) —— 授权、审计、钢印都在这一道门上
   → ③ 回执：成功给结果原文；缺票说缺什么 + 给你要敲的那一行
 ```
 
-> 为什么先收窄？实测过：让模型**直接面对 341 个名字**，它开始回 `py -3.14 tools/codex-scripts/release.py` 这种**命令行**（编的）；
+> 为什么先收窄？实测过：让模型**直接面对 348 个名字**，它开始回 `py -3.14 tools/codex-scripts/release.py` 这种**命令行**（编的）；
 > 收窄到 18 个候选后，它才老老实实在"名字"这一层作答。**收窄用的是这个仓库里的 `gbt_commander`，不是另写一套**——
 > 也就是说：`pip install` 到的那份检索库，真的在给 APP 的派活入口供血。
 
@@ -225,7 +227,7 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 **GBT小土豆V8 总指挥模型**被问"帮我做 X"时，它会先判断：这件事该落到哪个**能力位**、要什么参数、会不会写盘/花钱/出网、要不要先请人发一张授权票 —— 然后才动手。
 
 它的训练目标不是"知识问答"，而是**指挥**：
-- 说清 **341 个能力位**每一个是干什么的、属于哪个域、调用要注意什么；
+- 说清 **348 个能力位**每一个是干什么的、属于哪个域、调用要注意什么；
 - 把自然语言需求**落到具体能力位**（而不是泛泛而谈）；
 - 对**不可逆 / 花钱 / 出网**的动作，明确先要授权，不许自己放行。
 
@@ -238,7 +240,7 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 | # | 亮点 | 怎么验 |
 |---|---|---|
 | 1 | **335 题能力位基准 · PASS45 98.51%–99.10%**（两轮线上全量 + 零覆盖逐条复检） | [评测方法与逐项读数](docs/04-evaluation.md) |
-| 2 | **341 位能力全公开**，机器可读 JSON + 30 个域的逐位详解，不是一张截图 | [能力总表](docs/03-capabilities.md) · [capabilities.json](data/capabilities.json) |
+| 2 | **348 位能力全公开**，机器可读 JSON + 30 个域的逐位详解，不是一张截图 | [能力总表](docs/03-capabilities.md) · [capabilities.json](data/capabilities.json) |
 | 3 | **340 位逐位真跑通过**（只读空参 / 需参数带真参 / 写口隔离 store / 带票真跑 / 房间晋升 / 打断链 / 出图门），**失败 0** | [能力自证](docs/07-capability-proof.md) |
 | 4 | **只要密钥跟云端联通了，就能反向调用** —— 不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上 | [万能插 · 反向调用](docs/13-omni-plug.md) · [安全与方向控制](docs/14-security-and-control.md) |
 
@@ -249,7 +251,7 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 | 图 | 证明什么 | 读数 |
 |---|---|---|
 | ![评测](assets/fig-eval.png) | **说得准** | 335 题 · mean cov **0.9873** · PASS45 **330/335 = 98.51%** |
-| ![能力自证](assets/fig-caps.png) | **调得动** | 341 位：真跑通过 **340** · 要票 0 · 缺输入 1 · 缺依赖 0 · 高危未跑 0 · **失败 0** |
+| ![能力自证](assets/fig-caps.png) | **调得动** | 341 位（快照）：真跑通过 **340** · 要票 0 · 缺输入 1 · 缺依赖 0 · 高危未跑 0 · **失败 0** |
 | ![并发](assets/fig-concurrency.png) | **爆发力** | 512→4096 路并发 **全部 100% 成功**；4096 路只多用 ~50 MB 内存 |
 | ![链路](assets/fig-chain.png) | **整链通** | 本地框架→云插件→端点→流式，五段真跑全绿 |
 | ![GBT天真](assets/fig-tianzhen.png) | **不装 ComfyUI 也能跑它的契约** | 原生算子 **27**（18 个与 ComfyUI 同名同契约）· 契约面 1495 · 校验正例过、反例被抓 |
@@ -368,7 +370,7 @@ print(r.choices[0].message.content)
 
 ---
 
-## 能力面（341 位 / 30 域）
+## 能力面（348 位 / 30 域）
 
 | 域 | 位数 | 只读 | 需授权 | 代表能力 |
 |---|---:|---:|---:|---|
@@ -384,8 +386,9 @@ print(r.choices[0].message.content)
 | 数据 `data` | 12 | 9 | 3 | `echo` · `count_words` · `audit_query` · `record_grid` |
 | 引擎 `engine` | 10 | 9 | 1 | `wf_define` · `wf_run` · `sched_define` · `sched_tick` |
 | 工具 `tools` | 9 | 7 | 2 | `code_patch` · `git_read` · `git_write` · `capability_probe` |
-| 其余 18 个域 | 49 | 41 | 8 | 集成 / 吞天 / 视觉 / 财务 / 长程 / 语音 / 协作 / 设备 … |
-| **合计** | **341** | **262** | **79** | — |
+| 设备 `device` | 9 | 9 | 0 | `body_see` · `body_say` · `body_click` · `body_map`（7 位身体桥） |
+| 其余 17 个域 | 47 | 34 | 8 | 集成 / 吞天 / 视觉 / 财务 / 长程 / 语音 / 协作 … |
+| **合计** | **348** | **269** | **79** | — |
 
 > **全量逐位说明**：[`docs/03-capabilities.md`](docs/03-capabilities.md)（30 个域，每域一页，含"它做什么 / 只读还是需授权 / 要不要参数"）。
 
@@ -434,8 +437,8 @@ print(r.choices[0].message.content)
 |---|---|---|
 | `express_direct` | 3 次复测**稳定未命中**（cov=0）：它答的是「表达直达（主人令 2026-10-13…）」这一版描述，而 gold 是另一版措辞 | **答案语义正确、措辞不同** ⇒ 判据（逐字覆盖）偏严，属保守取向；已列为已知问题，不偷偷换题 |
 
-> 另有 **74 个能力位未进入这套基准**（写口/需授权位为主），所以 **98.51%–99.10% 不等于"341 位全过"**
-> —— 它等于"被测的 335 位里过了 330–332 位"。**"能不能调得动"另有一套证据**：[07 能力自证](docs/07-capability-proof.md)（341 位里 **340 位真跑通过**，失败 0）。
+> 另有 **74 个能力位未进入这套基准**（写口/需授权位为主），所以 **98.51%–99.10% 不等于"341 位快照全过"**
+> —— 它等于"被测的 335 位里过了 330–332 位"。**"能不能调得动"另有一套证据**：[07 能力自证](docs/07-capability-proof.md)（341 位快照里 **340 位真跑通过**，失败 0）。
 
 评测方法与可复算步骤：[docs/04-evaluation.md](docs/04-evaluation.md)
 
@@ -472,19 +475,19 @@ flowchart LR
 ├── docs/
 │   ├── 01-model-card.md       ← 模型卡（架构/配方/局限）
 │   ├── 02-architecture.md     ← 单门 + 授权 + 审计
-│   ├── 03-capabilities.md     ← 341 位总表（30 域）
+│   ├── 03-capabilities.md     ← 348 位总表（30 域）
 │   ├── capabilities/*.md      ← 每域逐位详解（自动生成）
 │   ├── 04-evaluation.md       ← 评测方法与逐项读数
 │   ├── 05-deployment.md       ← vLLM / RunPod / 代理 / 令牌门
 │   ├── 06-showcase.md         ← 真实回执（未经编辑）+ 一致性 + 已知问题
-│   ├── 07-capability-proof.md ← 341 位逐位真跑（340 通过 / 0 要票 / 1 缺输入 / 0 缺依赖 / 0 高危未跑 / 0 失败）
+│   ├── 07-capability-proof.md ← 341 位（快照）逐位真跑（340 通过 / 0 要票 / 1 缺输入 / 0 缺依赖 / 0 高危未跑 / 0 失败）
 │   ├── 08-concurrency.md      ← 触手并发爆发力（4096 路零失败，瓶颈在审计写盘）
 │   ├── 09-mirror-space.md     ← 镜像多维度空间（先排练，再一次性晋升）
 │   ├── 10-gbt-tianzhen.md     ← GBT天真（27 原生算子 / 18 个与 ComfyUI 同名同契约）
 │   ├── 11-five-dim.md         ← 五维合一（route→execute→verify→health 五条真跑回执）
 │   └── 12-multidomain-monitor.md ← 多域监控（29 域 236 位 / 基线 + diff / 回归 0）
 ├── data/
-│   ├── capabilities.json      ← 341 位机器可读全量
+│   ├── capabilities.json      ← 348 位机器可读全量
 │   ├── capability-live-test.json ← 逐位真调读数
 │   ├── concurrency-bench.json ← 并发台架原始读数
 │   ├── mirror-space-live.json ← 镜像只读五步读数
@@ -510,14 +513,14 @@ flowchart LR
 
 **发布**：本仓库有可引用的 Release —— [`v83-commander-2026-10-21`](https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/releases/tag/v83-commander-2026-10-21)（含本版读数与已知限制）。
 
-**已公开且可复核**：能力位全量清单（341 位）、评测方法、评测读数（含未过项）、部署路径、运行时的门与账设计、
+**已公开且可复核**：能力位全量清单（348 位）、评测方法、评测读数（含未过项）、部署路径、运行时的门与账设计、
 GBT天真的算子/契约现读读数、五维合一的五条真跑回执、多域监控的逐域读数与基线 diff。
 
 **还有两条要说清**：
 
 1. **GBT天真只覆盖契约面的 1.2%**（18/1495）：重生成与模型面 359 个、控图检测面 290 个要权重/GPU，本机没有；
    传统算法面还有 809 个「可原生但没接」。**别把「能用 ComfyUI 的节点名写图」读成「ComfyUI 的节点全能跑」。**
-2. **多域监控只测 236/341 位**（只读且无需参数的那批）：105 位写口/需参数位不跑、也不假装跑过。
+2. **多域监控只测 236/341 位（快照基数）**（只读且无需参数的那批）：105 位写口/需参数位不跑、也不假装跑过。
 
 ## 权重怎么拿
 
@@ -529,7 +532,7 @@ GBT天真的算子/契约现读读数、五维合一的五条真跑回执、多�
 ## 路线图
 
 - [ ] 公开 335 题基准的可复算脚本（当前为内部跑）
-- [ ] 补齐 74 个未测能力位，把基准扩到 341 位全覆盖
+- [ ] 补齐 74 个未测能力位，把基准扩到 348 位全覆盖
 - [ ] `health` 位内容修复（补样本重训）
 - [ ] 修 `voice_studio` 判据-数据不同源问题（0 成本，动尺子）
 - [ ] 发布 Hugging Face 权重卡（Safetensors + LFS）
