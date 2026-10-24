@@ -262,7 +262,7 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 |---|---|---|
 | ![评测](assets/fig-eval.png) | **说得准** | 335 题 · mean cov **0.9873** · PASS45 **330/335 = 98.51%** |
 | ![能力自证](assets/fig-caps.png) | **调得动** | 341 位（快照）：真跑通过 **340** · 要票 0 · 缺输入 1 · 缺依赖 0 · 高危未跑 0 · **失败 0** |
-| ![并发](assets/fig-concurrency.png) | **爆发力** | 512→4096 路并发 **全部 100% 成功**；4096 路只多用 ~50 MB 内存 |
+| ![并发](assets/fig-concurrency.png) | **爆发力** | **20,000 路并发零失败**（墙钟 135s）；4096 档只多用 ~50 MB 内存 |
 | ![链路](assets/fig-chain.png) | **整链通** | 本地框架→云插件→端点→流式，五段真跑全绿 |
 | ![GBT天真](assets/fig-tianzhen.png) | **不装 ComfyUI 也能跑它的契约** | 原生算子 **27**（18 个与 ComfyUI 同名同契约）· 契约面 1495 · 校验正例过、反例被抓 |
 | ![多域监控](assets/fig-monitor.png) | **改一处不坏别处** | 29 域 236 位逐位真调：**221 通过 / 15 要票 / 回归 0 / 修好 0** |
@@ -270,8 +270,8 @@ tool_calls=1 → get_capability({"name":"markdown_to_ppt"})`；OpenAI：`http=40
 
 细节页：[能力自证](docs/07-capability-proof.md) · [并发爆发力](docs/08-concurrency.md) · [镜像多维度空间](docs/09-mirror-space.md) · [GBT天真](docs/10-gbt-tianzhen.md) · [五维合一](docs/11-five-dim.md) · [多域监控](docs/12-multidomain-monitor.md) · [万能插（万物皆可插/可控·反向调云端算力）](docs/13-omni-plug.md) · [真实回执](docs/06-showcase.md)
 
-> **并发不是靠"多开线程"吹出来的**：4096 路零失败是真的，但延迟随并发线性上升——
-> 瓶颈是**审计写盘串行**（实测 512 路中位 2.9s → 4096 路 10.9s，吞吐稳定 ~260/s）。这条写在 [08](docs/08-concurrency.md) 里，没藏。
+> **并发不是靠"多开线程"吹出来的**：从 512 一路压到 **20,000 路**（全成功、**零失败**），延迟随并发线性上升——
+> 512 路中位 2.9s → 4096 路 10.9s → **20,000 路 99s**；吞吐稳定在 **148–340/s**，**瓶颈是审计写盘串行**。这条写在 [08](docs/08-concurrency.md) 里，没藏。
 
 ---
 
@@ -491,7 +491,7 @@ flowchart LR
 │   ├── 05-deployment.md       ← vLLM / RunPod / 代理 / 令牌门
 │   ├── 06-showcase.md         ← 真实回执（未经编辑）+ 一致性 + 已知问题
 │   ├── 07-capability-proof.md ← 341 位（快照）逐位真跑（340 通过 / 0 要票 / 1 缺输入 / 0 缺依赖 / 0 高危未跑 / 0 失败）
-│   ├── 08-concurrency.md      ← 触手并发爆发力（4096 路零失败，瓶颈在审计写盘）
+│   ├── 08-concurrency.md      ← 触手并发爆发力（512→4,096→**20,000** 全零失败，瓶颈在审计写盘）
 │   ├── 09-mirror-space.md     ← 镜像多维度空间（先排练，再一次性晋升）
 │   ├── 10-gbt-tianzhen.md     ← GBT天真（27 原生算子 / 18 个与 ComfyUI 同名同契约）
 │   ├── 11-five-dim.md         ← 五维合一（route→execute→verify→health 五条真跑回执）
