@@ -154,6 +154,13 @@ def _run_benign(kind, payload, policy_decision=None):
     except Exception as _e:
         pass   # 闸自身出错不能把框架锁死，但会在 selfscan 里自查
 
+    # ── 身体（设备即本体）：六根动作走同一道门 ──
+    if kind in ("body_see", "body_say", "body_type", "body_click", "body_volume", "body_open"):
+        from . import body_bridge
+        return body_bridge.run(kind[5:], payload or {})
+    if kind == "body_map":
+        from . import body_bridge
+        return body_bridge.body_map()
     if kind == "health":
         return {"platform": _plat_str(), "python": platform.python_version(),
                 "time": time.strftime("%Y-%m-%dT%H:%M:%S")}
