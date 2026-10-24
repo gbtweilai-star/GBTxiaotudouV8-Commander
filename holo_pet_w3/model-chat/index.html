@@ -62,6 +62,12 @@
   <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
   <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活 ⚡</button>
   <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（约 2 秒，不占对话）；加载中按秒报数">🔥 预热</button>
+  <button id="see" class="ghost" title="让她看一眼屏幕（走 body_see 能力位，要过授权门）">👁 看屏幕</button>
+  <button id="speak" class="ghost" title="让她说一句（走 body_say 能力位，要过授权门）">🗣 说一句</button>
+  <label class="ghost" style="display:flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid #26374f;border-radius:9px;cursor:pointer" title="默认关：实测这个模型不会用上文；开了可能答非所问">
+    <input type="checkbox" id="usehist"> 带上下文 <span id="ctxn" style="color:#8ea2c0">0</span>
+  </label>
+  <button id="clearctx" class="ghost" title="清空多轮上下文">⟲ 清</button>
   <button id="stop" class="ghost" disabled title="停止生成：已经收到的字会留着">■ 停止</button>
   <button id="send">发送</button>
 </footer>
@@ -75,6 +81,9 @@ const hint = document.getElementById("hint");
 let busy = false;
 let abort = () => {};
 let stopWake = () => {};   /* 每个请求自己覆盖；没覆盖就是空操作（派活那条路不加载权重） */
+/* 多轮上下文：只留最近几轮（ctx 256，带太多新问题就没地方放了）。
+   存的是**用户原话**（不含计算器/日历前缀），免得前缀滚雪球。 */
+const history = [];
 
 function add(role, text, meta) {
   const d = document.createElement("div");
@@ -193,8 +202,40 @@ async function pollWarm() {
     }
   } catch (e) { /* 桥断了：下一次轮询再说 */ }
 }
+/* ── 身体动作：走 /v1/dispatch，和别的能力位同一道门 ──
+   门拒就如实显示缺哪个作用域，不许绕过。 */
+async function bodyAct(cap, args, label) {
+  const card = add("assistant", "…" + label);
+  try {
+    const r = await fetch(BRIDGE + "/v1/dispatch", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({capability: cap, args: args})
+    });
+    const j = await r.json();
+    if (j.ok) {
+      const res = (j.result && (j.result.result || j.result)) || j;
+      card.textContent = "✅ " + label + "：" + JSON.stringify(res).slice(0, 300);
+    } else {
+      const scopes = (j.missing_scopes || []).join(",") || "?";
+      card.className = "msg ai err";
+      card.textContent = "⛔ " + label + " 需要授权：" + scopes
+        + "（在终端发一次票：python -m gbt_allinone auth grant --scope " + scopes + " --ttl 600）";
+    }
+  } catch (e) {
+    card.className = "msg ai err";
+    card.textContent = "连不上桥：" + e.message;
+  }
+}
+
 const stopBtn = document.getElementById("stop");
 stopBtn.addEventListener("click", () => { try { abort(); } catch (e) { /* 没在生成 */ } });
+document.getElementById("see").addEventListener("click", () => bodyAct("body_see", {monitor: 1}, "看一眼屏幕"));
+document.getElementById("speak").addEventListener("click", () => bodyAct("body_say", {text: "主人，我在"}, "说一句"));
+document.getElementById("clearctx").addEventListener("click", () => {
+  history.length = 0;
+  document.getElementById("ctxn").textContent = "0";
+  add("assistant", "（上下文已清空）");
+});
 warmBtn.addEventListener("click", async () => {
   if (warmTimer) return;
   warmBtn.textContent = "预热 0s…";
@@ -228,6 +269,12 @@ async function send() {
   try {
     const messages = [];
     if (sys) messages.push({role: "system", content: sys});
+    /* 多轮：实测这个细调模型**不会用上文** —— 带 1 轮历史问「我叫什么名字」，
+       它答「我叫本源台」（把自己的名字当答案），两轮更糟。
+       所以默认**不带**，勾上「带上下文」才带（留给人自己试）。 */
+    if (document.getElementById("usehist").checked) {
+      for (const m of history.slice(-4)) messages.push(m);
+    }
     /* 先用确定性的规则算（日历 / 计算器），算出来就把结果前置到用户消息里 */
     let prefix = weekdaySolve(text);
     if (!prefix) prefix = await calcNotes(text);
@@ -289,6 +336,8 @@ async function send() {
       if (!oursHdr) m2.style.color = "#f0b24c";
       node.appendChild(m2);
       if (!text2) node.textContent = "(空回包)";
+      history.push({role: "user", content: text}, {role: "assistant", content: text2});
+      if (history.length > 16) history.splice(0, history.length - 16);
       return;
     }
 
@@ -302,6 +351,8 @@ async function send() {
     const msg = (j.choices && j.choices[0] && j.choices[0].message) || {};
     stopWake();
     node.textContent = (msg.content || "(空回包)");
+    history.push({role: "user", content: text}, {role: "assistant", content: msg.content || ""});
+    if (history.length > 16) history.splice(0, history.length - 16);
     /* 🔴 2026-10-24：原来只印「请求的车道」，不印「实走哪条」——
        降级到云端时页面照样显示 selfhost，等于把"结果对、车道错"藏起来。
        现在逐发报 j.gbt.lane / weights_ours，不是自有权重就标黄。 */
