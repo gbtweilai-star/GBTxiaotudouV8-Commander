@@ -31,7 +31,10 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-ROOT = pathlib.Path(__file__).resolve().parents[2]
+# 🔴 2026-10-25：原来写 parents[2]，那指到 /var/minis/shared（比仓库根多一层），
+#   `gbt_allinone` 于是变成 "unknown location" ⇒ 四个云上游全报 err:ImportError，
+#   密钥一个都取不到。本文件在 <repo>/runtime/ 下，仓库根是 parents[1]。
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 # name → (base_url, model, vault profile, timeout_s)
@@ -49,11 +52,43 @@ UPSTREAMS = {
     "ours-alt": ("https://api.runpod.ai/v2/7b5inowyar12yh/openai/v1",
                  "/runpod-volume/gbt-v8-v83", "potato", 300),
     "local":    ("http://127.0.0.1:8000/v1", "gbt-v8", None, 120),
+    # 🔴 2026-10-25：本机免费模型池（FreeLLMAPI，127.0.0.1:3001，259 个模型零注册零付费）。
+    #    作用：A19 那个 App 的服务是手动开关，一关整条链路就哑。接上这个，
+    #    A19 不在时她照样能说话，A19 一回来又能自动切回去（见 FALLBACK）。
+    #    钥不写死在这里，走 file: 槽读 0600 文件。
+    #    模型用 auto：池子有 352 个模型，定死单个会在它被限流时直接 429 无路可走。
+    #    会吐思维链/回包乱码的那几个已在池里打 tombstone 停用，不靠桥来兜。
+    # 🔴 定模型而不是 auto：auto 在 352 个里随机飘，实测会落到吐思维链的
+    #    Qwen3.5/3.6 和回包乱码的 dots-3。改成两档**已知可用**的模型轮换：
+    #    mistral 1 秒、llama 2 秒，都被限流才落到 deepseek。
+    #    （模型名大小写必须照抄池子里的写法，否则 404。）
+    "freepool":   ("http://127.0.0.1:3001/v1", "mistral-small-3.2-24b",
+                   "file:/var/minis/shared/gbtv8/vaults/freellmapi/unified_api_key", 180),
+    "freepool-b": ("http://127.0.0.1:3001/v1", "llama-3.3-70b",
+                   "file:/var/minis/shared/gbtv8/vaults/freellmapi/unified_api_key", 180),
     "agnes":    ("https://apihub.agnes-ai.com/v1", "agnes-2.5-flash", "agnes", 180),
     "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat", "deepseek", 180),
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
 }
 DEFAULT = "selfhost"     # A19 优先：手机自己的算力
+
+# 哪些上游算「自有权重」（页面据此标 ✅ / ⚠）。免费池和云端通用模型都不算。
+OURS_LANES = {"selfhost", "ours", "ours-alt", "local"}
+
+# 降级链：指定的上游**网络不可达**时，按顺序自动往下试，不让整条链路哑掉。
+# 只在「连不上/超时」时降级；上游明确回了 4xx/5xx 就如实上报，不掩盖。
+# 显式在请求里写了 upstream 的，尊重调用方选择，不降级。
+FALLBACK = {
+    "selfhost":   ["freepool", "freepool-b", "deepseek"],
+    "local":      ["freepool", "freepool-b", "deepseek"],
+    "ours":       ["freepool", "freepool-b", "deepseek"],
+    "ours-alt":   ["freepool", "freepool-b", "deepseek"],
+    "freepool":   ["freepool-b", "deepseek"],
+    "freepool-b": ["deepseek"],
+    "agnes":      ["freepool", "freepool-b", "deepseek"],
+    "deepseek":   ["freepool", "freepool-b"],
+    "openai":     ["freepool", "freepool-b", "deepseek"],
+}
 UA = "gbt-v8/model-bridge"
 
 
@@ -65,6 +100,17 @@ def key_for(profile: str | None) -> tuple[str, str]:
     #    只用于 127.0.0.1，不进金库、不入日志。
     if profile.startswith("raw:"):
         return profile[4:], "raw:loopback"
+    # 🔴 2026-10-25：从 0600 文件读钥（本机免费池等）。钥不出现在源码里。
+    if profile.startswith("file:"):
+        path = profile[5:]
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                key = fh.read().strip()
+            if key:
+                return key, "file:" + path.rsplit("/", 1)[-1]
+            return "", "empty:" + path.rsplit("/", 1)[-1]
+        except Exception as exc:                              # noqa: BLE001
+            return "", "err:%s" % type(exc).__name__
     try:
         # 🔴 import 必须在 try 里面 —— 早先放在外面，
         #    `deepseek_key` 模块未随仓库发布时 torch 直接抛 ImportError，
@@ -159,6 +205,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Expose-Headers",
+                         "X-GBT-Lane, X-GBT-Weights-Ours, X-GBT-Fallback-From")
 
     def _json(self, code: int, obj: dict) -> None:
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -327,44 +375,87 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/dispatch"):
             return self._dispatch(body)
 
-        name = str(body.pop("upstream", "") or DEFAULT)
+        explicit = str(body.pop("upstream", "") or "").strip()
+        name = explicit or DEFAULT
         if name not in UPSTREAMS:
             return self._json(400, {"error": {"message": "不认的上游：%s（可选 %s）"
                                               % (name, ",".join(UPSTREAMS))}})
-        base, model_default, profile, timeout_s = UPSTREAMS[name]
-        body.setdefault("model", model_default)
         stream = bool(body.get("stream"))
 
-        key, slot = key_for(profile)
-        if not key:
-            return self._json(200, {"error": {"message": "没有可用钥匙（槽 %s）" % slot,
-                                              "slot": slot},
-                                    "ok": False})
+        # 降级链：**默认就开**，即使调用方显式点名了上游也照样降级。
+        #   原因：页面每次都把下拉值当 upstream 发上来（值恒为 selfhost），
+        #   若"显式就不降级"，等于从 UI 上把整条保底链路关死 —— 实测她直接哑掉。
+        #   可用性优先：连不上就往下试，响应里用 upstream/_fallback_from 如实说明谁答的。
+        #   要严格不走保底，请求体里带 "fallback": false。
+        allow_fb = body.pop("fallback", True) is not False
+        chain = [name]
+        if allow_fb:
+            chain += [n for n in FALLBACK.get(name, []) if n != name]
 
-        url = base.rstrip("/") + "/chat/completions"
         t0 = time.perf_counter()
-        req = urllib.request.Request(
-            url, data=json.dumps(body, ensure_ascii=False).encode("utf-8"), method="POST",
-            headers={"Content-Type": "application/json", "User-Agent": UA,
-                     "Authorization": "Bearer " + key})
-        try:
-            resp = urllib.request.urlopen(req, timeout=timeout_s)
-        except urllib.error.HTTPError as exc:
-            raw = (exc.read() or b"")[:800].decode("utf-8", "replace")
-            sys.stderr.write("[bridge] upstream=%s model=%s http=%s slot=%s\n"
-                             % (name, body.get("model"), exc.code, slot))
-            return self._json(200, {"ok": False, "http": exc.code, "upstream": name,
-                                    "key_slot": slot, "upstream_error": raw,
-                                    "error": {"message": raw}})
-        except Exception as exc:                              # noqa: BLE001
-            sys.stderr.write("[bridge] upstream=%s net_error=%s\n" % (name, type(exc).__name__))
-            return self._json(200, {"ok": False, "upstream": name, "key_slot": slot,
-                                    "error": {"message": "%s: %s" % (type(exc).__name__, exc)}})
+        resp = None
+        used, used_slot = name, ""
+        tried = []
+        for cand in chain:
+            base, model_default, profile, timeout_s = UPSTREAMS[cand]
+            # 首个沿用调用方给的 model；降级时换成本游默认模型（各家认的名字不同）
+            if cand == name:
+                body.setdefault("model", model_default)
+            elif model_default:
+                body["model"] = model_default
+            key, slot = key_for(profile)
+            if not key:
+                tried.append({"upstream": cand, "skip": "无钥（槽 %s）" % slot})
+                continue
+            url = base.rstrip("/") + "/chat/completions"
+            req = urllib.request.Request(
+                url, data=json.dumps(body, ensure_ascii=False).encode("utf-8"), method="POST",
+                headers={"Content-Type": "application/json", "User-Agent": UA,
+                         "Authorization": "Bearer " + key})
+            try:
+                resp = urllib.request.urlopen(req, timeout=timeout_s)
+                used, used_slot = cand, slot
+                if cand != name:
+                    sys.stderr.write("[bridge] fallback %s → %s\n" % (name, cand))
+                break
+            except urllib.error.HTTPError as exc:
+                raw = (exc.read() or b"")[:800].decode("utf-8", "replace")
+                sys.stderr.write("[bridge] upstream=%s model=%s http=%s slot=%s\n"
+                                 % (cand, body.get("model"), exc.code, slot))
+                # 5xx = 上游自己挂了 ⇒ 继续往下降级；4xx = 请求本身不对 ⇒ 如实上报，别掩盖
+                # 5xx=上游挂了，429=上游限流 ⇒ 都继续往下降级；其余 4xx=请求本身不对，如实报
+                if exc.code in (429, 529) or exc.code >= 500:
+                    if cand != chain[-1]:
+                        tried.append({"upstream": cand, "http": exc.code})
+                        resp = None
+                        continue
+                return self._json(200, {"ok": False, "http": exc.code, "upstream": cand,
+                                        "key_slot": slot, "upstream_error": raw,
+                                        "tried": tried,
+                                        "error": {"message": raw}})
+            except Exception as exc:                          # noqa: BLE001
+                sys.stderr.write("[bridge] upstream=%s net_error=%s\n"
+                                 % (cand, type(exc).__name__))
+                tried.append({"upstream": cand, "net_error": type(exc).__name__})
+                resp = None
+                continue
+
+        if resp is None:
+            return self._json(200, {"ok": False, "upstream": name, "key_slot": "",
+                                    "tried": tried,
+                                    "error": {"message": "所有上游都连不上：%s"
+                                                         % ", ".join(str(t.get("upstream")) for t in tried)}})
+        name, slot = used, used_slot
 
         if stream:
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream; charset=utf-8")
             self.send_header("Cache-Control", "no-cache")
+            # 流式也报「实走哪条」——页面从响应头读，读不到就印「实走 ?」
+            self.send_header("X-GBT-Lane", name)
+            self.send_header("X-GBT-Weights-Ours",
+                             "true" if name in OURS_LANES else "false")
+            self.send_header("X-GBT-Fallback-From", chain[0])
             self._cors()
             self.end_headers()
             try:
@@ -381,11 +472,28 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         raw = resp.read()
+        dt = time.perf_counter() - t0
         sys.stderr.write("[bridge] upstream=%s model=%s http=200 slot=%s %.2fs\n"
-                         % (name, body.get("model"), slot, time.perf_counter() - t0))
+                         % (name, body.get("model"), slot, dt))
+        # 🔴 2026-10-25：把「实走哪条」写进回包，页面才有得显示。
+        #   原来纯透传，上游不返回这条信息 ⇒ 页面永远印「实走 ?」，
+        #   分不清答话的到底是自有权重还是降级来的免费池。
+        try:
+            d = json.loads(raw.decode("utf-8", "replace"))
+            d["gbt"] = {"lane": name,
+                        "weights_ours": name in OURS_LANES,
+                        "fallback_from": chain[0] if name != chain[0] else None,
+                        "key_slot": slot,
+                        "elapsed_s": round(dt, 2),
+                        "bridge": "gbt-v8/model-bridge"}
+            raw = json.dumps(d, ensure_ascii=False).encode("utf-8")
+        except Exception:                                     # noqa: BLE001
+            pass                                              # 不是 JSON 就原样透传
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
+        self.send_header("X-GBT-Lane", name)
+        self.send_header("X-GBT-Weights-Ours", "true" if name in OURS_LANES else "false")
         self._cors()
         self.end_headers()
         self.wfile.write(raw)

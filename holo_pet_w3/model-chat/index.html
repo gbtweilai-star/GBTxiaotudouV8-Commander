@@ -41,7 +41,8 @@
   <span class="sp"></span>
   <select id="upstream" title="选上游（默认 = 云插件路线；钥只在桥里）">
     <option value="cloud">☁️ 云插件 · GBT小土豆V8（gbt-potato-v8 · 云端 c01-llm-gateway，我们的模型）</option>
-    <option value="selfhost" selected>🧠 本机自有权重 · Q5_0（127.0.0.1:8792 · weights_ours=true）</option>
+    <option value="selfhost" selected>🧠 本机 A19 · 自有权重（127.0.0.1:1234 · LM Pocket）</option>
+    <option value="freepool">🆓 本机免费池 · 259 个模型（127.0.0.1:3001 · 零注册零付费·A19 不通时自动降级到此）</option>
     <option value="ours">🧠 直连 RunPod · 我们的原生指挥官 gbt-v8（自报 /runpod-volume/gbt-v8-v83）</option>
     <option value="ours-alt">🧠 我们的原生指挥官（备用端点）</option>
     <option value="local">🧠 本地 vLLM（127.0.0.1:8000）</option>
@@ -109,15 +110,18 @@ async function health() {
     /* 🔴 2026-10-24：徽标原来只报"桥在线"——桥在线 ≠ 有自有权重车道。
        残留桥（没带 env 起的）照样在线，但 selfhost 车道根本不存在。 */
     const sh = ups.find(u => u.name === "selfhost");
+      const fp = ups.find(u => u.name === "freepool");
     // 🔴 手机版 A19 在 :1234，PC 版自有权重在 :8792 —— 两个端口都认。
     const _shUrl = String((sh && sh.base_url) || "");
     const shOk = !!(sh && (_shUrl.indexOf(":8792") >= 0 || _shUrl.indexOf(":1234") >= 0));
     badge.className = "badge ok";
     badge.style.color = shOk ? "" : "#f0b24c";
-    badge.textContent = shOk ? "桥：在线 · 自有权重就绪" : "桥：在线 · 无自有权重车道";
+    badge.textContent = shOk ? "桥：在线 · A19 优先（不通自动降级免费池）" : "桥：在线 · 走本机免费池";
     hint.textContent = shOk
-      ? ("自有权重 " + sh.base_url + " · 上游 " + ups.length + " · 钥只在桥里 · 页面零凭据")
-      : ("⚠ 桥没挂本机权重（缺 :8792）→ 对话会走云端 · 就绪 " + ready.join("/"));
+      ? ("A19 " + sh.base_url + " · 上游 " + ups.length + " 个 · "
+         + (fp ? "A19 不通时自动降级本机免费池" : "⚠ 免费池未挂，A19 不在就没保底")
+         + " · 钥只在桥里 · 页面零凭据")
+      : ("走本机免费池 " + (fp ? fp.base_url : "（未挂）") + " · 就绪 " + ready.join("/"));
   } catch (e) {
     badge.className = "badge bad";
     badge.textContent = "桥：连不上";
