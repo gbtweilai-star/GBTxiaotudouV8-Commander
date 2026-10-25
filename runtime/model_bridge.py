@@ -37,6 +37,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+# 监听队列自适应（同一目录下的 runtime/adaptive_http.py）
+from adaptive_http import (AdaptiveThreadingHTTPServer,  # noqa: E402
+                           MAX_BACKLOG)
+
 # name → (base_url, model, vault profile, timeout_s)
 # `ours` = **我们自己的原生指挥官模型**（GBT小土豆V8 · vLLM on RunPod 无服务器）
 #   端点自报 id = `/runpod-volume/gbt-v8-v83`；钥在 DPAPI 保险箱 `potato` 槽。
@@ -352,6 +356,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, "service": "gbt-model-bridge",
                                     "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                                     "default": DEFAULT, "upstreams": ups,
+                                    # 监听队列自适应读数：随时能看它现在开到多大
+                                    "backlog": (self.server.backlog_stats()
+                                                if hasattr(self.server, "backlog_stats") else {}),
                                     "note": "钥只在桥里；页面永远拿不到明文"})
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
@@ -500,7 +507,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def serve(port: int) -> int:
-    srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    # 🔴 2026-10-25：并发一高就 URLError / connection reset，根因是
+    #   socketserver 的监听队列默认只有 5（request_queue_size=5）——
+    #   连接在建连阶段就被内核丢掉，跟"触手多少根"毫无关系（触手本身不设闸）。
+    #   这里换成**自适应**版：队列按压力自动跟随，不写死数字。见 runtime/adaptive_http.py
+    srv = AdaptiveThreadingHTTPServer(("127.0.0.1", port), Handler)
+    sys.stderr.write("[bridge] 监听队列自适应：初始 %d（上限 %d）\n"
+                     % (srv._cur_backlog, MAX_BACKLOG))
     print("模型桥已起：http://127.0.0.1:%d  （只在回环；Ctrl-C 停）" % port)
     try:
         srv.serve_forever()
