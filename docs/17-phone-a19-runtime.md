@@ -202,3 +202,91 @@ App 一开就批量跑完。**一次前台窗口，把活干完。**
 
 **开发者：自由的风 · 护着：公主土豆**
 **本署名不可删除、不可篡改归属。**
+
+---
+
+## 十一、A19 不可达时的保底链（2026-10-25 加，实测可用）
+
+### 为什么要有这一层
+
+LM Pocket 的服务开关**在 App 里面**。它一旦被关掉（或被 iOS 回收后没恢复），
+`:1234` 就是空端口 —— 而桥的默认上游恰恰是它。整条链路于是**一句话都说不出**。
+
+这不是偶发故障，是**结构性依赖**：把"能不能说话"押在一个手动开关上。
+
+所以桥改成：**A19 优先，掉线自动往下走，全程不需要人介入。**
+
+```
+:1234  A19（LM Pocket）        ← 首选，手机自己的算力
+  ↓ 连不上
+:3001  freepool · mistral-small-3.2-24b   ← 本机免费池第一档（实测 1–4 秒）
+  ↓ 429 限流 / 5xx
+:3001  freepool-b · llama-3.3-70b         ← 第二档（实测 2–16 秒）
+  ↓ 也限流
+api.deepseek.com  deepseek-chat           ← 最后一道，钥在 DPAPI 保险箱
+```
+
+**A19 一回来就自动切回去**，不需要改任何配置：默认上游本来就是它。
+
+### 三条口径
+
+| 口径 | 行为 |
+|---|---|
+| `fallback` 默认 | **开**。显式点名上游也照样降级 —— 因为页面每次都把下拉值当 `upstream` 发上来，若"显式就不降级"，等于从 UI 上把保底链路关死 |
+| 要严格不降级 | 请求体带 `"fallback": false`，此时 A19 不通就如实报错，不掩盖 |
+| 什么情况降级 | 连不上 / 超时 / **5xx** / **429**。其余 4xx 是请求本身不对，如实上报不掩盖 |
+
+### 「实走谁」必须可见
+
+原来纯透传上游回包，页面拿不到"这一句是谁答的"，永远印 `实走 ?`。
+现在两条路都报：
+
+- **非流式**：回包注入 `"gbt": {"lane", "weights_ours", "fallback_from", "key_slot", "elapsed_s"}`
+- **流式**：响应头 `X-GBT-Lane` / `X-GBT-Weights-Ours` / `X-GBT-Fallback-From`（已加入 CORS Expose-Headers）
+
+页面据此标 `✅ 自有权重` 或 `⚠ 非自有权重 · 实走 freepool`。
+**降级了就是降级了，不假装是自有权重。**
+
+### 免费池为什么定模型、不用 `auto`
+
+池子里 352 个模型，`auto` 每次随机挑，实测踩到过：
+
+| 模型 | 症状 |
+|---|---|
+| `Qwen3.6-27B` / `Qwen3.5-9B` / `Qwen3.5-397B-A17B` | 开头就吐 `Here's a thinking process:` / `Thinking Process:` |
+| `dots-studio/dots-3-note-preview:free` | 回包是乱码（`content` 出来是 `ç…`），还夹 502 |
+
+处置：**这几个在池里打了 tombstone 停用**（`catalog_model_tombstones`，可逆），
+桥这边只用实测稳定的两个：`mistral-small-3.2-24b`、`llama-3.3-70b`。
+
+### 两个踩过的实现坑
+
+**① `sys.path` 层级写错，四个云上游全废**
+
+```python
+ROOT = pathlib.Path(__file__).resolve().parents[2]   # ← 错，指到 /var/minis/shared
+```
+
+本文件在 `<repo>/runtime/` 下，仓库根是 `parents[1]`。
+写错后 `from gbt_allinone import deepseek_key` 变成 "unknown location"，
+`ours` / `ours-alt` / `agnes` / `deepseek` / `openai` **五个上游全报 `err:ImportError`**，
+密钥一个都取不到 —— 而 `/health` 照常 200，症状极隐蔽。
+
+**② 探活不能用 curl**
+
+iSH 上 `curl` 对 node 起的服务会**秒回 000**（连拒绝 1 毫秒），而同一端口用
+python socket 连是通的、HTTP 也回 200。`:3001` 因此被误判成"停了"好几次。
+→ 统一改用 `tools/svcprobe.py`（纯 socket）。
+
+### 运维接口
+
+```sh
+sh tools/up.sh up       # 拉齐五路（幂等，已在跑的不动）
+sh tools/up.sh status   # 状态 + HTTP 实测
+sh tools/up.sh down     # 停（A19 由 App 自管，不碰）
+```
+
+`up.sh` 用**轮询等待**而非固定 sleep：node 在 iSH 走 `--no-opt` 解释执行，
+冷启实测约 50 秒，固定等 12 秒必然误判成失败。
+
+---
