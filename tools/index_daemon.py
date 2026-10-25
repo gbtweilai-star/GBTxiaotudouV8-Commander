@@ -171,7 +171,16 @@ class H(BaseHTTPRequestHandler):
 
 def cmd_serve(port):
     ms = load_all()
-    srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+    # 🔴 2026-10-25：与 model_bridge 同一个卡点 —— 监听队列默认 5，
+    #   并发一高连接在建连阶段就被丢。换成自适应版，按压力自动跟随。
+    try:
+        import sys as _sys
+        _root = pathlib.Path(__file__).resolve().parents[1]
+        _sys.path.insert(0, str(_root / "runtime"))
+        from adaptive_http import AdaptiveThreadingHTTPServer as _Srv
+    except Exception:                                          # noqa: BLE001
+        _Srv = ThreadingHTTPServer
+    srv = _Srv(("127.0.0.1", port), H)
     print("  常驻索引已起: http://127.0.0.1:%d" % port)
     print("  载入耗时: %.0f ms · 常驻 RSS: %.1f MB" % (ms, _rss_mb()))
     try:
