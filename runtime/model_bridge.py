@@ -39,6 +39,11 @@ sys.path.insert(0, str(ROOT))
 #   端点自报 id = `/runpod-volume/gbt-v8-v83`；钥在 DPAPI 保险箱 `potato` 槽。
 #   无服务器会冷启动 ⇒ 超时给到 300s（别用 60s 判它"挂了"）。
 UPSTREAMS = {
+    # 🔴 2026-10-25：手机上的 A19（LM Pocket，OpenAI 兼容口）。
+    #    model 留空 ⇒ 桥每次问 /v1/models 拿当前加载的模型名，换权重零改动。
+    # 页面（holo_pet_w3/model-chat）认的名字是 selfhost —— 名字对齐，页面不用改逻辑。
+    # 指向手机自己的 A19（LM Pocket，OpenAI 兼容口）。
+    "selfhost": ("http://127.0.0.1:1234/v1", "", "raw:gbt", 30),
     "ours":     ("https://api.runpod.ai/v2/qnnqf9w8xcefj8/openai/v1",
                  "/runpod-volume/gbt-v8-v83", "potato", 300),
     "ours-alt": ("https://api.runpod.ai/v2/7b5inowyar12yh/openai/v1",
@@ -48,7 +53,7 @@ UPSTREAMS = {
     "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat", "deepseek", 180),
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
 }
-DEFAULT = "ours"
+DEFAULT = "selfhost"     # A19 优先：手机自己的算力
 UA = "gbt-v8/model-bridge"
 
 
@@ -56,8 +61,15 @@ def key_for(profile: str | None) -> tuple[str, str]:
     """返回 (key, slot_name)。本地 vLLM 不需要钥 ⇒ ('EMPTY','none:local')。"""
     if not profile:
         return "EMPTY", "none:local"
-    from gbt_allinone import deepseek_key as DK
+    # 🔴 2026-10-25：本机回环端点的字面钥（如 LM Pocket 的 gbt）。
+    #    只用于 127.0.0.1，不进金库、不入日志。
+    if profile.startswith("raw:"):
+        return profile[4:], "raw:loopback"
     try:
+        # 🔴 import 必须在 try 里面 —— 早先放在外面，
+        #    `deepseek_key` 模块未随仓库发布时 torch 直接抛 ImportError，
+        #    整个 /health 500，页面判不出桥在不在。
+        from gbt_allinone import deepseek_key as DK
         key, _src = DK.load_key(profile)
         if key:
             return key, "vault:" + profile

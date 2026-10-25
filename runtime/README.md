@@ -18,8 +18,8 @@ PASS  门：契约层三件套齐全 · 信封归一 / 结果校验 / 产出即�
 PASS  作用域门：HUMAN_GATES 覆盖 14 个作用域 · 含 G1/G2/G3 关键项
 PASS  作用域门：机制层自保 · filesystem_write 在 MECHANISM_GATES 里
 PASS  票据：一次性票集合 · data_export、deploy_force、deploy_publish、owner_control、remote_device
-PASS  注册表：条数 348 · machine-readable
-PASS  注册表：348 个名字都能在 caps_registry.py 里找到 · 不是手抄的目录
+PASS  注册表：条数 341 · machine-readable
+PASS  注册表：341 个名字都能在 caps_registry.py 里找到 · 不是手抄的目录
 PASS  派活桥：真调走 run_task · 桥里是 `from gbt_allinone import run_task`
 PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / auth_gate 一律没直接导入
 

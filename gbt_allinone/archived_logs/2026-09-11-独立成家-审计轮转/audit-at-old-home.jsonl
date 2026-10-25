@@ -1,0 +1,176 @@
+{"ts": 1789093974.148, "iso": "2026-09-11T09:32:54", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789093974.239, "iso": "2026-09-11T09:32:54", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789093974.239, "iso": "2026-09-11T09:32:54", "event": "call", "meta": {"kind": "devour_scan", "payload_keys": []}}
+{"ts": 1789093974.249, "iso": "2026-09-11T09:32:54", "event": "ok", "meta": {"kind": "devour_scan"}}
+{"ts": 1789093974.249, "iso": "2026-09-11T09:32:54", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789093975.204, "iso": "2026-09-11T09:32:55", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789093975.204, "iso": "2026-09-11T09:32:55", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789093975.205, "iso": "2026-09-11T09:32:55", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789093975.205, "iso": "2026-09-11T09:32:55", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789093975.238, "iso": "2026-09-11T09:32:55", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789093980.727, "iso": "2026-09-11T09:33:00", "event": "call", "meta": {"kind": "devour_github", "payload_keys": ["repo", "name"]}}
+{"ts": 1789093980.728, "iso": "2026-09-11T09:33:00", "event": "devour_chain", "meta": {"step": "devour_tentacle.github"}}
+{"ts": 1789093981.381, "iso": "2026-09-11T09:33:01", "event": "pipeline_published", "meta": {"rec_id": "absorbed_knowledge.md-91105ea1-1789093981", "name": "absorbed_knowledge.md", "sha256": "91105ea19038", "refined": 0}}
+{"ts": 1789093981.388, "iso": "2026-09-11T09:33:01", "event": "pipeline_published", "meta": {"rec_id": "capability.json-8dcd5a22-1789093981", "name": "capability.json", "sha256": "8dcd5a223a79", "refined": 0}}
+{"ts": 1789093981.395, "iso": "2026-09-11T09:33:01", "event": "pipeline_published", "meta": {"rec_id": "run.py-91aca01b-1789093981", "name": "run.py", "sha256": "91aca01b05b2", "refined": 0}}
+{"ts": 1789093981.396, "iso": "2026-09-11T09:33:01", "event": "devour_inject", "meta": {"skill": "github_sindresorhus_slugify"}}
+{"ts": 1789093981.409, "iso": "2026-09-11T09:33:01", "event": "ok", "meta": {"kind": "devour_github"}}
+{"ts": 1789093984.282, "iso": "2026-09-11T09:33:04", "event": "devour_chain", "meta": {"step": "devour_tentacle.quick_devour"}}
+{"ts": 1789093984.299, "iso": "2026-09-11T09:33:04", "event": "devour_chain", "meta": {"step": "devour_tentacle.recombine"}}
+{"ts": 1789093987.893, "iso": "2026-09-11T09:33:07", "event": "pipeline_published", "meta": {"rec_id": ".gbt_dir_marker-2b64c6d9-1789093987", "name": ".gbt_dir_marker", "sha256": "2b64c6d9afd8", "refined": 0}}
+{"ts": 1789093987.895, "iso": "2026-09-11T09:33:07", "event": "devour_deploy", "meta": {"file": "capability.json", "context": "devour_recombine"}}
+{"ts": 1789093987.898, "iso": "2026-09-11T09:33:07", "event": "devour_deploy", "meta": {"file": "run.py", "context": "devour_recombine_run"}}
+{"ts": 1789093987.906, "iso": "2026-09-11T09:33:07", "event": "pipeline_published", "meta": {"rec_id": "absorbed_knowledge.md-df8380ac-1789093987", "name": "absorbed_knowledge.md", "sha256": "df8380ac03fe", "refined": 0}}
+{"ts": 1789093987.908, "iso": "2026-09-11T09:33:07", "event": "devour_chain", "meta": {"step": "devour_tentacle.recombine"}}
+{"ts": 1789093991.249, "iso": "2026-09-11T09:33:11", "event": "pipeline_published", "meta": {"rec_id": ".gbt_dir_marker-2b64c6d9-1789093991", "name": ".gbt_dir_marker", "sha256": "2b64c6d9afd8", "refined": 0}}
+{"ts": 1789093991.252, "iso": "2026-09-11T09:33:11", "event": "devour_deploy", "meta": {"file": "capability.json", "context": "devour_recombine"}}
+{"ts": 1789093991.255, "iso": "2026-09-11T09:33:11", "event": "devour_deploy", "meta": {"file": "run.py", "context": "devour_recombine_run"}}
+{"ts": 1789093991.263, "iso": "2026-09-11T09:33:11", "event": "pipeline_published", "meta": {"rec_id": "absorbed_knowledge.md-4462409b-1789093991", "name": "absorbed_knowledge.md", "sha256": "4462409b7c01", "refined": 0}}
+{"ts": 1789093991.265, "iso": "2026-09-11T09:33:11", "event": "devour_chain", "meta": {"step": "devour_tentacle.recombine"}}
+{"ts": 1789093992.783, "iso": "2026-09-11T09:33:12", "event": "pipeline_published", "meta": {"rec_id": ".gbt_dir_marker-2b64c6d9-1789093992", "name": ".gbt_dir_marker", "sha256": "2b64c6d9afd8", "refined": 0}}
+{"ts": 1789093992.786, "iso": "2026-09-11T09:33:12", "event": "devour_deploy", "meta": {"file": "capability.json", "context": "devour_recombine"}}
+{"ts": 1789093992.788, "iso": "2026-09-11T09:33:12", "event": "devour_deploy", "meta": {"file": "run.py", "context": "devour_recombine_run"}}
+{"ts": 1789093992.797, "iso": "2026-09-11T09:33:12", "event": "pipeline_published", "meta": {"rec_id": "absorbed_knowledge.md-152fb8f3-1789093992", "name": "absorbed_knowledge.md", "sha256": "152fb8f384a0", "refined": 0}}
+{"ts": 1789093992.799, "iso": "2026-09-11T09:33:12", "event": "devour_chain", "meta": {"step": "devour_tentacle.innovate"}}
+{"ts": 1789094035.478, "iso": "2026-09-11T09:33:55", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789094036.693, "iso": "2026-09-11T09:33:56", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789094036.694, "iso": "2026-09-11T09:33:56", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789094036.695, "iso": "2026-09-11T09:33:56", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789094036.696, "iso": "2026-09-11T09:33:56", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789094036.731, "iso": "2026-09-11T09:33:56", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789094061.186, "iso": "2026-09-11T09:34:21", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789094062.256, "iso": "2026-09-11T09:34:22", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789094062.257, "iso": "2026-09-11T09:34:22", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789094062.258, "iso": "2026-09-11T09:34:22", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789094062.259, "iso": "2026-09-11T09:34:22", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789094062.291, "iso": "2026-09-11T09:34:22", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789094422.365, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "alerts", "payload_keys": []}}
+{"ts": 1789094422.37, "iso": "2026-09-11T09:40:22", "event": "ok", "meta": {"kind": "alerts"}}
+{"ts": 1789094422.371, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "sec_defenses", "payload_keys": []}}
+{"ts": 1789094422.381, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "keylogger", "payload_keys": []}}
+{"ts": 1789094422.382, "iso": "2026-09-11T09:40:22", "event": "denied", "meta": {"kind": "keylogger", "reason": "键盘/输入监听"}}
+{"ts": 1789094422.383, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789094422.545, "iso": "2026-09-11T09:40:22", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789094422.546, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789094422.557, "iso": "2026-09-11T09:40:22", "event": "pipeline_blocked", "meta": {"rec_id": "_def_probe.txt-2d711642-1789094422", "name": "_def_probe.txt", "sha256": "2d711642b726", "refined": 0}}
+{"ts": 1789094422.558, "iso": "2026-09-11T09:40:22", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789094422.583, "iso": "2026-09-11T09:40:22", "event": "ok", "meta": {"kind": "sec_defenses"}}
+{"ts": 1789094422.584, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "pipeline_status", "payload_keys": []}}
+{"ts": 1789094422.631, "iso": "2026-09-11T09:40:22", "event": "ok", "meta": {"kind": "pipeline_status"}}
+{"ts": 1789094422.633, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "llm_status", "payload_keys": []}}
+{"ts": 1789094422.648, "iso": "2026-09-11T09:40:22", "event": "ok", "meta": {"kind": "llm_status"}}
+{"ts": 1789094422.649, "iso": "2026-09-11T09:40:22", "event": "call", "meta": {"kind": "tentacle_status", "payload_keys": []}}
+{"ts": 1789094424.279, "iso": "2026-09-11T09:40:24", "event": "ok", "meta": {"kind": "tentacle_status"}}
+{"ts": 1789094424.279, "iso": "2026-09-11T09:40:24", "event": "call", "meta": {"kind": "svc_inspect", "payload_keys": []}}
+{"ts": 1789094424.701, "iso": "2026-09-11T09:40:24", "event": "ok", "meta": {"kind": "svc_inspect"}}
+{"ts": 1789094470.544, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789094470.555, "iso": "2026-09-11T09:41:10", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789094470.555, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast"]}}
+{"ts": 1789094470.557, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789094470.558, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "llm_status", "payload_keys": []}}
+{"ts": 1789094470.558, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "tentacle_status", "payload_keys": []}}
+{"ts": 1789094470.559, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "svc_inspect", "payload_keys": []}}
+{"ts": 1789094470.559, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "sched_status", "payload_keys": []}}
+{"ts": 1789094470.559, "iso": "2026-09-11T09:41:10", "event": "call", "meta": {"kind": "wf_status", "payload_keys": []}}
+{"ts": 1789094470.567, "iso": "2026-09-11T09:41:10", "event": "ok", "meta": {"kind": "sched_status"}}
+{"ts": 1789094470.748, "iso": "2026-09-11T09:41:10", "event": "ok", "meta": {"kind": "llm_status"}}
+{"ts": 1789094470.774, "iso": "2026-09-11T09:41:10", "event": "ok", "meta": {"kind": "wf_status"}}
+{"ts": 1789094471.013, "iso": "2026-09-11T09:41:11", "event": "ok", "meta": {"kind": "svc_inspect"}}
+{"ts": 1789094471.732, "iso": "2026-09-11T09:41:11", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789094472.204, "iso": "2026-09-11T09:41:12", "event": "ok", "meta": {"kind": "tentacle_status"}}
+{"ts": 1789094472.207, "iso": "2026-09-11T09:41:12", "event": "call", "meta": {"kind": "selfscan", "payload_keys": ["autofix"]}}
+{"ts": 1789094472.208, "iso": "2026-09-11T09:41:12", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789094472.208, "iso": "2026-09-11T09:41:12", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789094472.209, "iso": "2026-09-11T09:41:12", "event": "call", "meta": {"kind": "sec_surface", "payload_keys": []}}
+{"ts": 1789094472.209, "iso": "2026-09-11T09:41:12", "event": "call", "meta": {"kind": "devour_scan", "payload_keys": []}}
+{"ts": 1789094472.214, "iso": "2026-09-11T09:41:12", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789094472.22, "iso": "2026-09-11T09:41:12", "event": "ok", "meta": {"kind": "devour_scan"}}
+{"ts": 1789094472.344, "iso": "2026-09-11T09:41:12", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789094473.638, "iso": "2026-09-11T09:41:13", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789094477.056, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "sec_surface"}}
+{"ts": 1789094477.058, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "sec_scan", "payload_keys": ["severity"]}}
+{"ts": 1789094477.059, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "sec_defenses", "payload_keys": []}}
+{"ts": 1789094477.059, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "devour_reflect", "payload_keys": []}}
+{"ts": 1789094477.06, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "devour_pulse", "payload_keys": []}}
+{"ts": 1789094477.06, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "audit_query", "payload_keys": ["event"]}}
+{"ts": 1789094477.061, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "keylogger", "payload_keys": []}}
+{"ts": 1789094477.061, "iso": "2026-09-11T09:41:17", "event": "devour_chain", "meta": {"step": "devour_tentacle.quick_devour"}}
+{"ts": 1789094477.061, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "alerts", "payload_keys": []}}
+{"ts": 1789094477.065, "iso": "2026-09-11T09:41:17", "event": "denied", "meta": {"kind": "keylogger", "reason": "键盘/输入监听"}}
+{"ts": 1789094477.067, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "alerts"}}
+{"ts": 1789094477.068, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789094477.067, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "audit_query"}}
+{"ts": 1789094477.071, "iso": "2026-09-11T09:41:17", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789094477.072, "iso": "2026-09-11T09:41:17", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789094477.213, "iso": "2026-09-11T09:41:17", "event": "pipeline_blocked", "meta": {"rec_id": "_def_probe.txt-2d711642-1789094477", "name": "_def_probe.txt", "sha256": "2d711642b726", "refined": 0}}
+{"ts": 1789094477.275, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789094477.297, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "sec_defenses"}}
+{"ts": 1789094477.44, "iso": "2026-09-11T09:41:17", "event": "ok", "meta": {"kind": "devour_reflect"}}
+{"ts": 1789094477.539, "iso": "2026-09-11T09:41:17", "event": "devour_chain", "meta": {"step": "devour_tentacle.innovate"}}
+{"ts": 1789094478.848, "iso": "2026-09-11T09:41:18", "event": "ok", "meta": {"kind": "sec_scan"}}
+{"ts": 1789094481.43, "iso": "2026-09-11T09:41:21", "event": "ok", "meta": {"kind": "devour_pulse"}}
+{"ts": 1789094481.432, "iso": "2026-09-11T09:41:21", "event": "call", "meta": {"kind": "pipeline_status", "payload_keys": []}}
+{"ts": 1789094481.445, "iso": "2026-09-11T09:41:21", "event": "ok", "meta": {"kind": "pipeline_status"}}
+{"ts": 1789094481.447, "iso": "2026-09-11T09:41:21", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789094481.447, "iso": "2026-09-11T09:41:21", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789094481.451, "iso": "2026-09-11T09:41:21", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789094519.014, "iso": "2026-09-11T09:41:59", "event": "call", "meta": {"kind": "wf_status", "payload_keys": ["name", "limit"]}}
+{"ts": 1789094519.035, "iso": "2026-09-11T09:41:59", "event": "ok", "meta": {"kind": "wf_status"}}
+{"ts": 1789094591.55, "iso": "2026-09-11T09:43:11", "event": "call", "meta": {"kind": "alerts", "payload_keys": ["last"]}}
+{"ts": 1789094591.558, "iso": "2026-09-11T09:43:11", "event": "ok", "meta": {"kind": "alerts"}}
+{"ts": 1789094591.559, "iso": "2026-09-11T09:43:11", "event": "call", "meta": {"kind": "sec_scan", "payload_keys": ["severity"]}}
+{"ts": 1789094593.537, "iso": "2026-09-11T09:43:13", "event": "ok", "meta": {"kind": "sec_scan"}}
+{"ts": 1789094593.539, "iso": "2026-09-11T09:43:13", "event": "call", "meta": {"kind": "selfscan", "payload_keys": ["autofix"]}}
+{"ts": 1789094594.804, "iso": "2026-09-11T09:43:14", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789094594.805, "iso": "2026-09-11T09:43:14", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789094594.805, "iso": "2026-09-11T09:43:14", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789094594.806, "iso": "2026-09-11T09:43:14", "event": "call", "meta": {"kind": "sec_scan", "payload_keys": ["severity"]}}
+{"ts": 1789094596.376, "iso": "2026-09-11T09:43:16", "event": "ok", "meta": {"kind": "sec_scan"}}
+{"ts": 1789094596.376, "iso": "2026-09-11T09:43:16", "event": "call", "meta": {"kind": "devour_pulse", "payload_keys": []}}
+{"ts": 1789094596.379, "iso": "2026-09-11T09:43:16", "event": "devour_chain", "meta": {"step": "devour_tentacle.quick_devour"}}
+{"ts": 1789094596.398, "iso": "2026-09-11T09:43:16", "event": "devour_chain", "meta": {"step": "devour_tentacle.innovate"}}
+{"ts": 1789094599.986, "iso": "2026-09-11T09:43:19", "event": "ok", "meta": {"kind": "devour_pulse"}}
+{"ts": 1789094599.987, "iso": "2026-09-11T09:43:19", "event": "call", "meta": {"kind": "svc_inspect", "payload_keys": []}}
+{"ts": 1789094600.398, "iso": "2026-09-11T09:43:20", "event": "ok", "meta": {"kind": "svc_inspect"}}
+{"ts": 1789094600.399, "iso": "2026-09-11T09:43:20", "event": "call", "meta": {"kind": "tentacle_status", "payload_keys": []}}
+{"ts": 1789094601.957, "iso": "2026-09-11T09:43:21", "event": "ok", "meta": {"kind": "tentacle_status"}}
+{"ts": 1789094621.29, "iso": "2026-09-11T09:43:41", "event": "call", "meta": {"kind": "sec_scan", "payload_keys": ["severity"]}}
+{"ts": 1789094622.823, "iso": "2026-09-11T09:43:42", "event": "ok", "meta": {"kind": "sec_scan"}}
+{"ts": 1789094742.548, "iso": "2026-09-11T09:45:42", "event": "call", "meta": {"kind": "sec_scan", "payload_keys": ["severity"]}}
+{"ts": 1789094744.063, "iso": "2026-09-11T09:45:44", "event": "ok", "meta": {"kind": "sec_scan"}}
+{"ts": 1789094881.778, "iso": "2026-09-11T09:48:01", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789094882.825, "iso": "2026-09-11T09:48:02", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789094882.826, "iso": "2026-09-11T09:48:02", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789094882.826, "iso": "2026-09-11T09:48:02", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789094882.827, "iso": "2026-09-11T09:48:02", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789094882.866, "iso": "2026-09-11T09:48:02", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789095511.628, "iso": "2026-09-11T09:58:31", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789095512.828, "iso": "2026-09-11T09:58:32", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789095512.829, "iso": "2026-09-11T09:58:32", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789095512.83, "iso": "2026-09-11T09:58:32", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789095512.83, "iso": "2026-09-11T09:58:32", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789095512.869, "iso": "2026-09-11T09:58:32", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789095801.839, "iso": "2026-09-11T10:03:21", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789095801.949, "iso": "2026-09-11T10:03:21", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789095807.714, "iso": "2026-09-11T10:03:27", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789095807.782, "iso": "2026-09-11T10:03:27", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789095814.999, "iso": "2026-09-11T10:03:34", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789095825.211, "iso": "2026-09-11T10:03:45", "event": "ok", "meta": {"kind": "osint_scan"}}
+{"ts": 1789095878.892, "iso": "2026-09-11T10:04:38", "event": "call", "meta": {"kind": "receive_status", "payload_keys": []}}
+{"ts": 1789095878.896, "iso": "2026-09-11T10:04:38", "event": "error", "meta": {"kind": "receive_status", "reason": "expected an indented block after 'try' statement on line 53 (wallet_adapter.py, line 54)"}}
+{"ts": 1789095910.356, "iso": "2026-09-11T10:05:10", "event": "call", "meta": {"kind": "receive_status", "payload_keys": []}}
+{"ts": 1789095910.365, "iso": "2026-09-11T10:05:10", "event": "ok", "meta": {"kind": "receive_status"}}
+{"ts": 1789095910.365, "iso": "2026-09-11T10:05:10", "event": "call", "meta": {"kind": "receive_scan", "payload_keys": []}}
+{"ts": 1789095910.366, "iso": "2026-09-11T10:05:10", "event": "ok", "meta": {"kind": "receive_scan"}}
+{"ts": 1789095910.367, "iso": "2026-09-11T10:05:10", "event": "call", "meta": {"kind": "receive_balances", "payload_keys": []}}
+{"ts": 1789095910.368, "iso": "2026-09-11T10:05:10", "event": "ok", "meta": {"kind": "receive_balances"}}
+{"ts": 1789096148.106, "iso": "2026-09-11T10:09:08", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096150.649, "iso": "2026-09-11T10:09:10", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096150.649, "iso": "2026-09-11T10:09:10", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789096150.65, "iso": "2026-09-11T10:09:10", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789096150.651, "iso": "2026-09-11T10:09:10", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789096150.66, "iso": "2026-09-11T10:09:10", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789096150.661, "iso": "2026-09-11T10:09:10", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789096150.661, "iso": "2026-09-11T10:09:10", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789096157.217, "iso": "2026-09-11T10:09:17", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096158.05, "iso": "2026-09-11T10:09:18", "event": "ok", "meta": {"kind": "selfscan"}}

@@ -1,0 +1,64 @@
+# =============================================================================
+#  docker-compose.yml — gbt_wallet 收款钱包(单服务)
+# -----------------------------------------------------------------------------
+#  用法(在 gbt_allinone/deploy/ 目录下):
+#    cp env.example .env      # 改值; .env 已在仓库 .gitignore 覆盖范围内, 严禁提交
+#    docker compose up -d --build
+#    docker compose logs -f
+#    docker compose down
+#
+#  关键点:
+#    * 端口只发布到宿主回环 127.0.0.1:8097 —— 公网入口必须由反向代理(Caddyfile)提供;
+#    * 数据根挂到命名卷 wallet-data(含 master.enc 与账本), 不要用 bind mount 到仓库目录;
+#    * 根文件系统只读; 仅 /data 可写。
+# =============================================================================
+services:
+  gbt-wallet:
+    build:
+      context: ../..                            # 仓库根(需同时包含 gbt_wallet/ 与 gbt_allinone/)
+      dockerfile: gbt_allinone/deploy/Dockerfile
+    image: gbt-wallet:0.5.0
+    container_name: gbt-wallet
+    restart: unless-stopped
+
+    # 环境变量: 从 deploy/.env 读取(参照 env.example); 下面这些是容器内固定值, 优先级高于 .env
+    env_file:
+      - .env
+    environment:
+      GBT_WALLET_DIR: /data
+      GBT_WALLET_PORT: "8097"
+      GBT_WALLET_BIND_HOST: 0.0.0.0
+      # GBT_WALLET_API_TOKEN / GBT_CORS_ORIGINS / GBT_EVM_RPC 由 .env 提供(留空则保持默认行为)
+
+    # 只绑宿主回环: 不直接对公网暴露钱包服务
+    ports:
+      - "127.0.0.1:8097:8097"
+
+    volumes:
+      - wallet-data:/data
+      - wallet-backups:/backup                  # 备份脚本输出(建议再同步到异地)
+
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request as u;t=os.environ.get('GBT_WALLET_API_TOKEN','');h={'Authorization':'Bearer '+t} if t else {};r=u.urlopen(u.Request('http://127.0.0.1:8097/api/gbtwallet/health',headers=h),timeout=5);raise SystemExit(0 if r.status==200 else 1)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 25s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  wallet-data:
+  wallet-backups:

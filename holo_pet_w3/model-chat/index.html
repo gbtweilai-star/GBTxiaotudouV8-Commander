@@ -109,7 +109,9 @@ async function health() {
     /* 🔴 2026-10-24：徽标原来只报"桥在线"——桥在线 ≠ 有自有权重车道。
        残留桥（没带 env 起的）照样在线，但 selfhost 车道根本不存在。 */
     const sh = ups.find(u => u.name === "selfhost");
-    const shOk = !!(sh && String(sh.base_url || "").indexOf(":8792") >= 0);
+    // 🔴 手机版 A19 在 :1234，PC 版自有权重在 :8792 —— 两个端口都认。
+    const _shUrl = String((sh && sh.base_url) || "");
+    const shOk = !!(sh && (_shUrl.indexOf(":8792") >= 0 || _shUrl.indexOf(":1234") >= 0));
     badge.className = "badge ok";
     badge.style.color = shOk ? "" : "#f0b24c";
     badge.textContent = shOk ? "桥：在线 · 自有权重就绪" : "桥：在线 · 无自有权重车道";
