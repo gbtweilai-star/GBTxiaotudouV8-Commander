@@ -4,6 +4,11 @@
 > 单条超时：第一轮 30s → 超时的用 120s 重探 → 仍超时的逐条列明
 > 覆盖 **341 / 341**，一条不漏。开发者：自由的风 · GBT小土豆V8
 
+> ⚠️ **口径更新（2026-10-25）**：本文审计的是当时的 **341 位**。
+> 现役已是 **348 位**，新增 7 个皆为原生动作位
+> （`body_see` `body_say` `body_type` `body_click` `body_volume` `body_open` `body_map`），
+> **不在这轮审计范围内**。完整 348 位目录见 [`18-native-cloud-catalog.md`](./18-native-cloud-catalog.md)。
+
 ---
 
 ## 一、总账

@@ -22,3 +22,7 @@ state/
 store/
 scratch/
 .scratch/
+*.bak-*
+
+# 本机密钥目录（统一密钥等），绝不入库
+vaults/

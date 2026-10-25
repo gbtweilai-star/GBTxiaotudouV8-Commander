@@ -34,7 +34,7 @@ given "turn this Markdown into a PPT", it names the exact capability bit, the ar
 needs, and whether the action requires a human ticket before it runs.
 
 What's actually verifiable in the repo:
-- 341 capability bits across 30 domains, machine-readable catalog (data/capabilities.json)
+- 348 capability bits across 30 domains, machine-readable catalog (data/capabilities.json)
 - every bit live-tested: 340 pass, 0 fail, 1 needs extra input (docs/07)
 - 335-item benchmark, greedy decoding, PASS45 = 99.10% / 98.51% on two full runs
 - a runtime where a single gate (run_task) is the only way in, so auth + audit can't be bypassed
@@ -78,21 +78,21 @@ compute (text, image, video, and a local CPU baseline), with sha256 of every art
 
 **标题**：`我们把「派活」这件事从提示词挪进了权重：7.6B 中文总指挥模型开源`
 
-结构：① 一个问题（模型会聊不会派）→ ② 我们怎么训（落到能力位 + 授权判断）→ ③ 怎么验（335 题 + 341 位逐位真跑，放两张图）→
+结构：① 一个问题（模型会聊不会派）→ ② 我们怎么训（落到能力位 + 授权判断）→ ③ 怎么验（335 题 + 348 位逐位真跑，放两张图）→
 ④ 30 秒自己跑（`python demo.py`）→ ⑤ 已知缺口（权重未放、1 位 needs_input、词表 24 条）→ ⑥ 求反馈。
 
-> 关键差异点别写空话：**「341 位逐位真跑，0 失败」**、**「单门执行，绕不过去」**、**「失败也照实写在文档里」** —— 这三句是中英文都稀缺的。
+> 关键差异点别写空话：**「341 位逐位真跑，0 失败」（当时快照；现役注册表 348 位）」**、**「单门执行，绕不过去」**、**「失败也照实写在文档里」** —— 这三句是中英文都稀缺的。
 
 ### ⑤ V2EX（`/go/create` 或 `/go/programmer`）
 
-标题：`开源了一个 7.6B 中文「总指挥」模型：341 位能力位、单门执行、逐位真跑证据`
+标题：`开源了一个 7.6B 中文「总指挥」模型：348 位能力位、单门执行、逐位真跑证据`
 
 正文用 ④ 的精简版（500 字内），末尾放仓库 + 落地页链接，并明确「求骂，尤其想要『这套路由口径有没有硬伤』的意见」。
 
 ### ⑥ 微信群 / 朋友圈（一句话 + 一张图）
 
-> 开源了：7.6B 中文「总指挥」模型 —— 不只会聊，它把活落到 341 位能力上，写盘/花钱/出网先过人闸。
-> 341 位逐位真跑过（0 失败），不用下权重也能试：`python demo.py "我要把 Markdown 变成 PPT"`。
+> 开源了：7.6B 中文「总指挥」模型 —— 不只会聊，它把活落到 348 位能力上，写盘/花钱/出网先过人闸。
+> 348 位逐位真跑过（0 失败），不用下权重也能试：`python demo.py "我要把 Markdown 变成 PPT"`。
 > 仓库：<链接> · 在线页：<链接>
 
 ---
@@ -113,6 +113,6 @@ compute (text, image, video, and a local CPU baseline), with sha256 of every art
 |---|---|
 | 权重在哪？ | 还没放。`docs/05` 写了怎么 serve。**不放权重是当前最大短板**，我在补。 |
 | 99.10% 怎么来的？会不会过拟合？ | 335 题是我们自己的能力位口径题，不是通用 benchmark；两轮全量 + `temperature=0`，逐题预算。已写进 `docs/04`。 |
-| 341 位是不是凑数？ | 有 `data/capabilities.json` 逐位可查，且 `docs/07` 给了逐位真跑回执；有 1 位仍是 `needs_input`，没算通过。 |
+| 348 位是不是凑数？ | 有 `data/capabilities.json` 逐位可查，且 `docs/07` 给了逐位真跑回执；有 1 位仍是 `needs_input`，没算通过。 |
 | 单门执行有什么了不起？ | 它让「授权 + 审计」变成架构保证而不是自觉：绕开 `run_task` 就没有留痕，这在多触手系统里是主要事故源。 |
 | 中文模型对英文用户有什么用？ | 路由口径与审计模型是语言无关的；目录、门、回执都可以复用到英文栈上。 |

@@ -1,0 +1,84 @@
+# =============================================================================
+#  Caddyfile — gbt_wallet 反向代理示例(TLS 终止)
+# -----------------------------------------------------------------------------
+#  拓扑: 用户/平台前端 --HTTPS--> Caddy(本机 443) --HTTP--> 127.0.0.1:8097
+#  钱包服务始终只绑 127.0.0.1, 永远不直接暴露公网。
+#
+#  用法:
+#    caddy validate --config gbt_allinone/deploy/Caddyfile      # 语法校验(务必先跑)
+#    GBT_PUBLIC_HOST=wallet.example.com caddy run --config gbt_allinone/deploy/Caddyfile
+#    (生产建议 systemd 单元 caddy.service 托管; 证书由 Caddy 自动申请与续期)
+#
+#  版本要求: 本示例用到 `servers` 全局块与 `request_body` 指令, 需 Caddy v2.7+。
+#  若你的 Caddy 更旧: 删掉下面的 servers/timeouts 段与站点内的 request_body 段即可(其余指令 v2.0+ 均支持)。
+#
+#  安全要点:
+#    * 只放行用户面路由; 内部/运营面(ops、engine、orders 内部视图、monitor)在边缘直接 403,
+#      即便令牌泄漏也不给攻击者运营入口 —— 这些接口只应从内网/跳板机访问。
+#    * 请求体上限、超时、必要响应头; 访问日志按天切片(含客户端 IP, 便于对账与审计)。
+#    * 若开启 GBT_WALLET_API_TOKEN, 边缘不再额外鉴权(令牌由平台后端持有, 不落到浏览器)。
+# =============================================================================
+
+{
+	email {$ACME_EMAIL:ops@example.com}
+	admin off
+	# 全局服务器级设置(超时属于全局/服务器级, 不是站点指令)
+	servers {
+		protocols h1 h2
+		timeouts {
+			read_body 30s
+			write 120s
+			idle 120s
+		}
+	}
+}
+
+{$GBT_PUBLIC_HOST:wallet.example.com} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# ---- 请求体上限与超时(钱包 API 都是小 JSON) ----
+	# 请求体上限: 站点级指令(Caddy v2.7+); 超时见文件顶部全局 servers.timeouts
+	request_body {
+		max_size 256KB
+	}
+
+	# ---- 1) 内部/运营面: 公网一律拒绝(只允许内网直连 127.0.0.1 或跳板机) ----
+	@internal path /api/gbtwallet/ops/* /api/gbtwallet/engine/* \
+		/api/gbtwallet/monitor /api/gbtwallet/orders/*/internal \
+		/api/gbtwallet/orders/*/admin/* /api/gbtwallet/receipts/summary \
+		/api/gbtwallet/receipts/export
+	respond @internal "forbidden: internal endpoint" 403
+
+	# ---- 2) 用户面: 反代到本机钱包服务 ----
+	# 可选: 边缘也加一层共享密钥, 与 GBT_WALLET_API_TOKEN 独立(纵深防御)
+	# @missing_auth not header Authorization "Bearer {$EDGE_SHARED_SECRET}"
+	# respond @missing_auth "unauthorized" 401
+	reverse_proxy /api/gbtwallet/* 127.0.0.1:8097 {
+		header_up Host {upstream_hostport}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		transport http {
+			dial_timeout 5s
+			response_header_timeout 120s
+		}
+	}
+
+	# ---- 3) 其余路径不对外提供 ----
+	respond 404
+
+	log {
+		output file /var/log/caddy/gbt-wallet-access.log {
+			roll_size 50MiB
+			roll_keep 14
+		}
+		format json
+	}
+}

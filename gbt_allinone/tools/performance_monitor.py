@@ -1,3 +1,4 @@
+import os
 # -*- coding: utf-8 -*-
 """性能监控与自动切换：本地慢 → 自动用云端算力加速。
 
@@ -42,7 +43,7 @@ class PerformanceMonitor:
         try:
             req = urllib.request.Request(
                 f"{self.local_endpoint}/health",
-                headers={"Authorization": "Bearer gbtv8-eb1140905a9ceceeeb809f3d9ec5d299"}
+                headers={"Authorization": "Bearer " + (os.environ.get("GBT_GATEWAY_TOKEN") or "")}  # 🔴 2026-10-25 脱敏：原来硬编码明文钥
             )
             resp = urllib.request.urlopen(req, timeout=3)
             return {"ok": True, "time_ms": resp.headers.get("X-Response-Time", 0)}
@@ -59,7 +60,7 @@ class PerformanceMonitor:
                 data=body,
                 headers={
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer gbtv8-eb1140905a9ceceeeb809f3d9ec5d299"
+                    "Authorization": "Bearer " + (os.environ.get("GBT_GATEWAY_TOKEN") or "")
                 }
             )
             resp = urllib.request.urlopen(req, timeout=60)

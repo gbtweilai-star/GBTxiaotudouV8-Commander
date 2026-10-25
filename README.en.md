@@ -4,7 +4,7 @@
 
 > **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 348 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
 >
-> **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (1 needs an extra input); every figure in this repo comes with a real receipt file.
+> **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (release snapshot; registry now 348) (1 needs an extra input); every figure in this repo comes with a real receipt file.
 >
 > **30 seconds, no GPU, no weights, zero dependencies:**
 >
@@ -16,7 +16,7 @@
 >
 > It prints the capability it picked, that bit's gate status, and the exact command the runtime would execute.
 
-<p><img src="assets/fig-caps.png" width="640" alt="341 capability bits, live-tested"></p>
+<p><img src="assets/fig-caps.png" width="640" alt="341 capability bits, live-tested (snapshot)"></p>
 
 ---
 
@@ -39,7 +39,7 @@ Three properties are trained into the weights, not bolted on with prompts:
 This repo is not only a model card. It ships a small, dependency-free Python client and a CLI:
 
 ```bash
-python -m gbt_commander stats                 # 348 bits · 30 domains · 269 read-only · 41 gated
+python -m gbt_commander stats                 # 348 bits · 30 domains · 262 read-only · 35 gated
 python -m gbt_commander catalog --domain pipeline
 python -m gbt_commander search "roll back to the previous version"
 python -m gbt_commander route "ship this to production" --endpoint http://127.0.0.1:8000/v1 --model gbt-v8
@@ -54,7 +54,7 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 | Claim | Reading | Where |
 |---|---|---|
 | Capability benchmark | 335 items · mean cov **0.9873** · **PASS45 330/335 = 98.51%** (2nd run); **99.10%** (1st run) | [docs/04-evaluation.md](docs/04-evaluation.md) |
-| Every bit live-tested | **340 ok / 0 needs-ticket / 1 needs-input / 0 failed = 341** | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
+| Every bit live-tested | **340 ok / 0 needs-ticket / 1 needs-input / 0 failed = 341**（快照；现役注册表 348） | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
 | Concurrency | 512 → 4096 concurrent calls, **100% success**, ~260/s, +~50 MB | [docs/08-concurrency.md](docs/08-concurrency.md) |
 | Multi-domain regression | 29 domains / 236 bits: **221 ok · 15 need ticket · 0 regressions** | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
 | Reverse-calling cloud compute | model `200 · 1.2s` · 3/3 images `29.7s` · local CPU `321.1 GFLOP/s` · video **27.0s / 49,893 B / sha_match=true** | [docs/13-omni-plug.md](docs/13-omni-plug.md) |

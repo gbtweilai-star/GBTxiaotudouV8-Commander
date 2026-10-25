@@ -1,0 +1,150 @@
+{"ts": 1789096174.085, "iso": "2026-09-11T10:09:34", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789096174.158, "iso": "2026-09-11T10:09:34", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789096174.159, "iso": "2026-09-11T10:09:34", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096174.951, "iso": "2026-09-11T10:09:34", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096174.951, "iso": "2026-09-11T10:09:34", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789096174.952, "iso": "2026-09-11T10:09:34", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789096174.953, "iso": "2026-09-11T10:09:34", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789096174.96, "iso": "2026-09-11T10:09:34", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789096190.361, "iso": "2026-09-11T10:09:50", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789096190.444, "iso": "2026-09-11T10:09:50", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789096190.445, "iso": "2026-09-11T10:09:50", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096191.323, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096191.324, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789096191.324, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789096191.325, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789096191.335, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789096191.336, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "devour_scan", "payload_keys": []}}
+{"ts": 1789096191.34, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "devour_scan"}}
+{"ts": 1789096191.341, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "sec_defenses", "payload_keys": []}}
+{"ts": 1789096191.342, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "keylogger", "payload_keys": []}}
+{"ts": 1789096191.342, "iso": "2026-09-11T10:09:51", "event": "denied", "meta": {"kind": "keylogger", "reason": "键盘/输入监听"}}
+{"ts": 1789096191.343, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789096191.343, "iso": "2026-09-11T10:09:51", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789096191.344, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789096191.351, "iso": "2026-09-11T10:09:51", "event": "pipeline_blocked", "meta": {"rec_id": "_def_probe.txt-2d711642-1789096191", "name": "_def_probe.txt", "sha256": "2d711642b726", "refined": 0}}
+{"ts": 1789096191.352, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789096191.353, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "sec_defenses"}}
+{"ts": 1789096191.354, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "llm_status", "payload_keys": []}}
+{"ts": 1789096191.356, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "llm_status"}}
+{"ts": 1789096191.357, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "wf_status", "payload_keys": []}}
+{"ts": 1789096191.366, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "wf_status"}}
+{"ts": 1789096191.367, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "audit_query", "payload_keys": []}}
+{"ts": 1789096191.369, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "audit_query"}}
+{"ts": 1789096191.369, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "alerts", "payload_keys": []}}
+{"ts": 1789096191.37, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "alerts"}}
+{"ts": 1789096191.371, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"]}}
+{"ts": 1789096191.371, "iso": "2026-09-11T10:09:51", "event": "error", "meta": {"kind": "osint_scan", "reason": "目标属于本机/内网/保留地址段。私人框架默认不扫内网；确需扫描自有内网资产时，请在调用中显式传 allow_private=True。"}}
+{"ts": 1789096191.372, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096191.413, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096191.414, "iso": "2026-09-11T10:09:51", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789096191.414, "iso": "2026-09-11T10:09:51", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789096242.485, "iso": "2026-09-11T10:10:42", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789096242.566, "iso": "2026-09-11T10:10:42", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789096242.567, "iso": "2026-09-11T10:10:42", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096243.433, "iso": "2026-09-11T10:10:43", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096428.67, "iso": "2026-09-11T10:13:48", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096429.077, "iso": "2026-09-11T10:13:49", "event": "file_hygiene", "meta": {"verdict": "messy", "findings": 16, "fixed": 0}}
+{"ts": 1789096429.078, "iso": "2026-09-11T10:13:49", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096446.882, "iso": "2026-09-11T10:14:06", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096447.383, "iso": "2026-09-11T10:14:07", "event": "file_hygiene", "meta": {"verdict": "messy", "findings": 1, "fixed": 0}}
+{"ts": 1789096447.384, "iso": "2026-09-11T10:14:07", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096463.73, "iso": "2026-09-11T10:14:23", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096464.16, "iso": "2026-09-11T10:14:24", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 0}}
+{"ts": 1789096464.161, "iso": "2026-09-11T10:14:24", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096464.164, "iso": "2026-09-11T10:14:24", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096464.626, "iso": "2026-09-11T10:14:24", "event": "file_hygiene", "meta": {"verdict": "messy", "findings": 3, "fixed": 0}}
+{"ts": 1789096464.627, "iso": "2026-09-11T10:14:24", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096464.627, "iso": "2026-09-11T10:14:24", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": ["fix"]}}
+{"ts": 1789096465.088, "iso": "2026-09-11T10:14:25", "event": "file_hygiene", "meta": {"verdict": "fixed", "findings": 3, "fixed": 4}}
+{"ts": 1789096465.089, "iso": "2026-09-11T10:14:25", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096465.089, "iso": "2026-09-11T10:14:25", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096465.496, "iso": "2026-09-11T10:14:25", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 0}}
+{"ts": 1789096465.497, "iso": "2026-09-11T10:14:25", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789096884.323, "iso": "2026-09-11T10:21:24", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789096885.138, "iso": "2026-09-11T10:21:25", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789096885.139, "iso": "2026-09-11T10:21:25", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789096885.139, "iso": "2026-09-11T10:21:25", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789096885.14, "iso": "2026-09-11T10:21:25", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789096885.145, "iso": "2026-09-11T10:21:25", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789096885.146, "iso": "2026-09-11T10:21:25", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789096885.57, "iso": "2026-09-11T10:21:25", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 0}}
+{"ts": 1789096885.57, "iso": "2026-09-11T10:21:25", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789097217.289, "iso": "2026-09-11T10:26:57", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["restore"]}}
+{"ts": 1789097217.591, "iso": "2026-09-11T10:26:57", "event": "signature_guard", "meta": {"verdict": "restored", "missing": 14, "restored": 14}}
+{"ts": 1789097217.591, "iso": "2026-09-11T10:26:57", "event": "ok", "meta": {"kind": "signature_guard"}}
+{"ts": 1789097244.867, "iso": "2026-09-11T10:27:24", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097245.465, "iso": "2026-09-11T10:27:25", "event": "pipeline_published", "meta": {"rec_id": "sig-demo.md-300d9b73-1789097245", "name": "sig-demo.md", "sha256": "300d9b7372ee", "refined": 0}}
+{"ts": 1789097245.465, "iso": "2026-09-11T10:27:25", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097251.239, "iso": "2026-09-11T10:27:31", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": []}}
+{"ts": 1789097251.4, "iso": "2026-09-11T10:27:31", "event": "signature_guard", "meta": {"verdict": "missing", "missing": 1, "restored": 0}}
+{"ts": 1789097251.401, "iso": "2026-09-11T10:27:31", "event": "ok", "meta": {"kind": "signature_guard"}}
+{"ts": 1789097251.401, "iso": "2026-09-11T10:27:31", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["restore"]}}
+{"ts": 1789097251.533, "iso": "2026-09-11T10:27:31", "event": "signature_guard", "meta": {"verdict": "restored", "missing": 1, "restored": 1}}
+{"ts": 1789097251.534, "iso": "2026-09-11T10:27:31", "event": "ok", "meta": {"kind": "signature_guard"}}
+{"ts": 1789097251.534, "iso": "2026-09-11T10:27:31", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": []}}
+{"ts": 1789097251.673, "iso": "2026-09-11T10:27:31", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1789097251.673, "iso": "2026-09-11T10:27:31", "event": "ok", "meta": {"kind": "signature_guard"}}
+{"ts": 1789097261.937, "iso": "2026-09-11T10:27:41", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789097262.644, "iso": "2026-09-11T10:27:42", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 0}}
+{"ts": 1789097262.644, "iso": "2026-09-11T10:27:42", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789097262.645, "iso": "2026-09-11T10:27:42", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": ["fix"]}}
+{"ts": 1789097263.603, "iso": "2026-09-11T10:27:43", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 1}}
+{"ts": 1789097263.603, "iso": "2026-09-11T10:27:43", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789097337.826, "iso": "2026-09-11T10:28:57", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789097337.851, "iso": "2026-09-11T10:28:57", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789097337.852, "iso": "2026-09-11T10:28:57", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast"]}}
+{"ts": 1789097337.854, "iso": "2026-09-11T10:28:57", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789097338.002, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789097338.004, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "count_words", "payload_keys": ["text"]}}
+{"ts": 1789097338.005, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "count_words"}}
+{"ts": 1789097338.007, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789097338.007, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789097338.009, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789097338.009, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast"]}}
+{"ts": 1789097338.011, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097338.071, "iso": "2026-09-11T10:28:58", "event": "pipeline_blocked", "meta": {"rec_id": "x.txt-a1fce436-1789097338", "name": "x.txt", "sha256": "a1fce4363854", "refined": 0}}
+{"ts": 1789097338.072, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097338.072, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "echo", "payload_keys": ["degraded"]}}
+{"ts": 1789097338.073, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "echo"}}
+{"ts": 1789097338.074, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789097338.075, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789097338.076, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789097338.077, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast"]}}
+{"ts": 1789097338.078, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "health", "payload_keys": []}}
+{"ts": 1789097338.079, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "health"}}
+{"ts": 1789097338.081, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789097338.081, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789097338.083, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789097338.083, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast", "max_node_retries"]}}
+{"ts": 1789097338.084, "iso": "2026-09-11T10:28:58", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097338.089, "iso": "2026-09-11T10:28:58", "event": "pipeline_blocked", "meta": {"rec_id": "z.txt-8e35c2cd-1789097338", "name": "z.txt", "sha256": "8e35c2cd3bf6", "refined": 0}}
+{"ts": 1789097338.089, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097338.091, "iso": "2026-09-11T10:28:58", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789097363.819, "iso": "2026-09-11T10:29:23", "event": "call", "meta": {"kind": "wf_define", "payload_keys": ["name", "nodes"]}}
+{"ts": 1789097363.832, "iso": "2026-09-11T10:29:23", "event": "ok", "meta": {"kind": "wf_define"}}
+{"ts": 1789097363.833, "iso": "2026-09-11T10:29:23", "event": "call", "meta": {"kind": "wf_run", "payload_keys": ["name", "fail_fast", "max_node_retries"]}}
+{"ts": 1789097363.834, "iso": "2026-09-11T10:29:23", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097363.855, "iso": "2026-09-11T10:29:23", "event": "pipeline_blocked", "meta": {"rec_id": "z.txt-8e35c2cd-1789097363", "name": "z.txt", "sha256": "8e35c2cd3bf6", "refined": 0}}
+{"ts": 1789097363.855, "iso": "2026-09-11T10:29:23", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097364.057, "iso": "2026-09-11T10:29:24", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097364.061, "iso": "2026-09-11T10:29:24", "event": "pipeline_blocked", "meta": {"rec_id": "z.txt-8e35c2cd-1789097364", "name": "z.txt", "sha256": "8e35c2cd3bf6", "refined": 0}}
+{"ts": 1789097364.062, "iso": "2026-09-11T10:29:24", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097364.263, "iso": "2026-09-11T10:29:24", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"]}}
+{"ts": 1789097364.268, "iso": "2026-09-11T10:29:24", "event": "pipeline_blocked", "meta": {"rec_id": "z.txt-8e35c2cd-1789097364", "name": "z.txt", "sha256": "8e35c2cd3bf6", "refined": 0}}
+{"ts": 1789097364.268, "iso": "2026-09-11T10:29:24", "event": "ok", "meta": {"kind": "pipeline_submit"}}
+{"ts": 1789097364.27, "iso": "2026-09-11T10:29:24", "event": "ok", "meta": {"kind": "wf_run"}}
+{"ts": 1789097643.734, "iso": "2026-09-11T10:34:03", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789097646.578, "iso": "2026-09-11T10:34:06", "event": "ok", "meta": {"kind": "selfscan"}}
+{"ts": 1789097646.579, "iso": "2026-09-11T10:34:06", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": []}}
+{"ts": 1789097646.579, "iso": "2026-09-11T10:34:06", "event": "ok", "meta": {"kind": "truth_scan"}}
+{"ts": 1789097646.58, "iso": "2026-09-11T10:34:06", "event": "call", "meta": {"kind": "ghost_guard", "payload_keys": []}}
+{"ts": 1789097646.587, "iso": "2026-09-11T10:34:06", "event": "ok", "meta": {"kind": "ghost_guard"}}
+{"ts": 1789097646.588, "iso": "2026-09-11T10:34:06", "event": "call", "meta": {"kind": "file_hygiene", "payload_keys": []}}
+{"ts": 1789097647.201, "iso": "2026-09-11T10:34:07", "event": "file_hygiene", "meta": {"verdict": "clean", "findings": 0, "fixed": 0}}
+{"ts": 1789097647.202, "iso": "2026-09-11T10:34:07", "event": "ok", "meta": {"kind": "file_hygiene"}}
+{"ts": 1789097647.202, "iso": "2026-09-11T10:34:07", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": []}}
+{"ts": 1789097647.306, "iso": "2026-09-11T10:34:07", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1789097647.307, "iso": "2026-09-11T10:34:07", "event": "ok", "meta": {"kind": "signature_guard"}}
+{"ts": 1789097653.83, "iso": "2026-09-11T10:34:13", "event": "call", "meta": {"kind": "selfscan", "payload_keys": []}}
+{"ts": 1789097654.746, "iso": "2026-09-11T10:34:14", "event": "ok", "meta": {"kind": "selfscan"}}

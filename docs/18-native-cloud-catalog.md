@@ -11,8 +11,8 @@
     Python   →  run_task("omni_plug", {"op":"body", "do":"use", "organ":"眼"})
     命令行   →  apple-vision ocr 图片.jpg                      # 原生桥直调
 
-**所有调用都过同一道授权门**：14 个作用域（external_llm / device_control /
-filesystem_write / privacy_read …），**AI 无权自授，只有主人在终端发票**。
+**所有调用都过同一道授权门**：14 个作用域（`external_llm` / `device_control` /
+`filesystem_write` / `privacy_read` …），**AI 无权自授，只有主人在终端发票**。
 
 ---
 
@@ -78,7 +78,7 @@ filesystem_write / privacy_read …），**AI 无权自授，只有主人在终�
 
 ### 2.4 压缩与直达 —— `quant_plan`
 
-每档 bits/weight ⇒ 估算体积（参数 × b/w ÷ 8 × 容器开销 1.3）⇒ 判断能不能落在 8GB 级。
+每档 bits/weight ⇒ 估算体积（`参数 × b/w ÷ 8 × 容器开销 1.3`）⇒ 判断能不能落在 8GB 级。
 
 **一手读数**：ternary PTQ1_0 = **1.75 b/w** · 语言模型 **7.67 GB** · **保留 98.2% FP16** ·
 同体积胜 IQ2_XXS **12 分**。
@@ -88,14 +88,14 @@ filesystem_write / privacy_read …），**AI 无权自授，只有主人在终�
 
 ### 2.5 并发与稳定性 —— `energy_scheduler` / `page_scan`
 
-**energy_scheduler**：批量 prompt → 多能源分配
+**`energy_scheduler`**：批量 prompt → 多能源分配
 
 - **每源并发上限**（按池内 status 档）
 - **失败冷却**：同源连败 3 次 ⇒ 300s 不再派
 - **公平**：least-load 优先，不饿死单源
-- plan 纯本地不出网（可单测可审计）· run 每一发都过唯一门
+- `plan` 纯本地不出网（可单测可审计）· `run` 每一发都过唯一门
 
-**page_scan**：按绑定逐页并发扫（主人定的架构「触手随每一页绑定好，扫的时候按绑定一页一页传回来」）
+**`page_scan`**：按绑定逐页并发扫（主人定的架构「触手随每一页绑定好，扫的时候按绑定一页一页传回来」）
 
 - **按契约判色**：绿=跑通 · 黄=需参数或需授权（不是故障）· **红=契约也满足却仍失败**
 - **实测引擎 ≥4096 根零失败**，压测档位拉到 **20,000 路零失败**
@@ -147,7 +147,7 @@ filesystem_write / privacy_read …），**AI 无权自授，只有主人在终�
 | `net_reach` | 网络与身份 | — |
 | `bt_nearby` | 蓝牙适配器 | — |
 
-### 4.2 六根动作（`body_*` 能力位）
+### 4.2 六根动作（`body_*` 六个能力位）
 
 | 能力位 | 动作 | 参数 |
 |---|---|---|
@@ -201,20 +201,20 @@ filesystem_write / privacy_read …），**AI 无权自授，只有主人在终�
 | `cloud_brain` | 主脑云插件 | worker | 免费 |
 | **`cloud_compute`** | **借算力云插件（插座）** | worker | 免费 |
 
-**五原语**：PROVISION（开通·不可逆·花钱·要过门）/ CONNECT（连上）/ STATUS（读数）/
-EXPAND（扩容，幂等）/ TEARDOWN（拆掉·要过门）
+**五原语**：`PROVISION`（开通·不可逆·花钱·要过门）/ `CONNECT`（连上）/ `STATUS`（读数）/
+`EXPAND`（扩容，幂等）/ `TEARDOWN`（拆掉·要过门）
 
 **「加一行 SOURCES 就扩容」—— 代码里就是这么写的。**
 
 **自有权重云端车道**：Cloudflare Worker（网关）→ RunPod（vLLM）。
 回执里 `weights_ours: true/false` 逐发可见。
-**⚠️ 实测有一次等 201 秒后返回 false —— 降级跑了别人的 3B。所以本地链路刻意设计成「不通就排队，绝不降级」。**
+**⚠️ 实测有一次等 201 秒后返回 `false` —— 降级跑了别人的 3B。所以本地链路刻意设计成「不通就排队，绝不降级」。**
 
 ---
 
 ## 六、348 个能力位
 
-**逐位总表见 [能力总表.md](./能力总表.md)（30 个域）。分域详情见 [capabilities/](./capabilities/)。**
+**逐位总表见 [`能力总表.md`](./能力总表.md)（30 个域）。分域详情见 [`capabilities/`](./capabilities/)。**
 
 | 域 | 位数 | 域 | 位数 |
 |---|---:|---|---:|
