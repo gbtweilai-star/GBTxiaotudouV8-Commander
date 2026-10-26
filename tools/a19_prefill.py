@@ -52,6 +52,7 @@ def main():
         return 2
     print("容器 UP · model=%s" % model)
 
+    fake = ("mock" in model.lower())        # 彩排替身：绝不允许它产出预算数字
     rows, best = [], None
     for n in [int(x) for x in a.chars.split(",") if x.strip()]:
         body = (FILLER * (n // len(FILLER) + 1))[:n] + "\n\n只回两个字：收到"
@@ -64,14 +65,19 @@ def main():
             u = r.get("usage") or {}
             pt = u.get("prompt_tokens") or 0
             ct = u.get("completion_tokens") or 0
-            pre = dt - (ct / 8.0 if ct else 0)   # 粗扣生成时间（按 8 tok/s 估）
+            # 🔴 彩排抓到的 bug：原来 pre = dt − ct/8，响应快时 dt < ct/8 ⇒ 负数 ⇒ rate 恒 0。
+            #    改成：prefill 时间至少占整次耗时的一半（保守），并且**太快就标明不可信**
+            pre = max(dt * 0.5, dt - (ct / 8.0 if ct else 0))
+            too_fast = dt < 0.30 or fake or bool(r.get("mock"))
             row = {"chars": n, "prompt_tokens": pt, "elapsed_s": round(dt, 2),
                    "prefill_tok_s": round(pt / pre, 1) if pre > 0 else None,
-                   "ok": True}
+                   "trustworthy": not too_fast, "ok": True}
             rows.append(row)
             best = row
-            print("  %5d 字 → prompt %6d tok · %7.2fs · prefill %6.1f tok/s"
-                  % (n, pt, dt, (pt / pre) if pre > 0 else 0))
+            print("  %5d 字 → prompt %6d tok · %7.2fs · prefill %6.1f tok/s%s"
+                  % (n, pt, dt, (pt / pre) if pre > 0 else 0,
+                     ("  ⚠ 彩排替身/太快，读数不可信" if fake else
+                      ("  ⚠ 太快，读数不可信" if too_fast else ""))))
         except urllib.error.HTTPError as exc:
             body = ""
             try:
@@ -87,9 +93,22 @@ def main():
             print("  %5d 字 → %s: %s" % (n, type(exc).__name__, exc))
             break
 
+    ok_rows = [r for r in rows if r.get("ok")]
+    trustworthy = [r for r in ok_rows if r.get("trustworthy")]
     budget = None
-    if best and best.get("prefill_tok_s"):
-        budget = int(best["prefill_tok_s"] * a.window * 0.8)   # 留 20% 余量给生成
+    if ok_rows and not trustworthy:
+        res = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": model,
+               "window_s": a.window, "rows": rows,
+               "window_prompt_budget_tokens": None,
+               "note": "阶梯都跑通了，但耗时过短（像假容器或命中缓存）⇒ **预算不可用**，不瞎给数"}
+        json.dump(res, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print("-" * 56)
+        print("结论：%d 个阶梯都通，但读数不可信（响应过快）⇒ 预算按保守值走，不冒充实测" % len(ok_rows))
+        print("落盘 %s" % OUT)
+        return 3
+    if trustworthy:
+        _b = trustworthy[-1]
+        budget = int(_b["prefill_tok_s"] * a.window * 0.8)   # 留 20% 余量给生成
     res = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": model,
            "window_s": a.window, "rows": rows,
            "window_prompt_budget_tokens": budget}
