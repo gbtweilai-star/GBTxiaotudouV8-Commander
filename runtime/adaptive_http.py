@@ -29,6 +29,33 @@ import threading
 import time
 from http.server import ThreadingHTTPServer
 
+# ── 两处必须在上限之前先放的闸 ──────────────────────────────────
+# ① 线程栈：iSH 默认 128 MB/线程（不是常见的 8 MB）。4.1 GB / 128 MB = 32 个线程，
+#    这就是"并发压不上去"的真正原因 —— 不是内存不够，是每个线程先占了 128 MB。
+#    压到 512 KB 后，同样内存能开 ~8000 个连接线程。
+# ② 文件描述符：soft 默认 1024（压到 96 路就开始 URLError 假崩）。顶到 hard。
+_STACK_KB = 512
+
+
+def tune_process_limits() -> dict:
+    """开工前把两个假闸放掉，返回实际生效值（便于日志与 /health 观察）。"""
+    out = {}
+    try:
+        threading.stack_size(_STACK_KB * 1024)
+        out["thread_stack_kb"] = _STACK_KB
+    except (ValueError, RuntimeError) as exc:                  # noqa: BLE001
+        out["thread_stack_kb"] = "默认（压不下来：%s）" % exc
+    try:
+        import resource
+        soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        want = hard if hard != resource.RLIM_INFINITY else 65535
+        resource.setrlimit(resource.RLIMIT_NOFILE, (want, hard))
+        out["nofile"] = "%s → %s（硬 %s）" % (soft, resource.getrlimit(resource.RLIMIT_NOFILE)[0], hard)
+    except Exception as exc:                                   # noqa: BLE001
+        out["nofile"] = "提不上去（%s）" % exc
+    return out
+
+
 MIN_BACKLOG = 64
 MAX_BACKLOG = 8192
 TICK = 1.0          # 采样周期（秒）
@@ -44,6 +71,9 @@ class AdaptiveThreadingHTTPServer(ThreadingHTTPServer):
     allow_reuse_address = True
 
     def __init__(self, *args, **kwargs):
+        self.limits = tune_process_limits()
+        sys.stderr.write("[limits] 线程栈 %s KB · FD %s\n"
+                         % (self.limits.get("thread_stack_kb"), self.limits.get("nofile")))
         self._lock = threading.Lock()
         self._active = 0
         self._peak = 0

@@ -1,0 +1,270 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   window.css · 壳层基座（**重建版**，非原物）
+   ───────────────────────────────────────────────────────────────────────────
+   为什么有这个文件：全站 349 页引用它，但它在本仓库里不存在（2026-10-26 全盘 find 无果），
+   于是每页各写一套 inline 样式 —— 同一个 slop 决策被抄了 349 遍（扫描见 docs/19）。
+
+   这份是按吞噬来的家规重建的**基座**，不是原文件的恢复：
+     · 一个地面、一个墨色、一个强调（强调只落在动作上）
+     · 面色靠色调级差分离，不靠 1px 线、不靠阴影
+     · 圆角一次定死：面板直角（0）／动作全圆（999px）
+     · 一款字；字号只从 --t-scale-* 取，且不超过 5 档
+     · 无渐变、无 emoji、无玻璃、无索引编号
+   入侵性刻意做低：只给 token 与最底层默认，页面自己的 inline 样式仍可覆盖。
+
+   判据：python3 tools/taste_lint.py --url <页面>   改动后必须 FAIL 不增加
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 面与墨：三级面靠色调差，不靠线 */
+  --gbt-bg:        #080b11;
+  --gbt-panel:     #0f151d;
+  --gbt-panel-2:   #141c26;
+  --gbt-ink:       #e9eef4;
+  --gbt-dim:       #93a3b5;
+  --gbt-faint:     #5d6b7c;
+
+  /* 线：**不是边框**，是给"需要一条分隔"的地方用的极暗底色 */
+  --gbt-line:      #18222e;
+
+  /* 强调：只有一个 */
+  --gbt-accent:    #3fb950;
+  --gbt-accent-ink:#04120a;
+
+  /* 语义色（页面已在用的名字都收在这里，避免各写各的） */
+  --gbt-text:      var(--gbt-ink);
+  --gbt-ok:        #3fb950;
+  --gbt-bad:       #ff7a7a;
+  --gbt-gold:      #d9a44c;
+  --gbt-cyan:      #57b6c9;
+  --gbt-miss:      var(--gbt-faint);
+  --gbt-off:       #2a333f;
+
+  /* 圆角：两个决定，不许出现 9–16px 的"软圆角" */
+  --gbt-radius:    0px;      /* 面板、卡片、输入框 */
+  --gbt-round:     999px;    /* 动作、状态徽标 */
+
+  /* 字号：五档封顶 */
+  --t-scale-1: 28px;
+  --t-scale-2: 20px;
+  --t-scale-3: 15px;
+  --t-scale-4: 13px;
+  --t-scale-5: 11px;
+
+  /* 间距：一套，别处不许自造 */
+  --t-gap-1: 4px;
+  --t-gap-2: 8px;
+  --t-gap-3: 16px;
+  --t-gap-4: 32px;
+  --t-gap-5: 64px;
+
+  /* 字体：一款 */
+  --t-face: -apple-system, system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* 底：只立能立的最小面 */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+body {
+  margin: 0;
+  background: var(--gbt-bg);
+  color: var(--gbt-ink);
+  font-family: var(--t-face);
+  font-size: var(--t-scale-3);
+  line-height: 1.55;
+  overflow-wrap: break-word;   /* 长 ID / 长串不许把页面撑出横滚 */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 标题：一页 ≤5 档字号；标题默认不超两行由内容决定，不在这里强设 */
+h1, h2, h3, h4, h5, h6 { margin: 0 0 var(--t-gap-2); font-weight: 600; line-height: 1.2; }
+h1 { font-size: var(--t-scale-1); letter-spacing: -0.03em; }
+h2 { font-size: var(--t-scale-2); letter-spacing: -0.02em; }
+h3, h4, h5, h6 { font-size: var(--t-scale-4); }
+
+p { margin: 0 0 var(--t-gap-3); max-width: 68ch; }
+
+a { color: inherit; text-decoration: none; border-bottom: 0; }
+a:hover { color: var(--gbt-accent); }
+
+/* 控件：形、标签、位置说明用法；输入框保留边界（家规豁免区） */
+button {
+  font: inherit; font-size: var(--t-scale-4);
+  color: var(--gbt-accent-ink); background: var(--gbt-accent);
+  border: 0; border-radius: var(--gbt-round);
+  padding: 10px 18px; cursor: pointer;
+}
+button:disabled { opacity: .45; cursor: default; }
+input, textarea, select {
+  font: inherit; font-size: var(--t-scale-4);
+  color: var(--gbt-ink); background: var(--gbt-panel-2);
+  border: 0; border-radius: var(--gbt-radius); padding: 9px 11px;
+}
+input::placeholder, textarea::placeholder { color: var(--gbt-faint); }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* 面：靠色调级差，不靠线 */
+.panel, .card, .surface {
+  background: var(--gbt-panel);
+  border: 0;
+  border-radius: var(--gbt-radius);
+  padding: var(--t-gap-3);
+}
+.panel-2 { background: var(--gbt-panel-2); }
+.rule    { height: var(--t-gap-1); background: var(--gbt-line); border: 0; }
+
+/* 徽标：全圆，不描边 */
+.badge, .chip, .tag {
+  display: inline-block; font-size: var(--t-scale-5);
+  padding: 2px 8px; border: 0; border-radius: var(--gbt-round);
+  background: var(--gbt-panel-2); color: var(--gbt-dim);
+}
+.badge.ok  { background: #12241a; color: var(--gbt-ok); }
+.badge.bad { background: #2a1518; color: var(--gbt-bad); }
+
+/* 表格：真表格可以有线（家规豁免），但用色调不用 1px */
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: var(--t-gap-2) var(--t-gap-2); }
+thead th { color: var(--gbt-dim); font-weight: 500; font-size: var(--t-scale-4); }
+tbody tr:nth-child(even) { background: var(--gbt-panel); }
+
+/* 动效：只给真正需要过渡的东西，且尊重减弱设置 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   壳层的布局类 —— **从 358 个页面里反推出来的**
+   ───────────────────────────────────────────────────────────────────────────
+   原 window.css 丢了，但页面还在用它的类名。按使用频次取出前 24 个（cap-sec 2437 次、
+   mc-tile 2088 次、kv 698 次…），在这里按家规重新实现：色阶代替线、直角面板、
+   圆角只有两个决定、字号只取 --t-scale-*。
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 页壳 */
+.cap-page { max-width: 1120px; margin: 0 auto; padding: var(--t-gap-4) var(--t-gap-3) var(--t-gap-5); }
+.cap-top  { display: flex; align-items: center; gap: var(--t-gap-3); flex-wrap: wrap;
+            padding-bottom: var(--t-gap-3); margin-bottom: var(--t-gap-4);
+            background: var(--gbt-panel); border-radius: var(--gbt-radius);
+            padding: var(--t-gap-3); }
+.crumb    { color: var(--gbt-dim); font-size: var(--t-scale-4); }
+.crumb a  { color: var(--gbt-dim); }
+.crumb a:hover { color: var(--gbt-accent); }
+.here     { color: var(--gbt-ink); font-size: var(--t-scale-4); }
+
+/* 头图区 */
+.cap-hero { margin: 0 0 var(--t-gap-4); }
+.cap-id   { color: var(--gbt-dim); font-size: var(--t-scale-4); letter-spacing: 0;
+            font-variant-numeric: tabular-nums; }
+.cap-desc { color: var(--gbt-dim); font-size: var(--t-scale-2); line-height: 1.35;
+            max-width: 100%; margin: var(--t-gap-2) 0 0; }
+.cap-body { max-width: 72ch; }
+
+/* 标签：全圆、不描边 */
+.cap-tags { display: flex; gap: var(--t-gap-2); flex-wrap: wrap; margin: var(--t-gap-3) 0 0; }
+.cap-tags > * , .gbt-chip { font-size: var(--t-scale-5); padding: 3px 9px;
+            background: var(--gbt-panel-2); color: var(--gbt-dim); border-radius: var(--gbt-round); }
+
+/* 节：节与节之间靠底色整体换面，不靠一条线 */
+.cap-sec  { background: var(--gbt-panel); border-radius: var(--gbt-radius);
+            padding: var(--t-gap-3); margin: 0 0 var(--t-gap-3); }
+.cap-sec > h2, .cap-sec > h3 { margin-top: 0; }
+/* `.n` = **计数/单位**，不是索引编号（2437 页在用，必须定死语义，否则会被拿去当 01/02）。
+   家规禁的是"用序号冒充结构"；数量本身是内容，所以允许，但必须：跟在本体后面、
+   用等宽数字对齐、不给它徽章式外形、不加前导零。 */
+.n        { color: var(--gbt-faint); font-size: var(--t-scale-5);
+            font-variant-numeric: tabular-nums; margin-left: var(--t-gap-2);
+            letter-spacing: 0; text-transform: none; font-family: inherit; }
+/* 真要表达顺序时，用真 <ol>；`.ordinal` 只是排版壳，不制造编号 */
+.ordinal  { color: var(--gbt-faint); font-size: var(--t-scale-5);
+            font-variant-numeric: tabular-nums; }
+
+/* 卡片墙 */
+.tiles    { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: var(--t-gap-3); margin: var(--t-gap-3) 0; }
+.mc-tile  { background: var(--gbt-panel-2); border-radius: var(--gbt-radius);
+            padding: var(--t-gap-3); }
+.mc-tile-label { color: var(--gbt-dim); font-size: var(--t-scale-5); }
+.mc-tile-value { font-size: var(--t-scale-2); line-height: 1.15; letter-spacing: -0.02em;
+                 margin-top: var(--t-gap-1); font-variant-numeric: tabular-nums;
+                 overflow-wrap: anywhere; }
+.mc-badge { display: inline-block; font-size: var(--t-scale-5); padding: 2px 8px;
+            border-radius: var(--gbt-round); background: var(--gbt-panel); color: var(--gbt-dim); }
+
+/* 两栏 / 键值表 */
+.cols2    { display: grid; grid-template-columns: 1fr 1fr; gap: var(--t-gap-3); }
+@media (max-width: 720px) { .cols2 { grid-template-columns: 1fr; } }
+.kv       { display: grid; grid-template-columns: minmax(120px, 28%) 1fr;
+            gap: var(--t-gap-2) var(--t-gap-3); margin: var(--t-gap-3) 0; }
+.k        { color: var(--gbt-dim); font-size: var(--t-scale-4); }
+.v        { color: var(--gbt-ink); font-size: var(--t-scale-4);
+            font-variant-numeric: tabular-nums; }
+
+/* 导航 / 页脚 / 留白 */
+.nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--t-gap-2); }
+.nav-grid a { background: var(--gbt-panel-2); border-radius: var(--gbt-radius);
+              padding: var(--t-gap-2) var(--t-gap-3); color: var(--gbt-ink);
+              font-size: var(--t-scale-4); display: block; }
+.nav-grid a:hover { background: var(--gbt-panel); color: var(--gbt-accent); }
+.foot     { color: var(--gbt-faint); font-size: var(--t-scale-5);
+            margin-top: var(--t-gap-5); padding-top: var(--t-gap-3); }
+.spacer   { height: var(--t-gap-4); }
+.hintline { color: var(--gbt-faint); font-size: var(--t-scale-4); margin: var(--t-gap-2) 0; }
+
+/* 早期名字的别名（10 来页在用） */
+.gbt-dim { color: var(--gbt-dim); }
+.gbt-card { background: var(--gbt-panel); border-radius: var(--gbt-radius); padding: var(--t-gap-3); }
+.gbt-btn { display: inline-block; background: var(--gbt-accent); color: var(--gbt-accent-ink);
+           border-radius: var(--gbt-round); padding: 8px 14px; font-size: var(--t-scale-4); }
+.gbt-grow { flex: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   家规覆盖层 —— 专门对付"各页 inline 写死的装饰"
+   ───────────────────────────────────────────────────────────────────────────
+   349 页各自 inline 写了 1px 边框、软圆角、渐变、第二种字体。改 349 个 HTML 不现实，
+   所以在壳层用 !important 把**装饰**压回来（**只压装饰，不碰布局与配色**）。
+   页面作者的布局与颜色仍然生效；被压掉的只有家规明令禁止的那几样。
+
+   判据：python3 tools/taste_lint.py --scan holo_pet_w3
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ① 线条与阴影：用色阶代替 */
+.cap-sec, .cap-top, .cap-page, .mc-tile, .mc-badge, .badge, .card, .panel,
+.kv, .foot, .hintline, .nav-grid a, .tiles > * {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/* ② 渐变与玻璃：一切背景图清掉（真图片走 <img>，不靠 background-image） */
+.cap-sec, .cap-top, .mc-tile, .badge, .card, .panel, .nav-grid a, button, .gbt-btn {
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ③ 圆角：只允许两个决定 —— 面板直角，动作/徽标全圆 */
+.cap-sec, .cap-top, .mc-tile, .card, .panel, .kv, .nav-grid a,
+input, textarea, select { border-radius: var(--gbt-radius) !important; }
+.mc-badge, .badge, button, .gbt-btn, button.ghost { border-radius: var(--gbt-round) !important; }
+
+/* ④ 字体：一款；真代码/等宽区块除外 */
+h1, h2, h3, h4, h5, h6, p, li, div, span, td, th, button, a, label, small, strong, em {
+  font-family: var(--t-face) !important;
+}
+pre, code, kbd, samp, textarea { font-family: ui-monospace, "SF Mono", Menlo, monospace !important; }
+
+/* ⑤ 全大写＋大字距的小标签：一律还原成句子大小写、正常字距 */
+.cap-tags > *, .badge, .mc-badge, .hintline {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+/* ⑥ 全局兜底：不属于「真表单/真表格/真代码」的元素，一律不许靠 1px 线分隔。
+      为什么敢这么压：家规把这几类列为豁免区，其余地方的线都是装饰。 */
+body *:not(input):not(textarea):not(select):not(button):not(table):not(thead):not(tbody):not(tr):not(td):not(th):not(pre):not(code):not(hr) {
+  border-top-width: 0 !important; border-right-width: 0 !important;
+  border-bottom-width: 0 !important; border-left-width: 0 !important;
+}

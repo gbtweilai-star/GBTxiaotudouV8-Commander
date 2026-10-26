@@ -114,10 +114,19 @@
 | [`验收-10问.md`](验收-10问.md) · [`验收-10问-v2.md`](验收-10问-v2.md) | Q5_0 十问验收（含事故后复验） |
 | [`09-mirror-space.md`](09-mirror-space.md) | 镜像空间：先在模拟世界跑绿，再晋升到现实 |
 | [`10-gbt-tianzhen.md`](10-gbt-tianzhen.md) | **GBT天真**：不装 ComfyUI，也跑得动 ComfyUI 的节点契约（27 个原生算子） |
+| [`19-tianzhen-usage.md`](19-tianzhen-usage.md) | **GBT天真 使用手册** · 三种调用方式 · 27 算子契约表 · 本机实跑读数 · 出图流水线 · 两条硬约束 · 踩过的坑 |
 
 ---
 
 ## 十、发布物料
+
+| 文件 | 是什么 |
+|---|---|
+| [`gallery/`](gallery/) | **实拍证据图**：开源海报 · A19 自检 · 天真放大 2048×2729 前后对比 · 三帧拼条 · 能力文档对齐复盘 |
+| [00-poster.jpg](gallery/00-poster.jpg) | 开源海报（341 位 / 20000 路并发 / 4.88 GB 手机能跑）|
+| [02-tianzhen-upscale-2048x2729.png](gallery/02-tianzhen-upscale-2048x2729.png) | **665×886 → 2048×2729**，本地 LANCZOS+USM 放大实拍 |
+| [05-tianzhen-3frame-strip.png](gallery/05-tianzhen-3frame-strip.png) | 三帧拼条 1080×540：蓄势→甩击→撞击，验动效连贯性 |
+
 
 [`launch/`](launch/) —— 3 份对外文案（中英标题、要点、常见问答）。
 

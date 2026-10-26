@@ -772,6 +772,25 @@ def selftest() -> dict:
             "说明": "插上是真探测（文件在/进程就绪/URL 合法）；驱动是真执行（过门）"}
 
 
+_A19_MOD = None
+
+
+def _a19_mod():
+    """按路径加载 tools/a19_ctl.py —— 它在 <repo>/tools/ 下，不在 gbt_allinone 包里，
+    所以不能 import，只能按文件加载。加载一次并缓存。"""
+    global _A19_MOD
+    if _A19_MOD is not None:
+        return _A19_MOD
+    import importlib.util
+    root = Path(__file__).resolve().parents[2]
+    path = root / "tools" / "a19_ctl.py"
+    spec = importlib.util.spec_from_file_location("gbt_a19_ctl", str(path))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    _A19_MOD = mod
+    return mod
+
+
 def run(op: str = "status", **kw) -> dict:
     op = str(op or "status").lower()
     if op == "status":
@@ -782,6 +801,40 @@ def run(op: str = "status", **kw) -> dict:
                                             "（process→process_execute · file写→filesystem_write · "
                                             "api→external_llm+data_export · web→desktop_control+privacy_read）",
                 "注": "网页/GUI 的坐标兜底走能力位 tentacle，不在本位重造一套"}
+    if op in ("a19", "a19容器", "lmpocket"):
+        # 容器面：把 LM Pocket 当容器管（status / ask / queue / up）。
+        # 纪律：容器不在 ⇒ 如实 offline / queued，绝不拿云端顶替（见 MANUAL_ONLY）。
+        mod = _a19_mod()
+        do = str(kw.get("do") or kw.get("action") or "status").lower()
+        if do in ("status", "ps", ""):
+            return dict({"op": "a19", "do": "status"}, **mod.status_dict())
+        if do in ("ask", "chat"):
+            text = str(kw.get("prompt") or kw.get("text") or kw.get("q") or "")
+            if not text:
+                return {"ok": False, "op": "a19", "do": "ask", "why": "需要 prompt"}
+            r = mod.ask_dict(text, int(kw.get("tokens") or 512),
+                             float(kw.get("temp") or 0.7), str(kw.get("system") or ""))
+            return dict({"op": "a19", "do": "ask"}, **r)
+        if do in ("queue", "enqueue"):
+            text = str(kw.get("prompt") or kw.get("text") or kw.get("q") or "")
+            if not text:
+                return {"ok": False, "op": "a19", "do": "queue", "why": "需要 prompt"}
+            return dict({"op": "a19", "do": "queue"},
+                        **mod.queue_add(text, int(kw.get("tokens") or 512)))
+        if do in ("up", "wake", "起"):
+            import subprocess as _sp
+            try:
+                _sp.run(["apple-open", "lmpocket://"], capture_output=True,
+                        text=True, timeout=20)
+                wake = "lmpocket:// 已送达（App 到前台；Load & Start Server 仍需人手点）"
+            except Exception as _e:                               # noqa: BLE001
+                wake = "唤起失败 %s" % type(_e).__name__
+            _t0 = time.time()
+            _wait = float(kw.get("wait") or 0)
+            while time.time() - _t0 < _wait and not mod.up_port():
+                time.sleep(1)
+            return dict({"op": "a19", "do": "up", "wake": wake}, **mod.status_dict())
+        return {"ok": False, "op": "a19", "why": "do 只支持 status/ask/queue/up"}
     if op in ("sockets", "snapshot"):
         p = Pulse()
         for k, t in (("file", str(Path(__file__).resolve())), ("process", "py:print(1)"),

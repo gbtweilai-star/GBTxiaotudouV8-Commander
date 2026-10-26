@@ -139,7 +139,7 @@
     + "font:13px/1.5 system-ui,'Microsoft YaHei',sans-serif;background:rgba(10,14,22,.92);"
     + "color:#e8eefc;border:1px solid rgba(120,170,255,.35);border-radius:12px;padding:10px 12px;"
     + "box-shadow:0 10px 30px rgba(0,0,0,.45)";
-  var head = el("div", null, "⛓ 调用能力位 ");
+  var head = el("div", null, "调用能力位 ");   /* 2026-10-26 去 emoji：家规第 15 条，687 页共用这一处 */
   head.style.cssText = "font-weight:600;margin-bottom:6px;cursor:pointer";
   var body = el("div");
   body.style.display = "none";

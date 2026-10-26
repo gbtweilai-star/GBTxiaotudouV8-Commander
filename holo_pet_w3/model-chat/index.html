@@ -15,7 +15,7 @@
   .badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
   .badge.ok{color:var(--green);border-color:rgba(63,185,80,.4)}
   .badge.bad{color:var(--red);border-color:rgba(255,122,122,.4)}
-  header select,header input{background:var(--card);color:var(--ink);border:1px solid var(--line);
+  header select,header input,header textarea{background:var(--card);color:var(--ink);border:1px solid var(--line);
        border-radius:8px;padding:5px 8px;font-size:12px}
   header .sp{flex:1}
   main{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
@@ -32,40 +32,77 @@
   button.ghost{background:transparent;color:var(--amber);border:1px solid rgba(240,178,76,.5)}
   button:disabled{opacity:.5;cursor:default}
   .hint{padding:0 18px 10px;font-size:11px;color:var(--dim)}
+/* 🔴 2026-10-26：390px 手机上底部按钮全被挤成竖排（"派活/预热/看屏幕/说一句"竖着写）、
+   输入框被挤出屏幕。桌面 Electron 没问题，手机上必须有窄屏兜底。 */
+@media (max-width:560px){
+  header{padding:10px 12px;gap:8px}
+  header select{max-width:100%;width:100%}
+  header #system{max-width:100%;width:100%}
+  footer{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  footer #input{flex:1 1 100%;min-height:66px}
+  footer button{flex:0 0 auto;white-space:nowrap;padding:8px 10px}
+  main{padding:10px 12px}
+  #log .msg{max-width:100%}
+}
+
+/* ═══ 品味修正（吞噬 taste-skill 后按家规改，2026-10-26）═══════════════════
+   ① 无 emoji ② 无发丝线（改用色调级差）③ 圆角一次定死：面板直角、动作全圆
+   判据见 docs/19-taste-absorbed.md；改完跑 tools/taste_lint.py 复核 */
+header{border-bottom:0;background:#0c121a}
+footer{border-top:0;background:#0c121a}
+.badge{border:1px solid transparent;background:#141c28;border-radius:999px}
+.badge.ok{border-color:transparent;background:#12241a}
+.badge.bad{border-color:transparent;background:#2a1518}
+.msg{border-radius:0}
+.me{background:#1b2b42;border:0}
+.ai{background:#141c28;border:0}
+.err{background:#2a1518;border:0}
+.ghost{background:#141c28;border:0;border-radius:999px}
+footer #input{border:0;border-radius:0;background:#141c28}
+header select,header textarea{border:0;border-radius:0;background:#141c28}
+/* 修正第二轮：特异性不够 —— `button.ghost` 压过 `.ghost`，`.badge` 的 transparent 边框也还是 1px */
+.badge,.badge.ok,.badge.bad{border:0}
+button,button.ghost{border:0;border-radius:999px}
+button.ghost{background:transparent}  /* 次级动作不占强调色：靠文字与位置说明用法 */
+header #system{line-height:1.35;padding:6px 8px}
 </style>
 </head>
 <body>
 <header>
-  <h1>🧠 模型对话</h1>
+  <h1>模型对话</h1>
   <span class="badge" id="bridge">桥：检查中…</span>
+  <a id="wake" class="ghost" href="lmpocket://" style="display:none;font-size:11px;padding:4px 10px;border-radius:999px;background:#141c28;color:#e9eef4;text-decoration:none">唤起 A19</a>
+  <span class="badge" id="a19" title="直连容器 :1234 的探活（只问 /v1/models，不通就如实写未开）">A19：检查中…</span>
   <span class="sp"></span>
-  <select id="upstream" title="选上游（默认 = 云插件路线；钥只在桥里）">
-    <option value="cloud">☁️ 云插件 · GBT小土豆V8（gbt-potato-v8 · 云端 c01-llm-gateway，我们的模型）</option>
-    <option value="selfhost" selected>🧠 本机 A19 · 自有权重（127.0.0.1:1234 · LM Pocket）</option>
-    <option value="freepool">🆓 本机免费池 · 259 个模型（127.0.0.1:3001 · 零注册零付费·A19 不通时自动降级到此）</option>
-    <option value="ours">🧠 直连 RunPod · 我们的原生指挥官 gbt-v8（自报 /runpod-volume/gbt-v8-v83）</option>
-    <option value="ours-alt">🧠 我们的原生指挥官（备用端点）</option>
-    <option value="local">🧠 本地 vLLM（127.0.0.1:8000）</option>
-    <option value="agnes">agnes-2.5-flash（云端算力 · 通用模型）</option>
-    <option value="deepseek">deepseek-chat（通用模型）</option>
-    <option value="openai">gpt-4o-mini（通用模型）</option>
+  <select id="upstream" title="默认 = 本机 A19（她的原生权重）。其余车道只在你自己选时才走">
+    <option value="direct">直连 A19（绕开桥 · 127.0.0.1:1234 · 少一跳）</option>
+    <option value="selfhost" selected>本机 A19 · 她的原生权重（经桥 · LM Pocket）</option>
+    <option value="ours">直连 RunPod · 原生指挥官 gbt-v8-v83（我们自建，不是二手模型）</option>
+    <option value="ours-alt">原生指挥官（备用端点）</option>
+    <option value="local">本地 vLLM（127.0.0.1:8000）</option>
+    <option value="freepool">本机免费池 · mistral（第三方模型，不会冒充她）</option>
+    <option value="freepool-b">本机免费池 · llama 备用</option>
+    <option value="agnes">agnes-2.5-flash（第三方）</option>
+    <option value="deepseek">deepseek-flash（第三方 · V4.1-Flash-1017）</option>
+    <option value="openai">gpt-4o-mini（第三方）</option>
   </select>
-  <input id="system" size="34" value="你是严谨的中文助手。算术题必须一步步来：先写算式，再算结果，最后单独一行写「答案：X」。不要提方法论、框架或自我介绍。" title="系统提示：默认这条是实测出来的——它能修掉「跑题到三轴法」和算错的毛病；想让它扮演别的角色就直接改">
+  <textarea id="system" rows="2" spellcheck="false" title="系统提示：原默认是「严谨的中文助手」—— 那是把她当算术机，她会连自己是谁都不知道。2026-10-26 换成她的身份 + 两条纪律（不扮演动作、不编造做过的事），算术口径保留。想让她扮演别的角色就直接改">你是 GBT小土豆V8（框架 8.0.0）。开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属。回答简洁、有主见、先看再动。不扮演动作或场景，不编造自己没做过的事。算术题一步来：先写算式，再算结果，最后单独一行写「答案：X」。</textarea>
 </header>
 
 <main id="log">
   <div class="msg ai">原生指挥官模型的对话面：页面只连本机桥 127.0.0.1:8791，钥匙在桥里（DPAPI 保险箱），页面永远拿不到明文。
-默认上游 = ☁️ 云插件路线：GBT小土豆V8 大模型（gbt-potato-v8）经云端 10 云插件拼网里的 c01-llm-gateway（/v1 面，网关钥 GW_AUTH）—— 2026-10-21 按主人令接入；「直连 RunPod」留作备用。
-云端自托管端点会睡，第一次调用可能要几十秒；怀疑它挂了先看桥的 health 徽标，别把冷启动当故障。回包元信息里的 weights_ours 逐发可见：true = 我们自己的权重在线，false = 按设计回落 Workers AI 托管兜底。</div>
+默认上游 = 本机 A19 · 她的原生权重（LM Pocket，127.0.0.1:1234）。<br>2026-10-26 主人令：A19 优先，且探不到就如实报错、不降级到任何云端或第三方模型 —— 「拿别人的模型冒充她」这件事在桥上被关掉了（要旧行为另设 GBT_ALLOW_CLOUD_FALLBACK=1）。
+严格模式下「回包是谁答的」逐发可见：upstream 字段写明车道，weights_ours 只有 true/false 两种，不存在「显示 selfhost 其实是别人」的情况。</div>
 </main>
 
 <footer>
   <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
-  <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活 ⚡</button>
-  <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（约 2 秒，不占对话）；加载中按秒报数">🔥 预热</button>
-  <button id="see" class="ghost" title="让她看一眼屏幕（走 body_see 能力位，要过授权门）">👁 看屏幕</button>
-  <button id="speak" class="ghost" title="让她说一句（走 body_say 能力位，要过授权门）">🗣 说一句</button>
-  <label class="ghost" style="display:flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid #26374f;border-radius:9px;cursor:pointer" title="默认关：实测这个模型不会用上文；开了可能答非所问">
+  <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活</button>
+  <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（约 2 秒，不占对话）；加载中按秒报数">预热</button>
+  <button id="taste" class="ghost" title="把「品味内核」灌进系统提示（吞噬自 Leonxlnx/taste-skill，1.2k token，4096 窗口吃得下）">品味</button>
+  <button id="see" class="ghost" title="让她看一眼屏幕（走 body_see 能力位，要过授权门）">看屏幕</button>
+  <button id="speak" class="ghost" title="让她说一句（走 body_say 能力位，要过授权门）">说一句</button>
+  <label class="ghost" style="display:flex;align-items:center;gap:4px;padding:6px 10px;border:0;border-radius:999px;background:#141c28;cursor:pointer" title="默认关：实测这个模型不会用上文；开了可能答非所问">
     <input type="checkbox" id="usehist"> 带上下文 <span id="ctxn" style="color:#8ea2c0">0</span>
   </label>
   <button id="clearctx" class="ghost" title="清空多轮上下文">⟲ 清</button>
@@ -76,6 +113,102 @@
 
 <script>
 const BRIDGE = "http://127.0.0.1:8791";
+/* 🔴 2026-10-26：直连容器（绕开桥）。只探 /v1/models，不做任何"猜活"。 */
+const DIRECT_BASE = "http://127.0.0.1:1234/v1";
+let _a19model = "";
+async function a19Model() {
+  if (_a19model) return _a19model;
+  const r = await fetch(DIRECT_BASE + "/models", {cache: "no-store",
+    headers: {"Authorization": "Bearer gbt"}});
+  if (!r.ok) throw new Error("models HTTP " + r.status);
+  const d = await r.json();
+  _a19model = (d.data && d.data[0] && d.data[0].id) || "";
+  return _a19model;
+}
+let _a19was = null;   /* 容器状态跃迁才记一笔，避免每 8 秒刷一行 */
+async function probeA19() {
+  const b = document.getElementById("a19");
+  if (!b) return;
+  try {
+    const m = await a19Model();
+    b.className = "badge ok";
+    b.style.color = "";
+    b.textContent = "A19：在（" + (m || "已连") + "）";
+    const wk = document.getElementById("wake");
+    if (wk) wk.style.display = "none";
+    /* 🔴 2026-10-26：页面是**唯一能在容器活着时看见它**的地方
+       （Minis 一回到前台，iOS 就把容器收走）。所以把读数记进共用账本，
+       我下次被叫起来时用 her.py --tail 就能读到"她那会儿是什么状态"。 */
+    if (_a19was !== "up") {
+      _a19was = "up";
+      logMsg("sensor", JSON.stringify({event: "container_up", model: m}), "selfhost", m);
+    }
+  } catch (e) {
+    _a19model = "";
+    b.className = "badge";
+    b.style.color = "#f0b24c";
+    b.textContent = "A19：未开（:1234 拒连）";
+    const wk2 = document.getElementById("wake");
+    if (wk2) wk2.style.display = "";   /* 一键把 LM Pocket 拉到前台，剩下的那一下仍在它界面里 */
+    if (_a19was !== "down") {
+      _a19was = "down";
+      logMsg("sensor", JSON.stringify({event: "container_down", why: "refused"}));
+    }
+  }
+}
+/* 🔴 2026-10-26：她的对话落盘。页面拿不到文件系统，所以走桥的 /_log/message
+   追加到 state/her_transcript.jsonl —— 容器一断、页面一关，她说过的话还在。 */
+/* 🔴 2026-10-26 修订：桥跑在 Minis 里（iSH）—— 她在 Safari 里聊天时 Minis 是后台，
+   桥根本不在，直接 POST 会全部丢掉（实测：账本 0 行）。
+   所以改成**本地优先**：先写 localStorage，桥在的时候再补传，传成功才删。 */
+const LOGBUF = "her_log_buf";
+function logMsg(role, text, upstreamName, modelName) {
+  let buf = [];
+  try { buf = JSON.parse(localStorage.getItem(LOGBUF) || "[]"); } catch (e) { buf = []; }
+  buf.push({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+    at: new Date().toISOString().slice(0, 19).replace("T", " "),
+    role: role, text: String(text || "").slice(0, 8000),
+    upstream: upstreamName || null, model: modelName || null, source: "page"});
+  if (buf.length > 200) buf.splice(0, buf.length - 200);
+  try { localStorage.setItem(LOGBUF, JSON.stringify(buf)); } catch (e) {}
+  flushLog();
+  return true;
+}
+async function flushLog() {
+  let buf = [];
+  try { buf = JSON.parse(localStorage.getItem(LOGBUF) || "[]"); } catch (e) { return 0; }
+  if (!buf.length) return 0;
+  const keep = [];
+  for (const rec of buf) {
+    try {
+      const r = await fetch(BRIDGE + "/_log/message", {method: "POST", cache: "no-store",
+        headers: {"Content-Type": "application/json"}, body: JSON.stringify(rec)});
+      if (!r.ok) keep.push(rec);
+    } catch (e) { keep.push(rec); }
+  }
+  try { localStorage.setItem(LOGBUF, JSON.stringify(keep)); } catch (e) {}
+  return keep.length;
+}
+async function restoreTranscript(n) {
+  try {
+    const r = await fetch(BRIDGE + "/_log/tail?n=" + (n || 6), {cache: "no-store"});
+    const d = await r.json();
+    if (!d.count) return 0;
+    const hr = document.createElement("div");
+    hr.className = "meta";
+    hr.textContent = "── 以下是落盘恢复的上次对话（" + d.count + " 条）──";
+    log.appendChild(hr);
+    let shown = 0;
+    for (const row of d.rows) {
+      /* 账本里还有 sensor 行（容器状态/每发速度），它们是**读数**不是对话，恢复时不渲进来 */
+      if (row.role !== "user" && row.role !== "assistant") continue;
+      add(row.role === "user" ? "user" : "assistant", row.text);
+      shown++;
+    }
+    if (!shown) hr.remove();
+    return d.count;
+  } catch (e) { return 0; }
+}
 const log = document.getElementById("log");
 const badge = document.getElementById("bridge");
 const hint = document.getElementById("hint");
@@ -116,10 +249,10 @@ async function health() {
     const shOk = !!(sh && (_shUrl.indexOf(":8792") >= 0 || _shUrl.indexOf(":1234") >= 0));
     badge.className = "badge ok";
     badge.style.color = shOk ? "" : "#f0b24c";
-    badge.textContent = shOk ? "桥：在线 · A19 优先（不通自动降级免费池）" : "桥：在线 · 走本机免费池";
+    badge.textContent = shOk ? "桥：在线 · A19 优先（不通就如实报错，不降级）" : "桥：在线 · 免费池（第三方，不冒充她）";
     hint.textContent = shOk
       ? ("A19 " + sh.base_url + " · 上游 " + ups.length + " 个 · "
-         + (fp ? "A19 不通时自动降级本机免费池" : "⚠ 免费池未挂，A19 不在就没保底")
+         + (fp ? "A19 优先 · 不通就如实报错（严格模式，不降级）" : "严格模式：A19 不在就没人替她答")
          + " · 钥只在桥里 · 页面零凭据")
       : ("走本机免费池 " + (fp ? fp.base_url : "（未挂）") + " · 就绪 " + ready.join("/"));
   } catch (e) {
@@ -130,6 +263,12 @@ async function health() {
 }
 health();
 setInterval(health, 15000);
+/* 容器探活：加载即探一次，之后每 8 秒一次（只问 /v1/models，很轻） */
+probeA19();
+setInterval(probeA19, 8000);
+restoreTranscript(6);
+flushLog();
+setInterval(flushLog, 10000);
 
 /* ── 三个确定性小工具，专门补模型短板 ─────────────────────────────
    1) 日历推算：周三放假、周五上班 ⇒ 连休几天（模型算不对，规则能算对）
@@ -197,11 +336,11 @@ async function pollWarm() {
     const r = await fetch(BRIDGE + "/warm/status", {cache: "no-store"});
     const j = await r.json();
     if (j.ok) {
-      warmBtn.textContent = "✅ 已就绪";
+      warmBtn.textContent = "已就绪";
       clearInterval(warmTimer); warmTimer = null;
-      setTimeout(() => { warmBtn.textContent = "🔥 预热"; }, 4000);
+      setTimeout(() => { warmBtn.textContent = "预热"; }, 4000);
     } else if (j.state === "failed") {
-      warmBtn.textContent = "❌ 加载失败";
+      warmBtn.textContent = "加载失败";
       clearInterval(warmTimer); warmTimer = null;
     } else {
       warmBtn.textContent = "预热 " + Math.round(j.elapsed_s || 0) + "s…";
@@ -220,11 +359,11 @@ async function bodyAct(cap, args, label) {
     const j = await r.json();
     if (j.ok) {
       const res = (j.result && (j.result.result || j.result)) || j;
-      card.textContent = "✅ " + label + "：" + JSON.stringify(res).slice(0, 300);
+      card.textContent = "完成 " + label + "：" + JSON.stringify(res).slice(0, 300);
     } else {
       const scopes = (j.missing_scopes || []).join(",") || "?";
       card.className = "msg ai err";
-      card.textContent = "⛔ " + label + " 需要授权：" + scopes
+      card.textContent = "被拒 " + label + " 需要授权：" + scopes
         + "（在终端发一次票：python -m gbt_allinone auth grant --scope " + scopes + " --ttl 600）";
     }
   } catch (e) {
@@ -241,6 +380,22 @@ document.getElementById("clearctx").addEventListener("click", () => {
   history.length = 0;
   document.getElementById("ctxn").textContent = "0";
   add("assistant", "（上下文已清空）");
+});
+/* 品味：把吞噬来的内核灌进系统提示。内核在桥上（state/taste_kernel.txt），
+   不放 HTML 里 —— 换代时只改一个文件，页面不用动。 */
+const tasteBtn = document.getElementById("taste");
+tasteBtn.addEventListener("click", async () => {
+  try {
+    const r = await fetch(BRIDGE + "/_taste", {cache: "no-store"});
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || "读取失败");
+    document.getElementById("system").value = d.kernel;
+    tasteBtn.textContent = "已装（" + d.chars + " 字）";
+    setTimeout(() => { tasteBtn.textContent = "品味"; }, 4000);
+  } catch (e) {
+    tasteBtn.textContent = "取不到内核";
+    setTimeout(() => { tasteBtn.textContent = "品味"; }, 4000);
+  }
 });
 warmBtn.addEventListener("click", async () => {
   if (warmTimer) return;
@@ -284,19 +439,63 @@ async function send() {
     /* 先用确定性的规则算（日历 / 计算器），算出来就把结果前置到用户消息里 */
     let prefix = weekdaySolve(text);
     if (!prefix) prefix = await calcNotes(text);
-    messages.push({role: "user", content: prefix ? prefix + text : text});
+    /* 🔴 2026-10-26：默认不带 messages 历史（这份细调模型会把历史吃歪，见上），
+       但「继续 / 然后呢」这类**纯指代短语**在无上文时必然幻觉 ——
+       实测 315/4096 时输入「继续」，她回「手在键盘上自动打字：chill、move、up」。
+       解法：只在纯指代时，把**上一轮她的回答**压成一句前缀塞进本条用户消息，
+       不动 messages 历史，所以默认「不带上下文」的口径不变。 */
+    const CONT = /^(继续|接着|然后呢?|再说|往下|接着说|go on|continue)[。.!！?？\s]*$/i;
+    let carry = "";
+    if (CONT.test(text)) {
+      const lastA = [...history].reverse()
+        .find(m => m.role === "assistant" && String(m.content || "").trim());
+      carry = lastA
+        ? "（你上一句是：「" + String(lastA.content).replace(/\s+/g, " ").slice(0, 160)
+          + "」）\n请直接接着往下写，不要复述这句、不要解释、不要扮演任何动作。\n"
+        : "（这一轮没有上文可接：请先问清要接着什么，不要自己编造动作或场景。）\n";
+    }
+    messages.push({role: "user", content: carry + (prefix ? prefix + text : text)});
     /* 🔴 2026-10-24：改流式。900 token 的老上限 + 2 tok/s = 最坏 7 分钟才见第一个字；
        流式后 2–3 秒就出首字。兜底车道会自行去掉 stream（桥那边 pop 掉），所以两条路都要能收。 */
     /* 900 token × 1.7 tok/s = 最坏 9 分钟。默认降到 320，够一段完整回答；
        要更长的答案自己说「详细点」，或者把 320 调大。 */
     const ctrl = new AbortController();
     abort = () => ctrl.abort();
-    const r = await fetch(BRIDGE + "/v1/chat/completions", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({upstream, messages, max_tokens: 320, stream: true}),
-      signal: ctrl.signal
-    });
+    /* 🔴 2026-10-26：「直连 A19」通道 —— 绕开桥，直接打容器 :1234。
+       少一跳（桥那一跳实测 30ms 上下），但**没有保底**：容器不在就是不在，
+       和 her.py 在 Minis 那边看到的是同一句实话。
+       风险：浏览器跨源。llama.cpp 系服务端一般带 Access-Control-Allow-Origin:*，
+       如果这版容器不带，fetch 会抛 TypeError —— 下面单独报这句，不混进"桥连不上"。 */
+    const DIRECT = "http://127.0.0.1:1234/v1";
+    const direct = upstream === "direct";
+    let url = BRIDGE + "/v1/chat/completions";
+    let hdrs = {"Content-Type": "application/json"};
+    const reqBody = {upstream, messages, max_tokens: 320, stream: true,
+      /* 🔴 2026-10-26：页面从来没送采样参数 ⇒ 全吃容器默认值，
+         实测会出现复读（「继续」被当成动作指令后原地打转）。
+         这三个是 llama.cpp 认的字段，容器不认就忽略，不会报错。 */
+      temperature: 0.7, top_p: 0.9, repeat_penalty: 1.12};
+    let r;
+    try {
+      if (direct) {
+        url = DIRECT + "/chat/completions";
+        hdrs["Authorization"] = "Bearer gbt";
+        delete reqBody.upstream;
+        /* a19Model() 也必须在 try 里 —— 它自己就会 fetch，抛出来要走 direct 的文案，
+           不能被外层 catch 吞成"连不上桥"（第一次实测就是这样报错的）。 */
+        reqBody.model = await a19Model();
+      }
+      r = await fetch(url, {method: "POST", headers: hdrs,
+        body: JSON.stringify(reqBody), signal: ctrl.signal});
+    } catch (e) {
+      node.dataset.got = "1";
+      node.textContent = direct
+        ? ("直连 A19 失败：" + e.message + "\\n可能原因：①容器没开（LM Pocket 点 Load & Start Server）②容器没发 CORS 头，浏览器拦了 —— 那就把上游切回「经桥」那条。")
+        : ("连不上桥（" + e.message + "）。先在 APP 里打开本页会自动起桥。");
+      busy = false;
+      document.getElementById("send").disabled = false;
+      return;
+    }
     const ctype = r.headers.get("Content-Type") || "";
     const lane = r.headers.get("x-gbt-lane") || "?";
     const oursHdr = r.headers.get("x-gbt-weights-ours") === "true";
@@ -337,13 +536,19 @@ async function send() {
       const ttft = firstMs ? ((firstMs - t0) / 1000).toFixed(1) : "?";
       const m2 = document.createElement("div");
       m2.className = "meta";
-      m2.textContent = (oursHdr ? "✅ 自有权重" : "⚠️ 非自有权重") + " · 实走 " + lane +
+      m2.textContent = (oursHdr ? "自有权重" : "非自有权重") + " · 实走 " + lane +
                        " · 首字 " + ttft + "s · 全文 " + dt2 + "s（流式）";
       if (!oursHdr) m2.style.color = "#f0b24c";
       node.appendChild(m2);
       if (!text2) node.textContent = "(空回包)";
       history.push({role: "user", content: text}, {role: "assistant", content: text2});
       if (history.length > 16) history.splice(0, history.length - 16);
+      logMsg("user", text, upstream, null);
+      logMsg("assistant", text2, lane, "");
+      /* 传感器：这一发到底多快、走的哪条、是不是自有权重 —— 落进账本，
+         我下次进来能看到"她当时真的答了、答了多久"。 */
+      logMsg("sensor", JSON.stringify({event: "answer", lane: lane, ours: oursHdr,
+        ttft_s: ttft, total_s: dt2, chars: (text2 || "").length}));
       return;
     }
 
@@ -359,6 +564,8 @@ async function send() {
     node.textContent = (msg.content || "(空回包)");
     history.push({role: "user", content: text}, {role: "assistant", content: msg.content || ""});
     if (history.length > 16) history.splice(0, history.length - 16);
+    logMsg("user", text, upstream, null);
+    logMsg("assistant", msg.content || "", upstream, j.model || "");
     /* 🔴 2026-10-24：原来只印「请求的车道」，不印「实走哪条」——
        降级到云端时页面照样显示 selfhost，等于把"结果对、车道错"藏起来。
        现在逐发报 j.gbt.lane / weights_ours，不是自有权重就标黄。 */
@@ -366,7 +573,7 @@ async function send() {
     const ours = g.weights_ours === true;
     const m = document.createElement("div");
     m.className = "meta";
-    m.textContent = (ours ? "✅ 自有权重" : "⚠️ 非自有权重") +
+    m.textContent = (ours ? "自有权重" : "非自有权重") +
                     " · 实走 " + (g.lane || "?") +
                     " · 请求 " + upstream +
                     " · " + (j.model || "") + " · " + dt + "s";
@@ -419,7 +626,7 @@ async function dispatch() {
       + "   命中方式 " + rt.match + " · 候选收窄 " + (rt.shortlist_by || "?") + "（" + short.length + " 选 1）\n"
       + "   域 " + (rt.domain || "?") + " · 只读 " + (rt.readonly === true ? "是" : "否")
       + " · 静态作用域 " + (rt.scopes_static || "—")
-      + (rt.requires_params ? "\n   ⚠ 这位要参数：" + (rt.params_hint || "") : "");
+      + (rt.requires_params ? "\n   这位要参数：" + (rt.params_hint || "") : "");
     const m1 = document.createElement("div");
     m1.className = "meta";
     m1.textContent = "路由耗时 " + rt.elapsed_s + "s · 模型 " + (rt.model || rt.upstream)

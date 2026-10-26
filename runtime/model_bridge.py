@@ -22,7 +22,9 @@
 from __future__ import annotations
 
 import argparse
+import collections
 import json
+import os
 import pathlib
 import sys
 import threading
@@ -71,7 +73,15 @@ UPSTREAMS = {
     "freepool-b": ("http://127.0.0.1:3001/v1", "llama-3.3-70b",
                    "file:/var/minis/shared/gbtv8/vaults/freellmapi/unified_api_key", 180),
     "agnes":    ("https://apihub.agnes-ai.com/v1", "agnes-2.5-flash", "agnes", 180),
-    "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat", "deepseek", 180),
+    # 🔴 2026-10-26：DeepSeek 侧已换代为 V4.1-Flash（发布日 1017）。
+    #    口径：API 只认 deepseek-flash / deepseek-v4-pro（传 -1017 后缀直接 400）；
+    #    deepseek-chat 仍可用但已被静默映射到 flash —— 显式写 flash，别靠别名。
+    #    上下文 1,048,576 / 单次输出上限 393,216 / 吃图 / effort=low|high|max。
+    #    钥走 0600 文件槽：本机没有 DPAPI 保险箱，profile 名取不到钥（实测 key_ready=false）。
+    "deepseek": ("https://api.deepseek.com/v1", "deepseek-flash",
+                 "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 180),
+    "deepseek-pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro",
+                 "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 300),
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
 }
 DEFAULT = "selfhost"     # A19 优先：手机自己的算力
@@ -94,6 +104,22 @@ FALLBACK = {
     "openai":     ["freepool", "freepool-b", "deepseek"],
 }
 UA = "gbt-v8/model-bridge"
+
+# 她的对话落盘（2026-10-26）：容器一断、页面一关，说过的话还在。
+TRANSCRIPT = str(ROOT / "state" / "her_transcript.jsonl")
+# 落盘去重（2026-10-26）：页面离线时先存本地、回来补传，
+# 补传可能"提交成功但回包丢了" ⇒ 重试会写重复行。按客户端给的 id 去重。
+LOG_IDS = collections.deque(maxlen=500)
+# 品味内核（吞噬 taste-skill 后蒸馏，见 docs/19-taste-absorbed.md）
+TASTE_KERNEL = str(ROOT / "state" / "taste_kernel.txt")
+
+# 🔴 2026-10-26 主人口径：「使用 A19 不使用云端」。
+#    selfhost（A19）探不到时**不再静默降级**到免费池/DeepSeek ——
+#    宁可如实报错（调用方自己决定要不要换车道），也不许拿别人的模型冒充她的。
+#    确需旧行为（可用性优先）时：export GBT_ALLOW_CLOUD_FALLBACK=1
+if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
+    FALLBACK["selfhost"] = []
+    FALLBACK["local"] = []
 
 
 def key_for(profile: str | None) -> tuple[str, str]:
@@ -360,13 +386,44 @@ class Handler(BaseHTTPRequestHandler):
                                     "backlog": (self.server.backlog_stats()
                                                 if hasattr(self.server, "backlog_stats") else {}),
                                     "note": "钥只在桥里；页面永远拿不到明文"})
+        # ── 她的对话落盘：读回最近 n 条（页面打开时恢复「上次她说了什么」）──────
+        if self.path.startswith("/_log/tail"):
+            n = 20
+            try:
+                q = self.path.split("?", 1)[1] if "?" in self.path else ""
+                for kv in q.split("&"):
+                    if kv.startswith("n="):
+                        n = max(1, min(200, int(kv[2:])))
+            except Exception:                                     # noqa: BLE001
+                n = 20
+            rows = []
+            try:
+                with open(TRANSCRIPT, encoding="utf-8") as fh:
+                    for line in fh.readlines()[-n:]:
+                        line = line.strip()
+                        if line:
+                            rows.append(json.loads(line))
+            except Exception:                                     # noqa: BLE001
+                rows = []
+            return self._json(200, {"ok": True, "count": len(rows), "rows": rows,
+                                    "file": TRANSCRIPT})
+        # ── 品味内核：页面「🎨 品味」按钮从这里取，避免把 1.2k token 写进 HTML ──
+        if self.path.startswith("/_taste"):
+            try:
+                with open(TASTE_KERNEL, encoding="utf-8") as fh:
+                    text = fh.read()
+                return self._json(200, {"ok": True, "chars": len(text),
+                                        "file": TASTE_KERNEL, "kernel": text})
+            except Exception as exc:                              # noqa: BLE001
+                return self._json(500, {"ok": False,
+                                        "error": "%s: %s" % (type(exc).__name__, exc)})
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
-        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch")
+        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -374,6 +431,30 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(self.rfile.read(n) or b"{}")
         except Exception as exc:                              # noqa: BLE001
             return self._json(400, {"error": {"message": "请求体不是 JSON：%s" % exc}})
+
+        # ── 她的对话落盘：页面每说一句就追加一行 ────────────────────────────
+        if self.path.startswith("/_log/message"):
+            try:
+                rid = str(body.get("id") or "")
+                if rid and rid in LOG_IDS:
+                    return self._json(200, {"ok": True, "saved": False,
+                                            "dup": True, "file": TRANSCRIPT})
+                if rid:
+                    LOG_IDS.append(rid)
+                os.makedirs(os.path.dirname(TRANSCRIPT), exist_ok=True)
+                rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "role": str(body.get("role") or "?"),
+                       "text": str(body.get("text") or "")[:8000],
+                       "upstream": body.get("upstream"),
+                       "model": body.get("model"),
+                       # 谁记的这一行：page（她的原生界面）/ minis（这个对话框）/ test
+                       "source": str(body.get("source") or "page")}
+                with open(TRANSCRIPT, "a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                return self._json(200, {"ok": True, "saved": True, "file": TRANSCRIPT})
+            except Exception as exc:                              # noqa: BLE001
+                return self._json(500, {"ok": False,
+                                        "error": "%s: %s" % (type(exc).__name__, exc)})
 
         # ── 派活①：先问模型该落哪个能力位，再用目录校验（幻觉当场拒）────────────
         if self.path.startswith("/v1/route"):
