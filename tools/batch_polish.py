@@ -63,38 +63,50 @@ def main():
                 f = _small
             b = tg.judge(f, "photo")
             m0 = metrics(f)
-            stage1 = f
-            reverted = False
-            dc_used = False
-            if a.reframe:
-                # 构图修复：先做，再自检；更差就回退到原图（宁可不改）
-                cand = os.path.join(a.out, base + "_rf.png")
-                im = Image.open(f).convert("RGB")
-                im, _k = rf.converge_focus(im)
-                im, _v, _p = rf.pad_space(im)
-                im.save(cand, "PNG")
-                c = tg.judge(cand, "photo")
-                if len(c["fails"]) >= len(b["fails"]) or c["readings"]["focus_blobs"] == 0:
-                    reverted = True
-                else:
-                    stage1 = cand
-            # ② 降杂乱：边缘密度过高的图先降一次（带自检：不改善就用上一阶段的图）
-            if a.declutter:
-                d_out = os.path.join(a.out, base + "_dc.png")
-                try:
-                    _im2 = Image.open(stage1).convert("RGB")
-                    _o, _ = dc.declutter(_im2, 12, 45, 0.7)
-                    _o.save(d_out, "PNG")
-                    _g0 = tg.judge(stage1, "photo"); _g1 = tg.judge(d_out, "photo")
-                    if len(_g1["fails"]) < len(_g0["fails"]):
-                        stage1 = d_out
-                        dc_used = True
-                except Exception:                                 # noqa: BLE001
-                    pass
-            p2.run(stage1, dst, a.scale, 0.22, 0.05, 0.55)  # 局部对比/分离色调/边缘锐化
-            m1 = metrics(dst)
+            # 🔴 顺序敏感（实测）：P4 要「先降杂乱再扩留白」，A2 要「先扩留白再降杂乱」。
+            #    所以**两路都跑，取判据更少的那一路**；同分取高频更高者。没有一条万能顺序。
+            def _pipeline(order):
+                cur = f
+                used_dc = used_rf = False
+                for step in order:
+                    if step == "dc":
+                        try:
+                            o = os.path.join(a.out, base + "_dc_%s.png" % order)
+                            im2 = Image.open(cur).convert("RGB")
+                            o_im, _ = dc.declutter(im2, 12, 45, 0.75)
+                            o_im.save(o, "PNG")
+                            g0 = tg.judge(cur, "photo"); g1 = tg.judge(o, "photo")
+                            if len(g1["fails"]) <= len(g0["fails"]):
+                                cur = o; used_dc = True
+                        except Exception:                         # noqa: BLE001
+                            pass
+                    else:
+                        try:
+                            o = os.path.join(a.out, base + "_rf_%s.png" % order)
+                            im2 = Image.open(cur).convert("RGB")
+                            im2, _ = rf.converge_focus(im2)
+                            im2, _v, _q = rf.pad_space(im2)
+                            im2.save(o, "PNG")
+                            g0 = tg.judge(cur, "photo"); g1 = tg.judge(o, "photo")
+                            if len(g1["fails"]) < len(g0["fails"]) and g1["readings"]["focus_blobs"] != 0:
+                                cur = o; used_rf = True
+                        except Exception:                         # noqa: BLE001
+                            pass
+                return cur, used_dc, used_rf
+
+            best = None
+            for order in (("dc", "rf"), ("rf", "dc")):
+                cur, u_dc, u_rf = _pipeline(order)
+                gt = tg.judge(cur, "photo")
+                hf = metrics(cur)["高频"]
+                key = (len(gt["fails"]), -hf)
+                if best is None or key < best[0]:
+                    best = (key, cur, gt, order, u_dc, u_rf)
+            _key, stage1, aft_pre, order_won, dc_used, rf_used = best
+            reverted = not (dc_used or rf_used)
+            p2.run(stage1, dst, a.scale, 0.22, 0.05, 0.55)
             aft = tg.judge(dst, "photo")
-            rows.append({"file": os.path.basename(f), "out": dst, "reverted": reverted, "declutter": dc_used,
+            rows.append({"file": os.path.basename(f), "out": dst, "reverted": reverted, "declutter": dc_used, "order": "".join(order_won),
                          "before": {"verdict": b["verdict"], "fails": b["fails"], **m0},
                          "after": {"verdict": aft["verdict"], "fails": aft["fails"], **m1},
                          "hf_delta": round(m1["高频"] - m0["高频"], 2)})

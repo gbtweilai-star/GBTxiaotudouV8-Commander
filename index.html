@@ -73,11 +73,17 @@
   .shot figcaption{color:#b9c5d6;font-size:13px;margin-top:9px;line-height:1.6}
   @media (max-width:640px){header{padding:52px 0 30px}.grid{grid-template-columns:1fr}}
 
-  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:14px}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
   .gallery a{display:block;border:1px solid var(--line);border-radius:10px;overflow:hidden;
              background:var(--card);text-decoration:none;transition:border-color .15s}
   .gallery a:hover{border-color:var(--amber)}
-  .gallery img{display:block;width:100%;height:180px;object-fit:cover;object-position:top}
+  /* 🔴 这些是手机长截图（1320×2868）。原来写死 height:180px + cover
+     ⇒ 只剩状态栏一条，裁得没法看。改成按截图原比例开框，整张图都露出来。 */
+  /* 手机截图是 1320×2868，海报是 720×962 —— 比例不同。
+     cover 会把海报左右裁掉（第一版就裁了），所以用 contain：一张都不裁，
+     比例不同的那几张自动留边，底色跟卡片一致。 */
+  .gallery img{display:block;width:100%;aspect-ratio:1320/2868;object-fit:contain;
+               object-position:center top;background:#0b0f16}
   .gallery span{display:block;padding:7px 9px;font-size:11.5px;line-height:1.45;color:var(--dim)}
 </style>
 </head>
