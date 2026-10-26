@@ -72,6 +72,13 @@
   .shot img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid #0c1118}
   .shot figcaption{color:#b9c5d6;font-size:13px;margin-top:9px;line-height:1.6}
   @media (max-width:640px){header{padding:52px 0 30px}.grid{grid-template-columns:1fr}}
+
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:14px}
+  .gallery a{display:block;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+             background:var(--card);text-decoration:none;transition:border-color .15s}
+  .gallery a:hover{border-color:var(--amber)}
+  .gallery img{display:block;width:100%;height:180px;object-fit:cover;object-position:top}
+  .gallery span{display:block;padding:7px 9px;font-size:11.5px;line-height:1.45;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -213,7 +220,32 @@ py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live
     <li><a href="docs/11-five-dim.md">11 五维合一</a></li>
     <li><a href="docs/12-multidomain-monitor.md">12 多域监控</a></li>
     <li><a href="docs/13-omni-plug.md">13 万能插 · 反向调云端算力</a></li>
+    <li><a href="docs/14-security-and-control.md">14 安全与授权门</a></li>
+    <li><a href="docs/15-tentacle-counter.md">15 触手计数器</a></li>
+    <li><a href="docs/16-capability-audit-341.md">16 341 位能力审计</a></li>
+    <li><a href="docs/17-phone-a19-runtime.md">17 手机端 A19 全链路</a></li>
+    <li><a href="docs/18-native-cloud-catalog.md">18 能力总目录</a></li>
+    <li><a href="docs/19-taste-absorbed.md">19 吞噬记录 · taste-skill</a></li>
+    <li><a href="docs/20-t2i-endpoint-spec.md">20 生图端点契约</a></li>
+    <li><a href="docs/21-tianzhen-usage.md"><b>21 GBT天真 使用手册</b></a></li>
+    <li><a href="docs/22-a19-ops-playbook.md">22 A19 运维手册</a></li>
+    <li><a href="docs/README.md"><b>总索引 README</b></a></li>
   </ul>
+</section>
+
+<section>
+  <h2><span class="n">08</span>实拍证据</h2>
+  <p class="dim">下面每一张都是本机真跑出来的，不是示意图。点开看原图。</p>
+  <div class="gallery">
+    <a href="docs/gallery/00-poster.jpg"><img src="docs/gallery/thumbs/00-poster.jpg" alt="开源海报" loading="lazy"><span>开源海报</span></a>
+    <a href="docs/gallery/01-a19-selfcheck.png"><img src="docs/gallery/thumbs/01-a19-selfcheck.jpg" alt="A19 自检" loading="lazy"><span>A19 自检 · q5_0 · 257/4096</span></a>
+    <a href="docs/gallery/02-tianzhen-upscale-2048x2729.png"><img src="docs/gallery/thumbs/02-tianzhen-upscale-2048x2729.jpg" alt="天真放大" loading="lazy"><span>GBT天真 665×886 → 2048×2729</span></a>
+    <a href="docs/gallery/03-tianzhen-product-closeup.png"><img src="docs/gallery/thumbs/03-tianzhen-product-closeup.jpg" alt="放大后特写" loading="lazy"><span>放大后特写：毛孔 / 毛发 / 血管 / 高光</span></a>
+    <a href="docs/gallery/04-tianzhen-pipeline-constraints.png"><img src="docs/gallery/thumbs/04-tianzhen-pipeline-constraints.jpg" alt="流水线与硬约束" loading="lazy"><span>出图流水线 + 两条硬约束</span></a>
+    <a href="docs/gallery/05-tianzhen-3frame-strip.png"><img src="docs/gallery/thumbs/05-tianzhen-3frame-strip.jpg" alt="三帧拼条" loading="lazy"><span>三帧拼条 1080×540 验动效</span></a>
+    <a href="docs/gallery/06-tianzhen-product-p5.png"><img src="docs/gallery/thumbs/06-tianzhen-product-p5.jpg" alt="P5 产物" loading="lazy"><span>P5 产物</span></a>
+    <a href="docs/gallery/07-capability-doc-alignment.png"><img src="docs/gallery/thumbs/07-capability-doc-alignment.jpg" alt="能力文档对齐" loading="lazy"><span>能力文档对齐复盘</span></a>
+  </div>
 </section>
 
 </main>
