@@ -99,7 +99,7 @@
      🔴 2026-09-23 改：本页原来自带一整套配色（#0b0a12 / #e9e4dc / #5b4a8f…），
      跟新壳皮肤不是一套 —— 被 tools/codex-scripts/audit_skin.py 当场抓成"壳里混进第二套皮"。
      风哥令「别跟旧皮肤混到一起去」。本页现在**零裸色值**。 -->
-<link rel="stylesheet" href="../window.css" />
+<link rel="stylesheet" href="../window.css?v=20261026c" />
 <link rel="stylesheet" href="../deck3d.css" />
 <style>
   /* 本块只写**版式**；颜色一律 var()。出现裸色值即违规。 */
@@ -145,7 +145,7 @@
 </style>
 </head>
 <body>
-<script src="../shell/nav-compact.js"></script>
+<script src="../shell/nav-compact.js?v=20261026"></script>
 
 
 
@@ -166,8 +166,8 @@
     <span id="gbtmsg" class="msg"></span>
   </div>
 
-  <p class="ok" style="margin-top: 4px">✅ 面板桥没起就先跑：
-    <code>py -3.14 holo_pet/panel_server.py --host 127.0.0.1 --port 8765</code></p>
+  <p class="ok" style="margin-top: 4px"> 面板桥没起就先跑：
+  <code>py -3.14 holo_pet/panel_server.py --host 127.0.0.1 --port 8765</code></p>
 
   <div class="why" style="margin-top: 22px">
     <b>高级 · DSH 对话面（自动接上中…；起不来才手贴）：</b>本窗一开，壳就会
@@ -193,9 +193,9 @@
     <span id="msg" class="msg"></span>
   </div>
 
-  <p class="warn">⚠️ 本页<b>故意不提供</b>「自动找到 token」的功能：那等于替你翻凭据（自动接上走的是
+  <p class="warn"> 本页<b>故意不提供</b>「自动找到 token」的功能：那等于替你翻凭据（自动接上走的是
     壳**自己拉起**的那条就绪行，不是替你翻任何东西）。</p>
-  <p class="ok">✅ 在此之前，对话面照常在浏览器里用 —— 本壳<b>没有动过 DSH 一个字节</b>（有守卫脚本为证）。</p>
+  <p class="ok"> 在此之前，对话面照常在浏览器里用 —— 本壳<b>没有动过 DSH 一个字节</b>（有守卫脚本为证）。</p>
 
   <div class="foot">
     开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属<br />
@@ -366,8 +366,8 @@
   if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
 })();
 </script>
-<script src="live-badge.js" defer></script>
-<script src="live-badge.js" defer></script>
-<script src="tentacle-kit.js" defer></script>
+<script src="live-badge.js?v=20261026" defer></script>
+<script src="live-badge.js?v=20261026" defer></script>
+<script src="tentacle-kit.js?v=20261026" defer></script>
 </body>
 </html>

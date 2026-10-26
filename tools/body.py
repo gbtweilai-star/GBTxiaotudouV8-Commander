@@ -202,6 +202,8 @@ def route_organ(text: str, limit: int = 3) -> list:
 # 所以每次调 @app 之前，先用 URL scheme 把它拉到前台，再发请求。
 # 实测：唤起后约 50 秒窗口内可正常推理（单次请求 0.2–0.4 秒，够用）。
 APP_WAKE = {"@app": "lmpocket://"}
+# 只许显式指定、不参与自动择活的实现（见 resolve 里的说明）
+MANUAL_ONLY = {"@cloud", "@engine"}
 
 
 def _wake(tool: str, wait: float = 2.0) -> bool:
@@ -366,6 +368,13 @@ def resolve(organ: str) -> dict:
         return {"organ": organ, "ok": False, "why": "没有这个器官"}
     tried = []
     for tool, cmd, args, rw, desc in o["impls"]:
+        # 🔴 2026-10-26：@cloud / @engine 只许**显式**指定，不参与自动择活。
+        #    原因（实测）：A19 一掉，resolve("推理") 会静默挑中 @cloud，
+        #    对外还报「ok:true · 云端 RunPod 自有权重」—— 等于拿别人的算力冒充她的，
+        #    正是主人定的「授权隐瞒」。宁可如实报「A19 不在线」，也不许自动降级。
+        if tool in MANUAL_ONLY:
+            tried.append({"impl": tool, "why": "需显式指定（不自动择活）"})
+            continue
         if tool.startswith("@"):
             _k = (list(args) + ["", ""])[1] if args else ""
             r = _probe_http(str(cmd), key=_k, timeout=1.5)

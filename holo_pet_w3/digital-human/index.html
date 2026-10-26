@@ -89,7 +89,7 @@
 </style>
 </head>
 <body data-mode="stage">
-<script src="../shell/nav-compact.js"></script>
+<script src="../shell/nav-compact.js?v=20261026"></script>
 
 
 
@@ -163,17 +163,17 @@
 </div>
 
 <!-- 壳里 vendor 的 three（零 CDN）+ 控制器 + glTF 载入器。必须经典脚本、按依赖序。 -->
-<script src="../brain/vendor/three.global.js"></script>
-<script src="../brain/vendor/BufferGeometryUtils.global.js"></script>
-<script src="../brain/vendor/GLTFLoader.global.js"></script>
-<script src="../brain/vendor/OrbitControls.global.js"></script>
+<script src="../brain/vendor/three.global.js?v=20261026"></script>
+<script src="../brain/vendor/BufferGeometryUtils.global.js?v=20261026"></script>
+<script src="../brain/vendor/GLTFLoader.global.js?v=20261026"></script>
+<script src="../brain/vendor/OrbitControls.global.js?v=20261026"></script>
 <!-- Blender 量出来的绑骨体检（rig-audit.py 生成；页面只显示，不自己算） -->
-<script src="rig-audit.js"></script>
+<script src="rig-audit.js?v=20261026"></script>
 <!-- 骨位标签表（写手 tools/codex-scripts/dh-bone-map.py：每根骨管什么 / 哪个轴 / 正负号全是实测）
      页面**只按这张表驱动** —— 动作 → 查表得轴与符号 → 摆骨。页面里不许另写一套轴（2026-10-21 主人令）。 -->
-<script src="bone-map.js"></script>
+<script src="bone-map.js?v=20261026"></script>
 <!-- 口型音素判定（吸收件）：wawa-lipsync MIT · 原文件在 vendor/wawa-lipsync/（含 LICENSE） -->
-<script src="dh-lipsync.js"></script>
+<script src="dh-lipsync.js?v=20261026"></script>
 
 <script>
 (function () {
@@ -1641,8 +1641,8 @@
   if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
 })();
 </script>
-<script src="../shell/live-badge.js" defer></script>
-<script src="../shell/tentacle-kit.js" defer></script>
+<script src="../shell/live-badge.js?v=20261026" defer></script>
+<script src="../shell/tentacle-kit.js?v=20261026" defer></script>
 
 <!-- ───────── 云插件安装台（一体式：就在本页里展开，不开新窗、不跳转 · 主人令 2026-10-23）───────── -->
 <style id="cfx-style">

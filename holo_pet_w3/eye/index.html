@@ -102,12 +102,12 @@
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
 <title>GBT小土豆V8 · 触手视觉回传</title>
-<link rel="stylesheet" href="../window.css" />
+<link rel="stylesheet" href="../window.css?v=20261026c" />
 <link rel="stylesheet" href="../skin-mission-control.css" />
 <link rel="stylesheet" href="eye.css" />
 </head>
 <body class="gbt-body eye-app">
-<script src="../shell/nav-compact.js"></script>
+<script src="../shell/nav-compact.js?v=20261026"></script>
 
 
 
@@ -181,7 +181,7 @@
      已按 .gitignore 排除（那份清单描述的是**主人的屏幕**，不入库）。
      静态引入会让全新检出必吃一个 404；改由 eye.js 首屏就走同一条动态加载路径，
      读不到时给的是**结构化提示**（"清单读不到 + 怎么生成"），不是一条无主的网络错。 -->
-<script src="eye.js"></script>
+<script src="eye.js?v=20261026"></script>
 
 
 <!-- gbt-defense -->
@@ -277,7 +277,7 @@
 })();
 </script>
 <div class="foot" style="margin-top:12px;padding:8px 12px;border-top:1px solid #1d2635;color:#8b97a8;font-size:11.5px">数据面：<b>vision</b>（视觉/图像识别入口）· <b>tentacle</b>（触手读帧）—— 本页真帧由触手取回，不摆占位图。</div>
-<script src="../shell/live-badge.js" defer></script>
-<script src="../shell/tentacle-kit.js" defer></script>
+<script src="../shell/live-badge.js?v=20261026" defer></script>
+<script src="../shell/tentacle-kit.js?v=20261026" defer></script>
 </body>
 </html>
