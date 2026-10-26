@@ -114,7 +114,7 @@
 | [`验收-10问.md`](验收-10问.md) · [`验收-10问-v2.md`](验收-10问-v2.md) | Q5_0 十问验收（含事故后复验） |
 | [`09-mirror-space.md`](09-mirror-space.md) | 镜像空间：先在模拟世界跑绿，再晋升到现实 |
 | [`10-gbt-tianzhen.md`](10-gbt-tianzhen.md) | **GBT天真**：不装 ComfyUI，也跑得动 ComfyUI 的节点契约（27 个原生算子） |
-| [`19-tianzhen-usage.md`](19-tianzhen-usage.md) | **GBT天真 使用手册** · 三种调用方式 · 27 算子契约表 · 本机实跑读数 · 出图流水线 · 两条硬约束 · 踩过的坑 |
+| [`21-tianzhen-usage.md`](21-tianzhen-usage.md) | **GBT天真 使用手册** · 三种调用方式 · 27 算子契约表 · 本机实跑读数 · 出图流水线 · 两条硬约束 · 踩过的坑 |
 
 ---
 
