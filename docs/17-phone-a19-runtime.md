@@ -840,3 +840,77 @@ python3 tools/a19_quality.py                  # 自由文本/结构化分开测
 ```
 
 ---
+
+---
+
+## 十八、无限上下文闭环：环形 + 双向绑定触手 + 异常回大脑（2026-10-28）
+
+主人口径（原话拆成四件）：
+> 「触手双向绑定他的上下文页面实时读取发现异常立马纠正继续回到主线跑；
+>   一根触手双向绑定负责上下文溢出保护；每一次的上下文异常都要返回大脑执行层
+>   在分析推理排布划分纠正深度推进主线任务。」
+
+### 已有什么 / 缺什么
+
+| 件 | 状态 |
+|---|---|
+| 环本身（有界窗口 / 溢出落库 / 秒查） | ✅ `ring_context`（能力位 `llm` 域） |
+| 双向绑定 | ✅ `tentacle_bind.bind(asset, tentacle)` |
+| 大脑执行层 | ✅ `brain_route` / `brain_execute` / `brain_verify` / `brain_health` |
+| **实时异常检测** | 🔴 **原来没有** → 本轮补 `tools/context_guard.py` |
+| **专责溢出保护触手** | 🔴 原来没有 → 绑 `context_overflow_guard` |
+| **异常 → 大脑 → 纠正 → 回主线** | 🔴 原来没有 → 本轮补成闭环 |
+
+### 环本身的实测（先证明底座真行）
+
+```
+RingContext(budget=4000)
+push 60 条 → 窗口 26 条 / 3900 字符 ≤ 4000   ✅ 长度恒定
+seq 78（单调）· db_turns 52（挤出即落库）    ✅ 溢出不丢
+recall("第3条") → 命中                        ✅ 秒查
+```
+
+### 守护触手（新）
+
+```
+① 每 tick 读 window + stats（双向绑定读的那一侧）
+② 判异常（客观、可复算）：near_overflow / overflow / window_lost / stuck / empty_window
+③ 异常 → brain_route 排布纠正动作
+④ 纠正：force_spill + resume_mainline（发【回主线】标记，主线 id 不变）
+⑤ 逐条落 state/context_guard.jsonl，可回溯
+```
+
+### 自检实测
+
+```
+灌注到第 27 轮：
+  [warn] 窗口 28 条 / 3504 字符 · 预算 4000 · 填充 88% · seq 80
+    ⚠ near_overflow  填充 88% > 85% 阈值
+    → 大脑执行层: called=True routed=libtv_workflow（⚠ 语义路由降级）
+    → 纠正: force_spill=True, resume_mainline=True
+纠正后：窗口 3554 ≤ 4000 · 没丢条 · 老内容仍秒查得到
+```
+
+### 本轮自己踩的三个错（都在代码里改掉了）
+
+**① 把 `stats()["window_chars"]` 当成预算。**
+真字段是 `window_chars`=当前字符数、`window_budget`=预算。
+错用后每次都报"填充 100%"，每次都误触发。
+
+**② 用 `seq - db_turns > window_n` 判"丢条"——没有意义。**
+`db_turns` 是**全库共享**计数，`seq` 是本 name 的单调值，两者不同源，相减不成立。
+真要验"没丢"靠 **recall 命中**，不靠减出来。
+
+**③ 读 `brain_route` 的返回值读错层。**
+答案在 `result.best.kind`，不是顶层 `capability`。
+
+### 必须如实说的一条限制
+
+`brain_route` 这次返回 **`degraded: true`** —— 语义路由降级到启发式，
+给出 `libtv_workflow`（视频工作流），跟"上下文异常纠正"**完全不相干**。
+
+⇒ **"异常回大脑"这条链是通的（真调用、真返回、真记录），
+但大脑当前给不出相关动作。** 闭环的"判断"那一环还是弱的，
+不能拿"叫过大脑"当成"大脑排布好了"。
+
+---
