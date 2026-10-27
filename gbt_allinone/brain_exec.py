@@ -146,6 +146,35 @@ def route(intent: str) -> dict:
     top = scored[:5]
     alt = [{"kind": s[1], "domain": s[2]} for s in top[1:]]
 
+    # ── ⓪ 词表路：确定性领域映射（排在语义路之前）──────────────────────────
+    # 🔴 2026-10-28：主路要统一大模型；A19 不在时降级到字符 2-gram，
+    #   实测把「上下文异常纠正」路由成了 libtv_workflow（视频工作流）——完全不相干。
+    #   词表是**人工钉死的领域→能力位映射**，命中即确定，不是降级。
+    #   没命中就照原路走，不影响其它意图。
+    try:
+        from .llm import route_lexicon as _LX
+        lx = _LX.match(intent)
+    except Exception:                                         # noqa: BLE001
+        lx = {"ok": False, "why": "词表不可用"}
+    if lx.get("ok"):
+        e = lx["entry"]
+        return {"ok": True, "intent": str(intent)[:120],
+                "best": {"kind": (e["kinds"] or [""])[0],
+                         "domain": "lexicon", "desc": e["reason"][:80],
+                         "via": "lexicon"},
+                "alternatives": [{"kind": k, "domain": "lexicon"}
+                                 for k in e["kinds"][1:]],
+                "candidates": len(e["kinds"]), "path": "lexicon",
+                "degraded": False,                 # 确定性命中不是降级
+                "lexicon": {"id": e["id"], "score": e["score"],
+                            "hits": e["hits"], "kinds": e["kinds"],
+                            "tools": e.get("tools") or [],
+                            "reason": e["reason"]},
+                "semantic_skipped": True,
+                "heuristic_best": ({"kind": top[0][1], "domain": top[0][2],
+                                    "desc": top[0][3]} if top else None),
+                "elapsed_ms": round((time.time() - t0) * 1000, 1)}
+
     # ── ① 主路：语义路由（不可用时它自己如实降级并带原因回来）──
     main, main_err = None, ""
     try:

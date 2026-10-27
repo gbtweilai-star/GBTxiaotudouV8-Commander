@@ -914,3 +914,77 @@ recall("第3条") → 命中                        ✅ 秒查
 不能拿"叫过大脑"当成"大脑排布好了"。
 
 ---
+
+---
+
+## 十九、两个补丁：词表路由 + 纠错位（2026-10-28）
+
+上一节留了一条硬伤：`brain_route` 降级时把「上下文异常纠正」路由成
+`libtv_workflow`（视频工作流），**完全不相干**。主人令 1、2 都做。
+
+### ① 领域词表：排在语义路之前（`gbt_allinone/llm/route_lexicon.py`）
+
+主路要统一大模型；A19 不在 ⇒ 降级到**字符 2-gram**，而「上下文/溢出/纠正」
+这类词在能力位描述里几乎不出现，于是被恰好共字的位抢走。
+
+词表是**人工钉死的「领域 → 能力位」映射**，命中即确定，**不是降级**：
+
+| 领域 | 命中词举例 | 落到位 |
+|---|---|---|
+| `context_overflow` | 上下文 / 溢出 / 窗口 / 落库 / 秒查 | `ring_context` · `context_vault` · `brain_route` |
+| `mirror_space` | 镜像 / 维度 / 排练 / 晋升 | `mirror_status` … `mirror_release` |
+| `tentacle_bind` | 触手 / 绑定 / 双向 | `tentacle_bind` · `tentacle` |
+| `concurrency` | 并发 / QPS / backlog / 扇出 | `health` · `svc_inspect` |
+| `llm_router` | 路由 / 落位 / 派活 | `brain_route` · `brain_execute` · `one_shot` |
+| `audit_align` | 对齐 / 审计 / 多域 / 回归 | `impact_check` · `mirror_scan` · `coverage_auditor` |
+
+**词表自带审计**：引用的能力位必须真实存在，写错了当场报。
+
+实测（同一句意图，改前 → 改后）：
+
+```
+「上下文异常纠正：near_overflow…」
+  改前  path=heuristic  degraded=true   best=libtv_workflow   ← 不相干
+  改后  path=lexicon    degraded=false  best=ring_context     ← 对上了
+```
+
+自检：`entries=6 · kinds=21 · unknown=[] · known_caps=348`
+三条真实意图 3/3 命中。
+
+**纪律**：只做加分，没命中就照原路走，不影响其它意图。
+
+### ② 纠错位：异常码 → 动作的确定性规则表（`tools/context_guard.py`）
+
+**纠正动作不向大脑要。** 靠降级判断去纠错等于闭眼动手。
+
+```
+near_overflow  → force_spill → resume_mainline
+overflow       → force_spill → shrink_window → resume_mainline
+window_lost    → rebuild_window → resume_mainline
+stuck          → dedupe → resume_mainline
+empty_window   → rebuild_window → resume_mainline
+
+严重度优先级：overflow > window_lost > empty_window > near_overflow > stuck
+```
+
+大脑**仍然被调用并记录**（留"分析推理排布"那一层的证），
+但**动作来源是表，不是它**。
+
+实测三条：
+- 覆盖：5 个异常码全有规则，**缺失 0**
+- 确定性：同一异常码跑 3 次，动作序列**完全一致**
+- 优先级：`overflow` 与 `near_overflow` 同时出现 ⇒ 选中 `overflow`（先治重症）
+
+### 合起来的效果
+
+```
+第 27 轮 88% 触发 near_overflow
+  → 大脑执行层: called=True  routed=ring_context      ← 词表修的
+  → 纠错位(规则表): near_overflow                      ← 规则表定的
+  → 纠正: force_spill=True, resume_mainline=True
+纠正后：3554/4000 · 没丢条 · 老内容秒查得到
+```
+
+**两条链各司其职：大脑给"相关方向"，规则表给"确定动作"。**
+
+---
