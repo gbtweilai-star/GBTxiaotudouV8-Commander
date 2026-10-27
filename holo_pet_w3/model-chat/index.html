@@ -99,6 +99,7 @@ header #system{line-height:1.35;padding:6px 8px}
   <textarea id="input" placeholder="问点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
   <button id="dispatch" class="ghost" title="真派活：先问我们自己的模型该落哪个能力位，再走唯一门 run_task 真调一次，回执原样贴出来">派活</button>
   <button id="warm" class="ghost" title="提前把 4.88 GB 权重加载好（约 2 秒，不占对话）；加载中按秒报数">预热</button>
+  <button id="persona" class="ghost" title="装上她的人格精简版（407 字 / 约 254 token，只占窗口 6%）—— 治她编造事实、把指令当任务；长版可用 /_persona 取">人格</button>
   <button id="taste" class="ghost" title="把「品味内核」灌进系统提示（吞噬自 Leonxlnx/taste-skill，1.2k token，4096 窗口吃得下）">品味</button>
   <button id="see" class="ghost" title="让她看一眼屏幕（走 body_see 能力位，要过授权门）">看屏幕</button>
   <button id="speak" class="ghost" title="让她说一句（走 body_say 能力位，要过授权门）">说一句</button>
@@ -383,6 +384,21 @@ document.getElementById("clearctx").addEventListener("click", () => {
 });
 /* 品味：把吞噬来的内核灌进系统提示。内核在桥上（state/taste_kernel.txt），
    不放 HTML 里 —— 换代时只改一个文件，页面不用动。 */
+const personaBtn = document.getElementById("persona");
+personaBtn.addEventListener("click", async () => {
+  try {
+    const r = await fetch(BRIDGE + "/_persona?lite=1", {cache: "no-store"});
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || "读取失败");
+    document.getElementById("system").value = d.persona;
+    personaBtn.textContent = "人格已装（" + d.chars + " 字）";
+    setTimeout(() => { personaBtn.textContent = "人格"; }, 4000);
+  } catch (e) {
+    personaBtn.textContent = "取不到人格";
+    setTimeout(() => { personaBtn.textContent = "人格"; }, 4000);
+  }
+});
+
 const tasteBtn = document.getElementById("taste");
 tasteBtn.addEventListener("click", async () => {
   try {
@@ -470,7 +486,7 @@ async function send() {
     const direct = upstream === "direct";
     let url = BRIDGE + "/v1/chat/completions";
     let hdrs = {"Content-Type": "application/json"};
-    const reqBody = {upstream, messages, max_tokens: 320, stream: true,
+    const reqBody = {upstream, messages, max_tokens: 200, stream: true,
       /* 🔴 2026-10-26：页面从来没送采样参数 ⇒ 全吃容器默认值，
          实测会出现复读（「继续」被当成动作指令后原地打转）。
          这三个是 llama.cpp 认的字段，容器不认就忽略，不会报错。 */

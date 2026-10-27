@@ -1,0 +1,49 @@
+{
+ "date": "20261027",
+ "files": [
+  {
+   "file": "deck.mp4",
+   "bytes": 31050456,
+   "sha256": "d85dcfb5760db89f",
+   "from": "/var/minis/attachments/deckM/deck.mp4"
+  },
+  {
+   "file": "deck.html",
+   "bytes": 7809,
+   "sha256": "ed46944b09388643",
+   "from": "/var/minis/attachments/deckM/deck.html"
+  },
+  {
+   "file": "script.md",
+   "bytes": 3875,
+   "sha256": "41f822d6b941fde5",
+   "from": "/var/minis/attachments/deckM/script.md"
+  },
+  {
+   "file": "review.png",
+   "bytes": 451678,
+   "sha256": "a83fda5fe93c6ac9",
+   "from": "/var/minis/attachments/deckM/review.png"
+  },
+  {
+   "file": "kaleido.html",
+   "bytes": 19934,
+   "sha256": "0d43349b135fb27a"
+  },
+  {
+   "file": "assets-manifest.json",
+   "bytes": 1454,
+   "sha256": "c7edf501eb906761"
+  },
+  {
+   "file": "media/",
+   "bytes": 4733558,
+   "sha256": "(5 张配图)"
+  },
+  {
+   "file": "deck-single.html",
+   "bytes": 6319252,
+   "sha256": "aaa33391fbf747e9"
+  }
+ ]
+}

@@ -1,0 +1,212 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SpaceBeam Lite v3</title>
+<style>
+ html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#eee;
+   font:14px/1.5 -apple-system,"PingFang SC",system-ui,sans-serif}
+ #c{position:fixed;inset:0;width:100%;height:100%}
+ #ui{position:fixed;left:0;right:0;top:0;display:flex;gap:6px;padding:8px;z-index:8;
+     background:linear-gradient(rgba(0,0,0,.65),transparent);flex-wrap:wrap}
+ #ui button{font:inherit;font-size:13px;background:#1b1f26;color:#e9eef7;border:1px solid #2a3140;
+     border-radius:9px;padding:5px 10px}
+ #ui button.on{background:#c8452d;border-color:#c8452d}
+ #msg{position:fixed;left:0;right:0;bottom:0;padding:8px 12px;font-size:12px;
+      background:rgba(0,0,0,.7);color:#ffd9a0;text-align:center;z-index:9}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="msg">初始化…</div>
+<div id="ui">
+  <button data-seg="2">2</button><button data-seg="3">3</button>
+  <button data-seg="4" class="on">4</button><button data-seg="6">6</button>
+  <button data-seg="8">8</button>
+  <button id="motion">运动驱动</button><button id="fps">FPS</button>
+</div>
+<script>
+"use strict";
+var msg = document.getElementById("msg");
+function say(t){ msg.textContent = t; }
+
+var S = { seg:4, rot:0, zoom:1, useTest:false, stream:null, facing:"environment",
+          video:null, testCv:null, tex:null, gl:null, prog:null, t0:0,
+          motion:false, prev:null, small:null, fps:0, fpsShow:false, frames:0, lastFps:0 };
+
+function initGL(){
+  var c = document.getElementById("c");
+  var gl = c.getContext("webgl", {antialias:false});
+  if(!gl) throw new Error("WebGL 不可用");
+  S.gl = gl;
+  var vs = "attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0,1);}";
+  var fs = [
+    "precision highp float;",
+    "varying vec2 uv;uniform sampler2D tex;uniform float seg,rot,zoom,aspect;",
+    "void main(){",
+    "  vec2 u=(uv-.5)*vec2(aspect,1.0);",
+    "  float c=cos(rot),s=sin(rot);",
+    "  u=vec2(u.x*c-u.y*s,u.x*s+u.y*c);",
+    "  float r=length(u); float a=atan(u.y,u.x);",
+    "  float segw=6.2831853/max(seg,1.0);",
+    "  float aa=a+segw*0.5;",
+    "  aa=aa-segw*floor(aa/segw);",          // 用 floor 取代 fmod（本机 GLSL ES 1.0 报文不支持）
+    "  a=abs(aa-segw*0.5);",
+    "  vec2 k=vec2(cos(a),sin(a))*r/max(zoom,.001)/vec2(aspect,1.0)+.5;",
+    "  vec3 col=texture2D(tex,k).rgb;",
+    "  float v=smoothstep(.75,.35,r);",
+    "  gl_FragColor=vec4(col*mix(.82,1.0,v),1.0);",
+    "}"
+  ].join("\n");
+
+  function mk(type, src){
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error("shader: "+gl.getShaderInfoLog(s));
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, mk(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error("link: "+gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  S.prog = prog;
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(prog, "p");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  S.tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, S.tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+}
+
+function resizeCanvas(){
+  var c = document.getElementById("c"), dpr = Math.min(window.devicePixelRatio||1, 2);
+  c.width = Math.floor(window.innerWidth*dpr);
+  c.height = Math.floor(window.innerHeight*dpr);
+  S.gl.viewport(0,0,c.width,c.height);
+}
+
+function testPattern(t){
+  if(!S.testCv){ S.testCv = document.createElement("canvas"); S.testCv.width=960; S.testCv.height=960; }
+  var x = S.testCv.getContext("2d"), N = 960;
+  x.fillStyle = "#0b1018"; x.fillRect(0,0,N,N);
+  for(var i=0;i<7;i++){
+    x.beginPath(); x.arc(N/2,N/2,60+i*55,0,Math.PI*2);
+    x.strokeStyle = "hsl("+((i*47+t*40)%360)+",80%,60%)"; x.lineWidth = 26; x.stroke();
+  }
+  for(var j=0;j<12;j++){
+    var a = t*0.5 + j*Math.PI/6;
+    x.beginPath(); x.moveTo(N/2,N/2);
+    x.lineTo(N/2+Math.cos(a)*N*0.46, N/2+Math.sin(a)*N*0.46);
+    x.strokeStyle = "hsla("+((j*30+t*60)%360)+",90%,65%,.5)"; x.lineWidth = 10; x.stroke();
+  }
+  x.fillStyle = "#fff"; x.beginPath(); x.arc(N/2,N/2,26,0,Math.PI*2); x.fill();
+  return S.testCv;
+}
+
+function analyzeMotion(src){
+  if(!S.small){ S.small = document.createElement("canvas"); S.small.width=32; S.small.height=32; }
+  var x = S.small.getContext("2d");
+  x.drawImage(src, 0, 0, 32, 32);
+  var d = x.getImageData(0,0,32,32).data, sum=0, sx=0, sy=0;
+  if(S.prev){
+    for(var y=0;y<32;y++) for(var i=0;i<32;i++){
+      var k=(y*32+i)*4, diff=Math.abs(d[k]-S.prev[k])+Math.abs(d[k+1]-S.prev[k+1]);
+      if(diff>24){ sum++; sx+=i; sy+=y; }
+    }
+  }
+  S.prev = d;
+  if(sum > 12){                       // 有运动才驱动，静止不转
+    return ((sx/sum)/32 - 0.5) * 0.9; // 横向偏移 → 角速度
+  }
+  return 0;
+}
+
+function frame(){
+  var gl = S.gl, t = (performance.now() - S.t0)/1000;
+  S.frames++;
+  if(t - S.lastFps > 1){ S.fps = S.frames/(t-S.lastFps||1); S.frames=0; S.lastFps=t;
+    if(S.fpsShow) say("FPS "+S.fps.toFixed(0)+(S.useTest?" · 测试图案":"")); }
+  var src = null;
+  if(S.video && S.video.readyState >= 2) src = S.video;
+  else if(S.useTest) src = testPattern(t);
+  if(src){
+    gl.bindTexture(gl.TEXTURE_2D, S.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+  }
+  if(S.motion && src){
+    S.rot += analyzeMotion(src) * 0.08;
+  }
+  var c = document.getElementById("c");
+  gl.uniform1f(gl.getUniformLocation(S.prog,"seg"), S.seg);
+  gl.uniform1f(gl.getUniformLocation(S.prog,"rot"), S.rot);
+  gl.uniform1f(gl.getUniformLocation(S.prog,"zoom"), S.zoom);
+  gl.uniform1f(gl.getUniformLocation(S.prog,"aspect"), c.width/Math.max(c.height,1));
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  requestAnimationFrame(frame);
+}
+
+function startCamera(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    S.useTest = true; say("这个环境不给相机（无 getUserMedia）· 已切换测试图案");
+    return;
+  }
+  say("正在请求相机…");
+  var done = false;
+  var timer = setTimeout(function(){
+    if(done) return;
+    S.useTest = true;
+    say("相机无响应（权限被拦或挂起）· 已切换测试图案 · Safari 打开 http://127.0.0.1:8080/kaleido/v3.html 可拿真相机");
+  }, 2500);
+
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:S.facing }, audio:false })
+    .then(function(st){
+      done = true; clearTimeout(timer);
+      S.stream = st;
+      var v = document.createElement("video");
+      v.autoplay = true; v.muted = true; v.playsInline = true; v.srcObject = st;
+      v.play().then(function(){ say("相机就绪 · 点屏幕切 UI"); }).catch(function(e){ say("播放失败："+e.name); });
+      S.video = v;
+    })
+    .catch(function(e){
+      done = true; clearTimeout(timer);
+      S.useTest = true;
+      say("相机失败："+e.name+" · 已切换测试图案");
+    });
+}
+
+function bindUI(){
+  window.addEventListener("resize", resizeCanvas);
+  var ui = document.getElementById("ui");
+  ui.addEventListener("click", function(e){
+    var b = e.target; if(b.tagName !== "BUTTON") return;
+    if(b.dataset.seg){
+      S.seg = parseFloat(b.dataset.seg);
+      [].forEach.call(ui.querySelectorAll("[data-seg]"), function(x){ x.classList.remove("on"); });
+      b.classList.add("on"); return;
+    }
+    if(b.id === "motion"){ S.motion = !S.motion; b.classList.toggle("on", S.motion); return; }
+    if(b.id === "fps"){ S.fpsShow = !S.fpsShow; b.classList.toggle("on", S.fpsShow); return; }
+  });
+  document.addEventListener("click", function(){ /* 预留 */ });
+}
+
+function boot(){
+  try{
+    S.t0 = performance.now();
+    initGL();
+    resizeCanvas();
+    bindUI();
+    startCamera();
+    requestAnimationFrame(frame);
+  }catch(e){
+    say("初始化失败：" + (e && e.message ? e.message : e));
+    console.error(e);
+  }
+}
+boot();
+</script></body></html>

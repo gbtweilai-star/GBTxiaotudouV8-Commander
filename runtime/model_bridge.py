@@ -112,6 +112,8 @@ TRANSCRIPT = str(ROOT / "state" / "her_transcript.jsonl")
 LOG_IDS = collections.deque(maxlen=500)
 # 品味内核（吞噬 taste-skill 后蒸馏，见 docs/19-taste-absorbed.md）
 TASTE_KERNEL = str(ROOT / "state" / "taste_kernel.txt")
+PERSONA = str(ROOT / "state" / "her_persona.txt")
+PERSONA_LITE = str(ROOT / "state" / "her_persona_lite.txt")
 
 # 🔴 2026-10-26 主人口径：「使用 A19 不使用云端」。
 #    selfhost（A19）探不到时**不再静默降级**到免费池/DeepSeek ——
@@ -408,6 +410,20 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, "count": len(rows), "rows": rows,
                                     "file": TRANSCRIPT})
         # ── 品味内核：页面「🎨 品味」按钮从这里取，避免把 1.2k token 写进 HTML ──
+        # ── 她的人格：页面「人格」按钮从这里取（说话自然靠它，不是靠模型大小）
+        if self.path.startswith("/_persona"):
+            try:
+                # ?lite=1 ⇒ 407 字精简版（默认），否则 1182 字全量版
+                lite = "lite=1" in self.path or "lite" == self.path.split("?")[-1]
+                with open(PERSONA_LITE if lite else PERSONA, encoding="utf-8") as fh:
+                    text = fh.read()
+                return self._json(200, {"ok": True, "chars": len(text),
+                                        "lite": lite,
+                                        "file": PERSONA_LITE if lite else PERSONA,
+                                        "persona": text})
+            except Exception as exc:                              # noqa: BLE001
+                return self._json(500, {"ok": False,
+                                        "error": "%s: %s" % (type(exc).__name__, exc)})
         if self.path.startswith("/_taste"):
             try:
                 with open(TASTE_KERNEL, encoding="utf-8") as fh:

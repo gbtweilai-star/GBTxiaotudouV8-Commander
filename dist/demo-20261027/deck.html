@@ -1,0 +1,72 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<title>GBT小土豆V8 · 能做什么</title>
+<style>
+ :root{--ink:#0b0f16;--paper:#f7f5f0;--accent:#c8452d;}
+ *{box-sizing:border-box;margin:0;padding:0}
+ html,body{height:100%}
+ body{background:var(--ink);color:var(--paper);font-family:-apple-system,"PingFang SC",system-ui,sans-serif;overflow:hidden}
+ .slide{position:absolute;inset:0;display:none;padding:8vh 8vw;flex-direction:column;justify-content:center}
+ .slide.on{display:flex}
+ .kicker{font-size:1.6vh;letter-spacing:.12em;color:#9aa6b6;margin-bottom:2.2vh}
+ h1{font-size:6.4vh;line-height:1.12;letter-spacing:-.02em;font-weight:700;max-width:78%}
+ h2{font-size:4.2vh;line-height:1.2;letter-spacing:-.015em;max-width:82%}
+ p{font-size:2.6vh;line-height:1.65;color:#cfd6e0;margin-top:2.4vh;max-width:62ch}
+ ul{margin-top:2.6vh;display:flex;flex-direction:column;gap:1.6vh;max-width:64ch}
+ li{font-size:2.5vh;line-height:1.5;color:#dfe5ee;list-style:none;padding-left:3.2vh;position:relative}
+ li:before{content:"";position:absolute;left:0;top:1.15vh;width:1.5vh;height:.28vh;background:var(--accent)}
+ .fig{position:absolute;right:0;bottom:0;top:0;width:42%;background-size:cover;background-position:center;opacity:.92}
+ .num{position:absolute;right:7vw;bottom:6vh;font-size:1.8vh;color:#7f8b9b;letter-spacing:.08em}
+ .bar{position:absolute;left:0;bottom:0;height:.5vh;background:var(--accent);width:0;transition:width .4s}
+ /* 2026-10-27：原来只按 16:9 横屏排，竖屏时右侧图幅压住标题（截图为证）。
+    竖屏改成"图在下三分一、字在上"，字号同步收一档。 */
+ @media (orientation: portrait){
+   .fig{left:0;right:0;top:auto;bottom:0;width:100%;height:34%;opacity:.9}
+   .slide{padding:7vh 7vw 40vh}
+   h1{font-size:9vh} h2{font-size:6.4vh}
+   p{font-size:3.6vh} li{font-size:3.4vh} ul{gap:1.2vh}
+   .num{bottom:2vh;right:6vw}
+ }
+ /* 提词条：默认隐藏，按 N 显示/隐藏。投屏时别开，彩排时开 */
+ .note{display:none;position:absolute;left:8vw;right:8vw;bottom:9vh;font-size:2.2vh;line-height:1.6;
+        color:#ffe9c9;background:rgba(0,0,0,.62);padding:1.6vh 2vh;border-left:.4vh solid var(--accent)}
+ body.notes .note{display:block}
+ /* 计时器：按 T 显示，记本页停留与被讲过的总时长 */
+ /* 硬字幕：烧进画面，静音播放也能读。--burn-subs 时给 body 加 subs 类 */
+ .sub{display:none;position:absolute;left:10vw;right:10vw;bottom:4.5vh;text-align:center;
+       font-size:2.6vh;line-height:1.5;color:#fff;
+       text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 2px #000}
+ body.subs .sub{display:block}
+ .clock{display:none;position:absolute;left:8vw;top:5vh;font-size:1.9vh;color:#9aa6b6;letter-spacing:.06em}
+ body.timer .clock{display:block}
+</style></head><body class="subs">
+<section class="slide" data-note="她是一台跑在手机上的私人框架。开发者自由的风，守护者公主土豆。权重和数据都在自己手里。"><div class="fig" style="background-image:url(media/deck-01.png)"></div><div class="kicker">GBT小土豆V8 · 8.0.0</div><h1>她是一台跑在手机上的私人框架</h1><p>开发者：自由的风　守护者：公主土豆。不接任何企业云，权重和数据都在自己手里。</p><div class="note">她是一台跑在手机上的私人框架。开发者自由的风，守护者公主土豆。权重和数据都在自己手里。</div><div class="sub">她是一台跑在手机上的私人框架。开发者自由的风，守护者公主土豆。权重和数据都在自己手里。</div><div class="num">01 / 05</div></section>
+<section class="slide" data-note="第一样是眼睛。她能读出画面里的东西：人、工具、文字、条码。读不到就说读不到。"><div class="fig" style="background-image:url(media/deck-02.png)"></div><div class="kicker">01 视觉</div><h2>眼睛：看得懂画面</h2><ul><li>会读出画面里的东西：人、工具、文字、条码</li><li>把读数叠成一张可投屏的稿</li><li>不猜，读不到就说读不到</li></ul><div class="note">第一样是眼睛。她能读出画面里的东西：人、工具、文字、条码。读不到就说读不到。</div><div class="sub">第一样是眼睛。她能读出画面里的东西：人、工具、文字、条码。读不到就说读不到。</div><div class="num">02 / 05</div></section>
+<section class="slide" data-note="第二样是手。她能改图，但改的是质感和构图，不改你的意思。改不动的，她会退回去，不硬来。"><div class="fig" style="background-image:url(media/deck-03.png)"></div><div class="kicker">02 修复</div><h2>手：改图不改意思</h2><ul><li>压边缘密度：让杂乱的背景安静下来</li><li>补留白：给主体让出呼吸的地方</li><li>五条判据能修，三条互相冲突时会回退，不硬改</li></ul><div class="note">第二样是手。她能改图，但改的是质感和构图，不改你的意思。改不动的，她会退回去，不硬来。</div><div class="sub">第二样是手。她能改图，但改的是质感和构图，不改你的意思。改不动的，她会退回去，不硬来。</div><div class="num">03 / 05</div></section>
+<section class="slide" data-note="第三样是嘴。短句，不喊口号。七情有分寸，声音是台湾腔的女声。"><div class="fig" style="background-image:url(media/deck-04.png)"></div><div class="kicker">03 表达</div><h2>嘴：说话像人</h2><ul><li>短句，不喊口号，不装懂</li><li>七情有分寸：喜具体夸，怒变短，哀会停一下</li><li>台湾腔女声，语速按情绪调</li></ul><div class="note">第三样是嘴。短句，不喊口号。七情有分寸，声音是台湾腔的女声。</div><div class="sub">第三样是嘴。短句，不喊口号。七情有分寸，声音是台湾腔的女声。</div><div class="num">04 / 05</div></section>
+<section class="slide" data-note="她要的只有一件东西：把事做成。做不成的那天，她会说做不成。"><div class="fig" style="background-image:url(media/deck-hero.png)"></div><div class="kicker">结尾</div><h2>她要的只有一件东西：把事做成</h2><p>不吹能力，只报读数。做不成的那天，她会说做不成。</p><div class="note">她要的只有一件东西：把事做成。做不成的那天，她会说做不成。</div><div class="sub">她要的只有一件东西：把事做成。做不成的那天，她会说做不成。</div><div class="num">05 / 05</div></section>
+<div class="bar" id="bar"></div>
+ <div class="clock" id="clock">00:00 · 本页 00:00</div>
+<script>
+const S=[...document.querySelectorAll('.slide')];let i=0;
+function show(n){i=(n+S.length)%S.length;S.forEach((s,k)=>s.classList.toggle('on',k===i));
+ document.getElementById('bar').style.width=((i+1)/S.length*100)+'%';}
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')show(i+1);if(e.key==='ArrowLeft')show(i-1);});
+let t=setInterval(()=>show(i+1), 8000);
+/* 提词与计时：N 切提词条，T 切计时，空格/方向键翻页 */
+let t0=null, pageT=null;
+function tick(){
+  const now=Date.now();
+  if(t0){ document.getElementById('clock').textContent =
+    fmt((now-t0)/1000)+' · 本页 '+fmt((now-(pageT||now))/1000); }
+  requestAnimationFrame(tick);
+}
+function fmt(s){const m=Math.floor(s/60),x=Math.floor(s%60);return String(m).padStart(2,'0')+':'+String(x).padStart(2,'0');}
+addEventListener('keydown',e=>{
+  if(e.key==='n'||e.key==='N')document.body.classList.toggle('notes');
+  if(e.key==='t'||e.key==='T'){document.body.classList.toggle('timer');t0=t0||Date.now();pageT=Date.now();}
+});
+const _show=show; show=function(n){_show(n);pageT=Date.now();};
+tick();
+addEventListener('click',()=>{clearInterval(t);show(i+1);});
+show(0);
+</script></body></html>

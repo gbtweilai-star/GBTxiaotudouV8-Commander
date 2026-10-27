@@ -31,9 +31,13 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = "http://127.0.0.1:1234/v1"
-KEY = "gbt"
-HOST, PORT = "127.0.0.1", 1234
+# 🔴 端点可覆盖：默认本机 LM Pocket；设 GBT_A19_BASE 就能指向**我们自己的 vLLM**
+#    （RunPod 上的 gbt-v8-v83）。这样"她的嘴"不绑死在手机上，也不改一行调用代码。
+BASE = os.environ.get("GBT_A19_BASE") or "http://127.0.0.1:1234/v1"
+KEY = os.environ.get("GBT_A19_KEY") or "gbt"
+_u = BASE.split("//")[-1].split("/")[0]
+HOST = _u.split(":")[0]
+PORT = int(_u.split(":")[1]) if ":" in _u else (443 if BASE.startswith("https") else 80)
 QUEUE = "/tmp/a19_queue.jsonl"
 DONE = "/tmp/a19_done.jsonl"
 

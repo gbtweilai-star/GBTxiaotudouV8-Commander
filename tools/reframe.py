@@ -95,6 +95,27 @@ def dominant_color(im):
     return Counter(px).most_common(1)[0][0]
 
 
+
+def boost_focus(im, gain=1.35, feather=8):
+    """与 converge_focus 相反的一招：**只提亮主光，不压暗别人**。
+
+    为什么需要两条：压暗会连同整体对比一起压掉（暗调图 tz_A 就是这么丢掉"对比"这条的）；
+    提亮不降对比，但只对"有明确最亮块"的图有效（tz_D 五块高光同样亮，提哪个都不够）。
+    """
+    g = np.asarray(im.convert("L"), dtype=np.float32)
+    thr = np.percentile(g, 99.0)
+    blobs, (gh, gw) = components(g >= thr)
+    if not blobs:
+        return im
+    m = Image.new("L", (gw, gh), 0)
+    for (y, x) in max(blobs, key=len):
+        m.putpixel((x, y), 255)
+    m = m.resize(im.size, Image.BILINEAR).filter(ImageFilter.GaussianBlur(feather))
+    f = np.asarray(m, dtype=np.float32) / 255.0
+    a = np.asarray(im, dtype=np.float32) * (1 + f[..., None] * (gain - 1))
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB")
+
+
 def pad_space(im, target_void=0.16, side="right"):
     """留白不够就往一侧扩画布（主色填充），形成非对称负空间。"""
     a = np.asarray(im.convert("RGB"), dtype=np.float32)

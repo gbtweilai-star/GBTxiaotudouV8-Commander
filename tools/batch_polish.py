@@ -63,49 +63,57 @@ def main():
                 f = _small
             b = tg.judge(f, "photo")
             m0 = metrics(f)
-            # 🔴 顺序敏感（实测）：P4 要「先降杂乱再扩留白」，A2 要「先扩留白再降杂乱」。
-            #    所以**两路都跑，取判据更少的那一路**；同分取高频更高者。没有一条万能顺序。
-            def _pipeline(order):
-                cur = f
-                used_dc = used_rf = False
-                for step in order:
-                    if step == "dc":
-                        try:
-                            o = os.path.join(a.out, base + "_dc_%s.png" % order)
+            # 🔴 逐步"只采纳更好"是贪心的：先降杂乱改好了，扩留白就不再"更优" ⇒ 被拒，
+            #    结果丢掉了一个本来能 PASS 的组合（P1 就这么丢的）。
+            #    改成：**三条路线全跑完，再整体择优** —— 原图 / 降杂乱→扩留白 / 扩留白→降杂乱。
+            def _apply(cur, order):
+                for _i, step in enumerate(order):
+                    try:
+                        if step == "bf":
+                            o = os.path.join(a.out, base + "_bf%s.png" % "".join(order))
                             im2 = Image.open(cur).convert("RGB")
-                            o_im, _ = dc.declutter(im2, 12, 45, 0.75)
-                            o_im.save(o, "PNG")
-                            g0 = tg.judge(cur, "photo"); g1 = tg.judge(o, "photo")
-                            if len(g1["fails"]) <= len(g0["fails"]):
-                                cur = o; used_dc = True
-                        except Exception:                         # noqa: BLE001
-                            pass
-                    else:
-                        try:
-                            o = os.path.join(a.out, base + "_rf_%s.png" % order)
+                            rf.boost_focus(im2).save(o, "PNG")
+                            cur = o
+                        elif step == "dc":
+                            o = os.path.join(a.out, base + "_dc%s.png" % "".join(order))
                             im2 = Image.open(cur).convert("RGB")
-                            im2, _ = rf.converge_focus(im2)
-                            im2, _v, _q = rf.pad_space(im2)
-                            im2.save(o, "PNG")
-                            g0 = tg.judge(cur, "photo"); g1 = tg.judge(o, "photo")
-                            if len(g1["fails"]) < len(g0["fails"]) and g1["readings"]["focus_blobs"] != 0:
-                                cur = o; used_rf = True
-                        except Exception:                         # noqa: BLE001
-                            pass
-                return cur, used_dc, used_rf
+                            o_im, _ = dc.declutter(im2, 12, 45, 0.75); o_im.save(o, "PNG")
+                            cur = o
+                        else:
+                            o = os.path.join(a.out, base + "_rf%s.png" % "".join(order))
+                            im2 = Image.open(cur).convert("RGB")
+                            # 🔴 已经提亮过主光（bf）就**不能再压暗**：两者目标相反，
+                            #    实测会把 P2 从 PASS 打回 FAIL（bf 提亮的正是 converge 要压的那块）。
+                            if "bf" not in order[:_i]:
+                                im2, _ = rf.converge_focus(im2)
+                            im2, _v, _q = rf.pad_space(im2); im2.save(o, "PNG")
+                            cur = o
+                    except Exception:                             # noqa: BLE001
+                        return None
+                return cur
 
+            cands = [(f, ("none",))]
+            for order in (("dc", "rf"), ("rf", "dc"), ("bf", "rf"), ("bf", "dc", "rf")):
+                c = _apply(f, order)
+                if c:
+                    cands.append((c, order))
             best = None
-            for order in (("dc", "rf"), ("rf", "dc")):
-                cur, u_dc, u_rf = _pipeline(order)
-                gt = tg.judge(cur, "photo")
-                hf = metrics(cur)["高频"]
+            for src_c, order in cands:
+                tmp = os.path.join(a.out, base + "_try_%s.png" % "".join(order))
+                try:
+                    p2.run(src_c, tmp, a.scale, 0.22, 0.05, 0.55)
+                except Exception:                                 # noqa: BLE001
+                    continue
+                gt = tg.judge(tmp, "photo")
+                hf = metrics(tmp)["高频"]
                 key = (len(gt["fails"]), -hf)
                 if best is None or key < best[0]:
-                    best = (key, cur, gt, order, u_dc, u_rf)
-            _key, stage1, aft_pre, order_won, dc_used, rf_used = best
-            reverted = not (dc_used or rf_used)
-            p2.run(stage1, dst, a.scale, 0.22, 0.05, 0.55)
-            aft = tg.judge(dst, "photo")
+                    best = (key, tmp, gt, order)
+            _key, dst, aft, order_won = best
+            stage1 = dst
+            dc_used = "dc" in order_won
+            reverted = order_won == ("none",)
+            m1 = metrics(dst)
             rows.append({"file": os.path.basename(f), "out": dst, "reverted": reverted, "declutter": dc_used, "order": "".join(order_won),
                          "before": {"verdict": b["verdict"], "fails": b["fails"], **m0},
                          "after": {"verdict": aft["verdict"], "fails": aft["fails"], **m1},
