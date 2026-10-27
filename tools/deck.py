@@ -31,7 +31,7 @@ HTML = """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
  ul{{margin-top:2.6vh;display:flex;flex-direction:column;gap:1.6vh;max-width:64ch}}
  li{{font-size:2.5vh;line-height:1.5;color:#dfe5ee;list-style:none;padding-left:3.2vh;position:relative}}
  li:before{{content:"";position:absolute;left:0;top:1.15vh;width:1.5vh;height:.28vh;background:var(--accent)}}
- .fig{{position:absolute;right:0;bottom:0;top:0;width:42%;background-size:cover;background-position:center;opacity:.92}}
+ .fig{{position:absolute;right:0;bottom:0;top:0;width:42%;background-size:contain;background-repeat:no-repeat;background-position:center;opacity:.92}}  /* 🔴 2026-10-27：原来是 cover。手机长截图（比例 0.46）塞进 42% 宽 × 全高的     容器里，cover 会把高度放大到 1700+ 像素，中间裁出来只剩一条键盘——     证据图看不到证据。改成 contain：整张可见，比例不同自动留边。 */
  .num{{position:absolute;right:7vw;bottom:6vh;font-size:1.8vh;color:#7f8b9b;letter-spacing:.08em}}
  .bar{{position:absolute;left:0;bottom:0;height:.5vh;background:var(--accent);width:0;transition:width .4s}}
  /* 2026-10-27：原来只按 16:9 横屏排，竖屏时右侧图幅压住标题（截图为证）。
