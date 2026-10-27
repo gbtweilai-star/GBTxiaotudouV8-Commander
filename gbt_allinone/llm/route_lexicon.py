@@ -64,6 +64,12 @@ LEXICON: list[dict] = [
         "reason": "把一句话落到一个能力位",
     },
     {
+        "id": "health_check",
+        "patterns": ["健康", "体检", "自检", "状态如何", "还活着", "health", "五维"],
+        "kinds": ["health", "brain_health", "mirror_status", "svc_inspect"],
+        "reason": "健康/体检一类：整体看 health，大脑自身看 brain_health",
+    },
+    {
         "id": "audit_align",
         "patterns": ["对齐", "审计", "体检", "普查", "无死角", "多域", "基线", "回归"],
         "kinds": ["impact_check", "mirror_scan", "health", "coverage_auditor"],
@@ -77,16 +83,25 @@ def _score(intent: str, entry: dict) -> tuple[int, list[str]]:
     return len(hit), hit
 
 
-def match(intent: str, min_hits: int = 1) -> dict:
+# 长意图阈值：像"能力位描述"那种长文本里全是顺手词，
+# 允许 1 个命中就劫持会误伤（实测：browser 描述含"窗口"被导到 ring_context，
+# coze_mail 含"绑定"被导到 tentacle_bind，n8n_wf 含"双向"同上）。
+# 规则：意图长度 > LONG_INTENT 时要求 ≥2 个不同命中；短人话 ≥1 即可。
+LONG_INTENT = 60
+
+
+def match(intent: str, min_hits: int = 0) -> dict:
     """返回 {ok, entry, score, hits, ranked}。没命中就 ok=False，不硬编。"""
     text = str(intent or "")
     if not text:
         return {"ok": False, "why": "空意图"}
+    need = min_hits or (2 if len(text) > LONG_INTENT else 1)
     ranked = []
     for e in LEXICON:
         sc, hits = _score(text, e)
-        if sc >= min_hits:
+        if sc >= need:
             ranked.append({"id": e["id"], "score": sc, "hits": hits[:6],
+                           "need": need,
                            "kinds": e["kinds"], "reason": e["reason"]})
     if not ranked:
         return {"ok": False, "why": "词表未命中"}

@@ -988,3 +988,66 @@ empty_window   → rebuild_window → resume_mainline
 **两条链各司其职：大脑给"相关方向"，规则表给"确定动作"。**
 
 ---
+
+---
+
+## 二十、严禁无脑操作：所有位必须过大脑执行层（2026-10-28）
+
+主人令：「**严禁无脑操作，大脑执行层是必须经过的**」。
+
+### 我之前犯的正是这个
+
+`tools/omni_align.py --run` 直接拿空 payload **轮询 220 个位**，绕开大脑执行层。
+那不是对齐，是无脑扫。**已停，废弃那条路。**
+
+### 正规入口：brain_unify
+
+```
+brain_unify(goal=<意图>, payload={kind: <位>})
+  → route     人话 → 位（lexicon / semantic / heuristic）
+  → execute   过唯一门与会授权门
+  → verify    视觉验证
+  → health    五维自检分
+```
+
+新工具 `tools/brain_align.py`，**每一位都走 brain_unify**，不再直接 run_task 打位。
+
+### 对齐判据（"无死角"的真含义）
+
+**拿每个能力位自己的描述当人类意图，看大脑能不能路由回它自己。**
+导不回来 = 路由层对这个位是瞎的，就算位本身能跑也算没对齐。
+
+### 跑出来的东西（llm 域 41 位，有界，不全量）
+
+```
+aligned       21
+needs_params   8
+routed_other   7
+skipped        5
+```
+
+### 期间修掉的一个真错：词表过度命中
+
+第一版词表**靠一个顺手词就劫持路由**：
+
+| 位 | 被劫持到 | 因为描述里含 |
+|---|---|---|
+| `browser` | `ring_context` | 「窗口」 |
+| `n8n_wf` | `tentacle_bind` | 「双向」 |
+| `coze_mail` | `tentacle_bind` | 「绑定」 |
+| `anatomy_figures` | `audit_align` | 「审计」 |
+
+**修法**：意图长度 > 60（像能力描述那种长文本）时要求 **≥2 个不同命中**才允许劫持；
+短人话 ≥1 即可。
+
+修后：8 位样本 **aligned 4 → 6**，误劫持 **4 → 1**；短人话三条仍全部命中。
+
+### 必须如实说的一条
+
+`verify` 在这台机上**恒返回 `vision: False`**（非交互桌面，GDI/DXGI 拿不到屏）。
+
+⇒ **每一份"已验证"的说法都要带上这一条。** 现在这条链是
+`route ✅ → execute ✅ → verify ❌(环境不可用) → health ✅`，
+**验证那一环是空的，不能算过。**
+
+---
