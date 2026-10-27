@@ -2111,3 +2111,58 @@ voice        ok=true
 **同一个作用域发一次就够** —— 重复发只是把 `grants_available` 叠上去（现在 `process_execute` 有 7 次可用），不会更安全，也不会解锁更多。
 
 ---
+
+---
+
+## 三十九、投影：能做的做了，做不到的查明原因（2026-10-28）
+
+主人问「怎么投影能力没跑通实现吗」。分三层查清：
+
+### ① 能力位层面 —— 本来就能跑
+
+```
+projection_card      ok=true  readonly  空间投射只读卡片（5 原语全标"未核实"）
+emotion_projection   ok=true  readonly  七情 + 叙事四问
+```
+
+**这两个不是坏，是"只呈现不执行"的设计**（`readonly_note` 里写死的）。
+`emotion_projection` 传 `op=status` 会报错，因为它只认
+`model/narrate/project/check/scan/scene_classes`。
+
+### ② 实物投墙 —— 做出来了
+
+新页 `holo_pet_w3/projection/index.html`，已进面板一级导航（第三项）：
+
+```
+投墙 180°   透镜成的是 180° 旋转实像，屏幕端预转抵消（这是之前修过的 bug）
+反色        白底更亮，投出去更亮
+镜像        只左右翻（非透镜场景）
+全屏 + 快捷键 F/1/2/3
+素材        8 张实拍可选 · 也支持拖进来 / 本地选图
+```
+
+**实测**：选中海报后 `naturalWidth=720×962` 正常加载，`stage` 类为
+`flip invert`（投墙 + 反色都开着，画面正确倒转 180°）。
+
+### ③ 实时摄像头 —— **拿不到，原因明确**
+
+```
+WebView 里 navigator.mediaDevices.getUserMedia(...) **挂起不返回**
+  —— 既不 resolve 也不 reject（权限提示弹不出来）
+真实点击触发也一样：5 秒后仍 null
+apple-* 全部 21 个工具里**没有任何摄像头入口**
+body_see（截屏）用的 mss 也没装，且装到 iSH 也抓不到 iOS 屏
+```
+
+⇒ **"调用原生后置摄像头实现投影效果"这条，本机确实做不到。**
+之前模型给出 `hxCamProjector` 是幻觉（仓库里没有这个位），
+而真正的限制是：**摄像头的权限面不在我能触到的任何一层**。
+
+### 一条口径
+
+**"能力位能跑" ≠ "那件事能做到"。**
+`projection_card` 返回 ok，不代表能投墙；
+能投墙的是 `lens.py` + 新投影台；
+而摄像头这一层，是环境没有，不是代码没写。
+
+---
