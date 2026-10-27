@@ -1452,3 +1452,67 @@ aligned 5/5 · verify 结论全是 unverified_no_surface · 计入验证的位 0
 以前它显示 `vision: False` 看不出区别，现在能分清"没验"和"验不过"了。
 
 ---
+
+---
+
+## 二十八、verify 接进镜像放行闸：先验现实，再谈晋升（2026-10-28）
+
+### 加在哪、为什么加在那儿
+
+`mirror_ascend` 原有前置是 `scan()` 的**五项体检**。
+
+**我没有改 `scan()`** —— 那是框架的契约，动它会改别人依赖的形状。
+而是在**编排层**（`tools/mirror_panel.py`）加一道**更严的门**：
+
+```
+放行前必须证明：
+  · 计划里每个服务的端口**真的在听**
+  · 计划里每个文件**真的在、哈希对得上**
+任何一条不过 ⇒ 拒绝放行，并点名是哪条
+```
+
+探活走**大脑执行层的 `brain_verify`（reality 面）**，不自己另写一套。
+
+### 正面：4 条面全过
+
+```
+verify    ok=True  验证面 4 条
+   ✅ panel_server :8765 应该在线          verified
+   ✅ static_pages :8080 应该在线          verified
+   ✅ 文件 holo_pet_w3/panel/index.html   verified
+   ✅ 文件 holo_pet/panel_server.py       verified
+   ✅ 现实全过 —— 可以进 release（release 本身还要过 deploy_publish 门）
+```
+
+### 负面：停掉服务，它真会拦
+
+```
+停掉 :8765 →
+  ok: False | 验证面: 4
+    🔴 panel_server :8765 应该在线   failed     ← 点名了
+    ✅ static_pages :8080 应该在线   verified
+    ✅ 文件 holo_pet_w3/panel/index.html  verified
+    ✅ 文件 holo_pet/panel_server.py      verified
+```
+
+**不是"有条面挂了就整体报红"，而是逐条列出、指出是哪一条。**
+
+### 一条硬纪律写进代码
+
+```
+验证面 == 0 时 ⇒ ok: False，why="一条可验证面都没有"
+```
+
+**不许因为"scan 全绿"就直接放行。** 没有可验证面就等于没验。
+
+### 现在这条链的完整形状
+
+```
+shape → scan(5) → plan → simulate(9) → parity(0 blocker)
+      → verify(现实面：端口/文件)        ← 本轮新加
+      → release（还要过 deploy_publish 门，只有主人能开）
+```
+
+**每一环都有读数，每一环都有"不过就不放行"的具体条件。**
+
+---
