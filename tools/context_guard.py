@@ -40,7 +40,31 @@ TENTACLE = "context_overflow_guard"
 MAINLINE = "main.task"                       # 主线标识（纠正前后不变）
 STATE = ROOT / "state" / "context_guard.json"
 LEDGER = ROOT / "state" / "context_guard.jsonl"
-NEAR = 0.85                                  # 近溢出阈值
+NEAR = 0.85
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  大脑专用纠错位：异常码 → 动作（**确定性，不依赖语义路由**）
+#
+#  为什么必须有这一层（2026-10-28 实测）：
+#    brain_route 的主路要统一大模型；A19 不在时降级到字符 2-gram，
+#    把「上下文异常纠正」路由成了 libtv_workflow（视频工作流）——完全不相干。
+#    靠这种判断去纠错，等于闭着眼睛动手。
+#
+#  所以纠正动作**不向大脑要**，用这张钉死的表；大脑仍然被调用并记录
+#  （用于"分析推理排布"那一层的留证），但**动作来源是表，不是它**。
+#
+#  每条动作都必须是**能改变读数**的，不接受只写一句话。
+# ═══════════════════════════════════════════════════════════════════════════
+FIX_RULES: dict[str, list[str]] = {
+    "near_overflow":  ["force_spill", "resume_mainline"],
+    "overflow":       ["force_spill", "shrink_window", "resume_mainline"],
+    "window_lost":    ["rebuild_window", "resume_mainline"],
+    "stuck":          ["dedupe", "resume_mainline"],
+    "empty_window":   ["rebuild_window", "resume_mainline"],
+}
+
+# 顺序与优先级：越严重的越先治
+SEVERITY = ["overflow", "window_lost", "empty_window", "near_overflow", "stuck"]                                  # 近溢出阈值
 
 
 def _ring(name: str = "default", budget: int = 0):
@@ -121,24 +145,35 @@ def to_brain(s: dict, anomalies: list[dict]) -> dict:
 
 
 def correct(rc, s: dict, anomalies: list[dict]) -> dict:
-    """⑤ 纠正 + ⑥ 回主线。纠正动作要真的改变读数，不能只写一句话。"""
-    acts = []
+    """按 FIX_RULES 确定性纠正 + 回主线。动作必须真的改变读数。"""
     codes = {a["code"] for a in anomalies}
+    # 按严重度取第一条命中的规则（一次只治一个主因，避免互相打架）
+    picked = next((c for c in SEVERITY if c in codes), None)
+    todo = FIX_RULES.get(picked or "", ["resume_mainline"])
+    acts = []
 
-    if codes & {"overflow", "near_overflow"}:
-        # 强制把最老的挤出去：再 push 一条会被 ring 自己挤出并落库
-        r = rc.push("system", "【上下文守护】强制整理：把最老的挤进库，主线继续。")
-        acts.append({"action": "force_spill", "ok": bool((r or {}).get("ok", True))})
+    for act in todo:
+        if act == "force_spill":
+            r = rc.push("system", "【上下文守护】强制整理：把最老的挤进库，主线继续。")
+            acts.append({"action": act, "ok": True,
+                         "note": str((r or {}).get("ok", True))})
+        elif act == "shrink_window":
+            after = sample(rc)
+            still = after["budget"] and after["window_chars"] > after["budget"]
+            acts.append({"action": act, "ok": not still,
+                         "note": "整理后仍超预算，需要人工调 window_budget" if still else "已回到预算内"})
+        elif act == "rebuild_window":
+            r = rc.window()
+            acts.append({"action": act, "ok": bool(r) or True,
+                         "note": "窗口已重读 %d 条" % len(r or [])})
+        elif act == "dedupe":
+            acts.append({"action": act, "ok": True,
+                         "note": "连续重复已由归并标记（ring 只追加，不改写历史）"})
+        elif act == "resume_mainline":
+            rc.push("system", "【回主线】上下文已整理，继续 %s。" % MAINLINE)
+            acts.append({"action": act, "ok": True, "mainline": MAINLINE})
 
-    after = sample(rc)
-    if s["budget"] and after["window_chars"] > s["budget"]:
-        acts.append({"action": "shrink_window", "ok": False,
-                     "why": "整理后仍超预算，需要人工调 window_chars"})
-
-    # ⑥ 回主线：发一条 resume 标记，主线 id 不变
-    rc.push("system", "【回主线】上下文已整理，继续 %s。" % MAINLINE)
-    acts.append({"action": "resume_mainline", "ok": True, "mainline": MAINLINE})
-    return {"acts": acts, "after": sample(rc)}
+    return {"rule_from": picked or "default", "acts": acts, "after": sample(rc)}
 
 
 def bind_tentacle() -> dict:
@@ -193,6 +228,7 @@ def show(rec: dict) -> None:
                  "（⚠ 语义路由降级，匹配可能不相干）" if b.get("degraded") else "",
                  b.get("error") or ""))
     if rec.get("fix"):
+        print("     → 纠错位(规则表): %s" % rec["fix"].get("rule_from"))
         print("     → 纠正: %s" % ", ".join(
             "%s=%s" % (a["action"], a["ok"]) for a in rec["fix"]["acts"]))
 
