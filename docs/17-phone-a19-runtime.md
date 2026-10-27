@@ -543,3 +543,75 @@ python3 tools/fanout_bench.py --stop     # 收掉
 那是两边都要重写，不是调参。
 
 ---
+
+---
+
+## 十四、asyncio 单进程：4096 路零失败（2026-10-27 实测）
+
+### 先纠正一条我自己写错的结论
+
+第十三节说「4096 是客户端 FD 硬上限，卡的是测试端」。**半对半错。**
+
+实测 `resource.setrlimit(RLIMIT_NOFILE, (131072, 131072))` **成功** ——
+iSH 上以 root 身份可以把 hard limit 一起抬上去：
+
+```
+4096 → 8192 → 16384 → 65536 → 131072   全部成功
+```
+
+**所以 4096 不是死墙，是我当时没试。** FD 不是天花板。
+
+### 真正的天花板是"一个连接一个线程"
+
+| 模型 | 单进程上限 | 备注 |
+|---|---|---|
+| `ThreadingHTTPServer`（同步桥） | **512 路** | 1024 路 TimeoutError，2048 路 `can't start new thread` |
+| `asyncio`（新 `runtime/async_gate.py`） | **4096 路零失败** | 单进程 · 无连接线程 · 无线程栈 |
+
+**同样 4096 路：同步桥要 6 个进程，asyncio 要 1 个。**
+
+### 实测（asyncio 单进程 · 打 /health）
+
+| 并发 | 墙钟 | QPS | 成功率 | p50 | p95 |
+|---:|---:|---:|---|---:|---:|
+| 1024 | 4.84s | 211.6 | **1024/1024** | 2855 ms | 4648 ms |
+| **4096** | 62.35s | 65.7 | **4096/4096** | 37026 ms | 61445 ms |
+| 8192 | 104.1s | 33.4 | 3472/8192 | 99680 ms | 103142 ms |
+| 16384 | 47.5s | 2.7 | 128/16384 | 16222 ms | 35034 ms |
+
+### 8192 以上为什么开始掉
+
+**不是连接建不起来，是来不及处理。** 失败分类全是 `超时`，不是
+`ConnectionRefused` —— 连接都接进来了，是 iSH 那颗被模拟的 CPU
+跑不动单个事件循环里的 Python。
+
+⇒ **4096 之后的天花板是 CPU 吞吐，不是并发模型。**
+真要再往上，得减少每请求的 Python 开销（或换语言），不是改并发框架。
+
+### 两个必须同时做的设置
+
+```python
+# 服务端
+resource.setrlimit(RLIMIT_NOFILE, (131072, 131072))
+
+# 客户端（压测端也必须松，否则测的是自己的上限）
+resource.setrlimit(RLIMIT_NOFILE, (131072, 131072))
+```
+
+**只抬客户端没用** —— 服务端 `accept()` 用自己的描述符，1024 一到就是
+`socket.accept() out of system resource`，整个进程被打死（踩过一次）。
+
+### 上游策略沿用主人口径
+
+`runtime/async_gate.py` 直接复用 `model_bridge` 的 `UPSTREAMS` / `FALLBACK` /
+`key_for`，所以**「使用 A19 不使用云端」那条口径自动继承**：
+`GBT_ALLOW_CLOUD_FALLBACK` 未设时，A19 探不到就如实报错，不拿别人的模型冒充她。
+
+用法：
+
+```sh
+python3 runtime/async_gate.py --port 8790
+python3 tools/async_bench.py --port 8790 --conc 1024,4096,8192
+```
+
+---
