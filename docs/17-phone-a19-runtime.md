@@ -2575,3 +2575,52 @@ apple-speech status → "authorization_status": "authorized"
 
 ---
 
+
+---
+
+## 四十七、语音识别权限的最终判定（2026-10-28）
+
+三条路全试，同一个拒绝：
+
+```
+--on-device        User denied access to speech recognition
+--language zh-TW   同上
+--language en-US   同上
+```
+
+而 `status` 接口仍然返回 `authorization_status: authorized`、`is_available: true`、`supports_on_device: false`。
+
+⇒ **状态接口不可信，实际请求才是真相。**
+（这也解释了为什么"麦克风通了"只是通了麦克风那一半。）
+
+### 为什么这不是代码问题
+
+- 权限判定在 `TCC`（iOS 的隐私数据库），命令行走不进去
+- `settings://Privacy` / `settings://SpeechRecognition` 深链均 `opened: false`，只能手点
+- 早期**曾经能用**（前 6 轮采到静音且无报错）⇒ 权限确实存在过，现在被关掉了
+
+### 要点的两处
+
+| 权限 | 路径（iOS 26 中文界面）|
+|---|---|
+| **语音识别** | 设置 → 隐私与安全性 → **语音识别** → **Minis** → 打开 |
+| **麦克风** | 设置 → 隐私与安全性 → **麦克风** → **Minis** → 打开 |
+
+**如果"语音识别"列表里根本没有 Minis** ⇒ 说明这次 App 启动后还没成功申请过该权限，
+那就需要让 App 先触发一次申请（在 App 内用一次语音功能），列表里才会出现。
+
+### 恢复后的验证顺序（一次到位，不反复打）
+
+```sh
+# ① 只测一次，确认权限通了
+python3 tools/wake_word.py --test "小土豆"
+timeout 90 apple-speech transcribe --source mic --duration 4
+
+# ② 通了才开循环
+gbt wake --loop --seconds 60 --until 1200
+```
+
+**纪律：先单次确认，再开循环。** 上次就是跳过这步，103 次把服务打坏的。
+
+---
+
