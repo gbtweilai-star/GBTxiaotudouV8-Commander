@@ -56,9 +56,12 @@ def up(t=1.5) -> bool:
         s.close()
 
 
-def ask(prompt: str, max_tokens: int = 120, timeout: float = 180):
+def ask(prompt: str, max_tokens: int = 120, timeout: float = 180,
+        system: str | None = None):
     s = socket.socket(); s.settimeout(timeout)
-    body = json.dumps({"messages": [{"role": "user", "content": prompt}],
+    msgs = ([{"role": "system", "content": system}] if system else [])
+    msgs.append({"role": "user", "content": prompt})
+    body = json.dumps({"messages": msgs,
                        "max_tokens": max_tokens, "temperature": 0},
                       ensure_ascii=False).encode()
     try:
@@ -102,7 +105,12 @@ def repetition(text: str) -> float:
 
 
 def mixed_script(text: str) -> float:
-    """拉丁字母夹在汉字之间的比例 —— 截图里 'nativezę' 这类就是它。"""
+    """⚠️ 这是个**坏指标**，保留只为留档，不要拿它下结论。
+
+    它把 `tentacle.py` / `media_pipeline` 这种**合法英文标识符**也算成"乱码"。
+    2026-10-28 实测：一段完全正常的原文算出来 0.714，比一段有错字的还算得更高。
+    ⇒ 区分不出好坏。要判乱码请看「标点数量」「标识符数量」「结构有效性」。
+    """
     cjk = re.findall(r"[\u4e00-\u9fff]", text)
     if not cjk:
         return 0.0
@@ -125,12 +133,34 @@ def identity(text: str) -> bool:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=1)
+    ap.add_argument("--compare", action="store_true",
+                    help="对照实验：同一问题，裸问 vs 加「说人话」system prompt")
     a = ap.parse_args()
 
     if not up():
         print("  🔴 :1234 不在 —— 不编数字，等容器起来再测")
         print("     起来后跑：python3 tools/a19_quality.py")
         return 1
+
+    if a.compare:
+        # 假设：输出"像乱码"是**风格**（压缩速记），不是能力塌了。
+        # 判据：加一句正常的 system prompt，看它能不能回到正常中文口语。
+        SYS = ("用正常的中文口语回答，句子之间加标点，不要用内部术语缩写，"
+               "不要输出 key=value，不要写代码标识符。像跟人说话那样说。")
+        q = "介绍一下你自己，说说你能帮我做什么。"
+        print("  对照实验：同一问题，只差一句 system prompt\n")
+        for tag, sysmsg in (("裸问", None), ("加提示", SYS)):
+            r = ask(q, max_tokens=160, system=sysmsg)
+            if not r["ok"]:
+                print("  %-6s 🔴 %s" % (tag, r["err"])); continue
+            t = r["text"]
+            punct = len(re.findall(r"[，。！？、；：]", t))
+            idents = len(re.findall(r"[a-z_]{3,}\.[a-z]{2,}|[a-z]+_[a-z_]+", t))
+            print("  %-6s %.2fs · %s tok/s · 标点 %d 个 · 标识符 %d 个"
+                  % (tag, r["s"], r["tps"], punct, idents))
+            print("        原话: %s" % t[:150].replace("\n", " "))
+        print("\n  判读：若「加提示」标点明显变多、标识符变少 ⇒ 是**风格**问题，能力没塌")
+        return 0
 
     print("  %-6s %-10s %-8s %-8s %-8s %s" %
           ("类型", "耗时", "tok/s", "重复率", "混排率", "其他"))
