@@ -113,7 +113,12 @@ header #system{line-height:1.35;padding:6px 8px}
 <div class="hint" id="hint"></div>
 
 <script>
-const BRIDGE = "http://127.0.0.1:8791";
+// 🔴 2026-10-27：桥地址可切。
+//    默认 :8791 = 同步桥（线程模型，单进程 512 路封顶）
+//    ?bridge=http://127.0.0.1:8790 = asyncio 批量车道（单进程 4096 路零失败）
+//    两条车道路由行为完全一致（已逐条对拍 11 条路由），可以直接换。
+const BRIDGE = (new URLSearchParams(location.search).get("bridge")
+                || "http://127.0.0.1:8791").replace(/\/+$/, "");
 /* 🔴 2026-10-26：直连容器（绕开桥）。只探 /v1/models，不做任何"猜活"。 */
 const DIRECT_BASE = "http://127.0.0.1:1234/v1";
 let _a19model = "";
