@@ -161,20 +161,64 @@ def feed(rc, intent: str) -> dict:
 
 
 def give_back(rc, out_text: str) -> dict:
-    """触手二：把输出交回大脑执行层，由大脑排布下一步（不自己拍脑袋）。"""
+    """触手二：把输出交回大脑执行层。
+
+    🔴 2026-10-28 改：原来直接拿她的输出当 intent 去 `brain_route`
+       —— 那是在问"这段话像哪个能力位"，问错了问题。
+       实测她的自述「我是 GBT小土豆V8。开发者：自由的风…」被路由成
+       `command_chain`，跟内容毫无关系。
+
+       正确做法是用**大脑执行层本来就有的「守望」位** `llm_watch`：
+       它的职责逐字就是「每次 LLM 输出过后**当场过机器判据**
+       —— 无证据的「已完成」声明 / 越权声明 / 机器事实无现读 /
+       自相矛盾 / claims 无 evidence / 数字对不上；命中就进主脑注意力队列」。
+
+       而且它自己写明「只认可机检的错，语义幻觉判不了就如实写判不了」——
+       这正是我们要的口径：**不冒充判过**。
+
+    返回两件事：
+      ① 守望判据：命中几条、是否进队
+      ② 下一步落位：仍然问 brain_route，但只当参考（它降级就标出来）
+    """
     rc.push("assistant", out_text)
+    out = {"tentacle": RET, "ok": True, "returned_chars": len(out_text)}
+
+    # ① 守望判据（主）
+    try:
+        from gbt_allinone.api import run_task
+        r = run_task("llm_watch", {"op": "review", "answer": out_text,
+                                   "claims": [], "evidence": []})
+        res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        hits = res.get("hits") or []
+        out["watch"] = {
+            "ok": bool(res.get("ok")),
+            "hits": len(hits),
+            # 命中项的字段是 code（不是 kind/rule），并带 severity 与 fix
+            "codes": [h.get("code") for h in hits][:5],
+            "severity": [h.get("severity") for h in hits][:5],
+            "fixes": [h.get("fix") for h in hits][:2],
+            "queued": res.get("queued") or 0,
+            "note": res.get("note") or res.get("why") or "",
+        }
+    except Exception as exc:                                  # noqa: BLE001
+        out["watch"] = {"ok": False, "why": "%s: %s"
+                        % (type(exc).__name__, str(exc)[:100])}
+
+    # ② 下一步落位（参考，不执行）
     try:
         from gbt_allinone.api import run_task
         r = run_task("brain_route", {"intent": out_text[:200]})
         res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
         best = res.get("best") or {}
-        return {"tentacle": RET, "ok": True,
-                "path": res.get("path"), "degraded": bool(res.get("degraded")),
-                "next_kind": best.get("kind"), "next_desc": (best.get("desc") or "")[:80],
-                "returned_chars": len(out_text)}
+        out["route"] = {"path": res.get("path"),
+                        "degraded": bool(res.get("degraded")),
+                        "next": best.get("kind"),
+                        "note": "仅作参考；输出是自然语言时它多半不相关"}
     except Exception as exc:                                  # noqa: BLE001
-        return {"tentacle": RET, "ok": False, "stage": "return_failed",
-                "why": "%s: %s" % (type(exc).__name__, str(exc)[:100])}
+        out["route"] = {"error": "%s: %s" % (type(exc).__name__, str(exc)[:80])}
+
+    out["ok"] = bool((out.get("watch") or {}).get("ok"))
+    return out
 
 
 def one_turn(rc, intent: str) -> dict:
@@ -205,12 +249,21 @@ def show(rec: dict) -> None:
           (f.get("model"), f.get("window_msgs"), f.get("window_chars"),
            f.get("s") or 0, f.get("tps")))
     print("        输出: %s" % (f.get("text") or "")[:70].replace("\n", " "))
-    if g.get("ok"):
-        print("     ②回  交回大脑 → path=%-10s next=%-16s%s" %
-              (g.get("path"), g.get("next_kind"),
-               "（降级）" if g.get("degraded") else ""))
+    w = g.get("watch") or {}
+    rt = g.get("route") or {}
+    if w.get("ok"):
+        print("     ②回  守望判据 → 命中 %s 条%s%s" %
+              (w.get("hits"),
+               ("（入队 %s）" % w.get("queued")) if w.get("queued") else "",
+               (" · " + "、".join(str(k) for k in (w.get("codes") or []))) if w.get("codes") else ""))
+        for f in (w.get("fixes") or []):
+            print("         怎么改：%s" % str(f)[:70])
     else:
-        print("     ②回  %-14s %s" % (g.get("stage"), g.get("why") or ""))
+        print("     ②回  守望 判不了：%s" % (w.get("why") or w.get("note") or "未命中"))
+    if rt.get("next"):
+        print("         下一步参考 → %-16s path=%s%s" %
+              (rt.get("next"), rt.get("path"),
+               "（降级，可能不相关）" if rt.get("degraded") else ""))
 
 
 def main() -> int:
