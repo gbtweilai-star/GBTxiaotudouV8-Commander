@@ -38,6 +38,52 @@ from model_bridge import (  # noqa: E402
 )
 
 MAX_HEADER = 64 * 1024
+
+# 同步桥（:8791）—— 页面还要用 /v1/dispatch /v1/route /warm /_log/* 这些
+# 低频管理路由，asyncio 版不重写它们，直接**反代**过去。
+# 这样本文件就成了完整顶替：高频的对话走自己的事件循环，其余原样转发。
+SYNC_BRIDGE = ("127.0.0.1", 8791)
+NATIVE_ROUTES = ("/health", "/v1/models", "/v1/chat/completions")
+
+
+async def _proxy_to_sync(method: str, target: str, headers: dict, body: bytes) -> bytes:
+    """把请求原样转给同步桥，回包字节也原样返回（不改写）。"""
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(*SYNC_BRIDGE), 10)
+    except OSError:
+        return (b"HTTP/1.1 503 Service Unavailable\r\n"
+                b"Content-Type: application/json\r\nContent-Length: 46\r\n"
+                + CORS.encode() + b"\r\n"
+                + b'{"error":{"message":"sync bridge unreachable"}}')
+    try:
+        hdrs = "Host: 127.0.0.1\r\n"
+        for k in ("content-type", "authorization"):
+            if k in headers:
+                hdrs += "%s: %s\r\n" % (k.title(), headers[k])
+        req = ("%s %s HTTP/1.0\r\n%sContent-Length: %d\r\nConnection: close\r\n\r\n"
+               % (method, target, hdrs, len(body))).encode("latin-1") + body
+        writer.write(req)
+        await writer.drain()
+        chunks = []
+        while True:
+            c = await asyncio.wait_for(reader.read(65536), 120)
+            if not c:
+                break
+            chunks.append(c)
+        raw = b"".join(chunks)
+        # 补上 CORS（同步桥给的是 HTTP/1.0 回包，页面在同源下其实不需要，
+        # 但跨端口访问时需要，安全起见补一次）
+        head, sep, rest = raw.partition(b"\r\n\r\n")
+        if sep and b"Access-Control-Allow-Origin" not in head:
+            head += b"\r\n" + CORS.rstrip("\r\n").encode()
+        return head + sep + rest
+    finally:
+        try:
+            writer.close()
+        except Exception:                                     # noqa: BLE001
+            pass
+
 CORS = (
     "Access-Control-Allow-Origin: *\r\n"
     "Access-Control-Allow-Headers: Content-Type\r\n"
@@ -55,15 +101,21 @@ _UPS_TTL = 1.0
 
 
 def _upstreams_json() -> str:
+    """必须与同步桥**同构**：upstreams 是**数组**，每项带 name。
+
+    页面是这么用的：`ups.find(u => u.name === "selfhost")`。
+    早先这里返回的是 dict(`{name: {...}}`)，find 不存在 ⇒ 页面抛异常
+    ⇒ 徽标显示「桥：连不上」——但桥明明是好的。结构不同就是不同的东西。
+    """
     now = time.monotonic()
     if now - _UPS_CACHE["at"] < _UPS_TTL and _UPS_CACHE["json"] != "[]":
         return _UPS_CACHE["json"]
-    cfg = {}
+    rows = []
     for n, (b, m, prof, _t) in UPSTREAMS.items():
         k, slot = key_for(prof)          # 每个上游只读一次文件
-        cfg[n] = {"base_url": b, "model_default": m,
-                  "key_ready": bool(k), "key_slot": slot}
-    blob = json.dumps(cfg, ensure_ascii=False)
+        rows.append({"name": n, "base_url": b, "model": m,
+                     "key_slot": slot, "key_ready": bool(k)})
+    blob = json.dumps(rows, ensure_ascii=False)
     _UPS_CACHE.update(at=now, json=blob)
     return blob
 
@@ -179,7 +231,9 @@ async def handle(reader, writer):
         if target == "/health":
             # 直接拼字符串：上游清单走缓存，stats 实时，避免每请求重建 dict
             out = ('{"ok": true, "service": "gbt-async-gate", "default": "%s", '
-                   '"upstreams": %s, "stats": %s, "at": "%s"}'
+                   '"upstreams": %s, "stats": %s, "at": "%s", '
+                   '"backlog": {"mode": "asyncio", "max": 8192}, '
+                   '"note": "asyncio 单进程事件循环；非原生路由反代到同步桥 :8791"}'
                    % (DEFAULT, _upstreams_json(),
                       json.dumps(STATS), time.strftime("%Y-%m-%dT%H:%M:%S"))
                    ).encode("utf-8")
@@ -188,11 +242,12 @@ async def handle(reader, writer):
             STATS["served"] += 1
             return
 
-        if target not in ("/v1/chat/completions", "/v1/models"):
-            writer.write(_resp("404 Not Found",
-                               b'{"error":{"message":"no route"}}',
-                               "application/json"))
+        # 非原生路由 → 原样转给同步桥（dispatch / route / warm / _log / calc …）
+        if target not in NATIVE_ROUTES:
+            raw = await _proxy_to_sync(method, meta["target"], meta["headers"], body)
+            writer.write(raw)
             await writer.drain()
+            STATS["served"] += 1
             return
 
         if target == "/v1/models":
