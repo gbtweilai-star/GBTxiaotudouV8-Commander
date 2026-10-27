@@ -1393,3 +1393,62 @@ aligned 17 / 20（85%）
 ```
 
 ---
+
+---
+
+## 二十七、把 verify 从"永远 false"救活（2026-10-28）
+
+### 原状：验证那一环是空的
+
+`verify()` 只有一条 **vision** 检查（`TB.get_eye()` 抓全屏帧）。
+本机是 iSH/Alpine，GDI/DXGI 拿不到屏 ⇒ checks 里只有一个 `False` ⇒ **ok 恒 false**。
+
+整条 `route → execute → verify → health` 里，**验证这一环从来没真跑过**。
+
+### 改法：两条面并存，视觉拿不到就不计入
+
+```
+vision   有桌面才算数；拿不到屏 → available=false, counted=false（如实标，不冒充失败）
+reality  端口 / 文件，无桌面也能算 —— 本机的主力
+```
+
+`reality` 认得出的面：
+- 文本里的 `:端口` / `127.0.0.1:端口` / `localhost:端口` → TCP 探活
+- 文本里的文件路径（`*.py|json|html|md|js|txt`）→ 存在性 + 字节数 + sha12
+
+**一条面都没有 ⇒ `verdict=unverified_no_surface`，不假装验过。**
+
+### 实测四例
+
+| expectation | verdict | 对不对 |
+|---|---|---|
+| `面板后端 :8765 应该在线`（服务在跑）| `verified` | ✅ |
+| `文件 tools/brain_align.py 存在` | `verified` | ✅ |
+| `端口 :9999 应该在线` | `failed` | ✅（真的不通）|
+| `随便一句话无可验证面` | `unverified_no_surface` | ✅（不编）|
+
+期间还验证了一次**真事**：`:8765` 报 `failed` 时我以为是正则坏了，
+查下去发现**面板后端真的掉了** —— 修好服务后立刻变 `verified`。
+**验证器没撒谎。**
+
+### 顺带修的两处
+
+**① 正则漏了裸 `:端口`** —— 原来要求带主机前缀，
+写"面板后端 :8765 应该在线"时匹配不到，被错判成"无可验证面"。
+
+**② `unify` 把 verify 的结论丢了** —— 只透传 `ok` 和"每条检查的 ok"，
+`verdict` / `counted_faces` 全没往上带 ⇒ 上层只看到 `vision: False`，
+**分不清"验失败"还是"根本没面可验"**。现在透传。
+
+### 对齐器里现在的真实读数
+
+`system` 域抽 5 位：
+
+```
+aligned 5/5 · verify 结论全是 unverified_no_surface · 计入验证的位 0
+```
+
+**这不是失败，是事实**：能力位跑完本身没有端口/文件这类可验证面。
+以前它显示 `vision: False` 看不出区别，现在能分清"没验"和"验不过"了。
+
+---
