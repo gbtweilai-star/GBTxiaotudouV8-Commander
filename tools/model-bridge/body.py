@@ -183,8 +183,23 @@ def act_open(args):
     target = str(args.get("target") or "")
     if not target:
         return {"ok": False, "error": "缺 target"}
-    os.startfile(target)                                          # noqa: S606
-    return {"ok": True, "opened": target[:120]}
+    # 🔴 2026-10-28：os.startfile 是 **Windows 专用**，本机（iSH/iOS）没有。
+    #   按平台依次降级，每档标明用了谁：
+    #     ① Windows → os.startfile
+    #     ② iOS/iSH → apple-open（系统 URL handler）
+    #     ③ 都没有  → 如实报
+    import shutil as _sh
+    if hasattr(os, "startfile"):
+        os.startfile(target)                                      # noqa: S606
+        return {"ok": True, "opened": target[:120], "engine": "os.startfile"}
+    if _sh.which("apple-open"):
+        r = subprocess.run(["apple-open", target], capture_output=True,
+                           text=True, timeout=60)
+        ok = r.returncode == 0
+        return {"ok": ok, "opened": target[:120], "engine": "apple-open",
+                "err": (r.stderr or "")[:120] if not ok else ""}
+    return {"ok": False, "error": "这台机没有打开手段（无 os.startfile / 无 apple-open）",
+            "engine": "none"}
 
 ACTUATORS = {
     "see": ("截屏", act_see),
