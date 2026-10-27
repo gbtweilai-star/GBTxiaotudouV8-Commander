@@ -117,8 +117,18 @@ def _self_label(cap_desc: str) -> str:
     在描述里**一个都不出现**，所以"按位名自识别"对这类位完全失效。
     中文自称谓才是它们在文本里的真实身份。
     """
-    head = str(cap_desc or "").split("：", 1)[0]
-    seg = head.split("·")[-1].strip()
+    import re as _re
+    # 🔴 2026-10-28 第三次修（每次都是实测撞出来的）：
+    #   ① markdown 污染：26 个位自称谓里带 **粗体** / `代码` / __下划线__
+    #   ② 长度守卫丢掉带括号说明的整段（llm_watch 的「**守望**（主人令…）」> 20 字）
+    #   ③ **截断顺序错了**：offload_distill 的描述开头没有「：」，
+    #      旧的 split("·")[-1] 会抓到很靠后的段 ⇒ 取到空 ⇒ 永远走兜底。
+    #      正确顺序：剥 md → 在「：」截断 → 在「（(」截断 → 最后才按「·」分段。
+    text = _re.sub(r"\*\*|__|`|~~|\[|\]", "", str(cap_desc or ""))
+    text = text.split("：", 1)[0]
+    text = _re.split(r"[（(]", text)[0]
+    seg = text.split("·")[-1].strip()
+    seg = seg.strip(" 　·:：，,。.）)」』】")
     return seg if 2 <= len(seg) <= 20 else ""
 
 

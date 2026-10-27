@@ -1211,3 +1211,60 @@ llm_watch → tentacle（routed_broad）
 markdown 的 `**` 把子串匹配打断了。这是一个具体的、可修的缺陷。
 
 ---
+
+---
+
+## 二十四、自称谓提取修了三次：错位与兜底黑洞全部归零（2026-10-28）
+
+### 三轮对比（llm 域 41 位 · 每位 3 次 · 只认稳定判定）
+
+| 轮次 | aligned | needs_params | skipped | flaky | broad | wrong | parent |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 修前 | 21 | 8 | 7 | 4 | 1 | 0 | 0 |
+| 中途 | 24 | 8 | 6 | 1 | 0 | 1 | 1 |
+| **最终** | **24** | **8** | **6** | **2** | **0** | **0** | **1** |
+
+**`routed_wrong` 0 · `routed_broad` 0** —— 跨域错位与兜底黑洞全部清零。
+`routed_parent 1`（`replan_loop → task_graph`，同域近似，可接受）。
+
+### `_self_label` 修了三次，每次都是实测撞出来的
+
+**第一次**：markdown 污染。26 个位的自称谓里带 `**粗体**` / `` `代码` `` / `__下划线__`，
+子串比对不中。
+
+**第二次**：长度守卫把带括号说明的整段丢掉。
+`llm_watch` 的自称谓是 `**守望**（主人令 2026-10-13「监控触手LLM的监控…」）`，
+超过 20 字 ⇒ 旧逻辑直接返回空 ⇒ 它永远走兜底黑洞 `tentacle`。
+
+**第三次**：**截断顺序错了**。
+`offload_distill` 的描述开头没有「：」，旧的 `split("·")[-1]` 抓到了很靠后的段 ⇒ 取到空。
+正确顺序是：**剥 markdown → 在「：」截断 → 在「（(」截断 → 最后才按「·」分段**。
+
+修完：**332/348 位**能取到自称谓（修前远少于此），
+关键位逐个验：`offload_distill` `recon_distill` `llm_watch` `codex_status`
+`brain_health` `brain_verify` `model_key_pool` `anim_fix` `tentacle_learn`
+**9/9 全部路由回自己，path=self_label**。
+
+### 短人话不回退（仍走词表）
+
+```
+「上下文异常纠正：near_overflow」→ ring_context    ✅
+「整体健康吗」                  → health          ✅
+「镜像维度排练」                → mirror_status   ✅
+```
+
+### 剩下的 2 个抖动位（如实记）
+
+```
+claude_code   skipped / skipped / aligned   → 执行偶发失败
+codebuddy     aligned / aligned / skipped   → 同上
+```
+
+**它们是"执行抖"（同一个位有时 ok 有时不 ok），不是路由错。** 我没有把它们算进 aligned。
+
+### verify 仍然恒 false
+
+本机非交互桌面，GDI/DXGI 拿不到屏。**链的真实形状仍是
+`route ✅ → execute ✅ → verify ❌ → health ✅`，验证那一环是空的。**
+
+---
