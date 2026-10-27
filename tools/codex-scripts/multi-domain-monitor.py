@@ -33,37 +33,51 @@ BASE = ROOT / "state" / "monitor" / "domain-baseline.json"
 
 
 def run_one(cap: str, timeout: int) -> dict:
-    from gbt_allinone import api as API
+    """单能力探活 —— **用可杀子进程**，不用线程。
 
+    🔴 2026-10-28 修（真 bug，不是调参）：
+      原实现是 `ThreadPoolExecutor(1).submit(...).result(timeout=)`。
+      Python **线程取消不了** —— result(timeout) 只是调用方不等了，
+      挂死的工作线程仍在跑并永久占住那个 worker。实测跑到 security 域后
+      **整个监控死锁**：日志 4 分钟不写、进程还在、只剩 0/1/2 三个 fd。
+
+      改成子进程：超时直接 kill，资源全还回来，账上记 timeout 继续往下走。
+      子进程 tools/cap_probe.py 走**同一个唯一门 run_task**，口径不变。
+    """
+    import json as _json
+    import pathlib as _pl
+    import subprocess as _sp
+    import sys as _sys
+
+    root = _pl.Path(__file__).resolve().parents[2]
+    worker = root / "tools" / "cap_probe.py"
     t0 = time.time()
     try:
-        with cf.ThreadPoolExecutor(max_workers=1) as ex:
-            r = ex.submit(API.run_task, cap, {}).result(timeout=timeout)
-        ms = int((time.time() - t0) * 1000)
-        if not isinstance(r, dict):
-            return {"result": "bad_shape", "ms": ms}
-        if r.get("denied"):
-            # 2026-10-21 修（P19 拒绝路径读数最容易被自己省掉）：门把 missing_scopes 放在
-            # **gbt_result.result 那一层**，而本器原来只读顶层 ⇒ 15 条拒绝全变成「(未报)」。
-            # 现在两层都看，并把 reason 里的作用域名也提出来（作用域是「要不要请人发票」的唯一依据）。
-            inner = r.get("result") if isinstance(r.get("result"), dict) else {}
-            scopes = r.get("missing_scopes") or inner.get("missing_scopes") or None
-            why = str(r.get("reason") or r.get("error") or inner.get("reason") or "")[:160]
-            if not scopes:
-                import re
-                m = re.search(r"（([a-z_]+)）", why)
-                scopes = [m.group(1)] if m else None
-            return {"result": "denied", "ms": ms, "missing_scopes": scopes, "why": why}
-        inner = r.get("result") if isinstance(r.get("result"), dict) else {}
-        ok = r.get("status") == "ok" and inner.get("ok") is not False
-        return {"result": "ok" if ok else "failed", "ms": ms,
-                "why": "" if ok else str(r.get("reason") or r.get("error")
-                                        or inner.get("error") or r.get("status"))[:120]}
-    except cf.TimeoutError:
-        return {"result": "timeout", "ms": timeout * 1000, "why": "> %ds" % timeout}
+        p = _sp.run([_sys.executable, str(worker), cap],
+                    capture_output=True, text=True, timeout=timeout, cwd=str(root))
+    except _sp.TimeoutExpired:
+        return {"result": "timeout", "ms": timeout * 1000,
+                "why": "> %ds（子进程已 kill）" % timeout}
     except Exception as e:                                    # noqa: BLE001
         return {"result": "exception", "ms": int((time.time() - t0) * 1000),
                 "why": "%s: %s" % (type(e).__name__, str(e)[:120])}
+    ms = int((time.time() - t0) * 1000)
+    line = (p.stdout or "").strip().splitlines()
+    if not line:
+        return {"result": "exception", "ms": ms,
+                "why": "子进程无输出（rc=%s）%s" % (p.returncode, (p.stderr or "")[-100:])}
+    try:
+        d = _json.loads(line[-1])
+    except Exception:                                         # noqa: BLE001
+        return {"result": "exception", "ms": ms, "why": "非 JSON: " + line[-1][:100]}
+    out = {"result": str(d.get("result") or "failed"), "ms": int(d.get("ms") or ms)}
+    if d.get("why"):
+        out["why"] = str(d["why"])[:160]
+    if out["result"] == "denied":
+        import re
+        m = re.search(r"（([a-z_]+)）", out.get("why") or "")
+        out["missing_scopes"] = [m.group(1)] if m else None
+    return out
 
 
 def main() -> int:
