@@ -1329,3 +1329,67 @@ replan_loop     → task_graph         （回流环本来就在生成任务图�
 不是"验证过了"。**
 
 ---
+
+---
+
+## 二十六、跨域抽样：判据站得住；顺带修两个真错（2026-10-28）
+
+### 四个域各抽 5 位（不铺全量）
+
+| 域 | aligned | 其它 |
+|---|---:|---|
+| `system` | **5/5** | — |
+| `creation` | **5/5** | — |
+| `security` | 2/5 | 2 skipped（有作用域，要授权·正常）· 1 platform_unavailable |
+| `mind` | **5/5**（修完后）| 修前 4/5 |
+
+**判据跨域成立** —— 四个域的位都能被自称谓路由回自己。
+
+### 修①：`platform_unavailable` 单列（原来算"执行失败"）
+
+`asset_vault_freeze` 报 `No module named 'winreg'` ——
+**Windows 专用模块，本机 iSH/Alpine 根本没有。**
+
+这不是"执行失败"，是**这台机没有那个平台**。新增一类 `platform_unavailable`，
+不再混进 exec_failed。
+
+### 修②：我自己造的传参 bug（最值得记）
+
+`belief_forge` 一直报：
+
+```
+beliefs() got an unexpected keyword argument 'payload'
+```
+
+追下去发现 `execute` 收到的 payload 长这样：
+
+```
+{'payload': {'kind': 'belief_forge'}}      ← 多包了一层
+```
+
+根因是 api 层 `brain_unify` 的写法：
+
+```python
+brain_exec.unify(goal, {k: v for k, v in p.items() if k != "goal"})
+```
+
+**它把"除 goal 以外的所有键"当 payload 传下去。**
+我却在外面写成 `{"goal":…, "payload": {"kind":…}}` ⇒ 多包一层，
+`payload` 这个键一路冲进具体函数变成非法参数。
+
+**正确写法是扁平传：`{"goal":…, "kind":…}`。**
+
+修完后 `belief_forge` 执行 ok，`mind` 域 5/5。
+
+**好消息**：llm 域的账**未被这个 bug 污染**（28/6/6/1 完全不变）——
+因为那一域没有函数式位，都不吃 `**kwargs`。
+
+### 跨域合计（4 域 20 位样本）
+
+```
+aligned 17 / 20（85%）
++ 2 correctly skipped（要授权）
++ 1 platform_unavailable（Windows 专用）
+```
+
+---
