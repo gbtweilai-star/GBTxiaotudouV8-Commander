@@ -2278,3 +2278,64 @@ apple-player play → {"status": "playing", "session_id": "dcf0bc6c"}
 **技术上成功、人格上是错的**。这类错最容易被"ok=true"掩盖。
 
 ---
+
+---
+
+## 四十二、触手总线：传输可插拔，不卡死在一种接口（2026-10-28）
+
+主人令：「**所有的一切都可使用触手来联通传输，没必要死卡在传统方式**」。
+
+### 这一路撞的同一堵墙（三次）
+
+```
+body_say   → powershell        Windows 专用
+body_volume→ pycaw             Windows 专用
+摄像头     → getUserMedia      WebView 挂起
+STT        → apple-speech      文件路径一律超时
+```
+
+**每次都不是"功能不存在"，而是绑定死了唯一一种传输。**
+
+### `tools/tentacle_bus.py`
+
+每个器官 = 一根触手，每根挂**多条传输**，按序试：
+
+```
+mouth（嘴）  ① edge-tts zh-TW-HsiaoChenNeural  ② apple-speak zh-TW  ③ powershell
+ear（耳）    apple-speech（mic）
+play（播）   apple-player
+```
+
+**回执必带 `via`（走的哪条）与 `tried`（试过哪些、为什么没过）** ——
+不许让人猜"到底是哪条干的活"。
+
+### `tools/voice_loop.py`：四根触手串成环
+
+```
+①耳 麦克风→文本 → ②脑 文本→回复 → ③嘴 回复→语音 → ④演 数字人/投影 → ↺
+```
+
+脑那段也挂两条：`a19` 直连 → `bridge`（严格模式，不通如实报）。
+
+### 实测
+
+```
+嘴    ok=True via=edge-tts-zhTW voice=zh-TW-HsiaoChenNeural played=True
+耳    ok=True via=apple-speech 但「识别到 0 字」（采到静音）
+脑    a19=False · bridge=True
+跑一整轮 → stage=ear_empty，如实停在"没听到内容"，不编
+```
+
+### 边界（不掩盖）
+
+| 段 | 状态 |
+|---|---|
+| ③嘴 | ✅ 实测 2502ms · 台湾腔 · 播放 True |
+| ④演 | ✅ 投影台 iframe 可投活页面 |
+| ①耳 | ⚠ 能采，**要有人说话才有字**；文件路径一律超时 |
+| ②脑 | 🔴 A19 离线；桥严格模式不降级（主人定的）|
+
+**这条环现在能跑 ③④，卡在 ①②。**
+①需要开口说话验证；②需要 A19 或放开降级。
+
+---
