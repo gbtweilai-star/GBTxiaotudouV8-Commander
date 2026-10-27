@@ -1268,3 +1268,64 @@ codebuddy     aligned / aligned / skipped   → 同上
 `route ✅ → execute ✅ → verify ❌ → health ✅`，验证那一环是空的。**
 
 ---
+
+---
+
+## 二十五、五轮收敛：llm 域 21 → 28 aligned，三类缺陷全清零（2026-10-28）
+
+| 轮次 | 修了什么 | aligned | wrong | broad | flaky |
+|---|---|---:|---:|---:|---:|
+| v1 | 修前基线 | 21 | 0 | 1 | 4 |
+| v2 | 中文自称谓 | 24 | 1 | 0 | 1 |
+| v3 | 自称谓提取三修 | 24 | 0 | 0 | 2 |
+| v4 | **判定顺序** | 26 | 2 | 0 | 0 |
+| **v5** | **自称谓撞车** | **28** | **0** | **0** | **0** |
+
+**v5 最终账（41 位 ×3 次，只认稳定判定）：**
+
+```
+aligned        28      ← 68.3%
+needs_params    6
+routed_parent   6      ← 同域近似，可接受
+skipped         1
+routed_wrong    0
+routed_broad    0
+flaky           0
+label_collision 0
+```
+
+### v4 修的那个 bug 最值得记：判定顺序掩盖了真错位
+
+`elif why:` 排在路由判断**前面** ⇒ 非只读位的**路由错位被伪装成 `skipped`**。
+
+实测 `claude_code`/`codebuddy` 在 `skipped↔aligned` 之间抖，直跑 6/6 全 ok
+—— 抖的其实是**路由**，被 `why` 盖住了。改顺序后错位现形（v4 冒出 2 个）。
+
+### v5 修的是数据缺陷，不是路由缺陷
+
+`omni_plug` 与 `wf_cache_clear` 的**中文自称谓完全一样**，都叫「万能插」。
+
+文本路由**无法区分** —— 这不是路由器笨，是**两个位重名**。
+
+处置：同权重撞车时，名字出现在意图里的优先，否则取名字最短的（更泛化的），
+并标 `ambiguous: true` + `tied: [...]` 让人看得见。
+
+### 同域近似的 6 个（不算错）
+
+```
+brain_execute   → omni_plug          （确实是"万能插"家族）
+codex_interrupt → codex_turn_send
+codex_models    → codex_tools        （同族）
+codex_thread_new→ codex_turn_send
+genoffice_bridge→ key_gateway
+replan_loop     → task_graph         （回流环本来就在生成任务图）
+```
+
+**它们是"落到同族的邻位"，不是指错方向。** 我照实单列，不混进 aligned 也不算错。
+
+### verify 仍然恒 false
+
+本机非交互桌面，GDI/DXGI 拿不到屏。**这 28 个 aligned 是"路由对了 + 执行 ok"，
+不是"验证过了"。**
+
+---

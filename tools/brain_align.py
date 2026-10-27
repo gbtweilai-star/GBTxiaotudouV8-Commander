@@ -104,6 +104,7 @@ def align_one(c: dict) -> dict:
     ex = ch.get("execute") or {}
     vf = ch.get("verify") or {}
     routed = (rt.get("best") or {}).get("kind")
+    rt_extra = rt.get("self_label") or {}
     # 🔴 2026-10-28：原来把"路由到别的位"一律记 routed_other，混了三种性质：
     #    ① 同域近似位（brain_health → health）：描述本身就有重叠，属正常近似
     #    ② 兜底黑洞（* → tentacle）：semantic 给不出时的通用落点
@@ -121,17 +122,28 @@ def align_one(c: dict) -> dict:
         except Exception:                                     # noqa: BLE001
             pass
 
-    if routed == name and ex.get("ok"):
-        verdict = "aligned"
-    elif why:                                  # 路由对了，只是我们没让它真跑（需参数/要作用域）
-        verdict = "needs_params" if why == "需参数" else "skipped"
-    elif routed and routed != name:
-        if routed == "tentacle":
+    # 🔴 2026-10-28 修判定顺序：原来 `elif why` 排在路由判断**前面**，
+    #    于是非只读位的**路由错位被伪装成 skipped** ——
+    #    实测 claude_code/codebuddy 在 skipped↔aligned 之间抖，直跑 6/6 全 ok，
+    #    抖的其实是路由，却被 why 盖住了。
+    #    正确顺序：先判路由对错，再看是不是我们自己没让它跑。
+    if routed and routed != name:
+        # 自称谓撞车：两个位的中文名完全一样（实测 omni_plug / wf_cache_clear
+        # 都叫「万能插」）——文本路由**无法区分**，这不是路由 bug，是数据撞车。
+        if (res.get("self_label") is None and (rt.get("self_label") or {}).get("ambiguous")):
+            verdict = "label_collision"
+        elif routed == "tentacle":
             verdict = "routed_broad"          # 兜底黑洞，不是错指
         elif got_dom and got_dom == tgt_dom:
             verdict = "routed_parent"         # 同域近似位
         else:
             verdict = "routed_wrong"          # 真错位（跨域）
+    elif routed == name and ex.get("ok"):
+        verdict = "aligned"
+    elif why:                                  # 路由对了，只是我们没让它真跑
+        verdict = "needs_params" if why == "需参数" else "skipped"
+    elif False:
+        pass
     elif ex.get("status") == "denied":
         verdict = "exec_denied"
     elif routed == name and not ex.get("ok"):
