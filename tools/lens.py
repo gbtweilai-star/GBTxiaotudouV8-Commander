@@ -7,6 +7,9 @@
       放大倍率 m = v/u      像大小 = 屏幕大小 × m
 
 为什么必须反色+镜像：透镜成的是**倒立左右反转**的实像，所以要在屏幕端先反一次，
+      🔴 2026-10-27 修正：这里只写 scaleX(-1) 是**错的**——
+      "倒立且左右反转"= 180° 旋转 = 两个轴都翻。只翻 X 投出来是上下颠倒的。
+      为什么两个轴都翻：scaleX(-1)·scaleY(-1) ≡ rotate(180°)，与透镜的 180° 正好抵消。
 投到墙上才是正的。
 
 用法：
@@ -25,7 +28,7 @@ HTML = """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
  *{margin:0;padding:0;box-sizing:border-box}
  html,body{height:100%;background:#fff;overflow:hidden}
  #stage{position:fixed;inset:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;
-        filter:invert(var(--inv)) brightness(var(--bri));transform:scaleX(var(--mir))}
+        filter:invert(var(--inv)) brightness(var(--bri));transform:scaleX(var(--mir)) scaleY(var(--mir))}
  .page{width:100%;height:100%;display:none;padding:6vh 6vw;flex-direction:column;justify-content:center}
  .page.on{display:flex}
  /* 亮度策略（反色后屏幕几乎全白）：黑字越少越亮 ⇒ 大字号、少行数、纯二值 */
