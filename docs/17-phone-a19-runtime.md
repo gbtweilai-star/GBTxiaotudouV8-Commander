@@ -2214,3 +2214,67 @@ info = 实时 · 控制面板（含镜像/巡检读数）
 摄像头只能投镜头前的东西，这个能投她自己正在跑的任何一屏。
 
 ---
+
+---
+
+## 四十一、声音：必须是她设定的台湾腔女声（2026-10-28）
+
+主人令：「**语音必须按照我设定的女声台湾腔语音，别又搞出鬼叫声**」。
+
+### 我又踩了他们早就踩过的坑
+
+先前 `body_say` 我写成 `apple-speak --voice zh-CN` —— **那是婷婷（大陆腔）**。
+
+而仓库里早就定死了，voice-theater 里还留着原话教训：
+
+> 「这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)`
+> —— **每次误报都会用大陆腔**」
+
+### 她的嗓音（仓库真源）
+
+```
+tools/digihuman/dh-live.py:  VOICES = {"tw": "zh-TW-HsiaoChenNeural", …}
+tools/digihuman/finish-clip.py: "tw": "zh-TW-HsiaoChenNeural",  # 台湾腔女声（曉臻）
+```
+
+**=`zh-TW-HsiaoChenNeural`（曉臻）· edge-tts 神经嗓 · 台湾腔女声**
+
+| 候选 | 判定 |
+|---|---|
+| `zh-TW-HsiaoChenNeural`（曉臻）| ✅ **她的** |
+| `zh-TW-YunJheNeural`（云哲）| 男声，不用 |
+| `zh-CN-XiaoxiaoNeural`（晓晓）| 大陆女声，不用 |
+| Apple `zh-TW.Meijia`（美嘉）| 系统嗓音，仅作兜底 |
+| Apple `zh-CN.Tingting`（婷婷）| 大陆腔，**禁用** |
+
+### 修好的优先级链
+
+```
+① edge-tts zh-TW-HsiaoChenNeural   ← 她的原声（默认）
+② apple-speak zh-TW（美嘉）          ← 兜底
+③ powershell System.Speech          ← Windows
+④ 如实报"这台机没有出声实现"
+```
+
+`edge_tts` 原本没装（`voice` 能力位自报 `tts: edge-tts …` 但模块缺失）。
+已 `pip install edge-tts`（7.3.1），实测可合成。
+
+### 实测
+
+```
+edge-tts 合成「我是 GBT小土豆V8，开发者自由的风，守护者公主土豆…」
+  → 36864 字节 · mp3 · 24000Hz · 单声道 · 6.144 秒
+与仓库参考音 voice-greet-zh-tw.mp3（24000Hz/单声道/9.552s）**同族**
+apple-player play → {"status": "playing", "session_id": "dcf0bc6c"}
+```
+
+**播放真的起来了。**
+
+### 一条口径
+
+**声音不是"能出声就行"，是"必须是那一个"。**
+
+`apple-speak --voice zh-CN` 能出声、也不报错，但那是婷婷——
+**技术上成功、人格上是错的**。这类错最容易被"ok=true"掩盖。
+
+---

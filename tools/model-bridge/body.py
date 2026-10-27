@@ -110,6 +110,40 @@ def act_say(args):
     #     ② iOS/iSH  → apple-speak（iOS AVSpeechSynthesizer 原生 TTS）
     #     ③ 都不行   → 如实报平台没有出声能力，不假装说过话
     import shutil as _sh
+    # 🔴 2026-10-28：**声音必须是她设定好的那个**，不是系统随便一个中文嗓音。
+    #   仓库里早就定死了：edge-tts `zh-TW-HsiaoChenNeural`（曉臻 · 台湾腔女声）
+    #     tools/digihuman/dh-live.py:  VOICES = {"tw": "zh-TW-HsiaoChenNeural", …}
+    #     voice-theater 里还留着教训：原来 u.lang="zh-CN" ⇒ 每次都用大陆腔
+    #   所以优先级：edge-tts 台湾腔 > apple-speak(美嘉 zh-TW) > powershell > 如实报
+    try:
+        import asyncio as _aio
+        import edge_tts as _et
+        import pathlib as _pl
+        import tempfile as _tf
+        _voice = str(args.get("voice") or "zh-TW-HsiaoChenNeural")
+        _rate = args.get("rate")
+        _kwargs = {}
+        if _rate is not None:
+            _kwargs["rate"] = "%+d%%" % int((float(_rate) - 1.0) * 100)
+        _f = _pl.Path(_tf.gettempdir()) / ("gbt_say_%d.mp3" % int(time.time() * 1000))
+        async def _gen():
+            c = _et.Communicate(text, _voice, **_kwargs)
+            await c.save(str(_f))
+        _aio.run(_gen())
+        size = _f.stat().st_size
+        # 播：iOS 走 apple-player；没有就如实报"已合成但没播"
+        played, how = False, "合成未播放"
+        if _sh.which("apple-player"):
+            _r = subprocess.run(["apple-player", "play", str(_f)], capture_output=True,
+                                text=True, timeout=120)
+            played = (_r.returncode == 0)
+            how = "apple-player"
+        return {"ok": played or size > 0, "chars": len(text), "engine": "edge-tts",
+                "voice": _voice, "bytes": size, "played": played, "player": how,
+                "file": str(_f)}
+    except Exception as _e:                                   # noqa: BLE001
+        pass   # 落下一档
+
     if _sh.which("powershell"):
         r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
                            capture_output=True, text=True, timeout=90)
@@ -119,7 +153,7 @@ def act_say(args):
         # 正确形态是 `speak --text <串>`（不是 `speak <串>`）；
         # 中文要用 zh-CN 嗓子，否则英文嗓子念中文会跳过。
         r = subprocess.run(["apple-speak", "speak", "--text", text,
-                            "--voice", str(args.get("voice") or "zh-CN")],
+                            "--voice", str(args.get("voice") or "zh-TW")],
                            capture_output=True, text=True, timeout=90)
         return {"ok": r.returncode == 0, "chars": len(text), "engine": "apple-speak",
                 "err": (r.stderr or "")[:120]}
