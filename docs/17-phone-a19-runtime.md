@@ -2066,3 +2066,48 @@ voice        ok=true
 授权一发就露出真相：**欠的是实现，不是票。**
 
 ---
+
+---
+
+## 三十八、授权会**级联**：放行一个，露出下一个（2026-10-28）
+
+主人发了 `audio_output` 和 4 次 `process_execute`。放行后实测：
+
+### 已能跑过门（5 位）
+
+```
+✅ codex_tools       ok=True
+✅ codex_interrupt   ok=None（过了门，缺参数）
+✅ codex_thread_new  ok=None
+✅ body_open         ok=True  engine=apple-open
+✅ mcp_call          ok=None
+```
+
+### 但其中 4 位改问**另一个作用域**
+
+```
+🔒 codex_chat / codex_models / codex_turn_send / autopilot
+   → 需要 external_llm（把当前任务数据发送到外部大模型服务）
+```
+
+**授权是逐层曝露的**：`process_execute` 管"能不能起进程"，
+`external_llm` 管"能不能把数据发出去"。两个都要。
+
+### 又修了一个 Windows 专用实现
+
+`body_open` 原来用 `os.startfile`（Windows 专用）。按平台降级：
+
+```
+① Windows → os.startfile
+② iOS/iSH → apple-open（系统 URL handler）
+③ 都没有  → 如实报
+```
+
+实测：`{"ok": true, "engine": "apple-open", "opened": "https://…"}` —— 真的打开了。
+
+### 一条提醒
+
+`mode: window` 是**时段授权**：有效期内可反复用，用一次记一次。
+**同一个作用域发一次就够** —— 重复发只是把 `grants_available` 叠上去（现在 `process_execute` 有 7 次可用），不会更安全，也不会解锁更多。
+
+---
