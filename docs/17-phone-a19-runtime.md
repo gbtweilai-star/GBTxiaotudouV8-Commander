@@ -1168,3 +1168,46 @@ model_key_pool  → model_key_pool  ✅  path=self_label
 **每一条都带 `path`，谁给的结果一查就知道。**
 
 ---
+
+---
+
+## 二十三、llm 域 41 位 × 3 次：稳定账（2026-10-28）
+
+| 判定 | 位 | 含义 |
+|---|---:|---|
+| `aligned` | **21** | 路由回到自己 + 执行 ok |
+| `needs_params` | 8 | 路由对，需参数，不盲跑 |
+| `skipped` | 7 | 路由对，有作用域/非只读，不盲跑 |
+| `flaky` | 4 | **3 次判定不一致，不计入任何一类** |
+| `routed_broad` | 1 | 落 `tentacle` 兜底黑洞 |
+| **`routed_wrong`** | **0** | **跨域真错位已清零**（自称谓修的）|
+
+### 抖动位（3 次各自不同）
+
+```
+claude_code   skipped / skipped / aligned      → 多数 2/3 skipped
+codebuddy     aligned / aligned / skipped      → 多数 2/3 aligned
+replan_loop   aligned / aligned / routed_broad → 多数 2/3 aligned
+warm_switch   routed_broad / aligned / routed_broad → 多数 2/3 broad
+```
+
+**按多数票折算后：aligned 23 · needs_params 8 · skipped 8 · broad 2（合计 41）。**
+
+但折算只是参考 —— **抖动本身就是一条读数**：这 4 位的路由/执行不稳定，
+不能拿"多数"当成"就是那样"。
+
+### 还剩一个兜底黑洞
+
+```
+llm_watch → tentacle（routed_broad）
+```
+
+`tentacle` 在 semantic 给不出时会吞掉很多意图。它的描述是
+「大脑执行层·**守望**（主人令 2026-10-13「监控触手LLM的监控…」）：…」，
+自称谓是「大脑执行层·**守望**」→ 取到 `守望`（2 字），而描述里
+`守望` 出现在**冒号之前**，理论上应该命中……
+
+**但它没命中，说明 `_self_label` 取到的是「守望」而文本里是「**守望**」（带粗体标记）** ——
+markdown 的 `**` 把子串匹配打断了。这是一个具体的、可修的缺陷。
+
+---
