@@ -135,15 +135,34 @@ def _self_label(cap_desc: str) -> str:
     return seg if 2 <= len(seg) <= 20 else ""
 
 
-def name_hint(intent: str) -> dict:
-    """在词表之前先认"自称谓"。命中越长的标签越优先（具体压笼统）。
+def _post_colon(cap_desc: str) -> str:
+    """冒号后那一小句（去掉 markdown / 括号），用来在自称谓撞车时分出彼此。
 
-    🔴 2026-10-28 修两处（都实测撞出来）：
-      ① **比对污染**：标签是剥过 markdown 的，而原文带 `**` ⇒ 子串永远不中。
-         实测 multimodal_port 因此被词表的「维度」劫持。现在两边都先剥。
-      ② **自称谓撞车**：omni_plug 与 wf_cache_clear 的中文名都叫「万能插」，
-         同权重时随机挑一个。现在撞车时：名字出现在意图里的优先，
-         否则取**名字最短**的（更泛化的那个），并标 ambiguous 让人看得见。
+    实测：codex_interrupt / codex_models / codex_thread_new 的**自称谓完全一样**
+    （「官方 Codex 写操作」/「官方 Codex 只读」），不延展就永远分不开。
+    延展后分别变成「…中断当前回合」/「…可用模型清单」/「…新建线程」。
+    """
+    import re as _re
+    t = _re.sub(r"\*\*|__|`|~~|\[|\]", "", str(cap_desc or ""))
+    parts = _re.split(r"[：:]", t, 1)
+    if len(parts) < 2:
+        return ""
+    tail = _re.split(r"[（(]", parts[1])[0].strip()
+    tail = tail.strip(" 　·:：，,。.）)」』】")
+    return tail[:14] if 2 <= len(tail) <= 14 else ""
+
+
+def name_hint(intent: str) -> dict:
+    """在词表之前先认"自称谓"。三条判据依次收紧：
+
+      ① **位置优先**：多个自称谓同长度时，**在文本里出现得更早的赢**
+         （主语通常先出现。实测 brain_execute 的「执行维」在前、
+          「万能插」在后 → 应归 brain_execute；
+          replan_loop 的「回流环」在前、「任务图」在后 → 应归 replan_loop）
+      ② **延展标签**：自称谓撞车（完全相同）时，带上冒号后那一小句再比
+         （codex_interrupt / codex_models / codex_thread_new 靠这条分开）
+      ③ **名字 token 兜底**：自称谓取空但**英文名字出现在文本里**时用它
+         （genoffice_bridge 描述里就写着 GenOffice）
     """
     import re as _re
     text = _re.sub(r"\*\*|__|`|~~|\[|\]", "", str(intent or ""))
@@ -161,26 +180,64 @@ def name_hint(intent: str) -> dict:
     for c in all_caps():
         if not isinstance(c, dict):
             continue
-        lab = _self_label(c.get("desc") or "")
-        if not lab or lab not in text:
-            continue
-        cands.append({"cap": str(c.get("name")), "label": lab,
-                      "weight": len(lab), "domain": c.get("domain")})
-    if not cands:
-        return {"ok": False, "why": "无自称谓命中"}
+        desc = c.get("desc") or ""
+        lab = _self_label(desc)
+        if lab and lab in text:
+            cands.append({"cap": str(c.get("name")), "label": lab,
+                          "weight": len(lab), "pos": text.find(lab),
+                          "how": "label", "domain": c.get("domain")})
 
-    top_w = max(x["weight"] for x in cands)
-    top = [x for x in cands if x["weight"] == top_w]
-    ambiguous = len(top) > 1
-    if ambiguous:
-        named = [x for x in top if x["cap"].lower() in text.lower()]
-        pick = (sorted(named, key=lambda x: len(x["cap"])) or
-                sorted(top, key=lambda x: len(x["cap"])))[0]
-    else:
-        pick = top[0]
-    pick = dict(pick)
-    pick["ambiguous"] = ambiguous
-    pick["tied"] = [x["cap"] for x in top] if ambiguous else []
+    # ③ 名字 token **始终参竞**（不是只在没自称谓时才用）。
+    #    实测 genoffice_bridge：描述里写着「GenOffice AI 线 → 统一密钥网关的…」，
+    #    同时命中了 key_gateway 的自称谓「统一密钥网关」⇒ 若只在"无自称谓"时
+    #    才看名字 token，它就永远被 key_gateway 抢走。
+    # ③ 名字 token **只在完全没有自称谓命中时**才用（纯兜底）。
+    #    🔴 试过"始终参竞"，结果通用词 over-match 严重：
+    #       omni_plug 被 brain_execute 抢走（因为描述里有 "execute"），
+    #       replan_loop / task_graph 被 wf_status 抢走（"status"）。
+    #    素材上分不开的（如 genoffice vs genoffice_bridge），
+    #    **宁可标 ambiguous 交人，也不硬猜一个。**
+    if not cands:
+        GENERIC = {"status", "models", "model", "tools", "tool", "board",
+                   "index", "check", "verify", "watch", "queue", "route",
+                   "plan", "read", "write", "list", "show", "info", "data"}
+        for c in all_caps():
+            if not isinstance(c, dict):
+                continue
+            nm = str(c.get("name") or "")
+            toks = [t for t in _re.split(r"[_\W]+", nm.lower())
+                    if len(t) >= 5 and t not in GENERIC]
+            hit = [t for t in toks if t in text.lower()]
+            if hit:
+                t0 = max(hit, key=len)
+                cands.append({"cap": nm, "label": t0, "weight": len(t0),
+                              "pos": text.lower().find(t0),
+                              "how": "name_token", "domain": c.get("domain")})
+        if not cands:
+            return {"ok": False, "why": "无自称谓、无名字 token 命中"}
+
+    # ② 撞车（同 label）时延展
+    tops = max(x["weight"] for x in cands)
+    tied = [x for x in cands if x["weight"] == tops]
+    if len(tied) > 1 and all(x["how"] == "label" for x in tied):
+        for x in tied:
+            d = ""
+            for c in all_caps():
+                if isinstance(c, dict) and str(c.get("name")) == x["cap"]:
+                    d = _post_colon(c.get("desc") or "")
+                    break
+            if d and d in text:
+                x["weight"] += len(d)
+                x["label"] = "%s：%s" % (x["label"], d)
+                x["how"] = "label+tail"
+        tops = max(x["weight"] for x in cands)
+        tied = [x for x in cands if x["weight"] == tops]
+
+    # ① 位置优先；再平手才按名字长度
+    tied.sort(key=lambda x: (x["pos"], len(x["cap"])))
+    pick = dict(tied[0])
+    pick["ambiguous"] = len(tied) > 1
+    pick["tied"] = [x["cap"] for x in tied] if len(tied) > 1 else []
     return {"ok": True, "best": pick}
 
 
