@@ -164,11 +164,16 @@ def align_one(c: dict) -> dict:
         verdict = "unroutable"
     else:
         verdict = "exec_failed"
+    # verify 的真实结论：本机没有交互桌面 ⇒ 能力位跑完通常拿不到可验证面。
+    # 不把它算成"验证过了"，也不藏起来 —— 单列 verdict 与计入的面。
+    v_verdict = vf.get("verdict") or ("verified" if vf.get("ok") else "unknown")
     return {"name": name, "domain": c.get("domain"), "verdict": verdict,
             "routed_to": routed, "route_path": rt.get("path"),
             "degraded": bool(rt.get("degraded")),
             "exec_ok": ex.get("ok"), "exec_status": ex.get("status"),
-            "verify_ok": vf.get("ok"), "verify_checks": vf.get("checks"),
+            "verify_ok": vf.get("ok"), "verify_verdict": v_verdict,
+            "verify_faces": vf.get("counted_faces") or [],
+            "verify_checks": vf.get("checks"),
             "health": (ch.get("health") or {}).get("score"),
             "ran": ok_run, "skip_why": why,
             "ms": round((time.time() - t0) * 1000)}
