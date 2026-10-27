@@ -61,6 +61,19 @@ start_index() {
   else say ":8792 索引层" "🔴 未起 → logs/index.log"; fi
 }
 
+start_gate() {
+  # asyncio 单进程桥（:8790）——**批量车道**
+  #   同步桥 :8791 是 thread-per-request，单进程 512 路就顶天；
+  #   这个单进程实测 4096 路零失败（无连接线程）。
+  #   页面仍走 :8791（它要用 /v1/dispatch /v1/route /warm，asyncio 版没实现那些）。
+  if up 8790; then say ":8790 asyncio 批量车道" "✅ 已在跑"; return; fi
+  pkill -f async_gate.py 2>/dev/null; sleep 1
+  cd "$BASE" || return
+  setsid nohup python3 -u runtime/async_gate.py --port 8790 > "$LOG/async_gate.log" 2>&1 < /dev/null &
+  if $PB wait 8790 40 >/dev/null 2>&1; then say ":8790 asyncio 批量车道" "✅ 已就绪"
+  else say ":8790 asyncio 批量车道" "🔴 未起 → logs/async_gate.log"; fi
+}
+
 probe_a19() {
   if up 1234; then say ":1234 A19" "✅ 在线"; return; fi
   command -v apple-open >/dev/null 2>&1 && apple-open lmpocket:// >/dev/null 2>&1
@@ -71,12 +84,12 @@ probe_a19() {
 case "${1:-status}" in
 up)
   echo "=== 拉齐五路 ==="
-  start_page; start_bridge; start_index; start_flr; probe_a19
+  start_page; start_bridge; start_gate; start_index; start_flr; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
   echo "=== 链路状态 ==="
-  for row in "3001|免费模型池" "8080|她的界面" "8791|模型桥" "8792|索引层" "1234|A19"; do
+  for row in "3001|免费模型池" "8080|她的界面" "8791|模型桥(同步)" "8790|批量车道(asyncio)" "8792|索引层" "1234|A19"; do
     p=${row%%|*}; n=${row#*|}
     if up "$p"; then say ":$p $n" "✅ up"
     else
@@ -90,12 +103,13 @@ status)
   echo "=== HTTP 实测 ==="
   $PB http 8080 /index.html
   $PB http 8791 /health
+  $PB http 8790 /health
   $PB http 8792 /health
   $PB http 3001 /api/ping
   ;;
 down)
   echo "=== 停止（A19 由 App 自管）==="
-  for row in "8080|http.server 8080" "8791|model_bridge.py" "8792|index_daemon.py" "3001|dist/index.js"; do
+  for row in "8080|http.server 8080" "8791|model_bridge.py" "8790|async_gate.py" "8792|index_daemon.py" "3001|dist/index.js"; do
     pat=${row#*|}
     if pkill -f "$pat" 2>/dev/null; then say ":${row%%|*}" "已停"; else say ":${row%%|*}" "本来没跑"; fi
   done
