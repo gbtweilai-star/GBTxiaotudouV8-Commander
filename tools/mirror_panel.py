@@ -21,6 +21,7 @@ import socket
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))   # run_task 在 gbt_allinone 里，脚本模式要自己挂路径
 PANEL = "holo_pet_w3/panel/index.html"
 NAME = "panel-mirror"
 HOST, PORT = "127.0.0.1", 8765
@@ -128,6 +129,47 @@ def build_plan() -> dict:
     }
 
 
+def verify_reality(plan: dict) -> dict:
+    """放行前先验现实 —— 比 scan 的五项更严的一道。
+
+    为什么加在编排层而不是改 scan()：
+      scan() 是框架的"五项体检"契约，改了会动别人依赖的形状；
+      这里做的是**编排层自己的更严门**：晋升前必须证明
+        · 计划里每个服务的端口真的在听
+        · 计划里每个文件真的在、哈希对得上
+      任何一条不过就拒绝放行，并列出是哪条。
+
+    走大脑执行层的 brain_verify（reality 面），不自己另写一套探活。
+    """
+    from gbt_allinone.api import run_task
+    targets: list[str] = []
+    for sv in (plan.get("plan", {}).get("services") or []):
+        url = str(sv.get("health_url") or "")
+        port = sv.get("port")
+        if port:
+            targets.append("%s :%s 应该在线" % (sv.get("name"), port))
+        elif url:
+            targets.append("%s %s 应该在线" % (sv.get("name"), url))
+    for f in (plan.get("plan", {}).get("files") or []):
+        targets.append("文件 %s 存在" % f)
+
+    out = {"ok": True, "checks": [], "faces": 0}
+    for t in targets:
+        r = run_task("brain_verify", {"expectation": t})
+        res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        v = res.get("verdict") or "unknown"
+        faces = res.get("counted_faces") or []
+        out["faces"] += 1 if faces else 0
+        row = {"expectation": t, "verdict": v, "ok": bool(res.get("ok"))}
+        out["checks"].append(row)
+        if v == "failed":
+            out["ok"] = False
+    if out["faces"] == 0:
+        out["ok"] = False
+        out["why"] = "一条可验证面都没有 —— 不能凭 scan 的脸色就放行"
+    return out
+
+
 def show(op: str, r: dict) -> None:
     x = result(r)
     keys = [k for k in ("ok", "clean", "plan_sha", "report_sha", "tree_sha",
@@ -167,6 +209,15 @@ def main() -> int:
         show("plan", call("plan", plan))
         show("simulate", call("simulate", {"name": NAME}))
         show("parity", call("parity", {"name": NAME}))
+        # ⑥ 放行前先验现实（编排层更严的门）
+        v = verify_reality(plan)
+        print("  %-9s ok=%-6s 验证面 %d 条" % ("verify", v["ok"], v["faces"]))
+        for c in v["checks"]:
+            print("     %s %-34s %s" % ("✅" if c["ok"] else "🔴", c["expectation"][:32], c["verdict"]))
+        if not v["ok"]:
+            print("     🔴 拒绝放行：%s" % (v.get("why") or "有面没过"))
+            return 1
+        print("     ✅ 现实全过 —— 可以进 release（release 本身还要过 deploy_publish 门）")
         return 0
 
     print(__doc__)
