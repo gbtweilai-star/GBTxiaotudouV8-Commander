@@ -91,10 +91,17 @@ def align_one(c: dict) -> dict:
     goal = desc or name
     ok_run, why = safe_to_run(c)
 
-    payload = {"kind": name} if ok_run else {"kind": name}
+    # 🔴 2026-10-28 修（**这是我自己造的 bug**）：
+    #   api 层 brain_unify 的写法是
+    #     brain_exec.unify(goal, {k: v for k, v in p.items() if k != "goal"})
+    #   —— 它把"除 goal 以外的所有键"当 payload 传下去。
+    #   我原来写成 {"goal":…, "payload": {"kind":…}} ⇒ 多包了一层，
+    #   "payload" 这个键一路冲进具体函数，变成
+    #     beliefs() got an unexpected keyword argument 'payload'
+    #   ⇒ 误判 belief_forge 执行失败。正确写法是**扁平传**。
     t0 = time.time()
     try:
-        r = run_task("brain_unify", {"goal": goal, "payload": payload})
+        r = run_task("brain_unify", {"goal": goal, "kind": name})
     except Exception as exc:                                  # noqa: BLE001
         return {"name": name, "domain": c.get("domain"), "verdict": "error",
                 "why": "%s: %s" % (type(exc).__name__, str(exc)[:120])}
@@ -105,6 +112,7 @@ def align_one(c: dict) -> dict:
     vf = ch.get("verify") or {}
     routed = (rt.get("best") or {}).get("kind")
     rt_extra = rt.get("self_label") or {}
+    _blob = json.dumps(res, ensure_ascii=False) if isinstance(res, (dict, list)) else str(res)
     # 🔴 2026-10-28：原来把"路由到别的位"一律记 routed_other，混了三种性质：
     #    ① 同域近似位（brain_health → health）：描述本身就有重叠，属正常近似
     #    ② 兜底黑洞（* → tentacle）：semantic 给不出时的通用落点
@@ -142,6 +150,10 @@ def align_one(c: dict) -> dict:
         verdict = "aligned"
     elif why:                                  # 路由对了，只是我们没让它真跑
         verdict = "needs_params" if why == "需参数" else "skipped"
+    elif "winreg" in _blob or "No module named 'win" in _blob:
+        # 平台不可用：winreg / _winapi 这类只在 Windows 存在，
+        # 本机是 iSH/Alpine —— 这不是"执行失败"，是**这台机没有那个平台**。
+        verdict = "platform_unavailable"
     elif False:
         pass
     elif ex.get("status") == "denied":
