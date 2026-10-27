@@ -103,9 +103,28 @@ def act_say(args):
     ps = ("Add-Type -AssemblyName System.Speech; "
           "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
           "$s.Rate = %d; $s.Speak([Console]::In.ReadToEnd())" % int(args.get("rate", 0)))
-    r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
-                       capture_output=True, text=True, timeout=90)
-    return {"ok": r.returncode == 0, "chars": len(text), "err": (r.stderr or "")[:120]}
+    # 🔴 2026-10-28：原来只会 powershell（Windows 专用）。本机是 iSH/iOS，
+    #   实测 FileNotFoundError: 'powershell' ⇒ 授权放开了门，门后没实现。
+    #   现在按平台依次降级，**每一档都如实报用了谁**：
+    #     ① Windows  → powershell System.Speech
+    #     ② iOS/iSH  → apple-speak（iOS AVSpeechSynthesizer 原生 TTS）
+    #     ③ 都不行   → 如实报平台没有出声能力，不假装说过话
+    import shutil as _sh
+    if _sh.which("powershell"):
+        r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
+                           capture_output=True, text=True, timeout=90)
+        return {"ok": r.returncode == 0, "chars": len(text), "engine": "powershell",
+                "err": (r.stderr or "")[:120]}
+    if _sh.which("apple-speak"):
+        # 正确形态是 `speak --text <串>`（不是 `speak <串>`）；
+        # 中文要用 zh-CN 嗓子，否则英文嗓子念中文会跳过。
+        r = subprocess.run(["apple-speak", "speak", "--text", text,
+                            "--voice", str(args.get("voice") or "zh-CN")],
+                           capture_output=True, text=True, timeout=90)
+        return {"ok": r.returncode == 0, "chars": len(text), "engine": "apple-speak",
+                "err": (r.stderr or "")[:120]}
+    return {"ok": False, "chars": len(text), "engine": "none",
+            "error": "这台机没有出声实现（无 powershell / 无 apple-speak）"}
 
 def act_type(args):
     import pyautogui
@@ -122,6 +141,28 @@ def act_click(args):
     return {"ok": True, "at": [x, y]}
 
 def act_volume(args):
+    # 🔴 2026-10-28：pycaw 是 Windows 专用。本机 iSH/iOS 实测
+    #   ModuleNotFoundError: 'pycaw' ⇒ 授权放开了门、门后没实现。
+    #   改：先认平台，Windows 走 pycaw，iOS 走 apple-media volume，都没有就如实报。
+    import shutil as _sh
+    if not _sh.which("powershell") and _sh.which("apple-media"):
+        import subprocess as _sp
+        lv = args.get("level")
+        if lv is None:
+            r = _sp.run(["apple-media", "volume"], capture_output=True,
+                        text=True, timeout=30)
+            try:
+                import json as _j
+                d = _j.loads((r.stdout or "").strip() or "{}")
+                cur = (d.get("data") or d).get("volume")
+                return {"ok": r.returncode == 0, "level": cur, "engine": "apple-media"}
+            except Exception:                                 # noqa: BLE001
+                return {"ok": False, "engine": "apple-media",
+                        "err": (r.stdout or r.stderr or "")[:150]}
+        r = _sp.run(["apple-media", "volume", "--level", str(float(lv))],
+                    capture_output=True, text=True, timeout=30)
+        return {"ok": r.returncode == 0, "level": float(lv), "engine": "apple-media",
+                "err": (r.stderr or "")[:120]}
     from pycaw.pycaw import AudioUtilities
     dev = AudioUtilities.GetSpeakers()
     # pycaw 新版：AudioDevice 直接带 EndpointVolume；旧版要自己 Activate

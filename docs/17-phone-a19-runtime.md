@@ -2010,3 +2010,59 @@ FAIL 服务面合计          5/6 通
 服务被回收这种事，要靠幂等启动兜住，不是靠验收脚本掩盖。**
 
 ---
+
+---
+
+## 三十七、授权放开之后才看见：门后是 Windows 实现（2026-10-28）
+
+主人发了 `audio_output`（`grant-1793142101455`，600s）。门开了，然后：
+
+```
+body_say     → FileNotFoundError: 'powershell'      ← Windows 专用
+body_volume  → ModuleNotFoundError: 'pycaw'         ← Windows 专用
+```
+
+**授权不是瓶颈，平台才是。** 门后那三个位是照 Windows 写的：
+PowerShell 的 `System.Speech` + `pycaw`。
+
+### 修法：按平台依次降级，每档都说清用了谁
+
+`tools/model-bridge/body.py`：
+
+```
+say     ① Windows  → powershell System.Speech
+        ② iOS/iSH  → apple-speak speak --text … --voice zh-CN   （AVSpeechSynthesizer）
+        ③ 都没有   → 如实报"这台机没有出声实现"
+
+volume  ① Windows  → pycaw
+        ② iOS/iSH  → apple-media volume [--level …]
+        ③ 都没有   → 如实报
+```
+
+**每一档回执里都带 `engine` 字段** —— 不让人猜"到底是谁干的活"。
+
+### 实测（授权窗口内）
+
+```
+body_say     ok=true  engine=apple-speak   chars=34
+body_volume  ok=true  engine=apple-media   level=0.300 → 设 0.35 成功
+voice        ok=true
+```
+
+**她真的出声了。**
+
+### 修的过程中撞到一次参数错
+
+第一次写的是 `apple-speak speak <text>`，它直接打印用法 ——
+**正确形态是 `speak --text <串>`，中文还要 `--voice zh-CN`**（英文嗓子念中文会跳过）。
+是看回执里的 usage 文本发现的，不是猜的。
+
+### 一条口径
+
+**"授权通过" ≠ "功能可用"。**
+
+门只管放行；门后的实现还得分平台。
+以前这两个位报 `gate_denied`，看起来像"欠授权"；
+授权一发就露出真相：**欠的是实现，不是票。**
+
+---
