@@ -86,6 +86,18 @@ start_gate() {
   else say ":8790 asyncio 批量车道" "🔴 未起 → logs/async_gate.log"; fi
 }
 
+start_patrol() {
+  # 低频真实巡检（每 5 分钟一轮）——**故意不隔离**，观测要进生产账。
+  # 只调只读零作用域的位，不制造 gate_denied 噪声。
+  # 作用：让 duty_board 的判据有干净的真实数据，不再全靠探活填。
+  if pgrep -f duty_patrol.py >/dev/null 2>&1; then say ":巡检 生产观测" "✅ 已在跑"; return; fi
+  cd "$BASE" || return
+  setsid nohup python3 -u tools/duty_patrol.py --interval 5 > "$LOG/patrol.out" 2>&1 < /dev/null &
+  sleep 2
+  if pgrep -f duty_patrol.py >/dev/null 2>&1; then say ":巡检 生产观测" "✅ 已启动（每 5 分钟）"
+  else say ":巡检 生产观测" "🔴 起不来"; fi
+}
+
 start_sentinel() {
   # A19 哨兵：每 5 秒探 :1234，一出现就自动验收（模型名 / 首字 / tok/s / 身份）
   # 并落 state/a19_ready.json。**不需要改桥配置** —— 桥默认上游本来就是 selfhost。
@@ -107,7 +119,7 @@ probe_a19() {
 case "${1:-status}" in
 up)
   echo "=== 拉齐五路 ==="
-  start_page; start_bridge; start_gate; start_panel; start_index; start_flr; start_sentinel; probe_a19
+  start_page; start_bridge; start_gate; start_panel; start_index; start_flr; start_patrol; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
@@ -137,7 +149,7 @@ status)
   ;;
 down)
   echo "=== 停止（A19 由 App 自管）==="
-  for row in "8080|http.server 8080" "8791|model_bridge.py" "8790|async_gate.py" "8792|index_daemon.py" "8765|panel_server.py" "3001|dist/index.js"; do
+  for row in "8080|http.server 8080" "8791|model_bridge.py" "8790|async_gate.py" "8792|index_daemon.py" "8765|panel_server.py" "3001|dist/index.js" "patrol|duty_patrol.py"; do
     pat=${row#*|}
     if pkill -f "$pat" 2>/dev/null; then say ":${row%%|*}" "已停"; else say ":${row%%|*}" "本来没跑"; fi
   done
