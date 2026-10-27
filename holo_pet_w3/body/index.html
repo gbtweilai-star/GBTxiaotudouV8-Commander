@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>身体 · 设备即本体 · GBT小土豆V8</title>
+<style>
+  :root{--bg:#080c14;--card:#101827;--line:#1e2c44;--ink:#e8eefc;--dim:#8ea2c0;--ok:#38d39f;--bad:#ff6b6b;--accent:#5b8cff}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#142241 0%,var(--bg) 60%);
+       color:var(--ink);font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif;min-height:100vh}
+  header{padding:26px 28px 10px}
+  h1{margin:0;font-size:22px;letter-spacing:.5px}
+  .sub{color:var(--dim);margin-top:6px}
+  .wrap{padding:8px 28px 40px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .card h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--bad)}
+  .dot.on{background:var(--ok);box-shadow:0 0 10px rgba(56,211,159,.8)}
+  .kv{color:var(--dim);font-size:12.5px;white-space:pre-wrap;word-break:break-all}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  button{background:#18243a;color:var(--ink);border:1px solid #26374f;border-radius:9px;
+          padding:6px 12px;cursor:pointer;font:13px system-ui}
+  button:hover{border-color:var(--accent);color:#fff}
+  input[type=text],input[type=range]{background:#0d1420;color:var(--ink);border:1px solid #26374f;border-radius:8px;padding:5px 8px}
+  #out{margin:0 28px 30px;background:#0a0f18;border:1px solid var(--line);border-radius:12px;
+       padding:12px 14px;font:12.5px/1.5 ui-monospace,Consolas,monospace;color:#b9cbe6;
+       max-height:220px;overflow:auto;white-space:pre-wrap}
+  .tag{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>身体 · 设备即本体</h1>
+  <div class="sub">装在哪台设备上，就把那台的感官与动作现读成身体；缺的如实报缺。<span id="host"></span></div>
+</header>
+<div class="wrap" id="wrap"></div>
+<pre id="out">点一个肢体试试…</pre>
+<script>
+const BRIDGE = "http://127.0.0.1:8791";
+const out = document.getElementById("out");
+function show(o){ out.textContent = JSON.stringify(o, null, 1).slice(0, 4000); }
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+async function act(limb, args){
+  out.textContent = "… " + limb;
+  try{
+    const r = await fetch(BRIDGE + "/v1/body/act", {method:"POST",
+      headers:{"Content-Type":"application/json"}, body: JSON.stringify({limb, args})});
+    show(await r.json());
+  }catch(e){ out.textContent = "桥连不上（" + BRIDGE + "）：" + e.message; }
+}
+
+async function loadBody(){
+  try{
+    const r = await fetch(BRIDGE + "/v1/body", {cache:"no-store"});
+    const b = await r.json();
+    if(!b.senses){ show(b); return; }
+    document.getElementById("host").textContent = " · " + b.device.host + " · " + b.device.os;
+    const wrap = document.getElementById("wrap");
+    wrap.innerHTML = "";
+    for(const s of b.senses){
+      const c = document.createElement("div"); c.className = "card";
+      c.innerHTML = "<h3><span class='dot " + (s.state==="ok"?"on":"") + "'></span>" + esc(s.label)
+        + " <span class='tag'>" + esc(s.limb) + "</span></h3><div class='kv'>"
+        + esc(JSON.stringify(s.detail, null, 1)).slice(0, 420) + "</div>";
+      const row = document.createElement("div"); row.className = "row";
+      if(s.limb === "see_screen"){
+        const btn = document.createElement("button"); btn.textContent = "截一张";
+        btn.onclick = () => act("see", {monitor:1}); row.appendChild(btn);
+      }
+      if(s.limb === "see_camera"){
+        const btn = document.createElement("button"); btn.textContent = "看一眼摄像头";
+        btn.onclick = () => act("see_camera", {}); row.appendChild(btn);
+      }
+      if(s.limb === "speak_out"){
+        const btn = document.createElement("button"); btn.textContent = "说一句";
+        btn.onclick = () => act("say", {text:"我是小土豆，身体在线"}); row.appendChild(btn);
+      }
+      if(s.limb === "feel_power"){
+        const btn = document.createElement("button"); btn.textContent = "刷新";
+        btn.onclick = () => loadBody(); row.appendChild(btn);
+      }
+      if(row.children.length) c.appendChild(row);
+      wrap.appendChild(c);
+    }
+    const c2 = document.createElement("div"); c2.className = "card";
+    c2.innerHTML = "<h3><span class='dot on'></span>动作 <span class='tag'>actuators</span></h3>";
+    const row2 = document.createElement("div"); row2.className = "row";
+    const mk = (label, fn) => { const b = document.createElement("button"); b.textContent = label; b.onclick = fn; row2.appendChild(b); };
+    mk("音量 → 30%", () => act("volume", {level:0.3}));
+    mk("音量 → 70%", () => act("volume", {level:0.7}));
+    mk("读音量", () => act("volume", {}));
+    const t = document.createElement("input"); t.type = "text"; t.placeholder = "要说的话"; t.value = "主人，我在";
+    c2.appendChild(t); c2.appendChild(row2);
+    mk("朗读", () => act("say", {text: t.value}));
+    const ctrl = document.createElement("div"); ctrl.className = "row";
+    const v = document.createElement("input"); v.type = "range"; v.min = 0; v.max = 1; v.step = 0.05; v.value = 0.5;
+    v.oninput = () => act("volume", {level: Number(v.value)});
+    ctrl.appendChild(v); c2.appendChild(ctrl);
+    wrap.appendChild(c2);
+    show({ok:true, score:b.score});
+  }catch(e){ out.textContent = "桥连不上（" + BRIDGE + "）：" + e.message + "\n先起桥：py -3.14 -X utf8 tools/model-bridge/server.py"; }
+}
+loadBody();
+</script>
+</body>
+</html>
