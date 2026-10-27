@@ -1742,3 +1742,67 @@ brain_execute 14 · mirror_plan 15 · mirror_simulate 12 · mirror_parity 12
 **没有掩盖，也没假装它们不是问题。**
 
 ---
+
+---
+
+## 三十三、我差点去追自己的脚印：探活污染观测账（2026-10-28）
+
+### 起因：`autopilot` 被报"反复撞门 16 笔"
+
+看着像有个循环在空转撞授权门。**查时间线后不成立**：
+
+```
+02:25:06 / :07 / :08      ← 3 笔，间隔 1 秒
+03:06:34 / :35 / :36      ← 3 笔
+03:17:53 / :54 / :55      ← 3 笔
+03:31:12 / :13 / :14      ← 3 笔
+03:47:09 / :09 / :11      ← 3 笔
+04:15:41                  ← 1 笔
+```
+
+**5 批各 3 笔 + 1 笔单跑。** 那正是我 `brain_align --repeat 3` 的签名 ——
+**不是 autopilot 循环，是我自己的探活。**
+
+### 量化：我的足迹有多大
+
+```
+失败总数 361 笔
+落在「3 连击」批次里（我的签名）  123 笔 = 34%
+gate_denied 217 笔中，3 连击       140 笔 = 65%
+```
+
+**⇒「等授权 24 个位」大半是我的足迹，主脑看到的是假积压。**
+
+### 根因：探活直接写进了生产观测账
+
+`skill_watch` 的观测账格式 `{at, cap, ok, ms, error_class, detail, gate}`
+**没有字段区分"探活"和"真实使用"** —— 探一次就记一笔，跟真用一模一样。
+
+### 修法：探活进程换 store，彻底隔离
+
+`brain_supervisor._dir()` 与 `skill_watch._dir()` **每次调用现读 `GBT_STORE_DIR`**
+⇒ 探活进程换个 store 就完全隔离，不用改账本格式。
+
+三个探活工具（`brain_align` / `cap_probe` / `omni_align`）启动时自动设：
+
+```python
+if not os.environ.get("GBT_PROBE_ISOLATED"):
+    os.environ["GBT_STORE_DIR"] = "<repo>/state/probe_store"
+    os.environ["GBT_PROBE_ISOLATED"] = "1"
+```
+
+**实测：**
+
+```
+隔离前 生产账 6132 笔
+跑一次 --sample 3 探活
+隔离后 生产账 6132 笔（**一笔没变**）
+探活的 16 条观测进了 state/probe_store/skill_watch/ledger.jsonl
+```
+
+### 一条方法论
+
+**测量仪器不许污染被测量的系统。** 我先前的"对齐读数"和"卡住名单"，
+有一部分是在量我自己的脚印 —— 这次把它隔离掉了。
+
+---
