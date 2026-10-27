@@ -119,6 +119,41 @@ def diagnose(s: dict, prev: dict | None, streak: int) -> list[dict]:
     return out
 
 
+# 异常码 → 严重度索引（与 brain_supervisor 的 0=critical … 3=low 一致）
+SEV = {"overflow": 0, "window_lost": 1, "empty_window": 1,
+       "near_overflow": 2, "stuck": 2}
+
+
+def to_brain_queue(s: dict, anomalies: list[dict]) -> dict:
+    """把上下文异常**并进主脑同一张注意力队列**。
+
+    为什么合并：输出异常（llm_watch）和上下文异常（本器）原来各判各的，
+    主脑要去看两处才知道"现在有没有事"。合到一张表，才叫**一个大脑在排布**。
+
+    直接复用 brain_supervisor 的 _append / _dir —— 不另写一套格式，
+    否则两处格式迟早漂移，合并就名存实亡。
+    """
+    try:
+        from gbt_allinone import brain_supervisor as BS
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": False, "why": "brain_supervisor 不可用: %s" % exc}
+    codes = [a["code"] for a in anomalies]
+    sev = min((SEV.get(c, 3) for c in codes), default=3)
+    row = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+           "kind": "context_guard", "severity": sev,
+           "codes": codes,
+           "hits": [{"code": a["code"], "why": a.get("why", "")} for a in anomalies],
+           "who": "context_overflow_guard",
+           "ctx": {"window_n": s.get("window_n"), "window_chars": s.get("window_chars"),
+                   "budget": s.get("budget"), "fill": s.get("fill"), "seq": s.get("seq")},
+           "acked_at": None}
+    try:
+        BS._append("queue.jsonl", row)
+        return {"ok": True, "severity": sev, "codes": codes}
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": False, "why": "%s: %s" % (type(exc).__name__, str(exc)[:100])}
+
+
 def to_brain(s: dict, anomalies: list[dict]) -> dict:
     """④ 异常回大脑执行层：让它排布纠正动作（不自己拍脑袋）。"""
     intent = ("上下文异常纠正：%s。当前窗口 %d 字符 / 预算 %d，条数 %d。"
@@ -201,6 +236,7 @@ def tick(rc, prev: dict | None, streak: int, do_correct: bool = True) -> dict:
     rec = {"sample": s, "anomalies": anomalies, "tentacle": TENTACLE}
     if anomalies:
         rec["brain"] = to_brain(s, anomalies)
+        rec["queue"] = to_brain_queue(s, anomalies)   # 并入主脑同一张注意力队列
         if do_correct:
             rec["fix"] = correct(rc, s, anomalies)
         rec["level"] = "warn"
@@ -228,6 +264,11 @@ def show(rec: dict) -> None:
                  "（⚠ 语义路由降级，匹配可能不相干）" if b.get("degraded") else "",
                  b.get("error") or ""))
     if rec.get("fix"):
+        q = rec.get("queue") or {}
+        if q.get("ok"):
+            print("     → 已并入主脑队列 · severity=%s · codes=%s" % (q.get("severity"), q.get("codes")))
+        elif q:
+            print("     → 入队失败：%s" % q.get("why"))
         print("     → 纠错位(规则表): %s" % rec["fix"].get("rule_from"))
         print("     → 纠正: %s" % ", ".join(
             "%s=%s" % (a["action"], a["ok"]) for a in rec["fix"]["acts"]))
@@ -272,11 +313,13 @@ def main() -> int:
         after = sample(rc)
         print("\n  纠正后：窗口 %d 字符（预算 %d）· seq %d · 落库 %d"
               % (after["window_chars"], after["budget"], after["seq"], after["spilled"]))
-        print("  窗口仍 ≤ 预算: %s · 没丢条: %s"
-              % (after["window_chars"] <= after["budget"],
-                 after["seq"] - after["spilled"] <= after["window_n"]))
+        print("  窗口仍 ≤ 预算: %s" % (after["window_chars"] <= after["budget"]))
+        # 🔴 原来这里用 "seq - db_turns <= window_n" 判"没丢条" —— **这个式子不成立**：
+        #   db_turns 是**全库共享**的计数，seq 是本会话的单调值，两者不同源。
+        #   真要验"没丢"，只能靠**秒查命中**（被挤出的必须还能 recall 到）。
         r = rc.recall("第3轮", k=2)
-        print("  老内容仍秒查得到: %s" % r.get("ok"))
+        r2 = rc.recall("第0轮", k=2)
+        print("  老内容仍秒查得到: %s / %s" % (r.get("ok"), r2.get("ok")))
         return 0
 
     if a.once:
