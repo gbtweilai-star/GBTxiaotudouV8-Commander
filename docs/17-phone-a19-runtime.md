@@ -2410,3 +2410,55 @@ play（播）   apple-player
 我这边不再重试，免得继续加重。
 
 ---
+
+---
+
+## 四十四、两条修复：从哪都能跑 + 出错必须退避（2026-10-28）
+
+### ① 路径问题第 N 次：做成 `gbt` 总入口
+
+主人两次在 `/var/minis` 下敲 `python3 tools/…`，都因路径不对失败。
+不再让他记路径：
+
+```sh
+gbt voice                # 语音互交环
+gbt say "文字"            # 让她用台湾腔说一句
+gbt status               # 八路服务
+gbt bus --status         # 触手总线
+gbt accept               # 闭环验收
+gbt auth                 # 授权列表
+gbt board                # 主脑注意力看板
+gbt patrol --once        # 巡检
+gbt mirror --run         # 镜像流程
+gbt proj                 # 投影台地址
+gbt a19 --once           # A19 哨兵
+```
+
+装在 `/usr/local/bin/gbt`，内部自己 `cd` 到仓库。实测从 `/var/minis` 直接可用
+（`status` 10 项 ✅、`bus` 嗓音正确、`say` 走 edge-tts 成功）。
+
+### ② 退避：把那次雪崩焊死
+
+```python
+fails += 1
+wait = min(60, 10 * (2 ** (fails - 1)))      # 10 → 20 → 40 → 封顶 60
+if fails >= 3:
+    print("⛔ 连败 3 次，停。识别服务需要恢复或重启 App，不硬撑。")
+    break
+```
+
+**实测**：
+
+```
+[01] 🔴 …退避 10s（连败 1）
+[02] 🔴 …退避 20s（连败 2）
+[03] 🔴 …退避 40s（连败 3）
+⛔ 连败 3 次，停
+用时 31 秒            ← 而之前是 80 秒打 103 次
+```
+
+同时把默认时长从 6 秒改成 **60 秒**（`--duration` 上限），
+把开关次数压到最低 —— 这才符合主人说的"插住别反复拔"。
+
+---
+

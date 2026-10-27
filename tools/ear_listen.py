@@ -66,7 +66,7 @@ def listen_once(seconds: int, lang: str) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--seconds", type=int, default=6)
+    ap.add_argument("--seconds", type=int, default=60)
     ap.add_argument("--rounds", type=int, default=0)
     ap.add_argument("--until", type=int, default=0, help="监听多少秒后停")
     ap.add_argument("--lang", default="zh-CN")
@@ -79,6 +79,7 @@ def main() -> int:
     t_start = time.time()
     round_no = 0
     heard = 0
+    fails = 0
     while True:
         round_no += 1
         if a.rounds and round_no > a.rounds:
@@ -90,10 +91,21 @@ def main() -> int:
         rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "round": round_no,
                "seconds": a.seconds, **r}
         if not r["ok"]:
-            print("🔴 %s" % (r.get("err") or "")[:60], flush=True)
+            # 🔴 2026-10-28 血训：原来出错 sleep(1) 就重试，
+            #   80 秒打了 103 次，被 iOS 判定滥用 ⇒ 识别服务被限流，
+            #   之后连**文件源**都失败（文件源根本不用麦克风）。
+            #   ⇒ 失败必须指数退避；连败 3 次就停，不硬撑。
+            fails += 1
+            wait = min(60, 10 * (2 ** (fails - 1)))
+            print("🔴 %s · 退避 %ds（连败 %d）"
+                  % ((r.get("err") or "")[:44], wait, fails), flush=True)
             log(rec)
-            time.sleep(1)
+            if fails >= 3:
+                print("  ⛔ 连败 3 次，停。识别服务需要恢复或重启 App，不硬撑。", flush=True)
+                break
+            time.sleep(wait)
             continue
+        fails = 0
         if not r["text"]:
             print("（静音）", flush=True)
             log(rec)
