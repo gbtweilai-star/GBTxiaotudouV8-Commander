@@ -74,6 +74,17 @@ start_gate() {
   else say ":8790 asyncio 批量车道" "🔴 未起 → logs/async_gate.log"; fi
 }
 
+start_sentinel() {
+  # A19 哨兵：每 5 秒探 :1234，一出现就自动验收（模型名 / 首字 / tok/s / 身份）
+  # 并落 state/a19_ready.json。**不需要改桥配置** —— 桥默认上游本来就是 selfhost。
+  if pgrep -f a19_attach.py >/dev/null 2>&1; then say ":1234 哨兵" "✅ 已在跑"; return; fi
+  cd "$BASE" || return
+  setsid nohup python3 -u tools/a19_attach.py > "$LOG/a19_attach.out" 2>&1 < /dev/null &
+  sleep 2
+  if pgrep -f a19_attach.py >/dev/null 2>&1; then say ":1234 哨兵" "✅ 已启动（每 5s 探一次）"
+  else say ":1234 哨兵" "🔴 起不来"; fi
+}
+
 probe_a19() {
   if up 1234; then say ":1234 A19" "✅ 在线"; return; fi
   command -v apple-open >/dev/null 2>&1 && apple-open lmpocket:// >/dev/null 2>&1
@@ -84,7 +95,7 @@ probe_a19() {
 case "${1:-status}" in
 up)
   echo "=== 拉齐五路 ==="
-  start_page; start_bridge; start_gate; start_index; start_flr; probe_a19
+  start_page; start_bridge; start_gate; start_index; start_flr; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
@@ -94,7 +105,11 @@ status)
     if up "$p"; then say ":$p $n" "✅ up"
     else
       case "$p" in
-        1234) say ":$p $n" "⚠ 离线（按需唤醒）" ;;
+        1234) if [ -f "$BASE/state/a19_ready.json" ] && grep -q '"ok": true' "$BASE/state/a19_ready.json" 2>/dev/null; then
+                say ":$p $n" "✅ 已验证就绪（$(python3 -c "import json;d=json.load(open('$BASE/state/a19_ready.json'));print('%.2fs %s tok/s'%(d.get('elapsed_s') or 0,d.get('tok_per_s')))" 2>/dev/null)）"
+              else
+                say ":$p $n" "⚠ 离线（哨兵在等，出现即自动接入）"
+              fi ;;
         *)    say ":$p $n" "🔴 down" ;;
       esac
     fi
