@@ -1573,3 +1573,65 @@ shape → scan(5) → plan → simulate(9) → parity(0 blocker)
 **取错字段就等于没判** —— 已改。
 
 ---
+
+---
+
+## 三十、上下文异常并入主脑注意力队列：一个大脑，一张表（2026-10-28）
+
+### 原来：两个地方各判各的
+
+- 输出异常 → `llm_watch` 判，进 `store/brain_supervisor/queue.jsonl`
+- 上下文异常 → `context_guard` 判，只落自己的 `state/context_guard.jsonl`
+
+**主脑要看两处才知道"现在有没有事"。** 这不叫一个大脑在排布。
+
+### 现在：复用同一个 `_append`，不另写格式
+
+```python
+from gbt_allinone import brain_supervisor as BS
+BS._append("queue.jsonl", {"at":…, "kind": "context_guard", "severity": sev,
+                           "codes": [...], "hits": [...],
+                           "who": "context_overflow_guard",
+                           "ctx": {窗口/预算/填充/seq}, "acked_at": None})
+```
+
+**直接调它的 `_append`** —— 另写一套格式的话，两处迟早漂移，合并就名存实亡。
+
+严重度对齐它的索引制（`0=critical … 3=low`）：
+
+```
+overflow       → 0  critical
+window_lost    → 1  high
+empty_window   → 1  high
+near_overflow  → 2  medium
+stuck          → 2  medium
+```
+
+### 实测：三类同表
+
+```
+llm_watch op=queue → 未处理 35 条
+  按来源: duty_board 12 · llm_watch 6 · context_guard 2
+
+  llm_watch      sev=0  ['越权声明']
+  llm_watch      sev=1  ['完成声明无证据','越权声明']
+  context_guard  sev=2  ['near_overflow']
+  context_guard  sev=2  ['near_overflow']
+```
+
+**主脑现在只看一张表，就能看到：输出越权、完成声明没证据、上下文快溢出、值班板。**
+
+### 顺带修掉一个一直误导的输出
+
+自检原来打印「没丢条: `seq - db_turns <= window_n`」——
+**这个式子不成立**：`db_turns` 是**全库共享**计数，`seq` 是本会话单调值，不同源。
+
+已改成**用秒查验证**（被挤出的必须还能 `recall` 到）：
+
+```
+老内容仍秒查得到: True / True
+```
+
+**"没丢"是要证明的，不是减出来就算。**
+
+---
