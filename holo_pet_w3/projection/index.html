@@ -28,9 +28,9 @@
   #stage.empty::after{content:"选一张图，或拖进来";color:var(--dim);font-size:13px}
 
   /* 投墙用：透镜成的是 180° 旋转的实像 ⇒ 屏幕端预转 180° 抵消 */
-  #stage.flip img, #stage.flip video{transform:scaleX(-1) scaleY(-1)}
-  #stage.mirror img, #stage.mirror video{transform:scaleX(-1)}
-  #stage.invert img, #stage.invert video{filter:invert(1) brightness(1.25)}
+  #stage.flip img, #stage.flip video, #stage.flip iframe{transform:scaleX(-1) scaleY(-1)}
+  #stage.mirror img, #stage.mirror video, #stage.mirror iframe{transform:scaleX(-1)}
+  #stage.invert img, #stage.invert video, #stage.invert iframe{filter:invert(1) brightness(1.25)}
   #stage.invert.flip img{filter:invert(1) brightness(1.25);transform:scaleX(-1) scaleY(-1)}
 
   footer{padding:8px 14px;border-top:1px solid var(--line);font-size:11.5px;
@@ -50,9 +50,17 @@
 
 <header>
   <h1>投影台</h1>
+  <select id="kind" title="投影源">
+    <option value="img">静态图片</option>
+    <option value="live">实时页面（把她正在跑的画面投出去）</option>
+  </select>
   <select id="pick">
     <option value="">— 选素材 —</option>
   </select>
+  <select id="livePick" style="display:none">
+    <option value="">— 选实时页 —</option>
+  </select>
+  <button id="bLiveFresh" style="display:none" title="强制重载实时页">⟳ 刷新源</button>
   <input id="file" type="file" accept="image/*" style="display:none">
   <button id="bFile">本地图</button>
   <button id="bFlip" class="on" title="透镜成 180° 旋转实像，屏幕端要预转 180° 抵消">投墙 180°</button>
@@ -64,6 +72,7 @@
 
 <div id="stage" class="empty flip invert">
   <img id="img" alt="" style="display:none">
+  <iframe id="live" style="display:none;width:100%;height:100%;border:0;background:#000"></iframe>
   <div id="hint">投墙：凸透镜 f≈20cm · 屏到镜头 16.7cm · 投距 1m ≈ 39×84cm · 全黑房间</div>
 </div>
 
@@ -95,6 +104,52 @@
     const o = document.createElement('option');
     o.value = src; o.textContent = name; pick.appendChild(o);
   }
+
+  // ── 实时源：把她正在跑的页面直接投出去（iframe 是实时的，不是截图）──
+  const LIVE = [
+    ['../panel/index.html',            '控制面板（含镜像/巡检读数）'],
+    ['../model-chat/index.html',       '对话面（她说话的地方）'],
+    ['../index.html',                  '上帝视角'],
+    ['../capability-bar/index.html',   '能力栏'],
+    ['../logbook/index.html',          '记录本'],
+    ['../blueprint/index.html',        '项目蓝图'],
+    ['../../index.html',               '开源发布页'],
+  ];
+  const livePick = document.getElementById('livePick');
+  for (const [href, name] of LIVE) {
+    const o = document.createElement('option');
+    o.value = href; o.textContent = name; livePick.appendChild(o);
+  }
+
+  const live = document.getElementById('live');
+  const kind = document.getElementById('kind');
+  const bFresh = document.getElementById('bLiveFresh');
+
+  function setKind(k) {
+    const isLive = (k === 'live');
+    pick.style.display     = isLive ? 'none' : '';
+    livePick.style.display = isLive ? '' : 'none';
+    bFresh.style.display   = isLive ? '' : 'none';
+    img.style.display      = (!isLive && img.src) ? 'block' : 'none';
+    live.style.display     = isLive ? 'block' : 'none';
+    if (isLive) {
+      stage.classList.remove('empty');
+      if (!live.src || live.src.endsWith('/projection/index.html')) {
+        if (livePick.value) live.src = livePick.value;
+      }
+    } else {
+      if (img.src) stage.classList.remove('empty');
+      else stage.classList.add('empty');
+    }
+  }
+  kind.onchange = () => setKind(kind.value);
+  livePick.onchange = () => {
+    if (livePick.value) {
+      live.src = livePick.value;
+      document.getElementById('info').textContent = '实时 · ' + livePick.selectedOptions[0].textContent;
+    }
+  };
+  bFresh.onclick = () => { if (live.src) live.src = live.src.split('?')[0] + '?t=' + Date.now(); };
 
   function show(src, label) {
     img.src = src;
@@ -151,6 +206,8 @@
     if (e.key === '2') bInv.click();
     if (e.key === '3') bMir.click();
   });
+
+  setKind('img');
 
   // 挂载状态：摄像头是否可用（本机 WebView 实测挂起，如实标注）
   const camNote = document.createElement('span');
