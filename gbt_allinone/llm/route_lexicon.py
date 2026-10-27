@@ -125,7 +125,10 @@ def _self_label(cap_desc: str) -> str:
     #      旧的 split("·")[-1] 会抓到很靠后的段 ⇒ 取到空 ⇒ 永远走兜底。
     #      正确顺序：剥 md → 在「：」截断 → 在「（(」截断 → 最后才按「·」分段。
     text = _re.sub(r"\*\*|__|`|~~|\[|\]", "", str(cap_desc or ""))
-    text = text.split("：", 1)[0]
+    # 半角冒号也要认：不少位描述是英文（"Claude Code CLI: official ..."），
+    # 只切全角「：」会让整段超长 ⇒ 自称谓取空 ⇒ 只能靠语义抖（实测 claude_code）
+    import re as _re2
+    text = _re2.split(r"[：:]", text, 1)[0]
     text = _re.split(r"[（(]", text)[0]
     seg = text.split("·")[-1].strip()
     seg = seg.strip(" 　·:：，,。.）)」』】")
@@ -133,8 +136,17 @@ def _self_label(cap_desc: str) -> str:
 
 
 def name_hint(intent: str) -> dict:
-    """在词表之前先认"自称谓"：命中越长的标签越优先（具体压笼统）。"""
-    text = str(intent or "")
+    """在词表之前先认"自称谓"。命中越长的标签越优先（具体压笼统）。
+
+    🔴 2026-10-28 修两处（都实测撞出来）：
+      ① **比对污染**：标签是剥过 markdown 的，而原文带 `**` ⇒ 子串永远不中。
+         实测 multimodal_port 因此被词表的「维度」劫持。现在两边都先剥。
+      ② **自称谓撞车**：omni_plug 与 wf_cache_clear 的中文名都叫「万能插」，
+         同权重时随机挑一个。现在撞车时：名字出现在意图里的优先，
+         否则取**名字最短**的（更泛化的那个），并标 ambiguous 让人看得见。
+    """
+    import re as _re
+    text = _re.sub(r"\*\*|__|`|~~|\[|\]", "", str(intent or ""))
     if not text:
         return {"ok": False, "why": "空意图"}
     try:
@@ -144,18 +156,32 @@ def name_hint(intent: str) -> dict:
             from gbt_allinone.caps_registry import all_caps   # type: ignore
         except Exception:                                     # noqa: BLE001
             return {"ok": False, "why": "注册表不可用"}
-    best = None
+
+    cands: list[dict] = []
     for c in all_caps():
         if not isinstance(c, dict):
             continue
         lab = _self_label(c.get("desc") or "")
         if not lab or lab not in text:
             continue
-        cand = {"cap": str(c.get("name")), "label": lab, "weight": len(lab),
-                "domain": c.get("domain")}
-        if best is None or cand["weight"] > best["weight"]:
-            best = cand
-    return {"ok": bool(best), "best": best} if best else {"ok": False, "why": "无自称谓命中"}
+        cands.append({"cap": str(c.get("name")), "label": lab,
+                      "weight": len(lab), "domain": c.get("domain")})
+    if not cands:
+        return {"ok": False, "why": "无自称谓命中"}
+
+    top_w = max(x["weight"] for x in cands)
+    top = [x for x in cands if x["weight"] == top_w]
+    ambiguous = len(top) > 1
+    if ambiguous:
+        named = [x for x in top if x["cap"].lower() in text.lower()]
+        pick = (sorted(named, key=lambda x: len(x["cap"])) or
+                sorted(top, key=lambda x: len(x["cap"])))[0]
+    else:
+        pick = top[0]
+    pick = dict(pick)
+    pick["ambiguous"] = ambiguous
+    pick["tied"] = [x["cap"] for x in top] if ambiguous else []
+    return {"ok": True, "best": pick}
 
 
 def audit() -> dict:
