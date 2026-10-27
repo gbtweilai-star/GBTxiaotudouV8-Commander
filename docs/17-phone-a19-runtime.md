@@ -1051,3 +1051,53 @@ skipped        5
 **验证那一环是空的，不能算过。**
 
 ---
+
+---
+
+## 二十一、对齐读数本身也不稳：重复采样才敢用（2026-10-28）
+
+### 先拆 `routed_other`：7 位里有三种性质
+
+原来一律记 `routed_other`，看着像"7 个全坏"。拆开后：
+
+| 类型 | 数量 | 含义 |
+|---|---:|---|
+| `routed_parent` | 0 | 同域近似位（如 brain_health → health）—— 描述重叠，属正常近似 |
+| `routed_broad` | **3** | 落到 `tentacle`（semantic 给不出时的**兜底黑洞**）|
+| `routed_wrong` | **4** | 跨域真错位（如 codex_status → health，仅因描述含"并发"）|
+
+### 然后发现：同一个位跑两次，判定会翻
+
+llm 域 41 位连跑两次：
+
+```
+第一次  aligned 19 · needs_params 8 · routed_wrong 4 · skipped 7 · routed_broad 3
+第二次  aligned 21 · needs_params 8 · routed_wrong 4 · skipped 6 · routed_broad 2
+
+判定不一致 4 位：
+  replan_loop    routed_broad → aligned     ← 路由本身在抖
+  codebuddy      aligned → skipped          ← 执行在抖
+  claude_code    skipped → aligned
+  omni_plug      skipped → aligned
+```
+
+⇒ **单次读数不能当结论。** 路由走 semantic 时依赖模型输出，执行偶发失败，
+两者都会让判定翻面。
+
+### 修法：重复采样，只认稳定判定
+
+`tools/brain_align.py --repeat N`：
+
+- 每位跑 N 次，N 次判定**全一致**才记 `stable: true`
+- 不一致的记 `verdict: flaky`，并把**每一次的结果都列出来**（`flaky: [...]`）
+- 汇总时 flaky 单列，不混进任何一类
+
+实测 6 位 × 3 次：**6/6 稳定**（5 aligned · 1 needs_params），本次样本无抖动。
+
+### 代价（如实报）
+
+每位 3 次约 40 秒。llm 域 41 位 × 3 ≈ **27 分钟**。
+所以本轮**只跑了 6 位 ×3 的样本**，整域 3 次没有跑完 —— 不拿单次数据冒充。
+
+---
+

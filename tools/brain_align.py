@@ -104,12 +104,34 @@ def align_one(c: dict) -> dict:
     ex = ch.get("execute") or {}
     vf = ch.get("verify") or {}
     routed = (rt.get("best") or {}).get("kind")
+    # 🔴 2026-10-28：原来把"路由到别的位"一律记 routed_other，混了三种性质：
+    #    ① 同域近似位（brain_health → health）：描述本身就有重叠，属正常近似
+    #    ② 兜底黑洞（* → tentacle）：semantic 给不出时的通用落点
+    #    ③ 真错位（指向不相干的域）
+    #    混在一起看就像"7 个全坏"，其实只有一部分是路由缺陷。
+    tgt_dom = str(c.get("domain") or "")
+    got_dom = ""
+    if routed:
+        try:
+            from gbt_allinone.caps_registry import all_caps as _ac
+            for _c in _ac():
+                if isinstance(_c, dict) and str(_c.get("name")) == str(routed):
+                    got_dom = str(_c.get("domain") or "")
+                    break
+        except Exception:                                     # noqa: BLE001
+            pass
+
     if routed == name and ex.get("ok"):
         verdict = "aligned"
     elif why:                                  # 路由对了，只是我们没让它真跑（需参数/要作用域）
         verdict = "needs_params" if why == "需参数" else "skipped"
     elif routed and routed != name:
-        verdict = "routed_other"
+        if routed == "tentacle":
+            verdict = "routed_broad"          # 兜底黑洞，不是错指
+        elif got_dom and got_dom == tgt_dom:
+            verdict = "routed_parent"         # 同域近似位
+        else:
+            verdict = "routed_wrong"          # 真错位（跨域）
     elif ex.get("status") == "denied":
         verdict = "exec_denied"
     elif routed == name and not ex.get("ok"):
@@ -133,6 +155,8 @@ def main() -> int:
     ap.add_argument("--sample", type=int, default=0)
     ap.add_argument("--domain", default="")
     ap.add_argument("--all", action="store_true")
+    ap.add_argument("--repeat", type=int, default=1,
+                    help="每位重复几次；≥2 时只认稳定判定，抖动位单列")
     a = ap.parse_args()
 
     items = caps()
@@ -151,6 +175,19 @@ def main() -> int:
     rows, t0 = [], time.time()
     for i, c in enumerate(items, 1):
         row = align_one(c)
+        if a.repeat > 1:
+            # 🔴 2026-10-28 实测：同一批位跑两次，41 位里有 4 位判定会翻
+            #    （路由走 semantic 时依赖模型输出；执行偶发失败）⇒ 单次读数不可当结论。
+            #    重复采样，全部一致才算 stable；不一致记 flaky 并列出各次结果。
+            seen = [row["verdict"]]
+            for _ in range(a.repeat - 1):
+                seen.append(align_one(c)["verdict"])
+            if len(set(seen)) == 1:
+                row["stable"] = True
+            else:
+                row["stable"] = False
+                row["flaky"] = seen
+                row["verdict"] = "flaky"
         rows.append(row)
         note = row.get("skip_why") or ("degraded" if row.get("degraded") else "")
         print("  %-22s %-13s %-9s %-6s %s" %
