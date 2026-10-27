@@ -26,6 +26,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import signal
 import pathlib
@@ -35,6 +36,17 @@ import traceback
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+# 🔴 2026-10-28：**探活不许污染生产观测账**。
+#   实测代价：我自己的对齐探活（--repeat 3）在观测账里留下 123 笔失败，
+#   占全部失败的 34%；gate_denied 217 笔里有 140 笔是我的 3 连击签名。
+#   于是"等授权 24 个位"大半是我的足迹，主脑看到的是假积压。
+#   `_dir()` 每次调用现读 GBT_STORE_DIR ⇒ 探活进程换个 store 就彻底隔离。
+if not os.environ.get("GBT_PROBE_ISOLATED"):
+    _probe_store = pathlib.Path(__file__).resolve().parents[1] / "state" / "probe_store"
+    _probe_store.mkdir(parents=True, exist_ok=True)
+    os.environ["GBT_STORE_DIR"] = str(_probe_store)
+    os.environ["GBT_PROBE_ISOLATED"] = "1"
+
 
 OUT = ROOT / "state" / "omni_align.json"
 PROBE_TIMEOUT = 8          # 单次探活上限（秒）
