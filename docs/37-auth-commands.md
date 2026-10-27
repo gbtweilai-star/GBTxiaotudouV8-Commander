@@ -7,7 +7,29 @@
 
 ---
 
-## 先 cd 进去
+## 〇、已装成本机命令，从哪都能跑
+
+```sh
+gbt-auth                              # 不带参数 → 列出 16 个作用域与剩余可用次数
+gbt-auth process_execute 600 "跑命令"   # 发一个作用域
+gbt-auth deploy_publish 600 "晋升"
+```
+
+脚本在 `/usr/local/bin/gbt-auth`，内部自己 `cd` 到仓库，**不用记路径、不用设 PYTHONPATH**。
+
+**下面两种写法也都能用**（万一 gbt-auth 被清了）：
+
+```sh
+cd /var/minis/shared/gbtv8 && python3 -m gbt_allinone auth grant --scope <s> --ttl 600 --purpose "…"
+PYTHONPATH=/var/minis/shared/gbtv8 python3 -m gbt_allinone auth grant --scope <s> --ttl 600 --purpose "…"
+```
+
+> ⚠ **不要在 `/var/minis` 直接跑 `python3 -m gbt_allinone`** —— 会报
+> `No module named gbt_allinone`（仓库在 `shared/gbtv8` 下面，不是根）。
+
+---
+
+## 原写法（等价，需要先 cd）
 
 ```sh
 cd /var/minis/shared/gbtv8
