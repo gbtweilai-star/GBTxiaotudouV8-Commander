@@ -1,0 +1,18 @@
+name: ios-build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - run: xcodegen generate
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -project SpaceBeamLite.xcodeproj -scheme SpaceBeamLite \
+            -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SpaceBeamLite-unsigned
+          path: build/Build/Products/Release-iphoneos/SpaceBeamLite.app

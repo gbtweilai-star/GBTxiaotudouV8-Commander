@@ -90,6 +90,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ask")
     ap.add_argument("--kernel", action="store_true", help="把品味内核当 system 一起送")
+    ap.add_argument("--no-persona", action="store_true", help="不送人格（默认送精简版）")
+    ap.add_argument("--persona-full", action="store_true", help="送 1182 字全量人格")
     ap.add_argument("--system", default="")
     ap.add_argument("--tokens", type=int, default=512)
     ap.add_argument("--temp", type=float, default=0.7)
@@ -118,8 +120,14 @@ def main():
         return 1
 
     system = a.system
-    if a.kernel and KERNEL.exists():
-        system = KERNEL.read_text(encoding="utf-8")
+    parts = []
+    PERS = STATE / ("her_persona.txt" if a.persona_full else "her_persona_lite.txt")
+    if not a.no_persona and PERS.exists():          # 人格优先：说话自然靠它
+        parts.append(PERS.read_text(encoding="utf-8"))
+    if a.kernel and KERNEL.exists():                 # 品味内核只在做设计时叠上去
+        parts.append(KERNEL.read_text(encoding="utf-8"))
+    if parts:
+        system = "\n\n".join(parts)
 
     budget = CTX - min(RESERVE, max(200, a.tokens))
     msgs, used = build(system, hist, a.ask, budget)

@@ -50,6 +50,20 @@ def log(role, text, upstream=None, model=None, source="minis"):
         return False
 
 
+PERSONA_LITE = TOOLS.parent / "state" / "her_persona_lite.txt"   # 407 字，默认
+PERSONA_FULL = TOOLS.parent / "state" / "her_persona.txt"        # 1182 字，--persona-full
+
+
+def persona(full=False):
+    """默认精简版：7.6B/4096 的窗口里，全量人格占 18%，会把对话挤没。"""
+    for p in ((PERSONA_FULL, PERSONA_LITE) if full else (PERSONA_LITE, PERSONA_FULL)):
+        try:
+            return p.read_text(encoding="utf-8")
+        except Exception:                                         # noqa: BLE001
+            continue
+    return ""
+
+
 def tail(n=6):
     if not TRANSCRIPT.exists():
         return []
@@ -72,6 +86,7 @@ def main():
     ap.add_argument("--tail", type=int, default=0)
     ap.add_argument("--taste", action="store_true",
                     help="输出「品味内核」（吞噬 taste-skill 后蒸馏，1.2k token）")
+    ap.add_argument("--persona-full", action="store_true", help="用 1182 字全量人格（默认 407 字精简）")
     ap.add_argument("--sensor", type=int, default=0,
                     help="读最近 N 条传感器记录（页面在容器活着/断了时记下的读数）")
     ap.add_argument("--tokens", type=int, default=512)
@@ -143,7 +158,7 @@ def main():
         print("动作：LM Pocket 前台点 Load & Start Server；或 a19_ctl queue add 先存着。")
         return 2
 
-    r = c.ask_dict(text, a.tokens, a.temp)
+    r = c.ask_dict(text, a.tokens, a.temp, system=persona(a.persona_full))
     if not r.get("ok"):
         print("容器出错：%s" % r.get("why"))
         return 3
