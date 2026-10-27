@@ -74,8 +74,17 @@ class RingContext:
                           "content, tokenize='unicode61')")
             except sqlite3.OperationalError:
                 pass
+            # 🔴 2026-10-28：原来 turns 表**没有 name 列** —— 所有会话共用一个表，
+            #   于是"按名字恢复窗口"根本做不到，而 self._ring 是纯内存的，
+            #   进程一换窗口就空（实测：同实例 5 条 / 新实例 0 条，库里 52 条仍在）。
+            #   ⇒ 那叫"会话内有限上下文"，不叫无限。
+            #   这里做**加法迁移**：补 name 列（老行落 'default'），以后按名恢复。
+            cols = {r[1] for r in c.execute('PRAGMA table_info(turns)').fetchall()}
+            if 'name' not in cols:
+                c.execute("ALTER TABLE turns ADD COLUMN name TEXT DEFAULT 'default'")
             row = c.execute('SELECT MAX(seq) FROM turns').fetchone()
             self._seq = int(row[0] or 0)
+        self._restore_window()
 
     # ── ① 入环：超预算就把最老的挤出去（先落库，再挤出）──────────────────
     def push(self, role: str, content: str, meta: dict | None = None) -> dict:
@@ -86,6 +95,12 @@ class RingContext:
         item['chars'] = len(content)
         self._ring.append(item)
         self._chars += item['chars']
+        # 🔴 2026-10-28：原来**只有被挤出时才落库**，于是"最近这一屏"从来没进过库
+        #   （实测：90 字远没到 4000 预算 ⇒ 一条没存 ⇒ 换进程窗口 0 条）。
+        #   ⇒ 那不叫无限上下文，叫"进程内有限窗口 + 老内容可搜"。
+        #   现在改成**每条都落库**，内存窗口只是"库的一个视图"：
+        #   进程重启后能从这个会话的尾部把窗口读回来。
+        self._persist(item)
         evicted = []
         while self._chars > self.window_chars and len(self._ring) > 1:
             oldest = self._ring[0]
@@ -97,16 +112,54 @@ class RingContext:
         return {'ok': True, 'seq': item['seq'], 'window_chars': self._chars,
                 'window_items': len(self._ring), 'evicted': evicted}
 
+    def _restore_window(self, max_items: int = 400) -> int:
+        """从库里把这个会话最近的若干条读回内存窗口（按预算截断）。
+
+        没有这一步，"窗口"就是进程私有的：换进程等于失忆，
+        只能靠 recall 一条条捞。补上之后才配叫**跨进程的无限上下文**。
+        """
+        try:
+            with self._conn() as c:
+                rows = c.execute(
+                    "SELECT seq, at, role, content, chars FROM turns "
+                    "WHERE COALESCE(name, 'default') = ? ORDER BY seq DESC LIMIT ?",
+                    (self.name, int(max_items))).fetchall()
+        except Exception:                                     # noqa: BLE001
+            return 0
+        restored = 0
+        for seq, at, role, content, chars in reversed(rows):
+            n = int(chars or len(content or ''))
+            if self._chars + n > self.window_chars and self._ring:
+                break
+            self._ring.append({'seq': int(seq), 'at': at, 'role': role,
+                               'content': content, 'chars': n, 'meta': {}})
+            self._chars += n
+            restored += 1
+        return restored
+
+    def _persist(self, item: dict) -> bool:
+        """把一条写进库（**幂等**，INSERT OR REPLACE）。每次 push 都调用。"""
+        return self._spill(item)
+
     def _spill(self, item: dict) -> bool:
         """把一个被挤出的条目落库（FTS5 同步）。返回是否落库成功。"""
         try:
             with self._conn() as c:
-                c.execute('INSERT OR REPLACE INTO turns (seq, at, role, content, chars) VALUES (?,?,?,?,?)',
-                          (item['seq'], item['at'], item['role'], item['content'], item['chars']))
+                c.execute('INSERT OR REPLACE INTO turns (seq, at, role, content, chars, name) '
+                          'VALUES (?,?,?,?,?,?)',
+                          (item['seq'], item['at'], item['role'], item['content'],
+                           item['chars'], self.name))
                 try:
-                    c.execute('INSERT INTO turns_fts (rowid, content) VALUES (?,?)',
+                    # 🔴 2026-10-28：改成"每条都落库"后，同一条会被写两次
+                    #   （push 时一次、被挤出时再一次），第二次插 FTS 的 rowid
+                    #   已经存在 ⇒ IntegrityError。而这里原来只 catch
+                    #   OperationalError ⇒ 异常冒出去 ⇒ _spill 返回 False
+                    #   ⇒ 挤出循环 break ⇒ **环形"长度恒定"铁律被破坏**
+                    #   （实测窗口涨到 8070 / 预算 3000）。
+                    #   两处都修：FTS 用 OR REPLACE，且把 IntegrityError 也接住。
+                    c.execute('INSERT OR REPLACE INTO turns_fts (rowid, content) VALUES (?,?)',
                               (item['seq'], item['content']))
-                except sqlite3.OperationalError:
+                except (sqlite3.OperationalError, sqlite3.IntegrityError):
                     pass
             return True
         except Exception:
