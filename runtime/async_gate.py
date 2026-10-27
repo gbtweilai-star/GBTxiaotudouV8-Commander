@@ -46,6 +46,27 @@ CORS = (
 )
 STATS = {"active": 0, "peak": 0, "served": 0, "failed": 0}
 
+# 🔴 2026-10-27：/health 原来**每个请求**都重建一遍上游清单，
+#    其中 key_for() 要开文件读密钥 ⇒ 4096 并发下光这块就是 9.7 秒纯 CPU，
+#    是 p95 61 秒的主因之一。清单本身几秒内不会变，缓存 1 秒即可。
+#    stats 仍然实时，只有 upstreams 那段吃缓存。
+_UPS_CACHE = {"at": 0.0, "json": "[]"}
+_UPS_TTL = 1.0
+
+
+def _upstreams_json() -> str:
+    now = time.monotonic()
+    if now - _UPS_CACHE["at"] < _UPS_TTL and _UPS_CACHE["json"] != "[]":
+        return _UPS_CACHE["json"]
+    cfg = {}
+    for n, (b, m, prof, _t) in UPSTREAMS.items():
+        k, slot = key_for(prof)          # 每个上游只读一次文件
+        cfg[n] = {"base_url": b, "model_default": m,
+                  "key_ready": bool(k), "key_slot": slot}
+    blob = json.dumps(cfg, ensure_ascii=False)
+    _UPS_CACHE.update(at=now, json=blob)
+    return blob
+
 
 def _split_base(base: str):
     u = urllib.parse.urlsplit(base)
@@ -156,15 +177,12 @@ async def handle(reader, writer):
             return
 
         if target == "/health":
-            cfg = {n: {"base_url": b, "model_default": m,
-                       "key_ready": bool(key_for(p)[0]), "key_slot": key_for(p)[1]}
-                   for n, (b, m, p, _t) in UPSTREAMS.items()}
-            out = json.dumps({"ok": True, "service": "gbt-async-gate",
-                              "default": DEFAULT,
-                              "upstreams": cfg,
-                              "stats": STATS,
-                              "at": time.strftime("%Y-%m-%dT%H:%M:%S")},
-                             ensure_ascii=False).encode("utf-8")
+            # 直接拼字符串：上游清单走缓存，stats 实时，避免每请求重建 dict
+            out = ('{"ok": true, "service": "gbt-async-gate", "default": "%s", '
+                   '"upstreams": %s, "stats": %s, "at": "%s"}'
+                   % (DEFAULT, _upstreams_json(),
+                      json.dumps(STATS), time.strftime("%Y-%m-%dT%H:%M:%S"))
+                   ).encode("utf-8")
             writer.write(_resp("200 OK", out, "application/json; charset=utf-8"))
             await writer.drain()
             STATS["served"] += 1
