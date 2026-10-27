@@ -109,6 +109,45 @@ def match(intent: str, min_hits: int = 0) -> dict:
     return {"ok": True, "entry": ranked[0], "ranked": ranked[:3]}
 
 
+def _self_label(cap_desc: str) -> str:
+    """从描述里取"自称谓"：第一个「：」之前、最后一个「·」之后那段。
+
+    为什么需要它：能力位名是**英文**（brain_health / brain_verify / model_key_pool），
+    而描述全是中文（"健康维"/"验证维"/"模型密钥池"）——实测位名 token
+    在描述里**一个都不出现**，所以"按位名自识别"对这类位完全失效。
+    中文自称谓才是它们在文本里的真实身份。
+    """
+    head = str(cap_desc or "").split("：", 1)[0]
+    seg = head.split("·")[-1].strip()
+    return seg if 2 <= len(seg) <= 20 else ""
+
+
+def name_hint(intent: str) -> dict:
+    """在词表之前先认"自称谓"：命中越长的标签越优先（具体压笼统）。"""
+    text = str(intent or "")
+    if not text:
+        return {"ok": False, "why": "空意图"}
+    try:
+        from ..caps_registry import all_caps
+    except Exception:                                         # noqa: BLE001
+        try:
+            from gbt_allinone.caps_registry import all_caps   # type: ignore
+        except Exception:                                     # noqa: BLE001
+            return {"ok": False, "why": "注册表不可用"}
+    best = None
+    for c in all_caps():
+        if not isinstance(c, dict):
+            continue
+        lab = _self_label(c.get("desc") or "")
+        if not lab or lab not in text:
+            continue
+        cand = {"cap": str(c.get("name")), "label": lab, "weight": len(lab),
+                "domain": c.get("domain")}
+        if best is None or cand["weight"] > best["weight"]:
+            best = cand
+    return {"ok": bool(best), "best": best} if best else {"ok": False, "why": "无自称谓命中"}
+
+
 def audit() -> dict:
     """词表自检：引用的能力位必须真实存在。写错了要当场报，不许静默失效。"""
     try:

@@ -1101,3 +1101,70 @@ llm 域 41 位连跑两次：
 
 ---
 
+
+---
+
+## 二十二、"位名自识别"是死路，中文自称谓才是对的（2026-10-28）
+
+### 先试原方案：按位名识别 —— 失败
+
+假设：意图里出现能力位名（`codex_status` 的 `codex`/`status`）就直连它。
+实测四个错位位，**只有 `codex_status` 命中一个 token**：
+
+| 位 | 整名出现 | 名字 token 在描述里 |
+|---|---|---|
+| `codex_status` | ❌ | `codex` ✅ |
+| `brain_health` | ❌ | **零个** |
+| `brain_verify` | ❌ | **零个** |
+| `model_key_pool` | ❌ | **零个** |
+
+**原因**：能力位名是**英文**（`brain_health` / `model_key_pool`），
+描述全是**中文**（"大脑执行层·健康维：…" / "模型密钥池（只读骨架）：…"）。
+英文名在中文描述里一个 token 都不会出现。
+
+⇒ **"按位名自识别"对这类位根本不可能生效。** 此路不通，如实记下。
+
+### 改用"中文自称谓"
+
+描述里的真身份是**第一个「：」之前、最后一个「·」之后**那段中文：
+
+```
+"大脑执行层·健康维：五维自检评分…"     → 自称谓 = 健康维
+"大脑执行层·验证维：触手肉眼验证…"     → 自称谓 = 验证维
+"模型密钥池（只读骨架）：按 owner_ai_id…" → 自称谓 = 模型密钥池（只读骨架）
+"官方 Codex 只读状态：进程/会话/并发…"  → 自称谓 = 官方 Codex 只读状态
+```
+
+**命中越长的标签越优先（具体压笼统）**：`健康维`(3) 压过词表的 `健康`(2)，
+`验证维`(3) 压过 `触手`(2)。
+
+### 实测：4/4 全部对上
+
+```
+codex_status    → codex_status    ✅  path=self_label
+brain_health    → brain_health    ✅  path=self_label
+brain_verify    → brain_verify    ✅  path=self_label
+model_key_pool  → model_key_pool  ✅  path=self_label
+```
+
+### 无回退（短人话仍走词表）
+
+```
+「上下文异常纠正：near_overflow」→ ring_context   path=lexicon
+「整体健康吗」                  → health         path=lexicon
+「看看镜像维度现在什么状态」      → mirror_status  path=lexicon
+```
+
+6 位 × 3 次复验：**6/6 稳定**（5 aligned · 1 needs_params）。
+
+### 现在的三条路优先级
+
+```
+① 自称谓（self_label）  —— 描述里出现某位的中文自称谓，且最长
+② 领域词表（lexicon）   —— 短人话的关键词，≥2 命中（长意图）或 ≥1（短句）
+③ 语义/启发式           —— 前两条都没命中时
+```
+
+**每一条都带 `path`，谁给的结果一查就知道。**
+
+---

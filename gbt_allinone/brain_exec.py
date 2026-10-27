@@ -151,6 +151,29 @@ def route(intent: str) -> dict:
     #   实测把「上下文异常纠正」路由成了 libtv_workflow（视频工作流）——完全不相干。
     #   词表是**人工钉死的领域→能力位映射**，命中即确定，不是降级。
     #   没命中就照原路走，不影响其它意图。
+    # ── ⓪-1 自称谓优先（比词表更具体）─────────────────────────────────
+    # 实测驱动：能力位名是**英文**（brain_health / model_key_pool），描述全是中文，
+    # 位名 token 在描述里一个都不出现 ⇒ "按位名自识别"对这类位完全失效。
+    # 但描述里有**中文自称谓**（"大脑执行层·健康维：" 里的"健康维"），
+    # 那才是它在文本里的真实身份。实测 4 个错位位 4/4 命中且都对。
+    try:
+        from .llm import route_lexicon as _LX0
+        nh = _LX0.name_hint(intent)
+    except Exception:                                         # noqa: BLE001
+        nh = {"ok": False}
+    if nh.get("ok"):
+        b = nh["best"]
+        return {"ok": True, "intent": str(intent)[:120],
+                "best": {"kind": b["cap"], "domain": b.get("domain") or "self",
+                         "desc": "自称谓命中：%s" % b["label"], "via": "self_label"},
+                "alternatives": [], "candidates": 1,
+                "path": "self_label", "degraded": False,
+                "self_label": {"label": b["label"], "weight": b["weight"]},
+                "semantic_skipped": True,
+                "heuristic_best": ({"kind": top[0][1], "domain": top[0][2],
+                                    "desc": top[0][3]} if top else None),
+                "elapsed_ms": round((time.time() - t0) * 1000, 1)}
+
     try:
         from .llm import route_lexicon as _LX
         lx = _LX.match(intent)
