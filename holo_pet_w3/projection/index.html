@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GBT小土豆V8 · 投影台</title>
+<style>
+  :root{--bg:#05080d;--ink:#e9eef7;--dim:#8fa1b8;--line:#1b2534;--acc:#6aa8ff;--amber:#f0b24c}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.55 system-ui,-apple-system,"PingFang SC",sans-serif;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  header{padding:10px 14px;border-bottom:1px solid var(--line);
+         display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none}
+  header h1{font-size:14px;margin:0;font-weight:600}
+  .sp{flex:1}
+  button,select{background:#111823;color:var(--ink);border:1px solid var(--line);
+         border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+  button:hover,select:hover{border-color:var(--acc)}
+  button.on{background:#1a2b45;border-color:var(--acc);color:#fff}
+  button.warn{color:var(--amber);border-color:rgba(240,178,76,.4)}
+
+  /* 舞台：所有变换都作用在这层 */
+  #stage{flex:1;position:relative;background:#000;overflow:hidden;
+         display:flex;align-items:center;justify-content:center}
+  #stage img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  #stage.empty::after{content:"选一张图，或拖进来";color:var(--dim);font-size:13px}
+
+  /* 投墙用：透镜成的是 180° 旋转的实像 ⇒ 屏幕端预转 180° 抵消 */
+  #stage.flip img, #stage.flip video{transform:scaleX(-1) scaleY(-1)}
+  #stage.mirror img, #stage.mirror video{transform:scaleX(-1)}
+  #stage.invert img, #stage.invert video{filter:invert(1) brightness(1.25)}
+  #stage.invert.flip img{filter:invert(1) brightness(1.25);transform:scaleX(-1) scaleY(-1)}
+
+  footer{padding:8px 14px;border-top:1px solid var(--line);font-size:11.5px;
+         color:var(--dim);display:flex;gap:14px;flex-wrap:wrap;flex:none}
+  .kbd{background:#111823;border:1px solid var(--line);border-radius:5px;
+       padding:0 5px;font-family:ui-monospace,monospace;font-size:10.5px}
+
+  /* 全屏时隐藏周边 */
+  body.fs header,body.fs footer{display:none}
+
+  #hint{position:absolute;left:10px;bottom:10px;background:rgba(5,8,13,.86);
+        border:1px solid var(--line);border-radius:8px;padding:6px 10px;
+        font-size:11px;color:var(--dim);max-width:70%}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>投影台</h1>
+  <select id="pick">
+    <option value="">— 选素材 —</option>
+  </select>
+  <input id="file" type="file" accept="image/*" style="display:none">
+  <button id="bFile">本地图</button>
+  <button id="bFlip" class="on" title="透镜成 180° 旋转实像，屏幕端要预转 180° 抵消">投墙 180°</button>
+  <button id="bInv" class="on" title="反色：白底更亮，投出去更亮">反色</button>
+  <button id="bMir" title="只左右镜像（非透镜场景用）">镜像</button>
+  <span class="sp"></span>
+  <button id="bFs" class="warn">全屏</button>
+</header>
+
+<div id="stage" class="empty flip invert">
+  <img id="img" alt="" style="display:none">
+  <div id="hint">投墙：凸透镜 f≈20cm · 屏到镜头 16.7cm · 投距 1m ≈ 39×84cm · 全黑房间</div>
+</div>
+
+<footer>
+  <span><span class="kbd">F</span> 全屏</span>
+  <span><span class="kbd">1</span>投墙 180° <span class="kbd">2</span>反色 <span class="kbd">3</span>镜像</span>
+  <span>亮度调到最高 · 画面留白多比字多更亮</span>
+  <span id="info"></span>
+</footer>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const img   = document.getElementById('img');
+  const pick  = document.getElementById('pick');
+
+  // 素材清单：仓库里现成的图（相对本页）
+  const ASSETS = [
+    ['../../docs/gallery/thumbs/00-poster.jpg', '开源海报'],
+    ['../../docs/gallery/thumbs/01-a19-selfcheck.jpg', 'A19 自检'],
+    ['../../docs/gallery/thumbs/02-tianzhen-upscale-2048x2729.jpg', '天真放大 2048×2729'],
+    ['../../docs/gallery/thumbs/03-tianzhen-product-closeup.jpg', '放大后特写'],
+    ['../../docs/gallery/thumbs/04-tianzhen-pipeline-constraints.jpg', '流水线与硬约束'],
+    ['../../docs/gallery/thumbs/05-tianzhen-3frame-strip.jpg', '三帧拼条'],
+    ['../../docs/gallery/thumbs/06-tianzhen-product-p5.jpg', 'P5 产物'],
+    ['../../docs/gallery/thumbs/07-capability-doc-alignment.jpg', '能力文档对齐'],
+  ];
+  for (const [src, name] of ASSETS) {
+    const o = document.createElement('option');
+    o.value = src; o.textContent = name; pick.appendChild(o);
+  }
+
+  function show(src, label) {
+    img.src = src;
+    img.style.display = 'block';
+    stage.classList.remove('empty');
+    document.getElementById('info').textContent = label || '';
+  }
+
+  pick.addEventListener('change', () => {
+    if (pick.value) show(pick.value, pick.selectedOptions[0].textContent);
+  });
+
+  document.getElementById('bFile').onclick = () => document.getElementById('file').click();
+  document.getElementById('file').onchange = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const u = URL.createObjectURL(f);
+    show(u, f.name + ' · ' + Math.round(f.size/1024) + 'KB');
+  };
+
+  const toggle = (btn, cls) => {
+    btn.classList.toggle('on');
+    stage.classList.toggle(cls);
+  };
+  const bFlip = document.getElementById('bFlip');
+  const bInv  = document.getElementById('bInv');
+  const bMir  = document.getElementById('bMir');
+  bFlip.onclick = () => toggle(bFlip, 'flip');
+  bInv.onclick  = () => toggle(bInv,  'invert');
+  bMir.onclick  = () => toggle(bMir,  'mirror');
+
+  // 全屏
+  const bFs = document.getElementById('bFs');
+  const fs = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else (document.documentElement.requestFullscreen?.() || Promise.resolve())
+          .catch(() => {});
+    document.body.classList.toggle('fs');
+  };
+  bFs.onclick = fs;
+
+  // 拖进来
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = e.dataTransfer?.files?.[0];
+    if (f && f.type.startsWith('image/')) show(URL.createObjectURL(f), f.name);
+  });
+
+  // 快捷键
+  document.addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') fs();
+    if (e.key === '1') bFlip.click();
+    if (e.key === '2') bInv.click();
+    if (e.key === '3') bMir.click();
+  });
+
+  // 挂载状态：摄像头是否可用（本机 WebView 实测挂起，如实标注）
+  const camNote = document.createElement('span');
+  camNote.style.color = '#f0b24c';
+  camNote.textContent = '⚠ 实时摄像头在本机 WebView 取不到流（getUserMedia 挂起）';
+  document.querySelector('footer').appendChild(camNote);
+})();
+</script>
+</body>
+</html>
