@@ -24,8 +24,9 @@ cd /var/minis/shared/gbtv8 && python3 -m gbt_allinone auth grant --scope <s> --t
 PYTHONPATH=/var/minis/shared/gbtv8 python3 -m gbt_allinone auth grant --scope <s> --ttl 600 --purpose "…"
 ```
 
-> ⚠ **不要在 `/var/minis` 直接跑 `python3 -m gbt_allinone`** —— 会报
-> `No module named gbt_allinone`（仓库在 `shared/gbtv8` 下面，不是根）。
+> ✅ **已装全局 .pth**：`/usr/lib/python3.12/site-packages/00-gbt-repo.pth` 指向仓库
+> ⇒ `python3 -m gbt_allinone …` **在任何目录都能跑**（/var/minis、/root、/tmp、/ 全验过）。
+> 所以直接把本页的命令原样粘贴即可，**不用 cd、不用改路径**。
 
 ---
 
