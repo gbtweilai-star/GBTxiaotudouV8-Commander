@@ -57,8 +57,20 @@ from gbt_allinone.security import policy  # noqa: E402
 from gbt_allinone.tentacle import vision_watch  # noqa: E402
 from gbt_allinone.tentacle.brain import tentacle_transmission  # noqa: E402
 
-import research_status  # noqa: E402
-import social_platforms  # noqa: E402
+# 🔴 2026-10-28：这两份**从未随仓库发布**（全仓搜不到），却在这里无条件 import
+#   ⇒ 面板后端一行都起不来（ModuleNotFoundError）。按"不编"原则改成可缺省：
+#   缺了就记进 MISSING_IMPLS，对应接口如实报 unimplemented，不让整个服务陪葬。
+MISSING_IMPLS = []
+try:
+    import research_status  # noqa: E402
+except Exception:                                            # noqa: BLE001
+    research_status = None
+    MISSING_IMPLS.append("research_status")
+try:
+    import social_platforms  # noqa: E402
+except Exception:                                            # noqa: BLE001
+    social_platforms = None
+    MISSING_IMPLS.append("social_platforms")
 
 try:
     from chat_client import ChatClient
@@ -2384,6 +2396,33 @@ class HoloBridge:
     # 面板不复制任何一份能力表，也不绕过 policy。
     # ------------------------------------------------------------------
 
+    def mirror(self, op: str = "status", payload: dict | None = None) -> dict:
+        """镜像多维度空间（10 位）：**一律转发到能力层**，面板不另写一套。
+
+        为什么走 run_task 而不是直接 import mirror_space：
+          能力层是唯一真源 —— 授权、审计、参数校验都在那里。
+          面板自己直连实现就等于绕开闸，这正是 docs/09 要防的事。
+        """
+        kind = "mirror_" + (op or "status").strip().lower()
+        allowed = {"mirror_status", "mirror_shape", "mirror_scan", "mirror_plan",
+                   "mirror_simulate", "mirror_parity", "mirror_rehearse",
+                   "mirror_release", "mirror_ascend", "mirror_rewind"}
+        if kind not in allowed:
+            return {"ok": False,
+                    "error": "未列出的 op（fail-closed）", "op": op,
+                    "allowed": sorted(x[len("mirror_"):] for x in allowed)}
+        try:
+            from gbt_allinone.api import run_task
+        except Exception as exc:                             # noqa: BLE001
+            return {"ok": False, "error": "能力层不可用: %s" % exc}
+        try:
+            r = run_task(kind, dict(payload or {}))
+        except Exception as exc:                             # noqa: BLE001
+            return {"ok": False, "op": op, "error": "%s: %s" % (type(exc).__name__, exc)}
+        if isinstance(r, dict):
+            r.setdefault("panel_missing_impls", MISSING_IMPLS)
+        return r if isinstance(r, dict) else {"ok": True, "result": r}
+
     def capabilities(self) -> dict:
         """能力总目录（只读）：数据源是她自己的 caps_registry。"""
         try:
@@ -3327,7 +3366,13 @@ class _Handler(BaseHTTPRequestHandler):
     # 于是凡声明 apiShim 的页在宿主内都拿不到本机服务。
     # 放行之后，宿主里的页可以直连 `http://127.0.0.1:8765/api/*`；
     # 反代一旦生效，前端会优先走同源那条，这段就成了兜底 —— 两条路都在明面上。
-    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080")
+    # 🔴 2026-10-28：原来只放行 :3080（DSH 宿主）。但本机静态页由
+    #   127.0.0.1:8080 提供（tools/up.sh 起的 http.server），面板页去取
+    #   /api/mirror 时被 CORS 拦成"离线"。加上回环 8080/8081。
+    #   **仍然只放行回环，不是 *。**
+    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080",
+                    "http://127.0.0.1:8080", "http://localhost:8080",
+                    "http://127.0.0.1:8081", "http://localhost:8081")
 
     def _send_cors(self) -> None:
         origin = self.headers.get("Origin")
@@ -3415,6 +3460,10 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/capabilities":
             self._send_json(self.bridge.capabilities())
             return
+        if parsed.path == "/api/mirror":
+            # 只读：维度/现实指纹、漂移、时间线史
+            self._send_json(self.bridge.mirror("status"))
+            return
         if parsed.path == "/api/tree":
             self._send_json(self.bridge.tree(
                 _query_int(parsed.query, "depth") or 3,
@@ -3501,6 +3550,17 @@ class _Handler(BaseHTTPRequestHandler):
         self.wfile.flush()
 
     def do_POST(self):  # noqa: N802
+        # 🔴 镜像多维度空间：写面一律走这里，op 白名单 fail-closed
+        if urlparse(self.path).path == "/api/mirror":
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+                body = json.loads(self.rfile.read(n) or b"{}")
+            except Exception as exc:                          # noqa: BLE001
+                self._send_json({"ok": False, "error": "请求体不是 JSON: %s" % exc})
+                return
+            self._send_json(self.bridge.mirror(body.get("op", "status"),
+                                               body.get("payload") or {}))
+            return
         parsed = urlparse(self.path)
         try:
             if parsed.path == "/api/message":

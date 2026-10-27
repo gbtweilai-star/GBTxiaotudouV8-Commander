@@ -61,6 +61,18 @@ start_index() {
   else say ":8792 索引层" "🔴 未起 → logs/index.log"; fi
 }
 
+start_panel() {
+  # 面板后端 :8765 —— 生产面板的读数与 /api/mirror 都靠它。
+  # 它原来因为 research_status/social_platforms 从未发布而一行都起不来，
+  # 已改成可缺省（缺了就如实报 unimplemented）。
+  if up 8765; then say ":8765 面板后端" "✅ 已在跑"; return; fi
+  pkill -f panel_server.py 2>/dev/null; sleep 1
+  cd "$BASE" || return
+  setsid nohup python3 -u holo_pet/panel_server.py --port 8765 > "$LOG/panel.log" 2>&1 < /dev/null &
+  if $PB wait 8765 40 >/dev/null 2>&1; then say ":8765 面板后端" "✅ 已就绪"
+  else say ":8765 面板后端" "🔴 未起 → logs/panel.log"; fi
+}
+
 start_gate() {
   # asyncio 单进程桥（:8790）——**批量车道**
   #   同步桥 :8791 是 thread-per-request，单进程 512 路就顶天；
@@ -95,12 +107,12 @@ probe_a19() {
 case "${1:-status}" in
 up)
   echo "=== 拉齐五路 ==="
-  start_page; start_bridge; start_gate; start_index; start_flr; start_sentinel; probe_a19
+  start_page; start_bridge; start_gate; start_panel; start_index; start_flr; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
   echo "=== 链路状态 ==="
-  for row in "3001|免费模型池" "8080|她的界面" "8791|模型桥(同步)" "8790|批量车道(asyncio)" "8792|索引层" "1234|A19"; do
+  for row in "3001|免费模型池" "8080|她的界面" "8791|模型桥(同步)" "8790|批量车道(asyncio)" "8765|面板后端" "8792|索引层" "1234|A19"; do
     p=${row%%|*}; n=${row#*|}
     if up "$p"; then say ":$p $n" "✅ up"
     else
@@ -119,12 +131,13 @@ status)
   $PB http 8080 /index.html
   $PB http 8791 /health
   $PB http 8790 /health
+  $PB http 8765 /api/state
   $PB http 8792 /health
   $PB http 3001 /api/ping
   ;;
 down)
   echo "=== 停止（A19 由 App 自管）==="
-  for row in "8080|http.server 8080" "8791|model_bridge.py" "8790|async_gate.py" "8792|index_daemon.py" "3001|dist/index.js"; do
+  for row in "8080|http.server 8080" "8791|model_bridge.py" "8790|async_gate.py" "8792|index_daemon.py" "8765|panel_server.py" "3001|dist/index.js"; do
     pat=${row#*|}
     if pkill -f "$pat" 2>/dev/null; then say ":${row%%|*}" "已停"; else say ":${row%%|*}" "本来没跑"; fi
   done
