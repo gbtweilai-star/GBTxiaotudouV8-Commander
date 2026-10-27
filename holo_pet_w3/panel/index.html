@@ -443,5 +443,112 @@ else window.addEventListener("load", firstPick, { once: true });
   if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
 })();
 </script>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     镜像多维度空间（2026-10-28 接入生产面板）
+     口径来自 docs/09：别拿现实当试验场。先在一模一样的那个世界里跑绿，
+     再一次性、可回溯地晋升到现实。这里只做**入口与读数**，
+     所有动作一律转发 /api/mirror → 能力层（不绕开闸）。
+     ════════════════════════════════════════════════════════════════════ -->
+<section id="gbt-mirror">
+  <h3>镜像多维度空间 <span id="mx-chip" class="mxchip">检查中…</span></h3>
+  <div class="mxgrid">
+    <div><b id="mx-dim">–</b><span>镜像维度 文件</span></div>
+    <div><b id="mx-real">–</b><span>现实 文件</span></div>
+    <div><b id="mx-tl">–</b><span>时间线</span></div>
+    <div><b id="mx-clean">–</b><span>一致性</span></div>
+  </div>
+  <div class="mxbtns">
+    <button data-op="scan">② 体检</button>
+    <button data-op="plan">③ 计划</button>
+    <button data-op="simulate">④ 推演</button>
+    <button data-op="parity">⑤ 一致性</button>
+    <button data-op="rehearse">⑥ 排练</button>
+    <button data-op="release" class="mxwarn">⑦ 晋升</button>
+    <button data-op="rewind" class="mxwarn">↺ 回滚</button>
+  </div>
+  <pre id="mx-out">就绪。晋升与回滚要过 deploy_publish 门，缺票会如实拒绝。</pre>
+</section>
+<style>
+  #gbt-mirror{position:fixed;left:10px;bottom:10px;width:min(340px,92vw);z-index:99998;
+    background:rgba(8,12,20,.95);border:1px solid #1e2937;border-radius:12px;padding:10px 12px;
+    color:#e9eef7;font:12px/1.5 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+  #gbt-mirror h3{margin:0 0 8px;font-size:12.5px;font-weight:600;display:flex;
+    justify-content:space-between;align-items:center;color:#e9eef7}
+  .mxchip{font-size:10px;padding:1px 7px;border-radius:999px;border:1px solid #1e2937;color:#93a3b8}
+  .mxchip.on{color:#3fb950;border-color:rgba(63,185,80,.4)}
+  .mxchip.bad{color:#ff7a7a;border-color:rgba(255,122,122,.4)}
+  .mxgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+  .mxgrid div{background:#111823;border-radius:8px;padding:5px 4px;text-align:center}
+  .mxgrid b{display:block;font-size:14px;color:#6aa8ff}
+  .mxgrid span{font-size:9.5px;color:#93a3b8}
+  .mxbtns{display:flex;flex-wrap:wrap;gap:5px}
+  .mxbtns button{background:#111823;color:#c9d6e6;border:1px solid #1e2937;border-radius:7px;
+    padding:4px 8px;font-size:11px;cursor:pointer}
+  .mxbtns button:hover{border-color:#6aa8ff;color:#fff}
+  .mxbtns button.mxwarn{color:#f0b24c;border-color:rgba(240,178,76,.35)}
+  .mxbtns button[disabled]{opacity:.45;cursor:wait}
+  #mx-out{margin:8px 0 0;max-height:88px;overflow:auto;font-size:10.5px;line-height:1.45;
+    color:#93a3b8;white-space:pre-wrap;word-break:break-all}
+</style>
+<script>
+(function(){
+  var BASE = "http://127.0.0.1:8765";
+  var chip = document.getElementById("mx-chip"), out = document.getElementById("mx-out");
+  function setChip(t, cls){ chip.textContent = t; chip.className = "mxchip" + (cls ? " " + cls : ""); }
+  function say(t){ out.textContent = t; }
+
+  function paint(d){
+    var r = (d && (d.gbt_result && d.gbt_result.result || d.result)) || {};
+    var dim = (r.dimension || {}).files, real = (r.reality || {}).files;
+    document.getElementById("mx-dim").textContent  = (dim  == null ? "–" : dim);
+    document.getElementById("mx-real").textContent = (real == null ? "–" : real);
+    document.getElementById("mx-tl").textContent   = (r.timelines == null ? "–" : r.timelines);
+    document.getElementById("mx-clean").textContent= (r.clean ? "✅" : "⚠️");
+    setChip(d && d.ok ? "在线" : "异常", d && d.ok ? "on" : "bad");
+    // 🔴 只在本就空着的时候写缺实现提示 —— 否则每 20 秒的刷新会把
+    //    刚才那次操作的结果覆盖掉（点了"体检"看不到回执，实测踩到）。
+    if ((d && d.panel_missing_impls || []).length && !out.textContent) {
+      say("⚠ 面板缺实现：" + d.panel_missing_impls.join("、") + "（从未随仓库发布，相关接口如实报未实现）");
+    }
+  }
+
+  function load(){
+    fetch(BASE + "/api/mirror", {cache:"no-store"})
+      .then(function(r){ return r.json(); })
+      .then(paint)
+      .catch(function(){ setChip("离线", "bad"); say("面板后端 :8765 没起，镜像读数取不到。"); });
+  }
+
+  function op(name, btn){
+    var payload = {};
+    if (name === "rewind") {
+      var v = prompt("回到第几版？（时间线版本号）", "1");
+      if (!v) return;
+      payload = {version: parseInt(v, 10) || 1};
+    }
+    btn.disabled = true; say("执行 mirror_" + name + " …");
+    fetch(BASE + "/api/mirror", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({op:name, payload:payload})
+    }).then(function(r){ return r.json(); }).then(function(d){
+      var r = (d && (d.gbt_result && d.gbt_result.result || d.result)) || {};
+      var lines = ["mirror_" + name + " → ok=" + (d.ok ? "true" : "false")];
+      ["clean","stage","plan_sha","report_sha","tree_sha","blocked","reason","error"].forEach(function(k){
+        if (r[k] !== undefined) lines.push("  " + k + ": " + (typeof r[k] === "object" ? JSON.stringify(r[k]) : r[k]));
+      });
+      say(lines.join("\n"));
+      load();
+    }).catch(function(e){ say("失败：" + e); })
+      .then(function(){ btn.disabled = false; });
+  }
+
+  document.querySelectorAll("#gbt-mirror .mxbtns button").forEach(function(b){
+    b.addEventListener("click", function(){ op(b.getAttribute("data-op"), b); });
+  });
+  load();
+  setInterval(load, 20000);
+})();
+</script>
 </body>
 </html>
