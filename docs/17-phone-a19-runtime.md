@@ -3612,3 +3612,72 @@ dh_preflight / duty_patrol / context_guard / tentacle_bus）——
 验收：PASS 25 · ENV 3 · INFO 4 · 退出码 0
 
 ---
+
+---
+
+## 六十六、吞 CodeGraph → 原生代码图谱 + 补上一道没关的黑客门（2026-10-29）
+
+### 一、先纠正仓库名
+截图里的是 **`colbymchenry/codegraph`**，不是 `symchenry`（后者 404）。
+用 GitHub API 搜出来核对，不靠猜。
+
+### 二、只取方法，不搬代码
+上游是 Node/Rust 单文件二进制（`codegraph install` 抓对应平台构建），iSH/aarch64 装不了。
+它自己的机制（读 README 提炼）：
+```
+SQLite 知识图谱 = symbols · edges · files · FTS5
+预建索引，代码变自动同步
+Surgical Context：一次调用返回入口点 + 相关符号 + 代码片段
+Impact Analysis：追 callers / callees / 影响半径
+自报收益：工具调用 −88% · token −62%
+```
+
+### 三、我们这版 `tools/codegraph_native.py`
+```
+Python 用 ast 真解析：函数/类/导入/调用
+JS/HTML 用正则抓：function / require-import
+存 symbols / edges / files + FTS5
+query(名) → 定义 + 片段 + callers + callees
+impact(名) → 影响半径（向上追）
+```
+实测（全量，1m41s）：
+```
+文件 2479 · 符号 19040 · 边 195072 · 解析失败 0
+query "RingContext" → 类 · ring_context.py:50 · doc · 调用者 5 个 · 前 8 行
+impact "push"       → 半径 15
+```
+固化：`gbt graph --build / --query 名 / --impact 名 / --stats`
+
+### 四、主人令：「除了黑客和转账其他不需要授权」
+框架早有这条（`policy.autonomous_self_judgment`，主人 2026-10-17 令），
+开关是 `GBT_AUTONOMOUS=1`，已写进 `up.sh`。**它不是绕过闸** ——
+闸照跑，只是判定者从"人工"变成"她自己"，转账/黑客仍然必须主人。
+
+### 五、但实测发现：**黑客那道门本来就没关**
+```
+pentest action=run      restricted=False  ← 从不问授权
+pentest action=scan     restricted=False
+sec_scan op=run         restricted=False
+redteam_recon accounts  restricted=False
+```
+根因：`restricted = bool(scopes)`，而黑客动作走**网络扫描**，
+不落盘不读屏 ⇒ 一个作用域都不挂 ⇒ 判"不受限" ⇒ 直接放行。
+**这不是开自主模式造成的**（那时它们根本走不到自主判定那一支），
+是这道门本来就没关。同类缺口 2026-10-21 修过一次（`osint_private`）。
+
+**补法**：`evaluate()` 收口处，security 域**进攻面**一律补 G1 护栏 `osint_private`
+（它已在 HUMAN_GATES ⇒ 必须主人）。防御/登记面（`_DEFENSIVE_SECURITY`）不受影响。
+另加 `_hacker_set()` 缓存（evaluate 是热路径，不能每次现读名册）。
+
+修前 → 修后（GBT_AUTONOMOUS=1）：
+```
+pentest run/scan   restricted=False → True·osint_private·auto=False ⇒ 必须主人
+sec_scan           False → True   redteam_recon  False → True
+sec_defenses       防御面 → 仍放行   body_say → 自主授权 True
+```
+端到端：`pentest / sec_scan / redteam_recon` 全部 `denied=True`；
+`body_say` 过闸（缺参数）。**该拦的拦住了，该放的放开了。**
+
+验收：PASS 24 · ENV 4 · INFO 3 · 退出码 0
+
+---

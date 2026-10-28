@@ -22,6 +22,12 @@ PB="python3 $BASE/tools/svcprobe.py"
 mkdir -p "$LOG"
 
 say() { printf '  %-26s %s\n' "$1" "$2"; }
+# 🔴 2026-10-29 主人令：「除了黑客和转账其他不需要授权」。
+#   框架早有这条（policy.autonomous_self_judgment，主人 2026-10-17 令），
+#   开关就是 GBT_AUTONOMOUS=1。**它不是绕过闸** —— 闸照跑，
+#   只是判定者从"人工"变成"她自己"，并且转账/黑客仍然必须主人。
+export GBT_AUTONOMOUS="${GBT_AUTONOMOUS:-1}"
+
 up()  { $PB tcp "$1" >/dev/null 2>&1; }
 
 # 🔴 2026-10-28：原来只判端口。端口一时没起来（进程还在启动 / 刚崩还没被回收）
