@@ -467,6 +467,19 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(500, {"ok": False,
                                         "error": {"message": "%s: %s" %
                                                   (type(exc).__name__, str(exc)[:120])}})
+            # 🔴 2026-10-28：页面（:8080）访问不到 /var/minis/attachments。
+            #   所以把 TTS 产物**同时**放进仓库里被 :8080 服务的目录，
+            #   并回一个 url —— 数字人页面直接 new Audio(url) 就能播 + 挂口型分析器。
+            try:
+                if out.get("ok") and out.get("file"):
+                    import shutil as _sh
+                    _dst = ROOT / "holo_pet_w3" / "digital-human" / "voice"
+                    _dst.mkdir(parents=True, exist_ok=True)
+                    _name = pathlib.Path(out["file"]).name
+                    _sh.copyfile(out["file"], _dst / _name)
+                    out["url"] = "/holo_pet_w3/digital-human/voice/" + _name
+            except Exception as _e:                           # noqa: BLE001
+                out["url_err"] = type(_e).__name__
             return self._json(200 if out.get("ok") else 500, out)
 
         if self.path.startswith("/voice/status"):

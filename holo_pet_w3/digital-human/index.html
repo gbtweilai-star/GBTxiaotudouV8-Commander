@@ -125,6 +125,9 @@
     <button id="btnWave" disabled title="等模型载入">挥手</button>
     <button id="btnWalk" disabled title="等模型载入">走两步</button>
     <button id="btnIdle" disabled title="等模型载入">站好</button>
+    <input id="sayText" placeholder="让她说什么…（留空=她的自我介绍）"
+           style="flex:1;min-width:180px;background:#0b1018;border:1px solid rgba(255,255,255,.14);
+                  color:#e8ecf8;border-radius:8px;padding:6px 10px;font-size:13px">
     <button id="btnZoom" disabled title="全身 → 半身 → 特写：画布就这么高，全身时头只有 ~70px，想看清脸就用这一档">镜头·全身</button>
     <span class="hint" id="stageHint">动作：等载入 · 口型：<b>音素驱动下颌</b>（viseme · 16° 上限 · 跟着声音走；仍无形态键/唇缝 ⇒ 近看不是「嘴唇分开」）</span>
   </div>
@@ -852,12 +855,40 @@
     var v = jawRest[JAW_AXIS] + JAW_SIGN * (JAW_MAX * Math.max(0, Math.min(1, level)));
     jawBone.rotation[JAW_AXIS] = v;
   }
+  /* 🔴 2026-10-28 打磨：说话走**真 TTS**（桥的 /voice/speak → edge-tts 曉臻台湾腔）。
+     原来的实现只播一个烘焙 wav（而且是固定台词、连文件都不在仓库里），
+     等于"点了没反应还说在播"。现在：
+       ① 读输入框（留空用她的自我介绍）
+       ② POST 桥 /voice/speak → 得到可被 :8080 服务的 url
+       ③ new Audio(url) + 挂 WebAudio 分析器 → 真口型
+       ④ 桥不可用才退回老 wav，且如实说"走的是烘焙件"
+  */
   function stageSay() {
-    /* 字幕只描述**真在播的东西**，不编台词（wav 里念什么我没权限改，就不替它写词）。 */
-    sub("正在播她的欢迎语音（welcome-gbt-v8-zh.wav）");
+    var el = $("sayText");
+    var text = (el && el.value ? el.value : "").trim() ||
+               "我是 GBT小土豆V8，开发者自由的风，守护者公主土豆。";
     if (talkingAudio) { try { talkingAudio.pause(); } catch (e) {} talkingAudio = null; }
+    sub("正在合成她的台湾腔…");
+    var BR = (location.protocol === "file:") ? "http://127.0.0.1:8791" : "http://127.0.0.1:8791";
+    fetch(BR + "/voice/speak", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text.slice(0, 300) })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok && j.url) {
+        sub("她说：" + text.slice(0, 40) + (text.length > 40 ? "…" : ""));
+        playSay(j.url);
+      } else {
+        sub("合成失败：" + String((j && (j.error || j.message)) || "桥没给 url").slice(0, 60));
+      }
+    }).catch(function (e) {
+      sub("桥不可用（" + String(e).slice(0, 40) + "），退回烘焙件");
+      playSay("welcome-gbt-v8-zh.wav");
+    });
+  }
+
+  function playSay(src) {
     try {
-      talkingAudio = new Audio("welcome-gbt-v8-zh.wav");
+      talkingAudio = new Audio(src);
       var hooked = hookAnalyser(talkingAudio);
       talkingAudio.onended = function () {
         sub("");
