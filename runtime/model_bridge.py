@@ -103,6 +103,10 @@ FALLBACK = {
     "deepseek":   ["freepool", "freepool-b"],
     "openai":     ["freepool", "freepool-b", "deepseek"],
 }
+# 每个上下文字段的上次读数（供自适应预算判压力）
+_LAST_FILL: dict = {}
+_LAST_MS: dict = {}
+
 UA = "gbt-v8/model-bridge"
 
 # 她的对话落盘（2026-10-26）：容器一断、页面一关，说过的话还在。
@@ -440,7 +444,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):                                        # noqa: N802
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
-                 "/v1/recall",
+                 "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -484,6 +488,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200 if out.get("ok") else 500, out)
 
         # 被分页挤出的话，随时可捞回来（这是"溢出不丢"的兑现口）
+        if self.path.startswith("/v1/context"):
+            try:
+                sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+                import adaptive_context as _AC
+                nm = str(body.get("name") or "bridge-default")
+                d = _AC.report(nm)
+                d["last_fill"] = _LAST_FILL.get(nm)
+                d["last_ms"] = _LAST_MS.get(nm)
+                return self._json(200, d)
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(500, {"ok": False, "error": {"message": str(exc)[:120]}})
+
         if self.path.startswith("/v1/recall"):
             q = str(body.get("query") or body.get("q") or "")
             nm = str(body.get("name") or "bridge-default")
@@ -548,8 +564,30 @@ class Handler(BaseHTTPRequestHandler):
         try:
             _msgs = body.get("messages")
             if isinstance(_msgs, list) and _msgs:
-                _budget = int(body.pop("context_budget", 0) or 0) or 12000
+                # 🔴 2026-10-28：**不再写死 12000**。
+                #   ① 12000 是错的：中文约 1.2 字/token，ctx 4096 减输出预留只剩 ~4147 字
+                #   ② 写死必然错：内存/上游/对话长度都会变
+                #   改成自适应：填充率 + 上次延迟 + 可用内存 三条判据一起滑。
                 _cname = str(body.pop("context_name", "") or "bridge-default")
+                _fixed = int(body.pop("context_budget", 0) or 0)
+                if _fixed:
+                    _budget = _fixed                      # 调用方明确指定就用它的
+                    _bwhy = "调用方指定"
+                else:
+                    try:
+                        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+                        import adaptive_context as _AC
+                        _st = _AC.window_chars(
+                            ctx_tokens=int(os.environ.get("GBT_MODEL_CTX") or 4096),
+                            max_tokens=int(body.get("max_tokens") or 512),
+                            used_ratio=_LAST_FILL.get(_cname),
+                            latency_ms=_LAST_MS.get(_cname),
+                            name=_cname)
+                        _budget = int(_st["budget"])
+                        _bwhy = _st["why"]
+                    except Exception:                     # noqa: BLE001
+                        _budget = 4000
+                        _bwhy = "自适应不可用，用保守 4000"
                 _tot = sum(len(str(m.get("content") or ""))
                            for m in _msgs if isinstance(m, dict))
                 if _tot > _budget:
@@ -569,6 +607,7 @@ class Handler(BaseHTTPRequestHandler):
                         sys.stderr.write(
                             "[bridge] 分页 %d→%d 条 · %d→%d 字（会话 %s · 溢出可 recall）\n"
                             % (len(_msgs), len(_win), _tot, _after, _cname))
+                        _LAST_FILL[_cname] = round(_after / float(_budget), 3)
         except Exception as _pe:                              # noqa: BLE001
             sys.stderr.write("[bridge] 分页跳过：%s\n" % type(_pe).__name__)
 
