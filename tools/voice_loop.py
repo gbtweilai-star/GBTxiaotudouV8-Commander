@@ -88,6 +88,27 @@ def log(rec: dict) -> None:
 
 
 # ── ② 脑：A19 优先，按序试多条传输 ─────────────────────────────────────────
+def ctx_guard(budget: int = 0) -> dict:
+    """每问跑一次上下文守卫：异常 → 主脑入队 → 大脑排布 → 确定性纠正 → 回主线。
+
+    为什么要它：voice_loop 原来只管"问一句答一句"，上下文异常根本没人看。
+    实测桥那边接上以后能给出 `大脑=ring_context(降级=False)`，
+    这里照同一条路接，语音这条链才算和文字链同等待遇。
+    """
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "cg", str(ROOT / "tools" / "context_guard.py"))
+        cg = importlib.util.module_from_spec(spec); spec.loader.exec_module(cg)
+        rc = cg._ring("voice", budget)
+        return cg.tick(rc, BG.get("prev"), BG.get("streak", 0), do_correct=True)
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": False, "why": "守卫不可用: %s" % type(exc).__name__}
+
+
+BG: dict = {}
+
+
 def brain_ask(text: str, timeout: float = 120) -> dict:
     tried = []
     # 传输⓪：**走框架自己的万能插**（kind=ai 插座）。
@@ -136,7 +157,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         s.connect(ADDR)
         body = json.dumps({"messages": [
             {"role": "system", "content": _persona_now()},
-            {"role": "user", "content": text}], "max_tokens": 300}).encode()
+            {"role": "user", "content": text}], "max_tokens": 300, "context_name": "voice"}).encode()
         t0 = time.perf_counter()
         s.sendall(b"POST /v1/chat/completions HTTP/1.0\r\nHost: x\r\n"
                   b"Authorization: Bearer gbt\r\n"
@@ -169,7 +190,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
             "http://127.0.0.1:8791/v1/chat/completions",
             data=json.dumps({"messages": [
                 {"role": "system", "content": _persona_now()},
-                {"role": "user", "content": text}], "max_tokens": 300}).encode(),
+                {"role": "user", "content": text}], "max_tokens": 300, "context_name": "voice"}).encode(),
             headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=timeout) as r:
             d = json.loads(r.read())

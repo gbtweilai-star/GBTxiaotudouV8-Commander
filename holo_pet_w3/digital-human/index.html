@@ -922,6 +922,10 @@
         //   她会自报「我是 DeepSeek」——那是车道，不是她。
         //   人设只约束"怎么说话"，不改变车道事实：
         //   回包里的 gbt.lane / weights_ours 照旧如实带，降级就是降级，可审计。
+        // 🔴 2026-10-28：数字人这条链原来不带 context_name ⇒ 落到桥的默认会话，
+        //   和网页对话共用一套上下文。她俩该各是各的环（会话隔离）。
+        context_name: "digital-human",
+        context_budget: 4000,
         messages: [
           { role: "system", content:
             "你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。" +
