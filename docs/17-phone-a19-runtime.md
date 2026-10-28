@@ -2762,3 +2762,72 @@ pid=2529  ppid=2526     ← 线程
 **这是"有兜底但根因未明"，不是"已解决"。**
 
 ---
+
+---
+
+## 五十一、348 位全量对齐 · 首次跑完（2026-10-28）
+
+### 结果
+
+```
+样本 348 位
+
+aligned               241   69.3%
+timeout                36   10.3%   ← security/system 里真扫描类
+skipped                27    7.8%   ← 要授权作用域
+needs_params           24    6.9%
+routed_parent           7    2.0%
+routed_wrong            6    1.7%
+exec_failed             4    1.1%
+routed_broad            2    0.6%
+platform_unavailable    1    0.3%
+```
+
+### 按域（对齐率）
+
+```
+100%  mind(19) · video(14) · integration(7) · brain/collab/desktop/infra/comms…
+ 89%  creation(54)
+ 83%  data(12)
+ 78%  tools(9)
+ 76%  recon(17)
+ 75%  finance/longrun/voice
+ 71%  llm(41)
+ 65%  system(51)   ← 17 个 timeout
+ 60%  engine(10) · devour(5)
+ 56%  tentacle(18)
+ 50%  automation · project
+ 39%  pipeline(18)  ← 7 个 skipped（要 deploy 授权）
+ 24%  security(29)  ← 17 个 timeout
+ 11%  device(9)     ← 6 个 skipped（要 device/audio 授权）
+  0%  social(2)     ← 2 个 timeout
+```
+
+### 三个拖累项，性质完全不同
+
+| 项 | 数 | 性质 |
+|---|---:|---|
+| **timeout** | 36 | 真扫描类（`sec_scan`/`redteam_recon`/`cross_scan`…）在本机跑不完 30 秒。**不是路由错** |
+| **skipped** | 27 | 过授权门被拒（device/audio/deploy）。**闸在工作** |
+| **needs_params** | 24 | 空 payload 不瞎跑。**设计如此** |
+
+**⇒ 这 87 位不是"坏了"，是"这次没跑成"或"本来就不该空跑"。**
+
+### 路由本身的缺陷只剩 6 个跨域错位
+
+```
+routed_wrong 6 (1.7%) · routed_broad 2 (0.6%)
+```
+从铺开前的 3 个（104 抽样）到全量的 6 个（348）—— 比例反而低了。
+
+### 这轮为了跑完，修了两处"拖时间"的真问题
+
+1. **每位一个子进程 → 每批 12 位一个子进程**
+   每位都要付 3~12s 的 Python 启动 + 6~19s 的视觉冷探测。
+   实测跑全量时 15 分钟只走了 38 位（24s/位）⇒ 改分批后 1 小时跑完 348。
+
+2. **`verify()` 的视觉探测没有超时**
+   本机拿不到屏，每次白磨 19 秒。`snapshot` 本身有 30s TTL 缓存，
+   但一位一进程时缓存永远是冷的 ⇒ 分批顺便把缓存用起来了。
+
+---

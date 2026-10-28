@@ -96,8 +96,76 @@ def safe_to_run(c: dict) -> tuple[bool, str]:
     return True, ""
 
 
-def align_one(c: dict) -> dict:
-    from gbt_allinone.api import run_task
+def _unify_batch(items: list, timeout: int = 240) -> list:
+    """一次子进程跑 **一批** 位。
+
+    🔴 2026-10-28：实测每个子进程光启动 + 导模块就要 3~12s，而 verify 的
+       视觉探测第一次要 6~19s（之后靠 snapshot 的 30s TTL 缓存才快）。
+       一位一个进程 ⇒ 每位都在付这笔冷启动，348 位要跑近 4 小时。
+       改成每批 12 位一个进程：冷启动只付一次，后面靠缓存。
+       超时按批算，批内某位挂死最多拖死这一批（其余批照常）。
+    """
+    import subprocess as _sp
+    payload = json.dumps([[str(g), str(k)] for g, k in items], ensure_ascii=False)
+    code = (
+        "import sys, json; sys.path.insert(0, %r)\n"
+        "from gbt_allinone.api import run_task\n"
+        "items = json.loads(%r)\n"
+        "out = []\n"
+        "for g, k in items:\n"
+        "    try:\n"
+        "        r = run_task('brain_unify', {'goal': g, 'kind': k})\n"
+        "    except Exception as e:\n"
+        "        r = {'_err': '%%s: %%s' %% (type(e).__name__, str(e)[:100])}\n"
+        "    out.append(r)\n"
+        "print('@@' + json.dumps(out, ensure_ascii=False, default=str))\n"
+        % (str(ROOT), payload)
+    )
+    try:
+        cp = _sp.run([sys.executable, "-c", code], capture_output=True,
+                     text=True, timeout=timeout, cwd=str(ROOT))
+        for ln in (cp.stdout or "").splitlines():
+            if ln.startswith("@@"):
+                return json.loads(ln[2:])
+        return [{"_probe_err": (cp.stderr or "无输出")[-160:]}] * len(items)
+    except _sp.TimeoutExpired:
+        return [{"_probe_timeout": timeout}] * len(items)
+    except Exception as exc:                                  # noqa: BLE001
+        return [{"_probe_err": "%s: %s" % (type(exc).__name__, str(exc)[:100])}] * len(items)
+
+
+def _unify_probe(goal: str, kind: str, timeout: int = 30) -> dict:
+    """在**独立子进程**里调 brain_unify，超时直接 kill。
+
+    🔴 2026-10-28：原来是在本进程直接 run_task ⇒ **没有超时保护**。
+       实测跑全量 348 位时，走到 security 域某个真扫描位就整轮卡死：
+       主进程活着、16 分钟没写日志、也没有子进程 —— 一直等一个永不返回的调用。
+       这和之前在 multi-domain-monitor 里修过的是同一个病。
+       改成子进程 + timeout，超时记 timeout 并继续往下走。
+    """
+    import subprocess as _sp
+    code = (
+        "import sys, json; sys.path.insert(0, %r)\n"
+        "from gbt_allinone.api import run_task\n"
+        "r = run_task('brain_unify', {'goal': %r, 'kind': %r})\n"
+        "print(json.dumps(r, ensure_ascii=False, default=str))\n"
+        % (str(ROOT), goal, kind)
+    )
+    try:
+        cp = _sp.run([sys.executable, "-c", code], capture_output=True,
+                     text=True, timeout=timeout, cwd=str(ROOT))
+        out = (cp.stdout or "").strip()
+        line = out.splitlines()[-1] if out else ""
+        if line.startswith("{"):
+            return json.loads(line)
+        return {"_probe_err": (cp.stderr or out or "无输出")[-160:]}
+    except _sp.TimeoutExpired:
+        return {"_probe_timeout": timeout}
+    except Exception as exc:                                  # noqa: BLE001
+        return {"_probe_err": "%s: %s" % (type(exc).__name__, str(exc)[:120])}
+
+
+def align_one(c: dict, prefetched: dict | None = None) -> dict:
     name = str(c.get("name"))
     desc = str(c.get("desc") or name)[:160]
     goal = desc or name
@@ -112,11 +180,13 @@ def align_one(c: dict) -> dict:
     #     beliefs() got an unexpected keyword argument 'payload'
     #   ⇒ 误判 belief_forge 执行失败。正确写法是**扁平传**。
     t0 = time.time()
-    try:
-        r = run_task("brain_unify", {"goal": goal, "kind": name})
-    except Exception as exc:                                  # noqa: BLE001
-        return {"name": name, "domain": c.get("domain"), "verdict": "error",
-                "why": "%s: %s" % (type(exc).__name__, str(exc)[:120])}
+    r = prefetched if prefetched is not None else _unify_probe(goal, name, timeout=30)
+    if "_probe_timeout" in r:
+        return {"name": name, "domain": c.get("domain"), "verdict": "timeout",
+                "why": ">%ss（子进程已 kill）" % r["_probe_timeout"]}
+    if "_probe_err" in r:
+        return {"name": name, "domain": c.get("domain"), "verdict": "exec_failed",
+                "why": r["_probe_err"][:120]}
     res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
     ch = res.get("chain") or {}
     rt = ch.get("route") or {}
@@ -221,8 +291,21 @@ def main() -> int:
     print("  %-22s %-13s %-9s %-6s %s" % ("位", "判定", "路由到", "执行", "备注"))
 
     rows, t0 = [], time.time()
+    # 🔴 2026-10-28：**全程分批**，每批 12 位一个子进程。
+    #   一位一个进程时，每位都要付 3~12s 的 Python 启动 + 6~19s 的视觉冷探测，
+    #   348 位要跑近 4 小时。分批后冷启动只付一次。
+    BATCH = 12
+    _pre = {}
+    batches = [items[i:i + BATCH] for i in range(0, len(items), BATCH)]
+    for bi, grp in enumerate(batches, 1):
+        keys = [(str(c.get("desc") or c.get("name"))[:160] or str(c.get("name")),
+                 str(c.get("name"))) for c in grp]
+        res = _unify_batch(keys, timeout=60 + 40 * len(grp))
+        for c, r in zip(grp, res):
+            _pre[str(c.get("name"))] = r
+        print("  批 %d/%d 就绪（%d 位）" % (bi, len(batches), len(grp)), flush=True)
     for i, c in enumerate(items, 1):
-        row = align_one(c)
+        row = align_one(c, _pre.get(str(c.get("name"))))
         if a.repeat > 1:
             # 🔴 2026-10-28 实测：同一批位跑两次，41 位里有 4 位判定会翻
             #    （路由走 semantic 时依赖模型输出；执行偶发失败）⇒ 单次读数不可当结论。
