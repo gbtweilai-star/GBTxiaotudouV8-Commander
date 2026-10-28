@@ -439,7 +439,8 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
-        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message")
+        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
+                 "/voice/speak", "/voice/status")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -449,6 +450,33 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"error": {"message": "请求体不是 JSON：%s" % exc}})
 
         # ── 她的对话落盘：页面每说一句就追加一行 ────────────────────────────
+        # ── 她的嗓子（单一门）───────────────────────────────────────────────
+        # 🔴 2026-10-28：页面里本来直接调 window.speechSynthesis.speak()，
+        #   而 iOS WebKit 的 getVoices() 首次常返回 0 ⇒ 落到错嗓音念中文 ⇒ 鬼叫。
+        #   现在页面的唯一出口是这里：走 tentacle_bus 的嘴（edge-tts 曉臻·台湾腔），
+        #   实在没有 edge-tts 才退 apple-speak zh-TW；两条都没有就如实说没有。
+        if self.path.startswith("/voice/speak"):
+            text = str(body.get("text") or "")[:500]
+            if not text:
+                return self._json(400, {"ok": False, "error": {"message": "缺 text"}})
+            try:
+                sys.path.insert(0, str(ROOT / "tools"))
+                import tentacle_bus as _BUS
+                out = _BUS.call("mouth", text)
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(500, {"ok": False,
+                                        "error": {"message": "%s: %s" %
+                                                  (type(exc).__name__, str(exc)[:120])}})
+            return self._json(200 if out.get("ok") else 500, out)
+
+        if self.path.startswith("/voice/status"):
+            try:
+                sys.path.insert(0, str(ROOT / "tools"))
+                import tentacle_bus as _BUS
+                return self._json(200, _BUS.status())
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(500, {"ok": False, "error": {"message": str(exc)[:120]}})
+
         if self.path.startswith("/_log/message"):
             try:
                 rid = str(body.get("id") or "")
