@@ -29,7 +29,12 @@ up()  { $PB tcp "$1" >/dev/null 2>&1; }
 #   把可用内存吃到只剩 259MB/4GB，然后 :8790 的 asyncio 进程被静默杀掉
 #   （没有 Traceback，是 SIGKILL）—— 这就是它反复掉线的真原因。
 #   现在：端口通 **或** 进程在，都算"已在跑"，绝不重复拉起。
-upm() { pgrep -f "$1" >/dev/null 2>&1; }
+# 🔴 2026-10-28：**不能用 pgrep** —— 实测在 iSH 上不可靠（`pgrep -c python3`
+#   返回过 0，明明有 14 个）。于是 upm 的"已在跑"判断一直失效，
+#   panel_server 被反复拉起 8 个，各自吃内存，可用内存掉到 85MB/4GB，
+#   然后 :8790 的 asyncio 进程被内核 SIGKILL。
+#   改用 ps + grep 判断，可靠。
+upm() { ps -o args 2>/dev/null | grep -v grep | grep -qF -- "$1"; }
 running() { up "$1" || upm "$2"; }
 
 start_flr() {
