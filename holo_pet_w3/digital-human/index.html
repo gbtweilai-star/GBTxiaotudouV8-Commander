@@ -208,6 +208,7 @@
     }
   } catch (e) { }
   if (_IS_LOW) { window.__GBT_LOW = true; }
+  if (/[?&]static=1/.test(location.search)) { window.__GBT_STATIC = true; }
   var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !_IS_LOW, alpha: false });
   /* ══ 画面高清度（2026-10-21 主人令：「画面高清度都要给我调整好」）════════════
      免费的高清项直接给足：各向异性过滤拉满 + ACES 色调映射 + sRGB 输出 + 接触阴影。
@@ -218,9 +219,13 @@
      真遇到满载再按 adaptHQ 自己降（先降超采样、最后才牺牲阴影）。 */
   var HQ = {
     dpr0: window.devicePixelRatio || 1,
-    prMin: 1.0,
+    /* 🔴 2026-10-28：**这才是真正的卡点**。
+       原来是 1.0 —— 我在低配里写 applyPr(0.5) 会被 clamp 回 1.0，
+       渲染缓冲仍是 1918×925 = 1.77M 像素，软件光栅化当然卡死。
+       软件渲染的开销**正比于像素数**：0.35× ⇒ 671×324 ≈ 0.22M，少 8 倍。 */
+    prMin: (window.__GBT_LOW ? 0.35 : 1.0),
     prMax: Math.min((window.devicePixelRatio || 1) * 1.6, 2.0),
-    pr: (window.__GBT_LOW ? 0.5 : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875)),
+    pr: (window.__GBT_LOW ? 0.35 : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875)),
     shadow: (window.__GBT_LOW ? false : true),
     /* 低配（软件渲染）关阴影：软件渲染下阴影贴图是纯 CPU 逐像素算，大头。
        下面是原始实测记录，保留：
@@ -1505,6 +1510,10 @@
     if (controls) controls.update();
     try { adaptHQ(performance.now()); } catch (e) { }
     renderer.render(scene, camera);
+    // 🔴 2026-10-28 诊断开关：?static=1 只渲染一帧就停。
+    //   用来分辨"渲染慢"和"根本画不出来"——
+    //   如果一帧都出不来，那就不是降质能救的，是本机没有可用渲染路径。
+    if (window.__GBT_STATIC) { return; }
     requestAnimationFrame(tick);
   }
 
@@ -1564,7 +1573,12 @@
 
   resize();
   tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · 模型载入中…", true);
-  requestAnimationFrame(tick);
+  if (window.__GBT_STATIC) {
+    console.info('[GBT] static 模式：只渲染，不进循环');
+    setTimeout(function () { try { tick(); } catch (e) { console.error(e); } }, 1);
+  } else {
+    requestAnimationFrame(tick);
+  }
 
   window.GBT_RIG = { state: function () { return STATE; }, select: selectBone };
 })();
