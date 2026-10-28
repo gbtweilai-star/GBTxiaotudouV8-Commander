@@ -207,6 +207,14 @@
       }
     }
   } catch (e) { }
+  // 🔴 2026-10-28：`?hq=1` **强制满画质**，压过一切低配判断。
+  //   为什么需要：iSH 里的软件渲染探测会把浏览器也判成软件渲染（同一台机），
+  //   但**系统 Safari 是真 WebKit + A19 GPU**，那里应该跑满。
+  //   用 ?hq=1 明确告诉她"这里算力够，按最高来过"。
+  if (/[?&]hq=1/.test(location.search)) {
+    _IS_LOW = false;
+    window.__GBT_HQ = true;
+  }
   if (_IS_LOW) { window.__GBT_LOW = true; }
   if (/[?&]static=1/.test(location.search)) { window.__GBT_STATIC = true; }
   var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !_IS_LOW, alpha: false });
@@ -225,7 +233,9 @@
        软件渲染的开销**正比于像素数**：0.35× ⇒ 671×324 ≈ 0.22M，少 8 倍。 */
     prMin: (window.__GBT_LOW ? 0.35 : 1.0),
     prMax: Math.min((window.devicePixelRatio || 1) * 1.6, 2.0),
-    pr: (window.__GBT_LOW ? 0.35 : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875)),
+    pr: (window.__GBT_LOW ? 0.35
+         : (window.__GBT_HQ ? Math.min((window.devicePixelRatio || 1) * 2, 2.0)
+                            : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875))),
     shadow: (window.__GBT_LOW ? false : true),
     /* 低配（软件渲染）关阴影：软件渲染下阴影贴图是纯 CPU 逐像素算，大头。
        下面是原始实测记录，保留：
