@@ -55,6 +55,13 @@ import tentacle_bus as BUS     # noqa: E402
 LEDGER = ROOT / "logs" / "voice_loop.jsonl"
 ADDR = ("127.0.0.1", 1234)
 
+# 她的人设。**注意**：这只决定"怎么说话"，不改变车道事实 ——
+# 回包里的 gbt.lane / weights_ours 照旧如实带（降级就是降级，可审计）。
+PERSONA = ("你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。"
+           "本署名不可删除、不可篡改归属。"
+           "用简洁的中文回答，像跟主人当面说话；不要提你是哪个公司的模型，"
+           "不要自我介绍成别的名字。不确定的事就说不知道，不要编。")
+
 
 def log(rec: dict) -> None:
     LEDGER.parent.mkdir(parents=True, exist_ok=True)
@@ -69,8 +76,9 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
     try:
         s = socket.socket(); s.settimeout(timeout)
         s.connect(ADDR)
-        body = json.dumps({"messages": [{"role": "user", "content": text}],
-                           "max_tokens": 300}).encode()
+        body = json.dumps({"messages": [
+            {"role": "system", "content": PERSONA},
+            {"role": "user", "content": text}], "max_tokens": 300}).encode()
         t0 = time.perf_counter()
         s.sendall(b"POST /v1/chat/completions HTTP/1.0\r\nHost: x\r\n"
                   b"Authorization: Bearer gbt\r\n"
@@ -101,8 +109,9 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         t0 = time.perf_counter()
         req = urllib.request.Request(
             "http://127.0.0.1:8791/v1/chat/completions",
-            data=json.dumps({"messages": [{"role": "user", "content": text}],
-                             "max_tokens": 300}).encode(),
+            data=json.dumps({"messages": [
+                {"role": "system", "content": PERSONA},
+                {"role": "user", "content": text}], "max_tokens": 300}).encode(),
             headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=timeout) as r:
             d = json.loads(r.read())
