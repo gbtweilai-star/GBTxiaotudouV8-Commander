@@ -419,3 +419,63 @@ orphan_audit        → 登记为活路径工具
 ```
 
 验收：**PASS 26**（比上一轮 +1）· ENV 3 · INFO 4 · 退出码 0
+
+---
+
+## 九、吞噬能力固化（2026-10-29）
+
+前闸验通之后，把散着的三件（取源 / 前闸 / 入库）拼成**一条契约**。
+
+### `tools/devour_pipe.py`
+
+```
+plan    --topic X --urls a,b   零写盘预演：自己下载、自己判，**不落胶囊、不入库**
+run     --topic X --urls a,b   全流程：取源 → 前闸 → 入库 → 统一索引
+batch   --file topics.json     批量；**幂等**（同 topic 同源已吞过就 skip）
+rejudge                        闸修过 bug 后，把历史账按新判据**就地重判**
+ledger                         看账（含每条判决与原因）
+```
+
+一条命令：`gbt devour plan|run|batch|rejudge|ledger`
+
+### 契约（写死在代码里）
+
+```
+· 只吞有出处的        intake 自带 source_ref 强制
+· 必过前闸            reject ⇒ indexed=false，账上留痕，不静默
+· 幂等                同 topic 同 sha 已吞过 ⇒ skip，不重复入库
+· 每步落盘            state/devour_pipe.json + 追加账 .jsonl
+· 判不了就写判不了    不编
+```
+
+### 固化过程中修掉的三处真缺陷
+
+**① `plan` 是假预演**
+上一版 plan 也走 `intake` ⇒ intake 内部必然落胶囊＋入库，
+回执里写着"入库=是"。**"只看不吞"是假的。**
+改为：plan 自己下载、用 `intake_gate.judge_text()` 判，零写盘。
+
+**② 摘录从 URL 中间切断（数据缺陷）**
+`self_intake` 摘录按 1800 字硬切：
+`https://doi.org/10.48550/arXiv.2211.17192` → `https://doi.org/10.48`
+闸去点它 ⇒ HTTPError ⇒ **被当成"来源死了"**。
+修：切完把尾巴上那段不完整的 URL 整段去掉。
+
+**③ 闸把"点不开"一律当成"来源死了"**
+截断的 URL 不是来源死了。新增逐级砍尾探测：
+任一前缀能通 ⇒ 判**不可验**（None）并写明"疑似截断"，不记失败。
+> 实测：`https://doi.org/10.48 → 疑似截断（前缀 https://doi.org/10.87 可通 HTTP 200）`
+
+### 当前账（7 个胶囊全部 pass）
+
+```
+✅ codegraph-代码图谱   27 主张 · 12 跑通 · 0 失败 · AI味 0
+✅ flashattention-原理  16 · 2 · 0
+✅ kv-cache-mqa         19 · 3 · 0
+✅ ring-attention-长上下文 16 · 2 · 0
+✅ taste_skill          60 · 18 · 0
+✅ 分组查询注意力-gqa      16 · 3 · 0
+✅ 推测解码-speculative-decoding 17 · 2 · 0
+```
+
+验收：**PASS 26**（吸收前闸：过 7 · 警告 0 · 拒 0）· ENV 3 · INFO 4 · 退出码 0
