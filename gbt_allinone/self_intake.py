@@ -331,7 +331,15 @@ def intake(topic: str = "", urls: list = None, files: list = None, note: str = "
     for g in got:
         lines.append("### " + str(g.get("url")))
         lines.append("")
-        lines.append("> " + (g.get("text") or "").strip()[:1800])
+        # 🔴 2026-10-29 修：摘录按字符硬切 1800，**会从 URL 中间切断**
+        #   （实测把 https://doi.org/10.48550/arXiv.2211.17192 切成 https://doi.org/10.48，
+        #     吸收前闸再去点它 ⇒ HTTPError，被当成"来源死了"——数据缺陷伪装成来源问题）。
+        #   处置：切完把尾巴上那段不完整的 URL 整段去掉，别留半截。
+        _ex = (g.get("text") or "").strip()[:1800]
+        _m = re.search(r"https?://[^\s)\]」'>]*$", _ex)
+        if _m and not re.search(r"[/\w]$", _m.group(0)):
+            _ex = _ex[: _m.start()].rstrip()
+        lines.append("> " + _ex)
         lines.append("")
     if str(note or "").strip():
         lines += ["## 三、人工补注", "", str(note).strip(), ""]

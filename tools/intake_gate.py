@@ -70,18 +70,45 @@ def _classify(c: str) -> str:
     return "plain"
 
 
-def _prove(kind: str, c: str, timeout: float = 6.0) -> dict:
-    """③ 跑通：能现读验的真跑一次。验不了就说验不了。"""
+def _prove(kind: str, c: str, timeout: float = 6.0, urls_all=None) -> dict:
+    """③ 跑通：能现读验的真跑一次。验不了就说验不了。
+
+    ⚠️ URL 必须从**全文**抽来的清单里取，不能从主张片段里取 ——
+    主张被切成 240 字，URL 一旦跨切点就被截断
+    （实测把 https://doi.org/10.48550/arXiv.2211.17192 截成 https://doi.org/10.48
+      ⇒ HTTPError 假失败）。
+    """
     if kind == "url":
         # 🔴 2026-10-29 修：原来把 URL 后面的 "`（4413" 也吞进去了 ⇒ UnicodeEncodeError
         #   假失败。URL 只允许 URL 合法字符，收尾再剥一次标点。
-        for u in re.findall(r"https?://[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+", c)[:2]:
+        cands = []
+        if urls_all:
+            cands = [x for x in urls_all if x and (x[:18] in c or c[:18] in x)]
+        if not cands:
+            cands = re.findall(r"https?://[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+", c)
+        for u in cands[:2]:
             u = u.rstrip(".,;:!?)]'\"`")
             try:
                 req = urllib.request.Request(u, headers={"User-Agent": "gbt-gate"})
                 with urllib.request.urlopen(req, timeout=timeout) as r:
                     return {"ok": True, "how": "url", "detail": "%s → HTTP %s" % (u[:60], r.status)}
             except Exception as exc:                          # noqa: BLE001
+                # 🔴 "点不开"不等于"来源死了"：可能是 URL 被截断（数据缺陷）。
+                #   逐级砍尾再试，任一级能通 ⇒ 判**不可验**（None）并写明疑似截断，
+                #   不给"失败"（那会把数据缺陷记成来源问题，骗自己）。
+                cut = u.rstrip("/")
+                for _ in range(4):
+                    cut = cut.rsplit("/", 1)[0]
+                    if cut.count("/") < 2 or len(cut) < 12:
+                        break
+                    try:
+                        with urllib.request.urlopen(urllib.request.Request(
+                                cut, headers={"User-Agent": "gbt-gate"}), timeout=timeout) as r2:
+                            return {"ok": None, "how": "url",
+                                    "detail": "%s → 疑似截断（前缀 %s 可通 HTTP %s）"
+                                              % (u[:40], cut[:36], r2.status)}
+                    except Exception:                         # noqa: BLE001
+                        continue
                 return {"ok": False, "how": "url",
                         "detail": "%s → %s" % (u[:50], type(exc).__name__)}
     if kind == "port":
@@ -118,15 +145,24 @@ def _conflict(topic: str) -> dict:
 
 
 def judge(capsule: str) -> dict:
+    """判一个**已落盘**的胶囊。"""
     p = DEVOURED / capsule / "absorbed_knowledge.md"
     if not p.is_file():
         return {"ok": False, "why": "胶囊不存在：%s" % p}
-    text = p.read_text(encoding="utf-8", errors="replace")
+    return judge_text(p.read_text(encoding="utf-8", errors="replace"), capsule)
+
+
+def judge_text(text: str, label: str = "(未落盘)") -> dict:
+    """判一段**还没落盘**的原文 —— 让 plan 能真正零写盘预演。"""
+    capsule = label
     cl = _claims(text)
+    # 全文 URL 清单（先抽好，供 _prove 校正被切断的 URL）
+    urls_all = [x.rstrip(".,;:!?)]'\"`") for x in
+                re.findall(r"https?://[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+", text)]
     rows = []
     for c in cl:
         k = _classify(c["text"])
-        pr = _prove(k, c["text"])
+        pr = _prove(k, c["text"], urls_all=urls_all)
         rows.append({"at": c["at"], "kind": k, "text": c["text"][:90],
                      "proved": pr.get("ok"), "detail": pr.get("detail")})
 
