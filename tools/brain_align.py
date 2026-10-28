@@ -303,6 +303,18 @@ def main() -> int:
         res = _unify_batch(keys, timeout=60 + 40 * len(grp))
         for c, r in zip(grp, res):
             _pre[str(c.get("name"))] = r
+        # 🔴 2026-10-28：**批内一个挂死会把整批 12 位都记成 timeout**。
+        #   实测 348 位跑完有 36 个 timeout，其中 28 个单独重跑立刻 aligned
+        #   （system 域从 65% 跳到 94% —— 那个域本来就没坏，是被整批拖累的）。
+        #   所以：批若超时，**逐个单独重跑这 12 位**（单位 120 秒），只把
+        #   真正跑不完的记 timeout。慢是多花时间，错是永远看不出真相。
+        if any("_probe_timeout" in r for r in res):
+            for c in grp:
+                n = str(c.get("name"))
+                g = str(c.get("desc") or n)[:160] or n
+                _pre[n] = _unify_probe(g, n, timeout=120)
+            print("  批 %d/%d 超时 → 已逐个重跑 %d 位" % (bi, len(batches), len(grp)),
+                  flush=True)
         print("  批 %d/%d 就绪（%d 位）" % (bi, len(batches), len(grp)), flush=True)
     for i, c in enumerate(items, 1):
         row = align_one(c, _pre.get(str(c.get("name"))))
