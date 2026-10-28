@@ -40,7 +40,25 @@ TENTACLE = "context_overflow_guard"
 MAINLINE = "main.task"                       # 主线标识（纠正前后不变）
 STATE = ROOT / "state" / "context_guard.json"
 LEDGER = ROOT / "state" / "context_guard.jsonl"
-NEAR = 0.85
+# 🔴 2026-10-28：阈值不能写死 0.85。
+#   实测：语音会话消息粒度大（每条约 1800 字 / 预算 12000），
+#   窗口永远只能填到 **84.1%** —— 再加一条就挤掉一条，永远够不到 85%。
+#   ⇒ 判据按**消息粒度自适应**：一条消息占预算的比例决定贴多近算"近溢出"。
+#   粒度粗 ⇒ 阈值低（能提前预警）；粒度细 ⇒ 阈值回到 0.85。
+NEAR_MAX = 0.85
+NEAR_MIN = 0.60
+
+
+def near_threshold(budget: int, avg_msg_chars: float) -> float:
+    if not budget or budget <= 0:
+        return NEAR_MAX
+    step = float(avg_msg_chars or 0) / float(budget)
+    # 留 2.5 条消息的余量（实测留 1.5 条时阈值 85%、填充恒 84.1%，永远擦边触发不了）
+    t = 1.0 - 2.5 * step
+    return max(NEAR_MIN, min(NEAR_MAX, t))
+
+
+NEAR = NEAR_MAX
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  大脑专用纠错位：异常码 → 动作（**确定性，不依赖语义路由**）
@@ -103,9 +121,16 @@ def diagnose(s: dict, prev: dict | None, streak: int) -> list[dict]:
     if s["budget"] and s["window_chars"] > s["budget"]:
         out.append({"code": "overflow", "why": "窗口 %d > 预算 %d（环形本身违约）"
                     % (s["window_chars"], s["budget"])})
-    elif s["budget"] and s["fill"] and s["fill"] > NEAR:
-        out.append({"code": "near_overflow", "why": "填充 %.0f%% > %.0f%% 阈值"
-                    % (s["fill"] * 100, NEAR * 100)})
+    elif s["budget"] and s["fill"]:
+        # 阈值按**消息粒度**自适应：一条消息占预算越大，越该提前预警。
+        # 实测语音会话每条 ~1800 字 / 预算 12000（15%）⇒ 窗口永远只能到 84.1%，
+        # 写死 0.85 就永远触发不了。
+        _avg = (s["window_chars"] / s["window_n"]) if s.get("window_n") else 0
+        _thr = near_threshold(int(s["budget"]), _avg)
+        if s["fill"] > _thr:
+            out.append({"code": "near_overflow",
+                        "why": "填充 %.0f%% > %.0f%% 阈值（粒度 %.0f 字/条自适应）"
+                        % (s["fill"] * 100, _thr * 100, _avg)})
     # 🔴 原判据 "seq - spilled > window_n ⇒ 丢条" 是错的：
     #    db_turns 是**全库共享**的计数，跟本 name 的 seq 不同源，相减没有意义。
     #    真要验"没丢"，靠 recall 命中（见 --selftest 的秒查检查），不靠减出来。

@@ -105,6 +105,9 @@ FALLBACK = {
 }
 # 每个上下文字段的上次读数（供自适应预算判压力）
 _LAST_FILL: dict = {}
+_PREV_SAMPLE: dict = {}
+_STREAK: dict = {}
+_CTX_ANOM: dict = {}
 _LAST_MS: dict = {}
 
 UA = "gbt-v8/model-bridge"
@@ -693,6 +696,38 @@ class Handler(BaseHTTPRequestHandler):
 
         except Exception as _pe:                              # noqa: BLE001
             sys.stderr.write("[bridge] 分页跳过：%s\n" % type(_pe).__name__)
+        # ── ③ 稳定输出：上下文异常**回大脑执行层**，纠正后回主线 ─────────
+        #   🔴 2026-10-28：context_guard 之前是孤立的工具，**从没接进对话路径**。
+        #     现在每发都在真实窗口上跑一遍：采样 → 判异常 → 并进主脑队列
+        #     → 交大脑执行层分析排布 → 执行确定性纠正 → 继续（不中断对话）。
+        try:
+            sys.path.insert(0, str(ROOT / "tools"))
+            import context_guard as _CG
+            from gbt_allinone.llm.ring_context import RingContext as _RCG
+            _gname = str(body.get("context_name") or "bridge-default")
+            _grc = _RCG(name=_gname, window_chars=4147)
+            _gs = _CG.sample(_grc)
+            _gan = _CG.diagnose(_gs, _PREV_SAMPLE.get(_gname), _STREAK.get(_gname, 0))
+            if _gan:
+                _codes = "、".join(a["code"] for a in _gan)
+                _gq = _CG.to_brain_queue(_gs, _gan)      # 并进主脑同一张队列
+                _gb = _CG.to_brain(_gs, _gan)            # 交大脑执行层分析排布
+                _gc = _CG.correct(_grc, _gs, _gan)       # 确定性纠正
+                _PREV_SAMPLE[_gname] = _gs
+                _STREAK[_gname] = 0
+                _CTX_ANOM[_gname] = _codes
+                sys.stderr.write(
+                    "[bridge] 上下文异常 %s → 主脑入队=%s · 大脑=%s(降级=%s) · 纠正=%s · 回主线\n"
+                    % (_codes, _gq.get("ok"), _gb.get("routed"), _gb.get("degraded"),
+                       ",".join(a["action"] for a in (_gc.get("acts") or [])) or "-"))
+            else:
+                _PREV_SAMPLE[_gname] = _gs
+                _STREAK[_gname] = _STREAK.get(_gname, 0) + 1
+                _CTX_ANOM.pop(_gname, None)
+        except Exception as _ge:                              # noqa: BLE001
+            sys.stderr.write("[bridge] 守卫跳过：%s\n" % type(_ge).__name__)
+
+
 
 
         stream = bool(body.get("stream"))
@@ -771,6 +806,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("X-GBT-Weights-Ours",
                              "true" if name in OURS_LANES else "false")
             self.send_header("X-GBT-Fallback-From", chain[0])
+            if _CTX_ANOM.get(name) or _CTX_ANOM.get(str(body.get("context_name") or "")):
+                self.send_header("X-GBT-Ctx",
+                                 _CTX_ANOM.get(name) or _CTX_ANOM.get("bridge-default", ""))
             self._cors()
             self.end_headers()
             # 🔴 2026-10-28：**上游不流式时，页面会永远卡在「正在生成」**。
