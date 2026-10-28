@@ -276,6 +276,18 @@ def main() -> int:
                 fn()
             except Exception as exc:                          # noqa: BLE001
                 rec("FAIL", fn.__name__, "%s: %s" % (type(exc).__name__, str(exc)[:60]))
+    # 说明书审计：348 位里谁真干活、谁只是说明书（接上去也没用）
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "spec_audit.py")],
+                       capture_output=True, text=True, timeout=400, cwd=str(ROOT))
+        _sd = json.loads((ROOT / "state" / "spec_audit.json").read_text(encoding="utf-8"))
+        _sp = _sd.get("spec_only") or []
+        rec("INFO", "说明书型能力",
+            "%d 位只有 steps/judges 无 I/O（接上去也没用）：%s"
+            % (len(_sp), "、".join(_sp[:5])) if _sp else "0 位")
+    except Exception as _e:                                   # noqa: BLE001
+        rec("ENV", "说明书审计", "跑不起来：%s" % type(_e).__name__)
+
     # 孤儿审计放在汇总**之前**跑 —— 否则它记的 PASS/INFO 进不了总数（实测踩到）
     sec_i()
 
