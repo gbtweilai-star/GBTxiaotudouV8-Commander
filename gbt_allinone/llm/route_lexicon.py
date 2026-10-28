@@ -130,7 +130,14 @@ def _self_label(cap_desc: str) -> str:
     import re as _re2
     text = _re2.split(r"[：:]", text, 1)[0]
     text = _re.split(r"[（(]", text)[0]
+    _head_raw = text.strip(" 　:：，,。.")
     seg = text.split("·")[-1].strip()
+    # 🔴 2026-10-28：「身体·说」这类 · 之后只剩一个字（说/看），
+    #   2 字下限会判空 ⇒ body_say / body_see 没有自称谓，
+    #   只能靠 semantic 猜 → 全落到 tentacle 兜底黑洞。
+    #   处置：限定名里的单字尾巴保留整个「身体·说」，比裸「说」具体。
+    if len(seg) == 1 and "·" in text and len(_head_raw) <= 12:
+        seg = _head_raw
     seg = seg.strip(" 　·:：，,。.）)」』】")
     return seg if 2 <= len(seg) <= 20 else ""
 
@@ -149,7 +156,11 @@ def _post_colon(cap_desc: str) -> str:
         return ""
     tail = _re.split(r"[（(]", parts[1])[0].strip()
     tail = tail.strip(" 　·:：，,。.）)」』】")
-    return tail[:14] if 2 <= len(tail) <= 14 else ""
+    # 🔴 2026-10-28：原来写的是 `tail[:14] if 2 <= len(tail) <= 14 else ""`
+    #   —— **尾巴太长时直接丢弃**，于是「蒸馏件」那 7 位的延展全变成空，
+    #   codex 那 3 位能分开纯属运气（它们的尾巴刚好 ≤14 字）。
+    #   正确语义：够长就截断，不是不要。取 18 字，足够区分"把吞入件 xxx/yyy"。
+    return tail[:18] if len(tail) >= 2 else ""
 
 
 def name_hint(intent: str) -> dict:
