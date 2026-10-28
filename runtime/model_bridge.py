@@ -110,6 +110,24 @@ _STREAK: dict = {}
 _CTX_ANOM: dict = {}
 _LAST_MS: dict = {}
 
+# Qwen2 的结束标记。🔴 2026-10-29 实测：真机（LM Pocket）**不吐 stop 就继续生成**，
+#   回答后面挂着 "<|im_end|>
+#   <type> x </type> 是什么？" 这种垃圾。
+#   这是模型侧的 stop 处理缺失，不是我们的错；但**我们的桥上必须截断**，
+#   否则她自己念出来就是一堆乱码（而且会污染记忆与纪律判定）。
+_STOP_MARKS = ("<|im_end|>", "<|endoftext|>", "<|im_start|>")
+
+
+def _cut_at_stop(text: str) -> str:
+    t = str(text or "")
+    cut = len(t)
+    for m in _STOP_MARKS:
+        i = t.find(m)
+        if i != -1:
+            cut = min(cut, i)
+    return t[:cut].strip()
+
+
 UA = "gbt-v8/model-bridge"
 
 # 她的对话落盘（2026-10-26）：容器一断、页面一关，说过的话还在。
@@ -876,6 +894,21 @@ class Handler(BaseHTTPRequestHandler):
                         "key_slot": slot,
                         "elapsed_s": round(dt, 2),
                         "bridge": "gbt-v8/model-bridge"}
+            # 🔴 2026-10-29 实测：真机（LM Pocket）**不吐 stop 就继续生成**，
+            #   回答后面挂着 "<|im_end|>" 之后的垃圾（如 "<type> x </type> 是什么？"）。
+            #   这是模型侧 stop 处理缺失，但桥上必须截断 —— 否则她念出来是乱码，
+            #   还会污染记忆、纪律判定、以及"有没有编造"的机器判据。
+            try:
+                for _ch in (d.get("choices") or []):
+                    _m = _ch.get("message") or {}
+                    if isinstance(_m.get("content"), str):
+                        _before = _m["content"]
+                        _m["content"] = _cut_at_stop(_before)
+                        if _m["content"] != _before:
+                            sys.stderr.write("[bridge] 截断 stop 之后垃圾 %d→%d 字\n"
+                                             % (len(_before), len(_m["content"])))
+            except Exception:                                 # noqa: BLE001
+                pass
             raw = json.dumps(d, ensure_ascii=False).encode("utf-8")
         except Exception:                                     # noqa: BLE001
             pass                                              # 不是 JSON 就原样透传
