@@ -249,6 +249,40 @@
     '#stage.flip.invert{transform:rotate(180deg) !important;filter:invert(1) !important}'
   ].join('\n');
   document.head.appendChild(css);
+  // 🔴 2026-10-28：`?src=` 真实现（上一版我在回复里说了却没写，是假话，已补）。
+  //   用途：投墙时指定投什么，不用回带工具栏的界面去选。
+  //     src=poster      开源海报（默认）
+  //     src=hr          她的 3D 本体（满画质）
+  //     src=chat        对话面（能问她）
+  //     src=panel       控制面板
+  //     src=<相对路径>   任意页面
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var v = (q.get('src') || '').toLowerCase();
+    var MAP = {
+      poster: null,
+      hr: '../digital-human/index.html?hq=1',
+      'digital-human': '../digital-human/index.html?hq=1',
+      chat: '../model-chat/index.html',
+      panel: '../panel/index.html',
+      capability: '../capability-bar/index.html'
+    };
+    if (!v) return;
+    var target = (v in MAP) ? MAP[v] : (v.indexOf('/') >= 0 || v.indexOf('.') >= 0 ? q.get('src') : null);
+    var st = document.getElementById('stage');
+    if (!st || !target) return;          // poster：保持默认图
+    // 清掉图片，装 iframe（实时渲染，不是截图）
+    st.innerHTML = '';
+    var f = document.createElement('iframe');
+    f.src = target;
+    f.style.cssText = 'width:100%;height:100%;border:0;display:block;background:#000';
+    f.setAttribute('allow', 'autoplay');
+    st.appendChild(f);
+    st.classList.remove('empty');
+    st.classList.add('live');
+    console.log('[GBT] 投墙源 → ' + target);
+  })();
+
   // 强制 180° + 反色
   var st = document.getElementById('stage');
   if (st) { st.classList.add('flip', 'invert'); st.classList.remove('mirror'); }
