@@ -125,6 +125,7 @@
     <button id="btnWave" disabled title="等模型载入">挥手</button>
     <button id="btnWalk" disabled title="等模型载入">走两步</button>
     <button id="btnIdle" disabled title="等模型载入">站好</button>
+    <button id="btnAsk" disabled title="把输入框的话交给她的大脑（桥 :8791 → A19），答完用台湾腔说出来">问她</button>
     <input id="sayText" placeholder="让她说什么…（留空=她的自我介绍）"
            style="flex:1;min-width:180px;background:#0b1018;border:1px solid rgba(255,255,255,.14);
                   color:#e8ecf8;border-radius:8px;padding:6px 10px;font-size:13px">
@@ -903,9 +904,60 @@
     } catch (e) { sub("声音没播出来：" + String(e).slice(0, 70)); }
     stagePlay(/idle/, "说话");
   }
+  /* 🔴 2026-10-28：让她**自己答**，不只是念稿。
+     链路：输入框 → 桥 /v1/chat/completions（桥内 A19 优先，走 selfhost）
+           → 拿到回答 → /voice/speak 合成台湾腔 → 播放 + 口型
+     回包里带 gbt.lane / weights_ours，界面如实标「自有权重 / 非自有权重」。
+  */
+  function askBrain() {
+    var el = $("sayText");
+    var q = (el && el.value ? el.value : "").trim();
+    if (!q) { sub("先写一句要问她的"); return; }
+    var BR = "http://127.0.0.1:8791";
+    sub("她在想…（" + q.slice(0, 30) + "）");
+    fetch(BR + "/v1/chat/completions", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // 🔴 2026-10-28：**必须带人设**。实测不带时，一旦降级到别家模型，
+        //   她会自报「我是 DeepSeek」——那是车道，不是她。
+        //   人设只约束"怎么说话"，不改变车道事实：
+        //   回包里的 gbt.lane / weights_ours 照旧如实带，降级就是降级，可审计。
+        messages: [
+          { role: "system", content:
+            "你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。" +
+            "本署名不可删除、不可篡改归属。" +
+            "用简洁的中文回答，像跟主人当面说话；不要提你是哪个公司的模型，" +
+            "不要自我介绍成别的名字。不确定的事就说不知道，不要编。" +
+            "【现在是 " + new Date().toLocaleString("zh-CN") +
+            "，涉及今天/现在的问题以它为准，不要凭记忆猜日期。】" },
+          { role: "user", content: q }
+        ], max_tokens: 200 })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      var g = j.gbt || {};
+      var ans = (((j.choices || [{}])[0] || {}).message || {}).content || "";
+      if (!ans) { sub("她没答上来：" + String(j.error || "空回包").slice(0, 50)); return; }
+      var laneTxt = (g.weights_ours ? "自有权重" : "非自有权重") +
+                    (g.lane ? " · 实走 " + g.lane : "");
+      sub("她（" + laneTxt + "）：" + ans.slice(0, 50));
+      stageSayText(ans);
+    }).catch(function (e) { sub("桥不可用：" + String(e).slice(0, 50)); });
+  }
+
+  /* 念指定文本（复用同一条 TTS 通道） */
+  function stageSayText(text) {
+    if (talkingAudio) { try { talkingAudio.pause(); } catch (e) {} talkingAudio = null; }
+    fetch("http://127.0.0.1:8791/voice/speak", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: String(text).slice(0, 300) })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok && j.url) { playSay(j.url); }
+      else { sub("合成失败：" + String((j && (j.error || j.message)) || "无 url").slice(0, 50)); }
+    }).catch(function (e) { sub("合成不可用：" + String(e).slice(0, 40)); });
+  }
+
   function stageReady(anims) {
     var names = (anims || []).map(function (c) { return c.name + "(" + c.duration.toFixed(2) + "s)"; });
-    ["btnSay", "btnWave", "btnWalk", "btnIdle"].forEach(function (id) { var b = $(id); if (b) { b.disabled = false; b.title = ""; } });
+    ["btnSay", "btnAsk", "btnWave", "btnWalk", "btnIdle"].forEach(function (id) { var b = $(id); if (b) { b.disabled = false; b.title = ""; } });
     if (!clipBy(/walk/)) { var w = $("btnWalk"); if (w) { w.disabled = true; w.title = "本资产没有 walk 动作"; } }
     if (!clipBy(/idle/)) {
       var i = $("btnIdle"); if (i) { i.disabled = true; i.title = "本资产没有 idle 动作"; }
@@ -917,6 +969,7 @@
            : "本资产无 jaw / 无形态键（<b>实时口型做不到</b>，真嘴对齐走视频出片）"));
   }
   $("btnSay").addEventListener("click", stageSay);
+  var _ba = $("btnAsk"); if (_ba) _ba.addEventListener("click", askBrain);
   $("btnWalk").addEventListener("click", function () {
     /* 优先走**程序化步态**（我按量出来的轴驱动腿与手臂）；没有骨架才退回烘焙片段。 */
     if (B("LeftUpLeg") && B("RightUpLeg")) { setPreset("walk"); return; }
