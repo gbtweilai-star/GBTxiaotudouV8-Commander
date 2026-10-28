@@ -3816,3 +3816,67 @@ if [ -f state/a19_ready.json ] && grep '"ok": true' → ✅ 已验证就绪
 那一下之后，上面三条路**不需要任何改动**就会切到真机。
 
 ---
+
+---
+
+## 七十、能不能在这边自己跑权重：能，但被内存墙挡住（2026-10-29 实测）
+
+主人说「App 只当容器，接到我们这边用」。这条路我认真试了，结论要一次说清。
+
+### 好消息：引擎本来就在本机
+```
+/usr/bin/llama-cli      0.6.0（GNU 15.2.0 · Linux aarch64）
+/usr/bin/llama-server
+/usr/bin/llama-quantize  ← 连量化工具都在
+CPU: aarch64 · Features: fp asimd evtstrm aes pmull atomics（NEON 有，fp16 扩展没有）
+```
+
+### 坏消息：iSH 的单次 mmap 有硬上限，二分数测出来是 **1.70 GB**
+```
+1.5 GB ✅   1.70 GB ✅   1.72 GB 🔴   2.0 GB 🔴
+```
+而我们的权重：
+```
+Q4_0  4.00 GB   ← 最小的
+Q5_0  4.88 GB
+Q8_0  7.54 GB
+```
+**4.00 / 1.70 = 差 2.3 倍。**
+
+两条路都试过，都堵死：
+```
+--load-mode mmap（默认）→ mmap failed: Out of memory
+--load-mode none（直接读）→ ggml_aligned_malloc: insufficient memory
+                            （要一次分配 4086 MB，容器总共 4194 MB）
+连 llama-quantize --dry-run 都在读源文件时撞同一道 mmap 墙。
+```
+
+### 量化到能装下？也不行（两层原因）
+```
+Q3_K_M 3.01 GB  超上限
+Q2_K   2.30 GB  仍超 1.70 GB 上限
+IQ2_XXS 1.86 GB 略超；且 IQ 量化要 imatrix，本机跑不了量化
+IQ1_S  1.42 GB  装得下，但 7.6B 压到 1.5bit ⇒ 质量崩
+```
+**而且 Q4_0 都已经严重退化过（vanavana / 激活放大 605×）。再压两档等于自废。**
+
+### 所以「App 只当容器」这句话本身就是答案
+这台设备上，**唯一能装下 5.24 GB 权重的地方就是那个 App 的额度**。
+我们的容器只有 4.19 GB 总内存、mmap 1.70 GB —— **物理上装不下**。
+
+容器的本分是「装权重并提供 OpenAI 兼容端点」，我们的本分是「用 omni_plug 把它的算力插进来」。
+这两件事现在**都已经成立**：
+```
+① 哨兵自动验收     models=['gbt-v8-v82-q5_0'] · identity_ok True
+② 桥              X-GBT-Lane: selfhost · X-GBT-Weights-Ours: true
+③ 语音环          via=omni_plug · lane=selfhost
+```
+
+### 真要"我们这边自己跑"，只有两条路（都不在本机）
+1. **在 PC 上量化成 IQ2_XXS（1.86 GB）再传回来** —— 本机装不下量化器要的 4 GB 源，
+   所以量化必须在别处做；而且 2bit 质量要另评。
+2. **加内存** —— iSH 给的是 4.19 GB，mmap 1.70 GB，改不了。
+
+**这两条我都做不到，如实记，不装作已经解决。**
+
+---
