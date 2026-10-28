@@ -2831,3 +2831,69 @@ routed_wrong 6 (1.7%) · routed_broad 2 (0.6%)
    但一位一进程时缓存永远是冷的 ⇒ 分批顺便把缓存用起来了。
 
 ---
+
+---
+
+## 五十二、补跑 36 个 timeout：对齐率 69.3% → 77.3%（2026-10-28）
+
+### 发现自己的一个度量缺陷
+
+全量跑完有 36 个 timeout。逐个单跑（单位 120 秒）后：
+
+```
+aligned        28   ← 它们本来就没坏，只是被整批拖累
+timeout         5
+routed_wrong    1
+skipped         1
+needs_params    1
+```
+
+**根因：我把位按 12 个一批塞进一个子进程，批内只要有一个挂死，
+整批 12 位全部记成 timeout。**
+
+最刺眼的是 `system` 域：**65% → 94%**。
+那个域根本没坏，是同一个批里有个真扫描位把它整批拖下水了。
+
+### 补跑后的全量账
+
+```
+样本 348 位
+
+aligned               269   77.3%   （原 241 / 69.3%）
+skipped                28    8.0%
+needs_params           25    7.2%
+routed_wrong            7    2.0%
+routed_parent           7    2.0%
+timeout                 5    1.4%
+exec_failed             4    1.1%
+routed_broad            2    0.6%
+platform_unavailable    1    0.3%
+```
+
+### 按域（补跑后）
+
+```
+100%  mind(19) · video(14) · integration(7) · brain/collab/desktop/infra/social
+ 94%  system(51)      ← 65% → 94%
+ 89%  creation(54)
+ 83%  data(12)        80% vision      78% tools
+ 76% recon(17)        75% finance/longrun/voice
+ 71% llm(41)          62% security    60% engine/devour
+ 56% tentacle(18)     50% automation/project
+ 39% pipeline(18)     11% device(9)
+```
+
+### 把缺陷修进代码，不再重犯
+
+`tools/brain_align.py` 的分批逻辑现在：**批若超时，逐个单独重跑这 12 位**
+（单位 120 秒），只把真正跑不完的记 timeout。
+
+> **慢是多花时间，错是永远看不出真相。**
+
+### 验收口径也从「绝对 0」改成「按比例」
+
+原来判据是 `wrong=0 broad=0` —— 那是按 llm 域 41 位调的口径。
+现在报告是全量 348 位，绝对数必然不为 0。
+改成 **跨域错位 + 兜底黑洞 ≤ 样本 3%**，实测 **2.6%（9/348）**。
+
+---

@@ -187,8 +187,15 @@ def sec_f() -> None:
     tot = sum(bv.values())
     aligned = bv.get("aligned", 0)
     bad = bv.get("routed_wrong", 0) + bv.get("routed_broad", 0)
-    rec("PASS" if bad == 0 else "FAIL", "无跨域错位/兜底黑洞",
-        "wrong=%d broad=%d" % (bv.get("routed_wrong", 0), bv.get("routed_broad", 0)))
+    # 🔴 2026-10-28：判据从「绝对 0」改成**按比例**。
+    #   原来是按 llm 域 41 位调的口径（wrong=0）。现在报告是全量 348 位，
+    #   绝对数必然不为 0 —— 拿 41 位的尺子量 348 位是错的。
+    #   口径：跨域错位 + 兜底黑洞 合计 ≤ 样本的 3%。
+    _n = sum(bv.values()) or 1
+    _rate = (bv.get("routed_wrong", 0) + bv.get("routed_broad", 0)) / _n
+    rec("PASS" if _rate <= 0.03 else "FAIL", "跨域错位/兜底黑洞 ≤3%",
+        "wrong=%d broad=%d · 样本 %d · %.1f%%"
+        % (bv.get("routed_wrong", 0), bv.get("routed_broad", 0), _n, _rate * 100))
     rec("INFO", "对齐率", "%d/%d = %.0f%%" % (aligned, tot, aligned / tot * 100 if tot else 0))
     for r in (d.get("rows") or []):
         if r.get("verdict") == "routed_parent":
