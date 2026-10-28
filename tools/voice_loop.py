@@ -81,6 +81,63 @@ def output_discipline(answer: str) -> dict:
         return {"ok": None, "why": type(exc).__name__}
 
 
+def code_recall(q: str, k: int = 3) -> dict:
+    """代码图谱查（codegraph_native）—— 问代码时一次给出定义+片段+调用者。
+
+    为什么要接：`codegraph_native` 建好了 2479 文件 / 19040 符号 / 195072 边，
+    但它只是命令行工具 —— 她答代码问题时**不会去查**，还是靠我口头描述。
+    接上之后：涉及代码的问句，先把图谱命中注进人设，她就不必"逐文件翻"。
+
+    口径：**只在问句看起来像代码问题时查**（函数/类/文件/在哪/谁调用），
+    否则每句都注入会把无关符号塞进上下文，反而干扰。
+    """
+    KEY = ("函数", "类", "方法", "在哪", "哪个文件", "谁调用", "调用者", "实现",
+           "定义", "模块", "接口", "代码", "class", "function", "def ", "()")
+    if not any(k in q for k in KEY):
+        return {"ok": True, "skipped": "不是代码问题", "lines": []}
+    # 🔴 2026-10-29：**不能把整句丢进 FTS**。
+    #   实测「RingContext 这个类在哪」→ 命中 0 —— 整句当一个查询串，
+    #   和 ring_context.recall / self_intake.known 是同一类 bug（第三次遇到）。
+    #   先从问句里抽符号名：CamelCase、snake_case、带下划线/驼峰的词。
+    import re as _re
+    cands = []
+    for m in _re.finditer(r"[A-Za-z_][A-Za-z0-9_]{2,}", q):
+        w = m.group(0)
+        cands.append(w)
+        # 驼峰拆开也试一次（RingContext → ring_context）
+        snake = _re.sub(r"(?<!^)(?=[A-Z])", "_", w).lower()
+        if snake != w.lower():
+            cands.append(snake)
+    cands = list(dict.fromkeys(cands))[:6]
+    if not cands:
+        return {"ok": True, "skipped": "问句里没有符号名", "lines": []}
+    try:
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools"))
+        import importlib
+        cg = importlib.import_module("codegraph_native")
+        lines, seen = [], set()
+        for c in cands:
+            for h in (cg.query(c, limit=k).get("hits") or []):
+                key = (h["name"], h["file"], h["line"])
+                if key in seen:
+                    continue
+                # 第三方/归档里的同名符号不是"我们的实现"，不进人设（否则噪声淹没真答案）
+                if any(x in h["file"] for x in ("vendor/", "_archive", "_upstream",
+                                                "third_party", "node_modules")):
+                    continue
+                seen.add(key)
+                lines.append("%s %s (%s:%s) 调用者=%s" % (
+                    h["kind"], h["name"], h["file"], h["line"],
+                    ",".join(h.get("callers") or [])[:40] or "无"))
+                if len(lines) >= k:
+                    break
+            if len(lines) >= k:
+                break
+        return {"ok": bool(lines), "count": len(lines), "cands": cands, "lines": lines}
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": False, "why": type(exc).__name__, "lines": []}
+
+
 def memory_recall(q: str, k: int = 4) -> dict:
     """统一记忆查（memory_unify）—— 跨源一次查全，每条带出处。
 
@@ -166,6 +223,12 @@ def _persona_now(topic: str = "") -> str:
                      "涉及具体事实时如实说不知道，**不要编**；可以提出需要哪份来源。】")
         # 统一记忆：跨源一次查全（对话全史 / 知识胶囊），每条带出处。
         # 默认**不含测试会话**，免得把测试噪音当成记忆。
+        # 代码图谱：问代码问题时一次给定义+片段+调用者（省掉逐文件翻）
+        code = code_recall(topic, k=3)
+        if code.get("lines"):
+            base += ("\n【代码图谱命中（她自己查的，带文件行号）：\n"
+                     + "\n".join("- " + x for x in code["lines"])
+                     + "\n按这些说，别凭印象编函数名。】")
         mem = memory_recall(topic, k=4)
         if mem.get("lines"):
             base += ("\n【你自己记得的相关内容（来自记忆库，带出处）：\n"
