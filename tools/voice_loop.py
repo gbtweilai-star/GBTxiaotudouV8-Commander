@@ -126,9 +126,11 @@ def code_recall(q: str, k: int = 3) -> dict:
                                                 "third_party", "node_modules")):
                     continue
                 seen.add(key)
-                lines.append("%s %s (%s:%s) 调用者=%s" % (
-                    h["kind"], h["name"], h["file"], h["line"],
-                    ",".join(h.get("callers") or [])[:40] or "无"))
+                cs = h.get("callers") or []
+                # 调用方带文件行号才有定位价值；只显示前 3 个，避免把上下文塞满
+                ctxt = "；".join(cs[:3]) if cs else "无"
+                lines.append("%s %s (%s:%s) 调用者：%s" % (
+                    h["kind"], h["name"], h["file"], h["line"], ctxt))
                 if len(lines) >= k:
                     break
             if len(lines) >= k:
