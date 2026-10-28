@@ -57,6 +57,19 @@ ADDR = ("127.0.0.1", 1234)
 
 # 她的人设。**注意**：这只决定"怎么说话"，不改变车道事实 ——
 # 回包里的 gbt.lane / weights_ours 照旧如实带（降级就是降级，可审计）。
+def _persona_now() -> str:
+    """人设 + **现读的真实时间**。
+
+    🔴 2026-10-28 实测：不注入时间时，问「今天几号」它答「2023年10月20日」——
+       纯幻觉。llm_watch 里「机器事实无现读」那条说的就是这种情况：
+       涉及本机事实（时间/端口/内存/版本）必须**现读一次再答**，不能凭记忆。
+    """
+    import time as _t
+    now = _t.strftime("%Y年%m月%d日 %H:%M（%A）", _t.localtime())
+    return (PERSONA + "\n【现在是 " + now + "，这是现读的真实时间，"
+            "涉及今天/现在的问题一律以它为准，不要凭记忆猜日期。】")
+
+
 PERSONA = ("你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。"
            "本署名不可删除、不可篡改归属。"
            "用简洁的中文回答，像跟主人当面说话；不要提你是哪个公司的模型，"
@@ -77,7 +90,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         s = socket.socket(); s.settimeout(timeout)
         s.connect(ADDR)
         body = json.dumps({"messages": [
-            {"role": "system", "content": PERSONA},
+            {"role": "system", "content": _persona_now()},
             {"role": "user", "content": text}], "max_tokens": 300}).encode()
         t0 = time.perf_counter()
         s.sendall(b"POST /v1/chat/completions HTTP/1.0\r\nHost: x\r\n"
@@ -110,7 +123,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         req = urllib.request.Request(
             "http://127.0.0.1:8791/v1/chat/completions",
             data=json.dumps({"messages": [
-                {"role": "system", "content": PERSONA},
+                {"role": "system", "content": _persona_now()},
                 {"role": "user", "content": text}], "max_tokens": 300}).encode(),
             headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=timeout) as r:
