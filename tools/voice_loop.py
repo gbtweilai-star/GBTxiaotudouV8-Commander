@@ -62,6 +62,25 @@ os.environ.setdefault("GBT_A19_KEY", "gbt")
 
 # 她的人设。**注意**：这只决定"怎么说话"，不改变车道事实 ——
 # 回包里的 gbt.lane / weights_ours 照旧如实带（降级就是降级，可审计）。
+def output_discipline(answer: str) -> dict:
+    """输出纪律核（answer_shaper）—— 判她这段话够不够"能照着做"。
+
+    为什么接它：`answer_shaper` 一直是孤儿，但它正是**稳定输出**的机器判据：
+      R1 行动优先 · R2 编号步骤 · R3 步骤≤5 · R4 无客套收尾 · R5 有下一步
+    全是确定性规则（零模型零出网），所以可以每句都过，不吃算力、不会幻觉。
+
+    口径：**只判不改**。`shape` 会重排文本，可能把意思挪歪 —— 这里只 check，
+    不替她重写。不合规就如实记，让人看得见。
+    """
+    try:
+        from gbt_allinone.api import run_task
+        r = run_task("answer_shaper", {"op": "check", "text": answer[:2000]})
+        res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        return {"ok": bool(res.get("ok")), "failed": res.get("failed") or []}
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": None, "why": type(exc).__name__}
+
+
 def knowledge_gate(topic: str) -> dict:
     """现学现做的**闸**：本地知识库命中没有？
 
