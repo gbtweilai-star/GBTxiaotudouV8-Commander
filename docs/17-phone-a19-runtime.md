@@ -3556,3 +3556,59 @@ iSH 不报 `Cached/AnonPages/RSS`，所以量不出是谁吃的 —— 这一条
 一个进程写、另一个进程读不到。与 `ring_context` 同一个根因，已同步改 `journal_mode=DELETE`。
 
 ---
+
+---
+
+## 六十五、context_vault 不是空的，是「建好没喂」（2026-10-29）
+
+### 先纠正一个我自己的误判
+
+上一节我写「context_vault 几乎空：docs 1 条 ⇒ 索引层没建好」。**查下去不是这样：**
+
+```
+db_status              docs 1 · is_real_db true
+db_search "KV Cache"   → 命中 source_ref=store/trace/kv-cache-mqa.passport.json
+db_add                 → denied: no_source_ref「归档条目必须有出处」
+```
+
+⇒ **它是好的、纪律也对（强制出处），只是「建好没喂」。** 「空」不等于「坏」。
+
+### 两个库的分工（不是一个库塞两用）
+
+| 库 | 存什么 | 用途 |
+|---|---|---|
+| `context_vault` | **只存引用与词**，带 `source_ref`，按预算裁剪 | 「知道在哪、要时去取」 |
+| `memory_unify` | **存正文副本**（为出片段 + 注入人设） | 「一句 query 查全册」 |
+
+**并纠正我自己一处说假话**：`memory_unify` 的原 docstring 写「不搬正文」，
+但代码里确实存了 `text` 全量副本。已改写成「**副本必须承认是副本** —— 权威永远在原库」。
+
+### 加了 `--feed-vault`（只喂有出处的）
+
+```
+fed:      kv-cache-mqa（235 词条）
+skipped:  taste_skill —— 没有护照（source_ref）⇒ 按纪律不喂
+```
+
+**跳过不是失败，是纪律生效。** 没有出处的东西不进归档层。
+
+### 固化
+
+```
+gbt mem --survey / --index / --recall "q" / --feed-vault / --stats
+up.sh 启动时自动：建索引 + 喂库（只喂有出处的）
+```
+
+实测启动行：
+```
+:MEM 记忆统一层   ✅ 索引 1990 条 · 喂库 1（跳过 1 条无出处）
+```
+
+### 审计口径也补上了
+`orphan_audit` 的活路径清单里补登记了新工具（memory_unify / voice_loop /
+dh_preflight / duty_patrol / context_guard / tentacle_bus）——
+**接了就登记，否则审计看不见**。活接线 36 → **37**，`context_vault` 现在算真接线。
+
+验收：PASS 25 · ENV 3 · INFO 4 · 退出码 0
+
+---

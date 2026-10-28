@@ -115,6 +115,34 @@ start_patrol() {
   else say ":巡检 生产观测" "🔴 起不来"; fi
 }
 
+start_mem() {
+  # 记忆统一层：建索引 + 喂框架自己的索引层（只喂有出处的）
+  python3 tools/memory_unify.py --index > /dev/null 2>&1 || true
+  local OUT
+  OUT=$(python3 - <<'PY2'
+import sys, json
+sys.path.insert(0, "tools")
+import memory_unify as M
+M.index()
+st = M.stats()
+fv = M.feed_vault()
+fed = len([x for x in fv.get("fed") or [] if x.get("ok")])
+skip = len(fv.get("skipped") or [])
+print("%d|%d|%d" % (st.get("total") or 0, fed, skip))
+PY2
+)
+  local TOT FED SKP
+  TOT=${OUT%%|*}; FED=$(echo "$OUT" | cut -d'|' -f2); SKP=$(echo "$OUT" | cut -d'|' -f3)
+  python3 - "$TOT" "$FED" "$SKP" <<'PY3'
+import sys
+t, f, s = sys.argv[1], sys.argv[2], sys.argv[3]
+print("    %-22s \u2705 \u7d22\u5f15 %s \u6761 \u00b7 \u5582\u5e93 %s%s"
+      % (":MEM \u8bb0\u5fc6\u7edf\u4e00\u5c42", t, f,
+         ("\uff08\u8df3\u8fc7 %s \u6761\u65e0\u51fa\u5904\uff09" % s) if int(s) else ""))
+PY3
+}
+
+
 start_dhgate() {
   # 数字人上场前必过的一道门（八条资产闸 · 只读）
   # 🔴 2026-10-28：dh_asset_gate 原来是孤儿 —— run_task 叫得到，没一条活路径用它。
@@ -154,7 +182,7 @@ up)
   #   桥的降级链已改成 deepseek 优先（0.8s、几乎不吃内存）。
   #   真要 259 个免费模型时：FORCE_FLR=1 sh tools/up.sh up
   if [ "${FORCE_FLR:-0}" = "1" ]; then start_flr; else say ":3001 免费模型池" "⏭ 默认不起（内存优先，要它用 FORCE_FLR=1）"; fi
-  start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
+  start_mem; start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)

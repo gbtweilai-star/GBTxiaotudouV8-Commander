@@ -50,6 +50,13 @@ LIVE_FILES = [
 #   结果审计报 348/348 全接线、0 孤儿 —— 假绿。
 #   仪器先得可信，否则量出来的数比不量更糟。
 LIVE_GLOBS = [
+    # ── 我这几天新接的活路径工具（接了就登记，否则审计看不见）──
+    "tools/memory_unify.py",       # 记忆统一层：喂 context_vault / 跨源 recall
+    "tools/voice_loop.py",         # 语音环：知识闸 / 输出纪律 / 真实闸 / 上下文守卫
+    "tools/dh_preflight.py",       # 数字人上场前的资产闸
+    "tools/duty_patrol.py",        # 低频真实巡检
+    "tools/context_guard.py",      # 上下文异常 → 主脑 → 大脑 → 纠正
+    "tools/tentacle_bus.py",       # 触手总线：嘴/耳/播
     "holo_pet_w3/model-chat/index.html",
     "holo_pet_w3/digital-human/index.html",
     "holo_pet_w3/panel/index.html",

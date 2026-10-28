@@ -17,8 +17,14 @@
   ③ recall(q) 一句查全册，按源分组返回
   ④ 测试会话**单列**（tag=test），默认不混进正经记忆
 
+## 与 context_vault 的分工（两个库，不是一个库塞两用）
+  · `context_vault` = 框架自己的**索引层**：只存**引用与词**，不存正文，带 source_ref，按预算裁剪。
+    适合"知道在哪、要时去取"。
+  · `memory_unify`   = **检索前置**：为了让一句 query 能出**可读片段**并注入人设，
+    它**确实存了正文副本**（`text` 列）。这是副本，不是权威 —— 权威永远在原库。
+
 ## 铁律
-  · **不搬正文**：统一库只存索引与指针，原文仍在原库（避免两处漂移）
+  · **副本必须承认是副本**：这里存 text 是为了出片段；原文与出处以 src/ref 为准
   · **不删原库**：只读遍历，一个字节都不改
   · **测试噪音不冒充记忆**：按 name 规则标 test，账上看得见
 """
@@ -181,6 +187,38 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
             "by_src": {k2: len(v) for k2, v in by.items()}, "hits": hits}
 
 
+def feed_vault() -> dict:
+    """把 devoured 胶囊灌进 context_vault（框架自己的索引层，只存引用与词）。
+
+    为什么要喂：实测 context_vault 的 docs 只有 1 条 —— 它建好了、能搜、
+    但**从来没被喂过**。而它的纪律是对的（db_add 强制 source_ref）。
+    胶囊自带护照（store/trace/<topic>.passport.json），正好当 source_ref。
+
+    口径：**只喂有出处的**。没有护照的一律不喂，并在账上列出来。
+    """
+    sys.path.insert(0, str(ROOT))
+    from gbt_allinone.api import run_task
+    if not DEVOURED.is_dir():
+        return {"ok": False, "why": "devoured 目录不存在"}
+    fed, skipped = [], []
+    for d in DEVOURED.iterdir():
+        f = d / "absorbed_knowledge.md"
+        passport = ROOT / "store" / "trace" / (d.name + ".passport.json")
+        if not f.is_file():
+            continue
+        if not passport.is_file():
+            skipped.append({"capsule": d.name, "why": "没有护照（source_ref）⇒ 按纪律不喂"})
+            continue
+        r = run_task("context_vault", {"op": "db_add", "doc_id": d.name,
+                                       "title": "胶囊 · " + d.name,
+                                       "source_ref": str(passport.relative_to(ROOT)),
+                                       "text": f.read_text(encoding="utf-8", errors="replace")[:20000]})
+        res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        (fed if res.get("ok") else skipped).append(
+            {"capsule": d.name, "ok": res.get("ok"), "terms": res.get("terms"), "why": res.get("why")})
+    return {"ok": True, "fed": fed, "skipped": skipped}
+
+
 def stats() -> dict:
     c = _conn()
     tot = c.execute("select count(*) from mem").fetchone()[0]
@@ -196,6 +234,7 @@ def main() -> int:
     ap.add_argument("--survey", action="store_true")
     ap.add_argument("--index", action="store_true")
     ap.add_argument("--stats", action="store_true")
+    ap.add_argument("--feed-vault", action="store_true")
     ap.add_argument("--recall", default="")
     ap.add_argument("--include-test", action="store_true")
     a = ap.parse_args()
@@ -208,6 +247,9 @@ def main() -> int:
         return 0
     if a.stats:
         print(json.dumps(stats(), ensure_ascii=False, indent=1))
+        return 0
+    if a.feed_vault:
+        print(json.dumps(feed_vault(), ensure_ascii=False, indent=1))
         return 0
     if a.recall:
         print(json.dumps(recall(a.recall, include_test=a.include_test), ensure_ascii=False, indent=1))
