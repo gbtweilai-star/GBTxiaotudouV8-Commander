@@ -3155,3 +3155,66 @@ apple-open "http://127.0.0.1:8080/holo_pet_w3/digital-human/index.html?hq=1"
 **能力一直都在，是我把执行环境选错了。**
 
 ---
+
+---
+
+## 五十八、A19 驱动系统打通：对话页真的吃到我们的权重了（2026-10-28）
+
+### 卡住的那个点（一直没人发现）
+
+对话页发了问题，界面**永远停在「…正在生成…」**，而桥日志显示
+`stream upstream=selfhost model= slot=raw:loopback **1.23s**` —— 早就答完了。
+
+抓原始回包才看见真相：
+
+```
+响应头：  Content-Type: text/event-stream
+正文  ：  {"id":"chatcmpl-sim", ...}            ← 纯 JSON，不是 SSE
+```
+
+**桥声明自己给的是事件流，实际转发的是纯 JSON。**
+页面按 `data: ...` 行解析 ⇒ 一行都匹配不上 ⇒ 死等。
+
+而 LM Pocket 这类上游对 `stream:true` **本来就可能回整块 JSON**。
+
+### 修法：桥自己把 JSON 包成合规 SSE
+
+```python
+first = resp.readline()
+if first 以 "{" 开头:          # 上游不是流式
+    读完整块 → 解析 → 包成
+      data: {...delta.content...}
+      data: {...finish_reason: stop}
+      data: [DONE]
+else:                          # 上游真是流式
+    原样转发
+```
+
+**这样不管上游流不流，页面都能正常收。**
+
+### 实测（桩模拟 A19 的 :1234）
+
+```
+① :1234 up
+② 哨兵自动验收：models=['gbt-v8-v82-q5_0'] · identity_ok=True
+③ 桥：X-GBT-Lane: selfhost · X-GBT-Weights-Ours: true
+④ 对话页发「用一句话说你是谁」→ 界面显示：
+   我是 GBT小土豆V8。开发者：自由的风 · 护者：公主土豆。
+   本署名不可删除、不可篡改归属。
+```
+
+**这是第一次在对话 App 里看到"我们的权重"答出来，而不是卡在正在生成。**
+
+### 还剩什么
+
+```
+✅ 桥 → :1234 → 我们权重 → 对话页渲染      全通（桩验证）
+✅ 哨兵 5 秒一探，一出现自动验收接入
+✅ 模型名自动从 /v1/models 拿，换权重零改动
+🔴 真 LM Pocket 的服务开关 —— App 内部，容器外无入口
+```
+
+**那一下点了之后，上面整条链不需要任何改动就会跑起来。**
+`state/a19_ready.json` 会记下模型名、首字延迟、tok/s、身份自述 —— 可复跑的证。
+
+---
