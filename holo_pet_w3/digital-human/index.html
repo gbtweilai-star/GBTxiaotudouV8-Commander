@@ -190,7 +190,25 @@
   if (!T.GLTFLoader) { tag("tagStage", "引擎：没 GLTFLoader", false); $("bones").textContent = "GLTFLoader.global.js 缺失"; return; }
 
   var canvas = $("gl");
-  var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+  // 🔴 2026-10-28：本机 WebGL 是**软件渲染**（iSH 模拟 x86，无 GPU 加速）。
+  //   原配置 antialias:true + 超采样 1.875× + 阴影，canvas 实际 3596×1734 ——
+  //   实测页面主线程被占满、画布全黑、浏览器标签页都能卡死。
+  //   这里改成先探测渲染器：软件渲染 ⇒ 直接进低配（关抗锯齿、0.5 超采样、关阴影）。
+  var _IS_LOW = /low=1/.test(location.search);
+  try {
+    var _probe = document.createElement('canvas').getContext('webgl2') ||
+                 document.createElement('canvas').getContext('webgl');
+    if (_probe) {
+      var _dbg = _probe.getExtension('WEBGL_debug_renderer_info');
+      var _r = (_dbg && _probe.getParameter(_dbg.UNMASKED_RENDERER_WEBGL)) || '';
+      if (/software|swiftshader|llvmpipe|basic render|mesa offscreen/i.test(String(_r))) {
+        _IS_LOW = true;
+        console.info('[GBT] 软件渲染，进低配模式：' + _r);
+      }
+    }
+  } catch (e) { }
+  if (_IS_LOW) { window.__GBT_LOW = true; }
+  var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !_IS_LOW, alpha: false });
   /* ══ 画面高清度（2026-10-21 主人令：「画面高清度都要给我调整好」）════════════
      免费的高清项直接给足：各向异性过滤拉满 + ACES 色调映射 + sRGB 输出 + 接触阴影。
      超采样按**实测**定档，不按印象：本轮把「窗真在桌上（非最小化）」当条件逐档量了一遍
@@ -202,8 +220,10 @@
     dpr0: window.devicePixelRatio || 1,
     prMin: 1.0,
     prMax: Math.min((window.devicePixelRatio || 1) * 1.6, 2.0),
-    pr: Math.min((window.devicePixelRatio || 1) * 1.5, 1.875),
-    shadow: true,    /* 实测（窗真在桌上）1.75× + 阴影 = 76.6fps ⇒ 阴影这钱花得起：
+    pr: (window.__GBT_LOW ? 0.5 : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875)),
+    shadow: (window.__GBT_LOW ? false : true),
+    /* 低配（软件渲染）关阴影：软件渲染下阴影贴图是纯 CPU 逐像素算，大头。
+       下面是原始实测记录，保留：
                         她脚下有接触阴影才不像"飘"在网格上 */
     fps: 0, blind: 0, up: 0, down: 0,
     manual: false, armed: false,   /* armed：载入期/刚开始那几秒的帧率不作数（见 adaptHQ） */
