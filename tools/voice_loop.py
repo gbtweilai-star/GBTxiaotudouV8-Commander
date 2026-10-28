@@ -62,7 +62,50 @@ os.environ.setdefault("GBT_A19_KEY", "gbt")
 
 # 她的人设。**注意**：这只决定"怎么说话"，不改变车道事实 ——
 # 回包里的 gbt.lane / weights_ours 照旧如实带（降级就是降级，可审计）。
-def _persona_now() -> str:
+def knowledge_gate(topic: str) -> dict:
+    """现学现做的**闸**：本地知识库命中没有？
+
+    self_intake 这条链一直是孤儿（known → intake → distill → stamp → known），
+    实现完整、实测可用（取 arXiv 1911.02150 → 建胶囊 217 词条 → 再 known 命中 coverage 1.0），
+    但**没有一条活路径在调它** ⇒ 她回答时从不查本地知识库，也就谈不上"现学现做"。
+
+    接线口径（照它自己的铁律，不加重也不放宽）：
+      known=True  ⇒ 把 source_ref 给她，让她按有出处的说
+      known=False ⇒ 明确告知"本地未命中"，**没出处就说不知道**，不许编
+    """
+    try:
+        import re as _re
+        from gbt_allinone.api import run_task
+    except Exception as exc:                                  # noqa: BLE001
+        return {"known": None, "why": type(exc).__name__}
+
+    # 🔴 2026-10-28：self_intake 的 known **把整个 topic 当一个归一化 token 比**。
+    #   实测：`MQA` 命中、`KV Cache MQA` 命中、`multi-query attention` 命中，
+    #   但 `MQA 是什么？为什么省显存` **不命中**（整句变成一个长 token）。
+    #   ⇒ 逐级试：原句 → 去问句词 → 拆出的每个词，取第一个命中的。
+    cands = [topic]
+    _stripped = _re.sub(r"[?？。，,、！!的了呢吗是什么为什么怎么多少哪谁请问帮我查一下]", " ", topic)
+    cands.append(_stripped.strip())
+    cands += [w for w in _stripped.split() if len(w) >= 2]
+    seen, uniq = set(), []
+    for c in cands:
+        c = (c or "").strip()
+        if c and c not in seen:
+            seen.add(c); uniq.append(c[:120])
+
+    for c in uniq:
+        try:
+            r = run_task("self_intake", {"op": "known", "topic": c})
+            res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        except Exception:                                     # noqa: BLE001
+            continue
+        if res.get("known"):
+            return {"known": True, "as": c, "ref": res.get("source_ref"),
+                    "coverage": res.get("coverage")}
+    return {"known": False, "tried": uniq[:4]}
+
+
+def _persona_now(topic: str = "") -> str:
     """人设 + **现读的真实时间**。
 
     🔴 2026-10-28 实测：不注入时间时，问「今天几号」它答「2023年10月20日」——
@@ -71,8 +114,17 @@ def _persona_now() -> str:
     """
     import time as _t
     now = _t.strftime("%Y年%m月%d日 %H:%M（%A）", _t.localtime())
-    return (PERSONA + "\n【现在是 " + now + "，这是现读的真实时间，"
+    base = (PERSONA + "\n【现在是 " + now + "，这是现读的真实时间，"
             "涉及今天/现在的问题一律以它为准，不要凭记忆猜日期。】")
+    if topic:
+        kg = knowledge_gate(topic)
+        if kg.get("known"):
+            base += ("\n【本地知识库已命中，出处：" + str(kg.get("ref")) +
+                     "（coverage " + str(kg.get("coverage")) + "）。按出处说。】")
+        elif kg.get("known") is False:
+            base += ("\n【本地知识库**未命中**，也没有出处。"
+                     "涉及具体事实时如实说不知道，**不要编**；可以提出需要哪份来源。】")
+    return base
 
 
 PERSONA = ("你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。"
@@ -173,7 +225,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         s = socket.socket(); s.settimeout(timeout)
         s.connect(ADDR)
         body = json.dumps({"messages": [
-            {"role": "system", "content": _persona_now()},
+            {"role": "system", "content": _persona_now(text)},
             {"role": "user", "content": text}], "max_tokens": 300, "context_name": "voice"}).encode()
         t0 = time.perf_counter()
         s.sendall(b"POST /v1/chat/completions HTTP/1.0\r\nHost: x\r\n"
@@ -206,7 +258,7 @@ def brain_ask(text: str, timeout: float = 120) -> dict:
         req = urllib.request.Request(
             "http://127.0.0.1:8791/v1/chat/completions",
             data=json.dumps({"messages": [
-                {"role": "system", "content": _persona_now()},
+                {"role": "system", "content": _persona_now(text)},
                 {"role": "user", "content": text}], "max_tokens": 300, "context_name": "voice"}).encode(),
             headers={"Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=timeout) as r:
