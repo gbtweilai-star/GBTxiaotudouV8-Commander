@@ -115,6 +115,19 @@ start_patrol() {
   else say ":巡检 生产观测" "🔴 起不来"; fi
 }
 
+start_dhgate() {
+  # 数字人上场前必过的一道门（八条资产闸 · 只读）
+  # 🔴 2026-10-28：dh_asset_gate 原来是孤儿 —— run_task 叫得到，没一条活路径用它。
+  #   接上后第一次跑就发现：闸写死 joints==65，在役件 dh-v7-detail.glb 是 66 ⇒ 对在役件恒红。
+  local OUT="$BASE/logs/dh_preflight.json"
+  python3 tools/dh_preflight.py > "$OUT" 2>/dev/null || true
+  if grep -q '"ok": true' "$OUT" 2>/dev/null; then
+    printf "    %-22s ✅ 八条全绿（%s）\n" ":DHGATE 资产闸" "$(grep -o 'dh-[a-z0-9.-]*\.glb' "$OUT" | head -1)"
+  else
+    printf "    %-22s ⚠ 有红项，见 logs/dh_preflight.json\n" ":DHGATE 资产闸"
+  fi
+}
+
 start_sentinel() {
   # A19 哨兵：每 5 秒探 :1234，一出现就自动验收（模型名 / 首字 / tok/s / 身份）
   # 并落 state/a19_ready.json。**不需要改桥配置** —— 桥默认上游本来就是 selfhost。
@@ -141,7 +154,7 @@ up)
   #   桥的降级链已改成 deepseek 优先（0.8s、几乎不吃内存）。
   #   真要 259 个免费模型时：FORCE_FLR=1 sh tools/up.sh up
   if [ "${FORCE_FLR:-0}" = "1" ]; then start_flr; else say ":3001 免费模型池" "⏭ 默认不起（内存优先，要它用 FORCE_FLR=1）"; fi
-  start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
+  start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
