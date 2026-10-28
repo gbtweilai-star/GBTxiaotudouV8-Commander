@@ -147,6 +147,57 @@ def index(sources: tuple = ("ring", "devoured")) -> dict:
     return {"ok": True, "added": added, "index": str(IDX.relative_to(ROOT))}
 
 
+# 最小双语桥：中文问句 ↔ 英文语料。
+# 🔴 2026-10-29 实测：胶囊多是英文原文（arxiv / GitHub README），
+#   中文问句「怎么做设计才有品味」用 FTS 命中 0 —— **不是检索坏了，是跨语言**。
+#   这里只做**有限的一组常用词**（不假装是翻译引擎）：命中中文词时补上对应英文词一起查。
+#   没在表里的词不猜 —— 查不到就如实查不到。
+BRIDGE = {
+    "设计": "design", "品味": "taste", "审美": "aesthetic", "风格": "style",
+    "配色": "color palette", "排版": "typography", "字体": "font",
+    "布局": "layout", "界面": "interface ui", "交互": "interaction",
+    "注意力": "attention", "显存": "memory vram", "缓存": "cache",
+    "推理": "inference", "量化": "quantization", "训练": "training",
+    "模型": "model", "权重": "weights", "上下文": "context",
+    "记忆": "memory", "检索": "retrieval search", "索引": "index",
+    "投影": "projection", "摄像": "camera", "数字人": "digital human",
+    "动捕": "motion capture", "骨骼": "rig skeleton", "渲染": "render",
+    "并发": "concurrency", "性能": "performance", "延迟": "latency",
+    "安全": "security", "审计": "audit", "权限": "permission",
+    "蒸馏": "distill", "吞噬": "devour", "触手": "tentacle",
+}
+
+
+STOP = set("的 了 我 你 他 她 是 在 有 和 就 也 都 而 及 或 吗 呢 吧 啊 怎么 什么 为什么 "
+           "如何 怎样 这个 那个 一个 可以 应该 需要 请问 能不能 有没有".split())
+
+
+def _terms(q: str) -> list:
+    """把 query 切成可检索的词。中文按 2 字滑窗，英文按空格。"""
+    q = re.sub(r"[^\w\u4e00-\u9fff]+", " ", str(q or ""))
+    q = re.sub(r"\b(%s)\b" % "|".join(sorted(STOP, key=len, reverse=True)), " ", q)
+    out = []
+    for seg in q.split():
+        if re.fullmatch(r"[\u4e00-\u9fff]+", seg):
+            if len(seg) >= 2:
+                out += [seg] if len(seg) <= 4 else [seg[i:i + 2] for i in range(len(seg) - 1)]
+        elif len(seg) >= 2:
+            out.append(seg)
+    # 双语桥：中文词补上对应的英文词（只补表里有的，不猜）
+    for seg in list(out):
+        for zh, en in BRIDGE.items():
+            if zh in seg:
+                out += en.split()
+    seen, uniq = set(), []
+    for t in out:
+        t = t.strip()
+        if t and t not in seen and t.lower() not in seen:
+            seen.add(t)
+            seen.add(t.lower())
+            uniq.append(t)
+    return uniq[:16]
+
+
 def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
     """一句查全册。默认**不含**测试噪音。"""
     c = _conn()
@@ -161,9 +212,13 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
             "select src, ref, name, at, role, text, tag from mem "
             "where text like ?" + (" and tag='real'" if not include_test else "") +
             " order by at desc limit ?", ("%" + q + "%", k)).fetchall()
-    if not rows:                                              # 词面兜底：拆词再查
-        toks = [t for t in re.split(r"\s+", q.strip()) if len(t) >= 2]
-        seen, got = set(), []
+    if not rows:                                  # 词面兜底：拆词再查（**中文必须按字切**）
+        # 🔴 2026-10-29 实测：问「怎么做设计才有品味，别那么套路？」
+        #   FTS 与按空格切都命中 0 —— **中文没有空格**，整句被当成一个超长 token。
+        #   和 self_intake 的 known 是同一类 bug。这里按 2 字滑窗切，逐词 LIKE 并计分。
+        toks = _terms(q)
+        seen, got, score = set(), [], {}
+        real_clause = "" if include_test else " and tag='real'"
         for t in toks:
             try:
                 rr = c.execute(
@@ -172,11 +227,19 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
                     " order by rank limit ?", (t, k)).fetchall()
             except sqlite3.OperationalError:
                 rr = []
+            if not rr:
+                rr = c.execute(
+                    "select src, ref, name, at, role, text, tag from mem "
+                    "where text like ?" + real_clause + " order by at desc limit ?",
+                    ("%" + t + "%", k)).fetchall()
             for x in rr:
-                if x[1] not in seen:
-                    seen.add(x[1])
+                key = (x[0], x[1])
+                score[key] = score.get(key, 0) + 1        # 命中词数越多越相关
+                if key not in seen:
+                    seen.add(key)
                     got.append(x)
-        rows = got
+        got.sort(key=lambda x: -score.get((x[0], x[1]), 0))
+        rows = got[:k]
     c.close()
     hits = [{"src": r[0], "ref": r[1], "name": r[2], "at": r[3],
              "role": r[4], "text": (r[5] or "")[:300], "tag": r[6]} for r in rows]
@@ -185,6 +248,43 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
         by.setdefault(h["src"], []).append(h)
     return {"ok": True, "query": q, "total": len(hits),
             "by_src": {k2: len(v) for k2, v in by.items()}, "hits": hits}
+
+
+SRC_RE = re.compile(r"来源[:：]\s*(https?://[^\s|)）]+)")
+
+
+def resolve_source(capsule_dir: pathlib.Path):
+    """找出处。**三种格式都认**，不只看护照文件。
+
+    🔴 2026-10-29 实测踩到的判据太窄：`taste_skill` 的出处明明写在胶囊头部
+       （`来源: https://github.com/Leonxlnx/taste-skill`），但它是 10-26 由
+       `devour_tentacle` 生成的，那时还没有 self_intake 的护照机制 ⇒ 没有
+       passport.json ⇒ 我的 feed_vault 把它当"无出处"跳过了。
+       **有出处却被当成无出处，等于把真知识扔掉。**
+
+    顺序：护照文件 → 胶囊头部「来源: URL」→ knowledge.json 里的 repo/url。
+    """
+    name = capsule_dir.name
+    passport = ROOT / "store" / "trace" / (name + ".passport.json")
+    if passport.is_file():
+        return str(passport.relative_to(ROOT)), "passport"
+    f = capsule_dir / "absorbed_knowledge.md"
+    if f.is_file():
+        head = f.read_text(encoding="utf-8", errors="replace")[:2000]
+        m = SRC_RE.search(head)
+        if m:
+            return m.group(1), "header_url"
+    kj = capsule_dir / "knowledge.json"
+    if kj.is_file():
+        try:
+            d = json.loads(kj.read_text(encoding="utf-8"))
+            for k in ("source", "repo", "url", "upstream"):
+                v = d.get(k)
+                if isinstance(v, str) and v.startswith("http"):
+                    return v, "knowledge_json"
+        except Exception:                                     # noqa: BLE001
+            pass
+    return None, None
 
 
 def feed_vault() -> dict:
@@ -203,19 +303,20 @@ def feed_vault() -> dict:
     fed, skipped = [], []
     for d in DEVOURED.iterdir():
         f = d / "absorbed_knowledge.md"
-        passport = ROOT / "store" / "trace" / (d.name + ".passport.json")
         if not f.is_file():
             continue
-        if not passport.is_file():
-            skipped.append({"capsule": d.name, "why": "没有护照（source_ref）⇒ 按纪律不喂"})
+        src, how = resolve_source(d)
+        if not src:
+            skipped.append({"capsule": d.name, "why": "护照/头部/元数据三处都找不到出处 ⇒ 按纪律不喂"})
             continue
         r = run_task("context_vault", {"op": "db_add", "doc_id": d.name,
                                        "title": "胶囊 · " + d.name,
-                                       "source_ref": str(passport.relative_to(ROOT)),
+                                       "source_ref": src,
                                        "text": f.read_text(encoding="utf-8", errors="replace")[:20000]})
         res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
         (fed if res.get("ok") else skipped).append(
-            {"capsule": d.name, "ok": res.get("ok"), "terms": res.get("terms"), "why": res.get("why")})
+            {"capsule": d.name, "ok": res.get("ok"), "terms": res.get("terms"),
+             "src": src, "how": how, "why": res.get("why")})
     return {"ok": True, "fed": fed, "skipped": skipped}
 
 
