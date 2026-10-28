@@ -84,6 +84,40 @@ def _last_round() -> int:
         return 0
 
 
+def _ensure_8790() -> str:
+    """顺手看护 :8790（asyncio 批量车道）。
+
+    🔴 2026-10-28：它会**无 Traceback 地静默消失**（SIGKILL 特征），
+       根因至今没查清（iSH 的内存读数不可信）。既然查不到，就给它自愈：
+       每轮巡检发现它 down 就重新拉起，并记一笔"重启过"。
+       **这是兜底，不是修复** —— 账上要能看出来它重启过几次。
+    """
+    import subprocess as _sp
+    def up():
+        try:
+            import socket as _s
+            c = _s.socket(); c.settimeout(1.2)
+            c.connect(("127.0.0.1", 8790)); c.close(); return True
+        except OSError:
+            return False
+    if up():
+        return "up"
+    try:
+        _sp.run(["sh", "-c",
+                 "cd %s && setsid nohup python3 -u runtime/async_gate.py --port 8790 "
+                 "> logs/async_gate.log 2>&1 < /dev/null &" % ROOT],
+                timeout=20, capture_output=True)
+        # 实测启动到端口通需要 6~15 秒，等 6 秒会误报 restart_failed
+        import time as _t
+        for _ in range(10):
+            _t.sleep(2)
+            if up():
+                return "restarted"
+        return "restart_failed"
+    except Exception:                                         # noqa: BLE001
+        return "restart_error"
+
+
 def one_round(rnd: int) -> dict:
     from gbt_allinone.api import run_task
     rows, ok, bad, skipped = [], 0, 0, 0

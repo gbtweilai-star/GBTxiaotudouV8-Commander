@@ -160,6 +160,13 @@ def align_one(c: dict) -> dict:
             verdict = "routed_wrong"          # 真错位（跨域）
     elif routed == name and ex.get("ok"):
         verdict = "aligned"
+    elif routed and routed != name and (rt.get("self_label") or {}).get("ambiguous"):
+        # 🔴 2026-10-28：**自称谓撞车要排在最前**。
+        #   实测 12 组标签撞车（「镜像空间」×10、「蒸馏件」×7、「黑客大脑」×4…），
+        #   涉及约 40 位。它们的中文名叫得一模一样，**文本上就是分不开** ——
+        #   这是**描述数据**的问题，不是路由指错方向。
+        #   以前被 why/exec 分支先吃掉，账上看着像"路由坏了"，误导。
+        verdict = "label_collision"
     elif why:                                  # 路由对了，只是我们没让它真跑
         verdict = "needs_params" if why == "需参数" else "skipped"
     elif "winreg" in _blob or "No module named 'win" in _blob:
