@@ -3681,3 +3681,60 @@ sec_defenses       防御面 → 仍放行   body_say → 自主授权 True
 验收：PASS 24 · ENV 4 · INFO 3 · 退出码 0
 
 ---
+
+---
+
+## 六十七、调她的原生扫描跑全量（2026-10-29）
+
+### 先按主人令排除黑客门
+`sec_scan` / `code_audit` / `sec_sweeper` / `penetrating_cross_scan`
+—— 这四个被 `osint_private` 门挡住（补门之后才挡得住），本轮跳过。
+
+### 15 位原生扫描全跑（每位置单独子进程 + 硬超时，一个挂死拖不住全量）
+
+| 位 | 结果 | 耗时 |
+|---|---|---:|
+| `selfscan` | ok（判 P0）| 54.4s |
+| `truth_scan` | ok · clean | 2.5s |
+| `coverage_auditor` | ok | 50.1s |
+| `mirror_scan` | ok | 3.8s |
+| `devour_scan` | ok | 5.7s |
+| `page_scan` | ok | 50.0s |
+| `wiki_graph verify` | ok | 3.5s |
+| `task_graph` | ok | 3.9s |
+| `audit_query` | ok | 5.5s |
+| `rig_audit` | ok | 50.7s |
+| `anim_audit` | ok | 3.5s |
+| `osint_scan` | ok | 51.5s |
+| `scan_cap` | timeout 130s → 补跑 400s 仍 timeout | — |
+| `caps_called_audit` | timeout 130s → **补跑 83s ok** | — |
+| `cross_scan` | timeout 130s → 补跑 600s 仍 timeout | — |
+
+**合计：12 ok · 1 补跑成功 · 2 真跑不完。**
+
+### selfscan 的唯一 P0，已清
+
+```
+P0/P1 存储异常: 缺目录['wf_runs'] 损坏 0 个
+```
+
+不是文件损坏，是**少一个目录**（生产 `wf_runs/`）。建上后：
+
+```
+verdict: clean · findings 0 条
+```
+
+自检覆盖面（它自己标的口径）：
+```
+routing   348 注册 / 348 路由 / 未路由 0 / 幽灵路由 0
+modules   37 检查 / 0 失败
+store     111 个 JSON / 111 可读 / 0 空 / 0 损坏
+audit     窗口 500 行 · 异常 1
+stub_gaps []
+```
+
+### 两个真跑不完的（如实记，不反复刷）
+`scan_cap` >400s、`cross_scan` >600s。与之前 `sec_scan`/`sec_chain` 同一性质：
+**全盘/全网真扫描，iSH 模拟 x86 跑不动。** 不是缺陷，是这台机的算力边界。
+
+---
