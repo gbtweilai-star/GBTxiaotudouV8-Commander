@@ -219,5 +219,47 @@
   document.querySelector('footer').appendChild(camNote);
 })();
 </script>
+<script>
+/* 🔴 2026-10-28：**纯净投墙模式** `?wall=1`
+   为什么要有：真拿去投墙时，页面上任何工具栏、边距、圆角都会一起被放大到墙上。
+   实物投墙的真实条件（docs/28）：凸透镜 f≈20cm · 屏到镜头 16.7cm · 全黑房间。
+   wall 模式做的事：
+     ① 隐藏所有 UI（工具栏、说明、按钮）—— 墙上只剩画面
+     ② body 背景纯黑（透镜下黑边不发光，不干扰）
+     ③ 强制 投墙180° + 反色
+     ④ 画面铺满，不留边距
+     ⑤ 点一下任意位置 → 进全屏（iOS 要求手势）
+   退出：刷新时去掉 ?wall=1。
+*/
+(function () {
+  if (!/[?&]wall=1/.test(location.search)) return;
+  var css = document.createElement('style');
+  css.textContent = [
+    'body>*:not(#stage){display:none !important}',
+    'body{background:#000 !important;margin:0 !important;overflow:hidden !important}',
+    '#stage{position:fixed !important;inset:0 !important;width:100vw !important;',
+    '  height:100vh !important;margin:0 !important;border:0 !important;',
+    '  border-radius:0 !important;background:#000 !important;padding:0 !important}',
+    '#stage img,#stage iframe{width:100% !important;height:100% !important;',
+    '  object-fit:contain !important;border:0 !important;border-radius:0 !important}',
+    '/* 投墙 180°：透镜成 180° 旋转实像，屏幕端预转抵消 */',
+    '#stage.flip{transform:rotate(180deg) !important}',
+    '/* 反色：白底更亮 */',
+    '#stage.invert{filter:invert(1) !important}',
+    '#stage.flip.invert{transform:rotate(180deg) !important;filter:invert(1) !important}'
+  ].join('\n');
+  document.head.appendChild(css);
+  // 强制 180° + 反色
+  var st = document.getElementById('stage');
+  if (st) { st.classList.add('flip', 'invert'); st.classList.remove('mirror'); }
+  // 点一下进全屏（iOS 需要用户手势）
+  document.addEventListener('click', function () {
+    var el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }, { once: true });
+  console.log('[GBT] 投墙模式：UI 已隐藏 · 180°+反色 · 铺满 · 点屏进全屏');
+})();
+</script>
 </body>
 </html>
