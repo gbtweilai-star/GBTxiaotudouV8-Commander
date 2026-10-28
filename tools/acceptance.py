@@ -276,6 +276,21 @@ def main() -> int:
                 fn()
             except Exception as exc:                          # noqa: BLE001
                 rec("FAIL", fn.__name__, "%s: %s" % (type(exc).__name__, str(exc)[:60]))
+    # 吸收前闸：吞进来的东西必须先过拆解/分析/跑通
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "intake_gate.py")],
+                       capture_output=True, text=True, timeout=300, cwd=str(ROOT))
+        _ig = json.loads((ROOT / "state" / "intake_gate.json").read_text(encoding="utf-8"))
+        _bad = [x for x in _ig if x.get("verdict") == "reject"]
+        _okn = [x for x in _ig if x.get("verdict") == "pass"]
+        _warn = [x for x in _ig if x.get("verdict") == "warn"]
+        rec("PASS" if not _bad else "FAIL", "吸收前闸（拆解/分析/跑通）",
+            "过 %d · 警告 %d · 拒 %d%s"
+            % (len(_okn), len(_warn), len(_bad),
+               ("：" + "、".join(x["capsule"] for x in _bad[:3])) if _bad else ""))
+    except Exception as _e:                                   # noqa: BLE001
+        rec("ENV", "吸收前闸", "跑不起来：%s" % type(_e).__name__)
+
     # 说明书审计：348 位里谁真干活、谁只是说明书（接上去也没用）
     try:
         subprocess.run([sys.executable, str(ROOT / "tools" / "spec_audit.py")],

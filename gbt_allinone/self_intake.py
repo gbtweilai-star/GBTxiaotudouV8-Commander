@@ -23,6 +23,7 @@ import hashlib
 import json
 import re
 import sqlite3
+import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -356,12 +357,38 @@ def intake(topic: str = "", urls: list = None, files: list = None, note: str = "
     ref = str(passport.relative_to(ROOT)).replace(chr(92), "/")
     toks = _tokens(t + " " + " ".join((g.get("text") or "")[:3000] for g in got))
     indexed = False
+    # 🔴 2026-10-29 主人令：「每次吞的时候要先在镜像多维度空间里面把东西
+    #   **拆解、分析、跑通**再吸收，就不会有（吞到二道垃圾）这个弊端。」
+    #
+    #   实测缺这道门的后果：devour/self_intake 原来「取源 → 直接落胶囊 → 直接入库」，
+    #   全网一旦被 AI 生成内容填满，我们就是二道垃圾的搬运工，而且没有分辨能力。
+    #
+    #   intake_gate 做五道机检（零模型零幻觉）：
+    #     ① 拆解成原子主张  ② 分类（url/number/file/port/opinion）
+    #     ③ 可现读验的**真跑一次**（来源还在不在 / 端口 / 文件）
+    #     ④ 与本机既有知识比对  ⑤ 判决 pass/warn/reject + 逐条原因
+    #
+    #   判决**不吃掉原文**：胶囊照留（可复查），只是**不给它进知识库的资格**。
+    gate = None
     try:
-        from .tools import context_vault as _CV
-        add = _CV.VaultStore().add(ref, " ".join(toks), "warm")
-        indexed = bool(add.get("ok")) and int(add.get("terms") or 0) > 0
-    except Exception:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import intake_gate as _IG
+        import importlib as _il
+        _il.reload(_IG)
+        gate = _IG.judge(slug)
+    except Exception as exc:                                  # noqa: BLE001
+        gate = {"verdict": "warn", "reasons": ["闸跑不起来：%s" % type(exc).__name__]}
+    if (gate or {}).get("verdict") == "reject":
+        sys.stderr.write("[intake] 🔴 吸收被拒（%s）：%s\n"
+                         % (slug, "；".join(gate.get("reasons") or [])))
         indexed = False
+    else:
+        try:
+            from .tools import context_vault as _CV
+            add = _CV.VaultStore().add(ref, " ".join(toks), "warm")
+            indexed = bool(add.get("ok")) and int(add.get("terms") or 0) > 0
+        except Exception:
+            indexed = False
     GROWTH.parent.mkdir(parents=True, exist_ok=True)
     with GROWTH.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "topic": t, "slug": slug,
