@@ -590,24 +590,107 @@ class Handler(BaseHTTPRequestHandler):
                         _bwhy = "自适应不可用，用保守 4000"
                 _tot = sum(len(str(m.get("content") or ""))
                            for m in _msgs if isinstance(m, dict))
+
+                # ── ⓪ 存：**每问都存**（幂等，不重复）──────────────────────
+                #   🔴 2026-10-28：上一版只在"超预算"时才 push ⇒ 短请求的事实
+                #   从来没进过库。实测埋进去的 ZX-4471-QK 查出来 0 条，
+                #   而库里有 1739 条"填充内容" —— 存的全是废的，要的没存。
+                #   ring_context 现在按 sha1(role+content) 去重，所以每问都存不会膨胀。
+                sys.path.insert(0, str(ROOT))
+                from gbt_allinone.llm.ring_context import RingContext as _RC0
+                _rc0 = _RC0(name=_cname, window_chars=_budget)
+                _n_new = 0
+                for _m in _msgs:
+                    if isinstance(_m, dict):
+                        _before = _rc0.stats().get("db_turns")
+                        _rc0.push(str(_m.get("role") or "user"),
+                                  str(_m.get("content") or ""))
+                        if _rc0.stats().get("db_turns") != _before:
+                            _n_new += 1
+                if _n_new:
+                    sys.stderr.write("[bridge] 入库 %d 条新消息（会话 %s）\n"
+                                     % (_n_new, _cname))
+
+                # ── ① 召回：**每问必做**（不挂在"超预算"上）────────────────
+                #   上一版把召回塞进 `if _tot > _budget:` 里 ⇒ 短问句不超预算
+                #   就永不召回。实测问「我设备的唯一密钥编号」(窗口早被冲掉)
+                #   直接答"我无法获取" —— 存了却不用，等于没存。
+                sys.path.insert(0, str(ROOT))
+                from gbt_allinone.llm.ring_context import RingContext as _RC
+                _rc = _RC(name=_cname, window_chars=_budget)
+                _ask = ""
+                for _m in reversed(_msgs):
+                    if isinstance(_m, dict) and str(_m.get("role")) == "user":
+                        _ask = str(_m.get("content") or "")
+                        break
+                _recalled = []
+                if _ask.strip():
+                    # 🔴 2026-10-28：**必须排除当前问句自身**。
+                    #   实测查「我设备的唯一密钥编号是什么？」时，FTS 把**这句问话本身**
+                    #   排第一（它跟查询字面最像），于是召回回来的是问题不是答案，
+                    #   模型当然答不出。过滤掉自身；若因此空了，再用关键词重查一次。
+                    _k = int(body.pop("recall_k", 0) or 4)
+
+                    def _grab(qq):
+                        out = []
+                        try:
+                            _r = _rc.recall(qq[:160], k=max(_k, 6))
+                            for _h in (_r.get("hits") or _r.get("items") or []):
+                                _txt = str((_h or {}).get("content") or "").strip()
+                                if not _txt or _txt == _ask.strip():
+                                    continue           # 跳过问句自身
+                                if _txt not in out:
+                                    out.append(_txt[:500])
+                                if len(out) >= _k:
+                                    break
+                        except Exception:                  # noqa: BLE001
+                            pass
+                        return out
+
+                    _recalled = _grab(_ask)
+                    if not _recalled:
+                        # 整句查不到 ⇒ **拆词逐个查再合并**。
+                        #   🔴 2026-10-28：以前把关键词拼成一个串去查，而 LIKE 兜底
+                        #   要求**连续子串**，"设备 唯一密钥编号" 中间有空格就断，
+                        #   实测返回 0 条。拆开逐个查才命中得了。
+                        import re as _re2
+                        _toks = [t for t in _re2.sub(
+                            r"[?？。，,、！!：:的了我你他她它是什么怎么多少呢吗]",
+                            " ", _ask).split() if len(t) >= 2]
+                        for _t in _toks[:4]:
+                            for _x in _grab(_t):
+                                if _x not in _recalled:
+                                    _recalled.append(_x)
+                            if len(_recalled) >= _k:
+                                break
+                if _recalled:
+                    _msgs = ([{"role": "system",
+                               "content": "[更早的相关内容（从库召回，不是最近几轮）]\n"
+                                          + "\n---\n".join(_recalled)}] + list(_msgs))
+                    body["messages"] = _msgs
+                    _tot = sum(len(str(m.get("content") or ""))
+                               for m in _msgs if isinstance(m, dict))
+                    sys.stderr.write("[bridge] 召回 %d 条旧内容插回窗口（问：%s）\n"
+                                     % (len(_recalled), _ask[:24]))
+
+                # ── ② 分页：超预算才裁，裁掉的逐条落库 ──────────────────────
                 if _tot > _budget:
-                    sys.path.insert(0, str(ROOT))
-                    from gbt_allinone.llm.ring_context import RingContext as _RC
-                    _rc = _RC(name=_cname, window_chars=_budget)
+                    _rc2 = _RC(name=_cname, window_chars=_budget)
                     for _m in _msgs:
                         if isinstance(_m, dict):
-                            _rc.push(str(_m.get("role") or "user"),
-                                     str(_m.get("content") or ""))
-                    _win = _rc.window()
+                            _rc2.push(str(_m.get("role") or "user"),
+                                      str(_m.get("content") or ""))
+                    _win = _rc2.window()
                     if _win:
                         body["messages"] = [
                             {"role": str(w.get("role") or "user"),
                              "content": str(w.get("content") or "")} for w in _win]
                         _after = sum(len(str(w.get("content") or "")) for w in _win)
                         sys.stderr.write(
-                            "[bridge] 分页 %d→%d 条 · %d→%d 字（会话 %s · 溢出可 recall）\n"
-                            % (len(_msgs), len(_win), _tot, _after, _cname))
+                            "[bridge] 分页 %d→%d 条 · %d→%d 字（会话 %s · %s）\n"
+                            % (len(_msgs), len(_win), _tot, _after, _cname, _bwhy[:40]))
                         _LAST_FILL[_cname] = round(_after / float(_budget), 3)
+
         except Exception as _pe:                              # noqa: BLE001
             sys.stderr.write("[bridge] 分页跳过：%s\n" % type(_pe).__name__)
 
