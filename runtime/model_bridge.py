@@ -603,13 +603,50 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("X-GBT-Fallback-From", chain[0])
             self._cors()
             self.end_headers()
+            # 🔴 2026-10-28：**上游不流式时，页面会永远卡在「正在生成」**。
+            #   实测 LM Pocket 的桩（以及某些上游）对 stream:true 仍回一个纯 JSON，
+            #   而响应头已经声明 text/event-stream ⇒ 页面按 `data:` 行解析，
+            #   永远匹配不上 ⇒ 界面死等。
+            #   处置：先读首块判断——是 SSE（以 data: 开头）就原样转发；
+            #   是纯 JSON（以 { 开头）就**替上游把它包成合规 SSE**再发。
             try:
-                while True:
-                    chunk = resp.readline()
-                    if not chunk:
-                        break
-                    self.wfile.write(chunk)
+                first = resp.readline()
+                head_bytes = first.lstrip()[:1]
+                if head_bytes == b"{":
+                    raw = first
+                    while True:
+                        more = resp.readline()
+                        if not more:
+                            break
+                        raw += more
+                    try:
+                        doc = json.loads(raw.decode("utf-8", "replace"))
+                    except Exception:                     # noqa: BLE001
+                        doc = {}
+                    msg = (((doc.get("choices") or [{}])[0].get("message") or {})
+                           .get("content") or "")
+                    frame = {"id": "gbt-json2sse", "object": "chat.completion.chunk",
+                             "model": doc.get("model") or "",
+                             "choices": [{"index": 0, "delta": {"content": msg},
+                                          "finish_reason": None}]}
+                    self.wfile.write(("data: " + json.dumps(frame, ensure_ascii=False) +
+                                      "\n\n").encode())
+                    done = {"id": "gbt-json2sse", "object": "chat.completion.chunk",
+                            "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]}
+                    self.wfile.write(("data: " + json.dumps(done, ensure_ascii=False) +
+                                      "\n\n").encode())
+                    self.wfile.write(b"data: [DONE]\n\n")
                     self.wfile.flush()
+                else:
+                    if first:
+                        self.wfile.write(first)
+                        self.wfile.flush()
+                    while True:
+                        chunk = resp.readline()
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
             except Exception:                                 # noqa: BLE001
                 pass
             sys.stderr.write("[bridge] stream upstream=%s model=%s slot=%s %.2fs\n"
