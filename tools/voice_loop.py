@@ -81,6 +81,27 @@ def output_discipline(answer: str) -> dict:
         return {"ok": None, "why": type(exc).__name__}
 
 
+def memory_recall(q: str, k: int = 4) -> dict:
+    """统一记忆查（memory_unify）—— 跨源一次查全，每条带出处。
+
+    为什么接它：她的记忆原来散在四处（对话全史 / 索引层 / 知识胶囊 / 事件账），
+    各查各的。问一句"之前说过什么"得知道去哪个库查 —— 那不是记忆，是四个抽屉。
+    这里用一个索引查全册，命中就注入人设，让她**答之前先看自己记得什么**。
+
+    口径：**默认不含测试会话**（tag=test 单列），免得把测试噪音当成记忆。
+    """
+    try:
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools"))
+        import importlib
+        mu = importlib.import_module("memory_unify")
+        r = mu.recall(q, k=k, include_test=False)
+        r["lines"] = ["[%s·%s] %s" % (h["src"], h["name"], h["text"][:120].replace("\n", " "))
+                      for h in (r.get("hits") or [])[:k]]
+        return r
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": False, "why": type(exc).__name__, "lines": []}
+
+
 def knowledge_gate(topic: str) -> dict:
     """现学现做的**闸**：本地知识库命中没有？
 
@@ -143,6 +164,13 @@ def _persona_now(topic: str = "") -> str:
         elif kg.get("known") is False:
             base += ("\n【本地知识库**未命中**，也没有出处。"
                      "涉及具体事实时如实说不知道，**不要编**；可以提出需要哪份来源。】")
+        # 统一记忆：跨源一次查全（对话全史 / 知识胶囊），每条带出处。
+        # 默认**不含测试会话**，免得把测试噪音当成记忆。
+        mem = memory_recall(topic, k=4)
+        if mem.get("lines"):
+            base += ("\n【你自己记得的相关内容（来自记忆库，带出处）：\n"
+                     + "\n".join("- " + x for x in mem["lines"])
+                     + "\n以这些为准；没写的不要编。】")
     return base
 
 
