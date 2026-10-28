@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import socket
 import sys
@@ -54,6 +55,10 @@ import tentacle_bus as BUS     # noqa: E402
 
 LEDGER = ROOT / "logs" / "voice_loop.jsonl"
 ADDR = ("127.0.0.1", 1234)
+
+# 本机回环的钥匙槽。A19（LM Pocket）只认小写 gbt，大写会 401。
+# 只写槽名、不回显明文 —— 与 omni_plug 的纪律一致。
+os.environ.setdefault("GBT_A19_KEY", "gbt")
 
 # 她的人设。**注意**：这只决定"怎么说话"，不改变车道事实 ——
 # 回包里的 gbt.lane / weights_ours 照旧如实带（降级就是降级，可审计）。
@@ -85,6 +90,46 @@ def log(rec: dict) -> None:
 # ── ② 脑：A19 优先，按序试多条传输 ─────────────────────────────────────────
 def brain_ask(text: str, timeout: float = 120) -> dict:
     tried = []
+    # 传输⓪：**走框架自己的万能插**（kind=ai 插座）。
+    # 🔴 2026-10-28 主人点醒后加的：之前我只会"自己写代码去连 A19"，
+    #   而 omni_plug 的插座类型表里本来就写着 ai = 「钥匙槽 + 任意 OpenAI 兼容端点，
+    #   插上即输能并操控」。**本机自己的模型恰恰最该走插座。**
+    #   它在最前面：这是框架的正路；直连与桥作为退路保留。
+    try:
+        from gbt_allinone.api import run_task as _rt
+        _m = "gbt-v8-v82-q5_0"
+        try:
+            import urllib.request as _ur
+            _req = _ur.Request("http://127.0.0.1:1234/v1/models",
+                               headers={"Authorization": "Bearer gbt"})
+            with _ur.urlopen(_req, timeout=8) as _r:
+                _ids = [x.get("id") for x in (json.loads(_r.read()).get("data") or [])]
+            if _ids:
+                _m = _ids[0]
+        except Exception:                                     # noqa: BLE001
+            pass
+        _plug = _rt("omni_plug", {"op": "plug", "socket": "ai",
+                                  "target": "http://127.0.0.1:1234/v1"})
+        _ps = ((_plug.get("gbt_result") or {}).get("result") or {}).get("插座") or {}
+        if _ps.get("state") == "plugged":
+            _r2 = _rt("omni_plug", {"op": "ai_chat",
+                                    "prompt": _persona_now() + "\n\n" + text,
+                                    "target": "http://127.0.0.1:1234/v1",
+                                    "model": _m, "key_env": "GBT_A19_KEY"})
+            _res = ((_r2.get("gbt_result") or {}).get("result") or {})
+            if _res.get("ok") and str(_res.get("text") or "").strip():
+                tried.append({"via": "omni_plug", "ok": True, "model": _m})
+                return {"ok": True, "via": "omni_plug", "lane": "selfhost",
+                        "answer": str(_res.get("text")).strip(),
+                        "model": _m, "tried": tried}
+            tried.append({"via": "omni_plug", "ok": False,
+                          "why": str(_res.get("reason"))[:60]})
+        else:
+            tried.append({"via": "omni_plug", "ok": False,
+                          "why": str(_ps.get("detail"))[:60]})
+    except Exception as exc:                                  # noqa: BLE001
+        tried.append({"via": "omni_plug", "ok": False, "why": type(exc).__name__})
+
     # 传输①：A19 直连
     try:
         s = socket.socket(); s.settimeout(timeout)
