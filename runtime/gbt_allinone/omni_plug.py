@@ -106,9 +106,22 @@ class Pulse:
                 # 2026-10-17 主人令「万能插只要插到其他 AI 都可直接输送能源操控她」：
                 #   AI 插座只认 **https** 端点（OpenAI 兼容）；钥匙槽在 options.key_env，缺就自动探常见槽位。
                 t = str(socket.target or "").strip()
-                if not t.startswith("https://"):
+                # 🔴 2026-10-28：原来只认 https，**把本机回环端点误伤了**。
+                #   实测插 A19（LM Pocket）时被这条挡死：
+                #     "AI 插座只认 https 端点（给的是 http://127.0.0.1:1234/v1）"
+                #   而回环地址天生就是 http —— 它物理上出不了本机，没有中间人可插。
+                #   主人令「万能插只要插到其他 AI 都可直接输送能源操控她」，
+                #   **本机自己的模型恰恰是最该插的那一个**。
+                #   处置：https 照旧；http 仅放行回环（127.0.0.0/8 · ::1 · localhost）。
+                _loopback = False
+                if t.startswith("http://"):
+                    _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
+                    _loopback = (_h in ("localhost", "::1", "0.0.0.0")
+                                 or _h.startswith("127."))
+                if not (t.startswith("https://") or _loopback):
                     socket.state = "failed"
-                    socket.detail = "AI 插座只认 https 端点（给的是 %s）" % (t[:60] or "空")
+                    socket.detail = ("AI 插座只认 https 或本机回环 http（给的是 %s）"
+                                     % (t[:60] or "空"))
                 else:
                     host = (t.split("/")[2] if "//" in t else t)[:60]
                     socket.state = "plugged"
@@ -218,8 +231,14 @@ def _ai_call(target: str, a: dict, timeout: float = 90.0) -> dict:
     import urllib.error
 
     t = str(target or "").strip()
-    if not t.startswith("https://"):
-        return {"ok": False, "reason": "AI 插座只认 https 端点"}
+    # 🔴 2026-10-28：与 plug 那道门保持一致 —— http 放行本机回环。
+    #   两处必须同步，否则会出现"A 说插上了、B 说不行"的自相矛盾（实测踩到）。
+    _lb = False
+    if t.startswith("http://"):
+        _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
+        _lb = (_h in ("localhost", "::1", "0.0.0.0") or _h.startswith("127."))
+    if not (t.startswith("https://") or _lb):
+        return {"ok": False, "reason": "AI 插座只认 https 或本机回环 http"}
     base = t.rstrip("/")
     url = base if base.endswith("/chat/completions") else (base + "/chat/completions")
     slots = ([str(a.get("key_env"))] if a.get("key_env") else
@@ -302,12 +321,23 @@ def _ai_call(target: str, a: dict, timeout: float = 90.0) -> dict:
                 "未读到": "回包不是 JSON", "raw": (raw or b"")[:200].decode("utf-8", "replace")}
     ch = (j.get("choices") or [{}])[0]
     msg = ch.get("message") or {}
-    return {"ok": bool(st and 200 <= st < 300), "http": st, "url": url, "key_slot": slot,
-            "model": j.get("model") or body.get("model"),
-            "text": str(msg.get("content") or "")[:4000],
-            "tool_calls": msg.get("tool_calls") or [],
-            "usage": j.get("usage") or {},
-            "_口径": "钥匙只回槽名不回明文；端点只认 https；缺啥如实报"}
+    ok = bool(st and 200 <= st < 300)
+    out = {"ok": ok, "http": st, "url": url, "key_slot": slot,
+           "model": j.get("model") or body.get("model"),
+           "text": str(msg.get("content") or "")[:4000],
+           "tool_calls": msg.get("tool_calls") or [],
+           "usage": j.get("usage") or {},
+           "_口径": "钥匙只回槽名不回明文；端点只认 https；缺啥如实报"}
+    # 2026-10-21 补（主人要"反向调用大模型的脱敏 log"时逮到的）：401/429 这类拒绝，上游把
+    # 原因放在 `error` 字段里，而这里原来只取 choices/message/usage ⇒ 拒绝路径只剩 http=401
+    # 一个数字，"为什么被拒"整段丢了（P19：拒绝路径最容易被自己省掉）。
+    if not ok:
+        err = j.get("error")
+        out["upstream"] = (json.dumps(err, ensure_ascii=False)[:600] if err
+                           else (raw or b"")[:400].decode("utf-8", "replace"))
+        out["reason"] = ((err.get("message") if isinstance(err, dict) else str(err))
+                         or "上游未给原因")
+    return out
 
 
 def counter_strike(targets=None, evidence=None, prompt=None, max_tentacles: int = 32,
@@ -776,13 +806,12 @@ _A19_MOD = None
 
 
 def _a19_mod():
-    """按路径加载 tools/a19_ctl.py —— 它在 <repo>/tools/ 下，不在 gbt_allinone 包里，
-    所以不能 import，只能按文件加载。加载一次并缓存。"""
+    """按路径加载 tools/a19_ctl.py —— 它在 <repo>/tools/ 下，不在 gbt_allinone 包里。"""
     global _A19_MOD
     if _A19_MOD is not None:
         return _A19_MOD
     import importlib.util
-    root = Path(__file__).resolve().parents[2]
+    root = Path(__file__).resolve().parents[1]
     path = root / "tools" / "a19_ctl.py"
     spec = importlib.util.spec_from_file_location("gbt_a19_ctl", str(path))
     mod = importlib.util.module_from_spec(spec)
@@ -803,7 +832,7 @@ def run(op: str = "status", **kw) -> dict:
                 "注": "网页/GUI 的坐标兜底走能力位 tentacle，不在本位重造一套"}
     if op in ("a19", "a19容器", "lmpocket"):
         # 容器面：把 LM Pocket 当容器管（status / ask / queue / up）。
-        # 纪律：容器不在 ⇒ 如实 offline / queued，绝不拿云端顶替（见 MANUAL_ONLY）。
+        # 纪律：容器不在 ⇒ 如实 offline / queued，绝不拿云端顶替。
         mod = _a19_mod()
         do = str(kw.get("do") or kw.get("action") or "status").lower()
         if do in ("status", "ps", ""):
@@ -826,7 +855,7 @@ def run(op: str = "status", **kw) -> dict:
             try:
                 _sp.run(["apple-open", "lmpocket://"], capture_output=True,
                         text=True, timeout=20)
-                wake = "lmpocket:// 已送达（App 到前台；Load & Start Server 仍需人手点）"
+                wake = "lmpocket:// 已送达（Load & Start Server 仍需人手点）"
             except Exception as _e:                               # noqa: BLE001
                 wake = "唤起失败 %s" % type(_e).__name__
             _t0 = time.time()
