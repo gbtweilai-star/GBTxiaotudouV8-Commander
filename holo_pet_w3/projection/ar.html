@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>GBT小土豆V8 · AR 投影（她站在你墙上）</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;
+            font:14px -apple-system,system-ui,sans-serif;color:#e8ecf8}
+  /* 投影层：整个复合画面统一做 180° + 反色（透镜用） */
+  #proj{position:fixed;inset:0;background:#000;
+        transform:rotate(var(--rot,180deg));
+        filter:invert(var(--inv,1)) brightness(var(--bri,1.1))}
+  /* 底层：摄像头实时画面（真实墙面/房间） */
+  #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  /* 上层：她的 3D 本体，canvas 透明，叠在摄像头画面上 */
+  #gl{position:absolute;inset:0;width:100%;height:100%;display:block;
+      pointer-events:none}
+  #ui{position:fixed;left:0;right:0;bottom:0;padding:10px 12px 18px;display:flex;
+      gap:8px;flex-wrap:wrap;align-items:center;z-index:10;
+      background:linear-gradient(to top,rgba(0,0,0,.92),rgba(0,0,0,0));
+      transition:opacity .25s}
+  #ui.hide{opacity:0;pointer-events:none}
+  button{background:rgba(22,30,44,.92);color:#e8ecf8;border:1px solid rgba(255,255,255,.16);
+         border-radius:9px;padding:8px 13px;font-size:13px}
+  button.on{background:#1d6fd6;border-color:#2f8bff}
+  #hint{position:fixed;inset:0 0 auto 0;padding:10px 14px;font-size:12.5px;z-index:10;
+        background:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,0));
+        transition:opacity .25s}
+  #hint.hide{opacity:0}
+  #err{position:fixed;inset:0;display:none;padding:26px;font-size:14.5px;line-height:1.8;
+       background:#0b1018;z-index:20;overflow:auto}
+  .k{color:#7fb2ff}
+</style>
+</head>
+<body>
+
+<div id="proj">
+  <video id="cam" playsinline muted autoplay></video>
+  <canvas id="gl"></canvas>
+</div>
+
+<div id="hint">
+  <b>AR 投影</b> · 摄像头拍你的墙，她站在那道墙上<br>
+  <span style="color:#8b97a8">点屏出控制条 · 拖动画她走到墙的哪个位置 · 投墙默认 180°+反色</span>
+</div>
+
+<div id="ui">
+  <button id="bStart">开摄像头</button>
+  <button id="bFlip" class="on">投墙 180°</button>
+  <button id="bInv" class="on">反色</button>
+  <button id="bBri">亮度 +</button>
+  <button id="bSize">她 大</button>
+  <button id="bFs">全屏</button>
+</div>
+
+<div id="err"></div>
+
+<script src="../brain/vendor/three.global.js?v=20261026"></script>
+<script src="../brain/vendor/GLTFLoader.global.js?v=20261026"></script>
+<script>
+(function () {
+  var T = window.THREE;
+  var rot = 180, inv = 1, bri = 1.1, scale = 1.0;
+  var v = document.getElementById('cam');
+  var cv = document.getElementById('gl');
+  var proj = document.getElementById('proj');
+  var ui = document.getElementById('ui'), hint = document.getElementById('hint');
+  var errBox = document.getElementById('err');
+  var stream = null, renderer, scene, camera, model, mixer, clock;
+
+  function fail(t, d) {
+    errBox.style.display = 'block';
+    errBox.innerHTML = '<h3 style="margin:0 0 12px">' + t + '</h3>' +
+      '<div style="color:#ff9f9f">' + d + '</div><hr style="border:0;border-top:1px solid #24304a;margin:16px 0">' +
+      '<div>排查：① 必须 <span class="k">Safari</span>（工具内 WebView 没有摄像头权限，会一直挂住）' +
+      '② 设置 → Safari → 相机 → 允许 ③ 别被其它 App 占着摄像头</div>';
+    console.error('[GBT][AR]', t, d);
+  }
+
+  function paint() {
+    proj.style.setProperty('--rot', rot + 'deg');
+    proj.style.setProperty('--inv', inv);
+    proj.style.setProperty('--bri', bri);
+    document.getElementById('bFlip').classList.toggle('on', rot !== 0);
+    document.getElementById('bInv').classList.toggle('on', inv === 1);
+    if (model) model.scale.setScalar(scale);
+  }
+
+  function resize() {
+    if (!renderer) return;
+    var w = cv.clientWidth || window.innerWidth, h = cv.clientHeight || window.innerHeight;
+    renderer.setSize(w, h, false);
+    if (camera) { camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  }
+
+  function initThree() {
+    if (renderer) { resize(); return; }
+    renderer = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+    renderer.setClearAlpha(0);              // **透明**：让摄像头画面透出来
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    scene = new T.Scene();
+    camera = new T.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, 1.15, 3.2);
+    camera.lookAt(0, 1.0, 0);
+    // 光：一盏主光 + 一盏环境，够把皮肤打出来
+    var key = new T.DirectionalLight(0xffffff, 2.1); key.position.set(1.6, 3.0, 2.4);
+    scene.add(key);
+    scene.add(new T.AmbientLight(0xdfe8ff, 1.15));
+    var rim = new T.DirectionalLight(0x9fc4ff, 0.75); rim.position.set(-2.0, 1.6, -1.8);
+    scene.add(rim);
+    clock = new T.Clock();
+    resize();
+
+    var loader = new T.GLTFLoader();
+    loader.load('../voice-theater/assets/dh-v7-detail.glb?v=' + Date.now(), function (gltf) {
+      model = gltf.scene;
+      model.scale.setScalar(scale);
+      scene.add(model);
+      if (gltf.animations && gltf.animations.length) {
+        mixer = new T.AnimationMixer(model);
+        var idle = gltf.animations.find(function (c) { return /idle/i.test(c.name); }) || gltf.animations[0];
+        mixer.clipAction(idle).play();
+      }
+      console.log('[GBT][AR] 她已入场 · 骨骼/动画就绪');
+      hint.innerHTML = '<b>AR 投影</b> · 她已入场 ✓ · 摄像头：' +
+        (v.srcObject ? '已开' : '未开（点「开摄像头」）') +
+        '<br><span style="color:#8b97a8">拖着画面挪她 · 投墙默认 180°+反色</span>';
+      hint.classList.remove('hide');
+      setTimeout(function(){ hint.classList.add('hide'); }, 4000);
+    }, undefined, function (e) {
+      fail('3D 本体载入失败', String(e && e.message || e));
+    });
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      var dt = clock.getDelta();
+      if (mixer) mixer.update(dt);
+      renderer.render(scene, camera);
+    })();
+  }
+
+  async function start() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      fail('这个浏览器不给摄像头 API', 'navigator.mediaDevices 不存在'); return;
+    }
+    try {
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' },
+                 width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+      v.srcObject = stream;
+      await v.play().catch(function () {});
+      document.getElementById('bStart').textContent = '摄像头 ✓';
+      document.getElementById('bStart').classList.add('on');
+      hint.classList.add('hide');
+      // 摄像头只是**背景**；她由 initThree 独立载入（见下方启动段）
+    } catch (e) {
+      fail('摄像头打不开：' + (e.name || '错误'), String(e.message || e));
+    }
+  }
+
+  document.getElementById('bStart').onclick = start;
+  document.getElementById('bFlip').onclick = function () { rot = rot ? 0 : 180; paint(); };
+  document.getElementById('bInv').onclick = function () { inv = inv ? 0 : 1; paint(); };
+  document.getElementById('bBri').onclick = function () {
+    bri = (bri >= 2.2) ? 1.0 : +(bri + 0.3).toFixed(1); paint();
+  };
+  document.getElementById('bSize').onclick = function () {
+    scale = (scale >= 1.8) ? 0.6 : +(scale + 0.3).toFixed(1);
+    document.getElementById('bSize').textContent = '她 ' + (scale <= 0.8 ? '小' : scale >= 1.6 ? '巨' : '大');
+    paint();
+  };
+  document.getElementById('bFs').onclick = function () {
+    var el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  };
+
+  // 拖她：上下左右挪位置（手指拖）
+  var drag = false, lx = 0, ly = 0;
+  cv.style.pointerEvents = 'auto';
+  cv.addEventListener('pointerdown', function (e) { drag = true; lx = e.clientX; ly = e.clientY; });
+  cv.addEventListener('pointermove', function (e) {
+    if (!drag || !model) return;
+    var k = 0.006;
+    model.position.x += (e.clientX - lx) * k;
+    model.position.y -= (e.clientY - ly) * k;
+    lx = e.clientX; ly = e.clientY;
+  });
+  window.addEventListener('pointerup', function () { drag = false; });
+
+  document.addEventListener('click', function (e) {
+    if (e.target.tagName === 'BUTTON' || e.target.id === 'gl') return;
+    ui.classList.toggle('hide'); hint.classList.toggle('hide');
+  });
+  window.addEventListener('resize', resize);
+
+  paint();
+  // 🔴 2026-10-28 修：原来 initThree() 挂在摄像头授权之后 ⇒ 没给权限她就不出场。
+  //   AR 的画面是「摄像头背景 + 她」两层，**她不该依赖摄像头**：
+  //   先把她载进来（黑底也看得见），摄像头批了再垫到后面当墙。
+  function boot() {
+    if (!window.THREE) { fail('three 没载进来', 'vendor/three.global.js 未就绪'); return; }
+    initThree();
+    if (/[?&]auto=1/.test(location.search)) setTimeout(start, 500);
+  }
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot);
+})();
+</script>
+</body>
+</html>
