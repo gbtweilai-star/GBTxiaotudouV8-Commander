@@ -3322,3 +3322,47 @@ lane=selfhost · ours=True
 这不是代码问题，是同一台机上"哪个执行面"的问题 —— 与之前那条教训同源。
 
 ---
+
+---
+
+## 六十一、后置摄像头投影：换执行面就有了（2026-10-28）
+
+### 我之前的结论错在哪
+
+我测 `getUserMedia` 是在**工具内 WebView** 里 —— 那里没有摄像头权限，
+调用既不 resolve 也不 reject，我据此判"本机拿不到摄像头"。
+
+**又是"执行面"问题。** 和 WebGL 那次一模一样：
+iSH 里没有 GPU，不代表 A19 没有；工具内 WebView 没有摄像头权限，
+不代表 **Safari 没有**。
+
+### 做了 `projection/camera.html`
+
+```
+后置摄像头实时流（facingMode: environment）
+  → 满屏 video（playsinline 必须，否则 iOS 强制全屏播放器）
+  → 整体 180° 旋转 + 反色 + 亮度可调
+  → 点屏出控制条，3 秒不点自动收
+```
+
+控制条：
+```
+开摄像头 · 投墙180° · 反色 · 前置/后置 · 亮度+ · 全屏
+```
+
+**打不开时不留死白**，直接列排查顺序（用 Safari / Safari 相机权限 /
+别被别的 App 占 / localhost 满足 https 要求）。
+
+### 实测
+
+```
+:8080 /holo_pet_w3/projection/camera.html → HTTP 200
+apple-open ".../camera.html?auto=1" → opened:true
+服务端日志 22:42:29 GET ...?auto=1 200
+Safari 到前台期间 :8080 仍在服务（HTTP 200）
+```
+
+**摄像头能不能开、画面正不正，要看 Safari 里的实况 —— 那一步我在这边看不到。**
+但页面已经把"该转的角度、该反的色、该调的亮度"都做成一键。
+
+---
