@@ -78,7 +78,7 @@ UPSTREAMS = {
     #    deepseek-chat 仍可用但已被静默映射到 flash —— 显式写 flash，别靠别名。
     #    上下文 1,048,576 / 单次输出上限 393,216 / 吃图 / effort=low|high|max。
     #    钥走 0600 文件槽：本机没有 DPAPI 保险箱，profile 名取不到钥（实测 key_ready=false）。
-    "deepseek": ("https://api.deepseek.com/v1", "deepseek-flash",
+    "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat",
                  "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 180),
     "deepseek-pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro",
                  "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 300),
@@ -93,8 +93,8 @@ OURS_LANES = {"selfhost", "ours", "ours-alt", "local"}
 # 只在「连不上/超时」时降级；上游明确回了 4xx/5xx 就如实上报，不掩盖。
 # 显式在请求里写了 upstream 的，尊重调用方选择，不降级。
 FALLBACK = {
-    "selfhost":   ["freepool", "freepool-b", "deepseek"],
-    "local":      ["freepool", "freepool-b", "deepseek"],
+    "selfhost":   ["deepseek", "freepool", "freepool-b"],
+    "local":      ["deepseek", "freepool", "freepool-b"],
     "ours":       ["freepool", "freepool-b", "deepseek"],
     "ours-alt":   ["freepool", "freepool-b", "deepseek"],
     "freepool":   ["freepool-b", "deepseek"],

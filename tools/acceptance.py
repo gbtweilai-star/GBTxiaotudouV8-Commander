@@ -81,15 +81,25 @@ def rt(cap: str, payload: dict | None = None) -> dict:
 # ── A 服务面 ────────────────────────────────────────────────────────────────
 def sec_a() -> None:
     print("\n── A 服务面 ──")
+    # 🔴 2026-10-28：:3001 免费池改为**按需启动**（node 9~17 进程，会把内存
+    #   吃到 259MB/4GB 并导致 :8790 被静默杀掉；桥的降级链已改为 deepseek 优先）。
+    #   它没起是**设计**，不是故障 ⇒ 记 ENV 不记 FAIL。
+    OPTIONAL = {3001}
     lanes = [(3001, "/api/ping"), (8080, "/index.html"), (8791, "/health"),
              (8790, "/health"), (8765, "/api/state"), (8792, "/health")]
     ok = 0
     for port, path in lanes:
         good, info = http(port, path)
         ok += 1 if good else 0
-        rec("PASS" if good else "FAIL", "服务 :%d %s" % (port, path), info)
-    rec("PASS" if ok == len(lanes) else "FAIL",
-        "服务面合计", "%d/%d 通" % (ok, len(lanes)))
+        if good:
+            rec("PASS", "服务 :%d %s" % (port, path), info)
+        elif port in OPTIONAL:
+            rec("ENV", "服务 :%d %s" % (port, path),
+                "按需启动，未起是设计（省内存）；要它用 FORCE_FLR=1")
+        else:
+            rec("FAIL", "服务 :%d %s" % (port, path), info)
+    rec("PASS" if ok >= len(lanes) - len(OPTIONAL) else "FAIL",
+        "服务面合计", "%d/%d 通（:3001 按需）" % (ok, len(lanes)))
     rec("ENV", ":1234 A19", "离线（App 内开关，只能人开；哨兵在等）"
         if not tcp(1234) else "在线")
 

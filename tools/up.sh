@@ -24,8 +24,16 @@ mkdir -p "$LOG"
 say() { printf '  %-26s %s\n' "$1" "$2"; }
 up()  { $PB tcp "$1" >/dev/null 2>&1; }
 
+# 🔴 2026-10-28：原来只判端口。端口一时没起来（进程还在启动 / 刚崩还没被回收）
+#   就会**再起一个**，旧的还在 ⇒ 实测 panel_server 堆到 7 个、http.server 2 个，
+#   把可用内存吃到只剩 259MB/4GB，然后 :8790 的 asyncio 进程被静默杀掉
+#   （没有 Traceback，是 SIGKILL）—— 这就是它反复掉线的真原因。
+#   现在：端口通 **或** 进程在，都算"已在跑"，绝不重复拉起。
+upm() { pgrep -f "$1" >/dev/null 2>&1; }
+running() { up "$1" || upm "$2"; }
+
 start_flr() {
-  if up 3001; then say ":3001 免费模型池" "✅ 已在跑"; return; fi
+  if running 3001 "dist/index.js"; then say ":3001 免费模型池" "✅ 已在跑"; return; fi
   [ -f "$FLR/server/dist/index.js" ] || { say ":3001 免费模型池" "🔴 缺 dist"; return; }
   cd "$FLR/server" || return
   FREEAPI_DB_DRIVER=node FREEAPI_DB_NO_WAL=1 IMAGE_NORMALIZE=off \
@@ -36,7 +44,7 @@ start_flr() {
 }
 
 start_page() {
-  if up 8080; then say ":8080 她的界面" "✅ 已在跑"; return; fi
+  if running 8080 "http.server 8080"; then say ":8080 她的界面" "✅ 已在跑"; return; fi
   cd "$BASE" || return
   setsid nohup python3 -m http.server 8080 --bind 127.0.0.1 > "$LOG/page.log" 2>&1 < /dev/null &
   if $PB wait 8080 20 >/dev/null 2>&1; then say ":8080 她的界面" "✅ 已就绪"
@@ -44,7 +52,7 @@ start_page() {
 }
 
 start_bridge() {
-  if up 8791; then say ":8791 模型桥" "✅ 已在跑"; return; fi
+  if running 8791 "model_bridge.py"; then say ":8791 模型桥" "✅ 已在跑"; return; fi
   pkill -f 'model_bridge.py' 2>/dev/null; sleep 1
   cd "$BASE" || return
   # 🔴 2026-10-28 主人口径：A19 不在时也要能答（可用性优先）。
@@ -57,7 +65,7 @@ start_bridge() {
 }
 
 start_index() {
-  if up 8792; then say ":8792 索引层" "✅ 已在跑"; return; fi
+  if running 8792 "index_daemon.py"; then say ":8792 索引层" "✅ 已在跑"; return; fi
   pkill -f 'index_daemon.py' 2>/dev/null; sleep 1
   cd "$BASE" || return
   setsid nohup python3 -u tools/index_daemon.py serve --port 8792 > "$LOG/index.log" 2>&1 < /dev/null &
@@ -69,7 +77,7 @@ start_panel() {
   # 面板后端 :8765 —— 生产面板的读数与 /api/mirror 都靠它。
   # 它原来因为 research_status/social_platforms 从未发布而一行都起不来，
   # 已改成可缺省（缺了就如实报 unimplemented）。
-  if up 8765; then say ":8765 面板后端" "✅ 已在跑"; return; fi
+  if running 8765 "panel_server.py"; then say ":8765 面板后端" "✅ 已在跑"; return; fi
   pkill -f panel_server.py 2>/dev/null; sleep 1
   cd "$BASE" || return
   setsid nohup python3 -u holo_pet/panel_server.py --port 8765 > "$LOG/panel.log" 2>&1 < /dev/null &
@@ -82,7 +90,7 @@ start_gate() {
   #   同步桥 :8791 是 thread-per-request，单进程 512 路就顶天；
   #   这个单进程实测 4096 路零失败（无连接线程）。
   #   页面仍走 :8791（它要用 /v1/dispatch /v1/route /warm，asyncio 版没实现那些）。
-  if up 8790; then say ":8790 asyncio 批量车道" "✅ 已在跑"; return; fi
+  if running 8790 "async_gate.py"; then say ":8790 asyncio 批量车道" "✅ 已在跑"; return; fi
   pkill -f async_gate.py 2>/dev/null; sleep 1
   cd "$BASE" || return
   setsid nohup python3 -u runtime/async_gate.py --port 8790 > "$LOG/async_gate.log" 2>&1 < /dev/null &
@@ -123,7 +131,12 @@ probe_a19() {
 case "${1:-status}" in
 up)
   echo "=== 拉齐五路 ==="
-  start_page; start_bridge; start_gate; start_panel; start_index; start_flr; start_patrol; start_sentinel; probe_a19
+  # 🔴 2026-10-28：免费池（node，9~17 个进程）默认**不起** —— 它是内存大户，
+  #   起来会把可用内存吃到 259MB/4GB，导致 :8790 被静默杀掉。
+  #   桥的降级链已改成 deepseek 优先（0.8s、几乎不吃内存）。
+  #   真要 259 个免费模型时：FORCE_FLR=1 sh tools/up.sh up
+  if [ "${FORCE_FLR:-0}" = "1" ]; then start_flr; else say ":3001 免费模型池" "⏭ 默认不起（内存优先，要它用 FORCE_FLR=1）"; fi
+  start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
