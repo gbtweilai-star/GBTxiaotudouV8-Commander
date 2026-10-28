@@ -198,8 +198,21 @@ status)
     if up "$p"; then say ":$p $n" "✅ up"
     else
       case "$p" in
-        1234) if [ -f "$BASE/state/a19_ready.json" ] && grep -q '"ok": true' "$BASE/state/a19_ready.json" 2>/dev/null; then
-                say ":$p $n" "✅ 已验证就绪（$(python3 -c "import json;d=json.load(open('$BASE/state/a19_ready.json'));print('%.2fs %s tok/s'%(d.get('elapsed_s') or 0,d.get('tok_per_s')))" 2>/dev/null)）"
+        1234) # 🔴 2026-10-29：凭据**必须验新鲜度**。实测一份 3.7 小时前由桩写入的
+              #   a19_ready.json（tok/s 37.85 = 桩特征，真机 8–11.7）让 status
+              #   报"已验证就绪"，而 :1234 其实是 down —— **这是虚报**。
+              #   规矩：文件存在 + ok:true + **30 分钟内** + 端口当时真通，才算就绪。
+              FRESH=0
+              if [ -f "$BASE/state/a19_ready.json" ]; then
+                MT=$(stat -c %Y "$BASE/state/a19_ready.json" 2>/dev/null || echo 0)
+                NOW=$(date +%s)
+                [ $((NOW - MT)) -le 1800 ] && FRESH=1
+              fi
+              # 🔴 2026-10-29 再修一处虚报：**这个分支永远不许报「已验证就绪」**。
+              #   因为走到这里说明端口已经 down —— 端口不通却报就绪，就是虚报。
+              #   凭据只能在"端口通"的那一支当补充说明，不能反过来给端口背书。
+              if [ "$FRESH" = "1" ] && grep -q '"ok": true' "$BASE/state/a19_ready.json" 2>/dev/null; then
+                say ":$p $n" "⚠ 离线（有 30 分钟内的历史凭据 $(python3 -c "import json;d=json.load(open('$BASE/state/a19_ready.json'));print('%s tok/s'%(d.get('tok_per_s')))" 2>/dev/null)，但**端口当前不通，不作数**）"
               else
                 say ":$p $n" "⚠ 离线（哨兵在等，出现即自动接入）"
               fi ;;
