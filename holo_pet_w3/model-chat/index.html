@@ -119,6 +119,22 @@ header #system{line-height:1.35;padding:6px 8px}
 //    两条车道路由行为完全一致（已逐条对拍 11 条路由），可以直接换。
 const BRIDGE = (new URLSearchParams(location.search).get("bridge")
                 || "http://127.0.0.1:8791").replace(/\/+$/, "");
+
+/* 🔴 2026-10-28：她的回答自动用台湾腔念出来。
+   一律走后端 /voice/speak（edge-tts 曉臻），**不在页面本地合成** ——
+   页面 speechSynthesis 在 iOS 上 getVoices() 常返回 0，会落到错嗓音念中文
+   ⇒ 就是之前那个"鬼叫"。本地零合成，是硬规矩。
+   开关：URL 加 ?voice=0 关掉，或点「说一句」按钮切换。 */
+let AUTO_VOICE = new URLSearchParams(location.search).get("voice") !== "0";
+function autoSpeak(text) {
+  if (!AUTO_VOICE || !text) return;
+  const clean = String(text).replace(/[*#`>_\[\]]/g, "").slice(0, 500);
+  if (!clean.trim()) return;
+  fetch(BRIDGE + "/voice/speak", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({text: clean}),
+  }).catch(() => {});   // 念不出来不影响文字回答
+}
 /* 🔴 2026-10-26：直连容器（绕开桥）。只探 /v1/models，不做任何"猜活"。 */
 const DIRECT_BASE = "http://127.0.0.1:1234/v1";
 let _a19model = "";
@@ -570,6 +586,7 @@ async function send() {
          我下次进来能看到"她当时真的答了、答了多久"。 */
       logMsg("sensor", JSON.stringify({event: "answer", lane: lane, ours: oursHdr,
         ttft_s: ttft, total_s: dt2, chars: (text2 || "").length}));
+      autoSpeak(text2);          /* ← 台湾腔念出来（走后端，本地零合成） */
       return;
     }
 
