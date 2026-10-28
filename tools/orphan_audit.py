@@ -51,6 +51,7 @@ LIVE_FILES = [
 #   仪器先得可信，否则量出来的数比不量更糟。
 LIVE_GLOBS = [
     # ── 我这几天新接的活路径工具（接了就登记，否则审计看不见）──
+    "tools/codegraph_native.py",   # 代码图谱：她查代码而不读代码
     "tools/memory_unify.py",       # 记忆统一层：喂 context_vault / 跨源 recall
     "tools/voice_loop.py",         # 语音环：知识闸 / 输出纪律 / 真实闸 / 上下文守卫
     "tools/dh_preflight.py",       # 数字人上场前的资产闸

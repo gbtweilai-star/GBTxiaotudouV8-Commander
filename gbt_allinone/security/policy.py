@@ -174,6 +174,20 @@ def _needs_private_network(payload: dict) -> bool:
     return False
 
 
+# 黑客能力位缓存：evaluate 是热路径，不能每次都现读名册
+_HACKER_CACHE: set = None
+
+
+def _hacker_set() -> set:
+    global _HACKER_CACHE
+    if _HACKER_CACHE is None:
+        try:
+            _HACKER_CACHE = set(_hacker_kinds())
+        except Exception:                                     # noqa: BLE001
+            _HACKER_CACHE = set()
+    return _HACKER_CACHE
+
+
 def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     p = dict(payload or {})
     op = str(p.get("op") or p.get("action") or p.get("method") or "").lower()
@@ -1068,6 +1082,24 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             add("process_execute", "filesystem_write")
         else:
             add("process_execute", "data_export", "filesystem_write")
+
+    # 🔴 2026-10-29 补门（主人令「除了黑客和转账其他不需要授权」）：
+    #   实测发现 security 域的**进攻面**能力被判成 `restricted=False` ⇒ 它们
+    #   **从来没进过授权闸**：
+    #       pentest action=run      restricted=False · scopes 空
+    #       pentest action=scan     restricted=False
+    #       sec_scan op=run         restricted=False
+    #       redteam_recon accounts  restricted=False
+    #   根因：`restricted = bool(scopes)`，而这些能力走的是**网络扫描**，
+    #   不落盘不读屏 ⇒ 一个作用域都不挂 ⇒ 判"不受限" ⇒ 直接放行。
+    #   这不是我开 GBT_AUTONOMOUS 造成的（那时候它们根本走不到自主判定那一支），
+    #   是**这道门本来就没关**。同一类缺口在 2026-10-21 也修过一次（osint_private）。
+    #
+    #   补法：security 域进攻面一律补上 G1 黑客护栏 `osint_private`
+    #   （它已在 HUMAN_GATES 里 ⇒ 必须主人发授权）。防御/登记面（_DEFENSIVE_SECURITY）不受影响。
+    if not scopes and kind in _hacker_set():
+        scopes.append("osint_private")
+        details["hacker_gate"] = "补门：security 域进攻面一律受限（主人令 2026-10-29）"
 
     return PolicyDecision(kind=kind, risk=risk, scopes=tuple(scopes),
                           action=action, allow_private=allow_private, details=details)
