@@ -45,6 +45,44 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
 
 LEDGER = ROOT / "logs" / "wake_word.jsonl"
+QUOTA_FILE = ROOT / "state" / "speech_quota.json"
+
+# 🔴 2026-10-28 实测出来的配额规律（不是猜的）：
+#   成功 3 次（间隔 15s）后开始被拒；间隔 5s/10s 也拒；冷却 200 秒仍拒；
+#   从被拒到恢复，实测隔了约 29 分钟。
+#   ⇒ iOS 对 SpeechRecognition 有**次数配额 + 长冷却**。
+#   所以：
+#     · **不要循环监听**，一次一枪（--once）
+#     · 冷却期内直接拒绝，不浪费尝试（每次尝试都可能在续期封锁）
+#     · 把最近一次成功/被拒的时间记下来，下次先看表
+COOLDOWN_S = 1800          # 被拒后至少等 30 分钟再试
+
+
+def _quota() -> dict:
+    try:
+        return json.loads(QUOTA_FILE.read_text(encoding="utf-8"))
+    except Exception:                                         # noqa: BLE001
+        return {}
+
+
+def _save_quota(d: dict) -> None:
+    QUOTA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    QUOTA_FILE.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def quota_state() -> dict:
+    """现在能不能安全地试一次？"""
+    q = _quota()
+    last_ok = q.get("last_ok") or 0
+    last_deny = q.get("last_deny") or 0
+    now = time.time()
+    if last_deny and now - last_deny < COOLDOWN_S:
+        return {"ok": False, "why": "被拒后冷却中",
+                "wait_s": int(COOLDOWN_S - (now - last_deny)),
+                "last_deny": time.strftime("%H:%M:%S", time.localtime(last_deny))}
+    return {"ok": True, "last_ok": (time.strftime("%H:%M:%S", time.localtime(last_ok))
+                                    if last_ok else "从未"),
+            "ok_count": q.get("ok_count", 0), "deny_count": q.get("deny_count", 0)}
 
 # 唤醒词（含常见误识别写法）
 WAKES = ["小土豆", "小土豆v8", "小土豆 v8", "土豆", "xiaotudou", "小土斗", "小士豆"]
@@ -107,9 +145,16 @@ def capture(seconds: int, lang: str = "zh-CN") -> dict:
         return {"ok": False, "text": "", "err": (out or r.stderr or "")[:100],
                 "ms": round((time.perf_counter() - t0) * 1000)}
     if not d.get("ok"):
-        return {"ok": False, "text": "",
-                "err": str((d.get("error") or {}).get("message") or "")[:100],
+        msg = str((d.get("error") or {}).get("message") or "")[:100]
+        q = _quota(); q["last_deny"] = time.time()
+        q["deny_count"] = q.get("deny_count", 0) + 1
+        _save_quota(q)
+        return {"ok": False, "text": "", "err": msg,
                 "ms": round((time.perf_counter() - t0) * 1000)}
+    q = _quota(); q["last_ok"] = time.time()
+    q["ok_count"] = q.get("ok_count", 0) + 1
+    q["last_deny"] = 0          # 成功即清掉冷却标记
+    _save_quota(q)
     return {"ok": True, "text": ((d.get("data") or {}).get("text") or "").strip(),
             "ms": round((time.perf_counter() - t0) * 1000)}
 
@@ -150,6 +195,13 @@ def main() -> int:
         ap.print_help()
         return 2
 
+    qs = quota_state()
+    if not qs.get("ok"):
+        print("  ⛔ 现在不该试：%s（还要等 %d 分 %d 秒）"
+              % (qs.get("why"), qs["wait_s"] // 60, qs["wait_s"] % 60), flush=True)
+        print("     上次被拒 %s。每次尝试都可能在续期封锁，所以直接等。"
+              % qs.get("last_deny"), flush=True)
+        return 1
     print("  🎤 唤醒词监听：喊「%s」她就应" % WAKES[0], flush=True)
     print("  每段 %d 秒（一次开关）· 退避 10/20/40 · 连败 3 次停\n" % a.seconds, flush=True)
 
