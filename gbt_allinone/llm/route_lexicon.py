@@ -184,9 +184,15 @@ def name_hint(intent: str) -> dict:
         lab = _self_label(desc)
         if lab and lab in text:
             cands.append({"cap": str(c.get("name")), "label": lab,
-                          "weight": len(lab), "pos": text.find(lab),
+                          # 描述**开头**就是这一位自己的名字（主语），后文出现的多半只是"提到别人"。
+                          # 实测 cloud_plugin：「云插件」在位置 0，却被后文的
+                          # 「ComfyUI」按长度压过 ⇒ 开头给压倒性权重。
+                          # 位置 0 的标签就是这一位自己的名字（描述的主语）；后文出现的多是"提到别人"。
+                          # 加成必须进 weight 本身 —— 因为决策段用 max(weight) 取最长，
+                          # 光改排序键不起作用（实测 cloud_plugin 仍被后文的 ComfyUI 压过）。
+                          "weight": len(lab) + (1000 if text.find(lab) == 0 else 0),
+                          "pos": text.find(lab),
                           "how": "label", "domain": c.get("domain")})
-
     # ③ 名字 token **始终参竞**（不是只在没自称谓时才用）。
     #    实测 genoffice_bridge：描述里写着「GenOffice AI 线 → 统一密钥网关的…」，
     #    同时命中了 key_gateway 的自称谓「统一密钥网关」⇒ 若只在"无自称谓"时
@@ -197,6 +203,31 @@ def name_hint(intent: str) -> dict:
     #       replan_loop / task_graph 被 wf_status 抢走（"status"）。
     #    素材上分不开的（如 genoffice vs genoffice_bridge），
     #    **宁可标 ambiguous 交人，也不硬猜一个。**
+    if not cands:
+        # 🔴 2026-10-28：**归一化整名命中优先**（放在 token 匹配之前）。
+        #   实测 ul_tars_desktop 描述是英文 "Ul-TARS Desktop desktop agent"，
+        #   自称谓取空、token 匹配又和别的 desktop 系打平而被抢走。
+        #   整名（去 _ - 空格、小写）出现在文本里 ⇒ 就是它自己。
+        _txtf = _re.sub(r"[\s_\-]+", "", text.lower())
+        for c in all_caps():
+            if not isinstance(c, dict):
+                continue
+            _n = str(c.get("name") or "")
+            _flat = _re.sub(r"[\s_\-]+", "", _n.lower())
+            if _flat and _flat in _txtf:
+                cands.append({"cap": _n, "label": _n, "weight": 999,
+                              "pos": _txtf.find(_flat), "how": "name_exact",
+                              "domain": c.get("domain")})
+        if cands:
+            # 🔴 2026-10-28：排序键 = **位置 0 优先 → 更长的标签优先 → 位置靠前优先**。
+            #   ① 位置 0 就是这一位自己的名字（cloud_plugin 的「云插件」在开头的
+            #      却被后文「ComfyUI」按长度压过 ⇒ 位置优先修掉）
+            #   ② 同为位置 0 时取更长更具体的（absorb_loop 的「吞天闭环」
+            #      必须压过 devour_scan 的短标签「吞天」）
+            best = sorted(cands, key=lambda x: (0 if x["pos"] == 0 else 1, -x["weight"], x["pos"]))[0]
+            return {"ok": True, "best": best, "tied": [], "ambiguous": False,
+                    "how": "name_exact"}
+
     if not cands:
         GENERIC = {"status", "models", "model", "tools", "tool", "board",
                    "index", "check", "verify", "watch", "queue", "route",
