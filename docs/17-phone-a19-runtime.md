@@ -3446,3 +3446,53 @@ KV Cache 怎么省显存的    → 命中（as=KV）
 这一条链现在是通的，只是"给链接"这一步要人参与。
 
 ---
+
+---
+
+## 六十三、整环六步接通 + 输出纪律核（2026-10-29）
+
+### 接了两个孤儿
+
+| 位 | 干什么 | 接在哪 |
+|---|---|---|
+| `self_intake`（昨天）| 现学现做闸：本地命中/未命中 | 回答前注入人设 |
+| **`answer_shaper`** | **输出纪律 5 条硬规则** | **出声前 check** |
+
+`answer_shaper` 的规则（确定性运算，零模型零出网）：
+```
+R1 行动优先 · R2 编号步骤 · R3 步骤≤5 · R4 无客套收尾 · R5 有下一步
+```
+**只 check 不 shape** —— shape 会重排文本，可能把意思挪歪；不合规就如实记，不替她重写。
+
+### 整环一次跑完（实测）
+
+```
+问: MQA 是什么？为什么省显存
+
+① 知识闸    命中 as=MQA
+② 脑        via=omni_plug  lane=selfhost
+③ 输出纪律  不合格=['R2_编号步骤']      ← 老实报
+④ 真实闸    verdict=clean  FAKE=0
+⑤ 上下文守卫 填充 84% · near_overflow
+⑥ 嘴        via=edge-tts-zhTW  played=True
+```
+
+六步都在活路径上，不是各自跑通。
+
+### 顺手排掉的一个误判：内存
+
+先前看到「只剩 156 MB → 服务被 OOM 杀」，怀疑有进程泄漏。
+查 `/proc/<pid>/stat` 第 4 字段：`model_bridge` / `a19_stub` / `panel_server`
+**ps 列出的多份全是线程（ppid 指向同一真进程），不是重复进程**。
+再读 meminfo：`MemFree` 已回 1.1 GB。
+
+⇒ **不是泄漏，是我跑重活（验收 + 孤儿审计子进程）时的瞬时峰。**
+iSH 不报 `Cached/AnonPages/RSS`，所以量不出是谁吃的 —— 这一条如实记，不编。
+
+### 孤儿进度
+```
+32 → 33（truth_scan）→ 34（dh_asset_gate）→ 36（answer_shaper）
+```
+按域最刺眼仍是：`creation 1/54` · `security 1/29` · `recon 0/17`。
+
+---
