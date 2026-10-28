@@ -401,6 +401,8 @@ print(r.choices[0].message.content)
 | **合计** | **348** | **269** | **79** | — |
 
 > **全量逐位说明**：[`docs/03-capabilities.md`](docs/03-capabilities.md)（30 个域，每域一页，含"它做什么 / 只读还是需授权 / 要不要参数"）。
+>
+> **专业级开源文档**：[`docs/native-capabilities/`](docs/native-capabilities/README.md) —— 按能力域独立成篇，每篇含**架构设计 · 能力清单 · API 参考 · 使用示例 · 安全边界 · 实现原理 · 性能基线**，共 25 篇 + 全量索引 [`00-INDEX.md`](docs/native-capabilities/00-INDEX.md)。
 
 **读法**：`只读` = 不改状态、不出网，随便调；`需授权` = 会写盘、花钱或把数据发到外部，**必须先由人发一张时段授权票**。
 
