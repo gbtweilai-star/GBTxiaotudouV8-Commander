@@ -1,21 +1,39 @@
-# 24 · 数字人 (`digital_human`)
+# 24 · 数字人 (`digital_human` / `dh_*` / `body_*`)
 
-> 5+ 能力位 · 全身线 · 微动 · 云库 · GPU渲染
+> 12 能力位（横切 3 个域）· 以图生视频 · 姿态 · 真实感 · 身体桥
+>
+> ⚠️ **口径更正（2026-10-28 按注册表现读）**：本文旧版写了 `dh_rig` 与 `body_bridge`
+> 两个能力位名。**注册表里没有这两个名字**——真名是 `dh_asset_gate`，以及
+> `body_see/say/click/type/open/volume/map` 七位（域 `device`）。
+> 按旧名调用只会得到 `unknown capability`。
+> 核验：`python docs/native-capabilities/verify_cap.py domain video`
 >
 > 开发者：自由的风 · 本署名不可删除、不可篡改归属
 
 ---
 
-## 能力清单
+## 能力清单（逐位，取自注册表）
 
-| 能力位 | 说明 |
-|---|---|
-| `digital_human` | 数字人主控（形象/动作/口型/表情） |
-| `dh_brain` | 数字人脑（对话/情绪/记忆） |
-| `dh_pose` | 姿态驱动 |
-| `dh_rig` | 骨骼绑定 |
-| `body_bridge` | 身体桥接（动作传输） |
-| `dh_realism` | 真实感增强 |
+| 能力位 | 域 | 类型 | 说明 |
+|---|---|---|---|
+| `digital_human` | `video` | 只读 | 数字人「以图生视频」（本地 SadTalker，零账号/零验证）：**一张照片 + 一段配音 ⇒ 带头部动作与口型同步的成片** |
+| `dh_brain` | `creation` | 只读 | 数字人脑（对话/情绪/记忆） |
+| `dh_pose` | `creation` | 只读 | 姿态驱动（微动/重心/呼吸） |
+| `dh_realism` | `creation` | 只读 | 真实感增强 |
+| `dh_asset_gate` | `creation` | 只读 | 数字人资产门（形象/动作/贴图的准入判据） |
+| `body_see` | `device` | 只读 | 身体·看：截当前屏幕落 png |
+| `body_say` | `device` | 只读 | 身体·说：系统 TTS 念一句 |
+| `body_click` | `device` | 只读 | 身体·点：按坐标点按 |
+| `body_type` | `device` | 只读 | 身体·打字：向前台窗口键入文本 |
+| `body_open` | `device` | 只读 | 身体·打开：系统默认程序打开文件/网址 |
+| `body_volume` | `device` | 只读 | 身体·音量：读或设主音量 |
+| `body_map` | `device` | 只读 | 身体·清单：现读本机七根感官与六根动作 |
+
+> **`body_*` 七位为什么算进数字人篇**：数字人要"活着"，就得能看、能说、能动手。
+> 这七位是她的**身体**；`digital_human` 是她的**脸和口型**；`dh_*` 是她的**动作与质感**。
+> 三者合起来才是一个完整的"人"。
+
+---
 
 ## 技术栈
 
@@ -89,14 +107,44 @@ result = gbt.run_task("dh_pose", {
 })
 ```
 
-### 骨骼绑定
+### 资产准入（dh_asset_gate）
 
 ```python
-result = gbt.run_task("dh_rig", {
-    "op": "bind",
+result = gbt.run_task("dh_asset_gate", {
+    "op": "check",
     "model": "avatar.glb"
 })
-# 返回: {ok, bones: 40, rig_type: "humanoid"}
+# 返回: {ok, bones: 40, rig_type: "humanoid", textures_ok: true, passed: true}
+```
+
+**为什么先过资产门**：形象/动作/贴图不合格就进渲染，出来的是废片。
+准入判据放在**渲染之前**，不是渲染之后。
+
+### 真实感增强（dh_realism）
+
+```python
+result = gbt.run_task("dh_realism", {
+    "op": "enhance",
+    "src": "raw.mp4",
+    "out": "enhanced.mp4"
+})
+```
+
+### 身体七位（body_*）
+
+```python
+# 先问清楚本机有什么
+gbt.run_task("body_map", {})
+
+# 看 / 说 / 音量
+gbt.run_task("body_see", {"monitor": 1})
+gbt.run_task("body_say", {"text": "大家好，我是GBT小土豆V8", "rate": 1.0})
+gbt.run_task("body_volume", {"level": 0.6})
+
+# 点 / 打字 / 打开
+gbt.run_task("body_click", {"x": 960, "y": 540, "clicks": 1})
+gbt.run_task("body_type", {"text": "hello"})
+gbt.run_task("body_open", {"target": "https://example.com"})
 ```
 
 ## 资产规格

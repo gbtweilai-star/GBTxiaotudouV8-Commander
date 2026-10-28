@@ -1,95 +1,109 @@
-# 原生能力全量清单 · 30 域 / 348+ 能力位
+# 原生能力全量索引 · 30 域 / 348 能力位
 
-> 本文是 GBT小土豆V8 全部原生能力的**权威索引**，逐域列出能力位与对应专业文档。
+> 本文是 GBT小土豆V8 全部原生能力的**权威索引**。
+>
+> **所有数字都是现算的，不是手写的**：跑
+> `python docs/native-capabilities/verify_cap.py stats`
+> 得到的就是下面这张表。手写的数字会腐烂——2026-10-28 这一版就是把上一版手写错的
+> 数字（"30 域"写成"31 域"、若干域位数写错）全部按注册表重算后改回来的。
 >
 > 开发者：自由的风 · 本署名不可删除、不可篡改归属
 
 ---
 
-## 能力位总数统计
+## 域统计（现算 · 数据源 `gbt_allinone/caps_registry.py`）
 
-| 域 | 能力位数 | 专业文档 |
-|---|---|---|
-| `system` | 51 | [01-system-data.md](01-system-data.md) |
-| `data` | 12 | [01-system-data.md](01-system-data.md) |
-| `engine` | 12 | [02-engine.md](02-engine.md) |
-| `pipeline` | 8 | [05-pipeline.md](05-pipeline.md) |
-| `mirror` | 10 | [03-mirror-space.md](03-mirror-space.md) |
-| `room` | 19 | [04-room-space.md](04-room-space.md) |
-| `llm` | 15 | [08-llm-gateway.md](08-llm-gateway.md) |
-| `brain` | 5 | [06-brain-exec.md](06-brain-exec.md) |
-| `tentacle` | 66 | [09-tentacle.md](09-tentacle.md) |
-| `security` | 9 | [10-security.md](10-security.md) |
-| `devour` | 4 | [11-devour.md](11-devour.md) |
-| `mind` | 1 | [12-mind-engine.md](12-mind-engine.md) |
-| `longrun` | 3 | [13-longrun.md](13-longrun.md) |
-| `recon` | 7 | [14-recon.md](14-recon.md) |
-| `device` | 2 | [15-device.md](15-device.md) |
-| `vision` | 9 | [16-vision.md](16-vision.md) |
-| `voice` | 8 | [17-voice.md](17-voice.md) |
-| `browser` | 5 | [18-browser.md](18-browser.md) |
-| `finance` | 6 | [19-finance.md](19-finance.md) |
-| `auth` | 1 | [20-auth-gate.md](20-auth-gate.md) |
-| `vault` | 1 | [21-brain-vault.md](21-brain-vault.md) |
-| `record` | 1 | [22-record-grid.md](22-record-grid.md) |
-| `deploy` | 6 | [23-deployment.md](23-deployment.md) |
-| `digital_human` | 6 | [24-digital-human.md](24-digital-human.md) |
-| `creation` | 12 | [25-creation.md](25-creation.md) |
-| 其他域 | 60+ | 见 `docs/capabilities/` |
+| 域 | 位数 | 只读 | 需授权 | 域级文档 |
+|---|---:|---:|---:|---|
+| `creation` | 54 | 32 | 22 | [25-creation.md](25-creation.md) |
+| `system` | 51 | 46 | 5 | [01-system-data.md](01-system-data.md) |
+| `llm` | 41 | 33 | 8 | [08-llm-gateway.md](08-llm-gateway.md) |
+| `security` | 29 | 20 | 9 | [10-security.md](10-security.md) |
+| `mind` | 19 | 18 | 1 | [12-mind-engine.md](12-mind-engine.md) |
+| `pipeline` | 18 | 18 | 0 | [05-pipeline.md](05-pipeline.md) |
+| `tentacle` | 18 | 13 | 5 | [09-tentacle.md](09-tentacle.md) |
+| `recon` | 17 | 11 | 6 | [14-recon.md](14-recon.md) |
+| `video` | 14 | 5 | 9 | [26-video-media.md](26-video-media.md) |
+| `data` | 12 | 9 | 3 | [01-system-data.md](01-system-data.md) |
+| `engine` | 10 | 9 | 1 | [02-engine.md](02-engine.md) |
+| `device` | 9 | 9 | 0 | [15-device.md](15-device.md) |
+| `tools` | 9 | 7 | 2 | [27-tools.md](27-tools.md) |
+| `integration` | 7 | 3 | 4 | [28-integration.md](28-integration.md) |
+| `devour` | 5 | 5 | 0 | [11-devour.md](11-devour.md) |
+| `vision` | 5 | 4 | 1 | [16-vision.md](16-vision.md) |
+| `finance` | 4 | 4 | 0 | [19-finance.md](19-finance.md) |
+| `longrun` | 4 | 4 | 0 | [13-longrun.md](13-longrun.md) |
+| `voice` | 4 | 4 | 0 | [17-voice.md](17-voice.md) |
+| `automation` | 2 | 1 | 1 | [18-browser.md](18-browser.md) |
+| `brain` | 2 | 2 | 0 | [06-brain-exec.md](06-brain-exec.md) |
+| `collab` | 2 | 1 | 1 | [28-integration.md](28-integration.md) |
+| `desktop` | 2 | 1 | 1 | [09-tentacle.md](09-tentacle.md) |
+| `infra` | 2 | 2 | 0 | [23-deployment.md](23-deployment.md) |
+| `project` | 2 | 2 | 0 | [19-finance.md](19-finance.md) |
+| `social` | 2 | 2 | 0 | [28-integration.md](28-integration.md) |
+| `comms` | 1 | 1 | 0 | [28-integration.md](28-integration.md) |
+| `framework` | 1 | 1 | 0 | [01-system-data.md](01-system-data.md) |
+| `image_video` | 1 | 1 | 0 | [26-video-media.md](26-video-media.md) |
+| `life` | 1 | 1 | 0 | [12-mind-engine.md](12-mind-engine.md) |
+| **合计** | **348** | **269** | **79** | — |
 
-**合计：348+ 能力位 / 30 域**
+**读法**：`只读` = 不改状态、不出网，随便调；`需授权` = 会写盘、花钱或把数据发到外部，**必须先由人发一张票**。
 
 ---
 
-## 全部能力位速查
+## 25 篇专业文档
 
-### 系统 / 数据（system / data）
+| 编号 | 文档 | 覆盖 |
+|---|---|---|
+| — | [README.md](README.md) | 总纲（架构图 + 设计原则 + 索引） |
+| 00 | [00-INDEX.md](00-INDEX.md) | 本文（全量索引） |
+| 01 | [01-system-data.md](01-system-data.md) | `system` · `data` · `framework`（体检层/审计层/卫生层） |
+| 02 | [02-engine.md](02-engine.md) | `engine`（DAG / 传输算子 / 条件分流 / 缓存） |
+| 03 | [03-mirror-space.md](03-mirror-space.md) | `mirror_*` 十位（成形/体检/晋升/回滚） |
+| 04 | [04-room-space.md](04-room-space.md) | `room_space`（1 位 · 16 op） |
+| 05 | [05-pipeline.md](05-pipeline.md) | `pipeline`（唯一交付通道 / 三阶段 / 版本化） |
+| 06 | [06-brain-exec.md](06-brain-exec.md) | `brain`（route→execute→verify→health） |
+| 07 | [07-think-loop.md](07-think-loop.md) | `think_loop`（完整心智循环七步） |
+| 08 | [08-llm-gateway.md](08-llm-gateway.md) | `llm`（密钥链 / 自主编排 / 多模态端口） |
+| 09 | [09-tentacle.md](09-tentacle.md) | `tentacle` · `desktop`（三通道感官 / 六铁律 / MCP） |
+| 10 | [10-security.md](10-security.md) | `security`（25 条检测 / 红蓝双模） |
+| 11 | [11-devour.md](11-devour.md) | `devour`（吞噬→反思→消化→重组→进化） |
+| 12 | [12-mind-engine.md](12-mind-engine.md) | `mind` · `life`（12 情绪维 / 8 需求维） |
+| 13 | [13-longrun.md](13-longrun.md) | `longrun`（非 LLM 机械验收 / 跨进程可续） |
+| 14 | [14-recon.md](14-recon.md) | `recon`（OSINT 七维 / 知识图谱 / 技能蒸馏） |
+| 15 | [15-device.md](15-device.md) | `device`（蓝牙 BLE + 身体桥七位） |
+| 16 | [16-vision.md](16-vision.md) | `vision`（感知指纹 / 变化定位 / 流回放） |
+| 17 | [17-voice.md](17-voice.md) | `voice`（TTS / ASR / 管弦乐 / WASAPI） |
+| 18 | [18-browser.md](18-browser.md) | `automation` + 穿透网 / 自适应抓取 / 逐页扫 |
+| 19 | [19-finance.md](19-finance.md) | `finance` · `project`（策略 / 回测 / 压缩直达） |
+| 20 | [20-auth-gate.md](20-auth-gate.md) | `auth_gate_status`（15 作用域 / 三道护栏） |
+| 21 | [21-brain-vault.md](21-brain-vault.md) | `brain_vault`（追加式 / 无删除路径） |
+| 22 | [22-record-grid.md](22-record-grid.md) | `record_grid`（七路转接 / 回写自证） |
+| 23 | [23-deployment.md](23-deployment.md) | `pipeline` 部署子集 · `infra`（一键部署 / 接管队列） |
+| 24 | [24-digital-human.md](24-digital-human.md) | `digital_human` · `dh_*` · `body_*`（12 位） |
+| 25 | [25-creation.md](25-creation.md) | `creation`（镜头导演 / 节点即触手 / 作品解剖） |
+| 26 | [26-video-media.md](26-video-media.md) | `video` · `image_video`（剪辑 / 音频 / 许可 / 钢印） |
+| 27 | [27-tools.md](27-tools.md) | `tools`（改代码唯一过门入口 / 版本库读写） |
+| 28 | [28-integration.md](28-integration.md) | `integration` · `collab` · `social` · `comms`（12 位） |
 
-`health` `echo` `count_words` `audit_query` `selfscan` `alerts` `readiness` `truth_scan` `root_fix` `cross_scan` `inventory` `signature_guard` `file_hygiene` `auth_gate_status` `action_gate` `agent_console` `agent_control` `agent_rig` `answer_shaper` `asset_index` `cap_tags` `caps_called_audit` `console_hub` `context_vault` `coverage_auditor` `delivery_gate` `detail_habit` `energy_pool` `figure_gate` `god_view` `gods_eye` `growth_hooks` `handoff` `hook_registry` `impact_check` `ledger_note` `orchestration_kernel` `page_scan` `project_drift` `room_space` `scan_cap` `shared_resources` `skill_watch` `slim_profile` `spend_guard` `surface_bind` `task_manager` `tentacle_arm` `tentacle_bind` `tentacle_cognition` `theme_cap` `trace_store` `ux_doctrine` `wave_probe` `welcome` `record_grid` `chart_html` `humanizer` `skill_finder`
+---
 
-### 万能插引擎（engine）
+## 怎么自己核对（三步）
 
-`wf_define` `wf_run` `wf_status` `wf_resume` `wf_cache_clear` `transfer` `sched_define` `sched_tick` `sched_status` `workflow_forge`
+```bash
+# 1) 看某一位的真实登记
+python docs/native-capabilities/verify_cap.py show mirror_ascend
 
-### 镜像 / 房间 / 管线（pipeline）
+# 2) 看某域全部能力位
+python docs/native-capabilities/verify_cap.py domain security
 
-`mirror_shape` `mirror_scan` `mirror_plan` `mirror_simulate` `mirror_parity` `mirror_rehearse` `mirror_release` `mirror_ascend` `mirror_status` `mirror_rewind` `pipeline_submit` `pipeline_versions` `pipeline_rollback` `pipeline_status` `one_key_deploy` `deploy_queue` `ghost_guard` `svc_inspect` `room_create` `room_enter` `room_shape` `room_scan` `room_observe` `room_frame` `room_snapshot` `room_replay` `room_plan` `room_simulate` `room_parity` `room_rehearse` `room_gate` `room_release` `room_sync` `room_status` `room_namespace` `room_registry` `room_resolve`
+# 3) 逐位对账：每个能力位是否都指得到一篇存在的文档
+python docs/native-capabilities/verify_cap.py check
+```
 
-### LLM / 大脑（llm / brain）
+**当前对账结果**：`348/348 位有文档 · 0 域无域级文档 · 0 条不过`
 
-`llm_chat` `llm_status` `cloud_llm` `autopilot` `brain_route` `brain_execute` `brain_verify` `brain_health` `brain_unify` `think_loop` `key_gateway` `multimodal_port` `genoffice_bridge` `codex_chat` `codex_status` `codex_tools` `codex_thread_new` `codex_turn_send` `codex_interrupt` `codex_models` `train_ground` `quant_plan` `llm_redteam` `responses_bridge`
-
-### 触手（tentacle）
-
-`tentacle` `tentacle_manifest` `tentacle_status` `tentacle_equip` `tentacle_learn` `tool_bay` `desktop_commander` `remote_confinement` `mcp_connect` `mcp_tools` `mcp_call`
-
-### 安全（security）
-
-`sec_surface` `sec_scan` `sec_chain` `sec_defenses` `sec_llm` `scan_cap` `offense_ops` `sec_sweeper` `pentest_distill`
-
-### 进化 / 心智 / 长程（devour / mind / longrun）
-
-`devour_github` `devour_scan` `devour_reflect` `devour_pulse` `mind_engine` `lr_submit` `lr_tick` `lr_status` `tactics_advise`
-
-### 侦察（recon）
-
-`osint_scan` `spider_ops` `know_map` `skill_forge` `book_skill` `recon_distill` `arxiv`
-
-### 感知（vision / voice / browser / device）
-
-`vision` `vision_snapshot` `vision_diff` `vision_stream_record` `vision_stream_replay` `vision_ocr` `vision_grounding` `vision_print` `vision_probe` `voice` `voice_studio` `voice_orchestra` `hf_voice` `audio_extract` `audio_mix` `silero_vad` `wasapi_loop` `browser` `native_browser` `omni_web` `scrapling_cap` `bluetooth` `bt_control`
-
-### 金融（finance）
-
-`quant_strategy` `quant_backtest` `quant_params` `platform_profile` `quant` `quant_plan`
-
-### 部署 / 数字人 / 创作
-
-`one_key_deploy` `deploy_queue` `svc_inspect` `ghost_guard` `digital_human` `dh_brain` `dh_pose` `dh_rig` `body_bridge` `dh_realism` `shot_director` `forge_mastery` `comfy_native` `comfy_forge` `showcase_ops` `music_auto` `art_brief` `art_chain` `a1art_skill` `filmkit_cap` `drama` `brand_outro`
-
-### 记忆 / 记录 / 授权
-
-`brain_vault` `record_grid` `auth_gate_status` `ledger_note` `context_vault` `memory_bank` `memory_manager`
+对账脚本只读 AST，**不 import 包、不执行任何能力**——可以放心在 CI 里跑。
 
 ---
 
@@ -98,7 +112,7 @@
 ```python
 import gbt_allinone as gbt
 
-# 查看全部能力
+# 列出全部可调能力
 caps = gbt.list_capabilities()
 
 # 调用任意能力
@@ -107,12 +121,12 @@ result = gbt.run_task("<能力位名>", {<参数>})
 
 ---
 
-## 安全边界
+## 安全边界（只禁一小撮，无绕过入口）
 
-框架只禁一小撮危险行为，无绕过入口：
+按名禁用的危险行为（返回 `denied`，无执行路径）：
 
 - 付费墙绕过
-- 会话/数据劫持
+- 会话 / 数据劫持
 - 无授权远程接管
 - 键鼠监控
 - 屏幕窃取
@@ -123,5 +137,19 @@ result = gbt.run_task("<能力位名>", {<参数>})
 - 社工钓鱼
 
 > 拒绝的永远只是**具体行为的风险**，不是这个人：说清为什么不行，再给出怎样才行。
+
+---
+
+## 口径更正记录（诚实账）
+
+| 日期 | 旧说法 | 现读事实 |
+|---|---|---|
+| 2026-10-28 | "30 域 / 348+ 能力位"（手写） | **30 域 / 348 位**（现算）；`+` 号去掉，因为没有第 349 位 |
+| 2026-10-28 | `room_space` 是 19 个能力位 | **1 个能力位 + 16 个 op** |
+| 2026-10-28 | `native_browser` / `scrapling_cap` | 真名 `browser` / `scrapling` |
+| 2026-10-28 | `dh_rig` / `body_bridge` | 真名 `dh_asset_gate` / `body_*` 七位 |
+| 2026-10-28 | `device` 域 2 位 | **9 位**（含 `body_*` 七位） |
+
+> 这些更正全部由 `verify_cap.py check` 抓出。**工具抓出来的错，比自己读三遍都可靠。**
 
 > 开发者：自由的风 · GBT小土豆V8 · 独立私人框架，与任何企业公司无关

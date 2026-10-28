@@ -72,7 +72,7 @@ _MAX_TEXT = 280          # 单条文本上限
 import gbt_allinone as gbt
 
 # 心智状态
-result = gbt.run_task("mind_engine", {"op": "state"})
+result = gbt.run_task("mind", {"op": "state"})
 # 返回: {
 #   ok, emotions: {joy: 0.42, trust: 0.58, ...},
 #   needs: {safety: 0.70, connection: 0.40, ...},
@@ -81,21 +81,21 @@ result = gbt.run_task("mind_engine", {"op": "state"})
 # }
 
 # 感知事件
-gbt.run_task("mind_engine", {
+gbt.run_task("mind", {
     "op": "perceive",
     "event": "task_completed",
     "meta": {"quality": 0.9}
 })
 
 # 预演方案
-result = gbt.run_task("mind_engine", {
+result = gbt.run_task("mind", {
     "op": "rehearse",
     "options": ["方案A", "方案B"]
 })
 # 返回: {ok, scored: [{option: "方案A", score: 0.8, risk: 0.2}]}
 
 # 反思
-result = gbt.run_task("mind_engine", {"op": "reflect"})
+result = gbt.run_task("mind", {"op": "reflect"})
 # 返回: {ok, lessons: [...], updated_values: {...}}
 ```
 

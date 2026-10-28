@@ -1,6 +1,6 @@
 # 15 · 设备控制 (`device`)
 
-> 2 能力位 · 蓝牙BLE扫描 · GATT读写 · 智能家居操控
+> 9 能力位 · 七根身体感官 + 六根身体动作 + 蓝牙 BLE
 >
 > 自然语言意图 → 识别 → 协议匹配 → 执行 → 验证
 >
@@ -8,12 +8,31 @@
 
 ---
 
-## 能力清单
+## 能力清单（逐位，取自注册表 · 全部只读）
+
+### 蓝牙（2 位）
 
 | 能力位 | 说明 |
 |---|---|
-| `bluetooth` | 蓝牙设备控制：扫描BLE、读写GATT、操控家居设备 |
-| `bt_control` | AI智能蓝牙操控：自然语言意图→识别→协议匹配→执行→验证 |
+| `bluetooth` | 蓝牙设备控制：扫描附近 BLE 设备、连接读写 GATT 特征（操控空调/灯/音箱等家居设备）、经典蓝牙状态报告 |
+| `bt_control` | AI 智能蓝牙操控：自然语言意图→扫描识别设备→协议匹配→组装指令→写入执行→验证（协议库只收公开文档协议，未知如实报告） |
+
+### 身体桥（7 位 · `body_*`）
+
+| 能力位 | 参数 | 说明 |
+|---|---|---|
+| `body_map` | — | 身体·清单：现读这台设备的**七根感官与六根动作**（零作用域，只读） |
+| `body_see` | `monitor`（可选） | 身体·看：截当前屏幕落 png |
+| `body_say` | `text` · `rate`（可选） | 身体·说：系统 TTS 念一句 |
+| `body_click` | `x` · `y` · `clicks` | 身体·点：按坐标点按 |
+| `body_type` | `text` | 身体·打字：向前台窗口键入文本 |
+| `body_open` | `target` | 身体·打开：用系统默认程序打开文件/网址 |
+| `body_volume` | `level` 0~1（不传则只读） | 身体·音量：读或设主音量 |
+
+> **七根感官 + 六根动作**：`body_map` 是这一族的"自知"入口——先问清楚这台机器
+> 有哪些感官和动作，再谈操控。**不知道有什么，就不该乱动。**
+
+---
 
 ## 架构设计
 
@@ -119,6 +138,68 @@ pip install pybluez  # Windows传统蓝牙
 
 缺失时如实报 `needs_dependency`，不静默失败。
 
+---
+
+## 身体桥用法（`body_*` 七位）
+
+### 先问清楚有什么
+
+```python
+import gbt_allinone as gbt
+
+result = gbt.run_task("body_map", {})
+# 返回: {
+#   ok,
+#   senses: ["see", "say", "volume", ...],   # 七根感官
+#   actions: ["click", "type", "open", ...], # 六根动作
+#   platform: "win32"
+# }
+```
+
+**这是这一族的入口**：先 `body_map` 拿到本机真实清单，再按清单动手。
+
+### 看 / 说 / 听
+
+```python
+# 看：截屏
+gbt.run_task("body_see", {"monitor": 1})
+# 返回: {ok, path: "store/frames/xxx.png"}
+
+# 说：系统 TTS
+gbt.run_task("body_say", {"text": "任务完成了", "rate": 1.0})
+
+# 音量：读或设
+gbt.run_task("body_volume", {})              # 只读
+gbt.run_task("body_volume", {"level": 0.4})  # 设置
+```
+
+### 动：点 / 打字 / 打开
+
+```python
+# 点：按坐标
+gbt.run_task("body_click", {"x": 960, "y": 540, "clicks": 1})
+
+# 打字：向前台窗口
+gbt.run_task("body_type", {"text": "hello"})
+
+# 打开：系统默认程序
+gbt.run_task("body_open", {"target": "https://example.com"})
+gbt.run_task("body_open", {"target": "C:/path/to/file.pdf"})
+```
+
+### 与触手的区别
+
+| 维度 | `body_*`（身体桥） | `tentacle`（触手） |
+|---|---|---|
+| 粒度 | 粗（坐标级/系统级） | 细（UIA 元素级） |
+| 依赖 | 零依赖（纯系统 API） | 需 uiautomation / dxcam |
+| 定位 | 保底通路 | 主通路 |
+| 典型场景 | 系统级动作（音量/打开/TTS） | 界面元素操作 |
+
+**选路原则**：能走触手就走触手（更精确）；触手不可用或只需系统级动作时走身体桥。
+
+---
+
 ## 安全边界
 
 | 作用域 | 覆盖 |
@@ -129,5 +210,6 @@ pip install pybluez  # Windows传统蓝牙
 - 只操作已配对或用户明确指定的设备
 - 写操作前读回确认当前状态
 - 不改设备固件、不做未授权的配对
+- `body_*` 七位在注册表里标**只读**（零作用域），但**动作本身会改屏幕/音量/前台窗口**——纪律靠"先 `body_map` 再动手"这条守，不靠门
 
 > 开发者：自由的风 · GBT小土豆V8 · 独立私人框架，与任何企业公司无关
