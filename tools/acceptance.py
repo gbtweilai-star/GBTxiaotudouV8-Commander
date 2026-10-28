@@ -240,6 +240,25 @@ def sec_h() -> None:
         rec("INFO", "巡检已跑轮次", "%d 轮" % len(rows))
 
 
+# ── I 孤儿审计（能力实现好了有没有人接）─────────────────────────────────────
+#   🔴 2026-10-28：这一场里我反复"实现了不接"（ring_context / context_guard / src=）。
+#   靠人盯不住，加这一段：每次验收都量一次"活接线 / 孤儿"。
+#   孤儿 ≠ 坏（有的位就是给 run_task 外部直调的），但**这个数字必须被看见**。
+def sec_i() -> None:
+    print("\n── I 孤儿审计 ──")
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "orphan_audit.py")],
+                       capture_output=True, text=True, timeout=300, cwd=str(ROOT))
+        d = json.loads((ROOT / "state" / "orphan_audit.json").read_text(encoding="utf-8"))
+        tot = d.get("total") or 0
+        w = len(d.get("wired") or [])
+        orp = len(d.get("orphan") or [])
+        rec("INFO", "孤儿审计", "活接线 %d / %d · 孤儿 %d（可调但活路径没人调）" % (w, tot, orp))
+        rec("PASS" if w >= 25 else "FAIL", "活接线数量不下滑", "%d 位（下限 25）" % w)
+    except Exception as e:                                    # noqa: BLE001
+        rec("ENV", "孤儿审计", "跑不起来：%s" % type(e).__name__)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
@@ -257,6 +276,9 @@ def main() -> int:
                 fn()
             except Exception as exc:                          # noqa: BLE001
                 rec("FAIL", fn.__name__, "%s: %s" % (type(exc).__name__, str(exc)[:60]))
+    # 孤儿审计放在汇总**之前**跑 —— 否则它记的 PASS/INFO 进不了总数（实测踩到）
+    sec_i()
+
     from collections import Counter
     c = Counter(s for s, _, _ in RESULTS)
     print("\n═══ 汇总 · 用时 %.1fs ═══" % (time.time() - t0))
