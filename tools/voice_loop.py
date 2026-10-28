@@ -88,6 +88,23 @@ def log(rec: dict) -> None:
 
 
 # ── ② 脑：A19 优先，按序试多条传输 ─────────────────────────────────────────
+def truth_gate(answer: str) -> dict:
+    """说话前过一道真实性闸（truth_scan / read-only）。
+
+    为什么接这个：`truth_scan` 一直是孤儿 —— 它能查"有没有假执行"，
+    但没人调它。而她说话这条链最怕的正是**说了没做的事**。
+    这里在"脑已答、嘴未出声"之间插一道，命中就不装作说了。
+    """
+    try:
+        from gbt_allinone.api import run_task
+        r = run_task("truth_scan", {})
+        res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
+        return {"ok": res.get("verdict") in (None, "clean"), "verdict": res.get("verdict"),
+                "FAKE": res.get("FAKE"), "detail": str(res.get("FAKE_detail") or "")[:80]}
+    except Exception as exc:                                  # noqa: BLE001
+        return {"ok": True, "verdict": "unavailable", "why": type(exc).__name__}
+
+
 def ctx_guard(budget: int = 0) -> dict:
     """每问跑一次上下文守卫：异常 → 主脑入队 → 大脑排布 → 确定性纠正 → 回主线。
 
