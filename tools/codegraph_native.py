@@ -190,8 +190,11 @@ def query(name: str, limit: int = 6) -> dict:
                 snippet = "\n".join(ls[max(0, line - 1): line + 7])
             except OSError:
                 pass
-        callers = [r[0] for r in c.execute(
-            "select distinct src from edges where dst=? limit 8", (nm,)).fetchall()]
+        # 调用方带**文件:行号** —— 只给名字等于没给定位（实测她自己也说"没给更细的路径"）
+        callers = ["%s @ %s:%s" % (r[0], r[1], r[2]) for r in c.execute(
+            "select distinct src, file, line from edges where dst=? "
+            "and file not like '%vendor/%' and file not like '%_archive%' "
+            "order by file limit 8", (nm,)).fetchall()]
         callees = [r[0] for r in c.execute(
             "select distinct dst from edges where src=? and kind!='import' limit 12",
             (nm,)).fetchall()]
