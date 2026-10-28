@@ -106,9 +106,22 @@ class Pulse:
                 # 2026-10-17 主人令「万能插只要插到其他 AI 都可直接输送能源操控她」：
                 #   AI 插座只认 **https** 端点（OpenAI 兼容）；钥匙槽在 options.key_env，缺就自动探常见槽位。
                 t = str(socket.target or "").strip()
-                if not t.startswith("https://"):
+                # 🔴 2026-10-28：原来只认 https，**把本机回环端点误伤了**。
+                #   实测插 A19（LM Pocket）时被这条挡死：
+                #     "AI 插座只认 https 端点（给的是 http://127.0.0.1:1234/v1）"
+                #   而回环地址天生就是 http —— 它物理上出不了本机，没有中间人可插。
+                #   主人令「万能插只要插到其他 AI 都可直接输送能源操控她」，
+                #   **本机自己的模型恰恰是最该插的那一个**。
+                #   处置：https 照旧；http 仅放行回环（127.0.0.0/8 · ::1 · localhost）。
+                _loopback = False
+                if t.startswith("http://"):
+                    _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
+                    _loopback = (_h in ("localhost", "::1", "0.0.0.0")
+                                 or _h.startswith("127."))
+                if not (t.startswith("https://") or _loopback):
                     socket.state = "failed"
-                    socket.detail = "AI 插座只认 https 端点（给的是 %s）" % (t[:60] or "空")
+                    socket.detail = ("AI 插座只认 https 或本机回环 http（给的是 %s）"
+                                     % (t[:60] or "空"))
                 else:
                     host = (t.split("/")[2] if "//" in t else t)[:60]
                     socket.state = "plugged"
@@ -218,8 +231,14 @@ def _ai_call(target: str, a: dict, timeout: float = 90.0) -> dict:
     import urllib.error
 
     t = str(target or "").strip()
-    if not t.startswith("https://"):
-        return {"ok": False, "reason": "AI 插座只认 https 端点"}
+    # 🔴 2026-10-28：与 plug 那道门保持一致 —— http 放行本机回环。
+    #   两处必须同步，否则会出现"A 说插上了、B 说不行"的自相矛盾（实测踩到）。
+    _lb = False
+    if t.startswith("http://"):
+        _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
+        _lb = (_h in ("localhost", "::1", "0.0.0.0") or _h.startswith("127."))
+    if not (t.startswith("https://") or _lb):
+        return {"ok": False, "reason": "AI 插座只认 https 或本机回环 http"}
     base = t.rstrip("/")
     url = base if base.endswith("/chat/completions") else (base + "/chat/completions")
     slots = ([str(a.get("key_env"))] if a.get("key_env") else
