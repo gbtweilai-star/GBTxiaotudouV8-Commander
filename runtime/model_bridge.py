@@ -440,6 +440,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):                                        # noqa: N802
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
+                 "/v1/recall",
                  "/voice/speak", "/voice/status")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -481,6 +482,20 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as _e:                           # noqa: BLE001
                 out["url_err"] = type(_e).__name__
             return self._json(200 if out.get("ok") else 500, out)
+
+        # 被分页挤出的话，随时可捞回来（这是"溢出不丢"的兑现口）
+        if self.path.startswith("/v1/recall"):
+            q = str(body.get("query") or body.get("q") or "")
+            nm = str(body.get("name") or "bridge-default")
+            try:
+                sys.path.insert(0, str(ROOT))
+                from gbt_allinone.llm.ring_context import RingContext as _RC
+                _rc = _RC(name=nm)
+                return self._json(200, _rc.recall(q, int(body.get("k") or 5)))
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(500, {"ok": False,
+                                        "error": {"message": "%s: %s" %
+                                                  (type(exc).__name__, str(exc)[:120])}})
 
         if self.path.startswith("/voice/status"):
             try:
@@ -525,6 +540,39 @@ class Handler(BaseHTTPRequestHandler):
         if name not in UPSTREAMS:
             return self._json(400, {"error": {"message": "不认的上游：%s（可选 %s）"
                                               % (name, ",".join(UPSTREAMS))}})
+        # ── 上下文分页（引擎外面补 KV 的硬账）────────────────────────────
+        # 🔴 2026-10-28：我们的权重 head_count_kv=4（GQA），ctx 原生 32768，
+        #   但手机侧实跑只有 4096 —— **KV 是引擎内部黑盒，插不进去**。
+        #   长对话的账只能在引擎外面补：超预算的旧消息逐条落 ring_context，
+        #   只把窗口内的发下去；被挤出的不删，随时可 /v1/recall 捞回。
+        try:
+            _msgs = body.get("messages")
+            if isinstance(_msgs, list) and _msgs:
+                _budget = int(body.pop("context_budget", 0) or 0) or 12000
+                _cname = str(body.pop("context_name", "") or "bridge-default")
+                _tot = sum(len(str(m.get("content") or ""))
+                           for m in _msgs if isinstance(m, dict))
+                if _tot > _budget:
+                    sys.path.insert(0, str(ROOT))
+                    from gbt_allinone.llm.ring_context import RingContext as _RC
+                    _rc = _RC(name=_cname, window_chars=_budget)
+                    for _m in _msgs:
+                        if isinstance(_m, dict):
+                            _rc.push(str(_m.get("role") or "user"),
+                                     str(_m.get("content") or ""))
+                    _win = _rc.window()
+                    if _win:
+                        body["messages"] = [
+                            {"role": str(w.get("role") or "user"),
+                             "content": str(w.get("content") or "")} for w in _win]
+                        _after = sum(len(str(w.get("content") or "")) for w in _win)
+                        sys.stderr.write(
+                            "[bridge] 分页 %d→%d 条 · %d→%d 字（会话 %s · 溢出可 recall）\n"
+                            % (len(_msgs), len(_win), _tot, _after, _cname))
+        except Exception as _pe:                              # noqa: BLE001
+            sys.stderr.write("[bridge] 分页跳过：%s\n" % type(_pe).__name__)
+
+
         stream = bool(body.get("stream"))
 
         # 降级链：**默认就开**，即使调用方显式点名了上游也照样降级。

@@ -330,6 +330,9 @@ async function calcNotes(text) {
     const r1 = await fetch(BRIDGE + "/v1/chat/completions", {
       method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
+        // 每段对话一个独立的分页会话；预算 12000 字（约 4096 token 的安全侧）
+        context_name: "model-chat",
+        context_budget: 12000,
         upstream: "selfhost", max_tokens: 24, temperature: 0,
         messages: [
           {role: "system", content: "把下面这道题写成一行算式，只输出算式本身（数字与 + - * / 括号），不要解释、不要算结果。"},
@@ -471,7 +474,12 @@ async function send() {
        它答「我叫本源台」（把自己的名字当答案），两轮更糟。
        所以默认**不带**，勾上「带上下文」才带（留给人自己试）。 */
     if (document.getElementById("usehist").checked) {
-      for (const m of history.slice(-4)) messages.push(m);
+      /* 🔴 2026-10-28：原来只带最后 4 条，且没有任何预算裁剪。
+   现在把**能带的都带上**，超预算由桥那边分页（ring_context）：
+     超出窗口的旧消息逐条落库，只把窗口内的发下去；被挤出的可 /v1/recall 捞回。
+   这不是"模型记不住就丢掉"，是"引擎外面补 KV 的硬账"（docs/31 §7.4）。
+   history 太长时页面侧仍设一个上限，避免把几十万字的请求塞爆连接。 */
+        for (const m of history.slice(-120)) messages.push(m);
     }
     /* 先用确定性的规则算（日历 / 计算器），算出来就把结果前置到用户消息里 */
     let prefix = weekdaySolve(text);
