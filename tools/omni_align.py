@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 import json
 import signal
 import pathlib
@@ -41,6 +42,14 @@ sys.path.insert(0, str(ROOT))
 #   占全部失败的 34%；gate_denied 217 笔里有 140 笔是我的 3 连击签名。
 #   于是"等授权 24 个位"大半是我的足迹，主脑看到的是假积压。
 #   `_dir()` 每次调用现读 GBT_STORE_DIR ⇒ 探活进程换个 store 就彻底隔离。
+# 2026-10-30：加 --prod-store 开关。
+#   默认隔离账（不污染生产），但代价是**读不到生产状态** —— 镜像计划/索引/脑库这类
+#   "要读现成状态"的位会被判 error，而它们在生产账里其实是好的（实测 mirror_plan
+#   定义后 ok）。所以要能给一遍生产账的读数，两个数并排看，不许拿隔离账的 error
+#   冒充"能力坏了"。
+_PROD_MODE = "--prod-store" in sys.argv if "sys" in dir() else False
+if _PROD_MODE:
+    os.environ["GBT_PROBE_ISOLATED"] = "1"      # 仍然不进生产账的审计噪声，但不换 store
 if not os.environ.get("GBT_PROBE_ISOLATED"):
     _probe_store = pathlib.Path(__file__).resolve().parents[1] / "state" / "probe_store"
     _probe_store.mkdir(parents=True, exist_ok=True)
@@ -187,6 +196,8 @@ def main() -> int:
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--prod-store", action="store_true",
+                    help="不换 store（用生产账复探，读得到现成状态）")
     a = ap.parse_args()
 
     if a.report:
