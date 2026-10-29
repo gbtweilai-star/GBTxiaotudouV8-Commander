@@ -51,6 +51,7 @@ LIVE_FILES = [
 #   仪器先得可信，否则量出来的数比不量更糟。
 LIVE_GLOBS = [
     # ── 我这几天新接的活路径工具（接了就登记，否则审计看不见）──
+    "tools/svc_guard.py",         # 服务守护：自愈 + 内存让位 + 记账
     "tools/devour_pipe.py",       # 吞噬流水线（取源→前闸→入库，幂等/可断点续）
     "tools/intake_gate.py",       # 吸收前闸：拆解/分析/跑通
     "tools/codegraph_native.py",   # 代码图谱：她查代码而不读代码
