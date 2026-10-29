@@ -1,0 +1,1072 @@
+[
+ {
+  "ok": false,
+  "why": "胶囊不存在：/var/minis/shared/gbtv8/gbt_allinone/store/devoured/agent信誉系统/absorbed_knowledge.md"
+ },
+ {
+  "ok": false,
+  "why": "胶囊不存在：/var/minis/shared/gbtv8/gbt_allinone/store/devoured/agent谈判协议/absorbed_knowledge.md"
+ },
+ {
+  "ok": true,
+  "capsule": "codegraph-代码图谱",
+  "verdict": "pass",
+  "claims": 27,
+  "proved_ok": 12,
+  "proved_bad": 0,
+  "unverifiable": 15,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · CodeGraph 代码图谱",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 23,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 78,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 134,
+    "kind": "url",
+    "text": "- `https://github.com/colbymchenry/codegraph`（2995 字符）",
+    "proved": true,
+    "detail": "https://github.com/colbymchenry/codegraph → HTTP 200"
+   },
+   {
+    "at": 189,
+    "kind": "url",
+    "text": "- `https://raw.githubusercontent.com/colbymchenry/codegraph/main/README.md`（61544 字符）",
+    "proved": true,
+    "detail": "https://raw.githubusercontent.com/colbymchenry/codegraph/mai → HTTP 200"
+   },
+   {
+    "at": 276,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 297,
+    "kind": "url",
+    "text": "### https://github.com/colbymchenry/codegraph",
+    "proved": true,
+    "detail": "https://github.com/colbymchenry/codegraph → HTTP 200"
+   },
+   {
+    "at": 344,
+    "kind": "plain",
+    "text": "> GitHub - colbymchenry/codegraph: Pre-indexed code knowledge graph, auto syncs on code ch",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 584,
+    "kind": "plain",
+    "text": "itHub Skip to content Navigation Menu Sign in Products Platform GitHub Repository hosting,",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 780,
+    "kind": "plain",
+    "text": "Ship Actions CI/CD and automation Code Quality Quality analysis, fixes, and enforcement Co",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1020,
+    "kind": "plain",
+    "text": "ntion All Features Developers Learn Documentation Training Certifications Build Build with",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1260,
+    "kind": "plain",
+    "text": "ments, and fixes across GitHub products, all in one place. Businesses By Stage Enterprises",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1500,
+    "kind": "plain",
+    "text": "ories Business insights Trust Center Add-ons GitHub Advanced Security Enterprise-grade cod",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1718,
+    "kind": "plain",
+    "text": "Connect Documentation Resource center Blog Events &amp;",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1774,
+    "kind": "plain",
+    "text": "webinars Community Forum Customer Stories Integrations Support Customer support Training G",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2014,
+    "kind": "plain",
+    "text": "next for GitHub. Pricing Search / Sign in Sign up Appearance settings You signed in with a",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2148,
+    "kind": "url",
+    "text": "### https://raw.githubusercontent.com/colbymchenry/codegraph/main/README.md",
+    "proved": true,
+    "detail": "https://raw.githubusercontent.com/colbymchenry/codegraph/mai → HTTP 200"
+   },
+   {
+    "at": 2225,
+    "kind": "url",
+    "text": "> # CodeGraph Already installed? Run `codegraph upgrade` Follow [@getcodegraph](https://x.",
+    "proved": true,
+    "detail": "https://x.com/getcodegraph → HTTP 200"
+   },
+   {
+    "at": 2465,
+    "kind": "url",
+    "text": "with Semantic Code Intelligence **The fastest complete code graph · surgical context · bui",
+    "proved": true,
+    "detail": "https://colbymchenry.github.io/codegraph/ → HTTP 200"
+   },
+   {
+    "at": 2705,
+    "kind": "url",
+    "text": "![npm version](https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](https://www.npmj",
+    "proved": true,
+    "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
+   },
+   {
+    "at": 2945,
+    "kind": "url",
+    "text": "Self-contained](https://img.shields.io/badge/Node.js-bundled%20%C2%B7%20none%20required-br",
+    "proved": true,
+    "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
+   },
+   {
+    "at": 3185,
+    "kind": "url",
+    "text": "builds](https://img.shields.io/badge/releases-signed%20%26%20attested-brightgreen.svg)](#v",
+    "proved": true,
+    "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
+   },
+   {
+    "at": 3425,
+    "kind": "url",
+    "text": "acOS-supported-blue.svg)](#supported-platforms) [![Linux](https://img.shields.io/badge/Lin",
+    "proved": true,
+    "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
+   },
+   {
+    "at": 3665,
+    "kind": "url",
+    "text": "![Cursor](https://img.shields.io/badge/Cursor-supported-blueviolet.svg)](#supported-agents",
+    "proved": true,
+    "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:45"
+ },
+ {
+  "ok": true,
+  "capsule": "flashattention-原理",
+  "verdict": "pass",
+  "claims": 16,
+  "proved_ok": 2,
+  "proved_bad": 0,
+  "unverifiable": 14,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · FlashAttention 原理",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 26,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 81,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 137,
+    "kind": "url",
+    "text": "- `https://arxiv.org/abs/2205.14135`（5371 字符）",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2205.14135 → HTTP 200"
+   },
+   {
+    "at": 184,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 205,
+    "kind": "url",
+    "text": "### https://arxiv.org/abs/2205.14135",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2205.14135 → HTTP 200"
+   },
+   {
+    "at": 243,
+    "kind": "plain",
+    "text": "> [2205.14135] FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 426,
+    "kind": "port",
+    "text": "Advanced search --> Computer Science > Machine Learning arXiv:2205.14135 (cs) [Submitted o",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 666,
+    "kind": "plain",
+    "text": "Authors: Tri Dao , Daniel Y. Fu , Stefano Ermon , Atri Rudra , Christopher Ré View a PDF o",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 906,
+    "kind": "plain",
+    "text": "ental) Abstract: Transformers are slow and memory-hungry on long sequences, since the time",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1146,
+    "kind": "plain",
+    "text": "ding off model quality to reduce the compute complexity, but often do not achieve wall-clo",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1386,
+    "kind": "plain",
+    "text": "We propose FlashAttention, an IO-aware exact attention algorithm that uses tiling to reduc",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1626,
+    "kind": "plain",
+    "text": "wing that it requires fewer HBM accesses than standard attention, and is optimal for a ran",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1866,
+    "kind": "plain",
+    "text": "g approximate attention method. FlashAttention trains Transformers faster than existing ba",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2052,
+    "kind": "plain",
+    "text": "> 本胶囊判据：每个源可点开 · 取不到的已如实列为「未读到」 · 署名不可删。",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2094,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:46"
+ },
+ {
+  "ok": true,
+  "capsule": "kv-cache-mqa",
+  "verdict": "pass",
+  "claims": 19,
+  "proved_ok": 3,
+  "proved_bad": 0,
+  "unverifiable": 16,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · KV Cache MQA",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 21,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 76,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 132,
+    "kind": "url",
+    "text": "- `https://arxiv.org/abs/1911.02150`（4413 字符）",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/1911.02150 → HTTP 200"
+   },
+   {
+    "at": 179,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 200,
+    "kind": "url",
+    "text": "### https://arxiv.org/abs/1911.02150",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/1911.02150 → HTTP 200"
+   },
+   {
+    "at": 238,
+    "kind": "plain",
+    "text": "> [1911.02150] Fast Transformer Decoding: One Write-Head is All You Need Skip to main cont",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 403,
+    "kind": "port",
+    "text": "Advanced search --> Computer Science > Neural and Evolutionary Computing arXiv:1911.02150 ",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 643,
+    "kind": "plain",
+    "text": "Fast Transformer Decoding: One Write-Head is All You Need, by Noam Shazeer View PDF HTML (",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 883,
+    "kind": "plain",
+    "text": "nformation across and between sequences. While training these layers is generally fast and",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1123,
+    "kind": "plain",
+    "text": "e to the memory-bandwidth cost of repeatedly loading the large &#34;",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1221,
+    "kind": "plain",
+    "text": "tensors. We propose a variant called multi-query attention, where the keys and values are ",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1372,
+    "kind": "plain",
+    "text": ", greatly reducing the size of these tensors and hence the memory bandwidth requirements o",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1612,
+    "kind": "plain",
+    "text": "on from the baseline. Subjects: Neural and Evolutionary Computing (cs.NE) ;",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1687,
+    "kind": "plain",
+    "text": "Computation and Language (cs.CL);",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1721,
+    "kind": "url",
+    "text": "Machine Learning (cs.LG) Cite as: arXiv:1911.02150 [cs.NE] (or arXiv:1911.02150v1 [cs.NE] ",
+    "proved": true,
+    "detail": "https://doi.org/10.48550/arXiv.1911.02150 → HTTP 200"
+   },
+   {
+    "at": 1961,
+    "kind": "port",
+    "text": "view email ] [v1] Wed, 6 Nov 2019 00:19:05 UTC (10 KB) Full-text links: Access",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2047,
+    "kind": "plain",
+    "text": "> 本胶囊判据：每个源可点开 · 取不到的已如实列为「未读到」 · 署名不可删。",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2089,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:46"
+ },
+ {
+  "ok": true,
+  "capsule": "ring-attention-长上下文",
+  "verdict": "pass",
+  "claims": 16,
+  "proved_ok": 2,
+  "proved_bad": 0,
+  "unverifiable": 14,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · Ring Attention 长上下文",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 28,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 83,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 139,
+    "kind": "url",
+    "text": "- `https://arxiv.org/abs/2310.01889`（4848 字符）",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2310.01889 → HTTP 200"
+   },
+   {
+    "at": 186,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 207,
+    "kind": "url",
+    "text": "### https://arxiv.org/abs/2310.01889",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2310.01889 → HTTP 200"
+   },
+   {
+    "at": 245,
+    "kind": "plain",
+    "text": "> [2310.01889] Ring Attention with Blockwise Transformers for Near-Infinite Context Skip t",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 421,
+    "kind": "port",
+    "text": "Advanced search --> Computer Science > Computation and Language arXiv:2310.01889 (cs) [Sub",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 661,
+    "kind": "plain",
+    "text": "Authors: Hao Liu , Matei Zaharia , Pieter Abbeel View a PDF of the paper titled Ring Atten",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 901,
+    "kind": "plain",
+    "text": "merged as the architecture of choice for many state-of-the-art AI models, showcasing excep",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1141,
+    "kind": "plain",
+    "text": "ences, thereby posing challenges in utilizing videos, actions, and other long-form sequenc",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1381,
+    "kind": "plain",
+    "text": "lockwise computation of self-attention and feedforward to distribute long sequences across",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1621,
+    "kind": "plain",
+    "text": "ning and inference of sequences that are up to device count times longer than those achiev",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1861,
+    "kind": "plain",
+    "text": "nsive experiments on language modeling and reinforcement learning tasks demonstrate the ef",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2054,
+    "kind": "plain",
+    "text": "> 本胶囊判据：每个源可点开 · 取不到的已如实列为「未读到」 · 署名不可删。",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2096,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:46"
+ },
+ {
+  "ok": true,
+  "capsule": "taste_skill",
+  "verdict": "pass",
+  "claims": 60,
+  "proved_ok": 18,
+  "proved_bad": 0,
+  "unverifiable": 42,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# Leonxlnx/taste-skill 吞噬记录 — devour_tentacle",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 46,
+    "kind": "url",
+    "text": "> 吞噬日期: 2026-10-26T04:28:37 | 来源: https://github.com/Leonxlnx/taste-skill",
+    "proved": true,
+    "detail": "https://github.com/Leonxlnx/taste-skill → HTTP 200"
+   },
+   {
+    "at": 120,
+    "kind": "plain",
+    "text": "> Stars: 102435 | 语言: JavaScript | 许可: MIT",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 172,
+    "kind": "plain",
+    "text": "- 描述: Agent skills that give coding agents taste: art direction, reference images and a br",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 302,
+    "kind": "plain",
+    "text": "- 主题: agent-skills, ai-agents, anti-slop, claude-code, codex, cursor, design-system, front",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 421,
+    "kind": "plain",
+    "text": "- 分支: main | 最近推送: 2026-10-25",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 465,
+    "kind": "plain",
+    "text": "<p align=\"center\">",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 496,
+    "kind": "plain",
+    "text": "<source media=\"(prefers-color-scheme: dark)\" srcset=\"assets/taste-skill-wordmark-dark.png\"",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 594,
+    "kind": "plain",
+    "text": "<img src=\"assets/taste-skill-wordmark.png\" alt=\"Taste Skill\" width=\"340\" />",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 693,
+    "kind": "plain",
+    "text": "<p align=\"center\">",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 712,
+    "kind": "url",
+    "text": "<a href=\"https://tasteskill.dev\" title=\"Visit tasteskill.dev\"><img src=\"https://img.shield",
+    "proved": true,
+    "detail": "https://tasteskill.dev → HTTP 200"
+   },
+   {
+    "at": 900,
+    "kind": "url",
+    "text": "<a href=\"https://tastecode.dev\" title=\"Visit tastecode.dev\"><img src=\"https://img.shields.",
+    "proved": true,
+    "detail": "https://img.shields.io/badge/website-tasteskill.dev-24292f?s → HTTP 200"
+   },
+   {
+    "at": 1071,
+    "kind": "url",
+    "text": "<a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/license-MIT-24292f?style=flat&amp",
+    "proved": true,
+    "detail": "https://img.shields.io/badge/website-tasteskill.dev-24292f?s → HTTP 200"
+   },
+   {
+    "at": 1180,
+    "kind": "plain",
+    "text": "logoColor=white\" alt=\"MIT License\" /></a>",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1231,
+    "kind": "url",
+    "text": "<a href=\"CHANGELOG.md\"><img src=\"https://img.shields.io/badge/changelog-view-24292f?style=",
+    "proved": true,
+    "detail": "https://img.shields.io/badge/website-tasteskill.dev-24292f?s → HTTP 200"
+   },
+   {
+    "at": 1358,
+    "kind": "plain",
+    "text": "<p align=\"center\">",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1377,
+    "kind": "url",
+    "text": "<a href=\"https://tastecode.dev\">",
+    "proved": true,
+    "detail": "https://tastecode.dev → HTTP 200"
+   },
+   {
+    "at": 1426,
+    "kind": "plain",
+    "text": "<source media=\"(prefers-color-scheme: dark)\" srcset=\"assets/readme-tastecode-dark.webp\" />",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1523,
+    "kind": "plain",
+    "text": "<img src=\"assets/readme-tastecode.webp\" alt=\"TasteCode is here. Taste Skill as a desktop a",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1746,
+    "kind": "plain",
+    "text": "<h3 align=\"center\">Sponsors</h3>",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1780,
+    "kind": "plain",
+    "text": "<table align=\"center\">",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1810,
+    "kind": "plain",
+    "text": "<td align=\"center\" width=\"104\">",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1846,
+    "kind": "url",
+    "text": "<a href=\"https://interfaces.dev/?utm_source=tasteskill&utm_medium=sponsorship\">",
+    "proved": true,
+    "detail": "https://interfaces.dev/?utm_source=tasteskill&utm_medium=spo → HTTP 200"
+   },
+   {
+    "at": 1932,
+    "kind": "plain",
+    "text": "<img src=\"assets/sponsors/interfaces-dev-icon.webp\" alt=\"Interfaces\" width=\"52\" height=\"52",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:52"
+ },
+ {
+  "ok": true,
+  "capsule": "分组查询注意力-gqa",
+  "verdict": "pass",
+  "claims": 16,
+  "proved_ok": 3,
+  "proved_bad": 0,
+  "unverifiable": 13,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · 分组查询注意力 GQA",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 20,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 75,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 131,
+    "kind": "url",
+    "text": "- `https://arxiv.org/abs/2305.13245`（4564 字符）",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2305.13245 → HTTP 200"
+   },
+   {
+    "at": 178,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 199,
+    "kind": "url",
+    "text": "### https://arxiv.org/abs/2305.13245",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2305.13245 → HTTP 200"
+   },
+   {
+    "at": 237,
+    "kind": "plain",
+    "text": "> [2305.13245] GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Ch",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 429,
+    "kind": "port",
+    "text": "Advanced search --> Computer Science > Computation and Language arXiv:2305.13245 (cs) [Sub",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 669,
+    "kind": "plain",
+    "text": "-Head Checkpoints Authors: Joshua Ainslie , James Lee-Thorp , Michiel de Jong , Yury Zemly",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 909,
+    "kind": "plain",
+    "text": "points, by Joshua Ainslie and 5 other authors View PDF HTML (experimental) Abstract: Multi",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1149,
+    "kind": "plain",
+    "text": ", and moreover it may not be desirable to train a separate model just for faster inference",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1389,
+    "kind": "plain",
+    "text": ", and (2) introduce grouped-query attention (GQA), a generalization of multi-query attenti",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1629,
+    "kind": "plain",
+    "text": "close to multi-head attention with comparable speed to MQA. Comments: Accepted at EMNLP 20",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1789,
+    "kind": "url",
+    "text": "Machine Learning (cs.LG) Cite as: arXiv:2305.13245 [cs.CL] (or arXiv:2305.13245v3 [cs.CL] ",
+    "proved": true,
+    "detail": "https://doi.org/10.48550/arXiv.2305.13245 → HTTP 200"
+   },
+   {
+    "at": 2046,
+    "kind": "plain",
+    "text": "> 本胶囊判据：每个源可点开 · 取不到的已如实列为「未读到」 · 署名不可删。",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2088,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:53"
+ },
+ {
+  "ok": false,
+  "why": "胶囊不存在：/var/minis/shared/gbtv8/gbt_allinone/store/devoured/卫星互联网终端/absorbed_knowledge.md"
+ },
+ {
+  "ok": false,
+  "why": "胶囊不存在：/var/minis/shared/gbtv8/gbt_allinone/store/devoured/太赫兹成像/absorbed_knowledge.md"
+ },
+ {
+  "ok": true,
+  "capsule": "推测解码-speculative-decoding",
+  "verdict": "pass",
+  "claims": 17,
+  "proved_ok": 2,
+  "proved_bad": 0,
+  "unverifiable": 15,
+  "ai_smell": 0,
+  "conflict": {
+   "existing": 0,
+   "sample": []
+  },
+  "reasons": [],
+  "rows": [
+   {
+    "at": 0,
+    "kind": "plain",
+    "text": "# 胶囊 · 推测解码 Speculative Decoding",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 34,
+    "kind": "plain",
+    "text": "> 吞噬日期：2026-10-29 ｜ 来源：未命中后取源（self_intake） ｜ 语言：auto",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 89,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 145,
+    "kind": "url",
+    "text": "- `https://arxiv.org/abs/2211.17192`（4680 字符）",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2211.17192 → HTTP 200"
+   },
+   {
+    "at": 192,
+    "kind": "plain",
+    "text": "## 二、原文摘录（只摆原文，不转述）",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 213,
+    "kind": "url",
+    "text": "### https://arxiv.org/abs/2211.17192",
+    "proved": true,
+    "detail": "https://arxiv.org/abs/2211.17192 → HTTP 200"
+   },
+   {
+    "at": 251,
+    "kind": "plain",
+    "text": "> [2211.17192] Fast Inference from Transformers via Speculative Decoding Skip to main cont",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 416,
+    "kind": "port",
+    "text": "Advanced search --> Computer Science > Machine Learning arXiv:2211.17192 (cs) [Submitted o",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 656,
+    "kind": "plain",
+    "text": "viathan , Matan Kalman , Yossi Matias View a PDF of the paper titled Fast Inference from T",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 896,
+    "kind": "plain",
+    "text": "e models like Transformers is slow - decoding K tokens takes K serial runs of the model. I",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1136,
+    "kind": "plain",
+    "text": "ing several tokens in parallel. At the heart of our approach lie the observations that (1)",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1376,
+    "kind": "plain",
+    "text": "n and a novel sampling method, we can make exact decoding from the large models faster, by",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1616,
+    "kind": "plain",
+    "text": "tribution. Our method can accelerate existing off-the-shelf models without retraining or a",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1856,
+    "kind": "plain",
+    "text": "mments: ICML 2023 Oral Subjects: Machine Learning (cs.LG) ;",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 1915,
+    "kind": "url",
+    "text": "Computation and Language (cs.CL) Cite as: arXiv:2211.17192 [cs.LG] (or arXiv:2211.17192v2 ",
+    "proved": null,
+    "detail": "https://doi.org/10.48 → 疑似截断（前缀 https://doi.org 可通 HTTP 200）"
+   },
+   {
+    "at": 2060,
+    "kind": "plain",
+    "text": "> 本胶囊判据：每个源可点开 · 取不到的已如实列为「未读到」 · 署名不可删。",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   },
+   {
+    "at": 2102,
+    "kind": "plain",
+    "text": "> 开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属",
+    "proved": null,
+    "detail": "这类主张本机无可验面"
+   }
+  ],
+  "checked_at": "2026-10-29T08:14:54"
+ },
+ {
+  "ok": false,
+  "why": "胶囊不存在：/var/minis/shared/gbtv8/gbt_allinone/store/devoured/水下声学通信/absorbed_knowledge.md"
+ }
+]
