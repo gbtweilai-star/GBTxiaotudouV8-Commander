@@ -735,7 +735,8 @@ def gaps(verbose: bool = False, sample: int = 20) -> dict:
             print(f"  · 第三方仓（**设计上不自动绑**，只列出）: {m}")
         if not missing:
             print("  ✅ 无漏绑")
-    return {"ok": not missing, "missing": len(missing), "no_kind": no_kind,
+    return {"ok": not missing, "missing": len(missing), "all": missing,
+            "no_kind": no_kind,
             "third_party": len(third_party), "scanned": scanned,
             "sample": missing[:sample], "third_party_sample": third_party[:sample]}
 
@@ -802,6 +803,33 @@ def main(argv: list) -> int:
         r = prune(verbose=True)
         print(f"  剪枝：{r.get('pruned')} 条绑定已不在盘上（理由进了台账）")
         return 0
+    if cmd == "gapbind":
+        # 2026-10-30 新增：把 gaps() 清单上的每条**一次绑完**。
+        #   为什么要它：autobind 是增量（只看水位线之后的新文件），
+        #   老缺口永远补不上 ⇒ 「只要进了项目树就必须双向绑定」这条纪律落不了地。
+        g = gaps(verbose=False)
+        miss = g.get("all") or []
+        if not miss:
+            print("  没有缺口：该绑的全绑了")
+            return 0
+        bound = 0
+        for rel in miss:
+            kind = suggest(rel)
+            if not kind:
+                continue
+            try:
+                if bind(rel, kind, note="gapbind", quiet=True).get("ok"):
+                    bound += 1
+            except Exception as exc:                              # noqa: BLE001
+                print("  🔴 绑不上 %s: %s" % (rel, type(exc).__name__))
+        print("  一次绑完：清单 %d 条 · 绑上 %d 条" % (len(miss), bound))
+        g2 = gaps(verbose=False)
+        left = g2.get("all") or []
+        print("  复量：剩余真缺口 %d 条" % len(left))
+        for x in left[:10]:
+            print("    · %s" % x)
+        return 0 if not left else 1
+
     if cmd == "autobind":
         r = autobind(force=True, verbose=True)
         print(f"  产出即绑：发现 {r.get('found')} · 绑定 {r.get('bound')}")

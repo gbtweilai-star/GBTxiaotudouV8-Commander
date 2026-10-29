@@ -29,6 +29,7 @@ import argparse
 import json
 import os
 import pathlib
+import subprocess
 import sys
 import time
 
@@ -118,6 +119,25 @@ def _ensure_8790() -> str:
         return "restart_error"
 
 
+def gene_tree_rules(rnd: int) -> dict:
+    """树规 GENE-HT-001 自愈（每 6 轮跑一次 ≈ 30 分钟）。
+
+    主人令 2026-10-30：任何代码进了项目树就得挂触手双向绑定、每页覆盖、页面互通。
+    这条刻在 her_persona 里，但人设只是话 —— 必须有机器的闸。
+    本钩子让它在巡检里常驻：每 30 分钟自愈一次（新增未绑的当场绑上），有缺口记红。
+    """
+    if rnd % 6 != 0:
+        return {}
+    try:
+        r = subprocess.run([sys.executable, "-u", str(ROOT / "tools" / "gene_guard.py")],
+                           capture_output=True, text=True, timeout=900, cwd=str(ROOT))
+        out = ((r.stdout or "") + (r.stderr or "")).strip()
+        tail = [l.strip() for l in out.splitlines() if l.strip()][-3:]
+        return {"round": rnd, "ok": r.returncode == 0, "rc": r.returncode, "tail": tail}
+    except Exception as exc:                                      # noqa: BLE001
+        return {"round": rnd, "ok": False, "why": "%s: %s" % (type(exc).__name__, exc)}
+
+
 def one_round(rnd: int) -> dict:
     from gbt_allinone.api import run_task
     rows, ok, bad, skipped = [], 0, 0, 0
@@ -149,8 +169,23 @@ def one_round(rnd: int) -> dict:
             COOLDOWN[cap] = COOLDOWN.get(cap, 0) + 1
             if COOLDOWN[cap] >= MAX_STREAK:
                 COOLDOWN[cap] = COOLDOWN_ROUNDS
+                # 主人令 2026-10-30：判断先问她的权重，不用传统办法自己拍。
+                # 只在**首次**连败时问一次（进冷却后 5 轮不再问），她不在就入她的队列。
+                try:
+                    _q = ("巡检里 %s 连续 %d 轮失败，最后一处：%s。"
+                          "这是代码问题还是环境问题？下一步该动哪里？"
+                          % (cap, MAX_STREAK, str(rows[-1].get("why") or "")[:120]))
+                    subprocess.run([sys.executable, str(ROOT / "tools" / "her_decide.py"), _q],
+                                   capture_output=True, text=True, timeout=180, cwd=str(ROOT))
+                except Exception:                                 # noqa: BLE001
+                    pass
     rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "round": rnd,
            "ok": ok, "bad": bad, "skipped": skipped, "items": rows}
+    _gt = gene_tree_rules(rnd)
+    if _gt:
+        rec["tree_rules"] = _gt
+        if not _gt.get("ok"):
+            print("    🔴 树规 GENE-HT-001 有缺口（详见 gene_guard 输出）")
     log(rec)
     return rec
 
