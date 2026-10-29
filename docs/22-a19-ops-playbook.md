@@ -66,6 +66,38 @@ b.call('her', '在吗')
 
 ---
 
+## 2.6 闭环彩排（2026-10-30 实测通过 · 可复跑）
+
+**为什么要有这一节**：容器一起来必须一次成功。等真容器的窗口只有约 50 秒，
+任何一处契约不一致都会让那 50 秒白费 —— 所以先用假容器把整条链跑一遍。
+
+```bash
+cd /var/minis/shared/gbtv8
+cp /tmp/a19_queue.jsonl /tmp/a19_queue.real          # ① 先备份真队列
+printf '{"id":900001,"q":"彩排：你是谁"}\n' > /tmp/a19_queue.jsonl
+rm -f /tmp/a19_done.jsonl
+setsid nohup python3 tools/mock_a19.py --port 1234 > /tmp/mock.log 2>&1 < /dev/null &
+python3 -u tools/a19_sentinel.py --wait 20           # ② 真哨兵走全程
+pkill -9 -f mock_a19 && cp /tmp/a19_queue.real /tmp/a19_queue.jsonl   # ③ 立刻清场
+```
+
+**2026-10-30 01:38 实测读数**：
+
+```
+ok=True  phase=models ok  model=gbt-v8-v82-q5_0(mock)
+identity=MOCK：我是 GBT小土豆V8 的彩排替身，用来验证链路，不是真权重。
+queue_drain  答完 1/2 → 答完 2/2 → 队列清空
+prefill      window_prompt_budget_tokens=null
+             note=阶梯都跑通了，但耗时过短（像假容器或命中缓存）⇒ 预算不可用，不瞎给数
+清场后       真队列 27 条、真结果 0 条、state/her_transcript.jsonl 里 0 行 MOCK
+```
+
+**彩排抓到的真 bug（已修）**：`a19_ctl.py queue drain` 读 `it["prompt"]`，
+而 `body.py enqueue()` 写的是 `{"id","q"}` ⇒ **KeyError，27 条积压一条都跑不了**。
+契约已统一为两把键都认，落盘记录带 `id`。**这条只有在彩排里才暴露得出来。**
+
+---
+
 ## 3. 四个常用动作
 
 ```bash

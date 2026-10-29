@@ -270,16 +270,16 @@ def cmd_queue(op, prompt, tokens):
             try:
                 d, dt = http("/chat/completions",
                              {"model": ids[0] if ids else "",
-                              "messages": [{"role": "user", "content": it["prompt"]}],
+                              "messages": [{"role": "user", "content": (it.get("q") or it.get("prompt") or "").strip()}],
                               "max_tokens": it.get("max_tokens", 512),
                               "temperature": 0.7, "stream": False}, 300)
                 txt = (d["choices"][0]["message"].get("content") or "").strip()
-                out.write(json.dumps({"prompt": it["prompt"], "answer": txt,
+                out.write(json.dumps({"id": it.get("id"), "q": (it.get("q") or it.get("prompt") or "").strip(), "prompt": (it.get("q") or it.get("prompt") or "").strip(), "answer": txt,
                                       "elapsed_s": round(dt, 2),
                                       "model": d.get("model")}, ensure_ascii=False) + "\n")
                 out.flush()
                 ok += 1
-                print("答完 %d/%d  %.2fs  %s" % (ok, len(items), dt, it["prompt"][:30]))
+                print("答完 %d/%d  %.2fs  %s" % (ok, len(items), dt, (it.get("q") or it.get("prompt") or "")[:30]))
             except Exception as exc:                              # noqa: BLE001
                 print("失败: %s: %s" % (type(exc).__name__, exc))
                 break
