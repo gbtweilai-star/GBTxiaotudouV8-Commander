@@ -151,13 +151,16 @@ def cmd_heartbeat(argv):
         "verdict": adv.get("verdict"),
         "headline": adv.get("headline"),
         "counts": adv.get("counts"),
+        # 指令必须进 JSON 本体 —— 2026-10-30 实测踩过：原来把"== 执行指令 =="另打印在
+        # JSON 之后，stdout 就成了 JSON+散文 ⇒ 下游 json.load 报 Extra data，
+        # 机器读不了等于这套东西白做。现在 stdout 永远是**纯 JSON**，散文走 stderr。
+        "instructions": adv.get("instructions") or [],
     }
     print(json.dumps(brief, ensure_ascii=False, indent=1))
     if adv.get("instructions"):
-        print("\n== 执行指令 ==")
         for x in adv["instructions"]:
-            print("  [%s] %s\n       动作: %s\n       依据: %s"
-                  % (x["priority"], x.get("id"), x.get("action"), str(x.get("why"))[:110]))
+            print("  [%s] %s | %s" % (x["priority"], x.get("id"), x.get("action")),
+                  file=sys.stderr)
     return 0 if adv.get("verdict") == "green" else 1
 
 

@@ -731,7 +731,36 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
     if persist:
         _write_json(_STATE_DIR / "latest.json", report)
         _write_json(_STATE_DIR / f"scan-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", report)
+        # 收敛到 KEEP_SCANS：触手的卫生层是在**写这一份之前**跑的，所以清完再写
+        # 会稳定多出 1 份（实测 21 > 20）。这里写完再收一次，让"≤20"成为真不变量。
+        if clean:
+            _prune_scans(KEEP_SCANS)
     return report
+
+
+def _prune_scans(keep: int = KEEP_SCANS) -> int:
+    """把 scan-*.json 收到最近 keep 份，返回删掉的个数。只动自己抽屉里的这一种文件。"""
+    try:
+        if not _STATE_DIR.exists():
+            return 0
+        scans = []
+        for p in _STATE_DIR.iterdir():
+            if p.is_file() and p.name.startswith("scan-") and p.name.endswith(".json"):
+                try:
+                    scans.append((p.stat().st_mtime, p))
+                except OSError:
+                    pass
+        scans.sort(reverse=True)
+        n = 0
+        for _, p in scans[keep:]:
+            try:
+                p.unlink()
+                n += 1
+            except OSError:
+                pass
+        return n
+    except Exception:  # noqa: BLE001
+        return 0
 
 
 def latest() -> dict:
