@@ -106,6 +106,18 @@ def main() -> int:
         if tcp() and alive():
             print("  ✅ :1234 真活 —— 开火", flush=True)
             rec = battery()
+            # 🔴 2026-10-29：接上框架自己的队列通道（a19_ctl queue）。
+            #   它的设计就是「容器不在就先存着，一开就跑」——这是容器不常驻下的正解，
+            #   比我手搓重试专业得多（a19_ctl 是原生的手，我只是调用它）。
+            try:
+                import subprocess as _sp
+                _q = _sp.run([sys.executable, str(ROOT / "tools" / "a19_ctl.py"),
+                              "queue", "drain"], capture_output=True, text=True,
+                             timeout=180, cwd=str(ROOT))
+                rec["queue_drain"] = {"rc": _q.returncode,
+                                      "tail": (_q.stdout or "").strip().splitlines()[-3:]}
+            except Exception as exc:                          # noqa: BLE001
+                rec["queue_drain"] = {"err": type(exc).__name__}
             OUT.parent.mkdir(parents=True, exist_ok=True)
             OUT.write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
             print("  📝 %s" % OUT, flush=True)
