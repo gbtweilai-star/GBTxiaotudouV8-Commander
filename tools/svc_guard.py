@@ -42,6 +42,9 @@ SVCS = [
      "python3 -u runtime/async_gate.py --port 8790 > logs/async_gate.log 2>&1"),
     ("巡检",             0,    True,
      "python3 -u tools/duty_patrol.py --interval 5 > logs/patrol.log 2>&1"),
+    # 2026-10-30 补：哨兵原来没人看，被 iOS 回收后不会自己回来 ⇒ A19 一起来没人接。
+    ("哨兵 a19",         0,    True,
+     "python3 -u tools/a19_sentinel.py --wait 5400 > logs/a19_sentinel.log 2>&1"),
     # 非必要：内存紧时先让它们
     ("面板后端 :8765",   8765, False,
      "python3 -u holo_pet/panel_server.py --port 8765 > logs/panel.log 2>&1"),
@@ -96,7 +99,7 @@ def port_up(p: int) -> bool:
 
 
 def proc_up(name: str) -> bool:
-    pat = {"巡检": "duty_patrol.py"}.get(name)
+    pat = {"巡检": "duty_patrol.py", "哨兵 a19": "a19_sentinel.py"}.get(name)
     if not pat:
         return True
     try:
@@ -126,6 +129,7 @@ KILL_PAT = {
     "面板后端 :8765": "panel_server.py",
     "索引层 :8792": "index_daemon.py",
     "巡检": "duty_patrol.py",
+    "哨兵 a19": "a19_sentinel.py",
 }
 
 

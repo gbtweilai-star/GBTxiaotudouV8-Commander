@@ -67,3 +67,5 @@
 {"kind": "run", "item": "关掉隐式云端降级", "status": "pass", "evidence": "无该环境变量起桥后 POST selfhost → tried=['selfhost']、error=所有上游都连不上：selfhost，未试任何云端", "files": ["tools/svc_guard.py", "tools/up.sh"], "at": "2026-10-30T00:29:09"}
 {"kind": "change", "what": "守护加真HTTP探活 + 清僵尸重起（修 TCP 通但不答⇒永远判活着）", "files": ["tools/svc_guard.py"], "why": "iSH 挂起时内核替冻结进程排队收连接，只看 TCP 永久误判；这是服务静默消失的真因", "commit": "", "at": "2026-10-30T01:22:18"}
 {"kind": "run", "item": "守护真HTTP探活+清僵尸", "status": "pass", "evidence": "acceptance 汇总 PASS 28 / FAIL 0 / ENV 4 / INFO 4（用时546.3s）；守护日志见 kill_frozen 动作", "files": ["tools/svc_guard.py"], "at": "2026-10-30T01:22:18"}
+{"kind": "change", "what": "哨兵纳入 svc_guard 监护（原来无人看管，被回收后不回来）", "files": ["tools/svc_guard.py"], "why": "生产要求：A19 一起来必须有人接；哨兵是唯一承接者", "commit": "", "at": "2026-10-30T01:23:38"}
+{"kind": "run", "item": "哨兵纳入监护", "status": "pass", "evidence": "ensure 后 pgrep a19_sentinel 有进程(4346)；名单核对 3 处；py_compile 通过", "files": ["tools/svc_guard.py"], "at": "2026-10-30T01:23:38"}
