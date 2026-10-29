@@ -94,3 +94,15 @@
 {"at": "2026-10-29T10:27:49", "act": "dead", "svc": "她的界面 :8080"}
 {"at": "2026-10-29T10:28:20", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3005}
 {"at": "2026-10-29T10:28:28", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:28:59", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 2964}
+{"at": "2026-10-29T10:29:07", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:29:38", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 2959}
+{"at": "2026-10-29T10:29:45", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:30:16", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 472}
+{"at": "2026-10-29T10:30:24", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:30:55", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 336}
+{"at": "2026-10-29T10:31:11", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:31:42", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 273}
+{"at": "2026-10-29T10:31:49", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:33:07", "act": "start_wait", "svc": "她的界面 :8080", "mem_mb": 106, "why": "内存迟迟不回升"}
+{"at": "2026-10-29T10:33:07", "act": "dead", "svc": "她的界面 :8080"}

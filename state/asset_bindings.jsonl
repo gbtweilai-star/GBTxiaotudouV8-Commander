@@ -2410,3 +2410,5 @@
 {"at": "2026-10-29T09:29:20", "event": "autobind", "files": 2, "bound": 2, "hint": "tentacle_bind", "pruned": 0}
 {"at": "2026-10-29T09:33:09", "event": "scan", "bindings": 2397, "missing_asset": 0, "ghost_tentacle": 0}
 {"at": "2026-10-29T10:18:57", "event": "autobind", "files": 1, "bound": 1, "hint": "pod_link", "pruned": 0}
+{"at": "2026-10-29T10:28:59", "event": "bind", "asset": "tools/source_registry.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-29T10:29:01", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
