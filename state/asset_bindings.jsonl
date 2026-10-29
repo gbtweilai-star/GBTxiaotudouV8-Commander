@@ -2449,3 +2449,129 @@
 {"at": "2026-10-30T01:36:09", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
 {"at": "2026-10-30T01:37:37", "event": "bind", "asset": "tools/a19_ctl.py", "tentacle": "omni_plug", "note": "autobind"}
 {"at": "2026-10-30T01:37:38", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T02:38:17", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
+{"at": "2026-10-30T02:38:42", "event": "scan", "bindings": 2400, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T02:38:44", "event": "gaps", "missing": 92, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:38:54", "event": "gaps", "missing": 92, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:39:04", "event": "gaps", "missing": 92, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:39:12", "event": "gaps", "missing": 92, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:39:21", "event": "gaps", "missing": 92, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/_glb-lab.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/assets/structure/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/assets/automation/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/assets/keys/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:21", "event": "bind", "asset": "holo_pet/assets/godview/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/health-panel/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/task-manager/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/digital-human/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/digital-human/raw/rig/model-expressions.glb", "tentacle": "blender", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/reference-front.jpg", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:22", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/levels-normalized.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/HERO-4096.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/upper-1024.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/albedo-1208x2048.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/source-copy.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/standard/tex/albedo-2416x4096.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/web/companion-1120.webp", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/web/avatar.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:23", "event": "bind", "asset": "holo_pet/assets/digital-human/web/vrm-runtime-check.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/digital-human/web/companion-560.webp", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/digital-human/web/companion-cutout.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/digital-human/web/companion-560.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/console3d/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/llm/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "holo_pet/assets/music/index.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "docs/本体-一体式设计.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:24", "event": "bind", "asset": "docs/GPU-车道实测与判决.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/验收-10问-v2.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/权重操作纪律.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/06-showcase.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/09-mirror-space.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/04-evaluation.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/APP-自有权重.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/10-gbt-tianzhen.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:25", "event": "bind", "asset": "docs/验收-10问.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/14-security-and-control.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/12-multidomain-monitor.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/身体-设备即本体.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/05-deployment.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/launch/release-v57.0.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "docs/launch/release-v58.0.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "skills/gbt-selfgrowth/SKILL.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:26", "event": "bind", "asset": "skills/gbt-ai-101/SKILL.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "tools/digihuman/vrm-runtime-check.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "tools/codex-scripts/view-glb.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "tools/codex-scripts/fixtures/aesthetic-sins.html", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "gbt_allinone/chart_html.py", "tentacle": "chart_html", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "gbt_allinone/tentacle_equip.py", "tentacle": "tentacle_equip", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "gbt_allinone/cross_scan.py", "tentacle": "cross_scan", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "gbt_allinone/digital_human.py", "tentacle": "digital_human", "note": "gapbind"}
+{"at": "2026-10-30T02:39:27", "event": "bind", "asset": "gbt_allinone/selfscan.py", "tentacle": "selfscan", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/skill_finder.py", "tentacle": "skill_finder", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/voice_cap.py", "tentacle": "voice", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/room_space.py", "tentacle": "room_space", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/train_ground.py", "tentacle": "train_ground", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/voice_studio.py", "tentacle": "voice_studio", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/tripo.py", "tentacle": "tripo", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/humanizer.py", "tentacle": "humanizer", "note": "gapbind"}
+{"at": "2026-10-30T02:39:28", "event": "bind", "asset": "gbt_allinone/install_selfcheck.py", "tentacle": "install_selfcheck", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/image_scout.py", "tentacle": "image_scout", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/docs/待落刀登记.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/docs/CAPABILITIES-索引.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/docs/语音三工作流-蒸馏.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/docs/数字人逼真度-专业口径/README-from-paper.md", "tentacle": "project_context", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/llm/cloud_llm_cap.py", "tentacle": "cloud_llm", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/llm/cloud_llm.py", "tentacle": "cloud_llm", "note": "gapbind"}
+{"at": "2026-10-30T02:39:29", "event": "bind", "asset": "gbt_allinone/llm/key_gateway.py", "tentacle": "key_gateway", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/research_intel.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/absorb_loop.py", "tentacle": "absorb_loop", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/gate_visibility.py", "tentacle": "gate_visibility", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/impact_check.py", "tentacle": "impact_check", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/code_patch.py", "tentacle": "code_patch", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/false_report_audit.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:30", "event": "bind", "asset": "gbt_allinone/tools/devour_fusion.py", "tentacle": "devour_fusion", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/warm_switch.py", "tentacle": "warm_switch", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/ai_capability_net.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/brain_graph.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/omni_arm.py", "tentacle": "omni_arm", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/anatomy_cap.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/comfy_cloud.py", "tentacle": "comfy_cloud", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/dh_rig.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:31", "event": "bind", "asset": "gbt_allinone/tools/caps_called_audit.py", "tentacle": "caps_called_audit", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/project_drift.py", "tentacle": "project_drift", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/scan_scope.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/machine_cap.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/cloud_plugin.py", "tentacle": "cloud_plugin", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/pod_link.py", "tentacle": "pod_link", "note": "gapbind"}
+{"at": "2026-10-30T02:39:32", "event": "bind", "asset": "gbt_allinone/tools/dh_pose.py", "tentacle": "dh_pose", "note": "gapbind"}
+{"at": "2026-10-30T02:39:33", "event": "bind", "asset": "gbt_allinone/tools/tentacle_arm.py", "tentacle": "tentacle_arm", "note": "gapbind"}
+{"at": "2026-10-30T02:39:33", "event": "bind", "asset": "gbt_allinone/tools/framework_gate.py", "tentacle": "domain:tools", "note": "gapbind"}
+{"at": "2026-10-30T02:39:34", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1987, "third_party": 0}
+{"at": "2026-10-30T02:39:58", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:40:00", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:40:08", "event": "gaps", "missing": 1, "no_kind": 342, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:40:15", "event": "gaps", "missing": 1, "no_kind": 342, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:40:15", "event": "bind", "asset": "holo_pet/assets/digital-human/web/gene-probe-new.png", "tentacle": "filmkit", "note": "gapbind"}
+{"at": "2026-10-30T02:40:16", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:40:19", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:40:23", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:40:28", "event": "prune", "asset": "holo_pet/assets/digital-human/web/gene-probe-new.png", "tentacles": ["filmkit"], "why": "不在盘上（转瞬即逝的中间产物）"}
+{"at": "2026-10-30T02:40:40", "event": "bind", "asset": "tools/gene_guard.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-30T02:40:41", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
+{"at": "2026-10-30T02:41:02", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:41:04", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:41:46", "event": "bind", "asset": "tools/acceptance.py", "tentacle": "brain_route", "note": "autobind"}
+{"at": "2026-10-30T02:41:46", "event": "bind", "asset": "tools/duty_patrol.py", "tentacle": "brain_route", "note": "autobind"}
+{"at": "2026-10-30T02:41:47", "event": "autobind", "files": 2, "bound": 2, "hint": "brain_route", "pruned": 0}
+{"at": "2026-10-30T02:45:55", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:45:57", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1988, "third_party": 0}
+{"at": "2026-10-30T02:46:20", "event": "bind", "asset": "tools/her_decide.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-30T02:46:24", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
+{"at": "2026-10-30T02:47:23", "event": "bind", "asset": "tools/duty_patrol.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-30T02:47:24", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
+{"at": "2026-10-30T02:52:32", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:52:39", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:56:51", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T02:56:53", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}

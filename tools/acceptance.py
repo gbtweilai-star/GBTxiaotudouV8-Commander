@@ -307,6 +307,24 @@ def sec_i() -> None:
         rec("ENV", "孤儿审计", "跑不起来：%s" % type(e).__name__)
 
 
+# ── J 树规 GENE-HT-001（进了树就得挂触手 · 每页覆盖 · 页面互通）─────────────
+#   主人令 2026-10-30：任何代码进了项目树就要触手双向绑定，每页覆盖每段代码，
+#   页面之间互通、不跑弯路。这条刻进了 her_persona，但人设只是话 —— 这里真验一次。
+def sec_j() -> None:
+    print("\n── J 树规 GENE-HT-001 ──")
+    try:
+        r = subprocess.run([sys.executable, "-u", str(ROOT / "tools" / "gene_guard.py")],
+                           capture_output=True, text=True, timeout=900, cwd=str(ROOT))
+        out = ((r.stdout or "") + (r.stderr or ""))
+        gene_ok = out.count("✅ 基因标记")
+        gap = "真缺口 0 条" in out
+        pages = "每页覆盖" in out
+        rec("PASS" if r.returncode == 0 else "FAIL", "树规成立（进来就绑·每页覆盖·互通）",
+            "基因标记 %d/3 · 缺口清零=%s · 页覆盖=%s" % (gene_ok, gap, pages))
+    except Exception as e:                                        # noqa: BLE001
+        rec("ENV", "树规成立", "跑不起来：%s" % type(e).__name__)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
@@ -387,6 +405,7 @@ def main() -> int:
 
     # 孤儿审计放在汇总**之前**跑 —— 否则它记的 PASS/INFO 进不了总数（实测踩到）
     sec_i()
+    sec_j()
 
     from collections import Counter
     c = Counter(s for s, _, _ in RESULTS)
