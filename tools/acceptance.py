@@ -79,12 +79,40 @@ def rt(cap: str, payload: dict | None = None) -> dict:
 
 
 # ── A 服务面 ────────────────────────────────────────────────────────────────
+def _self_heal() -> None:
+    """验收前先自愈 —— 服务被 OOM 杀掉时，别把"服务没起"记成"功能坏了"。
+    🔴 2026-10-29：这一场「服务全掉 → 12 个 FAIL → 我手动清 → 重跑」发生过四五次。
+       人盯不住，做成验收的第一步。
+    """
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "svc_guard.py"), "ensure"],
+                           capture_output=True, text=True, timeout=240, cwd=str(ROOT))
+        out = (r.stdout or "").strip().splitlines()
+        last = out[-1] if out else "（无输出）"
+        print("  自愈: %s" % last.strip())
+    except Exception as exc:                                  # noqa: BLE001
+        print("  自愈跑不起来: %s" % type(exc).__name__)
+
+
 def sec_a() -> None:
     print("\n── A 服务面 ──")
     # 🔴 2026-10-28：:3001 免费池改为**按需启动**（node 9~17 进程，会把内存
     #   吃到 259MB/4GB 并导致 :8790 被静默杀掉；桥的降级链已改为 deepseek 优先）。
     #   它没起是**设计**，不是故障 ⇒ 记 ENV 不记 FAIL。
     OPTIONAL = {3001}
+    # 守护器口径：**因省内存主动让位的服务不算 FAIL**（那不是坏了）。
+    # 不加这一条会出现自相矛盾：guard 停 8765/8792 省内存，验收却判它们 FAIL。
+    _intent = {}
+    try:
+        _g = subprocess.run([sys.executable, str(ROOT / "tools" / "svc_guard.py"), "status"],
+                            capture_output=True, text=True, timeout=60, cwd=str(ROOT))
+        for _ln in (_g.stdout or "").splitlines():
+            if "🔴" in _ln and "可让位" in _ln:
+                for _p in (8765, 8792):
+                    if ":%d" % _p in _ln:
+                        _intent[_p] = True
+    except Exception:                                          # noqa: BLE001
+        pass
     lanes = [(3001, "/api/ping"), (8080, "/index.html"), (8791, "/health"),
              (8790, "/health"), (8765, "/api/state"), (8792, "/health")]
     ok = 0
@@ -96,6 +124,9 @@ def sec_a() -> None:
         elif port in OPTIONAL:
             rec("ENV", "服务 :%d %s" % (port, path),
                 "按需启动，未起是设计（省内存）；要它用 FORCE_FLR=1")
+        elif _intent.get(port):
+            rec("ENV", "服务 :%d %s" % (port, path),
+                "内存紧张，守护器**主动让位**（不是坏了）；内存回升后自动拉回")
         else:
             rec("FAIL", "服务 :%d %s" % (port, path), info)
     rec("PASS" if ok >= len(lanes) - len(OPTIONAL) else "FAIL",
@@ -264,6 +295,10 @@ def main() -> int:
     ap.add_argument("--quick", action="store_true")
     a = ap.parse_args()
     t0 = time.time()
+    # 🔴 2026-10-29 修：自愈必须在**各段之前**跑。
+    #   上一版放在汇总前 ⇒ 段已经判完 FAIL 才去拉服务，等于白拉（实测 11 个 FAIL）。
+    _self_heal()
+    print()
     print("═══ 闭环验收 · %s ═══" % time.strftime("%Y-%m-%d %H:%M:%S"))
     for fn in (sec_a, sec_b, sec_c, sec_d, sec_e):
         try:
