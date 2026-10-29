@@ -38,3 +38,21 @@
 {"at": "2026-10-29T09:31:27", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 217}
 {"at": "2026-10-29T09:32:31", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 233}
 {"at": "2026-10-29T09:32:31", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 304}
+{"at": "2026-10-29T09:33:14", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 454}
+{"at": "2026-10-29T09:33:14", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 393}
+{"at": "2026-10-29T09:33:57", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 321}
+{"at": "2026-10-29T09:34:04", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T09:35:22", "act": "start_wait", "svc": "她的界面 :8080", "mem_mb": 241, "why": "内存迟迟不回升"}
+{"at": "2026-10-29T09:35:22", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T09:52:05", "act": "yield", "stopped": ["免费池", "面板后端 :8765"], "mem_mb": 91}
+{"at": "2026-10-29T09:52:05", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 487}
+{"at": "2026-10-29T09:52:05", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 503}
+{"at": "2026-10-29T10:14:07", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:14:38", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 546}
+{"at": "2026-10-29T10:14:38", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 471}
+{"at": "2026-10-29T10:14:38", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 324}
+{"at": "2026-10-29T10:14:53", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:15:24", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 564}
+{"at": "2026-10-29T10:15:32", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:16:03", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 571}
+{"at": "2026-10-29T10:16:11", "act": "dead", "svc": "她的界面 :8080"}
