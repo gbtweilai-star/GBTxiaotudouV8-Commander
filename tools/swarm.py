@@ -37,6 +37,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import sys
 import time
@@ -44,6 +45,9 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BASE = ROOT / "state" / "swarm"
 LEASE_S = 240          # 租约：节点被某根触手占了超过这么久没回来 ⇒ 视为掉了，回收重试
+# 🔴 2026-10-30 补：光靠超时不够。进程被杀（iOS 回收 App）后要干等 240 秒才回收，
+#   那不叫续跑。所以租约记「谁租的」（owner=pid），下一轮开跑时：
+#   主人已不在 ⇒ 立刻回收，不用等超时；主人还活着 ⇒ 尊重租约，不抢。
 MAX_TRIES = 3          # 同一个节点最多试 3 次。失败不是失败一次就算，
                        # 但也不能无限重试 —— 那是拿资源烧空气（2026-10-30 自测抓到跑 8 轮）。
 
@@ -118,15 +122,32 @@ def _ready(st: dict, now: float) -> list:
     return out
 
 
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+    except Exception:                                             # noqa: BLE001
+        return False
+
+
 def _reclaim(st: dict, now: float) -> list:
-    """租约过期 ⇒ 记一笔回收，让别的触手接手。不静默丢。"""
+    """回收该回收的租约：主人死了立刻收，主人活着就等超时。"""
     got = []
     for nid, n in st["nodes"].items():
+        if n["status"] in ("done", "dead"):
+            continue
         lease = n.get("lease")
-        if lease and (now - lease) >= LEASE_S and n["status"] not in ("done",):
+        if not lease:
+            continue
+        owner = n.get("owner")
+        owner_dead = bool(owner) and not _alive(int(owner))
+        expired = (now - lease) >= LEASE_S
+        if owner_dead or expired:
             n["lease"] = None
+            n["owner"] = None
             n["status"] = "pending"
-            n["why"] = "租约过期被回收（原触手没回来）"
+            n["why"] = ("主人进程 %s 已不在 ⇒ 立刻回收" % owner) if owner_dead \
+                       else "租约超时被回收（原触手没回来）"
             got.append(nid)
     return got
 
@@ -160,7 +181,13 @@ def run(name: str, lanes: int = 4, rounds: int = 0) -> dict:
             print("   ♻ 回收 %d 个过期租约：%s" % (len(reclaimed), reclaimed), flush=True)
         if not ready:
             break
-        print("   第 %d 轮 · 可派 %d 个" % (round_no, len(ready)), flush=True)
+        # 🔴 2026-10-30 实测缺陷：原来把 ready 全部占成 running，第一次派发就吃掉所有节点。
+        #   进程一被杀，8 个节点全部「已租未完成」⇒ 进度全废，只能重跑。
+        #   改：**一批只租 lanes 个**，跑完一批落一批账；崩也只丢当前这一批。
+        batch = ready[:max(1, lanes)]
+        ready = batch
+        print("   第 %d 轮 · 可派 %d 个（批 %d）" % (round_no, len(ready), len(batch)),
+              flush=True)
         try:
             import mirror_board as MB2
             MB2.post("coord", "第 %d 轮派发：%s" % (round_no, ",".join(ready)),
@@ -169,13 +196,19 @@ def run(name: str, lanes: int = 4, rounds: int = 0) -> dict:
             pass
         for nid in ready:
             st["nodes"][nid]["lease"] = now
+            st["nodes"][nid]["owner"] = os.getpid()
             st["nodes"][nid]["status"] = "running"
         _save(name, st)
 
         sys.path.insert(0, str(ROOT / "tools"))
         import tentacle_dispatch as TD
-        units = [{"id": nid, "kind": st["nodes"][nid]["kind"],
-                  "payload": st["nodes"][nid]["payload"]} for nid in ready]
+        units = []
+        for nid in ready:
+            nd = st["nodes"][nid]
+            u = {"id": nid, "kind": nd["kind"], "payload": nd["payload"]}
+            if isinstance(nd["payload"], dict) and nd["payload"].get("_sleep"):
+                u["sleep"] = nd["payload"]["_sleep"]      # 自测用的固定成本单元
+            units.append(u)
         res = TD.dispatch(units, max_workers=max(1, lanes), stall_s=3.0,
                           target_rps=2.0, verbose=False)
         by_id = {x.get("unit"): x for x in (res.get("results") or [])}
