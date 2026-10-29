@@ -2575,3 +2575,30 @@
 {"at": "2026-10-30T02:52:39", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
 {"at": "2026-10-30T02:56:51", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
 {"at": "2026-10-30T02:56:53", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1989, "third_party": 0}
+{"at": "2026-10-30T03:03:51", "event": "autobind", "files": 10, "bound": 10, "hint": "caps_called_audit", "pruned": 0}
+{"at": "2026-10-30T03:06:26", "event": "scan", "bindings": 2494, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:07:02", "event": "scan", "bindings": 2494, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:08:35", "event": "gaps", "missing": 1, "no_kind": 341, "scanned": 1990, "third_party": 0}
+{"at": "2026-10-30T03:08:35", "event": "bind", "asset": "tools/asset_index.py", "tentacle": "asset_index", "note": "gapbind"}
+{"at": "2026-10-30T03:08:36", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1990, "third_party": 0}
+{"at": "2026-10-30T03:08:54", "event": "autobind", "files": 1, "bound": 1, "hint": "asset_index", "pruned": 0}
+{"at": "2026-10-30T03:09:43", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1990, "third_party": 0}
+{"at": "2026-10-30T03:10:19", "event": "bind", "asset": "tools/control_loop.py", "tentacle": "control_loop", "note": "autobind"}
+{"at": "2026-10-30T03:10:20", "event": "autobind", "files": 2, "bound": 2, "hint": "control_loop", "pruned": 0}
+{"at": "2026-10-30T03:11:23", "event": "bind", "asset": "tools/penetrating_cross_scan.py", "tentacle": "penetrating_cross_scan", "note": "autobind"}
+{"at": "2026-10-30T03:11:24", "event": "autobind", "files": 11, "bound": 11, "hint": "ghost_guard", "pruned": 0}
+{"at": "2026-10-30T03:13:13", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:16:34", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:18:14", "event": "autobind", "files": 1, "bound": 1, "hint": "mirror_plan", "pruned": 0}
+{"at": "2026-10-30T03:19:35", "event": "autobind", "files": 10, "bound": 10, "hint": "caps_called_audit", "pruned": 0}
+{"at": "2026-10-30T03:22:15", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:22:26", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:23:51", "event": "bind", "asset": "tools/omni_align.py", "tentacle": "absorb_loop", "note": "autobind"}
+{"at": "2026-10-30T03:23:52", "event": "autobind", "files": 1, "bound": 1, "hint": "absorb_loop", "pruned": 0}
+{"at": "2026-10-30T03:25:07", "event": "autobind", "files": 10, "bound": 10, "hint": "brain_route", "pruned": 0}
+{"at": "2026-10-30T03:25:11", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}
+{"at": "2026-10-30T03:25:15", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}
+{"at": "2026-10-30T03:27:25", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:27:40", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:38:20", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}
+{"at": "2026-10-30T03:38:23", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}

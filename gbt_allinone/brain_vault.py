@@ -21,7 +21,10 @@ import os
 import time
 from pathlib import Path
 
-_DEFAULT_VAULT = Path(r"C:\Users\ADMIN\Documents\Codex\ObsidianVault")
+# 🔴 2026-10-30 修：原来硬编码 Windows 路径 `C:\Users\ADMIN\...`，
+#   在 Linux/iSH 上会让 Path() 在**当前目录造一个同名垃圾目录**（实测已复现并清理）。
+#   默认改成项目内的 state/brain_vault；要用外部库自己设 GBT_VAULT_DIR。
+_DEFAULT_VAULT = Path(__file__).resolve().parents[1] / "state" / "brain_vault"
 _INBOX = "收集箱.md"
 _MAIN = "地图/记忆总纲.md"
 
