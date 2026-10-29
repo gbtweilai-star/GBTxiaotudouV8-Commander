@@ -67,13 +67,38 @@ def _slug(topic: str) -> str:
     return s.strip("-")[:60] or "untitled"
 
 
-def one(topic: str, urls: list, do_absorb: bool = True) -> dict:
-    """一条流水线。返回可审计的回执。"""
+def _src_sha(urls: list, files: list) -> str:
+    """同源指纹：换主题名也认得出是同一批源。"""
+    import hashlib
+    raw = "|".join(sorted([str(u).strip() for u in (urls or [])] +
+                          [str(f).strip() for f in (files or [])]))
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def one(topic: str, urls: list, files: list = None, do_absorb: bool = True,
+        force: bool = False) -> dict:
+    """一条流水线。返回可审计的回执。
+
+    🔴 2026-10-29 打磨两处：
+      ① 支持本地文件 —— intake 本来就吃 files，流水线却只传 urls，
+         导致下载好的论文/README 吞不进来。
+      ② 同源去重 —— 去重原来只按「主题 slug」，**换个主题名同一批源会重复落胶囊**。
+         现在按源的指纹（sha1）判：同一批源已吞过 ⇒ dup_source 跳过（--force 可强制）。
+    """
+    files = list(files or [])
     from gbt_allinone.api import run_task
     import intake_gate as IG
 
     rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "topic": topic,
-           "urls": urls, "absorbed": False}
+           "urls": urls, "files": files, "absorbed": False}
+    sha = _src_sha(urls, files)
+    rec["src_sha"] = sha
+    _prev = (_load().get("sources") or {}).get(sha)
+    if _prev and not force and do_absorb:
+        rec.update({"verdict": "dup_source", "absorbed": False, "indexed": False,
+                    "dup_of": _prev.get("topic"), "why": "同一批源已吞过 ⇒ 跳过（--force 强制）"})
+        _log(rec)
+        return rec
 
     # plan 是**零写盘预演**：自己下载、自己判，不落胶囊、不入库。
     # 🔴 2026-10-29 修：上一版 plan 也走 intake ⇒ intake 内部必然落胶囊+入库，
@@ -81,6 +106,12 @@ def one(topic: str, urls: list, do_absorb: bool = True) -> dict:
     if not do_absorb:
         texts, failed = [], []
         import urllib.request as _U
+        for _f in (files or []):
+            try:
+                texts.append("# file:%s\n\n%s" % (_f, pathlib.Path(_f).read_text(
+                    encoding="utf-8", errors="replace")))
+            except Exception as exc:                          # noqa: BLE001
+                failed.append({"file": _f, "why": type(exc).__name__})
         for u in (urls or []):
             try:
                 req = _U.Request(u, headers={"User-Agent": "gbt-devour"})
@@ -103,7 +134,8 @@ def one(topic: str, urls: list, do_absorb: bool = True) -> dict:
         _log(rec); return rec
 
     # ① 取源 —— 只吞有出处的
-    r = run_task("self_intake", {"op": "intake", "topic": topic, "urls": urls or []})
+    r = run_task("self_intake", {"op": "intake", "topic": topic,
+                                 "urls": urls or [], "files": files or []})
     res = (r.get("gbt_result") or {}).get("result") or r.get("result") or {}
     rec["intake"] = {"ok": res.get("ok"), "sources": res.get("sources"),
                      "not_read": res.get("not_read"),
@@ -132,12 +164,24 @@ def one(topic: str, urls: list, do_absorb: bool = True) -> dict:
             rec["unified_indexed"] = False
             rec["unified_err"] = type(exc).__name__
     rec["absorbed"] = bool(rec["indexed"])
+    if rec["absorbed"]:
+        d = _load()
+        d.setdefault("sources", {})[sha] = {
+            "topic": topic, "capsule": _slug(topic),
+            "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+        d.setdefault("items", {})[_slug(topic)] = rec
+        _save(d)
     _log(rec)
     return rec
 
 
 def show(rec: dict) -> None:
-    mark = {"pass": "✅", "warn": "⚠️", "reject": "🔴"}.get(rec.get("verdict") or "", "·")
+    if rec.get("verdict") == "dup_source":
+        print("  ⏭ %-26s 同一批源已吞过（原属「%s」）⇒ 跳过；要强制用 --force"
+              % (rec.get("topic", "")[:26], rec.get("dup_of")))
+        return
+    mark = {"pass": "✅", "warn": "⚠️", "reject": "🔴",
+            "no_source": "·"}.get(rec.get("verdict") or "", "·")
     g = rec.get("gate") or {}
     print("  %s %-26s 取源 %s · 主张 %s · 跑通 %s · 失败 %s · 入库 %s"
           % (mark, rec["topic"][:26], rec.get("intake", {}).get("sources"),
@@ -161,11 +205,19 @@ def main(argv: list) -> int:
     if op in ("plan", "run"):
         topic = opt("--topic")
         urls = [u.strip() for u in (opt("--urls") or "").split(",") if u.strip()]
+        files = [f.strip() for f in (opt("--files") or "").split(",") if f.strip()]
         if not topic:
             print("  要给 --topic"); return 2
-        rec = one(topic, urls, do_absorb=(op == "run"))
-        d["items"][_slug(topic)] = rec
-        _save(d)
+        if not urls and not files:
+            print("  要给 --urls 或 --files"); return 2
+        rec = one(topic, urls, files, do_absorb=(op == "run"),
+                  force=("--force" in args))
+        # 🔴 2026-10-29 修：原来用**加载过的旧 d** 再写一遍 ⇒ 把 one() 刚登记的
+        #   sources 指纹覆盖掉了 ⇒ 同源去重永远失效（实测换名重吞没被拦住）。
+        #   正确做法：重读一次再落。
+        d2 = _load()
+        d2.setdefault("items", {})[_slug(topic)] = rec
+        _save(d2)
         show(rec)
         return 0
 
@@ -182,12 +234,14 @@ def main(argv: list) -> int:
             slot = _slug(t)
             prev = d["items"].get(slot) or {}
             # 幂等：同 topic 同源且已入库 ⇒ skip（不重复吞、不重复入库）
-            if prev.get("absorbed") and prev.get("urls") == us:
+            if prev.get("absorbed") and prev.get("urls") == us and not it.get("force"):
                 print("  ⏭ %-26s 已吞过同源，skip" % t[:26])
                 continue
-            rec = one(t, us, do_absorb=True)
-            d["items"][slot] = rec
-            _save(d)
+            rec = one(t, us, it.get("files") or [], do_absorb=True,
+                      force=bool(it.get("force")))
+            d2 = _load()
+            d2.setdefault("items", {})[slot] = rec
+            _save(d2)
             show(rec)
         return 0
 
