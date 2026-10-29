@@ -362,3 +362,36 @@ video-out/
 
 # vaults 里的密钥文件（已有 *_key*.json 规则，补清已跟踪的）
 vaults/*_key*.json
+
+# ── 2026-10-30 补二 —— 二批清理后残留的 15 处「已退出索引但规则没盖住」的面 ──
+# 现象：git rm --cached 之后这些路径变成 untracked，status 噪音；且没有规则拦着它们再溜回来。
+# 处理：按"这些是废弃件/产物，永不再入库"的口径把规则补死。
+
+# 被否掉的能力实现（REJECTED 后缀是当时的判定，不是待办）
+*.REJECTED
+**/rejected-*/
+
+# 旧框架归档（legacy 字样即弃用）
+outputs/framework-legacy/
+state/legacy/
+state/framework-legacy-*.json
+state/framework-legacy-groups.json
+state/framework-passports-legacy.json
+**/quant_legacy/
+
+# 第三方主题原始包（只留挑选后的 palettes/，raw 是抓下来的原料）
+state/theme/omarchy-community-raw/
+
+# state 下的旧版视频（static-old 这类对照件，产物）
+state/video-controls/*.mp4
+
+# Obsidian 工作区配置（vaults 里每个库的家务文件，不属于源码）
+**/.obsidian/
+
+# .cluster 子目录里的 py（原规则 `.cluster/*.py` 只盖顶层，子目录全漏 —— 补成递归）
+.cluster/**/*.py
+# .cluster 里的 *_backup 产物（report_v1_backup.html 这类）
+.cluster/**/*_backup*
+
+# render/video/ 整体是渲染产物（11MB mp4 + _mv_* 中间件），非源码
+render/video/
