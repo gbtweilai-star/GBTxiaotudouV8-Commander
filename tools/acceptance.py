@@ -328,6 +328,22 @@ def main() -> int:
                 fn()
             except Exception as exc:                          # noqa: BLE001
                 rec("FAIL", fn.__name__, "%s: %s" % (type(exc).__name__, str(exc)[:60]))
+    # 编排账本判决：**没跑通就不算验收**（主人令 2026-10-29）
+    try:
+        _r = subprocess.run([sys.executable, str(ROOT / "tools" / "orch_ledger.py"), "gate"],
+                            capture_output=True, text=True, timeout=180, cwd=str(ROOT))
+        _txt = (_r.stdout or "")
+        _bad = ("不算验收" in _txt) or (_r.returncode != 0)
+        _line = [x.strip() for x in _txt.splitlines() if "账目" in x]
+        rec("FAIL" if _bad else "PASS", "编排账本（没跑通就不算验收）",
+            _line[0] if _line else ("有未跑通项" if _bad else "全部有跑通记录"))
+        for x in _txt.splitlines():
+            if x.strip().startswith("· "):
+                rec("INFO", "账本未跑通/未记账", x.strip()[2:][:52])
+                break
+    except Exception as _e:                                   # noqa: BLE001
+        rec("ENV", "编排账本", "跑不起来：%s" % type(_e).__name__)
+
     # 触手页面覆盖：**每一页都要被触手覆盖**（主人令 2026-10-21/2026-10-29）
     try:
         subprocess.run([sys.executable, str(ROOT / "tools" / "page_tentacle.py"), "scan"],
