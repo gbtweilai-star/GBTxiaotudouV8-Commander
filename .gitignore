@@ -395,3 +395,8 @@ state/video-controls/*.mp4
 
 # render/video/ 整体是渲染产物（11MB mp4 + _mv_* 中间件），非源码
 render/video/
+
+# 十二根分类心跳触手的自有抽屉（运行期状态：每根一格 + 汇总 + 环形扫描史；非源码）
+# 依据主人令 2026-10-30「每个分类部署一根心跳触手」；本目录由 heartbeat_tentacle 自管，
+# 它的卫生层只在这个抽屉里清垃圾，不碰别处。
+state/heartbeat/

@@ -2,19 +2,19 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-29T23:41:38+08:00",
+ "generated_at": "2026-10-30T07:27:03+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
-  "ok": true,
-  "detail": "链自洽：759 条记录，末条 hash=sha256:471b995c66a4337",
-  "records": 759
+  "ok": false,
+  "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
+  "records": 763
  },
  "totals": {
-  "records": 759,
+  "records": 763,
   "scans": 30,
-  "changes": 596,
-  "decisions": 20,
+  "changes": 598,
+  "decisions": 22,
   "delivers": 92
  },
  "scans": [
@@ -1001,54 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 460,
-   "ts": "2026-10-14T06:28:03+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "Codex 桌面版连不上自家模型:①根因=模型选择器只写 model 不写 provider+config.toml 默认 provider=deepseek ②按主人令B 给 CLIProxyAPI 加 DeepSeek 车道并改默认 provider=gbt-potato ③余因=vLLM 未开 --enable-auto-tool-choice 带 tools 的请求回 400",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5b9df8894ca1d6d",
-   "prev": "sha256:b0356399c6313e6"
-  },
-  {
-   "n": 461,
-   "ts": "2026-10-14T07:03:12+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "RunPod gbt-v8-live 补 vLLM 工具参数(ENABLE_AUTO_TOOL_CHOICE/TOOL_CALL_PARSER=qwen3_coder, 未加 REASONING_PARSER):400 消失但模型吐的是自家格式 {fn,kwargs} 无解析器匹配=>带工具请求回空消息,Codex 仍不可用",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:86bd1369b463542",
-   "prev": "sha256:5b9df8894ca1d6d"
-  },
-  {
-   "n": 462,
-   "ts": "2026-10-14T07:38:11+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增 LLM 车道双向绑定+直通启动件 tools/codex-scripts/llm-lane-direct.py(A向=一条base-url直达全部车道+代理自愈;B向=读数回写 state/llm-lane-binding.json;登录自启 VBS 免提权;自适应保温 900s)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:04e90ce0434d914",
-   "prev": "sha256:86bd1369b463542"
-  },
-  {
-   "n": 463,
-   "ts": "2026-10-14T07:41:02+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清旧:停用 4446 老中继两条计划任务(CodexRelay/CodexRelayWatchdog)并摘掉任务定义里的明文 DeepSeek 密钥(Owner 提权执行);看门狗日志 06:38:04 后停刷",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:bce04853f79ccd7",
-   "prev": "sha256:04e90ce0434d914"
-  },
   {
    "n": 464,
    "ts": "2026-10-14T08:02:30+08:00",
@@ -4606,6 +4558,48 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:471b995c66a4337",
    "prev": "sha256:445904bb06b750b"
+  },
+  {
+   "n": null,
+   "ts": "2026-10-30T07:06:11.962224+08:00",
+   "kind": "decision",
+   "actor": null,
+   "what": null,
+   "where": null,
+   "hash": "None",
+   "prev": "None"
+  },
+  {
+   "n": null,
+   "ts": "2026-10-30T07:14:06.783387+08:00",
+   "kind": "change",
+   "actor": null,
+   "what": null,
+   "where": null,
+   "hash": "None",
+   "prev": "None"
+  },
+  {
+   "n": null,
+   "ts": "2026-10-30T07:22:53.375894+08:00",
+   "kind": "change",
+   "actor": null,
+   "what": null,
+   "where": null,
+   "hash": "None",
+   "prev": "None"
+  },
+  {
+   "n": 763,
+   "ts": "2026-10-30T07:27:03+08:00",
+   "kind": "decision",
+   "actor": "AI",
+   "what": "建立能力位严格分类(12大类)+每类一根心跳触手+状态回大脑执行层出指令",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:574b8e4ebc1d05e",
+   "prev": "genesis"
   }
  ]
 };
