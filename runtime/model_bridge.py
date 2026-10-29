@@ -466,7 +466,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):                                        # noqa: N802
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
-                 "/voice/speak", "/voice/status")
+                 "/voice/speak", "/voice/status",
+                 "/_cap", "/_tentacle/hello")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -481,6 +482,41 @@ class Handler(BaseHTTPRequestHandler):
         #   而 iOS WebKit 的 getVoices() 首次常返回 0 ⇒ 落到错嗓音念中文 ⇒ 鬼叫。
         #   现在页面的唯一出口是这里：走 tentacle_bus 的嘴（edge-tts 曉臻·台湾腔），
         #   实在没有 edge-tts 才退 apple-speak zh-TW；两条都没有就如实说没有。
+        # ── 触手接管器用：页面每一个可交互点都经这里调能力位 ──────────
+        # 🔴 2026-10-29：tentacle-kit.js 依赖 window.gbtW3.cap()，而那只在 Electron 壳里有。
+        #   在 Safari 里没有 ⇒ kit 只能报"无桥" ⇒ **20/28 个页面等于没接触手**。
+        #   这个端点就是网页版的唯一门：页面 → 这里 → run_task（门照跑，权限照判）。
+        if self.path.startswith("/_cap"):
+            cap = str(body.get("cap") or body.get("kind") or "").strip()
+            if not cap:
+                return self._json(400, {"ok": False, "error": {"message": "缺 cap"}})
+            try:
+                from gbt_allinone.api import run_task as _rt
+                r = _rt(cap, body.get("payload") or {})
+                res = (r.get("gbt_result") or {}).get("result") or r.get("result") or r
+                ok = bool(res.get("ok", True)) if isinstance(res, dict) else False
+                sys.stderr.write("[bridge] _cap %s → ok=%s\n" % (cap, ok))
+                return self._json(200, {"ok": ok, "cap": cap, "result": res})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "cap": cap,
+                                        "error": {"message": "%s: %s"
+                                                  % (type(exc).__name__, str(exc)[:120])}})
+
+        # ── 页面报到：证明"这一页真活着、真接了触手" ──────────────────
+        if self.path.startswith("/_tentacle/hello"):
+            try:
+                _HELLO_FILE = ROOT / "state" / "page_tentacle_hello.jsonl"
+                _HELLO_FILE.parent.mkdir(parents=True, exist_ok=True)
+                rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "page": str(body.get("page") or "")[:120],
+                       "kit": bool(body.get("kit")), "controls": body.get("controls"),
+                       "ua": str(self.headers.get("User-Agent") or "")[:60]}
+                with _HELLO_FILE.open("a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                return self._json(200, {"ok": True, "seen": rec["page"]})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
         if self.path.startswith("/voice/speak"):
             text = str(body.get("text") or "")[:500]
             if not text:
