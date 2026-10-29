@@ -33,7 +33,13 @@ for _s in (sys.stdout, sys.stderr):
     if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+# 🔴 2026-10-29 修：原来这里写死 Windows 路径
+#     Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+#   在 Linux/macOS 上它不是"不存在的绝对路径"，而是**相对路径字符串**
+#   ⇒ 会在仓库里造一个同名目录，读那份空绑定表 ⇒ `bindings: 0` 永远是 0。
+#   这就是"触手绑定一直是 0"的真正根因，不是没绑，是**读错了地方**。
+_ENV_ROOT = __import__("os").environ.get("GBT_ROOT")
+ROOT = Path(_ENV_ROOT) if _ENV_ROOT else Path(__file__).resolve().parents[1]
 STATE = ROOT / "state"
 BINDINGS = STATE / "asset_bindings.json"
 LEDGER = STATE / "asset_bindings.jsonl"

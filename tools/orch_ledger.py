@@ -62,16 +62,31 @@ def read() -> list:
 def git_changed() -> list:
     """工作区里改过/新增但**还没提交**的文件（相对仓根）。"""
     try:
-        r = subprocess.run(["git", "status", "--porcelain"], capture_output=True,
-                           text=True, timeout=30, cwd=str(ROOT))
-        out = []
-        for ln in (r.stdout or "").splitlines():
-            p = ln[3:].strip()
-            if " -> " in p:
-                p = p.split(" -> ")[-1]
-            if p:
-                out.append(p)
-        return out
+        # 🔴 core.quotepath=false：否则含中文/特殊字符的路径会被 git 转义成八进制
+        #   （实测 "C:\Users\..." 变成 "C://Users//ADMIN//.../345/260/217/..." 这种鬼样子，
+        #   账本按它去比对，永远对不上）。
+        # 🔴 用 -z（NUL 分隔）：git 对含反斜杠/中文的路径会加引号并转义成八进制
+        #   （实测 "C:\\Users\\..." 变成 ".../345/260/217/..."），文本模式怎么配都对不上。
+        #   -z 是**唯一不做任何转义**的格式。
+        r = subprocess.run(["git", "status", "--porcelain", "-z"],
+                           capture_output=True, text=True, timeout=30, cwd=str(ROOT))
+        out, gone = [], []
+        for ln in (r.stdout or "").split("\0"):
+            if len(ln) < 4:
+                continue
+            code = ln[:2]
+            path = ln[3:]
+            if " -> " in path:
+                path = path.split(" -> ")[-1]
+            if not path:
+                continue
+            # 删除的单独归一类：它也是"改动"，但文件已经不在了，
+            # 不能按"需要一个 pass 记录"去要求它。
+            if "D" in code:
+                gone.append(path)
+            else:
+                out.append(path)
+        return out + ["(DELETED) " + g for g in gone]
     except Exception:                                         # noqa: BLE001
         return []
 
@@ -104,7 +119,8 @@ def gate(strict: bool = True) -> dict:
     ledgered = set(changes)
     dirty = [_norm(x) for x in git_changed()]
     unrecorded = [x for x in dirty if x not in ledgered
-                  and not x.startswith(("state/", "logs/"))]
+                  and not x.startswith(("state/", "logs/"))
+                  and not x.startswith("(DELETED) ")]
 
     # ③ 显式 fail / unrun
     failed = [k for k, v in runs.items() if v.get("status") == "fail"]
