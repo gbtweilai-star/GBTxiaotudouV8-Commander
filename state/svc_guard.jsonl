@@ -352,3 +352,7 @@
 {"at": "2026-10-30T01:37:12", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 78}
 {"at": "2026-10-30T01:37:13", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 105}
 {"at": "2026-10-30T01:37:44", "act": "yield", "stopped": ["免费池"], "mem_mb": 135}
+{"at": "2026-10-30T01:37:48", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 133}
+{"at": "2026-10-30T01:37:49", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 140}
+{"at": "2026-10-30T01:38:37", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 368}
+{"at": "2026-10-30T01:38:37", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 336}
