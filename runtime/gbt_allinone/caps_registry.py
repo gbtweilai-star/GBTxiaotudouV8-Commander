@@ -13,6 +13,50 @@ UNIMPLEMENTED_CAPS 里的名字**只有名字、没有实现**：调用会得到
 """
 
 BENIGN_CAPS = {
+    # ── 身体（设备即本体 · 2026-10-24）：六个动作各是一条能力位 ──
+    # 装到哪台设备，这六根就长在那台设备上；库在 3.12，所以由 body_bridge 转发。
+    "body_map": {
+        "domain": 'device',
+        "desc": '身体·清单：现读这台设备的七根感官与六根动作（零作用域，只读）',
+        "handler": 'body_map',
+        "safe": True,
+    },
+    "body_see": {
+        "domain": 'device',
+        "desc": '身体·看：截当前屏幕落 png（可选 monitor 序号）',
+        "handler": 'body_see',
+        "safe": True,
+    },
+    "body_say": {
+        "domain": 'device',
+        "desc": '身体·说：系统 TTS 念一句（参数 text，可调 rate）',
+        "handler": 'body_say',
+        "safe": True,
+    },
+    "body_type": {
+        "domain": 'device',
+        "desc": '身体·打字：向前台窗口键入文本（参数 text）',
+        "handler": 'body_type',
+        "safe": True,
+    },
+    "body_click": {
+        "domain": 'device',
+        "desc": '身体·点：按坐标点按（参数 x,y,clicks）',
+        "handler": 'body_click',
+        "safe": True,
+    },
+    "body_volume": {
+        "domain": 'device',
+        "desc": '身体·音量：读或设主音量（参数 level 0~1；不传则只读）',
+        "handler": 'body_volume',
+        "safe": True,
+    },
+    "body_open": {
+        "domain": 'device',
+        "desc": '身体·打开：用系统默认程序打开文件/网址（参数 target）',
+        "handler": 'body_open',
+        "safe": True,
+    },
     # ── 官方 Codex 能力化（B 档 · 风哥 2026-09-15 批准）──
     # 只读：状态与工具清单；写：线程/回合/中断（由 policy 按 process_execute 作用域守护）
     "codex_status": {
@@ -931,14 +975,14 @@ BENIGN_CAPS = {
         "safe": False,
     },
     "omni_plug": {
-        "domain": 'llm',
+        "domain": 'llm',  # 🔴 2026-10-28：desc 从 6 个 op 补到 24 个（含别名）——主脑读声明做决策，没写进去的入口等于不存在。判据 omni-monitor.py --gap（AST 三向对账）。⚠️ 本段**行数必须恒定**：main.cjs 的 TOOLS_CAPS 按 caps_registry.py:NNN 钉指针，加行会让后面全体错位。
         "desc": '万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成'
-                '一根可扫可控的分支。op=status/sockets/energy/selftest 为**读类直连**；plug 只做存在性探测；'
-                'run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · '
-                'api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。'
-                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— '
-                'V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。'
-                '三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。',
+                '一根可扫可控的分支。op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；'
+                'run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。'
+                '**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。'
+                '**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。'
+                '**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。'
+                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。',
         "handler": 'omni_plug',
         "safe": False,
     },
@@ -1118,7 +1162,7 @@ BENIGN_CAPS = {
                 '未绑顶点/非归一化权重/零长骨/左右镜像/包围盒/缩放是否已应用；**自动剔除 Blender 导入器造的 42 顶点'
                 ' Icosphere 显示形状**（文件里没有它，别当杂物球）。op=status（纯读）· run（写派生 .js 给页吃 ⇒ '
                 'filesystem_write 门在处理器层）· check（只对账 .js 与 GLB 的 sha）',
-        "handler": 'dh_rig', "safe": False,
+        "handler": 'rig_audit', "safe": False,
     },
     "rig_fix": {
         "domain": 'creation',
@@ -1127,14 +1171,14 @@ BENIGN_CAPS = {
                 '量具自证换算 0.3~3 / 身高 1.720±0.02 在**文件空间**量 / 未绑顶点归零 / 蒙皮网格被骨架带动）。'
                 '⚠️ 它**不重做动作修正**（出件后必须再跑 anim_fix，否则腿折在胯上、手举过头顶 —— 2026-10-19 实栽）。'
                 'op=status/plan（纯读）· run（写 outputs/rig-fix/ ⇒ 要票）',
-        "handler": 'dh_rig', "safe": False,
+        "handler": 'rig_fix', "safe": False,
     },
     "anim_audit": {
         "domain": 'creation',
         "desc": '动画体检（**纯读免门**）：直接解析 GLB 的 animation 通道，把每根骨「首帧 vs 静止姿势」的夹角'
                 '从大到小排出来（当初就是它量出髋骨被扭 177.2°/176.3°）。阈值 --threshold 默认 30°，all 打全量。'
                 'op=status/run/where',
-        "handler": 'dh_rig', "safe": True,
+        "handler": 'anim_audit', "safe": True,
     },
     "anim_fix": {
         "domain": 'creation',
@@ -1142,7 +1186,7 @@ BENIGN_CAPS = {
                 '（髋骨 LeftUpLeg/RightUpLeg）或写成**量出来的**姿势（手臂组的值来自闭环解算，不许手搓）；'
                 '平移/缩放通道一律不碰；自检=命中通道/采样形状/四元数模长/写回逐帧复查/**只改这些字节（其余逐一相等）**/'
                 '网格蒙皮没被动。op=status/plan（纯读）· run（写 dst ⇒ 要票；dry=true 只自检不落盘 ⇒ 免票）',
-        "handler": 'dh_rig', "safe": False,
+        "handler": 'anim_fix', "safe": False,
     },
     "dh_asset_gate": {
         "domain": 'creation',
@@ -1150,7 +1194,7 @@ BENIGN_CAPS = {
                 ' 1.720±0.02（**在文件空间量 POSITION 的 Y 跨度**，不在 Blender 的 Z 里量）④ 无死顶点 ⑤ 髋骨没被扭'
                 '（<0.5°）⑥ 手臂垂放（40°~120°）⑦ 循环闭合（首末帧差 <2°，含阈值翻正留痕）⑧ 派生件 .b64.js 与源 sha 对账。'
                 'op=status/run/where',
-        "handler": 'dh_rig', "safe": True,
+        "handler": 'dh_asset_gate', "safe": True,
     },
     "omni_arm": {
         "domain": 'creation',
@@ -1803,12 +1847,26 @@ BENIGN_CAPS = {
     "memory_manager": {
         "domain": 'mind',
         "desc": '记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·'
-                '六类源（记忆/文档/技能/状态/**能力位**/代理）⇒ find 秒级返回「路径+类型+高亮片段」，'
+                '七类源（记忆/文档/技能/状态/**能力位**/代理/助手记忆）⇒ find 秒级返回「路径+类型+高亮片段」，'
                 '并**同时端出匹配的能力位**（"想到匹配面出现的能力"）；index 增量（mtime+sha 未变即跳过；'
                 '**不许整表清空** —— 实测因此丢过索引）；store 存记忆过 filesystem_write 门。'
                 'SQL 纪律：全部内联字面量 + `?` 占位符，不用变量拼 SQL（安全钩子实测拦过两次）。'
                 'op=index/find/store/stats',
         "handler": 'memory_manager',
+        "safe": True,
+    },
+    "code_graph": {
+        "domain": 'mind',
+        "desc": '代码知识图谱（主人令 2026-10-29，蒸馏自 symchenry/codegraph 的机制、不抄代码）：'
+                '**本地 AST 预索引 → SQLite 图谱（symbols/edges/files + FTS5）→ 结构化查询**。'
+                '给 AI 的是「文件:行 + 类型 + 签名 + 调用链」，**不是文件正文** —— 省 token 就在这一点。'
+                '.py 用标准库 `ast` 精确解析（exact=1，实测占 96%）；.js/.cjs 用正则粗解析并标 `exact=false`'
+                '（本仓零新依赖原则，不引 tree-sitter）。**改名导入已还原**（`import x as _tf` 后调 `_tf()` '
+                '仍能追到真名 —— 不还原的话 `callers` 会漏掉真正调用方，实测漏过 omni_plug/gpu_lane）；'
+                '`edges` 带 `src_file`，所以**同名函数不会串**（按名字 JOIN 曾把 5 个不同的 `discover` 混成一处）。'
+                '扫描面排除 `node_modules`/`.pylibs`/`native_browser`/`mirror_space`（第三方与生成代码）。'
+                'op=index/find/callers/callees/summary/stats',
+        "handler": 'code_graph',
         "safe": True,
     },
     "sec_sweeper": {
