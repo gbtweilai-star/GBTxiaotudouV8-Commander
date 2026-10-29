@@ -2629,3 +2629,6 @@
 {"at": "2026-10-30T04:13:19", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
 {"at": "2026-10-30T04:17:57", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1995, "third_party": 0}
 {"at": "2026-10-30T04:17:59", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1995, "third_party": 0}
+{"at": "2026-10-30T04:19:23", "event": "autobind", "files": 2, "bound": 2, "hint": "no_such_cap_xyz", "pruned": 0}
+{"at": "2026-10-30T04:25:41", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1995, "third_party": 0}
+{"at": "2026-10-30T04:25:44", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1995, "third_party": 0}

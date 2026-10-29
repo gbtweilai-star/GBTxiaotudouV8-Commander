@@ -61,10 +61,25 @@ def _board(space: str) -> pathlib.Path:
 
 
 def _append(space: str, rec: dict) -> dict:
+    """追加一行。**加排他锁**：多个 agent 同时写，行不能交错、不能丢。
+
+    POSIX 对 O_APPEND 的小写入通常是原子的，但"通常"不是保证 ——
+    真上几千个 agent 时，交错出一行半截的 JSON 就等于协作记录被污染。
+    所以显式 fcntl 锁，锁的是板子文件本身（不另建锁文件，少一个要清的东西）。
+    """
+    import fcntl
     rec.setdefault("at", time.strftime("%Y-%m-%dT%H:%M:%S"))
-    rec.setdefault("id", "m%d" % int(time.time() * 1000))
-    with _board(space).open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    rec.setdefault("id", "m%d-%d" % (int(time.time() * 1000), os.getpid()))
+    bd = _board(space)
+    line = json.dumps(rec, ensure_ascii=False) + "\n"
+    with bd.open("a", encoding="utf-8") as fh:
+        fcntl.flock(fh.fileno(), fcntl.LOCK_EX)
+        try:
+            fh.write(line)
+            fh.flush()
+            os.fsync(fh.fileno())
+        finally:
+            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
     return rec
 
 
@@ -203,9 +218,74 @@ def selftest() -> int:
     return bad
 
 
+def bench(writers: int = 8, posts: int = 50, mode: str = "thread") -> dict:
+    """并发写压测：N 个写手 × M 条，看丢不丢、烂不烂、多快。
+
+    两种模式分开量，读数不混：
+      thread  线程写手（同一进程内，各自开 fd 抢锁）—— 便宜，能拉到上千
+      proc    真进程写手（模拟真 agent）—— 受本机内存限制，只能小 N
+    """
+    import threading
+    sp = "bench_%s_%d" % (mode, int(time.time()))
+    bd = _board(sp)
+    if bd.exists():
+        bd.unlink()
+
+    def writer(wid: int) -> None:
+        for i in range(posts):
+            post("log", "w%d-%d" % (wid, i), by="bench%d" % wid, space=sp)
+
+    t0 = time.time()
+    procs = []
+    if mode == "proc":
+        code = ("import sys;sys.path.insert(0, r'%s')\n"
+                "import mirror_board as MB\n"
+                "for i in range(%d): MB.post('log','p%s-%%d'%%i,by='bench',space='%s')\n"
+                % (str(ROOT / "tools"), posts, "P", sp))
+        import subprocess
+        for _ in range(writers):
+            procs.append(subprocess.Popen([sys.executable, "-c", code],
+                                          stdout=subprocess.DEVNULL,
+                                          stderr=subprocess.DEVNULL))
+        for p_ in procs:
+            p_.wait()
+    else:
+        ts = [threading.Thread(target=writer, args=(w,)) for w in range(writers)]
+        for t in ts:
+            t.start()
+        for t in ts:
+            t.join()
+    elapsed = max(0.001, time.time() - t0)
+
+    lines, bad = 0, 0
+    if bd.is_file():
+        for ln in bd.read_text(encoding="utf-8").splitlines():
+            if not ln.strip():
+                continue
+            lines += 1
+            try:
+                json.loads(ln)
+            except Exception:                                     # noqa: BLE001
+                bad += 1
+    expect = writers * posts
+    res = {"mode": mode, "writers": writers, "posts": posts, "expect": expect,
+           "lines": lines, "malformed": bad, "lost": expect - lines,
+           "elapsed_s": round(elapsed, 2),
+           "per_sec": round(lines / elapsed, 1),
+           "ok": lines == expect and bad == 0}
+    bd.unlink(missing_ok=True)      # 压测数据不留盘（板子是协作记录，不是垃圾场）
+    return res
+
+
 def main(argv: list) -> int:
     if "--selftest" in argv or "selftest" in argv:
         return selftest()
+    if "bench" in argv:
+        def _o(k, d):
+            return argv[argv.index(k) + 1] if k in argv else d
+        r = bench(int(_o("--writers", 8)), int(_o("--posts", 50)), _o("--mode", "thread"))
+        print(json.dumps(r, ensure_ascii=False, indent=1))
+        return 0 if r["ok"] else 1
     def opt(k, d=None):
         return argv[argv.index(k) + 1] if k in argv else d
     if "post" in argv:

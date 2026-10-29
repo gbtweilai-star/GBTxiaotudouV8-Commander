@@ -138,6 +138,22 @@ def run(name: str, lanes: int = 4, rounds: int = 0) -> dict:
     while True:
         round_no += 1
         now = time.time()
+        # 板子回看：上一轮我发过求助的节点，如果别人交了文件，这一轮就接着干
+        try:
+            import mirror_board as MB3
+            rows = (MB3.tail(10 ** 6, space=name).get("rows") or [])
+            ans = {r.get("answers"): r.get("refs") or [] for r in rows
+                   if r.get("cat") == "file" and r.get("answers")}
+            for nid, n in st["nodes"].items():
+                sid = n.get("seek")
+                if sid and sid in ans and n["status"] in ("failed", "dead"):
+                    n["status"] = "pending"
+                    n["tries"] = 0
+                    n["why"] = "板上有人交付了：%s" % ans[sid]
+                    n.setdefault("payload", {})["_board_file"] = ans[sid][0]
+                    print("   📥 %s 接手：板上有答案 %s" % (nid, ans[sid][0]), flush=True)
+        except Exception:                                         # noqa: BLE001
+            pass
         reclaimed = _reclaim(st, now)
         ready = _ready(st, now)
         if reclaimed:
@@ -182,8 +198,9 @@ def run(name: str, lanes: int = 4, rounds: int = 0) -> dict:
                     MB.post("result", "节点 %s 完成（%d ms）" % (nid, n.get("ms") or 0),
                             refs=[n["kind"]], by="swarm:%s" % name, space=name)
                 else:
-                    MB.seek("%s 失败：%s" % (n["kind"], n.get("why") or stt),
-                            by="swarm:%s" % name, space=name)
+                    sk = MB.seek("%s 失败：%s" % (n["kind"], n.get("why") or stt),
+                                 by="swarm:%s" % name, space=name)
+                    n["seek"] = sk.get("posted")
             except Exception:                                     # noqa: BLE001
                 pass
             n["why"] = None if n["status"] == "done" else str(w.get("error") or stt)[:120]
