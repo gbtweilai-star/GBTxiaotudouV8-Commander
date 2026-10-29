@@ -18,9 +18,6 @@
 ## 红线（与框架同口径）
   · **密钥只从环境变量/密钥服务来**：`GBT_POTATO_BASE_URL` · `GBT_POTATO_API_KEY` · `GBT_FREE_POOL_KEY`
     · `GBT_CLIPROXY_KEY`（本地客户端钥匙；不给则**本机随机生成**并只落应用数据区）；
-  · **DeepSeek 官方车道**（2026-10-14 加）：`GBT_DEEPSEEK_BASE_URL`（默认 `https://api.deepseek.com/v1`）·
-    `GBT_DEEPSEEK_API_KEY`（不给就回退 `DEEPSEEK_API_KEY`）· `GBT_DEEPSEEK_MODELS`
-    （默认 `deepseek-flash,deepseek-v4-pro`）—— 让「我们自己的模型」与「DeepSeek 原档」同走 8317 一个口；
   · 生成物（config.yaml / 钥匙）只落 `%APPDATA%\\gbt-cliproxy\\`，**仓库里只放模板**；
   · 服务只绑 **127.0.0.1**（不外露）；
   · **本件所有出站请求只许回环**（见 `_checked_url`）：协议 http、主机白名单（127.0.0.1/localhost/::1）、
@@ -58,25 +55,6 @@ KEYFILE = APPDIR / "client-key.txt"
 PORT = int(os.environ.get("GBT_CLIPROXY_PORT", "8317"))
 HOST = "127.0.0.1"
 ALLOWED_LOOPBACK = frozenset({"127.0.0.1", "localhost", "::1"})
-
-
-def _env(name: str, default: str = "") -> str:
-    """环境变量优先；**本进程环境块缺它时回用户注册表读**。
-
-    🔴 2026-10-14 血读（真踩）：老进程/老终端的环境块可能是旧的 ⇒ `os.environ` 里没有 GBT_*
-    ⇒ 本件会拿"统一钥"当上游钥、并把缺钥的车道**整条丢掉**：实测车道 3 条 → 1 条，
-    上游 RunPod 回 `401 invalid api key`。注册表那份**仍是环境变量**（持久化的一份），
-    不是新凭据源 ⇒ 读它不违反"密钥只从环境变量来"。
-    """
-    v = (os.environ.get(name) or "").strip()
-    if v or os.name != "nt":
-        return v or default
-    try:
-        import winreg                                            # noqa: PLC0415
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
-            return (winreg.QueryValueEx(k, name)[0] or "").strip() or default
-    except Exception:                                            # noqa: BLE001
-        return default
 
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -130,13 +108,13 @@ def _unified_key() -> dict:
          并把该值 `setx GBT_CLIPROXY_KEY`（框架侧读得到，与路由器同一把）。
     返回 `{key, source, key_id, verified}`；铸不出就如实报缺（不编）。
     """
-    env = _env("GBT_CLIPROXY_KEY")
+    env = (os.environ.get("GBT_CLIPROXY_KEY") or "").strip()
     if env:
         return {"key": env, "source": "env:GBT_CLIPROXY_KEY"}
     if KEYFILE.is_file():
         s = KEYFILE.read_text(encoding="utf-8").strip()
         if s:
-            # 🔴 自愈（实测踩坑）：文件里可能是**早先随机生成、没过门**的钥 ⇒ 门不认 ⇒ 双向绑定只绑了一半。
+ # 自愈（实测踩坑）：文件里可能是**早先随机生成、没过门**的钥 ⇒ 门不认 ⇒ 双向绑定只绑了一半。
             #    拿到文件钥先**请门核验**；核不过就把它改名留存（不删），走 mint 重铸一把。
             ver = _gateway_call("key_gateway", {"op": "verify", "key": s})
             if ver.get("ok"):
@@ -173,22 +151,22 @@ def _lanes() -> list:
     密钥一律从环境变量来；免费池没在跑就 `disabled: true` —— 不编「活着」。
     """
     lanes = []
-    potato_base = _env("GBT_POTATO_BASE_URL").rstrip("/")
-    potato_key = _env("GBT_POTATO_API_KEY")
+    potato_base = (os.environ.get("GBT_POTATO_BASE_URL") or "").strip().rstrip("/")
+    potato_key = (os.environ.get("GBT_POTATO_API_KEY") or "").strip()
     potato_models = [m.strip() for m in
                      (os.environ.get("GBT_POTATO_MODELS") or "gbt-potato-v8").split(",") if m.strip()]
-    # 🔴 统一密钥口径：自家车道的上游钥 = **同一把统一密钥**（云端 GW_AUTH 也设成这个值）
+ # 统一密钥口径：自家车道的上游钥 = **同一把统一密钥**（云端 GW_AUTH 也设成这个值）
     #    ——「不做密钥填充，双向绑定在一个密钥上」。环境变量给了别的值就以其为准（主人显式覆盖）。
     unified = (_unified_key().get("key") or "")
-    # 🔴 2026-10-14 补（真跑咬出来的）：**车道上游钥可显式覆盖**。
+ # 2026-10-14 补（真跑咬出来的）：**车道上游钥可显式覆盖**。
     #    实测病案：本车道 base 指 RunPod 自托管端点，钥却取了「统一钥」（那把是给**云端 Worker** 的
     #    `GW_AUTH` 用的）⇒ 上游回 `401 invalid api key`；同一条链上 Worker 自己也一样 401。
     #    两者**不是同一把**钥 ⇒ 给车道留一个显式口：`GBT_POTATO_LANE_KEY`（不设时行为与改前逐字节相同）。
-    lane_key = _env("GBT_POTATO_LANE_KEY")
+    lane_key = (os.environ.get("GBT_POTATO_LANE_KEY") or "").strip()
     if potato_base:
-        # 🔴 优先级：**统一密钥优先**（主人令「一个密钥两边用」）。实测坑：环境里的旧钥
+ # 优先级：**统一密钥优先**（主人令「一个密钥两边用」）。实测坑：环境里的旧钥
         #    （setx 只对新进程生效 ⇒ 本进程仍拿旧值）会被优先写进配置 ⇒ 云端 401。
-        # 🔴 2026-10-14 再修（真跑咬出来的第二个坑）：**这条车道的 base 是 RunPod 自托管端点**
+ # 2026-10-14 再修（真跑咬出来的第二个坑）：**这条车道的 base 是 RunPod 自托管端点**
         #    ⇒ 它要的是 `rpa_…`（`GBT_POTATO_API_KEY`），**不是**那把"统一钥"（统一钥是给**云端 Worker**
         #    的 `GW_AUTH` 用的）。拿统一钥打 RunPod 端点 = `401 invalid api key`（本机实测）。
         #    ⇒ 车道钥优先级改成：显式覆盖 > **本车道自己的钥** > 统一钥。
@@ -197,22 +175,6 @@ def _lanes() -> list:
                             "(KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
                       "key": lane_key or potato_key or unified or "none",
                       "models": potato_models})
-    # ── 2026-10-14 追加：DeepSeek 官方车道（主人令「B：一个入口走全部模型」）──────────────
-    #   为什么加它：Codex 桌面版的模型选择器**只带 model、不带 provider**（实测：App 持久状态
-    #   `composer-recent-model-configurations-v1` 每条只有 model/reasoningEffort/serviceTier），
-    #   而 config.toml 的 `model_provider` 是**全局一格** ⇒ 选「GBT小土豆V8 v24（自托管）」时
-    #   请求仍发去 api.deepseek.com，DeepSeek 原样回 `but you passed gbt-potato-v8`（今天三次实测）。
-    #   解法：把 DeepSeek 也接成**同一入口（8317）下的一条车道**，`model_provider` 固定 gbt-potato
-    #   ⇒ App 里选哪个模型都从这个口出去，模型名自己分流（两边的 wire_api=responses 都实测 200）。
-    #   密钥来源：`GBT_DEEPSEEK_API_KEY`，回退到已有的 `DEEPSEEK_API_KEY`（都走环境变量，不落盘）。
-    #   没给钥就**不加这条车道**（如实缺，不编一条空车道）。
-    ds_base = _env("GBT_DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1").rstrip("/")
-    ds_key = _env("GBT_DEEPSEEK_API_KEY") or _env("DEEPSEEK_API_KEY")
-    if ds_key:
-        lanes.append({"name": "deepseek", "base": ds_base, "key": ds_key,
-                      "models": [m.strip() for m in
-                                 (os.environ.get("GBT_DEEPSEEK_MODELS")
-                                  or "deepseek-flash,deepseek-v4-pro").split(",") if m.strip()]})
     # 本机 Ollama 车道（组1）：权重本地、回环；在听就启用，不在听就如实 disabled
     ollama_base = (os.environ.get("GBT_LOCAL_LLM_BASE_URL") or "http://127.0.0.1:11434/v1").rstrip("/")
     lanes.append({"name": "gbt-local-ollama", "base": ollama_base, "key": "ollama",
@@ -274,7 +236,7 @@ def write_config() -> dict:
             '        - api-key: "%s"' % ln["key"],
         ]
         if ln.get("ua"):
-            # 🔴 实测坑（两个）：① 云端 Worker 在 CF 边缘后面，**非浏览器 UA 会被判 bot（403 code 1010）**
+ # 实测坑（两个）：① 云端 Worker 在 CF 边缘后面，**非浏览器 UA 会被判 bot（403 code 1010）**
             #    ⇒ 给上游加常规浏览器 UA；② **headers 必须写在 models 之前** —— 上一版我插在
             #    `models:` 与模型项之间，YAML 直接断链（`line 17: did not find expected key`）。
             lines += ["      headers:",
@@ -347,7 +309,7 @@ def cmd_up(_a) -> int:
     print("配置：%s（车道：%s）" % (info["config"], "、".join(info["lanes"])))
     st, _body = _get("/v1/models", timeout=3.0)
     if st == 200:
-        # 🔴 实测踩坑：服务在跑时**不重启** ⇒ 刚写的配置根本没被加载（车道恒空、看着像"没配"）。
+ # 实测踩坑：服务在跑时**不重启** ⇒ 刚写的配置根本没被加载（车道恒空、看着像"没配"）。
         # 本工具是"把配置变成活车道"的入口 ⇒ `up` 一律**重启**（`--keep-running` 才沿用现有进程）。
         if getattr(_a, "keep_running", False):
             print("服务已在跑（保持不动，--keep-running）")

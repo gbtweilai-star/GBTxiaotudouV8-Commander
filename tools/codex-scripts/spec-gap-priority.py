@@ -48,7 +48,7 @@ def count_calls():
                 except ValueError:
                     continue
                 k = (j.get("meta") or {}).get("kind")
-                # 🔴 2026-10-22 第一次跑就炸（留痕）：审计里有些行的 `meta.kind` 是**对象**
+ # 2026-10-22 第一次跑就炸（留痕）：审计里有些行的 `meta.kind` 是**对象**
                 #    （不是字符串）⇒ 直接当 dict 键会 TypeError。不是"审计坏了"，是读数形状不齐。
                 #    口径：只认字符串 kind；非字符串的记进 `other` 计数，不静默丢。
                 if isinstance(k, str) and k:

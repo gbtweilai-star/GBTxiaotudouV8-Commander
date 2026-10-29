@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # gbt-capability: subprocess
-# ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
+# 开发者：自由的风 · 永久钢印 · 禁止删除
 """run-all-tests.py —— 全仓测试**普查**（不是抽样）。
 
 为什么要有它
@@ -78,7 +78,7 @@ def run_one(path: Path, timeout: float, env: dict) -> dict:
     elif re.search(r"(?m)^FAILED", out):
         res = "FAILED"
     elif ran == 0:
-        # 🔴 **收集为 0 不等于出错**：pytest 风格的文件（无 unittest.TestCase）
+ # **收集为 0 不等于出错**：pytest 风格的文件（无 unittest.TestCase）
         #    在 `-m unittest` 下必然收集 0 个，且 `unittest` 会以非零码退出并喊
         #    "NO TESTS RAN"。第一版我把它归成 ERROR ⇒ 汇总里把它们列成"未过"，
         #    **与紧接着 pytest 跑出 156 passed 的事实自相矛盾**。
@@ -195,7 +195,7 @@ def main() -> int:
     # 本仓口径：必须隔离 store（否则测试包守卫会拒绝，或写脏生产）
     env.setdefault("GBT_STORE_DIR", str(ROOT / ".scratch" / "alltests-store"))
     env.setdefault("PYTHONIOENCODING", "utf-8")
-    # 🔴 2026-09-25 **第二处自纠：绝不要设 PYTHONPATH。**
+ # 2026-09-25 **第二处自纠：绝不要设 PYTHONPATH。**
     #    我第一版修完跑法后顺手加了 `PYTHONPATH=仓根` —— 那是**画蛇添足且有害**：
     #    `python -m unittest` 本身就会把 **cwd（`''`）** 放进 sys.path，
     #    仓根已经在里面了，`import gbt_allinone` 本来就成立。
@@ -211,7 +211,7 @@ def main() -> int:
     if args.filter:
         files = [f for f in files if args.filter in f.name]
         if not files:
-            # 🔴 2026-09-26 自纠：--filter 拼错时原版会空跑 0 个文件然后退出 0（"全绿"）——
+ # 2026-09-26 自纠：--filter 拼错时原版会空跑 0 个文件然后退出 0（"全绿"）——
             #    isolation_sweep 对同款「空绿」已立过判据：一次**没扫**不许当干净。
             print("🔴 --filter %r 没有匹配到任何测试文件 —— 本次一个都没扫，不许当全绿" % args.filter)
             return 2
@@ -282,7 +282,7 @@ def main() -> int:
     bad = [r for r in rows if r["result"] not in ("OK", "NO_TESTS")]
     zero = [r for r in rows if r["result"] == "NO_TESTS" or (r["ran"] == 0)]
 
-    # 🔴 2026-09-25 **第三处自纠：unittest 收不到 ≠ 这个文件没有测试。**
+ # 2026-09-25 **第三处自纠：unittest 收不到 ≠ 这个文件没有测试。**
     #    实测有 8 个文件是 **pytest 风格**（没有 unittest.TestCase，但有 10~41 个 `def test_*`）：
     #    `-m unittest` 对它们收集到 0 个用例 ⇒ 我第一版据此把它们当成"跑不起来"，
     #    实际用 pytest 跑是 **156 passed, 1 skipped** —— 全是好的。
@@ -310,7 +310,7 @@ def main() -> int:
                 bad = bad + [{"file": r["file"], "result": "PYTEST_FAIL", "ran": None,
                               "secs": 0, "fails": [], "tail": tail} for r in zero]
         except Exception as exc:  # noqa: BLE001
-            # 🔴 2026-09-26 自纠：pytest 二遍跑不动（超时/异常）时原版只印一行就当没事 ——
+ # 2026-09-26 自纠：pytest 二遍跑不动（超时/异常）时原版只印一行就当没事 ——
             #    这批文件停在 NO_TESTS，而 bad 的收集条件不含 NO_TESTS ⇒
             #    "pytest 文件一个没验证成"却计"未过 0 个"退出 0（报成功但没干）。
             #    现在如实记成 PYTEST_ERROR 进 bad：它不是"测试红"，是"没跑成"，fail-closed。
@@ -324,7 +324,7 @@ def main() -> int:
     if py_rows:
         print("pytest  风格：%d 个文件（见上面的 pytest 合计）" % len(py_rows))
     print("合计：unittest 通过 %d ，pytest 通过见上，未过 %d 个" % (len(ok), len(bad)))
-    # 🔴 2026-09-25 补：**把「超时」与「失败」分开报**。
+ # 2026-09-25 补：**把「超时」与「失败」分开报**。
     #    由来（一手）：我连着几轮用 `--timeout 180` 覆盖了本工具的默认 300 ⇒
     #    `test_framework.py`（单跑现读 **137.9s / 148 条**）在满仓横扫里被 180s 掐断，
     #    汇总却写「未过 1 个」—— 读的人会当成**红了**，而真相是**跑不完 = 本次无法判定**。
@@ -347,7 +347,7 @@ def main() -> int:
                                    encoding="utf-8")
         print()
         print("明细已写", args.json)
-    # 🔴 2026-09-26 自纠：原来无条件 return 0 —— 调用方/CI 无法用退出码区分"全绿"与"未过 8 个"。
+ # 2026-09-26 自纠：原来无条件 return 0 —— 调用方/CI 无法用退出码区分"全绿"与"未过 8 个"。
     #    现在口径：0=全绿 · 1=有未过 · 2=定向空扫 · 3=负载闸拒绝 · 4=--batch 用法错。
     #    PYTEST_ERROR/PYTEST_FAIL 都在 bad 里 ⇒ 一并算"未过"，不许静默归零。
     return 1 if bad else 0

@@ -13,17 +13,13 @@
     人读行不许混进 stdout（`tentacle_bind` 就是这么被打挂过一次，2026-09-26 修）。
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import contextlib
 import importlib.util
 import io
 from pathlib import Path
 
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 _FK_PATH = ROOT / "tools" / "filmkit.py"
 READ_OPS = ("status", "plan")
 WRITE_OPS = ("gen", "seg", "build", "add", "rm")

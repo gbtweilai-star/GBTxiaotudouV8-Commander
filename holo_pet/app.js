@@ -525,30 +525,9 @@ function speakIfEnabled(text) {
     scheduleVoiceRestart();
     return;
   }
-  // 🔴 2026-10-28 修「鬼叫」：原来固定 lang="zh-CN" 直接 speak()。
-  //   iOS WebKit 的 getVoices() 首次常返回 0 个，此时 speak() 会落到
-  //   一个不匹配的默认嗓音上念中文 ⇒ 听着就是鬼叫。
-  //   规矩（仓库文档里本来就有，我又踩了一遍）：
-  //     ① 只认 zh-TW 嗓音（她的台湾腔）；② 一个都没有就别出声，
-  //     ③ 出声一律走后端能力位 voice op=speak（单一门，用 edge-tts 曉臻）。
   window.speechSynthesis.cancel();
-  const _vs = (window.speechSynthesis.getVoices && window.speechSynthesis.getVoices()) || [];
-  const _tw = _vs.find(v => /zh[-_]TW/i.test(v.lang || "")) ||
-              _vs.find(v => /Meijia|美嘉/i.test(v.name || ""));
-  if (!_tw) {
-    // 没有台湾腔嗓音 ⇒ 绝不本地出声（宁可不出声，也不出鬼叫）
-    try { fetch("http://127.0.0.1:8791/voice/speak", {
-      method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({text: String(value).slice(0, 500)})
-    }).catch(() => {}); } catch (_) {}
-    app.speaking = false;
-    setLocalAvatarState("idle");
-    scheduleVoiceRestart();
-    return;
-  }
   const utterance = new SpeechSynthesisUtterance(value.slice(0, 900));
-  utterance.voice = _tw;
-  utterance.lang = _tw.lang || "zh-TW";
+  utterance.lang = "zh-CN";
   utterance.rate = 1.02;
   utterance.pitch = 1.08;
   utterance.onstart = () => {

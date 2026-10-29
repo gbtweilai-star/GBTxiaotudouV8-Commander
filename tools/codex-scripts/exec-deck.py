@@ -57,7 +57,7 @@ STALE_BAD_S = 48 * 3600
 def _read_audit_events() -> tuple:
     """数审计事件。返回 `(全史, 装钩子后, 改动后, since)` 四个。
 
-    🔴 **为什么要第三个窗口**：`since_hook` 覆盖的是一大段时间，而"门口默认同步"
+    **为什么要第三个窗口**（本仓最贵的一课）：`since_hook` 覆盖的是一大段时间，而"门口默认同步"
     （`auto_envelope` + `synced_entry`）是**中途才落的** ⇒ 拿整段算覆盖率会把
     "改动前的旧账"算进分子分母，得出"覆盖仅 41%"这种**误导读数**（本轮实测踩到）。
     判据：**带上 `synced_entry` 的那条记录 = 改动之后写的**（那是加了这一格才有的字段）。
@@ -212,7 +212,7 @@ def write_html(path: Path, payload: dict) -> str:
 
     att = payload.get("attention") or []
     att_html = ("<ul class=att>" + "".join("<li>%s</li>" % esc(x) for x in att) + "</ul>"
-                if att else "<p class=ok>✅ 没有需要人看的项</p>")
+                if att else "<p class=ok>没有需要人看的项</p>")
 
     debt_rows = "".join(
         "<tr><td class=mono>%s</td><td class=n>%s</td><td>%s</td></tr>"
@@ -231,7 +231,14 @@ def write_html(path: Path, payload: dict) -> str:
                     + "</ul>")
 
     html = """<!doctype html>
-<html lang="zh-CN" data-data-kind="快照" data-data-at="__AT__"><head><meta charset="utf-8" />
+<!-- data-page-id 是**触手网格的入场券**（2026-10-26 补）。
+     这页原来没有它 —— 于是它虽然被 windows.json 登记成"窗 C"，却不被网格认作一个节点：
+     跨页派活时 `from` 会取成 "unknown"、回执路由断。补上后它与另外 26 页同一口径。
+     注意：本页是**快照页**（`data-data-kind="快照"`，零脚本、零外链脚本）：按 B8 守卫它
+     不参与实时触手（没有 kit 就不会应答），这是**设计取舍**，不是漏做 —— 见
+     shell/tentacle-kit.js 头部⑫与 tests/test_tentacle_responder.cjs。
+     本页及注释里一律不用 emoji（界面记号禁令，见审美闸 emoji 规则）。 -->
+<html lang="zh-CN" data-page-id="exec-deck" data-data-kind="快照" data-data-at="__AT__"><head><meta charset="utf-8" />
 <meta name="color-scheme" content="dark" />
 <title>GBT小土豆V8 · 执行面</title>
 <link rel="stylesheet" href="__CSS__" />
@@ -337,7 +344,7 @@ def main() -> int:
     for name, blk in (("A 信封覆盖", A), ("D 能力卡点", D)):
         if blk.get("why"):
             attention.append("%s 取不到：%s" % (name, blk["why"][:80]))
-    # 🔴 判据用**改动后窗口**：拿 since_hook 整段算会把改动前的旧账算进来（本轮实测误导过）。
+    # 判据必须用**改动后窗口**：拿 since_hook 整段算会把改动前的旧账算进来（本轮实测误导过）。
     if isinstance(tg_rate, (int, float)) and tg_n >= 10 and tg_rate < 0.5:
         attention.append("**改动后**信封覆盖仅 %.0f%%（%d/%d）" % (tg_rate * 100,
                                                          tagged["inside"], tg_n))
@@ -353,7 +360,7 @@ def main() -> int:
 
     print("【A】信封覆盖 —— 源：%s" % A["source"])
     if A.get("why"):
-        print("    🔴 取不到：%s" % A["why"])
+        print("    [取不到] %s" % A["why"])
     else:
         d = A["data"] or {}
         print("    全史 brainless_ratio = %s · cap_calls_total = %s"
@@ -362,7 +369,7 @@ def main() -> int:
             print("    装钩子后（**整段·含改动前旧账，只作对照**）：%s/%s（rate %s）· via=%s · entry=%s"
                   % (sh.get("inside"), sh.get("calls"), sh.get("rate_inside"),
                      sh.get("inside_via"), sh.get("inside_entry")))
-        # 🔴 该看的那个数：带上 `synced_entry` 的记录 = 门口默认同步落地**之后**写的
+        # 该看的那个数：带上 `synced_entry` 的记录 = 门口默认同步落地**之后**写的
         if tg_n:
             print("    **改动后窗口**（按 `synced_entry` 存在与否切）：%d/%d 在信封内（rate %s）"
                   % (tagged["inside"], tg_n, round(tg_rate, 4)))
@@ -389,7 +396,7 @@ def main() -> int:
     print()
     print("【D】能力卡点（复用 unimplemented_scan 与探针产物）")
     if D.get("why"):
-        print("    🔴 %s" % D["why"])
+        print("    [取不到] %s" % D["why"])
     print("    只登记未实现 %s · 自标骨架 %s · 无分派分支 %s · 技能真桩 %s"
           % (D.get("registered_only"), D.get("stub_flagged"),
              D.get("no_dispatch"), D.get("skill_pointer_stubs")))
@@ -401,7 +408,7 @@ def main() -> int:
         for x in attention:
             print("    · %s" % x)
     else:
-        print("  ✅ 没有需要人看的项")
+        print("  没有需要人看的项")
     print("  下一步命令：")
     for k in ("A", "C", "D"):
         blk = {"A": A, "C": C, "D": D}[k]

@@ -44,7 +44,7 @@ HERE = pathlib.Path(__file__).resolve()
 ROOT = HERE.parents[2]
 # 仓根按 __file__ 定位 ⇒ **与 cwd 无关**，从任何目录都能跑（见 SKILL §2 的 cwd 契约）。
 
-# 🔴 控制台口径（2026-09-23 实测踩到）：GBK 控制台下直接 print 中文会**崩**
+# 控制台口径（2026-09-23 实测踩到）：GBK 控制台下直接 print 中文会**崩**
 #   `UnicodeEncodeError: 'gbk' codec can't encode ...`；只 reconfigure stdout 不够，
 #   还得把**控制台代码页**也切到 65001，否则中文以 UTF-8 写出、控制台按 GBK 解 ⇒ 乱码。
 #   （同一条教训在 tools/codex-scripts/five-dim.py 第 23–30 行已记过一次，本件沿用。）
@@ -311,7 +311,7 @@ def walk_tree():
     total = total_bytes = 0
     nm_n = 0
     # ── MTIME_ANOMALY（2026-09-24 第 96 轮新增，来自目录的『待进化』清单）────────
-    # 🔴 为什么接在这里：本函数**每个文件已经 stat 过一次**（下面 `st = e.stat(...)`）
+ # 为什么接在这里：本函数**每个文件已经 stat 过一次**（下面 `st = e.stat(...)`）
     #    ⇒ mtime/ctime 是**顺手拿到**的：不多走一遍树、不多发一次系统调用。
     #    （另一条路是单开一个 scan 函数再 walk 一次 —— 那是白加 6~13 秒，不做。）
     # 判定逻辑在模块级 `classify_mtime()` 里（自检能测真身）；这里只收集 + 分平面。
@@ -402,7 +402,7 @@ def scan_plane1_prod(prod):
     bom, nonutf8, mojibake, mixed_eol, nul = [], [], [], [], []
     json_bad, yaml_bad, toml_bad = [], [], []
     MOJI = re.compile(r"(â€|Ã[\x80-\xbf]|ï¿½|锟斤拷|\ufffd)")
-    # 🔴 2026-09-24 修一条**引用型/自指型假红**（与 TEST_CALIBER_HIJACK 同一类：判据分不清"病"和"讲病的教材"）。
+ # 2026-09-24 修一条**引用型/自指型假红**（与 TEST_CALIBER_HIJACK 同一类：判据分不清"病"和"讲病的教材"）。
     #    实测：本仓 21 条 MOJIBAKE 命中**全部**属于下面两类，没有一条是真乱码 ——
     #      · `tools/codex-scripts/quick_scan.py` L291：**它自己的乱码正则字面量**（自指）
     #      · `skills/gbt-quickscan/SKILL.md` L216 引用实例 `GBTС����V8`（讲控制台代码页那一课）
@@ -412,7 +412,7 @@ def scan_plane1_prod(prod):
     #      ① 匹配前**去掉行内代码 `…` 与围栏块 ```…```**（教材里的例子都写在代码span里）；
     #      ② **跳过定义这份模式表的本文件自己**（自指没法靠 ① 解决）。
     #    ⇒ 剩下的命中才是"没被引号包起来的裸乱码"，那才是真信号。
-    #    ⚠️ 这一行我第一版写成 `str(Path(__file__).resolve())` —— 而本文件**没有导入 `Path`**
+ # 这一行我第一版写成 `str(Path(__file__).resolve())` —— 而本文件**没有导入 `Path`**
     #    （用的是 `import pathlib` + L43 已有的 `HERE`）⇒ `NameError` ⇒ 扫描器 exit 3、报告根本没写，
     #    而我当时用 `Select-String '^故障'` 把 traceback 过滤掉了，于是**拿旧报告当新读数**。
     #    ⇒ 教训：**过滤器会吞掉报错**；跑完要看 exit 码，别只看自己关心的那行。
@@ -520,7 +520,7 @@ def check_deps(imports, fp_mods, fp_dirs):
     absent_abs = Counter()          # 绝对导入里"家规本该缺席"的（设计，不是故障）
     rel_broken, rel_absent = [], []
 
-    # 🔴 2026-09-24 修两处**拿名字硬比**造成的假红（都是实测出来的）：
+ # 2026-09-24 修两处**拿名字硬比**造成的假红（都是实测出来的）：
     #   ① **模块名 ≠ 发行名**：声明 `pillow` 清不掉 `PIL`；声明 `opencv-python`
     #      反而会被判"装不上"（发行名不是模块，`find_spec('opencv-python')` 必为 None）。
     #      ⇒ 修法**不手写别名表**（手写会过期），用解释器自己的权威映射
@@ -601,7 +601,7 @@ def check_deps(imports, fp_mods, fp_dirs):
                     origin_rel = None
                 if origin_rel:
                     for f in (dist.files or []):
-                        # 🔴 必须「全等 或 带 `/` 后缀」两条都留：只留后缀会把
+ # 必须「全等 或 带 `/` 后缀」两条都留：只留后缀会把
                         #    `win32/lib/win32con.py` 这种**全等**情形判否（两端都没有
                         #    前导 `/` ⇒ `endswith("/" + x)` 永远不成立）—— 这是我第一版
                         #    「收紧」时自己造出来的新假阳性，被紧接着的读数当场抓住。
@@ -646,7 +646,7 @@ def check_deps(imports, fp_mods, fp_dirs):
             continue
         third[top] += 1
         if u.find_spec(top) is None:
-            # 🔴 家规第 10 条本来说"wallet/ledger/bridge 这类资金模块本该在框架里缺席，
+ # 家规第 10 条本来说"wallet/ledger/bridge 这类资金模块本该在框架里缺席，
             #    别把它报成病" —— 但**旧版只把这个白名单用在相对导入上**，
             #    绝对导入的 `import gbt_wallet`（smoke_test.py 两处）照样被算成"缺依赖"。
             #    ⇒ 这里把同一条家规补到绝对导入上，并且**不是删掉、是单列**（照实可见）。
@@ -663,7 +663,7 @@ def check_deps(imports, fp_mods, fp_dirs):
             "relative_broken_n": len(rel_broken),
             "relative_absent_by_design": rel_absent[:20],
             "relative_absent_by_design_n": len(rel_absent),
-            # 🔴 认模块名 / 发行名 / 元数据对应关系 / top_level（见上面 _declared_covers 的说明）
+ # 认模块名 / 发行名 / 元数据对应关系 / top_level（见上面 _declared_covers 的说明）
             # 并且**只报"本机有、但没写下来"的**（那才是"重装即成谜"）。
             # 本机根本没有的那些已经由 DEP_MISSING 逐条报了 ⇒ 再报一遍是**同一个事实报两遍**，
             # 而且会**惩罚诚实的做法**（把装不上的写进声明 = 亲手制造 DEP_DECLARED_UNUSABLE）。
@@ -1004,13 +1004,13 @@ def scan_plane5():
         "openclaw_autoclaw": home / ".openclaw-autoclaw" / "skills",
         "claude": home / ".claude" / "skills",
     }
-    # 🔴 2026-09-24 第 98 轮补：**旧根集漏了会话真正的加载根** —— agent preset 的 `skills/`。
+ # 2026-09-24 第 98 轮补：**旧根集漏了会话真正的加载根** —— agent preset 的 `skills/`。
     #    实测（拿当前会话技能目录里的名字反查）：`cordis-plugin-development` /
     #    `editing-cordis-compositions` / `fc-nginx-website` / `opensearch` 这四个名字
     #    **在本会话里能加载**，却在上面那 5 个根里**一个都找不到**；
     #    它们只在 `$DSH_HOME/.agent-presets/<preset>/skills/` 里（本机 preset = `gbt-spine`）。
     #    ⇒ 旧根集把"本会话可读"算错了（它算的是 `.agents` + `.dsh/skills`）。
-    #    ⚠️ 只收**本机 preset**；装机自带那份在 npm-cache 里、属发布物，**不列进来、也不改**。
+ # 只收**本机 preset**；装机自带那份在 npm-cache 里、属发布物，**不列进来、也不改**。
     dsh_home = pathlib.Path(os.environ.get("DSH_HOME") or (home / ".dsh"))
     presets_dir = dsh_home / ".agent-presets"
     if presets_dir.is_dir():
@@ -1070,7 +1070,7 @@ def scan_plane5():
     # ── 声明面 vs 盘上实物（2026-09-24 第 99 轮：待进化的 `SKILL_DECLARED_NOT_LOADABLE`）
     # 判定走**图鉴自己的 `path`**（权威），不拿 `name` 猜目录名 —— v1 就是这么错的：
     # `name` 常是显示名（`Agentic Coding`）而目录是 slug（`agentic-coding`）⇒ 报出 97 个假缺。
-    # 🔴 根集也已按 §五十一 补上 `$DSH_HOME/.agent-presets/*/skills`；
+ # 根集也已按 §五十一 补上 `$DSH_HOME/.agent-presets/*/skills`；
     #    但注意仓内还有一棵 `审美相关skill/skills/`（887 个技能文件）**不在**会话根里 ——
     #    它会被这条判据如实列进 `outside_roots`，那正是要让人看见的东西。
     _df = declared_face(ROOT / "state" / "skill_atlas.json",
@@ -1110,18 +1110,18 @@ def scan_plane5():
                 continue                       # 解释器/系统目录不是项目目标
             if str(ROOT).lower() not in t.lower().replace("/", "\\"):
                 outside.append(t)
-        # 🔴 2026-09-23 第 48 轮修（**FR-8 的形：静默截断**）：
+ # 2026-09-23 第 48 轮修（**FR-8 的形：静默截断**）：
         #    三个 `[:4]` 都只列前 4 条，却**不说还有多少条没列出来** ——
         #    10 条缺失只看到 4 条，读者会把「只列了 4 条」读成「一共只有 4 条」。
         #    修法与本会话在 `pipeline.list_records` / `collab_gateway.inbox` /
         #    `agency_tentacles.catalog` 的改法同款：**报全量数 + 一句 note**。
-        #    ⚠️ `"missing_total"` **不会**再触发 FR-2：那条规则的正则是
+ # `"missing_total"` **不会**再触发 FR-2：那条规则的正则是
         #       `["']missing["']\s*[:=]`（`missing` 后紧跟引号），
         #       而 `"missing_total"` 里 `missing` 后面是 `_`，不匹配。
-        #    ⚠️ 本行以上新增了注释 ⇒ 带 missing 键那一行的**行号会变**，
+ # 本行以上新增了注释 ⇒ 带 missing 键那一行的**行号会变**，
         #       必须同步更新 `false_report_audit.KNOWN_LEGIT` 里带行号的那条登记
         #       （第 48 轮刚立的判据会在行号填错时变红，见 `test_false_report_audit.py`）。
-        #    ⚠️ 上面两句**故意不把那个键的写法原样抄进来**（不写成 引号+missing+引号+冒号）：
+ # 上面两句**故意不把那个键的写法原样抄进来**（不写成 引号+missing+引号+冒号）：
         #       抄进来就等于在**被审计的文件里**摆了一个 FR-2 的正则靶子 ——
         #       实测第 48 轮就是这么自己撞上去的（那一行被当成一条新的 FR-2 命中报出来）。
         #       这正是本会话第 79 条：**我的记录动作，改变了我自己的测量结果。**
@@ -1170,13 +1170,13 @@ def scan_git(tree):
     out["git_objects"] = so.strip().replace("\n", " | ")
     idx = ROOT / ".git" / "index"
     out["index_MB"] = round(idx.stat().st_size / 1048576, 2) if idx.exists() else None
-    # 🔴 2026-09-24 第 100 轮：**必须关掉 `core.quotepath`**，否则含非 ASCII 字节的路径会被
+ # 2026-09-24 第 100 轮：**必须关掉 `core.quotepath`**，否则含非 ASCII 字节的路径会被
     #    git **整体加引号转义**（`"delivery/逆向…`、`"\345\256\241…`），于是 `f.split("/")[0]`
     #    拿到的是 `"delivery` / `"\345…` 这种**对不上的键** ⇒ `tracked_by_top.get(t)` 恒为 0
     #    ⇒ P0 `PROD_TOPS_UNTRACKED` **假红**。实测（第 100 轮）：
     #      `审美相关skill` 索引里实际 **890** 条、`delivery` **170** 条，却被报成「入库 0」；
     #      而 `projects`/`.dsh`/`plugins` 在两种口径下都是 0 ⇒ **那三条是真的**。
-    #    ⚠️ L1153 的 `??` 那一支**早就 `.strip('"')` 了** —— 只有这一支漏了去引号。
+ # L1153 的 `??` 那一支**早就 `.strip('"')` 了** —— 只有这一支漏了去引号。
     tracked = [li for li in run(["git", "-c", "core.quotepath=false", "ls-files"])[1].splitlines()
                if li.strip()]
     out["tracked_n"] = len(tracked)
@@ -1206,9 +1206,9 @@ def scan_git(tree):
     out["tracked_junk_MB"] = round(b / 1048576, 1)
     big.sort(key=lambda x: -x["MB"])
     out["tracked_large"] = big[:15]
-    # 🔴 2026-09-24 第 101 轮：与 L1107 同一个坑。**当前计数不受影响，但这是巧合**——
+ # 2026-09-24 第 101 轮：与 L1107 同一个坑。**当前计数不受影响，但这是巧合**——
     #    实测：未跟踪名的**首段**是转义形态的有 **18 条**，而它们**全是仓根级文件**（无 `/`），
-    #    于是靠下面 `"/" not in f` 那一支被收进来了。⚠️ 一旦出现"未跟踪目录挂在非 ASCII
+ # 于是靠下面 `"/" not in f` 那一支被收进来了。 一旦出现"未跟踪目录挂在非 ASCII
     #    顶层下"，它就会**被静默丢掉**（`f.split("/")[0]` 对不上 `PROD_TOPS`）。
     #    ⇒ 关掉 quotepath：计数不变（实测 `??` 两种口径都是 44460 条），
     #      但路径变回可读、且不再依赖巧合。
@@ -1220,7 +1220,7 @@ def scan_git(tree):
     out["plugins_untracked_n"] = len([li for li in so.splitlines() if li.strip()])
     rc, so, _ = run(["git", "check-ignore", "-q", "plugins/gbt-master"])
     out["plugins_ignored"] = (rc == 0)
-    # 🔴 2026-09-23 自查补：原版只查 plugins/，漏掉了 skills/ 与 tools/ 同样未入库。
+ # 2026-09-23 自查补：原版只查 plugins/，漏掉了 skills/ 与 tools/ 同样未入库。
     # 泛化成"生产面每个顶层的入库比例"——凡 ≥20 个文件且入库 0 个 = 只活在磁盘上。
     prod_by_top = Counter()
     for p, _ in tree["prod"]:
@@ -1242,7 +1242,7 @@ def scan_git(tree):
                  if f.split("/")[0] in PROD_TOPS or "/" not in f]
     out["untracked_prod_n"] = len(prod_untr)
     out["untracked_prod_samples"] = prod_untr[:25]
-    # 🔴 命门：`git grep` 的开关必须放在 `--` **之前**。
+ # 命门：`git grep` 的开关必须放在 `--` **之前**。
     # 2026-09-23 自查抓到：写成 `git grep ... -- <pathspec> -l` 时 `-l` 被当成**路径**，
     # git 退回按行输出 ⇒ 报告里把真密钥**明文打了出来**。
     # 现在只用 `-n`（且放在 `--` 前），并且**一律经过 masked() 再入报告**。
@@ -1424,7 +1424,7 @@ def judge(tree, p1, deps, p234, p5, git, gates, extra=None):
                 "根目录无 pytest.ini/conftest.py/pyproject.toml/setup.cfg/tox.ini",
                 "加 conftest.py（自动设 GBT_STORE_DIR）+ pyproject.toml（钉 rootdir 与超时）")
         hij = tc.get("parent_config_hijack") or []
-        # 🔴 2026-09-24 修一条**假红判据**（坏判据比坏对象更危险）：
+ # 2026-09-24 修一条**假红判据**（坏判据比坏对象更危险）：
         #    原来只写 `if hij:` ⇒ 只要上级存在配置文件就报，
         #    **完全不看仓根有没有自己的配置**。而它自己给的修法恰恰是"在仓根放配置钉死 rootdir"
         #    ⇒ 按修法修完，它照样报（实测：改前 rootdir=C:\Users\ADMIN / configfile=pyproject.toml，
@@ -1666,7 +1666,7 @@ def judge(tree, p1, deps, p234, p5, git, gates, extra=None):
             "%d 个，例：%s" % (len(tree["empty_dirs"]), ", ".join(tree["empty_dirs"][:3])),
             "清或补 .gitkeep")
     # ── MTIME_ANOMALY（2026-09-24 第 96 轮：目录里挂着的『待进化』之一，现落地）
-    # 🔴 分档**不按数量、按「有多不可能」**：
+ # 分档**不按数量、按「有多不可能」**：
     #    future       → 机器上出现**未来文件**只可能来自时钟跳变 / 坏工具 / 坏归档 ⇒ P1
     #    epoch0       → mtime 落在 2000 年之前 ⇒ 几乎必是坏拷贝 ⇒ P2
     #    before_ctime → **Windows 上 ctime 是创建时间**，解压/复制保留 mtime 会天生刷屏
@@ -1679,7 +1679,7 @@ def judge(tree, p1, deps, p234, p5, git, gates, extra=None):
     _ep0 = [x for x in (_ma.get("epoch0") or []) if str(x.get("plane")) != "P4"]
     # 注意：`before_ctime` 这一档**故意不取用**（理由见下），它只经 `planes.mtime_anomaly` 出产物
     _sn = int(_ma.get("sentinel1980_n") or 0)     # 被排除的 ZIP 下界哨兵数（如实报）
-    # 🔴 `before_ctime` **故意不进故障**（2026-09-24 第 96 轮，量出来的决定）：
+ # `before_ctime` **故意不进故障**（2026-09-24 第 96 轮，量出来的决定）：
     #    实测本机全树 14290 个命中，其中 **9540 个倒挂不到 1 天**（= 复制/检出的常态），
     #    1~7 天又有 1679 个；剩下的按族归因全落在 `store/native_browser/profile`
     #    （Chromium 自带旧时间戳）与第三方树上 —— **都是合法拷贝，不是病**。
@@ -1748,7 +1748,7 @@ def score(faults):
 
 def diff_baseline(cur, base, cur_flags=None):
     if cur_flags and base.get("flags") and cur_flags != base["flags"]:
-        # 🔴 点名**是哪几个开关**不一致，而不是只说"开关不一致"：
+ # 点名**是哪几个开关**不一致，而不是只说"开关不一致"：
         #    读的人要能一眼分出这是「面没跑」还是「测试口径没跑」——两者的后果完全不同。
         _bf, _cf = base["flags"], cur_flags
         _differ = sorted(k for k in set(_bf) | set(_cf) if _bf.get(k) != _cf.get(k))
@@ -1890,7 +1890,7 @@ def main():
             "ports": extra.get("ports"),
             "doclinks": extra.get("doclinks"),
             "S_security": (sec_out["report"] if sec_out else {"skipped": True}),
-            # 🔴 时间戳异常**原样**进产物（含被排除的 ZIP 哨兵计数）：
+ # 时间戳异常**原样**进产物（含被排除的 ZIP 哨兵计数）：
             #    判词里只报"非 P4"的，但读数本身不该被藏起来 —— 否则下次谁也说不清
             #    "到底扫到多少、排除了多少"。
             "mtime_anomaly": tree.get("mtime_anomaly"),
@@ -1924,13 +1924,13 @@ def main():
             "进化层的『可能已死判据』只是候选：真死活要靠 --selftest 判定，别直接照它删判据",
         ],
     }
-    # 🔴 面选择必须进 flags（2026-09-24 补）。旧 flags 只记 with_gates/with_tests，
+ # 面选择必须进 flags（2026-09-24 补）。旧 flags 只记 with_gates/with_tests，
     #    而 `--no-security` 会让 **S 面整块 10 条**不出读数（机器状态码如
     #    PERSIST_USER_WRITABLE 在 4 分钟内不可能消失又回来）⇒ 台账无法区分
     #    「S 面跑了且干净」与「S 面根本没跑」，diff_baseline 的 not_comparable 也拦不住。
     #    实测代价：04:22–05:20 共 8 轮用了 --no-security，`19` 被当成全口径报出去，
     #    其中 10 条不是"修好了"而是"没扫"。这是**坏判据比坏对象更危险**的又一例。
-    # 🔴 一条**实测口径**要写进产物，否则读的人会以为"没报 = 没扫"：
+ # 一条**实测口径**要写进产物，否则读的人会以为"没报 = 没扫"：
     #    `mtime 早于创建时间` 全树命中上万，而它是 Windows 上复制/检出/解包的常态
     #    ⇒ 不进判词，但必须在"口径/盲区"里说清它被看过、以及为什么不算病。
     _ma_all = (tree or {}).get("mtime_anomaly") or {}
@@ -2037,7 +2037,7 @@ def main():
                 print("        怎么做: %s" % c["how"])
         if d.get("suspect"):
             print("▼ 从未响过且未被自检验过（跑 --selftest 判死活）：%s" % ", ".join(d["suspect"]))
-        # 🔴 第 103 轮：把"量过、决定不做"的**也打出来**（连理由一起）。
+ # 第 103 轮：把"量过、决定不做"的**也打出来**（连理由一起）。
         #    只把它们从 todo 里摘掉而不显示，读的人会以为"这些条目消失了"；
         #    打出来才看得见"有人量过、结论是不值得做"，也才好在有异议时被推翻。
         for _r in d.get("rejected_measured") or []:

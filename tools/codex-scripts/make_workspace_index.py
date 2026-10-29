@@ -357,7 +357,7 @@ def build() -> tuple[str, dict]:
                 else:
                     links.append(f'<span class="sub sub-miss">{esc(slabel)} · 缺</span>')
             sub_html = '<span class="subs">子窗口 · ' + " · ".join(links) + "</span>"
-        # ⚠️ `desc` 是**我们自己在 PANELS 里写的可信 HTML**（含 <b>/<code>），所以这里**不转义**；
+ # `desc` 是**我们自己在 PANELS 里写的可信 HTML**（含 <b>/<code>），所以这里**不转义**；
         #    名称与路径仍然转义。往 PANELS 里加条目时，desc 里出现字面 `<` 必须自己写成 `&lt;`。
         cards.append(f"""
       <a class="card" data-i="{n:02d}" href="{esc(rel)}"{' aria-disabled="true"' if not exists else ''}>

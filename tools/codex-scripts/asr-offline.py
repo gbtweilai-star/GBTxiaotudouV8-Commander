@@ -24,7 +24,7 @@
     py -3.14 tools/codex-scripts/asr-offline.py listen --device --seconds 3
     py -3.14 tools/codex-scripts/asr-offline.py selfcheck --json          # 判据 + 负对照
 
-## 🔴 纪律（写死）
+## 纪律（写死）
   · **绝不伪造**：听不到写 heard=false + 原文；拿不到麦写 no_input + 原文（不许用假音频充数）。
   · **不启用被禁用的录音设备**：那是改系统设置 ⇒ **只有主人能做**（设置→系统→声音→录制→
     显示禁用的设备）。本件只探测，不代劳、不放宽。

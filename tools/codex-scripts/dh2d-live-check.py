@@ -8,19 +8,15 @@ import json
 import os
 
 from playwright.sync_api import sync_playwright
-
 import sys
-for _s in (sys.stdout, sys.stderr):          # 不带 -X utf8 调用时不许静默输出空
-    try:
-        _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        pass
 
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# 默认跑剧场页；`DH2D_PAGE` 可指向任意一页（tools/digihuman/dh-live.py 生成的 live 页就走这条）
-PAGE = os.environ.get('DH2D_PAGE') or os.path.join(ROOT, 'holo_pet_w3', 'voice-theater', 'index.html')
-SHOTS = os.environ.get('DH2D_SHOTS') or ''   # 给了就顺手存三张图（静音/大声/中声）当证据
+PAGE = os.path.join(ROOT, 'holo_pet_w3', 'voice-theater', 'index.html')
 base = os.path.join(os.environ['LOCALAPPDATA'], 'ms-playwright')
 EXE = [os.path.join(base, d, 'chrome-win64', 'chrome.exe')
        for d in sorted(os.listdir(base), reverse=True)
@@ -42,19 +38,10 @@ with sync_playwright() as pw:
         pg.evaluate('window.GBT_DH2D.setState("%s")' % state)
         return pg.evaluate('window.GBT_DH2D._tick(%d, 1/60)' % n)
 
-    def shot(name):
-        if not SHOTS:
-            return
-        os.makedirs(SHOTS, exist_ok=True)
-        pg.screenshot(path=os.path.join(SHOTS, name))
-
     rec = {'ok': True, 'steps': []}
     rec['steps'].append({'case': '静音（level=0, speak）', 'out': tick(40, 0.0)})
-    shot('1-silent.png')
     rec['steps'].append({'case': '大声（level=0.95, speak）', 'out': tick(60, 0.95)})
-    shot('2-loud.png')
     rec['steps'].append({'case': '中声（level=0.45, speak）', 'out': tick(60, 0.45)})
-    shot('3-mid.png')
     rec['steps'].append({'case': '掉回静音', 'out': tick(60, 0.0)})
     rec['steps'].append({'case': '离开说话态（listen）', 'out': tick(60, 0.95, 'listen')})
 

@@ -103,62 +103,9 @@ def act_say(args):
     ps = ("Add-Type -AssemblyName System.Speech; "
           "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
           "$s.Rate = %d; $s.Speak([Console]::In.ReadToEnd())" % int(args.get("rate", 0)))
-    # 🔴 2026-10-28：原来只会 powershell（Windows 专用）。本机是 iSH/iOS，
-    #   实测 FileNotFoundError: 'powershell' ⇒ 授权放开了门，门后没实现。
-    #   现在按平台依次降级，**每一档都如实报用了谁**：
-    #     ① Windows  → powershell System.Speech
-    #     ② iOS/iSH  → apple-speak（iOS AVSpeechSynthesizer 原生 TTS）
-    #     ③ 都不行   → 如实报平台没有出声能力，不假装说过话
-    import shutil as _sh
-    # 🔴 2026-10-28：**声音必须是她设定好的那个**，不是系统随便一个中文嗓音。
-    #   仓库里早就定死了：edge-tts `zh-TW-HsiaoChenNeural`（曉臻 · 台湾腔女声）
-    #     tools/digihuman/dh-live.py:  VOICES = {"tw": "zh-TW-HsiaoChenNeural", …}
-    #     voice-theater 里还留着教训：原来 u.lang="zh-CN" ⇒ 每次都用大陆腔
-    #   所以优先级：edge-tts 台湾腔 > apple-speak(美嘉 zh-TW) > powershell > 如实报
-    try:
-        import asyncio as _aio
-        import edge_tts as _et
-        import pathlib as _pl
-        import tempfile as _tf
-        _voice = str(args.get("voice") or "zh-TW-HsiaoChenNeural")
-        _rate = args.get("rate")
-        _kwargs = {}
-        if _rate is not None:
-            _kwargs["rate"] = "%+d%%" % int((float(_rate) - 1.0) * 100)
-        _f = _pl.Path(_tf.gettempdir()) / ("gbt_say_%d.mp3" % int(time.time() * 1000))
-        async def _gen():
-            c = _et.Communicate(text, _voice, **_kwargs)
-            await c.save(str(_f))
-        _aio.run(_gen())
-        size = _f.stat().st_size
-        # 播：iOS 走 apple-player；没有就如实报"已合成但没播"
-        played, how = False, "合成未播放"
-        if _sh.which("apple-player"):
-            _r = subprocess.run(["apple-player", "play", str(_f)], capture_output=True,
-                                text=True, timeout=120)
-            played = (_r.returncode == 0)
-            how = "apple-player"
-        return {"ok": played or size > 0, "chars": len(text), "engine": "edge-tts",
-                "voice": _voice, "bytes": size, "played": played, "player": how,
-                "file": str(_f)}
-    except Exception as _e:                                   # noqa: BLE001
-        pass   # 落下一档
-
-    if _sh.which("powershell"):
-        r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
-                           capture_output=True, text=True, timeout=90)
-        return {"ok": r.returncode == 0, "chars": len(text), "engine": "powershell",
-                "err": (r.stderr or "")[:120]}
-    if _sh.which("apple-speak"):
-        # 正确形态是 `speak --text <串>`（不是 `speak <串>`）；
-        # 中文要用 zh-CN 嗓子，否则英文嗓子念中文会跳过。
-        r = subprocess.run(["apple-speak", "speak", "--text", text,
-                            "--voice", str(args.get("voice") or "zh-TW")],
-                           capture_output=True, text=True, timeout=90)
-        return {"ok": r.returncode == 0, "chars": len(text), "engine": "apple-speak",
-                "err": (r.stderr or "")[:120]}
-    return {"ok": False, "chars": len(text), "engine": "none",
-            "error": "这台机没有出声实现（无 powershell / 无 apple-speak）"}
+    r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
+                       capture_output=True, text=True, timeout=90)
+    return {"ok": r.returncode == 0, "chars": len(text), "err": (r.stderr or "")[:120]}
 
 def act_type(args):
     import pyautogui
@@ -175,28 +122,6 @@ def act_click(args):
     return {"ok": True, "at": [x, y]}
 
 def act_volume(args):
-    # 🔴 2026-10-28：pycaw 是 Windows 专用。本机 iSH/iOS 实测
-    #   ModuleNotFoundError: 'pycaw' ⇒ 授权放开了门、门后没实现。
-    #   改：先认平台，Windows 走 pycaw，iOS 走 apple-media volume，都没有就如实报。
-    import shutil as _sh
-    if not _sh.which("powershell") and _sh.which("apple-media"):
-        import subprocess as _sp
-        lv = args.get("level")
-        if lv is None:
-            r = _sp.run(["apple-media", "volume"], capture_output=True,
-                        text=True, timeout=30)
-            try:
-                import json as _j
-                d = _j.loads((r.stdout or "").strip() or "{}")
-                cur = (d.get("data") or d).get("volume")
-                return {"ok": r.returncode == 0, "level": cur, "engine": "apple-media"}
-            except Exception:                                 # noqa: BLE001
-                return {"ok": False, "engine": "apple-media",
-                        "err": (r.stdout or r.stderr or "")[:150]}
-        r = _sp.run(["apple-media", "volume", "--level", str(float(lv))],
-                    capture_output=True, text=True, timeout=30)
-        return {"ok": r.returncode == 0, "level": float(lv), "engine": "apple-media",
-                "err": (r.stderr or "")[:120]}
     from pycaw.pycaw import AudioUtilities
     dev = AudioUtilities.GetSpeakers()
     # pycaw 新版：AudioDevice 直接带 EndpointVolume；旧版要自己 Activate
@@ -217,23 +142,8 @@ def act_open(args):
     target = str(args.get("target") or "")
     if not target:
         return {"ok": False, "error": "缺 target"}
-    # 🔴 2026-10-28：os.startfile 是 **Windows 专用**，本机（iSH/iOS）没有。
-    #   按平台依次降级，每档标明用了谁：
-    #     ① Windows → os.startfile
-    #     ② iOS/iSH → apple-open（系统 URL handler）
-    #     ③ 都没有  → 如实报
-    import shutil as _sh
-    if hasattr(os, "startfile"):
-        os.startfile(target)                                      # noqa: S606
-        return {"ok": True, "opened": target[:120], "engine": "os.startfile"}
-    if _sh.which("apple-open"):
-        r = subprocess.run(["apple-open", target], capture_output=True,
-                           text=True, timeout=60)
-        ok = r.returncode == 0
-        return {"ok": ok, "opened": target[:120], "engine": "apple-open",
-                "err": (r.stderr or "")[:120] if not ok else ""}
-    return {"ok": False, "error": "这台机没有打开手段（无 os.startfile / 无 apple-open）",
-            "engine": "none"}
+    os.startfile(target)                                          # noqa: S606
+    return {"ok": True, "opened": target[:120]}
 
 ACTUATORS = {
     "see": ("截屏", act_see),

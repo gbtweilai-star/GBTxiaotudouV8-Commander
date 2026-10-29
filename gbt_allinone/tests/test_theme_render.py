@@ -13,6 +13,32 @@ TR = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(TR)
 
 
+def _active_palette():
+    """现役色源 = 各目标文件主题块**生成头里写的那个**（派生源，不写死名字）。
+
+    🔴 2026-10-25 · 原期望 → 新口径 → 为什么翻：
+      原期望：拿 `load_palette("default")` 去量全仓主题块有没有漂移。
+      新口径：先从目标文件的生成头读出实际色源（`palettes/<名>.toml`），
+              **所有目标必须同源**（不同源直接判红），再用那个源量漂移。
+      为什么翻：仓里在役的是 `gbt-brand`（CSS 头写着），写死 `default` 等于
+              **拿 A 尺量 B**（本仓 P1），于是 4 件全被误报漂移。**不是放宽**：
+              不同源仍红、色源缺失仍红（load_palette 会回 None）。
+    """
+    import re
+    seen = {}
+    for rel in TR.TARGETS:
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        m = re.search(r"palettes/([A-Za-z0-9_.\-]+)\.toml",
+                      p.read_text(encoding="utf-8", errors="replace"))
+        seen[rel] = m.group(1) if m else None
+    names = {v for v in seen.values()}
+    assert len(names) == 1 and None not in names, \
+        "目标文件的生成头不是同一个色源 / 有的没有生成头：%s" % seen
+    return names.pop()
+
+
 class RenderEngineTest(unittest.TestCase):
 
     def test_token_replaced_from_colors(self):
@@ -83,7 +109,7 @@ class RealTargetsTest(unittest.TestCase):
         self.assertFalse(s["errors"], s["errors"])
 
     def test_no_drift_between_palette_and_files(self):
-        _, meta, colors, _c, _d = TR.load_palette("default")
+        _, meta, colors, _c, _d = TR.load_palette(_active_palette())
         d = TR.drift(colors, meta)
         self.assertTrue(d["ok"], d["drifted"])
 

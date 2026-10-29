@@ -45,7 +45,7 @@ def devices() -> list:
 def judge(a: np.ndarray) -> dict:
     """一行判据：真采样 / 静默 / 垃圾。"""
     peak = float(np.max(np.abs(a))) if a.size else 0.0
-    # 🔴 2026-10-23 自纠（本件第一次跑就抓到自己）：NaN 会让下面两个比较**全为 False**，
+ # 2026-10-23 自纠（本件第一次跑就抓到自己）：NaN 会让下面两个比较**全为 False**，
     #   于是「静默的 NaN 数据」被判成 REAL —— 正是本仓最恨的假绿。
     #   判据加死：非有限值（NaN/Inf）与超范围值，一律 GARBAGE。
     with np.errstate(over="ignore", invalid="ignore"):

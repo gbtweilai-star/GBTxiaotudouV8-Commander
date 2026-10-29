@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """本地自动绑骨 · 第 3 步：蒙皮权重 + 导出绑骨 GLB + 姿态测试（全部本地，零积分）
 
 方法：
@@ -18,7 +14,7 @@ import struct
 import sys
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 # 可传参：autorig-skin.py <低模.glb> <骨架.json> <绑骨输出.glb> <姿态测试.glb>
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/avatarmesh/avatar-lowpoly.glb"
@@ -202,7 +198,7 @@ def subtree(n):
 pose = {}
 h = pos["LeftArm"]
 R = np.eye(4)
-# 🔴 旋转轴必须是**深度轴**，且深度轴是**量出来的**（skeleton.json 的 axes.dep），不能写死 X：
+# 旋转轴必须是**深度轴**，且深度轴是**量出来的**（skeleton.json 的 axes.dep），不能写死 X：
 #    本代网格做过定向归一（肩轴→X、正面→+Z），深度轴变成了 Z；写死 X 等于绕肩轴转，
 #    手臂只会前后甩、不会抬起 —— 实测就是这么把"抬左臂"测成了看不出变化。
 DEP = int(SK.get("axes", {}).get("dep", 0))

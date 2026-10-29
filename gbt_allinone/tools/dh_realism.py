@@ -26,10 +26,6 @@
 本件**只读**：不渲染、不写盘、不出网。
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import os
 import json
@@ -41,7 +37,7 @@ DOMAIN = "creation"
 CAP_TYPE = "internal"
 TRACE_SOURCE_KIND = "dh_realism"
 
-V8 = _GBT_ROOT
+V8 = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 
 # ══════════════════════════════════════════════════════════════════════════
 # ★ 八步流程（照 REALISM.md + PIPELINE.md 蒸馏；每步带判据）

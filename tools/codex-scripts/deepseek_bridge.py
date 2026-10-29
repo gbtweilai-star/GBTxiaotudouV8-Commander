@@ -451,7 +451,7 @@ def clip_read() -> str:
     import ctypes
     user32 = ctypes.windll.user32
     kernel32 = ctypes.windll.kernel32
-    # 🔴 64 位纪律（2026-10-04 第三轮实测抓出）：不声明 restype/argtypes 时，
+ # 64 位纪律（2026-10-04 第三轮实测抓出）：不声明 restype/argtypes 时，
     #    GlobalLock 返回的 **64 位指针被 ctypes 默认 c_int 截成 32 位** —— 拿去解引用
     #    轻则读空、重则 AV（最初那次「access violation」的真根因就是它，不是剪贴板本身）。
     user32.OpenClipboard.argtypes = [ctypes.c_void_p]

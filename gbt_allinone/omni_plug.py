@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -106,22 +107,9 @@ class Pulse:
                 # 2026-10-17 主人令「万能插只要插到其他 AI 都可直接输送能源操控她」：
                 #   AI 插座只认 **https** 端点（OpenAI 兼容）；钥匙槽在 options.key_env，缺就自动探常见槽位。
                 t = str(socket.target or "").strip()
-                # 🔴 2026-10-28：原来只认 https，**把本机回环端点误伤了**。
-                #   实测插 A19（LM Pocket）时被这条挡死：
-                #     "AI 插座只认 https 端点（给的是 http://127.0.0.1:1234/v1）"
-                #   而回环地址天生就是 http —— 它物理上出不了本机，没有中间人可插。
-                #   主人令「万能插只要插到其他 AI 都可直接输送能源操控她」，
-                #   **本机自己的模型恰恰是最该插的那一个**。
-                #   处置：https 照旧；http 仅放行回环（127.0.0.0/8 · ::1 · localhost）。
-                _loopback = False
-                if t.startswith("http://"):
-                    _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
-                    _loopback = (_h in ("localhost", "::1", "0.0.0.0")
-                                 or _h.startswith("127."))
-                if not (t.startswith("https://") or _loopback):
+                if not t.startswith("https://"):
                     socket.state = "failed"
-                    socket.detail = ("AI 插座只认 https 或本机回环 http（给的是 %s）"
-                                     % (t[:60] or "空"))
+                    socket.detail = "AI 插座只认 https 端点（给的是 %s）" % (t[:60] or "空")
                 else:
                     host = (t.split("/")[2] if "//" in t else t)[:60]
                     socket.state = "plugged"
@@ -221,6 +209,34 @@ def _guard_write(target: str) -> dict:
     return {"ok": True, "abs": str(p)}
 
 
+def chat_url(base: str) -> str:
+    """**唯一实现**：把用户给的 `base_url` 拼成 OpenAI 兼容的 chat 端点。
+
+    🔴 2026-10-29 修（主人问「插座支不支持自定义 base_url」时查出来的）：原来**两处各写一套** ——
+      `_ai_call` 一律 `base + "/chat/completions"`；`_local_ai_call` 三档（`/chat/completions` 结尾 /
+      `/v1` 结尾 / 其余补 `/v1/...`）。同一个 base 两处结果不同：
+        `https://x`      → `https://x/chat/completions`  vs  `https://x/v1/chat/completions`
+      接 NVIDIA NIM / Groq / Cerebras 这类免费兼容口时，用户填的 base 常见两种写法
+      （带 `/v1` 与不带），前者两处都对、后者**只有一处对** ⇒ 表现成"有时通有时 404"，
+      最容易被误判成"厂商不稳"。现在两处都调这个函数。
+
+    规则**按末段判，不猜**（三家实测形态都覆盖，见 `selftest` 的 7 条）：
+      ① 已写全 `/chat/completions` ⇒ 原样用（用户显式指定就尊重，别再加工）；
+      ② 末段是 `v1` / `v1beta`（`^v\\d`）或 `openai` ⇒ 只补 `/chat/completions`
+         （Gemini 的兼容口是 `…/v1beta/openai/chat/completions`，**没有** `/v1` 这一层）；
+      ③ 其余 ⇒ 补 `/v1/chat/completions`（DeepSeek / OpenAI / NIM 不带版本号时的默认）。
+    """
+    b = str(base or "").strip().rstrip("/")
+    if not b:
+        return ""
+    if b.endswith("/chat/completions"):
+        return b
+    tail = b.rsplit("/", 1)[-1].lower()
+    if re.match(r"^v\d", tail) or tail == "openai":
+        return b + "/chat/completions"
+    return b + "/v1/chat/completions"
+
+
 def _ai_call(target: str, a: dict, timeout: float = 90.0) -> dict:
     """插到任意 OpenAI 兼容 AI：**输能**（钥匙槽）+ **操控**（chat / tools）。
 
@@ -231,16 +247,10 @@ def _ai_call(target: str, a: dict, timeout: float = 90.0) -> dict:
     import urllib.error
 
     t = str(target or "").strip()
-    # 🔴 2026-10-28：与 plug 那道门保持一致 —— http 放行本机回环。
-    #   两处必须同步，否则会出现"A 说插上了、B 说不行"的自相矛盾（实测踩到）。
-    _lb = False
-    if t.startswith("http://"):
-        _h = t[7:].split("/")[0].split(":")[0].strip("[]").lower()
-        _lb = (_h in ("localhost", "::1", "0.0.0.0") or _h.startswith("127."))
-    if not (t.startswith("https://") or _lb):
-        return {"ok": False, "reason": "AI 插座只认 https 或本机回环 http"}
+    if not t.startswith("https://"):
+        return {"ok": False, "reason": "AI 插座只认 https 端点"}
     base = t.rstrip("/")
-    url = base if base.endswith("/chat/completions") else (base + "/chat/completions")
+    url = chat_url(base)
     slots = ([str(a.get("key_env"))] if a.get("key_env") else
              ["GBT_LLM_API_KEY", "ABLITERATION_API_KEY", "OPENAI_API_KEY", "DEEPSEEK_API_KEY"])
     tok, slot = "", ""
@@ -416,12 +426,7 @@ def _local_ai_call(base: str, body: dict, timeout: float = 90.0) -> dict:
         return {"ok": False, "reason": "需要 base（如 http://127.0.0.1:<port>）"}
     if not _loopback_ok(b):
         return {"ok": False, "reason": "免费通道只走回环（127.0.0.1/localhost）；远端请用 ai 插座"}
-    if b.endswith("/chat/completions"):
-        url = b
-    elif b.endswith("/v1"):
-        url = b + "/chat/completions"
-    else:
-        url = b + "/v1/chat/completions"
+    url = chat_url(b)
     rq = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"),
                                 headers={"Content-Type": "application/json",
                                          "User-Agent": "gbt-v8/workbuddy-tentacle"}, method="POST")
@@ -604,16 +609,34 @@ def discover(deep: bool = False, **_kw) -> dict:
     out["监听端口"] = {"count": len(uniq), "sample": list(uniq.values())[:60]}
 
     lm = []
-    for name, base, path in (("ollama", "http://127.0.0.1:11434", "/api/tags"),
-                             ("lmstudio", "http://127.0.0.1:1234", "/v1/models"),
-                             ("workbuddy-bridge", os.environ.get("GBT_WB_BASE") or "http://127.0.0.1:31720", "/v1/models"),
-                             ("llamacpp", "http://127.0.0.1:8080", "/v1/models")):
-        try:
-            import urllib.request
-            with urllib.request.urlopen(base + path, timeout=3) as s:
-                lm.append({"name": name, "base": base, "ok": 200 <= s.status < 300})
-        except Exception as e:                                      # noqa: BLE001
-            lm.append({"name": name, "base": base, "ok": False, "未读到": type(e).__name__})
+    # 🔴 2026-10-28 改两处（A/B 实测驱动，见 net_guard.LOOPBACK_HOSTS 上方注释）：
+    #   ① 原来用裸 `urllib.request.urlopen` 探回环口 ⇒ 被全局 HTTP_PROXY 接管，**没人监听的
+    #      端口**也回 `HTTPError 502`，与「服务在跑但报错」压成同一个错误类型 ⇒ 读数不可信。
+    #      现在统一走 `net_guard.loopback_open`（强制直连 + 失败分档 not_listening/timeout/http_error）。
+    #   ② 候选表里**没有我们自己的 GPU 车道口**（gpu_lane 默认 8793）⇒ 多域监控看不见自己的车道。
+    #      口从 `GBT_GPU_PORT` 现读，不写死。
+    try:
+        from .security.net_guard import loopback_open as _lb_open
+    except Exception:                                               # noqa: BLE001
+        _lb_open = None
+    _lanes = (("ollama", "http://127.0.0.1:11434", "/api/tags"),
+              ("lmstudio", "http://127.0.0.1:1234", "/v1/models"),
+              ("workbuddy-bridge", os.environ.get("GBT_WB_BASE") or "http://127.0.0.1:31720", "/v1/models"),
+              ("llamacpp", "http://127.0.0.1:8080", "/v1/models"),
+              ("gbt-gpu-lane",
+               "http://127.0.0.1:%s" % (os.environ.get("GBT_GPU_PORT") or "8793"), "/health"))
+    for name, base, path in _lanes:
+        if _lb_open is None:
+            lm.append({"name": name, "base": base, "ok": False, "kind": "not_probed",
+                       "未读到": "net_guard 取不到 ⇒ 未探测"})
+            continue
+        _r = _lb_open(base + path, timeout=3)
+        item = {"name": name, "base": base, "ok": bool(_r.get("ok")), "kind": _r.get("kind")}
+        if _r.get("status"):
+            item["http"] = _r["status"]
+        if not _r.get("ok"):
+            item["未读到"] = _r.get("detail") or _r.get("kind")
+        lm.append(item)
     out["本地模型口"] = lm
 
     try:
@@ -651,9 +674,14 @@ def discover(deep: bool = False, **_kw) -> dict:
 
     out["可插面计数"] = {"进程": len(procs), "端口": len(uniq),
                         "本地模型口可用": sum(1 for x in lm if x.get("ok")),
+                        "本地模型口分档": {k: [x["name"] for x in lm if x.get("kind") == k]
+                                     for k in ("ok", "not_listening", "timeout",
+                                               "http_error", "not_probed", "other")
+                                     if any(x.get("kind") == k for x in lm)},
                         "串口": len(out["串口"]) if isinstance(out["串口"], list) else 0,
                         "DB": len(dbs), "窗口": (out["窗口"].get("count") or 0)}
-    out["_口径"] = "只读枚举：发现→归一化→门→插上就用→拔掉；读不到的写未读到"
+    out["_口径"] = ("只读枚举：发现→归一化→门→插上就用→拔掉；读不到的写未读到；"
+                    "本地模型口按 kind 分档（not_listening=没起服务，不是「不兼容」）")
     out.setdefault("插座能源", {}).update(SOCKET_ENERGY)
     return out
 
@@ -793,31 +821,31 @@ def selftest() -> dict:
     done = [p.plug(x) for x in items]
     ok_items = [s for s in done if s.state == "plugged"]
     drv = plug_and_run("py:print(6*7)", kind="process", action="run", timeout=20)
-    return {"ok": bool(ok_items) and bool(drv.get("ok")),
+    # 🔴 端点拼接判据（2026-10-29 加）：接免费 OpenAI 兼容口时"填带不带 /v1"必须都对。
+    #   自检跑的是**纯函数**，不发请求 —— 所以零成本、可每次跑。
+    _cases = [
+        ("https://integrate.api.nvidia.com/v1", "https://integrate.api.nvidia.com/v1/chat/completions"),
+        ("https://integrate.api.nvidia.com/v1/", "https://integrate.api.nvidia.com/v1/chat/completions"),
+        ("https://api.groq.com/openai/v1", "https://api.groq.com/openai/v1/chat/completions"),
+        ("https://api.cerebras.ai/v1", "https://api.cerebras.ai/v1/chat/completions"),
+        # Gemini 的兼容口没有 /v1 这一层 —— 这条是**负对照**：补 /v1 就错
+        ("https://generativelanguage.googleapis.com/v1beta/openai",
+         "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"),
+        ("https://api.deepseek.com", "https://api.deepseek.com/v1/chat/completions"),
+        ("https://api.openai.com/v1", "https://api.openai.com/v1/chat/completions"),
+        ("https://gw.example.com/chat/completions", "https://gw.example.com/chat/completions"),
+        ("", ""),
+    ]
+    _bad = [(b, chat_url(b), want) for b, want in _cases if chat_url(b) != want]
+    return {"ok": bool(ok_items) and bool(drv.get("ok")) and not _bad,
             "插座数": len(done),
             "插上": ["%s:%s" % (s.kind, s.target) for s in ok_items],
             "失败": ["%s:%s %s" % (s.kind, s.target, s.detail) for s in done if s.state != "plugged"],
             "真驱动": {"ok": drv.get("ok"), "stdout": (drv.get("stdout") or "").strip(),
                                 "rc": drv.get("rc")},
+            "端点拼接": {"条数": len(_cases), "不符": _bad or "全对",
+                     "_口径": "填带 /v1 的、不带 /v1 的、写全 /chat/completions 的都必须落到同一个端点"},
             "说明": "插上是真探测（文件在/进程就绪/URL 合法）；驱动是真执行（过门）"}
-
-
-_A19_MOD = None
-
-
-def _a19_mod():
-    """按路径加载 tools/a19_ctl.py —— 它在 <repo>/tools/ 下，不在 gbt_allinone 包里。"""
-    global _A19_MOD
-    if _A19_MOD is not None:
-        return _A19_MOD
-    import importlib.util
-    root = Path(__file__).resolve().parents[1]
-    path = root / "tools" / "a19_ctl.py"
-    spec = importlib.util.spec_from_file_location("gbt_a19_ctl", str(path))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    _A19_MOD = mod
-    return mod
 
 
 def run(op: str = "status", **kw) -> dict:
@@ -830,40 +858,6 @@ def run(op: str = "status", **kw) -> dict:
                                             "（process→process_execute · file写→filesystem_write · "
                                             "api→external_llm+data_export · web→desktop_control+privacy_read）",
                 "注": "网页/GUI 的坐标兜底走能力位 tentacle，不在本位重造一套"}
-    if op in ("a19", "a19容器", "lmpocket"):
-        # 容器面：把 LM Pocket 当容器管（status / ask / queue / up）。
-        # 纪律：容器不在 ⇒ 如实 offline / queued，绝不拿云端顶替。
-        mod = _a19_mod()
-        do = str(kw.get("do") or kw.get("action") or "status").lower()
-        if do in ("status", "ps", ""):
-            return dict({"op": "a19", "do": "status"}, **mod.status_dict())
-        if do in ("ask", "chat"):
-            text = str(kw.get("prompt") or kw.get("text") or kw.get("q") or "")
-            if not text:
-                return {"ok": False, "op": "a19", "do": "ask", "why": "需要 prompt"}
-            r = mod.ask_dict(text, int(kw.get("tokens") or 512),
-                             float(kw.get("temp") or 0.7), str(kw.get("system") or ""))
-            return dict({"op": "a19", "do": "ask"}, **r)
-        if do in ("queue", "enqueue"):
-            text = str(kw.get("prompt") or kw.get("text") or kw.get("q") or "")
-            if not text:
-                return {"ok": False, "op": "a19", "do": "queue", "why": "需要 prompt"}
-            return dict({"op": "a19", "do": "queue"},
-                        **mod.queue_add(text, int(kw.get("tokens") or 512)))
-        if do in ("up", "wake", "起"):
-            import subprocess as _sp
-            try:
-                _sp.run(["apple-open", "lmpocket://"], capture_output=True,
-                        text=True, timeout=20)
-                wake = "lmpocket:// 已送达（Load & Start Server 仍需人手点）"
-            except Exception as _e:                               # noqa: BLE001
-                wake = "唤起失败 %s" % type(_e).__name__
-            _t0 = time.time()
-            _wait = float(kw.get("wait") or 0)
-            while time.time() - _t0 < _wait and not mod.up_port():
-                time.sleep(1)
-            return dict({"op": "a19", "do": "up", "wake": wake}, **mod.status_dict())
-        return {"ok": False, "op": "a19", "why": "do 只支持 status/ask/queue/up"}
     if op in ("sockets", "snapshot"):
         p = Pulse()
         for k, t in (("file", str(Path(__file__).resolve())), ("process", "py:print(1)"),
@@ -933,4 +927,13 @@ def run(op: str = "status", **kw) -> dict:
             action=str(kw.get("do") or "run"), args=kw.get("args"),
             timeout=float(kw.get("timeout") or 30.0)))
     return {"ok": False, "error": "不认的 op：%s" % op,
-            "known": ["status", "sockets", "energy", "selftest", "plug", "run", "ai", "ai_chat", "ai_control", "counter_strike", "counter_plan", "wb_chat", "wb_models", "wb_discover", "discover"]}
+            # 2026-10-28：这份自述原来只列了 14 个，而 run() 实际认 24 个（含 9 个别名）
+            #   ⇒ 照自述调用的人**摸不到** scan_local / snapshot / counter / wb / 可插面 这些入口。
+            #   判据在 tools/codex-scripts/omni-monitor.py --gap（AST 现读，不写死）。
+            "known": ["status", "sockets", "snapshot", "energy", "selftest", "plug", "run",
+                      "discover", "scan_local", "可插面",
+                      "ai", "ai_chat", "ai_control",
+                      "counter", "counter_plan", "counter_strike", "反控",
+                      "wb", "wb_chat", "workbuddy_chat",
+                      "wb_models", "workbuddy_models",
+                      "wb_discover", "workbuddy_discover"]}

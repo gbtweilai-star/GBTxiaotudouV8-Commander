@@ -38,7 +38,7 @@ HONEST_RE = re.compile(r"(未验|没验|没有验|未实测|未核实|待验|没
 SOURCE_RE = re.compile(r"(出处|真源|固化)")
 MIN_REF_BYTES = 800          # 深读比一页摘要短 ⇒ 基本就是空壳
 MIN_CMD_LINES = 3            # 深读里至少要有几条真命令（人类要照抄）
-# ⚠️ 判"有没有可照抄的命令"**不能按行首匹配**：深读里的命令大多写在**表格里**（`| \`node --version\` | …`），
+# 判"有没有可照抄的命令"**不能按行首匹配**：深读里的命令大多写在**表格里**（`| \`node --version\` | …`），
 # 行首是 `|`。第一版按行首写 ⇒ 把 L4 误报成"没有命令行"。改成**全篇找命令形状**。
 CMD_RE = re.compile(r"(?m)^[\s|>`\-*]*`?\s*((?:py -3\.14|python3?|node|npm|npx|pwsh|powershell|"
                     r"Get-[A-Z]\w+|arkcli|hyperframes|remotion|yt-dlp|ffmpeg|ffprobe|lark-cli)\b)")

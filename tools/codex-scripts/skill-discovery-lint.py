@@ -97,7 +97,7 @@ def lint_one(d: Path) -> dict:
     m = re.match(r"^---\n.*?\n---\n", stext, re.S)
     if m:
         head = stext[m.end():]          # 先剥 frontmatter
-    # 🔴 本轮实测踩到：第一版查 `stext[:600]` —— 而 frontmatter 一长（加了触发词注释），
+ # 本轮实测踩到：第一版查 `stext[:600]` —— 而 frontmatter 一长（加了触发词注释），
     #    正文里的成熟度头就被挤出前 600 字 ⇒ **明明写了却报"缺"**（假红）。
     #    修法：**先剥 frontmatter 再看正文**，别假设固定偏移。
     if MATURITY_RE.search(head[:800]):

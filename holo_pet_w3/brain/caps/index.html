@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-page-id="cap-index">
 <head>
 <meta charset="utf-8" />
-<!-- 🔴 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
+<!-- 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
 <title>全部能力页 · GBT小土豆V8</title>
-<link rel="stylesheet" href="../../window.css?v=20261026c" />
+<link rel="stylesheet" href="../../window.css" />
 <link rel="stylesheet" href="../../deck3d.css" />
 <link rel="stylesheet" href="../../skin-mission-control.css" />
 <link rel="stylesheet" href="../cap.css" />
+<link rel="stylesheet" href="../../page-skins.css" />
 </head>
 <body class="cap-page">
 <div class="cap-top">
-  <span class="crumb"><a href="../../index.html">神经工作台</a> / <span class="here">全部能力页</span></span>
+  <span class="crumb"><a href="#" data-panel-goto="godview">神经工作台</a> / <span class="here">全部能力页</span></span>
   <span class="spacer"></span>
   <span class="mc-badge" id="ix-at">—</span>
 </div>
 <header class="cap-hero">
   <h1 class="cap-id">全部能力页</h1>
-  <p class="cap-desc">每一条能力位**各自一页**（不是挤在一张卡里）。点任一进入它的独立页。</p>
+  <p class="cap-desc">每一条能力位各自一页（不是挤在一张卡里）。点任一进入它的独立页。</p>
 </header>
 <main class="cap-body">
   <section class="cap-sec"><h2>按束分组<span class="n" id="ix-n">—</span></h2><div id="ix-groups"></div></section>
 </main>
 <footer class="foot">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
-<script src="../brain-data.js?v=20261026"></script>
+<script src="../brain-data.js"></script>
 <script>
 (function () {
   "use strict";
@@ -46,9 +47,5 @@
   nodes.filter(function (n) { return !n.impl; }).map(link).join("") + "</span></span></div>";
 })();
 </script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../../shell/tentacle-kit.js?v=20261029"></script>
 </body>
 </html>

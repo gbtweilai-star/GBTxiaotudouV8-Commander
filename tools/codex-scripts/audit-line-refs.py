@@ -43,11 +43,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-# 🔴 2026-09-25 实测：第一版用 `Path('.').rglob('*')`，**过滤写在拿到路径之后**
+# 2026-09-25 实测：第一版用 `Path('.').rglob('*')`，**过滤写在拿到路径之后**
 #    ⇒ 仍然会遍历 .git / node_modules / store（那里有 2.4 GB 资产）⇒ **300s 超时**。
 #    ⇒ 必须**在 walk 时就剪枝**（`dirnames[:] = [...]`），而不是事后筛。
 #
-# 🔴 第二处：**`output/` 必须排除 —— 否则是自反馈回路。**
+# 第二处：**`output/` 必须排除 —— 否则是自反馈回路。**
 #    实测：本脚本把上一轮自己生成的 `output/blueprint-audit/line-refs.json` 当成
 #    "引用来源"又扫了一遍（那份 JSON 里全是 `文件:行号` 字符串），
 #    于是读数里冒出「api.py:333 ← output/blueprint-audit/line-refs.json」这种条目。
@@ -82,7 +82,7 @@ def main() -> int:
     # 行数缓存（被引用文件的），避免重复读
     lines_cache = {}
 
-    # 🔴 2026-09-25 **第二处自纠（解析器太窄，造出 1520 条假阳性）**：
+ # 2026-09-25 **第二处自纠（解析器太窄，造出 1520 条假阳性）**：
     #    第一版只按「仓根」和「引用文件所在目录」两处解析路径。
     #    实测：文档里大量引用是**裸文件名**（`panel_server.py` / `codex_bridge.py`），
     #    实际在 `holo_pet/` / `gbt_allinone/` 下 ⇒ 一律被判成 BROKEN_MISSING。

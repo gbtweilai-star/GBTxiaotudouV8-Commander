@@ -167,7 +167,7 @@ def cmd_check(_args) -> int:
                     no_src.append("%s 引用了不存在的出处 %s" % (x.get("id"), tag))
         add("D3", not no_src, "额度与稳定性都带出处、且出处都在 sources[] 里（问题：%s）" % (no_src or "无"))
 
-        # 🔴 状态纪律：设计不是部署
+ # 状态纪律：设计不是部署
         dirty = ["%s=%s" % (x.get("id"), x.get("status")) for x in fleet
                  if any(w in str(x.get("status")) for w in FORBIDDEN_STATUS)]
         add("D4", not dirty, "status 里没有「已部署/已连通/已验证」这类假绿（命中：%s）" % (dirty or "无"))

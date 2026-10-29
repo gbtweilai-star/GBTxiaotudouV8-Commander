@@ -104,9 +104,9 @@
     cv.width = 256; cv.height = 256;
     var g = cv.getContext("2d");
     var rg = g.createRadialGradient(128, 128, 6, 128, 128, 118);
-    rg.addColorStop(0, "rgba(0,0,0,.70)");
-    rg.addColorStop(0.5, "rgba(0,0,0,.28)");
-    rg.addColorStop(1, "rgba(0,0,0,0)");
+    rg.addColorStop(0, "rgba(3,4,12,.70)");
+    rg.addColorStop(0.5, "rgba(3,4,12,.28)");
+    rg.addColorStop(1, "rgba(3,4,12,0)");
     g.fillStyle = rg;
     g.fillRect(0, 0, 256, 256);
     var tex = new THREE.CanvasTexture(cv);

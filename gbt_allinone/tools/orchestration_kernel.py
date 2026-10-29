@@ -40,6 +40,7 @@ from . import (a1art_skill, auto_publish, auto_switch, awesome_tools_index,
                coverage_auditor, meta_cognition, model_key_pool, shared_resources,
                observer_anchor, proactive_report,
                tentacle_cognition, verification_watch,
+               project_drift,
                stigmergy)
 from .. import tactics          # `tactics.py` 在包根，不在 tools/
 
@@ -105,6 +106,13 @@ _READONLY_MODULES = {
     "awesome_tools_index": awesome_tools_index,
     # R-H353 · 落地即接线：协作层的**间接通道**（信息素场地；与 collab_gateway 并排）
     "stigmergy": stigmergy,
+    # 2026-10-25 · 落地即接线：**第三块监控**（全控变化 —— 主人 2026-10-19
+    # 「多余监控还缺了一个全控变化，也就是要有一个看着整个项目变化的」）。
+    # 它原来是「挂号不接线」：注册表 enabled、handler 有、只读零作用域，但入口叫
+    # `run_op` 而调度面只认 `run` ⇒ **一个内部调用方都没有**，审计把它报成内调型孤儿，
+    # 而真正的问题是「监控不会自己跑」。这一刀：`project_drift.run()` 薄适配 + 本行登记，
+    # 默认 op=status（只读），跑一次真读数见 `test_caps_called_audit` 复绿。
+    "project_drift": project_drift,
     # 注：`sec_chain`（安全面 HackerBrain）**故意不接** —— 安全面的入口语义要单独判，
     # 不随手给它造调用方（避免"为了数字好看而造假线"）。
 }

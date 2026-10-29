@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """面板档合成（分区 LOD）：**减面身体** + **高密度合格头** + 同一套 22 骨。
 判据：文件 <10MB（面板路由此前 61MB 会 500）· 体重算权重(和=1) · 头沿用 Head/Neck/HeadTop · 引用合法。
 从零重建 GLB：只带每件**自己的**贴图（避免把 4K 身体贴图也塞进头件）。"""
@@ -11,7 +7,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 BODY = DH / "raw/phase7-body-low/tripo-out/gbt-body-low-convert-98605f3a/model.glb"
 HEAD = DH / "raw/rig/part-head.glb"

@@ -85,7 +85,7 @@ STEP_SAVE = {
     tuple([PY, ".scratch/_brain_shot.py", "r_obj.png", "15"]): ".scratch/_r_obj.txt",
 }
 
-# 🟡 只有主人能开的那几格 —— **不算通过也不算失败**，单独印出来
+# 只有主人能开的那几格 —— **不算通过也不算失败**，单独印出来
 OWNER_GATED = [
     "⑥ **真出声**：`python -m gbt_allinone auth grant --scope audio_output --ttl 600`（一次性；一次授权=一次出声）",
     "⑥ **真听到**：插一个物理麦克风 / 3.5mm 耳麦（本机录音端点在场的 0 个；内置麦也没有）",
@@ -142,7 +142,7 @@ def preflight(label, cmd, reqs):
     for r in tuple(reqs) + EXTRA_REQUIRES.get(label, ()):
         if not (ROOT / r).exists():
             miss.append(r)
-    # 🔴 第 76 轮自检抓出来的洞：`subject_of()` **写了没接上** ⇒
+ # 第 76 轮自检抓出来的洞：`subject_of()` **写了没接上** ⇒
     #    "主脚本不在"这一条根本没被拦住（靠崩溃兜底才没念错）。
     #    自检判据 B 就是为这种"函数写对了、调用处没接上"设的 —— 它当场报了 false。
     sub = subject_of(cmd)
@@ -176,7 +176,7 @@ def main():
                                 encoding="utf-8", errors="replace", timeout=1800)
             out, code = cp.stdout or "", cp.returncode
             err = (cp.stderr or "").strip()
-            # 🔴 第 67 轮修（**跑测器自己的 bug**）：第一步只是**捕获**了 `_brain_shot.py` 的
+ # 第 67 轮修（**跑测器自己的 bug**）：第一步只是**捕获**了 `_brain_shot.py` 的
             #    输出，**没落盘** ⇒ 第二步 `_brain_readings.py .scratch/_r_obj.txt` 找不到文件
             #    ⇒ 0.1 秒就红。命令不带 shell，所以重定向要在这里手工做。
             save = STEP_SAVE.get(tuple(cmd))
@@ -213,13 +213,13 @@ def main():
         if isinstance(verdict, list):
             verdict = " / ".join(str(x) for x in verdict)
         v = str(verdict)
-        # 🟡 第三态（第 76 轮加）：验收器自己说"跑通了但没全过、只有读数"（verdict 以 🟡 开头）。
-        # 既不该念成 ✅，也不该念成 ❗ —— 本仓的三态纪律（✅已验 / 🟡已落盘未验 / ⛔等主人）同一条。
+ # 第三态（第 76 轮加）：验收器自己说"跑通了但没全过、只有读数"（verdict 以 开头）。
+ # 既不该念成 ，也不该念成 —— 本仓的三态纪律（已验 / 已落盘未验 / 等主人）同一条。
         #
-        # 🔴 第 76 轮同轮修的一个**判据错**：原来还看 `"未过" not in v`，
+ # 第 76 轮同轮修的一个**判据错**：原来还看 `"未过" not in v`，
         #    结果 `⓪ 总验收器自检` 的**成功**文本里写着「…念『起不来』而不是『未过』」⇒
-        #    它自己把自己判成了红（✅ 六条全过 却打 ❗）。判据只看**印章字符**（各验收器的约定：
-        #    失败一律以 ❗ 开头），不看自然语言里出现过什么词 —— 拿文本词当判据，迟早被自己的说明打脸。
+ # 它自己把自己判成了红（ 六条全过 却打 ）。判据只看**印章字符**（各验收器的约定：
+ # 失败一律以 开头），不看自然语言里出现过什么词 —— 拿文本词当判据，迟早被自己的说明打脸。
         partial = v.startswith("🟡")
         ok = code == 0 and ("❗" not in v)
         rows.append({"项": label, "组": group, "类": "部分" if (ok and partial) else ("过" if ok else "未过"),
@@ -260,7 +260,7 @@ def main():
     for x in OWNER_GATED:
         print("   · " + x)
     print("\n报告落盘：%s" % OUT)
-    # 退出码只认"每一条都是 ✅"：🟡（只给读数）与 ⛔（起不来）**都不算全过**
+ # 退出码只认"每一条都是 "：（只给读数）与 （起不来）**都不算全过**
     return 0 if rows and all(r.get("类") == "过" for r in rows) else 1
 
 

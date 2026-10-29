@@ -10,7 +10,7 @@
 3. 服务在不在（`127.0.0.1:8188`）；
 4. **结论**：现在能生产什么、缺什么才能到「电影」。
 
-## 🔴 三条纪律
+## 三条纪律
 - **只读**：不启动服务、不装包、不改 ComfyUI 一个字节；
 - **读不到就报未读到**，不用 0 冒充（例如没装 torch_directml ≠ 0 个）；
 - **不吹**：「无限生产高质量电影」这句话要能被读数拆开验证，拆不开就不写进账。
@@ -315,67 +315,53 @@ def cmd_selftest(a) -> int:
         lines.append("%s %s — %s" % ("✓" if cond else "✗", name, detail))
 
     s = scan()
-    installed = s.get("ok") is True
-
-    def ck2(name, cond, detail, applicable=True):
-        # 2026-10-15 对齐：**第三态——不适用**（不算过、不算败、不假绿）。
-        #   本机没装 ComfyUI 时，“装上才有读数”那几项测的是**机器装没装**，
-        #   不是**判据灵不灵** ⇒ 旧写法必红、红得没意义。
-        nonlocal bad
-        if not applicable:
-            lines.append("○ %s — **本机未装 ComfyUI ⇒ 本形态不适用**（不假绿·不算败）" % name)
-            return
-        bad += 0 if cond else 1
-        lines.append("%s %s — %s" % ("✓" if cond else "✗", name, detail))
-
-    ck2("**真装上就有读数**（不靠猜）", s.get("ok") is True,
-        str((s.get("安装") or {}).get("路径")), applicable=installed)
+    ck("**真装上就有读数**（不靠猜）", s.get("ok") is True, str(s.get("安装", {}).get("路径")))
     tb = s.get("算力后端", {})
-    ck2("**算力口径读出来了**（不是写死的）", tb.get("torch版本") not in (None, "?"),
-        "torch=%s ｜ %s" % (tb.get("torch版本"), tb.get("构建口径")), applicable=installed)
-    _mk = s.get("模型清单") or {}
-    ck2("**视频/图像模型分开数**（这是「电影」成不成的关键）",
-        isinstance(_mk.get("其中**视频/动图**类"), dict)
-        and isinstance(_mk.get("其中**图像**类"), dict),
-        "图像 %s ｜ 视频 %s"
-        % (sum(x.get("件", 0) for x in (_mk.get("其中**图像**类") or {}).values()),
-           sum(x.get("件", 0) for x in (_mk.get("其中**视频/动图**类") or {}).values())),
-        applicable=installed)
-    # 🔴 负控：**没找到安装时不许报"0 个模型"**，要报「未读到」
+    ck("**算力口径读出来了**（不是写死的）", tb.get("torch版本") not in (None, "?"),
+       "torch=%s ｜ %s" % (tb.get("torch版本"), tb.get("构建口径")))
+    ck("**视频/图像模型分开数**（这是「电影」成不成的关键）",
+       isinstance((s.get("模型清单") or {}).get("其中**视频/动图**类"), dict)
+       and isinstance((s.get("模型清单") or {}).get("其中**图像**类"), dict),
+       "图像 %s ｜ 视频 %s"
+       % (sum(v["件"] for v in (s.get("模型清单", {}).get("其中**图像**类") or {}).values()),
+          sum(v["件"] for v in (s.get("模型清单", {}).get("其中**视频/动图**类") or {}).values())))
+ # 负控：**没找到安装时不许报"0 个模型"**，要报「未读到」
     fake = {"ok": False, "结论": "**未读到**：没找到 ComfyUI 安装"}
     ck("**负控：没找到安装 ⇒ 报未读到，不报 0**",
        "未读到" in fake["结论"] and "0" not in fake["结论"], fake["结论"][:40])
-    # 🔴 结论里必须能看到缺口（按**实际形态**判：字典看缺口列表；字符串看“未读到”）
-    v = s.get("结论") or {}
-    if not isinstance(v, dict):
-        v = {"结论原文": str(v)}
-    str_form = isinstance(s.get("结论"), str)
-    str_ok = str_form and "未读到" in str(s.get("结论"))
+ # 负控：结论必须**列出缺口**，不许只报喜
+    v = s.get("结论", {})
     ck("**结论里必须能看到缺口**（不许只报喜）",
-       (isinstance(v.get("到「无限生产高质量电影」缺什么"), list)
-        and len(v["到「无限生产高质量电影」缺什么"]) >= 1) or str_ok,
+       isinstance(v.get("到「无限生产高质量电影」缺什么"), list)
+       and len(v["到「无限生产高质量电影」缺什么"]) >= 1,
        "%d 条缺口" % len(v.get("到「无限生产高质量电影」缺什么") or []))
-    ck2("**不承诺产量与画质**（「无限/高质量」是目标不是读数）",
-        "不承诺" in str(v.get("诚实边界")), str(v.get("诚实边界"))[:50], applicable=installed)
+    ck("**不承诺产量与画质**（「无限/高质量」是目标不是读数）",
+       "不承诺" in str(v.get("诚实边界")), str(v.get("诚实边界"))[:50])
+ # 内存这一关必须**量出来**，不许只写"CPU 慢"
     mem = s.get("内存可行性") or {}
-    ck2("**内存可行性量出来了**（能不能真出图，这一关也得过）",
-        bool(mem.get("结论")) and bool(mem.get("估计峰值MB")),
-        "空闲 %s MB ｜ 估峰值 %s MB ｜ %s"
-        % ((mem.get("内存现读") or {}).get("空闲MB"), mem.get("估计峰值MB"),
-           str(mem.get("结论"))[:44]), applicable=installed)
-    # 🔴 负控：内存读不到 ⇒ 必须说「不敢说能」，不许默认能
+    ck("**内存可行性量出来了**（能不能真出图，这一关也得过）",
+       "结论" in mem and mem.get("估计峰值MB"),
+       "空闲 %s MB ｜ 估峰值 %s MB ｜ %s"
+       % ((mem.get("内存现读") or {}).get("空闲MB"), mem.get("估计峰值MB"),
+          str(mem.get("结论"))[:44]))
+    ck("**内存不够时结论必须明确**（不许含糊）",
+       ("现在不行" in str(v.get("能做什么（**有据**）", {}).get("**现在能不能真出图**"))
+        or "看起来够" in str(v.get("能做什么（**有据**）", {}).get("**现在能不能真出图**"))
+        or "不敢说能" in str(v.get("能做什么（**有据**）", {}).get("**现在能不能真出图**"))),
+       str(v.get("能做什么（**有据**）", {}).get("**现在能不能真出图**"))[:56])
+ # 负控：内存读不到 ⇒ 必须说「不敢说能」，不许默认能
     fake_mem = {"内存": "**未读到**（不拿 0 冒充）"}
     fake_v = verdict({"算力后端": tb, "模型清单": s.get("模型清单") or {},
                       "内存可行性": fake_mem})
     ck("**负控：内存读不到 ⇒ 说「不敢说能」，不许默认能**",
        "不敢说能" in str(fake_v["能做什么（**有据**）"]["**现在能不能真出图**"]),
        str(fake_v["能做什么（**有据**）"]["**现在能不能真出图**"])[:44])
-    # 🔴 只读：AST 扫**真调用**，并检查**除落 state 那一处外没有别的写盘**
+ # 只读：AST 扫**真调用**，并检查**除落 state 那一处外没有别的写盘**
     src = Path(__file__).read_text(encoding="utf-8")
     stray = _stray_writes(src)
     ck("**只读**：除落 `state/comfy-surface.json` 那一次，无别的写盘调用",
        not stray, "越界写盘: %s" % (stray or "无"))
-    # 🔴 负控：种一段**真的越界写盘**进去 ⇒ 扫描器必须咬出来（否则判据是空的）
+ # 负控：种一段**真的越界写盘**进去 ⇒ 扫描器必须咬出来（否则判据是空的）
     planted = _stray_writes("from pathlib import Path\n"
                             "Path('C:/Users/ADMIN/ComfyUI/main.py').write_text('x')\n"
                             "import shutil; shutil.rmtree('C:/Users/ADMIN/ComfyUI')\n")

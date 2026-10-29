@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 """查宝箱 GLB 每个材质组的 UV 落区：图集象限 = 左上木 / 右上铁 / 右下金 / 左下(未使用,暗)。"""
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径
-#    `C:\Users\ADMIN\Desktop\GBT小土豆V8`，Linux/手机上会**造出一个同名垃圾目录**。
-#    改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 import json
 import struct
 import pathlib
 import numpy as np
 
-P = pathlib.Path(_GBT_ROOT + "/assets/treasure-chest.glb")
+P = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8\assets\treasure-chest.glb")
 raw = P.read_bytes()
 jlen, = struct.unpack_from("<I", raw, 12)
 j = json.loads(raw[20:20 + jlen].decode("utf-8"))

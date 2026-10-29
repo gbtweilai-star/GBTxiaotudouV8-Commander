@@ -33,7 +33,7 @@ _STORE = pathlib.Path(tempfile.mkdtemp(prefix="gbt_ticket_store_"))
 os.environ["GBT_STORE_DIR"] = str(_STORE)
 sys.path.insert(0, str(ROOT))
 
-# 🔴 2026-10-21 实测坑：授权账本**就在 store 里**（store/auth_grants.jsonl）。
+# 2026-10-21 实测坑：授权账本**就在 store 里**（store/auth_grants.jsonl）。
 #    隔离 store 会把主人刚发的票一起隔离掉 ⇒ 上一轮 21 条全报"仍缺票"（票是真的、我看错账本）。
 #    修法：隔离 store 建好后，把**真实账本只读复制**进来；写盘仍落在临时 store。
 import shutil                                        # noqa: E402

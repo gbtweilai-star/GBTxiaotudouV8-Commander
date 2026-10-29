@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """低模宝箱（带贴图 · 自包含 GLB）—— 零依赖程序化生成，不联网、不需要任何 API Key。
 
 产物：assets/treasure-chest.glb（贴图以 PNG 嵌在 GLB 内，单文件自包含）
@@ -17,7 +13,7 @@ import struct
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 OUT = WS / "assets/treasure-chest.glb"
 ATLAS = WS / "assets/treasure-chest-atlas.png"
 

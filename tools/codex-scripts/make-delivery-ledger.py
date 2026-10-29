@@ -69,7 +69,7 @@ def main(argv: list[str]) -> int:
                 str(len(re.findall(r"未验", body))),
             ))
 
-    # ⚠️ 合计必须按**去重后的文件**算：`gbt-creation` 同时映射 creation 与 image_video 两个域，
+ # 合计必须按**去重后的文件**算：`gbt-creation` 同时映射 creation 与 image_video 两个域，
     # 按"每行相加"会把它的字节/行数**记两遍**（读数虚高 = 我自己在账上撒谎，这种账不采信）。
     uniq = sorted({r[2] for r in rows})
     seen: set[str] = set()

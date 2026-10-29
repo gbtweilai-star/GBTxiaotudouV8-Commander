@@ -116,7 +116,7 @@ def boot() -> dict:
             for k, v in by_idem.items() if v[-1].get("closed")]
     open_ = [{"idem": k, "what": v[-1].get("what"), "at": v[-1].get("at")}
              for k, v in by_idem.items() if not v[-1].get("closed")]
-    # 🔴 2026-10-09 判据自身的错（自查出来的，实测撞了）：
+ # 2026-10-09 判据自身的错（自查出来的，实测撞了）：
     #    原来「同 idem 出现多次」一律判**疑似无脑重做** ⇒ 把**重新验证**也冤枉了。
     #    正解：**同 idem 且证据逐字相同** = 真无脑重做；**证据不同** = 重新验证（正常，另列）。
     blind, reverify = [], []

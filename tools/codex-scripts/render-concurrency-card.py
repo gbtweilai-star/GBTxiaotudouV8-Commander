@@ -10,20 +10,17 @@
 用法：
     py -3.14 -X utf8 tools/codex-scripts/render-concurrency-card.py
 """
-import sys
-
-for _s in (sys.stdout, sys.stderr):                    # 2026-10-15 对齐：输出编码守门（本仓口径）
-    try:
-        _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:
-        pass
-
-
 import io
 import json
 import os
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import sys
+
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(ROOT, "state", "concurrency-last.json")

@@ -38,7 +38,7 @@ import re
 import sys
 from pathlib import Path
 
-# 🔴 2026-10-10 修（**同族缺陷，第二次撞上**）：本件在 **GBK 控制台**上不带 -X utf8 调用时**当场崩**。
+# 2026-10-10 修（**同族缺陷，第二次撞上**）：本件在 **GBK 控制台**上不带 -X utf8 调用时**当场崩**。
 #    实测真因（不是猜）：gbt_allinone/tests/test_cloud_config_wiring.py 第 34 行调本件用的是
 #        subprocess.run([sys.executable, str(TOOL), "--root", root, "--json"], ...)
 #    —— **没带 -X utf8**；本件 ensure_ascii=False 印到 U+21D2（⇒）时抛
@@ -55,7 +55,7 @@ for _s in (sys.stdout, sys.stderr):
 
 ROOT = Path(__file__).resolve().parents[2]
 ALIAS_DECL = re.compile(r"\b(?:const|let|var)\s+(e|env2|envAlias)\s*=\s*[^;\n]*\benv\b")
-# ⚠️ 结尾是 {1,} 不是 {2,}：`AI` 只有 2 个字符，用 {2,} 会**扫不到 `e.AI`**，
+# 结尾是 {1,} 不是 {2,}：`AI` 只有 2 个字符，用 {2,} 会**扫不到 `e.AI`**，
 #    于是本器会把「AI 绑定」报成"声明了但代码不读"（假红），而 AI 恰恰是最要紧的那一个绑定。
 #    这是本器**自己的**一处假阳性，首跑就被这行读数暴露了。
 ENV_READ = re.compile(r"\b(env|e|ctx\.env|this\.env)\s*\.\s*([A-Z][A-Z0-9_]{1,})\b")
@@ -158,7 +158,7 @@ def main(argv=None) -> int:
     unused = sorted(n for n in declared if n not in reads)
 
     # C 类：形态 B 十个模块
-    # ⚠️ 探针根（测试造的最小目录）通常没有 mesh.json —— 那不算错，**跳过并说明**，
+ # 探针根（测试造的最小目录）通常没有 mesh.json —— 那不算错，**跳过并说明**，
     #    不许因此崩掉（首版会在 json.loads 处抛，探针用例根本跑不起来）。
     mod_problems, mesh_note = [], ""
     mesh_file = base / "mesh.json"

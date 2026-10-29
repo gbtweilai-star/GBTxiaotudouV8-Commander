@@ -32,7 +32,7 @@
   · **未探测** = **没条件探**（没跑过探针、或源件读不到、或被守卫拦下）—— **写明为什么**。
     🔴 铁律：**没探过的项，一律「未探测」，不许画成「接上」**。
 
-## 🔴 请求前的两道守卫（都不许省）
+## 请求前的两道守卫（都不许省）
 
   · **公网**（云插件基址）：先过 `cloud-status.py::host_guard` —— 只许 http/https，回环/私网/链路本地/保留
     一律拦下、**不发请求**（防 SSRF / DNS rebinding）。**复用它的，不另发明一套**。
@@ -68,6 +68,14 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 审美令牌（内联版）：唯一实现在 `_taste_inline.py`。本件产的页要求"零远端请求/自包含"，
+# 所以 taste-tokens 生成期内联（不挂 taste-tokens.css 的 <link>）；page-skins.css 是**皮肤**，
+# 挂相对 <link href="../page-skins.css">（相对不算远端，皮肤覆盖判据要求每页都挂）。
+from _taste_inline import site_root_block  # noqa: E402
+from _page_emit import clean_html  # noqa: E402
+# 页面文本卫生（emoji / 成对 markdown 记号 / None）：唯一实现在 `_page_text.py`。
+from _page_text import clean  # noqa: E402
 
 # ── 真源路径（现读） ──────────────────────────────────────────────────────
 CAPS_REG = ROOT / "gbt_allinone" / "caps_registry.py"
@@ -95,13 +103,13 @@ CMD_HEAL = "py -3.14 tools/codex-scripts/capability-supervisor.py heal"
 TIMEOUT = 3.0            # 单请求超时 3 秒（主人令）
 
 S_OK, S_BAD, S_MISS, S_UNK = "接上", "断连", "缺失", "未探测"
-# 🔴 2026-10-09 主人令「生产面板禁止有任何污点」+「别来一句不影响运行就跳过」：
+# 2026-10-09 主人令「生产面板禁止有任何污点」+「别来一句不影响运行就跳过」：
 #    第 5 态「按需未启用」= 这项服务**只有用到那个 provider 时才需要**，没跑**不是故障**。
 #    它与「断连」分开成格（附**拉起命令**与「谁能给」）—— **不是消音，是把信息放对格子**：
 #    真断连（面板/框架自身依赖的）一条都不许少报。
 S_OPT = "按需未启用"
 STATES = (S_OK, S_BAD, S_MISS, S_UNK, S_OPT)
-C_OK, C_BAD, C_MISS, C_UNK, C_OPT = "#22c55e", "#f87171", "#f5b041", "#6b7280", "#38bdf8"
+C_OK, C_BAD, C_MISS, C_UNK, C_OPT = "#22c55e", "#EF4444", "#f5b041", "#6b7280", "#38bdf8"
 
 # ── 类别表（顺序即面板上的顺序） ─────────────────────────────────────────
 CATEGORIES = [
@@ -174,7 +182,7 @@ ARTIFACTS = [
      "py -3.14 tools/codex-scripts/logbook.py render", "state/logbook.jsonl", 600),
     ("artifact.capability-audit-ledger", "state/capability-audit.json", "本审计台账",
      "py -3.14 tools/codex-scripts/capability-audit.py probe", "", 0),
-    # ⚠️ 宽限 300s（2026-10-08 修）：台账是**每次 probe 都重写**的，而 `render` 才会把页面刷新 ——
+ # 宽限 300s（2026-10-08 修）：台账是**每次 probe 都重写**的，而 `render` 才会把页面刷新 ——
     # 宽限写 0 就等于"这一格永远红"（审计自己咬自己，自愈会去反复重渲一个本来就没旧的页）。
     # 与记录本那条同一个道理：**产物允许落后源件一个渲染周期**，落后久了才算陈旧。
     ("artifact.capabilities-page", "holo_pet_w3/capabilities/index.html", "能力统计面板页",
@@ -204,6 +212,19 @@ ARTIFACTS = [
 
 def now() -> str:
     return datetime.now().isoformat(timespec="seconds")
+
+
+# ── 已归档产物：生成器还在，但产物被人为移出生产树（不再展示/不再进壳）──────────
+# **点名制**（2026-10-26 加），不按路径模式猜：每一条都要写清"为什么不算缺失"与归档去向。
+#    为什么不能直接从那 ARTIFACTS 里删掉：删了就再也看不出"这件产物曾经存在、后来归档了"——
+#    而"看不见的产物坏掉不会叫醒任何人"正是 ARTIFACTS 这张表存在的理由（见其上方注释）。
+#    ⇒ 条目保留在 ARTIFACTS（可追溯），只是审计时记成「按需未启用」而不是「缺失」。
+ARCHIVED_ARTIFACTS = {
+    "artifact.exec-deck-page":
+        "2026-10-21 归档：页面已移至 holo_pet_w3/_archive-20261021/exec-deck-index.html，"
+        "壳里那扇窗也标了 retired。生成器 tools/codex-scripts/exec-deck.py **仍在**——"
+        "要复活就重跑它生成到原路径，并删掉本行。",
+}
 
 
 def _load_mod(name: str, path: Path):
@@ -346,7 +367,7 @@ def judge_http(res: dict, accept: str, field: str = "", want=None) -> tuple:
             return S_OK, True, "HTTP 200 且 %s=%r ｜ 原文 %s" % (field, got, raw[:130] or "—")
         return S_BAD, False, "HTTP 200 但 %s=%r（期望 %r）｜ 原文 %s" % (field, got, want, raw[:140])
     if accept == "http200_or_auth":
-        # 🔴 2026-10-08 加的一档（主人令「全部接入」时撞出来的真区别）：
+ # 2026-10-08 加的一档（主人令「全部接入」时撞出来的真区别）：
         # **「服务在跑但不让匿名查」与「服务没起」是两件事**。实测：FreeLLMAPI 与 cliproxy
         # 都在听，匿名 GET /v1/models 回 401（Invalid / Missing API key）—— 而**带密钥的调用方**
         # （我们自己的 app、以及它们自己的启动器）拿到的是 200。
@@ -540,8 +561,16 @@ def enum_windows(items: list, at: str) -> None:
                       "why": None if not WINDOWS.is_file() else "在盘但解析不出 windows[] ⇒ 未探测"})
         return
     base = WINDOWS.parent
+    n_retired = 0
     for w in wj["windows"]:
         wid = w.get("id")
+ # 已作废（retired）的窗不审计（2026-10-26 加）：exec-deck / brain 已于 10-21 归档进
+        #    `_archive-20261021/`，条目保留只为历史可追溯。它们**不会开**，所以"页面在不在"
+        #    不构成能力断连；把它们算成「缺失」会让报警清单长期挂着两条假红。
+ # 与 pack-coverage.cjs 的 windowFiles 同一口径（两处判据必须一致，本仓为此付过代价）。
+        if w.get("retired"):
+            n_retired += 1
+            continue
         rel = w.get("file") or ""
         target = (base / rel) if rel else base
         r = probe_file(target, "窗口 %s 的页面" % wid, "windows.json 窗口 %r 的 file" % wid)
@@ -552,6 +581,20 @@ def enum_windows(items: list, at: str) -> None:
                       "state": r["state"], "at": r["at"], "ok": r["ok"],
                       "evidence": "%s ｜ file=%s" % (r["evidence"], rel),
                       "probe": {**r["probe"], "window": wid, "file": rel}, "why": r["why"]})
+    # 跳过的作废窗**必须留痕**（不许静默跳过 —— 那和"没看见"分不清）。
+    # 记成「按需未启用」而非「未探测」：未探测 = 没条件探；这里 = **明确不需要探**。
+    if n_retired:
+        names = [w.get("id") for w in wj["windows"] if w.get("retired")]
+        items.append({
+            "id": "win.retired", "category": "shell-window", "name": "已作废的窗（不审计）",
+            "expect": "windows.json 里标 retired 的条目：页面已归档、壳不再建窗 ⇒ 不算能力断连",
+            "state": S_OPT, "at": at, "ok": True,
+            "evidence": ("%d 扇窗已作废：%s ｜ 归档于 holo_pet_w3/_archive-20261021/ ⇒ "
+                         "按纪律不审计「页面在不在」（它们不会开，报缺失就是假红）"
+                         % (n_retired, "、".join(str(x) for x in names))),
+            "probe": {"kind": "note", "retired": names, "probed": False},
+            "why": "已作废不审计（不是未探测，是明确不需要）",
+        })
 
 
 def enum_panel_pages(items: list, at: str) -> None:
@@ -605,7 +648,7 @@ def enum_dsh(items: list, at: str) -> None:
     r = probe_http(url, "http_alive", "GET %s" % url, net=False,
                    note="401 是预期（无 token 就该 401）⇒ 服务在听即接上")
     ev = r["evidence"] + ("" if not why_port else " ｜ %s" % why_port)
-    # 🔴 2026-10-10 修一处**漏用已有策略**（不是新策略）：
+ # 2026-10-10 修一处**漏用已有策略**（不是新策略）：
     #    「按需服务没在跑不是故障」这条策略本来就有 —— service 分支（enum_services，L638-641）
     #    早就这么做了。但 **dsh 走的是本函数**，那段豁免**没被套用** ⇒ 没拉起的按需对话面
     #    被判成「断连 1」⇒ 级联成两条蓝图红（L3 巡检/L4 重启 的判据找「无断连」五个字，找不到就红）
@@ -664,6 +707,17 @@ def enum_services(items: list, at: str) -> None:
 
 def enum_artifacts(items: list, at: str) -> None:
     for iid, rel, human, gen, stale_vs, tol in ARTIFACTS:
+        # 已归档产物：不探（不报缺失），但**留痕**说明为什么不算断连。
+        if iid in ARCHIVED_ARTIFACTS:
+            items.append({"id": iid, "category": "artifact", "name": human,
+                          "expect": "已归档产物：不再生成、不再展示 ⇒ 不审计「在不在」",
+                          "state": S_OPT, "at": at, "ok": True,
+                          "evidence": "已归档不审计 ｜ %s ｜ 生成器：%s"
+                                      % (ARCHIVED_ARTIFACTS[iid], gen),
+                          "probe": {"kind": "note", "target": rel, "archived": True,
+                                    "probed": False, "generator": gen},
+                          "why": "已归档不审计（不是未探测，是明确不需要）"})
+            continue
         p = ROOT / rel
         r = probe_file(p, human, "%s（生成器：%s）" % (rel, gen))
         st, ev = r["state"], r["evidence"]
@@ -844,84 +898,176 @@ def cmd_probe(out=None) -> int:
 # ══════════════════════════════════════════════════════════════════════════
 # 渲染（自包含 · 生成期静态落图 · 数据只走经典脚本）
 # ══════════════════════════════════════════════════════════════════════════
-_CSS = """<style>
-:root{--gbt-bg:#0b1120;--gbt-panel:#111827;--gbt-line:#1e3a5f;--gbt-line-soft:#162035;
- --gbt-ink:#e7eef8;--gbt-dim:#8794a6;--gbt-off:#6b7280;--gbt-gold:#f5b041;--gbt-cyan:#00e5ff;
- --gbt-ok:#22c55e;--gbt-bad:#f87171;--gbt-miss:#f5b041;--ok-bg:#0f2a20;--bad-bg:#2a1414;--miss-bg:#2a2010;--off-bg:#16181d}
+_CSS = "<style>\n" + site_root_block() + """/* 能力统计页 · 表现层（2026-10-27 按仓内专业技能重排）
+ *
+ * ## 依据
+ * `审美相关skill/design-systems/mission-control/DESIGN.md`（本仓皮肤的出处）。
+ * 搬的是结构与度量，不是它的色板：
+ *   · 4px 基线网格（间距 4/8/12/16/24/32）
+ *   · 面板 = surface + 1px border + 4px 圆角 + 16px 内距；标题 13px/600 大写 0.08em 字距
+ *   · 所有数据读数一律等宽字（tabular-nums，数字按位对齐）
+ *   · 数据砖：标签 11px 大写二级灰 / 值 24px 700 / 单位 12px 三级灰
+ *   · 状态徽章：10px/600 大写 + 同色 15% 底 + 30% 描边，圆角 2px
+ *   · 表格：表头吸顶、细分隔线、数字列右对齐等宽
+ * 色仍然只有本仓冻结的三色语义（青=接上、金=断连/缺失、紫=未探测、红=真错），
+ * 全部经 `--taste-*` 令牌取值 —— 这里一个新色值都不引入。
+ */
+
+:root{
+ --gbt-bg:var(--taste-ground,#0B1120);--gbt-panel:var(--taste-surface,#111827);
+ --gbt-panel-2:var(--taste-raised,#1A2535);
+ --gbt-line:var(--taste-border,#1E3A5F);--gbt-line-soft:var(--taste-rule,#162035);
+ --gbt-ink:var(--taste-text,#E8ECF8);--gbt-dim:var(--taste-muted,#9AA4C4);--gbt-off:var(--taste-faint,#6B7280);
+ --gbt-gold:var(--taste-accent,#F5B041);--gbt-cyan:var(--taste-positive,#00E5FF);
+ --gbt-ok:var(--taste-positive,#00E5FF);--gbt-bad:var(--taste-negative,#EF4444);
+ --gbt-miss:var(--taste-warning,#F5B041);--gbt-unk:var(--taste-unknown,#7C4DFF);
+ /* 语义色的淡底/描边：用 rgba 由同一色相派生，不引入第四种颜色 */
+ --ok-bg:rgba(0,229,255,.10);--ok-line:rgba(0,229,255,.30);
+ --bad-bg:rgba(239,68,68,.10);--bad-line:rgba(239,68,68,.32);
+ --miss-bg:rgba(245,176,65,.10);--miss-line:rgba(245,176,65,.32);
+ --off-bg:rgba(107,114,128,.10);--off-line:rgba(107,114,128,.32);
+ --unk-bg:rgba(124,77,255,.12);--unk-line:rgba(124,77,255,.34);
+ /* 字体：数据一律等宽，正文走无衬线（中文落到雅黑） */
+ --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,"Cascadia Mono",monospace;
+ --f-sans:"Inter","Segoe UI","Microsoft YaHei UI",system-ui,sans-serif;
+ /* 4px 基线 */
+ --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s6:24px;--s8:32px}
 *{box-sizing:border-box}
-body{margin:0;background:var(--gbt-bg);color:var(--gbt-ink);font:13px/1.6 "Segoe UI","Microsoft YaHei UI",system-ui,sans-serif}
-.bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--gbt-line);background:linear-gradient(90deg,#0a0f16,#0c1118);flex-wrap:wrap}
-.mark{width:18px;height:18px;border:2px solid var(--gbt-gold);border-radius:4px}
-.brand{font-weight:700;letter-spacing:.4px}.brand b{color:var(--gbt-gold)}
+body{margin:0;background:var(--gbt-bg);color:var(--gbt-ink);font:14px/1.5 var(--f-sans);
+ -webkit-font-smoothing:antialiased}
+/* 顶栏：一层，不做第二层标题栏（一体式的底线） */
+.bar{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s4);
+ border-bottom:1px solid var(--gbt-line);background:var(--gbt-panel);flex-wrap:wrap;min-height:44px}
+.mark{width:16px;height:16px;border:2px solid var(--gbt-gold);border-radius:3px;flex:none}
+.brand{font-weight:700;letter-spacing:.02em}
+.brand b{color:var(--gbt-gold)}
 .note{color:var(--gbt-dim);font-size:11.5px}
-.wrap{padding:14px;display:grid;gap:14px}
-.card{background:var(--gbt-panel);border:1px solid var(--gbt-line);border-radius:6px;padding:12px}
-h2{margin:0 0 8px;font-size:13px;color:var(--gbt-dim);font-weight:600;letter-spacing:.4px}
-.hr{height:1px;background:var(--gbt-line);margin:10px 0}
-.mono{font-family:ui-monospace,Consolas,monospace}
-.stats{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px}
-.stat{min-width:88px}.stat b{display:block;font-size:24px;color:var(--gbt-cyan);font-variant-numeric:tabular-nums}
-.stat i{font-style:normal;color:var(--gbt-dim);font-size:12px}
-.stat b.ok{color:var(--gbt-ok)}.stat b.bad{color:var(--gbt-bad)}.stat b.miss{color:var(--gbt-miss)}.stat b.off{color:var(--gbt-off)}
-table{border-collapse:collapse;width:100%;font-size:11px}
-th,td{border:1px solid var(--gbt-line);padding:3px 6px;text-align:left;vertical-align:top}
-th{color:var(--gbt-dim);font-weight:600;background:#0b1017;position:sticky;top:0}
-td.cell{text-align:right;font-variant-numeric:tabular-nums}
+.note code{font-size:11px}
+.wrap{padding:var(--s4);display:grid;gap:var(--s4)}
+/* 面板 */
+.card{background:var(--gbt-panel);border:1px solid var(--gbt-line);border-radius:4px;
+ padding:var(--s4)}
+h2{margin:0 0 var(--s3);padding:0 0 var(--s2);border-bottom:1px solid var(--gbt-line-soft);
+ font-size:13px;color:var(--gbt-dim);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.hr{height:1px;background:var(--gbt-line-soft);margin:var(--s3) 0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+/* 数据砖：遥测条 */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+ gap:var(--s2);margin-bottom:var(--s3)}
+.stat{background:var(--gbt-panel-2);border:1px solid var(--gbt-line);border-radius:4px;
+ padding:var(--s3);min-width:0}
+.stat b{display:block;font-family:var(--f-mono);font-size:24px;font-weight:700;line-height:1;
+ color:var(--gbt-ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat i{display:block;margin-top:var(--s2);font-style:normal;color:var(--gbt-dim);
+ font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.stat b.ok{color:var(--gbt-ok)}.stat b.bad{color:var(--gbt-bad)}
+.stat b.miss{color:var(--gbt-miss)}.stat b.off{color:var(--gbt-off)}
+.stat b.unk{color:var(--gbt-unk)}
+/* 表格：等宽数字、细分隔、表头吸顶 */
+table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--gbt-line-soft);padding:6px var(--s2);text-align:left;
+ vertical-align:top}
+th{color:var(--gbt-dim);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+ background:var(--gbt-panel);position:sticky;top:0;border-bottom:1px solid var(--gbt-line)}
+td.cell{font-family:var(--f-mono);text-align:right}
 td.sok{color:var(--gbt-ok);font-weight:700}
 td.sbad{color:var(--gbt-bad);font-weight:700}
 td.smiss{color:var(--gbt-miss);font-weight:700}
 td.sunk{color:var(--gbt-off)}
-.pill{display:inline-block;border:1px solid var(--gbt-line);border-radius:999px;padding:0 7px;font-size:11px}
-.pill.ok{border-color:#1d5c45;color:var(--gbt-ok)}
-.pill.bad{border-color:#6b2a2a;color:var(--gbt-bad)}
-.pill.miss{border-color:#6b5320;color:var(--gbt-miss)}
-.pill.off{border-color:#39445a;color:var(--gbt-off)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0}
+/* 状态徽章 */
+.pill{display:inline-block;border:1px solid var(--off-line);border-radius:2px;
+ padding:1px 7px;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+ background:var(--off-bg);color:var(--gbt-off);white-space:nowrap}
+.pill.ok{border-color:var(--ok-line);background:var(--ok-bg);color:var(--gbt-ok)}
+.pill.bad{border-color:var(--bad-line);background:var(--bad-bg);color:var(--gbt-bad)}
+.pill.miss{border-color:var(--miss-line);background:var(--miss-bg);color:var(--gbt-miss)}
+.pill.off{border-color:var(--off-line);background:var(--off-bg);color:var(--gbt-off)}
+.pill.unk{border-color:var(--unk-line);background:var(--unk-bg);color:var(--gbt-unk)}
+/* 图例 */
+.legend{display:flex;gap:var(--s4);flex-wrap:wrap;margin:var(--s2) 0}
 .lg{display:flex;align-items:center;gap:6px;color:var(--gbt-dim);font-size:11.5px}
-.sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--gbt-line);display:inline-block}
+.sw{width:12px;height:12px;border-radius:2px;border:1px solid var(--gbt-line);display:inline-block;flex:none}
 .sw.ok{background:var(--ok-bg);border-color:var(--gbt-ok)}
 .sw.bad{background:var(--bad-bg);border-color:var(--gbt-bad)}
 .sw.miss{background:var(--miss-bg);border-color:var(--gbt-miss)}
 .sw.off{background:var(--off-bg);border-color:var(--gbt-off)}
-.alert{border:1px solid #6b2a2a;border-radius:6px;padding:8px 10px;margin:0 0 8px;background:#1a0f0f}
-.alert.miss{border-color:#6b5320;background:#1a150a}
+.sw.unk{background:var(--unk-bg);border-color:var(--gbt-unk)}
+/* 页面元信息条：不再重复壳的身份（壳铬条已经有品牌+标题）。
+   一体式的底线是"一层身份"；页面只留自己独有的东西（生成时刻 / 重建命令 / 判据命令）。 */
+.meta{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;
+ padding:var(--s2) var(--s4);background:transparent;border-bottom:1px solid var(--gbt-line-soft);
+ color:var(--gbt-dim);font-size:11.5px}
+.meta .sep{color:var(--gbt-line)}
+/* 报警条 */
+.alert{border:1px solid var(--bad-line);border-left-width:3px;border-radius:4px;
+ padding:var(--s2) var(--s3);margin:0 0 var(--s2);background:var(--bad-bg)}
+.alert.miss{border-color:var(--miss-line);background:var(--miss-bg)}
 .alert .t{font-weight:700;color:var(--gbt-ink)}
-.alert .e{color:var(--gbt-dim);font-size:11.5px;word-break:break-all;margin-top:3px}
+.alert .e{color:var(--gbt-dim);font-size:11.5px;word-break:break-all;margin-top:3px;font-family:var(--f-mono)}
 a{color:var(--gbt-cyan);text-decoration:none}a:hover{text-decoration:underline}
-.foot{border-top:1px solid var(--gbt-line);margin-top:12px;padding:10px 16px;color:var(--gbt-dim);font-size:11.5px}
-code{font-family:ui-monospace,Consolas,monospace;color:var(--gbt-cyan)}
-.grp{margin:0 0 4px;color:var(--gbt-gold);font-size:12px;font-weight:600}
+.foot{border-top:1px solid var(--gbt-line);margin-top:var(--s4);padding:var(--s3) var(--s4);
+ color:var(--gbt-dim);font-size:11.5px}
+code{font-family:var(--f-mono);color:var(--gbt-cyan);font-size:11.5px}
+.grp{margin:0 0 var(--s1);color:var(--gbt-gold);font-size:12px;font-weight:600;letter-spacing:.04em}
 .collapse{max-height:520px;overflow:auto}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>"""
 
 
+# 原来的 `_EMOJI` 正则已删除（2026-10-26）：清洗统一走 `_page_text.clean()`，
+# 本件只剩 `_esc()` 一个出口，留着它就是第二份区段定义 —— 改一处另一处不动的那种。
+
+
 def _esc(x) -> str:
-    return html.escape(str(x if x is not None else ""), quote=True)
+    """转义 + **出口清洗**（2026-10-26 主人令：界面/注释一律不留 emoji）。
+
+    本页大量字段来自台账（id / desc / 读数 / 证据），台账里带着别的工具打的记号；
+    在出口统一清一次，页面上就不会出现 emoji。模板里写死的 emoji 另需直接删。
+
+    2026-10-26 二次排查补：台账里除了 emoji 还有 **markdown 记号** —— `**回环**` 会印成
+    两个星号、`` `py -3.14 …` `` 会印成一个反引号（实测本页 63 处粗体 / 5 处反引号）。
+    清洗实现统一收到 `_page_text.clean()`：**只剥成对形态**，`state/**/*.json` 这种 glob
+    里的 `**` 是内容，不能动（动了就是"显示在说谎"）。
+    """
+    return html.escape(clean(x), quote=True)
 
 
 def _pill(st: str) -> str:
-    cls = {S_OK: "ok", S_BAD: "bad", S_MISS: "miss", S_UNK: "off"}.get(st, "off")
+    cls = {S_OK: "ok", S_BAD: "bad", S_MISS: "miss", S_UNK: "unk"}.get(st, "off")
     return '<span class="pill %s">%s</span>' % (cls, _esc(st))
 
 
-def _head(title: str) -> str:
-    # 🔴 2026-10-09 **生成器给自己的产物盖章**（根因修复，不是去列路径表）：
+def _head(title: str, page_id: str = "capabilities") -> str:
+ # 2026-10-09 **生成器给自己的产物盖章**（根因修复，不是去列路径表）：
     #    `capabilities-data.js` 早就自声明了「自动生成，别手改。重建：…」，所以框架门能按
     #    **文件自声明**把它认成生成物；而本函数渲的 index.html **没有自声明** ⇒ 被当成手写件、
     #    每次审计重渲都让门报一条 no_passport（实测 2026-10-09 撞了）。
     #    ⇒ 规矩：**凡本器渲的页，页头必须自盖章**（含「自动生成」与重建命令），
     #      这样门的判据仍然只看文件自声明，**永远不用维护路径清单**。
+ # 2026-10-26 加 `data-page-id`（主人令「触手覆盖每一页」）：本页是**跨页触手网格的
+    #    一个节点**，缺这个属性 ⇒ 别的页派活时 from 是 unknown、回执路由不回来。
+    #    默认值是本器的主产物（capabilities）；将来若本器再渲别的页，传自己的 id 即可。
     return ('<!doctype html>\n'
             '<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/capability-audit.py -->\n'
-            '<html lang="zh-CN"><head><meta charset="utf-8">\n'
+            '<html data-page-id="%s" lang="zh-CN"><head><meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            '<title>%s</title>\n%s</head><body>\n' % (_esc(title), _CSS))
+            '<link rel="stylesheet" href="../page-skins.css" />\n'
+            '<title>%s</title>\n%s</head><body>\n' % (_esc(page_id), _esc(title), _CSS))
 
 
 def _topbar(gen: str) -> str:
-    return ('<div class="bar"><span class="mark"></span><span class="brand">GBT<b>小土豆</b>V8 · 能力统计</span>'
-            '<span class="note">生成 %s ｜ 重生成 <code>%s</code> ｜ 判据 <code>%s</code> ｜ 报警/自愈 <code>%s</code></span></div>'
+    """页面自己的**元信息条**（2026-10-27 改）。
+
+    原来这里是一条带 logo + 品牌名的 `.bar`，但壳会在每一页顶上注入**自己的铬条**
+    （品牌 + 窗标题 + 健康度/刷新/折叠/自检），再外面还有一条跨页导航。
+    ⇒ 同一屏出现三层"这是谁"，恰恰是"一体式"的反面。
+    改法：**身份交给壳，页面只留自己独有的东西** —— 生成时刻与三条重建/判据命令。
+    独立用浏览器打开时也不难看：它现在读起来是页面元信息，不是第二条标题栏。
+    """
+    return ('<div class="meta"><span>生成 %s</span><span class="sep">|</span>'
+            '<span>重生成 <code>%s</code></span><span class="sep">|</span>'
+            '<span>判据 <code>%s</code></span><span class="sep">|</span>'
+            '<span>报警/自愈 <code>%s</code></span></div>'
             % (_esc(gen), _esc(CMD_RENDER), _esc(CMD_CHECK), _esc(CMD_WATCH)))
 
 
@@ -946,13 +1092,13 @@ def render_page(model: dict) -> str:
             '<div class="stat"><b class="ok">%d</b><i>接上</i></div>'
             '<div class="stat"><b class="bad">%d</b><i>断连</i></div>'
             '<div class="stat"><b class="miss">%d</b><i>缺失</i></div>'
-            '<div class="stat"><b class="off">%d</b><i>未探测</i></div>'
+            '<div class="stat"><b class="unk">%d</b><i>未探测</i></div>'
             '</div>' % (c["total"], c[S_OK], c[S_BAD], c[S_MISS], c[S_UNK]))
     legend = ('<div class="legend">'
               '<span class="lg"><i class="sw ok"></i><b>接上</b>：真探过且符合该条验收口径</span>'
               '<span class="lg"><i class="sw bad"></i><b>断连</b>：真探过、失败（带原始错误串）</span>'
               '<span class="lg"><i class="sw miss"></i><b>缺失</b>：清单里有、实物不在</span>'
-              '<span class="lg"><i class="sw off"></i><b>未探测</b>：没条件探（写明为什么）——<b>不许画成接上</b></span>'
+              '<span class="lg"><i class="sw unk"></i><b>未探测</b>：没条件探（写明为什么）——<b>不许画成接上</b></span>'
               '</div>')
     doctrine = "".join('<li>%s</li>' % _esc(d).replace("**", "") for d in model["doctrine"])
 
@@ -984,7 +1130,7 @@ def render_page(model: dict) -> str:
                   % (_esc(i["id"]), _esc(i["name"]), _esc(i.get("evidence")),
                      _esc(json.dumps(i.get("probe") or {}, ensure_ascii=False)[:400])))
     if not bad and not miss:
-        al.append('<div class="note">✅ 没有断连、没有缺失。</div>')
+        al.append('<div class="note">没有断连、没有缺失。</div>')
     else:
         al.append('<div class="note">共 <b>%d</b> 条报警（断连 %d + 缺失 %d）—— 置顶列出；'
                   '可自愈的项见 <code>%s</code>，不可自愈的项见设计文档「不能自愈的清单」。'
@@ -1022,8 +1168,8 @@ def render_page(model: dict) -> str:
     urows = "".join('<tr><td class="mono">%s</td><td>%s</td><td class="note">%s</td></tr>'
                     % (_esc(i["id"]), _esc(i["name"]), _esc(i.get("why") or i.get("evidence")))
                     for i in unk)
-    ublock = ('<div class="note">共 %d 条**未探测**（不是接上，也不是断连 —— 是「没条件探」）。'
-              '逐条写明为什么没探，**不许拿它冒充接上**。</div>'
+    ublock = ('<div class="note">共 %d 条「未探测」（不是接上，也不是断连 —— 是「没条件探」）。'
+              '逐条写明为什么没探，「不许拿它冒充接上」。</div>'
               '<div class="collapse"><table><thead><tr><th>id</th><th>名称</th><th>为什么没探</th>'
               '</tr></thead><tbody>%s</tbody></table></div>' % (len(unk), urows)) if unk else \
              '<div class="note">没有未探测项。</div>'
@@ -1032,8 +1178,8 @@ def render_page(model: dict) -> str:
     lrows = "".join('<tr><td class="mono">127.0.0.1:%s</td><td class="note">%s</td></tr>'
                     % (_esc(k), _esc(v)) for k, v in sorted(model["loopback_registry"].items(),
                                                             key=lambda x: int(x[0])))
-    lblock = ('<div class="note">本页对**本机回环**的探测是**为自愈服务的**（面板桥起没起、DSH 接没接上、'
-              '本机依赖服务在不在）—— 且**只探登记在册的地址**（下表逐条带登记出处）。'
+    lblock = ('<div class="note">本页对「本机回环」的探测是「为自愈服务的」（面板桥起没起、DSH 接没接上、'
+              '本机依赖服务在不在）—— 且「只探登记在册的地址」（下表逐条带登记出处）。'
               '公网探测（云插件）先过 <code>cloud-status.py::host_guard</code>。</div>'
               '<table><thead><tr><th>回环地址</th><th>登记出处</th></tr></thead><tbody>%s</tbody></table>'
               % lrows)
@@ -1045,7 +1191,7 @@ def render_page(model: dict) -> str:
         '云插件台账 <code>state/cloud-status.json</code> 生成于 %s ｜ 云插件台账计数 %s</div>'
         '</div>'
         '<div class="card"><h2>// 01 — 分类汇总（各类总数 / 接上 / 断连 / 缺失 / 未探测）</h2>%s</div>'
-        '<div class="card"><h2>// 02 — 🔴 报警清单（断连 + 缺失，置顶）</h2>%s</div>'
+        '<div class="card"><h2>// 02 — 报警清单（断连 + 缺失，置顶）</h2>%s</div>'
         '<div class="card"><h2>// 03 — 逐条明细（含证据 · 含探于何时）</h2>%s</div>'
         '<div class="card"><h2>// 04 — 未探测清单（不许假绿）</h2>%s</div>'
         '<div class="card"><h2>// 05 — 回环白名单（只探在册 · 为自愈服务）</h2>%s</div>'
@@ -1064,11 +1210,15 @@ def render_page(model: dict) -> str:
               '  document.title = "GBT小土豆V8 · 能力统计（" + globalThis.GBT_CAPABILITIES.counts.total + " 项）";\n'
               '}\n'
               '</script>\n')
-    # 🔴 2026-10-10：标题原来只列四态（接上/断连/缺失/未探测），而数据里**有第五态**
+ # 2026-10-10：标题原来只列四态（接上/断连/缺失/未探测），而数据里**有第五态**
     #    「按需未启用」—— 页面正文早就为它写了说明（"不是故障…凭据在主人侧"），
     #    只有标题漏了 ⇒ 主人看标题会以为只有四种状态、多出来的算"没配好"。补上。
+    # 触手网格接管器（主人令 2026-10-26「触手覆盖每一页」）：相对路径、非远端 ⇒
+    # 仍满足本页"零远端引用"那条纪律（判据 `_EXT_RE` 只拦 `//` 与 http 开头）。
     return (_head("GBT小土豆V8 · 能力统计面板（接上 / 断连 / 缺失 / 未探测 / 按需未启用）")
-            + _topbar(gen) + body + script + '</body></html>\n')
+            + _topbar(gen) + body + script
+            + '<script src="../shell/tentacle-kit.js" defer></script>\n'
+            + '</body></html>\n')
 
 
 def cmd_render() -> int:
@@ -1077,7 +1227,7 @@ def cmd_render() -> int:
         print("🔴 台账读不到或没有 items，先跑：%s" % CMD_PROBE)
         return 2
     PAGE.parent.mkdir(parents=True, exist_ok=True)
-    PAGE.write_text(render_page(model), encoding="utf-8")
+    PAGE.write_text(clean_html(render_page(model)), encoding="utf-8")
     data = {
         "generated_at": model.get("generated_at"),
         "commands": model.get("commands"),
@@ -1201,7 +1351,7 @@ def run_checks(art: dict) -> list:
     add("C3 状态只许四态（接上/断连/缺失/未探测）", not bad3 and len(items) > 0,
         "越界状态：%s" % (bad3 or "无"))
 
-    # C4 🔴 **不许假绿**：没探过的项不许显示成接上（判据与负对照同源）
+ # C4 **不许假绿**：没探过的项不许显示成接上（判据与负对照同源）
     finds = honesty_findings(items) if items else ["台账里没有 items（无从证真 ⇒ 报红）"]
     add("C4 不许假绿（未探测不得画成接上；接上必须有真探测记录）", not finds,
         "违规 %d 条：%s" % (len(finds), "；".join(finds[:3]) or "无"))

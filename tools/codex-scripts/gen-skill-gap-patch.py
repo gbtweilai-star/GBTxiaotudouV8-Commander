@@ -67,13 +67,6 @@ def _doc_mentions(text: str, kind: str) -> bool:
 def collect(only: str = "") -> dict:
     omni = _omni()
     dom2skill = dict(getattr(omni, "DISTILLED_DOMAINS", {}) or {})
-    # 🔴 2026-10-17 教训（留痕 · 走了一趟弯路并回退）：
-    #   一度把域宇宙扩成「注册表全部域 ∪ 已登记域」，想对齐验收器 —— 但**验收器只遍历
-    #   `omni.DISTILLED_DOMAINS`**（`verify-distill.py:169 doms = _dict_from_omni("DISTILLED_DOMAINS")`），
-    #   于是 `desktop` 这类「注册表有、未登记深蒸」的域被生成器单方面判成缺口 ⇒
-    #   `test_skill_gap_patch` 反而红在 "generator-only: ['desktop']"。
-    #   ⇒ **两边同源**：生成器也只遍历 `DISTILLED_DOMAINS`。未登记的域是
-    #   `omni.py gaps` 那条线的活，不由本清单承担。
     rows = []
     for domain, skill in sorted(dom2skill.items()):
         if only and domain != only:

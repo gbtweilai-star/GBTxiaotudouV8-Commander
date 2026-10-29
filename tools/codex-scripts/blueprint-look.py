@@ -159,7 +159,7 @@ def cmd_peek(a):
     """
     r = _rt("browser", {"op": "open", "url": a.url})
     time.sleep(a.wait)
-    # 🔴 必须紧接着点（同进程内）：`op=open` 同一个 URL 会让 **SPA 重载**，
+ # 必须紧接着点（同进程内）：`op=open` 同一个 URL 会让 **SPA 重载**，
     #    面板状态被重置（实测：重开后高亮回到 Preview，Code/文件树全丢）
     #    ⇒ open → 点导航 → 读，三步必须在同一个进程里连着做。
     if getattr(a, "click", None):

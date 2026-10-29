@@ -15,17 +15,13 @@
 （仰/俯/平/荷兰角）+ `dur`（时长=时机）+ `prompt`（英文，动作构图）+ `seed`（锁定）。
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import contextlib
 import importlib.util
 import io
 from pathlib import Path
 
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 _AC_PATH = ROOT / "tools" / "actioncam.py"
 READ_OPS = ("plan", "status", "qc")
 WRITE_OPS = ("gen", "seg", "build", "add", "rm")

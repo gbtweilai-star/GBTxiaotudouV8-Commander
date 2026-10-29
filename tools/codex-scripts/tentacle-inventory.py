@@ -16,7 +16,7 @@ r"""触手真身清单（tentacle-inventory）—— **看清她到底有多少�
 · 听觉：麦克风（活动录音端点 0）
 · 通用文件对话框（打开/保存）没有专门处理
 
-## 🔴 主人 2026-10-10 的三条修正（我先前读窄了，逐条刻进来）
+## 主人 2026-10-10 的三条修正（我先前读窄了，逐条刻进来）
 1. **她的领域是 30** —— 我上面那份 9 是**触手动作域**；**能力域 30** 才是她的领域面
    （现读 caps_registry：system 42 · llm 29 · security 26 · creation 22 · pipeline 18 · mind 16 ·
    tentacle 14 · video 13 · recon 9 · engine 9 · data 7 · tools 7 · devour 5 · finance 4 ·

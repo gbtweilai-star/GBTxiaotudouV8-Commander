@@ -133,12 +133,12 @@ for tag, t in (("原型", p), ("画布", c)):
     chk(tag + " 无占位文案", not ph, "命中 %d" % len(ph))
 
 # emoji 分档：**图标位**判红，**正文位**只列。
-# ⚠️ 第一版口径太粗（"标签后 12 字内出现 emoji"）⇒ 把 `→`/`←`/`↔`/`⇒`/`①` 这些
+# 第一版口径太粗（"标签后 12 字内出现 emoji"）⇒ 把 `→`/`←`/`↔`/`⇒`/`①` 这些
 #    **正文标点与序号**全算成图标，原型命中 1、画布命中 6 —— **假红**（第 10 次"门自己错"）。
 # 正确口径两条：
 #   ① 只认**图形类 emoji**（pictographic：U+1F000–1FAFF / U+2600–27BF / U+2B00–2BFF / U+FE0F），
 #      **不把箭头、序号、几何符号算进去**（它们在正文里就是标点）；
-#   ② 只有**元素全部文本就是 emoji**（如 `<span>🔴</span>`）或**属性值里带 emoji**
+# ② 只有**元素全部文本就是 emoji**（如 `<span></span>`）或**属性值里带 emoji**
 #      （alt/title/aria-label/placeholder/content）才算"当图标用"。
 PICTO = ("\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F")
 STRIP_TAGS = re.compile(r"<[^>]+>")

@@ -209,7 +209,7 @@ def main() -> int:
     print("  中间件：%s（%.2f MB）" % (mix.relative_to(ROOT), mix.stat().st_size / 1e6))
 
     from gbt_allinone.tools import audio_mix as AM
-    # 🔴 `format` **必须显式给**：`master` 的默认格式是 **mp3**，
+ # `format` **必须显式给**：`master` 的默认格式是 **mp3**，
     #    第一版我没传 ⇒ 落了一个 **内容 mp3、名字 .wav** 的件（扩展名与内容不符），
     #    而且它还被当成源又编了一遍 Opus（**有损转有损**）。
     r = AM.run("master", src=str(mix), out=MASTER_REL, format="wav",

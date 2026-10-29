@@ -62,7 +62,7 @@ outputs/  runtime/   # 产物 与 运行时
 | `skills/`（提案→门控→候选） | `skills/gbt-*`（79 个）· **源↔装唯一真相 + 哈希锁**（`tools/skills_sync.py`，覆盖前先备份） |
 | `governance/purpose.md` | `AGENTS.md` 红线 · `gbt_allinone/LAYOUT.md` 家规（铁律 1–13） |
 | `governance/protocol.md` | 授权门 `run_task` + `security/policy.py` 作用域 · 镜像三区（mirror/gate/production） |
-| `知识索引` | `state/skill_atlas.json` + `caps_registry.BENIGN_CAPS`（位/域数现算：`omni caliber`） |
+| `知识索引` | `state/skill_atlas.json` + `caps_registry.BENIGN_CAPS`（185 位 × 30 域） |
 | **验证门控 Validate** | 三板块总监令 · 交付前主检查清单 · `test_*` 常设判据 · **反向自检**（故意造缺陷看它红不红） |
 | **回滚 Rollback** | `.backups/`（skills-hub 覆盖前留档）· `.trash/`（只移不删）· DAG 检查点 · `git worktree reap` |
 | **生产/实验隔离** | **镜像多维度是唯一试验场**（生产零修改、一次性晋升）· 舰队 `git worktree` 每根一份隔离工作区 |

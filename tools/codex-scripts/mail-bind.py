@@ -56,7 +56,7 @@ ROOT = Path(__file__).resolve().parents[2]
 STATE = ROOT / "state" / "mail_bind.json"
 
 PASS_VARS = ("GBT_IMAP_PASS", "ZOHO_APP_PASSWORD")
-# 🔴 第 78 轮抓出来的真缺陷：原来回退链里带 `GBT_SMTP_USER` ⇒ 本机 `GBT_SMTP_USER`
+# 第 78 轮抓出来的真缺陷：原来回退链里带 `GBT_SMTP_USER` ⇒ 本机 `GBT_SMTP_USER`
 #    是**另一个服务**（forwardemail 的 noreply@…）⇒ 固化时它**冒充了本账号**，
 #    盘上写下"服务=Zoho Mail，账号=nore********"这种**假账**。
 #    ⇒ 回退只认本账号自己的变量名；发信腿那条另列（见 `cmd_status` 的「发信腿（既有的那条）」）。
@@ -336,45 +336,8 @@ def cmd_probe(a):
             break                                   # 通了一条就别继续试（不做无谓的失败尝试）
     smtp_ok = [h for h, r in smtp.items() if r["登录"] == "成功"]
 
-    def own_domain_imap():
-        """自有域收信腿（`gbtxiaotudou.com` 托管在 forwardemail）：**收发同一个账号**才叫双向。
-
-        为什么单独一条（2026-10-21 加）：本机现在是**两个账号** —— 收信 `payz****@zohomail.com`、
-        发信 `nore****@gbtxiaotudou.com`。就算 Zoho 那条登录成功，也收不到自己发出去的那封信，
-        「双向」永远验不成。这条腿用发信那个账号 + 它自己的邮箱密码去登 forwardemail 的 IMAP。
-        没有密码变量时**如实报未配**，绝不拿 Zoho 的账号去冒充这一条。
-        """
-        un, user = env2("GBT_SMTP_USER")
-        pn, pw = env2("GBT_SMTP_PASS", "GBT_SMTP_PASSWORD",
-                      "FORWARDEMAIL_PASS", "GBT_FORWARDEMAIL_PASS")
-        if not user:
-            return {"状态": "未配", "why": "缺账号变量 GBT_SMTP_USER", "端点": "imap.forwardemail.net:993"}
-        if not pw:
-            return {"状态": "未配", "why": "缺密码变量（GBT_SMTP_PASS / FORWARDEMAIL_PASS 都没有）",
-                    "账号掩码": mask(user), "账号变量": un, "端点": "imap.forwardemail.net:993"}
-        t0 = time.time()
-        try:
-            M = imaplib.IMAP4_SSL("imap.forwardemail.net", 993, timeout=20)
-            M.login(user, pw)
-            n = None
-            try:
-                _t, d = M.select("INBOX", readonly=True)
-                n = int(d[0]) if d and d[0] else None
-            except Exception:                                              # noqa: BLE001
-                pass
-            try:
-                M.logout()
-            except Exception:                                              # noqa: BLE001
-                pass
-            return {"状态": "登录成功", "账号掩码": mask(user), "账号变量": un,
-                    "INBOX 总数": n, "耗时s": round(time.time() - t0, 2)}
-        except Exception as e:                                             # noqa: BLE001
-            return {"状态": "登录失败", "账号掩码": mask(user), "账号变量": un,
-                    "why": scrub(e, pw)[:160], "耗时s": round(time.time() - t0, 2)}
-
     res = {"ok": bool(imap_ok), "status": "login_ok" if imap_ok else "auth_failed",
            "account": c["user_mask"], "IMAP": imap, "SMTP": smtp,
-           "自有域收信腿": own_domain_imap(),
            "下一步": ("收信腿通了 ⇒ 可以跑 roundtrip 验双向" if imap_ok and smtp_ok else
                    "只有一条腿通 ⇒ 去 Zoho 后台查另一条腿的开关" if (imap_ok or smtp_ok) else
                    "两条腿一起被拒 ⇒ 问题在**凭据本身**，按下面顺序查：\n"

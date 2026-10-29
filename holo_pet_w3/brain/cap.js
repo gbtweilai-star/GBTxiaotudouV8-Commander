@@ -41,8 +41,22 @@
   $("cap-id").textContent = kind || "（缺 id）";
   $("cap-desc").textContent = (me && me.desc) || "（这条能力位在本机注册表里没有说明字段）";
   $("crumb-here").textContent = kind;
-  $("crumb-bundle").textContent = bundle ? bundle.label : "（无束）";
-  $("crumb-bundle").setAttribute("href", HOME);
+  /* 🔴 页面固定（主人令 2026-10-27）：`（束）`这一格以前是
+       setAttribute("href", HOME)   // caps 页里 HOME = "../../index.html"
+     那是 **APP 根首页** —— 点下去等于把整个 APP 装进 panel 的 webview 内容区
+     （主人令 2026-10-04「不许跳转，全部内镶嵌」）。现在改成"让面板切页"：
+     `panelGoto` 只认注册表里的窗 id，`godview` 就是那扇窗；壳不在就由 cap.js 的
+     委托回退到 showWindow，再不行如实说没桥 —— 三层都不静默。
+     ⚠️ 只在 `caps/` 下这么改：模板页（`brain/` 下，IN_CAPS 为假）的 HOME 是
+     `index.html`（brain 自己的总目录），那是同目录浏览，语义不同，保持原样。 */
+  const cb = $("crumb-bundle");
+  cb.textContent = bundle ? bundle.label : "（无束）";
+  if (IN_CAPS) {
+    cb.setAttribute("href", "#");
+    cb.setAttribute("data-panel-goto", "godview");
+  } else {
+    cb.setAttribute("href", HOME);
+  }
 
   const state = !me ? "未登记" : !me.impl ? "仅登记未实现" : me.safe ? "免卡直跑" : "需授权";
   const badge = $("cap-state");
@@ -136,23 +150,23 @@
   /* ── ① 调用面板：本页就能跑任何能力位 ── */
   var panel = el("div", "gbt-call");
   panel.style.cssText = "position:fixed;right:14px;bottom:14px;z-index:2147483000;width:340px;"
-    + "font:13px/1.5 system-ui,'Microsoft YaHei',sans-serif;background:rgba(10,14,22,.92);"
-    + "color:#e8eefc;border:1px solid rgba(120,170,255,.35);border-radius:12px;padding:10px 12px;"
-    + "box-shadow:0 10px 30px rgba(0,0,0,.45)";
-  var head = el("div", null, "调用能力位 ");   /* 2026-10-26 去 emoji：家规第 15 条，687 页共用这一处 */
+    + "font:13px/1.5 system-ui,'Microsoft YaHei',sans-serif;background:rgba(7,10,26,.92);"
+    + "color:#E8ECF8;border:1px solid rgba(120,170,255,.35);border-radius:12px;padding:10px 12px;"
+    + "box-shadow:0 10px 30px rgba(3,4,12,.45)";
+  var head = el("div", null, "⛓ 调用能力位 ");
   head.style.cssText = "font-weight:600;margin-bottom:6px;cursor:pointer";
   var body = el("div");
   body.style.display = "none";
   var sel = el("select");
-  sel.style.cssText = "width:100%;margin:4px 0;background:#0d1420;color:#e8eefc;border:1px solid #2a3a55;border-radius:8px;padding:4px";
+  sel.style.cssText = "width:100%;margin:4px 0;background:#111827;color:#E8ECF8;border:1px solid var(--taste-border,#1E3A5F);border-radius:8px;padding:4px";
   var ta = el("textarea");
   ta.value = "{}";
   ta.rows = 3;
-  ta.style.cssText = "width:100%;box-sizing:border-box;background:#0d1420;color:#e8eefc;border:1px solid #2a3a55;border-radius:8px;padding:6px;font-family:ui-monospace,Consolas,monospace";
+  ta.style.cssText = "width:100%;box-sizing:border-box;background:#111827;color:#E8ECF8;border:1px solid var(--taste-border,#1E3A5F);border-radius:8px;padding:6px;font-family:ui-monospace,Consolas,monospace";
   var run = el("button", null, "运行");
-  run.style.cssText = "margin-top:6px;background:#2b6cff;color:#fff;border:0;border-radius:8px;padding:6px 14px;cursor:pointer";
+  run.style.cssText = "margin-top:6px;background:#2b6cff;color:var(--taste-text,#E8ECF8);border:0;border-radius:8px;padding:6px 14px;cursor:pointer";
   var out = el("pre", null, "");
-  out.style.cssText = "max-height:180px;overflow:auto;background:#0a0f18;border:1px solid #1d2b42;border-radius:8px;padding:8px;margin:8px 0 0;white-space:pre-wrap;word-break:break-all;font:12px/1.45 ui-monospace,Consolas,monospace";
+  out.style.cssText = "max-height:180px;overflow:auto;background:var(--taste-ground,#0B1120);border:1px solid var(--taste-border,#1E3A5F);border-radius:8px;padding:8px;margin:8px 0 0;white-space:pre-wrap;word-break:break-all;font:12px/1.45 ui-monospace,Consolas,monospace";
   head.appendChild(el("span", null, "· Ctrl+K 跳页"));
   body.appendChild(sel); body.appendChild(ta); body.appendChild(run); body.appendChild(out);
   panel.appendChild(head); panel.appendChild(body);
@@ -199,15 +213,15 @@
   /* ── ② 命令面板：Ctrl+K 搜 341 个能力位，回车跳页 ── */
   var pal = el("div", "gbt-pal");
   pal.style.cssText = "position:fixed;inset:0;z-index:2147483001;display:none;"
-    + "background:rgba(4,8,14,.72);backdrop-filter:blur(3px)";
+    + "background:rgba(3,4,12,.72);backdrop-filter:blur(3px)";
   var box = el("div");
   box.style.cssText = "position:absolute;left:50%;top:14%;transform:translateX(-50%);width:min(640px,92vw);"
-    + "background:#0b1220;border:1px solid #26374f;border-radius:14px;overflow:hidden;"
-    + "box-shadow:0 24px 60px rgba(0,0,0,.6)";
+    + "background:#111827;border:1px solid var(--taste-border,#1E3A5F);border-radius:14px;overflow:hidden;"
+    + "box-shadow:0 24px 60px rgba(3,4,12,.6)";
   var inp = el("input");
   inp.placeholder = "搜能力位 / 页面名…（Esc 关，Enter 打开）";
   inp.style.cssText = "width:100%;box-sizing:border-box;padding:14px 16px;border:0;outline:0;"
-    + "background:#0b1220;color:#e8eefc;font:15px system-ui,'Microsoft YaHei',sans-serif";
+    + "background:#111827;color:#E8ECF8;font:15px system-ui,'Microsoft YaHei',sans-serif";
   var list = el("div");
   list.style.cssText = "max-height:52vh;overflow:auto";
   box.appendChild(inp); box.appendChild(list);
@@ -224,16 +238,16 @@
     list.innerHTML = "";
     if (!hits.length) {
       var e2 = el("div", null, all.length ? "没有匹配" : "桥没起（:8791 不通），拿不到名册");
-      e2.style.cssText = "padding:16px;color:#8ea2c0";
+      e2.style.cssText = "padding:16px;color:#9AA4C4";
       list.appendChild(e2); return;
     }
     if (sel2 >= hits.length) { sel2 = 0; }
     hits.forEach(function (c, i) {
       var row = el("div");
-      row.style.cssText = "padding:9px 16px;cursor:pointer;border-top:1px solid #16233a;"
-        + (i === sel2 ? "background:#16233a;" : "");
-      row.innerHTML = "<b>" + c.name + "</b> <span style='color:#7f93b3'>· " + (c.domain || "")
-        + "</span><br><span style='color:#9db0cc;font-size:12px'>" + (c.desc || "") + "</span>";
+      row.style.cssText = "padding:9px 16px;cursor:pointer;border-top:1px solid var(--taste-border,#1E3A5F);"
+        + (i === sel2 ? "background:var(--taste-raised,#1A2535);" : "");
+      row.innerHTML = "<b>" + c.name + "</b> <span style='color:#9AA4C4'>· " + (c.domain || "")
+        + "</span><br><span style='color:#9AA4C4;font-size:12px'>" + (c.desc || "") + "</span>";
       row.addEventListener("click", function () { location.href = c.page; });
       list.appendChild(row);
     });
@@ -241,7 +255,7 @@
   function openPal() {
     sel2 = 0; inp.value = ""; pal.style.display = "block"; inp.focus();
     if (all.length) { paint(); return; }
-    list.innerHTML = "<div style='padding:16px;color:#8ea2c0'>读名册…</div>";
+    list.innerHTML = "<div style='padding:16px;color:#9AA4C4'>读名册…</div>";
     getCaps().then(function (caps) { all = caps; paint(); });
   }
   function closePal() { pal.style.display = "none"; }
@@ -262,3 +276,40 @@
     if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) { e.preventDefault(); openPal(); }
   });
 })();
+
+/* ── 页面固定（2026-10-27）：跨"扇"入口只许切页/开窗，不许导航 ──
+ *
+ * 这些页面活在 panel 的 `<webview>` 里（panel/index.html 显式给 webview 挂了壳的 preload，
+ * 所以 `window.gbtW3` 是有的）。三种环境、三层回退，**每层都不静默**：
+ *   ① 在面板里  ⇒ `panelGoto({id})`：让**面板**在内容区切页（主人令 2026-10-04
+ *      「不许跳转，全部内镶嵌」）—— 当前 webview 的 URL 一个字节不动；
+ *   ② 在壳里但不在面板 ⇒ `showWindow({id})`：开那扇窗（只认注册表里已有的 id）；
+ *   ③ 都没有（浏览器直开）⇒ 什么都不做，只把 title 改成实话，不假装点过了。
+ * 🔴 为什么写在这里而不是页页内联：cap.js 是这 349 页共用的渲染器
+ *    （"版式与渲染只有一份"，见 cap-pages.py 的纪律）。
+ */
+(function () {
+  "use strict";
+  var api = window.gbtW3 || null;
+  var els = document.querySelectorAll("[data-panel-goto]");
+  for (var i = 0; i < els.length; i++) {
+    (function (el) {
+      el.addEventListener("click", function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var id = el.getAttribute("data-panel-goto");
+        if (api && typeof api.panelGoto === "function") {
+          Promise.resolve(api.panelGoto({ id: id })).then(null, function () {
+            if (api && typeof api.showWindow === "function") return api.showWindow({ id: id });
+          });
+          return;
+        }
+        if (api && typeof api.showWindow === "function") {
+          Promise.resolve(api.showWindow({ id: id })).then(null, function () {});
+          return;
+        }
+        el.setAttribute("title", "浏览器直开时切不到「" + id + "」—— 请在 GBT小土豆V8 壳里打开");
+      });
+    })(els[i]);
+  }
+})();
+

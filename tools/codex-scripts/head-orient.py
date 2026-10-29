@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """专用头模 · 定向归一（用**鼻尖**定前后，不是脚趾）
 
 为什么不能直接用 avatar-orient.py：
@@ -28,7 +24,7 @@ import sys
 import numpy as np
 from PIL import Image
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else \
     DH / "raw/head-hi/tripo-out/owner-脸-特写-png-convert-81c54599/model.glb"
@@ -65,7 +61,7 @@ bc = np.asarray(Image.open(io.BytesIO(bytes(BIN[o:o + bv["byteLength"]]))).conve
 uu = np.clip((UV[:, 0] % 1.0) * (bc.shape[1] - 1), 0, bc.shape[1] - 1).astype(int)
 vv = np.clip((UV[:, 1] % 1.0) * (bc.shape[0] - 1), 0, bc.shape[0] - 1).astype(int)
 C = bc[vv, uu]
-# 🔴 皮肤掩码收紧到 R>150：上一版用 R>110，**棕发也满足**「暖色且够亮」⇒
+# 皮肤掩码收紧到 R>150：上一版用 R>110，**棕发也满足**「暖色且够亮」⇒
 #    判据把**后脑的头发**当成了鼻尖，整个头转了 180°（渲出来是后脑勺）。
 #    这是本项目第二次栽在"皮肤/头发颜色判据"上（第一次在 add-eyes.py 量脸宽），
 #    所以这次不是调阈值，而是**换判据**（见下面的脊宽法）。
@@ -114,7 +110,7 @@ def nose_dir(PP, tag):
         print(f"[{tag}] 候选 轴={'XZ'[d//2]} 向={'+' if s > 0 else '-'} · 脊宽 {w:.4f} · 外沿 {e:+.4f}")
     if not cands:
         return None, None, None
-    # 🔴 选法修正：**不能取"全局最窄"** —— 那样会选到与深度无关的那根轴
+ # 选法修正：**不能取"全局最窄"** —— 那样会选到与深度无关的那根轴
     #    （实测 Z 轴两侧都"窄"：0.0359 / 0.0388，但它不是前后轴）。
     #    正确口径：**同一根轴上比正反**。后脑是一大片、鼻尖是窄脊 ⇒ 比值大的那根轴
     #    才是深度轴；该轴上**较窄的那一向**就是正面。

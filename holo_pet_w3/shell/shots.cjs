@@ -135,6 +135,7 @@ function main() {
       const H = Math.min(1000, Math.max(520, d.h || 780));
       let settled = false;
       const errs = [];
+      let txtErr = "";                    // 文字落盘失败的原因（与截图失败分开记）
       const win = new BrowserWindow({
         show: true,                       // 🔴 必须真绘制，见文件头
         x: OFFSCREEN, y: OFFSCREEN,       // 屏幕外：真绘制但不打扰主人
@@ -170,21 +171,6 @@ function main() {
         settled = true;
         // 留一拍让页面脚本把桥上的数据画完（上帝视角 5s 一刷，这里取首屏）
         setTimeout(async () => {
-          /* 🔴 2026-10-18 补（语音剧场那次假读数）：这扇窗的 3D 要**后载**——
-             内联的 6.4 MB 绑骨模型 + 8.1 MB 兜底副本，真壳里要好几秒。
-             首版只等一拍就拍 ⇒ 拍到的还是「载入中…」的空舞台，看起来像"没做"。
-             ⇒ 拍之前**等它自己说 ready**（最多 25s）：读 `window.GBT_DH3D.info().status`，
-               没有这个对象（别的窗）就立刻过，不拖慢取证。 */
-          try {
-            const t0 = Date.now();
-            while (Date.now() - t0 < 45000) {
-              const st = await win.webContents.executeJavaScript(
-                "(window.GBT_DH3D && window.GBT_DH3D.info) ? String(window.GBT_DH3D.info().status) : ''", true);
-              if (!st || st === "ready" || st.indexOf("load-failed") === 0 ||
-                  st === "no-three" || st === "no-loader" || st === "no-webgl") break;
-              await new Promise((r) => setTimeout(r, 350));
-            }
-          } catch (e) { /* 读不到就当没这个舞台，照常拍 */ }
           const png = path.join(OUTDIR, w.id + ".png");
           try {
             /* 🔴 **铬在场断言**（2026-09-23 第 32 轮）：`chrome.attach` 挂上去没有，
@@ -201,20 +187,21 @@ function main() {
                 errs.push("App 铬没挂上（#gbt-chrome 不在）");
               }
             }
-            const img = await win.webContents.capturePage();
-            const blank = looksBlank(img);
-            fs.writeFileSync(png, img.toPNG());
-            /* 🔴 **顺带把"屏上真出现的文字"落盘**（2026-09-23 第 33 轮加）：
-               上一轮发现 h1 屏上明文写着 `C:\Users\ADMIN\AppData\...\h1mcp.exe`。
-               要成体系地查这件事，就不能只翻源码 —— **源码里的字符串不一定渲染上屏**，
-               而扫源码会把"只在注释/日志里出现"的路径当成暴露（假阳），
-               也会漏掉"拼出来的"（假阴）。⇒ 取**渲染后的 innerText**，由独立的
-               Python 判据去扫（判据可单测、可复跑，不埋在 Electron 里）。 */
+            /* 🔴 **先把"屏上真出现的文字"落盘，再截图**（2026-10-29 修顺序）：
+               原来文字落盘写在 `capturePage()` **之后** ⇒ 这台机器 `capturePage` 必挂
+               （`UnknownVizError`，GPU 进程崩），直接跳进 catch ⇒ **一个 .txt 都不写**。
+               于是 `exposure-scan.py` 永远退 2「没扫」，而「截图失败」和「文字没取到」
+               被压成了同一个失败 —— 两件不同的事压成一个，正是本仓最忌的那种糊。
+               现在：**文字独立成一步**（自己 try），截图挂了不影响取证面。
+               （文字仍是 `innerText`：扫源码会假阳/假阴，只有渲染后的文字是真取样面。） */
             try {
               const txt = await win.webContents.executeJavaScript(
                 "document.body ? document.body.innerText : ''", true);
               fs.writeFileSync(path.join(OUTDIR, w.id + ".txt"), String(txt || ""), "utf8");
-            } catch (_) { /* 取不到文字不该让取证失败（图还在） */ }
+            } catch (e) { txtErr = "文字取不到：" + String(e && e.message || e).slice(0, 60); }
+            const img = await win.webContents.capturePage();
+            const blank = looksBlank(img);
+            fs.writeFileSync(png, img.toPNG());
             /* 🔴 **数据新鲜度必须声明**（2026-09-23 第 34 轮）：
                八扇窗有五种取数方式，"用户看不出哪一扇的数字是几小时前的"就是假绿。
                契约是 `window.GBT_DATA`（有脚本的页）或 `<html data-data-*>`（静态页）。
@@ -244,7 +231,8 @@ function main() {
             });
           } catch (e) {
             say({ id: w.id, state: "FAIL",
-                  detail: "capturePage 失败：" + String(e && e.message || e).slice(0, 80) });
+                  detail: "capturePage 失败：" + String(e && e.message || e).slice(0, 80)
+                        + (txtErr ? " ｜ " + txtErr : " ｜ 文字已落盘（可跑 exposure-scan）") });
           }
           win.destroy(); resolve();
         }, 1600);

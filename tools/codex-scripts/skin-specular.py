@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """资产级「去油光 + 金属度归零 + T 区/唇部反光差异」
 
 为什么必须做（Owner 用本仓 AI 味禁令逐条对照后指出）：
@@ -37,7 +33,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-talk.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-specl.glb"
@@ -83,7 +79,7 @@ if "metallicRoughnessTexture" in pbr:
     mri = J["textures"][pbr["metallicRoughnessTexture"]["index"]]["source"]
     print(f"该 primitive 已有 MR 贴图 image{mri}")
 else:
-    # 🔴 实测发现：**头的材质根本没有 MR 贴图** —— 缝合时我只搬了底色与法线。
+ # 实测发现：**头的材质根本没有 MR 贴图** —— 缝合时我只搬了底色与法线。
     #    于是头是「金属度 0（好）+ **粗糙度全场均匀 0.55**（坏）」——
     #    这正是 Owner 指出的「**全脸均匀油光**」的直接来源。
     #    所以这里要**新建一张 MR**：G 放 T 区/唇部的粗糙度差异，B 恒 0。

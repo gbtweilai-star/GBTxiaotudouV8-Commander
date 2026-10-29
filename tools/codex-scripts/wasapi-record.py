@@ -16,7 +16,7 @@
   在「设置 → 系统 → 声音 → 更多声音设置 → 录制」里右键显示禁用的设备，
   启用 `立体声混音`（这是本机唯一一个"被禁用"的端点，启用后即有内录耳），或插 USB 麦克风。
 
-## 🔴 两条口径，不许念错
+## 两条口径，不许念错
 - **内录耳 ≠ 麦克风耳**：`立体声混音` 录的是**电脑正在放的声音**，听不到房间里的说话。
   要听主人说话，必须有物理麦克风（USB / 3.5mm 耳麦）。
 - **管道通 ≠ 听得懂**：本件只证明"录得到字节、WAV 格式对"。
@@ -39,7 +39,7 @@ import wave
 import numpy as np
 import sounddevice as sd
 
-# 🔴 第 75 轮补（**这个文件漏了**）：不重建 stdout 编码 ⇒ Windows 控制台默认 GBK，
+# 第 75 轮补（**这个文件漏了**）：不重建 stdout 编码 ⇒ Windows 控制台默认 GBK，
 #    中文/符号（`⇒`、`——`）一律乱码，遇到 GBK 编不出的字符还会**直接抛 `UnicodeEncodeError` 崩掉**
 #    （实测：`emit(...)` 里一个 `⇒` 就把整条错误路径打成 traceback）。
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -106,7 +106,7 @@ def main():
                         available=[r["name"] for r in ins])
         cands = [r for r in ins if r["index"] == dev]        # 点名了：只试它这一个
     else:
-        # 🔴 第 75 轮改：**不再盲取第一个**。候选顺序 = 真端点优先（WASAPI/MME/DirectSound），
+ # 第 75 轮改：**不再盲取第一个**。候选顺序 = 真端点优先（WASAPI/MME/DirectSound），
         #    WDM-KS 垫底。理由：WDM-KS 是**内核流引脚**，它可能"流开得起来但 0 帧"
         #    （引脚没被音频引擎路由）—— 先试真端点，能出数据的概率高得多。
         def _rank(r):

@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="zh-CN" data-data-kind="快照" data-data-at="2026-10-23T23:47:28"><head><meta charset="utf-8" />
+<html data-page-id="code-deck" lang="zh-CN" data-data-kind="快照" data-data-at="2026-10-29T10:01:13"><head><meta charset="utf-8" />
 <meta name="color-scheme" content="dark" />
 <title>GBT小土豆V8 · 代码台</title>
+<link rel="stylesheet" href="../page-skins.css" />
 <link rel="stylesheet" href="../deck3d.css" />
 <style>
-  /* 本页只写**版式**，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
+  /* 本页只写版式，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
   .two{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
   .two > .gbt-card{margin:0}
   ul.cm{margin:0;padding-left:18px}
@@ -25,7 +26,7 @@
     <div class="gbt-title">
       <h1>代码台 · 这个仓现在长什么样</h1>
       <div class="sub">
-        快照 <b>2026-10-23T23:47:28</b> ｜ 结构面 <b>gbt_allinone</b> ｜ 账本今次读取已走门
+        快照 <b>2026-10-29T10:01:13</b> ｜ 结构面 <b>gbt_allinone</b> ｜ 账本今次读取已走门
         <code>run_task</code> ｜ 立体视觉层 <code>../deck3d.css</code> 已就位
       </div>
     </div>
@@ -40,7 +41,7 @@
 
   <div class="gbt-card z-near">
     <h2>A · 代码结构</h2>
-    <p class="kv">文件 <b>653</b> ｜ 符号 <b>5895</b> ｜ 解析不了的文件 <b>0</b></p>
+    <p class="kv">文件 <b>656</b> ｜ 符号 <b>5939</b> ｜ 解析不了的文件 <b>0</b></p>
     <table><tr><th>定义最多的文件</th><th>defs</th></tr><tr><td class=mono>gbt_allinone/recon/last30days/engine/render.py</td><td class=n>60</td></tr><tr><td class=mono>gbt_allinone/native_browser.py</td><td class=n>58</td></tr><tr><td class=mono>gbt_allinone/life_archive.py</td><td class=n>51</td></tr><tr><td class=mono>gbt_allinone/tools/comfy_native.py</td><td class=n>49</td></tr><tr><td class=mono>gbt_allinone/tests/test_omni_web.py</td><td class=n>48</td></tr><tr><td class=mono>gbt_allinone/room_space.py</td><td class=n>46</td></tr></table>
     <p class="kv" style="margin-top:9px">要动手：<code>py -3.14 -c "from gbt_allinone import api;
       print(api.run_task('project_context',{'op':'symbols','name':'&lt;名字&gt;'}))"</code></p>
@@ -49,15 +50,15 @@
   <div class="two">
     <div class="gbt-card z-mid">
       <h2>B · 依赖网</h2>
-      <p class="kv">内部边 <b>1503</b> ｜ 解析不了 <b>0</b></p>
-      <table><tr><th>外部依赖（按出现文件数）</th><th>次数</th></tr><tr><td class=mono>pathlib</td><td class=n>521</td></tr><tr><td class=mono>__future__</td><td class=n>485</td></tr><tr><td class=mono>sys</td><td class=n>382</td></tr><tr><td class=mono>json</td><td class=n>381</td></tr><tr><td class=mono>time</td><td class=n>237</td></tr><tr><td class=mono>os</td><td class=n>226</td></tr></table>
+      <p class="kv">内部边 <b>1509</b> ｜ 解析不了 <b>0</b></p>
+      <table><tr><th>外部依赖（按出现文件数）</th><th>次数</th></tr><tr><td class=mono>pathlib</td><td class=n>523</td></tr><tr><td class=mono>__future__</td><td class=n>488</td></tr><tr><td class=mono>sys</td><td class=n>384</td></tr><tr><td class=mono>json</td><td class=n>383</td></tr><tr><td class=mono>time</td><td class=n>239</td></tr><tr><td class=mono>os</td><td class=n>227</td></tr></table>
     </div>
 
     <div class="gbt-card z-mid">
       <h2>C · 测试接得住吗</h2>
-      <p class="kv">源模块 <b>453</b> ｜ 测试文件 <b>1057</b> ｜
-        被提到 <b>43</b> ｜ <b>393</b> 没被提到（占 <b>86.8%</b>）</p>
-      <table><tr><th>没被任何测试提到的模块（示例）</th></tr><tr><td class=mono>gbt_allinone/adapters/workspace_adapter.py</td></tr><tr><td class=mono>gbt_allinone/auth_gate.py</td></tr><tr><td class=mono>gbt_allinone/autopilot.py</td></tr><tr><td class=mono>gbt_allinone/bluetooth_cap.py</td></tr><tr><td class=mono>gbt_allinone/book_skill.py</td></tr><tr><td class=mono>gbt_allinone/brain/brain_council.py</td></tr></table>
+      <p class="kv">源模块 <b>455</b> ｜ 测试文件 <b>238</b> ｜
+        被提到 <b>270</b> ｜ <b>168</b> 没被提到（占 <b>36.9%</b>）</p>
+      <table><tr><th>没被任何测试提到的模块（示例）</th></tr><tr><td class=mono>gbt_allinone/adapters/workspace_adapter.py</td></tr><tr><td class=mono>gbt_allinone/bluetooth_cap.py</td></tr><tr><td class=mono>gbt_allinone/body_bridge.py</td></tr><tr><td class=mono>gbt_allinone/book_skill.py</td></tr><tr><td class=mono>gbt_allinone/brain/brain_council.py</td></tr><tr><td class=mono>gbt_allinone/brain/cap_optimizer.py</td></tr></table>
       <p class="kv" style="margin-top:9px">边界：这是<strong>提到过</strong>的代理，<strong>不是行覆盖</strong> ——
         没被提到 ≠ 没被测，被提到 ≠ 测得好。</p>
     </div>
@@ -66,17 +67,17 @@
   <div class="gbt-card z-far">
     <h2>D · 版本与改动面</h2>
     <p class="kv">分支 <b>—</b> ｜ 改动文件 <b>—</b> ｜
-      分支数 <b>5</b> ｜ stash <b>0</b></p>
+      分支数 <b>7</b> ｜ stash <b>0</b></p>
     <div class="kv">改动面 <b>—</b> 个文件未收敛
       （过 200 该看一眼、过 1000 说明工作树已经不成形）——
-      `git status` 本身是只读免卡的，收敛与否是<strong>卫生读数</strong>，不是本页的判决。</div>
+      git status 本身是只读免卡的，收敛与否是<strong>卫生读数</strong>，不是本页的判决。</div>
     <div class="two" style="margin-top:11px">
       <div>
-        <p class="kv">最近提交</p><ul class="cm"><li class=mono>ec45af0 2026-10-20T09:00:55+07:00 docs(dh): 全程记录第十四节 —— 逐行 S 形重心转移两档对比 + 广播坑; 技能③同步升级</li><li class=mono>5b59a37 2026-10-20T08:59:39+07:00 feat(dh): body-motion 逐行 S 形重心转移(比整帧仿射像人) 并换进无人值守收尾; 1s 试片帧差 0.131→0.399</li><li class=mono>1089966 2026-10-20T08:57:57+07:00 fix(motion): 逮到并更正一条假账 —— 库里两条片的 voice 标成台灣腔，实测音轨相关 1.0000 是普通话; fix 子命令只追加更正</li><li class=mono>30c9853 2026-10-20T08:50:33+07:00 docs(dh): 全程记录 —— 十条要求→三次尺子纠错→三组对照→v3定档→微动→云库→全身线→GPU五试五败(含原话)→13条坑册→成本账</li><li class=mono>682b9a1 2026-10-20T08:48:54+07:00 feat(dh): finish-clip 无人值守收尾(等片→微动→交付→三条验收→上云) + 把整条生成流程写成技能 gbt-digital-human-video</li><li class=mono>b4a042a 2026-10-20T08:35:27+07:00 feat(motion): 动作库发布件 —— 成片+manifest+自包含播放页一起进公网桶(零部署), 每条公网回读比 sha</li></ul>
+        <p class="kv">最近提交</p><ul class="cm"><li class=mono>01c42a1 2026-10-28T20:57:19+07:00 feat(guard): 语言疲劳六型全机检 —— 7 条判据 + 判据总账</li><li class=mono>ec45af0 2026-10-20T09:00:55+07:00 docs(dh): 全程记录第十四节 —— 逐行 S 形重心转移两档对比 + 广播坑; 技能③同步升级</li><li class=mono>5b59a37 2026-10-20T08:59:39+07:00 feat(dh): body-motion 逐行 S 形重心转移(比整帧仿射像人) 并换进无人值守收尾; 1s 试片帧差 0.131→0.399</li><li class=mono>1089966 2026-10-20T08:57:57+07:00 fix(motion): 逮到并更正一条假账 —— 库里两条片的 voice 标成台灣腔，实测音轨相关 1.0000 是普通话; fix 子命令只追加更正</li><li class=mono>30c9853 2026-10-20T08:50:33+07:00 docs(dh): 全程记录 —— 十条要求→三次尺子纠错→三组对照→v3定档→微动→云库→全身线→GPU五试五败(含原话)→13条坑册→成本账</li><li class=mono>682b9a1 2026-10-20T08:48:54+07:00 feat(dh): finish-clip 无人值守收尾(等片→微动→交付→三条验收→上云) + 把整条生成流程写成技能 gbt-digital-human-video</li></ul>
       </div>
       <div>
         <p class="kv">改动样例（前 8 条）</p>
-        <table><tr><td class=mono> M .cluster/five-dim-ultimate/report_v1_backup.html</td></tr><tr><td class=mono> M .digihuman/ledger.json</td></tr><tr><td class=mono> M AGENTS.md</td></tr><tr><td class=mono> M CHARTER.md</td></tr><tr><td class=mono> M CODING_DISCIPLINE.md</td></tr><tr><td class=mono> M README.md</td></tr><tr><td class=mono> M SOUL.md</td></tr><tr><td class=mono> M "V22 GBT\345\260\217\345\234\237\350\261\206V8-\345\217\257\344\272\244\344\272\222\345\216\237\345\236\213.html"</td></tr></table>
+        <table><tr><td class=mono> M .cluster/dd_squad/toolchain_manifest.json</td></tr><tr><td class=mono> M .cluster/five-dim-ultimate/report_v1_backup.html</td></tr><tr><td class=mono> M .digihuman/ledger.json</td></tr><tr><td class=mono> M AGENTS.md</td></tr><tr><td class=mono> M CHARTER.md</td></tr><tr><td class=mono> M CODING_DISCIPLINE.md</td></tr><tr><td class=mono> M HEARTBEAT.md</td></tr><tr><td class=mono> M README.md</td></tr></table>
       </div>
     </div>
   </div>
@@ -90,17 +91,13 @@
   </div>
 
   <div class="gbt-card z-foot">
-    <h2>需要人看</h2><ul class=att><li>改动面没收敛：1788 个文件（过 1000 说明工作树已不成形）</li><li><strong>超一半</strong>源模块（87%）没被任何测试提到</li></ul>
+    <h2>需要人看</h2><ul class=att><li>改动面没收敛：2406 个文件（过 1000 说明工作树已不成形）</li></ul>
   </div>
 
   <div class="gbt-foot">
-    快照 <b>2026-10-23T23:47:28</b> ｜ 这是<strong>快照</strong>，不是实时。要新读数：
+    快照 <b>2026-10-29T10:01:13</b> ｜ 这是<strong>快照</strong>，不是实时。要新读数：
     <code>py -3.14 tools/codex-scripts/code-deck.py --html holo_pet_w3/code-deck/index.html</code><br />
     开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
   </div>
 </div>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../shell/tentacle-kit.js?v=20261029"></script>
 </body></html>

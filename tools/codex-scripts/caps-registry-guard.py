@@ -44,7 +44,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-# 🔴 2026-09-25 自纠：这里原来写死 **`EXPECT_TOTAL = 168`** —— 而"**条数不许写死**"
+# 2026-09-25 自纠：这里原来写死 **`EXPECT_TOTAL = 168`** —— 而"**条数不许写死**"
 #    正是我这一整轮在修的那条病（`checkup --self` 写死 `== 5`、防忘清单写死「16 道闸」、
 #    面板写死「296 个 .py」）。写死会**把合法的增长判成故障**：实测撞到
 #    另一个作者把注册表做到 **171 位**，我这个哨兵立刻报"口径不对"——**错的是哨兵**。
@@ -52,7 +52,7 @@ for _s in (sys.stdout, sys.stderr):
 #    条数**变了要报（漂移），但不判红**。
 MIN_BENIGN = 157            # 下限：良性位不许跌破这个数
 MIN_UNIMPL = 11             # **只用于自检负控造人造注册表**；真判据见下方 LEGACY_11
-# 🔴 2026-09-25 Owner 令「把黑客能力全部多维度全部覆盖补齐，使用需要人工授权即可」后，
+# 2026-09-25 Owner 令「把黑客能力全部多维度全部覆盖补齐，使用需要人工授权即可」后，
 #    下面这 11 个名字**全部接上了实现**（迁进 BENIGN_CAPS）⇒ 旧判据
 #    `UNIMPLEMENTED_CAPS >= 11`（"名字还在未实现表里"）**必然报红 = 假故障**
 #    —— 这正是本文件开头骂的那种"写死会把合法的变化判成故障"。
@@ -69,7 +69,7 @@ BASELINE_COUNT = 168        # **只作对照读数**（会漂移就报漂移）�
 def check(path: Path | None = None) -> dict:
     """**能证伪**的三条：import 得了吗 · 位数对不对 · 口径对不对。"""
     p = path or TARGET
-    # 🔴 路径可能在仓外（自检的人造件就在系统临时目录）⇒ `relative_to` 会抛 ValueError。
+ # 路径可能在仓外（自检的人造件就在系统临时目录）⇒ `relative_to` 会抛 ValueError。
     #    这是**自检的负控当场咬出来**的：第一版直接 `p.relative_to(ROOT)` ⇒ 自检自己崩。
     try:
         shown = str(p.relative_to(ROOT))
@@ -80,7 +80,7 @@ def check(path: Path | None = None) -> dict:
         return {**out, "ok": False, "为什么": "**文件不存在**（被删了没写回）",
                 "复原命令": "python tools/codex-scripts/caps-registry-guard.py restore"}
     py = sys.executable
-    # 🔴 **按"给的那个文件"加载，不按包名加载** —— 第一版写的是
+ # **按"给的那个文件"加载，不按包名加载** —— 第一版写的是
     #    `from gbt_allinone import caps_registry` ⇒ **`path` 参数被无视** ⇒
     #    自检的负控（人造空表）**永远过**（因为它查的还是真注册表）。
     #    这是自检负控当场咬出来的第二个我自己的错。
@@ -115,7 +115,7 @@ def check(path: Path | None = None) -> dict:
     # ② Owner 口径：解禁后没有任何名字被拒
     if got.get("disabled") != 0:
         bad.append("DISABLED_CAPS=%s（应 0：Owner 2026-09-23「把禁止全部解开」）" % got.get("disabled"))
-    # ③ 🔴 Owner 口径：登记未实现的名字不许丢 —— 2026-09-25 实现后改成**并集守恒**。
+ # ③ Owner 口径：登记未实现的名字不许丢 —— 2026-09-25 实现后改成**并集守恒**。
     #    旧写法 `unimpl >= MIN_UNIMPL` 在名字全部接上实现后**必然报红（假故障）**。
     #    新写法只问一句："那 11 个名字还找不找得到？"（在哪张表都行）
     _known = (set(got.get("benign_names") or []) | set(got.get("unimpl_names") or [])
@@ -134,10 +134,10 @@ def check(path: Path | None = None) -> dict:
     if cov and cov.get("未探位数"):
         drift_txt += " ｜ 🔴 **账里还没探的 %d 位**：%s（未探≠故障，但要点名）" % (
             cov["未探位数"], "、".join(cov["**未探（账里没有）**"][:6]))
-    # ⑥ 🔴 **登记 vs 接线**（红判据）：只登记不接线的位 = 假绿源头，不许存在
+ # ⑥ **登记 vs 接线**（红判据）：只登记不接线的位 = 假绿源头，不许存在
     #    注意：喂进去的是 **BENIGN 的名字**（`UNIMPLEMENTED_CAPS` 设计上就没有实现，不算）
     disp = dispatch_coverage(set(got.get("benign_names") or [])) if got.get("benign_names") else {}
-    # ⑦ 🔴 **空话分支**：有分支但不干活的位 ⇒ 同样是假绿（防"用空话骗闸"）
+ # ⑦ **空话分支**：有分支但不干活的位 ⇒ 同样是假绿（防"用空话骗闸"）
     empty = empty_branch_check(set(got.get("benign_names") or [])) if got.get("benign_names") else {}
     if empty and not empty.get("ok", True):
         bad.append(str(empty.get("为什么")))
@@ -212,7 +212,7 @@ def dispatch_coverage(benign_names: set, src_text: str | None = None) -> dict:
         txt = src_text if src_text is not None else src_p.read_text(encoding="utf-8-sig")
         tree = ast.parse(txt)
     except Exception as e:  # noqa: BLE001
-        # 🔴 措辞用本仓统一的「**未读到**」（不是"读不了"）——
+ # 措辞用本仓统一的「**未读到**」（不是"读不了"）——
         #    `criterion_bench` 的 D3（用0冒充）就是靠这个词判"有没有未读到出路"；
         #    我第一版写"读不了" ⇒ 被台架判成"源缺失时会静默报 0"（措辞不一致=假红，本仓已吃过一次）。
         return {"ok": False, "为什么": "**未读到** api.py：%s" % str(e)[:70]}
@@ -372,7 +372,7 @@ def cmd_selftest(a) -> int:
         lines.append("%s %s — %s" % ("✓" if cond else "✗", name, detail))
 
     # ① 真数据：**硬口径**（可导入 · 不跌破下限 · DISABLED==0）——
-    #    🔴 这里**不能**断言整体 `ok`：现在确实有 3 位"登记了没着落"（红判据⑥，真缺陷、要点名），
+ # 这里**不能**断言整体 `ok`：现在确实有 3 位"登记了没着落"（红判据⑥，真缺陷、要点名），
     #       那是**另一条判据**的事，不该把这条控制变成"因为那条红所以这条也红"。
     r = check()
     ck("**真数据：注册表可导入且未跌破下限/口径**",
@@ -384,7 +384,7 @@ def cmd_selftest(a) -> int:
         fake.write_text(PLANT_BROKEN, encoding="utf-8")
         rf = check(fake)
         ck("**负控：空表/跌破下限 ⇒ 必须红**", rf["ok"] is False, str(rf.get("为什么"))[:80])
-    # ②b 🔴 **正控：条数"变多"不许判红**（写死条数正是本仓反复吃的病；
+ # ②b **正控：条数"变多"不许判红**（写死条数正是本仓反复吃的病；
     #     实测撞到另一个作者把注册表做到 171 位，旧判据当场误判成故障）
     with tempfile.TemporaryDirectory() as td:
         grow = Path(td) / "caps_registry.py"
@@ -400,12 +400,12 @@ def cmd_selftest(a) -> int:
                ", ".join('"u%d": "x"' % i for i in range(MIN_UNIMPL))),
             encoding="utf-8")
         rg = check(grow)
-        # 🔴 这条控制**只测"条数变多"这一件事**：漂移要被报出来，且**不许以"条数不符"判红**。
+ # 这条控制**只测"条数变多"这一件事**：漂移要被报出来，且**不许以"条数不符"判红**。
         #    （人造注册表里的名字当然没有接线 ⇒ ⑥ 那条红判据**该红**，与本控制无关。）
         ck("**正控：条数变多只报漂移、不以「条数不符」判红**（不许写死条数）",
            "多" in str(rg.get("条数漂移")) and "all_caps()=" not in str(rg.get("为什么")),
            "%s ｜ %s" % (str(rg.get("为什么"))[:60], rg.get("条数漂移")))
-    # ②c 🔴 **负控：DISABLED_CAPS 非 0 必须红**（Owner 2026-09-23 口径）
+ # ②c **负控：DISABLED_CAPS 非 0 必须红**（Owner 2026-09-23 口径）
     with tempfile.TemporaryDirectory() as td:
         dis = Path(td) / "caps_registry.py"
         dis.write_text(
@@ -429,7 +429,7 @@ def cmd_selftest(a) -> int:
     ck("**已知良好副本或恢复脚本至少有一个在**", GOOD.is_file() or REBUILD.is_file(),
        "good=%s rebuild=%s" % (GOOD.name if GOOD.is_file() else "缺",
                                REBUILD.name if REBUILD.is_file() else "缺"))
-    # ⑤ 🔴 **登记 vs 接线**：判据要会咬 —— 编一个"登记了但没接线"的名字，必须被点名
+ # ⑤ **登记 vs 接线**：判据要会咬 —— 编一个"登记了但没接线"的名字，必须被点名
     d = dispatch_coverage({"count_words", "__绝对没有接线的假位__"})
     ck("**负控：登记了但没接线的名字必须被点名**",
        d.get("ok") is False and "__绝对没有接线的假位__" in (d.get("**真没着落（红）**") or []),
@@ -438,7 +438,7 @@ def cmd_selftest(a) -> int:
     d2 = dispatch_coverage({"count_words"})
     ck("**正控：已接线的名字不许被误报**", d2.get("ok") is True,
        "已接线 %s/%s" % (d2.get("已接线"), d2.get("登记位")))
-    # ⑤c 🔴 **注入源码**（原来这两条"未读到"分支只能靠 api.py 真坏掉 ⇒ **从没验过**）：
+ # ⑤c **注入源码**（原来这两条"未读到"分支只能靠 api.py 真坏掉 ⇒ **从没验过**）：
     #     ① 登记位在注入的源码里没着落 ⇒ 必须红
     d6 = dispatch_coverage({"__注入的假位__"},
                            'def _run_benign(kind, payload):\n    return 1\n')
@@ -454,7 +454,7 @@ def cmd_selftest(a) -> int:
        d7.get("ok") is True and d7.get("已接线") == 1
        and "beta" in (d7.get("着落待人工确认（不判红）") or []),
        "已接线 %s ｜ 待确认 %s" % (d7.get("已接线"), d7.get("着落待人工确认（不判红）")))
-    # ⑤d 🔴 **两条「未读到」分支**（源码读不到 / 源码里没有 `_run_benign`）—— 从没被走到过：
+ # ⑤d **两条「未读到」分支**（源码读不到 / 源码里没有 `_run_benign`）—— 从没被走到过：
     d8 = dispatch_coverage(set(), 'def broken(:\n')
     ck("**负控：源码读不到 ⇒ 必须报『未读到』，不许当通过**",
        d8.get("ok") is False and "未读到" in str(d8.get("为什么")), str(d8.get("为什么"))[:70])
@@ -468,7 +468,7 @@ def cmd_selftest(a) -> int:
     d11 = empty_branch_check({"x"}, 'def other():\n    return 1\n')
     ck("**负控（空话闸）：源码里没有 `_run_benign` ⇒ 必须报『别当通过』**",
        d11.get("ok") is False and "别当通过" in str(d11.get("为什么")), str(d11.get("为什么"))[:70])
-    # ⑥ 🔴 **空话分支**：三条控制（两条负控 + 一条正控）—— 防"用空话骗闸"
+ # ⑥ **空话分支**：三条控制（两条负控 + 一条正控）—— 防"用空话骗闸"
     d3 = empty_branch_check({"fake_a"},
                             'def _run_benign(kind, payload):\n    if kind == "fake_a":\n        return None\n')
     ck("**负控：只有 `return None` 的分支必须被点名为空话**",

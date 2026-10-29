@@ -1,1933 +1,715 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW">
+<html data-page-id="digital-human" lang="zh-Hant-TW">
 <head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 <meta charset="utf-8" />
-<title>GBT小土豆V8 · 她</title>
+<title>GBT小土豆V8 · 建模绑骨工作台</title>
 
+<!-- 2026-10-26：中性色吃 library 令牌（单一源 state/taste/*.json → theme/taste-tokens.css）。
+ --gold/--cyan 是品牌色、--line 是 10% 白hairline（透光体系），两者都不跟库走。 -->
+<link rel="stylesheet" href="../theme/taste-tokens.css" />
 <style>
-  :root{
-    --bg:#05070d; --panel:#0b1018; --line:rgba(255,255,255,.10); --ink:#e8ecf8;
-    --dim:#8fa3b8; --gold:#f5b041; --cyan:#00e5ff; --ok:#7ae8b8; --bad:#ff8a8a;
-    --mono: ui-monospace, Consolas, "Cascadia Mono", monospace;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);
-    font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif;overflow:hidden}
-  .wrap{display:grid;grid-template-columns:300px minmax(0,1fr) 320px;
-    /* 2026-10-21：多了一行主舞台控制条（40px）。不加这一行，新加的条会被自动塞进
-       第一列的格子里 —— 实测截图里「说话/走两步/站好」被挤成竖排、画布被压成一条。 */
-    grid-template-rows:52px 40px minmax(0,1fr) 44px;height:100%;gap:1px;background:var(--line)}
-  .bar{grid-column:1/4;display:flex;align-items:center;gap:14px;padding:0 16px;
-    background:var(--panel);font-size:13px}
-  .bar b{color:var(--gold);letter-spacing:.06em}
-  .bar .sp{flex:1}
-  .tag{font:11px/22px var(--mono);color:var(--dim);border:1px solid var(--line);
-    border-radius:7px;padding:0 8px}
-  .tag[data-ok="1"]{color:var(--ok);border-color:rgba(122,232,184,.35)}
-  .tag[data-ok="0"]{color:var(--bad);border-color:rgba(255,138,138,.35)}
-  aside,.vp{background:var(--panel);min-height:0}
-  aside{overflow:auto;padding:12px}
-  .h{font:11px/1 var(--mono);letter-spacing:.18em;color:var(--dim);
-    margin:6px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-  .bone{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;
-    cursor:pointer;font:12px/1.5 var(--mono);color:#cfdae8}
-  .bone:hover{background:rgba(0,229,255,.08)}
-  .bone[data-sel="1"]{background:rgba(245,176,65,.14);color:#ffe6b8}
-  .bone .dot{width:7px;height:7px;border-radius:50%;background:rgba(0,229,255,.7);flex:0 0 auto}
-  .bone .wt{margin-left:auto;color:var(--dim);font-size:11px}
-  .vp{position:relative;grid-column:2}   /* 钉死中间列：stage 模式下左右两块 display:none 后，
-                                            画布会被自动排进第一列（宽 0）—— 实测就是"一片黑"。 */
-  #gl{display:block;width:100%;height:100%}
-  .vpinfo{position:absolute;left:12px;bottom:10px;font:11px/1.6 var(--mono);color:var(--dim)}
-  .props{overflow:auto;padding:12px}
-  .row{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;margin:6px 0}
-  .row label{font:11px/1 var(--mono);color:var(--dim)}
-  .row input[type=range]{width:100%}
-  .row output{font:11px/1 var(--mono);color:var(--ink);text-align:right}
-  button{font:12px/26px var(--mono);height:28px;padding:0 10px;border-radius:7px;
-    background:rgba(0,229,255,.08);color:#bfefff;border:1px solid rgba(0,229,255,.24);cursor:pointer}
-  button:hover{background:rgba(0,229,255,.16)}
-  button.ghost{background:transparent;color:var(--dim);border-color:var(--line)}
-  .kv{font:11.5px/1.7 var(--mono);color:var(--dim);white-space:pre-wrap;word-break:break-word}
-  .kv b{color:var(--ink)}
-  .foot{grid-column:1/4;display:flex;align-items:center;gap:10px;padding:0 14px;
-    font:11.5px/1 var(--mono);color:var(--dim)}
-  .foot .sp{flex:1}
-  #gbt-direct-nav{max-height:24px;overflow:hidden;white-space:nowrap;opacity:.4}
-  #gbt-direct-nav:hover{max-height:44vh;overflow:auto;white-space:normal;opacity:1}
-  textarea{width:100%;height:120px;background:#070b12;color:#cfe3f5;border:1px solid var(--line);
-    border-radius:8px;font:11px/1.5 var(--mono);padding:8px}
-
-  /* ── 主舞台（2026-10-21 加）：她说话时的字幕 + 动作按钮 ─────────────────────
-     定位口径：这是「她」的主界面，绑骨台退为工具。字幕是**如实**的：本资产没有
-     jaw 骨也没有形态键，所以这里**不做假口型**，只给字幕 + 真实的声音与动作。 */
-  .stage-bar{grid-column:1/4;display:flex;align-items:center;gap:8px;padding:0 16px;
-    border-top:1px solid var(--line);background:#080c14}
-  .stage-bar button{border:1px solid rgba(0,229,255,.35);background:rgba(0,229,255,.08);color:var(--ink);
-    border-radius:8px;padding:0 14px;height:26px;font:12px/26px system-ui,"Microsoft YaHei",sans-serif;
-    white-space:nowrap;cursor:pointer}
-  .stage-bar button:hover{background:rgba(0,229,255,.18)}
-  .stage-bar button:disabled{opacity:.45;cursor:not-allowed}
-  .stage-bar .hint{font:11.5px/1.5 var(--mono);color:var(--dim)}
-  .stage-bar .hint b{color:#f2c14e}
-  .subtitle{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);max-width:78%;
-    padding:8px 16px;border-radius:12px;white-space:normal;text-align:center;
-    font:15px/1.6 system-ui,"Microsoft YaHei",sans-serif;color:#eaf6ff;
-    background:rgba(6,12,20,.82);border:1px solid rgba(0,229,255,.28);
-    box-shadow:0 10px 30px rgba(0,0,0,.55);opacity:0;transition:opacity .25s ease;pointer-events:none}
-  .subtitle.on{opacity:1}
-
-  /* ── 两种模式（2026-10-21）───────────────────────────────────────────────
-     定位要的是「打开就是她」。默认 **stage**：左骨骼树与右姿态台**收起**，
-     画布占满三列 —— 一进来看到的是全身的她，不是一堆骨名。
-     点顶栏「绑骨台」才展开那两块（tool 模式）。两块都还在，一根骨都没删。 */
-  body[data-mode="stage"] .wrap{grid-template-columns:0 minmax(0,1fr) 0}
-  body[data-mode="stage"] aside{display:none}
-  #btnMode[data-on="1"]{color:#f2c14e;border-color:rgba(242,193,78,.5)}
+ :root{
+ --bg:var(--taste-ground,#0B1120); --panel:var(--taste-surface,#111827);
+ --line:rgba(232,236,248,.10); --ink:var(--taste-text,#e8ecf8);
+ --dim:var(--taste-muted,#9aa4c4); --gold:#f5b041; --cyan:#00e5ff;
+ --ok:var(--taste-positive,#00E5FF); --bad:var(--taste-negative,#EF4444);
+ --mono: ui-monospace, Consolas, "Cascadia Mono", monospace;
+ }
+ *{box-sizing:border-box}
+ html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);
+ font:14px/1.6 system-ui,"Microsoft YaHei",sans-serif;overflow:hidden}
+ .wrap{display:grid;grid-template-columns:300px minmax(0,1fr) 320px;
+ grid-template-rows:52px minmax(0,1fr) 44px;height:100%;gap:1px;background:var(--line)}
+ .bar{grid-column:1/4;display:flex;align-items:center;gap:14px;padding:0 16px;
+ background:var(--panel);font-size:13px}
+ .bar b{color:var(--gold);letter-spacing:.06em}
+ .bar .sp{flex:1}
+ .tag{font:11px/22px var(--mono);color:var(--dim);border:1px solid var(--line);
+ border-radius:7px;padding:0 8px}
+ .tag[data-ok="1"]{color:var(--ok);border-color:rgba(52,211,153,.35)}
+ .tag[data-ok="0"]{color:var(--bad);border-color:rgba(255,138,138,.35)}
+ aside,.vp{background:var(--panel);min-height:0}
+ aside{overflow:auto;padding:12px}
+ .h{font:11px/1 var(--mono);letter-spacing:.18em;color:var(--dim);
+ margin:6px 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+ .bone{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;
+ cursor:pointer;font:12px/1.5 var(--mono);color:#cfdae8}
+ .bone:hover{background:rgba(0,229,255,.08)}
+ .bone[data-sel="1"]{background:rgba(245,176,65,.14);color:#ffe6b8}
+ .bone .dot{width:7px;height:7px;border-radius:50%;background:rgba(0,229,255,.7);flex:0 0 auto}
+ .bone .wt{margin-left:auto;color:var(--dim);font-size:11px}
+ .vp{position:relative}
+ #gl{display:block;width:100%;height:100%}
+ .vpinfo{position:absolute;left:12px;bottom:10px;font:11px/1.6 var(--mono);color:var(--dim)}
+ .props{overflow:auto;padding:12px}
+ .row{display:grid;grid-template-columns:52px 1fr 58px;align-items:center;gap:8px;margin:6px 0}
+ .row label{font:11px/1 var(--mono);color:var(--dim)}
+ .row input[type=range]{width:100%}
+ .row output{font:11px/1 var(--mono);color:var(--ink);text-align:right}
+ button{font:12px/26px var(--mono);height:28px;padding:0 10px;border-radius:7px;
+ background:rgba(0,229,255,.08);color:#bfefff;border:1px solid rgba(0,229,255,.24);cursor:pointer}
+ button:hover{background:rgba(0,229,255,.16)}
+ button.ghost{background:transparent;color:var(--dim);border-color:var(--line)}
+ .kv{font:11.5px/1.7 var(--mono);color:var(--dim);white-space:pre-wrap;word-break:break-word}
+ .kv b{color:var(--ink)}
+ .foot{grid-column:1/4;display:flex;align-items:center;gap:10px;padding:0 14px;
+ font:11.5px/1 var(--mono);color:var(--dim)}
+ .foot .sp{flex:1}
+ textarea{width:100%;height:120px;background:#070b12;color:#cfe3f5;border:1px solid var(--line);
+ border-radius:8px;font:11px/1.5 var(--mono);padding:8px}
 </style>
+<link rel="stylesheet" href="../page-skins.css" />
 </head>
-<body data-mode="stage">
-<script src="../shell/nav-compact.js?v=20261026"></script>
-
+<body>
+<script src="../shell/nav-compact.js"></script>
 
 
 
 
 <div class="wrap">
-  <div class="bar">
-    <b>GBT小土豆V8 · 她</b>
-    <span class="tag" id="tagStage" data-ok="0">引擎：载入中</span>
-    <span class="tag" id="tagBones" data-ok="0">骨骼：—</span>
-    <span class="tag" id="tagWt" data-ok="0">权重：—</span>
-    <!-- 🔴 构建戳（2026-10-19 加）：这块面板在桌面壳里长期不重载 ⇒ 看到旧读数时分不清
-         "资产坏了"还是"窗口没刷新"。有这枚戳就能一眼判：戳在=新代码在跑；没戳=窗口留着旧页，
-         Ctrl+R（或壳里的「重载」）即可。改页面时连这行一起改版本号。 -->
-    <span class="tag" id="tagBuild" data-ok="1" title="页面构建戳：不是这个值就说明窗口没重载">构建 v20261021f</span>
-    <span class="sp"></span>
-    <button class="ghost" id="btnMode" data-on="0" title="展开/收起左右两块工具面板（骨骼树 · 姿态台）">绑骨台</button>
-    <button class="ghost" id="btnWire">骨架</button>
-    <button class="ghost" id="btnReset">复位</button>
-    <button class="ghost" id="btnPose">导出姿态</button>
-  </div>
+<div class="bar">
+<b>GBT小土豆V8 · 建模绑骨工作台</b>
+<span class="tag" id="tagStage" data-ok="0">引擎：载入中</span>
+<span class="tag" id="tagBones" data-ok="0">骨骼：—</span>
+<span class="tag" id="tagWt" data-ok="0">权重：—</span>
+<!-- 构建戳（2026-10-19 加）：这块面板在桌面壳里长期不重载 ⇒ 看到旧读数时分不清
+ "资产坏了"还是"窗口没刷新"。有这枚戳就能一眼判：戳在=新代码在跑；没戳=窗口留着旧页，
+ Ctrl+R（或壳里的「重载」）即可。改页面时连这行一起改版本号。 -->
+<span class="tag" id="tagBuild" data-ok="1" title="页面构建戳：不是这个值就说明窗口没重载">构建 v20261019b</span>
+<span class="sp"></span>
+<button class="ghost" id="btnWire">骨架</button>
+<button class="ghost" id="btnReset">复位</button>
+<button class="ghost" id="btnPose">导出姿态</button>
+</div>
 
-  <!-- ══ 主舞台控制条（2026-10-21）══════════════════════════════════════════
-       三件事都**真跑**，三件事都**不许含糊**：
-         · 说话 = 播她那句真声音（仓内 wav，台湾腔神经嗓），同时出字幕；
-           口型 = **音素驱动下颌**（吸收 wawa-lipsync MIT：15 个 viseme → 张口量 → Jaw 骨 16°）；
-           仍**没有形态键/唇缝**，所以近看不是「嘴唇分开」——真唇形得做形态键或唇缝（DCC 活）。
-         · 走两步 = 程序化步态（按步态相位：手臂与同侧腿反相 · 膝在摆动相弯 · 脚背勾绷 · 骨盆肩反扭 · 1.20 m/s）。
-         · 站好 = 立刻回 idle。
-       按钮找不到动作时**如实禁用并写原因**，不装成能按。 -->
-  <div class="stage-bar">
-    <button id="btnSay" disabled title="等模型载入">说话</button>
-    <button id="btnWave" disabled title="等模型载入">挥手</button>
-    <button id="btnWalk" disabled title="等模型载入">走两步</button>
-    <button id="btnIdle" disabled title="等模型载入">站好</button>
-    <button id="btnAsk" disabled title="把输入框的话交给她的大脑（桥 :8791 → A19），答完用台湾腔说出来">问她</button>
-    <input id="sayText" placeholder="让她说什么…（留空=她的自我介绍）"
-           style="flex:1;min-width:180px;background:#0b1018;border:1px solid rgba(255,255,255,.14);
-                  color:#e8ecf8;border-radius:8px;padding:6px 10px;font-size:13px">
-    <button id="btnZoom" disabled title="全身 → 半身 → 特写：画布就这么高，全身时头只有 ~70px，想看清脸就用这一档">镜头·全身</button>
-    <span class="hint" id="stageHint">动作：等载入 · 口型：<b>音素驱动下颌</b>（viseme · 16° 上限 · 跟着声音走；仍无形态键/唇缝 ⇒ 近看不是「嘴唇分开」）</span>
-  </div>
+<aside>
+<div class="h">骨骼树（点一根 → 右侧调它）</div>
+<div id="bones" class="kv">载入中…</div>
+</aside>
 
-  <aside>
-    <div class="h">骨骼树（点一根 → 右侧调它）</div>
-    <div id="bones" class="kv">载入中…</div>
-    <div class="h" style="margin-top:14px">这根骨管什么（标签表念白）</div>
-    <div id="boneInfo" class="kv">点左边任意一根骨，这里念出它管什么、哪个轴、正负号朝哪（全部来自实测标签表）</div>
-  </aside>
+<section class="vp">
+<canvas id="gl"></canvas>
+<div class="vpinfo" id="vpinfo">拖动=旋转 · 滚轮=缩放</div>
+</section>
 
-  <section class="vp">
-    <canvas id="gl"></canvas>
-    <div class="vpinfo" id="vpinfo">拖动=旋转 · 滚轮=缩放</div>
-    <div class="subtitle" id="subtitle"></div>
-  </section>
+<aside class="props">
+<div class="h">姿态（真骨骼旋转，度）</div>
+<div id="poseBox">
+<div class="row"><label>X</label><input type="range" id="rx" min="-90" max="90" value="0"><output id="ox">0</output></div>
+<div class="row"><label>Y</label><input type="range" id="ry" min="-90" max="90" value="0"><output id="oy">0</output></div>
+<div class="row"><label>Z</label><input type="range" id="rz" min="-90" max="90" value="0"><output id="oz">0</output></div>
+</div>
+<div class="h" style="margin-top:14px">体检（现读，不装饰）</div>
+<div class="kv" id="audit">—</div>
+<div class="h" style="margin-top:14px">姿态产物（复制走）</div>
+<textarea id="poseOut" readonly placeholder="点「导出姿态」后这里出现 JSON"></textarea>
+</aside>
 
-  <aside class="props">
-    <div class="h">姿态（真骨骼旋转，度）</div>
-    <div id="poseBox">
-      <div class="row"><label>X</label><input type="range" id="rx" min="-90" max="90" value="0"><output id="ox">0</output></div>
-      <div class="row"><label>Y</label><input type="range" id="ry" min="-90" max="90" value="0"><output id="oy">0</output></div>
-      <div class="row"><label>Z</label><input type="range" id="rz" min="-90" max="90" value="0"><output id="oz">0</output></div>
-    </div>
-    <div class="h" style="margin-top:14px">体检（现读，不装饰）</div>
-    <div class="kv" id="audit">—</div>
-    <div class="h" style="margin-top:14px">姿态产物（复制走）</div>
-    <textarea id="poseOut" readonly placeholder="点「导出姿态」后这里出现 JSON"></textarea>
-  </aside>
-
-  <div class="foot">
-    <span id="footMsg">全部本地：three.js 与模型都在壳内，零 CDN、零付费接口。资产闸一条命令：py -3.14 tools/codex-scripts/dh-asset-gate.py（八条判据）</span>
-    <span class="sp"></span>
-    <span class="tag" id="tagCost">0 元</span>
-  </div>
+<div class="foot">
+<span id="footMsg">全部本地：three.js 与模型都在壳内，零 CDN、零付费接口。资产闸一条命令：py -3.14 tools/codex-scripts/dh-asset-gate.py（八条判据）</span>
+<span class="sp"></span>
+<span class="tag" id="tagCost">0 元</span>
+</div>
 </div>
 
 <!-- 壳里 vendor 的 three（零 CDN）+ 控制器 + glTF 载入器。必须经典脚本、按依赖序。 -->
-<script src="../brain/vendor/three.global.js?v=20261026"></script>
-<script src="../brain/vendor/BufferGeometryUtils.global.js?v=20261026"></script>
-<script src="../brain/vendor/GLTFLoader.global.js?v=20261026"></script>
-<script src="../brain/vendor/OrbitControls.global.js?v=20261026"></script>
+<script src="../brain/vendor/three.global.js"></script>
+<script src="../brain/vendor/BufferGeometryUtils.global.js"></script>
+<script src="../brain/vendor/GLTFLoader.global.js"></script>
+<script src="../brain/vendor/OrbitControls.global.js"></script>
 <!-- Blender 量出来的绑骨体检（rig-audit.py 生成；页面只显示，不自己算） -->
-<script src="rig-audit.js?v=20261026"></script>
-<!-- 骨位标签表（写手 tools/codex-scripts/dh-bone-map.py：每根骨管什么 / 哪个轴 / 正负号全是实测）
-     页面**只按这张表驱动** —— 动作 → 查表得轴与符号 → 摆骨。页面里不许另写一套轴（2026-10-21 主人令）。 -->
-<script src="bone-map.js?v=20261026"></script>
-<!-- 口型音素判定（吸收件）：wawa-lipsync MIT · 原文件在 vendor/wawa-lipsync/（含 LICENSE） -->
-<script src="dh-lipsync.js?v=20261026"></script>
+<script src="rig-audit.js"></script>
+<!-- AO 遮蔽图（Blender 4.2 Cycles 烘的，内联成 data URI；页面 file:// 下 fetch 本地文件被拦） -->
+<script src="ao.js"></script>
 
 <script>
 (function () {
-  "use strict";
-  var T = window.THREE;
-  var $ = function (id) { return document.getElementById(id); };
-  var STATE = { ok: false, why: "", bones: 0, selected: null, unweighted: null, hasSkin: false, meshes: 0, verts: 0 };
+ "use strict";
+ var T = window.THREE;
+ var $ = function (id) { return document.getElementById(id); };
+ var STATE = { ok: false, why: "", bones: 0, selected: null, unweighted: null, hasSkin: false, meshes: 0, verts: 0 };
 
-  function tag(id, text, ok) {
-    var el = $(id); if (!el) return;
-    el.textContent = text; el.setAttribute("data-ok", ok ? "1" : "0");
-  }
-  if (!T) { tag("tagStage", "引擎：没载入 three", false); $("bones").textContent = "three.global.js 不在或没挂上"; return; }
-  if (!T.GLTFLoader) { tag("tagStage", "引擎：没 GLTFLoader", false); $("bones").textContent = "GLTFLoader.global.js 缺失"; return; }
+ function tag(id, text, ok) {
+ var el = $(id); if (!el) return;
+ el.textContent = text; el.setAttribute("data-ok", ok ? "1" : "0");
+ }
+ if (!T) { tag("tagStage", "引擎：没载入 three", false); $("bones").textContent = "three.global.js 不在或没挂上"; return; }
+ if (!T.GLTFLoader) { tag("tagStage", "引擎：没 GLTFLoader", false); $("bones").textContent = "GLTFLoader.global.js 缺失"; return; }
 
-  var canvas = $("gl");
-  // 🔴 2026-10-28：本机 WebGL 是**软件渲染**（iSH 模拟 x86，无 GPU 加速）。
-  //   原配置 antialias:true + 超采样 1.875× + 阴影，canvas 实际 3596×1734 ——
-  //   实测页面主线程被占满、画布全黑、浏览器标签页都能卡死。
-  //   这里改成先探测渲染器：软件渲染 ⇒ 直接进低配（关抗锯齿、0.5 超采样、关阴影）。
-  var _IS_LOW = /low=1/.test(location.search);
-  try {
-    var _probe = document.createElement('canvas').getContext('webgl2') ||
-                 document.createElement('canvas').getContext('webgl');
-    if (_probe) {
-      var _dbg = _probe.getExtension('WEBGL_debug_renderer_info');
-      var _r = (_dbg && _probe.getParameter(_dbg.UNMASKED_RENDERER_WEBGL)) || '';
-      if (/software|swiftshader|llvmpipe|basic render|mesa offscreen/i.test(String(_r))) {
-        _IS_LOW = true;
-        console.info('[GBT] 软件渲染，进低配模式：' + _r);
-      }
-    }
-  } catch (e) { }
-  // 🔴 2026-10-28：`?hq=1` **强制满画质**，压过一切低配判断。
-  //   为什么需要：iSH 里的软件渲染探测会把浏览器也判成软件渲染（同一台机），
-  //   但**系统 Safari 是真 WebKit + A19 GPU**，那里应该跑满。
-  //   用 ?hq=1 明确告诉她"这里算力够，按最高来过"。
-  if (/[?&]hq=1/.test(location.search)) {
-    _IS_LOW = false;
-    window.__GBT_HQ = true;
-  }
-  if (_IS_LOW) { window.__GBT_LOW = true; }
-  if (/[?&]static=1/.test(location.search)) { window.__GBT_STATIC = true; }
-  var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !_IS_LOW, alpha: false });
-  /* ══ 画面高清度（2026-10-21 主人令：「画面高清度都要给我调整好」）════════════
-     免费的高清项直接给足：各向异性过滤拉满 + ACES 色调映射 + sRGB 输出 + 接触阴影。
-     超采样按**实测**定档，不按印象：本轮把「窗真在桌上（非最小化）」当条件逐档量了一遍
-     （state/_hq-ladder2.py，结果见 state/dh-status.md）：
-       pr 1.00=114fps · 1.25=81 · 1.75=70 · 2.00=71 · 1.25+影=90 · 1.50+影=93 · 1.75+影=77
-     ⇒ 这台机器 1.875× + 阴影 完全跑得动（≥55fps），所以默认就开到这个档；
-     真遇到满载再按 adaptHQ 自己降（先降超采样、最后才牺牲阴影）。 */
-  var HQ = {
-    dpr0: window.devicePixelRatio || 1,
-    /* 🔴 2026-10-28：**这才是真正的卡点**。
-       原来是 1.0 —— 我在低配里写 applyPr(0.5) 会被 clamp 回 1.0，
-       渲染缓冲仍是 1918×925 = 1.77M 像素，软件光栅化当然卡死。
-       软件渲染的开销**正比于像素数**：0.35× ⇒ 671×324 ≈ 0.22M，少 8 倍。 */
-    prMin: (window.__GBT_LOW ? 0.35 : 1.0),
-    prMax: Math.min((window.devicePixelRatio || 1) * 1.6, 2.0),
-    pr: (window.__GBT_LOW ? 0.35
-         : (window.__GBT_HQ ? Math.min((window.devicePixelRatio || 1) * 2, 2.0)
-                            : Math.min((window.devicePixelRatio || 1) * 1.5, 1.875))),
-    shadow: (window.__GBT_LOW ? false : true),
-    /* 低配（软件渲染）关阴影：软件渲染下阴影贴图是纯 CPU 逐像素算，大头。
-       下面是原始实测记录，保留：
-                        她脚下有接触阴影才不像"飘"在网格上 */
-    fps: 0, blind: 0, up: 0, down: 0,
-    manual: false, armed: false,   /* armed：载入期/刚开始那几秒的帧率不作数（见 adaptHQ） */
-    level: "初始化"
-  };
-  function applyPr(p) {
-    HQ.pr = Math.max(HQ.prMin, Math.min(HQ.prMax, Number(p) || HQ.prMin));
-    renderer.setPixelRatio(HQ.pr);
-    HQ.level = (HQ.shadow ? "阴影+" : "") + "超采样 " + HQ.pr.toFixed(2) + "×";
-  }
-  /* 阴影开关做成一处：默认开（实测花得起），掉了再关（见 adaptHQ） */
-  function setShadow(on) {
-    HQ.shadow = !!on;
-    if (renderer.shadowMap) renderer.shadowMap.enabled = HQ.shadow;
-    try { keyL.castShadow = HQ.shadow; } catch (e) { }
-    if (model) model.traverse(function (o) { if (o.isMesh) o.castShadow = HQ.shadow; });
-    scene.traverse(function (o) {
-      var ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
-      ms.forEach(function (m) { if (m) m.needsUpdate = true; });
-    });
-    HQ.level = (HQ.shadow ? "阴影+" : "") + "超采样 " + HQ.pr.toFixed(2) + "×";
-  }
-  applyPr(HQ.pr);
-  if ("outputColorSpace" in renderer) renderer.outputColorSpace = T.SRGBColorSpace;
-  renderer.toneMapping = T.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.00;   /* 候选 C：曝光略收，脸不再蒙一层白 */
-  if ("shadowMap" in renderer) {
-    renderer.shadowMap.enabled = HQ.shadow;    /* 跟随 HQ.shadow（默认开：见 HQ.shadow 的实测） */
-    renderer.shadowMap.type = T.PCFSoftShadowMap || 0;
-  }
-  renderer.setClearColor(0x05070d, 1);
+ var canvas = $("gl");
+ /* 软件渲染降级（2026-10-29 卡点根因修复）：
+    本机 GPU 起不来、走 SwiftShader 软件渲染时，THREE 的 WebGLRenderer 创建 + requestAnimationFrame
+    渲染循环会把渲染进程主线程占死（脚本调用永不返回、连心跳都发不出），
+    连累一体式外壳的 iframe 切页（onepiece 逐页验实测：这页卡死后其余页全超时）。
+    用临时 canvas 先探测 GPU 名（不建 THREE renderer —— renderer 创建本身就可能卡死），
+    命中软件渲染则降级到静态图、不建 renderer、不跑渲染循环，明写原因（这是降级，不是失败）。 */
+ var SOFT_GPU = false;
+ (function softGpuFallback() {
+   var name = "", soft = false;
+   try {
+     var probe = document.createElement("canvas");
+     var gl = probe.getContext("webgl") || probe.getContext("experimental-webgl");
+     if (!gl) { soft = true; name = "WebGL 拿不到"; }
+     else {
+       var ext = gl.getExtension("WEBGL_debug_renderer_info");
+       name = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || "") : "";
+       // 拿不到 debug 信息（ext 为 null / name 空）也当软件渲染：宁可降级，不许空转卡死
+       // （真启动 visible 时曾返回拿不到 ext，3D 循环空转把 renderer 拖到 CPU 470s、点不动）
+       if (!ext || !name) soft = true;
+       else if (/swiftshader|llvmpipe|software|basic render|mesa/i.test(name)) soft = true;
+     }
+   } catch (e) { soft = true; name = "探测抛错"; }
+   if (!soft) return;   // 真 GPU，继续 3D
+   canvas.style.display = "none";
+   var hero = document.createElement("img");
+   hero.id = "gbt-dh-hero";
+   hero.src = "digital-human-hero-front.jpg";
+   hero.alt = "GBT 数字人（软件渲染降级静态图）";
+   hero.style.cssText = "display:block;max-width:100%;max-height:100%;margin:0 auto;object-fit:contain;";
+   canvas.parentNode.insertBefore(hero, canvas);
+   tag("tagStage", "软件渲染降级：本机 GPU 不可用（" + name + "），3D 已换成静态图", true);
+   $("bones").textContent = "3D 已降级（软件渲染 · " + name + "）";
+   SOFT_GPU = true;
+ })();
+ if (SOFT_GPU) return;
+ var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+ if ("outputColorSpace" in renderer) renderer.outputColorSpace = T.SRGBColorSpace;
+ renderer.toneMapping = T.ACESFilmicToneMapping;
+ renderer.toneMappingExposure = 1.02;
+ /* 兜底色与影棚背景同调：天空球万一没建起来，看到的也是灰底而不是黑洞。 */
+ renderer.setClearColor(0x23262b, 1);
 
-  var scene = new T.Scene();
-  var camera = new T.PerspectiveCamera(35, 1, 0.05, 80);
-  camera.position.set(1.6, 1.5, 3.2);
+ var scene = new T.Scene();
+ var camera = new T.PerspectiveCamera(35, 1, 0.05, 80);
+ camera.position.set(1.6, 1.5, 3.2);
 
-  var controls = (T.OrbitControls ? new T.OrbitControls(camera, renderer.domElement) : null);
-  if (controls) { controls.target.set(0, 0.95, 0); controls.enableDamping = true; controls.dampingFactor = 0.08; }
+ var controls = (T.OrbitControls ? new T.OrbitControls(camera, renderer.domElement) : null);
+ if (controls) { controls.target.set(0, 0.95, 0); controls.enableDamping = true; controls.dampingFactor = 0.08; }
 
-  /* 取景：**按画布真实宽高自动装框**（2026-10-21 夜改）。
-     旧版是两套写死的机位（stage 全身 / tool 留手），问题很具体：
-       · 她自己高 1.72 m，旧 stage 机位在 fov35 下纵向只覆盖 ≈1.82 m ⇒ 上下各只剩 2.5 cm 余量，
-         窗口一旦矮一点（或走路起伏顶上 1.2 cm）**头顶就被切掉** —— 主人截图里那一圈红线就是这么来的；
-       · 主人要"全身"，而全身在 630px 高的画布里，头只有 ≈76px：这不是贴图糊，是**像素不够**。
-     所以这里按"身体包围盒 + 8% 余量"反算机位距离，纵向/横向哪个更紧就按哪个躲开；
-     窗口尺寸一变就重算一帧（resize 里调用）。 */
-  var FRAME = { y: 0.88, halfH: 0.86, halfW: 0.42, margin: 1.16, yawDeg: 22, pitchDeg: 4 };
-  function fitFrame() {
-    var vfov = camera.fov * Math.PI / 180;
-    var distV = (FRAME.halfH * FRAME.margin) / Math.tan(vfov / 2);
-    var hfov = 2 * Math.atan(Math.tan(vfov / 2) * (camera.aspect || 1.6));
-    var distH = (FRAME.halfW * FRAME.margin) / Math.tan(hfov / 2);
-    var dist = Math.max(distV, distH);
-    var yaw = FRAME.yawDeg * Math.PI / 180, pitch = FRAME.pitchDeg * Math.PI / 180;
-    camera.position.set(
-      Math.sin(yaw) * dist * Math.cos(pitch),
-      FRAME.y + Math.sin(pitch) * dist,
-      Math.cos(yaw) * dist * Math.cos(pitch)
-    );
-    if (controls) { controls.target.set(0, FRAME.y, 0); controls.update(); }
-    CAM_BASE = { cam: camera.position.clone(), tgt: controls ? controls.target.clone() : null };
-    return { dist: +dist.toFixed(2) };
-  }
-  /* 兼容旧调用：两种模式都走同一套装框（差异只在偏航角） */
-  function frameFor(mode) {
-    FRAME.yawDeg = (mode === "stage") ? 22 : 14;
-    return fitFrame();
-  }
-  /* 走路位移时相机跟着平移同样的量（屏幕上的她大小不变，脚步却在动 = 真在走） */
-  function followRoot(dz) {
-    if (!CAM_BASE) return;
-    camera.position.z = CAM_BASE.cam.z + dz;
-    if (controls && CAM_BASE.tgt) { controls.target.z = CAM_BASE.tgt.z + dz; controls.update(); }
-  }
+ scene.add(new T.HemisphereLight(0xdfe6f0, 0x30343a, 1.35));
+ var keyL = new T.DirectionalLight(0xfff4e8, 1.9); keyL.position.set(-2.2, 3.0, 2.4); scene.add(keyL);
+ var rimL = new T.DirectionalLight(0xd6e6ff, 0.85); rimL.position.set(2.4, 2.2, -2.6); scene.add(rimL);
+ var fillL = new T.DirectionalLight(0xeef4ff, 1.15); fillL.position.set(1.2, 1.0, 3.0); scene.add(fillL);
 
-  /* 灯位 = 候选 C（2026-10-21 脸位 A/B 实测后定）：
-     原来 rim 是 0x00e5ff @1.4 —— 在下巴／发际打出一圈青色，皮肤看着"合成感"；
-     C 把冷轮廓光收到 0x7fd8ff @0.5，补光改成中性偏暖 0xd9e2f2 @0.55，天光地面反光 0x1a1512（暖）。
-     对比图：outputs/dh-hd/gradeab-now-face.png vs gradeab-C-face.png */
-  var hemiL = new T.HemisphereLight(0xbdd0e6, 0x1a1512, 1.0); scene.add(hemiL);
-  var keyL = new T.DirectionalLight(0xffe6c4, 2.05); keyL.position.set(-2.2, 3.0, 2.4); scene.add(keyL);
-  var rimL = new T.DirectionalLight(0x7fd8ff, 0.5); rimL.position.set(2.4, 2.2, -2.6); scene.add(rimL);
-  var fillL = new T.DirectionalLight(0xd9e2f2, 0.55); fillL.position.set(1.2, 1.0, 3.0); scene.add(fillL);
+ /* ── 影棚化（2026-10-28 主人对标参考图后改）───────────────────────────────
+    原来：setClearColor(0x05070d) 纯深蓝黑 + GridHelper 网格地面 + 青轮廓光。
+          网格是"脚手架感"的最大来源 —— 一眼看出在建模软件里，不是拍照。
+    参考图给的是「灰色影棚背景纸 + 脚下柔和投影 + 中性冷白轮廓」，所以换三样：
+      ① 天空球（BackSide）贴径向渐变 —— 用球而不是平面，是因为这页有 OrbitControls，
+         用户一转视角平面就露馅；球从任何角度看都是连续的背景纸。
+      ② 脚下椭圆「伪投影」—— 不用 shadowMap：省性能、无锯齿，也不受硬件阴影贴图限制。
+      ③ 网格删掉（变量一并去掉，留着会误导后人以为它还在场景里）。
+    两处 toneMapped:false 是必须的 —— 否则 ACES 色调映射会把灰底压暗、把假投影提亮。 */
+ (function studioBackdrop() {
+   var cv = document.createElement("canvas");
+   cv.width = cv.height = 512;
+   var g = cv.getContext("2d");
+   var rg = g.createRadialGradient(256, 208, 24, 256, 256, 344);
+   rg.addColorStop(0, "#70757c");
+   rg.addColorStop(0.45, "#4d5259");
+   rg.addColorStop(0.78, "#34383e");
+   rg.addColorStop(1, "#23262b");
+   g.fillStyle = rg; g.fillRect(0, 0, 512, 512);
+   var tex = new T.CanvasTexture(cv);
+   if ("colorSpace" in tex) tex.colorSpace = T.SRGBColorSpace;
+   var sky = new T.Mesh(
+     new T.SphereGeometry(28, 32, 24),
+     new T.MeshBasicMaterial({ map: tex, side: T.BackSide, depthWrite: false, toneMapped: false })
+   );
+   scene.add(sky);
+ })();
 
-  /* ══ 环境光 IBL（2026-10-21 夜加 · "逼真程度"那一半）══════════════════════════════
-     体检读数：`scene.environment = null` —— 皮肤的高光只来自 3 盏平行光，
-     等于"世界上没有环境"，这是"塑料感"的结构性原因之一（真实世界里高光里带着整个房间）。
-     这里**不装任何外部 HDR**（离线可用、零 CDN）：用几个自发光面搭一个虚拟摄影棚，
-     再用 three 自带的 PMREMGenerator 烘成环境贴图（实测烘出来 768×1024，开销一次性）。
-     强度取 0.35：A/B 看过 0.35 / 0.6 两档（outputs/dh-hd/real-2-env60.png），
-     0.6 会把脸洗淡，0.35 只加"光的回弹"。
-     失败就静默降级（没有 IBL 也能渲染）—— 取证见 state/_realism-ab.py。 */
-  function bakeStudioEnv() {
-    try {
-      if (!T.PMREMGenerator) return null;
-      var env = new T.Scene();
-      var boxG = new T.BoxGeometry(1, 1, 1);
-      function panel(color, pos, scale) {
-        var m = new T.Mesh(boxG, new T.MeshBasicMaterial({ color: color }));
-        m.position.set(pos[0], pos[1], pos[2]);
-        m.scale.set(scale[0], scale[1], scale[2]);
-        env.add(m);
-      }
-      env.add(new T.Mesh(new T.BoxGeometry(20, 20, 20),
-        new T.MeshBasicMaterial({ color: 0x1a1d24, side: T.BackSide })));
-      panel(0xfff0dc, [0, 6.0, 0.6], [5.0, 0.2, 3.0]);      /* 顶部柔光箱 */
-      panel(0xffd9b0, [-5.0, 2.2, 3.2], [0.2, 3.2, 3.0]);   /* 左前暖光 */
-      panel(0x9fc8ff, [5.2, 2.6, -2.6], [0.2, 3.6, 2.6]);   /* 右后冷轮廓 */
-      panel(0x2a2118, [0, -5.0, 0], [8, 0.2, 8]);           /* 地面暖反射 */
-      panel(0xffffff, [0, 3.0, 5.2], [3.0, 2.0, 0.2]);      /* 正面补光 */
-      var pm = new T.PMREMGenerator(renderer);
-      pm.compileEquirectangularShader();
-      var rt = pm.fromScene(env, 0.035);
-      pm.dispose();
-      return rt.texture;
-    } catch (e) { return null; }
-  }
-  var ENV_TEX = bakeStudioEnv();
-  if (ENV_TEX) scene.environment = ENV_TEX;  var grid = new T.GridHelper(6, 24, 0x1b2430, 0x121a24); scene.add(grid);
-  /* 雾＝把网格的"边"化掉（不是特效）：6×6 的网格在远景会露出一条硬边，看起来像桌子沿。
-     雾色与清屏色一致(0x05070d)，远处网格自然淡进背景；她离相机 2.9m 只吃到 ~2.5% 的雾，
-     人不会发灰（实测读数见 state/dh-status.md）。 */
-  scene.fog = new T.FogExp2(0x05070d, 0.055);
+ (function groundShadow() {
+   var cv = document.createElement("canvas");
+   cv.width = cv.height = 256;
+   var g = cv.getContext("2d");
+   var rg = g.createRadialGradient(128, 128, 6, 128, 128, 118);
+   rg.addColorStop(0, "rgba(9,10,13,.58)");
+   rg.addColorStop(0.45, "rgba(9,10,13,.24)");
+   rg.addColorStop(1, "rgba(9,10,13,0)");
+   g.fillStyle = rg; g.fillRect(0, 0, 256, 256);
+   var tex = new T.CanvasTexture(cv);
+   if ("colorSpace" in tex) tex.colorSpace = T.SRGBColorSpace;
+   var m = new T.Mesh(
+     new T.PlaneGeometry(1.12, 0.76),
+     new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.95, toneMapped: false })
+   );
+   m.rotation.x = -Math.PI / 2;
+   m.position.set(0, 0.002, 0.02);
+   scene.add(m);
+ })();
 
-  /* 高清度第③件：地面阴影（她不再"飘"在网格上）。
-     用 ShadowMaterial 而不是实心地板：只画影子、不挡背景的星空感。
-     平行光给一个够紧的阴影相机（±2m / 1024 贴图）—— 太大就糊、太贵。 */
-  try {
-    keyL.castShadow = HQ.shadow;    /* 默认 false：见 HQ.shadow 那句实测 */
-    keyL.shadow.mapSize.set(1024, 1024);
-    keyL.shadow.camera.left = -2.2; keyL.shadow.camera.right = 2.2;
-    keyL.shadow.camera.top = 2.6; keyL.shadow.camera.bottom = -0.4;
-    keyL.shadow.camera.near = 0.5; keyL.shadow.camera.far = 9;
-    keyL.shadow.bias = -0.0006;
-    var shadowPlane = new T.Mesh(
-      new T.PlaneGeometry(8, 8),
-      new T.ShadowMaterial({ opacity: 0.32 })
-    );
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = 0.002;          /* 贴地一点点，避免和网格 z-fighting */
-    shadowPlane.receiveShadow = true;
-    scene.add(shadowPlane);
-  } catch (e) { /* 阴影不可用就退回无影（画面照常） */ }
+ /* ── 环境反射（2026-10-28）────────────────────────────────────────────────
+    为什么必须做：这个模型是单材质、且本来没有 envMap ⇒ 黑金服装上的金色件是「死」的，
+    不反射任何东西（只有方向光给的一点漫反射），皮肤暗部也没有环境光补充。
+    做法：用 canvas 画一张影棚等距柱状环境（上亮下暗 + 左右两块柔光板），
+    交给 PMREMGenerator 预卷积后赋给 scene.environment —— 不需要任何 HDR 文件，仍是零 CDN。
+    天空球是 MeshBasicMaterial，不受 environment 影响，所以背景不会被二次照亮。 */
+ (function studioEnv() {
+   if (!T.PMREMGenerator) return;
+   var cv = document.createElement("canvas");
+   cv.width = 512; cv.height = 256;
+   var g = cv.getContext("2d");
+   var lg = g.createLinearGradient(0, 0, 0, 256);
+   lg.addColorStop(0, "#dfe4ea");
+   lg.addColorStop(0.46, "#9aa1a9");
+   lg.addColorStop(0.54, "#4e5359");
+   lg.addColorStop(1, "#24272b");
+   g.fillStyle = lg; g.fillRect(0, 0, 512, 256);
+   function softPanel(cx, cy, r, a) {
+     var rg = g.createRadialGradient(cx, cy, 1, cx, cy, r);
+     rg.addColorStop(0, "rgba(255,255,255," + a + ")");
+     rg.addColorStop(1, "rgba(255,255,255,0)");
+     g.fillStyle = rg;
+     g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+   }
+   softPanel(112, 66, 104, 0.88);      /* 左柔光板（主光那一侧的反射） */
+   softPanel(398, 74, 96, 0.62);       /* 右柔光板（弱一档，制造左右差） */
+   var tex = new T.CanvasTexture(cv);
+   tex.mapping = T.EquirectangularReflectionMapping;
+   if ("colorSpace" in tex) tex.colorSpace = T.SRGBColorSpace;
+   var pmrem = new T.PMREMGenerator(renderer);
+   pmrem.compileEquirectangularShader();
+   scene.environment = pmrem.fromEquirectangular(tex).texture;
+   tex.dispose();
+   pmrem.dispose();
+ })();
 
-  var bones = {};            /* name → Bone（含 sanitize 后的名） */
-  var boneOrder = [];        /* 遍历顺序（去重），骨骼树按它排 */
-  var boneList = [];         /* 展示顺序 */
-  var weightCount = {};      /* skin.joints 下标 → 真绑到的顶点数 */
-  var model = null, mixer = null, skeletonHelper = null, wireOn = false;
+ var bones = {}; /* name → Bone（含 sanitize 后的名） */
+ var boneOrder = []; /* 遍历顺序（去重），骨骼树按它排 */
+ var boneList = []; /* 展示顺序 */
+ var weightCount = {}; /* skin.joints 下标 → 真绑到的顶点数 */
+ var model = null, mixer = null, skeletonHelper = null, wireOn = false;
 
-  function boneKey(n) { return String(n || "").replace(/[^\w\-]/g, ""); }
+ function boneKey(n) { return String(n || "").replace(/[^\w\-]/g, ""); }
 
-  function onGltf(gltf) {
-    model = gltf.scene || (gltf.scenes && gltf.scenes[0]);
-    if (!model) { tag("tagStage", "引擎：GLB 无场景", false); return; }
+ function onGltf(gltf) {
+ model = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+ if (!model) { tag("tagStage", "引擎：GLB 无场景", false); return; }
 
-    var box = new T.Box3().setFromObject(model), size = new T.Vector3(); box.getSize(size);
-    if (isFinite(size.y) && size.y > 0) {
-      var k = 1.72 / size.y; model.scale.multiplyScalar(k);
-      box.setFromObject(model);
-      var c = new T.Vector3(); box.getCenter(c);
-      model.position.x -= c.x; model.position.z -= c.z; model.position.y -= box.min.y;
-    }
-    /* 记住"站好时的根位置"：走路要在这上面加位移，回待机要能精确回到原位（不然越走越偏） */
-    MODEL_BASE = { x: model.position.x, y: model.position.y, z: model.position.z };
+ var box = new T.Box3().setFromObject(model), size = new T.Vector3(); box.getSize(size);
+ if (isFinite(size.y) && size.y> 0) {
+ var k = 1.72 / size.y; model.scale.multiplyScalar(k);
+ box.setFromObject(model);
+ var c = new T.Vector3(); box.getCenter(c);
+ model.position.x -= c.x; model.position.z -= c.z; model.position.y -= box.min.y;
+ }
 
-    model.traverse(function (o) {
-      if (o.isMesh) {
-        STATE.meshes += 1;
-        /* 高清度第②件：各向异性过滤拉满 + 让她能投阴影（贴图斜面不糊、影子跟着动） */
-        try {
-          o.castShadow = HQ.shadow;
-          o.receiveShadow = false;
-          var mats = Array.isArray(o.material) ? o.material : [o.material];
-          var maxAniso = renderer.capabilities && renderer.capabilities.getMaxAnisotropy
-            ? renderer.capabilities.getMaxAnisotropy() : 4;
-          mats.forEach(function (m) {
-            if (!m) return;
-            /* 环境光强度：0.35 是 A/B 看片定的（0.6 会把脸洗淡，见 bakeStudioEnv 注释） */
-            if ("envMapIntensity" in m) m.envMapIntensity = 0.25;
-            ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap", "aoMap"].forEach(function (k) {
-              if (m[k]) { m[k].anisotropy = maxAniso; m[k].needsUpdate = true; }
-            });
-            m.needsUpdate = true;
-          });
-        } catch (e) { /* 拿不到就按默认，不挡渲染 */ }
-        var geo = o.geometry;
-        if (geo && geo.attributes && geo.attributes.position) {
-          STATE.verts += geo.attributes.position.count;
-          if (geo.attributes.skinIndex && geo.attributes.skinWeight) {
-            /* 有蒙皮数据 ⇒ 计数从 0 起（"一个都没发现"不等于"没有这个字段"：
-               原来只在真发现未绑顶点时才从 null 变数字，于是 0 个未绑顶点被念成"无 skin 数据"）。 */
-            if (!STATE.hasSkin) { STATE.hasSkin = true; STATE.unweighted = 0; }
-            var si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
-            for (var v = 0; v < si.count; v++) {
-              var total = 0;
-              for (var j = 0; j < 4; j++) {
-                var w = sw.getComponent(v, j);
-                total += w;
-                if (w > 0.001) {
-                  var bi = si.getComponent(v, j);
-                  weightCount[bi] = (weightCount[bi] || 0) + 1;
-                }
-              }
-              if (total < 0.02) { STATE.unweighted += 1; }
-            }
-          }
-        }
-        o.frustumCulled = false;
-      }
-      if (o.isBone) {
-        bones[o.name] = o;
-        bones[boneKey(o.name)] = o;
-        if (boneOrder.indexOf(o) < 0) boneOrder.push(o);
-      }
-    });
+ /* 材质：单材质模型默认 envMapIntensity=1，在灰环境里几乎看不出反射 ——
+    提到 0.9 并显式标 needsUpdate，让上面那张环境贴图真的参与到金属件的高光里。 */
+ model.traverse(function (o) {
+   if (!o.isMesh || !o.material) return;
+   var mats = Array.isArray(o.material) ? o.material : [o.material];
+   mats.forEach(function (m) {
+     if ("envMapIntensity" in m) m.envMapIntensity = 0.9;
+     m.needsUpdate = true;
+   });
+ });
 
-    scene.add(model);
-    /* ⚠️ 名字口径（2026-10-19 修）：GLTFLoader 会把节点名 sanitize 成 `mixamorigLeftUpLeg`（**冒号被去掉**），
-       原来这里按 `mixamorig:` 前缀筛，于是一根骨头都筛不到 —— 顶上写着"骨骼 0 根"、骨骼树空、
-       姿态滑杆全废，而模型看着好好的（本仓 P1 那一族的变种：判据盯的名字跟引擎给的名字不是一个）。
-       ⇒ 按 /^mixamorig:?/ 两种写法都认；展示时把前缀剥掉。 */
-    boneList = boneOrder.filter(function (b) {
-      return /^mixamorig:?/.test(String(b.name));
-    }).map(function (b) { return b.name; });
-    STATE.bones = boneList.length;
-    STATE.ok = true;
+ /* AO 遮蔽：Blender 4.2 Cycles 对同一个 glb 烘的一张灰度图（不动 glb，避免往返破坏
+    skinning/动画）。作用：缝隙、褶皱、夹克层叠处暗下去 —— 照片感有很大一部分来自这个，
+    只靠灯光打不出来。
+    注意三个必须：
+       · uv2 要「同步」克隆（几何已就绪，不用等图片）——aoMap 采样的是 uv2，这套 glb 只有 uv；
+       · flipY = false（glTF 的 UV 原点在左上，Three 的 Texture 默认按左下）；
+       · colorSpace = NoColorSpace（AO 是数据不是颜色，按 sRGB 解码会整体偏亮）。 */
+ model.traverse(function (o) {
+   if (!o.isMesh || !o.geometry) return;
+   var g = o.geometry;
+   if (!g.attributes.uv2 && g.attributes.uv) g.setAttribute("uv2", g.attributes.uv);
+ });
 
-    tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · glTF2", true);
-    tag("tagBones", "骨骼：" + STATE.bones + " 根", STATE.bones > 0);
-    var wtText = !STATE.hasSkin ? "权重：无 skin 数据"
-      : ("权重：未绑顶点 " + STATE.unweighted + " / " + STATE.verts);
-    tag("tagWt", wtText, STATE.hasSkin && STATE.unweighted === 0);
+ (function applyAO() {
+   var ao = window.GBT_DH_AO;
+   if (!ao || !ao.dataURI) { tag("tagStage", "引擎：three · glTF2 · AO 未内联（跳过）", false); return; }
+   var img = new Image();
+   img.onload = function () {
+     var tex = new T.Texture(img);
+     tex.flipY = false;
+     if ("colorSpace" in tex) tex.colorSpace = T.NoColorSpace;
+     tex.needsUpdate = true;
+     model.traverse(function (o) {
+       if (!o.isMesh || !o.material) return;
+       var mats = Array.isArray(o.material) ? o.material : [o.material];
+       mats.forEach(function (m) {
+         m.aoMap = tex;
+         m.aoMapIntensity = 0.88;
+         m.needsUpdate = true;
+       });
+     });
+   };
+   img.onerror = function () { tag("tagStage", "引擎：three · AO 贴图解码失败", false); };
+   img.src = ao.dataURI;
+ })();
 
-    drawBones();
-    audit(gltf);
-    /* 把骨架/模型/three 挂到 window 上（只读调试窗）：量"某根骨绕哪个轴转会把肢体甩到哪"
-       必须从外面拿得到这些对象 —— 这一条是 2026-10-21 主人问"绑了骨是不是控制不好肢体方向"
-       时才加的：没有它，写驱动器只能靠猜轴。 */
-    try {
-      window.__GBT_RIG = {
-        T: T, model: model, bones: bones, boneList: boneList,
-        get: function (n) { return bones[n] || bones[boneKey(n)] || null; },
-        mixer: function () { return mixer; },
-        /* 掉帧取证窗（2026-10-21 加）：分辨「每帧真慢」还是「帧循环被冻住」必须能
-           在页内直接量一次 render 的耗时 + 拿到 renderer.info —— 不然只能靠猜。 */
-        renderer: function () { return renderer; },
-        scene: function () { return scene; },
-        camera: function () { return camera; },
-        ctl: function () { return controls; },   /* 取景必须连 controls.target 一起改：
-                                                    只改 camera.position 的话，下一帧
-                                                     controls.update() 会把它拉回去（实测：特写拍成了全身） */
-        probeRender: function (n) {
-          n = Math.max(1, Math.min(30, Number(n) || 1));
-          var t0 = performance.now(), i;
-          for (i = 0; i < n; i++) renderer.render(scene, camera);
-          var t1 = performance.now();
-          var inf = renderer.info || {};
-          return {
-            n: n, msEach: +((t1 - t0) / n).toFixed(2),
-            calls: inf.render ? inf.render.calls : null,
-            tris: inf.render ? inf.render.triangles : null,
-            geo: inf.memory ? inf.memory.geometries : null,
-            tex: inf.memory ? inf.memory.textures : null,
-            progs: inf.programs ? inf.programs.length : null,
-            pr: renderer.getPixelRatio ? renderer.getPixelRatio() : null,
-            size: [renderer.domElement.width, renderer.domElement.height]
-          };
-        }
-      };
-    } catch (e) { /* 挂不上不影响渲染 */ }
+ model.traverse(function (o) {
+ if (o.isMesh) {
+ STATE.meshes += 1;
+ var geo = o.geometry;
+ if (geo && geo.attributes && geo.attributes.position) {
+ STATE.verts += geo.attributes.position.count;
+ if (geo.attributes.skinIndex && geo.attributes.skinWeight) {
+ /* 有蒙皮数据 ⇒ 计数从 0 起（"一个都没发现"不等于"没有这个字段"：
+ 原来只在真发现未绑顶点时才从 null 变数字，于是 0 个未绑顶点被念成"无 skin 数据"）。 */
+ if (!STATE.hasSkin) { STATE.hasSkin = true; STATE.unweighted = 0; }
+ var si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+ for (var v = 0; v< si.count; v++) {
+ var total = 0;
+ for (var j = 0; j< 4; j++) {
+ var w = sw.getComponent(v, j);
+ total += w;
+ if (w> 0.001) {
+ var bi = si.getComponent(v, j);
+ weightCount[bi] = (weightCount[bi] || 0) + 1;
+ }
+ }
+ if (total< 0.02) { STATE.unweighted += 1; }
+ }
+ }
+ }
+ o.frustumCulled = false;
+ }
+ if (o.isBone) {
+ bones[o.name] = o;
+ bones[boneKey(o.name)] = o;
+ if (boneOrder.indexOf(o)< 0) boneOrder.push(o);
+ }
+ });
 
-    if (gltf.animations && gltf.animations.length && T.AnimationMixer) {
-      mixer = new T.AnimationMixer(model);
-      gltf.animations.forEach(function (clip) {
-        var act = mixer.clipAction(clip);
-        CLIPS[String(clip.name).toLowerCase()] = { clip: clip, act: act };
-        /* 🔴 2026-10-21 主人令「把所有绑骨的肢体摆正到正常位置」：
-           这里**不再自动播烘焙 idle** —— 它自带一帧姿态，会把"正常站姿"带歪。
-           于是骨架停在绑骨姿势（T-pose），基线（REST）也从那里抓，再叠 NEUTRAL 放下来。
-           烘焙片段仍可在「更多动作」里手动播（stagePlay 那条路没删）。 */
-      });
-    }
-    /* 动作清单填进主舞台：能播的按钮才解锁，不能播的**当场写明为什么** */
-    try { stageReady(gltf.animations || []); } catch (e) { /* 舞台条不在也不影响绑骨台 */ }
-    /* 程序化驱动器的基线：必须等烘焙片段已生效（否则抓到的是 T-pose 十字架） */
-    try {
-      captureRest();          /* 此刻没有任何 action 在播 ⇒ 抓到的是**绑骨姿势**（不是 idle 帧） */
-      bindJaw();              /* 找 Jaw 骨并记下静止角度（v4 资产才有；没有就静默降级） */
-      /* 🔴 2026-10-21 夜实测（`state/_clip-motion.py`）：**资产自带的烘焙片段不能用** ——
-         `walk` 只驱动小腿（大腿骨位移 0.000，小腿跨 0.51 rad）、画面上两条腿交叉成 X；
-         `idle` 只有颈/头在动（脊柱 0.012 rad、四肢 0.000）。所以默认仍走程序化步态。
-         保留 CLIP_MODE 开关与 setClipMode() 便于以后换了资产再试。 */
-      CLIP_MODE = false;
-      setPreset("idle");      /* 摆 NEUTRAL 标准站姿，呼吸/重心叠在上面 */
-    } catch (e) { /* 抓不到就退回只播片段，画面照常 */ }
-    if (controls) { frameFor(document.body.getAttribute("data-mode")); }
-    armHQ();   /* 载入完成后再开始量帧率（载入期的低帧率不算画质失败） */
-  }
+ scene.add(model);
+ /* 名字口径（2026-10-19 修）：GLTFLoader 会把节点名 sanitize 成 `mixamorigLeftUpLeg`（冒号被去掉），
+ 原来这里按 `mixamorig:` 前缀筛，于是一根骨头都筛不到 —— 顶上写着"骨骼 0 根"、骨骼树空、
+ 姿态滑杆全废，而模型看着好好的（本仓 P1 那一族的变种：判据盯的名字跟引擎给的名字不是一个）。
+ ⇒ 按 /^mixamorig:?/ 两种写法都认；展示时把前缀剥掉。 */
+ boneList = boneOrder.filter(function (b) {
+ return /^mixamorig:?/.test(String(b.name));
+ }).map(function (b) { return b.name; });
+ STATE.bones = boneList.length;
+ STATE.ok = true;
 
-  /* 骨名 → skin.joints 下标（权重按关节下标统计） */
-  function findSkinIndexOf(bone) {
-    var found = -1;
-    if (!model) return found;
-    model.traverse(function (o) {
-      if (o.isSkinnedMesh && o.skeleton && found < 0) {
-        for (var i = 0; i < o.skeleton.bones.length; i++) {
-          if (o.skeleton.bones[i] === bone) { found = i; break; }
-        }
-      }
-    });
-    return found;
-  }
+ tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · glTF2", true);
+ tag("tagBones", "骨骼：" + STATE.bones + " 根", STATE.bones> 0);
+ var wtText = !STATE.hasSkin ? "权重：无 skin 数据"
+ : ("权重：未绑顶点 " + STATE.unweighted + " / " + STATE.verts);
+ tag("tagWt", wtText, STATE.hasSkin && STATE.unweighted === 0);
 
-  function drawBones() {
-    var host = $("bones");
-    host.textContent = "";
-    boneList.forEach(function (name) {
-      var b = bones[name];
-      var idx = b ? findSkinIndexOf(b) : -1;
-      var n = idx >= 0 ? (weightCount[idx] || 0) : 0;
-      var lab = boneLabel(name);                 /* 骨位标签表：中文名 + 管什么 */
-      var row = document.createElement("div");
-      row.className = "bone";
-      row.setAttribute("data-bone", name);
-      row.title = lab ? (lab.cn + " · " + lab.what) : name;
-      row.innerHTML = '<span class="dot"></span><span>' +
-                      (lab ? lab.cn : String(name).replace(/^mixamorig:?/, "")) +
-                      '</span><span class="wt">' + (n ? n + " 顶点" : "—") + "</span>";
-      row.addEventListener("click", function () { selectBone(name); });
-      host.appendChild(row);
-    });
-  }
+ drawBones();
+ audit(gltf);
 
-  function selectBone(name) {
-    STATE.selected = name;
-    var rows = document.querySelectorAll(".bone");
-    for (var i = 0; i < rows.length; i++) {
-      rows[i].setAttribute("data-sel", rows[i].getAttribute("data-bone") === name ? "1" : "0");
-    }
-    var b = bones[name];
-    if (!b) return;
-    $("rx").value = Math.round(T.MathUtils.radToDeg(b.rotation.x));
-    $("ry").value = Math.round(T.MathUtils.radToDeg(b.rotation.y));
-    $("rz").value = Math.round(T.MathUtils.radToDeg(b.rotation.z));
-    syncOut();
-    /* 右侧「这根骨管什么」：直接念标签表，不在页面里另写一句话 */
-    var lab = boneLabel(name);
-    var info = $("boneInfo");
-    if (info) {
-      if (!lab) {
-        info.textContent = "标签表里没有这根骨（跑 tools/codex-scripts/dh-bone-map.py 重生成）";
-      } else {
-        var lines = ["<b>" + lab.cn + "</b> · " + lab.seg + " · " + lab.kind,
-                     "管什么：" + lab.what,
-                     "主轴实测：" + lab.main_phrase];
-        var keys = Object.keys(lab.drive || {});
-        if (keys.length) {
-          lines.push("可用动作（轴与符号都是实测）：");
-          keys.forEach(function (k) {
-            var d = lab.drive[k];
-            lines.push("　· " + k + " → " + d.axis.toUpperCase() + " × " + (d.sign > 0 ? "+" : "−") +
-                       " · " + d.dir_cn + " · 位移 " + d.amount + "m" + (d.weak ? "（弱）" : ""));
-          });
-        } else {
-          lines.push("（这根骨不驱动：末端/手指，或表里没给它动作键）");
-        }
-        info.innerHTML = lines.join("<br />");
-      }
-    }
-    $("footMsg").textContent = "已选：" + (lab ? lab.cn : name) + "（拖滑块 = 真改这根骨的旋转）";
-  }
+ if (gltf.animations && gltf.animations.length && T.AnimationMixer) {
+ mixer = new T.AnimationMixer(model);
+ gltf.animations.forEach(function (clip) {
+ if (/idle/i.test(clip.name)) { mixer.clipAction(clip).play(); }
+ });
+ }
+ if (controls) { controls.target.set(0, 0.95, 0); controls.update(); }
+ }
 
-  function syncOut() {
-    $("ox").textContent = $("rx").value;
-    $("oy").textContent = $("ry").value;
-    $("oz").textContent = $("rz").value;
-  }
+ /* 骨名 → skin.joints 下标（权重按关节下标统计） */
+ function findSkinIndexOf(bone) {
+ var found = -1;
+ if (!model) return found;
+ model.traverse(function (o) {
+ if (o.isSkinnedMesh && o.skeleton && found< 0) {
+ for (var i = 0; i< o.skeleton.bones.length; i++) {
+ if (o.skeleton.bones[i] === bone) { found = i; break; }
+ }
+ }
+ });
+ return found;
+ }
 
-  function applyPose() {
-    var name = STATE.selected; if (!name) return;
-    var b = bones[name]; if (!b) return;
-    b.rotation.x = T.MathUtils.degToRad(Number($("rx").value));
-    b.rotation.y = T.MathUtils.degToRad(Number($("ry").value));
-    b.rotation.z = T.MathUtils.degToRad(Number($("rz").value));
-  }
-  ["rx", "ry", "rz"].forEach(function (id) {
-    $(id).addEventListener("input", function () { syncOut(); applyPose(); });
-  });
+ function drawBones() {
+ var host = $("bones");
+ host.textContent = "";
+ boneList.forEach(function (name) {
+ var b = bones[name];
+ var idx = b ? findSkinIndexOf(b) : -1;
+ var n = idx>= 0 ? (weightCount[idx] || 0) : 0;
+ var row = document.createElement("div");
+ row.className = "bone";
+ row.setAttribute("data-bone", name);
+ row.innerHTML = '<span class="dot"></span><span>' + String(name).replace(/^mixamorig:?/, "") +
+ '</span><span class="wt">' + (n ? n + " 顶点" : "—") + "</span>";
+ row.addEventListener("click", function () { selectBone(name); });
+ host.appendChild(row);
+ });
+ }
 
-  function audit(gltf) {
-    var lines = [];
-    lines.push("网格 <b>" + STATE.meshes + "</b> · 顶点 <b>" + STATE.verts + "</b>");
-    lines.push("骨骼 <b>" + STATE.bones + "</b> · 动作 " + ((gltf.animations || []).length
-      ? gltf.animations.map(function (c) { return c.name + "(" + c.duration.toFixed(2) + "s)"; }).join(" / ")
-      : "无"));
-    var box = new T.Box3().setFromObject(model), s = new T.Vector3(); box.getSize(s);
-    lines.push("绑定姿势包围盒 高 <b>" + s.y.toFixed(2) + "m</b> · 宽 " + s.x.toFixed(2) + " · 厚 " + s.z.toFixed(2)
-               + "（量的是 T-pose：臂展张开时宽 1.67，不是她站着时的宽）");
-    lines.push("口型骨 <b>" + (jawBone || /Jaw/i.test(boneList.join(","))
-      ? ("有（" + (jawBone ? jawBone.name : "Jaw") + " · 191 个嘴部顶点加权 · 音素驱动 16°）")
-      : "无（本资产无 jaw / 无形态键）") + "</b>");
-    lines.push("真绑到的关节 <b>" + Object.keys(weightCount).length + "</b> / " + STATE.bones);
-    if (STATE.hasSkin) {
-      lines.push("未绑顶点 <b>" + STATE.unweighted + "</b>（占 " +
-        (100 * STATE.unweighted / Math.max(1, STATE.verts)).toFixed(1) + "%）");
-    } else {
-      lines.push("未绑顶点：<b>无 skin 数据</b>（不是 0 —— 是没这个字段）");
-    }
-    /* 来源必须指到**真读的那一份**，并且**自证**：把真被解析的字节的 sha16/字节数/取法打在页上。
-       这样别人看到"骨骼 0 根"时，一眼能判出：是资产不对（sha16 不等于在役件）、还是窗口过期。 */
-    /* 🔴 2026-10-21 夜：这行原来是**写死** ASSET 文件名的 —— 一旦走到内联兜底（file:// 下 fetch 被拦、
-       或资产坏了），页面会一边显示"来源 dh-v7-detail.glb"、一边真的在用 **v2-rigged 内联副本**
-       （实测：sha16 96114e1cc8b85e99 / 6,418,764 字节 = 65 骨、无下颌）。那是我自己造的假账。
-       现在按"到底经了哪条路"如实写，兜底就明说是兜底。 */
-    var assetName = String(ASSET).split("/").pop();
-    var viaInline = /inline/i.test(String(LOADED.via || ""));
-    lines.push((viaInline ? "来源 <b style='color:#ff9a9a'>内联兜底副本</b>（不是 " + assetName + "）"
-                          : "来源 <b>holo_pet_w3/voice-theater/assets/" + assetName + "</b>（v7 = v4 重绑下颌 + 彩度 ×1.75 + 粗糙度抬升 + 皮肤毛孔级细节）")
-               + (LOADED.via ? " · 经 <b>" + LOADED.via + "</b>" : "")
-               + (LOADED.bytes ? " · " + LOADED.bytes + " 字节" : "")
-               + (LOADED.sha16 ? " · sha16 <b>" + LOADED.sha16 + "</b>" : " · sha16 未取到（浏览器没给 subtle）"));
-    if (LOADED.sha16 && LOADED.sha16 !== WANT_SHA16) {
-      lines.push("🔴 <b>载入的不是在役件</b>（在役 " + WANT_SHA16 + "）—— 这一页的全部读数不作数，先查资产再谈绑骨");
-    }
-    var B = window.GBT_RIG_AUDIT;
-    if (B && B.ok) {
-      lines.push(""); lines.push("<b>Blender 量具（--background，只读）</b>");
-      lines.push("骨架 " + B.armatures + " · 骨骼 " + B.bones + " · 根骨 " + (B.roots || []).join(",") + " · 最大层级 " + B.max_depth);
-      lines.push("未绑顶点 <b>" + B.unweighted + "（" + B.unweighted_pct + "%）</b> · 非归一化 " + B.non_normalized + " · 真绑组 " + B.bound_groups);
-      lines.push("镜像 <b>" + B.mirror_ok + "/" + B.mirror_pairs + "</b> 对 · 零长骨 " + ((B.zero_len || []).length || "无"));
-      lines.push("高 <b>" + B.height_m + "m</b> · 未应用缩放 " + ((B.unapplied_scale || []).length || "无"));
-      lines.push("量于 " + String(B.at || "?").replace("T", " ").slice(0, 19));
-    } else if (B && B.ok === false) {
-      lines.push(""); lines.push("<b>Blender 量具</b>：🔴 " + String(B.why || "未读到最后一次审计"));
-    }
-    $("audit").textContent = "";
-    $("audit").appendChild(document.createTextNode(""));
-    $("audit").innerHTML = lines.join("<br />");
-  }
+ function selectBone(name) {
+ STATE.selected = name;
+ var rows = document.querySelectorAll(".bone");
+ for (var i = 0; i< rows.length; i++) {
+ rows[i].setAttribute("data-sel", rows[i].getAttribute("data-bone") === name ? "1" : "0");
+ }
+ var b = bones[name];
+ if (!b) return;
+ $("rx").value = Math.round(T.MathUtils.radToDeg(b.rotation.x));
+ $("ry").value = Math.round(T.MathUtils.radToDeg(b.rotation.y));
+ $("rz").value = Math.round(T.MathUtils.radToDeg(b.rotation.z));
+ syncOut();
+ $("footMsg").textContent = "已选：" + name + "（拖滑块 = 真改这根骨的旋转）";
+ }
 
-  $("btnMode").addEventListener("click", function () {
-    var on = document.body.getAttribute("data-mode") === "stage";
-    document.body.setAttribute("data-mode", on ? "tool" : "stage");
-    this.setAttribute("data-on", on ? "1" : "0");
-    this.title = on ? "收起左右两块，回到「只看她」" : "展开左右两块工具面板（骨骼树 · 姿态台）";
-    /* 画布尺寸跟着列宽变：不调 resize() 会拉成旧比例（实测过：变宽了人还是瘦的） */
-    var mode = document.body.getAttribute("data-mode");
-    setTimeout(function () {
-      try { resize(); } catch (e) {}
-      try { frameFor(mode); } catch (e) {}   /* 机位跟着模式走：stage 近（全身占满）/ tool 远（看得全） */
-    }, 60);
-  });
+ function syncOut() {
+ $("ox").textContent = $("rx").value;
+ $("oy").textContent = $("ry").value;
+ $("oz").textContent = $("rz").value;
+ }
 
-  $("btnWire").addEventListener("click", function () {
-    wireOn = !wireOn;
-    if (wireOn && !skeletonHelper && T.SkeletonHelper && model) {
-      skeletonHelper = new T.SkeletonHelper(model); scene.add(skeletonHelper);
-    }
-    if (skeletonHelper) skeletonHelper.visible = wireOn;
-    /* 不糊弄：没有骨架就别写"已显示真骨骼"——那一刻最该说的是"先查载入件"。 */
-    $("footMsg").textContent = wireOn
-      ? (boneList.length ? "骨架已显示（SkeletonHelper · " + boneList.length + " 根真骨）"
-                         : "🔴 没有骨架可显示：先查右侧「来源」的 sha16 是不是在役件")
-      : "骨架已隐藏";
-  });
+ function applyPose() {
+ var name = STATE.selected; if (!name) return;
+ var b = bones[name]; if (!b) return;
+ b.rotation.x = T.MathUtils.degToRad(Number($("rx").value));
+ b.rotation.y = T.MathUtils.degToRad(Number($("ry").value));
+ b.rotation.z = T.MathUtils.degToRad(Number($("rz").value));
+ }
+ ["rx", "ry", "rz"].forEach(function (id) {
+ $(id).addEventListener("input", function () { syncOut(); applyPose(); });
+ });
 
-  $("btnReset").addEventListener("click", function () {
-    ["rx", "ry", "rz"].forEach(function (id) { $(id).value = 0; });
-    syncOut(); applyPose();
-    $("footMsg").textContent = "已把选中的骨复位到 0°";
-  });
+ function audit(gltf) {
+ var lines = [];
+ lines.push("网格<b>" + STATE.meshes + "</b> · 顶点<b>" + STATE.verts + "</b>");
+ lines.push("骨骼<b>" + STATE.bones + "</b> · 动作 " + ((gltf.animations || []).length
+ ? gltf.animations.map(function (c) { return c.name + "(" + c.duration.toFixed(2) + "s)"; }).join(" / ")
+ : "无"));
+ var box = new T.Box3().setFromObject(model), s = new T.Vector3(); box.getSize(s);
+ lines.push("绑定姿势包围盒 高<b>" + s.y.toFixed(2) + "m</b> · 宽 " + s.x.toFixed(2) + " · 厚 " + s.z.toFixed(2)
+ + "（量的是 T-pose：臂展张开时宽 1.67，不是她站着时的宽）");
+ lines.push("口型骨<b>" + (/Jaw/i.test(boneList.join(",")) ? "有" : "无（本资产无 jaw / 无形态键）") + "</b>");
+ lines.push("真绑到的关节<b>" + Object.keys(weightCount).length + "</b> / " + STATE.bones);
+ if (STATE.hasSkin) {
+ lines.push("未绑顶点<b>" + STATE.unweighted + "</b>（占 " +
+ (100 * STATE.unweighted / Math.max(1, STATE.verts)).toFixed(1) + "%）");
+ } else {
+ lines.push("未绑顶点：<b>无 skin 数据</b>（不是 0 —— 是没这个字段）");
+ }
+ /* 来源必须指到真读的那一份，并且自证：把真被解析的字节的 sha16/字节数/取法打在页上。
+ 这样别人看到"骨骼 0 根"时，一眼能判出：是资产不对（sha16 不等于在役件）、还是窗口过期。 */
+ lines.push("来源<b>holo_pet_w3/voice-theater/assets/dh-v2-rigged.glb</b>"
+ + (LOADED.via ? " · 经<b>" + LOADED.via + "</b>" : "")
+ + (LOADED.bytes ? " · " + LOADED.bytes + " 字节" : "")
+ + (LOADED.sha16 ? " · sha16<b>" + LOADED.sha16 + "</b>" : " · sha16 未取到（浏览器没给 subtle）"));
+ if (LOADED.sha16 && LOADED.sha16 !== WANT_SHA16) {
+ /* 2026-10-26：去掉 记号（审美守卫判 emoji 当 UI）—— 状态用词 +<b> 表达。 */
+ lines.push("<b>载入的不是在役件</b>（在役 " + WANT_SHA16 + "）—— 这一页的全部读数不作数，先查资产再谈绑骨");
+ }
+ var B = window.GBT_RIG_AUDIT;
+ if (B && B.ok) {
+ lines.push(""); lines.push("<b>Blender 量具（--background，只读）</b>");
+ lines.push("骨架 " + B.armatures + " · 骨骼 " + B.bones + " · 根骨 " + (B.roots || []).join(",") + " · 最大层级 " + B.max_depth);
+ lines.push("未绑顶点<b>" + B.unweighted + "（" + B.unweighted_pct + "%）</b> · 非归一化 " + B.non_normalized + " · 真绑组 " + B.bound_groups);
+ lines.push("镜像<b>" + B.mirror_ok + "/" + B.mirror_pairs + "</b> 对 · 零长骨 " + ((B.zero_len || []).length || "无"));
+ lines.push("高<b>" + B.height_m + "m</b> · 未应用缩放 " + ((B.unapplied_scale || []).length || "无"));
+ lines.push("量于 " + String(B.at || "?").replace("T", " ").slice(0, 19));
+ } else if (B && B.ok === false) {
+ lines.push(""); lines.push("<b>Blender 量具</b>：<b>未通过</b> —— " + String(B.why || "未读到最后一次审计"));
+ }
+ $("audit").textContent = "";
+ $("audit").appendChild(document.createTextNode(""));
+ $("audit").innerHTML = lines.join("<br />");
+ }
 
-  $("btnPose").addEventListener("click", function () {
-    var pose = {};
-    boneList.forEach(function (n) {
-      var b = bones[n]; if (!b) return;
-      pose[n] = [+b.rotation.x.toFixed(4), +b.rotation.y.toFixed(4), +b.rotation.z.toFixed(4)];
-    });
-    $("poseOut").value = JSON.stringify({ at: new Date().toISOString(), bones: pose }, null, 1);
-    $("footMsg").textContent = "姿态 JSON 已生成（" + boneList.length + " 根骨）· 复制走即可";
-  });
+ $("btnWire").addEventListener("click", function () {
+ wireOn = !wireOn;
+ if (wireOn && !skeletonHelper && T.SkeletonHelper && model) {
+ skeletonHelper = new T.SkeletonHelper(model); scene.add(skeletonHelper);
+ }
+ if (skeletonHelper) skeletonHelper.visible = wireOn;
+ /* 不糊弄：没有骨架就别写"已显示真骨骼"——那一刻最该说的是"先查载入件"。 */
+ $("footMsg").textContent = wireOn
+ ? (boneList.length ? "骨架已显示（SkeletonHelper · " + boneList.length + " 根真骨）"
+ : "没有骨架可显示：先查右侧「来源」的 sha16 是不是在役件")
+ : "骨架已隐藏";
+ });
 
-  /* ══ 主舞台（2026-10-21）═════════════════════════════════════════════════
-     主人的四条线里，这一页只管两条半：
-       动作自然 → 播 GLB 自带 idle / walk（真动作，不是 CSS 摆样子）
-       语音     → 播她那句真声音（仓内 wav；**不用 zh-CN SAPI**，仓规写死）
-       嘴对齐   → **做不到就写做不到**：本资产 65 骨里没有 jaw、网格没有形态键（体检那行照实写），
-                  所以实时口型没法做。真嘴对齐只存在于**出片路线**（SadTalker 成片）。
-     口径：按钮按不动时**必须有原因**（`title` + 提示条），不许装成能按。 */
-  var CLIPS = {}, CUR = null, talkingAudio = null, subTimer = null;
+ $("btnReset").addEventListener("click", function () {
+ ["rx", "ry", "rz"].forEach(function (id) { $(id).value = 0; });
+ syncOut(); applyPose();
+ $("footMsg").textContent = "已把选中的骨复位到 0°";
+ });
 
-  function clipBy(re) {
-    var ks = Object.keys(CLIPS);
-    for (var i = 0; i < ks.length; i++) if (re.test(ks[i])) return CLIPS[ks[i]];
-    return null;
-  }
-  function hint(t) { var el = $("stageHint"); if (el) el.innerHTML = t; }
-  function sub(text) {
-    var el = $("subtitle"); if (!el) return;
-    if (subTimer) { clearTimeout(subTimer); subTimer = null; }
-    if (!text) { el.className = "subtitle"; el.textContent = ""; return; }
-    el.textContent = text; el.className = "subtitle on";
-  }
-  function switchTo(entry, loop) {
-    if (!entry || !mixer) return false;
-    if (CUR && CUR !== entry) { try { CUR.act.fadeOut(0.25); } catch (e) {} }
-    try {
-      entry.act.reset();
-      entry.act.setLoop(loop ? T.LoopRepeat : T.LoopOnce, loop ? Infinity : 1);
-      entry.act.clampWhenFinished = !loop;
-      entry.act.fadeIn(0.25).play();
-    } catch (e) { return false; }
-    CUR = entry;
-    return true;
-  }
-  var stagePlay = function (re, label) {
-    var hit = clipBy(re);
-    var idle = clipBy(/idle/);
-    if (!mixer) return false;
-    if (!hit) {
-      if (idle) switchTo(idle, true);
-      hint(label + "：本资产没有这个动作（实际只有 " + (Object.keys(CLIPS).join(" / ") || "无") + "）");
-      return false;
-    }
-    switchTo(hit, /idle/i.test(Object.keys(CLIPS).filter(function (k) { return CLIPS[k] === hit; })[0] || ""));
-    if (!/idle/i.test(label)) {
-      /* 一次性动作跑完自动回 idle：时长取真 clip.duration，不拍脑袋 */
-      setTimeout(function () { var i2 = clipBy(/idle/); if (i2) switchTo(i2, true); }, Math.max(300, hit.clip.duration * 1000));
-    }
-    return true;
-  };
-  /* ══ 口型（2026-10-21 · 主人第②条：真·嘴对齐要 jaw 骨）════════════════════
-     jaw 骨是 Blender 4.2 里加进 GLB 的（tools/digihuman/dh-add-jaw.py，151 个嘴部顶点带权重）。
-     这里把它接到**真播出来的声音**上：WebAudio 取样 → 振幅 → 下颌张角。
-     轴与符号是**量出来的**（state/_jaw-axis.py）：绕本地 Y 负向转，下巴往下 ≈2cm/0.35rad。
-     取不到分析器就退回正弦假口型，并在页面上**标明是假口型**（不许装成对齐）。 */
-  var jawBone = null, jawRest = null, audioCtx = null, analyser = null, audioBuf = null;
-  function bindJaw() {
-    jawBone = B("Jaw");
-    if (jawBone) jawRest = { x: jawBone.rotation.x, y: jawBone.rotation.y, z: jawBone.rotation.z };
-    return !!jawBone;
-  }
-  function hookAnalyser(el) {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      /* Chromium 新建的 AudioContext 常常是 suspended：不 resume 就永远是 0 字节频谱
-         （实测：口型判据只采到 sil，volume=null）。resume 失败也不挡播放。 */
-      try { if (audioCtx.state === "suspended") audioCtx.resume(); } catch (e) { }
-      if (!analyser) {
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.5;
-        audioBuf = new Uint8Array(analyser.fftSize);
-      }
-      var src = audioCtx.createMediaElementSource(el);
-      src.connect(analyser);
-      analyser.connect(audioCtx.destination);   /* 还要能听见，所以接到扬声器 */
-      /* 2026-10-21 夜：把同一条分析链接给吸收进来的 viseme 判定（dh-lipsync.js，MIT） */
-      try {
-        if (!LS && window.GBT_LIPSYNC) LS = window.GBT_LIPSYNC.create({ fftSize: 2048, historySize: 10 });
-        if (LS) LS.attachAnalyser(analyser, audioCtx.sampleRate);
-      } catch (e) { LS = null; }
-      return true;
-    } catch (e) { return false; }
-  }
-  /* ══ 口型：**音素驱动**（2026-10-21 夜 · 吸收 wawa-lipsync，MIT）══════════════
-     旧法 = RMS → 下颌角度：任何音都张一样大，是"假对齐"。
-     新法 = 15 个 viseme（Oculus LipSync 那套集合）→ 每个音素一个张口量，再做攻/放平滑。
-     单元音/双元音才大张，爆破/摩擦只微开 —— 嘴型才跟着字走。
-     幅度表是**按这套资产定的**（下颌只有 16° 上限、没有唇缝），不是理论值。 */
-  var LS = null, lsLevel = 0, lsViseme = "viseme_sil";
-  var VISEME_OPEN = {
-    viseme_aa: 1.00, viseme_O: 0.95, viseme_E: 0.70, viseme_I: 0.45, viseme_U: 0.30,
-    viseme_RR: 0.34, viseme_nn: 0.22, viseme_DD: 0.22, viseme_kk: 0.20,
-    viseme_CH: 0.14, viseme_SS: 0.12, viseme_FF: 0.10, viseme_TH: 0.10,
-    viseme_PP: 0.05, viseme_sil: 0.0
-  };
-  function jawLevel() {
-    var playing = talkingAudio && !talkingAudio.paused;
-    if (!playing) { lsLevel = 0; lsViseme = "viseme_sil"; return 0; }
-    if (LS && analyser) {
-      try {
-        LS.process();
-        var inf = LS.info();
-        lsViseme = inf.viseme;
-        var target = VISEME_OPEN[lsViseme];
-        if (target === undefined) target = 0.3;
-        /* 攻 0.10s / 放 0.16s：起音快（不然字头糊）、收音慢（不然像在弹舌） */
-        var dt = 1 / 60;
-        var k = target > lsLevel ? 1 - Math.exp(-dt / 0.10) : 1 - Math.exp(-dt / 0.16);
-        lsLevel += (target - lsLevel) * k;
-        return Math.min(1, lsLevel);
-      } catch (e) { /* 掉到 RMS 兜底 */ }
-    }
-    if (analyser && audioBuf) {
-      analyser.getByteTimeDomainData(audioBuf);
-      var s = 0;
-      for (var i = 0; i < audioBuf.length; i++) { var d = (audioBuf[i] - 128) / 128; s += d * d; }
-      var rms = Math.sqrt(s / audioBuf.length);
-      return Math.min(1, rms * 3.2);            /* ×3.2：正常说话 RMS ≈0.08–0.25 ⇒ 张角够看 */
-    }
-    return 0;
-  }
-  var JAW_AXIS = "y", JAW_SIGN = -1, JAW_MAX = 0.28;   /* 量出来的：绕 Y 负向张嘴。       上限 0.28 rad(16°) 是**按外观定的**，不是按骨骼能转多少定的：这个头是"闭着嘴的单张网格"，
-       没有口内壁也没有唇缝，转大了下巴会从腮帮子上撕下来（24° 时实测把眼睛都挤闭了）。
-       16° + 平滑权重是这套资产上"看着像在说话"的上限；要更大的口型得走形态键/唇缝，不是调这个数。 */
-  var jawHoldUntil = 0;   /* 取证用：按住这段时间内的嘴型（否则一秒 60+ 帧会用 jawLevel()=0 把它抹掉） */
-  function applyJaw(level) {
-    if (!jawBone || !jawRest) return;
-    var v = jawRest[JAW_AXIS] + JAW_SIGN * (JAW_MAX * Math.max(0, Math.min(1, level)));
-    jawBone.rotation[JAW_AXIS] = v;
-  }
-  /* 🔴 2026-10-28 打磨：说话走**真 TTS**（桥的 /voice/speak → edge-tts 曉臻台湾腔）。
-     原来的实现只播一个烘焙 wav（而且是固定台词、连文件都不在仓库里），
-     等于"点了没反应还说在播"。现在：
-       ① 读输入框（留空用她的自我介绍）
-       ② POST 桥 /voice/speak → 得到可被 :8080 服务的 url
-       ③ new Audio(url) + 挂 WebAudio 分析器 → 真口型
-       ④ 桥不可用才退回老 wav，且如实说"走的是烘焙件"
-  */
-  function stageSay() {
-    var el = $("sayText");
-    var text = (el && el.value ? el.value : "").trim() ||
-               "我是 GBT小土豆V8，开发者自由的风，守护者公主土豆。";
-    if (talkingAudio) { try { talkingAudio.pause(); } catch (e) {} talkingAudio = null; }
-    sub("正在合成她的台湾腔…");
-    var BR = (location.protocol === "file:") ? "http://127.0.0.1:8791" : "http://127.0.0.1:8791";
-    fetch(BR + "/voice/speak", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: text.slice(0, 300) })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.ok && j.url) {
-        sub("她说：" + text.slice(0, 40) + (text.length > 40 ? "…" : ""));
-        playSay(j.url);
-      } else {
-        sub("合成失败：" + String((j && (j.error || j.message)) || "桥没给 url").slice(0, 60));
-      }
-    }).catch(function (e) {
-      sub("桥不可用（" + String(e).slice(0, 40) + "），退回烘焙件");
-      playSay("welcome-gbt-v8-zh.wav");
-    });
-  }
+ $("btnPose").addEventListener("click", function () {
+ var pose = {};
+ boneList.forEach(function (n) {
+ var b = bones[n]; if (!b) return;
+ pose[n] = [+b.rotation.x.toFixed(4), +b.rotation.y.toFixed(4), +b.rotation.z.toFixed(4)];
+ });
+ $("poseOut").value = JSON.stringify({ at: new Date().toISOString(), bones: pose }, null, 1);
+ $("footMsg").textContent = "姿态 JSON 已生成（" + boneList.length + " 根骨）· 复制走即可";
+ });
 
-  function playSay(src) {
-    try {
-      talkingAudio = new Audio(src);
-      var hooked = hookAnalyser(talkingAudio);
-      talkingAudio.onended = function () {
-        sub("");
-        applyJaw(0);                                   /* 说完把嘴闭上 */
-        var i = clipBy(/idle/); if (i) switchTo(i, true);
-      };
-      var pr = talkingAudio.play();
-      if (pr && pr.catch) pr.catch(function (err) {
-        sub("声音没播出来：" + String(err).slice(0, 70));           /* 不假装说过了 */
-      });
-      if (!hooked) sub("正在播（WebAudio 分析器挂不上 ⇒ 口型退回正弦，不是真对齐）");
-    } catch (e) { sub("声音没播出来：" + String(e).slice(0, 70)); }
-    stagePlay(/idle/, "说话");
-  }
-  /* 🔴 2026-10-28：让她**自己答**，不只是念稿。
-     链路：输入框 → 桥 /v1/chat/completions（桥内 A19 优先，走 selfhost）
-           → 拿到回答 → /voice/speak 合成台湾腔 → 播放 + 口型
-     回包里带 gbt.lane / weights_ours，界面如实标「自有权重 / 非自有权重」。
-  */
-  function askBrain() {
-    var el = $("sayText");
-    var q = (el && el.value ? el.value : "").trim();
-    if (!q) { sub("先写一句要问她的"); return; }
-    var BR = "http://127.0.0.1:8791";
-    sub("她在想…（" + q.slice(0, 30) + "）");
-    fetch(BR + "/v1/chat/completions", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        // 🔴 2026-10-28：**必须带人设**。实测不带时，一旦降级到别家模型，
-        //   她会自报「我是 DeepSeek」——那是车道，不是她。
-        //   人设只约束"怎么说话"，不改变车道事实：
-        //   回包里的 gbt.lane / weights_ours 照旧如实带，降级就是降级，可审计。
-        // 🔴 2026-10-28：数字人这条链原来不带 context_name ⇒ 落到桥的默认会话，
-        //   和网页对话共用一套上下文。她俩该各是各的环（会话隔离）。
-        context_name: "digital-human",
-        context_budget: 4000,
-        messages: [
-          { role: "system", content:
-            "你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。" +
-            "本署名不可删除、不可篡改归属。" +
-            "用简洁的中文回答，像跟主人当面说话；不要提你是哪个公司的模型，" +
-            "不要自我介绍成别的名字。不确定的事就说不知道，不要编。" +
-            "【现在是 " + new Date().toLocaleString("zh-CN") +
-            "，涉及今天/现在的问题以它为准，不要凭记忆猜日期。】" },
-          { role: "user", content: q }
-        ], max_tokens: 200 })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      var g = j.gbt || {};
-      var ans = (((j.choices || [{}])[0] || {}).message || {}).content || "";
-      if (!ans) { sub("她没答上来：" + String(j.error || "空回包").slice(0, 50)); return; }
-      var laneTxt = (g.weights_ours ? "自有权重" : "非自有权重") +
-                    (g.lane ? " · 实走 " + g.lane : "");
-      sub("她（" + laneTxt + "）：" + ans.slice(0, 50));
-      stageSayText(ans);
-    }).catch(function (e) { sub("桥不可用：" + String(e).slice(0, 50)); });
-  }
+ function resize() {
+ var w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+ renderer.setSize(w, h, false);
+ camera.aspect = w / h; camera.updateProjectionMatrix();
+ }
+ window.addEventListener("resize", resize);
 
-  /* 念指定文本（复用同一条 TTS 通道） */
-  function stageSayText(text) {
-    if (talkingAudio) { try { talkingAudio.pause(); } catch (e) {} talkingAudio = null; }
-    fetch("http://127.0.0.1:8791/voice/speak", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: String(text).slice(0, 300) })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.ok && j.url) { playSay(j.url); }
-      else { sub("合成失败：" + String((j && (j.error || j.message)) || "无 url").slice(0, 50)); }
-    }).catch(function (e) { sub("合成不可用：" + String(e).slice(0, 40)); });
-  }
+ function tick() {
+ if (mixer) mixer.update(0.016);
+ if (controls) controls.update();
+ renderer.render(scene, camera);
+ requestAnimationFrame(tick);
+ }
 
-  function stageReady(anims) {
-    var names = (anims || []).map(function (c) { return c.name + "(" + c.duration.toFixed(2) + "s)"; });
-    ["btnSay", "btnAsk", "btnWave", "btnWalk", "btnIdle"].forEach(function (id) { var b = $(id); if (b) { b.disabled = false; b.title = ""; } });
-    if (!clipBy(/walk/)) { var w = $("btnWalk"); if (w) { w.disabled = true; w.title = "本资产没有 walk 动作"; } }
-    if (!clipBy(/idle/)) {
-      var i = $("btnIdle"); if (i) { i.disabled = true; i.title = "本资产没有 idle 动作"; }
-      var s = $("btnSay"); if (s) { s.title = "可以说（声音照播），但没有 idle 动作可配合"; }
-    }
-    hint("动作：" + (names.join(" · ") || "无") +
-         " · 口型：" + (B("Jaw")
-           ? "<b>有 jaw 骨</b>（Blender 加的）· 说话时按声音振幅驱动（真口型，不是假动画）"
-           : "本资产无 jaw / 无形态键（<b>实时口型做不到</b>，真嘴对齐走视频出片）"));
-  }
-  $("btnSay").addEventListener("click", stageSay);
-  var _ba = $("btnAsk"); if (_ba) _ba.addEventListener("click", askBrain);
-  $("btnWalk").addEventListener("click", function () {
-    /* 优先走**程序化步态**（我按量出来的轴驱动腿与手臂）；没有骨架才退回烘焙片段。 */
-    if (B("LeftUpLeg") && B("RightUpLeg")) { setPreset("walk"); return; }
-    stagePlay(/walk/, "走两步");
-  });
-  $("btnIdle").addEventListener("click", function () {
-    if (B("Spine1")) { setPreset("idle"); return; }
-    stagePlay(/idle/, "站好");
-  });
-  $("btnWave").addEventListener("click", function () {
-    if (B("RightArm") && B("RightForeArm")) { setPreset("wave"); return; }
-    hint("挥手：没有右臂骨可驱动（B(RightArm) 取不到）");
-  });
-  /* 镜头三档（2026-10-21 夜加）：把"为什么脸上看不清"变成能自己切的档位。
-     画布高 630px ⇒ 全身（1.72m）时她的头只有 ≈70px，那是**像素不够**，不是贴图糊；
-     想看清脸就切到半身/特写。三档只改装框参数，不改任何模型/贴图。 */
-  var ZOOM_STEPS = [
-    { name: "全身", y: 0.88, halfH: 0.86, halfW: 0.42, yaw: 22, pitch: 4 },
-    { name: "半身", y: 1.16, halfH: 0.50, halfW: 0.34, yaw: 18, pitch: 3 },
-    { name: "特写", y: 1.50, halfH: 0.20, halfW: 0.20, yaw: 10, pitch: 1 }
-  ];
-  var zoomIdx = 0;
-  function applyZoom(idx) {
-    var z = ZOOM_STEPS[((idx % ZOOM_STEPS.length) + ZOOM_STEPS.length) % ZOOM_STEPS.length];
-    zoomIdx = ZOOM_STEPS.indexOf(z);
-    FRAME.y = z.y; FRAME.halfH = z.halfH; FRAME.halfW = z.halfW;
-    FRAME.yawDeg = z.yaw; FRAME.pitchDeg = z.pitch;
-    fitFrame();
-    var b = $("btnZoom");
-    if (b) { b.textContent = "镜头·" + z.name; b.title = "当前：" + z.name + "（画布高 " + (canvas.clientHeight || 0) + "px）"; }
-    return z.name;
-  }
-  if ($("btnZoom")) $("btnZoom").addEventListener("click", function () { applyZoom(zoomIdx + 1); });
-  window.__GBT_ZOOM = function (i) { return applyZoom(typeof i === "number" ? i : zoomIdx + 1); };
+ var loader = new T.GLTFLoader();
+ var ASSET = "../voice-theater/assets/dh-v2-rigged.glb";
+ var WANT_SHA16 = "96114e1cc8b85e99"; /* 在役件指纹（= outputs/rig-fix/fixed-animfix.glb） */
+ var LOADED = { via: "", bytes: 0, sha16: "" };
 
-  /* ══ 程序化骨骼驱动器（2026-10-21）══════════════════════════════════════════
-     主人问：「都绑了骨你是没有方向控制不好肢体动作吗？」
-     —— 骨是绑好的，问题在**没人按方向去驱动它**：之前只播 GLB 里烘焙的 idle/walk 片段。
-     现在就由代码逐帧给骨**显式角度**。
+ /* 自证：本页显示的一切读数，必须能指回真被解析的那份字节。
+ 所以先把字节拿全（fetch → 退回 .b64.js），量它的 sha16/字节数，再交给 GLTFLoader。
+ 原来直接把 URL 丢给 loader.load：拿哪份、多少字节、是不是在役件，页面上一个字都没有 ——
+ 别人看到"骨骼 0 根"根本判不出是资产问题还是窗口过期。 */
+ function sha16Of(buf) {
+ if (!(window.crypto && crypto.subtle)) return Promise.resolve("");
+ return crypto.subtle.digest("SHA-256", buf).then(function (d) {
+ var b = new Uint8Array(d), s = "";
+ for (var i = 0; i< 8; i++) s += ("0" + b[i].toString(16)).slice(-2);
+ return s;
+ }).catch(function () { return ""; });
+ }
 
-     🔴 轴的依据是**量出来的**，不是凭记忆（state/hd/app-after/bone-axes.json）：
-        · 每根骨绕 X/Y/Z 各转 0.6 rad，看子骨的**世界位移**；哪个轴位移最大 = 那个轴管"摆"。
-        · 结论（世界轴）：
-            腿（UpLeg/Leg）   → **Z**：dz 负 = 往前抬，正 = 往后
-            臂（Arm）         → **X**：正 = 侧举（左右对称符号相反）
-            肘（ForeArm）     → **Z**：正 = 往身前收
-            脊（Spine/Spine1）→ **Z**：正 = 前倾
-            头（Neck/Head）   → **Z**：点头；**Y**：转头（绕骨轴，末端几乎不动 ⇒ 只能靠 Y）
-     🔴 基线不能取 T-pose：mixamo 的 rest 就是 T-pose（两臂平举），拿它当底会把人摆成十字架。
-        基线取**idle 片段第一帧**的姿态（captureRest 在 mixer 起播后抓一次），再叠我算的偏移。 */
-  var REST = {};               /* 归一化骨名 → 起播基线欧拉角 */
-  var MODEL_BASE = null;       /* 站好时模型根的位移基准（走路加位移、回待机要精确复位） */
-  var CAM_BASE = null;         /* 当前取景的机位基准（走路时相机随她平移，screen 大小不变） */
-  var PRESET = "idle";         /* idle | walk | wave | sit */
-  var PRESET_T0 = 0;           /* 预设开始时刻（秒） */
+ function parseBytes(buf, via) {
+ sha16Of(buf).then(function (h) {
+ LOADED.via = via; LOADED.bytes = buf.byteLength; LOADED.sha16 = h;
+ loader.parse(buf, "", function (g) { onGltf(g); audit(g); },
+ function (e) {
+ tag("tagStage", "解析失败：" + String((e && e.message) || e).slice(0, 40), false);
+ });
+ });
+ }
 
-  function B(name) {
-    var n = (boneList || []).filter(function (x) { return normBone(x) === name; })[0];
-    return n ? bones[n] : null;
-  }
-  function normBone(n) { return String(n || "").replace(/^mixamorig:?/i, ""); }
+ function loadInline() {
+ var s = document.createElement("script");
+ s.src = "../voice-theater/assets/dh-v2-rigged.glb.b64.js";
+ s.onload = function () {
+ if (!window.GBT_GLB_B64) { tag("tagStage", "载入失败：内联副本无载荷", false); return; }
+ try {
+ var raw = atob(window.GBT_GLB_B64), u8 = new Uint8Array(raw.length);
+ for (var i = 0; i< raw.length; i++) u8[i] = raw.charCodeAt(i);
+ parseBytes(u8.buffer, "inline(.b64.js)");
+ } catch (e) { tag("tagStage", "载入异常：" + String(e.message || e).slice(0, 40), false); }
+ };
+ s.onerror = function () { tag("tagStage", "载入失败：取不到模型/内联副本", false); };
+ document.head.appendChild(s);
+ }
 
-  function captureRest() {
-    REST = {};
-    /* 🔴 2026-10-21 夜补：原来这张表**漏了脚和肩** ⇒ poseSet 因为没有 REST 基线直接返回 false，
-       于是"脚背勾/绷"和"抬肩"写了也没生效（实测：走路时 LeftFoot/RightFoot 跨度恒 0.000）。
-       现在按"动作里用到的关节"逐个列全，缺一个就整段动作静默失效。 */
-    ["Spine", "Spine1", "Spine2", "Neck", "Head",
-     "LeftShoulder", "RightShoulder",
-     "LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand",
-     "LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot", "Hips"].forEach(function (n) {      var b = B(n);
-      if (b) REST[n] = { x: b.rotation.x, y: b.rotation.y, z: b.rotation.z };
-    });
-  }
-  function setRot(name, dx, dy, dz) {
-    var b = B(name), r = REST[name];
-    if (!b || !r) return;
-    b.rotation.set(r.x + (dx || 0), r.y + (dy || 0), r.z + (dz || 0));
-  }
-  /* ══ 动作驱动（2026-10-21 主人令：先标清每根骨管什么，再拿它驱动作）══════════
-     这里**不写任何轴**：轴与正负号全部向 `window.GBT_BONE_MAP` 查（那是由
-     tools/codex-scripts/dh-bone-map.py 从实测读数生成、写进 bone-map.js 的表）。
-     动作只声明「哪个关节做哪个动作、多大幅度」，剩下的照表办 —— 于是
-     「标签表」与「实际摆法」不可能各说各话（本仓 P1 那一族错误的根治）。
-     动作键（表里 drive 的键）：flex 屈伸/前后摆 · abduct 外展 · bend 前倾 ·
-     nod 点头 · turn 转头 · tilt 侧歪 · shrug 抬肩 · wave 腕摆 · point 绷脚 */
-  function boneLabel(name) {                     /* 表里这根骨的中文名/管什么 */
-    var m = window.GBT_BONE_MAP, n = normBone(name);
-    if (!m || !m.bones) return null;
-    for (var i = 0; i < m.bones.length; i++) if (m.bones[i].name === n) return m.bones[i];
-    return null;
-  }
-  /* 查表：这根骨的这个动作 → {axis, sign}（表由 dh-bone-map.py 从实测生成） */
-  function D(name, key) {
-    var b = boneLabel(name);
-    return (b && b.drive) ? (b.drive[key] || null) : null;
-  }
+ if (typeof fetch === "function") {
+ fetch(ASSET).then(function (r) {
+ if (!r.ok) throw new Error("HTTP " + r.status);
+ return r.arrayBuffer();
+ }).then(function (b) { parseBytes(b, "fetch"); }).catch(function () { loadInline(); });
+ } else {
+ loadInline();
+ }
 
-  /* 一次把一根骨的多个动作键合成到同一组欧拉角上（只在**表里那根轴**上叠加）。
-     为什么不能一个键一个键地设：driveBy 会把没设的轴复位，连续设两个键 =
-     后一个把前一个抹掉（实测：手臂 abduct + flex 同时要时只剩后一个）。 */
-  function poseSet(name, spec) {
-    var b = B(name), r = REST[name];
-    if (!b || !r) return false;
-    var v = { x: r.x, y: r.y, z: r.z }, used = 0;
-    Object.keys(spec || {}).forEach(function (k) {
-      var d = D(name, k);
-      if (!d) return;
-      v[d.axis] += d.sign * (spec[k] || 0);
-      used++;
-    });
-    b.rotation.set(v.x, v.y, v.z);
-    return used > 0;
-  }
+ resize();
+ tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · 模型载入中…", true);
+ requestAnimationFrame(tick);
 
-  /* ══ 世界轴旋转（2026-10-21 夜加 · "转头/转体/骨盆侧倾"专用）══════════════════════
-     为什么不能直接用骨位表的 turn/twist：`state/_axis-probe.py` 现量证明——
-     `Head.turn` 与 `Head.nod` 落到**同一根轴**（都写 z）⇒ 页面里"转头"其实在点头；
-     `Spine1.twist` 与 `bend` 也撞轴、`Hips.twist` 落到了俯仰轴。
-     根因是生成器用"单点位移"去反查 yaw：而绕竖直轴转的时候，那个探针点几乎不动（它就在轴上），
-     于是 yaw 被误判给别的轴。这里不改生成件（那是另一件事），改为**按世界轴施加**，语义与轴无关：
-       · yaw   = 绕世界 Y（竖直）→ 转头 / 躯干与骨盆转
-       · list  = 绕世界 Z（她正前方）→ 侧倾（骨盆一边沉下去）
-       · pitch = 绕世界 X（左右轴）→ 前后俯仰
-     实现：Δ局部 = Q_parent⁻¹ · R_world · Q_parent，再右乘到骨的四元数上（此时 quaternion 已含 REST）。
-     必须**在 poseSet 之后**调用 —— poseSet 会 rotation.set 覆盖。 */
-  var AX_Y = new T.Vector3(0, 1, 0), AX_Z = new T.Vector3(0, 0, 1), AX_X = new T.Vector3(1, 0, 0);
-  function spinWorld(name, yaw, list, pitch) {
-    var b = B(name);
-    if (!b || !b.parent) return false;
-    var deg = [yaw, list, pitch], any = false, i;
-    for (i = 0; i < 3; i++) if (deg[i]) any = true;
-    if (!any) return false;
-    /* 🔴 必须**从静止姿态重新起算**：Hips 在 NEUTRAL 里没有条目 ⇒ 没有任何地方每帧复位它，
-       而 spinWorld 是"在当前四元数上再乘一段"。不复位就等于每帧叠一点，10 秒能漂 8cm
-       （实测：idle 静立时右髋被拖低了 8.5cm、还在匀速移动 —— 这正是"动作不像人"的一大来源）。 */
-    var r = REST[name];
-    if (r) b.rotation.set(r.x, r.y, r.z);
-    var qp = new T.Quaternion(), qw = new T.Quaternion(), dl = new T.Quaternion();
-    b.parent.getWorldQuaternion(qp);
-    var axes = [AX_Y, AX_Z, AX_X];
-    for (i = 0; i < 3; i++) {
-      if (!deg[i]) continue;
-      qw.setFromAxisAngle(axes[i], deg[i]);
-      dl.copy(qp).invert().multiply(qw).multiply(qp);   /* Δ = Qp⁻¹·R·Qp */
-      /* 🔴 必须**左乘**（premultiply）：要让"骨的世界朝向"变成 R·Q，局部量就是 Δ·q_local。
-         上一版写成右乘（post-multiply）＝绕"骨自己的局部轴"转 —— 于是 Hips 那种接近单位朝向的骨
-         看着生效了，而 Spine1/Head 实际只转到 1/10 的量（实测：肩线本该 6.3° 只量到 0.63°）。 */
-      b.quaternion.premultiply(dl);
-    }
-    b.quaternion.normalize();
-    return true;
-  }
-
-  /* ── 标准站姿（2026-10-21 主人令：把所有绑骨的肢体摆正到正常位置）────────────
-     T-pose 是绑骨姿势（两臂平举），idle 片段的第一帧也带着它自己的姿态 ——
-     两个都不能当"正常站着"。这里给一组**明确的偏移量**，让肢体回到解剖学的自然位：
-       · 手臂：从平举往下放 ≈ 78°（abduct 负向），肘微屈 6°，手自然下垂
-       · 腿：伸直（0）· 脚：0 · 骨盆/脊柱/头：0
-     数量级来自骨位标签表的实测（abduct +1 ≈ 把臂往她自己那侧抬 ~0.09m/0.35rad），
-     放下来之后用「手的绝对高度」验收：目标 ≈ 髋部高度（1.72m 的人 ≈ 0.85–0.95m）。 */
-  var NEUTRAL = {
-    /* 手臂：从平举往下放 ≈ 78°，**再往外让一点**（abduct -1.52 → -1.46 = 让 3.4°）。
-       为什么要让：全身穿模扫描（state/_clip-scan.py）量到上臂离躯干最近只有 **1.9 mm**、
-       手离大腿 3.5 mm —— 站着不碰，一摆臂就擦进去。让出 3.4° 后余量够，视觉上仍是自然下垂。 */
-    LeftArm:  { abduct: -1.46, flex: 0.07 },
-    RightArm: { abduct: -1.46, flex: 0.07 },
-    LeftForeArm:  { flex: 0.10 },
-    RightForeArm: { flex: 0.10 },
-    LeftShoulder:  { shrug: 0 },
-    RightShoulder: { shrug: 0 },
-    /* 腿：**不并脚，留缝**。2026-10-21 夜主人红线指出"两只靴子挤成一根柱子"，
-       量出来是：旧值 abduct=-0.14 时踝间距只有 0.068 m，而单只靴子横向宽 0.128 m
-       ⇒ **每只靴子插进另一只 6 cm**（顶点最近距离 0.0005 m = 贴着）。
-       细扫（state/_stance-fine.py）后取 abduct=-0.09 / toeout=-0.06：
-       踝间距 0.150 m · 脚尖间距 0.163 m · **靴子最近 0.030 m（不穿模）**。
-       再往里收必然穿模（-0.10 时靴子间距只剩 0.012 m、-0.11 时 0.001 m）——
-       "完全并脚"在这么厚的靴子上做不到，除非改模型。 */
-    LeftUpLeg: { flex: 0, abduct: -0.09 }, RightUpLeg: { flex: 0, abduct: -0.09 },
-    LeftLeg: { flex: 0 },  RightLeg: { flex: 0 },
-    /* 脚：绑骨自带约 8° 外八，这里只轻微回正（负 = 往内收一点） */
-    LeftFoot: { flex: 0, toeout: -0.06 }, RightFoot: { flex: 0, toeout: -0.06 },
-    Spine: { bend: 0, side: 0 }, Spine1: { bend: 0, side: 0 }, Spine2: { bend: 0, side: 0 },
-    Neck: { nod: 0, tilt: 0 }, Head: { nod: 0, tilt: 0 }
-  };
-  function applyNeutral(delta) {                 /* delta：叠在标准站姿上的小偏移 */
-    Object.keys(NEUTRAL).forEach(function (n) {
-      var spec = {};
-      Object.keys(NEUTRAL[n]).forEach(function (k) { spec[k] = NEUTRAL[n][k]; });
-      if (delta && delta[n]) {
-        Object.keys(delta[n]).forEach(function (k) { spec[k] = (spec[k] || 0) + delta[n][k]; });
-      }
-      poseSet(n, spec);
-    });
-    /* 🔴 手掌内旋（2026-10-21 夜 · "骨架动作怪异"的一条真因）：
-       混音骨架是 T-pose 抓的，手心朝**下**；把手臂放下来 ≈78° 之后，手心就变成**朝镜头**
-       （实测：手心法线 (0.06,0.13,0.99) —— 几乎正对相机），这在真人身上是"立正摊手"，一眼就是假人。
-       这里绕世界竖直轴把两只手各转回来，让手心朝向大腿（自然垂手的姿态）。 */
-    spinWorld("LeftHand", -HAND_PRONATION, 0, 0);
-    spinWorld("RightHand", HAND_PRONATION, 0, 0);
-  }
-  var HAND_PRONATION = 1.45;   /* rad；由 state/_arm-audit.py 量的手掌法线反推，逐步试出来的 */
-
-  /* 三个预设：先摆正（NEUTRAL），再叠动作 —— 全部查表取轴 */
-  /* ══ 2026-10-21 夜 · 步态重写（主人令「调试骨架动作自然」）════════════════════
-     上一版为什么"机械"（逐条对过）：
-       ① 两条手臂用**同一个相位**摆（`LeftArm/RightArm 都是 0.26*s`）⇒ 双臂一起前摆，像划船；
-       ② 膝盖用 `-max(0,0.5s)` 半波整流 ⇒ 屈膝时机不对（该在摆动相弯、触地时伸直）；
-       ③ 脚从来不转 ⇒ 没有脚跟着地/脚尖离地，脚像贴在地上滑；
-       ④ 骨盆不转、肩不反扭 ⇒ 上半身是个整体，走起来像立牌；
-       ⑤ 上下起伏只有 1.2cm（真步态 2–4cm），没有侧向重心转移。
-     这一版按**步态相位**重排（一个周期 T=1.08s = 两步；左腿相位 p，右腿 p+π）：
-       大腿 ±0.42 · 膝在摆动相弯（峰值 ≈0.55）· 脚背在摆动相勾、离地相绷 · 手臂与**同侧腿**反相 ·
-       骨盆与肩反向扭 · 脊柱侧倾做重心转移 · 起伏 2.2cm（两次/周期）。
-     所有幅度都走 poseSet 的键（flex/point/twist/side/turn/nod/tilt），轴与符号仍从实测表取，不手写。 */
-  var PRESETS = {
-    /* 待机 2026-10-21（夜·第二轮打磨"自然动作"）：
-       上一版只有"呼吸 + 一点点手臂"，问题在于**重心从来不动** —— 真人站着的时候，
-       重量会在两脚之间慢慢来回，骨盆跟着侧倾、支撑腿那侧膝盖更直、另一侧微屈。
-       这一版补的就是这条主线索（幅度全部按"看得见但不夸张"取）：
-         · 呼吸 4.2s：胸廓起伏（Spine2 bend）+ 双肩微耸 + 脖子反向一点点（头才不会跟着点头）
-         · 重心 9.5s 一周期：骨盆**侧倾** 0.022rad + 整体横移 ±1cm + 支撑腿伸直/摆动腿微屈
-         · 头 30s 一周期慢转（世界轴 yaw）+ 2.7s/1.1s 两个不同周期的微小抖动（避免"正弦味"）
-       骨盆/头的 yaw·list 走 spinWorld（世界轴），不走撞轴的表项 —— 见 spinWorld 注释。 */
-    idle: function (t) {
-      var br = Math.sin(t * Math.PI * 2 / 4.2);
-      var w = Math.sin(t * 0.66);                          /* >0 = 重心挪到她的左侧 */
-      var look = Math.sin(t * 0.21);
-      var micro = 0.004 * Math.sin(t * 2.7) + 0.003 * Math.sin(t * 1.13);
-      applyNeutral({
-        Spine1: { bend: 0.016 * br, side: 0.016 * w },
-        Spine:  { bend: 0.008 * br, side: 0.010 * w },
-        Spine2: { bend: 0.010 * br },
-        Neck:   { nod: -0.005 * br },
-        Head:   { nod: 0.010 * br, tilt: 0.014 * w },
-        LeftShoulder:  { shrug: 0.006 * br },
-        RightShoulder: { shrug: 0.006 * br },
-        LeftArm:  { abduct: 0.020 * br + 0.010 * w, flex: 0.018 * w },
-        RightArm: { abduct: 0.020 * br - 0.010 * w, flex: -0.018 * w },
-        LeftForeArm:  { flex: 0.028 * br + 0.012 * w },
-        RightForeArm: { flex: 0.028 * br - 0.012 * w },
-        /* 膝盖：站久了不会锁死；重心在哪边，哪边就更直（支撑腿承重） */
-        LeftLeg:  { flex: -0.030 - 0.022 * Math.max(0, -w) },
-        RightLeg: { flex: -0.030 - 0.022 * Math.max(0, w) }
-      });
-      spinWorld("Hips", 0.018 * w, 0.024 * w, 0);           /* 骨盆：微转 + 侧倾 */
-      spinWorld("Spine1", 0.010 * w, 0, 0);
-      spinWorld("Head", 0.055 * look + micro, 0.008 * w, 0);
-      if (model && MODEL_BASE) {
-        model.position.x = MODEL_BASE.x + 0.010 * w;
-        model.position.y = MODEL_BASE.y;
-        model.position.z = MODEL_BASE.z;
-        followRoot(0);
-      }
-    },
-    /* 走路（第二轮）：在上一版"按相位排"的基础上，把**骨盆这条链**补齐 ——
-       上一版骨盆/躯干的"扭"其实落在俯仰轴上（表里撞轴，实测见 _axis-probe.py），
-       所以走起来上半身是"整体晃"而不是"骨盆转、肩反向转"。这一版：
-         · 骨盆 yaw ∓0.09（世界 Y，左腿在前时左髋在前）· 侧倾 ∓0.035（摆动侧髋下沉）
-         · 肩 yaw ±0.055 + 上胸 ±0.030（与骨盆反向）· 头 +0.035 反向补偿（视线稳）
-         · 整体横移 ∓1.8cm（重心压在支撑脚上）· 起伏 2.4cm，**最低点在触地、最高点在支撑中期**
-         · 摆臂 ±0.30，屈肘在手臂前摆时更大（0.16 → 0.36） */
-    walk: function (t) {
-      var T = 1.08, p = t * Math.PI * 2 / T;
-      var sL = Math.sin(p), sR = Math.sin(p + Math.PI);
-      /* 膝（2026-10-21 夜·第三次修）：上一版 phase 用 sin(pp-0.55) 整流，导致**支撑相一直在弯**：
-           触地时 0.569 rad(32.6°)、支撑中期 0.388 rad(22.2°) —— 真人这两处只有 5° 左右，
-           所以看着像"半蹲着走/端着腿"。改成"摆动相单峰"：
-             触地 0.10 rad(5.7°) · 支撑中期 0.10(5.7°) · 离地 0.363(20.8°) · 摆动峰值 0.68(39°)
-           （峰位在 pp≈1.85π，即离地后立刻收腿，这是步态里最像人的时序） */
-      function knee(pp) { return -(0.10 + 0.58 * Math.max(0, Math.sin(pp - 1.35 * Math.PI))); }
-      function foot(pp) { return 0.20 * Math.sin(pp + 2.60); }
-      applyNeutral({
-        LeftUpLeg:  { flex: 0.42 * sL },
-        RightUpLeg: { flex: 0.42 * sR },
-        LeftLeg:    { flex: knee(p) },
-        RightLeg:   { flex: knee(p + Math.PI) },
-        LeftFoot:   { flex: foot(p) },
-        RightFoot:  { flex: foot(p + Math.PI) },
-        LeftArm:  { flex: -0.30 * sL, abduct: 0.05 },
-        RightArm: { flex: -0.30 * sR, abduct: 0.05 },
-        LeftForeArm:  { flex: 0.16 + 0.20 * Math.max(0, -sL) },
-        RightForeArm: { flex: 0.16 + 0.20 * Math.max(0, -sR) },
-        Spine:  { bend: 0.020 },
-        Spine1: { bend: 0.010 }
-      });
-      spinWorld("Hips", -0.090 * sL, -0.035 * Math.cos(p), 0);
-      spinWorld("Spine1", 0.055 * sL, 0.020 * Math.cos(p), 0);
-      spinWorld("Spine2", 0.030 * sL, 0, 0);
-      spinWorld("Head", 0.035 * sL, -0.010 * Math.cos(p), 0);
-      if (model && MODEL_BASE) {
-        var SPEED = 1.20;                    /* 与步幅匹配：±0.42rad × 腿长0.85m ⇒ ≈1.28m/s */
-        var dz = SPEED * t;
-        model.position.z = MODEL_BASE.z + dz;
-        model.position.x = MODEL_BASE.x - 0.018 * Math.cos(p);          /* 重心横移 */
-        model.position.y = MODEL_BASE.y + 0.012 * (1 - Math.cos(2 * p - Math.PI)) / 2;
-        followRoot(dz);
-      }
-    },
-    /* 挥手：站姿打底，只把右臂抬到肩上方来回摆 */
-    wave: function (t) {
-      var k = Math.min(1, t / 0.35);
-      var osc = Math.sin(t * Math.PI * 2 * 2.2);
-      applyNeutral({
-        RightArm:     { abduct: 1.44 + 0.72 * k, flex: 0.10 * k },  /* 抵消站姿下放量（1.44）再抬到肩上方 ≈38°；
-                                                                       第一版写成 +1.10 会把手举过头顶（实测 dy 0.911m）*/
-        RightForeArm: { flex: 0.10 + 0.25 * k + 0.20 * osc * k },   /* 屈肘别太大：太大会把手举过头顶（实测 dy 0.91→0.85 降不下来，主因在这儿） */
-        RightHand:    { wave: 0.16 * osc * k },
-        Neck: { tilt: -0.04 * k },
-        Head: { tilt: -0.06 * k }
-      });
-    },
-  };
-
-  /* 🔴 2026-10-21 夜：**默认改成播资产自带的烘焙片段**（真动画数据）。
-     病根：她这个 GLB 里本来就带 `idle` / `walk` 两条 198 通道的完整动画，是绑骨时一起烘出来的；
-     之前为了"把肢体摆正"把它整个停掉、改成手搓正弦角度 —— 于是走路的膝弯时机、髋部反转、
-     肩臂反摆、脚的碾地全丢了，怎么调都"机械"。
-     现在：片段优先（CLIP_MODE=true），程序化驱动只当兜底（资产没有片段时）。
-     两者都不再抢骨头：driveApply 在片段模式下直接 return。 */
-  var CLIP_MODE = false;
-  function setClipMode(on) {
-    CLIP_MODE = !!on;
-    if (!CLIP_MODE) {
-      var all = Object.keys(CLIPS);
-      for (var i = 0; i < all.length; i++) {
-        var a = CLIPS[all[i]].act;
-        if (a && a.isRunning && a.isRunning()) { try { a.stop(); } catch (e) { } }
-      }
-      try { captureRest(); setPreset(PRESET); } catch (e) { }
-    }
-    return CLIP_MODE;
-  }
-  var PRESET_DUR = { walk: 1.08 * 4, wave: 5.0 };        /* 一次性预设的时长（秒）·
-      5.0 而不是 3.2：截图/录屏本身要花时间，3.2s 常常"刚举手就被我自己的截图等回待机了"（实测） */
-
-  function setPreset(name) {
-    if (!PRESETS[name]) name = "idle";
-    PRESET = name;
-    PRESET_T0 = performance.now() / 1000;
-    var el = $("stageHint");
-    if (CLIP_MODE) {
-      /* 片段模式：直接把对应片段循环播起来（walk 播 walk、其余播 idle） */
-      var ce = clipBy(new RegExp("^" + name + "$", "i")) || clipBy(new RegExp(name, "i")) || clipBy(/idle/);
-      if (ce) { switchTo(ce, name === "idle" || name === "walk"); }
-      if (el) {
-        var cn = Object.keys(CLIPS).join(" / ") || "无";
-        hint("动作：<b>烘焙片段 " + (ce ? (Object.keys(CLIPS).filter(function (k) { return CLIPS[k] === ce; })[0] || name) : "无") +
-             "</b>（真动画数据 · 片段列表 " + cn + "）· 口型：跟着声音走下颌骨（16° 上限）");
-      }
-      return;
-    }
-    if (el && name !== "idle") {
-      var label = name === "walk" ? "走两步（程序化步态 · 1.08s/步）" : "挥手（程序化 · 右臂侧举 + 前臂摆）";
-      hint("动作：<b>" + label + "</b> · 口型：<b>音素驱动下颌</b>（viseme · 16° 上限 · 跟着声音走；仍无形态键/唇缝 ⇒ 近看不是「嘴唇分开」）");
-    } else if (el) {
-      var names = Object.keys(CLIPS).map(function (k) { return k; }).join(" / ") || "无";
-      hint("动作：idle 待机（程序化呼吸 + 头微偏）· 也可播烘焙片段 " + names +
-           " · 口型：<b>音素驱动下颌</b>（viseme · 16° 上限 · 跟着声音走；仍无形态键/唇缝 ⇒ 近看不是「嘴唇分开」）");
-    }
-    /* 2026-10-21（主人令：把所有绑骨的肢体摆正）：**不再启停烘焙动作**。
-       姿态一律 = NEUTRAL（标准站姿）+ 查表驱动的偏移；烘焙片段只走 stagePlay 那条手动路。
-       否则烘焙 idle 会每帧把骨写回它自己那一帧的姿态，摆正了也会被它带歪。 */
-    if (mixer) {
-      var all = Object.keys(CLIPS);
-      for (var i = 0; i < all.length; i++) {
-        var a = CLIPS[all[i]].act;
-        if (a && a.isRunning && a.isRunning()) { try { a.stop(); } catch (e) {} }
-      }
-    }
-  }
-
-  /* 每帧在 mixer.update 之后调用：烘焙片段的姿态先落地，再由这里覆盖被驱动的骨 */
-  var DRIVE_PAUSED = false;   /* 取证：冻住姿态，只让嘴型动 —— 否则呼吸会把逐像素对比淹掉（实测底噪 36%） */
-  function driveApply() {
-    if (DRIVE_PAUSED) return;
-    if (CLIP_MODE) return;    /* 片段模式：骨头交给 mixer，程序化一律不碰 */
-    var t = performance.now() / 1000;
-    var fn = PRESETS[PRESET] || PRESETS.idle;
-    fn(t - PRESET_T0);
-    if (PRESET_DUR[PRESET] && (t - PRESET_T0) >= PRESET_DUR[PRESET]) setPreset("idle");
-  }
-  /* 调试窗（只读 + 切预设）：量"到底有没有驱动上"必须能从外面看到 preset / REST / 某根骨的角度。
-     2026-10-21 第一次实测：一次性测到"脚位移 0.000" —— 没有这个窗就只能靠猜。 */
-  try {
-    /* 口型调试窗：量"张嘴到底有没有动"必须能从外面读到下颌角度与下巴位置 */
-  try {    window.__GBT_JAW = {
-      info: function () {
-        return {
-          hasJaw: !!jawBone,
-          name: jawBone ? jawBone.name : null,
-          rotY: jawBone ? +jawBone.rotation.y.toFixed(4) : null,
-          restY: jawRest ? +jawRest.y.toFixed(4) : null,
-          level: +jawLevel().toFixed(3),
-          viseme: lsViseme, lispync: LS ? LS.info() : null,
-          axis: JAW_AXIS, sign: JAW_SIGN, max: JAW_MAX
-        };
-      },
-      set: function (lv, holdMs) {
-        /* 取证口（2026-10-21 加 hold）：一秒 60+ 帧的时候，set(1) 会在下一帧被
-           tick 里的 applyJaw(jawLevel()=0) 抹掉 —— 上一个探针就是这么"量到 0cm"的假绿。
-           给了 hold 之后，这段时间内 tick 不动嘴型，探针能真的量到"张到最大"。 */
-        jawHoldUntil = performance.now() + (Number(holdMs) || 0);
-        applyJaw(Number(lv) || 0);
-        return this.info();
-      }
-    };
-  } catch (e) { }
-  /* 调色口（2026-10-21 夜 · 主人问"颜色能微调到自然逼真吗"）：外面能改四盏灯的色/强度与曝光，
-     量着调、不靠猜。测得的基线：皮肤 RGB(187,170,159) · 色相 24° · **饱和 0.149** · 明度 0.732
-     —— 色相已经对，**饱和明显偏低（发灰/像蜡像）**，主因是冷蓝天光+冷蓝补光+青色轮廓光把暖肤色的彩度洗掉。 */
-  try {
-    window.__GBT_GRADE = function (o) {
-      o = o || {};
-      if (o.hemi) { hemiL.color.setHex(o.hemi); }
-      if (o.hemiGround) { hemiL.groundColor.setHex(o.hemiGround); }
-      if (typeof o.hemiI === "number") hemiL.intensity = o.hemiI;
-      if (o.key) keyL.color.setHex(o.key);
-      if (typeof o.keyI === "number") keyL.intensity = o.keyI;
-      if (o.rim) rimL.color.setHex(o.rim);
-      if (typeof o.rimI === "number") rimL.intensity = o.rimI;
-      if (o.fill) fillL.color.setHex(o.fill);
-      if (typeof o.fillI === "number") fillL.intensity = o.fillI;
-      if (typeof o.exp === "number") renderer.toneMappingExposure = o.exp;
-      return {
-        hemi: "#" + hemiL.color.getHexString(), hemiGround: "#" + hemiL.groundColor.getHexString(),
-        hemiI: hemiL.intensity, key: "#" + keyL.color.getHexString(), keyI: keyL.intensity,
-        rim: "#" + rimL.color.getHexString(), rimI: rimL.intensity,
-        fill: "#" + fillL.color.getHexString(), fillI: fillL.intensity,
-        exp: renderer.toneMappingExposure
-      };
-    };
-  } catch (e) { }
-  try { window.__GBT_SAY = function () { try { stageSay(); return true; } catch (e) { return String(e); } }; } catch (e) { }
-  /* 站姿口（调参用 · 2026-10-21 夜）：主人红线指出"两只靴子挤成一根柱子"。
-     这里让外面能原地改 NEUTRAL 的 abduct/toeout/knee，扫一遍就知道分开多少不穿模，
-     定下来再写回 NEUTRAL 常量（不留运行期魔法值）。 */
-  try {
-    window.__GBT_STANCE = function (o) {
-      o = o || {};
-      if (typeof o.abduct === "number") { NEUTRAL.LeftUpLeg.abduct = o.abduct; NEUTRAL.RightUpLeg.abduct = o.abduct; }
-      if (typeof o.toeout === "number") { NEUTRAL.LeftFoot.toeout = o.toeout; NEUTRAL.RightFoot.toeout = o.toeout; }
-      if (typeof o.knee === "number") { NEUTRAL.LeftLeg.flex = o.knee; NEUTRAL.RightLeg.flex = o.knee; }
-      if (typeof o.hipY === "number" && model) { model.position.y = MODEL_BASE.y + o.hipY; }
-      return { abduct: NEUTRAL.LeftUpLeg.abduct, toeout: NEUTRAL.LeftFoot.toeout, knee: NEUTRAL.LeftLeg.flex };
-    };
-  } catch (e) { }
-  try {
-    window.__GBT_HQ = function () {
-      return {
-        level: HQ.level, pr: +HQ.pr.toFixed(3), prReal: +(renderer.getPixelRatio ? renderer.getPixelRatio() : 0).toFixed(3),
-        shadow: HQ.shadow, shadowOn: !!(renderer.shadowMap && renderer.shadowMap.enabled),
-        fps: HQ.fps, frames: FRAMES,
-        blind: HQ.blind, manual: HQ.manual, armed: HQ.armed,
-        step: HQ_I, steps: HQ_LADDER.length,
-        prMin: HQ.prMin, prMax: HQ.prMax,
-        canvas: [canvas.width, canvas.height], css: [canvas.clientWidth, canvas.clientHeight]
-      };
-    };
-    window.__GBT_FRAMES = function () { return FRAMES; };
-    /* 量档位用（手动接管自适应）：tune({pr, shadow}) 定到某档，auto() 交回自适应。
-       没有这个，就只能靠改代码做 A/B —— 而改代码做 A/B 会把"上一次量的是哪一档"忘掉。 */
-    window.__GBT_HQ.tune = function (o) {
-      o = o || {};
-      if (typeof o.pr === "number") applyPr(o.pr);
-      if ("shadow" in o) setShadow(o.shadow);
-      HQ.manual = o.auto === true ? false : true;
-      return window.__GBT_HQ();
-    };
-    window.__GBT_HQ.auto = function () { HQ.manual = false; return window.__GBT_HQ(); };
-  } catch (e) { }
-  window.__GBT_DRIVE = {
-      info: function () {
-        var ra = B("RightArm"), ll = B("LeftUpLeg");
-        return {
-          preset: PRESET,
-          frames: (typeof FRAMES === "number" ? FRAMES : -1),
-          now: +(performance.now() / 1000).toFixed(3),
-          restKeys: Object.keys(REST),
-          rightArm: ra ? [+ra.rotation.x.toFixed(3), +ra.rotation.y.toFixed(3), +ra.rotation.z.toFixed(3)] : null,
-          leftUpLeg: ll ? [+ll.rotation.x.toFixed(3), +ll.rotation.y.toFixed(3), +ll.rotation.z.toFixed(3)] : null,
-          restRightArm: REST.RightArm || null,
-          restLeftUpLeg: REST.LeftUpLeg || null
-        };
-      },
-      set: function (n) { setPreset(n); return PRESET; },
-      /* pause(true)：冻住程序化姿态（呼吸/摆臂全停），只留嘴型能动 —— 逐像素取证用 */
-      pause: function (v) { DRIVE_PAUSED = !!v; return { paused: DRIVE_PAUSED, preset: PRESET }; },
-      /* hold(秒)：把"一次性预设自动回待机"按住，方便截图/录屏取证。
-         （不加这个只能靠手速：实测截图本身要好几秒，5s 的挥手常常在快门落之前就回待机了） */
-      hold: function (sec) { PRESET_DUR[PRESET] = Number(sec) || 0; return { preset: PRESET, dur: PRESET_DUR[PRESET] }; }
-    };
-
-    /* ══ 姿态读数窗（2026-10-21 夜加 · 量"自然动作"用）══════════════════════════
-       为什么需要：这一轮把"骨盆转/侧倾/头转"改成**世界轴**施加（见 spinWorld），
-       但世界轴的幅度**没有任何现成量具能读** —— 骨位表里的数只对本地轴有意义。
-       这里直接给：某根骨相对**父骨**绕世界 Y/Z/X 转了多少（yaw/list/pitch，单位 rad），
-       以及她脚下（模型根）的 x/y 位移 → 起伏、横移、扭胯、侧倾四个量都能一眼读出。 */
-  try {
-    window.__GBT_AXIS = {
-      read: function (names) {
-        var T2 = T, out = {};
-        (names || ["Hips", "Spine1", "Spine2", "Neck", "Head"]).forEach(function (n) {
-          var b = B(n);
-          if (!b) { out[n] = null; return; }
-          /* 不用欧拉分解：骨的静止朝向本身带 90° 量级的偏移，欧拉拆出来会跳变（实测 range 上过 2rad）。
-             改成直接读**世界方向向量**：
-               · yaw   = 骨的正前方 (局部 +Z) 在世界 XZ 平面上的方位角 atan2(x,z)
-               · list  = 骨的正上方 (局部 +Y) 倒向哪一侧 atan2(x,y)
-             两者都是"看得见的角度"，且不受静止偏移影响（只看变化量就够了）。 */
-          var qb = new T2.Quaternion(), fwd = new T2.Vector3(0, 0, 1), up = new T2.Vector3(0, 1, 0);
-          b.getWorldQuaternion(qb);
-          fwd.applyQuaternion(qb); up.applyQuaternion(qb);
-          out[n] = {
-            yaw: +Math.atan2(fwd.x, fwd.z).toFixed(4),
-            list: +Math.atan2(up.x, up.y).toFixed(4)
-          };
-        });
-        if (model && MODEL_BASE) {
-          out.__root = {
-            x: +(model.position.x - MODEL_BASE.x).toFixed(4),
-            y: +(model.position.y - MODEL_BASE.y).toFixed(4),
-            z: +(model.position.z - MODEL_BASE.z).toFixed(4)
-          };
-        }
-        out.__preset = PRESET;
-        return out;
-      },
-      /* 直接试一下"绕世界轴转"的语义：给某根骨加一段 yaw，量末端骨往哪走（人工核对用） */
-      spin: function (name, yaw, list, pitch) {
-        return spinWorld(name, Number(yaw) || 0, Number(list) || 0, Number(pitch) || 0);
-      }
-    };
-  } catch (e) { }
-  } catch (e) { /* 挂不上不影响渲染 */ }
-
-  function resize() {
-    var w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h; camera.updateProjectionMatrix();
-    /* 画布一变形就重装框：不然"纵向刚好装下"的机位在变矮之后会把她头顶切掉 */
-    try { fitFrame(); } catch (e) { }
-  }
-  window.addEventListener("resize", resize);
-  var FRAMES = 0;                       /* 帧计数：用来分辨"驱动没跑"和"根本没渲染" */
-  /* 🔴 帧间隔必须**真量**（2026-10-21 夜）：原来写死 mixer.update(0.016)，
-     而实机 40–140fps ⇒ 动画速度随帧率漂（100fps 时快 1.6 倍、40fps 时慢 0.36 倍），
-     这是"动作不自然/忽快忽慢"的第二个真因。现在用真实 delta 并夹在 [0, 0.05]。 */
-  var lastTickT = performance.now();
-  function tickDt(now) {
-    var dt = (now - lastTickT) / 1000;
-    lastTickT = now;
-    if (!isFinite(dt) || dt < 0) return 0;
-    return dt > 0.05 ? 0.05 : dt;
-  }
-  /* ══ 高清度自适应（2026-10-21 重写 · 上一版是错的）══════════════════════════════
-     上一版判据的坑（实测记录，别再犯）：窗被**最小化**时 Chromium 的合成器不产帧，
-     requestAnimationFrame 被饿到 ~1fps —— 而 `backgroundThrottling:false` 还把
-     Page Visibility 一起冻住，于是 `document.visibilityState` 仍报 "visible"。
-     上一版 adaptHQ 只认帧率：看到 1fps 就当成"高清档太贵"，于是把 1.50× 一路降成
-     1.00×、还永久不再回升 ⇒ 主人看到的画面反而更糊。
-     现在三条判据分开：
-       ① **fps < 6 ⇒ 判"窗没在桌上"（最小化/被完全盖住），不改档**（HQ.blind 记一笔）；
-       ② 48 ≤ fps：降档（先牺牲阴影，再降超采样）；
-       ③ fps > 57 且连续两次：升档（升到 prMax 为止）—— 有了这条，降下去的画质能自己回来。 */
-  var hqT0 = performance.now(), hqF0 = 0;
-  /* 档位是一个**单向可逆的梯子**，不是"每次临时乘个系数"：
-     上一版的毛病是降下去就回不来（降超采样永远不升、关掉的阴影永远不再开）。
-     梯子每一级都是本轮实测过的组合（pr + 阴影），上去下来都只走一格。 */
-  var HQ_LADDER = [
-    { pr: 1.00, shadow: false },
-    { pr: 1.15, shadow: false },
-    { pr: 1.30, shadow: false },
-    { pr: 1.30, shadow: true },
-    { pr: 1.50, shadow: true },
-    { pr: 1.70, shadow: true },
-    { pr: 1.875, shadow: true }
-  ];
-  var HQ_I = HQ_LADDER.length - 1;      /* 从最高档起步：实测这台机器 1.875×+阴影 撑得住 */
-  function applyLadder(i) {
-    HQ_I = Math.max(0, Math.min(HQ_LADDER.length - 1, i));
-    var s = HQ_LADDER[HQ_I];
-    if (HQ.shadow !== s.shadow) setShadow(s.shadow); else applyPr(s.pr);
-    applyPr(s.pr);                       /* 保证 pr 与 level 文字同步（setShadow 不设 pr） */
-  }
-  var FPS_FLOOR = 34, FPS_CEIL = 62, FPS_BLIND = 6;
-  /* 升降都要**冷却 + 连续两次**：帧率读数本身有抖动（实测同一档 40↔147fps），
-     一次抖动就升降会让画质来回跳 —— 跳一次就要重设 drawingBuffer，比低一档还难看。 */
-  var STEP_DOWN_MS = 8000, STEP_UP_MS = 4000, STEP_UP_HITS = 2, STEP_DOWN_HITS = 2;
-  /* 载入完成后 2.5 秒才"武装"：GLB 解析/贴图上传/着色器编译那几秒帧率本来就很低，
-     上一版就是在那一瞬把阴影判死的（读数 58.9fps 却 shadow:false —— 病根在这）。 */
-  function armHQ() {
-    HQ.armed = false; hqT0 = performance.now(); hqF0 = FRAMES;
-    setTimeout(function () { HQ.armed = true; hqT0 = performance.now(); hqF0 = FRAMES; HQ.lastMove = 0; }, 4000);
-  }
-  function adaptHQ(now) {
-    if (HQ.manual) return;
-    if (!HQ.armed) { hqT0 = now; hqF0 = FRAMES; return; }
-    if (now - hqT0 < 2000) return;
-    var fps = (FRAMES - hqF0) / ((now - hqT0) / 1000);
-    hqT0 = now; hqF0 = FRAMES; HQ.fps = Math.round(fps * 10) / 10;
-    if (fps < FPS_BLIND) { HQ.blind += 1; HQ.up = 0; return; }   /* 窗没在桌上，不是画质问题 */
-    HQ.blind = 0;
-    if (fps < FPS_FLOOR) {
-      HQ.up = 0; HQ.down += 1;
-      if (HQ.down >= STEP_DOWN_HITS && now - HQ.lastMove >= STEP_DOWN_MS) {
-        HQ.down = 0; HQ.lastMove = now; applyLadder(HQ_I - 1);
-      }
-      return;
-    }
-    HQ.down = 0;
-    if (fps > FPS_CEIL) {
-      HQ.up += 1;
-      if (HQ.up >= STEP_UP_HITS && now - HQ.lastMove >= STEP_UP_MS) {
-        /* 往上**一步回顶**：帧率已经证明这台机器撑得住最高档，就没必要一级一级爬
-           （实测：一次载入抖动会把档位压到 1.30× 无阴影，一级一级回要 40 秒以上，
-           主人这期间看到的是"糊的"）。真撑不住时下面的降档路会再把它拉回来。 */
-        HQ.up = 0; HQ.lastMove = now;
-        applyLadder(HQ_I < HQ_LADDER.length - 1 ? HQ_LADDER.length - 1 : HQ_I + 1);
-      }
-    } else { HQ.up = 0; }
-  }
-  function tick() {
-    FRAMES++;
-    var now = performance.now();
-    var dt = tickDt(now);
-    if (mixer) mixer.update(dt);      /* 真 delta（不再是写死的 0.016） */
-    /* 烘焙片段先落地，再由程序化驱动器按**量出来的轴**覆盖被驱动的那几根骨 */
-    try { driveApply(); } catch (e) { /* 驱动器出错不许把整帧打死 */ }
-    /* 口型：只要在说话就把下颌角度接到声音振幅上（说完 onended 会归零闭上） */
-    try { if (performance.now() >= jawHoldUntil) applyJaw(jawLevel()); } catch (e) { }
-    if (controls) controls.update();
-    try { adaptHQ(performance.now()); } catch (e) { }
-    renderer.render(scene, camera);
-    // 🔴 2026-10-28 诊断开关：?static=1 只渲染一帧就停。
-    //   用来分辨"渲染慢"和"根本画不出来"——
-    //   如果一帧都出不来，那就不是降质能救的，是本机没有可用渲染路径。
-    if (window.__GBT_STATIC) { return; }
-    requestAnimationFrame(tick);
-  }
-
-  var loader = new T.GLTFLoader();
-  var ASSET = "../voice-theater/assets/dh-v7-detail.glb";  /* v5 = v4 + 贴图级皮肤彩度（只动 color 那一个 bufferView，几何/骨骼/动作逐字节不变） */
-  var WANT_SHA16 = "5cf749067fb7850c";      /* 在役件指纹（dh-v7-detail.glb · 66 骨 · 色度×1.75 + 粗糙度 0.558 + 皮肤毛孔级细节） */
-  var LOADED = { via: "", bytes: 0, sha16: "" };
-
-  /* 自证：本页显示的一切读数，必须能指回**真被解析的那份字节**。
-     所以先把字节拿全（fetch → 退回 .b64.js），量它的 sha16/字节数，再交给 GLTFLoader。
-     原来直接把 URL 丢给 loader.load：拿哪份、多少字节、是不是在役件，页面上一个字都没有 ——
-     别人看到"骨骼 0 根"根本判不出是资产问题还是窗口过期。 */
-  function sha16Of(buf) {
-    if (!(window.crypto && crypto.subtle)) return Promise.resolve("");
-    return crypto.subtle.digest("SHA-256", buf).then(function (d) {
-      var b = new Uint8Array(d), s = "";
-      for (var i = 0; i < 8; i++) s += ("0" + b[i].toString(16)).slice(-2);
-      return s;
-    }).catch(function () { return ""; });
-  }
-
-  function parseBytes(buf, via) {
-    sha16Of(buf).then(function (h) {
-      LOADED.via = via; LOADED.bytes = buf.byteLength; LOADED.sha16 = h;
-      loader.parse(buf, "", function (g) { onGltf(g); audit(g); },
-        function (e) {
-          tag("tagStage", "解析失败：" + String((e && e.message) || e).slice(0, 40), false);
-        });
-    });
-  }
-
-  function loadInline() {
-    var s = document.createElement("script");
-    /* ⚠️ 内联副本仍是 **v2（无 jaw）**：它是 fetch 被挡时的兜底。真走到这条路上，
-       页面会照实标「内联 v2 · 没有 jaw」—— 口型那段就不许假装能张（JAW_OK=false）。 */
-    s.src = "../voice-theater/assets/dh-v2-rigged.glb.b64.js";
-    s.onload = function () {
-      if (!window.GBT_GLB_B64) { tag("tagStage", "载入失败：内联副本无载荷", false); return; }
-      try {
-        var raw = atob(window.GBT_GLB_B64), u8 = new Uint8Array(raw.length);
-        for (var i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
-        parseBytes(u8.buffer, "inline(.b64.js)");
-      } catch (e) { tag("tagStage", "载入异常：" + String(e.message || e).slice(0, 40), false); }
-    };
-    s.onerror = function () { tag("tagStage", "载入失败：取不到模型/内联副本", false); };
-    document.head.appendChild(s);
-  }
-
-  if (typeof fetch === "function") {
-    fetch(ASSET).then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.arrayBuffer();
-    }).then(function (b) { parseBytes(b, "fetch"); }).catch(function () { loadInline(); });
-  } else {
-    loadInline();
-  }
-
-  resize();
-  tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · 模型载入中…", true);
-  if (window.__GBT_STATIC) {
-    console.info('[GBT] static 模式：只渲染，不进循环');
-    setTimeout(function () { try { tick(); } catch (e) { console.error(e); } }, 1);
-  } else {
-    requestAnimationFrame(tick);
-  }
-
-  window.GBT_RIG = { state: function () { return STATE; }, select: selectBone };
+ window.GBT_RIG = { state: function () { return STATE; }, select: selectBone };
 })();
 </script>
 <!-- gbt-defense -->
 <script>
 (function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
-    return true;
-  }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
-  }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
+ if (window.__gbtDefense) return; window.__gbtDefense = 3;
+ var RULES = [
+ ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
+ ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
+ ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
+ ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
+ ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
+ ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
+ ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
+ ];
+ function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
+ function log(rec){
+ try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
+ localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
+ }
+ function bar(msg, tone){
+ var d=document.getElementById("gbt-defense-bar");
+ if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
+ d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
+ d.textContent=msg; d.style.display="block";
+ d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(17,24,39,.94)";
+ d.style.color="#E8ECF8"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
+ }
+ function baseUrl(){
+ var b = window.GBT_FRAMEWORK_URL || "";
+ if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
+ if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
+ return b;
+ }
+ function report(rec){
+ var base = baseUrl();
+ if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
+ log(rec);
+ try{
+ return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
+ body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
+ .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
+ }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
+ }
+ function speak(t){ /* 2026-10-18 主人令：不许用 zh-CN SAPI 出声（主人原话：「还有其他声音参入」）。
+ 这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
+ 念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
+ 仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在只留视觉红条 + 控制台留痕；
+ 要真出声只能走能力位 `voice op=speak`（单一门）。 */
+ try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
+ function block(el, why){
+ var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
+ where:(el&&(el.tagName||""))||"page-text"};
+ bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
+ report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+ return true;
+ }
+ // ① 拦输入/粘贴
+ function guardInputs(){
+ var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
+ for(var i=0;i<els.length;i++){(function(el){
+ el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
+ if(w){ e.preventDefault(); block(el,w); } });
+ el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
+ bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
+ var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
+ if(w){ e.preventDefault(); block(el,w); } }); }
+ })(els[i]);}
+ }
+ // ② 扫页面可见文本（攻击内容被注入到页面时）
+ /* 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
+ 原来这里对页面自己的静态正文跑 `block()` —— 于是像 digital-human 这种正文里写着
+ 「密钥 / 明文 / 凭证」字样的页面，一打开就自己报一次"已拦截「套密钥」"，
+ 还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
+ ⇒ 页面正文命中只留证（log），不弹条、不再出声；真正要拦的是输入/粘贴/提交那三条路。 */
+ function scanPage(){
+ var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
+ if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
+ }
+ // ③ 自卫条：显示状态 + 证据导出 + 反控说明
+ function panel(){
+ guardInputs();
+ var d=document.createElement("div"); d.id="gbt-defense-pill";
+ d.setAttribute("data-action","defense-log");   /* 触手覆盖：SEL 认 [data-action]，不再当死控件 */
+ d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(7,10,26,.92);color:#9AA4C4;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
+ d.textContent="自卫：开"; d.title="点击查看拦截记录";
+ d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
+ alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
+ "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
+ document.body.appendChild(d);
+ }
+ document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
+ if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
 })();
 </script>
-<script src="../shell/live-badge.js?v=20261026" defer></script>
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../shell/tentacle-kit.js?v=20261026" defer></script>
-
-<!-- ───────── 云插件安装台（一体式：就在本页里展开，不开新窗、不跳转 · 主人令 2026-10-23）───────── -->
-<style id="cfx-style">
-  #cfx-fab{position:fixed;right:16px;top:64px;z-index:9998;background:rgba(245,176,65,.16);color:#ffd48a;
-    border:1px solid rgba(245,176,65,.55);border-radius:10px;padding:8px 12px;font:13px "Microsoft YaHei",system-ui;
-    cursor:pointer;backdrop-filter:blur(6px)}
-  #cfx-fab:hover{background:rgba(245,176,65,.28)}
-  #cfx{position:fixed;inset:0;z-index:9999;display:none;background:rgba(6,10,16,.86);backdrop-filter:blur(8px);
-    font:13.5px/1.6 "Microsoft YaHei",system-ui;color:#dfe9f3}
-  #cfx.on{display:flex;flex-direction:column}
-  #cfx .hd{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid #1e2c3a}
-  #cfx .hd b{color:#f5b041}
-  #cfx .hd span{color:#8ea3b8;font-size:12.5px}
-  #cfx .hd .x{margin-left:auto;background:#16232f;color:#dfe9f3;border:1px solid #1e2c3a;border-radius:8px;
-    padding:6px 12px;cursor:pointer}
-  #cfx .bd{padding:14px 18px;overflow:auto;flex:1}
-  #cfx .tip{color:#8ea3b8;font-size:12.5px;margin:0 0 12px}
-  #cfx .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:10px}
-  #cfx .slot{background:#111a24;border:1px solid #1e2c3a;border-radius:10px;padding:10px 12px}
-  #cfx .slot.done{border-color:rgba(55,214,122,.55)}
-  #cfx .slot.bad{border-color:rgba(227,93,106,.6)}
-  #cfx .slot h4{margin:0 0 8px;font-size:13.5px;font-weight:600}
-  #cfx .slot h4 em{font-style:normal;color:#8ea3b8;font-size:12px;margin-left:6px}
-  #cfx .row{display:flex;gap:8px}
-  #cfx input{flex:1;min-width:0;background:#0d141c;border:1px solid #1e2c3a;border-radius:8px;color:#dfe9f3;padding:7px 10px;
-    font:12.5px Consolas,monospace}
-  #cfx button{background:#16232f;color:#dfe9f3;border:1px solid #1e2c3a;border-radius:8px;padding:7px 12px;cursor:pointer;font:inherit}
-  #cfx button.primary{background:rgba(245,176,65,.14);border-color:rgba(245,176,65,.5)}
-  #cfx button:disabled{opacity:.45;cursor:not-allowed}
-  #cfx .st{font-size:12px;color:#8ea3b8;margin-top:7px;min-height:16px;word-break:break-all}
-  #cfx .st a{color:#f5b041}
-  #cfx .log{margin-top:12px;background:#0d141c;border:1px solid #1e2c3a;border-radius:10px;padding:9px 11px;
-    font:12px/1.6 Consolas,monospace;white-space:pre-wrap;max-height:150px;overflow:auto;color:#8ea3b8}
-</style>
-<div id="cfx-fab" title="十槽安装云插件（本页内展开）">云插件 10</div>
-<div id="cfx">
-  <div class="hd">
-    <b>云插件安装台 · 十槽</b>
-    <span>每槽粘一把你自己的 API 令牌 · 令牌只在内存，不落盘不回显</span>
-    <div class="x" id="cfx-x">收起</div>
-  </div>
-  <div class="bd">
-    <p class="tip">一槽 = 一个独立 Cloudflare 账号 = 一个云插件。令牌必须带 <b style="color:#f5b041">Workers Scripts:Edit</b>；
-      没有这条权限会报「No access to the specified resource」。顶部进度会随安装数增长。</p>
-    <div class="row" style="margin-bottom:10px">
-      <button class="primary" id="cfx-all" style="flex:0 0 auto">全部安装</button>
-      <button id="cfx-mesh" style="flex:0 0 auto">互认打通（10 次写 → 90 边）</button>
-      <span id="cfx-allst" class="st" style="margin:0"></span>
-    </div>
-    <div class="grid" id="cfx-grid"></div>
-    <div class="log" id="cfx-log">就绪。</div>
-  </div>
-</div>
-<script>
-(function(){
-  "use strict";
-  var fab = document.getElementById("cfx-fab"), box = document.getElementById("cfx"),
-      grid = document.getElementById("cfx-grid"), logEl = document.getElementById("cfx-log"),
-      cntEl = null, slots = [];
-  if (!fab || !box) return;
-  document.getElementById("cfx-x").addEventListener("click", function(){ box.classList.remove("on"); });
-  fab.addEventListener("click", function(){ box.classList.add("on"); });
-  function log(m){ logEl.textContent = "[" + new Date().toLocaleTimeString() + "] " + m + "\n" + logEl.textContent; }
-  function bump(){
-    var n = slots.filter(function(s){ return s.url; }).length;
-    fab.textContent = "云插件 " + n + "/10";
-  }
-  for (var i = 1; i <= 10; i++) {
-    var n = ("0" + i).slice(-2);
-    var d = document.createElement("div");
-    d.className = "slot";
-    d.innerHTML = '<h4>云插件 ' + n + '<em>独立账号</em></h4>' +
-      '<div class="row"><input type="password" placeholder="粘贴该账号 API 令牌（cfat_…）" autocomplete="off" spellcheck="false">' +
-      '<button class="ghost">自检</button><button class="primary">安装</button></div><div class="st">未安装</div>';
-    grid.appendChild(d);
-    slots.push({ n: n, el: d, input: d.querySelector("input"),
-                 btn: d.querySelector("button.primary"), chk: d.querySelector("button.ghost"),
-                 st: d.querySelector(".st"), url: null });
-  }
-  var api = window.gbtCloud;
-  if (!api || !api.install) { log("壳里没有 cf:install 通道 —— 请更新并重启 APP。"); document.getElementById("cfx-all").disabled = true; }
-  function install(s){
-    var tok = (s.input.value || "").trim();
-    if (!tok) { s.st.textContent = "先粘令牌"; return Promise.resolve(false); }
-    s.btn.disabled = true; s.st.textContent = "安装中…";
-    return api.install(s.n, tok).then(function(r){
-      s.btn.disabled = false;
-      if (r && r.ok) {
-        s.url = r.url; s.el.className = "slot done";
-        s.st.innerHTML = "已安装 · " + r.account + " · " + r.idMask + "<br><a href='" + r.url + "' target='_blank' rel='noreferrer'>" + r.url + "</a>";
-        log("槽 " + s.n + " 装好：" + r.account + " → " + r.url); bump();
-      } else {
-        s.el.className = "slot bad"; s.st.textContent = "失败：" + ((r && r.why) || "未知");
-        log("槽 " + s.n + " 失败：" + JSON.stringify(r).slice(0, 240));
-      }
-      return !!(r && r.ok);
-    }).catch(function(e){ s.btn.disabled = false; s.el.className = "slot bad"; s.st.textContent = "出错：" + e; return false; });
-  }
-  slots.forEach(function(s){
-    s.btn.addEventListener("click", function(){ install(s); });
-    if (s.chk) s.chk.addEventListener("click", function(){
-      var tok = (s.input.value || "").trim();
-      if (!tok) { s.st.textContent = "先粘令牌"; return; }
-      s.st.textContent = "自检中…";
-      if (!api.verify) { s.st.textContent = "壳里没 verify 通道（重启 APP）"; return; }
-      api.verify(s.n, tok).then(function(r){
-        if (r && r.ok) {
-          s.st.innerHTML = "令牌可读 · " + r.account + " · " + r.idMask + " · 已有脚本 " + r.scriptsRead + " 个"
-            + (r.meshPresent ? " · <b style='color:#37d67a'>本账号已装网格节点</b>" : "");
-        } else {
-          s.st.textContent = "自检失败：" + ((r && r.why) || "未知");
-        }
-      }).catch(function(e){ s.st.textContent = "自检出错：" + e; });
-    });
-  });
-  var meshBtn = document.getElementById("cfx-mesh");
-  if (meshBtn) meshBtn.addEventListener("click", function(){
-    var st = document.getElementById("cfx-allst");
-    if (!api.meshSync) { st.textContent = "壳里没有 meshSync 通道（重启 APP）"; return; }
-    st.textContent = "正在把全表推到每个节点…";
-    meshBtn.disabled = true;
-    api.meshSync().then(function(r){
-      meshBtn.disabled = false;
-      if (r && r.ok) {
-        st.innerHTML = "<b style='color:#37d67a'>互认完成</b> · " + r.synced + "/" + r.nodes
-          + " 节点 · 期望 " + r.expected_edges + " 条有向边（每节点 peers=" + (r.nodes - 1) + "）";
-        log("互认打通：" + r.synced + "/" + r.nodes + " · 期望边 " + r.expected_edges);
-      } else {
-        st.textContent = "互认未完成：" + ((r && r.why) || (r && (r.synced + "/" + r.nodes)) || "未知");
-        log("互认失败：" + JSON.stringify(r).slice(0, 240));
-      }
-    }).catch(function(e){ meshBtn.disabled = false; st.textContent = "互认出错：" + e; });
-  });
-
-  document.getElementById("cfx-all").addEventListener("click", function(){
-    var btn = this, st = document.getElementById("cfx-allst");
-    var q = slots.filter(function(s){ return (s.input.value || "").trim(); });
-    if (!q.length) { st.textContent = "没有已填令牌的槽"; return; }
-    btn.disabled = true; var k = 0, ok = 0;
-    (function next(){
-      if (k >= q.length) { st.textContent = "完成：" + ok + "/" + q.length; btn.disabled = false; bump(); return; }
-      var s = q[k++]; st.textContent = "正在装槽 " + s.n + "（" + k + "/" + q.length + "）…";
-      install(s).then(function(g){ if (g) ok++; next(); });
-    })();
-  });
-  bump();
-})();
-</script>
-
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
+<script src="../shell/tentacle-kit.js" defer></script>
 </body>
 </html>
 

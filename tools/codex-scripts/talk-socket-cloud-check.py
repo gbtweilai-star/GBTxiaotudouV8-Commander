@@ -12,16 +12,14 @@ import ctypes
 import ctypes.wintypes as w
 import json
 import sys
+
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8", errors="replace")
 import urllib.error
 import urllib.request
 from pathlib import Path
-
-for _s in (sys.stdout, sys.stderr):          # 不带 -X utf8 调用时不许静默输出空
-    try:
-        _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        pass
-
 
 ROOT = Path(__file__).resolve().parents[2]
 URL = 'https://gbt-talk-socket.paysssk.workers.dev'

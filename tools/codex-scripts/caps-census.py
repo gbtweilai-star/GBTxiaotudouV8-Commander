@@ -181,7 +181,7 @@ def main() -> int:
     need_param = [r for r in rows if r["param_required"]]
     no_handler = [r for r in rows if r["handler_missing"]]
     ungated = [r for r in rows if r["ungated_all_actions"]]
-    # 🔴 本表要抓的那一类：**只看 op / 空参都读不出门，一给字段门就出现**。
+ # 本表要抓的那一类：**只看 op / 空参都读不出门，一给字段门就出现**。
     #    （上一版普查就是在这里把 `mirror_plan` 读成免卡的。）
     field_only = [r for r in rows if r["gated_fields"] and not r["gated_actions"]]
     # 「两个轴都扫过还是零作用域」—— 这才是能说的那句话。

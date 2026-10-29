@@ -32,7 +32,7 @@
   python tools/codex-scripts/figma-fetch.py nodes <file_key> --ids 1:2,1:3
   python tools/codex-scripts/figma-fetch.py export <file_key> --ids 1:2 --scale 2 --out render/figma
   python tools/codex-scripts/figma-fetch.py vars  <file_key>              # 设计令牌（Variables）
-  # 🔵 离线：拿本地夹具跑同一套"摘要"逻辑（没凭据也能验解析）
+ # 离线：拿本地夹具跑同一套"摘要"逻辑（没凭据也能验解析）
   python tools/codex-scripts/figma-fetch.py file --from-json fixture.json
 退出码：0 成功 · 2 参数/用法错 · 3 **缺凭据** · 4 HTTP 错 · 5 响应形状不认识
 """

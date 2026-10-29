@@ -57,7 +57,7 @@ def run(args: list[str], root: pathlib.Path, store: pathlib.Path) -> tuple[int, 
     txt = (r.stdout or "") + (r.stderr or "")
     i = txt.find("{")
     if i >= 0:
-        # 🔴 加固（2026-09-25 印章那次跑抓到的第三个"量具病"）：**不能假设输出是一整段干净 JSON**。
+ # 加固（2026-09-25 印章那次跑抓到的第三个"量具病"）：**不能假设输出是一整段干净 JSON**。
         #    实测 `json.loads(txt[i:])` 炸在 `Extra data: line 8 column 1` —— 门吐的 JSON 后面
         #    还跟着别的行（`[stamp] …`）。于是 `open` 明明返回了 `id`，我却当成"没返回 id"，
         #    全 9 条连锁红。修法：`raw_decode` **只取第一个 JSON 值**，尾随内容一概忽略。
@@ -91,7 +91,7 @@ def scenario(td: str, name: str, changed: list[str]) -> tuple[pathlib.Path, path
 def main() -> int:
     lines, bad = [], 0
 
-    # 🔴 开工自检（**先验量具，再量东西**）：印章那次跑里全部 9 条都以 rc=2 红掉，
+ # 开工自检（**先验量具，再量东西**）：印章那次跑里全部 9 条都以 rc=2 红掉，
     #    而 rc=2 正是"python 打不开脚本"的退出码 —— 也就是**量具本身没找对被测对象**。
     #    没有这道自检，这种失败会伪装成"被测对象坏了"（又一次假故障）。
     diag = {"cwd": str(pathlib.Path.cwd()), "ROOT": str(ROOT), "GATE": str(GATE),
@@ -178,7 +178,7 @@ def main() -> int:
         # 实测教训：真仓那批老护照**根本没有** declared_scope / claimed_all_pending 两个键
         # （fhnb：两键皆 None）⇒ 第一版探测器写 `p.get("claimed_all_pending") and …`
         # ⇒ **历史那批一个都抓不到**，而它们恰恰就是 F31/F39 那一批。这里造一个老格式护照咬住它。
-        # 🔴 路径别照抄真仓：`--store` 传进去的**就是账本根**，护照落在 `<store>/passports/`
+ # 路径别照抄真仓：`--store` 传进去的**就是账本根**，护照落在 `<store>/passports/`
         #    （真仓那串 `gbt_allinone/store/framework_changes` 是 `_default_store()` 的**返回值**，
         #     不是相对结构）。我第一版写成 `<store>/framework_changes/passports/` ⇒ 文件写到了没人读的地方。
         legacy = store / "passports" / "fc-legacy-00000000-zzzz.json"

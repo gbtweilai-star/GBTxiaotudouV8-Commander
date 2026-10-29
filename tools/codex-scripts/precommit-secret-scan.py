@@ -34,7 +34,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# 🔴 2026-10-10 修（**同族编码缺陷，第三次撞上**）：本件在 **GBK 控制台**上不带 -X utf8 调用时**当场崩**。
+# 2026-10-10 修（**同族编码缺陷，第三次撞上**）：本件在 **GBK 控制台**上不带 -X utf8 调用时**当场崩**。
 #    实测真因（不是猜）：gbt_allinone/tests/test_precommit_secret_scan.py 第 118 行调本件用的是
 #        subprocess.run([PY, str(TOOL), "--selftest", "--json"], ...)     # PY = sys.executable
 #    —— **没带 -X utf8**；本件打印含 U+21D2（⇒）时抛

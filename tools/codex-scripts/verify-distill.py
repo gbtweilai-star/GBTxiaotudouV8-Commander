@@ -127,7 +127,7 @@ def check_cluster(c: str, atlas: dict, clusters: dict) -> dict:
     row: dict = {"cluster": c, "skill": skill, "fail": [], "facts": {}}
     names = [s["name"] for s in atlas.get("skills", [])
              # 判据＝**与前缀口径一致**：`<前缀>-*`。
-             # ⚠️ 2026-09-22 **改回来**（上一轮我曾把裸名并进来，那条改动是错的）：
+ # 2026-09-22 **改回来**（上一轮我曾把裸名并进来，那条改动是错的）：
              #   `omni.py gaps` 的聚类是 `nm.split("-")[0] + "-*" if "-" in nm else nm`
              #   —— **裸名 `remotion` 是它自己的另一条簇**，不是 `remotion-*` 的成员。
              #   实测后果：`remotion-*` 12 条 + 裸名 1 条（`design-asset` 审美桩）
@@ -185,7 +185,7 @@ def main(argv: list[str]) -> int:
         return 2
 
     if "--cluster" in argv:
-        # 🔴 2026-09-22 补：簇也要有**内容级**验收，不能只看"两份在不在"。
+ # 2026-09-22 补：簇也要有**内容级**验收，不能只看"两份在不在"。
         # 域的覆盖判据是"该域每个能力位都被点到"；簇的对应判据是
         # **"该簇每条技能名都被点到"**（图鉴里 name 以 `<stem>-` 开头的那批）。
         rows = [check_cluster(c, atlas, clusters) for c in want]

@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """胸像（头肩）简化骨架 + 微动：SpineBase→Spine1→Neck→Head→HeadTop
 要点（全部沿用已验证口径）：
   · 颈位**由几何实测**（沿臂轴横截宽度最小处），不猜比例
@@ -16,7 +12,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 import sys  # noqa: E402
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/portrait-bust.glb"

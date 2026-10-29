@@ -77,7 +77,7 @@ def probe(ns: list) -> list:
         info = get(n["url"] + "/mesh/info")
         ij = info.get("json") or {}
         peers = ij.get("peers") or j.get("peers") or []
-        # 🔴 2026-10-23 对齐真回包：worker 用 `node` 不是 `node_id`；
+ # 2026-10-23 对齐真回包：worker 用 `node` 不是 `node_id`；
         #    /health 的 peers 是**数字**，/mesh/info 的 peers 才是**数组** —— 两处不混用。
         rows.append({"id": n["id"], "url": n["url"], "acct": n["acct"],
                      "health": h.get("status"), "ok": bool(j.get("ok")),

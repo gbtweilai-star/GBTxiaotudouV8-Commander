@@ -26,7 +26,6 @@
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import pathlib
@@ -44,7 +43,41 @@ def _store_dir() -> pathlib.Path:
     return _ROOT / "gbt_allinone" / "store"
 
 
-DEFAULT_WINDOW_CHARS = 12000
+# 🔴 2026-10-28 主人令「权重模型上下文最长长度让触手把控好」：
+#   原来 `DEFAULT_WINDOW_CHARS = 12000` 是**写死的**，与模型实际 ctx 无关 ——
+#   模型换了（2048 / 8192 / 32768）窗口预算纹丝不动，那叫"拍板"不叫"把控"。
+#   现改为**按模型 ctx 派生**，并把三条实测口径写死在这里：
+#     ① 字符/token：**1.714**（2026-10-28 真分词器实测，12000 字符 = 7000 token）；
+#     ② 安全系数 **0.8**：留出 system 提示 / 输出余量；
+#     ③ 上限仍受 12000 约束（设计上"一屏"，不是越大越好）。
+#   🔴 更要紧的实测（同日）：**整窗硬塞 0/4，recall 秒查 3/4** ——
+#     说明历史本来就该走 recall，window 只负责"最近那屏"。窗口不是越大越好。
+def _default_window_chars() -> int:
+    """按模型 ctx 派生一屏预算（触手口径）；读不到就回落设计值并**说明**。
+
+    取值顺序（都读**真实来源**，不猜）：
+      ① 环境 `GBT_LLM_CTX`（壳/车道启动时设的，是真在跑的那个 ctx）；
+      ② `state/model-ctx.json` 的 `ctx`（触手落盘的模型上限缓存，存在才用）；
+      ③ 都读不到 ⇒ 12000（设计值），**不静默变成 0**。
+    """
+    ctx = 0
+    try:
+        ctx = int(os.environ.get("GBT_LLM_CTX") or 0)
+    except (TypeError, ValueError):
+        ctx = 0
+    if ctx <= 0:
+        try:
+            f = _ROOT / "state" / "model-ctx.json"
+            if f.is_file():
+                ctx = int((json.loads(f.read_text(encoding="utf-8")) or {}).get("ctx") or 0)
+        except Exception:                                      # noqa: BLE001
+            ctx = 0
+    if ctx <= 0:
+        return 12000                    # 读不到模型上限 ⇒ 用设计值
+    return max(512, min(12000, int(ctx * 1.714 * 0.8)))
+
+
+DEFAULT_WINDOW_CHARS = _default_window_chars()
 
 
 class RingContext:
@@ -63,17 +96,7 @@ class RingContext:
 
     def _conn(self):
         c = sqlite3.connect(str(self.db_path))
-        # 🔴 2026-10-28：**不能用 WAL**。
-        #   WAL 依赖共享内存（-shm），而 iSH 的 mmap 是**每进程私有**的
-        #   ⇒ 一个进程写进去、另一个进程读不到（实测：写入后另开连接查询 0 条，
-        #     同进程内却能查到）。
-        #   这和之前免费池 better-sqlite3 写入丢失是**同一个根因**。
-        #   改成 DELETE（回滚日志）模式：不依赖共享内存，跨进程立即可见。
-        try:
-            c.execute('PRAGMA journal_mode=DELETE')
-        except sqlite3.OperationalError:
-            pass
-        c.execute('PRAGMA synchronous=FULL')
+        c.execute('PRAGMA journal_mode=WAL')
         return c
 
     def _init_db(self):
@@ -85,28 +108,8 @@ class RingContext:
                           "content, tokenize='unicode61')")
             except sqlite3.OperationalError:
                 pass
-            # 🔴 2026-10-28：原来 turns 表**没有 name 列** —— 所有会话共用一个表，
-            #   于是"按名字恢复窗口"根本做不到，而 self._ring 是纯内存的，
-            #   进程一换窗口就空（实测：同实例 5 条 / 新实例 0 条，库里 52 条仍在）。
-            #   ⇒ 那叫"会话内有限上下文"，不叫无限。
-            #   这里做**加法迁移**：补 name 列（老行落 'default'），以后按名恢复。
-            cols = {r[1] for r in c.execute('PRAGMA table_info(turns)').fetchall()}
-            if 'name' not in cols:
-                c.execute("ALTER TABLE turns ADD COLUMN name TEXT DEFAULT 'default'")
-            # 🔴 2026-10-28：加**内容指纹列**做幂等。
-            #   为什么要：桥现在要"每问都存"（不存的话短请求的事实永远进不了库，
-            #   实测埋进去的 ZX-4471-QK 查了 0 条）。
-            #   但每次请求都是新 RingContext，seq 从 MAX 接着涨 ⇒ 全存会无限重复。
-            #   用 sha1(role+content) 去重：同一条话进库只留一份。
-            if 'h' not in cols:
-                c.execute("ALTER TABLE turns ADD COLUMN h TEXT")
-            try:
-                c.execute('CREATE INDEX IF NOT EXISTS idx_turns_h ON turns(h)')
-            except sqlite3.OperationalError:
-                pass
             row = c.execute('SELECT MAX(seq) FROM turns').fetchone()
             self._seq = int(row[0] or 0)
-        self._restore_window()
 
     # ── ① 入环：超预算就把最老的挤出去（先落库，再挤出）──────────────────
     def push(self, role: str, content: str, meta: dict | None = None) -> dict:
@@ -115,28 +118,8 @@ class RingContext:
                 'at': time.strftime('%Y-%m-%dT%H:%M:%S'), 'meta': meta or {}}
         self._seq += 1
         item['chars'] = len(content)
-        # 🔴 2026-10-28：**同一条话不重复进环**。
-        #   设计用法是「一条长命的 RingContext，只 push 新消息」；
-        #   但调用方（桥）是无状态的，每请求会 new 一个再把历史重推一遍 ——
-        #   那样 _persist 去重了，`_ring` 却会重复，window() 里同一条话出现好几遍。
-        #   这里加一道环内去重：与环里**最近 8 条**任一条相同 ⇒ 直接返回，不入环。
-        #   （只比最近 8 条：老消息可能被合法地重复提到，不该永久拦住。）
-        _h_now = hashlib.sha1(("%s\x00%s" % (role, content)).encode("utf-8")).hexdigest()
-        for _old in self._ring[-8:]:
-            if _old.get("h") == _h_now or (_old.get("role") == role
-                                           and _old.get("content") == content):
-                return {'ok': True, 'seq': _old.get('seq'), 'dup': True,
-                        'window_chars': self._chars, 'window_items': len(self._ring),
-                        'evicted': []}
-        item['h'] = _h_now
         self._ring.append(item)
         self._chars += item['chars']
-        # 🔴 2026-10-28：原来**只有被挤出时才落库**，于是"最近这一屏"从来没进过库
-        #   （实测：90 字远没到 4000 预算 ⇒ 一条没存 ⇒ 换进程窗口 0 条）。
-        #   ⇒ 那不叫无限上下文，叫"进程内有限窗口 + 老内容可搜"。
-        #   现在改成**每条都落库**，内存窗口只是"库的一个视图"：
-        #   进程重启后能从这个会话的尾部把窗口读回来。
-        self._persist(item)
         evicted = []
         while self._chars > self.window_chars and len(self._ring) > 1:
             oldest = self._ring[0]
@@ -148,67 +131,16 @@ class RingContext:
         return {'ok': True, 'seq': item['seq'], 'window_chars': self._chars,
                 'window_items': len(self._ring), 'evicted': evicted}
 
-    def _restore_window(self, max_items: int = 400) -> int:
-        """从库里把这个会话最近的若干条读回内存窗口（按预算截断）。
-
-        没有这一步，"窗口"就是进程私有的：换进程等于失忆，
-        只能靠 recall 一条条捞。补上之后才配叫**跨进程的无限上下文**。
-        """
-        try:
-            with self._conn() as c:
-                rows = c.execute(
-                    "SELECT seq, at, role, content, chars FROM turns "
-                    "WHERE COALESCE(name, 'default') = ? ORDER BY seq DESC LIMIT ?",
-                    (self.name, int(max_items))).fetchall()
-        except Exception:                                     # noqa: BLE001
-            return 0
-        restored = 0
-        for seq, at, role, content, chars in reversed(rows):
-            n = int(chars or len(content or ''))
-            if self._chars + n > self.window_chars and self._ring:
-                break
-            self._ring.append({'seq': int(seq), 'at': at, 'role': role,
-                               'content': content, 'chars': n, 'meta': {}})
-            self._chars += n
-            restored += 1
-        return restored
-
-    def _persist(self, item: dict) -> bool:
-        """把一条写进库（**幂等**，INSERT OR REPLACE）。每次 push 都调用。"""
-        return self._spill(item)
-
     def _spill(self, item: dict) -> bool:
         """把一个被挤出的条目落库（FTS5 同步）。返回是否落库成功。"""
         try:
             with self._conn() as c:
-                import hashlib as _hl
-                _h = _hl.sha1(("%s\x00%s" % (item['role'], item['content']))
-                              .encode('utf-8')).hexdigest()
-                # 🔴 2026-10-28：去重**必须按会话隔离**。
-                #   原来只按 h 全局查 ⇒ A 会话存过的话，B 会话 push 时被当成重复跳过，
-                #   B 会话里就永远没有这条（实测 final 会话只剩 1 条）。
-                _dup = c.execute(
-                    "SELECT seq FROM turns WHERE h = ? "
-                    "AND COALESCE(name, 'default') = ? LIMIT 1",
-                    (_h, self.name)).fetchone()
-                if _dup:
-                    return True          # 同一句话已经在库里，不重复存
-                c.execute('INSERT OR REPLACE INTO turns '
-                          '(seq, at, role, content, chars, name, h) '
-                          'VALUES (?,?,?,?,?,?,?)',
-                          (item['seq'], item['at'], item['role'], item['content'],
-                           item['chars'], self.name, _h))
+                c.execute('INSERT OR REPLACE INTO turns (seq, at, role, content, chars) VALUES (?,?,?,?,?)',
+                          (item['seq'], item['at'], item['role'], item['content'], item['chars']))
                 try:
-                    # 🔴 2026-10-28：改成"每条都落库"后，同一条会被写两次
-                    #   （push 时一次、被挤出时再一次），第二次插 FTS 的 rowid
-                    #   已经存在 ⇒ IntegrityError。而这里原来只 catch
-                    #   OperationalError ⇒ 异常冒出去 ⇒ _spill 返回 False
-                    #   ⇒ 挤出循环 break ⇒ **环形"长度恒定"铁律被破坏**
-                    #   （实测窗口涨到 8070 / 预算 3000）。
-                    #   两处都修：FTS 用 OR REPLACE，且把 IntegrityError 也接住。
-                    c.execute('INSERT OR REPLACE INTO turns_fts (rowid, content) VALUES (?,?)',
+                    c.execute('INSERT INTO turns_fts (rowid, content) VALUES (?,?)',
                               (item['seq'], item['content']))
-                except (sqlite3.OperationalError, sqlite3.IntegrityError):
+                except sqlite3.OperationalError:
                     pass
             return True
         except Exception:
@@ -238,24 +170,16 @@ class RingContext:
         try:
             with self._conn() as c:
                 try:
-                    # 🔴 2026-10-28：**召回必须限定本会话**。
-                    #   原来不限 name ⇒ 会串到别的会话去（实测：final 会话自己只有 1 条，
-                    #   却 recall 出 3 条 —— 全是别的测试会话的）。
-                    #   每个会话是一个独立的环，串了就等于偷看别人的上下文。
                     rows = c.execute(
                         'SELECT t.seq, t.at, t.role, t.content FROM turns_fts f '
                         'JOIN turns t ON t.seq = f.rowid WHERE turns_fts MATCH ? '
-                        "AND COALESCE(t.name, 'default') = ? "
-                        'ORDER BY rank LIMIT ?',
-                        (_fts_q(query), self.name, k)).fetchall()
+                        'ORDER BY rank LIMIT ?', (_fts_q(query), k)).fetchall()
                 except sqlite3.OperationalError:
                     rows = []
                 if not rows:
-                    rows = c.execute(
-                        'SELECT seq, at, role, content FROM turns '
-                        "WHERE content LIKE ? AND COALESCE(name, 'default') = ? "
-                        'ORDER BY seq DESC LIMIT ?',
-                        ('%' + query + '%', self.name, k)).fetchall()
+                    rows = c.execute('SELECT seq, at, role, content FROM turns '
+                                     'WHERE content LIKE ? ORDER BY seq DESC LIMIT ?',
+                                     ('%' + query + '%', k)).fetchall()
         except Exception as e:
             return {'ok': False, 'error': repr(e)[:200], 'hits': []}
         for r in rows:

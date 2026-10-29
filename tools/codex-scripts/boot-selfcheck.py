@@ -43,8 +43,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# 🔴 2026-10-18 修（2026-10-17 实测）：**本脚本自己是「一条命令跑完全部判据」的主闸**，
-#    但在中文 Windows 控制台（cp936/GBK）上，印 ✅/🔴 会当场抛
+# 2026-10-18 修（2026-10-17 实测）：**本脚本自己是「一条命令跑完全部判据」的主闸**，
+# 但在中文 Windows 控制台（cp936/GBK）上，印 / 会当场抛
 #    `UnicodeEncodeError: 'gbk' codec can't encode character '\u2705'`（原第 448 行）。
 #    实测后果：**37 段判据其实全跑完了**，却在最后一步「印结果」时崩掉，退出码 1 ⇒
 #    读数被误读成「自检有红」——这是**工具自身**的假红（P11 假读数一族：无效输出当数据源）。
@@ -56,55 +56,40 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 # 判据组：**只点名，不复制**。每个都必须是 `gbt_allinone.tests.<名>`
-# 🔴 2026-10-10 加（主人令：「整个框架只有三个护栏」+「镜像多维度空间的最大能力就是只出品生产，不出品废物」）：
+# 2026-10-10 加（主人令：「整个框架只有三个护栏」+「镜像多维度空间的最大能力就是只出品生产，不出品废物」）：
 #    这两条**政策**已经落成脚本（guardrail-check.py / deployment-law-check.py），各有真植入负控。
 #    但它们**散在 tools/codex-scripts 里 = 没人跑** —— 而本文件的第一句话就是「判据散着 = 没人跑」。
 #    ⇒ 收进开机自检。口径同本文件：**只调，不重写**（判据只有一份，在各自的脚本里）。
-#    🔴 **许可证**：这两条判据**不是**"又多加了门" —— 它们是**把主人已经说过的两条律钉成可复跑的读数**：
+# **许可证**：这两条判据**不是**"又多加了门" —— 它们是**把主人已经说过的两条律钉成可复跑的读数**：
 #      ① 只有三道护栏（黑客全能力 / 付款 / 生成代码禁入生产面板）+ 一道自我保护机制（filesystem_write·不能删）
 #      ② 只出品生产，不出品废物（镜像干净 / 体检 5/5 / 生产里没有绕过镜像多出来的件）
 EXTRA_JUDGMENTS = [
     ("护栏只有三道", ["-X", "utf8", "tools/codex-scripts/guardrail-check.py"]),
     ("部署法制·只出品生产", ["-X", "utf8", "tools/codex-scripts/deployment-law-check.py"]),
-    # 🔴 2026-10-10 加（主人令逐字：「**没有亲自跑通的东西不许交付**」）：
+ # 2026-10-10 加（主人令逐字：「**没有亲自跑通的东西不许交付**」）：
     #    本件**当场复跑**台账 state/delivery-claims.jsonl 里每一条交付声明的命令，
     #    并比对期望读数 —— 只有口述的、命令跑不通的、读数对不上的，一律红。
     ("没有亲跑不许交付", ["-X", "utf8", "tools/codex-scripts/proof-of-run-check.py"]),
-    # 🔴 2026-10-10 加（**棘轮**，防回归）：一天里同一个病咬掉 3 条红 ——
+ # 2026-10-10 加（**棘轮**，防回归）：一天里同一个病咬掉 3 条红 ——
     #    测试调工具不带 -X utf8 + 本机控制台 GBK ⇒ 印非 ASCII 时 UnicodeEncodeError
     #    ⇒ **stdout 空** ⇒ 调用方解析空 ⇒ 判据恒红。
     #    存量 151 件登记在 state/encoding-guard-baseline.json（不红）；
     #    **新件再犯必红**；修好后会提示可移出基线（棘轮只会缩，不会长）。
     ("编码守门不许退步", ["-X", "utf8", "tools/codex-scripts/encoding-guard-check.py"]),
-    # 🔴 2026-10-17 加（主人令逐字：「**把她放在重启大模型第一眼就能看到的地方**」；
+ # 2026-10-17 加（主人令逐字：「**把她放在重启大模型第一眼就能看到的地方**」；
     #    当轮自纠：「**编队账本你没有第一时间看到吗**」）：触手 LLM 编队的**单一真源**
     #    deploy/cloud-10/llm-lanes.json 必须每次重启第一眼现读（live 探针走 HEARTBEAT 硬指令第 1 步）。
     #    这里钉的是它**自身契约**的离线判据（--check 不发一字节请求，合「判据不依赖外网」律）：
     #    19 车道字段齐 · 托管不许冒充无审查 · 本机回环只许退场不许回吊 · 不许假绿 · 出处纪律 · 图像面在册。
     ("云上模型编队账本契约", ["-X", "utf8", "tools/codex-scripts/llm-lanes.py", "--check"]),
-    # 🔴 2026-10-23 加（主人问「让 V8 吞噬原生 vLLM 是不是就有起来的路线」）：
-    #    换车道（GPU→TPU→别的云）唯一能判"起来了没有"的是**三项读数**：首字 p50 ≤2s · ≥20 tok/s · weights_ours=true。
-    #    这条钉的是**量具自己**（--selftest 纯离线，4 个负对照必须判对），不是"某个端点有没有通"——
-    #    端点通不通要真跑 `lane-bench.py --base …`，那要票，不放进开机自检。
-    ("换车道压测量具可复跑", ["-X", "utf8", "tools/codex-scripts/lane-bench.py", "--selftest"]),
-    # 🔴 2026-10-23 加（专业体检发现：账停在 239 而注册表已 341，2026-10-01 之后再没写过）：
-    #    cap-probe 的默认档来自 state/caps_tiers.json —— 账比真少 102 位，按它扫就等于漏扫三分之一。
-    #    这条钉「四档之和 == 注册表条数」+「账不旧于 7 天」；重算走同一件的无参模式（它就是写手）。
-    ("能力位分档账与注册表同数且新鲜", ["-X", "utf8", "tools/codex-scripts/gen-caps-tiers.py", "--check"]),
-    # 🔴 2026-10-23 加（主人两次点名「一体式、不要跳转」）：把这条从口号变成机器判据 ——
-    #    安装台在页内 · 无独立安装窗 · 对话面接主人自己那台 DSH · 页面无外站跳转 · 无「全项目索引」浮条 · 无 V9 残留。
-    ("APP 一体式（不跳转）七条判据", ["-X", "utf8", "tools/codex-scripts/integrated-check.py"]),
-    # 2026-10-23：云插件互联的**尺子**必须自己能跑（离线负控：单向边要咬出来）。
-    # 注意这里只跑 --selftest，不跑真验收 —— 10 槽还没装完，真验收现在是红的，红在缺节点而不是缺判据。
-    ("云插件互联验收判据可复跑", ["-X", "utf8", "tools/codex-scripts/mesh-verify.py", "--selftest"]),
 
-    # 🔴 2026-10-11 加（主人令逐字：「记得每一页都要亲自扫描到触手双向绑定好，
+ # 2026-10-11 加（主人令逐字：「记得每一页都要亲自扫描到触手双向绑定好，
     #    确保所有的状态主脑第一时间都能知道，别搞得像无关要紧是的」）：
     #    逐页扫 240 个能力页（不抽样）：① 每页 data-kind 必须在主脑数据里找得到
     #    ② 那个节点必须有 bundle（触手承载）③ 主脑数据新鲜 ④ 快照功能页不许烤过期
     ("每一页都绑到触手", ["-X", "utf8", "tools/codex-scripts/page-bind-check.py"]),
 
-    # 🔴 2026-10-17 加（主人令逐字：「**她自己要懂得编排懂得整理自己的身体，电脑就是她的身体，
+ # 2026-10-17 加（主人令逐字：「**她自己要懂得编排懂得整理自己的身体，电脑就是她的身体，
     #    这个不懂等于傻**」）：self-tend 四件套早就落地，但**没有任何东西会来调它** ——
     #    能力位在盘上、身体不会自己整理。这条把「触发节奏」钉成开机可复跑的读数：
     #    ① 政策白名单没被删条 ② 节流状态 schema 合法 ③ **距上次整理 ≤7 天**
@@ -113,7 +98,7 @@ EXTRA_JUDGMENTS = [
     #    离线判据：不碰网络、不搬一物，只读 state/self-tend/last-run.json 与政策常量。
     ("身体自整理节奏", ["-X", "utf8", "tools/codex-scripts/self-tend.py", "check"]),
 
-    # 🔴 2026-10-18 加（P9「账没有写手必烂」· 全量扫描现读出来的真病灶）：
+ # 2026-10-18 加（P9「账没有写手必烂」· 全量扫描现读出来的真病灶）：
     #    台账是注入进会话头的「唯一进度真源」，而它 updated_at 停在 2026-10-11，
     #    同一份盘上 logbook 却在 2026-10-18 还在写 —— 注入给模型的是六天前的快照。
     #    本条钉四件事，全部可复算、不代笔：
@@ -124,7 +109,7 @@ EXTRA_JUDGMENTS = [
     #    写手在 tools/codex-scripts/ledger-refresh.py；本条只读，不写盘。
     ("台账写手与一屏账在位", ["-X", "utf8", "tools/codex-scripts/ledger-refresh.py", "--check"]),
 
-    # 🔴 2026-10-18 加（F12 防回退）：room_space 里 simulate/parity/rehearse/release 等
+ # 2026-10-18 加（F12 防回退）：room_space 里 simulate/parity/rehearse/release 等
     #    八个原语模块里早就实现，而 api.py 从不路由 ⇒ gate 永远报「没有房间排练报告」，
     #    房间那条「排练 → 盖章 → 原子替换」的正路在门上走不完（模型只能回生产面涂改）。
     #    本轮补齐并把这条判据挂上：模块有、门上没有；名单与真分支不同源；豁免表里那几个
@@ -132,7 +117,7 @@ EXTRA_JUDGMENTS = [
     ("房间原语都在门上", ["-X", "utf8", "-m", "unittest",
                           "gbt_allinone.tests.test_room_ops_wired"]),
 
-    # 🔴 2026-10-18 加（Owner 令：「画面必须高清 动作自然」「手指都要」
+ # 2026-10-18 加（Owner 令：「画面必须高清 动作自然」「手指都要」
     #    「严格按我的要求直到合格为止」）：把"好不好看"变成能咬的读数 ——
     #    骨架/手指 ≥40 · 模型必须真带 idle+walk · 贴图 ≥2048 · 4K 基准件真 4096 ·
     #    页面必须真播动画（AnimationMixer+crossFade）且给 PBR 环境 · 不许 iframe ·
@@ -141,23 +126,23 @@ EXTRA_JUDGMENTS = [
     ("数字人标准达标", ["-X", "utf8", "-m", "unittest",
                         "gbt_allinone.tests.test_dh_standard"]),
 
-    # 🔴 2026-10-19 加（本轮实栽：舞台里她"能渲染"，但双腿折在胯上、双手举过头顶）：
+ # 2026-10-19 加（本轮实栽：舞台里她"能渲染"，但双腿折在胯上、双手举过头顶）：
     #    idle 里 LeftUpLeg/RightUpLeg 被自动绑骨扭了 177°（Tripo 髋骨重定向符号错），
     #    而当时那六条绑骨判据全绿 —— 因为它们只看**网格/蒙皮/尺度**，没人看**动作**。
     #    本条把八条一起钉成开机可复跑的读数（只读 GLB 二进制 + 派生件对账，不起进程）：
     #      ① 单网格单蒙皮 ② 无 42 顶点杂物球 ③ 身高 1.720±0.02（文件空间 Y 跨度）
     #      ④ 无死顶点 ⑤ 髋骨没被扭（逐帧 <0.5°）⑥ 手臂垂放（40°~120°：既不是 T-pose 也不举过头顶）
     #      ⑦ 循环闭合（首末帧差 <2°）⑧ .b64.js 派生件与源对账
-    #    ⚠️ 别拿 Blender 的"2 个网格 / 42 未绑顶点"当红：那是导入器给 65 根骨骼造的显示形状，
+ # 别拿 Blender 的"2 个网格 / 42 未绑顶点"当红：那是导入器给 65 根骨骼造的显示形状，
     #       GLB 字节里没有它（rig-audit.py 已剔除，并在回执里点名）。
     ("数字人资产八条", ["-X", "utf8", "tools/codex-scripts/dh-asset-gate.py"]),
-    # 🔴 2026-10-19 加（主人令「她的所有能力都要融合进触手…这样就不会出现缺失和断连」
+ # 2026-10-19 加（主人令「她的所有能力都要融合进触手…这样就不会出现缺失和断连」
     #    +「通电秒达，如果没秒到就是那里不通」）：
     #    ① 触手主干六腿：登记/分派/承载/资产/页面/记忆页 —— 每条能力缺一条就是断连（非零退出）
     #    ② 通电三层秒表：索引微秒级 · 门毫秒级 · 真调用在预算内（超预算 = 那处不通）
     ("触手主干六腿", ["-X", "utf8", "tools/codex-scripts/tentacle-trunk-check.py"]),
     ("通电秒达", ["-X", "utf8", "tools/codex-scripts/tentacle-pulse-check.py", "--sample", "4"]),
-    # 🔴 2026-10-19 加（主人令「改一处之前，先分出触手盯住与它相连的所有地方」）：
+ # 2026-10-19 加（主人令「改一处之前，先分出触手盯住与它相连的所有地方」）：
     #    **多域监控的驱动轮** —— 这一条同时做两件事：
     #      ① 真跑一次 `sched_tick`（把到期调度跑掉；`impact_monitor` 每 3600s 就跑一遍
     #         影响面排行）。留痕：`schedule.run_forever` 至今**没有常驻调用方**，所以
@@ -165,7 +150,7 @@ EXTRA_JUDGMENTS = [
     #      ② 真跑一次 `impact_check status`（图规模 + 连通性；图读不到就红，不许静默）。
     #    两件事都只读，不写生产盘（sched_tick 只会写它自己的 last_run_ts）。
     ("多域监控·定时轮", ["-X", "utf8", "tools/codex-scripts/impact-monitor-tick.py"]),
-    # 🔴 2026-10-19 加（主人令「都要跑通闭环啊」）：**循环本身也得有人判**。
+ # 2026-10-19 加（主人令「都要跑通闭环啊」）：**循环本身也得有人判**。
     #    `sched_define` 只登记、`monitor-once.py` 只一拍，真让它 24/7 转的是
     #    Windows 任务计划 GBT-MonitorLoop（每 2 分钟）。任务被停/被删/机器刚起来，
     #    在读数上和"一切正常"完全一样 —— 所以这一条专门判"心跳还新不新"（>600s 即红）。
@@ -173,16 +158,16 @@ EXTRA_JUDGMENTS = [
 ]
 
 JUDGMENTS = [
-    # 🔴 2026-10-11 加（七步法第七步的挂点）：接外部件必须落一条机器判据，否则
+ # 2026-10-11 加（七步法第七步的挂点）：接外部件必须落一条机器判据，否则
     #    「接上了、后来悄悄坏了」没人知道。本件判的是 om-ai-lab/VLX-Flow 的接入：
     #    ① 钢印（接自哪、上游当前是否纯文档仓）② 三处齐（注册表 + 分派）
     #    ③ 两层记忆都在位（视觉缓存层四能力 + 语义记忆层）④ 真跑闭环（digest→recall）
     #    ⑤ **负控**：未列出的 op 必须 fail-closed。上游"还没放代码"时判**如实报缺**也算过。
     ("VLX-Flow 接入", "gbt_allinone.tests.test_vlx_flow_intake"),
-    # 🔴 2026-10-11 加（主人令「重启机制下达一条硬性指令」：重启后必须接通上帝视角 +
+ # 2026-10-11 加（主人令「重启机制下达一条硬性指令」：重启后必须接通上帝视角 +
     #    自检 + 把发现登记）—— 见 HEARTBEAT.md 顶部那一节。
     ("重启硬指令·三件齐", "gbt_allinone.tests.test_restart_mandate"),
-    # 🔴 2026-10-11 加（主人令三条铁律：禁止脑补 / 必须带参 / 先纠错再回答）
+ # 2026-10-11 加（主人令三条铁律：禁止脑补 / 必须带参 / 先纠错再回答）
     ("三条铁律", "gbt_allinone.tests.test_iron_rules"),
     ("能力总数一致", "gbt_allinone.tests.test_cap_total_consistency"),
     ("注入命令为真", "gbt_allinone.tests.test_prompt_commands_are_real"),
@@ -241,7 +226,7 @@ JUDGMENTS = [
     # 2026-09-25 加：**cross_scan 的 V 维（视图对账）**。它此前只出现在维度声明里
     # （声称 10 维、实际 6 维能产出发现）；本轮真做出来，判据是**加减法要闭合**
     # （家根总项 == 六类之和），而不是只读一个数字。
-    # 🔴 最要紧的是安全红线：`inventory.scan(fix=True)` 会**真删文件** ——
+ # 最要紧的是安全红线：`inventory.scan(fix=True)` 会**真删文件** ——
     #    用例用桩记录 kwargs，直接断言扫描器传的是 `fix=False`（「扫一下」不该改动任何东西）。
     ("视图对账且只读", "gbt_allinone.tests.test_cross_scan_v_dim"),
     # 2026-09-25 加：**满仓横扫的负载闸**。两次实跑证明：内存被压满时满仓横扫会出**假红**
@@ -279,7 +264,7 @@ def _env(store: str) -> dict:
     e = dict(os.environ)
     e["GBT_STORE_DIR"] = store
     e["PYTHONIOENCODING"] = "utf-8"
-    # 🔴 2026-09-26 自纠：环境里残留的 PYTHONPATH 会把注入面测成假红
+ # 2026-09-26 自纠：环境里残留的 PYTHONPATH 会把注入面测成假红
     #    （run-all-tests.py 里的一手实录）。这里跑的是同一批 unittest 模块，
     #    却没做同样的环境清洁 —— 现在补上，同一条判据同一条规矩。
     e.pop("PYTHONPATH", None)
@@ -298,7 +283,7 @@ def _run(cmd: list, env: dict, timeout: int = 600) -> tuple:
 
 
 # ── 2026-10-13 加（主人令：「触手绑定每一页代码…全量绑定好的一起并发不可能达不到的」）────────
-# 🔴 现读病象：27 条 unittest + 5 条政策判据 + node 漂移闸 + 验收单**全串行**跑
+# 现读病象：27 条 unittest + 5 条政策判据 + node 漂移闸 + 验收单**全串行**跑
 #    （每条超时上限 600s）⇒ 实测 **457.5 秒**。它们**互不依赖**（各自独立子进程、各自隔离 store）
 #    ⇒ 本来就该并发。下面把「要点哪些判据」抽成**一份计划**（**只点名，不复制实现**），
 #    顺序执行与并发执行**共用这一份**。
@@ -321,47 +306,6 @@ def _plan(quick: bool = False) -> list:
     else:
         plan.append({"cat": "闸", "step": "闸/装机副本漂移", "kind": "missing_gate",
                      "argv": [], "cmd": str(DRIFT_GATE), "timeout": 0})
-    # 🔴 2026-10-22 加（Owner 令「按照专业化来推进」；当天页面卡死排查把真因拆成四处）：
-    #    模型车道（Chip「GBT小土豆V8 原生 · 云上拼接网 · 身份注入」）此前没有任何常设判据 ——
-    #    端点常驻参数（workersMin/idleTimeout）、引擎窗口、Worker 自权重接线、鉴权 fail-closed、
-    #    SSE 必须带 finish_reason+[DONE]、秒级闸、带 tools 仍能收尾，全靠临时脚本各测一半，
-    #    于是「每轮冷启动 92~300 秒」和「maxTokens 256000 撞 1M 上下文墙」都活过了很多轮。
-    #    这条把它们收成一次执行、一个退出码（判据本体只在 lane-doctor.py 里一份）。
-    #    它要真打端点 ⇒ 与「重启验收单」同类：`--quick` 跳过（**跳过不是通过**）。
-    #    离线不判红：lane-doctor 带 --gate，把「连不上」降 WARN；契约坏仍是 FAIL。
-    # 🔴 2026-10-24 换闸（主人令逐字：「这个要花钱我们不需要直接清理了就没卡点了」）：
-    #    旧闸判的是 RunPod **自有权重**车道，该车道已按令清理 ⇒ 再判它永远红，
-    #    而红的原因已经不是"坏了"而是"不做了" —— **判据必须量在役的东西**。
-    #    现役车道 = 免费道（Cloudflare Workers AI / Agnes），新闸 3 条：
-    #      L1 桥在役且默认是免费道 · L2 真出话（非空）· L3 口径明示 weights_ours=false。
-    #    自有权重车道将来恢复时，把本步换回 lane-doctor 即可（两份判据都留着）。
-    if quick:
-        plan.append({"cat": "闸", "step": "闸/模型车道（现役免费道）", "kind": "skipped",
-                     "argv": [], "cmd": "（--quick 跳过）", "timeout": 0})
-    else:
-        plan.append({"cat": "闸", "step": "闸/模型车道（现役免费道 · 3 条）", "kind": "script",
-                     "argv": [sys.executable, "-X", "utf8",
-                              "tools/codex-scripts/lane-gate-free.py"],
-                     "cmd": "python tools/codex-scripts/lane-gate-free.py",
-                     "timeout": 180})
-    # 🔴 2026-10-22 加（D3 的尺子挂成常设判据）：
-    #    「规程缺口」此前只有台账里一句**无法复跑**的「5 处」；现在有量具 `spec-gap-scan.py`
-    #    （现算：341 位 / 30 域 / 缺口 149 位）。这条**不是**判「缺口=0」（缺口归 D3 由主人定补法），
-    #    而是判 **尺子本身能跑**：脚本能起、能现算、能落回执 —— 量具烂掉要立刻看见，
-    #    否则下一轮又会拿一句旧数字当读数（P9：账没有写手必烂）。
-    plan.append({"cat": "判据", "step": "判据/规程缺口量具可复跑", "kind": "script",
-                 "argv": [sys.executable, "-X", "utf8",
-                          "tools/codex-scripts/spec-gap-scan.py"],
-                 "cmd": "python tools/codex-scripts/spec-gap-scan.py", "timeout": 180})
-    # 🔴 2026-10-22 加（把「账实一致」也变成常设判据）：
-    #    护照是"我声称改了什么 + 证据 + 回滚"，但**没有东西会去核对它是否还成立** ——
-    #    件被删了、证据变成空话、回滚写得像口号，门都看不见（门只看"有没有护照"）。
-    #    这条逐张查五件事：件在盘 / 证据含 `命令 => 读数` / 回滚 ≥8 字 / 有复核或`--no-review-reason` /
-    #    有印章或`--no-stamp-reason`。**只查今天关闭的护照**（历史账见 F22，已明示登记，不重算）。
-    plan.append({"cat": "判据", "step": "判据/护照账实一致（今日关闭的）", "kind": "script",
-                 "argv": [sys.executable, "-X", "utf8",
-                          "tools/codex-scripts/passport-audit.py", "--today"],
-                 "cmd": "python tools/codex-scripts/passport-audit.py --today", "timeout": 180})
     if quick:
         plan.append({"cat": "闸", "step": "闸/重启验收单", "kind": "skipped",
                      "argv": [], "cmd": "（--quick 跳过）", "timeout": 0})
@@ -439,7 +383,7 @@ def _run_plan(plan: list, env: dict, jobs: int) -> dict:
     res: dict = {}
 
     def _timed(argv, env_, timeout):
-        # 🔴 逐条耗时必须在**工人自己身上**量 —— 首版在工作线程收结果时量，
+ # 逐条耗时必须在**工人自己身上**量 —— 首版在工作线程收结果时量，
         #    结果全是 0.0（量的是"取结果"那一刻，不是"跑"那一刻）。真读数咬出来的。
         t = time.time()
         rc, out = _run(argv, env_, timeout)
@@ -512,12 +456,12 @@ def _panel_html(rep: dict) -> str:
 
 
 def selfcheck(quick: bool = False, jobs: int = 1, panel: str = "") -> dict:
-    # 🔴 2026-09-26 自纠：原来用固定共享路径 %TEMP%/gbt_boot_selfcheck_store ——
+ # 2026-09-26 自纠：原来用固定共享路径 %TEMP%/gbt_boot_selfcheck_store ——
     #    两次自检并发会共享同一 store（读数互相污染），且跨次运行累积不清理，
     #    "隔离 store"只隔离了生产，没隔离上一次自己。现在每检一次一间新屋。
     store = tempfile.mkdtemp(prefix="gbt_boot_selfcheck_store_")
     env = _env(store)
-    # 🔴 2026-10-13：判据计划抽成**一份** `_plan()`（顺序执行与并发执行共用），
+ # 2026-10-13：判据计划抽成**一份** `_plan()`（顺序执行与并发执行共用），
     #    逐条读数口径一字未改（挪进 `_post()`）。`jobs>1` 即并发。
     plan = _plan(quick)
     t0 = time.time()
@@ -551,7 +495,7 @@ def selfcheck(quick: bool = False, jobs: int = 1, panel: str = "") -> dict:
             result["panel"] = str(p)
         except Exception as _e:                                 # noqa: BLE001
             result["panel_error"] = "%s: %s" % (type(_e).__name__, str(_e)[:120])
-    # 🔴 2026-10-11 加（主人令「重启之后必须查看框架使用以及自动自检」）——**落痕**：
+ # 2026-10-11 加（主人令「重启之后必须查看框架使用以及自动自检」）——**落痕**：
     #    实测本件跑了十几次，而 state/ 下**一个痕迹都没有** ⇒ 重启硬指令的判据
     #    （tools/codex-scripts/restart-mandate-check.py）**根本无从判断"自检做没做"** ——
     #    这正是主人说的「重启再问她她都不懂了」。

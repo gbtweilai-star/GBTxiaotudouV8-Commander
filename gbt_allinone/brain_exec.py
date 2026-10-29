@@ -146,60 +146,6 @@ def route(intent: str) -> dict:
     top = scored[:5]
     alt = [{"kind": s[1], "domain": s[2]} for s in top[1:]]
 
-    # ── ⓪ 词表路：确定性领域映射（排在语义路之前）──────────────────────────
-    # 🔴 2026-10-28：主路要统一大模型；A19 不在时降级到字符 2-gram，
-    #   实测把「上下文异常纠正」路由成了 libtv_workflow（视频工作流）——完全不相干。
-    #   词表是**人工钉死的领域→能力位映射**，命中即确定，不是降级。
-    #   没命中就照原路走，不影响其它意图。
-    # ── ⓪-1 自称谓优先（比词表更具体）─────────────────────────────────
-    # 实测驱动：能力位名是**英文**（brain_health / model_key_pool），描述全是中文，
-    # 位名 token 在描述里一个都不出现 ⇒ "按位名自识别"对这类位完全失效。
-    # 但描述里有**中文自称谓**（"大脑执行层·健康维：" 里的"健康维"），
-    # 那才是它在文本里的真实身份。实测 4 个错位位 4/4 命中且都对。
-    try:
-        from .llm import route_lexicon as _LX0
-        nh = _LX0.name_hint(intent)
-    except Exception:                                         # noqa: BLE001
-        nh = {"ok": False}
-    if nh.get("ok"):
-        b = nh["best"]
-        return {"ok": True, "intent": str(intent)[:120],
-                "best": {"kind": b["cap"], "domain": b.get("domain") or "self",
-                         "desc": "自称谓命中：%s" % b["label"], "via": "self_label"},
-                "alternatives": [], "candidates": 1,
-                "path": "self_label", "degraded": False,
-                "self_label": {"label": b["label"], "weight": b["weight"],
-                               "ambiguous": bool(b.get("ambiguous")),
-                               "tied": b.get("tied") or []},
-                "semantic_skipped": True,
-                "heuristic_best": ({"kind": top[0][1], "domain": top[0][2],
-                                    "desc": top[0][3]} if top else None),
-                "elapsed_ms": round((time.time() - t0) * 1000, 1)}
-
-    try:
-        from .llm import route_lexicon as _LX
-        lx = _LX.match(intent)
-    except Exception:                                         # noqa: BLE001
-        lx = {"ok": False, "why": "词表不可用"}
-    if lx.get("ok"):
-        e = lx["entry"]
-        return {"ok": True, "intent": str(intent)[:120],
-                "best": {"kind": (e["kinds"] or [""])[0],
-                         "domain": "lexicon", "desc": e["reason"][:80],
-                         "via": "lexicon"},
-                "alternatives": [{"kind": k, "domain": "lexicon"}
-                                 for k in e["kinds"][1:]],
-                "candidates": len(e["kinds"]), "path": "lexicon",
-                "degraded": False,                 # 确定性命中不是降级
-                "lexicon": {"id": e["id"], "score": e["score"],
-                            "hits": e["hits"], "kinds": e["kinds"],
-                            "tools": e.get("tools") or [],
-                            "reason": e["reason"]},
-                "semantic_skipped": True,
-                "heuristic_best": ({"kind": top[0][1], "domain": top[0][2],
-                                    "desc": top[0][3]} if top else None),
-                "elapsed_ms": round((time.time() - t0) * 1000, 1)}
-
     # ── ① 主路：语义路由（不可用时它自己如实降级并带原因回来）──
     main, main_err = None, ""
     try:
@@ -366,123 +312,35 @@ def execute(kind: str = "", payload: dict = None, parallel: list = None,
 # ── 维度三：verify（触手肉眼验证——先看再动）──
 
 @_spanned
-def _probe_reality(expectation: str) -> dict:
-    """**非视觉**的现实验证面 —— 给没有交互桌面的机器用。
-
-    2026-10-28 实测驱动：本机是 iSH/Alpine，GDI/DXGI 拿不到屏，
-    `verify` 的 vision 检查恒 false ⇒ 整条链的"验证"那一环是空的。
-    但"验证现实"不等于"必须看屏幕"：端口通不通、文件在不在、哈希对不对，
-    同样是现实，同样可复算。
-
-    只认得出来的面；认不出就如实说"无可验证面"，**绝不假装验过**。
-    """
-    import hashlib
-    import pathlib as _pl
-    import re as _re
-    import socket
-    text = str(expectation or "")
-    faces, results = [], {}
-
-    # ① 端口 / URL
-    # 允许裸 ":8765"（实测：写"面板后端 :8765 应该在线"时旧正则要求主机前缀，漏掉了）
-    for m in _re.finditer(r"(?<![\d:])(?:(?:127\.0\.0\.1|localhost))?:(\d{2,5})\b", text):
-        port = int(m.group(1))
-        faces.append("port:%d" % port)
-        ok = False
-        s = socket.socket()
-        s.settimeout(2.0)
-        try:
-            s.connect(("127.0.0.1", port))
-            ok = True
-        except OSError:
-            ok = False
-        finally:
-            s.close()
-        results["port:%d" % port] = {"ok": ok, "kind": "tcp"}
-
-    # ② 文件路径（相对仓库根）
-    root = _pl.Path(__file__).resolve().parents[1]
-    for m in _re.finditer(r"([\w./-]+\.(?:py|json|html|md|js|txt))", text):
-        rel = m.group(1)
-        fp = (root / rel)
-        if not fp.exists():
-            fp2 = _pl.Path(rel)
-            fp = fp2 if fp2.exists() else fp
-        faces.append("file:" + rel)
-        if fp.is_file():
-            h = hashlib.sha256(fp.read_bytes()).hexdigest()[:12]
-            results["file:" + rel] = {"ok": True, "kind": "file",
-                                      "bytes": fp.stat().st_size, "sha12": h}
-        else:
-            results["file:" + rel] = {"ok": False, "kind": "file",
-                                      "why": "不存在"}
-
-    if not faces:
-        return {"ok": False, "reason": "无可验证面（expectation 里没有端口/文件）",
-                "faces": [], "results": {}}
-    ok = all(v["ok"] for v in results.values())
-    return {"ok": ok, "faces": faces, "results": results,
-            "reason": "" if ok else "有面没过"}
-
-
 def verify(expectation: str = "", window: str = None) -> dict:
-    """验证现实。视觉优先，**没有桌面就走非视觉面**。
+    """用触手的眼睛验证现实：抓全屏帧 + 感知指纹 + （可选）目标窗口内容读回。
 
-    🔴 2026-10-28 改：原来只有 vision 一条检查，而本机（iSH/Alpine）
-       GDI/DXGI 拿不到屏 ⇒ checks 里只有一个 False ⇒ ok 恒 false，
-       整条链的"验证"永远是空的。
-       现在两条面并存：
-         vision  —— 有桌面才算数；拿不到就标 available=false 且 counted=false
-         reality —— 端口/文件，无桌面也能算
-       只要 reality 有面且全过 ⇒ verdict=verified；
-       一条面都没有 ⇒ verdict=unverified_no_surface（**不假装验过**）。
+    expectation 只是记录预期（供人对照），验证证据是视觉/读回的原始数据。
     """
     from .tentacle import bridge as TB
     from .tentacle import vision_bus as VB
     t0 = time.time()
     checks = {}
-
-    # 1) 视觉证据（拿不到屏要如实标，且**不计入判定**）
+    # 1) 视觉证据（全屏帧 + 指纹）
     try:
         eye = TB.get_eye()
         snap = VB.snapshot(eye, ttl=30)
-        ok_v = bool(snap.get("ok"))
-        checks["vision"] = {"ok": ok_v, "counted": ok_v,
-                            "available": True,
-                            "fingerprint": snap.get("fingerprint"),
-                            "size": snap.get("size")}
-    except Exception as e:                                    # noqa: BLE001
-        checks["vision"] = {"ok": False, "counted": False, "available": False,
-                            "error": str(e)[:80],
-                            "note": "无交互桌面（拿不到屏）—— 本机正常状态，不计入判定"}
-
-    # 2) 目标窗口读回（UIA 穿透，Windows）
+        checks["vision"] = {"ok": bool(snap.get("ok")),
+                             "fingerprint": snap.get("fingerprint"),
+                             "size": snap.get("size")}
+    except Exception as e:  # noqa: BLE001
+        checks["vision"] = {"ok": False, "error": str(e)[:80]}
+    # 2) 目标窗口读回（domain_read——UIA 穿透）
     if window:
         try:
             r = TB.invoke("domain_read", window)
             checks["window_read"] = {"ok": bool(r.get("ok")),
-                                     "counted": bool(r.get("ok")),
-                                     "sample": str(r)[:200]}
-        except Exception as e:                                # noqa: BLE001
-            checks["window_read"] = {"ok": False, "counted": False,
-                                     "available": False, "error": str(e)[:80]}
-
-    # 3) 非视觉现实面（端口 / 文件）—— 本机的主力
-    rl = _probe_reality(expectation)
-    checks["reality"] = {**rl, "counted": bool(rl.get("faces"))}
-
-    counted = [c for c in checks.values() if c.get("counted")]
-    if not counted:
-        verdict, ok = "unverified_no_surface", False
-    else:
-        ok = all(c.get("ok") for c in counted)
-        verdict = "verified" if ok else "failed"
-
-    audit("brain_verify", {"ok": ok, "verdict": verdict,
-                           "expectation": expectation[:60]})
-    return {"ok": ok, "verdict": verdict,
-            "expectation": expectation[:200], "checks": checks,
-            "counted_faces": [k for k, v in checks.items() if v.get("counted")],
+                                      "sample": str(r)[:200]}
+        except Exception as e:  # noqa: BLE001
+            checks["window_read"] = {"ok": False, "error": str(e)[:80]}
+    ok = all(c.get("ok") for c in checks.values()) if checks else False
+    audit("brain_verify", {"ok": ok, "expectation": expectation[:60]})
+    return {"ok": ok, "expectation": expectation[:200], "checks": checks,
             "elapsed_ms": round((time.time() - t0) * 1000, 1)}
 
 
@@ -577,11 +435,7 @@ def unify(goal: str, payload: dict = None, expectation: str = "") -> dict:
 
     # 3) 验证（触手肉眼）
     vf = verify(expectation or f"执行 {kind} 后的现实状态")
-    # 🔴 2026-10-28：原来只透传 ok 与"每条检查的 ok"，把 verdict / 计入的面
-    #   全丢了 ⇒ 上层只看到 vision:False，分不清"验失败"还是"根本没面可验"。
     chain["verify"] = {"ok": vf.get("ok"),
-                        "verdict": vf.get("verdict"),
-                        "counted_faces": vf.get("counted_faces") or [],
                         "checks": {k: v.get("ok") for k, v in vf.get("checks", {}).items()}}
 
     # 4) 健康

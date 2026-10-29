@@ -369,7 +369,7 @@ def cmd_doors(a) -> int:
     return 0
 
 
-# 🔴 负控用的人造模块：**真的**绕过统一口（直接 import bridge 并调用 chat）
+# 负控用的人造模块：**真的**绕过统一口（直接 import bridge 并调用 chat）
 PLANT_BYPASS = ('from .llm import bridge as LB\n'
                 '\n'
                 'def go(p):\n'
@@ -429,7 +429,7 @@ def cmd_selftest(a) -> int:
     ck("**正控：走统一口 ⇒ 不许算绕过**",
        _scan_src(PLANT_THROUGH) == [("unified", "ask", 4)],
        str(_scan_src(PLANT_THROUGH)))
-    # ③ 🔴 **`status()` 不算模型调用**（否则会把「读自己的状态」误报成绕过）
+ # ③ **`status()` 不算模型调用**（否则会把「读自己的状态」误报成绕过）
     ck("**负控：`LB.status()` 不算模型调用**（只读自己状态，不是问模型）",
        _scan_src(PLANT_STATUS_ONLY) == [], str(_scan_src(PLANT_STATUS_ONLY)))
     # ④ 身份：期望常量必须读得到（读不到就是「未读到」，不许显示 0/None 冒充）
@@ -437,13 +437,13 @@ def cmd_selftest(a) -> int:
     exp = idn.get("统一口期望")
     ck("**身份期望读得到**（读不到要报未读到）",
        isinstance(exp, dict) and bool(exp.get("provider")), str(exp))
-    # ⑤ 🔴 **红线：对方那列不许出现「实测值」**（宣传语不当读数）
+ # ⑤ **红线：对方那列不许出现「实测值」**（宣传语不当读数）
     t = TARGET
     ck("**红线：对标目标标着「未取证」**（宣传语不是读数）",
        "未取证" in str(t.get("我方核验状态")) and "宣传语不是读数" in str(t.get("红线")),
        str(t.get("我方核验状态"))[:60])
     crows = card()["四·逐项对标卡"]
-    # 🔴 判据第一版写成「只能等于 `—` 或含『未取证』」⇒ **太窄**：带出处的宣称
+ # 判据第一版写成「只能等于 `—` 或含『未取证』」⇒ **太窄**：带出处的宣称
     #    （「截图宣称「本地 8GB 显存即可运行」」）是**合法**写法，被误判成违规。
     #    真不变式是：**对方那列不许把宣传语写成读数**。
     _BANNED = ("实测", "跑分", "得分", "评测值")
@@ -457,7 +457,7 @@ def cmd_selftest(a) -> int:
     ck("**本机算力有读数或如实报未读到**",
        bool(lp.get("内存现读")) and bool(lp.get("显存现读")),
        "内存=%s 显存=%s" % (str(lp.get("内存现读"))[:50], lp.get("显存现读")))
-    # ⑦ 🔴 **计划里的变量名必须现读命中 `_KEY_CHAIN`** —— 否则计划会"说得好听但设不对"
+ # ⑦ **计划里的变量名必须现读命中 `_KEY_CHAIN`** —— 否则计划会"说得好听但设不对"
     #    （写死变量名 = 又一个会过期的读数；本仓吃过太多次）
     try:
         from gbt_allinone.llm import cloud_llm as _CL

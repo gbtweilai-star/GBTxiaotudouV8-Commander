@@ -17,7 +17,7 @@
 ⇒ 走门：每次开页，读动作都落到 `audit.jsonl`，**审计格能复查这一页的每一次读取**。
 代价是 `git status` 在这个仓要 8 秒左右（2529 个改动文件），可以接受。
 
-## 🔴 一条不许越的线：本页**不试探授权**
+## 一条不许越的线：本页**不试探授权**
 
 写动作（`code_patch apply` / `git_write commit`）要 `filesystem_write`。
 "现在有没有授权"这件事**不能靠试**：`policy.authorize()` 对受限动作会**消耗一次性人工授权** ——
@@ -320,8 +320,10 @@ def write_html(path: Path, payload: dict) -> str:
                 "warnbox" if (isinstance(dirty_n, int) and dirty_n >= DIRTY_WARN) else "kv"
 
     att = payload.get("attention") or []
+    # 2026-10-26：原来这里是 `✅ 没有需要人看的项` —— 只在**一切正常**时才输出，
+    # 等于一颗潜伏地雷：哪天全绿了才冒出来撞审美闸的 emoji 条款（同类问题在 exec-deck 已踩过一次）。
     att_html = ("<ul class=att>" + "".join("<li>%s</li>" % md(x) for x in att) + "</ul>"
-                if att else "<p class=ok>✅ 没有需要人看的项</p>")
+                if att else "<p class=ok>没有需要人看的项</p>")
 
     # 视觉层在不在：**不许猜**，生成时就查一次并写在页上
     css_rel = "../" + DECK3D
@@ -333,12 +335,13 @@ def write_html(path: Path, payload: dict) -> str:
         att = att + ["立体视觉层 %s 没找到 —— 页面会退化成平面" % css_rel]
 
     html = """<!doctype html>
-<html lang="zh-CN" data-data-kind="快照" data-data-at="__AT__"><head><meta charset="utf-8" />
+<html data-page-id="code-deck" lang="zh-CN" data-data-kind="快照" data-data-at="__AT__"><head><meta charset="utf-8" />
 <meta name="color-scheme" content="dark" />
 <title>GBT小土豆V8 · 代码台</title>
+<link rel="stylesheet" href="../page-skins.css" />
 <link rel="stylesheet" href="__CSS__" />
 <style>
-  /* 本页只写**版式**，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
+  /* 本页只写版式，立体与配色一律由 deck3d.css 供（裸色值不在这出现） */
   .two{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
   .two > .gbt-card{margin:0}
   ul.cm{margin:0;padding-left:18px}
@@ -403,7 +406,7 @@ def write_html(path: Path, payload: dict) -> str:
       分支数 <b>__D_BRN__</b> ｜ stash <b>__D_STASH__</b></p>
     <div class="__DIRTYCLS__">改动面 <b>__D_DIRTY__</b> 个文件未收敛
       （过 __DW__ 该看一眼、过 __DB__ 说明工作树已经不成形）——
-      `git status` 本身是只读免卡的，收敛与否是<strong>卫生读数</strong>，不是本页的判决。</div>
+      git status 本身是只读免卡的，收敛与否是<strong>卫生读数</strong>，不是本页的判决。</div>
     <div class="two" style="margin-top:11px">
       <div>
         <p class="kv">最近提交</p><ul class="cm">__ROWS_CM__</ul>

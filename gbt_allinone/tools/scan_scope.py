@@ -41,6 +41,12 @@ TOOLING_DIRS = {
     "outputs", "infinite-canvas-output", "archive",
     "store",            # 镜像数据面（不是代码）
     "dist", "build",    # 构建产物
+    # 🔴 2026-10-25 · 补三类「不是我们的代码」，因为它们是量出来的真数
+    #    （_owned_py_files(ROOT) 现读 13383 个 .py，其中 .venv-sadtalker 10117、
+    #     Python/ 1159、third_party/SadTalker 109 都是第三方树 ⇒ 剪掉后只剩 3266）：
+    ".venv-sadtalker",  # SadTalker 的虚拟环境（site-packages 全是第三方）
+    "Python",           # 仓根内嵌的 CPython 运行时（pythoncore-3.15-64）
+    "third_party",      # vendored 外部件（SadTalker）
 }
 
 # 扫描时一律跳过（含外部语料）
@@ -58,7 +64,12 @@ def walk(root, onerror=None):
     """
     root = Path(root)
     for dirpath, dirnames, filenames in os.walk(root, onerror=onerror):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        # 🔴 2026-10-25 · 虚拟环境不只叫 .venv-sadtalker：凡是 .venv* / venv /
+        #    site-packages 一律不进（这一条是**前缀规则**，不是点名，避免下次换个名字又漏）。
+        dirnames[:] = [d for d in dirnames
+                       if d not in SKIP_DIRS
+                       and not d.startswith(".venv")
+                       and d not in ("venv", "site-packages")]
         yield Path(dirpath), dirnames, filenames
 
 

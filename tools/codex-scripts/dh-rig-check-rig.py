@@ -1,7 +1,3 @@
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """数字人 · 绑骨/蒙皮/全肢体动作 判据（含 **3 条负对照**）
@@ -36,7 +32,7 @@ import struct
 import sys
 import time
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 OUT = os.path.join(WS, "projects", "digital-human", "out")
 GLB = os.path.join(OUT, "dh_rigged.glb")
 TRACE = os.path.join(OUT, "trace.json")

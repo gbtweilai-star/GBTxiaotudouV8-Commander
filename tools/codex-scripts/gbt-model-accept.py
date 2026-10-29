@@ -100,7 +100,7 @@ TOOLS = [{"type": "function",
 
 
 def c1() -> None:
-    # 🔴 实测坑（2026-10-14）：上游 worker 冷启动/回收期间，CLIProxyAPI **会暂时不列车道**
+ # 实测坑（2026-10-14）：上游 worker 冷启动/回收期间，CLIProxyAPI **会暂时不列车道**
     #    ⇒ 一次读不到就判红是误报。这里退避重试（最多 90s），仍然读不到才红。
     st, body, ids = 0, "", []
     for _ in range(9):

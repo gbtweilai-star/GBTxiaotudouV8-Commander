@@ -43,7 +43,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[2]
-GLB = ROOT / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v5-color.glb"   # 量**在役件**（v5），不去量构建树里的旧副本
+GLB = ROOT / "projects" / "digital-human" / "out" / "dh-v2-rigged.glb"
 OUT_JS = ROOT / "holo_pet_w3" / "digital-human" / "rig-audit.js"
 BLENDER_CANDIDATES = [
     Path(r"C:\Program Files\Blender Foundation\Blender 4.2\blender.exe"),
@@ -69,7 +69,7 @@ def main():
 
     objs = list(bpy.data.objects)
     arms = [o for o in objs if o.type == 'ARMATURE']
-    # ⚠️ 2026-10-19 修（量具自己错了尺，不是资产的问题）：
+ # 2026-10-19 修（量具自己错了尺，不是资产的问题）：
     #   Blender 的 glTF 导入器会给**每一根 pose bone** 造一个显示形状（一个 42 顶点的 Icosphere，
     #   实测 custom_shape_users=65），它出现在场景里、却没有顶点组 ⇒ 被当成"第二个网格 + 42 个未绑顶点"。
     #   文件字节里根本没有 "Icosphere" 这个词（grep 整份 GLB 得到 -1），glTF 侧也只有 1 个网格。
@@ -170,7 +170,7 @@ def main():
                 mn[i] = min(mn[i], float(w[i])); mx[i] = max(mx[i], float(w[i]))
     res["bbox_min"] = [round(v, 3) for v in mn]
     res["bbox_max"] = [round(v, 3) for v in mx]
-    # ⚠️ 2026-10-19 修：Blender 是 **Z-up**，身高在 **Z**（第 3 个数），原来是 mx[1]-mn[1] 量的 Y —— 
+ # 2026-10-19 修：Blender 是 **Z-up**，身高在 **Z**（第 3 个数），原来是 mx[1]-mn[1] 量的 Y ——
     #   拿横向尺寸当身高（同一个错尺病，这已经是这一件的第 3 次）。三个轴都报出来，谁也别猜。
     res["height_m"] = round(mx[2] - mn[2], 3)            # 场景 Z 跨度 = 身高（Blender 口径）
     res["span_axes"] = {"x": round(mx[0] - mn[0], 3),

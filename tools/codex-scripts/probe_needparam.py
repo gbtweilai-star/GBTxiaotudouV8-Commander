@@ -9,7 +9,7 @@
 **「🟡 需参数·未探」** —— 空参探不动。但**「空参探不动」和「能力坏了」是两件事**，
 账上目前没有这个区分。本脚本把这件事**探清楚**。
 
-## 🔴 三条安全纪律（写死成代码）
+## 三条安全纪律（写死成代码）
 1. **表外一律拒**：只跑下面 `DECLARED` 里逐条**声明过**的 payload，别的一律不出门（fail-closed）。
 2. **每一条都必须是只读路**，理由写在表里：
    - `browser` 走 `op=native + action=status` —— **框架注册表自己声明的只读路**
@@ -43,7 +43,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-# 🔴 **声明表**：只跑这 5 条，每条写明「为什么这条是只读安全的」
+# **声明表**：只跑这 5 条，每条写明「为什么这条是只读安全的」
 DECLARED = {
     "browser": {
         "payload": {"op": "native", "action": "status"},
@@ -122,7 +122,7 @@ def classify(rc: int, out: str) -> dict:
         ec = res.get("error_class")
         msg = str(res.get("message") or "")[:160]
         st = str(res.get("status") or "")
-        # 🔴 `ok:false` 不等于「坏」：本仓大量能力用 `status:"needs_*"` 表达**环境条件缺**
+ # `ok:false` 不等于「坏」：本仓大量能力用 `status:"needs_*"` 表达**环境条件缺**
         #    （实测：browser 返回 needs_browser_debug / cdp_available:false / 端口 9222 无监听，
         #     但分支真跑了、动作表 23 个全返回）⇒ 这必须与「痛」分开，否则又是假痛（F35 同型）。
         if st.startswith("needs_"):
@@ -229,7 +229,7 @@ def cmd_selftest(a) -> int:
                 )["判决"].startswith("🟡"), "已验")
     ck("分类器·ok:true ⇒ 判通",
        classify(0, '{"result":{"ok":true,"n":3}}')["判决"].startswith("✅"), "已验")
-    # 🔴 负控：`ok:false` + `status:"needs_*"` **不是痛**（browser 实测就是这个）
+ # 负控：`ok:false` + `status:"needs_*"` **不是痛**（browser 实测就是这个）
     ck("分类器·**ok:false + needs_\\* ⇒ 判环境未就绪，不判痛**",
        classify(0, '{"result":{"ok":false,"status":"needs_browser_debug","cdp_available":false}}'
                 )["判决"].startswith("🟠"),

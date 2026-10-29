@@ -210,7 +210,7 @@ def build(timeout: int = 600) -> dict:
     checks = [
         ("GLB 已落盘", glb.is_file() and glb.stat().st_size > 0, "%s · %s 字节"
          % (glb.name, glb.stat().st_size if glb.is_file() else 0)),
-        # 🔴 口径留痕（第一版判错了一次）：原来这里比的是 `nodes == 40`，实测 nodes=42 ⇒ 判红。
+ # 口径留痕（第一版判错了一次）：原来这里比的是 `nodes == 40`，实测 nodes=42 ⇒ 判红。
         #    真因是**判据错尺**：glTF 的 nodes 除了 40 根骨，还包括「网格节点」与「骨架根节点」；
         #    骨数的真源是 `skin.joints`（= 40）。所以改成：joints==40 且 nodes 允许 41~42。
         ("骨数 = 40（skin.joints；nodes 另有网格+骨架根）",

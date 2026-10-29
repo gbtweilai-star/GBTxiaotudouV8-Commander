@@ -74,7 +74,7 @@ def main(argv) -> int:
         # 只在 `:root` 块**之外**替换（块里的声明本身要保留字面量）
         open_i = css.index("{", css.index(":root"))
         close_i = css.index("}", open_i)
-        # 🔴 **head 必须切到 open_i**，不是 close_i ——
+ # **head 必须切到 open_i**，不是 close_i ——
         #    第一版写成 `head = css[:close_i]` 而 `body = css[open_i:close_i]`，
         #    于是 `head + body` **把 :root 块算了两遍**：每跑一轮就多一份 :root，
         #    8 轮下来 28,931 字符被写成 **258,857**（≈9 倍），而脚本自己毫无察觉、照样落盘。
@@ -95,7 +95,7 @@ def main(argv) -> int:
         print("\n（dry-run：加 --apply 才落盘）")
         return 1
 
-    # 🔴 **落盘前的保命闸**：改了颜色名，长度只该微增；
+ # **落盘前的保命闸**：改了颜色名，长度只该微增；
     #    第一版把 :root 重复插了 8 次（28,931 → 258,857 字符）却照样写盘 ——
     #    ⇒ 现在长度差超阈值就**拒绝落盘**（宁可不动，也不写出一个 9 倍大的文件）。
     delta = len(css) - len(orig)

@@ -17,7 +17,7 @@
 4. **想看哪里**：`probe <编号>` 现读单个；`map` 看全身；`pain` 只看痛的地方。
 5. **诚实分级**：探针分**强/中/弱**，并且**没有探针的能力如实写「❓未知」，绝不当成健康**。
 
-## 🔴 三条不许破的线
+## 三条不许破的线
 - **探针不许写盘、不许改云**：全部是只读或自带替身云的自检。**没读数 = 未知，不是健康。**
 - **超时也是痛**：探针卡住 ⇒ 记 ⛔（不是 ✅）。"不问就不知道"在这里是缺陷，不是省事。
 - **强弱必须标**：弱探针（只看文件在不在）**不能**拿来证明"功能是好的"。这一条写进输出里。
@@ -69,7 +69,7 @@ PROBES = {
     "P01": (PY + [_s("deploy-panel.py"), "selftest"], "强", "顺序门 11 行自检", None),
     "P02": (PY + [_s("render-agent.py"), "modules"], "中", "读模块图（只读）", None),
     "P03": ([shutil.which("npx") or "npx", "--yes", "wrangler", "--version"], "中", "wrangler 版本", None),
-    # 🔴 F35：第一版写成 `remotion --version` —— **remotion 没有这个 flag**，rc=1 ⇒ 报了**假痛**。
+ # F35：第一版写成 `remotion --version` —— **remotion 没有这个 flag**，rc=1 ⇒ 报了**假痛**。
     #    正确姿势是 `remotion versions`，且必须在**工程目录**里跑（--no-install 需要本地 node_modules）。
     "P04": ([shutil.which("npx") or "npx", "--no-install", "remotion", "versions"], "中",
             "remotion versions", str(ROOT / ".scratch" / "remotion-smoke")),
@@ -89,7 +89,7 @@ PROBES = {
     "P13": (PY + [_s("quick_scan.py"), "--help"], "弱", "只看能起（**弱**；全扫太慢）", None),
     "P14": (PY + [_s("quickscan_evolve.py"), "--selftest"], "强", "判据 15 行自检", None),
     "P15": (PY + [_s("five-dim.py"), "cap", "health"], "中", "走唯一门读健康位", None),
-    # 🔴 F35 同型：第一版把路径写成 tools/codex-scripts/framework_gate.py ⇒ **文件不在那儿**（真身在
+ # F35 同型：第一版把路径写成 tools/codex-scripts/framework_gate.py ⇒ **文件不在那儿**（真身在
     #    gbt_allinone/tools/）⇒ 又报了一个**假痛**。下面这条"探针体检"就是为它加的。
     "P16": (PY + [str(ROOT / "gbt_allinone" / "tools" / "framework_gate.py"), "verify"], "强",
             "真读框架门红绿", None),
@@ -102,9 +102,9 @@ PROBES = {
     "P23": (PY + [_s("generator.py"), "providers"], "中", "真读生成端凭据（双源）", None),
     "P24": (PY + [_s("lint_cjk_quotes.py"), "tools/codex-scripts"], "强",
             "中文串 ASCII 引号闸（0 命中 rc=0）", None),
-    # 🔴 探针**只验架子**（`--self`），不跑完整 checkup —— 否则
+ # 探针**只验架子**（`--self`），不跑完整 checkup —— 否则
     #    nerve selftest → checkup → nerve selftest → … **无限递归**。
-    # 🔴 措辞里**不许出现条数**：这里曾写「五步齐」，而体检长到 22 步后
+ # 措辞里**不许出现条数**：这里曾写「五步齐」，而体检长到 22 步后
     #    `checkup --self` 因写死的 `== 5` 恒 rc=4 ⇒ **P25 长期假痛**，无人看见。
     "P25": (PY + [_s("checkup.py"), "--self"], "中",
             "体检脚本架子在（**步骤齐 · 引用的脚本都在** · 不重跑体检）", None),
@@ -122,8 +122,8 @@ def classify(prev: dict, cur: dict) -> list[dict]:
         a = (prev.get(pid) or {}).get("感觉")
         b = (cur.get(pid) or {}).get("感觉")
         if a is None:
-            # 🔴 F36：新增末梢**如果是痛的，那就是新痛**，不许归成中性的"新增"。
-            #    第一版把它归"新增末梢"，而判决只看"新痛" ⇒ 会打出【✅ 无变化，无新痛】
+ # F36：新增末梢**如果是痛的，那就是新痛**，不许归成中性的"新增"。
+ # 第一版把它归"新增末梢"，而判决只看"新痛" ⇒ 会打出【 无变化，无新痛】
             #    —— **假的全清**。假全清比漏报更坏：它让人放心地不去看。
             chg = ("🔴 **新痛**（新增末梢）" if b.startswith("⛔")
                    else "❓ 新增未知" if b.startswith("❓") else "＋ 新增末梢")
@@ -200,7 +200,7 @@ def cmd_patrol(a) -> int:
             old = {}
     else:
         old = {}
-    # 🔴 F38：缓存必须**同时记住"有多少末梢"和"这轮测了多少"**。
+ # F38：缓存必须**同时记住"有多少末梢"和"这轮测了多少"**。
     #    第一版只存测过的 ⇒ 面板打「末梢 13 · 痛 0」，而全机有 **23** 个末梢，
     #    没测的那 10 个里**正好包括真红的 framework_gate** ⇒ 又是一次**假的全清**。
     #    部分覆盖**绝不能念成"没有痛"**。
@@ -434,7 +434,7 @@ def caps_scan() -> dict:
     }
 
 
-# 🔴 **重件档**（本轮实测定的）：有些位的**代码自己就声明了长预算**，不是坏了。
+# **重件档**（本轮实测定的）：有些位的**代码自己就声明了长预算**，不是坏了。
 #    `cross_scan.scan(deep=True)` docstring 原话：「含 H 维（**全能力运行时可达——较慢**）」，
 #    H 维逐个调全部能力；X 维跑 4 个隔离扫描器、**每个 `timeout_s=240`** ⇒ 最坏近 1000s。
 #    ⇒ **阈值必须按"这类活本来多慢"给**。一刀切会把"慢"报成"病"（与"把病报成好"同类的错读数）。
@@ -469,7 +469,7 @@ def probe_cap(kind: str, timeout: int = 300) -> dict:
                 "读数尾": out.strip().replace("\n", " ")[-110:]}
     low = out.lower()
     # ══ 分类：**解析信封**，不许拿子串猜 ═══════════════════════════════════════
-    # 🔴 病史（本轮实测抓出，比跑数重要）：第一版用 `"denied" in low` 判"被门拒"，
+ # 病史（本轮实测抓出，比跑数重要）：第一版用 `"denied" in low` 判"被门拒"，
     #    而门返回是**两层信封** —— **外层恒有 `"denied": false`** ⇒ 那个子串**永远成立**，
     #    于是把「缺少 kind 或 parallel」这种**缺参**（`error_class: user_error`）判成了"被门拒"。
     #    **一处否定信号被读成肯定信号。** 真值在 `result.error_class` / `result.message` 里。
@@ -571,7 +571,7 @@ def cmd_caps(a) -> int:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(json.dumps(snap, ensure_ascii=False, indent=1), encoding="utf-8")
 
-        # 🔴 **累积账**（本轮修的真问题）：单点探测**不许冲掉全量视图**。
+ # **累积账**（本轮修的真问题）：单点探测**不许冲掉全量视图**。
         #    实测事故：`--run --kind cross_scan` 把 138 位的快照覆盖成"本次探位 1"，
         #    整张能力位面的读数**一句话就没了** ⇒ 单点查询与全量视图必须是**两本账**：
         #    这本按 kind 合并，只更新这次真探到的那几位，其余原样保留。
@@ -601,7 +601,7 @@ def cmd_caps(a) -> int:
                        "需参数": [x["kind"] for x in rows if x["态"].startswith("🟡")],
                        "被门拒": [x["kind"] for x in rows if x["态"].startswith("🔒")],
                        "落盘": str(p.relative_to(ROOT))}
-        # 🔴 两个数分开念
+ # 两个数分开念
         out["已探针率"] = "%d / %d（可探针）" % (len(rows), r["分类计数"]["可探针"])
         out["口径"] = ("**可探针率 ≠ 已探针率**：87.9% 是「能不能探」，"
                      "上面这个才是「真探了多少」")
@@ -624,7 +624,7 @@ def caps_drift() -> dict:
         cur = {k: v.get("态") for k, v in
                (json.loads(acc_p.read_text(encoding="utf-8")).get("逐位") or {}).items()}
     RANK = {"✅ 通": 0, "🟡 需参数·未探": 1, "🔒 被门拒·缺授权": 1, "⛔ 痛": 2}
-    worse, better, gone, new, unprobed = [], [], [], [], []
+    worse, better, gone, new = [], [], [], []
     for k in sorted(set(base) | set(cur)):
         b, c = base.get(k), cur.get(k)
         if b is None:
@@ -632,19 +632,11 @@ def caps_drift() -> dict:
         elif c is None:
             gone.append({"kind": k, "基线": b})
         elif RANK.get(c, 1) > RANK.get(b, 1):
-            # 2026-10-15 对齐（口径自相矛盾修正）：本文件 449 行自己写着
-            #   「缺参 ⇒ 需参数·未探（**不是痛**）｜被门拒 ⇒ 缺授权（不是痛）」，
-            #   但这里又把它们算进「变坏」⇒ 判决恒红、红得没依据。
-            #   现在分开：**没测到 ≠ 变坏**（取不到读数不许当读数用）。
-            if c.startswith(("🟡", "🔒")):
-                unprobed.append({"kind": k, "基线": b, "现在": c})
-            else:
-                worse.append({"kind": k, "基线": b, "现在": c})
+            worse.append({"kind": k, "基线": b, "现在": c})
         elif RANK.get(c, 1) < RANK.get(b, 1):
             better.append({"kind": k, "基线": b, "现在": c})
     return {"ok": True, "基线": {"at": base_doc.get("at"), "位数": len(base)},
             "当前位数": len(cur), "🔴 变坏": worse, "🟢 变好": better,
-            "🟡 未探/缺授权（**不算变坏**）": unprobed,
             "＋ 新增": new, "－ 消失": gone,
             "判决": ("🔴 **有 %d 位变坏** ⇒ 立刻查" % len(worse)) if worse else
             "✅ 无变坏（%d 位与基线同级）" % max(len(base) - len(better), 0),
@@ -738,8 +730,8 @@ def cmd_selftest(a) -> int:
     ck("变化分类·痛→通 = 新愈", "新愈" in got.get("B", ""), "B: %s" % got.get("B"))
     ck("变化分类·痛→痛 = 未愈", "未愈" in got.get("C", ""), "C: %s" % got.get("C"))
     ck("变化分类·没出现过 = 新增", "新增" in got.get("F", ""), "F: %s" % got.get("F"))
-    # 🔴 F36 回归：**空上一轮 + 本轮是痛** ⇒ 必须判成"新痛"，不许判成中性的"新增末梢"
-    #    （否则判决会打【✅ 无变化，无新痛】= 假全清）
+ # F36 回归：**空上一轮 + 本轮是痛** ⇒ 必须判成"新痛"，不许判成中性的"新增末梢"
+ # （否则判决会打【 无变化，无新痛】= 假全清）
     g2 = {r["编号"]: r["变化"] for r in classify({}, {"X": {"感觉": "⛔ 痛"}})}
     ck("变化分类·空上轮+本轮痛 ⇒ 新痛（F36 回归）", "新痛" in g2.get("X", ""),
        "X: %s（**不许是「＋ 新增末梢」**）" % g2.get("X"))
@@ -751,7 +743,7 @@ def cmd_selftest(a) -> int:
            PROBES.get(x, ("", "—"))[1] != "强" for x in _plan(False)),
        "quick %d 条 · deep %d 条 · 总数 %d"
        % (len(_plan(False)), len(_plan(True)), len(_dp().PLUGIN_SLOTS)))
-    # 🔴 F38 回归：**部分覆盖必须被标出来**，不许让面板把"只测了一部分"念成"没有痛"
+ # F38 回归：**部分覆盖必须被标出来**，不许让面板把"只测了一部分"念成"没有痛"
     co = coverage(["A", "B", "C", "D"], ["A", "B"])
     ck("覆盖·未测必须点名（F38 回归）",
        co["未测"] == 2 and co["未测名单"] == ["C", "D"] and "不许把部分覆盖念成全清" in co["警告"],

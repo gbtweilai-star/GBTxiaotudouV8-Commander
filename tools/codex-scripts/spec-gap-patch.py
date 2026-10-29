@@ -126,6 +126,25 @@ def main():
             fh.write(new)
         os.replace(tmp, p)
         receipt["files"][-1]["backup"] = bak
+ # 2026-10-25 · **两个根一起维护**（缺陷修正，不是新功能）：
+        # 原来只写 scan 给的**一个**路径（那个路径指向托管根 `~/.openclaw-autoclaw/skills`），
+        # 源稿 `skills/<名>/SKILL.md` 从来没收到过自动段 ⇒ `verify-distill` 的 A 项
+        # （源稿 vs 托管**逐字节相同**）一次报 20 个域 FAIL；而 `audit-skill-roots.py --fix`
+        # 从源稿刷新副本时，又把**只存在于托管**的自动段整段覆盖掉（实测：17 段的
+        # caps-auto 全部消失）。⇒ 现在同一次写入把孪生件也写成**同一份字节**，两个根从源头一致。
+        twin = os.path.join(ROOT, "skills", os.path.basename(os.path.dirname(p)), "SKILL.md")
+        if os.path.abspath(twin) != os.path.abspath(p) and os.path.isdir(os.path.dirname(twin)):
+            tb = os.path.join(BACKUP, "%s__src-SKILL.md.bak-%s"
+                              % (r["domain"], time.strftime("%Y%m%dT%H%M%S")))
+            if os.path.isfile(twin):
+                with open(tb, "w", encoding="utf-8", newline="\n") as fh:
+                    fh.write(open(twin, encoding="utf-8", errors="replace").read())
+                receipt["files"][-1]["backup_src"] = tb
+            ttmp = twin + ".tmp"
+            with open(ttmp, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(new)
+            os.replace(ttmp, twin)
+            receipt["files"][-1]["twin"] = twin
 
     tmp = RECEIPT + ".tmp"
     with open(tmp, "w", encoding="utf-8", newline="\n") as fh:

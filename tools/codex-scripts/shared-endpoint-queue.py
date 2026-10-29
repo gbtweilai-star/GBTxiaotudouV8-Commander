@@ -22,7 +22,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import os
 import queue
 import sys
 import threading
@@ -88,47 +87,20 @@ def schedule(n_tasks: int, concurrency: int, worker) -> dict:
     return stat
 
 
-def _resolve_key(explicit: str, env_name: str) -> str:
-    """取客户端钥匙（**只报形状、绝不回显**）。
-
-    🔴 2026-10-14 补（实测真缺口）：本器原来**不带 Authorization 头** ⇒ 只能测 mock/匿名端点；
-    打我们任何真端点（CLIProxyAPI 要 GBT_CLIPROXY_KEY · 云插件要 GW_AUTH · RunPod 要 rpa_…）
-    十发全 401、读数只剩"未读到"。修法：显式 --key > 环境变量 > **用户注册表**（老进程环境块
-    可能是旧的 —— 今天已两次踩到，别再让判据栽在环境上）。
-    """
-    if explicit:
-        return explicit.strip()
-    if not env_name:
-        return ""
-    v = (os.environ.get(env_name) or "").strip()
-    if v or os.name != "nt":
-        return v
-    try:
-        import winreg                                            # noqa: PLC0415
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
-            return (winreg.QueryValueEx(k, env_name)[0] or "").strip()
-    except Exception:                                            # noqa: BLE001
-        return ""
-
-
-def ask(base_url: str, model: str, q: str, timeout: float = 30.0, key: str = "") -> bool:
+def ask(base_url: str, model: str, q: str, timeout: float = 30.0) -> bool:
     body = {"model": model, "messages": [{"role": "user", "content": q}]}
-    headers = {"Content-Type": "application/json"}
-    if key:
-        headers["Authorization"] = "Bearer " + key
     req = urllib.request.Request(base_url.rstrip("/") + "/chat/completions",
                                  data=json.dumps(body).encode("utf-8"),
-                                 headers=headers, method="POST")
+                                 headers={"Content-Type": "application/json"}, method="POST")
     with urllib.request.urlopen(req, timeout=timeout) as r:      # noqa: S310
         d = json.loads(r.read().decode("utf-8", errors="replace"))
     return bool(((d.get("choices") or [{}])[0].get("message") or {}).get("content"))
 
 
-def run(base_url: str, model: str, clients: int, concurrency: int, key: str = "") -> int:
+def run(base_url: str, model: str, clients: int, concurrency: int) -> int:
     stat = schedule(clients, concurrency,
-                    lambda i: ask(base_url, model, "第 %d 号插件的请求：你好。" % (i + 1), key=key))
+                    lambda i: ask(base_url, model, "第 %d 号插件的请求：你好。" % (i + 1)))
     print(json.dumps({"端点": base_url, "模型": model, "客户端数": clients,
-                      "钥匙": (key[:4] + "****(" + str(len(key)) + ")") if key else "（未带钥匙）",
                       "读数": stat,
                       "口径": "**模型只在端点加载一份**，N 个插件都是客户端 ⇒ "
                             "插件侧不各自吃内存（这才是「不怕内存不够」的成立条件）；"
@@ -182,23 +154,19 @@ def main() -> int:
     ap.add_argument("--clients", type=int, default=10)
     ap.add_argument("--concurrency", type=int, default=2)
     ap.add_argument("--with-mock", action="store_true")
-    ap.add_argument("--key", default="", help="显式客户端钥匙（不给则读 --key-env）")
-    ap.add_argument("--key-env", default="GBT_CLIPROXY_KEY",
-                    help="从哪个环境变量取钥匙（缺则回用户注册表；空串=不带钥匙）")
     a = ap.parse_args()
-    a.key_used = _resolve_key(a.key, a.key_env)
     if a.cmd == "selftest":
         return selftest()
     if a.with_mock:
         srv, base = _with_mock(model=a.model)
         try:
-            return run(base, a.model, a.clients, a.concurrency, key=a.key_used)
+            return run(base, a.model, a.clients, a.concurrency)
         finally:
             srv.shutdown()
     if not a.base_url:
         print(json.dumps({"拒绝": "run 需要 --base-url 或 --with-mock"}, ensure_ascii=False))
         return 2
-    return run(a.base_url, a.model, a.clients, a.concurrency, key=a.key_used)
+    return run(a.base_url, a.model, a.clients, a.concurrency)
 
 
 if __name__ == "__main__":

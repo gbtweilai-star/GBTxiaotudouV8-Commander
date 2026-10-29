@@ -206,7 +206,7 @@ def check() -> int:
                        % " vs ".join(str(r) for r in rels))
 
     # ── R5 内容指纹撞车（只在两条都是实体时才成立）──
-    # ⚠️ 空树不比：本仓有四棵**约定空目录**（.autoclaw / .backups / data / .gbt），
+ # 空树不比：本仓有四棵**约定空目录**（.autoclaw / .backups / data / .gbt），
     #    它们的内容指纹天然相同 —— 拿"同为 0 个文件"报重复是量具自己在造噪声。
     fps: dict[str, list[str]] = {}
     for name, t in trees.items():
@@ -230,7 +230,7 @@ def check() -> int:
     # 第 40 轮实测：我准备清的 `.scratch/render` / `ai_duanju_audit` / `_traces` /
     # `_v22_diff` / `.scratch/archive`，**Owner 与历次记录早就写了"留"**，
     # 只是散在 memory / delivery / PROJECT_BLUEPRINT 的正文里，没有一处机检。
-    # ⚠️ R8 只登记**盘上确实存在的成品/证据**：代码按需创建的空落点（如
+ # R8 只登记**盘上确实存在的成品/证据**：代码按需创建的空落点（如
     #    `.scratch/_dsh_home`）不在其列 —— 把"会按需创建"写成"必须存在"，
     #    等于给下一个人造一条假红。（第 40 轮自查：我正是这么写错的。）
     missing = 0
@@ -241,7 +241,7 @@ def check() -> int:
             red.append("R8 已判过「留」的东西不见了：`%s`（%s）—— 谁动的？"
                        % (item.get("path"), item.get("source", "?")))
     if reg.get("protected") and not missing:
-        # 🔴 这行**只在零缺失时**才印：上一版只要表非空就印「都在」，
+ # 这行**只在零缺失时**才印：上一版只要表非空就印「都在」，
         #    于是同一次输出里既说"13 件都在"又点名一件不见了 —— 读数自相矛盾。
         print("  ✓ R8 已判过「留」的 %d 件都在（判据见登记表 protected）"
               % len(reg["protected"]))

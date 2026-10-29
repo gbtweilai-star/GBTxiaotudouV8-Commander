@@ -13,7 +13,7 @@ if hasattr(sys.stdout, "reconfigure"):
 ROOT = Path(__file__).resolve().parent.parent.parent
 CAPS = ROOT / "holo_pet_w3" / "brain" / "caps"
 REF = re.compile(r'(?:href|src)="([^"]+)"')
-# 🔴 必须先剥掉 `<script>…</script>`（首跑在这里误报过一条）：
+# 必须先剥掉 `<script>…</script>`（首跑在这里误报过一条）：
 #    总目录页是**用 JS 拼链接**的，源码里长这样 —— `href="' + encodeURIComponent(n.id) + '.html"`
 #    不剥脚本就会把这段**代码文本**当成一个静态 href，报出一条并不存在的断链。
 #    扫描器报假红，比不报更贵：它会让人开始不信红灯。
@@ -36,19 +36,7 @@ def main() -> int:
             if m.startswith(("http", "#", "data:")):
                 continue
             checked += 1
-            # 🔴 2026-10-17 翻正（留痕 · 原始口径已翻，为什么翻，原期望是什么）：
-            #   原口径：`(f.parent / m).resolve()` —— 把 href **原样**当文件名去 exists()。
-            #   病因：页面 href 是 **URL 编码**的（真实案例 `../../../state/dingtalk-14%E6%B4%BB%E9%A1%B5.html`
-            #         ⇒ 解码后是 `state/dingtalk-14活页.html`，文件**真实存在**）。
-            #         Path.resolve() 不解码 ⇒ 拿 `%E6%B4%BB...` 当字面文件名 ⇒ 永远不存在。
-            #   原期望：编码后的 href 应能解析到真文件；实测 311 页报 311 条断链 = **全是同一条假红**。
-            #   现口径：先 unquote + 剥掉 ?query / #fragment，再 resolve。
-            #   （判据报假红比不报更贵：它会让人开始不信红灯。）
-            from urllib.parse import unquote
-            _target = unquote(m.split("#", 1)[0].split("?", 1)[0])
-            if not _target:
-                continue
-            if not (f.parent / _target).resolve().exists():
+            if not (f.parent / m).resolve().exists():
                 bad.append((f.name, m))
     print("=" * 70)
     print("能力页引用可达性")

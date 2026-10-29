@@ -118,7 +118,7 @@ PAGE_TARGETS = [
     ("outputs/tentacle-studio/V1 触手工作流-可交互原型.html",
      "同上：同族已有 `V2 触手工作流-可交互原型.html`。"),
 ]
-# ⚠️ 不入表、也永不搬的（**别人的页面 / 上游素材**）：写在这里是为了让下一个人一眼看到边界
+# 不入表、也永不搬的（**别人的页面 / 上游素材**）：写在这里是为了让下一个人一眼看到边界
 PAGE_NEVER = ("_upstream", "vendor", "gbt_allinone", "审美相关skill", "node_modules", ".git",
               "delivery", "plugins", "holo_pet_w3")
 
@@ -147,7 +147,7 @@ def manifest_paths() -> tuple:
     ⇒ 三样齐了才敢说"没人用"。
     """
     pats = ("plugins/**/*.js", "plugins/**/*.mjs", "plugins/**/*.json", "plugins/**/*.py",
-            # 🔴 2026-09-23 第 30 轮补 `.md`：**面板清单还有一份写在 README 里**。
+ # 2026-09-23 第 30 轮补 `.md`：**面板清单还有一份写在 README 里**。
             # 实测：`plugins/gbt-master/README.md:36` 那张表就是「12 个面板各是谁、落哪个文件」，
             # 而 `deploy` 那条写着 `deploy/index.html` —— 上一版扫描面**没有 .md**，
             # 于是"面板 #12 是谁"这件事只有 `lib/*.js` 一条线索。
@@ -171,12 +171,12 @@ def manifest_paths() -> tuple:
                 if seg:
                     found.setdefault(seg, set()).add(str(f.relative_to(ROOT)))
     # ── **传递闭包**（2026-09-23 补：差这一层就还是漏）──
-    # 自证时发现：`holo_pet/index.html` 被清单点名 ✅，但它引用的 `styles.css` / `app.js`
-    # 判成"清单没提" ❌。而**清单点名的那个页面引用的东西，一样是活的** ——
+ # 自证时发现：`holo_pet/index.html` 被清单点名 ，但它引用的 `styles.css` / `app.js`
+ # 判成"清单没提" 。而**清单点名的那个页面引用的东西，一样是活的** ——
     # 删了样式表，那个面板照样烂。⇒ 从被点名的文件出发，把它引用到的本地件也算活（走两层）。
     frontier = set()
     for seg in list(found.keys()):
-        # ⚠️ 种子是**被点名的那个文件本身**（`found` 的键），不是引用它的那个文件（值）——
+ # 种子是**被点名的那个文件本身**（`found` 的键），不是引用它的那个文件（值）——
         #    首版把两者搞反了，于是 `holo_pet/index.html`（.html，该当种子）没进 frontier，
         #    而 `host.js`（.js）被 `.html` 过滤挡掉 ⇒ 闭包空转，`styles.css` 照样漏。
         for cand in (ROOT / seg, ROOT / seg.replace("\\", "/")):
@@ -278,7 +278,7 @@ def live_paths() -> dict:
                            capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=60)
         rows = list(csv.DictReader(io.StringIO(r.stdout or "")))
-        # 🔴 **排除本进程的祖先链**（2026-09-23 第 30 轮加）——量具不许量到自己头上。
+ # **排除本进程的祖先链**（2026-09-23 第 30 轮加）——量具不许量到自己头上。
         # 实测症状：我为了诊断跑了一条命令，命令行里写了 `.scratch\_hv\demo.html` 与
         # `deploy\index.html`，于是**这两个路径当场被判成"活进程在用"**。
         # 而且这不是偶发：清理器自己的调用、任何并发的管理命令，都会把它提到的路径标成活。
@@ -335,7 +335,7 @@ def guard_live(path, live: dict) -> str:
         f = str(frag).replace("/", "\\").strip("\\").lower()
         if not f:
             continue
-        # 🔴 2026-09-23 第 30 轮修：**去掉裸子串判定 `f in s`**（原来挂在最后一条 or 上）。
+ # 2026-09-23 第 30 轮修：**去掉裸子串判定 `f in s`**（原来挂在最后一条 or 上）。
         # 那不是路径关系 —— `f="c:\users\admin"` 会命中任何含这串的路径；而真正该管的
         # 三种关系（相等 / 候选是活路径的父目录 / 候选在活路径里面）下面已经盖全。
         # 留着它只制造**假"活"**；假"活"一多，人就学会无视护栏 —— 那比没有护栏更坏。
@@ -453,7 +453,7 @@ def plan(tiers: set, refs: set) -> tuple:
     man, _n = manifest_paths()
 
     def add(tier, path, why=""):
-        # 🔴 **两道护栏**（顺序有讲究：先说"谁点名了"，再说"谁正拿着"）
+ # **两道护栏**（顺序有讲究：先说"谁点名了"，再说"谁正拿着"）
         #    ① 清单护栏：面板/窗口注册表里点名过的 —— 2026-09-23 就是漏了这道，
         #       删掉 `holo_pet/index.html` 把面板从 12/12 打到 11/12；
         #    ② 活进程护栏：系统里有进程正拿着这条路径。
@@ -528,12 +528,12 @@ def plan(tiers: set, refs: set) -> tuple:
 
     # ── pages：旧页面 ──
     # 风哥 2026-09-23 **第三次**令：「旧页面都要清理掉别留在项目里面容易搞混」。
-    # ⚠️ 判据定死为「**被超越**」，不是「看着旧」或「时间早」：
+ # 判据定死为「**被超越**」，不是「看着旧」或「时间早」：
     #   ① **版本族**：`archive/V<n> X.html` 只有在**仓根存在同后缀的更高版** `V<m> X.html`（m>n）时才算被超越；
     #      找不到更高版 ⇒ **它是唯一的**，一律留着（不许靠猜删历史）。
     #   ② **生成镜像**：整份目录是工具生成的（生成器在盘上 + `.gitignore` 已列 ⇒ 可重建）。
     #   ③ **临时 / 备份页**：显式清单，逐条写明理由。
-    # 🔴 三条护栏一条不少：现行版永不搬 · `referenced_names()` 命中就不搬（宁多留）· 不碰别人的页面。
+ # 三条护栏一条不少：现行版永不搬 · `referenced_names()` 命中就不搬（宁多留）· 不碰别人的页面。
     if "pages" in tiers:
         import re as _re
 

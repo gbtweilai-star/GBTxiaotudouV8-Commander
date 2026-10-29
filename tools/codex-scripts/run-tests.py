@@ -49,7 +49,7 @@ def main(argv: list[str]) -> int:
               "`py -3.14 -m pip install pytest pytest-timeout`")
         return 3
 
-    # ⚠️ 传进来的相对路径要**先按仓根解析**：第一版直接 `Path(a)`，
+ # 传进来的相对路径要**先按仓根解析**：第一版直接 `Path(a)`，
     #    于是 `run-tests.py holo_pet/tests` 在打印时 `relative_to(ROOT)` 抛
     #    `ValueError: 'holo_pet\tests' is not in the subpath of …`（**本器自己崩**）。
     picked = [(Path(a) if Path(a).is_absolute() else (ROOT / a)).resolve()
@@ -70,7 +70,7 @@ def main(argv: list[str]) -> int:
     print("=" * 88)
     print("仓库自带测试 · %d 个测试根" % len(roots))
     print("=" * 88)
-    # 🔴 关键步（不做它，`gbt_allinone/tests` **80/80 全部收集失败**）：
+ # 关键步（不做它，`gbt_allinone/tests` **80/80 全部收集失败**）：
     #    `gbt_allinone/tests/__init__.py` 有一条**生产 store 隔离守卫** ——
     #    父包在 import 期就把 STORE_DIR 绑成常量，而 pytest 收集时会先 import 父包，
     #    于是守卫**故意报错停下**（`拒绝在绑定【生产 store】的进程里跑测试`）。
@@ -94,7 +94,7 @@ def main(argv: list[str]) -> int:
         t0 = time.time()
         cmd = [sys.executable, "-m", "pytest", str(r), "-q", "--timeout=180", "-p", "no:cacheprovider"]
         out, rc = "", 1
-        # ⚠️ 实测撞过一次"**0 收集**"（passed 0 / failed 0；而 `holo_pet/tests` 平时 157 项必过），
+ # 实测撞过一次"**0 收集**"（passed 0 / failed 0；而 `holo_pet/tests` 平时 157 项必过），
         #    随后连跑 3 次不再复现 ⇒ 偶发（temp 目录 / 收集竞态一类）。所以：
         #    **空收集自动重试一次**，并把"空"与"失败"分开写 —— 否则一次抖动会被读成"测试坏了"。
         for attempt in (1, 2):

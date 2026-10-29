@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """system 域只读位批量体检（扫描所有故障的框架口径）。
 
 这些位是本仓自己设计的"体检口"：health / selfscan / truth_scan / cross_scan /
@@ -15,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 sys.path.insert(0, str(ROOT))
 import gbt_allinone as gbt  # noqa: E402
 
@@ -34,10 +30,10 @@ SLOTS = [
     "auth_gate_status", "caps_called_audit", "tentacle_cognition",
 ]
 
-# 🔴 2026-09-25 **自纠（第一版读错了平面，把干净的三位报成了 ✗）**：
+# 2026-09-25 **自纠（第一版读错了平面，把干净的三位报成了 ）**：
 #    第一版对每个位做 `leaf(...)` 剥到**内层 payload** 再取 `.get("ok")` ——
 #    可 `ok`/`status` 在**信封顶层**，内层 payload（如 health 的 {platform,python,time}）
-#    **根本没有 ok 字段** ⇒ 一律 `✗` 且关键字段全空。
+# **根本没有 ok 字段** ⇒ 一律 `` 且关键字段全空。
 #    实测同一时刻直接调：
 #      health   → {"platform":"Windows-11-10.0.26200-SP0","python":"3.14.5"}   0.3s
 #      selfscan → {"verdict":"clean","findings":[],"sections":{…}}              0.4s
@@ -45,7 +41,7 @@ SLOTS = [
 #    **它们没坏，是我读错平面** —— 与我在"钥匙"那栏犯的错同型（进程环境 vs 用户环境）。
 #    ⇒ 改成从**信封顶层**取 ok/status，内层 payload 只作为读数展示。
 #
-# ⚠️ 已知限制（第一版还撞到）：`cross_scan` / `inventory` 一类重活位会**走全树**，
+# 已知限制（第一版还撞到）：`cross_scan` / `inventory` 一类重活位会**走全树**，
 #    实测把整轮扫描拖过 600s。⇒ 本脚本**不把重活位放进默认批次**；
 #    要跑它们请单独跑并自行带超时。
 _HEAVY = {"cross_scan", "inventory"}   # 从默认批次剔除，避免整轮被拖死

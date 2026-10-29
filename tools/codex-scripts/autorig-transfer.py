@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """把低模骨架的蒙皮权重**迁移到高模**（同一次生成、同一坐标系 ⇒ 精确迁移，不是投影猜）
 理由：低模用来做实时/网页（能动能省），高模用来出图/主控台形象（好看）。两边共用同一套 22 骨骨架。
 
@@ -14,7 +10,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 LOW = DH / "raw/rig/model-rigged.glb"               # 已绑骨（含 JOINTS_0/WEIGHTS_0）—— 注意不是绑骨前的转换件
 HIGH = DH / "raw/phase2a/model.glb"                  # 高保真 T-pose（762k）

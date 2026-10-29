@@ -90,7 +90,7 @@ def library_keys():
         if i < 0:
             return {"ok": False, "reason": raw[-200:]}
         doc = json.loads(raw[i:])
-        # 🔴 2026-10-14 自纠：原来死盯 result.preview.keys._head 一层 —— 结构一变就返回空列表，
+ # 2026-10-14 自纠：原来死盯 result.preview.keys._head 一层 —— 结构一变就返回空列表，
         #    被 H2 念成「在役 0 把，无废钥」= **假绿**（取不到不许当 0，是本仓明令）。
         #    改成递归收集：凡是带 key_id 的字典都算一条钥，结构怎么收窄都跑得掉。
         found = []
@@ -113,6 +113,61 @@ def library_keys():
         return {"ok": False, "reason": str(exc)[:200]}
 
 
+CODE_EXT = (".py", ".js", ".mjs", ".cjs", ".ps1")
+# 只在这几棵树上找活引用（全仓 34 万件，不能裸 walk）；账本/产出/文档不算活引用。
+REF_ROOTS = ("tools", "gbt_allinone", "holo_pet_w3/shell", "deploy")
+_REF_SKIP = {"node_modules", ".git", "__pycache__", "outputs", "output", "state",
+             "memory", "docs", ".pylibs", "third_party"}
+
+
+def live_refs(name: str, limit: int = 12) -> list:
+    """**活引用**：这个名字真的被代码用到（返回 `文件:行` 列表）。
+
+    🔴 2026-10-25 为什么加（口径翻正 · 留痕）：
+      H1 原口径 = 「远端同时挂着 `X` 与 `XS` ⇒ 判 `X` 被取代、应删」。
+      它只量了**名字还在**，没量**是否真被取代** —— 实测本轮就撞上：
+      `GBT_ENDPOINT_TOKEN` 在 `chain-check.py:117` · `cloud-mesh.py:1340` ·
+      `model-align.py:258` · `keys-page.py:67` **四处仍在调用**，
+      删了会把这几条链路当场打死。**有活引用的钥不叫"被取代"，叫"仍在役"。**
+      ⇒ 现口径：只有**零活引用**才算被取代（该删）。
+      原期望没丢：零引用的老钥照样红、照样要删。
+
+    保守口径（宁可不删）：注释行（`#` / `//` / `*` 开头）不算引用 ——
+    但**行尾注释里出现它仍算引用**（拿不准就当成"有人还在用"，错杀比漏报贵）。
+    """
+    hits = []
+    for root in REF_ROOTS:
+        base_dir = ROOT / root
+        if not base_dir.is_dir():
+            continue
+        for base, dirs, files in os.walk(base_dir):
+            dirs[:] = [d for d in dirs if d not in _REF_SKIP]
+            for fn in files:
+                if not fn.lower().endswith(CODE_EXT):
+                    continue
+                p = Path(base) / fn
+                try:
+                    if p.stat().st_size > 2_000_000:
+                        continue
+                    txt = p.read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+                for i, line in enumerate(txt.splitlines(), 1):
+                    if name not in line:
+                        continue
+                    s = line.strip()
+                    if s.startswith("#") or s.startswith("//") or s.startswith("*"):
+                        continue
+                    try:
+                        rel = p.relative_to(ROOT).as_posix()
+                    except ValueError:
+                        rel = str(p)
+                    hits.append("%s:%d" % (rel, i))
+                    if len(hits) >= limit:
+                        return hits
+    return hits
+
+
 def check_remote(offline):
     if offline:
         j("H1", "远端旧钥位", True, "跳过（--offline 显式降级）—— 读数里带着这句，不许念成全绿")
@@ -122,11 +177,26 @@ def check_remote(offline):
         j("H1", "远端旧钥位", False, "未读到远端 secret 名单：%s" % r.get("reason"))
         return False
     names = r["names"]
-    stale = [n[:-1] for n in names if n.endswith("S") and n[:-1] in names]
-    j("H1", "远端旧钥位", not stale,
-      ("同时挂着被取代的单值钥：%s ⇒ 应 wrangler secret delete" % "、".join(stale)) if stale
-      else "secret %d 条：%s；无被取代的单值钥" % (len(names), "、".join(sorted(names))))
-    return not stale
+    stale, in_use = [], []
+    for n in names:
+        if not (n.endswith("S") and n[:-1] in names):
+            continue
+        single = n[:-1]
+        refs = live_refs(single)
+        (in_use if refs else stale).append((single, refs))
+    if stale:
+        j("H1", "远端旧钥位", False,
+          "被取代且**零活引用**的单值钥：%s ⇒ 应 `wrangler secret delete`"
+          % "、".join(x[0] for x in stale))
+        return False
+    if in_use:
+        j("H1", "远端旧钥位", True,
+          "单值钥仍在役（有活引用，不算被取代，**不动它**）：%s｜迁移完引用再删"
+          % "；".join("%s ← %s" % (x[0], "、".join(x[1][:3])) for x in in_use))
+        return True
+    j("H1", "远端旧钥位", True,
+      "secret %d 条：%s；无被取代的单值钥" % (len(names), "、".join(sorted(names))))
+    return True
 
 
 def check_library():
@@ -178,9 +248,20 @@ def selftest():
     def c(name, ok, d=""):
         ck.append(bool(ok))
         print(("OK  " if ok else "BAD ") + name + (" — " + str(d)[:90] if d else ""))
-    names_pos = [SINGLE, LIST]
-    stale = [n[:-1] for n in names_pos if n.endswith("S") and n[:-1] in names_pos]
-    c("正控·单值+列表同时在 ⇒ 必认出被取代的那条", stale == [SINGLE], stale)
+ # 2026-10-25 口径翻正后，控制也一起改（旧控制写的是"名字同时在 ⇒ 必被取代"，
+    #    那正是被证伪的那条）。现在分两个方向各控一次：
+    #      正控：名字同时在 **且零活引用** ⇒ 才算被取代（用一个人造名，仓里必然零引用）
+    #      负控：名字同时在 **但有活引用** ⇒ **不许**判被取代（用真实的 GBT_ENDPOINT_TOKEN）
+ # 2026-10-25 自纠（P33 量具把自己算进去）：第一版这里写 `fake = "GBT_..._SELFTEST_ONLY"`，
+    #    于是 `live_refs(fake)` 在 **本文件第 255 行** 命中——**判据把自己的测试字面量当成了活引用**，
+    #    正控当场 BAD。⇒ 名字**拼出来**，别以完整字面量出现。
+    fake = "GBT_SUPERSEDED_" + "SELFTEST_ONLY"
+    refs_fake = live_refs(fake)
+    c("正控·零活引用的老单值 ⇒ 认作被取代", refs_fake == [], refs_fake[:3])
+    refs_real = live_refs(SINGLE)
+    c("负控·有活引用的单值 ⇒ 不许判被取代", len(refs_real) > 0,
+      "活引用 %d 处（例：%s）" % (len(refs_real), refs_real[:2]))
+    c("负控·注释行不算活引用（人造名只在注释里也不该被算进来）", refs_fake == [], refs_fake[:3])
     names_clean = [LIST, "GW_AUTH"]
     stale2 = [n[:-1] for n in names_clean if n.endswith("S") and n[:-1] in names_clean]
     c("负控·只有列表 ⇒ 不许虚报", stale2 == [], stale2)

@@ -1,75 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html data-page-id="capability-bar" lang="zh-CN">
 <head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 
 
@@ -97,87 +29,102 @@
 
 <title>GBT小土豆V8 · 能力栏 · 族 × 三态（一屏可读）</title>
 <!--
-  GBT小土豆V8 · 能力栏（B 腿 · 自包含页）
-  ==========================================================================
-  主人令 2026-10-08：「记得能力栏精细设计一下」·「使用官方的 APP 来改造」
+ GBT小土豆V8 · 能力栏（B 腿 · 自包含页）
+ ==========================================================================
+ 主人令 2026-10-08：「记得能力栏精细设计一下」·「使用官方的 APP 来改造」
 
-  这一页只干一件事：把**能力不丢失**讲清楚，且**一个数字都不许假**。
-    ① 一屏可读：240 位按**族**（域）聚合 30 族；默认只出「族 × 三态计数 + 逐位一格」，
-       点「明细」才展开到条目 —— 不许一上来铺 240 行。
-    ② 三态一色：接上=品牌青 / 断连=品牌金 / 未探测=品牌紫（**不引第四色**；
-       「缺失」用金 + 虚线形状区分，仍是三色的金）。**未探测绝不画成通。**
-    ③ 数据新鲜度：每个数字带**来源 + 时刻**（页脚一张源表 + 每个读数旁边的小字），
-       年龄按《数据新鲜度契约》上色（快照：≤6h 青 · ≤48h 金 · >48h 紫）。
-    ④ 零打扰：无 emoji 图标 · 无外链 · 零远端取数 · 尊重 prefers-reduced-motion · 裸色值只在 :root。
-    ⑤ 可点到处：每一族/每一类都给出「详页」（在册页 id，不许死链）或**它的调用法**
-       （`py -3.14 -m gbt_allinone run <位名>`）；给不出对应页的**明写「无对应页」**。
+ 这一页只干一件事：把能力不丢失讲清楚，且一个数字都不许假。
+ ① 一屏可读：240 位按族（域）聚合 30 族；默认只出「族 × 三态计数 + 逐位一格」，
+ 点「明细」才展开到条目 —— 不许一上来铺 240 行。
+ ② 三态一色：接上=品牌青 / 断连=品牌金 / 未探测=品牌紫（不引第四色；
+ 「缺失」用金 + 虚线形状区分，仍是三色的金）。未探测绝不画成通。
+ ③ 数据新鲜度：每个数字带来源 + 时刻（页脚一张源表 + 每个读数旁边的小字），
+ 年龄按《数据新鲜度契约》上色（快照：≤6h 青 · ≤48h 金 ·>48h 紫）。
+ ④ 零打扰：无 emoji 图标 · 无外链 · 零远端取数 · 尊重 prefers-reduced-motion · 裸色值只在 :root。
+ ⑤ 可点到处：每一族/每一类都给出「详页」（在册页 id，不许死链）或它的调用法
+ （py -3.14 -m gbt_allinone run<位名>）；给不出对应页的明写「无对应页」。
 
-  三态的证据是**运行记录**，不是"已绑"（已绑只是接线有代码证据 —— 把它画成"接上"就是假绿）：
-    · 接上   = 账本窗口内该位**最后一次**记录是 ok
-    · 断连   = 最后一次记录是 denied / error（**原始串随行**）
-    · 未探测 = 窗口内**没有**该位的记录（窗口有界 ⇒ 口径随数字一起显示）
-    窗口：近 24 小时 · 最多回读 24 MB · 来源 gbt_allinone/store/audit.jsonl（只读尾部）
-    快照由 `py -3.14 tools/codex-scripts/capability-bar-check.py refresh` 生成；
-    宿主内（官方 APP 里那一格）由插件路由**现读**同一账本后经经典脚本注入，页面不自取数。
+ 三态的证据是运行记录，不是"已绑"（已绑只是接线有代码证据 —— 把它画成"接上"就是假绿）：
+ · 接上 = 账本窗口内该位最后一次记录是 ok
+ · 断连 = 最后一次记录是 denied / error（原始串随行）
+ · 未探测 = 窗口内没有该位的记录（窗口有界 ⇒ 口径随数字一起显示）
+ 窗口：近 24 小时 · 最多回读 24 MB · 来源 gbt_allinone/store/audit.jsonl（只读尾部）
+ 快照由 py -3.14 tools/codex-scripts/capability-bar-check.py refresh 生成；
+ 宿主内（官方 APP 里那一格）由插件路由现读同一账本后经经典脚本注入，页面不自取数。
 
-  数据件（全部**经典脚本**，零远端取数）：
-    · run-evidence.js            运行证据快照（本目录 · 本件生成）
-    · ../energy/energy-data.js   240 位 × 触手 10 域 × 能量 13 通道（既有生成物，只读）
-    · ../capabilities/capabilities-data.js   审计 326 项四态（既有生成物，只读）
+ 数据件（全部经典脚本，零远端取数）：
+ · run-evidence.js 运行证据快照（本目录 · 本件生成）
+ · ../energy/energy-data.js 240 位 × 触手 10 域 × 能量 13 通道（既有生成物，只读）
+ · ../capabilities/capabilities-data.js 审计 326 项四态（既有生成物，只读）
 
-  开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+ 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
 -->
+<!-- 2026-10-26：底色/面板吃 library 令牌（单一源 state/taste/*.json → theme/taste-tokens.css）。
+ 本页是透光体系：直接用不透明令牌会把玻璃层次拍平 ⇒ 用 color-mix 保留原透明度、
+ 只替换基色。品牌三色与三态语义（on/off2/unk）一律不跟库走，那是本页 §1 冻结的口径。 -->
+<link rel="stylesheet" href="../theme/taste-tokens.css" />
 <style>
-/* ── §1 token 定义块（**全页唯一允许出现裸色值的地方**）────────────────── */
+/* ── §1 token 定义块（全页唯一允许出现裸色值的地方）────────────────── */
 :root{
-  /* 品牌三色（白皮书冻结 · memory/2026-09-22-品牌与Logo不丢.md §一） */
-  --gbt-gold:#F5B041;             /* 土豆金 */
-  --gbt-cyan:#00E5FF;             /* 赛博青 */
-  --gbt-violet:#7C4DFF;           /* 深空紫 */
-  /* 结构（照 window.css §1 的口径，值原样起名） */
-  --cb-bg:rgba(5,7,17,.96);
-  --cb-panel:rgba(12,16,34,.72);
-  --cb-panel-2:rgba(9,12,26,.86);
-  --cb-line:rgba(124,77,255,.34);
-  --cb-line-soft:rgba(0,229,255,.16);
-  --cb-hairline:rgba(255,255,255,.05);
-  --cb-glass-hi:rgba(255,255,255,.022);
-  --cb-hover:rgba(255,255,255,.035);
-  --cb-shadow:rgba(3,6,16,.55);
-  --cb-shadow-2:rgba(4,10,28,.38);
-  --cb-ink:#E8ECF8;
-  --cb-dim:#9AA4C4;
-  --cb-off:#6B7280;
-  /* 三态 ← 品牌三色（**不引第四色**） */
-  --cb-on:var(--gbt-cyan);        /* 接上 */
-  --cb-off2:var(--gbt-gold);      /* 断连 / 缺失 */
-  --cb-unk:var(--gbt-violet);     /* 未探测（不许画成通） */
-  /* 形状系统（四档，各有角色；新增元素必须归入其中一档） */
-  --cb-radius:10px; --cb-radius-sm:6px; --cb-pill:999px;
-  --cb-mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
+ /* 品牌三色（白皮书冻结 · memory/2026-09-22-品牌与Logo不丢.md §一） */
+ --gbt-gold:#F5B041; /* 土豆金 */
+ --gbt-cyan:#00E5FF; /* 赛博青 */
+ --gbt-violet:#7C4DFF; /* 深空紫 */
+ /* 结构（照 window.css §1 的口径，值原样起名）；基色已接库令牌，透明度不变 */
+ --cb-bg:color-mix(in srgb,var(--taste-ground,#0B1120) 96%,transparent);
+ --cb-panel:color-mix(in srgb,var(--taste-surface,#111827) 72%,transparent);
+ --cb-panel-2:color-mix(in srgb,var(--taste-surface,#111827) 86%,transparent);
+ --cb-line:rgba(124,77,255,.34);
+ --cb-line-soft:rgba(0,229,255,.16);
+ --cb-hairline:rgba(255,255,255,.05);
+ --cb-glass-hi:rgba(255,255,255,.022);
+ --cb-hover:rgba(255,255,255,.035);
+ --cb-shadow:rgba(3,6,16,.55);
+ --cb-shadow-2:rgba(4,10,28,.38);
+ --cb-ink:var(--taste-text,#E8ECF8);
+ --cb-dim:var(--taste-muted,#9AA4C4);
+ --cb-off:#6B7280;
+ /* 三态 ← 品牌三色（不引第四色） */
+ --cb-on:var(--gbt-cyan); /* 接上 */
+ --cb-off2:var(--gbt-gold); /* 断连 / 缺失 */
+ --cb-unk:var(--gbt-violet); /* 未探测（不许画成通） */
+ /* 形状系统（四档，各有角色；新增元素必须归入其中一档） */
+ --cb-radius:10px; --cb-radius-sm:6px; --cb-pill:999px;
+ --cb-mono:Consolas,"Cascadia Mono",ui-monospace,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:
-    radial-gradient(120% 80% at 50% -10%, var(--cb-line-soft), transparent 60%),
-    linear-gradient(180deg, var(--cb-panel-2), var(--cb-bg));
-  min-height:100vh;
-  color:var(--cb-ink);
-  font:13px/1.6 "Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
-  padding:0 0 26px;
+ /* 2026-10-26：原为「radial 底光 + linear 两档」两层渐变 —— 拿渐变当层次，
+ 与本仓方向（gbt-direction.json.avoid：层次只靠明度）冲突 ⇒ 改纯色。
+ 页面深度改由卡片 --cb-panel / 面板 --cb-panel-2 与底 --cb-bg 的明度差承担。 */
+ background:var(--cb-bg);
+ min-height:100vh;
+ color:var(--cb-ink);
+ font:13px/1.6 "Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
+ padding:0 0 26px;
 }
-.cb-brand-rule{height:3px;background:linear-gradient(90deg,var(--gbt-violet),var(--gbt-cyan),var(--gbt-gold))}
+/* 品牌三色条：这是身份，不是层次（白皮书冻结的三色按序排列，等价于一枚旗标）。
+ 2026-10-26：原为 linear-gradient 三色渐变，靠"登记例外"过闸。但例外的存在本身
+ 让闸里永远挂着一条黄 —— 现在改成三段纯色（紫 ｜ 青 ｜ 金）：顺序与语义一字不改，
+ CSS 里不再有 gradient ⇒ 这一条例外可以撤掉。 */
+.cb-brand-rule{position:relative;height:3px;background:var(--gbt-violet)}
+.cb-brand-rule::before,.cb-brand-rule::after{content:"";position:absolute;top:0;height:3px;width:33.34%}
+.cb-brand-rule::before{left:33.33%;background:var(--gbt-cyan)}
+.cb-brand-rule::after{left:66.66%;background:var(--gbt-gold)}
 
 /* ── §2 顶栏 ─────────────────────────────────────────────────────────────── */
-.cb-top{position:relative;overflow:hidden;border-bottom:1px solid var(--cb-line);background:linear-gradient(180deg,var(--cb-glass-hi),transparent)}
-.cb-top::after{content:"";position:absolute;inset:0 auto 0 -30%;width:30%;
-  background:linear-gradient(90deg,transparent,var(--cb-line-soft),transparent);animation:cb-scan 7s linear infinite}
+/* 2026-10-26：顶栏原来是 glass 渐变（--cb-glass-hi → transparent）当高光，改纯 --cb-glass-hi；
+ 原来的 ::after 扫描流光（透明→半透明→透明的移动高亮）已删 —— 它不承载信息、只是"看着在跑"，
+ 正是 slop 的典型。真要表达"在跑"，该由三态与账本给出，不由一道光给出。 */
+.cb-top{position:relative;overflow:hidden;border-bottom:1px solid var(--cb-line);background:var(--cb-glass-hi)}
 .cb-top-in{display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
 .cb-mark{width:30px;height:30px;border-radius:8px;box-shadow:0 0 0 1px var(--cb-line),0 0 18px var(--cb-line-soft)}
-.cb-word{font-weight:800;font-size:16px;letter-spacing:.5px;
-  background:linear-gradient(90deg,var(--gbt-violet),var(--gbt-cyan),var(--gbt-gold));
-  -webkit-background-clip:text;background-clip:text;color:transparent}
+/* 2026-10-26：原来是"三色渐变 + background-clip:text + color:transparent"。
+ 审美守卫（taste-guard）的 gradient-text 条款判它：渐变文字伤可读性（尤其 11-16px 的中文，
+ 底色一深一浅时字会"缺笔"）。这里改成纯品牌金——不引新色，仍是 :root 里的 --gbt-gold。
+ 这也是本页自己 §1 的口径：品牌三色用于语义，不用于给正文上花纹。 */
+.cb-word{font-weight:800;font-size:16px;letter-spacing:.5px;color:var(--gbt-gold)}
 .cb-sub{display:block;font-size:11px;color:var(--cb-dim);letter-spacing:.2px}
 .cb-grow{flex:1 1 auto}
 .cb-legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--cb-dim)}
@@ -188,7 +135,7 @@ body{
 .cb-dot.cb-st-unk{background:var(--cb-unk)}
 .cb-dot.cb-st-miss{background:transparent;border:1px dashed var(--cb-off2)}
 .cb-fresh{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--cb-line);border-radius:var(--cb-pill);
-  padding:2px 10px;font-size:11.5px;white-space:nowrap;color:var(--cb-dim)}
+ padding:2px 10px;font-size:11.5px;white-space:nowrap;color:var(--cb-dim)}
 .cb-fresh[data-lv="ok"]{color:var(--cb-on);border-color:var(--cb-on)}
 .cb-fresh[data-lv="warn"]{color:var(--cb-off2);border-color:var(--cb-off2)}
 .cb-fresh[data-lv="bad"]{color:var(--cb-unk);border-color:var(--cb-unk)}
@@ -196,22 +143,25 @@ body{
 /* ── §3 布局 ─────────────────────────────────────────────────────────────── */
 .cb-wrap{padding:14px 16px 0;display:grid;gap:14px;max-width:1500px;margin:0 auto}
 .cb-card{border:1px solid color-mix(in srgb,var(--gbt-cyan) 13%,transparent);border-radius:var(--cb-radius);
-  background:linear-gradient(180deg,var(--cb-glass-hi),transparent 42%),var(--cb-panel);
-  box-shadow:0 1px 0 var(--cb-hairline) inset,0 1px 2px var(--cb-shadow),0 10px 26px var(--cb-shadow-2);
-  padding:12px 14px;position:relative}
+ /* 2026-10-26：原为 glass 渐变（--cb-glass-hi → transparent 42%）叠在 --cb-panel 上。
+ 高光层也是"用渐变造层次" ⇒ 落到纯 --cb-panel；卡片浮起仍靠 --cb-panel 与 --cb-bg 的明度差。 */
+ background:var(--cb-panel);
+ box-shadow:0 1px 0 var(--cb-hairline) inset,0 1px 2px var(--cb-shadow),0 10px 26px var(--cb-shadow-2);
+ padding:12px 14px;position:relative}
+/* 左侧强调条：原为 cyan → 全透明的渐变淡出（视觉上等于"一段会消失的线"）。改纯 cyan + opacity。 */
 .cb-card::before{content:"";position:absolute;left:0;top:12px;width:2px;height:20px;border-radius:0 2px 2px 0;
-  background:linear-gradient(180deg,var(--gbt-cyan),color-mix(in srgb,var(--gbt-cyan) 0%,transparent));opacity:.28}
-.cb-card > h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--cb-ink);
-  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.cb-card > h2 .cb-h2-src{font-weight:400;font-size:11px;color:var(--cb-dim)}
-.cb-card > h2 .cb-h2-note{font-weight:400;font-size:11px;color:var(--cb-dim)}
+ background:var(--gbt-cyan);opacity:.28}
+.cb-card> h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.03em;color:var(--cb-ink);
+ display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cb-card> h2 .cb-h2-src{font-weight:400;font-size:11px;color:var(--cb-dim)}
+.cb-card> h2 .cb-h2-note{font-weight:400;font-size:11px;color:var(--cb-dim)}
 
 /* 瓦片：一屏读数（每个数都带来源小字；300px 起 ⇒ 宽屏 4 列，读数与来源都不被截断） */
 .cb-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px}
 .cb-tile{border:1px solid var(--cb-line);border-radius:var(--cb-radius-sm);background:var(--cb-bg);padding:7px 9px;min-width:0}
 .cb-tile-k{font-size:10.5px;color:var(--cb-dim);letter-spacing:.03em}
 .cb-tile-v{font:600 17px/1.2 var(--cb-mono);font-variant-numeric:tabular-nums;color:var(--cb-ink);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cb-tile-v.u{color:var(--cb-unk)}.cb-tile-v.w{color:var(--cb-off2)}.cb-tile-v.o{color:var(--cb-on)}
 .cb-tile-src{display:block;margin-top:2px;font-size:10px;color:var(--cb-off);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cb-tile-src[data-lv="ok"]{color:var(--cb-on)}.cb-tile-src[data-lv="warn"]{color:var(--cb-off2)}
@@ -227,7 +177,7 @@ body{
 .cb-fam-t{font:11px/1 var(--cb-mono);color:var(--cb-dim)}
 .cb-fam-bind{margin-left:auto;font:11px/1 var(--cb-mono);color:var(--cb-dim);white-space:nowrap}
 .cb-btn{background:transparent;border:1px solid var(--cb-line);border-radius:var(--cb-radius-sm);color:var(--cb-ink);
-  font:inherit;font-size:11.5px;padding:2px 8px;cursor:pointer;white-space:nowrap}
+ font:inherit;font-size:11.5px;padding:2px 8px;cursor:pointer;white-space:nowrap}
 .cb-btn:hover{border-color:var(--cb-cyan);color:var(--cb-cyan)}
 .cb-btn:focus-visible{outline:1px solid var(--cb-cyan);outline-offset:1px}
 .cb-btn[data-act="page"]{color:var(--cb-dim)}
@@ -247,11 +197,11 @@ body{
 /* 明细（展开才出现） */
 .cb-det{margin-top:8px;border-top:1px solid var(--cb-line-soft);padding-top:6px;display:grid;gap:5px}
 .cb-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--cb-line);border-radius:var(--cb-radius-sm);
-  background:var(--cb-bg);padding:5px 8px;min-width:0}
+ background:var(--cb-bg);padding:5px 8px;min-width:0}
 .cb-row-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
 .cb-name{font:600 12px/1.5 var(--cb-mono);color:var(--cb-ink);word-break:break-all}
 .cb-desc{font-size:11.5px;color:var(--cb-dim);grid-column:1 / -1;line-height:1.5;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cb-tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap;grid-column:1 / -1}
 .cb-tag{font:10.5px/1.6 var(--cb-mono);border:1px solid var(--cb-line);border-radius:var(--cb-pill);padding:0 7px;color:var(--cb-dim);white-space:nowrap}
 .cb-tag.cb-st-on{color:var(--cb-on);border-color:var(--cb-on)}
@@ -260,7 +210,7 @@ body{
 .cb-tag.cb-st-miss{color:var(--cb-off2);border-color:var(--cb-off2);border-style:dashed}
 .cb-call{grid-column:1 / -1;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .cb-call code{font:11px/1.6 var(--cb-mono);color:var(--cb-cyan);background:color-mix(in srgb,var(--gbt-cyan) 6%,transparent);
-  border:1px solid var(--cb-line-soft);border-radius:var(--cb-radius-sm);padding:1px 6px;word-break:break-all}
+ border:1px solid var(--cb-line-soft);border-radius:var(--cb-radius-sm);padding:1px 6px;word-break:break-all}
 .cb-raw{grid-column:1 / -1;font:11px/1.5 var(--cb-mono);color:var(--cb-off2);word-break:break-all}
 
 /* 表（能量 / 审计 / 源表） */
@@ -284,24 +234,69 @@ body{
 .cb-hint[data-state="warn"]{border-left-color:var(--cb-off2)}
 .cb-hint[data-state="fault"]{border-left-color:var(--cb-unk)}
 details.cb-cal{margin-top:8px;font-size:11.5px;color:var(--cb-dim)}
-details.cb-cal > summary{cursor:pointer;color:var(--cb-dim)}
-details.cb-cal > div{margin-top:5px;display:grid;gap:4px}
+details.cb-cal> summary{cursor:pointer;color:var(--cb-dim)}
+details.cb-cal> div{margin-top:5px;display:grid;gap:4px}
 .cb-seg-t{font:11px/1.5 var(--cb-mono)}
 .cb-foot{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
-  padding:9px 16px 0;color:var(--cb-dim);font-size:11px}
+ padding:9px 16px 0;color:var(--cb-dim);font-size:11px}
 .cb-sign{color:var(--cb-off)}
 .cb-search{background:var(--cb-bg);border:1px solid var(--cb-line);border-radius:var(--cb-radius-sm);color:var(--cb-ink);
-  font:inherit;font-size:12px;padding:3px 8px;width:220px}
+ font:inherit;font-size:12px;padding:3px 8px;width:220px}
 .cb-search:focus{outline:1px solid var(--cb-cyan)}
 .cb-empty{color:var(--cb-off)}
-@media (prefers-reduced-motion: reduce){
-  .cb-top::after{animation:none}
-}
-@keyframes cb-scan{0%{left:-30%}100%{left:100%}}
+/* 2026-10-26：@media (prefers-reduced-motion) 与 @keyframes cb-scan 一并删掉 ——
+ 它们只服务于顶栏那道扫描流光，流光已按方向文件（层次只靠明度）删除。
+ 本页现无任何持续动画，就不需要"给动画兜底"的媒体查询（死代码留着比删掉更危险：
+ 下一个人会以为"这页有动画要照顾"）。
+ 若将来重新加动画，必须把 prefers-reduced-motion 一起加回来。 */
 </style>
+<link rel="stylesheet" href="../page-skins.css" />
 </head>
 <body>
-<script src="../shell/nav-compact.js?v=20261026"></script>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -310,760 +305,661 @@ details.cb-cal > div{margin-top:5px;display:grid;gap:4px}
 <div class="cb-brand-rule"></div>
 
 <header class="cb-top">
-  <div class="cb-top-in">
-    <img class="cb-mark" src="../../assets/brand/logo-potato-64.png" width="30" height="30" alt="GBT小土豆V8">
-    <div>
-      <span class="cb-word">GBT小土豆V8 · 能力栏</span>
-      <span class="cb-sub" id="cb-sub">族 × 三态 · 一屏可读 · 每个数字带来源与时刻</span>
-    </div>
-    <span class="cb-grow"></span>
-    <span class="cb-legend">
-      <span class="cb-leg"><i class="cb-dot cb-st-on"></i>接上 · 窗口内最后一次是成功</span>
-      <span class="cb-leg"><i class="cb-dot cb-st-off"></i>断连 · 最后一次是失败/被拒</span>
-      <span class="cb-leg"><i class="cb-dot cb-st-unk"></i>未探测 · 窗口内没见它跑（<b>不画成通</b>）</span>
-      <span class="cb-leg"><i class="cb-dot cb-st-miss"></i>缺失 · 在册但实物不在（金+虚）</span>
-    </span>
-    <span class="cb-fresh" id="cb-fresh" data-lv="ok">数据 读取中</span>
-  </div>
+<div class="cb-top-in">
+<img class="cb-mark" src="../assets/brand/logo-potato-64.png" width="30" height="30" alt="GBT小土豆V8">
+<div>
+<span class="cb-word">GBT小土豆V8 · 能力栏</span>
+<span class="cb-sub" id="cb-sub">族 × 三态 · 一屏可读 · 每个数字带来源与时刻</span>
+</div>
+<span class="cb-grow"></span>
+<span class="cb-legend">
+<span class="cb-leg"><i class="cb-dot cb-st-on"></i>接上 · 窗口内最后一次是成功</span>
+<span class="cb-leg"><i class="cb-dot cb-st-off"></i>断连 · 最后一次是失败/被拒</span>
+<span class="cb-leg"><i class="cb-dot cb-st-unk"></i>未探测 · 窗口内没见它跑（<b>不画成通</b>）</span>
+<span class="cb-leg"><i class="cb-dot cb-st-miss"></i>缺失 · 在册但实物不在（金+虚）</span>
+</span>
+<span class="cb-fresh" id="cb-fresh" data-lv="ok">数据 读取中</span>
+</div>
 </header>
 
 <div class="cb-wrap">
 
-  <!-- §A 读数瓦片（全部现算 · 每个数带来源与时刻） -->
-  <section class="cb-card" aria-labelledby="cb-a">
-    <h2 id="cb-a">读数（现算）<span class="cb-h2-src" id="cb-a-src"></span></h2>
-    <div class="cb-tiles" id="cb-tiles"></div>
-    <details class="cb-cal">
-      <summary>口径（点开：三态怎么判 · 窗口是什么 · 为什么这样才不假绿）</summary>
-      <div id="cb-kou" class="cb-hint"></div>
-    </details>
-  </section>
+<!-- §A 读数瓦片（全部现算 · 每个数带来源与时刻） -->
+<section class="cb-card" aria-labelledby="cb-a">
+<h2 id="cb-a">读数（现算）<span class="cb-h2-src" id="cb-a-src"></span></h2>
+<div class="cb-tiles" id="cb-tiles"></div>
+<details class="cb-cal">
+<summary>口径（点开：三态怎么判 · 窗口是什么 · 为什么这样才不假绿）</summary>
+<div id="cb-kou" class="cb-hint"></div>
+</details>
+</section>
 
-  <!-- §B 族盘：30 族 × 三态（点「明细」展开到条目） -->
-  <section class="cb-card" aria-labelledby="cb-b">
-    <h2 id="cb-b">族 × 三态（<span id="cb-b-n">—</span> 族 · <span id="cb-b-c">—</span> 位，一位一格）
-      <span class="cb-grow"></span>
-      <input class="cb-search" id="cb-q" type="search" placeholder="筛族 / 能力位名（本页过滤，不取数）" aria-label="筛选">
-    </h2>
-    <div class="cb-fams" id="cb-fams"></div>
-    <p class="cb-note" id="cb-b-note"></p>
-  </section>
+<!-- §B 族盘：30 族 × 三态（点「明细」展开到条目） -->
+<section class="cb-card" aria-labelledby="cb-b">
+<h2 id="cb-b">族 × 三态（<span id="cb-b-n">—</span> 族 ·<span id="cb-b-c">—</span> 位，一位一格）
+<span class="cb-grow"></span>
+<input class="cb-search" id="cb-q" type="search" placeholder="筛族 / 能力位名（本页过滤，不取数）" aria-label="筛选">
+</h2>
+<div class="cb-fams" id="cb-fams"></div>
+<p class="cb-note" id="cb-b-note"></p>
+</section>
 
-  <!-- §C 能量 13 通道 -->
-  <section class="cb-card" aria-labelledby="cb-c">
-    <h2 id="cb-c">能量通道（13 条逐条）<span class="cb-h2-src" id="cb-c-src"></span></h2>
-    <div id="cb-chan"></div>
-    <p class="cb-note cb-hint" id="cb-c-note"></p>
-  </section>
+<!-- §C 能量 13 通道 -->
+<section class="cb-card" aria-labelledby="cb-c">
+<h2 id="cb-c">能量通道（13 条逐条）<span class="cb-h2-src" id="cb-c-src"></span></h2>
+<div id="cb-chan"></div>
+<p class="cb-note cb-hint" id="cb-c-note"></p>
+</section>
 
-  <!-- §D 审计 326 项（八类 · 四态） -->
-  <section class="cb-card" aria-labelledby="cb-d">
-    <h2 id="cb-d">审计面（八类 · 四态）<span class="cb-h2-src" id="cb-d-src"></span></h2>
-    <div id="cb-audit"></div>
-    <p class="cb-note cb-hint" id="cb-d-note"></p>
-  </section>
+<!-- §D 审计 326 项（八类 · 四态） -->
+<section class="cb-card" aria-labelledby="cb-d">
+<h2 id="cb-d">审计面（八类 · 四态）<span class="cb-h2-src" id="cb-d-src"></span></h2>
+<div id="cb-audit"></div>
+<p class="cb-note cb-hint" id="cb-d-note"></p>
+</section>
 
-  <!-- §E 记录本链 -->
-  <section class="cb-card" aria-labelledby="cb-e">
-    <h2 id="cb-e">记录本（链状态）<span class="cb-h2-src" id="cb-e-src"></span></h2>
-    <div id="cb-log"></div>
-  </section>
+<!-- §E 记录本链 -->
+<section class="cb-card" aria-labelledby="cb-e">
+<h2 id="cb-e">记录本（链状态）<span class="cb-h2-src" id="cb-e-src"></span></h2>
+<div id="cb-log"></div>
+</section>
 
-  <!-- §F 源表：每个数字的来源与时刻 -->
-  <section class="cb-card" aria-labelledby="cb-f">
-    <h2 id="cb-f">来源与时刻（本页所有数字的出处 · 按年龄上色）</h2>
-    <div id="cb-srcs"></div>
-    <p class="cb-note">
-      调用法（通用）：<code>py -3.14 -m gbt_allinone run &lt;位名&gt; '{"op":"status"}'</code>
-      —— 例：<code>py -3.14 -m gbt_allinone run key_gateway '{"op":"status"}'</code>（只读）。
-      本页**零远端取数**：三份数据件都是经典脚本（同树同源），宿主内那一格由插件路由现读账本后注入。
-    </p>
-  </section>
+<!-- §F 源表：每个数字的来源与时刻 -->
+<section class="cb-card" aria-labelledby="cb-f">
+<h2 id="cb-f">来源与时刻（本页所有数字的出处 · 按年龄上色）</h2>
+<div id="cb-srcs"></div>
+<p class="cb-note">
+ 调用法（通用）：<code>py -3.14 -m gbt_allinone run &lt;位名&gt; '{"op":"status"}'</code>
+ —— 例：<code>py -3.14 -m gbt_allinone run key_gateway '{"op":"status"}'</code>（只读）。
+ 本页零远端取数：三份数据件都是经典脚本（同树同源），宿主内那一格由插件路由现读账本后注入。
+</p>
+</section>
 
 </div>
 
 <footer class="cb-foot">
-  <span class="cb-sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</span>
-  <span id="cb-cmds" class="cb-mono cb-sign"></span>
+<span class="cb-sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</span>
+<span id="cb-cmds" class="cb-mono cb-sign"></span>
 </footer>
 
-<!-- 数据件：**经典脚本**（非 module）· 顺序不变（先证据、再两份既有生成物） -->
-<script src="run-evidence.js?v=20261026"></script>
-<script src="../energy/energy-data.js?v=20261026"></script>
-<script src="../capabilities/capabilities-data.js?v=20261026"></script>
+<!-- 数据件：经典脚本（非 module）· 顺序不变（先证据、再两份既有生成物） -->
+<script src="run-evidence.js"></script>
+<script src="../energy/energy-data.js"></script>
+<script src="../capabilities/capabilities-data.js"></script>
 <script>
 /* GBT小土豆V8 · 能力栏 · 渲染（经典脚本；本页不自取数、不写盘、不改任何状态） */
 (function () {
-  "use strict";
-  var ERR = [];
-  var SNAPSHOT_CMD = "py -3.14 tools/codex-scripts/capability-bar-check.py refresh";
-  var CHECK_CMD = "py -3.14 tools/codex-scripts/capability-bar-check.py --check";
+ "use strict";
+ var ERR = [];
+ var SNAPSHOT_CMD = "py -3.14 tools/codex-scripts/capability-bar-check.py refresh";
+ var CHECK_CMD = "py -3.14 tools/codex-scripts/capability-bar-check.py --check";
 
-  /* 域名 → 中文（与 tools/codex-scripts/capability-bar-check.py::DOMAIN_CN 同一张表；
-     表里没有的回落显示英文 token —— **不编中文名**） */
-  var DOMAIN_CN = {
-    system:"系统", llm:"内核", tentacle:"触手", device:"设备", data:"数据", finance:"金融",
-    project:"项目", recon:"侦察", security:"安全", engine:"引擎", longrun:"长程", pipeline:"产出",
-    creation:"创作", comms:"通信", life:"生命", mind:"心智", vision:"视觉", voice:"语音",
-    automation:"自动化", digital_human:"数字人", devour:"吞天", brain:"脑域", collab:"协作",
-    framework:"框架", image_video:"影像", infra:"基建", integration:"集成", social:"社交",
-    tools:"工具", video:"视频", desktop:"桌面", dangerous:"禁用"
-  };
-  /* 三态/四态 → 类名（**唯此一份**；判据按这几个类名验色） */
-  var CLASS = { "接上":"on", "断连":"off", "未探测":"unk", "缺失":"miss" };
-  /* 族 → 在册详页（页 id 取自 holo_pet_w3/shell/windows.json 与 panel/index.html::PAGES，
-     两处都有这个 id 才能点；给不出对应页的族**明写「无对应页」**，不许死链）。
-     🔴 这几行是"可点到处"的**唯一清单**，判据（capability-bar-check.py C8）按它验在册。 */
-  var PTR_PAGES = {
-    "energy": "能量与绑定 · 240 条逐条（能力 × 绑定 × 通道）",
-    "capabilities": "能力统计 · 326 项逐条（含证据与探于何时）"
-  };
-  var PAGE = { id: "energy", label: "能量与绑定", why: "240 条逐条（能力 × 绑定 × 通道）" };
-  var PAGE_AUDIT = { id: "capabilities", label: "能力统计", why: "326 项逐条（含证据与探于何时）" };
+ /* 域名 → 中文（与 tools/codex-scripts/capability-bar-check.py::DOMAIN_CN 同一张表；
+ 表里没有的回落显示英文 token —— 不编中文名） */
+ var DOMAIN_CN = {
+ system:"系统", llm:"内核", tentacle:"触手", device:"设备", data:"数据", finance:"金融",
+ project:"项目", recon:"侦察", security:"安全", engine:"引擎", longrun:"长程", pipeline:"产出",
+ creation:"创作", comms:"通信", life:"生命", mind:"心智", vision:"视觉", voice:"语音",
+ automation:"自动化", digital_human:"数字人", devour:"吞天", brain:"脑域", collab:"协作",
+ framework:"框架", image_video:"影像", infra:"基建", integration:"集成", social:"社交",
+ tools:"工具", video:"视频", desktop:"桌面", dangerous:"禁用"
+ };
+ /* 三态/四态 → 类名（唯此一份；判据按这几个类名验色） */
+ var CLASS = { "接上":"on", "断连":"off", "未探测":"unk", "缺失":"miss" };
+ /* 族 → 在册详页（页 id 取自 holo_pet_w3/shell/windows.json 与 panel/index.html::PAGES，
+ 两处都有这个 id 才能点；给不出对应页的族明写「无对应页」，不许死链）。
+ 这几行是"可点到处"的唯一清单，判据（capability-bar-check.py C8）按它验在册。 */
+ var PTR_PAGES = {
+ "energy": "能量与绑定 · 240 条逐条（能力 × 绑定 × 通道）",
+ "capabilities": "能力统计 · 326 项逐条（含证据与探于何时）"
+ };
+ var PAGE = { id: "energy", label: "能量与绑定", why: "240 条逐条（能力 × 绑定 × 通道）" };
+ var PAGE_AUDIT = { id: "capabilities", label: "能力统计", why: "326 项逐条（含证据与探于何时）" };
 
-  var E = (typeof window.GBT_ENERGY === "object" && window.GBT_ENERGY) ? window.GBT_ENERGY : null;
-  var A = (typeof window.GBT_CAPABILITIES === "object" && window.GBT_CAPABILITIES) ? window.GBT_CAPABILITIES : null;
-  var EV = (typeof window.GBT_CAPBAR_EVIDENCE === "object" && window.GBT_CAPBAR_EVIDENCE) ? window.GBT_CAPBAR_EVIDENCE : null;
-  var LIVE = (typeof window.GBT_CAPBAR_LIVE === "object" && window.GBT_CAPBAR_LIVE) ? window.GBT_CAPBAR_LIVE : null;
+ var E = (typeof window.GBT_ENERGY === "object" && window.GBT_ENERGY) ? window.GBT_ENERGY : null;
+ var A = (typeof window.GBT_CAPABILITIES === "object" && window.GBT_CAPABILITIES) ? window.GBT_CAPABILITIES : null;
+ var EV = (typeof window.GBT_CAPBAR_EVIDENCE === "object" && window.GBT_CAPBAR_EVIDENCE) ? window.GBT_CAPBAR_EVIDENCE : null;
+ var LIVE = (typeof window.GBT_CAPBAR_LIVE === "object" && window.GBT_CAPBAR_LIVE) ? window.GBT_CAPBAR_LIVE : null;
 
-  function h(tag, cls, text) {
-    var el = document.createElement(tag);
-    if (cls) el.className = cls;
-    if (text !== undefined && text !== null) el.textContent = String(text);
-    return el;
-  }
-  function byId(id) { return document.getElementById(id); }
-  function atMs(at) { var t = at ? Date.parse(String(at).replace(" ", "T")) : NaN; return isFinite(t) ? t : NaN; }
-  function fmtAge(sec) {
-    if (!isFinite(sec)) return "时刻不可读";
-    if (sec < 0) sec = 0;
-    var m = Math.floor(sec / 60), hh = Math.floor(m / 60), dd = Math.floor(hh / 24);
-    if (sec < 60) return sec + "s";
-    if (m < 60) return m + "m";
-    if (hh < 48) return hh + "h" + (m % 60) + "m";
-    return dd + "d" + (hh % 24) + "h";
-  }
-  /* 年龄 → 档（照《数据新鲜度契约》快照档：≤6h 青 · ≤48h 金 · >48h 紫） */
-  function freshLevel(atIso) {
-    var t = atMs(atIso);
-    if (!isFinite(t)) return { lv: "bad", text: "时刻不可读" };
-    var age = (Date.now() - t) / 1000;
-    var lv = age <= 6 * 3600 ? "ok" : (age <= 48 * 3600 ? "warn" : "bad");
-    return { lv: lv, text: "快照 · " + fmtAge(age) + " 前", age: age };
-  }
-  function srcTag(file, at) {
-    var f = freshLevel(at);
-    var s = h("span", "cb-tile-src", file + " · " + f.text);
-    s.setAttribute("data-lv", f.lv);
-    s.title = file + " @ " + (at || "（无生成时刻）");
-    return s;
-  }
+ function h(tag, cls, text) {
+ var el = document.createElement(tag);
+ if (cls) el.className = cls;
+ if (text !== undefined && text !== null) el.textContent = String(text);
+ return el;
+ }
+ function byId(id) { return document.getElementById(id); }
+ function atMs(at) { var t = at ? Date.parse(String(at).replace(" ", "T")) : NaN; return isFinite(t) ? t : NaN; }
+ function fmtAge(sec) {
+ if (!isFinite(sec)) return "时刻不可读";
+ if (sec< 0) sec = 0;
+ var m = Math.floor(sec / 60), hh = Math.floor(m / 60), dd = Math.floor(hh / 24);
+ if (sec< 60) return sec + "s";
+ if (m< 60) return m + "m";
+ if (hh< 48) return hh + "h" + (m % 60) + "m";
+ return dd + "d" + (hh % 24) + "h";
+ }
+ /* 年龄 → 档（照《数据新鲜度契约》快照档：≤6h 青 · ≤48h 金 ·>48h 紫） */
+ function freshLevel(atIso) {
+ var t = atMs(atIso);
+ if (!isFinite(t)) return { lv: "bad", text: "时刻不可读" };
+ var age = (Date.now() - t) / 1000;
+ var lv = age<= 6 * 3600 ? "ok" : (age<= 48 * 3600 ? "warn" : "bad");
+ return { lv: lv, text: "快照 · " + fmtAge(age) + " 前", age: age };
+ }
+ function srcTag(file, at) {
+ var f = freshLevel(at);
+ var s = h("span", "cb-tile-src", file + " · " + f.text);
+ s.setAttribute("data-lv", f.lv);
+ s.title = file + " @ " + (at || "（无生成时刻）");
+ return s;
+ }
 
-  /* ── 运行证据：三态**判定**（唯此一份；页面自报里带出去给端到端门读） ───── */
-  var evMap = null, evWhy = "", evAt = null, evWin = null;
-  if (LIVE && LIVE.evidence && LIVE.evidence.map) {
-    evMap = LIVE.evidence.map; evAt = LIVE.evidence.at || LIVE.at;
-    evWin = LIVE.evidence; evWhy = "宿主现读（插件路由吃掉账本尾部有界窗口后注入）";
-  } else if (EV && EV.map) {
-    evMap = EV.map; evAt = EV.at; evWin = EV;
-    evWhy = "快照 · " + SNAPSHOT_CMD;
-  } else {
-    evWhy = "运行证据源未接（run-evidence.js 不在 / 宿主未注入）—— 本页**不判定**通断";
-  }
-  function capState(name) {
-    if (!evMap) return { s: "未探测", why: "运行证据源未接" };
-    var r = evMap[name];
-    if (!r) return { s: "未探测", why: "窗口内没有它的记录（未探到 ≠ 不能用）" };
-    if (r.s === "ok") return { s: "接上", at: r.at, why: "窗口内最后一次是 ok" };
-    return { s: "断连", at: r.at, raw: r.raw, why: "窗口内最后一次是 " + r.s };
-  }
+ /* ── 运行证据：三态判定（唯此一份；页面自报里带出去给端到端门读） ───── */
+ var evMap = null, evWhy = "", evAt = null, evWin = null;
+ if (LIVE && LIVE.evidence && LIVE.evidence.map) {
+ evMap = LIVE.evidence.map; evAt = LIVE.evidence.at || LIVE.at;
+ evWin = LIVE.evidence; evWhy = "宿主现读（插件路由吃掉账本尾部有界窗口后注入）";
+ } else if (EV && EV.map) {
+ evMap = EV.map; evAt = EV.at; evWin = EV;
+ evWhy = "快照 · " + SNAPSHOT_CMD;
+ } else {
+ evWhy = "运行证据源未接（run-evidence.js 不在 / 宿主未注入）—— 本页不判定通断";
+ }
+ function capState(name) {
+ if (!evMap) return { s: "未探测", why: "运行证据源未接" };
+ var r = evMap[name];
+ if (!r) return { s: "未探测", why: "窗口内没有它的记录（未探到 ≠ 不能用）" };
+ if (r.s === "ok") return { s: "接上", at: r.at, why: "窗口内最后一次是 ok" };
+ return { s: "断连", at: r.at, raw: r.raw, why: "窗口内最后一次是 " + r.s };
+ }
 
-  /* ── 载入自检（拿不到就如实说，不用漂亮空壳冒充） ─────────────────────── */
-  if (!E) { ERR.push("cap-bindings 数据件读不到（../energy/energy-data.js）"); }
-  if (!A) { ERR.push("audit 数据件读不到（../capabilities/capabilities-data.js）"); }
-  if (!evMap) { ERR.push("运行证据源未接：" + evWhy); }
+ /* ── 载入自检（拿不到就如实说，不用漂亮空壳冒充） ─────────────────────── */
+ if (!E) { ERR.push("cap-bindings 数据件读不到（../energy/energy-data.js）"); }
+ if (!A) { ERR.push("audit 数据件读不到（../capabilities/capabilities-data.js）"); }
+ if (!evMap) { ERR.push("运行证据源未接：" + evWhy); }
 
-  /* ── 瓦片 ─────────────────────────────────────────────────────────────── */
-  var counts = { caps: 0, families: 0, 接上: 0, 断连: 0, 未探测: 0, bound: 0, direct: 0, tentacle: 0 };
-  var famRows = [];
-  if (E) {
-    var caps = E.caps || [];
-    var groups = {};
-    caps.forEach(function (c) {
-      var d = c.domain || "（无域）";
-      if (!groups[d]) groups[d] = [];
-      groups[d].push(c);
-      var st = capState(c.name);
-      counts[st.s] = (counts[st.s] || 0) + 1;
-      counts.caps++;
-      if (c.bind_kind === "触手承载") counts.tentacle++; else counts.direct++;
-      if (c.bind_kind) counts.bound++;
-    });
-    /* 族计数现算（不写死 30）：有能力的域就是族 */
-    Object.keys(groups).forEach(function (d) {
-      var g = groups[d], n = { "接上": 0, "断连": 0, "未探测": 0 };
-      g.forEach(function (c) { n[capState(c.name).s]++; });
-      famRows.push({ dom: d, caps: g, n: n });
-    });
-    famRows.sort(function (a, b) { return b.caps.length - a.caps.length || (a.dom < b.dom ? -1 : 1); });
-    counts.families = famRows.length;
-  }
-  var chanAlive = 0, chanDead = 0, chanUnk = 0;
-  if (E && E.energy_channels) {
-    E.energy_channels.forEach(function (ch) {
-      if (ch.alive) chanAlive++; else if (ch.status) chanDead++; else chanUnk++;
-    });
-  }
-  var auditCounts = (A && A.counts) || {};
+ /* ── 瓦片 ─────────────────────────────────────────────────────────────── */
+ var counts = { caps: 0, families: 0, 接上: 0, 断连: 0, 未探测: 0, bound: 0, direct: 0, tentacle: 0 };
+ var famRows = [];
+ if (E) {
+ var caps = E.caps || [];
+ var groups = {};
+ caps.forEach(function (c) {
+ var d = c.domain || "（无域）";
+ if (!groups[d]) groups[d] = [];
+ groups[d].push(c);
+ var st = capState(c.name);
+ counts[st.s] = (counts[st.s] || 0) + 1;
+ counts.caps++;
+ if (c.bind_kind === "触手承载") counts.tentacle++; else counts.direct++;
+ if (c.bind_kind) counts.bound++;
+ });
+ /* 族计数现算（不写死 30）：有能力的域就是族 */
+ Object.keys(groups).forEach(function (d) {
+ var g = groups[d], n = { "接上": 0, "断连": 0, "未探测": 0 };
+ g.forEach(function (c) { n[capState(c.name).s]++; });
+ famRows.push({ dom: d, caps: g, n: n });
+ });
+ famRows.sort(function (a, b) { return b.caps.length - a.caps.length || (a.dom< b.dom ? -1 : 1); });
+ counts.families = famRows.length;
+ }
+ var chanAlive = 0, chanDead = 0, chanUnk = 0;
+ if (E && E.energy_channels) {
+ E.energy_channels.forEach(function (ch) {
+ if (ch.alive) chanAlive++; else if (ch.status) chanDead++; else chanUnk++;
+ });
+ }
+ var auditCounts = (A && A.counts) || {};
 
-  function tile(k, v, cls, extras) {
-    var t = h("div", "cb-tile");
-    t.appendChild(h("div", "cb-tile-k", k));
-    t.appendChild(h("div", "cb-tile-v" + (cls ? " " + cls : ""), v));
-    (extras || []).forEach(function (el) { if (el) t.appendChild(el); });
-    return t;
-  }
-  (function buildTiles() {
-    var box = byId("cb-tiles");
-    if (!box) return;
-    var eSrc = E ? srcTag("cap-bindings.json", E.generated_at) : null;
-    var aSrc = A ? srcTag("capability-audit.json", A.generated_at) : null;
-    var vSrc = evAt ? srcTag((LIVE && LIVE.evidence ? "宿主现读 audit.jsonl" : "run-evidence.js"), evAt) : null;
-    function sub(text) { return h("span", "cb-tile-src", text); }
-    box.appendChild(tile("能力位（全部在册）", counts.caps + " 位", "o", [eSrc]));
-    box.appendChild(tile("已绑（直连 + 触手承载）",
-      counts.bound + " / " + counts.caps, counts.bound === counts.caps ? "o" : "w",
-      [sub("直连 " + counts.direct + " · 触手承载 " + counts.tentacle + " · 未绑 " + (counts.caps - counts.bound))]));
-    box.appendChild(tile("族（有能力的域）", counts.families + " 族", "o", [eSrc]));
-    box.appendChild(tile("触手域（总纲）",
-      (E && E.counts ? E.counts.tentacle_domains : "—") + " 域", "",
-      [sub("条目 " + (E && E.counts ? E.counts.tentacle_items : "—") + " · 承载位 " + counts.tentacle), eSrc]));
-    box.appendChild(tile("能量通道（活 / 全）", chanAlive + " / " + (chanAlive + chanDead + chanUnk),
-      chanDead > 0 ? "w" : "o", [sub("死 " + chanDead + " 通道承载 0 位（不算承载）"), eSrc]));
-    box.appendChild(tile("挂能量链的能力位（现读）",
-      (E && E.counts ? E.counts.caps_energy : "—") + " 位", "", [eSrc]));
-    box.appendChild(tile("运行证据（台账窗口内）", counts["接上"] + " 通 · " + counts["断连"] + " 断",
-      counts["断连"] > 0 ? "w" : "o", [sub("窗口 " + (evWin ? ("近 " + evWin.window_hours + "h · " + (evWin.capped ? "触顶" : "回读 " + (evWin.read_bytes / 1048576).toFixed(0) + "MB")) : "未接")), vSrc]));
-    box.appendChild(tile("审计面（八类 · 四态之和）",
-      (auditCounts.total === undefined ? "—" : auditCounts.total) + " 项", "",
-      [sub("接上 " + (auditCounts["接上"] === undefined ? "—" : auditCounts["接上"])
-        + " · 断连 " + (auditCounts["断连"] === undefined ? "—" : auditCounts["断连"])
-        + " · 缺失 " + (auditCounts["缺失"] === undefined ? "—" : auditCounts["缺失"])
-        + " · 未探 " + (auditCounts["未探测"] === undefined ? "—" : auditCounts["未探测"])), aSrc]));
-  })();
+ function tile(k, v, cls, extras) {
+ var t = h("div", "cb-tile");
+ t.appendChild(h("div", "cb-tile-k", k));
+ t.appendChild(h("div", "cb-tile-v" + (cls ? " " + cls : ""), v));
+ (extras || []).forEach(function (el) { if (el) t.appendChild(el); });
+ return t;
+ }
+ (function buildTiles() {
+ var box = byId("cb-tiles");
+ if (!box) return;
+ var eSrc = E ? srcTag("cap-bindings.json", E.generated_at) : null;
+ var aSrc = A ? srcTag("capability-audit.json", A.generated_at) : null;
+ var vSrc = evAt ? srcTag((LIVE && LIVE.evidence ? "宿主现读 audit.jsonl" : "run-evidence.js"), evAt) : null;
+ function sub(text) { return h("span", "cb-tile-src", text); }
+ box.appendChild(tile("能力位（全部在册）", counts.caps + " 位", "o", [eSrc]));
+ box.appendChild(tile("已绑（直连 + 触手承载）",
+ counts.bound + " / " + counts.caps, counts.bound === counts.caps ? "o" : "w",
+ [sub("直连 " + counts.direct + " · 触手承载 " + counts.tentacle + " · 未绑 " + (counts.caps - counts.bound))]));
+ box.appendChild(tile("族（有能力的域）", counts.families + " 族", "o", [eSrc]));
+ box.appendChild(tile("触手域（总纲）",
+ (E && E.counts ? E.counts.tentacle_domains : "—") + " 域", "",
+ [sub("条目 " + (E && E.counts ? E.counts.tentacle_items : "—") + " · 承载位 " + counts.tentacle), eSrc]));
+ box.appendChild(tile("能量通道（活 / 全）", chanAlive + " / " + (chanAlive + chanDead + chanUnk),
+ chanDead> 0 ? "w" : "o", [sub("死 " + chanDead + " 通道承载 0 位（不算承载）"), eSrc]));
+ box.appendChild(tile("挂能量链的能力位（现读）",
+ (E && E.counts ? E.counts.caps_energy : "—") + " 位", "", [eSrc]));
+ box.appendChild(tile("运行证据（台账窗口内）", counts["接上"] + " 通 · " + counts["断连"] + " 断",
+ counts["断连"]> 0 ? "w" : "o", [sub("窗口 " + (evWin ? ("近 " + evWin.window_hours + "h · " + (evWin.capped ? "触顶" : "回读 " + (evWin.read_bytes / 1048576).toFixed(0) + "MB")) : "未接")), vSrc]));
+ box.appendChild(tile("审计面（八类 · 四态之和）",
+ (auditCounts.total === undefined ? "—" : auditCounts.total) + " 项", "",
+ [sub("接上 " + (auditCounts["接上"] === undefined ? "—" : auditCounts["接上"])
+ + " · 断连 " + (auditCounts["断连"] === undefined ? "—" : auditCounts["断连"])
+ + " · 缺失 " + (auditCounts["缺失"] === undefined ? "—" : auditCounts["缺失"])
+ + " · 未探 " + (auditCounts["未探测"] === undefined ? "—" : auditCounts["未探测"])), aSrc]));
+ })();
 
-  /* ── 口径（点开可见） ─────────────────────────────────────────────────── */
-  (function buildKou() {
-    var box = byId("cb-kou");
-    if (!box) return;
-    var L = [];
-    L.push("三态的证据是**运行记录**，不是『已绑』—— 已绑只证明接线有代码证据，把它画成『接上』就是假绿（本仓《假绿与自伤清单》）。");
-    L.push("窗口：" + (evWin ? ("近 " + evWin.window_hours + " 小时 · 回读 " + (evWin.read_bytes / 1048576).toFixed(1) + " MB · 账本共 " + (evWin.file_bytes / 1048576).toFixed(1) + " MB · 触顶=" + (evWin.capped ? "是" : "否") + (evWin.records !== undefined ? " · 窗口内记录 " + evWin.records + " 条" : "")) : "（证据源未接，未判定）") + "；窗口有界 ⇒ **未探到不等于不能用**，也不等于坏。");
-    L.push("来源：" + (evWin && evWin.ledger ? evWin.ledger : "gbt_allinone/store/audit.jsonl") + "（只读尾部；证据源：" + evWhy + "）。");
-    L.push("判定：接上=窗口内最后一次是 ok；断连=最后一次是 denied/error（原始串随行）；未探测=窗口内无该位记录。");
-    L.push("族盘里每一格 = 一个能力位（点一下看它那一条）。**一位一格**，240 位都在这一屏上。");
-    L.push("详页（" + PAGE.label + "：" + PAGE.why + "）；审计详页（" + PAGE_AUDIT.label + "：" + PAGE_AUDIT.why + "）。给不出对应页的，行内明写『无对应页』并给调用法。");
-    L.forEach(function (s) { box.appendChild(h("p", "cb-note", s)); });
-  })();
+ /* ── 口径（点开可见） ─────────────────────────────────────────────────── */
+ (function buildKou() {
+ var box = byId("cb-kou");
+ if (!box) return;
+ var L = [];
+ L.push("三态的证据是运行记录，不是『已绑』—— 已绑只证明接线有代码证据，把它画成『接上』就是假绿（本仓《假绿与自伤清单》）。");
+ L.push("窗口：" + (evWin ? ("近 " + evWin.window_hours + " 小时 · 回读 " + (evWin.read_bytes / 1048576).toFixed(1) + " MB · 账本共 " + (evWin.file_bytes / 1048576).toFixed(1) + " MB · 触顶=" + (evWin.capped ? "是" : "否") + (evWin.records !== undefined ? " · 窗口内记录 " + evWin.records + " 条" : "")) : "（证据源未接，未判定）") + "；窗口有界 ⇒ 未探到不等于不能用，也不等于坏。");
+ L.push("来源：" + (evWin && evWin.ledger ? evWin.ledger : "gbt_allinone/store/audit.jsonl") + "（只读尾部；证据源：" + evWhy + "）。");
+ L.push("判定：接上=窗口内最后一次是 ok；断连=最后一次是 denied/error（原始串随行）；未探测=窗口内无该位记录。");
+ L.push("族盘里每一格 = 一个能力位（点一下看它那一条）。一位一格，240 位都在这一屏上。");
+ L.push("详页（" + PAGE.label + "：" + PAGE.why + "）；审计详页（" + PAGE_AUDIT.label + "：" + PAGE_AUDIT.why + "）。给不出对应页的，行内明写『无对应页』并给调用法。");
+ L.forEach(function (s) { box.appendChild(h("p", "cb-note", s)); });
+ })();
 
-  /* ── 族盘 + 明细 ──────────────────────────────────────────────────────── */
-  function callLine(name) {
-    return "py -3.14 -m gbt_allinone run " + name;
-  }
-  function copyText(text, btn) {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { btn.textContent = "已复制"; },
-          function () { btn.textContent = "复制被拒（手选）"; });
-        return;
-      }
-    } catch (e) { /* 落下面兜底 */ }
-    try {
-      var ta = document.createElement("textarea");
-      ta.value = text; document.body.appendChild(ta); ta.select();
-      document.execCommand("copy"); document.body.removeChild(ta);
-      btn.textContent = "已复制";
-    } catch (e2) { btn.textContent = "手工复制"; }
-  }
-  function pill(state) {
-    var cls = CLASS[state] || "unk";
-    var sp = h("span", "cb-state cb-st-" + cls);
-    sp.appendChild(h("i", "cb-dot cb-st-" + cls));
-    sp.appendChild(h("span", null, state));
-    return sp;
-  }
-  function renderCapRow(c) {
-    var st = capState(c.name);
-    var row = h("div", "cb-row");
-    var hd = h("div", "cb-row-h");
-    hd.appendChild(h("span", "cb-name", c.name));
-    hd.appendChild(pill(st.s));
-    row.appendChild(hd);
+ /* ── 族盘 + 明细 ──────────────────────────────────────────────────────── */
+ function callLine(name) {
+ return "py -3.14 -m gbt_allinone run " + name;
+ }
+ function copyText(text, btn) {
+ try {
+ if (navigator.clipboard && navigator.clipboard.writeText) {
+ navigator.clipboard.writeText(text).then(function () { btn.textContent = "已复制"; },
+ function () { btn.textContent = "复制被拒（手选）"; });
+ return;
+ }
+ } catch (e) { /* 落下面兜底 */ }
+ try {
+ var ta = document.createElement("textarea");
+ ta.value = text; document.body.appendChild(ta); ta.select();
+ document.execCommand("copy"); document.body.removeChild(ta);
+ btn.textContent = "已复制";
+ } catch (e2) { btn.textContent = "手工复制"; }
+ }
+ function pill(state) {
+ var cls = CLASS[state] || "unk";
+ var sp = h("span", "cb-state cb-st-" + cls);
+ sp.appendChild(h("i", "cb-dot cb-st-" + cls));
+ sp.appendChild(h("span", null, state));
+ return sp;
+ }
+ function renderCapRow(c) {
+ var st = capState(c.name);
+ var row = h("div", "cb-row");
+ var hd = h("div", "cb-row-h");
+ hd.appendChild(h("span", "cb-name", c.name));
+ hd.appendChild(pill(st.s));
+ row.appendChild(hd);
 
-    var tags = h("div", "cb-tags");
-    tags.appendChild(h("span", "cb-tag" + (c.bind_kind === "触手承载" ? " cb-st-on" : ""),
-      "绑：" + (c.bind_kind || "未绑")));
-    var e = c.energy || {};
-    if (e.chain) {
-      var liveN = (e.channels || []).length;
-      tags.appendChild(h("span", "cb-tag " + (liveN > 0 ? "cb-st-on" : "cb-st-off"),
-        liveN > 0 ? ("链 · 活 " + liveN + " 条 · 死 " + ((e.dead_channels || []).length) + " 条（不算承载）") : "链 · 全灭"));
-    } else {
-      tags.appendChild(h("span", "cb-tag cb-st-unk", "无链（该层没有可量的链）"));
-    }
-    if ((c.tentacle_domains || []).length) {
-      tags.appendChild(h("span", "cb-tag", "触手：" + c.tentacle_domains.join("/")));
-    }
-    tags.appendChild(h("span", "cb-tag", "域 " + (DOMAIN_CN[c.domain] || c.domain)));
-    if (c.requires_params) tags.appendChild(h("span", "cb-tag cb-st-off", "需参数"));
-    tags.appendChild(h("span", "cb-tag", "依据：" + (c.carrier_basis || "（未写）")));
-    if (st.at) tags.appendChild(h("span", "cb-tag", "末次 " + st.at));
-    row.appendChild(tags);
+ var tags = h("div", "cb-tags");
+ tags.appendChild(h("span", "cb-tag" + (c.bind_kind === "触手承载" ? " cb-st-on" : ""),
+ "绑：" + (c.bind_kind || "未绑")));
+ var e = c.energy || {};
+ if (e.chain) {
+ var liveN = (e.channels || []).length;
+ tags.appendChild(h("span", "cb-tag " + (liveN> 0 ? "cb-st-on" : "cb-st-off"),
+ liveN> 0 ? ("链 · 活 " + liveN + " 条 · 死 " + ((e.dead_channels || []).length) + " 条（不算承载）") : "链 · 全灭"));
+ } else {
+ tags.appendChild(h("span", "cb-tag cb-st-unk", "无链（该层没有可量的链）"));
+ }
+ if ((c.tentacle_domains || []).length) {
+ tags.appendChild(h("span", "cb-tag", "触手：" + c.tentacle_domains.join("/")));
+ }
+ tags.appendChild(h("span", "cb-tag", "域 " + (DOMAIN_CN[c.domain] || c.domain)));
+ if (c.requires_params) tags.appendChild(h("span", "cb-tag cb-st-off", "需参数"));
+ tags.appendChild(h("span", "cb-tag", "依据：" + (c.carrier_basis || "（未写）")));
+ if (st.at) tags.appendChild(h("span", "cb-tag", "末次 " + st.at));
+ row.appendChild(tags);
 
-    row.appendChild(h("div", "cb-desc", c.desc || "（注册表未写说明）"));
-    if (st.raw) row.appendChild(h("div", "cb-raw", "原始串：" + st.raw));
-    var call = h("div", "cb-call");
-    call.appendChild(h("code", null, callLine(c.name)));
-    var cp = h("button", "cb-btn", "复制调用法");
-    cp.type = "button";
-    cp.addEventListener("click", function () { copyText(callLine(c.name), cp); });
-    call.appendChild(cp);
-    if (st.s === "未探测") call.appendChild(h("span", "cb-tag cb-st-unk", "运行证据：" + st.why));
-    if (st.s === "接上") call.appendChild(h("span", "cb-tag cb-st-on", "运行证据：窗口内最后一次是 ok（" + (st.at || "—") + "）"));
-    row.appendChild(call);
-    return row;
-  }
-  function pageBtn(p) {
-    /* 可点到处：在壳里走**壳自己的口**（window.gbtW3.panelGoto，页 id 在册）；
-       在官方面板/浏览器里没有那个口 ⇒ 如实给"到哪儿看"的文字指针（**不开新窗、不嵌死链**） */
-    var known = Object.prototype.hasOwnProperty.call(PTR_PAGES, p.id);
-    var b = h("button", "cb-btn", known ? ("详页 · " + p.label) : ("无对应页 · " + p.label));
-    b.type = "button";
-    b.title = (known ? (PTR_PAGES[p.id] + " · ") : "本页给不出对应页 · ") + "页 id " + p.id + "（取自 windows.json / panel PAGES 现读）";
-    if (!known) { b.setAttribute("aria-disabled", "true"); return b; }
-    b.addEventListener("click", function () {
-      var api = window.gbtW3;
-      if (api && typeof api.panelGoto === "function") {
-        Promise.resolve(api.panelGoto({ id: p.id })).then(function (r) {
-          b.textContent = (r && r.ok) ? ("已切到 · " + p.label)
-            : ("没切过去：" + ((r && r.error) || "未知") + " · " + p.label);
-        }, function () { b.textContent = "切页请求失败 · " + p.label; });
-      } else {
-        b.textContent = "无壳口 · 去「控制面板 → " + p.label + "」";
-      }
-    });
-    return b;
-  }
-  function renderFamily(f) {
-    var card = h("article", "cb-fam");
-    card.setAttribute("data-domain", f.dom);
-    var hd = h("div", "cb-fam-h");
-    hd.appendChild(h("span", "cb-fam-n", DOMAIN_CN[f.dom] || f.dom));
-    hd.appendChild(h("span", "cb-fam-t", f.dom));
-    var d = 0, t = 0;
-    f.caps.forEach(function (c) { if (c.bind_kind === "触手承载") t++; else d++; });
-    hd.appendChild(h("span", "cb-fam-bind", "绑 " + f.caps.length + " · 直 " + d + " · 触 " + t));
-    var more = h("button", "cb-btn", "明细");
-    more.type = "button";
-    more.setAttribute("aria-expanded", "false");
-    hd.appendChild(more);
-    hd.appendChild(pageBtn(PAGE));
-    card.appendChild(hd);
+ row.appendChild(h("div", "cb-desc", c.desc || "（注册表未写说明）"));
+ if (st.raw) row.appendChild(h("div", "cb-raw", "原始串：" + st.raw));
+ var call = h("div", "cb-call");
+ call.appendChild(h("code", null, callLine(c.name)));
+ var cp = h("button", "cb-btn", "复制调用法");
+ cp.type = "button";
+ cp.addEventListener("click", function () { copyText(callLine(c.name), cp); });
+ call.appendChild(cp);
+ if (st.s === "未探测") call.appendChild(h("span", "cb-tag cb-st-unk", "运行证据：" + st.why));
+ if (st.s === "接上") call.appendChild(h("span", "cb-tag cb-st-on", "运行证据：窗口内最后一次是 ok（" + (st.at || "—") + "）"));
+ row.appendChild(call);
+ return row;
+ }
+ function pageBtn(p) {
+ /* 可点到处：在壳里走壳自己的口（window.gbtW3.panelGoto，页 id 在册）；
+ 在官方面板/浏览器里没有那个口 ⇒ 如实给"到哪儿看"的文字指针（不开新窗、不嵌死链） */
+ var known = Object.prototype.hasOwnProperty.call(PTR_PAGES, p.id);
+ var b = h("button", "cb-btn", known ? ("详页 · " + p.label) : ("无对应页 · " + p.label));
+ b.type = "button";
+ b.title = (known ? (PTR_PAGES[p.id] + " · ") : "本页给不出对应页 · ") + "页 id " + p.id + "（取自 windows.json / panel PAGES 现读）";
+ if (!known) { b.setAttribute("aria-disabled", "true"); return b; }
+ b.addEventListener("click", function () {
+ var api = window.gbtW3;
+ if (api && typeof api.panelGoto === "function") {
+ Promise.resolve(api.panelGoto({ id: p.id })).then(function (r) {
+ b.textContent = (r && r.ok) ? ("已切到 · " + p.label)
+ : ("没切过去：" + ((r && r.error) || "未知") + " · " + p.label);
+ }, function () { b.textContent = "切页请求失败 · " + p.label; });
+ } else {
+ b.textContent = "无壳口 · 去「控制面板 → " + p.label + "」";
+ }
+ });
+ return b;
+ }
+ function renderFamily(f) {
+ var card = h("article", "cb-fam");
+ card.setAttribute("data-domain", f.dom);
+ var hd = h("div", "cb-fam-h");
+ hd.appendChild(h("span", "cb-fam-n", DOMAIN_CN[f.dom] || f.dom));
+ hd.appendChild(h("span", "cb-fam-t", f.dom));
+ var d = 0, t = 0;
+ f.caps.forEach(function (c) { if (c.bind_kind === "触手承载") t++; else d++; });
+ hd.appendChild(h("span", "cb-fam-bind", "绑 " + f.caps.length + " · 直 " + d + " · 触 " + t));
+ var more = h("button", "cb-btn", "明细");
+ more.type = "button";
+ more.setAttribute("aria-expanded", "false");
+ hd.appendChild(more);
+ hd.appendChild(pageBtn(PAGE));
+ card.appendChild(hd);
 
-    var cells = h("div", "cb-cells");
-    f.caps.forEach(function (c) {
-      var st = capState(c.name);
-      var cell = h("i", "cb-cell cb-st-" + CLASS[st.s]);
-      cell.title = c.name + " · " + st.s + (st.at ? (" · " + st.at) : "") + (st.raw ? (" · " + st.raw) : "");
-      cell.setAttribute("data-name", c.name);
-      cells.appendChild(cell);
-    });
-    card.appendChild(cells);
+ var cells = h("div", "cb-cells");
+ f.caps.forEach(function (c) {
+ var st = capState(c.name);
+ var cell = h("i", "cb-cell cb-st-" + CLASS[st.s]);
+ cell.title = c.name + " · " + st.s + (st.at ? (" · " + st.at) : "") + (st.raw ? (" · " + st.raw) : "");
+ cell.setAttribute("data-name", c.name);
+ cells.appendChild(cell);
+ });
+ card.appendChild(cells);
 
-    var nums = h("div", "cb-fam-nums");
-    nums.appendChild(h("span", "cb-n-on", "接上 " + f.n["接上"]));
-    nums.appendChild(h("span", "cb-n-off", "断连 " + f.n["断连"]));
-    nums.appendChild(h("span", "cb-n-unk", "未探测 " + f.n["未探测"]));
-    nums.appendChild(h("span", "cb-n-dim", "绑 " + f.caps.length + " / " + f.caps.length));
-    card.appendChild(nums);
+ var nums = h("div", "cb-fam-nums");
+ nums.appendChild(h("span", "cb-n-on", "接上 " + f.n["接上"]));
+ nums.appendChild(h("span", "cb-n-off", "断连 " + f.n["断连"]));
+ nums.appendChild(h("span", "cb-n-unk", "未探测 " + f.n["未探测"]));
+ nums.appendChild(h("span", "cb-n-dim", "绑 " + f.caps.length + " / " + f.caps.length));
+ card.appendChild(nums);
 
-    var det = h("div", "cb-det");
-    det.hidden = true;
-    more.addEventListener("click", function () {
-      if (det.hidden) {
-        if (!det.childNodes.length) {
-          f.caps.slice().sort(function (a, b2) {
-            var o = { "断连": 0, "接上": 1, "未探测": 2 };
-            var sa = capState(a.name).s, sb = capState(b2.name).s;
-            return (o[sa] - o[sb]) || (a.name < b2.name ? -1 : 1);
-          }).forEach(function (c) { det.appendChild(renderCapRow(c)); });
-        }
-        det.hidden = false; more.textContent = "收起"; more.setAttribute("aria-expanded", "true");
-        card.setAttribute("data-open", "true");
-      } else {
-        det.hidden = true; more.textContent = "明细"; more.setAttribute("aria-expanded", "false");
-        card.removeAttribute("data-open");
-      }
-    });
-    card.appendChild(det);
-    return card;
-  }
-  (function buildFams() {
-    var box = byId("cb-fams");
-    if (!box) return;
-    if (!E) {
-      box.appendChild(h("p", "cb-hint cb-empty", "cap-bindings 数据件读不到 —— 不编空壳：先跑 ../energy/energy-data.js 的生成器（py -3.14 tools/codex-scripts/capability-bindings.py render）"));
-      return;
-    }
-    famRows.forEach(function (f) { box.appendChild(renderFamily(f)); });
-    byId("cb-b-n").textContent = counts.families;
-    byId("cb-b-c").textContent = counts.caps;
-    var note = byId("cb-b-note");
-    note.appendChild(h("span", null, "一位一格 = 一个能力位（共 " + counts.caps + " 位）。接上 " +
-      counts["接上"] + " · 断连 " + counts["断连"] + " · 未探测 " + counts["未探测"] +
-      "（未探测**不画成通**：窗口内没见它跑；也**不等于坏**）。点格子看那一位；点「明细」展开整族。"));
-  })();
-  (function wireSearch() {
-    var q = byId("cb-q");
-    if (!q) return;
-    q.addEventListener("input", function () {
-      var s = q.value.trim().toLowerCase();
-      Array.prototype.forEach.call(document.querySelectorAll(".cb-fam"), function (card) {
-        if (!s) { card.hidden = false; return; }
-        var dom = (card.getAttribute("data-domain") || "").toLowerCase();
-        var cn = DOMAIN_CN[card.getAttribute("data-domain")] || "";
-        var hit = dom.indexOf(s) >= 0 || cn.indexOf(s) >= 0;
-        if (!hit) {
-          Array.prototype.forEach.call(card.querySelectorAll(".cb-cell"), function (cell) {
-            if ((cell.getAttribute("data-name") || "").toLowerCase().indexOf(s) >= 0) hit = true;
-          });
-        }
-        card.hidden = !hit;
-      });
-    });
-  })();
+ var det = h("div", "cb-det");
+ det.hidden = true;
+ more.addEventListener("click", function () {
+ if (det.hidden) {
+ if (!det.childNodes.length) {
+ f.caps.slice().sort(function (a, b2) {
+ var o = { "断连": 0, "接上": 1, "未探测": 2 };
+ var sa = capState(a.name).s, sb = capState(b2.name).s;
+ return (o[sa] - o[sb]) || (a.name< b2.name ? -1 : 1);
+ }).forEach(function (c) { det.appendChild(renderCapRow(c)); });
+ }
+ det.hidden = false; more.textContent = "收起"; more.setAttribute("aria-expanded", "true");
+ card.setAttribute("data-open", "true");
+ } else {
+ det.hidden = true; more.textContent = "明细"; more.setAttribute("aria-expanded", "false");
+ card.removeAttribute("data-open");
+ }
+ });
+ card.appendChild(det);
+ return card;
+ }
+ (function buildFams() {
+ var box = byId("cb-fams");
+ if (!box) return;
+ if (!E) {
+ box.appendChild(h("p", "cb-hint cb-empty", "cap-bindings 数据件读不到 —— 不编空壳：先跑 ../energy/energy-data.js 的生成器（py -3.14 tools/codex-scripts/capability-bindings.py render）"));
+ return;
+ }
+ famRows.forEach(function (f) { box.appendChild(renderFamily(f)); });
+ byId("cb-b-n").textContent = counts.families;
+ byId("cb-b-c").textContent = counts.caps;
+ var note = byId("cb-b-note");
+ note.appendChild(h("span", null, "一位一格 = 一个能力位（共 " + counts.caps + " 位）。接上 " +
+ counts["接上"] + " · 断连 " + counts["断连"] + " · 未探测 " + counts["未探测"] +
+ "（未探测不画成通：窗口内没见它跑；也不等于坏）。点格子看那一位；点「明细」展开整族。"));
+ })();
+ (function wireSearch() {
+ var q = byId("cb-q");
+ if (!q) return;
+ q.addEventListener("input", function () {
+ var s = q.value.trim().toLowerCase();
+ Array.prototype.forEach.call(document.querySelectorAll(".cb-fam"), function (card) {
+ if (!s) { card.hidden = false; return; }
+ var dom = (card.getAttribute("data-domain") || "").toLowerCase();
+ var cn = DOMAIN_CN[card.getAttribute("data-domain")] || "";
+ var hit = dom.indexOf(s)>= 0 || cn.indexOf(s)>= 0;
+ if (!hit) {
+ Array.prototype.forEach.call(card.querySelectorAll(".cb-cell"), function (cell) {
+ if ((cell.getAttribute("data-name") || "").toLowerCase().indexOf(s)>= 0) hit = true;
+ });
+ }
+ card.hidden = !hit;
+ });
+ });
+ })();
 
-  /* ── 能量 13 通道 ─────────────────────────────────────────────────────── */
-  (function buildChan() {
-    var box = byId("cb-chan");
-    if (!box) return;
-    if (!E) { box.appendChild(h("p", "cb-hint cb-empty", "数据件读不到 —— 不编。")); return; }
-    var t = h("table", "cb-tbl");
-    var thead = h("thead"), tr = h("tr");
-    ["#", "通道", "层", "存活", "状态（原始）", "模型", "承载位", "来源", "已用"].forEach(function (k) { tr.appendChild(h("th", null, k)); });
-    thead.appendChild(tr); t.appendChild(thead);
-    var tb = h("tbody");
-    (E.energy_channels || []).forEach(function (ch) {
-      var row = h("tr");
-      row.appendChild(h("td", "num", ch.order));
-      row.appendChild(h("td", "mono", ch.provider));
-      row.appendChild(h("td", "c-d", ch.tier || "—"));
-      var st = ch.alive ? "接上" : "断连";
-      var td = h("td", "c-" + (ch.alive ? "a" : "b"));
-      td.appendChild(pill(st));
-      row.appendChild(td);
-      row.appendChild(h("td", "c-d", ch.alive ? "可用" : (ch.status || "（无状态可读 ⇒ 未探测）")));
-      row.appendChild(h("td", "mono", ch.model || "—"));
-      row.appendChild(h("td", "num", ch.cap_count || 0));
-      row.appendChild(h("td", "mono", ch.source || "—"));
-      row.appendChild(h("td", "num", ch.used || 0));
-      tb.appendChild(row);
-    });
-    t.appendChild(tb);
-    box.appendChild(t);
-    var note = byId("cb-c-note");
-    if (note) {
-      note.appendChild(h("span", null, "现读：" + chanAlive + " 活 / " + chanDead + " 灭（不可用通道**不算在承载着谁** —— 绑定台账的 doctrine：#13 条链里死 4 条，承载位 0）。"));
-      note.appendChild(h("br"));
-      note.appendChild(h("span", null, "口径：本条『接上/断连』只按 alive 判；**密钥值只报掩码**（数据件里就是掩码，本页不回显、不落第二份）。"));
-    }
-  })();
+ /* ── 能量 13 通道 ─────────────────────────────────────────────────────── */
+ (function buildChan() {
+ var box = byId("cb-chan");
+ if (!box) return;
+ if (!E) { box.appendChild(h("p", "cb-hint cb-empty", "数据件读不到 —— 不编。")); return; }
+ var t = h("table", "cb-tbl");
+ var thead = h("thead"), tr = h("tr");
+ ["#", "通道", "层", "存活", "状态（原始）", "模型", "承载位", "来源", "已用"].forEach(function (k) { tr.appendChild(h("th", null, k)); });
+ thead.appendChild(tr); t.appendChild(thead);
+ var tb = h("tbody");
+ (E.energy_channels || []).forEach(function (ch) {
+ var row = h("tr");
+ row.appendChild(h("td", "num", ch.order));
+ row.appendChild(h("td", "mono", ch.provider));
+ row.appendChild(h("td", "c-d", ch.tier || "—"));
+ var st = ch.alive ? "接上" : "断连";
+ var td = h("td", "c-" + (ch.alive ? "a" : "b"));
+ td.appendChild(pill(st));
+ row.appendChild(td);
+ row.appendChild(h("td", "c-d", ch.alive ? "可用" : (ch.status || "（无状态可读 ⇒ 未探测）")));
+ row.appendChild(h("td", "mono", ch.model || "—"));
+ row.appendChild(h("td", "num", ch.cap_count || 0));
+ row.appendChild(h("td", "mono", ch.source || "—"));
+ row.appendChild(h("td", "num", ch.used || 0));
+ tb.appendChild(row);
+ });
+ t.appendChild(tb);
+ box.appendChild(t);
+ var note = byId("cb-c-note");
+ if (note) {
+ note.appendChild(h("span", null, "现读：" + chanAlive + " 活 / " + chanDead + " 灭（不可用通道不算在承载着谁 —— 绑定台账的 doctrine：#13 条链里死 4 条，承载位 0）。"));
+ note.appendChild(h("br"));
+ note.appendChild(h("span", null, "口径：本条『接上/断连』只按 alive 判；密钥值只报掩码（数据件里就是掩码，本页不回显、不落第二份）。"));
+ }
+ })();
 
-  /* ── 审计 326 项（八类 · 四态；缺失=金+虚，不引第四色） ───────────────── */
-  (function buildAudit() {
-    var box = byId("cb-audit");
-    if (!box) return;
-    if (!A) { box.appendChild(h("p", "cb-hint cb-empty", "audit 数据件读不到 —— 不编。")); return; }
-    var cats = A.categories || [], items = A.items || [];
-    var t = h("table", "cb-tbl");
-    var thead = h("thead"), tr = h("tr");
-    ["类别", "总数", "接上", "断连", "缺失", "未探测", "来源"].forEach(function (k) { tr.appendChild(h("th", null, k)); });
-    thead.appendChild(tr); t.appendChild(thead);
-    var tb = h("tbody");
-    cats.forEach(function (c) {
-      var row = h("tr");
-      row.appendChild(h("td", null, c.name + "（" + c.id + "）"));
-      row.appendChild(h("td", "num", c.total));
-      row.appendChild(h("td", "num c-a", c["接上"]));
-      row.appendChild(h("td", "num " + (c["断连"] ? "c-b" : "c-d"), c["断连"]));
-      row.appendChild(h("td", "num " + (c["缺失"] ? "c-b" : "c-d"), c["缺失"]));
-      row.appendChild(h("td", "num " + (c["未探测"] ? "c-u" : "c-d"), c["未探测"]));
-      row.appendChild(h("td", "mono", c.source || "—"));
-      tb.appendChild(row);
-    });
-    t.appendChild(tb);
-    box.appendChild(t);
+ /* ── 审计 326 项（八类 · 四态；缺失=金+虚，不引第四色） ───────────────── */
+ (function buildAudit() {
+ var box = byId("cb-audit");
+ if (!box) return;
+ if (!A) { box.appendChild(h("p", "cb-hint cb-empty", "audit 数据件读不到 —— 不编。")); return; }
+ var cats = A.categories || [], items = A.items || [];
+ var t = h("table", "cb-tbl");
+ var thead = h("thead"), tr = h("tr");
+ ["类别", "总数", "接上", "断连", "缺失", "未探测", "来源"].forEach(function (k) { tr.appendChild(h("th", null, k)); });
+ thead.appendChild(tr); t.appendChild(thead);
+ var tb = h("tbody");
+ cats.forEach(function (c) {
+ var row = h("tr");
+ row.appendChild(h("td", null, c.name + "（" + c.id + "）"));
+ row.appendChild(h("td", "num", c.total));
+ row.appendChild(h("td", "num c-a", c["接上"]));
+ row.appendChild(h("td", "num " + (c["断连"] ? "c-b" : "c-d"), c["断连"]));
+ row.appendChild(h("td", "num " + (c["缺失"] ? "c-b" : "c-d"), c["缺失"]));
+ row.appendChild(h("td", "num " + (c["未探测"] ? "c-u" : "c-d"), c["未探测"]));
+ row.appendChild(h("td", "mono", c.source || "—"));
+ tb.appendChild(row);
+ });
+ t.appendChild(tb);
+ box.appendChild(t);
 
-    var alerts = items.filter(function (it) { return it.state !== "接上"; });
-    var det = h("details", "cb-cal");
-    var sm = h("summary", null, "非「接上」清单（" + alerts.length + " 项：断连/缺失/未探测逐条 · 带原始串与探于何时）");
-    det.appendChild(sm);
-    var body = h("div");
-    if (!alerts.length) body.appendChild(h("p", "cb-note", "无 —— 全部接上。"));
-    alerts.forEach(function (it) {
-      var r = h("div", "cb-row");
-      var hd = h("div", "cb-row-h");
-      hd.appendChild(h("span", "cb-name", it.id + " · " + it.name));
-      hd.appendChild(pill(it.state));
-      r.appendChild(hd);
-      r.appendChild(h("div", "cb-desc", "期望：" + (it.expect || "（未写）")));
-      var tags = h("div", "cb-tags");
-      tags.appendChild(h("span", "cb-tag", "探于 " + (it.at || "（未探）")));
-      if (it.why) tags.appendChild(h("span", "cb-tag cb-st-unk", "为什么不探：" + it.why));
-      r.appendChild(tags);
-      r.appendChild(h("div", "cb-raw", "证据：" + (it.evidence || "（无）").slice(0, 400)));
-      body.appendChild(r);
-    });
-    det.appendChild(body);
-    box.appendChild(det);
+ var alerts = items.filter(function (it) { return it.state !== "接上"; });
+ var det = h("details", "cb-cal");
+ var sm = h("summary", null, "非「接上」清单（" + alerts.length + " 项：断连/缺失/未探测逐条 · 带原始串与探于何时）");
+ det.appendChild(sm);
+ var body = h("div");
+ if (!alerts.length) body.appendChild(h("p", "cb-note", "无 —— 全部接上。"));
+ alerts.forEach(function (it) {
+ var r = h("div", "cb-row");
+ var hd = h("div", "cb-row-h");
+ hd.appendChild(h("span", "cb-name", it.id + " · " + it.name));
+ hd.appendChild(pill(it.state));
+ r.appendChild(hd);
+ r.appendChild(h("div", "cb-desc", "期望：" + (it.expect || "（未写）")));
+ var tags = h("div", "cb-tags");
+ tags.appendChild(h("span", "cb-tag", "探于 " + (it.at || "（未探）")));
+ if (it.why) tags.appendChild(h("span", "cb-tag cb-st-unk", "为什么不探：" + it.why));
+ r.appendChild(tags);
+ r.appendChild(h("div", "cb-raw", "证据：" + (it.evidence || "（无）").slice(0, 400)));
+ body.appendChild(r);
+ });
+ det.appendChild(body);
+ box.appendChild(det);
 
-    var note = byId("cb-d-note");
-    if (note) {
-      note.appendChild(h("span", null, "四态之和 " + (auditCounts.total || "—") + " = 接上 " + (auditCounts["接上"] || 0) +
-        " + 断连 " + (auditCounts["断连"] || 0) + " + 缺失 " + (auditCounts["缺失"] || 0) + " + 未探测 " + (auditCounts["未探测"] || 0) +
-        "。『未探测』必写「为什么没探」（例：50 槽蓝图**不算接上** ⇒ 不探）；**不许假绿**。"));
-      note.appendChild(h("br"));
-      var pb = pageBtn(PAGE_AUDIT);
-      note.appendChild(h("span", null, "逐条明细（含证据与探于何时）："));
-      note.appendChild(pb);
-    }
-  })();
+ var note = byId("cb-d-note");
+ if (note) {
+ note.appendChild(h("span", null, "四态之和 " + (auditCounts.total || "—") + " = 接上 " + (auditCounts["接上"] || 0) +
+ " + 断连 " + (auditCounts["断连"] || 0) + " + 缺失 " + (auditCounts["缺失"] || 0) + " + 未探测 " + (auditCounts["未探测"] || 0) +
+ "。『未探测』必写「为什么没探」（例：50 槽蓝图不算接上 ⇒ 不探）；不许假绿。"));
+ note.appendChild(h("br"));
+ var pb = pageBtn(PAGE_AUDIT);
+ note.appendChild(h("span", null, "逐条明细（含证据与探于何时）："));
+ note.appendChild(pb);
+ }
+ })();
 
-  /* ── 记录本（快照只能报文件级；宿主现读多一条运行时行） ───────────────── */
-  (function buildLog() {
-    var box = byId("cb-log");
-    if (!box) return;
-    var t = h("table", "cb-tbl");
-    var tb = h("tbody");
-    function kv(k, v, cls) {
-      var tr = h("tr");
-      tr.appendChild(h("td", "c-d", k));
-      tr.appendChild(h("td", cls || "", v));
-      tb.appendChild(tr);
-    }
-    if (LIVE && LIVE.logbook && LIVE.logbook.ok === false) {
-      kv("现读", "取不到：" + (LIVE.logbook.error || "（未写原因）"), "c-b");
-    } else if (LIVE && LIVE.logbook) {
-      var L = LIVE.logbook;
-      kv("现读（宿主）", L.lines + " 条 · 末条 #" + (L.last_n === undefined ? "—" : L.last_n) +
-        " · " + (L.last_ts || "—") + " · kind=" + (L.last_kind || "—"), "c-a");
-      kv("末条 hash", (L.last_hash || "—"), "mono");
-      kv("文件", (L.file || "state/logbook.jsonl") + " · " + ((L.file_bytes || 0) / 1024).toFixed(1) + " KB", "mono");
-    } else {
-      kv("快照", "宿主未注入 ⇒ 本页不读盘；链完整性的**判据**是下面这条命令（本页不替它下结论）", "c-u");
-      kv("链状态判据", "py -3.14 tools/codex-scripts/logbook.py verify", "mono");
-      kv("文件", "state/logbook.jsonl（只追加 · 自链哈希）", "mono");
-    }
-    t.appendChild(tb);
-    box.appendChild(t);
-    var note = byId("cb-e-src");
-    if (note) note.textContent = (LIVE && LIVE.logbook) ? ("现读 · " + (LIVE.at || "")) : "快照 · 本页不读盘（file:// 下没有读盘口）";
-  })();
+ /* ── 记录本（快照只能报文件级；宿主现读多一条运行时行） ───────────────── */
+ (function buildLog() {
+ var box = byId("cb-log");
+ if (!box) return;
+ var t = h("table", "cb-tbl");
+ var tb = h("tbody");
+ function kv(k, v, cls) {
+ var tr = h("tr");
+ tr.appendChild(h("td", "c-d", k));
+ tr.appendChild(h("td", cls || "", v));
+ tb.appendChild(tr);
+ }
+ if (LIVE && LIVE.logbook && LIVE.logbook.ok === false) {
+ kv("现读", "取不到：" + (LIVE.logbook.error || "（未写原因）"), "c-b");
+ } else if (LIVE && LIVE.logbook) {
+ var L = LIVE.logbook;
+ kv("现读（宿主）", L.lines + " 条 · 末条 #" + (L.last_n === undefined ? "—" : L.last_n) +
+ " · " + (L.last_ts || "—") + " · kind=" + (L.last_kind || "—"), "c-a");
+ kv("末条 hash", (L.last_hash || "—"), "mono");
+ kv("文件", (L.file || "state/logbook.jsonl") + " · " + ((L.file_bytes || 0) / 1024).toFixed(1) + " KB", "mono");
+ } else {
+ kv("快照", "宿主未注入 ⇒ 本页不读盘；链完整性的判据是下面这条命令（本页不替它下结论）", "c-u");
+ kv("链状态判据", "py -3.14 tools/codex-scripts/logbook.py verify", "mono");
+ kv("文件", "state/logbook.jsonl（只追加 · 自链哈希）", "mono");
+ }
+ t.appendChild(tb);
+ box.appendChild(t);
+ var note = byId("cb-e-src");
+ if (note) note.textContent = (LIVE && LIVE.logbook) ? ("现读 · " + (LIVE.at || "")) : "快照 · 本页不读盘（file:// 下没有读盘口）";
+ })();
 
-  /* ── 源表（每个数字的出处 · 按年龄上色） ─────────────────────────────── */
-  (function buildSrcs() {
-    var box = byId("cb-srcs");
-    if (!box) return;
-    var t = h("table", "cb-tbl");
-    var tb = h("tbody");
-    function fmtAt(at) { return at ? String(at).replace("T", " ") : ""; }
-    function row(file, what, at, cmd, readOnDemand) {
-      var tr = h("tr");
-      tr.appendChild(h("td", "mono", file));
-      tr.appendChild(h("td", null, what));
-      tr.appendChild(h("td", "mono nowrap", at ? fmtAt(at) : (readOnDemand ? "（本页不读盘 · 宿主内现读）" : "（无时刻）")));
-      var f = at ? freshLevel(at) : null;
-      var td = h("td", f ? ("c-" + (f.lv === "ok" ? "a" : (f.lv === "warn" ? "b" : "u"))) : "c-d",
-        f ? f.text : "按需现读（file:// 下没有读盘口 ⇒ 不虚报时刻）");
-      tr.appendChild(td);
-      tr.appendChild(h("td", "mono", cmd));
-      tb.appendChild(tr);
-    }
-    var th = h("tr");
-    ["文件", "管什么", "生成/现读时刻", "年龄（快照：≤6h 青 · ≤48h 金 · >48h 紫）", "重生成 / 判据命令"].forEach(function (k) { th.appendChild(h("th", null, k)); });
-    var thead = h("thead"); thead.appendChild(th); t.appendChild(thead);
-    row("state/cap-bindings.json", "240 位 × 触手 10 域 × 能量 13 通道（绑定台账）",
-      E ? E.generated_at : null, "py -3.14 tools/codex-scripts/capability-bindings.py");
-    row("state/capability-audit.json", "审计 326 项四态（真探 · 带证据）",
-      A ? A.generated_at : null, "py -3.14 tools/codex-scripts/capability-audit.py");
-    row(LIVE && LIVE.evidence ? "audit.jsonl（宿主现读尾部窗口）" : "holo_pet_w3/capability-bar/run-evidence.js",
-      "运行证据（三态判定的依据）· 窗口 " + (evWin ? ("近 " + evWin.window_hours + "h / 回读 " + (evWin.read_bytes / 1048576).toFixed(1) + "MB / 触顶=" + (evWin.capped ? "是" : "否")) : "未接"),
-      evAt, SNAPSHOT_CMD);
-    row("gbt_allinone/store/key_gateway/runtime.json", "能量链路运行时（现读只在宿主内；页面不读盘）",
-      LIVE && LIVE.energy_runtime ? LIVE.energy_runtime.at : null,
-      "py -3.14 -m gbt_allinone run key_gateway '{\"op\":\"status\"}'", !LIVE);
-    row("state/logbook.jsonl", "记录本（只追加 · 自链哈希）",
-      LIVE && LIVE.logbook ? LIVE.logbook.at : null, "py -3.14 tools/codex-scripts/logbook.py verify", !LIVE);
-    t.appendChild(tb);
-    box.appendChild(t);
-    if (LIVE && LIVE.energy_runtime) {
-      var p = h("p", "cb-note cb-hint");
-      p.appendChild(h("span", null, "宿主现读（能量运行时）：活 " + LIVE.energy_runtime.alive + " / " + LIVE.energy_runtime.total +
-        " · 当前道 " + (LIVE.energy_runtime.active || "—") + " · 换道 " + (LIVE.energy_runtime.switches === undefined ? "—" : LIVE.energy_runtime.switches) +
-        " 次 · @" + (LIVE.energy_runtime.at || "—")));
-      box.appendChild(p);
-    }
-  })();
+ /* ── 源表（每个数字的出处 · 按年龄上色） ─────────────────────────────── */
+ (function buildSrcs() {
+ var box = byId("cb-srcs");
+ if (!box) return;
+ var t = h("table", "cb-tbl");
+ var tb = h("tbody");
+ function fmtAt(at) { return at ? String(at).replace("T", " ") : ""; }
+ function row(file, what, at, cmd, readOnDemand) {
+ var tr = h("tr");
+ tr.appendChild(h("td", "mono", file));
+ tr.appendChild(h("td", null, what));
+ tr.appendChild(h("td", "mono nowrap", at ? fmtAt(at) : (readOnDemand ? "（本页不读盘 · 宿主内现读）" : "（无时刻）")));
+ var f = at ? freshLevel(at) : null;
+ var td = h("td", f ? ("c-" + (f.lv === "ok" ? "a" : (f.lv === "warn" ? "b" : "u"))) : "c-d",
+ f ? f.text : "按需现读（file:// 下没有读盘口 ⇒ 不虚报时刻）");
+ tr.appendChild(td);
+ tr.appendChild(h("td", "mono", cmd));
+ tb.appendChild(tr);
+ }
+ var th = h("tr");
+ ["文件", "管什么", "生成/现读时刻", "年龄（快照：≤6h 青 · ≤48h 金 ·>48h 紫）", "重生成 / 判据命令"].forEach(function (k) { th.appendChild(h("th", null, k)); });
+ var thead = h("thead"); thead.appendChild(th); t.appendChild(thead);
+ row("state/cap-bindings.json", "240 位 × 触手 10 域 × 能量 13 通道（绑定台账）",
+ E ? E.generated_at : null, "py -3.14 tools/codex-scripts/capability-bindings.py");
+ row("state/capability-audit.json", "审计 326 项四态（真探 · 带证据）",
+ A ? A.generated_at : null, "py -3.14 tools/codex-scripts/capability-audit.py");
+ row(LIVE && LIVE.evidence ? "audit.jsonl（宿主现读尾部窗口）" : "holo_pet_w3/capability-bar/run-evidence.js",
+ "运行证据（三态判定的依据）· 窗口 " + (evWin ? ("近 " + evWin.window_hours + "h / 回读 " + (evWin.read_bytes / 1048576).toFixed(1) + "MB / 触顶=" + (evWin.capped ? "是" : "否")) : "未接"),
+ evAt, SNAPSHOT_CMD);
+ row("gbt_allinone/store/key_gateway/runtime.json", "能量链路运行时（现读只在宿主内；页面不读盘）",
+ LIVE && LIVE.energy_runtime ? LIVE.energy_runtime.at : null,
+ "py -3.14 -m gbt_allinone run key_gateway '{\"op\":\"status\"}'", !LIVE);
+ row("state/logbook.jsonl", "记录本（只追加 · 自链哈希）",
+ LIVE && LIVE.logbook ? LIVE.logbook.at : null, "py -3.14 tools/codex-scripts/logbook.py verify", !LIVE);
+ t.appendChild(tb);
+ box.appendChild(t);
+ if (LIVE && LIVE.energy_runtime) {
+ var p = h("p", "cb-note cb-hint");
+ p.appendChild(h("span", null, "宿主现读（能量运行时）：活 " + LIVE.energy_runtime.alive + " / " + LIVE.energy_runtime.total +
+ " · 当前道 " + (LIVE.energy_runtime.active || "—") + " · 换道 " + (LIVE.energy_runtime.switches === undefined ? "—" : LIVE.energy_runtime.switches) +
+ " 次 · @" + (LIVE.energy_runtime.at || "—")));
+ box.appendChild(p);
+ }
+ })();
 
-  /* ── 新鲜度声明（《数据新鲜度契约》：形态 + 时刻；两条声明路都写） ────────── */
-  (function declareFresh() {
-    var times = [];
-    if (E && E.generated_at) times.push(atMs(E.generated_at));
-    if (A && A.generated_at) times.push(atMs(A.generated_at));
-    if (evAt) times.push(atMs(evAt));
-    var valid = times.filter(function (t) { return isFinite(t); });
-    var oldest = valid.length ? Math.min.apply(null, valid) : NaN;
-    var iso = isFinite(oldest) ? new Date(oldest).toISOString() : new Date().toISOString();
-    /* 口径：本页宣称的"新鲜度"以**最旧的那一源**为准 —— 页面上最新的数字也就是这个底线 */
-    window.GBT_DATA = { kind: "快照", at: iso };
-    try {
-      if (typeof window.gbtFresh === "function") window.gbtFresh(window.GBT_SNAP || "快照", iso);
-      document.documentElement.setAttribute("data-data-kind", "快照");
-      document.documentElement.setAttribute("data-data-at", iso);
-    } catch (e) { /* 声明不上就靠 window.GBT_DATA */ }
-    var el = byId("cb-fresh");
-    var f = freshLevel(iso);
-    if (el) {
-      el.textContent = "数据 " + f.text + "（取最旧一源）";
-      el.setAttribute("data-lv", f.lv);
-      el.title = "本页数字的最旧来源时刻：" + iso + "（快照档：≤6h 青 · ≤48h 金 · >48h 紫）";
-    }
-    var sub = byId("cb-sub");
-    if (sub) sub.textContent = "族 × 三态 · 一屏可读 · 每个数字带来源与时刻 · 数据 " + f.text;
-  })();
+ /* ── 新鲜度声明（《数据新鲜度契约》：形态 + 时刻；两条声明路都写） ────────── */
+ (function declareFresh() {
+ var times = [];
+ if (E && E.generated_at) times.push(atMs(E.generated_at));
+ if (A && A.generated_at) times.push(atMs(A.generated_at));
+ if (evAt) times.push(atMs(evAt));
+ var valid = times.filter(function (t) { return isFinite(t); });
+ var oldest = valid.length ? Math.min.apply(null, valid) : NaN;
+ var iso = isFinite(oldest) ? new Date(oldest).toISOString() : new Date().toISOString();
+ /* 口径：本页宣称的"新鲜度"以最旧的那一源为准 —— 页面上最新的数字也就是这个底线 */
+ window.GBT_DATA = { kind: "快照", at: iso };
+ try {
+ if (typeof window.gbtFresh === "function") window.gbtFresh(window.GBT_SNAP || "快照", iso);
+ document.documentElement.setAttribute("data-data-kind", "快照");
+ document.documentElement.setAttribute("data-data-at", iso);
+ } catch (e) { /* 声明不上就靠 window.GBT_DATA */ }
+ var el = byId("cb-fresh");
+ var f = freshLevel(iso);
+ if (el) {
+ el.textContent = "数据 " + f.text + "（取最旧一源）";
+ el.setAttribute("data-lv", f.lv);
+ el.title = "本页数字的最旧来源时刻：" + iso + "（快照档：≤6h 青 · ≤48h 金 ·>48h 紫）";
+ }
+ var sub = byId("cb-sub");
+ if (sub) sub.textContent = "族 × 三态 · 一屏可读 · 每个数字带来源与时刻 · 数据 " + f.text;
+ })();
 
-  /* ── 页脚命令 + 自报（端到端门读它） ──────────────────────────────────── */
-  (function report() {
-    var cmds = byId("cb-cmds");
-    if (cmds) cmds.textContent = "重生成 " + SNAPSHOT_CMD + " ｜ 判据（含负对照）" + CHECK_CMD;
-    window.__gbtCapBar = {
-      version: "gbt-capability-bar-b1",
-      at: new Date().toISOString(),
-      evidence_source: evMap ? (LIVE && LIVE.evidence ? "宿主现读" : "快照") : "未接",
-      classify: CLASS,
-      counts: counts,
-      counts_audit: auditCounts,
-      channels: { alive: chanAlive, dead: chanDead, unk: chanUnk },
-      sources: {
-        cap_bindings: E ? E.generated_at : null,
-        audit: A ? A.generated_at : null,
-        evidence: evAt || null,
-        evidence_window: evWin ? { hours: evWin.window_hours, read_bytes: evWin.read_bytes, capped: !!evWin.capped, records: evWin.records } : null
-      },
-      errors: ERR
-    };
-  })();
+ /* ── 页脚命令 + 自报（端到端门读它） ──────────────────────────────────── */
+ (function report() {
+ var cmds = byId("cb-cmds");
+ if (cmds) cmds.textContent = "重生成 " + SNAPSHOT_CMD + " ｜ 判据（含负对照）" + CHECK_CMD;
+ window.__gbtCapBar = {
+ version: "gbt-capability-bar-b1",
+ at: new Date().toISOString(),
+ evidence_source: evMap ? (LIVE && LIVE.evidence ? "宿主现读" : "快照") : "未接",
+ classify: CLASS,
+ counts: counts,
+ counts_audit: auditCounts,
+ channels: { alive: chanAlive, dead: chanDead, unk: chanUnk },
+ sources: {
+ cap_bindings: E ? E.generated_at : null,
+ audit: A ? A.generated_at : null,
+ evidence: evAt || null,
+ evidence_window: evWin ? { hours: evWin.window_hours, read_bytes: evWin.read_bytes, capped: !!evWin.capped, records: evWin.records } : null
+ },
+ errors: ERR
+ };
+ })();
 })();
 </script>
-
-
-<!-- gbt-defense -->
-<script>
-(function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
-    return true;
-  }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
-  }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
-})();
-</script>
-<script src="../shell/live-badge.js?v=20261026" defer></script>
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../shell/tentacle-kit.js?v=20261026" defer></script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
+<script src="../shell/tentacle-kit.js" defer></script>
 </body>
 </html>

@@ -143,41 +143,8 @@ def _plat_str() -> str:
     return _PLAT_CACHE[0]
 
 
-# 🔴 2026-10-25 生产加固：这几份"实现文件"未随仓库发布。
-#    以前它们在 exec_module 时抛原始 FileNotFoundError —— 跟"代码写坏了"看起来
-#    一模一样，探针里只能记成 error。这里统一前置拦截，报成 **impl_missing**：
-#      · 查询本身是成功的（我们确实查明它不在）
-#      · 原因可机器读（reason_code），不混进真故障
-_TOOL_IMPL = {
-    "asset_index":            "tools/asset_index.py",
-    "control_loop":           "tools/control_loop.py",
-    "penetrating_cross_scan": "tools/penetrating_cross_scan.py",
-    "hook_enforcer":          "tools/penetrating_cross_scan.py",
-    "look_grade":             "tools/filmgrade.py",
-}
-
-
-def _impl_missing(kind: str):
-    """返回 None 表示实现文件在位；否则返回一条如实的 impl_missing 回执。"""
-    rel = _TOOL_IMPL.get(kind)
-    if not rel:
-        return None
-    from pathlib import Path as _P
-    f = _P(__file__).resolve().parents[1] / rel
-    if f.is_file():
-        return None
-    return {"status": "unimplemented", "ok": False, "kind": kind,
-            "reason_code": "impl_missing", "impl_file": rel,
-            "error": "实现文件未随仓库发布: %s" % rel,
-            "how_to_fix": "把 %s 一起纳入仓库（它是该能力位的真实实现）" % rel,
-            "note": "**这是缺文件，不是代码坏了** —— 判定可机器读（reason_code）"}
-
-
 def _run_benign(kind, payload, policy_decision=None):
     """良性能力分派：这里实现真实可用的系统/数据类样例。"""
-    _miss = _impl_missing(kind)                 # 缺实现文件 ⇒ 如实报
-    if _miss:
-        return _miss
     # 第 37 条：先看后动（只拦动手类，只读不拦）
     try:
         from . import see_first as _sf
@@ -843,6 +810,12 @@ def _run_benign(kind, payload, policy_decision=None):
         from .tools import memory_manager as _mm
         p = payload or {}
         return _mm.run_op(p.get("op", "stats"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "code_graph":
+        # 代码知识图谱（主人令 2026-10-29 蒸馏自 symchenry/codegraph）：
+        # 给 AI 的是「文件:行 + 签名 + 调用链」，不是文件正文 —— 省 token 就在这一点。
+        from .tools import code_graph as _cg
+        p = payload or {}
+        return _cg.run_op(p.get("op", "stats"), **{k: v for k, v in p.items() if k != "op"})
     if kind == "sec_sweeper":
         # 安全棒：每半天全量穿透式交叉扫描 + 健康账/面板 + 专用口 + 上下文复用（不重扫）
         # 外加：框架**垃圾清理**与**加速**（主人 2026-09-27 追加）。

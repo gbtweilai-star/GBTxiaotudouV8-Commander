@@ -90,13 +90,13 @@
       });
     if (!got) {
       bizBox.textContent = "○ 业务读数 · 未读到" + (bizErrs.length ? "（" + bizErrs.join("; ") + "）" : "");
-      bizBox.style.color = "#8b97a8";
+      bizBox.style.color = "#9AA4C4";
       return;
     }
     bizBox.textContent = parts.join(" · ")
       + " · " + ((Date.now() - biz.at) / 1000).toFixed(1) + "s 前"
       + (bizErrs.length ? " · 缺 " + bizErrs.join("; ") : "");
-    bizBox.style.color = bizErrs.length ? "#f5b041" : "#cfd6dd";
+    bizBox.style.color = bizErrs.length ? "#f5b041" : "#E8ECF8";
   }
 
   var badge = null, strip = null;
@@ -116,14 +116,14 @@
       badge = mkBox("gbt-live-badge",
         "position:fixed;right:10px;bottom:10px;z-index:2147483000;" +
         "font:11.5px/1.4 ui-monospace,Consolas,monospace;padding:3px 8px;border-radius:999px;" +
-        "border:1px solid rgba(255,255,255,.16);background:rgba(10,13,18,.82);color:#cfd6dd;" +
+        "border:1px solid rgba(232,236,248,.16);background:rgba(7,10,26,.82);color:#E8ECF8;" +
         "pointer-events:none;opacity:.92");
     }
     if (!strip) {
       strip = mkBox("gbt-live-strip",
         "position:fixed;left:10px;bottom:10px;z-index:2147482999;max-width:calc(100vw - 220px);" +
         "font:11.5px/1.5 ui-monospace,Consolas,monospace;padding:3px 9px;border-radius:8px;" +
-        "border:1px solid rgba(255,255,255,.12);background:rgba(10,13,18,.78);color:#cfd6dd;" +
+        "border:1px solid rgba(232,236,248,.12);background:rgba(7,10,26,.78);color:#E8ECF8;" +
         "pointer-events:none;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis");
       strip.textContent = "○ 实时条 · 等心跳";
     }
@@ -131,7 +131,7 @@
       bizBox = mkBox("gbt-live-biz",
         "position:fixed;left:10px;bottom:34px;z-index:2147482998;max-width:calc(100vw - 220px);" +
         "font:11.5px/1.5 ui-monospace,Consolas,monospace;padding:3px 9px;border-radius:8px;" +
-        "border:1px solid rgba(255,255,255,.12);background:rgba(10,13,18,.72);color:#cfd6dd;" +
+        "border:1px solid rgba(232,236,248,.12);background:rgba(7,10,26,.72);color:#E8ECF8;" +
         "pointer-events:none;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis");
       bizBox.textContent = "○ 业务读数 · 等第一次拉取";
     }
@@ -180,15 +180,15 @@
     if (!badge) return;
     var now = Date.now(), txt, color;
     if (!api) {
-      txt = "⚠ 无桥 · 浏览器直开"; color = "#8b97a8";
+      txt = "⚠ 无桥 · 浏览器直开"; color = "#9AA4C4";
     } else if (!lastBeatAt) {
       txt = "○ 桥已接 · 等心跳 " + Math.round((now - bootAt) / 1000) + "s"; color = "#f5b041";
     } else if (now - lastBeatAt < LIVE_MS) {
       txt = "● LIVE " + ((now - lastBeatAt) / 1000).toFixed(1) + "s · hb" + counts.heartbeat + "/ev" + counts.event;
-      color = "#34d399";
+      color = "#22C55E";
     } else {
       txt = "○ 静默 " + Math.round((now - lastBeatAt) / 1000) + "s · hb" + counts.heartbeat + "/ev" + counts.event;
-      color = "#8b97a8";
+      color = "#9AA4C4";
     }
     badge.textContent = txt;
     badge.style.color = color;

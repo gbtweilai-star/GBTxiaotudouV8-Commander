@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """语音面普查（只读）：把「配音 / 复刻 / 生成 / 识别」这条链上**真实存在**的东西量出来。
 
 口径：每一项都要有现读来源（框架能力位 / 磁盘技能 / 可执行文件 / Python 包 / 钥匙）。
@@ -15,7 +11,7 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 SKILLS = Path(r"C:\Users\ADMIN\.openclaw-autoclaw\skills")
 sys.path.insert(0, str(ROOT))
 

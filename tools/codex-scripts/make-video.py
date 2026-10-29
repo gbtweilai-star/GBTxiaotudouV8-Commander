@@ -177,7 +177,7 @@ def main() -> int:
             s.unlink()
         except Exception:                                                 # noqa: BLE001
             pass
-    # 🔴 **临时目录也要清** —— 本仓成品规矩：「无 `_*.py` / `.tmp` / `__pycache__` 残留」。
+ # **临时目录也要清** —— 本仓成品规矩：「无 `_*.py` / `.tmp` / `__pycache__` 残留」。
     #    实测踩过：只 unlink 段文件、没删 `_mv_<stem>/` ⇒ `outputs/…/_mv_out/` 留在成品目录里。
     for _ in range(2):
         try:
@@ -192,7 +192,7 @@ def main() -> int:
                 pass
     if tmp.exists():
         shutil.rmtree(tmp, ignore_errors=True)
-    # 🔴 **名义时长 vs 实际时长**：`--sec` 是**每段**时长，而段间**交叉溶解会吃掉重叠**
+ # **名义时长 vs 实际时长**：`--sec` 是**每段**时长，而段间**交叉溶解会吃掉重叠**
     #    ⇒ 成片 = n×sec − (n−1)×xf，**比 n×sec 短**。实测：3 段 × 2.0 s − 2 × 0.6 s = **4.8 s**
     #    （144 帧 @30fps，与 ffprobe 分毫不差）。以前只吐 ffprobe 读数，**没点明这件事**，
     #    使用者按 `--sec 2 × 3 张 = 6 s` 去期待就会觉得"少了两秒"。

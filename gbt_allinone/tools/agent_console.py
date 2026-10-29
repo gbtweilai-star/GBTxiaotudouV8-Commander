@@ -228,7 +228,13 @@ def approve(req_id: str = "", **_kw) -> dict:
                 "how": "请主人在终端跑本命令；或手写 state/agent_console.jsonl 追加 approve 行"}
     print(f"即将批准连接请求 {req_id}。输入 YES 确认：", end=" ", flush=True)   # noqa: T201
     if (sys.stdin.readline() or "").strip() != "YES":
-        return {"ok": False, "op": "approve", "error": "没确认 ⇒ 不批"}
+        # 🔴 2026-10-25 · **拒绝的形状不许随 TTY 变**（本仓 P3 那一族）：
+        #    上一条「非交互」分支带 denied，而这条交互分支原来只带 error ⇒
+        #    同一句「AI 不能批连接请求」在两种环境下**长得不一样**，
+        #    判据在 TTY 存在时读到 denied=None 就报「拒的形状不对」。
+        #    ⇒ 两处一律 denied=True + fail_closed=True（形状统一，语义不变：仍然不批）。
+        return {"ok": False, "op": "approve", "denied": True, "fail_closed": True,
+                "error": "没确认 ⇒ 不批", "how": "要在终端手打 YES 才算批准"}
     _log({"event": "approve", "req_id": req_id, "by": "owner"})
     return {"ok": True, "op": "approve", "req_id": req_id}
 

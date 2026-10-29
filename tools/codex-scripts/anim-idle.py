@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """程序化 **idle（待机）动作** —— 给自研 26 关节骨架加一条循环闭合的呼吸/重心微动
 
 为什么需要它：
@@ -31,7 +27,7 @@ import sys
 
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-final.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-anim.glb"
@@ -77,7 +73,7 @@ def add_acc(arr, ct, typ, mm=False):
     vi = add_view(arr)
     a = {"bufferView": vi, "componentType": ct, "count": len(arr), "type": typ}
     if mm:
-        # 🔴 SCALAR 访问器是 1 维：`min(axis=0)` 返回**标量**，不能直接迭代
+ # SCALAR 访问器是 1 维：`min(axis=0)` 返回**标量**，不能直接迭代
         #    （实测 `for x in np.float32(...)` 直接 TypeError）。1 维要单独走一条路。
         if arr.ndim == 1:
             a.update({"min": [float(arr.min())], "max": [float(arr.max())]})

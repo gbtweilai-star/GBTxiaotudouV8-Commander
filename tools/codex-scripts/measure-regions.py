@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """量出低模全身件的**裙摆区域**与**头发区域**（弹簧骨要按区域加权，不能猜）。
 输出：y 范围、每层横截半径分布、候选骨位（裙：4 向；发：后+两侧）。"""
 import json
@@ -10,7 +6,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = DH / "raw/rig/model-rigged-anim.glb"
 

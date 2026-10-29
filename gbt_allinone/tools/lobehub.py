@@ -131,16 +131,18 @@ def _version(exe: Path) -> str:
 
 
 def _pids() -> list:
-    """找 LobeHub 进程。走 tools/procfs.py 的安全层 ——
-    psutil 在 iSH 上会因 /proc/<pid>/stat 字段不全而抛 IndexError（实测），
-    直接用 psutil.process_iter 会让整个能力位崩掉。"""
     try:
-        from . import procfs                                  # noqa: PLC0415
-        snap = procfs.snapshot()
-        return sorted(int(r["pid"]) for r in snap["rows"]
-                      if str(r.get("name") or "").lower() == _APP.lower())
-    except Exception:                                         # noqa: BLE001
+        import psutil                                        # noqa: PLC0415
+    except ImportError:
         return []
+    out = []
+    for p in psutil.process_iter(["name", "pid"]):
+        try:
+            if (p.info.get("name") or "").lower() == _APP.lower():
+                out.append(p.info["pid"])
+        except Exception:                                     # noqa: BLE001
+            continue
+    return sorted(out)
 
 
 def _settings_path() -> Path:
@@ -306,12 +308,7 @@ def status(**_kw) -> dict:
     pids = _pids()
     port = _bridge_port()
     up = bool(port) and socket.socket().connect_ex(("127.0.0.1", port)) == 0
-    # 🔴 `ok` 保留原义（= 这个能力现在能不能用）；
-    #    另给 `state` / `reason_code`，让"没装"与"代码坏了"能被机器区分开 ——
-    #    生产口径：查询成功 ≠ 目标可用。前者是 True，后者看 installed。
-    _state = "running" if pids else ("installed" if exe else "not_installed")
-    return {"ok": bool(exe), "op": "status", "state": _state,
-            "reason_code": "" if exe else "not_installed",
+    return {"ok": bool(exe), "op": "status",
             "installed": bool(exe), "exe": str(exe) if exe else "", "exe_source": src,
             "version": _version(exe) if exe else "",
             "running": bool(pids), "pids": pids,

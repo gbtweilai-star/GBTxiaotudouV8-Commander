@@ -1,18 +1,110 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   壳层兼容基座（**重建占位**，非原物）
-   ───────────────────────────────────────────────────────────────────────────
-   全站 349 页引用本文件，但原物在本仓库里不存在（2026-10-26 全盘 find 无果）。
-   这份**刻意保持最小**：只保证不 404、并暴露统一 token，不覆盖各页既有 inline 设计，
-   避免"恢复皮肤"变成"重画门面"。
+/* GBT小土豆V8 · 单项能力独立页 · 版式
+ *
+ * 风哥令：「她的能力页面都要**独立页面**，别设计的挤在一起小气的样子」。
+ * ⇒ 一条能力 = 一页。**不挤**靠三件事，不是靠把卡片放大：
+ *   ① 一屏**只讲一件事**：头部（身份）→ 遥测条（数字）→ 连接（关系）→ 调用史（证据）→ 出处（回查）；
+ *   ② 版面用 MC 的 12 列 / 4px 基线，节与节之间 `--mc-8` 起，不用密集表格塞满；
+ *   ③ 标题层用 MC 的 Display 档（等宽、大号、制表数字），数据自己会显得"有分量"。
+ *
+ * 皮肤：`skin-mission-control.css`（出处见该文件头）。本文件**只写版式**，颜色一律 var()；
+ * 出现裸色值 `tools/codex-scripts/audit_skin.py` 会报。
+ */
 
-   真正的基座在 window.css（token + 默认样式）。要改全站观感，改那一份。
-   判据：python3 tools/taste_lint.py --scan holo_pet_w3
-   ═══════════════════════════════════════════════════════════════════════════ */
-:root {
-  /* 与 window.css 对齐的别名，避免各页各写一套名字 */
-  --shell-bg: var(--gbt-bg, #080b11);
-  --shell-panel: var(--gbt-panel, #0f151d);
-  --shell-line: var(--gbt-line, #18222e);
-  --shell-radius: var(--gbt-radius, 0px);
-  --shell-accent: var(--gbt-accent, #3fb950);
+html, body { margin: 0; height: 100%; }
+body.cap-page {
+  background: var(--mc-bg); color: var(--gbt-text);
+  font: 400 14px/1.5 var(--mc-sans);
+  overflow-y: auto;
 }
+
+/* ── 顶栏：面包屑 + 状态。**贴顶不悬浮**（MC：仪器不做浮动玻璃）── */
+.cap-top {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: var(--mc-4);
+  padding: var(--mc-3) var(--mc-6);
+  background: var(--mc-surface); border-bottom: 1px solid var(--mc-border);
+}
+.crumb { font: 400 12px/1.4 var(--mc-mono); color: var(--gbt-dim); }
+.crumb a { color: var(--gbt-dim); text-decoration: none; border-bottom: 1px dotted var(--mc-border); }
+.crumb a:hover { color: var(--gbt-cyan); }
+.crumb .here { color: var(--gbt-gold); }
+.cap-top .spacer { margin-left: auto; }
+
+/* ── 头部：身份层。这里可以大 —— 一屏只讲一件事，不需要省地方 ── */
+.cap-hero { padding: var(--mc-8) var(--mc-6) var(--mc-6); border-bottom: 1px solid var(--mc-border); }
+.cap-id {
+  font: 700 40px/1.05 var(--mc-mono); letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; color: var(--gbt-text); margin: 0 0 var(--mc-2);
+  word-break: break-all;
+}
+.cap-desc { font-size: 15px; line-height: 1.65; color: var(--gbt-dim); max-width: 78ch; margin: 0 0 var(--mc-4); }
+.cap-tags { display: flex; flex-wrap: wrap; gap: var(--mc-2); }
+
+/* ── 主体：12 列栅格，4px 基线；节距给足（不挤） ── */
+.cap-body { padding: var(--mc-6) var(--mc-6) var(--mc-12); display: grid; gap: var(--mc-6); }
+.cap-sec { background: var(--mc-surface); border: 1px solid var(--mc-border); border-radius: var(--mc-r);
+           padding: var(--mc-5) var(--mc-5) var(--mc-6); }
+.cap-sec > h2 {
+  margin: 0 0 var(--mc-4); padding-bottom: var(--mc-2);
+  border-bottom: 1px solid var(--mc-border-subtle);
+  font: 600 13px/1.2 var(--mc-sans); text-transform: uppercase; letter-spacing: .08em;
+  color: var(--gbt-dim);
+  display: flex; align-items: center; gap: var(--mc-3);
+}
+.cap-sec > h2 .n { font: 400 11px/1 var(--mc-mono); color: var(--gbt-off); margin-left: auto; }
+
+/* 遥测条：MC §6 telemetry-strip（自适应，最小 160px） */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--mc-3); }
+
+/* 两列区：宽屏并排，窄屏自动落成单列 —— 不硬挤 */
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--mc-5); }
+@media (max-width: 1040px) { .cols2 { grid-template-columns: 1fr; } }
+
+/* 键值行：左标签右值，行距足 */
+.kv { display: grid; grid-template-columns: minmax(96px, 160px) 1fr; gap: var(--mc-4);
+      padding: var(--mc-2) 0; border-bottom: 1px solid var(--mc-border-subtle); font-size: 13px; }
+.kv:last-child { border-bottom: 0; }
+.kv .k { color: var(--gbt-dim); }
+.kv .v { font-family: var(--mc-mono); font-variant-numeric: tabular-nums; color: var(--gbt-text);
+         word-break: break-all; }
+.kv .v.gold { color: var(--gbt-gold); }
+.kv .v.mute { color: var(--gbt-off); }
+.kv .v a { color: var(--gbt-cyan); text-decoration: none; border-bottom: 1px dotted var(--mc-border); }
+
+/* 连接列表：一条 = 一行（真依赖，带出处文件） */
+.link-row { display: grid; grid-template-columns: 22px 1fr auto; gap: var(--mc-3); align-items: baseline;
+            padding: 5px 0; border-bottom: 1px solid var(--mc-border-subtle);
+            font: 400 12.5px/1.6 var(--mc-mono); }
+.link-row:last-child { border-bottom: 0; }
+.link-row .dir { color: var(--gbt-off); text-align: center; }
+.link-row .id { color: var(--gbt-cyan); }
+.link-row .id.dim { color: var(--gbt-dim); }
+.link-row .w { color: var(--gbt-off); font-size: 11px; }
+.link-row .via { grid-column: 2 / -1; color: var(--gbt-off); font-size: 11px;
+                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 调用史：遥测行 */
+.hist { display: grid; grid-template-columns: 74px 1fr auto; gap: var(--mc-3);
+        padding: 4px 0; border-bottom: 1px solid var(--mc-border-subtle);
+        font: 400 12px/1.6 var(--mc-mono); font-variant-numeric: tabular-nums; }
+.hist:last-child { border-bottom: 0; }
+.hist .t { color: var(--gbt-off); }
+.hist .ok { color: var(--gbt-ok); }
+.hist .bad { color: var(--gbt-fault); }
+
+/* 空态：**说清是"没有"还是"读不到"** */
+.empty { color: var(--gbt-off); font-size: 13px; }
+.empty b { color: var(--gbt-warn); }
+
+.hintline { font-size: 13px; line-height: 1.7; color: var(--gbt-dim); max-width: 78ch; margin: 0 0 var(--mc-4); }
+.nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--mc-2); }
+.nav-grid a {
+  display: block; padding: var(--mc-2) var(--mc-3); border: 1px solid var(--mc-border-subtle);
+  border-radius: var(--mc-r); color: var(--gbt-dim); text-decoration: none;
+  font: 400 12px/1.5 var(--mc-mono);
+}
+.nav-grid a:hover { border-color: var(--mc-border); color: var(--gbt-cyan); }
+.nav-grid a.here { border-color: var(--gbt-gold); color: var(--gbt-gold); }
+
+.foot { padding: var(--mc-5) var(--mc-6); border-top: 1px solid var(--mc-border);
+        color: var(--gbt-off); font: 400 11.5px/1.7 var(--mc-mono); }

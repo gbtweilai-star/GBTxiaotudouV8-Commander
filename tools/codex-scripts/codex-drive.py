@@ -24,7 +24,7 @@ python tools/codex-scripts/codex-drive.py --task-file task.md         # 从文�
 python tools/codex-scripts/codex-drive.py --no-state "只回答 PONG"    # 不带现状
 python tools/codex-scripts/codex-drive.py --write "…"                # 允许她改文件（有后果）
 ```
-## 🔴 要她给什么（第 86 轮实测补的一条）
+## 要她给什么（第 86 轮实测补的一条）
 **要结论与结构，不要细节。** 实测：她的"细节化方案"9 条里 7 条是编的
 （`controlnet_name`/`control_image` 这类入参名、`{"nodes":[...]}` 这类格式、几处路径/文件名），
 而她给的结构判断（分段、三件套同卡、轮询兜底、审核闸）全对 —— **她的价值在结构与边界，不在细节**。

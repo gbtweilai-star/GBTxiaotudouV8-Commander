@@ -45,11 +45,11 @@ class Eye:
     """一条实时眼：独立线程抓，只留最新帧，脑取最新不等。"""
 
     def __init__(self, name="main", full=False, region=None, fps_cap=FPS_CAP, keep_pixels=False):
-        # 🔴 2026-10-10 补 keep_pixels（主人令「本地录制」那条链要用它）：
+ # 2026-10-10 补 keep_pixels（主人令「本地录制」那条链要用它）：
         #    本件原来**只存元数据（seq/ts/size）不存像素** —— 它是为"视觉闭环"造的
         #    （脑只需要判断帧新不新），**录不了像**。
         #    正路不是另造采集器（那是平行实现），而是**给框架自己的眼加一个可选的像素槽**。
-        #    ⚠️ 代价如实说：下面注释里那条实测（读 .rgb 会逼出整块像素拷贝，75fps→24.6fps）
+ # 代价如实说：下面注释里那条实测（读 .rgb 会逼出整块像素拷贝，75fps→24.6fps）
         #       **在 keep_pixels=True 时必然要付** —— 所以默认 False，**谁要录像谁显式开**，
         #       并且 fps() 照实报（开了之后帧率会掉，读数上看得见）。
         self.name, self.full, self.region, self.fps_cap = name, full, region, fps_cap
@@ -81,7 +81,7 @@ class Eye:
     def _grab_loop(self):
         try:
             import mss
-            # 🔴 2026-10-10 抓到真 bug：原来写 getattr(mss, "MSS", None) or mss.mss
+ # 2026-10-10 抓到真 bug：原来写 getattr(mss, "MSS", None) or mss.mss
             #    —— **mss.MSS 是抽象基类**（mss.base.MSS），它存在 ⇒ 这行永远选中抽象基类，
             #    抓帧线程卡在那儿：engine 空、error 空、grabbed 0（不报错但不干活）。
             #    正解用**小写工厂** mss.mss()（平台实现）。
@@ -100,7 +100,7 @@ class Eye:
                     raw = s.grab(box)
                     self.seq += 1
                     self.grabbed += 1
-                    # 🔴 2026-10-10 实测：我原来每帧做 len(raw.rgb) —— 那会**逼出整块像素拷贝**
+ # 2026-10-10 实测：我原来每帧做 len(raw.rgb) —— 那会**逼出整块像素拷贝**
                     #    ⇒ 帧率只有 24.6fps（她 640x360 实测 75.3）⇒ **每帧开销就在这一行**。
                     #    修法：**不碰像素**（尺寸从 grab 的对象上取，不读 .rgb）。
                     f = {"seq": self.seq, "ts": time.time(), "size": (raw.width, raw.height)}

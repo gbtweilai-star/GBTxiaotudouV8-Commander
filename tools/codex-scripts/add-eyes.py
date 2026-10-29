@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """面部专件 · **眼球**（独立几何 + 程序化虹膜贴图 + 绑到 Head 骨）
 
 为什么必须做这一件（REALISM.md §2 第 7 步）：
@@ -29,7 +25,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-springs.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-eyes.glb"
@@ -58,7 +54,7 @@ names = [n.get("name", "") for n in J["nodes"]]
 joints = J["skins"][0]["joints"]
 HEAD = next(i for i, nd in enumerate(joints) if names[nd] == "mixamorig:Head")
 y_top, y_bot = P[:, 1].max(), P[:, 1].min()
-# 🔴 眼线是**全身**比例，不能用"所测 primitive 自己的高度"：
+# 眼线是**全身**比例，不能用"所测 primitive 自己的高度"：
 #    缝合件里选中的是**专用头那一片**（裁过的头+一截颈，自身高只有 0.17），
 #    拿它算 y_eye = y_top − 0.066·H 会落到**头顶头发**上，于是"取不到皮肤顶点"。
 #    必须用**整体** bbox（全部 primitive 的并集）来定身高。
@@ -84,7 +80,7 @@ C = bc[vv, uu]
 print(f"底色图 = image{_bci}（按材质取）· {bc.shape[1]}²")
 
 # ── 人工给定眼位（路径 ①）────────────────────────────────────────────────
-# 🔴 为什么最后走人工：比例法 / 几何反查 / 连通域**三种自动方法全部失败**，根源同一个 ——
+# 为什么最后走人工：比例法 / 几何反查 / 连通域**三种自动方法全部失败**，根源同一个 ——
 #    源图是「重妆光泽人偶」：浓眼妆吃掉了眼白、额头高光冒充眼白（见 STATUS.json eye_attempt_4）。
 #    **输入里没有可供定位的解剖信号**，再换第四种自动方法也是碰运气。
 #    量取来源：render/眼球-缝合件-正面.png（真眼睛在画面约 58% 处 ⇒ y≈0.395；
@@ -105,7 +101,7 @@ if _manual:
         raise SystemExit(1)
     print("✅ 解剖期望闸通过（人工值落在人头该在的区间内）")
 
-# 🔴 方法换血（第二次失败后的修正）：**不再靠比例猜眼线**。
+# 方法换血（第二次失败后的修正）：**不再靠比例猜眼线**。
 #    比例法连错两次的根因是"口径"——身体比例套到头模上，眼线/脸宽都偏。
 #    改用**几何反查**：眼白是脸上最显眼的「**高亮度 + 低色度**」区域
 #    （巩膜接近中性白，而皮肤是暖色、头发是暗棕）。取这些顶点、按 x 分成左右两簇，
@@ -248,7 +244,7 @@ OUT.write_bytes(b"glTF" + struct.pack("<II", 2, 12 + 8 + len(js) + 8 + len(body)
 # 自检
 bad = []
 prim = J["meshes"][0]["primitives"]
-# 🔴 不能写死 3：缝合件本身已经是 2 个 primitive（身 + 头），加 2 眼 = 4。
+# 不能写死 3：缝合件本身已经是 2 个 primitive（身 + 头），加 2 眼 = 4。
 #    判据必须是"**原有多少 + 2**"，而不是一个常数。
 if len(prim) != N_PRIM0 + 2:
     bad.append(f"primitive 数 {len(prim)} ≠ 原有 {N_PRIM0} + 2")

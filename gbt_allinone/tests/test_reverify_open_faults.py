@@ -157,7 +157,17 @@ class EveryProbeIsAliveTest(unittest.TestCase):
         allowed = {"F3", "F11", "F18", "F19"}
         self.assertTrue(set(human) <= allowed,
                         "这些条目不该是『需人读』：%s（多半是探针悄悄坏了）" % sorted(set(human) - allowed))
-        self.assertIn("F3", human, "F3 是语义问题，必须老实报『需人读』")
+        # 🔴 2026-10-25 口径翻正（留痕 · 谁改的、为什么、原期望是什么）：
+        #   原文写死 `assertIn("F3", human)`，等于**把 F3 钉成永远『需人读』**。
+        #   后果实测撞到了：F3 其实 2026-09-28 就修好（api.py 的异常分支已 fail-closed、
+        #   判据 test_preflight_fail_closed 3/3 PASS），这一轮据实结账 ⇒ **这条判据反而变红**。
+        #   那等于变相惩罚"把账结掉"：要么永远别结，要么改判据。
+        #   原期望（没变）：**不许有『新』id 悄悄混进需人读**（上界检查，上面那行一行没动）。
+        #   现口径：**还在册的**才要求它老实报『需人读』；已结账的不再要求。
+        open_ids = {r["id"] for r in rows}
+        if "F3" in open_ids:
+            self.assertIn("F3", human,
+                          "F3 还在册 ⇒ 它是语义问题，必须老实报『需人读』，不许被某条探针悄悄判成绿")
         self.assertEqual(0, rc)
 
 

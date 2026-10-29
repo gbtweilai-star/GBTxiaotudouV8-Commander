@@ -143,7 +143,7 @@ def main():
             piles["该划例外（上游/存档/重复）"].append(
                 {"path": d, "why": "同名出现 %d 次（重复件）" % len(by_name[name])})
         elif _depth(d, low) >= 2:
-            # 🔴 2026-10-22 量完才定（留痕，第 7 次自纠）：**嵌套件是"料"，不是"可调用技能"**。
+ # 2026-10-22 量完才定（留痕，第 7 次自纠）：**嵌套件是"料"，不是"可调用技能"**。
             #    实测：递归会多收 177 条，其中 171 条落在
             #    `…/autoclaw-design-capability/审美相关skill/design-skeletons|design-systems/*`
             #    —— 而这两族图鉴**早已单列**为 `design_assets_bulk`（235 条，按类聚合）。

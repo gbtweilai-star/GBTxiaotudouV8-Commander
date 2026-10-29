@@ -116,7 +116,7 @@ def cmd_put(a) -> int:
                          ensure_ascii=False))
         return 3
 
-    # 🔴 真往返：拉回来逐字节比对，一致才算数
+ # 真往返：拉回来逐字节比对，一致才算数
     VERIFY_DIR.mkdir(parents=True, exist_ok=True)
     back = VERIFY_DIR / name
     down_ok, down_tail = ra._get(key, back)

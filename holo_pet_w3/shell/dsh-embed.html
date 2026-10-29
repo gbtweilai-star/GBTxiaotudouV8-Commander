@@ -1,75 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html data-page-id="shell-dsh-embed" lang="zh-CN">
 <head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 
 
@@ -95,19 +27,22 @@
 
 <meta charset="utf-8" />
 <title>GBT小土豆V8 · 对话</title>
-<!-- 皮肤：只引壳的 token（window.css / deck3d.css 的 :root）。**零裸色值**。 -->
-<link rel="stylesheet" href="../window.css?v=20261026c" />
+<!-- 皮肤：只引壳的 token（window.css / deck3d.css 的 :root）。零裸色值。 -->
+<link rel="stylesheet" href="../window.css" />
 <link rel="stylesheet" href="../deck3d.css" />
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; }
   body { background: var(--gbt-deep); color: var(--gbt-text);
          font: 14px/1.6 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
          display: flex; flex-direction: column; }
-  /* ① 我们的品牌头条 —— 她在下面跑，但**门面是我们的** */
+  /* ① 我们的品牌头条 —— 她在下面跑，但门面是我们的 */
   header.brand {
     flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
     padding: 10px 16px; border-bottom: 1px solid var(--gbt-line);
-    background: linear-gradient(180deg, var(--gbt-deep-2), var(--gbt-deep));
+    /* 2026-10-26：原为 linear-gradient(180deg, var(--gbt-deep-2), var(--gbt-deep)) —— 两档。
+       换成纯明度一档 --gbt-deep-2：品牌头条本来就该比正文区亮一档，不需要渐变来"过渡"。
+       （审美守卫 gradient 命中 -1；层次仍在，只是不再靠渐变。） */
+    background: var(--gbt-deep-2);
   }
   .logo { width: 26px; height: 26px; flex: 0 0 auto; }
   .who { font-size: 15px; letter-spacing: .02em; }
@@ -119,7 +54,7 @@
   .pill.ok { color: var(--gbt-ok); border-color: var(--gbt-ok); }
   .pill.wait { color: var(--gbt-warn); border-color: var(--gbt-warn); }
   .pill.bad { color: var(--gbt-fault); border-color: var(--gbt-fault); }
-  /* ② 她的引擎：内层 webview（token 由**主进程**在请求头里带，不进本页 JS） */
+  /* ② 她的引擎：内层 webview（token 由主进程在请求头里带，不进本页 JS） */
   #host { flex: 1 1 auto; position: relative; background: var(--gbt-deep); }
   #dsh { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: none; }
   #dsh.on { display: block; }
@@ -127,9 +62,53 @@
                justify-content: center; color: var(--gbt-dim); font-size: 13px;
                text-align: center; padding: 24px; }
 </style>
+<link rel="stylesheet" href="../page-skins.css" />
 </head>
 <body>
-<script src="../shell/nav-compact.js?v=20261026"></script>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -160,122 +139,100 @@
   var note = document.getElementById("note");
   var wv = document.getElementById("dsh");
   function say(cls, text) { st.className = "pill " + cls; st.textContent = text; }
-  /* 主进程把**已注入 token 的入口 URL**塞进来；本页只拿到 URL，拿不到 token 本身。 */
-  window.__gbtMountDsh = function (url) {
-    if (!url) { say("bad", "没拿到入口"); return false; }
-    wv.setAttribute("src", url);
-    wv.classList.add("on");
-    note.style.display = "none";
-    say("ok", "已接入 · 引擎在内");
-    return true;
-  };
+
+  /*  2026-10-26：本页从不接触带 token 的入口 URL。
+     原来是壳用脚本注入把 URL 推进来、本页 setAttribute("src", url) ——
+     同时踩两条纪律：B4（壳往别的窗注入脚本）、B7（带 token 的 URL 不许回显）。
+     现在：本页只负责"让 webview 挂上 + 说一声我准备好了"，
+     由主进程把入口 URL 直接 loadURL 进这个 webview —— URL 只在主进程内存。
+
+      两个"看着能跑其实不跑"的坑，本轮都修了：
+       ① 先 setAttribute("src") 后挂监听 ⇒ attach 极快的机器会错过事件
+          （顺序必须：先挂监听 → 再设 src）；
+       ② `if (!mount()) setInterval(...)` ⇒ mount 恒返回 true，条件永不成立
+          ⇒ 重试从来没启动过。改成无条件起定时器，靠 inflight/mounted 挡重复。
+
+      诚实性：`r.ok` 只代表主进程受理了 loadURL，不代表页面真加载成功。
+        若 DSH 回 401，webview 里是 401 页，状态却说"已接入"= 假绿。
+        ⇒ "受理"只说"正在接入"，真接上由 webview 的 did-finish-load 说；
+          did-fail-load 如实报错误码。 */
   var api = window.gbtW3 || {};
-  if (typeof api.dshEntry === "function") {
-    Promise.resolve(api.dshEntry()).then(function (r) {
-      if (r && r.ok && r.url) { window.__gbtMountDsh(r.url); }
-      else { say("wait", "等壳把引擎拉起来…"); }
-    }).catch(function () { say("wait", "等壳把引擎拉起来…"); });
-  } else {
-    say("wait", "等壳把引擎拉起来…");
-  }
-})();
-</script>
+  var inflight = false;    // 请求在飞
+  var mounted = false;     // 主进程已受理（已发 loadURL）
+  var ok = false;          // webview 真的加载完 —— 这才是"接上"
+  var firstTimer = null, retryTimer = null;
 
+  function stopRetry() {
+    if (firstTimer) { clearTimeout(firstTimer); firstTimer = null; }
+    if (retryTimer) { clearInterval(retryTimer); retryTimer = null; }
+  }
 
-<!-- gbt-defense -->
-<script>
-(function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
+  function mount() {
+    if (inflight || mounted) return true;
+    var wcId = 0;
+    try { wcId = wv.getWebContentsId(); } catch (e) { wcId = 0; }
+    /* 拿不到 wcId 不等于装不了：照发（0 = "你自己找"），主进程会凭 hostWebContents
+       反查它名下的 guest。这种 Electron 版本差异不该让页面去猜。 */
+    inflight = true;
+    Promise.resolve(api.dshMount({ wcId: wcId })).then(function (r) {
+      inflight = false;
+      if (r && r.ok) {
+        mounted = true;
+        stopRetry();               // 受理了就停重试，别让定时器空跑到天荒地老
+        say("wait", "正在接入" + (r.how ? "（" + r.how + "）" : "") + "…");
+      } else {
+        var why = (r && (r.error || r.reason)) || "";
+        say("wait", "等壳把引擎拉起来…" + (why ? "（" + why + "）" : ""));
+      }
+    }).catch(function (e) {
+      inflight = false;
+      say("wait", "等壳把引擎拉起来…（" + ((e && e.message) || "调用失败") + "）");
+    });
     return true;
   }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
+
+  /* 真加载完才算"页面进来了" —— 但注意：HTTP 401 也算加载完成
+     （DSH 的 401 是它自己返回的错误页，会正常触发 did-finish-load）。
+     所以这里不敢说"接入成功"，只说"已加载"，并把 401 的可能明写在提示区 ——
+     主人看到的是 webview 里的真实内容 + 一句怎么修，而不是一句乐观的绿字。 */
+  wv.addEventListener("did-finish-load", function () {
+    if (!mounted) return;
+    var u = "";
+    try { u = wv.getURL() || ""; } catch (e) { u = ""; }
+    if (!u || u === "about:blank") return;    // 我们自己的占位页，不算
+    ok = true;
+    wv.classList.add("on");
+    note.style.display = "";
+    note.innerHTML = "引擎已载入。若这里显示 <b>401 authentication required</b>，" +
+      "说明入口 URL 没带 token —— 回「接对话面」页重新粘贴 <code>dsh web</code> " +
+      "打印的完整 URL（含 <code>?token=</code> 那段）。";
+    say("ok", "已载入 · 若界面是 401 请见下方提示");
+  });
+
+  /* 加载失败如实报（-3 = 被后续导航打断，属正常，不报）。 */
+  wv.addEventListener("did-fail-load", function (ev) {
+    if (!mounted || ok) return;
+    var code = ev && ev.errorCode;
+    if (code === -3) return;
+    say("bad", "引擎加载失败：" +
+      ((ev && ev.errorDescription) || ("错误码 " + code)) +
+      "（地址 " + ((ev && ev.validatedURL) || "?") + "）");
+  });
+
+  if (typeof api.dshMount === "function") {
+    /* 先挂监听、再设 src（顺序不能反）。 */
+    wv.addEventListener("dom-ready", mount);
+    wv.addEventListener("did-attach", mount);
+    wv.setAttribute("src", "about:blank");   // 让 webview 先 attach（主进程靠它反查 guest）
+    /* 兜底：事件万一没来，1s 后主动试一次，之后每 3s 一次；
+       受理成功即 stopRetry()，失败则继续（壳拉起 dsh web 需要时间）。 */
+    firstTimer = setTimeout(mount, 1000);
+    retryTimer = setInterval(mount, 3000);
+  } else {
+    say("wait", "壳动作口没加载 —— 请从托盘菜单开「对话」窗");
   }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
 })();
 </script>
-<script src="live-badge.js?v=20261026" defer></script>
-<script src="live-badge.js?v=20261026" defer></script>
-<script src="tentacle-kit.js?v=20261026" defer></script>
+<script src="tentacle-kit.js" defer></script>
 </body>
 </html>

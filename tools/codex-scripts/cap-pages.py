@@ -17,6 +17,12 @@
   · 生成的页**不许手改**（文件头写明"自动生成"与重建命令）；
   · 每页都是**自包含可达的**：只引本机文件，零外链（壳要能离线跑）；
   · 顺带出一张 `caps/index.html` 总目录（161 条一眼看全）。
+  · 🔴 **页面固定**（主人令 2026-10-27「不能在出现跳转页面」）：跨"扇"的入口
+    （`神经工作台` / `（束）` / `回神经工作台`）一律写成 `href="#" data-panel-goto="godview"`，
+    由 `cap.js` 转成 `gbtW3.panelGoto`（让**面板**在内容区切页，主人令 2026-10-04
+    「不许跳转，全部内镶嵌」）。以前写的是 `href="../../index.html"` —— 那是 **APP 根首页**，
+    点下去等于把整个 APP 装进 panel 的 webview 内容区。
+    同一束/兄弟能力页之间的 `href="<id>.html"` **保留**：那是内容区内部的正常浏览。
 
 ## 用法
 
@@ -39,22 +45,23 @@ HEAD = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<!-- 🔴 **自动生成，别手改**。重建：py -3.14 tools/codex-scripts/cap-pages.py
+<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cap-pages.py
      版式与渲染只有一份（cap.css / cap.js）；本页只负责带一个 id。 -->
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src http://127.0.0.1:8791" />
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
 <title>__KIND__ · 能力页 · GBT小土豆V8</title>
 <link rel="stylesheet" href="../../window.css" />
 <link rel="stylesheet" href="../../deck3d.css" />
 <link rel="stylesheet" href="../../skin-mission-control.css" />
 <link rel="stylesheet" href="../cap.css" />
+<link rel="stylesheet" href="../../page-skins.css" />
 </head>
 <body class="cap-page" data-kind="__KIND__">
 
 <div class="cap-top">
   <span class="crumb">
-    <a href="../../index.html">神经工作台</a> /
-    <a id="crumb-bundle" href="../../index.html">（束）</a> /
+    <a href="#" data-panel-goto="godview">神经工作台</a> /
+    <a id="crumb-bundle" href="#" data-panel-goto="godview">（束）</a> /
     <span class="here" id="crumb-here">__KIND__</span>
   </span>
   <span class="spacer"></span>
@@ -116,12 +123,12 @@ HEAD = """<!DOCTYPE html>
   <section class="cap-sec">
     <h2>全部能力页<span class="n" id="all-n">—</span></h2>
     <p class="hintline">
-      161 条能力**各自一页**。这里**不把它们铺开** —— 铺开就成了"挤在一起"，
+      161 条能力各自一页。这里不把它们铺开 —— 铺开就成了"挤在一起"，
       正是风哥要避免的样子；要看全量去总目录（那里按束分组）。
     </p>
     <div class="nav-grid">
       <a href="index.html">打开总目录 · 按束分组</a>
-      <a href="../../index.html">回神经工作台（3D 全脑）</a>
+      <a href="#" data-panel-goto="godview">回神经工作台（3D 全脑）</a>
     </div>
   </section>
 
@@ -139,25 +146,26 @@ HEAD = """<!DOCTYPE html>
 """
 
 INDEX = """<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-page-id="cap-index">
 <head>
 <meta charset="utf-8" />
-<!-- 🔴 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
+<!-- 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
 <title>全部能力页 · GBT小土豆V8</title>
 <link rel="stylesheet" href="../../window.css" />
 <link rel="stylesheet" href="../../deck3d.css" />
 <link rel="stylesheet" href="../../skin-mission-control.css" />
 <link rel="stylesheet" href="../cap.css" />
+<link rel="stylesheet" href="../../page-skins.css" />
 </head>
 <body class="cap-page">
 <div class="cap-top">
-  <span class="crumb"><a href="../../index.html">神经工作台</a> / <span class="here">全部能力页</span></span>
+  <span class="crumb"><a href="#" data-panel-goto="godview">神经工作台</a> / <span class="here">全部能力页</span></span>
   <span class="spacer"></span>
   <span class="mc-badge" id="ix-at">—</span>
 </div>
 <header class="cap-hero">
   <h1 class="cap-id">全部能力页</h1>
-  <p class="cap-desc">每一条能力位**各自一页**（不是挤在一张卡里）。点任一进入它的独立页。</p>
+  <p class="cap-desc">每一条能力位各自一页（不是挤在一张卡里）。点任一进入它的独立页。</p>
 </header>
 <main class="cap-body">
   <section class="cap-sec"><h2>按束分组<span class="n" id="ix-n">—</span></h2><div id="ix-groups"></div></section>
@@ -208,30 +216,17 @@ def main() -> int:
     d = _data()
     nodes = d.get("nodes") or []
     if not nodes:
-        print("🔴 读不到 brain-data.js 里的 nodes —— 先跑 brain-feed.py")
+        print("读不到 brain-data.js 里的 nodes —— 先跑 brain-feed.py")
         return 2
-
-    # R-H992（2026-10-15）主人令：所有模块代码页面也要登记在她自己能看到的地方。
-    #   原来页面源 = brain-data 的图谱子集（253），注册表却是 303 ⇒ 50 位没页。
-    #   现在取并集：注册表全量 ∪ 图谱节点 —— 一位一页。
-    kinds, seen = [], set()
-    for n in nodes:
-        k = str(n.get('id') or '').strip()
-        if k and k not in seen:
-            seen.add(k); kinds.append(k)
-    try:
-        sys.path.insert(0, str(ROOT))
-        from gbt_allinone import caps_tables as _CT
-        for c in _CT.all_caps():
-            k = str(c.get('name') or '').strip()
-            if k and k not in seen:
-                seen.add(k); kinds.append(k)
-    except Exception as exc:
-        print('提示：注册表读不到（%s），本次只出图谱节点页' % type(exc).__name__)
 
     OUT.mkdir(parents=True, exist_ok=True)
     wrote, skipped = 0, 0
-    for kind in kinds:
+    want = set()
+    for n in nodes:
+        kind = str(n.get("id") or "").strip()
+        if not kind:
+            continue
+        want.add(kind + ".html")
         f = OUT / (kind + ".html")
         html = HEAD.replace("__KIND__", kind)
         if f.is_file() and f.read_text(encoding="utf-8") == html:
@@ -241,17 +236,39 @@ def main() -> int:
             f.write_text(html, encoding="utf-8")
         wrote += 1
     ix = OUT / "index.html"
-    if not (ix.is_file() and ix.read_text(encoding="utf-8") == INDEX) and not a.check:
+    ix_stale = not (ix.is_file() and ix.read_text(encoding="utf-8") == INDEX)
+    if ix_stale and not a.check:
         ix.write_text(INDEX, encoding="utf-8")
+    # 孤儿页：盘上有这个文件、能力数据里已经没有它 —— 删掉一条能力却留着它的页 = 旧页面。
+    # 原来不查这一项，所以"数据减了、页面不减"永远不会被发现。
+    orphans = sorted(p.name for p in OUT.glob("*.html")
+                     if p.name not in want and p.name != "index.html")
 
     print("=" * 74)
     print("能力独立页生成 · 一条能力 = 一个真文件")
     print("=" * 74)
     print("  能力位 %d 条 ⇒ %s" % (len(nodes), OUT))
-    print("  %s %d 页 · 内容未变跳过 %d 页 · 目录页 1 个"
-          % ("将写" if a.check else "已写", wrote, skipped))
+    print("  %s %d 页 · 内容未变 %d 页 · 目录页 %s"
+          % ("将写" if a.check else "已写", wrote, skipped,
+             "待更新" if ix_stale else "未变"))
+    if orphans:
+        print("  🔴 孤儿页 %d 个（能力数据里已经没有）：%s"
+              % (len(orphans), ", ".join(orphans[:8])))
+        if len(orphans) > 8:
+            print("       … 另 %d 个" % (len(orphans) - 8))
     print("  总目录：caps/index.html")
     print("  重建：py -3.14 tools/codex-scripts/cap-pages.py")
+    if a.check:
+        # 🔴 原来这里无条件 return 0 —— 挂进闸就是假绿（有差异也报成功）。
+        bad = wrote + (1 if ix_stale else 0) + len(orphans)
+        if bad:
+            print("  🔴 FAIL —— %d 处与能力数据不一致（要修就跑不带 --check）" % bad)
+            print("→ 本次退出码 = 1")
+            return 1
+        print("  ✅ PASS —— %d 个能力页与数据逐条一致，无孤儿页" % skipped)
+        print("→ 本次退出码 = 0")
+        return 0
+    print("→ 本次退出码 = 0")
     return 0
 
 

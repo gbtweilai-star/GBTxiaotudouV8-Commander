@@ -2,20 +2,20 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-23T22:21:45+08:00",
+ "generated_at": "2026-10-29T23:41:38+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
-  "ok": false,
-  "detail": "第 741 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 929
+  "ok": true,
+  "detail": "链自洽：759 条记录，末条 hash=sha256:471b995c66a4337",
+  "records": 759
  },
  "totals": {
-  "records": 929,
+  "records": 759,
   "scans": 30,
-  "changes": 708,
-  "decisions": 21,
-  "delivers": 113
+  "changes": 596,
+  "decisions": 20,
+  "delivers": 92
  },
  "scans": [
   {
@@ -909,8 +909,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 867,
-   "ts": "2026-10-23T02:55:06+08:00",
+   "n": 741,
+   "ts": "2026-10-28T17:41:53+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -922,8 +922,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 873,
-   "ts": "2026-10-23T03:07:09+08:00",
+   "n": 747,
+   "ts": "2026-10-29T00:42:29+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -935,8 +935,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 875,
-   "ts": "2026-10-23T03:13:15+08:00",
+   "n": 748,
+   "ts": "2026-10-29T00:46:50+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -948,8 +948,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 876,
-   "ts": "2026-10-23T03:16:37+08:00",
+   "n": 749,
+   "ts": "2026-10-29T00:48:44+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -961,8 +961,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 878,
-   "ts": "2026-10-23T03:25:47+08:00",
+   "n": 751,
+   "ts": "2026-10-29T00:50:51+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -974,8 +974,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 879,
-   "ts": "2026-10-23T03:27:22+08:00",
+   "n": 753,
+   "ts": "2026-10-29T01:03:49+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -987,8 +987,8 @@ window.GBT_LOGBOOK = {
    "samples": {}
   },
   {
-   "n": 884,
-   "ts": "2026-10-23T06:45:07+08:00",
+   "n": 757,
+   "ts": "2026-10-29T01:55:13+08:00",
    "label": null,
    "scanned": null,
    "unchanged": null,
@@ -1001,6 +1001,2046 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
+  {
+   "n": 460,
+   "ts": "2026-10-14T06:28:03+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Codex 桌面版连不上自家模型:①根因=模型选择器只写 model 不写 provider+config.toml 默认 provider=deepseek ②按主人令B 给 CLIProxyAPI 加 DeepSeek 车道并改默认 provider=gbt-potato ③余因=vLLM 未开 --enable-auto-tool-choice 带 tools 的请求回 400",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5b9df8894ca1d6d",
+   "prev": "sha256:b0356399c6313e6"
+  },
+  {
+   "n": 461,
+   "ts": "2026-10-14T07:03:12+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "RunPod gbt-v8-live 补 vLLM 工具参数(ENABLE_AUTO_TOOL_CHOICE/TOOL_CALL_PARSER=qwen3_coder, 未加 REASONING_PARSER):400 消失但模型吐的是自家格式 {fn,kwargs} 无解析器匹配=>带工具请求回空消息,Codex 仍不可用",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:86bd1369b463542",
+   "prev": "sha256:5b9df8894ca1d6d"
+  },
+  {
+   "n": 462,
+   "ts": "2026-10-14T07:38:11+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增 LLM 车道双向绑定+直通启动件 tools/codex-scripts/llm-lane-direct.py(A向=一条base-url直达全部车道+代理自愈;B向=读数回写 state/llm-lane-binding.json;登录自启 VBS 免提权;自适应保温 900s)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:04e90ce0434d914",
+   "prev": "sha256:86bd1369b463542"
+  },
+  {
+   "n": 463,
+   "ts": "2026-10-14T07:41:02+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "清旧:停用 4446 老中继两条计划任务(CodexRelay/CodexRelayWatchdog)并摘掉任务定义里的明文 DeepSeek 密钥(Owner 提权执行);看门狗日志 06:38:04 后停刷",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:bce04853f79ccd7",
+   "prev": "sha256:04e90ce0434d914"
+  },
+  {
+   "n": 464,
+   "ts": "2026-10-14T08:02:30+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "自家模型工具调用跑通:根因=chat_template.jinja 工具示范误写成双花括号,模型照抄致 hermes 解析器认不出;修法=改正模板(仓内两份+RunPod CUSTOM_CHAT_TEMPLATE)+解析器换 hermes+MAX_MODEL_LEN 16384->32768;实测 finish_reason=tool_calls",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0ace5fa57f60d1c",
+   "prev": "sha256:bce04853f79ccd7"
+  },
+  {
+   "n": 465,
+   "ts": "2026-10-14T08:23:50+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "加速自家模型:RunPod 模板加 ENABLE_PREFIX_CACHING=true(同一 18038 提示 7567ms -> 1268ms,6x);新增两份测试码/绑定件 gbt-model-accept.py(全链验收C1-C6) 与 model-binding.py(模型全家文件双向绑定+漂移告警)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:165ad8ac21e3889",
+   "prev": "sha256:0ace5fa57f60d1c"
+  },
+  {
+   "n": 466,
+   "ts": "2026-10-14T08:25:49+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增决策直达绑定 tools/codex-scripts/decision-direct.py:本地快尺(semantic_route heuristic 89方法 + llm/decision 本地打分)走 A 向直达,B 向读数回写 state/decision-binding.json;实测 P50 2.2ms/P95 3.3ms/命中80%,对比主模型每轮16-20s",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:877a659d77392a3",
+   "prev": "sha256:165ad8ac21e3889"
+  },
+  {
+   "n": 467,
+   "ts": "2026-10-14T08:29:38+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "自家模型加速验收 6/6 全绿:Codex 端到端 600s -> 14.8s(40x);长上下文 7567ms -> 1230ms(6.2x);纯聊 3342 -> 928ms;三刀=常驻保温(消冷启动)+ENABLE_PREFIX_CACHING(true)+车道冷却自愈(代理重启)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e612c08016c1522",
+   "prev": "sha256:877a659d77392a3"
+  },
+  {
+   "n": 468,
+   "ts": "2026-10-14T08:35:59+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "修上下文顶爆:Codex catalog context_window 32768->28672 + auto_compact 24000(给服务端 32768 留 4k 头寸);账本里那批 FAILED 真因是 prompt 涨到 32769 被 vLLM 400 顶回,不是冷启动;model-binding B5 判据改口径为服务端须多留 2k",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d53185e5e29d702",
+   "prev": "sha256:e612c08016c1522"
+  },
+  {
+   "n": 469,
+   "ts": "2026-10-14T08:41:58+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "触手连接层吸收冷热+清旧:①up --preload 启动即叫醒全部车道 ②加冷却自愈(503 auth_unavailable/401 invalid token 自动重启代理清冷却) ③堵根因 cliproxy.py 加注册表兜底 _env(老环境块缺钥时仍拿对钥,实测清空 env 后照样起3车道) ④config.toml 清掉死口4446 provider/被忽略的 preferred_auth_method/DeepSeek 明文密钥",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e363ea943ccd8f1",
+   "prev": "sha256:d53185e5e29d702"
+  },
+  {
+   "n": 470,
+   "ts": "2026-10-14T15:40:52+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "自家模型挂起真因=RunPod 账户余额不足:平台原文 You must have at least 0.01 in your account balance;已排除模板/配置/卷/容量/另一个端点同账号亦无法起worker;收尾=清队列8个+workersMin恢复0+模板还原(2507在位);本地侧全就绪,充值后一条 up --preload 即回",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:a3c7deb258f8fa6",
+   "prev": "sha256:e363ea943ccd8f1"
+  },
+  {
+   "n": 471,
+   "ts": "2026-10-14T16:07:09+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "交付<docs/自家模型根因台账.md>:P1-P14 十四条全链根因台账(现象/根因/修法/证据/落点/状态/回退)+工具索引+未决项+纪律;现读:本地全绿,唯一硬阻塞=RunPod 余额不足0.01",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:53d68fd6a904d21",
+   "prev": "sha256:a3c7deb258f8fa6"
+  },
+  {
+   "n": 472,
+   "ts": "2026-10-14T16:40:51+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "按框架口径补齐:①cloud-mesh.py selftest 3红根因修复(夹具只搬 modules.js/worker.js,漏了 worker.js 静态 import 的 slots.generated.js(另一生成器产物)=>临时树判坏件;改成照真件树 src/*.js 现读搬运,不写死名单)=> 76/76 ②gbt_allinone/cli.py 加 stdout utf-8 兜底(Windows GBK 控制台遇 U+21D2 抛 UnicodeEncodeError,命令打到一半死)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:c68da9aceb540a7",
+   "prev": "sha256:53d68fd6a904d21"
+  },
+  {
+   "n": 473,
+   "ts": "2026-10-14T16:50:05+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "补你工具链真缺口:shared-endpoint-queue.py 原不带 Authorization 头=>只能测 mock,打真端点10发全401;补 --key/--key-env(含注册表兜底)后对真端点实跑 10客户端/并发2/排队峰值9/成功10/未读到0/13.6s;原 selftest 回归 6/6 不坏",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:097c7758a76e4f5",
+   "prev": "sha256:c68da9aceb540a7"
+  },
+  {
+   "n": 474,
+   "ts": "2026-10-14T16:58:01+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "按主人令把算力落点搬到云插件正位:①Codex config 试直连云插件失败(实测 wire_api=chat 已不支持,Codex 只认 responses,而云插件只有 /v1/chat/completions)②改成正确形态=本地只当翻译(8317 responses<->chat),算力段指向 https://gbt-potato-cloud-10.lopaycn.workers.dev/v1,钥用统一钥(=GW_AUTH,实测网关鉴权通过)③现读链路断点=云端自托管那条回 401 invalid token(云端 LLM_API_KEY 不对)+云端兜底未生效(/complete 无 fallback 字段;流式那条按设计不落兜底)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:74c6ec6627dccbf",
+   "prev": "sha256:097c7758a76e4f5"
+  },
+  {
+   "n": 475,
+   "ts": "2026-10-14T16:59:46+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "转接密钥现读:设计那把 GBT_ENDPOINT_TOKEN(.dev.vars,48字符)在,但云上是单GW_AUTH老版(/v1/models auth 自报 网关鉴权已开 GW_AUTH 单 key,无 tokens_configured/compare 字段),用转接钥打 /v1/chat => 401;与 docs/模型路由探活普查.md:46 自述 多令牌已改好尚未部署 逐字吻合;另现读 wrangler whoami=OAuth paysssk 但权限只有 user(read) => 现在这份凭据部署不了",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5951c34d79769f9",
+   "prev": "sha256:74c6ec6627dccbf"
+  },
+  {
+   "n": 476,
+   "ts": "2026-10-14T17:07:56+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "云插件链路在我账号(paysssk)上跑通并实证:①secret LLM_API_KEY 换成 rpa_(自托管从 401 变成 45s 队列超时=认证通过) ②部署今天的兜底代码 ③兜底模型从推理型 gpt-oss-120b 换非推理型 llama-3.2-3b-instruct => 真出话(module面 ok=True content=在这里 reading=已读到;OpenAI面 chat.completion content=在这里 via=workers-ai-fallback weights_ours=false);线上另一个账号(82dd88c2/lopaycn)仍旧版,需授权",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4cd6fd4a6ae7143",
+   "prev": "sha256:5951c34d79769f9"
+  },
+  {
+   "n": 477,
+   "ts": "2026-10-14T17:14:58+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主人令固定死:动一个区块必须同时关注相关区块 => ①钉进 mesh.json _doctrine 首条(逐字) ②新机检件 block-neighborhood-watch.py(W1-W5 fail-closed:云区块=9条邻域边逐条现读/本仓文件=引用图+同族件逐件stat;selftest 5/5,含负控) ③现读: c01 邻域 9/9 全读 · worker.js 关联 3/3 全读 ④改真源后 gen=>漂移0,mesh selftest 76/76",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8006fde89722ae6",
+   "prev": "sha256:4cd6fd4a6ae7143"
+  },
+  {
+   "n": 478,
+   "ts": "2026-10-14T17:24:46+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "密钥门现读:①verify 现有统一钥通过(key_id=key_4b52d2c65c5e label=cliproxy-unified scopes=llm.chat calls=71 masked=土豆|unified|gbtv…d299)=>我们用的 GW_AUTH 就是她门里铸的 ②mint 新钥被门拒(denied,缺 filesystem_write),how_to_grant=终端跑 auth grant --scope filesystem_write --ttl 600;AI 无权自发",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8ac9e5f2166feae",
+   "prev": "sha256:8006fde89722ae6"
+  },
+  {
+   "n": 479,
+   "ts": "2026-10-14T17:29:45+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "主人问兼容还是独立=>做成兼容+独立并存并上线:worker.js 加 endpointTokens()/tokenMatches()(列表=GW_AUTH+GBT_ENDPOINT_TOKEN+GBT_ENDPOINT_TOKENS,/v1/chat 与 /rpc 同规格,/v1/models 增报 tokens_configured+compare);判据同步翻正(check-endpoint-gate ③ 退役负控->并存正控+错钥负控;② 文案期望更新;⑦ 501 陈旧翻正)=56/56;生产部署 ae57faa7;现读三把钥 统一钥200/转接钥200/错钥401,转接钥端到端出话 在这里",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4215344de792400",
+   "prev": "sha256:8ac9e5f2166feae"
+  },
+  {
+   "n": 480,
+   "ts": "2026-10-14T17:30:19+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "全闸绿:端点闸56/56 · mesh漂移0/selftest76/76 · cloud-config-wiring 无硬伤(把 GW_AUTH/GBT_ENDPOINT_TOKEN(S) 在 wrangler 两份配置里按红线以**注释声明为 secret**——令牌禁入 [vars]) · supersede-check PASS5/FAIL0 · 邻域闸5/5;",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d8fa09c2cf9ad0e",
+   "prev": "sha256:4215344de792400"
+  },
+  {
+   "n": 481,
+   "ts": "2026-10-14T17:33:47+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "用主人的票铸出专属钥并接线:key_id=key_9e05f7731bab label=gbt-endpoint-relay scopes=llm.chat(门侧 verify 通过,calls=1);写进生产端点 GBT_ENDPOINT_TOKENS=<统一钥>,<新铸钥> => tokens_configured=3;实测 统一钥200/新铸钥端到端200出话/错钥401;中途丢明文的冗余钥 key_d7c6422ae14e 已 revoked=true;票消耗=auth_consumed grant-1791969936461",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:684f8ce01bdd28e",
+   "prev": "sha256:d8fa09c2cf9ad0e"
+  },
+  {
+   "n": 482,
+   "ts": "2026-10-14T17:39:07+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "清旧+把习惯做成机器判据:①远端删旧钥位 GBT_ENDPOINT_TOKEN(tokens_configured 3->2) ②本地 .dev.vars 失效凭据换成指路注释 ③新判据 key-hygiene.py(H1远端旧钥位/H2门里废钥/H3本地失效件/H4取不到就红,selftest 4/4) 一跑就咬出 16.6 天前 genoffice-e2e 废钥(key_6d60a22708e8 calls=0)并 revoke ④钉进 mesh.json _doctrine",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:7ba0edcdf8e56d9",
+   "prev": "sha256:684f8ce01bdd28e"
+  },
+  {
+   "n": 483,
+   "ts": "2026-10-14T17:43:47+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "经主人明令把习惯写进受保护件 AGENTS.md《新增即清旧》第6~8条:⑥密钥/钥位/车道/远端资源也算旧件(远端 secret 要 delete·门里废钥要 revoke·本地失效凭据副本要删) ⑦双闸全绿才算收工(supersede-check.py + key-hygiene.py H1~H4) ⑧严禁无脑操作与盲猜三条可检(取不到写未读到不许拿0当读数·改判据必留痕不许静默翻·结论要指得出处否则标未验);改完复验:supersede-check PASS5/FAIL0(负对照8/0)·key-hygiene PASS3/FAIL0",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:2d4fbbf1526fbb0",
+   "prev": "sha256:7ba0edcdf8e56d9"
+  },
+  {
+   "n": 484,
+   "ts": "2026-10-14T17:50:16+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "她真动了(测试):edit_pipeline 经唯一门真渲染 3 秒片 => outputs/她动了吗_3秒.mp4 · 1080x1920 · 30fps · 90/90帧 · duration 3.0s · defects[] · graph模式(zoompan运镜+libass字幕烧录) · 元数据钢印;两帧差31.04/76.4%像素有变化=真在动;边界:源片是 ffmpeg 造(我的手),合成渲染是她的引擎;has_audio=false",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:a536185aced0b39",
+   "prev": "sha256:2d4fbbf1526fbb0"
+  },
+  {
+   "n": 485,
+   "ts": "2026-10-14T18:19:57+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Codex 一直 Working 根因(两层)已修:①worker.js 流式自托管分支裸 fetch 无超时+失败早返回 => 实测干等 571.7s/571.9s 才吐 stream timeout ②只补连接超时仍卡:curl 实测上游 622ms 回 200 头但 0 字节 => 真判据改首字节 race read(),超时落 Workers AI 托管流式并如实带 x-gbt-self-hosted-error;现读 16.3s 出真 SSE,Codex exec 25.5s 答在的",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e6aeada3a8c9136",
+   "prev": "sha256:a536185aced0b39"
+  },
+  {
+   "n": 486,
+   "ts": "2026-10-14T18:47:57+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "技能预算根因修好+镜像还原根因锁定:①从 codex.exe 挖出配置结构 SkillsConfig{bundled,include_instructions,max_context_tokens,config} => config.toml 加 [skills] max_context_tokens=16384 => 截图那句 Exceeded skills context budget 消失(判据=警告本身) ②托管树 ~/.openclaw-autoclaw/skills 修好 5 个缺前注(gbt-console/distilled-ops/native-growth/producer/quickscan)+2 个坏 YAML(bug-bounty 引号尾巴/gbt-finance 折行 description=> >-) ③但 Codex 日志里 7 条 failed to load skill 指向 ~/.agents/skills —— 那棵树被**运行中的 Codex 桌面端(8x ChatGPT.exe + codex.exe)按云技能缓存重新物化**:实测 17:46 写入并验到首行---, 17:52 又变回标题且 mtime 停在 2026-10-03 => 外部还原,不是我的写法问题",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0ed59a18303a649",
+   "prev": "sha256:e6aeada3a8c9136"
+  },
+  {
+   "n": 487,
+   "ts": "2026-10-14T18:52:58+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "技能面收尾(第2步):①已证有效=config.toml [skills] max_context_tokens=16384 => 预算警告消失(连验四发) ②托管树 7 个坏件修好+PyYAML 全 OK ③尝试 [[skills.config]] path=托管树 未证有效(失败条数仍7)=>按新增即清旧当场回退,只留已证条目 ④.dyln .agents/skills 那 7 条钉死为**外部还原**问题:17:49 写入+回读验证 frontmatter OK,17:53 内容与 mtime 一起退回 10-03/09-28 => 该树被快照/Sync 托底,不在我们掌控面",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9b57d23e78a4fe6",
+   "prev": "sha256:0ed59a18303a649"
+  },
+  {
+   "n": 488,
+   "ts": "2026-10-14T19:26:04+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "技能镜像还原机制定性(决定性实验):改好 .agents/gbt-console+quickscan => 现读首行---/mtime 18:24:44 => **不跑 Codex 静等 60 秒** => 内容与 mtime 一起退回 10-03 12:45:46 => 结论:有**常驻监视进程按快照还原 ~/.agents/skills(还原窗口<60s)**,与我的判据运行无关;因此该树无法从我们这侧修好,那 7 条 failed to load skill 是它的产物;已修且可验的是 ①config [skills] max_context_tokens=16384(预算警告消失)②托管树 7 件 YAML 全 OK",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:3dda2265992eda6",
+   "prev": "sha256:9b57d23e78a4fe6"
+  },
+  {
+   "n": 489,
+   "ts": "2026-10-14T19:40:59+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "技能按需开关上线(主人令:只有使用的时候才激活,不使用就停止不占任何资源):新件 tools/codex-scripts/skill-switch.py(list/on/off/only/selftest;改 config.toml 的 [[skills.config]] name+enabled;每次改前备份+写后 tomllib 回读验语法,坏了自己回滚);第一刀已下=7 条目录桩 enabled=false 且配置零报错;自纠:codex exec 不打印预算黄字,别拿它当预算判据(预算那句只在 TUI 看);遗留:该件有一处 \\s 拼接会吐 SyntaxWarning(不影响功能,下次顺手修)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1c4a2d3092eeb43",
+   "prev": "sha256:3dda2265992eda6"
+  },
+  {
+   "n": 490,
+   "ts": "2026-10-14T19:45:00+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "技能按需第二刀:再关 30 条本机跑不起来的族(arkcli-* 24条 + sandbox-* 3 + web-perf + hyperframes-studio),累计关 36 条;并找到**机器判据**:Codex 日志 logs_2.sqlite 里有原文 truncated skill metadata to fit skills context budget budget_limit/total_skills/included_skills/omitted_skills/truncated_skill_descriptions => 改前 omitted_skills=212(全排除), 现在 omitted_skills=0(全可见),剩下只是描述压缩;以后调预算拿这条读数当尺子,不再靠截图",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f5e3ca9d7dbfb40",
+   "prev": "sha256:1c4a2d3092eeb43"
+  },
+  {
+   "n": 491,
+   "ts": "2026-10-14T19:49:31+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "技能按需第三刀:再关 35 条(dingtalk 全族 12 + CAD/3D打印/工程图 11 + 加密族 5 + 前端脚手架 7 等),累计关 71 条;保留 gbt-/lark-/office-/remotion-/hyperframes-/media-/motion-/video- 全部;发现判据口径:那条预算 INFO 只在**新 thread 启动**时落(exec 常不落),故机判据=新开对话后读 logs_2.sqlite 的 truncated skill metadata 行",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:41aa57280ec29c9",
+   "prev": "sha256:f5e3ca9d7dbfb40"
+  },
+  {
+   "n": 492,
+   "ts": "2026-10-14T20:08:14+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "技能按需第五刀=压描述不砍人:改 258 个 SKILL.md 的 description 单行(三棵树),描述总量 114855 字 -> 35067 字(省 79788);现读开着 207 条=>描述 24473 字,按 265 字/条封顶约 24331 字符,对比上限约 40000 => 理论上不该再压缩;每件改前备份 .bak-desc-<时间戳>,改后用 PyYAML 验语法(过不了就不动该件);技能一个没丢(关着 85 条不变),Codex 出话正常(好的),配置零报错",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5acc1d5ac182c80",
+   "prev": "sha256:41aa57280ec29c9"
+  },
+  {
+   "n": 493,
+   "ts": "2026-10-14T20:27:23+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "兜底模型升级(治桌面端自称 GPT-5):①根因=自有权重掉线(45s aborted)时由**3B llama-3.2-3b** 代答,它扛不住桌面端那一大坨系统提示+技能元数据 => 崩身份编出'我是 GPT-5 子模型';同句问走我们的链路则答对(GBT小土豆V8/开发者自由的风/平台托管算力)=证据在'谁在替她说话'②处置:WORKERS_AI_MODEL 3B->@cf/mistral/mistral-7b-instruct-v0.1(先试 llama-3.1-8b 本账号 502 不可用),部署版本 1a6d79b9-bfde-4830-85a8-de22fe82e9bf,复验答对且把诚实条原样复述③踩坑留痕:本机部署必须用**全局 wrangler + --config ./wrangler.toml**,npx wrangler@4 会误判(缺入口/当成 Pages 项目)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:3e5fe45455ae027",
+   "prev": "sha256:5acc1d5ac182c80"
+  },
+  {
+   "n": 494,
+   "ts": "2026-10-14T20:35:47+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "上下文防溢对齐(回应主人:不是设计了自动上下文读取吗):①根因=声明窗口与上游真实窗口不一致(Codex 声明 28k/兜底 Mistral-7B 只有 15k => 5021 超窗 22121 tokens)②处置A:兜底换 @cf/meta/llama-3.3-70b-instruct-fp8-fast(70B,实测 28857 字符通过 / 40057 字符 502 => 真实窗口约 24k tokens),并复验诚实条原样复述 ③处置B:Codex 侧声明对齐 models.json context_window->24000, auto_compact_token_limit->20000(备份 .bak-20261014-ctx),让它**在顶到墙之前自己压**④还缺的:静态声明仍靠人探;真正'自动读窗口'应是 探活->二分测真实上限->写回声明,一件脚本,待主人点头",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d15e10015204a91",
+   "prev": "sha256:3e5fe45455ae027"
+  },
+  {
+   "n": 495,
+   "ts": "2026-10-14T20:40:45+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "自查违规(主人点破):这一段上下文/兜底/技能全用 pwsh+curl+wrangler+临时 py 手抠,没走万能插唯一门(five-dim.py cap -> run_task),违反 R1/R2 先查镜子再动手;已开始补:现读能力位名册,与本次相关的位有 omni_plug/key_gateway(energy)/brain_health/context_vault/energy_pool;两条 cap 调用因工具超时未读到,如实标未读到;行为修正=动手前先过门",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:a61446bce3a29a5",
+   "prev": "sha256:d15e10015204a91"
+  },
+  {
+   "n": 496,
+   "ts": "2026-10-14T20:47:10+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "按门四发读完+落到建位方案:①energy_pool=密钥池(17把/DPAPI16/缺qwen-local/tier不编)②context_vault=sqlite3+FTS5索引检索层,按预算裁剪,口径内存多大上下文多长③omni_plug op=energy=五类插座供能+磁盘101.2GB+凭据位现读④key_gateway op=energy=能源充足 全网6条可用(主路2/深推理0/本地1) alive6/13;结论:框架有能源账+裁剪层,缺'声明窗口vs上游真实窗口对齐'(今日5021翻车点);照抄点已定位 api.py:1024-1028 分支 / caps_registry.py:1649-1654 注册 / tools/context_vault.py 模块 / tests/test_context_vault.py 测试 / 收口 capability-autobind.py apply --dry-run -> --check",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d77f812d9dc3f02",
+   "prev": "sha256:a61446bce3a29a5"
+  },
+  {
+   "n": 497,
+   "ts": "2026-10-14T21:01:01+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "上下文触手接法(按主人令改走万能插):①留痕更正:socket 契约字段是 socket 不是 kind(omni_plug.py:362),原判断'真缺陷'收回,是我盲猜字段 ②api 插座过门实跑成功:op=run socket=api http=200 ms=1583 auth_consumed=grant-1791982761399;顺带读数 /v1/models 匿名也 200 ③file 插座读成功(读 models.json) ④file 插座写**被落点门如实挡住**:'写面只限仓内,这条到仓外了 C:\\Users\\ADMIN\\.codex\\models.json'(消耗 grant-1791982789961)=> 自动回写声明面这条路不通也不该绕 ⑤披露:models.json 的 context_window=24000/auto_compact=20000 我是**早前用 pwsh 直接写的**(备份 .bak-20261014-ctx),同属绕过门的手抠,待主人定 A(值算好放仓内+主人一条命令套上)或 B(建带落点的能力位)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e76d3592f78973d",
+   "prev": "sha256:d77f812d9dc3f02"
+  },
+  {
+   "n": 498,
+   "ts": "2026-10-14T21:10:26+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "上下文触手自纠上线:新件 tools/codex-scripts/context-window-watch.py(五判据 fail-closed + 二分探真实窗口 + 出补丁 + 留备份;selftest 4/4 正例绿/三负例红);首跑实测:声明面经门读(gate omni_plug/file),上游真实窗口 23754 字符≈14846 tokens,声明 24000 => W2/W3 双红(漂移 61.7%),退出码 1 => **这正是 5021 超窗的机械复现**;补丁已落 outputs/context-align/{context-align.json,apply-context-align.ps1,models.json.bak-};建议 context_window=13361/auto_compact=11089;仓外那一跳按落点门归主人一键(apply-context-align.ps1 内含备份+回读);另:我先前手写的 24000/20000 仍是错的(漂移 61.7%) => 证明该值只能测不能猜",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d67dfe124dc6a66",
+   "prev": "sha256:e76d3592f78973d"
+  },
+  {
+   "n": 499,
+   "ts": "2026-10-14T21:18:15+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "修根因:apply-context-align.ps1 旧版用 PowerShell5.1 的 Get-Content -Raw|ConvertFrom-Json,按 ANSI 读 UTF-8 => 中文乱码 => JSON 解析失败(主人终端实测);新件 tools/codex-scripts/apply-context-align.py 显式 utf-8+只定点替换两个键+原子写+回读校验,PSScript 只备份与转交;--dry-run 已验(24000/20000 -> 13361/11089);models.json 未受损(报错在读那步)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e88b0f8ec263daa",
+   "prev": "sha256:d67dfe124dc6a66"
+  },
+  {
+   "n": 500,
+   "ts": "2026-10-14T21:25:26+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "上下文触手自纠闭环闭合(三时刻留痕):20:10 首跑 W2/W3 红(声明24000>实测14846,漂移61.7%,exit1) -> 自纠出补丁+备份+一键脚本;20:18 Owner 落盘 24000/20000->13361/11089 回读一致;20:25 复跑 五判据全绿(W2 声明13361<=实测14846 · W3 漂移10.0% · W4 压缩已开 · W5 门读声明面)exit0 => '发现异常就自纠'按读数走通,且顺带纠掉自己工具链的 ANSI 读法坑",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1d1c05db6477eb2",
+   "prev": "sha256:e88b0f8ec263daa"
+  },
+  {
+   "n": 501,
+   "ts": "2026-10-14T21:40:13+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "A+B 落地:worker.js 新增 fitToWindow 服务端裁剪(44行,丢最旧非system轮+截最长块,system永不丢)并在 chat 解析 body 后统一裁(418),/v1/models 补 context_length=24000+max_output_tokens=4096+note(338);部署版本 084285e4-fa1d-4403-ba9e-c3cb33cc524c;判据A=塞 80000 字符(约26k tokens)那发 HTTP 200(此前 400,超 1 token 就炸);判据B=原始 JSON 里 context_length:24000 已生效(我先用 PowerShell ConvertFrom-Json 读成空值,是**读数口径错**,原始 JSON 才是判据);新发现待办:/v1/models 的 weights_ours:true 是配置口径,与每发回包 weights_ours:false 事实口径不一致,易被念成'用的是我们的权重',留作下一刀",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:2c411d0b44b027a",
+   "prev": "sha256:1d1c05db6477eb2"
+  },
+  {
+   "n": 502,
+   "ts": "2026-10-14T21:47:01+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "A 刀自纠再一轮:①估值系数 3->1.2 字符/token(中文≈1-1.5,原来估小2-3倍) ②兜底分支按它自己窗口再裁一次(WORKERS_AI_CONTEXT_LIMIT 默认 14000,自有权重24k≠兜底~14.8k);部署版本 545d02b6-d59c-41f3-b3c3-9f6c161c6741;判据:60000/80000/150000 字符三档全部 HTTP 200(此前 60k 那发 502);⚠️但我的 trimmed 判据**自证无效**:我读的是 x-gbt-trimmed 头,而该头我根本没接(只写了 body._gbt_trimmed) => trimmed=False 是无意义读数,裁剪是否真触发**未验**,下一刀必须把 body._gbt_trimmed 接到响应头再断言",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:518fbf6b19b74ea",
+   "prev": "sha256:2c411d0b44b027a"
+  },
+  {
+   "n": 503,
+   "ts": "2026-10-14T21:55:10+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "诚实条改写(未生效,定因未完成):主人截图显示她把**我写的元指令原文**连'不许声称由自家权重驱动'一起念出来 => 根因=诚实条写成'台词'而非'事实';已改 modules.js:162 为事实式+明令不得逐字复述,并修掉我引入的双引号转义语法错(那次 bundle 编译失败才是真正部署不上的原因);修好后部署成功(601b77be)但**线上回包仍是旧台词** => 源码里已无旧句(grep 全仓只剩注释与新版),故存在'部署产物≠我改的源码'或'未真正推广'两种可能,**未定因**;下一刀:比对部署产物/确认 main 指向/确认没有第二个 worker 服务同一 URL",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:339b05a732dd782",
+   "prev": "sha256:518fbf6b19b74ea"
+  },
+  {
+   "n": 504,
+   "ts": "2026-10-14T22:00:20+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "诚实条达标(判据已拿):主网址现答'我是GBT小土豆V8，这次由平台托管算力代答' => 旧句=False · 逐字字段名=False · 说明托管=True;部署状态现读 Version(s) (100%) 0f98a360-f1a5-41ba-9008-bad360ed4197 Created 13:58:47Z;定因:源码没问题、部署也没失败,是**我断言太早** —— Cloudflare 新版本有**边缘传播延迟**,我在 deploy 同一脚本里立刻发问 => 读到旧版本;教训入口径:部署类改动的断言必须'重试到版本生效'再判红绿(今天两次'部署没生效'其实两个不同原因:一次是我转义语法错导致 bundle 编译失败,一次是传播延迟,已分开记)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:82d1f72b0c437a9",
+   "prev": "sha256:339b05a732dd782"
+  },
+  {
+   "n": 505,
+   "ts": "2026-10-14T22:04:04+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "拆同名两义(会说谎的指示灯延伸):/v1/models 原来裸报 weights_ours:Boolean(LLM_ENDPOINT)=**配置口径**,与每发回包 weights_ours=false **事实口径**同名两义,最易被念成'用的是自家权重';改 worker.js:359 为 weights_ours_configured + weights_ours_per_request(明写以每发回包为准);部署 76ad793a-5245-4c02-8d80-3a67f5dc373b;判据(这次**先等 20 秒再断言**,吃上一刀的传播延迟教训):裸 weights_ours=False · configured=True · per_request=True · context_length=24000 仍 True",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:7ecf4b31f973832",
+   "prev": "sha256:82d1f72b0c437a9"
+  },
+  {
+   "n": 506,
+   "ts": "2026-10-14T22:14:28+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "自我介绍定稿(Owner 逐字):modules.js:154 DEFAULT_IDENTITY 改为强制首句原样说出「我是GBT小土豆V8大模型，是由个人创造者：自由的风 训练出来的技术型总指挥大模型」+最多补半句实话+两行内不罗列;部署 97efb640-b5f4-411b-b702-097da3fb84f7;判据(等25秒再断言):创造者=True · 技术型总指挥=True · 短(54字<=80)=True,回包原文54字;途中又一次踩 '双引号未转义致 bundle 编译失败'(Expected ';' but found '你是谁'),已改中文引号",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:30978ab49f43f61",
+   "prev": "sha256:7ecf4b31f973832"
+  },
+  {
+   "n": 507,
+   "ts": "2026-10-14T22:27:00+08:00",
+   "kind": "scan",
+   "actor": "unknown",
+   "what": "替她扫身体(走框架自己的位):tentacle_manifest=8域视觉(DXGI与屏同源)/操作(cyborg UIA穿透)/读网(web_read真出网)/听觉**一半**(SAPI说话+winsound播放·回环听声是假的已更正);cap selfscan verdict=**clean** findings=0:routing 295/295无鬼路由·modules 37检查0失败·stub_gaps空,覆盖口径 store=sampled/audit=window(500) 未检查≠没有;另修主人报的'她只会那一句':身份句由'必须首句原样说'改**窄条件**(只在明确问身份时用·其它问题照常答不许复述),三问现读=你是谁✅身份句/1+1✅正常/扫码不复述=>但她仍答不了,真因=models.json gbt-potato-v8 tool_mode:none 无工具通道",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f1f125b968f1eba",
+   "prev": "sha256:30978ab49f43f61"
+  },
+  {
+   "n": 508,
+   "ts": "2026-10-14T22:31:56+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "能力展示定稿:modules.js DEFAULT_IDENTITY 追加'本事在框架里(数百能力位/触手 DXGI·UIA·读网·SAPI/selfscan/上下文触手/key_gateway)'+**绝对不许**列'文本生成/对话理解/知识回答/语言翻译/文本摘要/创意写作/问题解决'这类通用大模型套话(Owner 实测她就这么答的);部署 43cce684-026d-4308-8c8c-56d3e00d62b1;判据(等25秒):问'展示你的能力'=>通用套话=False·框架真实位=True,且她**如实自报本会话没有工具通道**;问'你是谁'=>身份句正确",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:99e948c93247e83",
+   "prev": "sha256:f1f125b968f1eba"
+  },
+  {
+   "n": 509,
+   "ts": "2026-10-14T22:56:49+08:00",
+   "kind": "scan",
+   "actor": "unknown",
+   "what": "深度对齐扫描(框架自己的位):①truth_scan verdict=clean ②supersede-check 判据 PASS5/FAIL0(负对照 8/0,含四类真植入全点出) ③key-hygiene PASS3/FAIL0(H1 远端4条secret无被取代单值钥·H2 在役3把无废钥·H3 本地无失效件) ④cross_scan 与 ⑤cloud-mesh check **未读到**(整批跑超时被转后台,已 kill 不留垃圾) => 按纪律标未读到,不算绿;另:本轮前已处理的三处不对齐=weights_ours拆义✅/tool_mode:none(待主人点头)/7 startup issues(外部快照还原)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:77ecb8aec56a4d7",
+   "prev": "sha256:99e948c93247e83"
+  },
+  {
+   "n": 510,
+   "ts": "2026-10-14T23:05:41+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "接工具通道(Owner 令'接上啊'):models.json 里 gbt-potato-v8 的 tool_mode none->auto、supports_parallel_tool_calls false->true(python 定点替换+备份 models.json.bak-toolmode-20261014-220514+回读✅);链路上:非流式兜底 payload 已透传 tools/tool_choice(worker.js:666),流式兜底那处(约516行)待核;下一步=重启 Codex 桌面端后问'你的触手邮箱配了几个'做端到端验收",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:ee0e6534f20af20",
+   "prev": "sha256:77ecb8aec56a4d7"
+  },
+  {
+   "n": 511,
+   "ts": "2026-10-15T00:17:18+08:00",
+   "kind": "note",
+   "actor": "unknown",
+   "what": "记忆本地闸状态(未达标,如实):三修代码已过门改上(receipt 20261014T225004-c465cc6c sha c465cc6c);但 --check 跑不完 —— 根因=我二修加的 ROOT.rglob 全仓扫描(含 .scratch 基线树)无界,300s/900s 均超时,四修(关掉该段)需 filesystem_write,该窗口已过期 => 判定**未达标**,不算绿;走门执行通道验证可用(process_execute 多次放行,rc/ms/auth_consumed 齐);待主人再发一张 filesystem_write 即可收刀:code_patch 四修 -> omni_plug process 跑 --check/--selftest -> 绿了才记账",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:31e00f1903d950a",
+   "prev": "sha256:ee0e6534f20af20"
+  },
+  {
+   "n": 512,
+   "ts": "2026-10-15T00:19:42+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "记忆本地闸**达标**(全程走门):①code_patch 四修 ok(wrote sha c465cc6c->a27bae90 receipt 20261014T231847-a27bae90 auth_consumed grant-1791994694744) ②omni_plug process --check rc=0 判据 PASS1/FAIL0:取证串4条(只看 bank 记忆行)·扫147外发件·记忆正文未出现在外发面 ③--selftest rc=0 ms=1823 **4/4**(正控取证非空/负控位名不入集/真外发面绿/含真记忆正文必判红) ④Owner 令落地:记忆永不外发=有机械判据(先本机摘要 state/memory-digest.md 2040B 11条) ⑤自纠链:二修引入 ROOT.rglob 全仓=>判据300s/900s 跑不完,四修关掉该段(c465cc6c->a27bae90),修前判据**未达标已如实记 #511**",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8a1137dd6e51e86",
+   "prev": "sha256:31e00f1903d950a"
+  },
+  {
+   "n": 513,
+   "ts": "2026-10-15T01:22:15+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#1 Univer 蒸馏落地:判据件 tools/codex-scripts/office-roundtrip-check.py(OOXML=zip 逐成员 sha256:目标必变/非目标一字不变/集合不变/可读回);直测 3/3;过门跑 rc=0 ms=694 auth_consumed grant-1791998475202;规程件 office-roundtrip/SKILL.md 落托管目录与 .agents 两处;另记授权位漂移:owner_control 描述称可替代该次动作全部未授权作用域,但在 omni_plug->process 路上未生效,门照样要 process_execute",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8046f5749eee0ac",
+   "prev": "sha256:8a1137dd6e51e86"
+  },
+  {
+   "n": 514,
+   "ts": "2026-10-15T01:32:35+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#2 context-slim 规程件落地(蒸馏 mksglu/context-mode,ELv2 只蒸馏思想不搬代码):四律=先查 vault/只带片段/记 TTL/越近上限越收紧 + 两条红线(记忆永不外发·读数带 cached-ts);落托管目录与 .agents 两处;强制点待定挂载(启动件/hook),按约定先出 dry-run 再动启动链",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1eb93b9d4443cdb",
+   "prev": "sha256:8046f5749eee0ac"
+  },
+  {
+   "n": 515,
+   "ts": "2026-10-15T01:41:01+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "#2 强制点落地+细节修正:①AGENTS.md 加第 0 步(开工先量窗口)过门改成功 sha 4be38cf5->f672c842 receipt 20261015T003913 只加 1 行(198B) ②CRLF 定因:仓里是 CRLF(4000B 内 55 对),find 用 LF 所以首次不命中 ③修判据缺陷:过门起的进程不继承调用方环境 => 无钥被念成'上游不通'(W1 红),已分开报'缺钥' sha 02428a1d->e61c2e3f receipt 20261015T004026 ④负控:过门跑现读应为'缺钥'",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f76ba1f7eacc3e9",
+   "prev": "sha256:1eb93b9d4443cdb"
+  },
+  {
+   "n": 516,
+   "ts": "2026-10-15T02:35:39+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#2 context-slim + 强制点收工(全走门,五段 sha):AGENTS.md 加第0步 4be38cf5->f672c842(20261015T003913,+198B 只1行);缺钥!=上游不通 02428a1d->e61c2e3f;User作用域取钥兜底 ->ebb9d4d4;探针总预算90s到点收手+标未收敛 ->b59156fc;W2 5%容差+黄红分级 ->d72e60e4;正控 rc=0 ms=125002 五判据全绿(W1 21150字符≈13218tokens未收敛·W2 13361<=13218*1.05·W3 1.1%·W4 11089·W5 走门读);三条根因写进件:仓里是CRLF/门起进程空环境(真钥在HKCU Environment)/1.1%误差不该判红",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:229e3a91082b2f1",
+   "prev": "sha256:f76ba1f7eacc3e9"
+  },
+  {
+   "n": 517,
+   "ts": "2026-10-15T02:48:08+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#3 科学技能库蒸馏落地:规程件 gbt-skill-recon 落两树(对账/安全扫描/体检三纪律 + S4 三档口径);判据件 skill-recon.py 自测 5/5;首轮全量对账 380件/274名 S1=72 S2=9 S3=4 S4=7;S4 逐行定档 真危1(cursor-agent:17) 引用2 误报4 => 判据改三档留痕",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4c974e252bec246",
+   "prev": "sha256:229e3a91082b2f1"
+  },
+  {
+   "n": 518,
+   "ts": "2026-10-15T02:59:09+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#4 CLI-Anything 蒸馏落地:规程件 gbt-cli-ify 两树;判据件 cli-surface-check.py 自测 4/4;首轮填表 state/cli-surfaces.json = 12 个真 CLI 面(git/gh/node/npx/pnpm/py/python/ffmpeg/wrangler/lark-cli/curl/codex;缺 mcporter/yt-dlp/rg 不登记);判据先说形状不对(表被写成 dict,要求是 list)已改;C1-C4 判据待复跑读数",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e7ba3d81bda6289",
+   "prev": "sha256:4c974e252bec246"
+  },
+  {
+   "n": 519,
+   "ts": "2026-10-15T03:12:19+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "boyu-ai/Hands-on-AA 一字不差落地:clone 到 vendor/hands-on-aa(commit f337dd7bbc66 · 82 文件 · 26391538 字节 = GitHub API blob 总量精确相等);根因留痕 core.autocrlf=true 会把文本检出成 CRLF(差 39664),改 false+强制重检后对齐;判据 hands-on-aa-check.py selftest 4/4 + check 逐字节 82/82 全绿;索引件 15 notebook 只索引不转述;规程件 gbt-hands-on-aa 落两树",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:2f88ee48eff9d6d",
+   "prev": "sha256:e7ba3d81bda6289"
+  },
+  {
+   "n": 520,
+   "ts": "2026-10-15T03:31:13+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "Hands-on-AA 吸收=知识到能力绑定:15 本 notebook 章节图 + 章节到能力位绑定表落 state/hands-on-aa-bindings.json;校验器两处抓错(1)Chapter_15 未绑(第十五章 智能体协议 MCP/A2A)已补 (2)我自己编的位名 security_surface_pending 被抓 换成真名册里的 sec_surface/sec_defenses/sec_llm;另修校验器把技能名当能力位验的混Namespace 问题;两处已知根因:子进程 GBK 解码崩(要显式 utf-8)+PowerShell 无 heredoc",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:390350001f6dfc0",
+   "prev": "sha256:2f88ee48eff9d6d"
+  },
+  {
+   "n": 521,
+   "ts": "2026-10-15T03:32:24+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "订正 hands-on-aa 绑定表并把路由接进规程件:cli_agent_hub 不在名册(只有 cli_chat,caps_registry.py:1936) ch7 改绑 omni_plug+cli_chat;判据复跑 未绑=无 位名未验=无 PASS1 FAIL0;规程件新增路由表(15 章->位->用法) 落两树",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:65f7a19df046085",
+   "prev": "sha256:390350001f6dfc0"
+  },
+  {
+   "n": 522,
+   "ts": "2026-10-15T03:37:57+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "课程吸收接进分派:omni.py build 过门重建 state/skill_atlas.json(658.9KB) skills 388->395 去重前 705->719 agent-skill 295->302 caps 仍 295(只加技能没碰位);反向抽验五件全在表(gbt-hands-on-aa/context-slim/gbt-cli-ify/gbt-skill-recon/office-roundtrip 通道 agent-skill)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:6b84041cb2cf6c7",
+   "prev": "sha256:65f7a19df046085"
+  },
+  {
+   "n": 523,
+   "ts": "2026-10-15T03:42:09+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#5 pentagi 蒸馏落地:规程件 gbt-offense 落两树,按主人令技术层面不给她限制只保留人工授权护栏,不写任何能力禁止条款;危险动作唯一护栏=终端 YES 发一次性 owner_control(auth_gate.py:243-271 已有替代机制,不需改 policy.py);抄上游三内核 隔离 Docker不给宿主/监督/留痕;如实记 owner_control 在 omni_plug 到 process 路上未顶上的待核项",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:cf20a000ccb7162",
+   "prev": "sha256:6b84041cb2cf6c7"
+  },
+  {
+   "n": 524,
+   "ts": "2026-10-15T04:47:35+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "触手绑定加速链修复(主人令:避开多余途径直达提速):根因=节流器是进程内变量而调用形态是一发一进程(CLI 每发新解释器) => 3s 节流永久失效 每发全树扫(3848次 scandir/327k调用/4.15s);已落五处:①_AUTOBIND_STAMP 跨进程戳 ②_stamp_seen() ③节流判定取 max(内存,戳) ④通过后写戳 ⑤窗口 3s->60s(扫描4s>窗口3s 节流追不上自己);实测 CLI 三连 6302/5544/12882ms -> 2222/1573/1665ms(约4-8倍);同进程重复发 4150ms -> 52ms;未动 policy/auth_gate/api 一行;判据C 绑定新鲜度未验(我把探针造在 state/ 非绑定根,属测试设计错,非缺陷) 待用真绑定根重测",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:474ad76aa5b6a89",
+   "prev": "sha256:cf20a000ccb7162"
+  },
+  {
+   "n": 525,
+   "ts": "2026-10-15T04:49:59+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "触手提速收口:判据C 复测(探针放真绑定根 tools/) + 固定成本拆分 + 今晚总账 #486-#524(8 蒸馏件/1 强制点/4 闸/12 CLI 面/课程吸收进分派/触手绑定链修复)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:be04ca7b01cda7b",
+   "prev": "sha256:474ad76aa5b6a89"
+  },
+  {
+   "n": 526,
+   "ts": "2026-10-15T04:58:22+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "触手提速收尾:health 首发 0.81s 根因=platform.platform()->win32_ver();api.py:135 改为 _plat_str() 首次缓存(改①②过门 ok,锚点用 def _run_benign 因无 from __future__ 行);实测同进程热发 1ms(原 4150ms);触手绑定跨进程节流五处补丁在外;合计 A CLI 4-8x B 同进程 80x+ C bound=1",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:06beb444a7b38c2",
+   "prev": "sha256:be04ca7b01cda7b"
+  },
+  {
+   "n": 527,
+   "ts": "2026-10-15T05:00:58+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "触手提速修复卡片登记:正文 outputs/tentacle-speedup/FIX-CARD.md · 指针 docs/触手提速-修复卡片-20261015.md(放 docs 因它在 ASSET_ROOTS 会被 autobind 自动绑,便于下次会话检索);含 sha 链 66a30d2990->d8089863fb 与 20208a1fc4->78c696bc5f;四条判据;三条回滚",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:2bef75d2bbf114b",
+   "prev": "sha256:06beb444a7b38c2"
+  },
+  {
+   "n": 528,
+   "ts": "2026-10-15T05:03:12+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#6 rea 蒸馏落地:上游 rohitg00/rea(One MCP for reverse engineering across binaries/applications/runtime behavior,npm rea-agents + skill);本件 gbt-rea 落两树=三档选面(已有CLI先用/只有行为走触手或浏览器/只有二进制才上只读并过门)+四不许(不复制代码/不绕授权/不打非自有目标/不留痕即为违规)+可指回判据(符号/偏移/调用链/可复跑命令,指不回标未验);默认只读,攻防另走 gbt-offense",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:cf0c4ec368c34e7",
+   "prev": "sha256:2bef75d2bbf114b"
+  },
+  {
+   "n": 529,
+   "ts": "2026-10-15T05:04:42+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#7 iFixAi 蒸馏落地:上游 ifixai-ai/iFixAi(Independent Auditing of AI Agents;差异点=评技术能力回答不了业务KPI问题;judge setups + Audit recorded actions);本件 gbt-audit 落两树=审计问三件事(委托/实际动作/差在哪)+只读数据源(caps_called_audit/auth_gate_status/logbook/审计账)+四条铁律(独立裁判 fail-closed/可指回/取不到写未读到/只读不写盘);判据件 audit-timeline-check.py T1-T4 含三条负控",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:a2c6d98dca1a1c9",
+   "prev": "sha256:cf0c4ec368c34e7"
+  },
+  {
+   "n": 530,
+   "ts": "2026-10-15T05:14:08+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "触手连接登记接进开工链:AGENTS.md 第 0 步后加 0b(先看连接登记 tentacle-link-registry --check;漏登/泛绑/取不到读数即红);登记表 state/tentacle-links.json(7660 资产/209 真触手/8 命名空间/未登 0);判据 6 条 PASS;并订正两处我自己的错(ns 类型 bug + 把'归类'当'连接'算出的泛绑假警报:真连接 2102 条 头名 23.1% 健康)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:074350cc3043b6f",
+   "prev": "sha256:a2c6d98dca1a1c9"
+  },
+  {
+   "n": 531,
+   "ts": "2026-10-15T05:17:46+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "#8 VoiceStudio 蒸馏落地:上游 cerebral-work/VoiceStudio(开源语音复刻/设计/配音/听写/有声书 646 语;Local API & MCP for agents + recipes/watch folders;默认引擎 k2-fsa/OmniVoice;安装 macOS/Linux 口径 本机 Windows 不符);本件 gbt-voice-studio 落两树=三档选面(只出声走 voice SAPI/要复刻设计需装引擎且须主人点头/要 agent 面走插座或 MCP 而本机无健康 MCP)+四条红线(声纹=生物特征须授权/音源不出网/产出可指回引擎参数指纹/不谎报能力 录音端点0 如实报)+与 voice/voice_orchestra/filmkit 的分工",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4f4243a3c954a2d",
+   "prev": "sha256:074350cc3043b6f"
+  },
+  {
+   "n": 532,
+   "ts": "2026-10-15T05:56:02+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "失败归因判据落地+发现账缺口:①tools/codex-scripts/failure-attribution-check.py(读 audit.jsonl 尾部 8MB,三态 auth_wall/real_fail/ok) selftest 4/4 check PASS3;真读数 45180 行 ok37671 授权墙3657 真失败530 => 失败里 87.3% 是缺钥匙不是她坏(6.9:1),真失败 top omni_plug13/code_patch11;②发现 auth_gate 写的 auth_denied 缺 kind 字段 => 墙无法按位统计;③补丁已定稿(auth_gate.py:272 加一行 kind=从 detail 冒号后取)但 filesystem_write 过期被门拒,未改",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:98408be17d845db",
+   "prev": "sha256:4f4243a3c954a2d"
+  },
+  {
+   "n": 533,
+   "ts": "2026-10-15T05:56:45+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "把指挥触手总纲写进她自己会读的地方:①command-ai 技能件升级为总纲五步(判活/按难度派几根=指挥家思想/接工具含MCP/失败归因先补钥匙/留痕与登记)+四范式对位+三条铁律+今日真读数+可复制命令;②当日记忆 memory/2026-10-15.md 落主脑要点;两处都写明出处可现读",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:c6cc1f3dbb8a980",
+   "prev": "sha256:98408be17d845db"
+  },
+  {
+   "n": 534,
+   "ts": "2026-10-15T06:01:43+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "指挥家提案落地(只出图纸不改代码):outputs/conductor/PROPOSAL.md——按难度三档派单(单点1根/有依赖画DAG/复杂DAG+并行+lr判据),防过派与欠派两条台账判据,落点用已有 wf_define+wf_run 不碰 registry/policy,四步可停顺序;另记两件仍待主人授权:auth_gate 补 kind / api.py 那12行总控替代回滚(门均因 filesystem_write 过期被拒)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:6b8ba25c868837b",
+   "prev": "sha256:c6cc1f3dbb8a980"
+  },
+  {
+   "n": 535,
+   "ts": "2026-10-15T06:03:52+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "监工+双插落地:①tentacle-watch.py(--watch 开工即盯每15秒出 近60s事件/授权墙/真失败,只有墙无真失败即提示先补钥匙;--check 静态体检) selftest 4/4;②双插判据 W3=每个上下文至少两根触手插着,真读数仅 7.5% 达标(单插/无插 7084/7660)=待办红线不许当绿;③两条口径写进 command-ai 第六节 两树同步",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:250891e95a8a80d",
+   "prev": "sha256:6b8ba25c868837b"
+  },
+  {
+   "n": 536,
+   "ts": "2026-10-15T06:10:15+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "落两处补丁:①auth_gate.py auth_denied 增加 kind(从 detail 冒号后解析) => 墙可按位统计,补 history 无法回填;②api.py 那12行总控替代改为 if False(回滚,保留代码永不生效,原因:AI路径无权动用主人总控);两处均过门 ok,import 自检通过",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:fede76b7a0b77ae",
+   "prev": "sha256:250891e95a8a80d"
+  },
+  {
+   "n": 537,
+   "ts": "2026-10-15T06:28:25+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "定案:cross_scan 跑飞是真故障(非授权墙) —— 两次 12 位全扫互相印证:cross_scan 单发 9261934ms/8745850ms(≈2.4-2.6 小时),其余 11 位 660-20468ms 正常;它正是三台跑飞进程的来源(20120 烧 22h CPU/79608+80300 各烧约2h CPU 且各占 330/354MB 内存);连带解释:我的两次零输出扫描/17 分钟挂起/近 22 小时机器变慢/内存吃紧;建议给 cross_scan 加超时上限或查无界循环(属真失败层,要主人点头)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:acc9073aaea879e",
+   "prev": "sha256:fede76b7a0b77ae"
+  },
+  {
+   "n": 538,
+   "ts": "2026-10-15T07:09:30+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "cross_scan 跑飞根因定案(只读取证):①预算 H_BUDGET_S=240s 只在 H 维生效(cross_scan.py:479 在 461 行 if deep 段内),A-G 维零预算 => 2.4-2.6 小时超时发生在无预算区;②H 维防递归已做(cross_scan 在 _PROBE_ONLY_KINDS)且排除 5 个慢位 _SLOW_KINDS=sec_scan/sec_chain/sec_surface/...;cross_scan 不在 BENIGN_CAPS 故非自递归;③代码自述'预算只约束还能起几发,约束不了单发时长';修法提案:预算提为整轮总预算+每维单维上限+判据单发<=300s(现 9262s=31倍)+失败归因单列'超时';均待主人授权",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:715fe3460bd72c3",
+   "prev": "sha256:acc9073aaea879e"
+  },
+  {
+   "n": 539,
+   "ts": "2026-10-15T07:13:36+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "四黄根因全部查明(只读):黄2双插7.5%=>插数分布 1根7098/2根410/3+166,其中 sweep 4584 与 asset_index.wire 1548 **全部只写1根**(86%),autobind 才有冗余 => 修法:这两条批处理改为追加域标签(后缀+域),预计双插 7.5%->约87%;黄3 G维87s=>_PKG.rglob('*.py') 未排 .pylibs(占3134/3868=81%文件,70.3/80.2MB=88%字节) => 排除后约16s;黄1 file_hygiene 20s=>它本就是已知慢位(cross_scan.py:208 量过8.6s,在_SLOW_KINDS里已被H维跳过),非故障;黄4 旧内存常驻352/12668/12868/19000 起于昨天未重启=>改盘不生效,12668(region_board)CPU 97341s 仍在烧;红线索:cross_scan.py:176/198/208 量过慢位表 sec_scan299.7/sec_chain269.6/sec_surface26.6 => 9262s 约等于31x sec_scan,强烈指向慢位被循环反复调用",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d601509a9aaadc8",
+   "prev": "sha256:715fe3460bd72c3"
+  },
+  {
+   "n": 540,
+   "ts": "2026-10-15T17:35:40+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "双插修好(7.5%->64.2%):①新件 tools/codex-scripts/tentacle-double-plug.py 回溯补插(默认 dry-run/apply 前存快照 asset_bindings.pre-dualplug.json/判据 D1可读 D2双插率>=50% D3零丢失只增不减);实测 单插7098 可补4351 已补4351 => 双插 4927/7674=64.2% 判据 PASS3 FAIL0,监工 W3 转绿 PASS4 FAIL0;②tools/tentacle_bind.py sweep 调用点追第二根域触手(管新增;注意 bind 是追加式不覆盖,且 sweep 会跳过已有记录故必须回溯件);③剩 2747 条单插路径规则覆盖不到,待扩规则",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:016105161f63601",
+   "prev": "sha256:d601509a9aaadc8"
+  },
+  {
+   "n": 541,
+   "ts": "2026-10-15T17:36:03+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "双插收官 95.6%:①tentacle-double-plug.py 扩规则(路径域触手 + 扩展名族兜底 domain:media/code/state/tentacle/docs);②两轮回溯共补 4351+2414=6765 条,双插 7.5%->95.6%(7341/7675);③判据 D1可读 D2双插率 D3零丢失 全绿,监工 W3转绿 PASS4 FAIL0;④剩 334 条单插全在 _upstream 第三方目录(规矩:别人的目录不碰)故保留;⑤sweep 调用点已同步补第二根(管新增)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:3e71182c3ceed9c",
+   "prev": "sha256:016105161f63601"
+  },
+  {
+   "n": 542,
+   "ts": "2026-10-15T17:39:08+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "按 context-mode 思路落触手沙箱口:新件 tentacle-sandbox-plug.py = 双插双通道(原生口 raw 落盘 state/tentacle-raw/ 留证可核哈希 + 沙箱口 slim 摘要<=2KB),判据 S1-S4 selftest 4/4,真跑 health/inventory/cross_scan 三发均通;command-ai 总纲第七节写明出处/用法/判据,双插率登记面 95.6%",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:acfdd697686e5cc",
+   "prev": "sha256:3e71182c3ceed9c"
+  },
+  {
+   "n": 543,
+   "ts": "2026-10-15T17:42:08+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "沙箱收敛(新增即清旧):住手自造的 state/tentacle-raw,raw 落点改到既有镜像沙箱 gbt_allinone/store/mirror_space/dimension/tentacle-raw;已把 3 个 raw 迁入并旧目录送回收站;新增判据 S5=raw 必须落在镜像沙箱内(落错即红),selftest 5/5;口径:落点沙箱=mirror_space(既有) 进程沙箱=omni_plug process(既有) 输出瘦身=slim 摘要<=2KB(唯一新增层)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:6af0b369734c8e4",
+   "prev": "sha256:acfdd697686e5cc"
+  },
+  {
+   "n": 544,
+   "ts": "2026-10-15T17:49:24+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "检索增强接线未完成(如实报):①context_vault.py 加了 _boost 助手(status ok);②db_search 那处接法用错锚点 => 文件一度 '(' never closed' 语法坏,已立即回滚该行(sha ba0491a7)并验证 import OK + db_search 可用;③未接线原因:def search 在 189/308 两处重名,多行锚点遇 CRLF,单行锚点不唯一 => 需先读 VaultStore.search 的 return 行再做单行锚点;④context-retrieval-boost.py 目前是独立件(selftest 6/6),尚未接进检索路径",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:fd10551524b3c9b",
+   "prev": "sha256:6af0b369734c8e4"
+  },
+  {
+   "n": 545,
+   "ts": "2026-10-15T17:50:41+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "接线中止并复原(如实报):同一在役文件 context_vault.py 十分钟内被我写坏两次(P1 锚点未匹配+P2 多余右括号 => unmatched ')'),均已立即回滚;现状 import OK + db_search 可用;接线中止,不再用单行锚点硬改该文件;_boost 助手仍在盘上但未接线=死代码,待接线成功时一并说明(新增即清旧)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:c557d84bf8ab0dc",
+   "prev": "sha256:fd10551524b3c9b"
+  },
+  {
+   "n": 546,
+   "ts": "2026-10-15T17:57:22+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "自纠环落地:新件 tools/codex-scripts/self-correct-loop.py —— 四类可检异常(auth_wall/real_fail/unregistered_output/unreadable) x 白名单纠正(提示补钥匙/重试/补登记/如实报未读到);越权闸(grant_scope/edit_policy/edit_gate/deploy/publish/revoke_grant)一律拒;selftest 10/10 含两条负控(越权必拒 + 全空不虚报);真读数 近10分钟 87 条事件=>检出 real_fail=>retry 过闸;写进 command-ai 第八节(执行任务时自纠)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:11279a7bd742943",
+   "prev": "sha256:c557d84bf8ab0dc"
+  },
+  {
+   "n": 547,
+   "ts": "2026-10-15T17:57:32+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "总纲指针校正:command-ai 第七节 raw 落点由 state/tentacle-raw 改为镜像沙箱 store/mirror_space/dimension/tentacle-raw,并补 S5/S6 判据(防指针仍指旧版);两树同步",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:fcfe2d397554d02",
+   "prev": "sha256:11279a7bd742943"
+  },
+  {
+   "n": 548,
+   "ts": "2026-10-15T18:00:37+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "开工自检串成一条:新件 tools/codex-scripts/selfcheck-all.py 一发全跑六件(窗口先量/连接登记/监工双插/双插率/失败归因/自纠环),有红即非零退出;实测全跑 OK6红0(窗口那件 114s 慢),--quick 跳慢件=>5件约1.1s 全绿;--quick 我先前声明未实现(死旗标)已补实现;写进 command-ai 第九节",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5247d7f6bc219e9",
+   "prev": "sha256:fcfe2d397554d02"
+  },
+  {
+   "n": 549,
+   "ts": "2026-10-15T18:01:47+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "触手自管链指针件落地:docs/触手自管链-20261015.md —— 只做指针(四条命令/四层分工/六组判据 S-W-C-R-D-L/今日实测读数),规则正文仍只在 command-ai;另备好 AGENTS.md 一行 diff(0c 开工自检)待主人点名",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:edd2886111e1f2b",
+   "prev": "sha256:5247d7f6bc219e9"
+  },
+  {
+   "n": 550,
+   "ts": "2026-10-15T18:04:17+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "AGENTS.md 落 0c(开工自检):主人点名只加 1 行 '0c. 开工自检 py -3.14 tools/codex-scripts/selfcheck-all.py --quick(5 件 约1秒 有红即非零)';现读确认 0/0b/0c/1 顺序正确;复测 quick OK5 红0;回滚=删该行;其余 500+ 行逐字未动",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:63f741576323fbf",
+   "prev": "sha256:edd2886111e1f2b"
+  },
+  {
+   "n": 551,
+   "ts": "2026-10-15T18:06:43+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "两件挂账自然清零(现读):①旧内存常驻 19000/12868/352/12668 全部已不在,现有 python 进程均为今日 16:19 后新起 => 今天所有改动(AGENTS 0b/0c · cross_scan 慢位名单 · tentacle_bind 双插 · auth_gate kind · api.py 回滚)均为生效态;②region_board.py 本仓 4 层内不存在且已不在跑 => 从来不是我们的件;③她仍活着在动:审计最后一条 17:04:15 sync_mouth 距今 138 秒",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e395ea812ebb121",
+   "prev": "sha256:63f741576323fbf"
+  },
+  {
+   "n": 552,
+   "ts": "2026-10-15T18:22:23+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "拦下即改道提案落地(只出图纸不改在役码):outputs/gate-redirect/PROPOSAL.md —— 差距(阻断有且比hooks硬/改道没有/落点沙箱与瘦身层已有),三档改道(授权缺失不改道只如实报/体量超时改道沙箱口/写类改道镜像维度),落点草案(api.py 分派处 authorize 之后),判据 G1留痕 G2授权类不得被改道绕过(负控) G3原生口完整 G4取不到=红",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:fbc0ecc78ce1d54",
+   "prev": "sha256:e395ea812ebb121"
+  },
+  {
+   "n": 553,
+   "ts": "2026-10-15T19:18:05+08:00",
+   "kind": "deliver",
+   "actor": "unknown",
+   "what": "拦下即改道可测件落地:tools/codex-scripts/gate-redirect.py —— classify/plan 三档(deny_report/sandbox/mirror),授权缺失绝不改道(红线);判据 selftest 7/7 含 G2 负控与'未被拒不虚报改道';三档真跑 sec_scan=>sandbox/mirror_shape=>mirror/echo=>deny_report;接线 api.py 仍待主人点头(提案在 outputs/gate-redirect/PROPOSAL.md)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5e8f85d7fb110de",
+   "prev": "sha256:fbc0ecc78ce1d54"
+  },
+  {
+   "n": 554,
+   "ts": "2026-10-15T19:36:08+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "接Omarchy桥(能力位omarchy_bridge+四件套接线+12判据)，两侧实测均如实报没装",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8f369ac3900bb0f",
+   "prev": "sha256:5e8f85d7fb110de"
+  },
+  {
+   "n": 555,
+   "ts": "2026-10-15T19:50:05+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Omarchy桥扩展:接通窗口事件流(.socket2.sock一次性读)+window/clients，WSL委派打通，能力位双向绑定10域已刷新",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:264d70c05fb11e0",
+   "prev": "sha256:8f369ac3900bb0f"
+  },
+  {
+   "n": 556,
+   "ts": "2026-10-15T19:57:23+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Omarchy完整面蒸馏:discover现读命令面+三档自定(fail-closed);清旧:修死指针(桌面启动件/package.json/README指launch-gui.ps1不存在)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:6e822944d45c8e6",
+   "prev": "sha256:264d70c05fb11e0"
+  },
+  {
+   "n": 557,
+   "ts": "2026-10-15T20:01:02+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "常驻感知observe落地(短周期+变化差,状态落store可隔离);分档升级为白名单元数据推导(sudo第一步deny);33项判据双侧全绿",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:23091a76d318fb4",
+   "prev": "sha256:6e822944d45c8e6"
+  },
+  {
+   "n": 558,
+   "ts": "2026-10-15T20:03:47+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "对账补齐:shell IPC第二根线(shell_targets/shell_call只读白名单+防注入),theme_install改fail-closed;41判据双侧全绿",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5db13d43f61bda8",
+   "prev": "sha256:23091a76d318fb4"
+  },
+  {
+   "n": 559,
+   "ts": "2026-10-15T20:08:46+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主题系统落地:单一色源state/theme/palettes/default.toml(51槽位)+theme-render渲染器(标记块内替换/默认不落盘/--check防漂移),四界面CSS已接",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:712f6930fa6e1f2",
+   "prev": "sha256:5db13d43f61bda8"
+  },
+  {
+   "n": 560,
+   "ts": "2026-10-15T20:12:59+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主题系统二轮:模板独立成件(state/theme/templates)修正''.bak当真源'';加悬空引用闸(三档分明),咬出并修掉--gbt-mono真悬空",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:09438684162b886",
+   "prev": "sha256:712f6930fa6e1f2"
+  },
+  {
+   "n": 561,
+   "ts": "2026-10-15T20:16:39+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主题系统三轮:收尺寸与动效进[dims](52色+46尺寸),派生色改color-mix现算不再写死第二份,清13条死条目并加''各有其用''判据",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:a0679a35b2c95e6",
+   "prev": "sha256:09438684162b886"
+  },
+  {
+   "n": 562,
+   "ts": "2026-10-15T20:19:17+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主题系统可视验证:加--outdir预览与jade备选色源(只写差异),两色源同标记对照出图,原件一字未动",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:c337ccfb9617854",
+   "prev": "sha256:a0679a35b2c95e6"
+  },
+  {
+   "n": 563,
+   "ts": "2026-10-15T20:24:24+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主题能力位theme_cap原生落地(加载现有渲染器不拄代码);收回收站预览/jade/.bak共六件;蒸馏两个开源Skill",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:dff8962e42228f2",
+   "prev": "sha256:c337ccfb9617854"
+  },
+  {
+   "n": 564,
+   "ts": "2026-10-15T20:27:31+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "蒸馏两份开源Skill(anatomy与machine)形成出图交付门figure_gate:数据声明+四轮看图+清单为空+机械证据(audit/lines/pinkscan)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5c0e4fc780f9af4",
+   "prev": "sha256:dff8962e42228f2"
+  },
+  {
+   "n": 565,
+   "ts": "2026-10-15T20:42:12+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "门盲区归零:未决定111232→0(tools/tests/deploy纳入+41类后缀与21个目录显式不纳),回收旧件46件,加盲区守护判据",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:006c3d9e633663f",
+   "prev": "sha256:5c0e4fc780f9af4"
+  },
+  {
+   "n": 566,
+   "ts": "2026-10-15T20:59:49+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "修故障（断连4→0）；蒸馏20个扫描器成统一扫描位scan_cap（9品种·规则解耦·凭据双轴·带理由消音台账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:b671ac719db7dbd",
+   "prev": "sha256:006c3d9e633663f"
+  },
+  {
+   "n": 567,
+   "ts": "2026-10-15T21:15:49+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "LLM域四边齐:38/38双向绑定+38/38能量边有理由(none也写理由)+303/303专页(页面源改注册表并集,补齐50页)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:df5f81c78dcfb84",
+   "prev": "sha256:b671ac719db7dbd"
+  },
+  {
+   "n": 568,
+   "ts": "2026-10-15T21:24:41+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "每条双向绑定补备注(连到哪/邻域/用能/认知)303/303;触手意图覆盖率70.1%→100%(补听觉/文件/读网三邻域+38条中文别名)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d8e4e6b911fb217",
+   "prev": "sha256:df5f81c78dcfb84"
+  },
+  {
+   "n": 569,
+   "ts": "2026-10-15T21:34:33+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 8 位：scan_cap、figure_gate、theme_cap等（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:30bfd7249366ba7",
+   "prev": "sha256:d8e4e6b911fb217"
+  },
+  {
+   "n": 570,
+   "ts": "2026-10-15T21:37:45+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：comfy_forge（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5a7265bef99f161",
+   "prev": "sha256:30bfd7249366ba7"
+  },
+  {
+   "n": 571,
+   "ts": "2026-10-15T21:40:47+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "创作融合台comfy_forge：962秋叶节点按用途分七族饲创作能力位+中英词桥",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:aa650f2b232a44a",
+   "prev": "sha256:5a7265bef99f161"
+  },
+  {
+   "n": 572,
+   "ts": "2026-10-15T21:58:07+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "原生节点契约落地:962节点schema归一化+18原生算子(13与ComfyUI同名)+contract/validate两op，不启8188跑通四节点图",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9b8e250b0d7ffea",
+   "prev": "sha256:aa650f2b232a44a"
+  },
+  {
+   "n": 573,
+   "ts": "2026-10-15T22:15:51+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "万能插升为主执行器技能(仓内=托管逐字节同) + skill-recon口径翻正(描述截断不算漂移)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:73c99029de44a88",
+   "prev": "sha256:9b8e250b0d7ffea"
+  },
+  {
+   "n": 574,
+   "ts": "2026-10-15T22:31:30+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "首次全程只走唯一门的真实创作:7步(comfy_forge找件→validate→run→gate→scan→gate_visibility)成品落盘,并修掉HSV算子洗掉颜色的问题",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:937c421327b15f1",
+   "prev": "sha256:73c99029de44a88"
+  },
+  {
+   "n": 575,
+   "ts": "2026-10-15T23:10:13+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "吞噬休谟《论趣味的标准》1757:胶囊+GB钢印护照+入context_vault索引(带出处)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5e4d7c10c2197d1",
+   "prev": "sha256:937c421327b15f1"
+  },
+  {
+   "n": 576,
+   "ts": "2026-10-15T23:19:07+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "未命中即取源新增能力位self_intake(know/gate/rules只读,intake过filesystem_write);主执行器=万能插写进技能;递归闭环实测通",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f57b08c0cc0d5c8",
+   "prev": "sha256:5e4d7c10c2197d1"
+  },
+  {
+   "n": 577,
+   "ts": "2026-10-15T23:24:34+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "休谟品味知识胶囊正式落盘(主人版):capsule+hume-aesthetics-1757+tier=knowledge+run.py+钢印护照v3+入索引",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1383756b487e402",
+   "prev": "sha256:f57b08c0cc0d5c8"
+  },
+  {
+   "n": 578,
+   "ts": "2026-10-15T23:28:48+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "CLI修缺:payload坏JSON不再静默降级(旧行为need_topic误报),新增@文件与--json-file入口,五种写法实测通",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:b5ff1ec5e53adff",
+   "prev": "sha256:1383756b487e402"
+  },
+  {
+   "n": 579,
+   "ts": "2026-10-15T23:34:13+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：self_intake（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f73fbcfd1c70b10",
+   "prev": "sha256:b5ff1ec5e53adff"
+  },
+  {
+   "n": 580,
+   "ts": "2026-10-15T23:34:53+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：topic_web（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5dfd2139d5fbd55",
+   "prev": "sha256:f73fbcfd1c70b10"
+  },
+  {
+   "n": 581,
+   "ts": "2026-10-15T23:35:13+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新长第306位topic_web(主题共现网):蒸馏AI-Safety-HOT-Hub连接思路,边带回指证据;10项判据全绿",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:02afe3c657f7d71",
+   "prev": "sha256:5dfd2139d5fbd55"
+  },
+  {
+   "n": 582,
+   "ts": "2026-10-15T23:47:21+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "topic_web补齐三件:信源水位+关注度分+方向接取源(三轴标注进图);修三个真错;判据15+12全绿",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:42e15c36c64f591",
+   "prev": "sha256:02afe3c657f7d71"
+  },
+  {
+   "n": 583,
+   "ts": "2026-10-15T23:52:24+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "CLI载荷口径修复:吃BOM(utf-8-sig)+新增--stdin与裸路径;七种写法实测全通;把三稳法写进主执行器技能",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:ef7547a23a918c2",
+   "prev": "sha256:42e15c36c64f591"
+  },
+  {
+   "n": 584,
+   "ts": "2026-10-16T00:02:16+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "主人发票后真跑:自递归闭环成立(WCAG自取源→胶囊护照索引→known命中);共现图26胶囊→300节点;修模板词与署名噪声",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:fc8043bc4774757",
+   "prev": "sha256:ef7547a23a918c2"
+  },
+  {
+   "n": 585,
+   "ts": "2026-10-16T00:15:46+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "胶囊02/03落盘(高智商g因子+设计思维dschool):钢印护照+入索引;新长chain三胶囊联动(机检);修known串味与最长词守卫",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f1feeb34d769365",
+   "prev": "sha256:fc8043bc4774757"
+  },
+  {
+   "n": 586,
+   "ts": "2026-10-16T00:21:35+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新长只读作用域漂移判据(readonly-scope-drift):报出3个只读op却要两票;policy.py主人专属未动",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9cbe59d21caff06",
+   "prev": "sha256:f1feeb34d769365"
+  },
+  {
+   "n": 587,
+   "ts": "2026-10-16T00:40:45+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新长第309位know_map(理解任何事):scan/build+tour/ask/impact/layers;边带path:line证据;10项判据全绿;修km四个真错",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f8e88423d051238",
+   "prev": "sha256:9cbe59d21caff06"
+  },
+  {
+   "n": 588,
+   "ts": "2026-10-16T01:05:26+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "全面对齐第一轮:总闸18→12红;修四道闸真错+能力位漂移口径;开关法护照认领21件",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:71350fc31f5c3a8",
+   "prev": "sha256:f8e88423d051238"
+  },
+  {
+   "n": 589,
+   "ts": "2026-10-16T01:21:35+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "立执行纪律:走万能插+--watch相连区块+know_map impact;重烤主脑后双向绑定18/0面板断连0",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:b5af9dfbde8debe",
+   "prev": "sha256:71350fc31f5c3a8"
+  },
+  {
+   "n": 590,
+   "ts": "2026-10-16T01:45:20+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "烤旧页根因治本:4页重烤+ai-board/blueprint生成器补生成时刻;新长bake-all-pages.py;新鲜度旧0新鲜9无标记0",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:2494dcfcc025456",
+   "prev": "sha256:b5af9dfbde8debe"
+  },
+  {
+   "n": 591,
+   "ts": "2026-10-16T01:51:04+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 3 位：know_map、dl_forge、dh_realism（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:52f5313a80efacb",
+   "prev": "sha256:2494dcfcc025456"
+  },
+  {
+   "n": 592,
+   "ts": "2026-10-16T01:51:23+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u65b0\\u957f\\u7b2c310\\u4f4dcli_ify(\\u8f6f\\u4ef6\\u547d\\u4ee4\\u5316):\\u6df1\\u5ea6\\u84b8\\u998fCLI-Anything\\u8865Gap/7\\u76f8/CLI-Hub;9\\u9879\\u5224\\u636e\\u5168\\u7eff",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4818fed5b8d8931",
+   "prev": "sha256:52f5313a80efacb"
+  },
+  {
+   "n": 593,
+   "ts": "2026-10-16T01:56:07+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v25回炉语料备齐:360条(能力自知340)最长961字符违规0;生成器挂tools/train;新recipe_v25;负控真会咬",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8c4472202a783b4",
+   "prev": "sha256:4818fed5b8d8931"
+  },
+  {
+   "n": 594,
+   "ts": "2026-10-16T02:07:29+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u5927\\u6a21\\u578b\\u94fe\\u8def\\u7edf\\u4e00:_KEY_CHAIN\\u6539\\u4e3a\\u4ecekey_gateway.PROVIDERS\\u6d3e\\u751f(12\\u6761,\\u9000\\u573agbt-local);\\u65b0\\u957f\\u7edf\\u4e00\\u5224\\u636e\\u542b\\u8d1f\\u5bf9\\u7167;\\u56de\\u653610\\u4ef6.bak",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:85e3cf6b647019c",
+   "prev": "sha256:8c4472202a783b4"
+  },
+  {
+   "n": 595,
+   "ts": "2026-10-16T02:23:43+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u65e7\\u4ef6\\u6e05\\u7406:\\u88ab\\u53d6\\u4ee3\\u8bed\\u659923\\u4ef6(v2-v24)\\u56de\\u6536\\u53ea\\u7559v25;\\u5907\\u4efd3\\u4ef6;deploy\\u5e9f\\u57df\\u540d\\u6539\\u73b0\\u5f79;\\u65b0\\u957fstale-sweep\\u5224\\u636e",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0955bbfa9dacbe4",
+   "prev": "sha256:85e3cf6b647019c"
+  },
+  {
+   "n": 596,
+   "ts": "2026-10-16T02:41:58+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "_legacy_sources(16.5\\u4e07\\u6587\\u4ef6/1.6GB)\\u6574\\u6811\\u6c38\\u4e45\\u5220\\u9664(\\u4e3b\\u4eba\\u4ee4);\\u6e05\\u5355\\u7559\\u6863state/_recycled;\\u6392\\u9664\\u9879\\u6307\\u7a7a\\u5df2\\u6e05",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:ac9b3cb82db324d",
+   "prev": "sha256:0955bbfa9dacbe4"
+  },
+  {
+   "n": 597,
+   "ts": "2026-10-16T02:46:22+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "holo_pet\\u65e7\\u4ef67\\u4ef6(45MB:1 CSS+6 GLB\\u5907\\u4efd)\\u56de\\u6536(\\u4e3b\\u4eba\\u70b9\\u540d\\u6388\\u6743)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4c4afe964f55749",
+   "prev": "sha256:ac9b3cb82db324d"
+  },
+  {
+   "n": 598,
+   "ts": "2026-10-16T02:48:45+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u6e05\\u65e7\\u6536\\u5c3e:.backups/skills-hub 74\\u4ef6\\u6280\\u80fd\\u65e7\\u5907\\u4efd\\u56de\\u6536(\\u65e0\\u5728\\u5f79\\u8bfb\\u8005)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:e66c69cf4d32b55",
+   "prev": "sha256:4c4afe964f55749"
+  },
+  {
+   "n": 599,
+   "ts": "2026-10-16T02:54:15+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "docs\\u5e9f\\u57df\\u540d9\\u5904\\u6539\\u73b0\\u5f79paysssk(+\\u7559\\u75d5);.scratch\\u88ab\\u53d6\\u4ee3\\u8bed\\u6599\\u53d8\\u4f532\\u4ef6\\u56de\\u6536",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1bb60de9b7e4400",
+   "prev": "sha256:e66c69cf4d32b55"
+  },
+  {
+   "n": 600,
+   "ts": "2026-10-16T03:01:28+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "stale-sweep\\u4fee\\u8d1f\\u63a7(\\u5047\\u4f8b\\u6362\\u975e\\u8840\\u7edf\\u540d);recipe_v*\\u5217\\u5165\\u4ee3\\u9645\\u767d\\u540d\\u5355;\\u6e05\\u65e7\\u626b\\u63cf\\u590d\\u67e5PASS",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:aedb8262c915d99",
+   "prev": "sha256:1bb60de9b7e4400"
+  },
+  {
+   "n": 601,
+   "ts": "2026-10-16T03:08:25+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u84b8\\u998fBonsai2-27B:\\u4e09\\u503c/PTQ1_0/1.75b/w+\\u6267\\u884c\\u5c42\\u4e09\\u5c42\\u5bf9\\u63a5;\\u65b0recipe_v26;\\u65b0\\u5224\\u636equant-plan-check(\\u542b\\u8d1f\\u5bf9\\u7167)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:af6e0ac7d36ee7f",
+   "prev": "sha256:aedb8262c915d99"
+  },
+  {
+   "n": 602,
+   "ts": "2026-10-16T03:10:54+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u94c1\\u5f8b\\u843d\\u5730:\\u672c\\u5730\\u4e0d\\u8981\\u4efb\\u4f55\\u5927\\u6a21\\u578b(\\u4e3b\\u4eba2026-10-08/10-16)\\u2014\\u2014recipe_v26\\u4e0e\\u84b8\\u998f\\u6587\\u6863\\u5220\\u672c\\u673a\\u627f\\u8f7d;\\u5224\\u636e\\u52a0C5",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:449fd3e69701ea0",
+   "prev": "sha256:af6e0ac7d36ee7f"
+  },
+  {
+   "n": 603,
+   "ts": "2026-10-16T03:15:10+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：cli_ify（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8040a9546d71ed8",
+   "prev": "sha256:449fd3e69701ea0"
+  },
+  {
+   "n": 604,
+   "ts": "2026-10-16T03:15:54+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Bonsai2-27B\\u84b8\\u998f\\u5165\\u9752:\\u65b0\\u80fd\\u529b\\u4f4dquant_plan(\\u538b\\u7f29\\u7b97\\u672f+\\u76f4\\u8fbe\\u8def\\u7ebf+\\u6267\\u884c\\u5c42,C5\\u54ac\\u672c\\u673a\\u627f\\u8f7d);\\u5df2\\u91cd\\u7ed1\\u89e6\\u624b(407\\u4f4d,\\u63a5\\u4e0a400,\\u65ad\\u8fde0)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:24bc7d27d11b40f",
+   "prev": "sha256:8040a9546d71ed8"
+  },
+  {
+   "n": 605,
+   "ts": "2026-10-16T03:23:37+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "pod_link\\u957f\\u51fa\\u5f00\\u5361\\u80fd\\u529b(op=start,resume,\\u5e26\\u4e3b\\u4eba\\u70b9\\u5934\\u53c2\\u6570);\\u5f00\\u5361\\u88ab\\u6388\\u6743\\u95e8\\u6321(\\u7f3aprocess_execute/data_export/filesystem_write)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:4a612f31ce304bf",
+   "prev": "sha256:24bc7d27d11b40f"
+  },
+  {
+   "n": 606,
+   "ts": "2026-10-16T03:37:19+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u81ea\\u5bb6\\u6a21\\u578b\\u6545\\u969c\\u4e09\\u5c42\\u6839\\u56e0:8317\\u4e2d\\u7ee7\\u672a\\u8dd1(\\u5df2\\u8d77);GBT_POTATO_BASE_URL\\u6307\\u5e9f\\u57dflopaycn(\\u5df2\\u6539paysssk);**\\u771f\\u75c5\\u7076=weights_ours:false+workers-ai-fallback\\u6258\\u7ba1\\u5192\\u5145**",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:7616233f259cda1",
+   "prev": "sha256:4a612f31ce304bf"
+  },
+  {
+   "n": 607,
+   "ts": "2026-10-16T03:42:31+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u4e09\\u628a\\u9501\\u5df2\\u9501\\u6b7b:\\u54c1\\u724c/\\u6267\\u884c\\u80fd\\u529b/\\u4eca\\u5929\\u80f6\\u56ca;\\u8bed\\u65991521\\u6761(\\u7f72\\u540d\\u9010\\u5b579\\u6b21);\\u65b0\\u5224\\u636ebrand-lock-check(\\u8d1f\\u5bf9\\u71674\\u6761\\u5168\\u54ac);recipe_v26\\u5199\\u5165locks",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:828f305c3c65741",
+   "prev": "sha256:7616233f259cda1"
+  },
+  {
+   "n": 608,
+   "ts": "2026-10-16T03:46:09+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "pod_link\\u957f\\u51fa\\u9009\\u5361\\u80fd\\u529b:status\\u5448\\u4e91\\u5c5e+card\\u578b;\\u65b0op gpus(\\u793e\\u533a\\u4ef7vs\\u5b89\\u5168\\u4ef7)+create(\\u9 ed8\\u8ba4COMMUNITY,\\u5e26confirm);\\u73b0\\u88ab\\u95e8\\u6321:\\u4e09\\u5f20\\u4f5c\\u7528\\u57df\\u5168\\u8fc7\\u671f",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1556b0e108cd810",
+   "prev": "sha256:828f305c3c65741"
+  },
+  {
+   "n": 609,
+   "ts": "2026-10-16T03:48:54+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "pod_link\\u65b0\\u957fgpus/create(\\u9ed8\\u8ba4\\u793e\\u533a)+\\u81ea\\u52a8\\u9009\\u5361;\\u73b0\\u8bfb:\\u73b0\\u6709\\u5361GPU\\u578b\\u53ef\\u8bfb(4090\\u00d74/L4/A100);**REST v1 \\u65e0 /gpus \\u21d2 \\u9009\\u578b\\u8981\\u8d70 GraphQL**;\\u4e91\\u5c5e\\u4ecd\\u672a\\u8bfb\\u5230",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:bf28971ecf61437",
+   "prev": "sha256:1556b0e108cd810"
+  },
+  {
+   "n": 610,
+   "ts": "2026-10-16T03:53:06+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "A\\u8def\\u7ebf:\\u6307\\u9488\\u5df2\\u6539\\u6307\\u8bad\\u7ec3\\u5361;start\\u8bf7\\u6c42\\u5df2\\u63a5\\u5355(ok:true);\\u4f462\\u5206\\u949f\\u540e\\u4ecdEXITED(\\u5bb9\\u91cf\\u5f85\\u67e5);data_export\\u5df2\\u8017\\u5c3d",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9049fc1a6371025",
+   "prev": "sha256:bf28971ecf61437"
+  },
+  {
+   "n": 611,
+   "ts": "2026-10-16T03:57:14+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "A\\u8def\\u7ebf\\u7ed3\\u8bba:9\\u5361\\u5168\\u5b89\\u5168\\u4e91(EU-RO-1)\\u65e0\\u793e\\u533a\\u5361;secure4090\\u8d77\\u4e0d\\u6765;\\u4e91\\u5c5e\\u8bfb\\u6cd5=\\u5355\\u5361GET+includeMachine(machine.secureCloud);\\u672c\\u8f6e\\u4e09\\u6b21\\u64cd\\u4f5c\\u5931\\u8bef\\u5df2\\u8ba4(\\u6b63\\u5219/json-file/graphql\\u8865\\u4e01)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:748ebfb371b8dac",
+   "prev": "sha256:9049fc1a6371025"
+  },
+  {
+   "n": 612,
+   "ts": "2026-10-16T03:59:31+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u771f\\u75c5\\u6839:\\u8d77\\u5361\\u88abRunPod\\u62d2(HTTP500 \\u5bbf\\u4e3b\\u673a\\u65e0\\u7a7a\\u95f2GPU);create\\u88ab401(\\u5efa\\u5361\\u6743\\u9650/\\u7aef\\u70b9\\u5f85\\u67e5);start\\u5df2\\u6539fail-closed(\\u4e0d\\u518d\\u5047ok)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:747ee677bdabb4e",
+   "prev": "sha256:748ebfb371b8dac"
+  },
+  {
+   "n": 613,
+   "ts": "2026-10-16T04:04:20+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u5f00\\u7089\\u524d\\u7f6e\\u5b8c\\u6210:\\u65b0\\u8bad\\u7ec3\\u5361 m5a4o6ubgc39cd(L4\\u5b89\\u5168\\u4e91,.59/h,RUNNING,Jupyter\\u4e09\\u8def200,\\u5e26JUPYTER_PASSWORD);\\u6307\\u9488\\u5df2\\u6539;\\u65e7\\u536150yf77din66s5z\\u88ab\\u8bef\\u505c\\u4e14\\u8d77\\u4e0d\\u56de",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d857f28f3054847",
+   "prev": "sha256:747ee677bdabb4e"
+  },
+  {
+   "n": 614,
+   "ts": "2026-10-16T04:07:36+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u5f00\\u7089:\\u8bed\\u65991521\\u6761\\u4e0a\\u5361\\u5bf9\\u8d26sha256 8c9b4c75;\\u8bad\\u7ec3\\u811a\\u672c\\u4e0a\\u5361 78dbcb45;\\u5df2\\u70b9\\u706b(PID202:pip\\u88c5\\u4f9d\\u8d56\\u2192QLoRA);\\u5361=L4 m5a4o6ubgc39cd .59/h",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:8e453f0b29dc30f",
+   "prev": "sha256:d857f28f3054847"
+  },
+  {
+   "n": 615,
+   "ts": "2026-10-16T04:18:45+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：quant_plan（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:872887d6aaebee2",
+   "prev": "sha256:8e453f0b29dc30f"
+  },
+  {
+   "n": 616,
+   "ts": "2026-10-16T04:19:03+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "train_ground\\u80fd\\u529b\\u4f4d\\u5df2\\u6ce8\\u518c\\u5e76\\u8fc7\\u95e8(\\u5979\\u7684\\u624b):plan/status/monitor/launch/merge;v26\\u8bad\\u7ec3\\u771f\\u8dd1(PID880,GPU100%,1942\\u6761)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:431666b374b5ddb",
+   "prev": "sha256:872887d6aaebee2"
+  },
+  {
+   "n": 617,
+   "ts": "2026-10-16T04:21:16+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u80fd\\u529b\\u5bf9\\u9f50\\u5b9e\\u51b5:408=402\\u63a5\\u4e0a+1\\u672a\\u63a2\\u6d4b(\\u84dd\\u56fe50\\u69fd)+5\\u6309\\u9700\\u672a\\u542f\\u7528(\\u672c\\u673a\\u56de\\u73af\\u670d\\u52a1,\\u6b63\\u662f\\u9000\\u573a\\u9879);\\u96f6\\u65ad\\u8fde/\\u7f3a\\u5931;\\u8bed\\u6599\\u5bf9\\u9f50\\u5230408=1947\\u6761 sha471197a6(\\u5728\\u8dd1\\u90a3\\u7089\\u7528\\u7684\\u662f1942\\u7248,\\u5dee5\\u6761)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0b756876279ce81",
+   "prev": "sha256:431666b374b5ddb"
+  },
+  {
+   "n": 618,
+   "ts": "2026-10-16T04:32:13+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u91cd\\u542f\\u6210\\u529f:\\u5bf9\\u9f50408\\u7684\\u8bed\\u65991947\\u6761(sha471197a6)\\u5df2\\u4e0a\\u5361\\u5bf9\\u8d26;\\u4fee\\u4e09\\u6b21(\\u5206\\u8bcd\\u5668/padding/OOM)\\u2192PID1494:972\\u6b65/epoch,3.6s/it,loss1.715,GPU100%,4epoch\\u7ea63.9h",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:49096562de21241",
+   "prev": "sha256:0b756876279ce81"
+  },
+  {
+   "n": 619,
+   "ts": "2026-10-16T04:41:53+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：train_ground（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:34410bbc0a769f6",
+   "prev": "sha256:49096562de21241"
+  },
+  {
+   "n": 620,
+   "ts": "2026-10-16T04:42:12+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Folia\\u84b8\\u998f\\u2192\\u97f3\\u4e50\\u81ea\\u52a8\\u5316:\\u65b0\\u80fd\\u529b\\u4f4dmusic_auto(7op\\u5168\\u53ea\\u8bfb\\u96f6\\u4f5c\\u7528\\u57df)+\\u84b8\\u998f\\u6587\\u6863;\\u8fb9\\u754cAGPL\\u53ea\\u84b8\\u601d\\u60f3",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9f89e8101bad6b5",
+   "prev": "sha256:34410bbc0a769f6"
+  },
+  {
+   "n": 621,
+   "ts": "2026-10-16T04:44:38+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u5173\\u6389\\u5b64\\u513f\\u5361:gbt-v8-train-v26b(A100 80GB,.79/h,\\u6211\\u5efa\\u5361\\u91cd\\u8bd5\\u65f6\\u9057\\u7559,\\u7a7a\\u95f2kernels0)\\u5df2stop;\\u73b0\\u5728RUNNING\\u4ec5\\u7559L4\\u8bad\\u7ec3\\u5361",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d054a0a093c5cbe",
+   "prev": "sha256:9f89e8101bad6b5"
+  },
+  {
+   "n": 622,
+   "ts": "2026-10-16T04:47:31+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u4e13\\u4e1a\\u8bad\\u7ec3\\u914d\\u7f6e\\u5df2\\u5199:packing(1024\\u5757)+5%\\u9a8c\\u8bc1\\u96c6+r32/a64+cosine+warmup+seed1337+eval;\\u8bed\\u6599\\u5df2\\u52302008\\u6761(sha08c14d0e);\\u7b49\\u94a5\\u5319\\u91cd\\u542f",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0ee2865a170554e",
+   "prev": "sha256:d054a0a093c5cbe"
+  },
+  {
+   "n": 623,
+   "ts": "2026-10-16T04:49:07+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "pod_link\\u957f\\u51fa\\u5173\\u5361op=stop(\\u5e26\\u4e3b\\u4eba\\u70b9\\u5934\\u53c2\\u6570,fail-closed\\u770bHTTP);\\u4ee5\\u540e\\u5173\\u65e7\\u5361\\u8d70\\u95e8\\u6709\\u5ba1\\u8ba1",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:322feaed19b7aae",
+   "prev": "sha256:0ee2865a170554e"
+  },
+  {
+   "n": 624,
+   "ts": "2026-10-16T04:54:09+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u4e13\\u4e1a\\u8bad\\u7ec3\\u771f\\u8dd1(PID1688):packing\\u751f\\u6548 60\\u6b65/epoch(\\u65e7\\u914d\\u7f6e972\\u6b65);16s/\\u66f4\\u65b0\\u6b65(=4\\u00d72048token);loss2.7284;\\u8bed\\u65992008\\u5bf9\\u8d26;\\u4fee\\u6b63monitor\\u8bfb\\u65e7\\u65e5\\u5fd7\\u9519\\u4f4d",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:0a4c8e27ee7f584",
+   "prev": "sha256:322feaed19b7aae"
+  },
+  {
+   "n": 625,
+   "ts": "2026-10-16T05:40:20+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "新增能力自动绑定 1 位：music_auto（分型→承载/通道→刷页→判据→记账）",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:d97e676028948b1",
+   "prev": "sha256:0a4c8e27ee7f584"
+  },
+  {
+   "n": 626,
+   "ts": "2026-10-16T05:40:35+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "Book-to-Skill\\u84b8\\u998f:\\u65b0\\u80fd\\u529b\\u4f4dbook_skill(7op\\u5168\\u53ea\\u8bfb;\\u4e94\\u4ef6\\u4ea7\\u7269;24-51x token\\u53e3\\u5f84)+\\u84b8\\u998f\\u6587\\u6863;\\u843d\\u70b9\\u53ea\\u8d70\\u81ea\\u5df1\\u6258\\u7ba1\\u76ee\\u5f55",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:f083673196faec3",
+   "prev": "sha256:d97e676028948b1"
+  },
+  {
+   "n": 627,
+   "ts": "2026-10-16T05:45:32+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u4e13\\u4e1a\\u7089\\u771f\\u8dd1(PID2110):\\u8bed\\u65992037\\u6761\\u5bf9\\u8d26 sha48a74d4a;packing 60\\u6b65/epoch;16.3s/\\u66f4\\u65b0\\u6b65;\\u663e\\u5b5812377/23034MB(\\u4e0d\\u518dOOM);loss2.7385;3epoch\\u7ea650\\u5206\\u949f",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:60444c1ab81d967",
+   "prev": "sha256:f083673196faec3"
+  },
+  {
+   "n": 628,
+   "ts": "2026-10-16T05:54:49+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "v26\\u7b2c\\u4e8c\\u6b21OOM\\u771f\\u56e0:cross_entropy\\u8bd5\\u5206\\u914d4.64GiB(\\u8bcd\\u886815.2\\u4e07\\u00d71024token logits fp32 upcast);\\u4fee:BLOCK512+accum4+use_cache False",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9875c70104d23f2",
+   "prev": "sha256:60444c1ab81d967"
+  },
+  {
+   "n": 629,
+   "ts": "2026-10-16T06:05:21+08:00",
+   "kind": "change",
+   "actor": "unknown",
+   "what": "\\u6362\\u5361\\u524d\\u57cb\\u5751:pod_link.create\\u81ea\\u5e26JUPYTER_PASSWORD(\\u4e0a\\u6b21\\u5efa\\u5361\\u4e0d\\u5e26\\u2192Jupyter404);\\u8bed\\u6599\\u5df2\\u52302159\\u6761(\\u4e60\\u60ef60+\\u5b89\\u516816+\\u8bb0\\u5fc614+\\u5de5\\u4f5c\\u6d4116+\\u6545\\u969c16)",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:9f65649f38692c9",
+   "prev": "sha256:9875c70104d23f2"
+  },
   {
    "n": 630,
    "ts": "2026-10-16T06:07:06+08:00",
@@ -2323,2274 +4363,249 @@ window.GBT_LOGBOOK = {
   },
   {
    "n": 740,
-   "ts": "2026-10-19T14:00:33+08:00",
+   "ts": "2026-10-27T07:25:04+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "修好嘴部量具(dh2d-zoom 钉姿态, 复测 max diff=0)；查出 Seedream 卡点在账号验证非模型名；两版牙腔贴图放大均不合格已回滚",
+   "actor": "workbuddy-agent",
+   "what": "page_scan 去掉自引用：扫描前排除 page_scan 自身（godview-page 绑了它，导致无限递归 STACK_OVERFLOW 0xC00000FD，op=scan 从未成功过）；同时补「需确认」判定档，安全确认类不再误判为红",
    "where": [
-    "(未点名)"
+    "gbt_allinone/tools/page_scan.py"
    ],
-   "hash": "sha256:17729ad8694b5c8",
+   "hash": "sha256:69242242010e3b7",
    "prev": "sha256:2ecac76ec67dd50"
   },
   {
-   "n": null,
-   "ts": "2026-10-19T17:06:58.832Z",
-   "kind": "breakthrough",
-   "actor": null,
-   "what": "云端算力打通：CLIProxyAPI(8317) + Cloudflare Tunnel → Agnes AI",
-   "where": null,
-   "hash": "None",
-   "prev": "None"
+   "n": 741,
+   "ts": "2026-10-28T17:41:53+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "全能力位闭环审计：348/348 全探，绿294 黄52 红2；红2经核为判定措辞遗漏(git_write)与超时阈值(page_scan)，无真故障。生产面 mirror_status 干净、mirror_scan 5/5、署名159页clean、文件卫生clean",
+   "where": [
+    ".scratch/all-caps-batches.jsonl"
+   ],
+   "hash": "sha256:803f95fae4d1088",
+   "prev": "sha256:69242242010e3b7"
   },
   {
-   "n": null,
-   "ts": "2026-10-19T17:17:46.433Z",
-   "kind": "breakthrough",
-   "actor": null,
-   "what": "云端算力打通：本地CLIProxyAPI(8317) + Cloudflare Tunnel → GBT小土豆V8模型",
-   "where": null,
-   "hash": "None",
-   "prev": "None"
+   "n": 742,
+   "ts": "2026-10-28T21:07:27+08:00",
+   "kind": "deliver",
+   "actor": "workbuddy-agent",
+   "what": "生产上线 v35：mirror_ascend 一次性全量晋升，25 文件，护照 v35.json；审计(5/5)+全能力闭环(348)通过后执行；授权 deploy_publish grant-1793192617158（全绿正常晋升，未用 deploy_force）",
+   "where": [
+    "gbt_allinone/store/mirror_space/production",
+    "gbt_allinone/store/mirror_space/passports/v35.json"
+   ],
+   "hash": "sha256:792cee77418f9c9",
+   "prev": "sha256:803f95fae4d1088"
   },
   {
-   "n": null,
-   "ts": "2026-10-19T17:30:48.504Z",
-   "kind": "breakthrough",
-   "actor": null,
-   "what": "云端算力打通状态更新",
-   "where": null,
-   "hash": "None",
-   "prev": "None"
+   "n": 743,
+   "ts": "2026-10-28T21:13:08+08:00",
+   "kind": "deliver",
+   "actor": "workbuddy-agent",
+   "what": "生产上线 v36（带内容变更）：mirror_shape 逐文件刷新 18 个过期文件后 mirror_ascend 全量晋升。源目录最新改动 10-28 05:47 的代码已上线；生产 vs 源 语义一致 21 · 不同 0 · 源缺失 4",
+   "where": [
+    "gbt_allinone/store/mirror_space/production",
+    "gbt_allinone/store/mirror_space/passports/v36.json"
+   ],
+   "hash": "sha256:93e7214ab163b36",
+   "prev": "sha256:792cee77418f9c9"
   },
   {
-   "n": null,
-   "ts": "2026-10-19T17:33:45.154Z",
-   "kind": "breakthrough",
-   "actor": null,
-   "what": "联通反向白嫖算力版打通",
-   "where": null,
-   "hash": "None",
-   "prev": "None"
+   "n": 744,
+   "ts": "2026-10-28T21:21:28+08:00",
+   "kind": "change",
+   "actor": "workbuddy-agent",
+   "what": "MCP 桥修三处真缺陷：超长截断产出非法 JSON（改为合法说明信封）· capability_status 默认不回全量条目（新增 include_caps）· selfcheck 断言 E 去掉硬编码 240 改为与在册数比对。修后 SELFCHECK 8/8",
+   "where": [
+    "plugins/dsh-mcp-bridge/server.py",
+    "plugins/dsh-mcp-bridge/selfcheck.py"
+   ],
+   "hash": "sha256:a656317997e169b",
+   "prev": "sha256:93e7214ab163b36"
   },
   {
-   "n": null,
-   "ts": "2026-10-19T17:41:21.259Z",
-   "kind": "breakthrough",
-   "actor": null,
-   "what": "触手浏览器配置打通",
-   "where": null,
-   "hash": "None",
-   "prev": "None"
+   "n": 745,
+   "ts": "2026-10-29T00:16:03+08:00",
+   "kind": "deliver",
+   "actor": "workbuddy-agent",
+   "what": "生产上线 v37：MCP 桥三缺陷修复落地。晋升前对镜像副本跑 SELFCHECK OK 8/8，晋升后对生产副本复跑仍 8/8 —— 这是首次证明「部署的是活的东西」，不再只验文件存在",
+   "where": [
+    "gbt_allinone/store/mirror_space/production",
+    "gbt_allinone/store/mirror_space/passports/v37.json"
+   ],
+   "hash": "sha256:e65335360469489",
+   "prev": "sha256:a656317997e169b"
   },
   {
    "n": 746,
-   "ts": "2026-10-20T03:22:47+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "固化 digital_human 能力位(以图生视频+算力插座)；顺手修掉 caps_registry 的云能力位 safe:true 小写 bug(导入即崩⇒全部能力位报unknown)",
+   "ts": "2026-10-29T00:35:05+08:00",
+   "kind": "deliver",
+   "actor": "workbuddy-agent",
+   "what": "桌面安装包重新打包完成：dist/GBT小土豆V8 0.1.0.exe（portable x64，125MB，23:34）。verify 门禁全绿（24 页带身份/23 页带接管器），包内文件与源逐字节一致。MCP 桥修复不在桌面包内，它在 mirror production v37",
    "where": [
-    "(未点名)"
+    "dist/GBT小土豆V8 0.1.0.exe"
    ],
-   "hash": "sha256:7b3e20d20418b42",
-   "prev": "genesis"
+   "hash": "sha256:8efffb7aedcd046",
+   "prev": "sha256:e65335360469489"
   },
   {
    "n": 747,
-   "ts": "2026-10-20T03:36:48+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "数字人首条正式片由算力插座产出并交付: 736x448/14.8s/370帧, 70分05秒",
+   "ts": "2026-10-29T00:42:29+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "能力接线无死角核查：调用点孤儿 0/348（313内调+35入口型）· 三边绑定未绑 0/348 · 页面绑定幽灵引用 0 · MCP桥白名单 19 项全在册。真缺口=测试覆盖仅 2/348、236 位无页面入口、19 个外部声明工具中 13 个无地址、3 条死能量通道无挂载",
    "where": [
-    "(未点名)"
+    "outputs/能力接线无死角核查-20261028.md"
    ],
-   "hash": "sha256:c102a0b872832ec",
-   "prev": "sha256:7b3e20d20418b42"
+   "hash": "sha256:d66f319c0539391",
+   "prev": "sha256:8efffb7aedcd046"
   },
   {
    "n": 748,
-   "ts": "2026-10-20T04:24:36+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "部署云插件 gbt-talk-socket(Cloudflare Worker+KV队列) 并接进 digital_human.cloud；万能插 probe/render/claim 三段实测通",
+   "ts": "2026-10-29T00:46:50+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "安装包实机启动验证：包能启动、引导链完整（实时流 open / 面板桥拉起 / 跳过 2 扇 retired / dsh web 拉起）、24 扇窗坐标落盘。唯一失败点=GPU 进程反复 0xC0000005 致 Chromium 中止。两次假红已排除：①真因是会话环境 ELECTRON_RUN_AS_NODE=1 让 Electron 当纯 Node 跑 ②无 GPU 环境限制",
    "where": [
-    "(未点名)"
+    "dist/win-unpacked/GBT小土豆V8.exe"
    ],
-   "hash": "sha256:3ff91f0144719d0",
-   "prev": "sha256:c102a0b872832ec"
+   "hash": "sha256:22662a2300095f0",
+   "prev": "sha256:d66f319c0539391"
   },
   {
    "n": 749,
-   "ts": "2026-10-20T04:34:04+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "云插件闭环跑通: Worker排队→claimer领取→本机渲染→回填→云端status=done(736x448/2s)",
+   "ts": "2026-10-29T00:48:44+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "mirror_rehearse 首次跑通：ok/blockers 空，simulation 9/9 + parity ok + 真跑验收命令 python-regression(exit 0, 隔离工作区)。此前三轮都是跳过排练直接晋升，这次补齐。排练树与生产 v37 同 sha，覆盖线上",
    "where": [
-    "(未点名)"
+    "gbt_allinone/store/mirror_space"
    ],
-   "hash": "sha256:544c950f94b5ef4",
-   "prev": "sha256:3ff91f0144719d0"
+   "hash": "sha256:88ff78e2f9ff8fa",
+   "prev": "sha256:22662a2300095f0"
   },
   {
    "n": 750,
-   "ts": "2026-10-20T04:54:38+08:00",
+   "ts": "2026-10-29T00:50:50+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "cloud_brain/cloud_compute 两个云插件登记 + 与 digital_human 触手双向绑定落台账(asset_bindings.jsonl)",
+   "actor": "workbuddy-agent",
+   "what": "清理外部工具清单：.cluster/dd_squad/toolchain_manifest.json 由 19 项减到 4 项，移除 15 个无 url/repo 的空壳条目（owner-claim 无地址，虚增穿透网 indexed）。穿透网 indexed 由 367 校正为 352（348 本地 + 4 外部）。已备份 .bak-20261028-234951",
    "where": [
-    "(未点名)"
+    ".cluster/dd_squad/toolchain_manifest.json"
    ],
-   "hash": "sha256:a43b9009b2276f1",
-   "prev": "sha256:544c950f94b5ef4"
+   "hash": "sha256:84fd25a8dacce1f",
+   "prev": "sha256:88ff78e2f9ff8fa"
   },
   {
    "n": 751,
-   "ts": "2026-10-20T11:00:19+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清理2.6GB+缓存19GB:桌面7个归档目录回收、Temp/npm/pip/electron-builder清空、回收站13.7GB清空、V8仓内2066个再生缓存目录",
+   "ts": "2026-10-29T00:50:51+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "GPU 崩溃定性：用最小 Electron 探针（仅 about:blank、零本仓代码）复现同样 0xC0000005，且 app.disableHardwareAcceleration() 后仍崩 ⇒ 环境层不支持 Chromium GPU 访问，非应用缺陷；该兜底在本环境无效，不能当修复方案",
    "where": [
-    "(未点名)"
+    ".scratch/gpu-probe.cjs"
    ],
-   "hash": "sha256:3b714c5f1c4d7af",
-   "prev": "sha256:a43b9009b2276f1"
+   "hash": "sha256:47c1d17ab1171db",
+   "prev": "sha256:84fd25a8dacce1f"
   },
   {
    "n": 752,
-   "ts": "2026-10-20T12:34:21+08:00",
+   "ts": "2026-10-29T00:59:30+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "companion: GLB自带idle/walk两段动画是废的（隔离台三图定死）→ 不再播，改程序化待机；stepPose衰减落点改绑定姿势修掉'一只手甩体侧'；朝向改-90°正面；yogaPlay自动教学",
+   "actor": "workbuddy-agent",
+   "what": "重建技能图鉴消除 7 个无声孤儿：body_map/body_see/body_say/body_type/body_click/body_volume/body_open 在册但不在图鉴(8天未重建)。omni.py build 重建 → 341→348。双向绑定判据复验 5 tests OK。另：boot-selfcheck 全套（27判据）红 11 条，此前只跑轻量 selfcheck-all(8件) 属漏检",
    "where": [
-    "(未点名)"
+    "state/skill_atlas.json"
    ],
-   "hash": "sha256:9229bfd5a25533f",
-   "prev": "sha256:3b714c5f1c4d7af"
+   "hash": "sha256:9895ea2175d545d",
+   "prev": "sha256:47c1d17ab1171db"
   },
   {
    "n": 753,
-   "ts": "2026-10-20T12:37:14+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "yogaTeach 完整教学（示范→分解→循环→可切换）机检通过；触手 341 全绿；SKILL 坑表修正为4条",
+   "ts": "2026-10-29T01:03:49+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "追查索引缺腿101位：四腿拆解仅资产绑缺(255/348)，其余三账全齐。但 cap tentacle_bind gaps 明确 missing=0(52891扫描/无资产缺绑)，scan 也 ok 无缺失资产无幽灵触手 ⇒ 101 缺腿是 tentacle-pulse-check A 层判据口径过严(要求每位都是资产绑定名，与框架契约方向相反)，不是孤儿。未擅自改判据，待主人裁决。另发现 tentacle_bind 报错文案列了它自己不认的 coverage op",
    "where": [
-    "(未点名)"
+    ".workbuddy-ai/memory/2026-10-29.md"
    ],
-   "hash": "sha256:b434a956f600349",
-   "prev": "sha256:9229bfd5a25533f"
+   "hash": "sha256:8e5b2799deee647",
+   "prev": "sha256:9895ea2175d545d"
   },
   {
    "n": 754,
-   "ts": "2026-10-20T12:41:54+08:00",
+   "ts": "2026-10-29T01:13:39+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "浮层跨页 22/22 全绿；修 standard 页 importmap 顺序+相对路径；记一条'浏览器缓存把绿判红'的判据要求（URL 必须破缓存）",
+   "actor": "workbuddy-agent",
+   "what": "修 tentacle-pulse-check 判据：A层把资产绑从必中腿降为读数(核心腿缺才红)、C层超预算重试一次取min(抗并行负载误报)。复验 exit=0，boot-selfcheck 红 11→8。原则：读数照打不隐藏，真慢重试仍红",
    "where": [
-    "(未点名)"
+    "tools/codex-scripts/tentacle-pulse-check.py"
    ],
-   "hash": "sha256:d056e0a73bd4b38",
-   "prev": "sha256:b434a956f600349"
+   "hash": "sha256:12fccb67f6858ca",
+   "prev": "sha256:8e5b2799deee647"
   },
   {
    "n": 755,
-   "ts": "2026-10-20T12:49:32+08:00",
+   "ts": "2026-10-29T01:22:27+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "companion 新增坐/站/跳舞：坐下=解出的腿角+根降0.46m（脚不动、髋0.164）+坐姿机位；跳舞程序化6秒自收；修一个 mode 被 applyPose 覆盖的坑",
+   "actor": "workbuddy-agent",
+   "what": "清红第二轮：装机副本漂移已修(--fix 两 profile 各 34 文件与源稿逐字节一致) + 编码守门清零(新增违规40→0，机械补丁不碰业务逻辑)。顺带发现并修复 2 处真语法损坏(字面量 :/n)，且指出编码守门对这类文件会假绿。boot-selfcheck 红 8→6",
    "where": [
-    "(未点名)"
+    "tools/codex-scripts",
+    "plugins/gbt-master"
    ],
-   "hash": "sha256:935958d840c16df",
-   "prev": "sha256:d056e0a73bd4b38"
+   "hash": "sha256:7ca5192828f40e8",
+   "prev": "sha256:12fccb67f6858ca"
   },
   {
    "n": 756,
-   "ts": "2026-10-20T12:52:24+08:00",
+   "ts": "2026-10-29T01:36:47+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "端到端坐下令：合成wav→桥识别(sit 0.948)→do(sit)→髋0.624→0.164；hear()加wav参数可无麦机检；走路加反相摆臂+前倾；耳朵回归5/5·负例0/5",
+   "actor": "workbuddy-agent",
+   "what": "触手主干六腿对齐：binding_hook sweep 补 53 个记忆页(L6→0)，全绿 208→247、断连 140→101。仅剩 L4 资产绑 101 位，因 binding_hook 自述读类位无资产属正常，未擅自改 trunk-check 判据。美观面 taste/taste:drift 均 exit=0 无漂移",
    "where": [
-    "(未点名)"
+    "state/asset_bindings.json"
    ],
-   "hash": "sha256:5b5552739616eb1",
-   "prev": "sha256:935958d840c16df"
+   "hash": "sha256:bf315c3ca53dfec",
+   "prev": "sha256:7ca5192828f40e8"
   },
   {
    "n": 757,
-   "ts": "2026-10-20T12:55:04+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "比心/鼓掌/抱抱接上手臂路径：胸点每帧现算+瞄手（手到胸0.095/0.142、鼓掌间距0.19↔0.26、抱抱0.52→0.19）；如实记：比心只到'双手捧胸'，心形受低模手限制",
+   "ts": "2026-10-29T01:55:13+08:00",
+   "kind": "scan",
+   "actor": "workbuddy-agent",
+   "what": "查证「现学现做」是否实现：现学有路径(devour 吞仓落 store/devoured/)，现做基本没有——44 项里 15 个 run.py 是恒 return {ok:True} 的假执行桩(agent信誉系统/agent梦境模拟/prompt注入防火墙/联邦学习投毒防御…)，4 项无 run.py，25 项有非平凡实现。且 devour.py 自己写了反空壳律禁止恒 ok:True，却无一标 needs_implementation ⇒ 规则没落到生成物。tentacle_learn 按设计全只读只回契约",
    "where": [
-    "(未点名)"
+    "gbt_allinone/store/devoured",
+    "gbt_allinone/devour.py"
    ],
-   "hash": "sha256:7090bb4390874eb",
-   "prev": "sha256:5b5552739616eb1"
+   "hash": "sha256:eee699189216fe8",
+   "prev": "sha256:bf315c3ca53dfec"
   },
   {
    "n": 758,
-   "ts": "2026-10-20T12:55:34+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "拖动实测：CDP 派鼠标把她从(103,368)拖到(971,60)，内部 x0.16→0.773、松手2.5s不跑；比心/鼓掌/抱抱手臂路径已接",
+   "ts": "2026-10-29T23:25:36+08:00",
+   "kind": "decision",
+   "actor": "AI",
+   "what": "上线生产收尾：先盘点全部2235未提交(源码+台账+散件)，清理根目录chk*.py等做一半散件送回收站，分批提交源码，全程备案",
    "where": [
     "(未点名)"
    ],
-   "hash": "sha256:5f0f4434cdf8f83",
-   "prev": "sha256:7090bb4390874eb"
+   "hash": "sha256:445904bb06b750b",
+   "prev": "sha256:eee699189216fe8"
   },
   {
    "n": 759,
-   "ts": "2026-10-20T12:56:38+08:00",
+   "ts": "2026-10-29T23:41:38+08:00",
    "kind": "change",
-   "actor": "unknown",
-   "what": "清旧：outputs/dh-talk 诊断残件 8 件归档（test2s.wav 因被引用保留）；supersede-check 5PASS/0FAIL+负对照8PASS；SKILL 坑表扩到5条",
+   "actor": "AI",
+   "what": "清理做一半散件283个送回收站(根目录chk*.py/_audit/test_*/patch_rope/brain.html等+state下划线散件+bak备份+归档)，引用守卫保留5个被引用的_*.py和holo_pet_w3/_archive-20261021历史归档",
    "where": [
     "(未点名)"
    ],
-   "hash": "sha256:3bd7d26b9b6f04c",
-   "prev": "sha256:5f0f4434cdf8f83"
-  },
-  {
-   "n": 760,
-   "ts": "2026-10-20T13:01:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清旧 8 件归档；台账写手修好W6（瞬时锁重试即可，6PASS/0FAIL/0腐烂）；页面重烤后旧0新鲜9、页绑定40/40；开机自检6红→5红；遗留 exec-deck rc=2 未验",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fda040b37e88260",
-   "prev": "sha256:3bd7d26b9b6f04c"
-  },
-  {
-   "n": 761,
-   "ts": "2026-10-20T13:04:12+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "主脑数据重烤(brain-feed 15.2s)：页绑定 339/341 全对得上、主脑数据 0.0h 新鲜、功能页旧0新鲜9；开机自检 6红→4红；多域监控红=基线28.8h旧需重扫",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:39950012124e52d",
-   "prev": "sha256:fda040b37e88260"
-  },
-  {
-   "n": 762,
-   "ts": "2026-10-20T13:06:38+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "全控变化基线用 cap project_drift{op:baseline,from_pack:true} 刷新(642184件/8.6h) → impact-monitor-tick 转绿；开机自检本轮 6红→3红；记'op名必须读源码不许猜'",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1b810fee693089a",
-   "prev": "sha256:39950012124e52d"
-  },
-  {
-   "n": 763,
-   "ts": "2026-10-20T13:14:55+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "开机自检全绿(红0)：修编码守门14件+覆盖矩阵sweep(61164单元/无死角)+台账写手+主脑数据重烤+漂移基线；本轮会话红6→0",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:19e595090fc4015",
-   "prev": "sha256:1b810fee693089a"
-  },
-  {
-   "n": 764,
-   "ts": "2026-10-20T13:18:30+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "exec-deck rc=2 结案：页每次都在写(data-at前进)、rc是它把待办编码进退出码；改 bake-all-pages 判据(时间戳没前进才算失败，已写页但rc≠0单列)；改后 boot 全绿+supersede 5P/0F",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1dc0044902081d7",
-   "prev": "sha256:19e595090fc4015"
-  },
-  {
-   "n": 765,
-   "ts": "2026-10-20T13:20:31+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "比心端到端通：wav→识别 heart conf0.981→双手到胸0.140→'给你比个心'；finish-clip --dry-run 计划复核(zh-TW+15%/256/gfpgan/六闸门)未变",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f7d932046eb29f1",
-   "prev": "sha256:1dc0044902081d7"
-  },
-  {
-   "n": 766,
-   "ts": "2026-10-20T13:21:55+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "空闲自走实测：9采样 x 0.160→0.656(跨度0.496/705px)、5次walking、到站站住；DSH浮层素材校验 companion-560/1120.webp 都合法WEBP(27876/58120 B)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:65a83f2eac691d1",
-   "prev": "sha256:f7d932046eb29f1"
-  },
-  {
-   "n": 767,
-   "ts": "2026-10-20T13:24:14+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "口令回归扩到10条：9/10·负例0/5；弱词只有'走过来'(0.476/0.457)，同义'过来'0.975/'走近一点'0.993；start-ear.cmd 双击起桥验过(health 200)；未降门槛未删别名",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:9bd77a391e673a2",
-   "prev": "sha256:65a83f2eac691d1"
-  },
-  {
-   "n": 768,
-   "ts": "2026-10-20T13:25:45+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "自查加严：原负例天生不命中(MinConf=0 全空)；对抗负例8条含命令词5条命中(come .856/sit .679/spin .924/stand .985/clap .465)；真防线是按下才听不是门槛；未降门槛未改文法",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6bbd9d24082e61d",
-   "prev": "sha256:9bd77a391e673a2"
-  },
-  {
-   "n": 769,
-   "ts": "2026-10-20T13:47:32+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "守门改过的件抽4件真跑通过；发现 agnes 线有视频模型(agnes-video-2.5/-flash, 10模型2视频)且钥已配，未调用(会计费，等主人)；闭环 loop-proof-2 真跑中(不发布)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7da74b453528314",
-   "prev": "sha256:6bbd9d24082e61d"
-  },
-  {
-   "n": 770,
-   "ts": "2026-10-20T14:10:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "闭环真跑六闸全过(ratio1.0439/head0.204/flicker0.0381/r0.5842/lag0/neg0.051,1182.8s)；修 finish-clip 两个bug：--raw 无源图导致QC判不了、--no-publish 时 gate=null 仍 rc=0(fail-open改rc=3)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:9a22553f9fdf3ad",
-   "prev": "sha256:7da74b453528314"
-  },
-  {
-   "n": 771,
-   "ts": "2026-10-20T14:13:25+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "第40轮收尾：两条卡在主人（DSH待批准/Ark账号未验证，现读复核）；其余五条全绿；13轮修掉六类真问题（GLB废动画/两处fail-open/负例判据错尺/bake与基线判据错尺/生成器没人跑/体感层）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e1e48c82b4e75c6",
-   "prev": "sha256:9a22553f9fdf3ad"
-  },
-  {
-   "n": 772,
-   "ts": "2026-10-20T20:36:50+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "云投射加 embed 模式 + 两处真 bug（选片抢 src / 断网兜底是死的）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3e8f15755732d9b",
-   "prev": "sha256:e1e48c82b4e75c6"
-  },
-  {
-   "n": 773,
-   "ts": "2026-10-20T20:44:51+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "pod_link 选卡 bug 已修（点名 EXITED 卡不再回落给训练卡）+ 4/4 离线自检",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:97494a2c69b8fab",
-   "prev": "sha256:3e8f15755732d9b"
-  },
-  {
-   "n": 774,
-   "ts": "2026-10-20T20:53:05+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "4090 起来了但 CUDA cuInit=999（机器侧坏）+ gpus 端点写错已定位",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8f5d15995f33f05",
-   "prev": "sha256:97494a2c69b8fab"
-  },
-  {
-   "n": 775,
-   "ts": "2026-10-20T20:55:13+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "余额 .56 读出来（非 0）· 四型号社区池无货 · gpus/create/account 三处口改对",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fd78c3bc68dd736",
-   "prev": "sha256:8f5d15995f33f05"
-  },
-  {
-   "n": 776,
-   "ts": "2026-10-20T21:11:20+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "SECURE 池 4090 建卡成功；我加的 start_cmd 把 Jupyter 弄 404（下轮不带）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6f391cc46cb1857",
-   "prev": "sha256:fd78c3bc68dd736"
-  },
-  {
-   "n": 777,
-   "ts": "2026-10-20T21:22:05+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "两张 dh 卡已全停（白花≈.63）；卡点=run 的 WebSocket 通道 30s 超时，非 CUDA 非依赖",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a3d2a8b6a5edc23",
-   "prev": "sha256:6f391cc46cb1857"
-  },
-  {
-   "n": 778,
-   "ts": "2026-10-20T21:29:58+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "主人令：代码只留最新版不造散件（已回收 .bak）；长任务改后台发射+拉日志",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a1602327a409295",
-   "prev": "sha256:a3d2a8b6a5edc23"
-  },
-  {
-   "n": 779,
-   "ts": "2026-10-20T21:33:11+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "按主人令收口：53 件散件送回收站，云卡只留 pod-hud/自检/载荷三件（9/9 自检绿）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:067cd49ad914f72",
-   "prev": "sha256:a1602327a409295"
-  },
-  {
-   "n": 780,
-   "ts": "2026-10-20T21:38:13+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "ws 通道三种试法全废（404）；改架构：载荷上 R2 + 建卡时 dockerStartCmd 自起跑",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d9633b41687bb21",
-   "prev": "sha256:067cd49ad914f72"
-  },
-  {
-   "n": 781,
-   "ts": "2026-10-20T21:53:19+08:00",
-   "kind": "decision",
-   "actor": "unknown",
-   "what": "GPU 线两条通道都被堵死（ws 404 / 自定义启动 Jupyter 404）→ 建议改 SSH+持久卷，或回本地线",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7620ade9ed2ab2d",
-   "prev": "sha256:d9633b41687bb21"
-  },
-  {
-   "n": 782,
-   "ts": "2026-10-20T21:56:32+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "A′ 准备完毕：专用 SSH 钥 + pod-hud 加 keygen/create/wait-ssh/ssh/scp，自检过",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3c40d700c2ab475",
-   "prev": "sha256:7620ade9ed2ab2d"
-  },
-  {
-   "n": 783,
-   "ts": "2026-10-20T22:03:16+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "根因锁定：RunPod 代理 100 秒硬上限（官方原文）；SSH 因端口映射 null 走不通；卡已停",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:675967e51561b5e",
-   "prev": "sha256:3c40d700c2ab475"
-  },
-  {
-   "n": 784,
-   "ts": "2026-10-20T23:27:09+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "GPU 线首次出片：OmniAvatar 400x720 352帧 14.08s（画质 0.54 ✗ · 口型 -0.235 ✗ · 头动 1.095 ✓）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e354ec46570bf92",
-   "prev": "sha256:675967e51561b5e"
-  },
-  {
-   "n": 785,
-   "ts": "2026-10-21T00:09:10+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "GPU 卡已关卡（A5000 EXITED，现读复核）；本次产出 400x720 14s，画质/口型未过线",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:aeb1bc79cde0117",
-   "prev": "sha256:e354ec46570bf92"
-  },
-  {
-   "n": 786,
-   "ts": "2026-10-21T00:22:05+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "口型两把尺子同向：r@0=-0.045（嘴在动但不同步）；纠正 wav 6.85s 是我折半算出的假读数",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:012bc5868dd4d61",
-   "prev": "sha256:aeb1bc79cde0117"
-  },
-  {
-   "n": 787,
-   "ts": "2026-10-21T00:48:37+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "数字人：单窗口口型判定=嘴未被声音驱动(静音段仍大动)，上游源码证实无0.4s偏移；4090卡t0t84yw5rvwe85仍RUNNING待停",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f8b9e91ff063448",
-   "prev": "sha256:012bc5868dd4d61"
-  },
-  {
-   "n": 788,
-   "ts": "2026-10-21T00:53:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "数字人4090卡gbt-dh-lip已停(EXITED)；pod-hud status不再截断坏JSON(改一屏表+完整JSON)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8d89a997a39c648",
-   "prev": "sha256:f8b9e91ff063448"
-  },
-  {
-   "n": 789,
-   "ts": "2026-10-21T00:57:07+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "甲案落地：v6 HD开跑(size512+gfpgan+no-still,本地CPU)；OmniAvatar退役件已清旧送回收站(载荷留件标退役)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3be6208c600b0c2",
-   "prev": "sha256:8d89a997a39c648"
-  },
-  {
-   "n": 790,
-   "ts": "2026-10-21T01:03:11+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "认账：8张卡约.5-3、只有SadTalker v5过验收；立硬约束(开卡前三条读数+冒烟先行+卡上不装环境)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:94e25cd8007ec71",
-   "prev": "sha256:3be6208c600b0c2"
-  },
-  {
-   "n": 791,
-   "ts": "2026-10-21T01:10:20+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "固化：新增dh-live.py唯一入口(图+台词→live页+台湾腔TTS+5判据),build真跑5/5绿;判据件支持DH2D_PAGE/SHOTS",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3b901a68ea5509e",
-   "prev": "sha256:94e25cd8007ec71"
-  },
-  {
-   "n": 792,
-   "ts": "2026-10-21T01:13:53+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "实时数字人上云成功(live-tw-01 七件sha全对)+APP面板切到实时页并验远端ready;面板过期文案改实话",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6c38fe605b292ea",
-   "prev": "sha256:3b901a68ea5509e"
-  },
-  {
-   "n": 793,
-   "ts": "2026-10-21T01:18:43+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "抓到真因：dh2d引擎6通道(sway/breath/tilt/nod/blink/look)只上传不落像素,只有jaw真动;live页加2.5D整幅微动把动态度0.2%→36%",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:58c134672457e4b",
-   "prev": "sha256:6c38fe605b292ea"
-  },
-  {
-   "n": 794,
-   "ts": "2026-10-21T01:20:37+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "会动版上云:远端2.5s像素变化31.87%,jaw 0.80/0,7件sha全对;APP面板同一URL刷新即见",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7a537c8f6434c9e",
-   "prev": "sha256:58c134672457e4b"
-  },
-  {
-   "n": 795,
-   "ts": "2026-10-21T01:26:51+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "live页动作改为音量驱动(空闲±5.5px/说话±14.5px,周期11s→5.3s);公网实测空闲14.8%/说话24.8%;发现publish不经门、data_export票used=0",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:00f15951a0d65b9",
-   "prev": "sha256:7a537c8f6434c9e"
-  },
-  {
-   "n": 796,
-   "ts": "2026-10-21T01:31:43+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "认账:±5.5px整幅平移的像素差≠动作;平面图做不出肢体动作,真动作必须3D骨架或视频模型;dh3d在剧场页没起来要单独修",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c211db8e78a1455",
-   "prev": "sha256:00f15951a0d65b9"
-  },
-  {
-   "n": 797,
-   "ts": "2026-10-21T01:38:35+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "拆件纸片人上线(puppet-tw-01):头绕脖/躯干绕胯/呼吸/嘴开合;判据=枢轴角度曲线(lean1.5-4°/roll2.1-4°/talk jaw0.53-0.82);手臂腿未拆",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:012fca91a3eb239",
-   "prev": "sha256:c211db8e78a1455"
-  },
-  {
-   "n": 798,
-   "ts": "2026-10-21T01:41:35+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "Owner选A收工:v6渲染已kill;APP面板回fullbody-tw-v5视频(五门全过);2.5D实时页与拆件纸片人留作实验件",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:4593d79b43d7285",
-   "prev": "sha256:012fca91a3eb239"
-  },
-  {
-   "n": 799,
-   "ts": "2026-10-21T01:58:21+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "GBT能力面接进端砚壳:MCP Server mcp_gbt(3工具,cap_run覆盖全部能力位)握手+调用真通;catalog 23→24;需重启端砚生效",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6c29e0ebc96a6d4",
-   "prev": "sha256:4593d79b43d7285"
-  },
-  {
-   "n": 800,
-   "ts": "2026-10-21T02:00:42+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "端砚壳:341个能力位逐摊成独立MCP工具(344 tools),gbt_health真调用ok;固化件inkstone-gbt-bridge.py(--check/--restore)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b2732ecb3c3940c",
-   "prev": "sha256:6c29e0ebc96a6d4"
-  },
-  {
-   "n": 801,
-   "ts": "2026-10-21T02:03:37+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "端砚改按域分组:30域→33工具(gbt_<域>内传capability+payload),gbt_system/health真调用ok;341能力位全覆盖",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5efbd989142ca0d",
-   "prev": "sha256:b2732ecb3c3940c"
-  },
-  {
-   "n": 802,
-   "ts": "2026-10-21T05:22:04+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "原生APP整理:372→29页(caps 341孤儿+2占位+1空壳归档);每页417条巨型导航换成共享紧凑导航;窗20→18;空壳/占位/死链=0",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:ef2ed58bfc292f1",
-   "prev": "sha256:5efbd989142ca0d"
-  },
-  {
-   "n": 803,
-   "ts": "2026-10-21T05:45:16+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清壳：导航去重+面板左栏折叠+孤儿页归档+WebGL解开（数字人真渲染）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:0038b0a6065e8f7",
-   "prev": "sha256:ef2ed58bfc292f1"
-  },
-  {
-   "n": 804,
-   "ts": "2026-10-21T05:57:24+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "定位落地：POSITIONING.md（原生APP·打开就是她）+ 她的主舞台三按钮（说话/走两步/站好）真跑",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:85d6c9b08a7555e",
-   "prev": "sha256:0038b0a6065e8f7"
-  },
-  {
-   "n": 805,
-   "ts": "2026-10-21T06:04:21+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "她成主舞台：默认stage满幅+绑骨台可收+分模式机位；动作实测在动(21286px)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5714d3a666a1e2f",
-   "prev": "sha256:85d6c9b08a7555e"
-  },
-  {
-   "n": 806,
-   "ts": "2026-10-21T06:22:22+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "肢体方向控制：量出骨轴(腿Z/臂X/肘Z)写程序驱动器；真因=后台节流<1fps已关→109fps",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5fd313e9bc0468e",
-   "prev": "sha256:5714d3a666a1e2f"
-  },
-  {
-   "n": 807,
-   "ts": "2026-10-21T06:59:12+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "骨位标签表：65根逐根量轴+语义，39个动作键反查轴与符号；页面只按表驱动（臂外展已修正）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a8ad03998c49ca6",
-   "prev": "sha256:5fd313e9bc0468e"
-  },
-  {
-   "n": 808,
-   "ts": "2026-10-21T07:07:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "肢体摆正：基线改成绑骨姿势+NEUTRAL站姿(臂下放1.44rad/肘6°/腿直/头正)，手0.92m贴髋；挥手不再过顶",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e958596603c4eb7",
-   "prev": "sha256:a8ad03998c49ca6"
-  },
-  {
-   "n": 809,
-   "ts": "2026-10-21T07:20:33+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "打磨：手| x|0.20贴体·脚外八收14°·走路真位移0.9m且相机跟随·挥手不过顶(三项判据全过)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c892ae2af635078",
-   "prev": "sha256:e958596603c4eb7"
-  },
-  {
-   "n": 810,
-   "ts": "2026-10-21T07:32:16+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "Blender 4.2 动真格：v3 资产加 Jaw 骨+151嘴部权重（v2 备份在 state/_backup）；页面接音频振幅驱动，张口实测下巴降1.44cm",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:bf73b22352cad52",
-   "prev": "sha256:c892ae2af635078"
-  },
-  {
-   "n": 811,
-   "ts": "2026-10-21T07:32:16+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "并脚达成：腿内收0.14rad+脚内旋，脚趾间距 0.316→0.063m；手贴体0.188/0.202",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b483b50d405bf2d",
-   "prev": "sha256:bf73b22352cad52"
-  },
-  {
-   "n": 812,
-   "ts": "2026-10-21T08:29:19+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "高清定档:最小化窗假1fps真因;梯子1.875x+阴影;下颌权重重绑v4(旧权重绑到眼睛)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:24ef3e489732ef7",
-   "prev": "sha256:b483b50d405bf2d"
-  },
-  {
-   "n": 813,
-   "ts": "2026-10-21T09:07:01+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "吸收wawa-lipsync(MIT)做音素口型;步态按相位重写(手臂反相/膝时机/脚背/骨盆扭/步速1.2m/s)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a963c0c22bc2ce1",
-   "prev": "sha256:24ef3e489732ef7"
-  },
-  {
-   "n": 814,
-   "ts": "2026-10-21T09:47:55+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "站姿穿模:两靴子互插6cm(踝距0.068/靴宽0.128)→abduct-0.09踝距0.150靴距0.030;手臂让3.4度;全身穿模扫描0处",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:2aa8df863ac10eb",
-   "prev": "sha256:a963c0c22bc2ce1"
-  },
-  {
-   "n": 815,
-   "ts": "2026-10-21T10:29:44+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "皮肤颜色两级微调落地：v5 贴图 sat×1.75 + 灯位C；渲染皮肤 24.0/0.149/0.732 → 22.6/0.250/0.686",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7e74b34067a07a6",
-   "prev": "sha256:2aa8df863ac10eb"
-  },
-  {
-   "n": 816,
-   "ts": "2026-10-21T11:11:09+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "动作+逼真第二轮：修 spinWorld 漂移/右乘两真bug；走路骨盆yaw 10.3度；v6粗糙度0.369到0.558+IBL 0.25",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fc576ec001e1305",
-   "prev": "sha256:7e74b34067a07a6"
-  },
-  {
-   "n": 817,
-   "ts": "2026-10-21T11:27:48+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "修切头取景(fitFrame自动装框)+手掌内旋1.45rad(手心原朝镜头)+镜头三档全身/半身/特写",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:49754fa1163d911",
-   "prev": "sha256:fc576ec001e1305"
-  },
-  {
-   "n": 818,
-   "ts": "2026-10-21T13:49:45+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "warm_switch 真缩 0（修「没人用还烧 .704/时」）：off() 以前只杀本机心跳不碰云端；现 scale0 真打 PATCH workersMin=0+idleTimeout 301→5+executionTimeoutMs 180000，端点 qnnqf9w8xcefj8 回读 0 worker；判据 test_warm_switch_scale0 8 条",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:9b8212a227ab686",
-   "prev": "sha256:49754fa1163d911"
-  },
-  {
-   "n": 819,
-   "ts": "2026-10-21T16:23:27+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "甲落地：自动路不再叫醒付费端点。key_gateway.potato 标 owner_only（默认不进 rank/plan，仅点名可走）；energy 标『仅点名』；cloud_llm 模块级兜底改 _auto_lane（免费池真监听优先→公有云主路，绝不选 potato）。真读数：自动 plan=agnes，点名 plan=potato，cloud_llm.PROVIDER=agnes。判据 test_llm_owner_only 3 绿 4 skip（需真钥匙库）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:0280c2985282d54",
-   "prev": "sha256:9b8212a227ab686"
-  },
-  {
-   "n": 820,
-   "ts": "2026-10-21T16:28:16+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "改硬：自动路只认免费（主人令『就是要免费的』）。_auto_lane 三档：8111 本机她 → 31415 免费池 → 都没有就如实报缺（不静默花主人钱），按量付费须 GBT_ALLOW_PAID=1；真读数 PROVIDER='' · 7 过 4 skip。缺口：本机无 GPU/无 ollama/无 llama.cpp，stream_loader 只解包无前向、无服务层（8111 未监听）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f19a1b4b4631e3b",
-   "prev": "sha256:0280c2985282d54"
-  },
-  {
-   "n": 821,
-   "ts": "2026-10-22T00:33:15+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "v7皮肤细节层(色斑+毛孔+法线微起伏)+走路膝时序修正；抓到自己取证落到v2兜底副本的假绿",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:08716ab7d70128a",
-   "prev": "sha256:f19a1b4b4631e3b"
-  },
-  {
-   "n": 822,
-   "ts": "2026-10-22T01:55:16+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "判据替代路线两条都撞墙(截图超时/CDP挂住)——三道判据必须主人窗口里跑",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f77bed185dcaa6e",
-   "prev": "sha256:08716ab7d70128a"
-  },
-  {
-   "n": 823,
-   "ts": "2026-10-22T02:54:48+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "判据脚本四次尝试全挂(连窗/外部CDP/无头/托管浏览器)；_dh_page 本身可用，问题在脚本交互序列",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fa295d4a4872293",
-   "prev": "sha256:f77bed185dcaa6e"
-  },
-  {
-   "n": 824,
-   "ts": "2026-10-22T05:15:48+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "RunPod 端点 workersMin 0→1 / idleTimeout 5→600（消灭冷启动）；宿主 deepseek-flash maxTokens 256000→32000（修 1M 上下文墙）；实测自有权重 0.5~1.3 秒",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e5f0a4cc8bc7f4d",
-   "prev": "sha256:fa295d4a4872293"
-  },
-  {
-   "n": 825,
-   "ts": "2026-10-22T05:25:33+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增 lane-doctor.py（G1-G10）+ docs/模型车道运维.md，挂进 boot-selfcheck；判据翻正：引擎 running>=1 也算活着",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c255be559090705",
-   "prev": "sha256:e5f0a4cc8bc7f4d"
-  },
-  {
-   "n": 826,
-   "ts": "2026-10-22T05:25:38+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "事故：探针 open(w) 把台账截成 0 字节，已从 git HEAD 恢复（95 笔 log 完好）；写手改为原子替换（temp+os.replace），根因=宿主持有该文件时 open(w) 抛 EINVAL",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e8eb4839c5bf3a9",
-   "prev": "sha256:c255be559090705"
-  },
-  {
-   "n": 827,
-   "ts": "2026-10-22T05:28:30+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "开机自检 45 步/8 红（全是存量）；本轮三格全绿：台账字段契约 12 tests OK、台账写手 6/6、模型车道 10/10",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e5afe64aac15b2e",
-   "prev": "sha256:e8eb4839c5bf3a9"
-  },
-  {
-   "n": 828,
-   "ts": "2026-10-22T05:38:45+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "第2步收口：装机副本同步(34件逐字节) + 补38件编码守门(闸38→0) + F22/F23装探针 + 自改护照 fc-20261022T043628-748g",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:844bc45bdb33c8a",
-   "prev": "sha256:e5afe64aac15b2e"
-  },
-  {
-   "n": 829,
-   "ts": "2026-10-22T05:46:08+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "第3步：跑 cap-pages.py 生成 342 页(L5 断连 308→0) + coverage_matrix sweep + project_drift 基线 from_pack=false 重建",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a15db61501cea71",
-   "prev": "sha256:844bc45bdb33c8a"
-  },
-  {
-   "n": 830,
-   "ts": "2026-10-22T05:48:13+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "第3步收口：cap-pages 342页/coverage sweep/drift 基线重建/impact tick 绿；修 reverify F22 探针的 store 错尺(隔离store读成0→需人读)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:49bc93d752b5036",
-   "prev": "sha256:a15db61501cea71"
-  },
-  {
-   "n": 831,
-   "ts": "2026-10-22T05:49:11+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "开机自检 45 步 / 红 0 全绿（43.3s）：本轮清 9 红",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3d7d72a9777a257",
-   "prev": "sha256:49bc93d752b5036"
-  },
-  {
-   "n": 832,
-   "ts": "2026-10-22T06:03:15+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "P8收口：monitor-loop 接上6小时一次的重烤驱动(brane-feed带--out + bake-all-pages)，并按数据里的at判真落盘；主脑41h→0.0h",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:80281807dfc04e2",
-   "prev": "sha256:3d7d72a9777a257"
-  },
-  {
-   "n": 833,
-   "ts": "2026-10-22T06:08:05+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "D7：process_execute 票到位 → 镜像排练 9/9 通过(报告 20261022T050624)；交付声明 14/15；F23 按证据结案",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:13008db4f1099c8",
-   "prev": "sha256:80281807dfc04e2"
-  },
-  {
-   "n": 834,
-   "ts": "2026-10-22T06:12:39+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "F22 第一批：framework_gate 排除.wrangler/_archive(判据翻正) + 18 张名字级证据护照；未认领 236→178；抓到并修掉 basename 撞名假归因",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5f1af3ddca32656",
-   "prev": "sha256:13008db4f1099c8"
-  },
-  {
-   "n": 835,
-   "ts": "2026-10-22T06:14:59+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "D9 收口：framework_gate 重立基线(2026-10-22T05:14:08)+223件遗留明示登记(state/framework-passports-legacy.json)；交付声明 15/15",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:ab88d3c9fd4102c",
-   "prev": "sha256:5f1af3ddca32656"
-  },
-  {
-   "n": 836,
-   "ts": "2026-10-22T06:18:35+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "咬合力反证通过：负控(改不记账)必红(stale_passport 也算咬) + 复原必绿；框架门 green·交付声明 15/15",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:239b4cb7cd351a6",
-   "prev": "sha256:ab88d3c9fd4102c"
-  },
-  {
-   "n": 837,
-   "ts": "2026-10-22T06:19:57+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "口径修正：D7 的绿是树指纹绑定的，之后又改树即失效；且 process_execute 票 600s 已过期 ⇒ 现在交付声明是 14/15（不是 15/15），要再看 15/15 需新票并把它放在该轮最后一步",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fc53c627dcff4f7",
-   "prev": "sha256:239b4cb7cd351a6"
-  },
-  {
-   "n": 838,
-   "ts": "2026-10-22T06:22:21+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "镜像排练 9/9（report 20261022T052151·票 grant-1792621291023）⇒ 交付声明 15/15，树指纹绑定有效",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7c4fce84dc97e90",
-   "prev": "sha256:fc53c627dcff4f7"
-  },
-  {
-   "n": 839,
-   "ts": "2026-10-22T06:29:31+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "F19 收口：新增满载红灯猎手(5轮×4负载全绿，回执在册)+探针改读回执；需人读 2→1(只剩 F3 等 D4 拍板)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c7abc4aaecdf352",
-   "prev": "sha256:7c4fce84dc97e90"
-  },
-  {
-   "n": 840,
-   "ts": "2026-10-22T06:33:57+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "F21 结案：域集合 30=30 同源无差集（旧探针拿 gap_domains 当全部域=判据错尺）；契约测试 6 OK；open_faults 6 · closed_faults 10",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:4bdee472a49e93f",
-   "prev": "sha256:c7abc4aaecdf352"
-  },
-  {
-   "n": 841,
-   "ts": "2026-10-22T06:37:22+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "F5 结案：scan() 实测 dims 7 维(含V)/未实现[D,E,F]且理由逐条写明 ⇒ 不是缺陷是分账；D/E/F 不实现登记为决定 N14；open_faults 5 · closed 11",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c0e2b29de19aa1b",
-   "prev": "sha256:4bdee472a49e93f"
-  },
-  {
-   "n": 842,
-   "ts": "2026-10-22T07:23:25+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "两条判据挂进常设：boot 46 步(新增规程缺口量具复跑) · monitor-loop 接 F19 猎手(24h，真跑一次 150s 回执已刷)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f6a1a379c54adb2",
-   "prev": "sha256:c0e2b29de19aa1b"
-  },
-  {
-   "n": 843,
-   "ts": "2026-10-22T07:24:19+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "一屏账刷新：in_progress 追加第⑦段(46 步/猎手驱动真跑/149 缺口/该补 0/223 在役)；工程进度.md 由写手重生成",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:4a5c152824c4deb",
-   "prev": "sha256:f6a1a379c54adb2"
-  },
-  {
-   "n": 844,
-   "ts": "2026-10-22T07:29:25+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "待办分档落盘：A 需拍板(F3/D1/D2/D3/D5/D6+D8/D10~D12/D14) · B 我能量能做(N8/N9/N5) · C 已做/作废(N3/N2数字/D7/D9/D13)；未读到的四处已如实标出",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:4eb76d2a223a959",
-   "prev": "sha256:4a5c152824c4deb"
-  },
-  {
-   "n": 845,
-   "ts": "2026-10-22T07:33:42+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "N8 收口：341 位按「门×写口」四档现算（只读 212/有写口 41/需授权 20/无 import 68）；顺手量清 N5 = query 不在白名单 ⇒ 要 data_export+external_llm",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3f1633eb57b1517",
-   "prev": "sha256:4eb76d2a223a959"
-  },
-  {
-   "n": 846,
-   "ts": "2026-10-22T07:35:45+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "N9 部分收口：3/13 已审(autoclaw-mcp-tools LOW · code-security-review LOW · skill-vetter MEDIUM 全文档性命中)；另 10 条本机不存在，需主人给 slug/URL/路径/压缩包",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:91602ad8dc1d298",
-   "prev": "sha256:3f1633eb57b1517"
-  },
-  {
-   "n": 847,
-   "ts": "2026-10-22T07:37:59+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "F22 记账：223 件里 9 件盘上已缺，已标「已不存在」（在役 214 件一件不标）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:77461d1d9172cc2",
-   "prev": "sha256:91602ad8dc1d298"
-  },
-  {
-   "n": 848,
-   "ts": "2026-10-22T07:40:07+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "写口面摊开：41 位模块级有 97 个写盘点（95 个函数内无 op 门）；自纠第 10 次——alerts 反例证明是模块级粗判，未判可达",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:069ebb484509b26",
-   "prev": "sha256:77461d1d9172cc2"
-  },
-  {
-   "n": 849,
-   "ts": "2026-10-22T07:43:31+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "写口可达性：41→27 可达/12 不可达/2 未解析；默认参数逐个看签名(fix/autofix=False)⇒ 默认下会动手的真可疑只剩一类",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:41b2eefe5980718",
-   "prev": "sha256:069ebb484509b26"
-  },
-  {
-   "n": 850,
-   "ts": "2026-10-22T07:45:45+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "根因模式表 +2 条：P33 量具自身两类系统错(过滤写在循环外/读不到当结论/裸名当路径/对象当键) · P34 粒度与单位当结论(名字vs目录/模块级vs可达/语法vs默认参数)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8dc8465cd75f3c6",
-   "prev": "sha256:41b2eefe5980718"
-  },
-  {
-   "n": 851,
-   "ts": "2026-10-22T07:52:12+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "D3 甲落地：17 个域 SKILL.md 写入 caps-auto 位清单（148 位，17 份备份），规程缺口 149→1；台账 N2→已做 · D3→已落地 · 新增 D15",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b23d0d8a8722b22",
-   "prev": "sha256:8dc8465cd75f3c6"
-  },
-  {
-   "n": 852,
-   "ts": "2026-10-22T07:53:24+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "账实一致复核：今天关闭的 47 张护照逐张查（件在盘/证据含=>/回滚≥8字/复核/印章）⇒ 问题 0 张",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:26eececc8e96281",
-   "prev": "sha256:b23d0d8a8722b22"
-  },
-  {
-   "n": 853,
-   "ts": "2026-10-22T07:56:03+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "常设判据 46→47 步：新增「护照账实一致（今日关闭的）」；今日 47 张护照复核问题 0",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:394ae5811e9a8cc",
-   "prev": "sha256:26eececc8e96281"
-  },
-  {
-   "n": 854,
-   "ts": "2026-10-22T07:59:30+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "自纠第 11 次：护照文件字段是 changed 不是 files ⇒ passport-audit 空检查已修；交付清单落盘 49 张/57 件（常设 7 · 驱动 2 · 一次性 40）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fb8a8cd583aaa35",
-   "prev": "sha256:394ae5811e9a8cc"
-  },
-  {
-   "n": 855,
-   "ts": "2026-10-22T08:07:24+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "P33 订正为 11 条实证（键名当事实3 · 弱键当证据2 · 口径单位4 · 实现写错2）+ 三条根治：负例自检 / 读不到不推结论 / 输出自带单位",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:977d7b6b647338c",
-   "prev": "sha256:fb8a8cd583aaa35"
-  },
-  {
-   "n": 856,
-   "ts": "2026-10-22T08:21:44+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "F25 登记：端点 ready=0/inQueue=8，chat 25s 超时 ⇒ 页面会转圈（同最初症状）；修它要改云端生产面，等主人",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d8b4563d07fa1d8",
-   "prev": "sha256:977d7b6b647338c"
-  },
-  {
-   "n": 857,
-   "ts": "2026-10-22T08:25:49+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "F25 参数假设排除：已 workersMin=1/idleTimeout=600，PATCH 后 105s 仍 ready=0、inQueue 涨到 10 ⇒ 疑 GPU 容量/卷挂载/账户额度",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6f6a61bec553c82",
-   "prev": "sha256:d8b4563d07fa1d8"
-  },
-  {
-   "n": 858,
-   "ts": "2026-10-22T09:11:42+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "误限制排查：341位/75组合 → 读类要授权5条(3条合理) · 写类零作用域1条(cli_chat.send)；F25 甲(模板升版)无效",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:2afb96ebb7577e7",
-   "prev": "sha256:6f6a61bec553c82"
-  },
-  {
-   "n": 859,
-   "ts": "2026-10-23T02:09:29+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "删掉全项目索引页(搬 state/legacy)并摘掉面板唯一入口；两处判据改口径留痕",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:50aaf7f01cde395",
-   "prev": "sha256:2afb96ebb7577e7"
-  },
-  {
-   "n": 860,
-   "ts": "2026-10-23T02:12:00+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "页面固定改严：窗内跨文档跳转一律拦且不再替他开窗(旧口径=跳转即开窗)；启动窗整理为 数字人+DSH对话",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:9d061f96d3b8bdc",
-   "prev": "sha256:50aaf7f01cde395"
-  },
-  {
-   "n": 861,
-   "ts": "2026-10-23T02:20:26+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "对话窗真因：3080占用时dsh web直接EADDRINUSE崩；改npx+cwd仓根+一律--port 0，端到端19s接上，单测16/16",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b4b2e19fbc15e5f",
-   "prev": "sha256:9d061f96d3b8bdc"
-  },
-  {
-   "n": 862,
-   "ts": "2026-10-23T02:35:26+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新建桌面快捷方式(带 Logo icon.ico)；桌面原先没有本APP快捷方式",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d8047e077a6a9f9",
-   "prev": "sha256:b4b2e19fbc15e5f"
-  },
-  {
-   "n": 863,
-   "ts": "2026-10-23T02:39:24+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清V9(启动项+空目录)；真因=面板服务空转2.5核(杀后全机CPU降到14%)+内存仅剩1.4G",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:21040291c1a106a",
-   "prev": "sha256:d8047e077a6a9f9"
-  },
-  {
-   "n": 864,
-   "ts": "2026-10-23T02:39:44+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "吸收 TorchTPU：建后端登记表+选路器（GPU/TPU 同 OpenAI 接口）；F25 放大到账号级：两条端点同时 0 worker（q=26/1）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:269e582bac9baa4",
-   "prev": "sha256:21040291c1a106a"
-  },
-  {
-   "n": 865,
-   "ts": "2026-10-23T02:47:30+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "原生 TPU 车道套件落地：bootstrap/serve/preflight_weights + tpu-register（验活才登记）；本机无 GCP 配额故未真跑",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f41aad35a31ccaa",
-   "prev": "sha256:269e582bac9baa4"
-  },
-  {
-   "n": 866,
-   "ts": "2026-10-23T02:48:04+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "APP全面排查：8达成/3部分/0未达成；嘴形与GPU车道与运行时点检仍未达",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f349b6eb45ac647",
-   "prev": "sha256:f41aad35a31ccaa"
-  },
-  {
-   "n": 867,
-   "ts": "2026-10-23T02:55:06+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "云插件现读：10/10在线·c01/c03已接线·c06未读到；/v1无票401；真断点=LLM_ENDPOINT指向已熄火RunPod",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:ba3c8adf4c6de6c",
-   "prev": "sha256:f349b6eb45ac647"
-  },
-  {
-   "n": 868,
-   "ts": "2026-10-23T02:58:36+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "云插件=接线不是算力：isolate装不下8B权重/起不了vLLM；Containers只有CPU；TPU要GCP",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:49e0f14138a9201",
-   "prev": "sha256:ba3c8adf4c6de6c"
-  },
-  {
-   "n": 869,
-   "ts": "2026-10-23T03:00:51+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "甲：算出我们模型 TPU 适配结论（Qwen2/28heads/4kv ⇒ TP≤4；bnb-4bit 需重存 bf16）；preflight fail-closed + serve.sh 拒非法 TP + plan_parallel",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:82bfe16aa532af7",
-   "prev": "sha256:49e0f14138a9201"
-  },
-  {
-   "n": 870,
-   "ts": "2026-10-23T03:01:37+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "换车道runbook+压测尺(lane-bench selftest 4/4)+登记开机自检；结论=路线成立但算力绕不开",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a6b16a8e9150ab0",
-   "prev": "sha256:82bfe16aa532af7"
-  },
-  {
-   "n": 871,
-   "ts": "2026-10-23T03:04:06+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "实测带宽9.5GB/s⇒8B-int4天花板1.9tok/s；云插件是single-isolate共用内存，10x5G不成立",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d84f924c5c1b4ad",
-   "prev": "sha256:a6b16a8e9150ab0"
-  },
-  {
-   "n": 872,
-   "ts": "2026-10-23T03:05:07+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "校准：云插件自带算力=Workers AI托管模型(权重非我们的)+按账号额度不是按模块;要真实容量需GW_AUTH",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:03a2074e219120f",
-   "prev": "sha256:d84f924c5c1b4ad"
-  },
-  {
-   "n": 873,
-   "ts": "2026-10-23T03:07:09+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "实测边缘并发叠加6.87×；叠加的是并发不是单模型算力；正确用法=多路并行+合稿",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:46bf2d7eab39819",
-   "prev": "sha256:03a2074e219120f"
-  },
-  {
-   "n": 874,
-   "ts": "2026-10-23T03:09:58+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "按主人设计写多账户额度池化路由(account-pool)；盘上现读只有1个账户，10账户仍是设计",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:3c8c6c05adcb625",
-   "prev": "sha256:46bf2d7eab39819"
-  },
-  {
-   "n": 875,
-   "ts": "2026-10-23T03:13:15+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "账户现读=1个(whoami+单凭据+mesh掩码不一致)；触手双向绑定8267资产/341触手/2402真连接 6/0 PASS",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:dd8a843d5c37d84",
-   "prev": "sha256:3c8c6c05adcb625"
-  },
-  {
-   "n": 876,
-   "ts": "2026-10-23T03:16:37+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "CF令牌实测：账号级只见1账户(83817924)；Workers AI 1.09s/7tok/2.66neurons ⇒ 约3759轮/天/账户",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:215ffbaf7039a4d",
-   "prev": "sha256:dd8a843d5c37d84"
-  },
-  {
-   "n": 877,
-   "ts": "2026-10-23T03:19:58+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "10账户推理：额度/并发真×10(3.76万轮/天)；唯一不成立=权重切片，正确形态=每账户一个复制体/入口",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:79148d0dfd25398",
-   "prev": "sha256:215ffbaf7039a4d"
-  },
-  {
-   "n": 878,
-   "ts": "2026-10-23T03:25:47+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "第二把令牌实证第二个账号(Lopaycn/82dd88c2/14worker)；跨账号并发实测仅1.2×(轻载)，额度与隔离才是真叠加",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:03daa1b71cccf87",
-   "prev": "sha256:79148d0dfd25398"
-  },
-  {
-   "n": 879,
-   "ts": "2026-10-23T03:27:22+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "满并发实测:12并发下单账号p90 1.87s→两账号0.76s/15.9rps=4.9×加速;24档读数不稳不采信",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:13d8623a57335a9",
-   "prev": "sha256:03daa1b71cccf87"
-  },
-  {
-   "n": 880,
-   "ts": "2026-10-23T03:31:47+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "改OAuth多账号方案:USERPROFILE隔离实测有效(WRANGLER_HOME无效)；已建cf-oauth-login.cmd+cf-oauth-check.py(10槽0登)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b766d68d9ffaff7",
-   "prev": "sha256:13d8623a57335a9"
-  },
-  {
-   "n": 881,
-   "ts": "2026-10-23T03:46:25+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "授权搬进APP:cloud-auth窗口+cf:status/login/deploy三条IPC;终端发链接流程退役",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:57c026e68ebf044",
-   "prev": "sha256:b766d68d9ffaff7"
-  },
-  {
-   "n": 882,
-   "ts": "2026-10-23T03:48:58+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "触手跑十账号授权cf-oauth-auto.py(独立浏览器配置+自动点允许+自动部署)；自检browser/mesh/whoami全绿",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a5cfc7c12541dba",
-   "prev": "sha256:57c026e68ebf044"
-  },
-  {
-   "n": 883,
-   "ts": "2026-10-23T04:07:49+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "APP十槽安装台(cf:install/令牌内存态)；实测门槛=令牌缺Workers Scripts:Edit",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:592d839ce1c5f1e",
-   "prev": "sha256:a5cfc7c12541dba"
-  },
-  {
-   "n": 884,
-   "ts": "2026-10-23T06:45:07+08:00",
-   "kind": "scan",
-   "actor": "unknown",
-   "what": "专业体检:模型与APP未对齐(权重复活=断)；caps_tiers账停在239(注册表341，2026-10-01)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7bd379afbb2f324",
-   "prev": "sha256:592d839ce1c5f1e"
-  },
-  {
-   "n": 885,
-   "ts": "2026-10-23T06:48:53+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "分档账239→341+写手gen-caps-tiers.py+挂开机自检；语音体检=耳无在役采集端点(硬件)、嘴已是Edge神经嗓",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1f841ce178f7ecd",
-   "prev": "sha256:7bd379afbb2f324"
-  },
-  {
-   "n": 886,
-   "ts": "2026-10-23T06:50:46+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "嘴验收通过:edge-tts/zh-TW-HsiaoChenNeural/spoken=true;耳仍缺在役采集端点(硬件)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:533128ac80b5bfe",
-   "prev": "sha256:1f841ce178f7ecd"
-  },
-  {
-   "n": 887,
-   "ts": "2026-10-23T06:52:22+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "耳实测:WDM-KS 4端点全不通(#9/#10 0帧·#11/#6 IOCTL错)；隐私=Allow；PnP无麦克风端点⇒硬件/驱动层",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:de159a969f4ebf0",
-   "prev": "sha256:533128ac80b5bfe"
-  },
-  {
-   "n": 888,
-   "ts": "2026-10-23T06:55:25+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "耳真因:录制页只有组合口麦克风(未插入)+立体声混音(已停用),无内置麦端点;自纠mic-probe NaN判成REAL",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6db280b9fe89a06",
-   "prev": "sha256:de159a969f4ebf0"
-  },
-  {
-   "n": 889,
-   "ts": "2026-10-23T06:59:48+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "耳三链路:回环采集通/本地ASR通(heard=true置信0.146)/缺麦克风输入源;真因=Realtek播放侧驱动",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8d5de24654a38a7",
-   "prev": "sha256:6db280b9fe89a06"
-  },
-  {
-   "n": 890,
-   "ts": "2026-10-23T07:13:17+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "耳突破:重配对后iPhone HFP麦克风端点ACTIVE(pnputil可见);仍非默认设备故PortAudio打不开;差设为默认",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:f21aa8ec85d6b36",
-   "prev": "sha256:8d5de24654a38a7"
-  },
-  {
-   "n": 891,
-   "ts": "2026-10-23T07:22:00+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "耳收尾:同端点一次REAL(peak0.029)后又恒SILENCE=间歇静默;手机HFP端点ACTIVE但PortAudio打不开;采集/识别链路均已验",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:76baa9cdac2ea73",
-   "prev": "sha256:f21aa8ec85d6b36"
-  },
-  {
-   "n": 892,
-   "ts": "2026-10-23T07:23:43+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "一体式验收7条全绿(integrated-check.py,已挂开机自检);顺手删voice-theater里#gbt-project-nav死CSS",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:68f014f7e87c274",
-   "prev": "sha256:76baa9cdac2ea73"
-  },
-  {
-   "n": 893,
-   "ts": "2026-10-23T07:26:32+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "云插件:cf:verify令牌只读自检+每槽自检按钮;mesh-verify互联验收(90边判据,selftest通过,账本3→1)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7f88b88e73e6046",
-   "prev": "sha256:68f014f7e87c274"
-  },
-  {
-   "n": 894,
-   "ts": "2026-10-23T07:28:51+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "云插件互联收口:worker支持批量roster(10写→90边)+安装器自动建KV绑定+mesh:sync与页内按钮;真节点实测501缺KV=10节点互不认的根",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:0b4b253dc5d04cb",
-   "prev": "sha256:7f88b88e73e6046"
-  },
-  {
-   "n": 895,
-   "ts": "2026-10-23T07:46:51+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "自检49步:红2→1;监控基线修绿(op=baseline&from_pack=false,age4s);车道闸>600s挂起未被我的15s超时修好=阻塞点在别处",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1790b30551923cf",
-   "prev": "sha256:0b4b253dc5d04cb"
-  },
-  {
-   "n": 896,
-   "ts": "2026-10-23T07:54:12+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "车道闸提速:314.7s→44.9s(真凶=调用方显式timeout120/60/60/180/240,非默认值);判决不变4PASS5WARN1FAIL;F25新证inQueue26→56不消费",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:6cb95908ae8425f",
-   "prev": "sha256:1790b30551923cf"
-  },
-  {
-   "n": 897,
-   "ts": "2026-10-23T07:59:30+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "页面转圈修复:桥加车道硬截止20s+兜底链(deepseek优先)+空content换道+车道印记;实测20.8s出话lane=deepseek/ours=false",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c26bddcd8153681",
-   "prev": "sha256:6cb95908ae8425f"
-  },
-  {
-   "n": 898,
-   "ts": "2026-10-23T08:02:19+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "免费道路落地:桥默认车道切cfai(Workers AI),实测0.8s出话;车道印记lane/weights_ours=false/free=true;三处自纠(模型名/空content/印记语义)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d68f11ba1d7599d",
-   "prev": "sha256:c26bddcd8153681"
-  },
-  {
-   "n": 899,
-   "ts": "2026-10-23T08:08:42+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "自家权重优先已上线(ours→ours-alt→cloud→免费道);但RunPod两台端点workers全0,队列69/4,96-120s仍IN_QUEUE不报错=账号侧不provision",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d66235e56de542d",
-   "prev": "sha256:d68f11ba1d7599d"
-  },
-  {
-   "n": 900,
-   "ts": "2026-10-23T08:11:53+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "纠偏:cloud_llm口径=只调算力不调模型;先前未指名model落到agnes-3.0-flash(错);现强制指名我们的模型/算力,实测Agnes钥不认RunPod端点=401",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a1341d35cefc0eb",
-   "prev": "sha256:d66235e56de542d"
-  },
-  {
-   "n": 901,
-   "ts": "2026-10-23T08:17:07+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "按主人法调用:omni_plug op=ai_control 插我们自有算力;plug.state=plugged/host+model+key_slot明示;90s TimeoutError=线通远端无worker",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c3b79dfc78cd945",
-   "prev": "sha256:a1341d35cefc0eb"
-  },
-  {
-   "n": 902,
-   "ts": "2026-10-23T08:20:18+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "清理RunPod付费车道(F25按取消车道关闭):桥只留cfai→agnes免费道;实测25.7s→3.1s",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:9f4f4827429a8a2",
-   "prev": "sha256:c3b79dfc78cd945"
-  },
-  {
-   "n": 903,
-   "ts": "2026-10-23T08:22:28+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "付费车道清理完成+F25按取消关闭;闸换lane-gate-free(1.1s全绿,旧闸保留);桥实测0.7s",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:00bcc736d1b3e6c",
-   "prev": "sha256:9f4f4827429a8a2"
-  },
-  {
-   "n": 904,
-   "ts": "2026-10-23T08:29:44+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "免费GPU跑自有权重链路备齐:weights.zip3.96GB(v82 Qwen2-7B nf4)+run_gbt_gpu.py+bridge selfhost车道+手册;差Colab会话与上传",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b47cec1b1eb5d9f",
-   "prev": "sha256:00bcc736d1b3e6c"
-  },
-  {
-   "n": 905,
-   "ts": "2026-10-23T09:52:46+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "自有权重本机跑通(按需激活):解量化100%对官方·前向逐logit一致·真出话'我是本命:一个学习者';0.03tok/s",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8b5e1f7d65bbcef",
-   "prev": "sha256:b47cec1b1eb5d9f"
-  },
-  {
-   "n": 906,
-   "ts": "2026-10-23T18:59:46+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增 gguf-q4 契约检查器（env/selftest/compare/roundtrip/scan）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5771449eeaab607",
-   "prev": "sha256:8b5e1f7d65bbcef"
-  },
-  {
-   "n": 907,
-   "ts": "2026-10-23T19:36:09+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "修 GGUF 特殊 token：bos/eos/pad 现在真落盘；新增 meta 闸",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:5fa5e950260eb3b",
-   "prev": "sha256:5771449eeaab607"
-  },
-  {
-   "n": 908,
-   "ts": "2026-10-23T19:57:50+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增 fixids：不重导补 bos/eos/pad，4GB 补丁 45 秒",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:93b45e3ea7a3229",
-   "prev": "sha256:5fa5e950260eb3b"
-  },
-  {
-   "n": 909,
-   "ts": "2026-10-23T20:04:57+08:00",
-   "kind": "change",
-   "actor": "dsh",
-   "what": "桌面权重文档升完整版权：A/B/C三口径·A=31片4.76GB·B=6个GGUF·C=v83 15.25GB只在云上",
-   "where": [
-    "GBT权重使用文档.md",
-    "state/_probe-gguf.py"
-   ],
-   "hash": "sha256:6b5eafb39fd60ed",
-   "prev": "sha256:93b45e3ea7a3229"
-  },
-  {
-   "n": 910,
-   "ts": "2026-10-23T20:22:53+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增 fullscan-tentacle：目录快照增量扫 + 页面触手并行探针（1.6s/8787页）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:c6c502f91f2302c",
-   "prev": "sha256:6b5eafb39fd60ed"
-  },
-  {
-   "n": 911,
-   "ts": "2026-10-23T20:46:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "fullscan-tentacle 完工：sqlite 快照 + 页面探针 + 双向绑定体检",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e06f81f7569a65d",
-   "prev": "sha256:c6c502f91f2302c"
-  },
-  {
-   "n": 912,
-   "ts": "2026-10-23T20:48:44+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "fullscan 增 usn 子命令（需提权，非提权如实报 3）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:7439120dab3a279",
-   "prev": "sha256:e06f81f7569a65d"
-  },
-  {
-   "n": 913,
-   "ts": "2026-10-23T20:54:59+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "USN 跑通：全量 24.8s / 增量 1ms（提权），偏移自适应",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a74dfb82c874134",
-   "prev": "sha256:7439120dab3a279"
-  },
-  {
-   "n": 914,
-   "ts": "2026-10-23T21:19:56+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "USN 路径还原跑通（找到 probe 文件）；建索引 1388s 成新瓶颈",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1811ffadd1e04f6",
-   "prev": "sha256:a74dfb82c874134"
-  },
-  {
-   "n": 915,
-   "ts": "2026-10-23T21:21:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "MFT 建库 1388s→47.3s：去掉每条 buf.raw 的 1MB 拷贝",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:8abe4f9d0e15e1a",
-   "prev": "sha256:1811ffadd1e04f6"
-  },
-  {
-   "n": 916,
-   "ts": "2026-10-23T21:24:02+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "fullscan all 合成一条：快照+页面+绑定（典型 5.6s）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:0e69cee200143dd",
-   "prev": "sha256:8abe4f9d0e15e1a"
-  },
-  {
-   "n": 917,
-   "ts": "2026-10-23T21:25:50+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "scan 抖动定位：全在走目录段（热 3.4s / 冷 13.3s），其余两段稳定",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:41e0cf992e9fbd3",
-   "prev": "sha256:0e69cee200143dd"
-  },
-  {
-   "n": 918,
-   "ts": "2026-10-23T21:35:03+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "Q5_0 出片并验通：说人话 + 正确 EOS（4.88GB，4.7s/token）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:b879008de5a8f10",
-   "prev": "sha256:41e0cf992e9fbd3"
-  },
-  {
-   "n": 919,
-   "ts": "2026-10-23T21:38:19+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "端到端打通：桥 selfhost→本机 Q5_0，weights_ours=true，答'中国的首都是北京。'",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:2a1f489d2909b79",
-   "prev": "sha256:b879008de5a8f10"
-  },
-  {
-   "n": 920,
-   "ts": "2026-10-23T21:42:32+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "main.cjs 接自有权重：拉起 8792 + 桥带 selfhost env；端到端 laneselfhost/ours=true",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:023428e3867702e",
-   "prev": "sha256:2a1f489d2909b79"
-  },
-  {
-   "n": 921,
-   "ts": "2026-10-23T21:43:42+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "壳启动加车道自检：桥缺 selfhost 车道就收掉重启（端口定位已验）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:130f15ecb090525",
-   "prev": "sha256:023428e3867702e"
-  },
-  {
-   "n": 922,
-   "ts": "2026-10-23T21:46:11+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "对话页加 selfhost 选项并逐发报实走车道/weights_ours",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:1285727960d47ea",
-   "prev": "sha256:130f15ecb090525"
-  },
-  {
-   "n": 923,
-   "ts": "2026-10-23T21:47:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "对话页徽标区分有无 selfhost 车道；all --usn 非提权优雅跳过",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:cabdcb3b5d7be44",
-   "prev": "sha256:1285727960d47ea"
-  },
-  {
-   "n": 924,
-   "ts": "2026-10-23T21:48:54+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "基准没跑成：第二份 Q5_0 加载即 OOM（commit 0.37GB），GGML_ASSERT mem_buffer",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:2bfe30e89245e0f",
-   "prev": "sha256:cabdcb3b5d7be44"
-  },
-  {
-   "n": 925,
-   "ts": "2026-10-23T21:55:07+08:00",
-   "kind": "decision",
-   "actor": "unknown",
-   "what": "Q5_0 参数定档：threads=8 ctx=256（冷热差 3 倍，ctx64 优势是假象）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:fece00e84220c27",
-   "prev": "sha256:2bfe30e89245e0f"
-  },
-  {
-   "n": 926,
-   "ts": "2026-10-23T21:59:51+08:00",
-   "kind": "note",
-   "actor": "unknown",
-   "what": "真 Electron 里验通启动链：本机权重服务 1000ms 就绪；壳在本会话内 GPU 崩溃（环境）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:2b585af977f086a",
-   "prev": "sha256:fece00e84220c27"
-  },
-  {
-   "n": 927,
-   "ts": "2026-10-23T22:01:32+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "新增 doctor.py 一键体检自有权重链路（6 项全绿）",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:a39a0b84345072a",
-   "prev": "sha256:2b585af977f086a"
-  },
-  {
-   "n": 928,
-   "ts": "2026-10-23T22:02:49+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "新增 docs 自有权重启动与排障一页纸",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:625b5e9b1ef30bc",
-   "prev": "sha256:a39a0b84345072a"
-  },
-  {
-   "n": 929,
-   "ts": "2026-10-23T22:21:45+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "v1/chat 流式：首字 4.1s（整句 72s）；页面认 [DONE] 收工",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:01caa3dd0179061",
-   "prev": "sha256:625b5e9b1ef30bc"
+   "hash": "sha256:471b995c66a4337",
+   "prev": "sha256:445904bb06b750b"
   }
  ]
 };

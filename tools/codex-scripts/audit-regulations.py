@@ -28,7 +28,7 @@ OMNI = ROOT / "tools" / "codex-scripts" / "omni.py"
 MANAGED = Path.home() / ".openclaw-autoclaw" / "skills"
 
 # 每份规程"应当有"的四个面（对齐 Objective 与 Owner 的硬要求）
-# ⚠️ 判据是**关键词**，所以必须把自然变体都收进来 —— 第一版只认字面"未验"，
+# 判据是**关键词**，所以必须把自然变体都收进来 —— 第一版只认字面"未验"，
 # 于是 `gbt-vision`（写的是"没有验过"）、`gbt-tentacle`（写的是"诚实账"）被误判成"缺账"。
 # **本器只能证明"有痕迹"，不能证明"账写得对"**；误判要往"收词"这边修，不许放宽成不查。
 FACETS = {
@@ -80,7 +80,7 @@ def main(argv: list[str]) -> int:
     for c, s in sorted(clusters.items()):
         targets.append((f"簇 {c}", s))
     uniq = sorted({s for _k, s in targets})
-    # 🔴 2026-09-22 补：**元/框架件**——既不是职业域、也不是技能簇，但确实交付在盘上。
+ # 2026-09-22 补：**元/框架件**——既不是职业域、也不是技能簇，但确实交付在盘上。
     # 旧版只按两张登记表枚举 ⇒ `gbt-aesthetic` / `gbt-omni` / `gbt-potato` / `gbt-brain-vault` /
     # `gbt-design-mastery` 这五件**交付了却没有任何一关看它**（"没查"被读成了"没问题"，就是假绿）。
     # 现在按 `skills/` 现读补进来，单独一组，四节照样判。

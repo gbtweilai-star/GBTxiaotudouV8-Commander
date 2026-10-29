@@ -31,6 +31,14 @@ import time
 
 _ROOT = pathlib.Path(__file__).resolve().parents[2]
 
+# 安全确认标记：批量删除等破坏性动作会先要确认（英文大写标记），
+# 属「闸在正确咬」，归黄不归红。
+CONFIRM_MARKS = ("CONFIRM_REQUIRED", "SAFE_DELETE_BULK", "确认")
+
+# 本能力位自己的名字。绑在 godview-page 上没错（那页要能触发扫描），
+# 但**扫描器不能探测自己** —— 会无限递归到栈溢出，见 scan() 里的说明。
+SELF_CAP = "page_scan"
+
 
 def _store() -> pathlib.Path:
     d = os.environ.get("GBT_STORE_DIR")
@@ -76,6 +84,12 @@ def _classify(cap: str) -> dict:
         return {"cap": cap, "color": "green", "why": "", "ms": ms}
     if any(k in msg for k in ("需要", "缺少", "不能为空", "必填", "不存在", "required", "must")):
         return {"cap": cap, "color": "yellow", "why": "需参数（契约如此）：" + msg[:70], "ms": ms}
+    # 安全确认档：批量删除 / 破坏性动作会先要确认，这是**闸在正确咬**，不是故障。
+    # 实测出处（2026-10-27）：recon_distill 空载荷返回 rc=1 +
+    #   `[safe-delete][SAFE_DELETE_BULK_CONFIRM_REQUIRED] {"count":50,"threshold":50}`
+    # 原判定只认中文关键词，英文标记漏网 ⇒ 被误判成红。补这一档。
+    if any(k in msg for k in CONFIRM_MARKS):
+        return {"cap": cap, "color": "yellow", "why": "需确认（安全闸在咬 ✓）：" + msg[:70], "ms": ms}
     return {"cap": cap, "color": "red", "why": msg[:110] or st, "ms": ms}
 
 
@@ -88,6 +102,16 @@ def scan(workers: int = 512) -> dict:
     uniq = sorted({c for cs in page_caps.values() for c in cs})
     absent = [c for c in uniq if c not in caps_reg]
     nobind = [p for p, cs in page_caps.items() if not cs]
+    # ── 自引用排除（2026-10-27 实测根因）────────────────────────────────────
+    # godview-page 的 8 个正向能力位里含 page_scan 自己。于是：
+    #   _classify("page_scan") → api.run_task("page_scan") → scan() → _classify("page_scan") → …
+    # 无限递归 ⇒ STACK_OVERFLOW（退出码 3221225725 = 0xC00000FD），
+    # 整个扫描进程当场死亡，**连 JSON 信封都吐不出来**（这就是 op=scan 一直
+    # 只有 SIGTERM + 0 字节、而 op=status 正常的原因）。
+    # 排除它，并且在返回里**明说排除了**，不静默吞掉。
+    self_ref = SELF_CAP in uniq
+    if self_ref:
+        uniq = [c for c in uniq if c != SELF_CAP]
     t0 = time.time()
     with cf.ThreadPoolExecutor(max_workers=max(1, min(workers, len(uniq) or 1))) as ex:
         res = list(ex.map(_classify, uniq)) if uniq else []
@@ -99,7 +123,10 @@ def scan(workers: int = 512) -> dict:
            "页数": len(pages), "绑好": pb.get("绑好"), "未绑好": pb.get("未绑好"),
            "落点不在盘的页": missing_page or "无 ✓",
            "无绑定能力位的页": nobind or "无 ✓",
-           "声明引用": sum(len(v) for v in page_caps.values()), "唯一能力位": len(uniq),
+           "声明引用": sum(len(v) for v in page_caps.values()),
+           "唯一能力位": len(uniq) + (1 if self_ref else 0),
+           "实探能力位": len(uniq),
+           "自引用已排除": (SELF_CAP + "（否则递归栈溢出，见 scan 注释）") if self_ref else "无 ✓",
            "不在册的声明": absent or "无 ✓",
            "并发度": min(workers, len(uniq)), "用时秒": wall,
            "绿": len(by["green"]), "黄": len(by["yellow"]), "红": len(by["red"]),

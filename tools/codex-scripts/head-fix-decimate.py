@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """定案修法：pymeshlab **几何 QEM（不带纹理）** + UV 原样 → trimesh 导 GLB → 注入原贴图。
 （Round 19 定案：`..._with_texture` 缺贴图会退化成乱塌缩；几何 QEM 本身正常。）"""
 import json
@@ -11,7 +7,7 @@ import struct
 import trimesh
 import pymeshlab as ml
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 RIG = WS / "holo_pet/assets/digital-human/raw/rig"
 SRC = RIG / "part-head.glb"
 TMP = pathlib.Path(r"C:\gbt_pml")

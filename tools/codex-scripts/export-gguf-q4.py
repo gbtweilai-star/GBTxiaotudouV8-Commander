@@ -48,6 +48,20 @@ PROJ_MAP = {
     "mlp.up_proj": "ffn_up",
     "mlp.down_proj": "ffn_down",
 }
+
+N_HEAD, N_HEAD_KV = 28, 4      # config.json: heads 28 / kv 4
+
+
+def rope_permute(w, n_head=N_HEAD, n_head_kv=N_HEAD_KV):
+    """llama.cpp 的 RoPE 成对交错置换（形状不变）。
+    实测依据：GGUF 直比 shard 差 0.000952（Q4_0 噪声级），
+             置换后差 0.018253（19 倍）⇒ 原产物没置换 ⇒ vanavana。"""
+    if n_head_kv and n_head != n_head_kv:
+        n_head = n_head_kv
+    return (w.reshape(n_head, 2, w.shape[0] // n_head // 2, *w.shape[1:])
+             .swapaxes(1, 2).reshape(w.shape))
+
+
 SMALL_MAP = {
     "input_layernorm.weight": "attn_norm.weight",
     "post_attention_layernorm.weight": "ffn_norm.weight",
@@ -58,7 +72,7 @@ SMALL_MAP = {
 
 
 FP16_ONLY = os.environ.get("GBT_GGUF_FP16") == "1"
-# 🔴 2026-10-24 03:14 A/B 实测：整份 Q4_0 ⇒ 输出崩（vanavana）；整份 fp16 ⇒ 通顺（'哪里？'）。
+# 2026-10-24 03:14 A/B 实测：整份 Q4_0 ⇒ 输出崩（vanavana）；整份 fp16 ⇒ 通顺（'哪里？'）。
 #    llama.cpp 的惯例也是「embed / output / norm 不进低比特量化」（官方 quantize 把 output 留 Q6_K）。
 #    KEEP_IO_FP16=1 ⇒ token_embd / output / 所有 norm 保 fp16，其余 Q4_0。
 KEEP_IO_FP16 = os.environ.get("GBT_GGUF_KEEP_IO") == "1"
@@ -95,7 +109,7 @@ def add_tensor(w: gguf.GGUFWriter, name: str, arr: np.ndarray, quantize: bool):
             w.add_tensor(name, out, raw_dtype=_QTYPE)
             return
     a = np.ascontiguousarray(arr.astype(np.float32))
-    # 🔴 2026-10-24 02:23 实测修正：ggml 的二维张量约定是 **ne0 = 输入维**，
+ # 2026-10-24 02:23 实测修正：ggml 的二维张量约定是 **ne0 = 输入维**，
     #   而 PyTorch 权重是 [out, in]。不转置就会「能加载、能跑、但输出 vanavana 这种乱码」。
     # 2026-10-24 02:30 实测：gguf 库写 dims 时会把 numpy shape **反着写**，
     #   于是 numpy [out, in] 正好落成 llama.cpp 要的 ne0=in。**不要转置**
@@ -170,12 +184,12 @@ def add_int8_matrix(w: gguf.GGUFWriter, name: str, shard, qkey: str, skey: str,
     nb = k // 32
     if k % 32:
         raise ValueError("%s 的 ne0=%d 不是 32 的倍数" % (name, k))
-    # 🔴 每块字节数随量化类型变：Q4_0=18 · Q4_1=20 · Q5_0=22 · Q5_1=24 · Q8_0=34
+ # 每块字节数随量化类型变：Q4_0=18 · Q4_1=20 · Q5_0=22 · Q5_1=24 · Q8_0=34
     #   原写死 18，跑 Q5_0 时报 "could not broadcast (4096,2464) into (4096,2016)"。
     row_bytes = {"Q4_0": 18, "Q4_1": 20, "Q5_0": 22, "Q5_1": 24, "Q8_0": 34}.get(GGUF_TYPE, 18)
     out = np.empty((rows, nb * row_bytes), dtype=np.uint8)
     t0 = time.time()
-    # 🔴 自适应分块：这台机器的 commit 会突然塌到几十 MB，固定 4096 行（56 MiB）会半路 OOM。
+ # 自适应分块：这台机器的 commit 会突然塌到几十 MB，固定 4096 行（56 MiB）会半路 OOM。
     #   失败就减半重试，成功后再慢慢加回去。
     lo, cur = 0, chunk
     while lo < rows:
@@ -206,7 +220,7 @@ def main() -> int:
     n_layers = cfg["num_hidden_layers"]
     hidden = cfg["hidden_size"]
 
-    # 🔴 2026-10-24 实测：use_temp_file=False 时 writer 把所有张量**攒在内存里**，
+ # 2026-10-24 实测：use_temp_file=False 时 writer 把所有张量**攒在内存里**，
     #   到最后才落盘 —— 4 GB 的模型就要 4 GB 常驻，7.4 GB 机器必然 OOM。
     #   置 True 后超过 256 MB 自动滚到临时文件，内存只留一个 chunk。
     w = gguf.GGUFWriter(OUT, "qwen2", use_temp_file=True)
@@ -220,14 +234,14 @@ def main() -> int:
     w.add_rope_freq_base(float(cfg.get("rope_theta") or 1e6))
     w.add_layer_norm_rms_eps(float(cfg.get("rms_norm_eps") or 1e-6))
     w.add_file_type(gguf.LlamaFileType.MOSTLY_F16 if FP16_ONLY else gguf.LlamaFileType.MOSTLY_Q4_0)
-    # 🔴 2026-10-24 02:05 实测补：llama.cpp 加载器要求 tokenizer.model / tokenizer.pre 两个键，
+ # 2026-10-24 02:05 实测补：llama.cpp 加载器要求 tokenizer.model / tokenizer.pre 两个键，
     #   缺了会报 "key not found in model: tokenizer.ggml.model"（模型本身没毛病）。
     w.add_tokenizer_model("gpt2")     # Qwen2 用 BPE（gpt2 语义）
     w.add_tokenizer_pre("qwen2")      # 预分词规则名
 
     # ---- tokenizer ----
     vocab = tok["model"]["vocab"]                      # token -> id
-    # 🔴 2026-10-24 02:07 实测修正：词表长度必须取 **config.vocab_size**（152064），
+ # 2026-10-24 02:07 实测修正：词表长度必须取 **config.vocab_size**（152064），
     #   不能取 max(vocab)+1（151643）。否则 ① 特殊 token（<|im_start|>/<|im_end|>）被挤掉、
     #   ② token_embd 行数(152064)与词表长度(151643)对不上，llama.cpp 直接拒载：
     #   "tensor 'token_embd.weight' has wrong shape; expected 3584, 151643, got 3584, 152064"
@@ -249,7 +263,7 @@ def main() -> int:
     merges = tok["model"].get("merges") or []
     if merges:
         w.add_token_merges([m if isinstance(m, str) else " ".join(m) for m in merges])
-    # 🔴 2026-10-24 02:14 实测补：chat 模板与特殊 token 在 tokenizer_config.json 里，
+ # 2026-10-24 02:14 实测补：chat 模板与特殊 token 在 tokenizer_config.json 里，
     #   不写进 GGUF ⇒ llama.cpp 用默认模板拼 prompt，模型会输出 "vanavana…" 这种乱码。
     tcfg_path = os.path.join(SRC, "tokenizer_config.json")
     tcfg = json.load(open(tcfg_path, encoding="utf-8")) if os.path.isfile(tcfg_path) else {}
@@ -257,7 +271,7 @@ def main() -> int:
     if ct:
         w.add_chat_template(ct)
         print("已写入 chat_template（%d 字符）" % len(ct), flush=True)
-    # 🔴 2026-10-24 实测修正（本机复现）：特殊 token（<|im_end|>/<|endoftext|>/<|im_start|>）
+ # 2026-10-24 实测修正（本机复现）：特殊 token（<|im_end|>/<|endoftext|>/<|im_start|>）
     #    **不在** tokenizer.json 的 model.vocab 里（那里只有 151643 条），它们在 added_tokens 里。
     #    原来用 "v in vocab" 判断 ⇒ 永远为假 ⇒ GGUF 里根本没有 bos/eos/pad 三个键，
     #    llama.cpp 回落到默认 eos=11（实测解出来是逗号），**生成到第一个逗号就停**。
@@ -297,7 +311,10 @@ def main() -> int:
     for li in range(n_layers):
         z = load_npz(li)
         for src_key, dst in PROJ_MAP.items():
-            add_tensor(w, "blk.%d.%s.weight" % (li, dst), z[src_key], True)
+            t = z[src_key]
+            if dst in ("attn_q", "attn_k"):
+                t = rope_permute(t)          # GBT 补丁：llama.cpp 的 RoPE 约定
+            add_tensor(w, "blk.%d.%s.weight" % (li, dst), t, True)
         for src_key, dst in SMALL_MAP.items():
             add_tensor(w, "blk.%d.%s" % (li, dst), z[src_key], False)
         del z

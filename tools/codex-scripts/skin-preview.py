@@ -90,7 +90,7 @@ def _moon(img, p, cx, cy, r):
     img.alpha_composite(gl)
     d = ImageDraw.Draw(img)
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=p["moon"] + (238,))
-    # ⚠️ 第一版在月面正中画了个内圆 ⇒ 看着像**甜甜圈**。改成**偏心的淡淡阴影**（像月海）。
+ # 第一版在月面正中画了个内圆 ⇒ 看着像**甜甜圈**。改成**偏心的淡淡阴影**（像月海）。
     d.ellipse([cx - r * 0.72, cy - r * 0.85, cx + r * 0.05, cy - r * 0.10],
               fill=_lerp(p["moon"], p["sky"][1], 0.10) + (70,))
     d.ellipse([cx + r * 0.15, cy + r * 0.10, cx + r * 0.70, cy + r * 0.62],
@@ -119,7 +119,7 @@ def _pagoda(img, p, x, base_y, scale):
         ww = w * (1 - i * 0.19)
         d.polygon([(x - ww, y), (x + ww, y), (x + ww * 0.72, y - 16 * scale),
                    (x - ww * 0.72, y - 16 * scale)], fill=col)
-        # ⚠️ PIL 的 rectangle 要求 y1 ≥ y0（我第一版写成 [y-16, y-42] ⇒ 报
+ # PIL 的 rectangle 要求 y1 ≥ y0（我第一版写成 [y-16, y-42] ⇒ 报
         #    「y1 must be greater than or equal to y0」）—— 上下要**升序**给。
         d.rectangle([x - ww * 0.42, y - 42 * scale, x + ww * 0.42, y - 16 * scale], fill=col)
         y -= 42 * scale
@@ -137,7 +137,7 @@ def _figure(img, p, x, base_y, s):
     ⇒ 看着像**两条蜘蛛腿**；袖子是两片尖三角。改：飘带**细**（宽 2）、**短**、
     贴身后扬；袖子改成**圆润的垂坠**而不是尖角；整体收小一点。
     """
-    # 🔴 第二版仍然读不出"仙侠"：暗剪影贴在暗山脊上 = 一团（我又 read_image 看了一次）。
+ # 第二版仍然读不出"仙侠"：暗剪影贴在暗山脊上 = 一团（我又 read_image 看了一次）。
     #    ⇒ 改画法：先在本层画**纯黑**，再整层合成两次 ——
     #    先一层**模糊的轮廓光**（偏移一点点），再压上本体。**有边光才立得起来。**
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -183,7 +183,7 @@ def _neon(img, p, rng, horizon):
     gl = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     dg = ImageDraw.Draw(gl)
     c = p["neon"]
-    # ⚠️ 第一版网格 alpha 只给 46 又画在深色近山上 ⇒ **肉眼几乎看不见**（我 read_image 亲眼看出来的）。
+ # 第一版网格 alpha 只给 46 又画在深色近山上 ⇒ **肉眼几乎看不见**（我 read_image 亲眼看出来的）。
     #    改：地平线打一条亮的，网格提亮，纵向线只留近处几根。
     dg.line([(0, horizon), (W, horizon)], fill=c[1] + (150,), width=2)
     for i in range(10):

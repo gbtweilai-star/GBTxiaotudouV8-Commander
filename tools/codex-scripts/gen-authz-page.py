@@ -279,14 +279,14 @@ def main(argv=None) -> int:
               % (age_h, a.stale_hours, len(live["safe_false"]), len(live["state_changing"])))
 
     if a.dry_run:
-        # ⚠️ `--json` 模式**只许往 stdout 打 JSON**（机读契约）；人读的附注一律走 stderr。
+ # `--json` 模式**只许往 stdout 打 JSON**（机读契约）；人读的附注一律走 stderr。
         #    第一版把"（--dry-run：没有写盘）"打到了 stdout ⇒ 调用方 `json.loads(stdout)` 直接崩
         #    （`Extra data: line 18`）。这是本会话第 N 次栽在"机读口混进人读话"上。
         (sys.stderr if a.json else sys.stdout).write("（--dry-run：没有写盘）\n")
         return 0
 
     OUT.write_text(text, encoding="utf-8")
-    # 🔴 写盘后立刻自验：产物里必须出现**本次现算的注册表条数**，否则就是"跑完了但写的还是旧数"
+ # 写盘后立刻自验：产物里必须出现**本次现算的注册表条数**，否则就是"跑完了但写的还是旧数"
     back = OUT.read_text(encoding="utf-8")
     if str(n_reg) not in back or len(back) < 500:
         (sys.stderr if a.json else sys.stdout).write(

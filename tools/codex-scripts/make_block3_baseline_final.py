@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 """从 block3_probe_prod.json 蒸馏出「块3 落生产前改前基线」工件。"""
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 import hashlib
 import json
 import sys
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 PROD = ROOT / "holo_pet" / "panel_server.py"
 PROBE = ROOT / ".scratch" / "block3_probe.py"
 SRC = ROOT / ".scratch" / "block3_probe_prod.json"

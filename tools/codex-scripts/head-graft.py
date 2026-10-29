@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """把头接进全身（head graft）：拿**审美合格的头**（胸像）替换身体模型的头部。
 做法（游戏里常用的"分离头部"法，不做焊接）：
   ① 身体：删掉"颈线以上"的三角形（顶点保留，无害）⇒ 身体不再有旧头
@@ -16,7 +12,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 BODY = DH / "raw/rig/model-rigged-4k.glb"
 HEAD = DH / "raw/portrait-bust.glb"

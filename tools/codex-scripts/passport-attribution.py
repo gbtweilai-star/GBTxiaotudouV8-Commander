@@ -54,7 +54,7 @@ def logbook_rows():
             j = json.loads(ln)
         except Exception:  # noqa: BLE001
             continue
-        # 🔴 2026-10-22 修（第一次跑就抓到）：logbook 的时间字段叫 **`ts`**，不是 `at`/`time`。
+ # 2026-10-22 修（第一次跑就抓到）：logbook 的时间字段叫 **`ts`**，不是 `at`/`time`。
         #    我照台账的习惯写成 at ⇒ 833 条一笔都没解析上 ⇒ 归因结果「有据可查 0 件」是**假读数**。
         at = j.get("ts") or j.get("at") or j.get("time") or ""
         try:
@@ -86,7 +86,7 @@ def main():
         except OSError:
             mtime = 0
         base = os.path.basename(path)
-        # 🔴 2026-10-22 修（**时间窗不等于证据**，第一次跑就抓到自己）：
+ # 2026-10-22 修（**时间窗不等于证据**，第一次跑就抓到自己）：
         #    原来只按 mtime ±2h 找最近一条 logbook 就当理由 —— 实测把
         #    `deploy/.wrangler/tmp/.../middleware-*.js` 归到了「数字人判据脚本挂掉」那条上
         #    （两件毫不相干的事只是时间挨着）。拿这种理由开护照，正是门自己写的

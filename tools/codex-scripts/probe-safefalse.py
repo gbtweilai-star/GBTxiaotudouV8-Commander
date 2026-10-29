@@ -9,7 +9,7 @@
 其中 `edit_pipeline` 已在 §一百一十六 推到「已验」（22/22 测试 + 真拼片 2.800s 对账 0.000）。
 **本工具推剩下 7 位。**
 
-## 🔴 纪律（与 `probe_needparam.py` 同一套）
+## 纪律（与 `probe_needparam.py` 同一套）
 1. **表外一律拒**（fail-closed）：只跑下面 `DECLARED` 里逐条**声明过**的 payload；
 2. **每条只准走只读 op**（理由写在表里）：`status` / `formats` / `tracks` /
    `loudness_targets` / `platforms` / `check` / `list`，以及 `code_patch` 的 **`dry_run`（默认只算不写）**；
@@ -64,7 +64,7 @@ DECLARED = {
          "**`dry_run` 是三原语默认**（原话：dry_run（**默认，只算不写**））", "只算不写"),
     ],
 }
-# 🔴 **明确不探**：写在这里是为了让"为什么没探"也上账，而不是悄悄跳过
+# **明确不探**：写在这里是为了让"为什么没探"也上账，而不是悄悄跳过
 REFUSED = {
     "git_write": "会改版本库（`git add`/`commit`）—— **不探，宁可账上留缺口**",
     "media_run": "一次调用把整条链走到尾（每步落真件）—— **不探**",
@@ -104,7 +104,7 @@ def classify(res: dict) -> str:
         return "❓ 判不了"
     if res.get("被门拒"):
         return "🔒 被门拒·缺授权"
-    # 🔴 门的「**结果收窄**」信封（大结果只报形状）⇒ **真值在 `preview.ok` 里**。
+ # 门的「**结果收窄**」信封（大结果只报形状）⇒ **真值在 `preview.ok` 里**。
     #    第一版没看它 ⇒ 3 个**其实成功**的只读 op 被判「判不了」。
     if "_摘要" in res:
         pv = res.get("preview") if isinstance(res.get("preview"), dict) else {}
@@ -118,7 +118,7 @@ def classify(res: dict) -> str:
     st = str(res.get("status") or "")
     if st.startswith("needs_"):
         return "🟠 环境未就绪"
-    # 🔴 **模块自己的安全自检驳回**（例：`code_patch` 的 find 有歧义 ⇒ 「拒绝替你挑一个」）
+ # **模块自己的安全自检驳回**（例：`code_patch` 的 find 有歧义 ⇒ 「拒绝替你挑一个」）
     #    ⇒ 这是**安全行为**、且证明 **op 真可达**，**不是痛**。
     rc = str(res.get("reason_code") or "")
     msg = str(res.get("message") or res.get("error") or "")
@@ -142,7 +142,7 @@ def probe_all() -> dict:
                 "payload": payload, "为什么只读安全": why, "性质": kind_of,
                 "判决": v, "秒": round(time.time() - t0, 1),
                 "返回的键": sorted(res)[:12] if isinstance(res, dict) else None,
-                # 🔴 **原始返回必须可见**：分类器认不出时不许静默 —— 把原文尾巴带上
+ # **原始返回必须可见**：分类器认不出时不许静默 —— 把原文尾巴带上
                 "原始返回": (json.dumps(res, ensure_ascii=False)[:260]
                          if isinstance(res, dict) else str(res)[:200]),
                 "证据": ({"被门拒": res.get("被门拒"), "message": res.get("message"),
@@ -154,7 +154,7 @@ def probe_all() -> dict:
             "「🔒 被门拒」= 如实报缺授权（**不改判成「坏」**）"}
 
 
-# 🔴 **拒绝面探针**：`git_write` 会改版本库 ⇒ **绝不真写**。
+# **拒绝面探针**：`git_write` 会改版本库 ⇒ **绝不真写**。
 #    但"**写面不点名路径必须拒**"本身就是它最关键的安全判据（源码原话：
 #    「写面**必须点名路径** —— 本仓脏行可能上万」）⇒ **不给路径就永远不可能写**。
 #    ⇒ 验的是**拒绝面**，不是写路径 —— **两个状态分开写**。
@@ -220,7 +220,7 @@ def cmd_selftest(a) -> int:
 
     flat = [(k, p, kind_of) for k, v in DECLARED.items() for p, _, kind_of in v]
     # ① **只准只读 op**：通用白名单 **或** `code_patch` 专属的 `dry_run`
-    #    🔴 第一版只查通用白名单 ⇒ `dry_run` 被误判越界。**判据要写成精确表达式**：
+ # 第一版只查通用白名单 ⇒ `dry_run` 被误判越界。**判据要写成精确表达式**：
     #    「只读 op ∪ (code_patch ∧ dry_run)」——`dry_run` 不许给别的位置用。
     READONLY_OPS = {"status", "formats", "tracks", "loudness_targets", "platforms",
                     "check", "list", "qc", "schema", "probe"}

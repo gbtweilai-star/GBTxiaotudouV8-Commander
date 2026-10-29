@@ -37,7 +37,7 @@ BASE = STATUS.parent
 OUT = ROOT / "state" / "dh_status_audit.json"
 
 REL_RE = re.compile(r"(?<![\w/\\~.])((?:~[\\/]|\.{1,2}[\\/])?(?:[A-Za-z0-9_\u4e00-\u9fff\-]+[\\/])+[A-Za-z0-9_\u4e00-\u9fff\-]+\.(?:glb|gltf|fbx|png|jpg|jpeg|webp|mp4|mov|json|md|py|ps1|txt|csv|wav|mp3))")
-# ⚠️ 全角标点必须排除：状态源里绝对路径后面常紧跟 `（说明）`，
+# 全角标点必须排除：状态源里绝对路径后面常紧跟 `（说明）`，
 #    第一版只排了 `）` 没排 `（`，于是把 `…\skills\digihuman-pipeline\（托管根…` 整段当路径 ⇒ 假红。
 ABS_RE = re.compile(r"([A-Za-z]:\\[^\"'，。；、（）()\s]+)")
 SIZE_RE = re.compile(r"(\d[\d,]{2,})\s*(?:B|字节)\b|(\d+(?:\.\d+)?)\s*(MB|KB|GB)", re.I)
@@ -117,7 +117,7 @@ def main(argv: list[str]) -> int:
             raw = m.group(1).rstrip("\\/")
             refs.setdefault(raw, {"abs": raw, "refs": []})["refs"].append(path)
 
-    # ⚠️ 相对路径的**基准不唯一**（这是我第一版把 29 个文件误报成"不在盘"的原因）：
+ # 相对路径的**基准不唯一**（这是我第一版把 29 个文件误报成"不在盘"的原因）：
     #    状态源里的相对路径有三种基准 —— ① 它自己所在的目录（`raw/…`、`samples/…`）
     #    ② 仓根（`tools/codex-scripts/…`、`plugins/…`、`render/…`）③ 它提到的技能目录（`scripts/…`、`references/…`）。
     #    ⇒ **三个基准都不命中才算不在盘**；命中就把"用哪个基准"写进回执。

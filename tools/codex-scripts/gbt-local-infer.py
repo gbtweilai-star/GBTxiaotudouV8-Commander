@@ -120,7 +120,7 @@ def _lut(code: np.ndarray) -> np.ndarray:
     c = code.astype(np.float32)
     tab = np.empty((256, 2), dtype=np.float32)
     for b in range(256):
-        # 🔴 2026-10-24 01:33 实测校正（拿 bitsandbytes 官方 dequantize_4bit 当对照）：
+ # 2026-10-24 01:33 实测校正（拿 bitsandbytes 官方 dequantize_4bit 当对照）：
         #   原来按「低位=偶数位」写，对照结果**正好成对颠倒**（max 差 0.62、一致率 7.3%）。
         #   官方是 **高 nibble = 偶数位元素、低 nibble = 奇数位元素**。改成这样就逐元素对齐。
         tab[b, 0] = c[(b >> 4) & 0x0F]   # 高 nibble = 偶数位元素

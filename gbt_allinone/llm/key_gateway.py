@@ -180,6 +180,14 @@ PROVIDERS = [
     dict(name="deepseek",  vault="deepseek", envs=["DEEPSEEK_API_KEY"],
          url="https://api.deepseek.com/v1", model="deepseek-flash",
          wire="openai", tier="primary", quota_tokens=0, weight=0.95),
+    # ── 免费池（Kilo AI 公共网关 · 免密 · 2026-10-29 实测出字）────────────────
+    #   上游 https://api.kilo.ai/api/gateway（标准 OpenAI 兼容，**免 key**）；kilo-auto/free 自动路由。
+    #   ⚠️ Kilo 免责：prompts 可能被上游记录用于改进，别发敏感内容。
+    #   `no_key=True` = 免密：_present 直接判在位、materialize 放行空 key、
+    #   _call_once 不发 Authorization（Kilo 忽略它）。契合 Owner 2026-10-21 口径「自动循环用免费池」。
+    dict(name="kilo", vault="", envs=[],
+         url="https://api.kilo.ai/api/gateway", model="kilo-auto/free",
+         wire="openai", tier="standard", quota_tokens=0, weight=0.90, no_key=True),
     # ── 深度推理备用（NVIDIA NIM · OpenAI 兼容 · 2026-09-27 实弹确认可达）
     #    实测读数：glm-5.3 冷启动 >240s；glm-5.3-flash 65s 可回。
     #    ⚠️ 推理模型坑：max_tokens 太小会被 reasoning 吃光 ⇒ content 空但 HTTP 200。
@@ -388,6 +396,9 @@ def _present(name: str) -> tuple:
     p = _BY_NAME.get(name)
     if not p:
         return False, "unknown-provider"
+    if p.get("no_key"):
+        # 免密 provider（如 Kilo 免费池）：不需要 key，永远在位。
+        return True, "no-key"
     try:
         from gbt_allinone import deepseek_key as _dk
         for v in _vaults_of(p):
@@ -649,8 +660,10 @@ def materialize(name: str) -> dict:
     if not p:
         return {"ok": False, "error": "未知 provider %r" % name}
     key, src = key_for(name)
-    if not key:
+    if not key and not p.get("no_key"):
         return {"ok": False, "error": "该通道密钥不在位", "source": src}
+    if not key and p.get("no_key"):
+        src = "no-key"
     return {"ok": True, "provider": name, "key": key, "source": src,
             "url": _url_of(p), "model": p.get("model", ""),
             "wire": p.get("wire", "openai"), "masked": mask(key, name),
@@ -1044,6 +1057,13 @@ def selftest() -> dict:
     ck("同密钥同指纹", fingerprint("sk-abc") == fingerprint("sk-abc"))
     ck("异密钥异指纹", fingerprint("sk-abc") != fingerprint("sk-abd"))
     ck("不读密钥也能报在位（rank 只读）", isinstance(rank(), list))
+    # 🔴 免密 provider（Kilo 免费池）：不要求 key，却必须在位、materialize 也放行 ——
+    #    若这里不钉，以后有人把 no_key 字段删了，Kilo 会静默「密钥不在位」而没人发现。
+    ck("免密 provider（kilo）判在位（no_key 不要求 key）",
+       _present("kilo") == (True, "no-key"))
+    ck("免密 provider materialize 放行空 key（source=no-key）",
+       (lambda m: m.get("ok") is True and m.get("source") == "no-key" and m.get("key") == "")
+       (materialize("kilo")))
 
     # 自检只读：跑前后运行态逐字节相同
     rf = _runtime_file()

@@ -292,10 +292,10 @@ def check_render(timeout_s: int = 25, shot: Path | None = None) -> dict:
                     f"http://127.0.0.1:{port}/{PAGE_REL}",
                 ]
                 try:
-                    # 🔴 不用 pipe 接 stdio（本沙箱会挡）；输出走真文件。
+ # 不用 pipe 接 stdio（本沙箱会挡）；输出走真文件。
                     with logpath.open("wb") as log:
                         proc = subprocess.Popen(cmd, stdout=log, stderr=log)
-                        # 🔴 **不许因为"启动器已退出"就提前收工**：Edge/Chrome 的 chrome.exe
+ # **不许因为"启动器已退出"就提前收工**：Edge/Chrome 的 chrome.exe
                         #    只是启动器，真正落截图的是后台工作进程（实测：启动器秒退、截图 1–3s 后才落）。
                         #    这里只按**文件是否出现**判，且给足预算。
                         deadline = time.time() + timeout_s

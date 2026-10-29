@@ -400,45 +400,22 @@ def _sw_rows() -> list:
 def _duty_board(op: str, p: dict) -> dict:
     if op not in ("board", "status"):
         return {"ok": False, "error": "未知 op:%s" % op, "known": list(OPS["duty_board"])}
-    # 🔴 2026-10-28：判据原来**没有时间窗** —— 用整本观测账的累计失败数。
-    #   后果：位修好了也永远显示"卡住"（实测 brain_route 历史 29 笔失败，
-    #   而现在每次都 ok=True，看板仍报它卡住）⇒ 看板失去可操作性。
-    #   改成只看**最近 WINDOW 笔**：窗口内的失败才算数。
-    WINDOW = 20
     obs = _sw_rows()
-    _recent: dict = {}
-    for r in obs:
-        c = str(r.get("cap") or "")
-        if not c:
-            continue
-        _recent.setdefault(c, []).append(r)
-    obs = [r for c, rows in _recent.items() for r in rows[-WINDOW:]]
     per: dict = {}
     for r in obs:
         cap = str(r.get("cap") or "")
         if not cap:
             continue
-        d = per.setdefault(cap, {"n": 0, "ok": 0, "last": "", "fail": 0,
-                                 "err": "", "deny": 0})
+        d = per.setdefault(cap, {"n": 0, "ok": 0, "last": "", "fail": 0, "err": ""})
         d["n"] += 1
         d["ok"] += 1 if r.get("ok") else 0
         d["last"] = max(d["last"], str(r.get("at") or ""))
         if not r.get("ok"):
             d["fail"] += 1
             d["err"] = str(r.get("error_class") or "")[:40]
-            if "denied" in d["err"] or "denied" in str(r.get("error_class") or ""):
-                d["deny"] += 1
-    # 🔴 2026-10-28：原来把**所有失败**都算「卡住」，包括 `gate_denied`。
-    #   实测主脑队列里 57% 的"卡住"是 `gate_denied` —— 那是**闸在工作**
-    #   （位在等主人发票），不是脑卡住。把它算成故障就是假警报。
-    #   现在拆成三档：等授权 / 真卡住 / 跑过但有失败。
-    running, worn, stuck, awaiting = [], [], [], []
+    running, worn, stuck = [], [], []
     for cap, d in sorted(per.items()):
-        denied_only = d["deny"] >= 2 and d["fail"] <= d["deny"]
-        if denied_only:
-            awaiting.append({"位": cap, "被拒笔数": d["deny"],
-                             "说明": "过授权门被拒 —— 等主人在终端发票，不是故障"})
-        elif d["fail"] >= 2:
+        if d["fail"] >= 2:
             stuck.append({"位": cap, "失败笔数": d["fail"], "最近错误类": d["err"]})
         elif d["fail"] == 0:
             running.append({"位": cap, "用了": d["n"], "最后": d["last"]})
@@ -450,20 +427,15 @@ def _duty_board(op: str, p: dict) -> dict:
              and not c.get("unimplemented") and not c.get("needs_confirmation")][:20]
     if op == "status":
         return {"ok": True, "op": "status", "ops": list(OPS["duty_board"]),
-                "观察窗口": "每位最近 %d 笔 —— 历史失败不再永久挂账"
-                            "（修好了不会永远显示卡住）" % WINDOW,
-                "口径": "忙闲按读数算（skill_watch 观测账 + 图鉴位面）；"
-                        "读不到就如实说读不到；**等授权 ≠ 卡住**"}
+                "口径": "忙闲按读数算（skill_watch 观测账 + 图鉴位面）；读不到就如实说读不到"}
     if stuck:
         _append("queue.jsonl", {"at": _now(), "kind": "duty_board", "severity": "high",
                                "codes": ["有脑卡住"], "hits": stuck, "acked_at": None})
     return {"ok": True, "op": "board", "观测笔数": len(obs), "有观测的位": len(per),
             "在跑（零失败）": running[-10:], "跑过但有失败": worn[-10:],
-            "卡住（失败≥2笔·已排除等授权）": stuck,
-            "等授权（过门被拒，不是故障）": awaiting,
+            "卡住（失败≥2笔）": stuck,
             "从未用过（图鉴在册·观测账 0 笔）": never,
             "上报": {"queued": 1 if stuck else 0},
-            "观察窗口": "每位最近 %d 笔（历史失败不再永久挂账）" % WINDOW,
             "口径": "卡住的主动进主脑队列；空转/从未用过照实列出，不美化"}
 
 

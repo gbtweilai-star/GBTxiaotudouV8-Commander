@@ -19,9 +19,11 @@ import queue
 import re
 import shutil
 import socket
+import socketserver
 import sys
 import threading
 import time
+import types
 import uuid
 from datetime import datetime
 from http import HTTPStatus
@@ -57,20 +59,8 @@ from gbt_allinone.security import policy  # noqa: E402
 from gbt_allinone.tentacle import vision_watch  # noqa: E402
 from gbt_allinone.tentacle.brain import tentacle_transmission  # noqa: E402
 
-# 🔴 2026-10-28：这两份**从未随仓库发布**（全仓搜不到），却在这里无条件 import
-#   ⇒ 面板后端一行都起不来（ModuleNotFoundError）。按"不编"原则改成可缺省：
-#   缺了就记进 MISSING_IMPLS，对应接口如实报 unimplemented，不让整个服务陪葬。
-MISSING_IMPLS = []
-try:
-    import research_status  # noqa: E402
-except Exception:                                            # noqa: BLE001
-    research_status = None
-    MISSING_IMPLS.append("research_status")
-try:
-    import social_platforms  # noqa: E402
-except Exception:                                            # noqa: BLE001
-    social_platforms = None
-    MISSING_IMPLS.append("social_platforms")
+import research_status  # noqa: E402
+import social_platforms  # noqa: E402
 
 try:
     from chat_client import ChatClient
@@ -112,6 +102,46 @@ def _is_same_hook(current, target) -> bool:
 def _clip(value, limit: int = 320) -> str:
     text = " ".join(str(value or "").split())
     return text[:max(0, int(limit))]
+
+
+# ── 客户端断开：正常事件，不许当故障刷屏（2026-10-27）──────────────────────
+# 断开有**两个发生点**，缺一处就还剩一半噪声：
+#   ① **写响应**（`_Handler._send_json` 里的 end_headers / wfile.write）—— 已在方法内接住；
+#   ② **读下一个请求行**（keep-alive 循环里的 `rfile.readline`）—— 在标准库内部，
+#      业务方法够不着，只能覆写 `socketserver.BaseServer.handle_error`。
+# 实测账：只修 ① 时，20 次 RST 仍产出 **20 条** traceback（经查全来自 ②）；
+# 两处都修才是 **0 条**。⚠️ 别只修一处就宣布治好 —— 那正是"看起来好了"。
+_DISCONNECT_ERRORS = (BrokenPipeError, ConnectionResetError, ConnectionAbortedError)
+
+
+def is_disconnect(exc) -> bool:
+    """这条异常是不是「对端先走了」。
+
+    ⚠️ 只认这三类，**不用 `OSError` 宽口径** —— `except OSError` 会把
+    「磁盘满 / 句柄耗尽」这类真错一起吞掉，那比噪声更糟（判据里有负对照钉这条）。
+    """
+    return isinstance(exc, _DISCONNECT_ERRORS)
+
+
+def quiet_disconnects(server):
+    """把 `handle_error` 换成「断开不吭声、其余照打」的版本；返回被换下的原函数。
+
+    为什么必须有这一层：`socketserver` 默认对**每个请求线程**的异常打完整 traceback。
+    实测：面板服务跑 9h02m，stderr 攒到 1.29MB / 12.9 万行，其中 98% 是同一个
+    `WinError 10053` —— 真正的故障（末尾那次段错误）被埋在这些噪声里，一行都看不见。
+
+    盖在 `create_server` 里而不是入口脚本里，是因为**换个起法就不该失效**
+    （测试、别的 launcher、别处 import 起服务，都该一样干净）。
+    """
+    original = socketserver.BaseServer.handle_error
+
+    def quiet(self, request, client_address):
+        if is_disconnect(sys.exc_info()[1]):
+            return
+        return original(self, request, client_address)
+
+    server.handle_error = types.MethodType(quiet, server)
+    return original
 
 
 
@@ -2396,33 +2426,6 @@ class HoloBridge:
     # 面板不复制任何一份能力表，也不绕过 policy。
     # ------------------------------------------------------------------
 
-    def mirror(self, op: str = "status", payload: dict | None = None) -> dict:
-        """镜像多维度空间（10 位）：**一律转发到能力层**，面板不另写一套。
-
-        为什么走 run_task 而不是直接 import mirror_space：
-          能力层是唯一真源 —— 授权、审计、参数校验都在那里。
-          面板自己直连实现就等于绕开闸，这正是 docs/09 要防的事。
-        """
-        kind = "mirror_" + (op or "status").strip().lower()
-        allowed = {"mirror_status", "mirror_shape", "mirror_scan", "mirror_plan",
-                   "mirror_simulate", "mirror_parity", "mirror_rehearse",
-                   "mirror_release", "mirror_ascend", "mirror_rewind"}
-        if kind not in allowed:
-            return {"ok": False,
-                    "error": "未列出的 op（fail-closed）", "op": op,
-                    "allowed": sorted(x[len("mirror_"):] for x in allowed)}
-        try:
-            from gbt_allinone.api import run_task
-        except Exception as exc:                             # noqa: BLE001
-            return {"ok": False, "error": "能力层不可用: %s" % exc}
-        try:
-            r = run_task(kind, dict(payload or {}))
-        except Exception as exc:                             # noqa: BLE001
-            return {"ok": False, "op": op, "error": "%s: %s" % (type(exc).__name__, exc)}
-        if isinstance(r, dict):
-            r.setdefault("panel_missing_impls", MISSING_IMPLS)
-        return r if isinstance(r, dict) else {"ok": True, "result": r}
-
     def capabilities(self) -> dict:
         """能力总目录（只读）：数据源是她自己的 caps_registry。"""
         try:
@@ -3356,8 +3359,19 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self._send_cors()
         self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
+        # 🔴 2026-10-27：客户端断开是**正常事件**（轮询页刷新 / 切标签 / 关页 / 前端 abort），
+        # 不是服务出错。不接住它，`socketserver` 会给**每个请求线程**打一整段 traceback ——
+        # 实测：面板服务跑 9h02m，stderr 攒到 1.29MB / 12.9 万行，其中 98% 是同一个
+        # `WinError 10053`，把自己真正的故障（末尾那次段错误）埋在噪声里。
+        # SSE 那条路径（`_sse_stream` 的 `except (BrokenPipeError, ConnectionResetError, OSError)`）
+        # 早就接了，JSON 这条一直没接 —— 同一件事两条路径，只接了一条。
+        # ⚠️ 只接这三类断开异常，**不用 `OSError` 宽口径**：
+        # `except OSError` 会把"磁盘满 / 句柄耗尽"这类真错一起吞掉，那比噪声更糟。
+        try:
+            self.end_headers()
+            self.wfile.write(raw)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
 
     # ── 同机直连放行（只放行本机回环上的 DSH 宿主源，**不是 `*`**）──────────────
     # 为什么需要：DSH 宿主里 `/gbt-master/api/*` 的内嵌反代**当前不生效**
@@ -3366,13 +3380,7 @@ class _Handler(BaseHTTPRequestHandler):
     # 于是凡声明 apiShim 的页在宿主内都拿不到本机服务。
     # 放行之后，宿主里的页可以直连 `http://127.0.0.1:8765/api/*`；
     # 反代一旦生效，前端会优先走同源那条，这段就成了兜底 —— 两条路都在明面上。
-    # 🔴 2026-10-28：原来只放行 :3080（DSH 宿主）。但本机静态页由
-    #   127.0.0.1:8080 提供（tools/up.sh 起的 http.server），面板页去取
-    #   /api/mirror 时被 CORS 拦成"离线"。加上回环 8080/8081。
-    #   **仍然只放行回环，不是 *。**
-    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080",
-                    "http://127.0.0.1:8080", "http://localhost:8080",
-                    "http://127.0.0.1:8081", "http://localhost:8081")
+    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080")
 
     def _send_cors(self) -> None:
         origin = self.headers.get("Origin")
@@ -3460,10 +3468,6 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/capabilities":
             self._send_json(self.bridge.capabilities())
             return
-        if parsed.path == "/api/mirror":
-            # 只读：维度/现实指纹、漂移、时间线史
-            self._send_json(self.bridge.mirror("status"))
-            return
         if parsed.path == "/api/tree":
             self._send_json(self.bridge.tree(
                 _query_int(parsed.query, "depth") or 3,
@@ -3550,17 +3554,6 @@ class _Handler(BaseHTTPRequestHandler):
         self.wfile.flush()
 
     def do_POST(self):  # noqa: N802
-        # 🔴 镜像多维度空间：写面一律走这里，op 白名单 fail-closed
-        if urlparse(self.path).path == "/api/mirror":
-            try:
-                n = int(self.headers.get("Content-Length") or 0)
-                body = json.loads(self.rfile.read(n) or b"{}")
-            except Exception as exc:                          # noqa: BLE001
-                self._send_json({"ok": False, "error": "请求体不是 JSON: %s" % exc})
-                return
-            self._send_json(self.bridge.mirror(body.get("op", "status"),
-                                               body.get("payload") or {}))
-            return
         parsed = urlparse(self.path)
         try:
             if parsed.path == "/api/message":
@@ -3701,6 +3694,8 @@ def create_server(host: str = "127.0.0.1", port: int = 8765,
     server.daemon_threads = True
     server.bridge = bridge or HoloBridge()  # type: ignore[attr-defined]
     server.dedupe = MessageDeduper()  # type: ignore[attr-defined]
+    # 客户端断开不许刷屏（读路径只能在这一层接，见 quiet_disconnects 的说明）
+    quiet_disconnects(server)
     return server
 
 

@@ -777,7 +777,12 @@ def _io_boundary(boundary, path):
 #   ⇒ 修法不是"多加几个名字"（第 59 轮就是这么补的，同类病照样复发），而是**认不出就报**。
 _ACCEPTED_PARAMS = {
     "tts": {"text", "voice", "rate", "out", "backend", "engine",
-            "edge_rate", "pitch", "volume"},
+            "edge_rate", "pitch", "volume",
+            # 🔴 2026-10-25 · 声明面补真实参数：play 是 2026-10-19 真加进
+            # 	ts() 签名的形参（文档写着「传了就按传的来」），_dispatch 也
+            # 确实把它转下去了（params.get("play")）—— 唯独这张声明表漏了它，
+            # 等于**把能用的参数藏起来**（判据原话：少一个 = 把能用的藏了）。
+            "play"},
     "asr": {"audio"},
     "listen": {"seconds", "culture", "min_confidence", "timeout", "wav", "device"},
     "status": set(),

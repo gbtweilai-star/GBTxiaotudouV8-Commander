@@ -235,7 +235,7 @@ def _done_status(jid: str) -> dict | None:
 def cmd_run(a) -> int:
     jid = a.job_id
     worker = a.worker or ("pid-%d" % os.getpid())
-    # 🔴 每个终端**自己的**工作目录：30~50 个终端共用一个目录会互相踩
+ # 每个终端**自己的**工作目录：30~50 个终端共用一个目录会互相踩
     #    （实测：w2 渲完删了本地，w1 再去删同一路径就 FileNotFoundError 崩掉）
     work = ROOT / "state" / "render-jobs" / jid / worker
     work.mkdir(parents=True, exist_ok=True)

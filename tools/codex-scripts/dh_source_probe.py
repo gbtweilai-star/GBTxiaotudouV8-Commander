@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """源 GLB 拓扑体检 · 第二轮：**手贴髋**那一处到底是"同一张面"还是"两张面贴在一起"。
 
 在 v1 代理网格上量到的最坏"帆边"静置端点（去重后的重灾区，见 dh_scan_*.json）：
@@ -24,7 +20,7 @@ import sys
 
 import numpy as np
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 SRC = os.path.join(os.path.expanduser("~"), "Downloads", "futuristic cosplay outfit 3d model.glb")
 REPORT = os.path.join(WS, "projects", "digital-human", "out", "rig_report.json")
 OUT = os.path.join(WS, ".scratch", "dh_source_probe.json")

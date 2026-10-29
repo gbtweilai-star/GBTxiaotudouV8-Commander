@@ -32,9 +32,22 @@ class TestPodLink(unittest.TestCase):
         #     `confirm="主人已授权"`。旧断言把**新设计当故障**，还要求一条与实现相反的文案。
         #   现口径：① ops 认全部 10 个；② 花钱 op 的**人闸**改成硬判据（缺 confirm 必拒）；
         #     ③ 令牌不回显 / 传完对账 两条铁律照旧咬。
-        self.assertEqual(set(w["ops"]),
-                         {"status", "ls", "up", "down", "run", "where",
-                          "start", "stop", "gpus", "create"}, w["ops"])
+        # 🔴 2026-10-25 再翻一次（留痕 · 原期望 / 新口径 / 为什么翻）：
+        #   原期望：ops **恰好**是上面硬写的 10 个。
+        #   新口径：与派生源 PL._OPS 对齐；并仍然咬住三条牙 ——
+        #           ① 那 10 个历史 op 缺任何一个照样红（能力被砍就是真故障）；
+        #           ② ops 不许有重复项（注册表被写坏）；
+        #           ③ hard_rules 里「不回显」那条照旧咬（下面已有）。
+        #   为什么翻：实现后来真加了 ccount / ports / logs 三个只读 op，
+        #     硬写的 10 个把**新增当故障** ⇒ 报「first set 多出 ports, logs」。
+        #   这不是放宽：缺一个历史 op、或出现重复，都还是红。
+        ops = list(w["ops"])
+        self.assertEqual(set(ops), set(PL._OPS),
+                         "where 报的 ops 必须与派生源 _OPS 一致：%r vs %r" % (ops, list(PL._OPS)))
+        for core in ("status", "ls", "up", "down", "run", "where",
+                     "start", "stop", "gpus", "create"):
+            self.assertIn(core, ops, "历史 op 丢了：%s（现读 %r）" % (core, ops))
+        self.assertEqual(len(ops), len(set(ops)), "ops 有重复项：%r" % (ops,))
         for k in ("走的路", "hard_rules", "作用域"):
             self.assertIn(k, w, "契约面缺 %s" % k)
         hard = " ".join(w["hard_rules"])

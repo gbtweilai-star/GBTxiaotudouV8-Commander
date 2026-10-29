@@ -14,7 +14,8 @@
  */
 "use strict";
 
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell } = require("electron");
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell,
+        webContents } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
@@ -28,25 +29,60 @@ const chrome = require("./chrome.cjs");
    注入只允许收口在本模块（守卫 B4 的判据已据此改写）。 */
 const deepseekLoop = require("./deepseek_loop.cjs");
 const os = require("os");
+/* 看门狗预算的单一决策点（纯函数，可单测）。见模块头部：为什么不能用拍死的常数。 */
+const beatBudgetMod = require("./beat-budget.cjs");
 
 const HERE = __dirname;
 const PANEL = process.env.GBT_PANEL_URL || "http://127.0.0.1:8765";
 const READONLY_NOTE = "只读态：自检结果仅 UI 显示，不落盘";
 
-/* 🔴 2026-10-21 根因修复（主人：「数字人页面是垃圾 / 一片载入中」）：
-   实测（CDP 抓控制台）数字人那扇窗报 `THREE.WebGLRenderer: A WebGL context
-   could not be created. Reason: VENDOR = 0xffff, DEVICE = 0xffff,
-   GL_VENDOR = Disabled, GL_RENDERER = Disabled` ⇒ three.js 根本没起来，
-   页面永远停在「引擎：载入中」，左边 2/3 是全黑的空工作台。
-
-   本机显卡是在的（AMD Radeon RX 6500M + 核显，驱动 30.0.14064.4）：所以不是「没有
-   GPU」，而是**这台 Electron 的 GL 被禁用了**（Chromium 走到 0xffff 那档 =
-   GPU 不可用 + 软件光栅也被挡）。Chromium ≥128 起，软件 WebGL 必须显式开
-   `enable-unsafe-swiftshader` 才允许 —— 这条开关就是补这一层：
-   GPU 能用就走 GPU，不能用就走 CPU 软渲染（慢一点，但**画得出来**）。
-   ⚠️ 名字里的「unsafe」是 Chromium 对「软渲染可被用于时序攻击」的历史称谓，
-   我们只渲染自己的本地 GLB、零外部输入、零远端取数 ⇒ 风险面不成立。 */
-app.commandLine.appendSwitch("enable-unsafe-swiftshader");
+/* 🔴 按需载页（2026-10-27）—— **权重从台账读，不从"我觉得重"读**。
+ *
+ * 依据：`state/window-weights.json` 由 `tools/codex-scripts/window-weights.py`
+ * 从**真启动日志**（每窗 `[w3] 载完 <id> · Nms`）算出，权重 = 该窗载入耗时的中位。
+ * 实测 10 轮：logbook 1763ms · capabilities 1644ms · panel 1519ms（判 heavy），
+ * 全体中位 1353ms —— 这三扇的载入量之和占全部窗的 22%（**并发载入，不是墙钟收益**）。
+ *
+ * 取舍（写清楚，免得下一个人以为是漏了）：
+ *   · 只延后 heavy 档；`core`（godview / digital-human，启动后会被 focus）与其余照旧；
+ *   · 台账读不到 ⇒ **全部照旧载**（fail-safe：宁可多等，不许开出一堆空窗）；
+ *   · **默认开**（2026-10-27 定）：`GBT_W3_LAZY=0|off` 才关；`=1` 只延后 heavy 3 扇（实测零收益，留着备查）。
+ *
+ * 为什么默认开（不是拍脑袋，是**已有的产品决定本来就这么要求**）：
+ *   本文件 1297 行已按主人令 2026-10-08 定下「启动只显数字人，其余窗一律不显」。
+ *   那些隐藏窗在 lazy 关掉时**照样 loadFile**（16 个隐藏页常驻）—— 那是纯浪费：
+ *   实测同一台机，17 载 vs 2 载的空闲 CPU 是 **56% vs 13~20%**，墙钟不变。
+ *   端到端也验过：`showWindow(logbook)` 与 `pageMessage(capabilities)` 都会先把它拉起来再投递。
+ */
+const lazyEnv = String(process.env.GBT_W3_LAZY || "").trim().toLowerCase();
+const LAZY_MODE = (lazyEnv === "0" || lazyEnv === "off") ? "off" : (lazyEnv === "1" ? "heavy" : "all");
+const LAZY_ON = LAZY_MODE !== "off";
+const LAZY_IDS = (() => {
+  if (!LAZY_ON) {
+    console.log("[w3] 按需载页：关（GBT_W3_LAZY=" + lazyEnv + "）⇒ 全部照旧载");
+    return new Set();
+  }
+  /* `all`（默认）：除核心窗（启动后会被 focus 的那两扇）外**全部**按需载。
+     实测 `heavy`（只延后台账 heavy 的 3 扇）**墙钟与 CPU 都没变** ——
+     17 扇是并发载的，少 3 扇不在关键路径上。要动 CPU 只有一条路：
+     把启动期的常驻页从 17 降到 2。 */
+  const all = LAZY_MODE === "all";
+  try {
+    const p = path.join(HERE, "..", "..", "state", "window-weights.json");
+    const d = JSON.parse(fs.readFileSync(p, "utf8"));
+    const rows = d.windows || [];
+    const core = new Set((d.core || []).map(String));
+    const ids = rows.filter((w) => w && (all ? !core.has(String(w.id)) : w.tier === "heavy"))
+      .map((w) => String(w.id));
+    console.log("[w3] 按需载页（" + (all ? "all＝只留核心窗" : "heavy 档") + "）：" + ids.length
+      + " 扇先不载（" + ids.join(",") + "），首次显示时再载");
+    return new Set(ids);
+  } catch (err) {
+    console.log("[w3] 按需载页：台账读不到（" + String((err && err.message) || err).slice(0, 60)
+      + "）⇒ 退回全部照旧载");
+    return new Set();
+  }
+})();
 
 /* 🔴 2026-10-10 根因修复（主人截图：上帝视角「看任务/看账本」全 ENOENT，
    读的是 userData\gbt_allinone\store）：**打包态 ROOT=null**。
@@ -630,7 +666,7 @@ function startSse(broadcast) {
 const TOOLS_CAPS = [
   {
     cap: "prompt_bridge",
-    registered: "caps_registry.py:889",
+    registered: "caps_registry.py:941",
     actions: [
       { name: "status", state: "live", reason: "只读纯函数：先问当前态再决定发不发车（零副作用）" },
       { name: "compile", state: "live", reason: "只读纯本地：四段模板 + 原意保真自检（丢词即 intent_loss）" },
@@ -647,7 +683,7 @@ const TOOLS_CAPS = [
   },
   {
     cap: "coze_mail",
-    registered: "caps_registry.py:784",
+    registered: "caps_registry.py:836",
     actions: [
       { name: "status", state: "live", reason: "只读探针：读 state.json 与通道行数，不调能力层" },
       { name: "search", state: "pending", reason: "后端未接线 backend_not_wired（coze_mail_cap.py:69 _UnwiredTransport）" },
@@ -657,7 +693,7 @@ const TOOLS_CAPS = [
   },
   {
     cap: "create",
-    registered: "caps_registry.py:790",
+    registered: "caps_registry.py:842",
     actions: [
       { name: "status", state: "live", reason: "只读探针：读 state.json 与写根存在性，零字节零目录" },
       { name: "intent", state: "pending", reason: "本地登记（不发网络）；本轮不开放点击" },
@@ -1083,189 +1119,6 @@ async function ensurePanelBridge() {
   return { ok: false, reason: "进程起了但 :8765 一直没接管（可能端口被占，launch_panel 会顺延）" };
 }
 
-/* 🔴 2026-10-21（主人令「把云插件的GBT小土豆V8大模型接入到原生APP里面使用」）：
-   **建窗之前**确保模型桥在跑 —— 「模型对话」页（model-chat）只连本机桥 127.0.0.1:8791，
-   钥匙在桥里（DPAPI 保险箱），页面零凭据；桥没人拉 ⇒ 页面永远「桥：连不上」，
-   云插件的 GBT小土豆V8 大模型就等于没接进 APP。
-   做法：探活（GET /health）→ 没起就 spawn `py -3.14 -X utf8 tools/model-bridge/server.py`，
-   桥自己的 stderr（只有 slot/model/http/耗时 一行行，不落聊天内容）追加进
-   outputs/model-bridge/bridge.log。失败只打日志、不牵连壳启动（与 R-H295 同向）。
-   退出收尸：只 kill **本进程拉起的**那个 child；用户自己终端拉的桥不碰。 */
-const MODEL_BRIDGE_PORT = 8791;
-const MODEL_BRIDGE_JS = path.join(ROOT, "tools", "model-bridge", "server.py");
-let modelBridgeChild = null;
-
-/* 🔴 2026-10-24（主人令「接 APP 启动逻辑」）：本机自有权重服务（Q5_0 · OpenAI 兼容）——
-   桥的 selfhost 车道就指向它。为什么由壳来拉：
-   ① 桥的车道地址在 import 时算好，必须在桥之前就绪；
-   ② 壳是唯一同时知道 ROOT、解释器、权重位置的地方。
-   失败只打日志、不牵连壳启动；桥那边会自然落回 cfai（weights_ours=false）。 */
-const LOCAL_LLM_PORT = 8792;
-const GPU_LANE_PORT = 8793;   /* Vulkan 车道（实验）；壳退出时一并收掉 —— 本体不留后台 */
-const LOCAL_LLM_JS = path.join(ROOT, "tools", "model-bridge", "local_llm_server.py");
-const LOCAL_LLM_GGUF = path.join(ROOT, "state", "weights", "gbt-v8-v82-q5_0.gguf");
-let localLlmChild = null;
-
-function localLlmPing() {
-  return new Promise((resolve) => {
-    const req = http.get(
-      { host: "127.0.0.1", port: LOCAL_LLM_PORT, path: "/health", timeout: 2000 },
-      (res) => { res.resume(); resolve(res.statusCode === 200); });
-    req.on("error", () => resolve(false));
-    req.setTimeout(2000, () => { req.destroy(); resolve(false); });
-  });
-}
-
-/* 🔴 2026-10-24 实测：壳默认的 PETS_PY_EXE = "py" → 落到 Python 3.14（uv），
-   那里**没装 llama_cpp** ⇒ 服务秒退（ModuleNotFoundError），而桥是纯标准库所以照跑。
-   所以这里必须单独挑一个「能 import llama_cpp」的解释器。 */
-function pickLlmPython() {
-  const cands = [process.env.GBT_LLM_PY_EXE, "C:\\Python312\\python.exe", PETS_PY_EXE].filter(Boolean);
-  for (const cand of cands) {
-    try {
-      require("child_process").execFileSync(cand, ["-c", "import llama_cpp"],
-        { stdio: "ignore", windowsHide: true, timeout: 20000 });
-      return cand;
-    } catch (err) { /* 下一个候选 */ }
-  }
-  return "";
-}
-
-async function ensureLocalLLM() {
-  if (!ROOT) return { ok: false, reason: "找不到仓库根" };
-  if (!fs.existsSync(LOCAL_LLM_GGUF)) return { ok: false, reason: "缺权重：" + LOCAL_LLM_GGUF };
-  if (await localLlmPing()) return { ok: true, already: true };
-  const pyExe = pickLlmPython();
-  if (!pyExe) return { ok: false, reason: "没有装 llama_cpp 的解释器（试过 GBT_LLM_PY_EXE / C:\\Python312 / " + PETS_PY_EXE + "）" };
-  const bareLauncher = !/[\\/]/.test(pyExe);
-  const argv = (bareLauncher ? ["-3.14", "-X", "utf8"] : ["-X", "utf8"]).concat([
-    /* 2026-10-24 实测（6 核 / 12 线程）：threads=8 在两次对照里都是同批最高；
-       ctx=64 的"更快"是页缓存温度造成的假象，反向复跑就没了，所以仍用 256。 */
-    LOCAL_LLM_JS, "--model", LOCAL_LLM_GGUF, "--port", String(LOCAL_LLM_PORT),
-    "--ctx", "256", "--threads", "8",
-  ]);
-  let logStream = null;
-  try {
-    fs.mkdirSync(path.join(ROOT, "outputs", "model-bridge"), { recursive: true });
-    logStream = fs.createWriteStream(path.join(ROOT, "outputs", "model-bridge", "local-llm.log"), { flags: "a" });
-    localLlmChild = spawn(pyExe, argv,
-      { cwd: ROOT, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
-    const sink = logStream;
-    localLlmChild.stdout.on("data", (d) => { try { sink.write(d); } catch (err) { /* 日志写不出不拖垮服务 */ } });
-    localLlmChild.stderr.on("data", (d) => { try { sink.write(d); } catch (err) { /* 同上 */ } });
-    localLlmChild.on("exit", () => { localLlmChild = null; });
-  } catch (err) {
-    return { ok: false, reason: "起不来：" + String((err && err.message) || err) };
-  }
-  /* 4.88 GB 权重冷加载 + 换页可能要几十秒；最多等 90s，不无限等。 */
-  for (let i = 0; i < 90; i += 1) {
-    await new Promise((r) => setTimeout(r, 1000));
-    if (await localLlmPing()) return { ok: true, already: false, waited_ms: (i + 1) * 1000 };
-  }
-  return { ok: false, reason: "进程起了但 :8792 一直没接管（看 outputs/model-bridge/local-llm.log）" };
-}
-
-function modelBridgePing() {
-  return new Promise((resolve) => {
-    const req = http.get(
-      { host: "127.0.0.1", port: MODEL_BRIDGE_PORT, path: "/health", timeout: 1500 },
-      (res) => { res.resume(); resolve(true); });
-    req.on("error", () => resolve(false));
-    req.setTimeout(1500, () => { req.destroy(); resolve(false); });
-  });
-}
-
-function modelBridgeHealth() {
-  return new Promise((resolve) => {
-    const req = http.get(
-      { host: "127.0.0.1", port: MODEL_BRIDGE_PORT, path: "/health", timeout: 2000 },
-      (res) => {
-        let buf = "";
-        res.setEncoding("utf8");
-        res.on("data", (d) => { buf += d; });
-        res.on("end", () => { try { resolve(JSON.parse(buf)); } catch (err) { resolve(null); } });
-      });
-    req.on("error", () => resolve(null));
-    req.setTimeout(2000, () => { req.destroy(); resolve(null); });
-  });
-}
-
-/* 桥的 /health 里有没有 selfhost 车道、地址是不是指向本机权重服务。 */
-function bridgeHasSelfhost(h) {
-  if (!h || !Array.isArray(h.upstreams)) return false;
-  return h.upstreams.some((u) => u && u.name === "selfhost"
-    && String(u.base_url || "").indexOf(":" + LOCAL_LLM_PORT) >= 0);
-}
-
-/* 收掉监听某端口的进程 —— 只用于清掉**没带 selfhost 车道**的残留桥。
-   拿不到 PID 就返回 0，让上层如实报"没清掉"，不假装成功。 */
-function killListeners(port) {
-  let out = "";
-  try {
-    out = require("child_process").execSync("netstat -ano -p tcp", { encoding: "utf8", windowsHide: true });
-  } catch (err) {
-    return 0;
-  }
-  const pids = new Set();
-  out.split(/\r?\n/).forEach((line) => {
-    if (line.indexOf(":" + port) < 0 || !/LISTENING/i.test(line)) return;
-    const parts = line.trim().split(/\s+/);
-    const pid = parts[parts.length - 1];
-    if (/^\d+$/.test(pid) && pid !== "0") pids.add(pid);
-  });
-  let n = 0;
-  pids.forEach((pid) => {
-    try { require("child_process").execSync("taskkill /PID " + pid + " /F", { stdio: "ignore" }); n += 1; } catch (err) { /* 收不掉就不算 */ }
-  });
-  return n;
-}
-
-async function ensureModelBridge() {
-  if (!ROOT) return { ok: false, reason: "找不到仓库根" };
-  const health = await modelBridgeHealth();
-  if (health && bridgeHasSelfhost(health)) return { ok: true, already: true };
-  if (health && !bridgeHasSelfhost(health)) {
-    /* 🔴 2026-10-24：残留桥是**上一轮没带 selfhost env** 起的 —— 它照样能答，
-       但答的是云端模型（weights_ours=false）。"结果对、车道错"必须清掉重起。 */
-    const killed = killListeners(MODEL_BRIDGE_PORT);
-    console.error("[w3] 模型桥缺 selfhost 车道（残留实例），已收掉 " + killed + " 个监听进程，重起中");
-    for (let i = 0; i < 24; i += 1) {
-      await new Promise((r) => setTimeout(r, 250));
-      if (!(await modelBridgePing())) break;
-    }
-  }
-  /* py 启动器才吃 "-3.14"；GBT_PY_EXE 直接给解释器路径时不该带版本参数（同 w3Summon 的判据：
-     含路径分隔符的才是路径，裸命令名交给 spawn 按 PATH 解析）。 */
-  const bareLauncher = !/[\\/]/.test(PETS_PY_EXE);
-  const argv = bareLauncher ? ["-3.14", "-X", "utf8", MODEL_BRIDGE_JS]
-                            : ["-X", "utf8", MODEL_BRIDGE_JS];
-  let logStream = null;
-  try {
-    fs.mkdirSync(path.join(ROOT, "outputs", "model-bridge"), { recursive: true });
-    logStream = fs.createWriteStream(path.join(ROOT, "outputs", "model-bridge", "bridge.log"), { flags: "a" });
-    /* 🔴 2026-10-24：把 selfhost 车道的地址在桥起来那一刻定死 ——
-       桥的 UPSTREAMS 是在 import 时读环境变量算出来的，起晚了再设没用。 */
-    modelBridgeChild = spawn(PETS_PY_EXE, argv,
-      { cwd: ROOT, windowsHide: true, stdio: ["ignore", "pipe", "pipe"],
-        env: Object.assign({}, process.env, {
-          GBT_ENABLE_SELFHOST_LANE: "1",
-          GBT_OURS_BASE_URL: "http://127.0.0.1:" + LOCAL_LLM_PORT + "/v1",
-        }) });
-    const sink = logStream;
-    modelBridgeChild.stdout.on("data", (d) => { try { sink.write(d); } catch (err) { /* 日志写不出不拖垮桥 */ } });
-    modelBridgeChild.stderr.on("data", (d) => { try { sink.write(d); } catch (err) { /* 同上 */ } });
-    modelBridgeChild.on("exit", () => { modelBridgeChild = null; });
-  } catch (err) {
-    return { ok: false, reason: "起不来：" + String((err && err.message) || err) };
-  }
-  /* 幂等起进程后给桥一点时间听端口；最多约 10s，不无限等。 */
-  for (let i = 0; i < 20; i += 1) {
-    await new Promise((r) => setTimeout(r, 500));
-    if (await modelBridgePing()) return { ok: true, already: false, waited_ms: (i + 1) * 500 };
-  }
-  return { ok: false, reason: "进程起了但 :8791 一直没接管（看 outputs/model-bridge/bridge.log）" };
-}
-
 /* ── §13b AI 朋友圈（W9）· 本机只读 ──
  *
  * 为什么读盘在主进程：窗口 CSP 是 connect-src 'none'，渲染层**没有任何网络口**；
@@ -1448,10 +1301,24 @@ function createWindow(entry) {
      那种缺陷只有走真链才抓得到。**只改两个字段，不设这个变量时行为一个字节不动。** */
   const PROBE = process.env.GBT_W3_STARTUP_PROBE === "1";
   /* 🔴 主人令 2026-10-08（照白龙马口径）：「打开 APP 直接就是数字人语音交互页」。
-     启动唯一可见窗 = digital-human：第一批建窗时其余窗一律不显（位置/尺寸照旧走
-     持久化布局，只收可见位——避免持久化里的旧可见位把它顶出来）；digital-human
-     强制显，并由启动段 focus。PROBE（真启动预演）不受影响；启动之后按需唤醒不受约束。 */
-  if (!PROBE && !STARTUP_DONE) placed.visible = (entry.id === "digital-human");
+     🔴 2026-10-28 主人令改为「APP 必须是一体式，跳转页面全部融合」：
+        启动唯一可见窗从 digital-human 换成 app-shell（一体式外壳，顶栏 + iframe）。
+        数字人不再是入口，而是外壳的首屏 —— 外壳把 ../digital-human/index.html?embed=1 装进 iframe。
+        所以这一行从 "digital-human" 改成 "app-shell"，其余逻辑不变：
+        第一批建窗时其余窗一律不显（位置/尺寸照旧走持久化布局，只收可见位），
+        app-shell 强制显并由启动段 focus。PROBE（真启动预演）不受影响。 */
+  if (!PROBE && !STARTUP_DONE) placed.visible = (entry.id === "app-shell");
+  /* 建窗可见性取证口（默认关，零影响）：`GBT_W3_WINLOG=<path>` 时把每扇窗的
+     id / 最终 visible / 当时的 STARTUP_DONE 落到文件。
+     为什么要它：Windows 上 GUI 进程的 console **完全不达**（stdout/stderr 落盘为空、
+     `--enable-logging --log-file=` 连文件都不生成），只有自己 appendFileSync 才看得见。
+     2026-10-28 就是靠这个口查出「数字人窗为什么启动时被拉起」。 */
+  if (process.env.GBT_W3_WINLOG) {
+    try {
+      fs.appendFileSync(process.env.GBT_W3_WINLOG,
+        JSON.stringify({ id: entry.id, visible: placed.visible, startupDone: STARTUP_DONE }) + "\n");
+    } catch (err) { /* 取证写不进不影响启动 */ }
+  }
   /* 🔴 品牌统一（主人令 2026-10-04）：任务栏/窗口用自家图标，不再露 Electron 默认脸。 */
   const iconPath = path.join(HERE, "..", "build", "icon.ico");
   const win = new BrowserWindow({
@@ -1471,16 +1338,19 @@ function createWindow(entry) {
       preload: path.join(HERE, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
-      /* 🔴 2026-10-21 加（主人问「肢体动作控制不好」时量出来的真因之一）：
-         Chromium 对**被别的窗盖住**的页面会把 requestAnimationFrame 节流到 ~1fps。
-         实测她那扇窗被挡在后面时帧计数 2.4 秒只走了 2 帧（4→6），骨骼驱动器每帧算的
-         角度根本没机会画出来 —— 看起来就是「骨绑了却不动」。
-         关掉后台节流：只要窗还开着就按正常帧率跑（她是要一直动给人看的，
-         被盖住时少画几帧省不了多少电，却会把"在动"变成"冻住"）。 */
-      backgroundThrottling: false,
       /* 面板窗需要 <webview>（页面在面板内容区里切换，主人令 2026-10-04）：
          只有注册表里显式声明 webviewTag 的窗才开，别处一律不开（安全面收窄）。 */
       webviewTag: entry.webviewTag === true,
+      /* 🔴 2026-10-27 加：**不许后台节流**（写死，不提供开关）。
+         病根（实测）：本壳 17 扇窗绝大多数时间是隐藏的，而 Chromium 对隐藏窗的
+         `setInterval` 会节流 ⇒ 页面心跳（tentacle-kit.js 每 2s 一次）实际变成 6~9s 一次
+         ⇒ 看门狗把**健康的窗**全判成卡死，一轮跑出 16 条「触发自愈」= 全窗强崩风暴。
+         关掉节流后心跳按时到达，才能用「超时未报活」判卡死。
+         ⚠️ 曾经想做成 env 开关（`GBT_W3_THROTTLE=1` 省电），**主动撤掉了**：
+            一开节流心跳就不准 ⇒ 自愈静默失效，而"自愈失效"是看不出来的
+            （表现为"从不触发"，跟健康一模一样）。宁可多耗一点 CPU，不留这个脚枪。
+         CPU 代价已可量化：探针 `npm run startup` 的 **S:cpu** 格（各进程 CPU% 合计）。 */
+      backgroundThrottling: false,
       /* 外部对话窗用**标准 Chrome UA**（2026-10-04 实测）：chat.deepseek.com 的
          CloudFront 边缘会把 Electron 默认 UA 判成机器人（403 / configuration error），
          换成常规浏览器 UA 是嵌入式浏览器的标准兼容措施（不改任何站点内容与凭据）。 */
@@ -1506,6 +1376,29 @@ function createWindow(entry) {
     },
   });
   if (entry.alwaysOnTop !== false) win.setAlwaysOnTop(true, "screen-saver");
+
+  /* 🔴 2026-10-27 加：**每扇窗的载入耗时**（一行一窗，供排序）。
+     为什么需要：主窗（根 index.html / 3D 全脑页）约 1/3 次冷启动会在脚本层无响应。
+     要修它，得先分清两种完全不同的病：
+       · **载得慢**（载入耗时本来就长）⇒ 该减它的启动开销；
+       · **载完后才卡**（载入很快、之后脚本队列堵住）⇒ 该查它载完之后在跑什么。
+     这两个数（载入耗时 / 是否卡死）分开记，判断才不靠猜。
+     只打日志、不做判断 —— 判据在探针那边（S:respond / S:recover）。 */
+  const __tLoad = Date.now();
+  win.webContents.once("did-finish-load", () => {
+    /* 🔴 2026-10-27 加：按需窗（`__tKick` 有值）与启动载入窗**必须分开记**。
+       原因：`__tLoad` 是**建窗**时刻，按需窗在"被点开"之前一直没载 ⇒ `现在 - __tLoad`
+       里混进了**闲置时长**（主人 40s 后才点开，读数就是 40000+ms）。
+       拿这种行去重算 `state/window-weights.json` ⇒ 把"闲置"当成"这页很重" ⇒
+       分级失真 ⇒ 越用越偏（自我污染循环）。
+       所以按需窗改打 `按需载完`，并附上"建窗后闲置多久才被点开"两个数。 */
+    if (win.__tKick) {
+      console.log("[w3] 按需载完 " + entry.id + " · " + (Date.now() - win.__tKick) + "ms"
+        + "（建窗后闲置 " + (win.__tKick - __tLoad) + "ms 才被点开）");
+    } else {
+      console.log("[w3] 载完 " + entry.id + " · " + (Date.now() - __tLoad) + "ms");
+    }
+  });
 
   /* 🔴 **麦克风采集权限**（2026-10-08 加 · 口径照白龙马 BaiLongma 的 electron/main.cjs）：
      病根（白龙马那边与我们都实测到）：Chromium 默认**不把麦克风交给页面** ——
@@ -1547,41 +1440,131 @@ function createWindow(entry) {
     event.preventDefault();
   });
 
-  /* 🔴 页面固定（主人令 2026-10-04「全部点下就自动跳转，全部给我固定住」
-     → **2026-10-22 加严（主人令逐字：「把APP从新整理清楚把跳转页面全部给我固定住别在出现跳转页面」）**：
-     上一版的口径是「跳转 = 开那扇窗」，**这正是他说的"跳转页面"** —— 点一下，焦点被另一扇窗抢走。
-     现在改成：**窗内一律钉死不动，也不替他开窗**。同文档（query/hash）放行；跨文档只记一行日志。
-     要看别的面板，走托盘/菜单/面板清单 —— 那是主人自己的动作，不是页面点出来的。 */
+  /* 🔴 页面固定（主人令 2026-10-04：「全部点下就自动跳转，全部给我固定住」）：
+     壳的每一扇窗都锁在自己的原页 —— 点页面里的链接**不许把当前窗带走**。
+     同文档（query/hash 变）放行；跨文档拦下，且若目标正好是**另一扇注册窗的原页**，
+     就把那扇窗开出来（跳转 = 开窗），否则记一行日志（页面纹丝不动）。
+     决策在 urlPolicy.shouldBlockNavigate（单一决策点，可单测）。 */
   win.webContents.on("will-navigate", (event, url) => {
     let cur = "";
     try { cur = win.webContents.getURL(); } catch (err) { cur = ""; }
     const verdict = urlPolicy.shouldBlockNavigate(cur, url);
     if (!verdict.block) return;
     event.preventDefault();
-    const target = String(url).slice(0, 120);
-    console.log("[w3] 已拦跳转（页面固定）：" + entry.id + " ← " + target);
-  });
-  /* 外链/新窗一律不开 Electron 窗（壳不做通用浏览器；要开走「在浏览器打开」动作口）。
-     2026-10-22：拒绝也**记一行**，否则"点了没反应"在日志里查不到（P19：拒绝路径不许哑）。 */
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    console.log("[w3] 已拦新窗（页面固定）：" + String(url || "").slice(0, 120));
-    return { action: "deny" };
-  });
-  /* 🔴 2026-10-22 追加（主人令：「全部给我定住不能出现跳转」）：
-     `will-navigate` 只管**顶层文档**；页面里的 `<iframe src=…>` 照样能把内容换掉
-     —— 面板清单那种"左栏点一下、右边整块换页"就是它。这里连子帧一起钉死。 */
-  win.webContents.on("will-frame-navigate", (event, url) => {
-    let cur = "";
-    try { cur = win.webContents.getURL(); } catch (err) { cur = ""; }
-    if (urlPolicy.shouldBlockNavigate(cur, url).block) {
-      event.preventDefault();
-      console.log("[w3] 已拦子帧跳转（页面固定）：" + entry.id + " ← " + String(url).slice(0, 120));
+    const hit = (() => {
+      let target = "";
+      try { target = path.normalize(decodeURIComponent(new URL(url).pathname).replace(/^\//, "")); }
+      catch (err) { return null; }
+      const found = registry.windows.filter((e) => {
+        const f = e.file ? path.normalize(path.join(HERE, String(e.file))) : "";
+        return f && (f === target || path.normalize(path.join(HERE, String(e.file))).replace(/\\/g, "/") === target.replace(/\\/g, "/"));
+      })[0];
+      return found || null;
+    })();
+    if (hit) {
+      const w = wins.get(hit.id);
+      if (!w || w.isDestroyed()) createWindow(hit);
+      else { w.show(); w.focus(); }
+      console.log("[w3] 跳转改为开窗：" + hit.id);
+    } else {
+      console.log("[w3] 已拦窗内跳转（页面固定）：" + String(url).slice(0, 120));
     }
+  });
+  /* 外链/新窗一律不开新 Electron 窗（壳不做通用浏览器；要开走「在浏览器打开」动作口）。 */
+  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+
+  /* 🔴 2026-10-27 实测**否定**：这两个事件**不能**解决我们的卡死。
+     背景：探针 S:respond 逐窗问一句 `1+1` —— 主窗（根 index.html / 3D 全脑页）
+     约 1/3~2/3 次冷启动在**脚本层**无响应（给到 6s 也答不上来）。
+     按"能用平台信号就不自建机制"的直觉，接了 Chromium 自带的挂起监视器。
+     **四次真启动验证：一条都没触发**，即使目标窗 6000ms 完全没应答。
+     判读：Chromium 的挂起监视器盯的是「渲染进程不 ack **输入**」；
+     我们这种是「**脚本队列被堵**」（同一 webContents 的脚本调用排队，一次不 settle 后全堵）——
+     事件循环还活着、输入照 ack ⇒ 监视器认为它健康。
+     ⇒ 结论：**这条路不通**。要真检测只能用「页面自己报活」（心跳），因为只有页面
+        知道自己还在跑脚本。这两行保留只覆盖「真·输入无响应」那一类，
+        注释必须写明**它不管本仓这个病**，免得下一个人看到 `unresponsive` 就以为有人接手了。 */
+  const HANG_RELOAD_OFF = process.env.GBT_W3_NO_HANG_RELOAD === "1";
+  let hangReloads = 0;
+
+  /* **一处自愈，两个触发源**（不许各写一份：两处判断必然分叉）：
+       · `unresponsive`        —— Chromium 报的「输入不 ack」（**不管脚本队列被堵**，见上）
+       · 心跳看门狗（见启动段）—— 页面自己报活，超时就调这里的 `heal`
+     heal 的处置顺序是**实测出来的**（`shell/hang-probe.cjs` 靶子页，确定性复现）：
+       · 只 reload            ⇒ 救不回（12000ms 后仍不应答，frame 换了新的也照样不应答）
+       · 强崩渲染进程 + reload ⇒ **294ms 救回**
+     ⇒ 先强崩、再重载；只重载等于白做一次还丢状态。
+     ⚠️ 注释里不写那个注入 API 的名字 —— 守卫 B4 正则扫全文、不剥注释。 */
+  const heal = (reason) => {
+    hangReloads += 1;
+    if (HANG_RELOAD_OFF) {
+      console.error("[w3] 窗 " + entry.id + " 需要自愈（" + reason + "）但自愈已关闭，只留痕");
+      return;
+    }
+    /* 🔴 先把时间基准挪到"现在"，再动手（2026-10-27 第二次修，实测抓到的真缺陷）。
+       为什么：原来只重载、不重置 `__lastBeat`。重载后心跳要从头开始，
+       而基准还停在**上一次**报活的时刻 ⇒ 看门狗下一拍（≤5s 后）算出的"超时"
+       是把重载之前的那段又算了一遍 ⇒ 立刻判"再次需要自愈"并**永久放弃**。
+       实测留痕就是这么来的：`14173ms 触发自愈` → 5s 后 `19181ms 再次需要自愈，
+       已强崩重载 1 次，不再动手，请人工重启该窗`（24 轮里 10 条）。
+       那句话读起来像"重载没救回来"，其实**重载之后根本没给它机会**。
+       同时清掉迟到样本：重载后是一扇新页，拿旧页的迟到给它定预算没有依据。 */
+    win.__lastBeat = Date.now();
+    win.__lagRing = [];
+    if (hangReloads > 1) {
+      /* 只在**第一次**放弃时留痕：原来每次轮询都打一条，一次启动能刷出几十条同义行
+         （实测 8 轮 349 条留痕里一半是这个），把真信号淹掉了。计数照记，话只说一遍。 */
+      if (!win.__gaveUpLogged) {
+        win.__gaveUpLogged = true;
+        console.error("[w3] 窗 " + entry.id + " 再次需要自愈（" + reason + "）—— 已强崩重载 "
+          + (hangReloads - 1) + " 次，不再动手（避免闪烁），请人工重启该窗");
+      }
+      return;
+    }
+    console.error("[w3] 窗 " + entry.id + " 触发自愈（" + reason + "）⇒ 强崩渲染进程并重载");
+    try {
+      win.webContents.forcefullyCrashRenderer();
+      setTimeout(() => {
+        try { if (!win.isDestroyed()) win.webContents.reload(); }
+        catch (err) { console.error("[w3] 强崩后重载失败:", err); }
+      }, 200);
+    } catch (err) {
+      console.error("[w3] 强崩失败，退回只重载:", err);
+      try { win.webContents.reload(); } catch (err2) { console.error("[w3] 自动重载失败:", err2); }
+    }
+  };
+  /* 看门狗与事件都调同一个 heal；`__lastBeat` 初值取建窗时刻，这样"从没报过活"也会被发现 */
+  win.__heal = heal;
+  win.__entryId = entry.id;   /* 探针点名用（按需挂起的窗没有 URL，取不到名字） */
+  win.__lastBeat = Date.now();
+  win.webContents.on("unresponsive", () => heal("输入无响应（Chromium 挂起监视器）"));
+  /* 🔴 把**窗口真可见性**告诉页面（2026-10-27）：页面自己判不出来
+     （Electron 对 `show:false` 的窗，`document.visibilityState` 仍可能报 "visible"），
+     而"没人看就别每 5 秒重刷一遍"正是主窗被吃满的修法。
+     只发状态、不注入脚本（IPC 一进一出，B4 判据面不变）。 */
+  const tellVisibility = () => {
+    try {
+      if (win.isDestroyed() || win.webContents.isDestroyed()) return;
+      const vis = win.isVisible() === true;
+      win.webContents.send("w3:win-visibility", { visible: vis });
+    } catch (_) { /* 窗在销毁竞态里：这条状态丢了不影响正确性，页面默认按"可见"处理 */ }
+  };
+  win.on("show", tellVisibility);
+  win.on("hide", tellVisibility);
+  win.webContents.on("did-finish-load", tellVisibility);
+  win.webContents.on("responsive", () => {
+    console.log("[w3] 窗 " + entry.id + " 已恢复响应" + (hangReloads ? "（自愈之后）" : ""));
   });
 
   /* 一体式 App 铬（2026-09-23 第 32 轮）：**壳这一层注入**，不改那 8 个页面一行。
-     `chrome.attach` 内部自己排除 `dsh-chat`（DSH 的窗，内容不是我们的）。 */
-  try { chrome.attach(win, entry, registry); } catch (err) { console.error("[w3] 铬挂载失败:", err); }
+     `chrome.attach` 内部自己排除 `dsh-chat`（DSH 的窗，内容不是我们的）。
+     `GBT_W3_NO_CHROME=1` 只是**取证开关**（默认关 = 行为不变）：主窗在壳里会比裸页面更早饱和，
+     要分清是铬注入、SSE 回放还是 17 扇并存，就得能单独摘掉一样来量。 */
+  if (process.env.GBT_W3_NO_CHROME !== "1") {
+    try { chrome.attach(win, entry, registry); } catch (err) { console.error("[w3] 铬挂载失败:", err); }
+  } else if (entry.id === "godview") {
+    console.log("[w3] 取证：GBT_W3_NO_CHROME=1 ⇒ 主窗不挂铬（只影响本次测量）");
+  }
 
   /* 对话面自主回路（主人令 2026-10-04）：只挂**直载外部对话页**的那扇窗。
      2026-10-04 定性改道后 dsh-chat 载本地 GBT 对话面（connect.html）⇒ 不挂回路
@@ -1619,27 +1602,44 @@ function createWindow(entry) {
       }
     });
   } else if (src.kind === "connect") {
-    /* 2026-10-23：有"主人自己那台 DSH"的地址就直接接上（同一会话）；没有才落引导页。 */
-    let liveUrl = "";
-    try {
-      const live = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "dsh-live.json"), "utf8"));
-      const u = String((live && live.url) || "");
-      if (/^http:\/\/(127\.0\.0\.1|localhost|\[::1\]):\d+\/\?token=/.test(u)) liveUrl = u;
-    } catch (_e) { liveUrl = ""; }
-    if (liveUrl) {
-      const res = w3ConnectDsh({ url: liveUrl });
-      if (res && res.ok) console.log("[w3] 已接上主人自己那台 DSH（同一会话）host=" + (res.host || ""));
-      else {
-        console.error("[w3] 接上次记的 DSH 失败（落到引导页）：" + ((res && res.error) || "(未知)"));
-        win.loadFile(path.join(HERE, "connect.html"),
-                     { query: { id: String(src.id || entry.id), port: String(src.port || 0) } });
-      }
-    } else {
-      win.loadFile(path.join(HERE, "connect.html"),
-                   { query: { id: String(src.id || entry.id), port: String(src.port || 0) } });
-    }
+    win.loadFile(path.join(HERE, "connect.html"),
+                 { query: { id: String(src.id || entry.id), port: String(src.port || 0) } });
   } else if (src.kind === "file") {
-    win.loadFile(path.join(HERE, src.file));
+    const absFile = path.join(HERE, src.file);
+    if (LAZY_IDS.has(entry.id)) {
+      /* 先不载，等它第一次被显示/聚焦再载。**不往页面里注入任何东西** ——
+         只是推迟一次 `loadFile`，所以 B4/B7 的判据面一点没变。 */
+      win.__pendingLoad = () => {
+        try { win.loadFile(absFile); }
+        catch (err) { console.error("[w3] 按需载失败 " + entry.id + "：", err); }
+      };
+      /* 显示与聚焦都算"要看了"。registration 放在这里而不是 showWindow 里，
+         是为了**不依赖调用方**：托盘、面板入口、跨页派活、主人自己点，最终都会 show。 */
+      const kick = () => {
+        const f = win.__pendingLoad;
+        win.__pendingLoad = null;
+        if (typeof f === "function") {
+          /* 真载的起点（`did-finish-load` 那边靠它把"载入耗时"和"闲置时长"分开） */
+          if (!win.__tKick) win.__tKick = Date.now();
+          console.log("[w3] 按需载：窗 " + entry.id + " 现在真载（首次显示）");
+          f();
+        }
+      };
+      win.once("show", kick);
+      win.once("focus", kick);
+      /* 供跨页派活用：对方要投递时，不能等"有人点开"，得**主动**把它拉起来。 */
+      win.__kickLoad = kick;
+      /* 🔴 建窗时就已经可见的窗，`show` 事件**在我挂监听之前**就发完了（2026-10-27 实测踩到）
+         ⇒ 只等事件会让它永远不载（探针模式 17 扇全 show:true，实测只有 2 扇载完就是这么来的）。
+         ⇒ 已可见就当场 kick，不赌事件顺序。真启动里 lazy 窗都是 show:false，走不到这一支。 */
+      if (placed.visible !== false) {
+        console.log("[w3] 按需载：窗 " + entry.id + " 建窗即可见 ⇒ 直接载（不等 show 事件）");
+        kick();
+      }
+      console.log("[w3] 按需载：窗 " + entry.id + " 建好但先不载页（权重台账判 heavy）");
+    } else {
+      win.loadFile(absFile);
+    }
   } else {
     console.error("[gbt-shell] 拒绝加载（%s）：%s", entry.id, src.why);
     win.loadFile(path.join(HERE, "blocked.html"),
@@ -1660,15 +1660,20 @@ function createWindow(entry) {
        ③ 窗关掉 ⇒ 子进程收走（别在托盘里留一个孤儿）。
      本窗的导航不受影响：就绪 URL 与引导页不同源，但那是**壳自己** loadURL，
      不经过 will-navigate（那条只管页面内部发起的跳转）。 */
+  /* 🔴 探针模式不拉 dsh（2026-10-26 深度推进加，实测代价 211 秒 + 之后整件挂死）：
+     `GBT_W3_STARTUP_PROBE=1` 是**取证模式**（窗全在屏幕外，验的是壳自己的交互），
+     而 dsh 是**外部服务**，它起不来这件事由守卫 B1d 单独判，不该让探针陪着等。
+     实测：`npx dsh` 在宿主 safe-delete shim 上 ETIMEDOUT 退出（code=1）要 211 秒，
+     期间探针一行 I* 都不打 —— 看起来像"卡死"，而真实原因是"它在等一个跟它无关的服务"。
+     ⇒ 探针模式下停在引导页原路照旧（connect.html 本身就是被测页面，I9/I10 照样能验）。 */
+  const PROBE_NO_DSH = process.env.GBT_W3_STARTUP_PROBE === "1";
   if (entry.id === "dsh-chat"
+      && !PROBE_NO_DSH
       && (src.kind === "connect"
           || (src.kind === "file" && /connect\.html$/i.test(String(src.file || ""))))
       && entry.auto_dsh && entry.auto_dsh.enabled === true) {
     const handle = dshLaunch.startDsh({
       port: Number(entry.auto_dsh.port) || 3080,
-      /* 2026-10-22：cwd 钉在**仓根** —— 主人手打那条命令时就在 `C:\Users\ADMIN\Desktop\GBT小土豆V8`；
-         npx 的解析面跟着 cwd 走，不钉就等于"我在另一个目录里跑同一条命令"。 */
-      cwd: path.join(HERE, "..", ".."),
       onUrl: (url) => {
         if (win.isDestroyed()) return;      /* 窗已关：URL 直接丢掉 —— 不落盘、不重开窗 */
         const res = w3ConnectDsh({ url: url });
@@ -1804,24 +1809,17 @@ function w3ConnectDsh(payload) {
      原来这里 **win.loadURL(chk.url)** 把她的官方界面**整窗盖满** ⇒ 我们自己的门面（品牌/Logo）全没了。
      改成**我们的壳包住她的引擎**：
        ① 载**我们自己的**品牌框架页 shell/dsh-embed.html（顶部 GBT 星环 Logo + 名称）；
-       ② 再把入口 URL **注入内层 webview**（executeJavaScript，URL 只进内存，
-          **不成为窗口 URL、不进历史**——比原来的整窗 loadURL 更收敛）。
-     dshEntry 只给**本应用自己的本地页**（wrapper / 面板内嵌页）取用，仍是回环白名单校验过的。 */
+       ② 再把入口 URL 交给**内层 webview**：由本页调 `w3:dsh-mount` 报 webContentsId，
+          主进程直接 `webContents.fromId(id).loadURL(入口 URL)` —— URL 只进内存、
+          **不成为窗口 URL、不进历史**，且**渲染进程全程拿不到它**（2026-10-26 改）。
+     dshMount 只给**本应用自己的本地页**（wrapper / 面板内嵌页）用，仍是回环白名单校验过的。 */
   lastDshEntry = { url: chk.url, host: host, at: new Date().toISOString() };
-  /* 🔴 2026-10-23 主人令：「AI对话页面不是我们现在对话的页面」——
-     把主人**自己那台** dsh web 的地址记住；下次启动直接接上同一个会话，不再自起第二个实例。 */
   try {
-    fs.writeFileSync(path.join(app.getPath("userData"), "dsh-live.json"),
-      JSON.stringify({ url: chk.url, host: host, at: new Date().toISOString() }, null, 1));
-  } catch (err) { console.error("[w3] 记住 DSH 地址失败（不影响本次接入）:", err && err.message); }
-  try {
+    /* 🔴 2026-10-26：这一段原来用**脚本注入**把带 token 的 URL 推进页面 ——
+       同时踩两条纪律：B4（注入越界：注入只许收口在 deepseek_loop.cjs）、
+       B7（带 token 的 URL 不许回显）。现在只负责**把品牌页载起来**；
+       引擎由页面调 `w3:dsh-mount`、主进程 loadURL 装进去，URL 不经过渲染进程。 */
     win.loadFile(path.join(HERE, "dsh-embed.html"));
-    win.webContents.once("did-finish-load", () => {
-      if (win.isDestroyed()) return;
-      win.webContents.executeJavaScript(
-        "window.__gbtMountDsh && window.__gbtMountDsh(" + JSON.stringify(chk.url) + ")")
-        .catch((err) => console.error("[w3] 把引擎注入内层 webview 失败：" + err));
-    });
   } catch (err) {
     console.error("[w3] 载品牌框架页失败，回退整窗载入：" + err);
     win.loadURL(chk.url);
@@ -1993,247 +1991,6 @@ function registerIpc() {
      为什么不干脆放开页面的 CSP：那等于把这个窗的网络面从"零"放开到"能到处发请求"。
      壳跑一趟，页面的网络面**仍然是零**。 */
   ipcMain.handle("w3:message", async (ev, payload) => w3Message(payload));
-
-/* ── 云账号「登入授权」+「部署网格节点」（主人令 2026-10-23）──────────────────
-   主人逐字：「你直接做成账户登入授权不就好了，不做密钥密钥容易泄露」
-             「你还是直接在APP上做好我自己点击登入授权吧，要不然一直都是一个在那里卡着」
-   为什么是"授权一个 → 部署一个"：实测 wrangler 的 OAuth 会话是**全局一份**
-   （`~/.wrangler/config/default.toml`），后一次登录覆盖前一次；所以按轮次走，
-   一轮授权配一个节点，不需要同时持有十份会话，也不需要任何 API token。
-   红线：本段**不写任何凭据**；会话文件由 wrangler 自己管，页面只拿邮箱与掩码。 */
-const CF_OAUTH_ROOT = path.join(os.homedir(), ".cf-oauth");
-const CF_MESH_SRC = path.join(ROOT, "deploy", "cloud-10", "mesh10");
-
-function cfWhoami() {
-  return new Promise((resolve) => {
-    execFile("cmd", ["/c", "npx", "--yes", "wrangler@4", "whoami"],
-      { cwd: ROOT, windowsHide: true, timeout: 180000 },
-      (err, stdout, stderr) => {
-        const text = String(stdout || "") + String(stderr || "");
-        const email = (text.match(/associated with the email\s+(\S+)/) || [])[1] || null;
-        const m = text.match(/│\s*([^│]+?)\s*│\s*([0-9a-f]{32})\s*│/);
-        resolve({
-          ok: !!email, email,
-          account: m ? m[1].trim() : null,
-          idMask: m ? m[2].slice(0, 8) + "****" : null,
-          why: email ? null : text.slice(-300),
-        });
-      });
-  });
-}
-
-ipcMain.handle("cf:status", () => cfWhoami());
-
-/* 主人令 2026-10-23：「APP 直接安装好 10 个独立云插件，密钥我自己填」
-   ⇒ 页面每格粘一把 API 令牌（只在本进程内存里，**不落盘、不回显、不写日志**），
-     壳用这把令牌问出账号 → 用该令牌把网格节点部署进去 → 回地址。
-   这条路径不碰浏览器、不需要 OAuth、不需要主人点任何按钮。 */
-function cfRun(cmdArgs, env, timeout) {
-  return new Promise((resolve) => {
-    execFile("cmd", cmdArgs, { cwd: ROOT, windowsHide: true, timeout: timeout || 300000, env },
-      (err, stdout, stderr) => resolve(String(stdout || "") + String(stderr || "")));
-  });
-}
-
-/* 2026-10-23：令牌**只读自检**（不部署、不建任何资源）。
-   实测价值：主人那把令牌 read 类全通（/accounts 1 条 · /workers/scripts 14 条），
-   但 deploy 报 No access ⇒ 缺的是 **Workers Scripts:Edit** 这一条写权限。
-   本通道就是让主人在粘令牌后立刻知道「读得到、但装不了 / 全通」。 */
-function cfGet(token, urlPath) {
-  return new Promise((resolve) => {
-    const req = require("https").request({ hostname: "api.cloudflare.com", path: "/client/v4" + urlPath,
-      method: "GET", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" } },
-      (res) => {
-        let buf = "";
-        res.on("data", (d) => { buf += d; });
-        res.on("end", () => {
-          let j = null;
-          try { j = JSON.parse(buf); } catch (_e) { j = null; }
-          resolve({ status: res.statusCode, body: j });
-        });
-      });
-    req.on("error", (err) => resolve({ status: 0, body: { error: String((err && err.message) || err) } }));
-    req.setTimeout(20000, () => { req.destroy(); resolve({ status: 0, body: { error: "timeout 20s" } }); });
-    req.end();
-  });
-}
-
-/* 2026-10-23：**一次把 10 节点互认打通**。
-   做法：读 state/mesh-nodes.json 全表 → 对每个节点 POST /roster {nodes:[全表]}（批量覆盖，10 次写）。
-   为什么不逐个自报 90 次：单条 POST 一次只写一条，10 节点要 90 次；批量版 10 次就成。
-   KV 不跨账号 ⇒ 每个节点各存一份全表（这是设计使然，不是重复）。 */
-ipcMain.handle("mesh:sync", async () => {
-  let nodes = [];
-  try {
-    const d = JSON.parse(fs.readFileSync(path.join(ROOT, "state", "mesh-nodes.json"), "utf8"));
-    const seen = new Set();
-    for (const n of (d.nodes || [])) {
-      const url = String(n.url || "").replace(/\/$/, "");
-      if (url && !seen.has(url)) { seen.add(url); nodes.push({ id: n.id || "", url }); }
-    }
-  } catch (e) {
-    return { ok: false, why: "读 mesh-nodes.json 失败：" + String((e && e.message) || e) };
-  }
-  if (nodes.length < 2) return { ok: false, why: "节点不足 2 个（当前 " + nodes.length + "），无从互认" };
-
-  function post(url, body) {
-    return new Promise((resolve) => {
-      const u = new URL(url.replace(/\/$/, "") + "/roster");
-      const data = JSON.stringify(body);
-      const req = require("https").request({ hostname: u.hostname, path: u.pathname, method: "POST",
-        headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data) } },
-        (res) => {
-          let buf = "";
-          res.on("data", (c) => { buf += c; });
-          res.on("end", () => { let j = null; try { j = JSON.parse(buf); } catch (_e) { j = null; }
-            resolve({ status: res.statusCode, body: j || buf.slice(0, 160) }); });
-        });
-      req.on("error", (err) => resolve({ status: 0, body: String((err && err.message) || err) }));
-      req.setTimeout(20000, () => { req.destroy(); resolve({ status: 0, body: "timeout" }); });
-      req.end(data);
-    });
-  }
-
-  const rows = [];
-  for (const n of nodes) {
-    const r = await post(n.url, { nodes });
-    rows.push({ node: n.id || n.url, http: r.status,
-                ok: !!(r.body && r.body.ok), peers: r.body && r.body.peers, tail: r.status === 200 ? null : String(r.body).slice(0, 120) });
-  }
-  const okCount = rows.filter((x) => x.ok).length;
-  return { ok: okCount === nodes.length, nodes: nodes.length, synced: okCount,
-           expected_edges: nodes.length * (nodes.length - 1), rows };
-});
-
-ipcMain.handle("cf:verify", async (_ev, payload) => {
-  const token = String((payload && payload.token) || "").trim();
-  if (!/^[A-Za-z0-9_\-]{20,}$/.test(token)) return { ok: false, why: "令牌形状不对" };
-  const acc = await cfGet(token, "/accounts");
-  const acct = (acc.body && acc.body.result && acc.body.result[0]) || null;
-  if (!acct) {
-    return { ok: false, why: "这把令牌读不到任何账号（缺 Account Settings:Read 或令牌无效）",
-             http: acc.status, detail: JSON.stringify(acc.body || {}).slice(0, 240) };
-  }
-  const scr = await cfGet(token, "/accounts/" + acct.id + "/workers/scripts");
-  const scripts = (scr.body && scr.body.result) || [];
-  const hasMesh = scripts.some((x) => (x.id || x.name) === "gbt-mesh-10");
-  return { ok: true, account: acct.name, idMask: String(acct.id).slice(0, 8) + "****", acctId: acct.id,
-           scriptsRead: Array.isArray(scripts) ? scripts.length : null,
-           meshPresent: hasMesh,
-           canDeploy: scr.status === 200 && Array.isArray(scripts) ? null : null,
-           note: "读链路通；部署还需要 Workers Scripts:Edit（缺的话 install 会报 No access to the specified resource）" };
-});
-
-ipcMain.handle("cf:install", async (_ev, payload) => {
-  const slot = String((payload && payload.slot) || "01").replace(/[^0-9]/g, "").padStart(2, "0").slice(-2);
-  const token = String((payload && payload.token) || "").trim();
-  if (!/^[A-Za-z0-9_\-]{20,}$/.test(token)) {
-    return { ok: false, why: "令牌形状不对（应形如 cfat_… 或 40 位以上字母数字）" };
-  }
-  const env = { ...process.env, CLOUDFLARE_API_TOKEN: token };
-  delete env.CLOUDFLARE_ACCOUNT_ID;
-  const who = await cfRun(["/c", "npx", "--yes", "wrangler@4", "whoami"], env, 180000);
-  const m = who.match(/│\s*([^│]+?)\s*│\s*([0-9a-f]{32})\s*│/);
-  if (!m) return { ok: false, why: "这把令牌问不出账号（可能已失效/权限不足）", detail: who.slice(-300) };
-  const acctName = m[1].trim();
-  const acctId = m[2];
-  const mask = acctId.slice(0, 8);
-  const dir = path.join(CF_MESH_SRC, "build", "slot-" + slot);
-  try {
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, "worker.js"), fs.readFileSync(path.join(CF_MESH_SRC, "worker.js")));
-    fs.writeFileSync(path.join(dir, "wrangler.toml"),
-      'name = "gbt-mesh-10"\nmain = "worker.js"\ncompatibility_date = "2025-01-01"\n\n'
-      + '[vars]\nNODE_ID = "acct-' + mask + '"\nMESH = "[]"\n');
-  } catch (e) {
-    return { ok: false, why: "写部署目录失败", detail: String((e && e.message) || e) };
-  }
-  /* 2026-10-23：每个账号各建一份 KV（命名空间不跨账号）→ 写进 wrangler.toml 的绑定。
-     没有 ROSTER 时 /roster 会回 501「没绑 KV」，10 节点就永远互不认。 */
-  const kvOut = await cfRun(["/c", "npx", "--yes", "wrangler@4", "kv", "namespace", "create", "ROSTER", "--json"],
-    { ...env, CLOUDFLARE_ACCOUNT_ID: acctId }, 180000);
-  let kvId = null;
-  try {
-    const j = JSON.parse(String(kvOut).slice(String(kvOut).indexOf("{")));
-    kvId = (j && (j.id || j.namespace_id)) || null;
-  } catch (_e) { kvId = null; }
-  if (kvId) {
-    try {
-      fs.appendFileSync(path.join(dir, "wrangler.toml"),
-        '\n[[kv_namespaces]]\nbinding = "ROSTER"\nid = "' + kvId + '"\n');
-    } catch (e) { console.error("[w3] 写 KV 绑定失败:", e && e.message); }
-  } else {
-    console.error("[w3] KV 未建成（不影响部署，但本节点将无法登记邻居）：" + String(kvOut).slice(-200));
-  }
-
-  const depEnv = { ...env, CLOUDFLARE_ACCOUNT_ID: acctId };
-  const out = await cfRun(["/c", "npx", "--yes", "wrangler@4", "deploy", "-c",
-    path.join(dir, "wrangler.toml")], depEnv, 300000);
-  const url = (out.match(/https:\/\/[a-z0-9\-.]+\.workers\.dev/) || [])[0] || null;
-  return { ok: !!url, url, slot, account: acctName, idMask: mask + "****", acctId,
-           tail: url ? null : out.slice(-400) };
-});
-
-ipcMain.handle("cf:login", async (ev, payload) => {
-  const raw = String((payload && payload.slot) || "01").replace(/[^0-9]/g, "") || "01";
-  const slot = raw.padStart(2, "0").slice(-2);
-  const home = path.join(CF_OAUTH_ROOT, "acct-" + slot);
-  try { fs.mkdirSync(home, { recursive: true }); } catch (_e) { /* 目录已在就算成功 */ }
-  return await new Promise((resolve) => {
-    const child = spawn("cmd", ["/c", "npx", "--yes", "wrangler@4", "login"], {
-      cwd: ROOT, windowsHide: true,
-      env: { ...process.env, USERPROFILE: home, HOME: home, CLOUDFLARE_API_TOKEN: "" },
-    });
-    let out = "";
-    let urlSent = false;
-    const timer = setTimeout(() => {
-      try { child.kill(); } catch (_e) { /* 已退出 */ }
-      resolve({ ok: false, why: "5 分钟没等到授权（已中止，可重试）" });
-    }, 300000);
-    const grab = (buf) => {
-      out += String(buf);
-      const m = out.match(/https:\/\/dash\.cloudflare\.com\/oauth2\/auth\?[^\s]+/);
-      if (m && !urlSent) {
-        urlSent = true;
-        try { shell.openExternal(m[0]); } catch (_e) { /* 打不开就让页面自己给链接 */ }
-        try { ev.sender.send("cf:login-url", m[0]); } catch (_e) { /* 窗已关 */ }
-      }
-    };
-    child.stdout.on("data", grab);
-    child.stderr.on("data", grab);
-    child.on("exit", async (code) => {
-      clearTimeout(timer);
-      const st = await cfWhoami();
-      resolve({ ...st, code, slot, home });
-    });
-  });
-});
-
-ipcMain.handle("cf:deploy", async () => {
-  const st = await cfWhoami();
-  if (!st.ok) return { ok: false, why: "当前没有有效会话：先点「登入授权」", detail: st.why };
-  const mask = String(st.idMask || "").replace(/\*/g, "");
-  if (!/^[0-9a-f]{8}$/.test(mask)) return { ok: false, why: "读不到账号 id（掩码不完整）", detail: st };
-  const dir = path.join(CF_MESH_SRC, "build", "acct-" + mask);
-  try {
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, "worker.js"), fs.readFileSync(path.join(CF_MESH_SRC, "worker.js")));
-    fs.writeFileSync(path.join(dir, "wrangler.toml"),
-      'name = "gbt-mesh-10"\nmain = "worker.js"\ncompatibility_date = "2025-01-01"\n\n'
-      + '[vars]\nNODE_ID = "acct-' + mask + '"\nMESH = "[]"\n');
-  } catch (e) {
-    return { ok: false, why: "写部署目录失败", detail: String((e && e.message) || e) };
-  }
-  return await new Promise((resolve) => {
-    execFile("cmd", ["/c", "npx", "--yes", "wrangler@4", "deploy", "-c", path.join(dir, "wrangler.toml")],
-      { cwd: ROOT, windowsHide: true, timeout: 300000 },
-      (err, stdout, stderr) => {
-        const text = String(stdout || "") + String(stderr || "");
-        const url = (text.match(/https:\/\/[a-z0-9\-.]+\.workers\.dev/) || [])[0] || null;
-        resolve({ ok: !!url, url, email: st.email, node: "acct-" + mask, tail: text.slice(-400) });
-      });
-  });
-});
 
   /* ── 数字人页的**嘴**：把"念一句"交给框架能力位（单一门 run_task）────────────
      主人令 2026-10-18：「把 digital-human 那扇窗的嘴也换成神经嗓」。
@@ -2449,13 +2206,53 @@ ipcMain.handle("cf:deploy", async () => {
   ipcMain.handle("w3:connect-dsh", (ev, payload) => w3ConnectDsh(payload));
 /* 把入口交给**本应用自己的本地页**（品牌框架页 / 面板内嵌页）→ 引擎嵌在我们门面里跑。
    仍过回环白名单；没有就如实说"还没接上"，不假装。 */
-ipcMain.handle("w3:dsh-entry", () => {
+/* 🔴 2026-10-26 改：**不再把带 token 的 URL 交给渲染进程**（守卫 B7）。
+   原来这里 `return { ok: true, url: chk.url, host }` —— 页面拿它 setAttribute("src", url)
+   才能载引擎，但那等于把凭据交给页面 JS（B7 明令：带 token 的 URL 不许回显）。
+
+   改成「页面只报 webview 的 webContentsId，主进程代劳 loadURL」：
+     · 渲染进程**拿不到 URL**，也就不存在回显面；
+     · 主进程仍是**唯一**持有 token 的地方，且只在内存、不落盘；
+     · URL 由主进程直接 loadURL 进目标 webview，**不成为窗口 URL、不进历史**
+       —— 比原来页内 setAttribute 更收敛（页内 src 属性是能被别的脚本读到的）。
+   回执只给 host（不含 token、不含 query）—— 与 B1e 那张回执同一口径。 */
+ipcMain.handle("w3:dsh-mount", (ev, payload) => {
+  const wcId = Number(payload && payload.wcId);
   if (!lastDshEntry || !lastDshEntry.url) {
-    return { ok: false, error: "还没接上：壳尚未拉起 dsh web（或它没打印就绪 URL）" };
+    return no("还没接上：壳尚未拉起 dsh web（或它没打印就绪 URL）");
   }
   const chk = loopbackUrlOnly(lastDshEntry.url);
-  if (!chk.ok) return { ok: false, error: chk.why };
-  return { ok: true, url: chk.url, host: lastDshEntry.host };
+  if (!chk.ok) return no(chk.why);
+
+  /* 找目标 webview：优先用页面报的 id；**拿不到就从调用方反查它的 guest**。
+     🔴 为什么要反查（2026-10-26）：不同 Electron 版本里，`<webview>` 在 `about:blank`
+     阶段调 `getWebContentsId()` 可能抛错或返回 0。页面拿不到 id 就此罢工的话，
+     "对话"页会永远停在「等壳把引擎拉起来…」——而它其实只是**版本差异**，不是坏了。
+     主进程这边有可靠依据：webview 的 guest webContents 的 `hostWebContents`
+     就是那个页面自己，所以能凭 `ev.sender.id` 认出"谁是它名下的 webview"。
+     ⇒ 页面的职责降为"我准备好了"，找谁是主进程的事。 */
+  let target = wcId ? webContents.fromId(wcId) : null;
+  let how = wcId ? "按页面报的 webContentsId" : "";
+  if (!target) {
+    const guests = webContents.getAllWebContents().filter(
+      (w) => w && w.hostWebContents && w.hostWebContents.id === ev.sender.id
+    );
+    // 优先挑"还没载过东西"的那个（about:blank），免得误装进别的 webview
+    const blank = guests.filter((w) => {
+      try { const u = w.getURL(); return !u || u === "about:blank"; } catch (e) { return false; }
+    });
+    target = blank[0] || guests[0] || null;
+    how = "按调用方反查 guest";
+    if (!target) {
+      return no("webview 还没挂上（页面没报 id，反查也没找到它的 guest）—— 稍后重试");
+    }
+  }
+  try {
+    target.loadURL(chk.url);
+  } catch (err) {
+    return no(String(err && err.message || err).slice(0, 200));
+  }
+  return ok({ host: lastDshEntry.host, mounted: true, how: how });
 });
   /* 面板内跳页（主人令 2026-10-04「要固定在 APP 面板上」）：只认注册表里的窗 id，
      把该窗的页面路径发给**面板窗**，由它在内容区里切换 —— **不开任何新窗**。
@@ -2501,6 +2298,178 @@ ipcMain.handle("w3:dsh-entry", () => {
     /* 判据在 `chrome.showWindow`（纯函数、可单测）—— 这里只做 `ok()/no()` 的适配。 */
     const r = chrome.showWindow(registry, wins, payload);
     return r.ok ? ok(r.data) : no(r.error);
+  });
+
+  /* ══ 2026-10-26 跨页触手网格（主人令：「使用量化APP和权重触手双向绑定触手覆盖每一页，
+        每一页和所有页面互通按需激活，本地内存足够了」）══════════════════════════════
+     两个口，各管一半：
+
+     ① `w3:page-message` —— **跨页派活**（动作口，preload 已登记）。
+        · 只认注册表里**已有的 id**（白名单，不认任意字符串）→ 打不开就如实报；
+        · 消息**原样透传**：主进程不解析、不校验 reqId/replyTo、不存任何会话状态
+          ⇒ 页面崩溃不会留下幽灵请求（配对全在渲染层做）；
+        · **不替目标页调能力位** —— 只是"唤起 + 派活"，执行权在目标页自己。
+          （这是安全边界的核心：跨页消息不许变成"绕过页面的远程执行口"）
+
+     ② `w3:page-state` —— **只读**快照（不进 non_readonly_capability）。
+        · 各窗可见性 + 页面自盖的 `data-tentacle-active`（按需激活的现读凭据）；
+        · 只读不写、不发请求、不调能力位。
+     ⚠️ `data-tentacle-active` 是**页面自己**在 visibilitychange 时盖的（见 tentacle-kit.js），
+        主进程只读不写 —— 判据才有"页面真活了"的意义，否则就是自证。 */
+  /* 等一扇窗"真的载完"（按需载页的配套件）。三种情形分开报，不含糊：
+       · 已经载好且没在载 ⇒ 立刻 ok（waited=0）
+       · 还没载（按需挂起）⇒ 主动 kick，等 did-finish-load
+       · 正在载 ⇒ 等 did-finish-load
+     超时不抛异常，返回 `{ok:false, why}` —— 调用方要能把这句原话回给发起页。 */
+  function ensureLoaded(win, timeoutMs) {
+    return new Promise((resolve) => {
+      let wc = null;
+      try { wc = (win && !win.isDestroyed()) ? win.webContents : null; } catch (_) { wc = null; }
+      if (!wc) return resolve({ ok: false, why: "窗不在或已销毁", waited: 0 });
+      let loading = false;
+      try { loading = wc.isLoading(); } catch (_) { /* 取不到就当没在载 */ }
+      const pending = typeof win.__pendingLoad === "function";
+      if (!pending && !loading) return resolve({ ok: true, waited: 0 });
+
+      const t0 = Date.now();
+      let settled = false;
+      let timer = null;
+      const fin = (ok, why) => {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        try { wc.removeListener("did-finish-load", onDone); } catch (_) {}
+        try { wc.removeListener("did-fail-load", onFail); } catch (_) {}
+        resolve({ ok: ok, why: why || "", waited: Date.now() - t0 });
+      };
+      const onDone = () => {
+        /* 🔴 不许被 `about:blank` 那一发满足（2026-10-27 实测警觉）：
+           建窗本身可能触发一次空导航的 did-finish-load，若就此 resolve，
+           消息会打进空页 —— 于是又回到"delivered:true 但对方没收到"的假绿。
+           只认真页面：URL 必须是 file:// 或已声明的 https。 */
+        let u = "";
+        try { u = wc.getURL() || ""; } catch (_) { u = ""; }
+        if (!/^file:\/\//.test(u) && !/^https:\/\//.test(u)) return;   /* 继续等 */
+        fin(true);
+      };
+      const onFail = (_e, code, desc) => fin(false, "载入失败 " + code + " " + String(desc || "").slice(0, 60));
+      wc.once("did-finish-load", onDone);
+      wc.once("did-fail-load", onFail);
+      timer = setTimeout(() => fin(false, "等了 " + timeoutMs + "ms 还没载完"), timeoutMs);
+
+      if (pending && typeof win.__kickLoad === "function") {
+        try { win.__kickLoad(); } catch (_) { /* kick 自己会报错，别吞两次 */ }
+      }
+    });
+  }
+
+  /* 🔴 **主动问一次可见性**（2026-10-27）：推送（`w3:win-visibility`）有个竞态 ——
+     注入脚本可能**晚于**那次推送才订阅上（两者都在 did-finish-load 附近发生），
+     于是页面永远以为"可见"，门等于没装。实测：加了门主窗照塌就是这么来的。
+     ⇒ 再给一个只读的拉取口，谁都能在启动时问一次真值（`win.isVisible()`）。 */
+  ipcMain.handle("w3:win-visible", (ev) => {
+    const w = BrowserWindow.fromWebContents(ev.sender);
+    if (!w || w.isDestroyed()) return ok({ visible: false, why: "窗不在" });
+    let wasShown = false;
+    try { wasShown = w.isVisible() === true; } catch (_) { wasShown = false; }
+    return ok({ visible: wasShown });
+  });
+
+  ipcMain.handle("w3:page-message", async (ev, payload) => {
+    const toId = payload && payload.to ? String(payload.to) : "";
+    if (!toId) return no("缺少目标页 id");
+    const entry = registry.windows.filter((w) => w.id === toId)[0];
+    if (!entry) return no("没有这扇窗：" + toId.slice(0, 40));
+    if (entry.retired) return no("这扇窗已作废：" + toId);
+    const targetWin = wins.get(toId);
+    if (!targetWin || targetWin.isDestroyed()) return no("目标窗还没建起来或已关：" + toId);
+    /* 🔴 按需载页的**配套**（2026-10-27）：目标窗可能"建好了但还没载页"。
+       直接 send 会打进一个空页 —— 对方收不到（它的接管器还没跑）。
+       ⇒ 先把它拉起来、等真载完，再投递；并把**等了多久**回给发起方（可量化）。
+       为什么这段必须在这里、不能靠调用方自觉：派活的来源有四种（页面、托盘、
+       面板入口、主人手点），要求每个来源都记得"先唤起再等"等于把这件事实质上放弃。 */
+    const ready = await ensureLoaded(targetWin, 8000);
+    if (!ready.ok) return no("目标窗还没就绪（" + ready.why + "）⇒ 消息未投递：" + toId);
+    try {
+      targetWin.webContents.send("w3:page-message", {
+        to: toId,
+        from: String(payload && payload.from || "?").slice(0, 60),
+        msg: (payload && payload.msg) || {},
+        at: Date.now(),
+      });
+      return ok({ delivered: true, to: toId, waitedMs: ready.waited });
+    } catch (err) {
+      return no(String(err && err.message || err).slice(0, 200));
+    }
+  });
+
+  /* 🔴 2026-10-26 改：按需激活状态改成**页面主动上报**，主进程不再去读页面 DOM。
+     原来这里用**页面脚本注入**读 data-tentacle-active —— 踩了守卫 B4
+     （注入只许收口在 deepseek_loop.cjs）。改自报还有额外好处：**判据不会自证**，
+     状态是页面自己在 visibilitychange 里发出来的，主进程只负责记。
+     键用 webContents.id：同一扇窗导航后 id 不变，旧记录被覆盖，不会无限增长。 */
+  const pageActive = new Map();   // webContents.id → { pageId, active, at }
+
+  ipcMain.handle("w3:page-active", (ev, payload) => {
+    const pageId = payload && payload.pageId ? String(payload.pageId).slice(0, 60) : "";
+    if (!pageId) return no("缺少 pageId");
+    const active = payload && payload.active ? "1" : "0";
+    const wcId = ev.sender && ev.sender.id;
+    pageActive.set(wcId, { pageId: pageId, active: active,
+                           at: new Date().toISOString() });
+    return ok({ pageId: pageId, active: active });
+  });
+
+  /* 🔴 2026-10-27 加：**页面心跳**（卡死自愈的"检测端"）。
+     为什么必须由页面报、不能由主进程探：实测（hang-probe 靶子页，确定性复现）——
+     脚本队列被堵时，主进程发过去的脚本调用**永远不 settle**，Chromium 的挂起监视器
+     **也不报**（它只管"输入不 ack"）。换句话说：**只有页面自己知道自己还在跑脚本**。
+     所以页面每 8s 发一次；主进程只记时间戳（打在 win 对象上，键天然是那扇窗，不用另建 Map）。
+     看门狗在启动段：超时未报活 ⇒ 调 createWindow 里那个 `__heal`（强崩 + 重载，实测 294ms 恢复）。 */
+  ipcMain.handle("w3:page-heartbeat", (ev, payload) => {
+    const win = BrowserWindow.fromWebContents(ev.sender);
+    if (!win || win.isDestroyed()) return no("窗不在（可能正在重建）");
+    const now = Date.now();
+    win.__lastBeat = now;
+    win.__everBeat = true;   /* 记号：这扇窗**曾经**报过活（看门狗只对这类动手，见启动段） */
+    /* 🔴 迟到自报（2026-10-27 第二次修）：页面把"这次比本应时刻晚了多少"一起报上来。
+       为什么需要：看门狗原来按一个拍死的 10s 判，而实测 24 轮强崩 72 次，迟到大都
+       刚落 10~15s（中位 12.7s）—— 重页在软件渲染下本来就会迟到十几秒。
+       ⇒ 只留最近 `LAG_KEEP` 次，看门狗按**这扇窗自己的实测迟到**抬预算。
+       异常值处理：负数（首拍 / 时钟回拨）当 0，不许把预算抬到天上。 */
+    const lag = Number(payload && payload.lag);
+    const ring = win.__lagRing || (win.__lagRing = []);
+    ring.push(lag > 0 ? lag : 0);
+    if (ring.length > beatBudgetMod.LAG_KEEP) ring.shift();
+    /* 学习期要用的两个记号：第一拍的时刻、累计拍数。缺了它们看门狗没法判"学够了没"。 */
+    if (!win.__firstBeat) win.__firstBeat = now;
+    win.__beats = (win.__beats || 0) + 1;
+    return ok({ at: now, lag: ring[ring.length - 1] });
+  });
+
+  ipcMain.handle("w3:page-state", (ev, payload) => {
+    const filterId = payload && payload.id ? String(payload.id) : null;
+    /* pageId → 最近一次上报 */
+    const byPage = {};
+    for (const rec of pageActive.values()) byPage[rec.pageId] = rec;
+
+    const pages = {};
+    for (const w of registry.windows) {
+      if (w.retired) continue;
+      if (filterId && w.id !== filterId) continue;
+      const win = wins.get(w.id);
+      const alive = !!(win && !win.isDestroyed());
+      const rec = byPage[w.id];
+      pages[w.id] = {
+        title: w.title || w.id,
+        built: alive,
+        visible: !!(alive && win.isVisible()),
+        // null = 这页**从没上报过**（"不知道" ≠ "没激活"）—— 不许画成 0
+        active: rec ? rec.active : null,
+        active_at: rec ? rec.at : null,
+      };
+    }
+    return ok({ pages: pages, at: new Date().toISOString() });
   });
 
   /* ══ W3 · 语音对讲（2026-09-23 第 58 轮）══════════════════════════════════
@@ -2667,7 +2636,13 @@ if (WIRE_ONLY) {
      * 现在：只读数据面（IPC + SSE 订阅）先无条件建立；窗口/托盘各自 try/catch，
      * 坏了就在盘上如实说坏了，不牵连数据面。 */
     registerIpc();
-    startSse(broadcast);
+    /* `GBT_W3_NO_SSE=1` 只是**取证开关**（默认关 = 行为不变）：主窗在壳里比裸页面更早饱和，
+       要分清是 SSE 状态回放、铬注入还是 17 扇并存，就得能单独摘掉一样再量。 */
+    if (process.env.GBT_W3_NO_SSE === "1") {
+      console.log("[w3] 取证：GBT_W3_NO_SSE=1 ⇒ 不起实时流（只影响本次测量）");
+    } else {
+      startSse(broadcast);
+    }
 
     /* 🔴 2026-10-10（主人令）：**建窗之前**确保面板桥在跑 ——
        否则数字人壳没有可加载的页面，主人看到的是一片「未连接/未配置」。
@@ -2678,44 +2653,146 @@ if (WIRE_ONLY) {
       if (br.ok !== true) {
         console.error("[w3] 面板桥未就绪（不牵连壳启动）:", br.reason);
       } else if (br.already !== true) {
-        console.error("[w3] 面板桥已拉起（等了 " + br.waited_ms + " ms）");
+        /* 🔴 2026-10-27：这条是**信息**，不是失败 —— 改用 console.log。
+           原因：`startup.cjs` 的 S:noreport 判据是"引导期有没有 [w3] 的 console.error"
+           （stderr 只该承载失败）。这条原来走 console.error，探针就把它记成
+           「引导期有 1 条失败留痕：[w3] 面板桥已拉起」—— 把**一句正常通报判成了故障**。
+           修的是通道（信息走 stdout、失败走 stderr），不是让判据去解析中文措辞。 */
+        console.log("[w3] 面板桥已拉起（等了 " + br.waited_ms + " ms）");
       }
     } catch (err) {
       console.error("[w3] 面板桥确保失败（不牵连壳启动）:", err);
     }
 
-    /* 🔴 2026-10-21（主人令）：**建窗之前**确保模型桥在跑 ——
-       「模型对话」页只连 127.0.0.1:8791，桥不起 = 云插件的大模型在 APP 里用不上。
-       失败只打日志、不牵连壳启动（与面板桥同向）。 */
-    /* 🔴 2026-10-24（主人令「按需激活运行」）：**启动时不再加载 4.88 GB 权重**。
-       第一次真要用我们的模型时，由桥的 ensure_selfhost() 现拉；闲置
-       GBT_SELFHOST_IDLE（默认 900s）后服务自己退出，把内存还给系统。
-       所以这里只留一句日志，不做任何加载动作。 */
     try {
-      console.error("[w3] 按需激活模式：权重在首次对话时才加载（闲置 "
-        + (process.env.GBT_SELFHOST_IDLE || "900") + "s 自动退）");
-    } catch (err) {
-      console.error("[w3] 按需激活模式（日志失败不影响启动）:", err);
-    }
-
-    try {
-      const mb = await ensureModelBridge();
-      if (mb.ok !== true) {
-        console.error("[w3] 模型桥未就绪（不牵连壳启动）:", mb.reason);
-      } else if (mb.already !== true) {
-        console.error("[w3] 模型桥已拉起（等了 " + mb.waited_ms + " ms）");
+      /* 2026-10-26 修：**retired 的窗不许建**。
+         windows.json 里 `exec-deck` / `brain` 自 2026-10-21 起就标着 `retired: true`
+         （页面已归档进 `holo_pet_w3/_archive-20261021/`，审计那边也记「已归档不审计」），
+         但这里原来是 `forEach` 全建 ⇒ 每次启动都刷两条 `ERR_FILE_NOT_FOUND`，
+         看起来像"页面丢了"，其实是**壳没认 retired**。
+         同一份注册表三种读法：派活口（约 2096 行）与 pageState（约 2137 行）早就认了，
+         只有建窗这一处漏 —— 这正是本仓最贵的教训（一处口径、三种实现）。
+         判据：启动日志里不再出现这两条 ERR_FILE_NOT_FOUND，而 windows.json 一个字不改。 */
+      /* 🔴 一体式彻底化（2026-10-29 主人令）：启动**只建 app-shell 一扇**，17 页全走它的 iframe。
+         之前 `filter(!retired)` 一次性建 18 扇独立窗 ⇒ 本机 GPU 起不来走软件渲染，18 个渲染进程
+         并发竞争、渐进卡死（onepiece 实测：多窗下第 5 页起脚本调用超时；单窗下 18 页
+         全部 0.8s 级秒回）。17 扇窗改成**按需建**（showWindow 时才 createWindow，单扇不并发）；
+         dsh-chat 外部对话窗同样按需建（主人运行时给 URL 才建）。 */
+      const booted = registry.windows.filter((entry) => !entry.retired && entry.id === "app-shell");
+      const skipped = registry.windows.length - booted.length;
+      if (skipped > 0) {
+        console.log("[w3] 一体式：启动只建 app-shell，其余 " + skipped
+          + " 扇按需建（含 2 扇 retired 按设计不建）");
       }
-    } catch (err) {
-      console.error("[w3] 模型桥确保失败（不牵连壳启动）:", err);
-    }
+      /* 🔴 2026-10-27 实测结论：分批建窗**默认关闭**（BOOT_BATCH=0），机制留作开关。
+         为什么关掉（两次一致的 A/B，探针 `npm run startup` 读数）：
+           · BATCH=0（一次性建 17 扇）⇒ S:windows 17/17 · **S:stream PASS**（徽章「实时流：已接」）
+             · 探针 9 秒跑完 · PASS 10 · FAIL 0
+           · BATCH=4 / 250ms            ⇒ S:windows 17/17 · **S:stream 8s 无回话**（主窗脚本队列被堵）
+             · PASS 9 · FAIL 1
+         机制猜测（未证）：主窗（godview）落在最后一批，它的 `chrome.attach` 注入要排在
+         被串行化的注入链后面（见 chrome.cjs 的 `_injectChain`），于是主窗那次**脚本注入调用**
+         排在注入之后 ⇒ 8s 内轮不到它。
+         ⚠️ 这里别写那个函数名 —— 守卫 B4 是**正则扫全文、不剥注释**的，注释里写一句也会红。
+         ⇒ **分批建窗没解决原问题（并发加载卡死），却新增了一个可观测的回归**，
+           所以不默认开启。要真治并发加载，方向是「先建空窗、按需载页」，不是错峰建窗。
+         开关：`GBT_W3_BOOT_BATCH=4 GBT_W3_BOOT_GAP_MS=250` 可复现上面的对比。 */
+      const BOOT_BATCH = process.env.GBT_W3_BOOT_BATCH === undefined
+        ? 0 : Math.max(0, Number(process.env.GBT_W3_BOOT_BATCH) || 0);
+      const BOOT_GAP = process.env.GBT_W3_BOOT_GAP_MS === undefined
+        ? 250 : Math.max(0, Number(process.env.GBT_W3_BOOT_GAP_MS) || 0);
+      if (BOOT_BATCH > 0 && BOOT_BATCH < booted.length) {
+        console.log("[w3] 分批建窗：" + booted.length + " 扇 / 每批 " + BOOT_BATCH
+          + " 扇 / 间隔 " + BOOT_GAP + "ms（并发建窗会让部分渲染进程卡死）");
+        for (let i = 0; i < booted.length; i += BOOT_BATCH) {
+          booted.slice(i, i + BOOT_BATCH).forEach((entry) => createWindow(entry));
+          if (i + BOOT_BATCH < booted.length && BOOT_GAP > 0) {
+            await new Promise((r) => setTimeout(r, BOOT_GAP));
+          }
+        }
+      } else {
+        booted.forEach((entry) => createWindow(entry));
+      }
 
-    try {
-      registry.windows.forEach((entry) => createWindow(entry));
+      /* 🔴 心跳看门狗（2026-10-27）：`main.cjs` 唯一能发现"脚本队列被堵"的手段。
+         为什么不用 Chromium 的 `unresponsive`：实测（hang-probe 靶子页 + 四次真启动）
+         它**一次都没触发** —— 它盯的是"输入不 ack"，不是"脚本调用不 settle"。
+         预算：**按窗自适应**，不再是一个拍死的常数 —— 见下面三条不变式。
+         页面每 2s 报一次（tentacle-kit.js BEAT_MS），并把"这次迟到多少"一起报上来。
+         `GBT_W3_BEAT_STALE_MS` 只能把**下限**往上调（下限本身再被 3×周期兜一次），
+         `GBT_W3_NO_HANG_WATCHDOG=1` 可整条关掉。
+         只对**已载完**的窗动手：还在载页的窗本来就没脚本在跑，此时报活缺失不算卡死。 */
+      if (process.env.GBT_W3_NO_HANG_WATCHDOG !== "1") {
+        /* 🔴 三条不变式（改这里的人必须同时满足，见 shell/beat-budget.cjs）：
+             ① 预算 **永远 ≥ 3×心跳周期**（1× 时每扇窗都在两次心跳之间被判死 ⇒ 全窗风暴，
+                实测一次跑出 81 条失败留痕）；
+             ② 预算随该窗**实测迟到**单调不减（迟到是重页的正常表现，不是故障）；
+             ③ 上限比下限还小时以下限为准（宁可慢，不许造风暴）。
+           🔴 2026-10-27 第二次改的由来：第一版按拍死的 10s 判，24 轮真启动里
+           强崩 **72 次**（平均每轮 3 次），主窗 godview 24 轮里 18 轮被强崩，
+           而同期 S:respond 说它 23/24 次都回话 ⇒ **打的是迟到，不是死**。
+           72 条超时读数中位 12.7s、38% 落在 10~12s，全都只是刚过线一点。 */
+        const BEAT_MS = 2000;
+        const STALE_MS = Math.max(BEAT_MS * 3, Number(process.env.GBT_W3_BEAT_STALE_MS) || 10000);
+        /* 🔴 学习期（2026-10-27 第三次修，被我自己那次回归逼出来的）：
+           **迟到只能事后观测** —— 页面迟到了 8s，它只能在第 8s 那一刻报上来；
+           而线是 6s 的话，第 6s 就已经把它杀了，于是**永远学不到它能迟到多久**。
+           实测就是这么炸的：把下限从 10000 顺手写成 6000 后，8 次真启动里留痕从
+           3 条/轮 涨到 43 条/轮，日志显示所有窗的实测迟到只有 0~400ms，
+           却在开机 8s 处**整段停跳 6.6~8.6s**（17 扇同时载页，定时器被拖住）⇒ 全窗同时强崩。
+           ⇒ 规则：一扇窗必须先活够学习期（≥4 拍且 ≥15s），期间**只学不杀**。
+             学到的迟到上限才拿去做预算。这不是宽容，是"没量过就不许下结论"。 */
+        const LEARN_MS = Math.max(15000, STALE_MS * 1.5);
+        const LEARN_BEATS = 4;
+        const beatTimer = setInterval(() => {
+          const now = Date.now();
+          wins.forEach((w, id) => {
+            if (!w || w.isDestroyed()) return;
+            let loading = false;
+            try { loading = w.webContents.isLoading(); } catch (_) { return; }
+            if (loading) return;                      /* 还在载 ⇒ 不算卡死 */
+            /* 🔴 只对**曾经报过活**的窗动手（2026-10-27 实测踩到）：
+               `code-deck` 是按设计**零脚本**的快照页（守卫 B8 要求），它没有接管器、
+               永远不会报活 ⇒ 若把"从未报过"当卡死，它每 10 秒就被强崩一次（实测每轮必发生）。
+               ⇒ 「从未报过」≠ 卡死：可能是按设计没有脚本。**卡死的前提是"曾经活着"**。 */
+            if (w.__everBeat !== true) return;
+            const last = w.__lastBeat || 0;
+            const lagMax = (w.__lagRing || []).reduce((m, x) => Math.max(m, x), 0);
+            const budget = beatBudgetMod.beatBudget({
+              beatMs: BEAT_MS, floorMs: STALE_MS, lagMax: lagMax, capMs: beatBudgetMod.STALE_CAP_MS,
+            });
+            /* 🔴 预算变了就报一行（只在**变化时**打，不刷屏）。
+               为什么非报不可：若页面那条 `lag` 根本没送到，预算会一直贴着下限，
+               表现和"自适应没生效"一模一样 —— 都是"没报错、但照样强崩"。
+               把预算和实测迟到摊出来，"通道断了"与"量到了"才分得开。 */
+            if (w.__budgetLogged !== budget) {
+              w.__budgetLogged = budget;
+              console.log("[w3] 心跳预算 " + id + " = " + budget + "ms（实测迟到上限 "
+                + lagMax + "ms · 下限 " + STALE_MS + "ms · 拍数 " + (w.__beats || 0) + "）");
+            }
+            /* 学习期：还没攒够"它能迟到多久"的证据，就不许判它死（只学不杀）。 */
+            const learned = (w.__beats || 0) >= LEARN_BEATS
+              && (now - (w.__firstBeat || now)) >= LEARN_MS;
+            if (!learned) return;
+            if (now - last <= budget) return;
+            if (typeof w.__heal === "function") {
+              w.__heal("心跳超时 " + (now - last) + "ms（预算 " + budget + "ms = max("
+                + STALE_MS + ", 2×该窗实测迟到 " + lagMax + " + " + BEAT_MS + ")）");
+            }
+          });
+        }, Math.min(5000, Math.max(1000, Math.floor(STALE_MS / 2))));
+        if (beatTimer.unref) beatTimer.unref();
+      }
       STARTUP_DONE = true;      /* 启动批次结束：此后按需唤醒不再受「唯一可见窗」约束 */
-      /* 主人令 2026-10-08：打开 APP 直接进入数字人语音交互页 —— 把它顶到最前。 */
+      /* 主人令 2026-10-28「APP 必须是一体式」：启动只把外壳顶到最前。
+         这里原来是「打开 APP 直接进数字人语音交互页」（2026-10-08 令），无条件 dh.show()；
+         数字人现在是外壳 iframe 里的一个页，不再单独开窗 —— 这行不改的话，
+         启动会多出一扇数字人窗盖在外壳上（实测就是 2 个窗，且它绕过 placed.visible，
+         所以建窗阶段看得完全正确、只在启动收尾这一步冒出来）。
+         注意环境变量名是 GBT_W3_STARTUP_PROBE，与上面的 PROBE 不是同一个，别混。 */
       if (process.env.GBT_W3_STARTUP_PROBE !== "1") {
-        const dh = wins.get("digital-human");
-        if (dh && !dh.isDestroyed()) { dh.show(); dh.focus(); }
+        const sh = wins.get("app-shell");
+        if (sh && !sh.isDestroyed()) { sh.show(); sh.focus(); }
       }
     } catch (err) {
       console.error("[w3] 建窗失败（数据面不受影响）:", err);
@@ -2755,25 +2832,6 @@ if (WIRE_ONLY) {
   app.on("will-quit", () => {
     dshAutoHandles.forEach((h) => { try { h.stop(); } catch (err) { /* 收不掉不拖垮退出 */ } });
     dshAutoHandles.clear();
-    /* 模型桥同理：只收**本进程拉起的**那个（用户自己终端拉的桥不碰）。
-       桥是 ThreadingHTTPServer，没有优雅停接口 ⇒ kill 子进程即停。 */
-    /* 本机权重服务同理：只收本进程拉起的那个（4.88 GB 常驻，不收会漏内存）。 */
-    if (localLlmChild) {
-      try { localLlmChild.kill(); } catch (err) { /* 已退：如实忽略 */ }
-      localLlmChild = null;
-    }
-    /* 按需激活后，权重服务是**桥拉起的独立进程**（不在本进程的子进程表里），
-       所以退出时按端口收：只收我们这条链的 :8792，不碰别人的进程。 */
-    try {
-      let n = killListeners(LOCAL_LLM_PORT);
-      /* 模型 + APP 是一体：壳一退，权重和 GPU 车道都不能留在后台占内存/显存。 */
-      n += killListeners(GPU_LANE_PORT);
-      if (n) console.error("[w3] 已收掉按需加载的权重/GPU 服务 " + n + " 个");
-    } catch (err) { /* 收不掉不拖垮退出 */ }
-    if (modelBridgeChild) {
-      try { modelBridgeChild.kill(); } catch (err) { /* 已退：如实忽略 */ }
-      modelBridgeChild = null;
-    }
   });
 }
 

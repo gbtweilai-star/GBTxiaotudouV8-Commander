@@ -74,7 +74,7 @@ except Exception:                                    # pragma: no cover
     yaml = None
 
 # 只读用的「已知密钥值」清单：任何输出在落盘前都会拿它做一次替换。
-# 🔴 **它只活在内存里**，不进任何返回结构、不进 json、不进日志。
+# **它只活在内存里**，不进任何返回结构、不进 json、不进日志。
 _SECRETS: list = []
 
 
@@ -767,7 +767,7 @@ def selftest() -> int:
                "web", "gbt-potato", types, None)["ok"] is False,
            "非回环 http 必须被拒")
 
-        # ⑧ 🔴 负控（本仓红线）：**打印里不许出现密钥明文**
+ # ⑧ 负控（本仓红线）：**打印里不许出现密钥明文**
         h8 = _fixture_home(td)
         r8 = run(h8, "web", "gbt-potato", types, None)
         printed = redact(json.dumps(r8, ensure_ascii=False))
@@ -909,7 +909,7 @@ def main() -> int:
     if a.cmd == "models":
         return cmd_models(a)
     a.live = (a.cmd == "live")
-    # 🔴 **不要**在这里给 `--model` 塞默认值：早先写死了 `gbt-potato-v8`，
+ # **不要**在这里给 `--model` 塞默认值：早先写死了 `gbt-potato-v8`，
     #    结果 `live --route gbt-free` 会拿**别人家的模型名**去断言，报出一条**假红**
     #    （本仓最忌的「写死」类错误，而且是我自己犯的）。`live` 自己会用 patch 里
     #    声明的**第一个**模型去真打；`--model` 只在**用户显式给了**时才当判据。

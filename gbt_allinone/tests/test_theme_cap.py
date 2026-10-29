@@ -16,6 +16,34 @@ def _scopes(payload):
     return sorted(getattr(d, "scopes", ()) or ())
 
 
+def _active_palette():
+    """现役色源 = 4 个主题块**生成头里写的那个**（派生源，不写死名字）。
+
+    🔴 2026-10-25 · 原期望 → 新口径 → 为什么翻：
+      原期望：`TC.run("check")` 用默认色源 `default` 校验全仓主题块。
+      新口径：先读每个目标文件 `GBT-THEME-BEGIN … palettes/<名>.toml …` 的生成头，
+              **四件必须同源**（不同源直接判红），再用那个源去校验。
+      为什么翻：仓里在役的是 `gbt-brand`（CSS 头里就写着），而这条判据写死
+              `default` ⇒ **拿 A 尺量 B**（本仓 P1），于是 4 件全部被报「漂移」。
+              **这不是放宽**：四件不同源仍然红；色源文件不存在也仍然红。
+    """
+    import re
+    targets = TC.run("discover")["targets"]
+    seen = {}
+    for t in targets:
+        rel = t["file"] if isinstance(t, dict) else t
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        head = p.read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"palettes/([A-Za-z0-9_.\-]+)\.toml", head)
+        seen[rel] = m.group(1) if m else None
+    names = {v for v in seen.values()}
+    assert len(names) == 1 and None not in names, \
+        "4 个主题块的生成头不是同一个色源 / 有的块没有生成头：%s" % seen
+    return names.pop()
+
+
 class ThemeCapReadTest(unittest.TestCase):
 
     def test_list_reports_palettes(self):
@@ -38,7 +66,7 @@ class ThemeCapReadTest(unittest.TestCase):
         self.assertEqual(r["reason"], "palette_not_found")
 
     def test_check_passes_on_current_repo(self):
-        r = TC.run("check")
+        r = TC.run("check", palette=_active_palette())
         self.assertTrue(r["pass"], r.get("errors") or r.get("drifted"))
         self.assertTrue(r["ok"])
 

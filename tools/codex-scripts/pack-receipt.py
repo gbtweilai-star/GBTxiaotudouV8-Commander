@@ -158,14 +158,14 @@ def main() -> int:
         pass
     chk("electron 版本定值", bool(ev) and ev[0].isdigit(), "electronVersion=%r" % ev)
 
-    # ── 🔴 包与源码**同源**吗（2026-09-23 第 46 轮加）──
+ # ── 包与源码**同源**吗（2026-09-23 第 46 轮加）──
     # 为什么这是本回执最该有的一格（实测教训）：
     #   我第 40 轮打出包、回执 **8 项红 0**；此后第 43-45 轮改了
     #   `window.js` / `index.html` / `shell/main.cjs` / `shell/preload.cjs` ——
     #   而回执**照样全绿**，因为原来的 8 项**只量包的形状，不量包的内容**。
     #   ⇒ 一个"PASS"的回执配一个**过期的包**，是最坏的一种绿：它让人以为装机件是新的。
     #   ⇒ 逐字节比 sha256：包里的 `resources/app/<路径>` 必须等于源里的同名文件。
-    # ⚠️ `package.json` **不参与比对**：electron-builder 会重写它（裁剪字段），
+ # `package.json` **不参与比对**：electron-builder 会重写它（裁剪字段），
     #    比它必然"不同源"，那是打包器的正常行为，不是缺陷。
     PARITY = ["index.html", "window.js", "window.css", "deck3d.css",
               "skin-mission-control.css", "ef_render.js",

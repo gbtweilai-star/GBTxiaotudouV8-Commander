@@ -46,7 +46,7 @@ from gbt_allinone.security import policy as POLICY          # noqa: E402
 PROBE = ROOT / "plugins" / "gbt-master" / "tools" / "verify-state-injection.mjs"
 
 RE_PATH = re.compile(r"\bpython\s+((?:[\w.\-]+[\\/])*[\w.\-]+\.(?:py|cjs|js))\b")
-# 🔴 2026-09-25 当场修我自己的假阳性（**首跑就撞上**）：
+# 2026-09-25 当场修我自己的假阳性（**首跑就撞上**）：
 #   原来写的是 `([\w.]+)` ⇒ `\w` **吃中日韩汉字** ⇒ 台账里那句散文
 #   「修我自己一条过窄判据（python -m 包 vs 模块）」被解析成
 #   `python -m 包` ⇒ 报「模块/包不存在：包」。**这是"把提到当成用了"的又一例**

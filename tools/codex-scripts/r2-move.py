@@ -45,7 +45,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parents[2]
 LOG = ROOT / "state" / "r2-move-log.jsonl"
 PARTS = ROOT / "state" / "r2-multipart.json"
-# 🔴 2026-10-20 实修：桶名原来是**写死的 gbt-bigfiles**，我拿它往"公网动作库 gbt-motion"传了 4 件，
+# 2026-10-20 实修：桶名原来是**写死的 gbt-bigfiles**，我拿它往"公网动作库 gbt-motion"传了 4 件，
 #    它报 ok、sha 双对、还给了 verify 命令 —— 但对象其实进了 gbt-bigfiles，公网 404。
 #    「双对」只证明"传到某个桶里且没坏"，不证明"传到了你要的那个桶"。
 #    ⇒ 桶名走环境变量，默认仍是老桶（不改变既有调用方行为）。
@@ -307,7 +307,7 @@ def cmd_move(a):
     f0 = free_of(local)
     local.unlink()
     f1 = free_of(local)
-    # 🔴 注意键序：`**det` 里也带「阶段」⇒ 必须放在后面，否则会把 done 盖成「回验通过」，
+ # 注意键序：`**det` 里也带「阶段」⇒ 必须放在后面，否则会把 done 盖成「回验通过」，
     #    日志就分不出"搬完没有"了（第 79 轮实测的坏读数）。
     log({"动作": "move", "本地": str(local), "key": key,
          "字节": n2, "sha256": sha2, "释放字节": f1 - f0, **det, "阶段": "done"})

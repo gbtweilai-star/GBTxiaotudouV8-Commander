@@ -41,6 +41,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+# 🔴 2026-10-29 修 §三 第 3 项（502 归因错）：回环**强制直连** + 失败**分档**。
+#    本机 `HTTP_PROXY` 是全局的、`urlopen` 对 127.0.0.1 不自动 bypass ⇒ 车道没起时
+#    代理回 502，被我们当成「上游真回 502」上报。独立成 lane_guard，本文件不再自己判一遍。
+if str(pathlib.Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import lane_guard as LG                                            # noqa: E402
+
 # name → (base_url, model, vault profile, timeout_s)
 # `cloud` = **云插件路线**（主人令 2026-10-21「把云插件的GBT小土豆V8大模型接入到原生APP里面使用」）：
 #   Cloudflare Worker `gbt-potato-cloud-10`（10 云插件拼网里的 c01-llm-gateway，
@@ -59,21 +66,37 @@ sys.path.insert(0, str(ROOT))
 #    做法：给**主车道一个硬截止**（默认 20s，可用 GBT_BRIDGE_PRIMARY_DEADLINE 调），
 #    到点就换下一条车道，并在回包里**明示 lane 与 weights_ours**（兜底一律 false，不许糊）。
 LANE_DEADLINE_S = int(os.environ.get("GBT_BRIDGE_PRIMARY_DEADLINE", "20"))
-# 只有这三条车道跑的是**我们自己的权重**（云端 workers 拼网 / RunPod 直连 / 本机 vLLM）。
-# 免费道路（cfai=Cloudflare Workers AI、agnes）是别人的模型 ⇒ weights_ours 必须 false，不许糊。
-# 车道总顺序：**我们自己的权重排最前**（ours 直连 RunPod → ours-alt → 云端拼网 cloud），
-# 只有它们都不回包时才落免费道（cfai=Workers AI、agnes），最后才是 deepseek。
 # 每条车道都有独立预算：自家车道 8s（GPU 起不来就该快速让位），免费道 20s。
-LANE_CHAIN = ((["selfhost_gpu"] if os.environ.get("GBT_ENABLE_GPU") == "1" else []) +
-              ["selfhost", "cfai", "agnes"] if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1"
-              # 免费 GPU 上的**我们自己的权重**一旦就位，用这条开关把它排到最前
-              else ["cfai", "agnes"])
-LANE_BUDGET = {"selfhost": 120, "gate": 45, "cfai": 20, "agnes": 12, "deepseek": 12}
+# 🔴 2026-10-28 实测补（根因修）：`selfhost_gpu` **原来不在这张表里** ⇒ 它吃的是上面
+#    `LANE_DEADLINE_S` 的 **20s 默认值**。而满窗口（ctx8192 / 12000 字）实测要 **46.5s**
+#    ⇒ **必然超时**，于是按 LANE_CHAIN 兜底到 `selfhost`（CPU，ctx 2048），
+#    再被 fit gate 判 `context_overflow`。用户看到的是「这发请求装不进上下文」，
+#    **真因是预算把 GPU 车道掐死了** —— 这条坑让整套 q3_k_m/8192 的优化在真实路径上等于没接。
+#    ⇒ 单列一条 180s（实测 46.5s 的约 3.9 倍，给冷启与更大窗口留余量）。
+#    判据：tools/codex-scripts/lane-budget-check.py（红的时候直接印出这条处方）。
+LANE_BUDGET = {"selfhost_gpu": 180, "selfhost": 120, "gate": 45,
+               "cfai": 20, "agnes": 12, "deepseek": 12}
+
+# 🔴 2026-10-24 主人令「不用云端驱动，按需激活使用本地算力」——
+#    车道链**默认只走我们自己**：selfhost = 本机 GGUF（按需现拉、闲置自退）。
+#    cfai（Cloudflare Workers AI）/ agnes / deepseek 用的都是**别人的权重、别人的算力**，
+#    与「本地算力 + 不用云端」直接相悖 ⇒ **默认不再回落到它们**。
+#    要恢复回落必须**显式** `GBT_ALLOW_CLOUD=1`：可见、可逆、可审计，
+#    不再像以前那样"自己权重起不来就悄悄用别人的模型"（那会让 weights_ours=false 变成常态）。
+ALLOW_CLOUD = os.environ.get("GBT_ALLOW_CLOUD") == "1"
+_CLOUD_LANES = ["cfai", "agnes"] if ALLOW_CLOUD else []
+_OURS_GPU = ["selfhost_gpu"] if os.environ.get("GBT_ENABLE_GPU") == "1" else []
+if os.environ.get("GBT_ENABLE_SELFHOST_LANE") == "1":
+    LANE_CHAIN = _OURS_GPU + ["selfhost"] + _CLOUD_LANES
+else:
+    # 没开 selfhost 车道时**不许把链清空**（空链=一个都不问，等于哑巴）。
+    # 但那种配法本身也违反「不用云端」⇒ 至少保 localhost 一条，让失败带原因而不是沉默。
+    LANE_CHAIN = (_CLOUD_LANES or ["selfhost"])
 
 OURS_LANES = {"selfhost"}   # 免费 GPU 上跑我们自己的权重时，这条为 true（weights_ours=true）
 FREE_LANES = {"cfai", "agnes", "gate"}
 
-FALLBACK_ORDER = ["agnes", "deepseek"]   # 主人令：免费优先（cfai 主道；agnes 免费额度；deepseek 兜最后）
+FALLBACK_ORDER = (["agnes", "deepseek"] if ALLOW_CLOUD else [])   # 不用云端 ⇒ 不兜别家模型
 
 def _cfai_base():
     """Cloudflare Workers AI 的 OpenAI 兼容 base（免费额度那条道）。账户号不是密钥，可以落盘。"""
@@ -99,7 +122,12 @@ UPSTREAMS = {
     #    这一条是**我们自己的权重**（本地 v82/v70 Qwen2-7B nf4）在免费 GPU（Colab/Kaggle）上跑起来后，
     #    由 cloudflared 隧道暴露出来的 OpenAI 兼容地址。地址从环境变量来，没配就不进链。
     #    用法：set GBT_OURS_BASE_URL=https://xxx.trycloudflare.com/v1 然后 set GBT_ENABLE_SELFHOST_LANE=1
-    "selfhost": (os.environ.get("GBT_OURS_BASE_URL", "").rstrip("/") or "https://__unset__/v1",
+    # 🔴 2026-10-25 · D28-甲（主人口径「云端不是我们的选择」）：兜底从 https://__unset__/v1
+    #    改成**本机回环** http://127.0.0.1:8792/v1（local_llm_server.py 的默认端口）。
+    #    原状：不设 env 时地址是 __unset__ ⇒ 「默认走本机」名字对、地址悬空，连接必然失败。
+    #    现口径：默认指向本机权重服务；桥仍会**按需拉起** 8792（闲置 900s 自退）；
+    #    要用免费 GPU/隧道那条，仍可用 env 覆盖：set GBT_OURS_BASE_URL=https://xxx.trycloudflare.com/v1
+    "selfhost": (os.environ.get("GBT_OURS_BASE_URL", "").rstrip("/") or "http://127.0.0.1:8792/v1",
                  os.environ.get("GBT_OURS_MODEL", "gbt-v8"), "potato", 120),
 
     # GPU 车道：llama.cpp Vulkan 后端（钉 b6000，见 gpu_lane.py）。
@@ -128,11 +156,16 @@ _OURS_PY = os.environ.get("GBT_LLM_PY") or (
 _OURS_SCRIPT = os.path.join(_HERE, "local_llm_server.py")
 _OURS_WEIGHTS = os.environ.get("GBT_OURS_WEIGHTS") or os.path.join(
     _REPO, "state", "weights", "gbt-v8-v82-q5_0.gguf")
-_OURS_IDLE = os.environ.get("GBT_SELFHOST_IDLE", "900")
+# 🔴 2026-10-25 主人令「按需激活，没激活的静默不占内存」：闲置默认 900s → **120s**。
+#    实测热态 RSS 4640MB，900s 太迟；120s 足够一轮对话间隙又很快把内存还给系统。
+_OURS_IDLE = os.environ.get("GBT_SELFHOST_IDLE", "120")
 # 身体要用装得起 mss/cv2/sounddevice/pycaw 的那个解释器（本机是 3.12）
 BODY_PY = os.environ.get("GBT_BODY_PY") or (
     r"C:\Python312\python.exe" if os.path.exists(r"C:\Python312\python.exe") else sys.executable)
 _OURS_PROC = [None]
+_LAST_MEM_GATE = [{"ok": True, "note": "尚未触发预检"}]
+_LAST_UNLOAD = [None]   # 上一次 unload 的回执（供 /health 与外部闸判断「闲置」而非「半开」）
+_LAST_UP_FAIL = [None]   # 上一次「现拉自有权重」失败的原因（结构化，供回包与 /health 用）
 _WARM = {"started": 0.0, "state": "idle"}
 
 
@@ -168,6 +201,20 @@ def calc(expr: str) -> dict:
         val = int(val)
     return {"ok": True, "expr": src, "value": val}
 
+
+
+def _budget() -> dict:
+    """本体内存预算：把「够不够跑」变成可读的四个数，而不是感觉。"""
+    try:
+        import psutil
+        vm = psutil.virtual_memory()
+        total = round(vm.total / 1048576)
+        used = round(vm.used / 1048576)
+        return {"ram_total_mb": total, "ram_used_mb": used,
+                "ram_free_mb": total - used,
+                "verdict": "RAM 充足" if (total - used) > 1500 else "RAM 偏紧"}
+    except Exception as exc:                                    # noqa: BLE001
+        return {"error": "%s: %s" % (type(exc).__name__, str(exc)[:80])}
 
 def _prewarm_caps() -> None:
     """桥一起来就把能力目录与 run_task 预热好。
@@ -226,44 +273,202 @@ def _health_ok(url: str, timeout: float = 2.0) -> bool:
         if root.endswith("/v1"):
             root = root[:-3]
         req = urllib.request.Request(root + "/health", headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        # 回环直连：探活最容易被全局代理污染成 502（见 lane_guard 头注 ①）
+        with LG.open_url(root + "/health", req, timeout) as r:
             return r.status == 200
     except Exception:                                             # noqa: BLE001
         return False
 
 
+# ── 内存预检（2026-10-25 立）──────────────────────────────────────────────
+# 为什么要有：本机 7.5GB，在役权重 q5_0 是 4.88GB。余量不足时硬拉 = 进程被系统
+# 杀掉或整机换页卡死，而且**失败不带原因**（外面只看到 502）。
+# 口径（照本仓 fail-closed + 带原因）：
+#   · 余量够 ⇒ 放行；
+#   · 余量不够 ⇒ **不拉**，回 mem_insufficient 与「还差多少 MB」；
+#   · 读不到内存数 ⇒ **不静默放行**：回执里带 mem_check="unavailable" 让人看见。
+# 阈值：GBT_OURS_MIN_FREE_MB，默认 5500（4.88GB 权重 + 推理余量）。
+def _free_mb() -> int | None:
+    try:
+        import ctypes
+
+        class _MS(ctypes.Structure):
+            _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong),
+                        ("ullTotalPhys", ctypes.c_ulonglong), ("ullAvailPhys", ctypes.c_ulonglong),
+                        ("ullTotalPageFile", ctypes.c_ulonglong), ("ullAvailPageFile", ctypes.c_ulonglong),
+                        ("ullTotalVirtual", ctypes.c_ulonglong), ("ullAvailVirtual", ctypes.c_ulonglong),
+                        ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+
+        st = _MS()
+        st.dwLength = ctypes.sizeof(_MS)
+        if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st)):
+            return None
+        return int(st.ullAvailPhys / (1024 * 1024))
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
+def _mem_gate() -> dict:
+    # 🔴 2026-10-25 纠正（主人当场指出）：权重服务是 Llama(..., use_mmap=True) ——
+    #    **mmap 懒加载**，常驻不等于 4.88GB 全进内存，页按需调入。
+    #    ⇒ 我原来把默认阈值写成 5500MB 并且**默认拦截**，等于把一条能跑的路挡死（P27：
+    #      挡住的功能看着像没做）。现口径：GBT_OURS_MEM_GATE = warn(默认)/block/off。
+    #      warn：只把读数报出来（mem_low=true），**照常拉起**；
+    #      block：余量不足就不拉（老口径，需要严格保护的机器才用）；
+    #      off：连读数都不看。
+    _need = int(os.environ.get("GBT_OURS_MIN_FREE_MB", "1200"))
+    _mode = os.environ.get("GBT_OURS_MEM_GATE", "warn").strip().lower()
+    if _mode == "off":
+        return {"ok": True, "mem_check": "off", "mode": _mode}
+    free = _free_mb()
+    if free is None:
+        return {"ok": True, "mem_check": "unavailable", "mode": _mode, "need_mb": _need,
+                "why": "读不到可用内存 ⇒ 不静默放行，但也不假装已量过"}
+    if free < _need:
+        base = {"free_mb": free, "need_mb": _need, "short_by_mb": _need - free, "mode": _mode,
+                "why": "权重是 mmap 懒加载，余量偏小也能跑（会慢）；这里只报警不拦"}
+        if _mode == "block":
+            return {**base, "ok": False, "reason": "mem_insufficient",
+                    "how": "放掉内存再来，或改 GBT_OURS_MEM_GATE=warn 允许慢跑"}
+        return {**base, "ok": True, "mem_low": True}
+    return {"ok": True, "free_mb": free, "need_mb": _need, "mode": _mode}
+
+
+def _mem_gate_blocked() -> dict:
+    need = int(os.environ.get("GBT_OURS_MIN_FREE_MB", "1200"))
+    free = _free_mb()
+    if free is None:
+        return {"ok": True, "mem_check": "unavailable", "need_mb": need,
+                "why": "读不到可用内存 ⇒ 不静默放行，但也不假装已量过"}
+    if free < need:
+        return {"ok": False, "reason": "mem_insufficient", "free_mb": free,
+                "need_mb": need, "short_by_mb": need - free,
+                "how": "放掉内存再来：关掉占大的程序（本机常见是浏览器），或用 GBT_OURS_MIN_FREE_MB 调低阈值（知道自己在干什么才调）"}
+    return {"ok": True, "free_mb": free, "need_mb": need}
+
+
+def unload_selfhost() -> dict:
+    """**显式卸载**：把本机权重服务收掉，内存当场还给系统（按需激活的另一半）。
+
+    为什么要有：主人令 2026-10-25「没激活的静默不就不占内存了」。只靠 idle 超时
+    意味着「没人用也要占着直到超时」，而页面切换/换页时应当能立刻释放。
+    口径：真的杀了才报 released；本来就没起来就如实报 not_running，**不许报假成功**。
+    """
+    killed = []
+    proc = _OURS_PROC[0]
+    if proc is not None and proc.poll() is None:
+        try:
+            proc.terminate()
+            try:
+                proc.wait(timeout=8)
+            except Exception:                                # noqa: BLE001
+                proc.kill()
+            killed.append(proc.pid)
+        except Exception as e:                               # noqa: BLE001
+            return {"ok": False, "error": "terminate_failed: %s" % e}
+    _OURS_PROC[0] = None
+    # 兜底：按端口收（进程句柄丢了/别的实例拉起来的）
+    try:
+        port = urlsplit(UPSTREAMS.get("selfhost", ("",))[0]).port or 8792
+    except Exception:                                        # noqa: BLE001
+        port = 8792
+    if _health_ok("http://127.0.0.1:%d/v1" % port):
+        try:
+            if os.name == "nt":
+                out = subprocess.run(["netstat", "-ano"], capture_output=True, text=True, timeout=20).stdout
+                for line in out.splitlines():
+                    if (":%d" % port) in line and "LISTEN" in line.upper():
+                        pid = line.split()[-1]
+                        subprocess.run(["taskkill", "/PID", pid, "/T", "/F"],
+                                       capture_output=True, timeout=20)
+                        killed.append(int(pid))
+                        break
+        except Exception:                                    # noqa: BLE001
+            pass
+    time.sleep(1)
+    still = _health_ok("http://127.0.0.1:%d/v1" % port)
+    _LAST_UNLOAD[0] = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "killed_pids": killed,
+                       "port": port, "still_up": still}
+    return {"ok": not still, "killed_pids": killed, "port": port,
+            "still_up": still, "free_mb": _free_mb(),
+            "note": "ok=true 表示权重服务已停、内存已交回系统" if not still
+                    else "仍在上（可能被别的进程占着），如实报 still_up"}
+
+
+def _up_fail(reason: str, **extra) -> bool:
+    """记录一次「现拉自有权重」失败（结构化），并返回 False。"""
+    _LAST_UP_FAIL[0] = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "reason": reason, **extra}
+    sys.stderr.write("[activate] 失败：%s\n" % json.dumps(_LAST_UP_FAIL[0], ensure_ascii=False))
+    return False
+
+
 def ensure_selfhost(wait_s: int = 150) -> bool:
-    """selfhost 不在就拉起来；已在则秒回 True。返回是否就绪。"""
+    """selfhost 不在就拉起来；已在则秒回 True。返回是否就绪。
+
+    🔴 2026-10-25 根因修（真故障追踪）：原来本函数**只把原因打到 stderr**，
+       调用处又**不看返回值** ⇒ 权重起不来时，外面仍去请求一条死车道，
+       错误形状退化成「连不上」，**真正的因（权重不在 / 内存被拦 / 拉起即死 / 等待超时）全被吞**。
+       现在：每个早退都写 `_LAST_UP_FAIL`（带 reason + 细节），调用处据此**直接回结构化错误**。
+    """
     base = UPSTREAMS.get("selfhost", ("",))[0]
     if not base:
-        return False
+        return _up_fail("not_configured", why="selfhost base_url 为空")
     if _health_ok(base):
+        _LAST_UP_FAIL[0] = None
         return True
     proc = _OURS_PROC[0]
     if proc is not None and proc.poll() is None:
         pass                                  # 已经在起了，等它
     else:
         if not os.path.isfile(_OURS_WEIGHTS):
-            sys.stderr.write("[activate] 权重不在：%s\n" % _OURS_WEIGHTS)
-            return False
+            return _up_fail("weights_missing", path=_OURS_WEIGHTS,
+                            how="把权重放到该路径，或设 GBT_OURS_WEIGHTS")
+        _g = _mem_gate()
+        _LAST_MEM_GATE[0] = _g
+        if not _g.get("ok"):
+            return _up_fail("mem_blocked", **{k: _g.get(k) for k in ("free_mb", "need_mb", "short_by_mb")})
+        if _g.get("mem_low"):
+            sys.stderr.write("[activate] 内存偏小但照常拉起（mmap 懒加载）：%s\n" % json.dumps(_g, ensure_ascii=False))
         flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
         cmd = [_OURS_PY, "-X", "utf8", _OURS_SCRIPT, "--model", _OURS_WEIGHTS,
                "--port", str(urlsplit(base).port or 8792), "--ctx",
                os.environ.get("GBT_SELFHOST_CTX", "256"), "--threads",
                os.environ.get("GBT_SELFHOST_THREADS", "8"), "--idle-exit", _OURS_IDLE]
         sys.stderr.write("[activate] 按需加载自有权重：%s\n" % " ".join(cmd[1:]))
-        _OURS_PROC[0] = subprocess.Popen(cmd, cwd=_REPO, creationflags=flags,
-                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            _OURS_PROC[0] = subprocess.Popen(cmd, cwd=_REPO, creationflags=flags,
+                                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            return _up_fail("spawn_failed", error="%s: %s" % (type(e).__name__, str(e)[:160]),
+                            cmd=" ".join(cmd[1:4]))
     t0 = time.perf_counter()
     while time.perf_counter() - t0 < wait_s:
         if _health_ok(base):
             sys.stderr.write("[activate] 就绪，用时 %.1fs\n" % (time.perf_counter() - t0))
+            _LAST_UP_FAIL[0] = None
             return True
+        p2 = _OURS_PROC[0]
+        if p2 is not None and p2.poll() is not None:
+            # 进程已经死了（eos 可疑会 exit 3、缺 llama_cpp 会 exit 1 等）——原因带出去
+            return _up_fail("exited", rc=p2.returncode, waited_s=round(time.perf_counter() - t0, 1),
+                            how="看 `py -3.14 -X utf8 tools/model-bridge/local_llm_server.py --model <权重> --port 8792` 的前几行")
         time.sleep(2)
-    sys.stderr.write("[activate] %ds 内没起来\n" % wait_s)
-    return False
+    return _up_fail("timeout", waited_s=wait_s,
+                    how="权重太大/机器太慢；可加大 GBT_SELFHOST_WAIT 或先卸载其它占用")
 # 主人令 2026-10-24「使用我们自己的权重」：启用 selfhost 车道时**默认就是自有权重**；
 # 起不来才按 LANE_CHAIN 落免费道，回包 gbt.weights_ours=false 明示是别人的模型。
+# ── 身份注入（2026-10-25）────────────────────────────────────────────────
+# 为什么要这一层：三题对照实测 —— 事实题「中国的首都」→ 北京 ✅、算术题「3+4」→ 7 ✅、
+# 但「你是谁」→ 它复读我们自己的训练语料（「我是记录者 DBCrafter…」）。
+# 结论：**权重不坏，是身份没对齐**（语料里满是台账/技能文案，问身份就掉进那段）。
+# 产品面正解：请求里没有 system 时，**由桥补一条身份**（不改权重、不重训）。
+# 口径：只在**我们自己的车道**（selfhost / local / selfhost_gpu）注入；云端车道不动
+#       （那是别人的模型，硬塞人设只会让它更胡说）。GBT_IDENTITY_PROMPT 可覆盖，
+#       设成空串 = 关闭注入。
+_OURS_LANE_NAMES = {"selfhost", "local", "selfhost_gpu"}
+DEFAULT_IDENTITY = ("你是 GBT小土豆V8，一个跑在主人自己机器上的本地大模型助手。"
+                    "回答简洁、直接；被问到你是谁时，就照这句话说，不要复述任何文档或台账原文。")
+
 UA = "gbt-v8/model-bridge"
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -343,19 +548,26 @@ def _gate_llm(body: dict) -> tuple[int, bytes]:
     return 200, json.dumps(conv, ensure_ascii=False).encode()
 
 
-def _post_json(url: str, payload: dict, key: str, timeout_s: int) -> tuple[int, bytes]:
-    """发一发 JSON，返回 (http, 原始字节)；4xx/5xx 也把上游原话带回来（P19）。"""
+def _post_json(url: str, payload: dict, key: str, timeout_s: int) -> tuple[int, bytes, str]:
+    """发一发 JSON，返回 (http, 原始字节, 归因档)；4xx/5xx 也把上游原话带回来（P19）。
+
+    🔴 2026-10-29 归还因（原来只有 (http, bytes)）：`st == -1` 一个数说不清是
+      「车道没起」还是「等超时」还是「代理编的 502」——三者处置完全不同。
+      归因由 `lane_guard.classify_exc` 判（纯函数、有负对照），本函数不另写一套。
+    """
     req = urllib.request.Request(
         url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"), method="POST",
         headers={"Content-Type": "application/json", "User-Agent": UA,
                  "Authorization": "Bearer " + key})
     try:
-        with urllib.request.urlopen(req, timeout=timeout_s) as r:
-            return r.status, r.read()
+        with LG.open_url(url, req, timeout_s) as r:
+            return r.status, r.read(), "ok"
     except urllib.error.HTTPError as exc:
-        return exc.code, (exc.read() or b"")
+        # ⚠️ 先读 body 再归因：代理编的 502 只能靠 body 认出来（响应头里没有痕迹）
+        raw = exc.read() or b""
+        return exc.code, raw, LG.classify_exc(exc, url, raw)
     except Exception as exc:                                  # noqa: BLE001
-        return -1, ("%s: %s" % (type(exc).__name__, str(exc)[:200])).encode("utf-8")
+        return -1, ("%s: %s" % (type(exc).__name__, str(exc)[:200])).encode("utf-8"), LG.classify_exc(exc, url)
 
 
 def _extract_json(text: str) -> dict | None:
@@ -391,9 +603,9 @@ def _release_root() -> "pathlib.Path | None":
 
 
 def _shortlist(question: str, cat: dict, k: int = 18) -> tuple[list[str], str]:
-    """把 341 位收窄成候选，再让模型挑。
+    """把**全量**能力位收窄成候选，再让模型挑。
 
-    为什么需要：实测（2026-10-21）让 7B 级模型直接面对 341 位时，它回的是
+    为什么需要：实测（2026-10-21）让 7B 级模型直接面对全量目录时，它回的是
     `py -3.14 tools/codex-scripts/release.py` 这种**命令行**，不是能力位名 ——
     收窄到十几个候选后它才在"名字"这个层面作答。
     收窄用的是**已发布那套检索**（`gbt_commander.Catalog.search`：词表 + IDF），不另写一套。
@@ -413,6 +625,45 @@ def _shortlist(question: str, cat: dict, k: int = 18) -> tuple[list[str], str]:
         raise RuntimeError("search 空")
     except Exception as exc:                                  # noqa: BLE001
         return sorted(cat)[:k], "fallback-first-%d(%s)" % (k, type(exc).__name__)
+
+
+def _policy_gate(body: dict):
+    """按 `serving_policy` 的档位判这一发；拒则返回结构化信封，放行返回 None。
+
+    🔴 2026-10-28 补（**真实缺口**）：`serving_policy.py` 原来只被 `local_llm_server.py` 引用，
+    而默认车道是 `selfhost_gpu`（走 llama-server）⇒ **桥这层根本没有策略**。
+    也就是说「我们有内容策略开关」这个对外说法，在**默认路径上是空的**。
+    这里补在**唯一出口**：一处覆盖 selfhost / selfhost_gpu / 云车道全部。
+    默认档 `uncensored`（自用）⇒ 行为完全不变；`serving_policy.py --set-mode filter-lite|strict` 才生效。
+    """
+    try:
+        if _HERE not in sys.path:
+            sys.path.insert(0, _HERE)
+        import serving_policy as _sp                          # noqa: PLC0415
+        pol = _sp.Policy.load()
+    except Exception as exc:                                  # noqa: BLE001
+        # 策略层自己坏了不许把桥打死，但**不许静默**：打一行 stderr，这一发放行
+        sys.stderr.write("[policy] 载入失败，已跳过（这一发不拦）：%s\n" % type(exc).__name__)
+        return None
+    if getattr(pol, "mode", "uncensored") == "uncensored":
+        return None
+    msgs = body.get("messages") or []
+    text = " ".join(str(m.get("content") or "") for m in msgs
+                    if str(m.get("role") or "") == "user")
+    d = pol.check(text)
+    if d.get("allow", True):
+        return None
+    sys.stderr.write("[policy] 拒绝一发（档位 %s，原因 %s）\n" % (d.get("mode"), d.get("reason")))
+    return {"id": "policy-refused", "object": "chat.completion",
+            "model": body.get("model") or "gbt",
+            "choices": [{"index": 0, "finish_reason": "content_filter",
+                         "message": {"role": "assistant",
+                                     "content": "这条请求被本地策略层拦下：%s。当前档位 `%s`。"
+                                                "（这是策略开关，不是模型能力问题）"
+                                                % (d.get("reason"), d.get("mode"))}}],
+            "gbt": {"policy_mode": d.get("mode"),
+                    "policy_hits": [h.get("category") for h in (d.get("hits") or [])],
+                    "gate_position": "bridge（唯一出口，覆盖所有车道）"}}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -437,6 +688,20 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):                        # 只留一行最小读数
         sys.stderr.write("[bridge] %s\n" % (fmt % args))
 
+    def handle_one_request(self):
+        """吞掉「客户端提前断开」这一类，别把 traceback 打进日志。
+
+        🔴 2026-10-28 实测：健康探测（`curl --max-time 2`）断开时，
+        `BaseHTTPRequestHandler` 在 `readline()` 上抛
+        `ConnectionAbortedError [WinError 10053]`，**整段 traceback 落到 stderr**。
+        它不是请求路径上的错（那一发仍是 http=200），但会让日志变脏、
+        也会让人误以为服务在报错。断开就是断开 —— 关掉连接、别喊。
+        """
+        try:
+            super().handle_one_request()
+        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+            self.close_connection = True
+
     # ---------- 派活：两个 POST 端点 ----------
     @staticmethod
     def _catalog() -> dict:
@@ -460,17 +725,17 @@ class Handler(BaseHTTPRequestHandler):
         if not cat:
             return self._json(200, {"ok": False,
                                     "error": {"message": "读不到能力目录（capabilities.json）"}})
-        # 先把 341 位**收窄成候选**，再让模型在这几个里挑 —— 7B 级模型直接面对 341 位会开始编命令
+        # 先把**全量**收窄成候选，再让模型在这几个里挑 —— 7B 级模型直接面对全量会开始编命令
         # （实测它 2026-10-21 回的是 `py -3.14 tools/codex-scripts/release.py` 这种命令行）。
         # 收窄用的是我们**已发布的那套检索**（gbt_commander.Catalog），不另写一套：单一真源。
         short, how_short = _shortlist(question, cat, k=int(body.get("k") or 18))
         if not short:
             return self._json(200, {"ok": False,
                                     "error": {"message": "候选为空（检索没命中任何能力位）"}})
-        prompt = ("你是 GBT小土豆V8 总指挥。下面是从 341 位里筛出的候选能力位：\n%s\n"
+        prompt = ("你是 GBT小土豆V8 总指挥。下面是从 %d 位里筛出的候选能力位：\n%s\n"
                   "用户的话：%s\n"
                   "只回答最该执行的那一个能力位名字本身（不要解释、不要命令、不要代码块、不要标点）。"
-                  % ("\n".join("- " + s for s in short), question))
+                  % (len(cat), "\n".join("- " + s for s in short), question))
         name = str(body.get("upstream") or DEFAULT)
         cfg = UPSTREAMS.get(name) or UPSTREAMS[DEFAULT]
         base, model, profile, timeout_s = cfg
@@ -481,11 +746,12 @@ class Handler(BaseHTTPRequestHandler):
         payload = {"model": model, "max_tokens": 60, "temperature": 0,
                    "messages": [{"role": "user", "content": prompt}]}
         t0 = time.perf_counter()
-        st, raw = _post_json(base.rstrip("/") + "/chat/completions", payload, key, timeout_s)
+        st, raw, kind_hint = _post_json(base.rstrip("/") + "/chat/completions", payload, key, timeout_s)
         dt = round(time.perf_counter() - t0, 2)
         text = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else str(raw)
         if st != 200:
             return self._json(200, {"ok": False, "http": st, "upstream": name, "key_slot": slot,
+                                    "kind": kind_hint, "why": LG.kind_text(kind_hint),
                                     "error": {"message": text[:400]}})
         try:
             d = json.loads(text)
@@ -508,8 +774,8 @@ class Handler(BaseHTTPRequestHandler):
                "usage": d.get("usage") or {}, "key_slot": slot,
                "catalog_size": len(cat), "shortlist": short, "shortlist_by": how_short}
         if not hit:
-            out["error"] = {"message": "模型给的名字在 341 位目录里查不到（幻觉或措辞不符）：%r"
-                                       % (answer[:60] or "<空>")}
+            out["error"] = {"message": "模型给的名字在 %d 位目录里查不到（幻觉或措辞不符）：%r"
+                                       % (len(cat), answer[:60] or "<空>")}
             return self._json(200, out)
         out.update({"domain": hit.get("domain"), "readonly": hit.get("readonly"),
                     "scopes_static": hit.get("scopes_static"),
@@ -561,6 +827,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):                                         # noqa: N802
         if self.path.startswith("/health"):
+            # selfhost 的「状态」：现拉/就绪/已卸载（闲置）。外部闸靠它区分
+            # 「按需闲置（对）」与「半开（坏）」——两者在端口读数上一模一样。
+            _sh_up = _health_ok(UPSTREAMS.get("selfhost", ("",))[0] or "")
+            _selfhost = {"up": _sh_up, "state": "ready" if _sh_up else
+                         ("unloaded" if _LAST_UNLOAD[0] else
+                          ("failed" if _LAST_UP_FAIL[0] else "idle")),
+                         "last_unload": _LAST_UNLOAD[0],
+                         "last_error": _LAST_UP_FAIL[0]}
             ups = []
             for name, (base, model, prof, _to) in UPSTREAMS.items():
                 key, slot = key_for(prof)
@@ -569,6 +843,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, "service": "gbt-model-bridge",
                                     "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                                     "default": DEFAULT, "upstreams": ups,
+                                    "selfhost": _selfhost,
                                     "note": "钥只在桥里；页面永远拿不到明文"})
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
@@ -612,6 +887,7 @@ class Handler(BaseHTTPRequestHandler):
                     "quit": "壳退出时按端口收掉 8791/8792，不留后台进程",
                 },
                 "default_lane": DEFAULT,
+                "budget": _budget(),
             })
         if self.path.startswith("/v1/body"):
             # 身体：装在哪台设备上，就把那台设备的感官/动作现读成身体。
@@ -626,7 +902,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, {"ok": False, "error": "%s: %s"
                                         % (type(exc).__name__, str(exc)[:150])})
         if self.path.startswith("/v1/caps"):
-            # 页面互通的口：341 个能力位 + 各自页面地址，一次给全（前端缓存）
+            # 页面互通的口：全量能力位 + 各自页面地址，一次给全（前端缓存；条数由台账决定）
             try:
                 import json as _json
                 cbp = os.path.join(_REPO, "state", "cap-bindings.json")
@@ -658,6 +934,18 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(404, {"error": {"message": "no route %s" % self.path}})
 
     def do_POST(self):                                        # noqa: N802
+        if self.path.startswith("/v1/unload") or self.path.startswith("/unload"):
+            # 🔴 2026-10-25 实测坑：不把请求体读完就回包，Windows 上客户端会看到
+            #    「response ended prematurely」（效果其实已经发生，但回包丢了 ⇒ 外面只能猜）。
+            #    先把 Content-Length 读完（丢弃），再回结构化回执。
+            try:
+                _n = int(self.headers.get("Content-Length") or 0)
+                if _n > 0:
+                    self.rfile.read(_n)
+            except Exception:                                # noqa: BLE001
+                pass
+            _res = unload_selfhost()
+            return self._json(200, _res)
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/v1/calc", "/v1/body/act")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -691,6 +979,11 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/v1/dispatch"):
             return self._dispatch(body)
 
+        # ── 策略层：**在选车道之前**判，一处覆盖所有车道（含默认的 selfhost_gpu）────
+        _pol = _policy_gate(body)
+        if _pol is not None:
+            return self._json(200, _pol)
+
         name = str(body.pop("upstream", "") or DEFAULT)
         if name not in UPSTREAMS:
             return self._json(400, {"error": {"message": "不认的上游：%s（可选 %s）"
@@ -716,7 +1009,17 @@ class Handler(BaseHTTPRequestHandler):
         used = name
         for lane in chain:
             if lane == "selfhost":
-                ensure_selfhost()          # 按需激活：不在就现拉
+                # 🔴 2026-10-25 根因修：原来忽略返回值 ⇒ 权重起不来还去打死车道，
+                #    错误退化成「连不上」。现在：起不来就**带原因回包**，不再往下撞。
+                if not ensure_selfhost():
+                    fe = _LAST_UP_FAIL[0] or {"reason": "unknown"}
+                    attempts.append({"lane": lane, "why": "自有权重起不来：%s" % fe.get("reason")})
+                    return self._json(200, {
+                        "ok": False, "lane": lane, "weights_ours": False,
+                        "error": {"message": "自有权重车道未就绪（%s）" % fe.get("reason"),
+                                  "reason": fe.get("reason"), "detail": fe,
+                                  "how": fe.get("how") or "见 /health 的 selfhost.last_error"},
+                        "attempts": attempts})
             if lane == "selfhost_gpu" and not ensure_gpu():
                 continue                   # GPU 不通就跳过，走 CPU 车道
             l_base, l_model, l_profile, l_timeout = UPSTREAMS[lane]
@@ -729,6 +1032,26 @@ class Handler(BaseHTTPRequestHandler):
             #    ⇒ cfai（Workers AI）收到 "gbt-potato-v8" 这种它不认的名字，直接失败再落到兜底。
             #    正确口径：**每条车道都用它自己清单里的模型名**，页面传的 model 只在同名车道里保留。
             l_body["model"] = l_model
+            # 🔴 2026-10-25 身份注入：自家车道 + 页面没给 system ⇒ 补一条身份
+            if lane in _OURS_LANE_NAMES:
+                _ident = os.environ.get("GBT_IDENTITY_PROMPT", DEFAULT_IDENTITY)
+                _msgs = list(l_body.get("messages") or [])
+                if _ident and _msgs:
+                    if not any((m or {}).get("role") == "system" for m in _msgs):
+                        _msgs = [{"role": "system", "content": _ident}] + _msgs
+                    # 🔴 2026-10-25 实测追加：**这个权重量不读 system，读 user 段**。
+                    #   对照（同一句「你是谁」）：
+                    #     · 只塞 system  → 「我是龙珠融合版…」（仍复读训练语料）
+                    #     · 用户段前缀   → 「我是 GBT小土豆V8，一个跑在主人自己机器上的本地大模型助手。」
+                    #   所以两条都塞：system 留给以后换权重，user 段前缀负责现在真生效。
+                    _prefix = "记住：你是 GBT小土豆V8，主人自己的本地模型，回答简洁直接。不要复述任何文档或台账原文。\n\n"
+                    for _i in range(len(_msgs) - 1, -1, -1):
+                        if (_msgs[_i] or {}).get("role") == "user":
+                            if not str(_msgs[_i].get("content") or "").startswith("记住：你是 GBT小土豆V8"):
+                                _msgs[_i] = dict(_msgs[_i],
+                                                 content=_prefix + str(_msgs[_i].get("content") or ""))
+                            break
+                l_body["messages"] = _msgs
             if lane != name:
                 l_body.pop("stream", None)           # 兜底不保证 SSE，先要整包
             l_url = l_base.rstrip("/") + "/chat/completions"
@@ -755,8 +1078,30 @@ class Handler(BaseHTTPRequestHandler):
                                      "ms": int((time.perf_counter() - lt0) * 1000)})
                 continue
             lt0 = time.perf_counter()
+            # 🔴 2026-10-29 修 §三 第 2 项（fit gate 只在 CPU 车道）：
+            #    GPU 车道原来只靠 llama-server 的 `--no-context-shift` 回 400 兜底，
+            #    而那是**推理跑起来之后**才回（满窗口实测 46.5s）⇒ 用户白等一场才被告知装不下。
+            #    这里在**发请求之前**用车道自己的 `/tokenize` 数真 token（毫秒级）再判。
+            #    只对 `selfhost_gpu` 做：CPU 车道自己在 local_llm_server.py 里已有同一套判据，
+            #    重复判会变成两套判断（判据文化不允许）。
+            if lane == "selfhost_gpu":
+                _fit = LG.precheck_fit(l_base, l_body, lane=lane)
+                if _fit.get("checked") and _fit.get("over"):
+                    sys.stderr.write("[fit] 提前拒 lane=%s tokens=%s+%s > n_ctx=%s\n"
+                                     % (lane, _fit.get("tokens"), _fit.get("max_tokens"),
+                                        _fit.get("n_ctx")))
+                    return self._json(200, {
+                        "ok": False, "lane": lane, "weights_ours": False,
+                        "error": {"message": "这发请求装不进 %s 车道的上下文：prompt %s + max_tokens %s "
+                                             "> n_ctx %s（超 %s token）"
+                                             % (lane, _fit.get("tokens"), _fit.get("max_tokens"),
+                                                _fit.get("n_ctx"), _fit.get("over_by")),
+                                  "reason": "context_overflow",
+                                  "how": "缩短上下文、调小 max_tokens，或把 GBT_GPU_CTX 调大后重启车道；"
+                                         "**这条是发之前判的**，没有白等推理"},
+                        "fit": _fit, "attempts": attempts})
             try:
-                resp = urllib.request.urlopen(l_req, timeout=budget)
+                resp = LG.open_url(l_url, l_req, budget)
                 if not stream:
                     body_bytes = resp.read()
                     # 🔴 2026-10-24 00:00 实测：agnes 会回 **HTTP 200 但 content 为空**。
@@ -778,18 +1123,33 @@ class Handler(BaseHTTPRequestHandler):
                                      % (name, LANE_DEADLINE_S, lane))
                 break
             except urllib.error.HTTPError as exc:
-                raw = (exc.read() or b"")[:400].decode("utf-8", "replace")
-                attempts.append({"lane": lane, "http": exc.code, "why": raw[:200],
+                # 502 分两种：上游真回 vs 本机代理编的（后者说明端点根本没通）
+                # ⚠️ 必须先读 body 再归因 —— 代理的 502 只在 body 里留签名，响应头是干净的
+                raw_b = exc.read() or b""
+                kind = LG.classify_exc(exc, l_url, raw_b)
+                raw = raw_b[:400].decode("utf-8", "replace")
+                attempts.append({"lane": lane, "http": exc.code, "kind": kind,
+                                 "why": LG.kind_text(kind) + ("：" + raw[:160] if raw else ""),
+                                 "upstream_said": raw[:200],
                                  "ms": int((time.perf_counter() - lt0) * 1000)})
-                sys.stderr.write("[bridge] lane=%s http=%s slot=%s\n" % (lane, exc.code, l_slot))
+                sys.stderr.write("[bridge] lane=%s http=%s kind=%s slot=%s\n"
+                                 % (lane, exc.code, kind, l_slot))
             except Exception as exc:                          # noqa: BLE001
-                attempts.append({"lane": lane, "why": "%s" % type(exc).__name__,
+                kind = LG.classify_exc(exc, l_url)
+                attempts.append({"lane": lane, "kind": kind,
+                                 "why": LG.kind_text(kind),
+                                 "detail": "%s" % type(exc).__name__,
                                  "ms": int((time.perf_counter() - lt0) * 1000)})
-                sys.stderr.write("[bridge] lane=%s net_error=%s\n" % (lane, type(exc).__name__))
+                sys.stderr.write("[bridge] lane=%s net=%s detail=%s\n"
+                                 % (lane, kind, type(exc).__name__))
         if resp is None:
+            # 归因一起带出去：**「我们没起服务」与「上游报错」处置完全不同**
+            kinds = sorted({a.get("kind") for a in attempts if a.get("kind")})
             return self._json(200, {"ok": False, "upstream": name, "attempts": attempts,
                                     "lane_used": None, "weights_ours": False,
-                                    "error": {"message": "所有车道都没回包（含兜底）"}})
+                                    "kinds": kinds,
+                                    "error": {"message": "所有车道都没回包（含兜底）",
+                                              "why": "；".join(LG.kind_text(k) for k in kinds) or "无可用车道"}})
         if stream:
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream; charset=utf-8")

@@ -13,7 +13,7 @@ AST 逐函数：① 函数里有**拒绝字样**的字面量（或 `raise Permis
 ② 同一函数里有没有**授权线索**（作用域名 / `scope` / `grant` / `auth` / `missing_scopes`）⇒ 分两档；
 ③ 若那条字面量本身只是「未实现/未读到/未接线」⇒ **不算拒绝**。
 
-## 🔴 它量不了什么
+## 它量不了什么
 - 只看**函数粒度**：一个函数里既有授权门又有硬拒，会被算成「授权型"⇒ **保守偏宽**（宁少报不冤报）。
 - 只认**字面量**：拼接出来的拒绝语（`"拒" + "绝"`）识别不到 ⇒ 会漏。
 ⇒ 输出是**底账 + 候选**，不是判决。
@@ -43,7 +43,7 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 # 「拒绝」字样（单一来源；空表 = 拒绝，见 selftest）
-# 🔴 第一版漏了「不许」⇒ **漏掉了最大的一条**（`qiankun.py` 的「未声明落点：不许默认把项目
+# 第一版漏了「不许」⇒ **漏掉了最大的一条**（`qiankun.py` 的「未声明落点：不许默认把项目
 #    堆进全局生产面」）。**词表太窄 ⇒ 底账漏项**；补上后复验命中数（先量信噪比再定宽窄）。
 REFUSAL = ("拒绝", "denied", "refuse", "forbidden", "不允许", "不许", "禁止", "not allowed", "拦截")
 # 这些字样说明「只是没实现/没读到」，**不是拒**
@@ -52,7 +52,7 @@ NOT_REFUSAL = ("未实现", "未读到", "未接线", "没实现", "needs_depend
 AUTH_HINT = ("scope", "grant", "authoriz", "missing_scopes", "check_and_consume")
 _SKIP = ("__pycache__", "vendor", ".git")
 
-# 🔴 **门面**（= 决定「能力许不许用」的那几处）。只有这里的硬拒才叫「限制」。
+# **门面**（= 决定「能力许不许用」的那几处）。只有这里的硬拒才叫「限制」。
 #    别处（`*/tools/check_*`、`assert_*`、`must_*`）是**质量护栏**：拦的是「产物的合规性」，
 #    不是「模型不许干活」。第一版不分类 ⇒ 报了 296 条假数（把护栏全算成限制）——
 #    **先量信噪比再定宽窄**（§一百五十三那条纪律）。
@@ -88,12 +88,12 @@ def _is_gate_surface(rel: str) -> bool:
     return False
 
 
-# 🔴 **门面硬拒认领表**（主人令「千万不能出现拒绝的限制」的处置底账）——
+# **门面硬拒认领表**（主人令「千万不能出现拒绝的限制」的处置底账）——
 #    每一处门面硬拒都必须在表里有**处置 + 为什么 + 放开的后果 + 谁定的**；
 #    不在表里 ⇒ 闸红（`**未认领**` 非空）。新增一处硬拒，就必须在这一行给出处置。
 #    处置三档：`保留（防护）` · `保留（主人红线）` · `假阳性（不是拒法）`。
 CLAIMS = {
-    # 🔴 2026-10-10 补（体检 rc=1 追根因：这两处"新增门面硬拒"没认领）：
+ # 2026-10-10 补（体检 rc=1 追根因：这两处"新增门面硬拒"没认领）：
     "gbt_allinone/security/redteam.py|remote_domain": {
         "处置": "改（2026-10-13）：从「公网一律拒」改成「**终端 YES 授权才放行**」",
         "谁定的": "Owner 2026-10-13（「技术层面不能给她有限制只保留人工授权护栏即可」·"
@@ -293,7 +293,7 @@ def classify_function(node, scopes: tuple, parents=None, docids=None) -> dict | 
                 continue
             if parents and not _decided(n, parents):
                 continue
-            # 🔴 出现在 `return {...}` / `raise` 里才算「拒绝决定」；顺带把「只是没实现」剔掉
+ # 出现在 `return {...}` / `raise` 里才算「拒绝决定」；顺带把「只是没实现」剔掉
             lits.append((n.lineno, t))
         elif isinstance(n, ast.Raise) and isinstance(n.exc, (ast.Call, ast.Name)):
             nm = getattr(getattr(n.exc, "func", n.exc), "id", "")
@@ -319,7 +319,7 @@ def scan_text(src: str, scopes: tuple, markers=REFUSAL) -> dict:
         return {"解析失败": "第 %s 行：%s" % (exc.lineno, exc.msg)}
     parents, docids = _parents(tree), _doc_ids(tree)
     rows = []
-    # 🔴 只分**顶层函数**：嵌套函数会被外层一起算进去，逐个再分一次 = 重复计数 + 平方级开销
+ # 只分**顶层函数**：嵌套函数会被外层一起算进去，逐个再分一次 = 重复计数 + 平方级开销
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             r = classify_function(node, scopes, parents, docids)
@@ -349,7 +349,7 @@ def scan_roots(roots: list[str], scopes: tuple, surface_only: bool = False) -> d
                 continue
             relf = _rel(p)
             on_gate = _is_gate_surface(relf)
-            # 🔴 棘轮/自检只看**门面**（十几件 ⇒ 秒级）；全仓底账由 `scan` 按需跑（30+ 秒）
+ # 棘轮/自检只看**门面**（十几件 ⇒ 秒级）；全仓底账由 `scan` 按需跑（30+ 秒）
             if surface_only and not on_gate:
                 continue
             try:
@@ -516,7 +516,7 @@ def selftest() -> int:
         (hard_dir / "api.py").write_text(
             "def f():\n    return {'ok': False, '拒绝': '这里谁都别想过'}\n", encoding="utf-8")
         roots = [str(hard_dir)]
-        # 🔴 合成靶的指纹也得**在认领表里**（否则红的原因是"未认领"而不是"新增"，
+ # 合成靶的指纹也得**在认领表里**（否则红的原因是"未认领"而不是"新增"，
         #    控制就咬错了地方 —— 这一条我第一版没做，两条控制当场红给我看）
         fp_api = "%s|f" % str(hard_dir / "api.py").replace("\\", "/")
         fp_gate = "%s|g" % str(hard_dir / "auth_gate.py").replace("\\", "/")

@@ -14,24 +14,6 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 const invoke = (channel, payload) => ipcRenderer.invoke(channel, payload);
 
-/* ── 云账号授权面（主人令 2026-10-23：「直接在APP上做好我自己点击登入授权」）──
-   三个口：status（现读会话）/ login（起一轮浏览器授权，指定槽位）/ deploy（把网格节点部署到当前账号）。
-   红线：这条面**不发凭据**，只回邮箱、账号掩码与部署地址 —— 任何 token 都不经这里。 */
-contextBridge.exposeInMainWorld("gbtCloud", {
-  status: () => invoke("cf:status"),
-  login: (slot) => invoke("cf:login", { slot: String(slot) }),
-  deploy: () => invoke("cf:deploy"),
-  install: (slot, token) => invoke("cf:install", { slot: String(slot), token: String(token) }),
-  verify: (slot, token) => invoke("cf:verify", { slot: String(slot), token: String(token) }),
-  meshSync: () => invoke("mesh:sync"),
-  onLoginUrl: (cb) => {
-    if (typeof cb !== "function") return () => {};
-    const handler = (_e, url) => { try { cb(String(url)); } catch (_err) { /* 页面自己兜 */ } };
-    ipcRenderer.on("cf:login-url", handler);
-    return () => ipcRenderer.removeListener("cf:login-url", handler);
-  },
-});
-
 contextBridge.exposeInMainWorld("gbtW3", {
   readonly: true,
   non_readonly_capability: "summon（只起一个本机窗口：不写文件、不发网络、不 kill 进程）"
@@ -45,7 +27,12 @@ contextBridge.exposeInMainWorld("gbtW3", {
     + "只改窗口可见性/焦点，不写文件、不出网、不 kill 进程）"
     + " · intercom（**开麦克风采集 + 让本机出声**。第 58 轮加。"
     + "口径：监听随页面生灭、不设开关；真跑的是 intercom.py，它走唯一门 run_task；"
-    + "主进程不直接碰 voice_cap、不读凭据、不写文件；关页面即 kill 该子进程）",
+    + "主进程不直接碰 voice_cap、不读凭据、不写文件；关页面即 kill 该子进程）"
+    + " · pageMessage（**跨页派活**：给指定注册窗发一条消息，触发该页 onPageMessage 回调。"
+    + "消息原样透传、不解析、不存；只认注册表 id；**不替目标页调能力位**——执行权在目标页）"
+    + " · dshMount（**把对话引擎装进指定 webview**：只接受 webview 的 webContentsId，"
+    + "入口 URL 由主进程 loadURL 直接装 —— **渲染进程拿不到带 token 的 URL**；"
+    + "不过回环白名单的一律拒；回执只含 host，不含 token、不落盘）",
   config: () => invoke("w3:config"),
   state: () => invoke("w3:state"),
   tasks: () => invoke("w3:tasks"),
@@ -65,20 +52,18 @@ contextBridge.exposeInMainWorld("gbtW3", {
      取**对话引擎入口**给自己的本地页用（品牌框架页 / 面板内嵌页），
      这样引擎跑在**我们的门面**里，而不是她的整窗界面。
      口径不变：只放行本机回环；没有就如实说"还没接上"，不假装。 */
-  dshEntry: () => invoke("w3:dsh-entry"),
+  /* 🔴 2026-10-26 换口：原来是 `dshEntry()` 把**带 token 的入口 URL** 交给页面
+     （页面再 setAttribute("src", url) 载引擎）—— 那等于把凭据暴露给渲染进程 JS，
+     守卫 B7 明令禁止回显。
+     ⇒ 改成 `dshMount({ wcId })`：页面只报自己那个 <webview> 的 webContentsId，
+        **由主进程直接 loadURL**。URL 全程不进渲染进程，回执只含 host。
+        与 B4 一起变干净：壳里不再需要往页面里推脚本。 */
+  dshMount: (payload) => invoke("w3:dsh-mount", payload),
   /* 数字人页的「文本→桥」受理口（2026-10-08）：页面是**离线自包含**的
      （CSP `connect-src 'none'`，自己发不出任何请求），所以由**壳替它跑这一趟**：
      页面只给文本，**目标由壳写死**（只可能打到本机面板桥 :8765 的 /api/message）
      ⇒ 页面构造不出别的地址，也就不用放开它的网络面。失败**带原文**回来，不静默。 */
   message: (payload) => invoke("w3:message", payload),
-  /* 让她念一句（动作口，2026-10-18 主人令「digital-human 那扇窗的嘴也换成神经嗓」）：
-     壳替页面跑一次**能力位**调用 `cap voice op=speak`（单一门、授权/审计都在门上），
-     回执原样回（spoken / 被拒 missing_scopes / no_taiwan_lane 全带原因）。不写文件、不发声不假报。 */
-  say: (payload) => invoke("w3:say", payload),
-  /* 让她**自己动手**（2026-10-18「下一步：她 → 触手」）：调一个**白名单内的只读能力位**。
-     白名单写在壳里（main.cjs `CAP_READONLY`），页面传什么都不可能越界；
-     需要票的、会写盘的、会出网的**一律不放**，被拒时把门的原话带回来。 */
-  cap: (payload) => invoke("w3:cap", payload),
   showWindow: (payload) => invoke("w3:show-window", payload),
   /* 在系统浏览器里打开**本机回环**页面（动作口，2026-10-04）：页面固定的配套 ——
      窗不上跳，显式意图走浏览器。只放行回环；URL 只进内存，返回只有 host。 */
@@ -102,6 +87,17 @@ contextBridge.exposeInMainWorld("gbtW3", {
   gene: () => invoke("w3:gene"),
   onEvent: (handler) => ipcRenderer.on("w3:event", (_e, msg) => handler(msg)),
   onStreamState: (handler) => ipcRenderer.on("w3:stream", (_e, st) => handler(st)),
+  /* 🔴 窗口**真可见性**（2026-10-27）：只有主进程知道窗口是不是真的露在人眼前
+     （`win.isVisible()`）。页面自己判不出来 —— 实测 Electron 对 `show:false` 的窗，
+     `document.visibilityState` 仍可能报 "visible"（离屏渲染时尤其如此）。
+     页面据此决定"没人看就别刷"，这是主窗被 5s 轮询吃满的修法。 */
+  onWinVisibility: (handler) => ipcRenderer.on("w3:win-visibility", (_e, m) => handler(m)),
+  /* 推送有竞态（注入脚本可能晚于那一次推送才订阅上）⇒ 再给个**主动问一次**的口。
+     `GBT_W3_NO_VIS_PULL=1` 只是**取证开关**（默认关）：把它关掉就能单独复现"只有推送"那一版，
+     用来证明「推送 + 不拉 = 主窗塌」不是猜的。 */
+  winVisible: () => (process.env.GBT_W3_NO_VIS_PULL === "1"
+    ? Promise.resolve({ ok: false, error: "取证：GBT_W3_NO_VIS_PULL=1 ⇒ 不提供真可见性" })
+    : invoke("w3:win-visible")),
   /* 实时流的**现状**（只读拉取 · 2026-09-23 第 45 轮加）。
      上面那个 `onStreamState` 是**推**：只在状态变化时来一次。而窗口可能**在连接之后**才建
      （`startSse` 跑在建窗之前 —— 数据面先立那条规矩），推的那一次就没人听得到。
@@ -116,4 +112,25 @@ contextBridge.exposeInMainWorld("gbtW3", {
      = `api.run_task`）；**主进程不直接碰 voice_cap、不读凭据、不写数据**。 */
   intercom: (op, args) => invoke("w3:intercom", { op: op, args: args || {} }),
   onIntercom: (handler) => ipcRenderer.on("w3:intercom-event", (_e, msg) => handler(msg)),
+
+  /* ── 2026-10-26 跨页触手网格（主人令：「每一页和所有页面互通按需激活」）──────
+     三个口配合 `tentacle-kit.js` 的跨页网格：
+       · pageMessage  —— 跨页派活（动作口，已登记进 non_readonly_capability）；
+       · pageState    —— **只读**快照各窗可见性 + 页面自盖的 data-tentacle-active；
+       · onPageMessage—— 渲染进程侧监听跨页消息（含回执）。
+     ⚠️ 回执配对（reqId / replyTo）**全在渲染层**做，主进程只透传 —— 主进程不维护
+     跨页会话状态，也就不会因为页面崩溃而留下幽灵请求。 */
+  pageMessage: (payload) => invoke("w3:page-message", payload),
+  pageState: (payload) => invoke("w3:page-state", payload),
+  /* 按需激活**自报**口（2026-10-26）：页面在 visibilitychange 时把自己"可见/隐藏"告诉壳，
+     壳只记录、不推断。这样「哪页活着」是页面自己说的，不是主进程去读 DOM 猜的。 */
+  reportActive: (payload) => invoke("w3:page-active", payload),
+  /* 页面心跳口（2026-10-27）：页面每 8s 报一次「我还在跑脚本」。
+     🔴 键名**不能叫 heartbeat** —— 上面第 79 行已有 `heartbeat`（触手心跳派活，`w3:heartbeat`），
+        同名键在对象字面量里会被后者覆盖 ⇒ 我会把那个功能悄悄弄坏（实测 grep 抓到）。
+     为什么必须页面自报：脚本队列被堵时，主进程发过去的调用**永远不 settle**，
+     Chromium 的挂起监视器也不报（靶子页确定性复现 + 四次真启动全 0 次触发）
+     ⇒ 只有页面自己知道自己还活着。壳只记时间戳，超时就强崩重载（实测 294ms 恢复）。 */
+  pageBeat: (payload) => invoke("w3:page-heartbeat", payload),
+  onPageMessage: (handler) => ipcRenderer.on("w3:page-message", (_e, msg) => handler(msg)),
 });

@@ -73,7 +73,7 @@ def main():
         with open(path, "ab") as fh:
             fh.write(b"# bite-test probe (framework gate negative control)\n")
         v1 = verify()
-        # 🔴 2026-10-22 自纠（P1 判据错尺，第一次真跑就抓到）：我原来只认「未认领≥1」算咬住。
+ # 2026-10-22 自纠（P1 判据错尺，第一次真跑就抓到）：我原来只认「未认领≥1」算咬住。
         #    实测：目标件 close-fault.py **早有一张护照**，再改它 ⇒ 门走的是 **stale_passport**
         #    那条路（判红、但 未认领=0）⇒ 门确实咬了，是我的断言太窄，把"咬住"误判成"没咬"。
         #    现口径：**红在哪条路都算咬住**（未认领 / 认领但已过期 / 或 findings 里点到这个件），

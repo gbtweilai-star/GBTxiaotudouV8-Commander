@@ -12,18 +12,13 @@
 
 用法：blender -b -P dh-basebuild.py -- <out_dir>
 """
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径
-#    `C:\Users\ADMIN\Desktop\GBT小土豆V8`，Linux/手机上会**造出一个同名垃圾目录**。
-#    改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 import json
 import os
 import sys
 
 import bpy
 
-OUT = sys.argv[-1] if "--" in sys.argv else _GBT_ROOT + "/holo_pet/assets/digital-human/raw"
+OUT = sys.argv[-1] if "--" in sys.argv else r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet\assets\digital-human\raw"
 RIG_DIR = os.path.join(OUT, "rig")
 PHASE1 = os.path.join(OUT, "phase1")
 os.makedirs(RIG_DIR, exist_ok=True)
@@ -84,7 +79,7 @@ skin = body.modifiers.new("Skin", "SKIN")
 sub = body.modifiers.new("Sub", "SUBSURF")
 sub.levels = 2
 # 半径：按骨长给一个基础体型（躯干粗、四肢细），不追求像，只求**实体成立**
-# 🔴 Blender 4.x：皮肤半径不在 MeshVertex 上（没有 .radius），在 **skin_vertices 层**里。
+# Blender 4.x：皮肤半径不在 MeshVertex 上（没有 .radius），在 **skin_vertices 层**里。
 #    第一版写成 v.radius ⇒ AttributeError: 'MeshVertex' object has no attribute 'radius'。
 sv = me.skin_vertices[0].data
 for i, b in enumerate(bones):
@@ -121,7 +116,7 @@ body.select_set(True)
 rig.select_set(True)
 bpy.context.view_layer.objects.active = rig
 bpy.ops.object.parent_set(type="ARMATURE_AUTO")
-# 🔴 2026-10-09 修（实测撞了，导出器原话「GBTBody has no skin, skipping adding neutral bone data」）：
+# 2026-10-09 修（实测撞了，导出器原话「GBTBody has no skin, skipping adding neutral bone data」）：
 #    ARMATURE_AUTO 建好了顶点组与修改器，但**父子类型落在 OBJECT** ⇒
 #    glTF 导出器的 find_armature() 认不出这网格有蒙皮 ⇒ **skins=0**（JOINTS_0/WEIGHTS_0 都白导）。
 #    显式把父子类型钉成 **ARMATURE**（Armature Deform），导出器才写得进 skin 数组。
@@ -161,11 +156,11 @@ for pb in rig.pose.bones:
 bpy.ops.object.mode_set(mode="OBJECT")
 
 # ⑧ 导出：基底网格（S1）+ 绑骨动画件（S6/S8）
-# 🔴 2026-10-09 修（实测撞了）：第一版 use_selection=True ⇒ 导出的 GLB **skins=0**
+# 2026-10-09 修（实测撞了）：第一版 use_selection=True ⇒ 导出的 GLB **skins=0**
 #    （JOINTS_0/WEIGHTS_0 都在，但没有 skin 数组）⇒ S6 门直接判「无 skin」。
 #    根因：use_selection 下场景图里没有「骨架是网格父节点」这条关系（而且 metarig 还在场）。
 #    修法：**先删掉临时 metarig**，再**整场景导出**。
-# 🔴 2026-10-09 清场（根因修复）：Rigify 生成了一大堆 WGT-* 控件件（本次导出 **928 个节点**），
+# 2026-10-09 清场（根因修复）：Rigify 生成了一大堆 WGT-* 控件件（本次导出 **928 个节点**），
 #    导出器在这一堆里**认不出蒙皮**（原话「GBTBody has no skin」），skins 恒为 0。
 #    修法：导出前**只留 body + rig**，并按最规范的三步重建蒙皮关系（父子 + 修改器 + 逆矩阵），
 #    而不是靠 parent_set 的副产物。

@@ -30,6 +30,13 @@ import sys
 import threading
 import time
 
+# 编码守门（2026-10-24 补 · encoding-guard-check 报的「新增违规」之一）
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()

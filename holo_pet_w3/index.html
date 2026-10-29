@@ -1,75 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html data-page-id="godview" lang="zh-CN">
 <head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 
 
@@ -95,386 +27,332 @@
 
 <meta charset="utf-8" />
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
+ content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
 <title>GBT小土豆V8 · 上帝视角</title>
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB2gAH/8kQ0dQAAAABJRU5ErkJggg==">
-<link rel="stylesheet" href="window.css?v=20261026c" />
-<!-- 专业皮肤层：**必须在 window.css 之后** —— 它把壳的语义 token（--gbt-bg/panel/line/radius）
-     映射到 mission-control 的值上，靠加载顺序生效。出处见该文件头。 -->
+<link rel="stylesheet" href="window.css" />
+<!-- 专业皮肤层：必须在 window.css 之后 —— 它把壳的语义 token（--gbt-bg/panel/line/radius）
+ 映射到 mission-control 的值上，靠加载顺序生效。出处见该文件头。 -->
 <link rel="stylesheet" href="skin-mission-control.css" />
+<link rel="stylesheet" href="skin-omarchy.css" />
+<link rel="stylesheet" href="page-skins.css" />
 </head>
 <body class="gbt-body">
-<script src="./shell/nav-compact.js?v=20261026"></script>
+<script src="./shell/nav-compact.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 <header class="gbt-topbar" id="topbar">
-  <span class="gbt-brand">GBT小土豆V8 · 上帝视角</span>
-  <span class="gbt-grow"></span>
-  <span class="gbt-badge" id="health-badge" data-state="gray" title="整体健康度">健康度 —</span>
-  <span class="gbt-actions">
-    <button type="button" id="btn-refresh" class="gbt-btn">刷新</button>
-    <button type="button" id="btn-collapse" class="gbt-btn">折叠</button>
-    <button type="button" id="btn-selfcheck" class="gbt-btn">自检</button>
-    <input type="search" id="search-box" class="gbt-search" placeholder="搜索节点 / 故障点" />
-  </span>
+<span class="gbt-brand">GBT小土豆V8 · 上帝视角</span>
+<span class="gbt-grow"></span>
+<span class="gbt-badge" id="health-badge" data-state="gray" title="整体健康度">健康度 —</span>
+<span class="gbt-actions">
+<button type="button" id="btn-refresh" class="gbt-btn">刷新</button>
+<button type="button" id="btn-collapse" class="gbt-btn">折叠</button>
+<button type="button" id="btn-selfcheck" class="gbt-btn">自检</button>
+<input type="search" id="search-box" class="gbt-search" placeholder="搜索节点 / 故障点" />
+</span>
 </header>
 
 <nav class="gbt-tabs" id="tabs">
-  <button type="button" class="gbt-tab" data-view="workbench" data-active="true">编程</button>
-  <button type="button" class="gbt-tab" data-view="quad">四视图</button>
-  <button type="button" class="gbt-tab" data-view="tree">工作树</button>
-  <button type="button" class="gbt-tab" data-view="matrix">故障矩阵</button>
-  <button type="button" class="gbt-tab" data-view="cockpit">驾驶舱</button>
-  <button type="button" class="gbt-tab" data-view="tools">工具</button>
-  <button type="button" class="gbt-tab" data-view="pets">数字人</button>
+<button type="button" class="gbt-tab" data-view="workbench" data-active="true">编程</button>
+<button type="button" class="gbt-tab" data-view="quad">四视图</button>
+<button type="button" class="gbt-tab" data-view="tree">工作树</button>
+<button type="button" class="gbt-tab" data-view="matrix">故障矩阵</button>
+<button type="button" class="gbt-tab" data-view="cockpit">驾驶舱</button>
+<button type="button" class="gbt-tab" data-view="tools">工具</button>
+<button type="button" class="gbt-tab" data-view="pets">数字人</button>
 </nav>
 
 <main class="gbt-main">
 
-  <!-- ══ 编程工作台（2026-09-23 第 45 轮加）══
-       Owner 目标原话里有「重新设计为一体式多功能专业级编程AI」。
-       改前的实况（看真壳截图得出的，不是推的）：**七个页签全是系统健康面**，
-       而编程面（代码台/执行面/对话）都在**别扇窗**里 —— 主窗**根本没有编程入口**。
-       ⇒ 打开 App 看到的是"体检报告"，不是一个编程 AI。
-       ⇒ 本页签补上：**回路六步**（认现有能力位）+ **本仓编程动作流**（活的，
-         从主窗已有的 audit_tail 里筛编程类 kind）+ **四个入口**
-         （走已有的 showWindow 桥，与铬里的跨窗跳转**同一套**，不另造）。
-       ⚠️ 刻意**不**在这里重复"门/命令"（那是代码台 F 块的读数）：
-          一件事实两处渲染 = 两套口径，本仓最贵的教训。
-       ⇒ 这里只放"步骤与能力位名"，门与命令指过去（按钮直达代码台）。
-       容器 id 固定，`window.js` 的刷新契约独立。 -->
-  <section class="gbt-view" id="view-workbench" data-active="true">
-    <article class="gbt-card gbt-console" id="card-workbench">
-      <div class="gbt-console-head">
-        <h2>编程工作台 · 回路 · 动作流 · 入口</h2>
-        <span class="gbt-chip" id="chip-workbench" data-state="gray">等读数</span>
-      </div>
-      <div class="gbt-console-body" id="workbench-body"></div>
-    </article>
-  </section>
+<!-- ══ 编程工作台（2026-09-23 第 45 轮加）══
+ Owner 目标原话里有「重新设计为一体式多功能专业级编程AI」。
+ 改前的实况（看真壳截图得出的，不是推的）：七个页签全是系统健康面，
+ 而编程面（代码台/执行面/对话）都在别扇窗里 —— 主窗根本没有编程入口。
+ ⇒ 打开 App 看到的是"体检报告"，不是一个编程 AI。
+ ⇒ 本页签补上：回路六步（认现有能力位）+ 本仓编程动作流（活的，
+ 从主窗已有的 audit_tail 里筛编程类 kind）+ 四个入口
+ （走已有的 showWindow 桥，与铬里的跨窗跳转同一套，不另造）。
+ 刻意不在这里重复"门/命令"（那是代码台 F 块的读数）：
+ 一件事实两处渲染 = 两套口径，本仓最贵的教训。
+ ⇒ 这里只放"步骤与能力位名"，门与命令指过去（按钮直达代码台）。
+ 容器 id 固定，window.js 的刷新契约独立。 -->
+<section class="gbt-view" id="view-workbench" data-active="true">
+<article class="gbt-card gbt-console" id="card-workbench">
+<div class="gbt-console-head">
+<h2>编程工作台 · 回路 · 动作流 · 入口</h2>
+<span class="gbt-chip" id="chip-workbench" data-state="gray">等读数</span>
+</div>
+<div class="gbt-console-body" id="workbench-body"></div>
+</article>
+</section>
 
-  <!-- ══ 四视图（2026-09-23 第 31 轮重构：**从 JSON 转储改成控制台**）══
-       改前：四格各一个 `<pre>`，把 `payload.data` 整个 `JSON.stringify` 铺在屏上。
-       实测（真壳取证 `shell/shots.cjs` 拍的图）那意味着：
-         · 屏上是**四坨原始 JSON**，没有层级、没有状态色、不能扫读；
-         · 还**明文带着本机绝对路径**（`C:\Users\ADMIN\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe`）
-           与服务 host/port —— 本仓 AGENTS.md 明写「不要暴露内部地址、端口、配置」。
-       ⇒ 现在每格是：顶部**状态瓦片带**（颜色只编码状态）+ 结构化表 / 时间线；路径一律掩码。
-       容器 id 一个都没变（`card-self` 等），`window.js` 的刷新契约不受影响。 -->
-  <section class="gbt-view" id="view-quad" hidden>
-    <article class="gbt-card gbt-console">
-      <h2>看自己 <span class="gbt-chip" id="chip-self" data-state="gray">等待数据</span></h2>
-      <div class="gbt-console-body" id="card-self"><p class="gbt-dim">读数据中…</p></div>
-    </article>
-    <article class="gbt-card gbt-console">
-      <h2>看任务 <span class="gbt-chip" id="chip-tasks" data-state="gray">等待数据</span></h2>
-      <div class="gbt-console-body" id="card-tasks"><p class="gbt-dim">读数据中…</p></div>
-    </article>
-    <article class="gbt-card gbt-console">
-      <h2>看环境 <span class="gbt-chip" id="chip-env" data-state="gray">等待数据</span></h2>
-      <div class="gbt-console-body" id="card-env"><p class="gbt-dim">读数据中…</p></div>
-    </article>
-    <article class="gbt-card gbt-console">
-      <h2>看账本 <span class="gbt-chip" id="chip-ledger" data-state="gray">等待数据</span></h2>
-      <div class="gbt-console-body" id="card-ledger"><p class="gbt-dim">读数据中…</p></div>
-    </article>
-    <!-- 顾问席 · **三栏**（主人 2026-09-23 定：此前只做了一栏）。
-         三栏都是**只读**：① 项目树 ② 交流视野（本会话的事件/工具流）③ 顾问建议（克劳德 / DSH 两席）。
-         「只有建议权、没有执行权」由 `tools/codex-scripts/advisor-audit.py` 的四条判据保证（可机检）。 -->
-    <article class="gbt-card gbt-console gbt-adv">
-      <h2>顾问席 · 三栏<span class="gbt-adv-sub">（只读 · 建议不执行）</span>
-        <span class="gbt-chip" id="chip-advisors" data-state="gray">等待数据</span></h2>
-      <div class="gbt-adv-grid">
-        <div class="gbt-adv-col">
-          <h3>① 项目树<span class="gbt-chip" id="chip-adv-tree" data-state="gray">待读</span></h3>
-          <div class="gbt-adv-body" id="card-adv-tree"><p class="gbt-dim">读数据中…</p></div>
-        </div>
-        <div class="gbt-adv-col">
-          <h3>② 交流视野<span class="gbt-chip" id="chip-stream" data-state="gray">待读</span></h3>
-          <div class="gbt-adv-body" id="card-stream"><p class="gbt-dim">读数据中…</p></div>
-        </div>
-        <div class="gbt-adv-col">
-          <h3>③ 顾问建议<span class="gbt-chip" id="chip-seats" data-state="gray">待读</span></h3>
-          <div class="gbt-adv-body" id="card-seats"><p class="gbt-dim">读数据中…</p></div>
-        </div>
-      </div>
-    </article>
-  </section>
+<!-- ══ 四视图（2026-09-23 第 31 轮重构：从 JSON 转储改成控制台）══
+ 改前：四格各一个 `<pre>`，把 `payload.data` 整个 `JSON.stringify` 铺在屏上。
+ 实测（真壳取证 `shell/shots.cjs` 拍的图）那意味着：
+ · 屏上是**四坨原始 JSON**，没有层级、没有状态色、不能扫读；
+ · 还**明文带着本机绝对路径**（`C:\Users\ADMIN\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe`）
+ 与服务 host/port —— 本仓 AGENTS.md 明写「不要暴露内部地址、端口、配置」。
+ ⇒ 现在每格是：顶部**状态瓦片带**（颜色只编码状态）+ 结构化表 / 时间线；路径一律掩码。
+ 容器 id 一个都没变（`card-self` 等），`window.js` 的刷新契约不受影响。 -->
+<section class="gbt-view" id="view-quad" hidden>
+<article class="gbt-card gbt-console">
+<h2>看自己<span class="gbt-chip" id="chip-self" data-state="gray">等待数据</span></h2>
+<div class="gbt-console-body" id="card-self"><p class="gbt-dim">读数据中…</p></div>
+</article>
+<article class="gbt-card gbt-console">
+<h2>看任务<span class="gbt-chip" id="chip-tasks" data-state="gray">等待数据</span></h2>
+<div class="gbt-console-body" id="card-tasks"><p class="gbt-dim">读数据中…</p></div>
+</article>
+<article class="gbt-card gbt-console">
+<h2>看环境<span class="gbt-chip" id="chip-env" data-state="gray">等待数据</span></h2>
+<div class="gbt-console-body" id="card-env"><p class="gbt-dim">读数据中…</p></div>
+</article>
+<article class="gbt-card gbt-console">
+<h2>看账本<span class="gbt-chip" id="chip-ledger" data-state="gray">等待数据</span></h2>
+<div class="gbt-console-body" id="card-ledger"><p class="gbt-dim">读数据中…</p></div>
+</article>
+<!-- 顾问席 · **三栏**（主人 2026-09-23 定：此前只做了一栏）。
+ 三栏都是**只读**：① 项目树 ② 交流视野（本会话的事件/工具流）③ 顾问建议（克劳德 / DSH 两席）。
+ 「只有建议权、没有执行权」由 `tools/codex-scripts/advisor-audit.py` 的四条判据保证（可机检）。 -->
+<article class="gbt-card gbt-console gbt-adv">
+<h2>顾问席 · 三栏<span class="gbt-adv-sub">（只读 · 建议不执行）</span>
+<span class="gbt-chip" id="chip-advisors" data-state="gray">等待数据</span></h2>
+<div class="gbt-adv-grid">
+<div class="gbt-adv-col">
+<h3>① 项目树<span class="gbt-chip" id="chip-adv-tree" data-state="gray">待读</span></h3>
+<div class="gbt-adv-body" id="card-adv-tree"><p class="gbt-dim">读数据中…</p></div>
+</div>
+<div class="gbt-adv-col">
+<h3>② 交流视野<span class="gbt-chip" id="chip-stream" data-state="gray">待读</span></h3>
+<div class="gbt-adv-body" id="card-stream"><p class="gbt-dim">读数据中…</p></div>
+</div>
+<div class="gbt-adv-col">
+<h3>③ 顾问建议<span class="gbt-chip" id="chip-seats" data-state="gray">待读</span></h3>
+<div class="gbt-adv-body" id="card-seats"><p class="gbt-dim">读数据中…</p></div>
+</div>
+</div>
+</article>
+</section>
 
-  <section class="gbt-view" id="view-tree" hidden>
-    <div class="gbt-tree-bar">
-      <span class="gbt-engine">引擎：<b id="tree-engine">—</b></span>
-      <span class="gbt-dim">视图 A · 结构 + 状态 + 数据流三层叠加</span>
-    </div>
-    <div class="gbt-tree" id="tree-host" data-engine="text"></div>
-  </section>
+<section class="gbt-view" id="view-tree" hidden>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">引擎：<b id="tree-engine">—</b></span>
+<span class="gbt-dim">视图 A · 结构 + 状态 + 数据流三层叠加</span>
+</div>
+<div class="gbt-tree" id="tree-host" data-engine="text"></div>
+</section>
 
-  <section class="gbt-view" id="view-matrix" hidden>
-    <div class="gbt-matrix-bar">
-      <span>视图 B · 逐点对齐《GBT全故障点设计.md》§10.2 母表，本屏不另立判据</span>
-      <span class="gbt-dim" id="matrix-source">来源：—</span>
-    </div>
-    <div class="gbt-matrix-wrap">
-      <table class="gbt-matrix" id="matrix-table">
-        <thead><tr>
-          <th>故障点</th><th>探针</th><th>心跳</th><th>审计</th><th>用户</th><th>状态</th><th>判定</th>
-        </tr></thead>
-        <tbody id="matrix-body"><tr><td colspan="7" class="gbt-dim">取不到矩阵：母表未读到</td></tr></tbody>
-      </table>
-    </div>
-    <div class="gbt-matrix-foot">
-      <span>当前活跃故障：<b id="stat-active">—</b></span>
-      <span>历史故障（24h）：<b id="stat-history">—</b></span>
-      <span>盲区：<b id="stat-blind">—</b></span>
-      <button type="button" id="btn-blind-detail" class="gbt-btn">展开整改方案</button>
-    </div>
-  </section>
+<section class="gbt-view" id="view-matrix" hidden>
+<div class="gbt-matrix-bar">
+<span>视图 B · 逐点对齐《GBT全故障点设计.md》§10.2 母表，本屏不另立判据</span>
+<span class="gbt-dim" id="matrix-source">来源：—</span>
+</div>
+<div class="gbt-matrix-wrap">
+<table class="gbt-matrix" id="matrix-table">
+<thead><tr>
+<th>故障点</th><th>探针</th><th>心跳</th><th>审计</th><th>用户</th><th>状态</th><th>判定</th>
+</tr></thead>
+<tbody id="matrix-body"><tr><td colspan="7" class="gbt-dim">取不到矩阵：母表未读到</td></tr></tbody>
+</table>
+</div>
+<div class="gbt-matrix-foot">
+<span>当前活跃故障：<b id="stat-active">—</b></span>
+<span>历史故障（24h）：<b id="stat-history">—</b></span>
+<span>盲区：<b id="stat-blind">—</b></span>
+<button type="button" id="btn-blind-detail" class="gbt-btn">展开整改方案</button>
+</div>
+</section>
 
-  <section class="gbt-view" id="view-cockpit" hidden>
-    <div class="gbt-card gbt-wide">
-      <h2>驾驶舱</h2>
-      <p class="gbt-dim">本页两个动作在 W3 阶段<b>不产生任何写操作</b>；写盘要等后台探针服务独立进程上线。</p>
-      <button type="button" id="btn-schedule" class="gbt-btn">全局调度</button>
-      <button type="button" id="btn-introspect" class="gbt-btn">全局自省</button>
-      <pre class="gbt-json" id="cockpit-out">未触发</pre>
-    </div>
+<section class="gbt-view" id="view-cockpit" hidden>
+<div class="gbt-card gbt-wide">
+<h2>驾驶舱</h2>
+<p class="gbt-dim">本页两个动作在 W3 阶段<b>不产生任何写操作</b>；写盘要等后台探针服务独立进程上线。</p>
+<button type="button" id="btn-schedule" class="gbt-btn">全局调度</button>
+<button type="button" id="btn-introspect" class="gbt-btn">全局自省</button>
+<pre class="gbt-json" id="cockpit-out">未触发</pre>
+</div>
 
-    <!-- R-H295 新接：框架自己的两只只读审计器，**实时现跑**（欠账「覆盖审计接进上帝视角」
-         「零调用点清单接进上帝视角」）。数据不落快照：每次点刷新都真调一次审计器。 -->
-    <div class="gbt-card gbt-wide">
-      <h2>覆盖率与死角</h2>
-      <div class="gbt-tree-bar">
-        <span class="gbt-engine">可上报模块：<b id="cov-reportable">—</b></span>
-        <span class="gbt-dim" id="cov-groups">分组覆盖：—</span>
-        <span class="gbt-grow"></span>
-        <span class="gbt-dim" id="cov-at">未取</span>
-        <button type="button" id="btn-coverage" class="gbt-btn">刷新覆盖率</button>
-      </div>
-      <div class="gbt-gap-list" id="cov-gaps"><span class="gbt-pet-reason">未取：点「刷新覆盖率」即现跑，不猜。</span></div>
-      <p class="gbt-dim" id="cov-source">来源：—</p>
-    </div>
+<!-- R-H295 新接：框架自己的两只只读审计器，实时现跑（欠账「覆盖审计接进上帝视角」
+ 「零调用点清单接进上帝视角」）。数据不落快照：每次点刷新都真调一次审计器。 -->
+<div class="gbt-card gbt-wide">
+<h2>覆盖率与死角</h2>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">可上报模块：<b id="cov-reportable">—</b></span>
+<span class="gbt-dim" id="cov-groups">分组覆盖：—</span>
+<span class="gbt-grow"></span>
+<span class="gbt-dim" id="cov-at">未取</span>
+<button type="button" id="btn-coverage" class="gbt-btn">刷新覆盖率</button>
+</div>
+<div class="gbt-gap-list" id="cov-gaps"><span class="gbt-pet-reason">未取：点「刷新覆盖率」即现跑，不猜。</span></div>
+<p class="gbt-dim" id="cov-source">来源：—</p>
+</div>
 
-    <div class="gbt-card gbt-wide">
-      <h2>零调用点审计</h2>
-      <div class="gbt-tree-bar">
-        <span class="gbt-engine">已接调用点：<b id="orph-wired">—</b></span>
-        <span class="gbt-dim" id="orph-scanned">扫描文件：—</span>
-        <span class="gbt-grow"></span>
-        <span class="gbt-dim" id="orph-at">未取</span>
-        <button type="button" id="btn-orphans" class="gbt-btn">刷新零调用点</button>
-      </div>
-      <div class="gbt-gap-list" id="orph-list"><span class="gbt-pet-reason">未取：点「刷新零调用点」即现跑，不猜。</span></div>
-      <p class="gbt-dim" id="orph-rule">口径：—</p>
-    </div>
+<div class="gbt-card gbt-wide">
+<h2>零调用点审计</h2>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">已接调用点：<b id="orph-wired">—</b></span>
+<span class="gbt-dim" id="orph-scanned">扫描文件：—</span>
+<span class="gbt-grow"></span>
+<span class="gbt-dim" id="orph-at">未取</span>
+<button type="button" id="btn-orphans" class="gbt-btn">刷新零调用点</button>
+</div>
+<div class="gbt-gap-list" id="orph-list"><span class="gbt-pet-reason">未取：点「刷新零调用点」即现跑，不猜。</span></div>
+<p class="gbt-dim" id="orph-rule">口径：—</p>
+</div>
 
-    <!-- R-H295 新接：渲染进化的最优基因（欠账「上帝视角显示最优基因」—— 未接）。
-         现在 0 代就如实写 0 代；五个渲染原语按**盘上真有没有**逐条标。 -->
-    <div class="gbt-card gbt-wide">
-      <h2>渲染进化 · 最优基因</h2>
-      <div class="gbt-tree-bar">
-        <span class="gbt-engine">代数：<b id="gene-count">—</b></span>
-        <span class="gbt-dim" id="gene-exp">实验数：—</span>
-        <span class="gbt-grow"></span>
-        <span class="gbt-dim" id="gene-at">未取</span>
-        <button type="button" id="btn-gene" class="gbt-btn">刷新基因</button>
-      </div>
-      <div class="gbt-gap-list" id="gene-winners"><span class="gbt-pet-reason">未取：点「刷新基因」即现跑，不猜。</span></div>
-      <table class="gbt-matrix">
-        <thead><tr><th>渲染原语</th><th>来源</th><th>盘上状态</th></tr></thead>
-        <tbody id="gene-body"><tr><td colspan="3" class="gbt-dim">未取</td></tr></tbody>
-      </table>
-      <p class="gbt-dim" id="gene-boundary">边界：—</p>
-    </div>
-  </section>
-  <section class="gbt-view" id="view-tools" hidden>
-    <article class="gbt-card gbt-wide">
-      <!-- R-H295 ⑤：原标题「工具出口」暗示全量，实际是精选表 —— 命名与覆盖面错位。
-           改成明说精选，并把落差数字放在页面上（口径取自正门 /api/capabilities）。 -->
-      <h2>工具出口（精选展示 · 只读态）</h2>
-      <p class="gbt-dim">本页只读：不落账、不建目录、不写健康通道。状态判定一律以能力层为准，面板只做展示映射；灰态一律带原因，不写「灰了不说」。</p>
-      <p class="gbt-coverage" id="tools-coverage">覆盖面：未取</p>
-      <div class="gbt-tree-bar">
-        <span class="gbt-engine">账本：<b id="tools-store">—</b></span>
-        <span class="gbt-dim" id="tools-note">未取</span>
-        <span class="gbt-grow"></span>
-        <button type="button" id="btn-tools-refresh" class="gbt-btn">刷新出口状态</button>
-      </div>
-      <table class="gbt-matrix">
-        <thead><tr><th>能力</th><th>动作</th><th>状态</th><th>原因 / 说明</th></tr></thead>
-        <tbody id="tools-body"><tr><td colspan="4" class="gbt-dim">未取（点「刷新出口状态」，或再点一次本标签）</td></tr></tbody>
-      </table>
-      <p class="gbt-dim" id="tools-foot">敏感档动作不挂出口（物理上没有键）—— 这是**不挂**的那部分；本页只列精选，其余能力见能力总目录。</p>
-    </article>
-  </section>
+<!-- R-H295 新接：渲染进化的最优基因（欠账「上帝视角显示最优基因」—— 未接）。
+ 现在 0 代就如实写 0 代；五个渲染原语按盘上真有没有逐条标。 -->
+<div class="gbt-card gbt-wide">
+<h2>渲染进化 · 最优基因</h2>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">代数：<b id="gene-count">—</b></span>
+<span class="gbt-dim" id="gene-exp">实验数：—</span>
+<span class="gbt-grow"></span>
+<span class="gbt-dim" id="gene-at">未取</span>
+<button type="button" id="btn-gene" class="gbt-btn">刷新基因</button>
+</div>
+<div class="gbt-gap-list" id="gene-winners"><span class="gbt-pet-reason">未取：点「刷新基因」即现跑，不猜。</span></div>
+<table class="gbt-matrix">
+<thead><tr><th>渲染原语</th><th>来源</th><th>盘上状态</th></tr></thead>
+<tbody id="gene-body"><tr><td colspan="3" class="gbt-dim">未取</td></tr></tbody>
+</table>
+<p class="gbt-dim" id="gene-boundary">边界：—</p>
+</div>
+</section>
+<section class="gbt-view" id="view-tools" hidden>
+<article class="gbt-card gbt-wide">
+<!-- R-H295 ⑤：原标题「工具出口」暗示全量，实际是精选表 —— 命名与覆盖面错位。
+ 改成明说精选，并把落差数字放在页面上（口径取自正门 /api/capabilities）。 -->
+<h2>工具出口（精选展示 · 只读态）</h2>
+<p class="gbt-dim">本页只读：不落账、不建目录、不写健康通道。状态判定一律以能力层为准，面板只做展示映射；灰态一律带原因，不写「灰了不说」。</p>
+<p class="gbt-coverage" id="tools-coverage">覆盖面：未取</p>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">账本：<b id="tools-store">—</b></span>
+<span class="gbt-dim" id="tools-note">未取</span>
+<span class="gbt-grow"></span>
+<button type="button" id="btn-tools-refresh" class="gbt-btn">刷新出口状态</button>
+</div>
+<table class="gbt-matrix">
+<thead><tr><th>能力</th><th>动作</th><th>状态</th><th>原因 / 说明</th></tr></thead>
+<tbody id="tools-body"><tr><td colspan="4" class="gbt-dim">未取（点「刷新出口状态」，或再点一次本标签）</td></tr></tbody>
+</table>
+<p class="gbt-dim" id="tools-foot">敏感档动作不挂出口（物理上没有键）—— 这是不挂的那部分；本页只列精选，其余能力见能力总目录。</p>
+</article>
+</section>
 
-  <section class="gbt-view" id="view-pets" hidden>
-    <article class="gbt-card">
-      <h2>数字人召唤台</h2>
-      <p class="gbt-dim" id="pets-note">未取（点本标签才取，不做后台轮询）</p>
-      <div class="gbt-tree-bar">
-        <span class="gbt-engine">形象库：<b id="pets-count">—</b></span>
-        <span class="gbt-dim" id="pets-python">Python 腿：未探测</span>
-        <span class="gbt-grow"></span>
-        <button type="button" id="btn-pets-refresh" class="gbt-btn">刷新就绪态</button>
-      </div>
-      <div class="gbt-pet-grid" id="pets-carriers">
-        <span class="gbt-pet-reason">未取：点本标签即测，不猜。</span>
-      </div>
-      <p class="gbt-dim" id="pets-summon-out">未召唤</p>
-    </article>
-    <article class="gbt-card">
-      <h2>形象库（真扫盘）</h2>
-      <div class="gbt-pet-grid" id="pets-models"><span class="gbt-pet-reason">未取</span></div>
-    </article>
-    <article class="gbt-card">
-      <h2>AI 朋友圈 · 动态流</h2>
-      <p class="gbt-dim" id="ef-note">未取（数据来自本机 EigenFlux 缓存，本机只读）</p>
-      <div class="ef-list" id="ef-feed"><div class="ef-empty">未取</div></div>
-    </article>
-    <article class="gbt-card">
-      <h2>好友 / 私信 / 档案</h2>
-      <div class="gbt-ef-split">
-        <div class="gbt-ef-col"><h3>好友</h3><div class="ef-list" id="ef-friends"><div class="ef-empty">未取</div></div></div>
-        <div class="gbt-ef-col"><h3>私信</h3><div class="ef-list" id="ef-messages"><div class="ef-empty">未取</div></div></div>
-        <div class="gbt-ef-col"><h3>档案</h3><div class="ef-list" id="ef-profile"><div class="ef-empty">未取</div></div></div>
-      </div>
-    </article>
-  </section></main>
+<section class="gbt-view" id="view-pets" hidden>
+<article class="gbt-card">
+<h2>数字人召唤台</h2>
+<p class="gbt-dim" id="pets-note">未取（点本标签才取，不做后台轮询）</p>
+<div class="gbt-tree-bar">
+<span class="gbt-engine">形象库：<b id="pets-count">—</b></span>
+<span class="gbt-dim" id="pets-python">Python 腿：未探测</span>
+<span class="gbt-grow"></span>
+<button type="button" id="btn-pets-refresh" class="gbt-btn">刷新就绪态</button>
+</div>
+<div class="gbt-pet-grid" id="pets-carriers">
+<span class="gbt-pet-reason">未取：点本标签即测，不猜。</span>
+</div>
+<p class="gbt-dim" id="pets-summon-out">未召唤</p>
+</article>
+<article class="gbt-card">
+<h2>形象库（真扫盘）</h2>
+<div class="gbt-pet-grid" id="pets-models"><span class="gbt-pet-reason">未取</span></div>
+</article>
+<article class="gbt-card">
+<h2>AI 朋友圈 · 动态流</h2>
+<p class="gbt-dim" id="ef-note">未取（数据来自本机 EigenFlux 缓存，本机只读）</p>
+<div class="ef-list" id="ef-feed"><div class="ef-empty">未取</div></div>
+</article>
+<article class="gbt-card">
+<h2>好友 / 私信 / 档案</h2>
+<div class="gbt-ef-split">
+<div class="gbt-ef-col"><h3>好友</h3><div class="ef-list" id="ef-friends"><div class="ef-empty">未取</div></div></div>
+<div class="gbt-ef-col"><h3>私信</h3><div class="ef-list" id="ef-messages"><div class="ef-empty">未取</div></div></div>
+<div class="gbt-ef-col"><h3>档案</h3><div class="ef-list" id="ef-profile"><div class="ef-empty">未取</div></div></div>
+</div>
+</article>
+</section></main>
 
 <footer class="gbt-statusbar">
-  <!-- 第 1 轮审美审计 P0-3：原先三个占位（stat-edges / stat-faults / stat-sleep）
-       全树从未被赋值，渲染成「活跃连线 — 故障链 — 休眠节点」，读者分不清是
-       「值为 0」还是「没接上」—— 空态读作故障。改为显式状态 + 填充路径
-       （taste-skill §4.5 Empty States）。**不写 0，因为没量到就写 0 是编造指标。** -->
-  <span class="gbt-dim" id="stat-graph">图指标（活跃连线／故障链／休眠节点）：待工作树引擎上报</span>
-  <span class="gbt-grow"></span>
-  <span class="gbt-badge" id="stream-badge" data-state="gray">实时流：未接</span>
-  <span class="gbt-dim" id="stat-clock">—</span>
+<!-- 第 1 轮审美审计 P0-3：原先三个占位（stat-edges / stat-faults / stat-sleep）
+ 全树从未被赋值，渲染成「活跃连线 — 故障链 — 休眠节点」，读者分不清是
+ 「值为 0」还是「没接上」—— 空态读作故障。改为显式状态 + 填充路径
+ （taste-skill §4.5 Empty States）。不写 0，因为没量到就写 0 是编造指标。 -->
+<span class="gbt-dim" id="stat-graph">图指标（活跃连线／故障链／休眠节点）：待工作树引擎上报</span>
+<span class="gbt-grow"></span>
+<span class="gbt-badge" id="stream-badge" data-state="gray">实时流：未接</span>
+<span class="gbt-dim" id="stat-clock">—</span>
 </footer>
 
 <aside class="gbt-sidebar" id="sidebar" hidden>
-  <header class="gbt-sidebar-head">
-    <b id="sidebar-title">详情</b>
-    <button type="button" id="btn-sidebar-close" class="gbt-btn">收起</button>
-  </header>
-  <pre class="gbt-json" id="sidebar-body">—</pre>
+<header class="gbt-sidebar-head">
+<b id="sidebar-title">详情</b>
+<button type="button" id="btn-sidebar-close" class="gbt-btn">收起</button>
+</header>
+<pre class="gbt-json" id="sidebar-body">—</pre>
 </aside>
 
 <footer class="gbt-signature" data-developer="自由的风">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
 
-<script src="ef_render.js?v=20261026"></script>
-<!-- 宿主内桥降级垫片：**必须在 window.js 之前**。它只在 Electron 桥（window.gbtW3）缺失时
-     才装一个同名方法面（走宿主 HTTP 只读端点），桥在的时候一个字都不动它。
-     六窗因此不用改一行 —— 它们既有的"取不到就如实说取不到"照旧生效。 -->
-<script src="host-bridge.js?v=20261026"></script>
-<script src="window.js?v=20261026"></script>
-<!-- 🔴 2026-10-10 补：avatar-roam.js 是本仓的**跨页穿梭层**（数字人不属于任何一页）。
-     它自己的红线写着「任何页只要引了它就'她在场'」—— 而我建完**一个页都没引**：
-     取证时量到"被引用页数 0" ⇒ **建了但没接上 = 死代码**。这里补上。 -->
-<script src="avatar-roam.js?v=20261026"></script>
-
-
-<!-- gbt-defense -->
-<script>
-(function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
-    return true;
-  }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
-  }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
-})();
-</script>
-<script src="shell/live-badge.js?v=20261026" defer></script>
-<script src="shell/live-badge.js?v=20261026" defer></script>
-<script src="shell/tentacle-bridge.js?v=20261029"></script>
-<script src="shell/tentacle-kit.js?v=20261026" defer></script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="shell/tentacle-bridge.js?v=20261029"></script>
+<script src="ef_render.js"></script>
+<!-- 宿主内桥降级垫片：必须在 window.js 之前。它只在 Electron 桥（window.gbtW3）缺失时
+ 才装一个同名方法面（走宿主 HTTP 只读端点），桥在的时候一个字都不动它。
+ 六窗因此不用改一行 —— 它们既有的"取不到就如实说取不到"照旧生效。 -->
+<script src="host-bridge.js"></script>
+<script src="window.js"></script>
+<!-- 2026-10-10 补：avatar-roam.js 是本仓的跨页穿梭层（数字人不属于任何一页）。
+ 它自己的红线写着「任何页只要引了它就'她在场'」—— 而我建完一个页都没引：
+ 取证时量到"被引用页数 0" ⇒ 建了但没接上 = 死代码。这里补上。 -->
+<script src="avatar-roam.js"></script>
+<script src="shell/tentacle-kit.js" defer></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ for _gbt_s in (_gbt_sys.stdout, _gbt_sys.stderr):
 
 ROOT = Path(__file__).resolve().parents[2]
 PAGE_DIRS = ["holo_pet_w3", "state", "state/blueprints", "docs"]
-# 🔴 2026-10-17 事故剪枝（与 `page-reach` 同源 · 自反爆炸）：产物目录绝不进页面枚举
+# 2026-10-17 事故剪枝（与 `page-reach` 同源 · 自反爆炸）：产物目录绝不进页面枚举
 SKIP_PARTS = {".git", "node_modules", ".pylibs", "vendor", "_upstream", ".scratch",
               "mobile-pack", ".mimosa", "__pycache__", ".wrangler"}
 MAX_PAGES = 3000
@@ -29,7 +29,7 @@ MAX_PAGES = 3000
 def _skip(p):
     return any(part in SKIP_PARTS for part in p.parts)
 MARK = "<!-- gbt-apple-config -->"
-# 🔴 2026-10-17 修（**苹果安卓都要** · 留痕 · 原口径 / 为什么翻 / 现口径）：
+# 2026-10-17 修（**苹果安卓都要** · 留痕 · 原口径 / 为什么翻 / 现口径）：
 #   原口径：只注入 Apple 元信息 + 触控 44px。
 #   为什么翻（主人令「手机是苹果安卓都有的哈」+ 现读 `state/deploy-profiles.json`）：
 #     两档并存：`apple-iphone17`（tap_min_px=44，viewport-fit=cover）与

@@ -40,7 +40,7 @@ SKIP = ("selftest-audit.py", "criterion_bench.py", "supersede-check.py")
 NEG_START = re.compile(r"(负对照|负控|negs\s*=|selftest|自检)", re.I)
 IO_WRITE = re.compile(r"(write_text|write_bytes|mkdir|copyfile|shutil\.copy)")
 IO_RESTORE = re.compile(r"(unlink|rmdir|shutil\.move|rmtree|finally)")
-# 🔴 2026-10-10 自纠：**这一维才决定"喂数据够不够"**。
+# 2026-10-10 自纠：**这一维才决定"喂数据够不够"**。
 #    我第一版只按"有没有动文件系统"分型，于是把 forget-list-check.py 也标成"纯合成" ——
 #    可它**有 13 条负对照**，条条对着真失败模式；它的 check() 吃的是**文本**、不碰盘
 #    ⇒ **喂数据就是对的测法**。==判据比对象宽 = 假红，我又犯了一次。==

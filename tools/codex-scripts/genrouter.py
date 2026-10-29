@@ -129,7 +129,7 @@ add(id="pollinations", name="Pollinations（公开端点，无需 key）", kind=
     probe="https://image.pollinations.ai/prompt/hello?width=64&height=64&nologo=true",
     probe_kind="image")
 
-# 🔴 登记表 → 适配器**接线修正**（离线核对 `--dry-adapters` 当场抓出来的错）：
+# 登记表 → 适配器**接线修正**（离线核对 `--dry-adapters` 当场抓出来的错）：
 #    `_OA` 那一圈默认都套了通用 `openai_image`（POST {base}/images/generations），
 #    可事实是：HF 有自己的走法（我为它写了 `gen_hf` 却**没接上**）、Google 的图接口不是这个形状、
 #    fal 也不认这条路。**接错线的后果**是"看着写好了、一给钥匙就 404" —— 比没写更坏。
@@ -713,7 +713,7 @@ def probe_endpoint(b, timeout=8):
                 return {"reachable": True, "http": r.status, "url": u, "tried": tried,
                         "note": "端点可达（%d）· 就是这条" % r.status}
         except urllib.error.HTTPError as e:
-            # 🔴 **"端点回了话" ≠ "出网不通"**（第 1 版把 400 判成出网不通，是混口径）。
+ # **"端点回了话" ≠ "出网不通"**（第 1 版把 400 判成出网不通，是混口径）。
             #    只要有 HTTP 状态码，就说明**网络到达了对方**；区别只在凭据/参数/路径。
             saw_http = True
             tried.append("%s → %d" % (u[:56], e.code))
@@ -746,7 +746,7 @@ def cmd_verify_pool(st):
         if not b:
             continue
         miss = [k for k in (b.get("needs") or []) if not os.environ.get(k)]
-        # 🔴 守卫写错过一次：原来只在"登记了 base"时才探 ⇒ 把 cf_flux_schnell（只有 model、
+ # 守卫写错过一次：原来只在"登记了 base"时才探 ⇒ 把 cf_flux_schnell（只有 model、
         #    端点写在 CAND 里）和候选矩阵整个跳过，报成"本机服务"。有 CAND 就该探。
         pe = (probe_endpoint(b)
               if (b["id"] in CAND or str(b.get("base") or "").startswith("http"))
@@ -905,7 +905,7 @@ def main() -> int:
         # 轮询池 = **可用** 且 **有适配器** 的后端（没适配器的登记项不冒充能出图）
         cands = [b for b in B if b["kind"] == "image"
                  and status_of(b, st)[0] == "可用" and b.get("adapter") in ADAPTERS]
-        # 🔴 排序修正：**快的先上，本机只做兜底**。
+ # 排序修正：**快的先上，本机只做兜底**。
         #    原来按池子顺序轮询 ⇒ `comfy_local` 排第一，`--n 1` 会先挑最慢的那条（实测 586 秒），
         #    而云腿只要几秒。所以：非本机（云）优先，本机排最后；组内按池序。
         cands.sort(key=lambda x: (1 if str(x["id"]).endswith("_local") else 0,
@@ -924,7 +924,7 @@ def main() -> int:
         outdir = ROOT / "render" / "router"
         results, order = [], []
         for i in range(a.n):
-            # 🔴 **每根触手可能"挂住不返回"**（第 22 轮实测：pollinations 挂住把 600 秒耗光，
+ # **每根触手可能"挂住不返回"**（第 22 轮实测：pollinations 挂住把 600 秒耗光，
             #    而冷却只在"返回了错误"时触发 ⇒ 挂住 = 永远不切腿）。
             #    ⇒ 一律经 `call_with_deadline`：超时即记 `timeout` 记录、进冷却、**立刻切下一条腿**，
             #       并在这一轮里**重试下一个可用后端**（不再干等）。

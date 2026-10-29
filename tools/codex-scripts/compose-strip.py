@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """把逐帧渲染图拼成一条（验收动画用）。
 用法: python tools/codex-scripts/compose-strip.py <角色/动作名> <时间列表逗号分隔> <输出名>
 例:   python tools/codex-scripts/compose-strip.py walk "0.00,0.28,0.55,0.83" 动画条-walk.png
@@ -11,7 +7,7 @@ import pathlib
 import sys
 from PIL import Image, ImageDraw
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 R = WS / "render"
 
 name, times, outname = sys.argv[1], sys.argv[2].split(','), sys.argv[3]

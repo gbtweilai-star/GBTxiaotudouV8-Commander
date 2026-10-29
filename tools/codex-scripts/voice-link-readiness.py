@@ -70,7 +70,7 @@ def _run_json(cmd: list[str], timeout: int = 90) -> tuple[object | None, str]:
 
 
 def grants() -> dict:
-    # 🔴 用 sys.executable（**已经是 3.14 解释器**）⇒ 不能再传 `-3.14`：
+ # 用 sys.executable（**已经是 3.14 解释器**）⇒ 不能再传 `-3.14`：
     #    那是 `py` 启动器的写法，传给 python.exe 会报 `Unknown option: -3`（本器第一版就这么栽的）。
     data, why = _run_json([PY, "-m", "gbt_allinone", "auth", "status"])
     if not isinstance(data, dict):

@@ -1,75 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-page-id="blocked">
 <head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 
 
@@ -95,10 +27,10 @@
 
 <meta charset="utf-8" />
 <title>GBT小土豆V8 · 这个窗被拒绝了</title>
-<!-- 皮肤：**只引壳的 token**（与 connect.html 同一条纪律）。
-     🔴 2026-09-23 改：本页原来自带一套暖红配色（#140d0d / #f2e6e2 / #a2453a…），
-     被 tools/codex-scripts/audit_skin.py 抓成"壳里混进第二套皮"。现在**零裸色值**。 -->
-<link rel="stylesheet" href="../window.css?v=20261026c" />
+<!-- 皮肤：只引壳的 token（与 connect.html 同一条纪律）。
+      2026-09-23 改：本页原来自带一套暖红配色（#140d0d / #f2e6e2 / #a2453a…），
+     被 tools/codex-scripts/audit_skin.py 抓成"壳里混进第二套皮"。现在零裸色值。 -->
+<link rel="stylesheet" href="../window.css" />
 <link rel="stylesheet" href="../deck3d.css" />
 <style>
   /* 只写版式；颜色一律 var()。 */
@@ -121,9 +53,53 @@
   .foot { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--gbt-hair);
           color: var(--gbt-off); font-size: 12px; }
 </style>
+<link rel="stylesheet" href="../page-skins.css" />
 </head>
 <body>
-<script src="../shell/nav-compact.js?v=20261026"></script>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -151,100 +127,6 @@
     const why = q.get('why'); if (why) w.textContent = why;
     const id = q.get('id'); if (id) i.textContent = id;
   } catch (e) { /* 拒绝页自己不因参数出错而崩 */ }
-</script>
-
-
-<!-- gbt-defense -->
-<script>
-(function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
-    return true;
-  }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
-  }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
-})();
 </script>
 </body>
 </html>

@@ -78,7 +78,7 @@ PLACEHOLDER_NAMES = {"foo", "bar", "baz", "qux", "dummy", "placeholder",
 GENERIC_FN_NAMES = {"handle", "process", "do_stuff", "stuff", "misc", "deal_with",
                     "manage", "do_it", "temp_func"}
 BOOL_PREFIXES = ("is", "has", "can", "should", "need", "want", "allow", "enable", "use", "was")
-# M1 布尔名：🔴 2026-09-23 误报修 —— 第一版**只认前缀**，于是 `in_str = True` / `esc_next = False`
+# M1 布尔名： 2026-09-23 误报修 —— 第一版**只认前缀**，于是 `in_str = True` / `esc_next = False`
 # 这些**合格的状态短语**被判违规（真仓实测 63 文件/155 处噪声）。判据收窄成
 # **「什么都没说」的布尔名**（flag/result/value/temp…）；`in_str`/`isLoading` 一律不报。
 MEANINGLESS_BOOL = {"flag", "result", "res", "value", "val", "temp", "tmp", "data",
@@ -659,9 +659,9 @@ def audit_py(path: Path, text: str, lines, is_out: bool = False,
                 methods = [b for b in node.body
                            if isinstance(b, (ast.FunctionDef, ast.AsyncFunctionDef))
                            and not b.name.startswith("__")]
-                # 🔴 私有类不报：实测 `_BlindEye` / `_GoodEye` 这类**测试替身**就是单方法类，
+ # 私有类不报：实测 `_BlindEye` / `_GoodEye` 这类**测试替身**就是单方法类，
                 # 那是正当写法（鸭子类型的假件）。判据只对**公开类**提这个问题。
-                # 🔴 有基类的也不报：实测 `class NoRedirect(HTTPRedirectHandler)` 只覆写一个方法，
+ # 有基类的也不报：实测 `class NoRedirect(HTTPRedirectHandler)` 只覆写一个方法，
                 # 那是**正当的子类扩展**，不是"该变成函数的单方法类"。
                 if len(methods) == 1 and not node.name.startswith("_") and not node.bases:
                     single_method.append({"line": node.lineno,
@@ -992,7 +992,7 @@ def audit_js(path: Path, text: str, lines, is_out: bool = False,
         if not one:
             continue
         callee = one.group(1)
-        # 🔴 2026-09-23 判据 bug 修：第一版**只看了"函数体是一次调用"**，没比参数 ⇒
+ # 2026-09-23 判据 bug 修：第一版**只看了"函数体是一次调用"**，没比参数 ⇒
         # `esc()`/`map()`/`dshShort()` 这些**有自己语义**的包装全被误判（真仓 61 文件/95 处）。
         # 现在必须：① 参数逐个相同；② 不是方法调用；③ 目标不是内建。三者全中才算"多余的间接层"。
         if "." in callee or callee in JS_BUILTINS:

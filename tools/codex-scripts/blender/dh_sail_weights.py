@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[3])
 """② 「大帆」区权重实况（**只读**，不改 blend）
 
 回答四件事，全部给数字：
@@ -21,7 +17,7 @@ import math
 import os
 import sys
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 LIMB_GROUP = {"hips": "torso", "spine": "torso", "chest": "torso", "neck": "torso", "head": "torso",
               "shoulder_L": "armL", "upper_arm_L": "armL", "forearm_L": "armL", "hand_L": "armL",
               "shoulder_R": "armR", "upper_arm_R": "armR", "forearm_R": "armR", "hand_R": "armR",

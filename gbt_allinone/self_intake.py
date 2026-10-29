@@ -23,7 +23,6 @@ import hashlib
 import json
 import re
 import sqlite3
-import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -33,7 +32,7 @@ DB = ROOT / "gbt_allinone" / "store" / "context_vault" / "index.sqlite3"
 DEVOURED = ROOT / "gbt_allinone" / "store" / "devoured"
 TRACE = ROOT / "store" / "trace"
 GROWTH = ROOT / "state" / "self_intake" / "growth.jsonl"
-READ_OPS = ("chain", "known", "gate", "rules")
+READ_OPS = ("chain", "known", "gate", "rules", "plan", "batch", "rejudge", "ledger")
 WRITE_OPS = ("intake",)
 MAX_BYTES = 400000
 STAMP_TITLE = "开发者：自由的风 · 守护者：公主土豆 · 本署名不可删除、不可篡改归属"
@@ -265,13 +264,15 @@ def gate(topic: str = "", source_ref: str = "") -> dict:
 def rules() -> dict:
     return {"ok": True, "op": "rules",
             "loop": ["known（先查本地知识库）",
-                     "intake（未命中则抓取全网取源：国内外论文/文档）",
-                     "distill（蒸馏成 V8 胶囊：出处→原文→启示）",
-                     "stamp（写钢印护照 + 入 context_vault 索引）",
-                     "known（再查 ⇒ 这次命中）"],
-            "iron_laws": ["未命中且无出处 ⇒ 拒绝干活",
-                          "取不到就写「未读到」，绝不编内容顶上",
-                          "胶囊必须带出处；入库必须带 source_ref"],
+                     "plan（零写盘预演：下载+前闸判定，不落盘）",
+                     "intake（取源 → 前闸 → 入库；真吞才落盘）",
+                     "batch（批量幂等：同 topic 同源已吞过就跳过）",
+                     "ledger（看账）+ rejudge（闸改后重判历史账）"],
+            "iron_laws": ["只吞有出处的",
+                          "必过前闸（_vet_source 规则级 + 可选 _verify_knowledge 模型级）",
+                          "幂等（同 topic 同源已吞过不重复）",
+                          "每步落盘（胶囊/护照/账本）",
+                          "判不了就写拒（unavailable 不否决、unverified 不进索引）"],
             "growth_log": str(GROWTH).replace(chr(92), "/")}
 
 def _clean_html(raw: str) -> str:
@@ -294,7 +295,126 @@ def _fetch(url: str) -> dict:
                 "detail": str(exc)[:160]}
 
 
-def intake(topic: str = "", urls: list = None, files: list = None, note: str = "", lang: str = "") -> dict:
+# ── 入库验证门（2026-10-29 主人指出的「最大的隐患」）────────────────────────
+# 🔴 隐患：intake 原来**取到就入库**，不区分「来源死了」和「内容坏了」。
+#   fetch 200 但内容是反爬页/登录页/错误页 ⇒ 照样写胶囊、进索引 ⇒ 吞进垃圾知识。
+#   现在：入库前过一道**规则级**验证门（零成本、不调模型、不转述），
+#   把「取到的源」分成 accepted（验收）与 vetoed（取到但无效）两栏，
+#   两者都**如实列出**（不编、不删），但只有 accepted 进索引。
+#   同构于「先过镜像再进生产」：先验证，再入库。
+_VET_MIN_CHARS = 60          # 清洗后正文字符数下限（低于 = 疑似空壳/反爬）
+_VET_BLOCK_MAX_CHARS = 500   # 拦截词只在「短内容」里判：长文档提到 cloudflare 是正常引用，不是反爬页
+_VET_BLOCK_PATTERNS = [       # 命中任一 = 疑似登录页/错误页/反爬（窄口径，避免误伤正文）
+    "captcha", "verify you are human", "cloudflare", "just a moment",
+    "access denied", "forbidden", "not found", "page not found",
+    "please enable javascript", "enable javascript",
+    "登录", "验证码", "请登录", "页面不存在", "访问被拒绝",
+]
+
+
+def _vet_source(text: str) -> tuple:
+    """**纯函数**：验证一条取到的源够不够格当「有效知识」，返回 (verdict, why)。
+
+    verdict ∈ ok / empty_shell / login_or_error。
+    🔴 这是「取源 → 入库」之间的**验证门** —— 不转述、不改内容，只判这段原文
+       能不能入库。它与「来源死」是**两回事**：fetch 抛异常 = 来源死（如实列「未读到」）；
+       这里判的是「fetch 成功但内容是垃圾」= 内容坏（列「取到但无效」）。
+    🔴 拦截词只在「短内容」里判（`_VET_BLOCK_MAX_CHARS` 以内）：反爬页/登录页是**短提示**；
+       长文档正文里提到 cloudflare / 登录 是**正常引用**，若按子串命中会误伤（AGENTS.md 实测）。
+    """
+    t = re.sub(r"\s+", " ", str(text or "")).strip()
+    if len(t) < _VET_MIN_CHARS:
+        return "empty_shell", "清洗后仅 %d 字符，疑似空壳/反爬（下限 %d）" % (len(t), _VET_MIN_CHARS)
+    if len(t) < _VET_BLOCK_MAX_CHARS:
+        low = t.lower()
+        for pat in _VET_BLOCK_PATTERNS:
+            if pat in low:
+                return "login_or_error", "命中拦截特征 %r（疑似登录页/错误页/反爬）" % pat
+    return "ok", ""
+
+
+# ── 模型级验真（新能力 · 2026-10-29）───────────────────────────────────────
+# 🔴 GBT 深度思考里说的「拆解→分析→跑通→吸收」，规则级验证门只挡「空壳/登录页」，
+#   挡不住「空话/感慨/营销文案」这类**看着有字、其实不可对账**的内容。
+#   这一道用**免费车道 Kilo** 判「能不能对账」：可复现的方法/可查证的事实/可执行的操作。
+#   不转述、不改内容，只给 verdict；免费车道不在位/模型挂了 ⇒ unavailable（不假装验证过）。
+_VERIFY_PROMPT = (
+    "判断下面这段内容是不是「能对账的知识」。能对账 = 含可复现的方法、可查证的事实、"
+    "可执行的操作或可引用的出处；不能对账 = 空话、感慨、营销文案、无法验证的断言。\n"
+    "只回一个词：verified 或 unverified。不要解释、不要别的字。\n\n"
+    "主题：%s\n\n内容：\n%s"
+)
+
+
+def _parse_verdict(reply: str) -> tuple:
+    """**纯函数**：解析模型验真返回，提取 (verdict, why)。
+
+    verdict ∈ verified / unverified / unavailable。fail-closed：读不出 ⇒ unavailable。
+    🔴 先判 unverified 再判 verified —— unverified 含 verified 子串，顺序反了会把
+       「不可对账」判成「可对账」（同族错误：先判 shadowed 会丢掉真依赖）。
+    """
+    r = str(reply or "").strip()
+    if not r:
+        return "unavailable", "模型空回"
+    low = r.lower()
+    if "unverified" in low or any(k in low for k in
+                                  ("不可对账", "不可复现", "空话", "感慨", "营销", "不通过", "unverifiable")):
+        return "unverified", r[:200]
+    if "verified" in low or any(k in low for k in ("可对账", "可复现", "可查证", "通过")):
+        return "verified", r[:200]
+    return "unavailable", "判定读不出：" + r[:80]
+
+
+def _verify_knowledge(topic: str, text: str) -> tuple:
+    """模型级验真：用**免费车道 Kilo** 判这段知识能不能对账，返回 (verdict, why)。
+
+    verdict ∈ verified / unverified / unavailable。
+    🔴 fail-closed：免费车道不在位 / 模型挂了 ⇒ unavailable（不假装验证过，也不静默放行）。
+    """
+    try:
+        from .llm import key_gateway as _kg
+        mat = _kg.materialize("kilo")
+        if not mat.get("ok"):
+            return "unavailable", "免费车道不在位：" + str(mat.get("error"))
+        from .llm import cloud_llm as _cl
+        body = {"messages": [{"role": "user",
+                              "content": _VERIFY_PROMPT % (str(topic or ""), (text or "")[:3000])}],
+                # kilo-auto/free 是推理模型：reasoning 会吃 token，给足 512 才有 content 空间
+                # （实测 80 会被 reasoning 吃光 → content 空 → 上游 200 但空答）。
+                "max_tokens": 512, "temperature": 0.0}
+        reply = _cl._call_once(mat["wire"], mat["url"], mat["model"], mat["key"],
+                               body, "", "", 45, "kilo")
+        return _parse_verdict(reply)
+    except Exception as exc:
+        return "unavailable", "验真失败：" + type(exc).__name__ + ":" + str(exc)[:80]
+
+
+def intake(topic: str = "", urls: list = None, files: list = None, note: str = "",
+           lang: str = "", verify: bool = False, items: list = None) -> dict:
+    if items:
+        # 批量幂等（GBT 说的 batch）：同 topic 同源已吞过就跳过，其余逐个走单个 intake。
+        results = []
+        for _item in items:
+            _item = _item or {}
+            _t = str(_item.get("topic", "")).strip()
+            if not _t:
+                results.append({"ok": False, "reason": "need_topic", "item": _item})
+                continue
+            _already = _devoured_sources(_t)
+            _urls = [str(u).strip() for u in (_item.get("urls") or []) if str(u).strip()]
+            _new = [u for u in _urls if u not in _already]
+            if _urls and not _new:
+                results.append({"ok": True, "topic": _t, "status": "skipped",
+                                "why": "同 topic 同源已吞过（幂等跳过）"})
+                continue
+            _r = intake(_t, _new, _item.get("files"), _item.get("note", ""),
+                        _item.get("lang", ""), verify=verify)
+            results.append({"topic": _t, **_r})
+        return {"ok": True, "op": "batch", "count": len(results),
+                "吞了": sum(1 for r in results if r.get("ok") and r.get("op") == "intake"),
+                "跳过": sum(1 for r in results if r.get("status") == "skipped"),
+                "拒": sum(1 for r in results if not r.get("ok")),
+                "results": results}
     t = str(topic or "").strip()
     if not t:
         return {"ok": False, "reason": "need_topic"}
@@ -315,31 +435,46 @@ def intake(topic: str = "", urls: list = None, files: list = None, note: str = "
     if not got:
         return {"ok": False, "reason": "no_source_fetched", "topic": t, "failed": failed,
                 "detail": "一个源都没取到 ⇒ **如实报未读到，不编内容**"}
+    # ── 入库验证门：把「取到的源」拆成 accepted（验收）与 vetoed（取到但无效）──
+    accepted, vetoed = [], []
+    for g in got:
+        g["vet"], g["vet_why"] = _vet_source(g.get("text") or "")
+        (accepted if g["vet"] == "ok" else vetoed).append(g)
+    if not accepted:
+        return {"ok": False, "reason": "all_sources_vetoed", "topic": t,
+                "vetoed": [{"url": g.get("url"), "why": g.get("vet_why")} for g in vetoed],
+                "failed": [{"url": f.get("url"), "why": f.get("error")} for f in failed],
+                "detail": "源全被验证门拦下（疑似空壳/登录页/错误页）⇒ 不写胶囊、不吞垃圾"}
+    # ── 模型级验真（可选，默认关——不花钱；显式 verify=True 才调免费车道 Kilo）──
+    #   verified 进索引；unverified 保留原文但不进索引；unavailable 如实记（免费车道挂，不硬否决）。
+    verified, unverified = [], []
+    if verify:
+        for g in accepted:
+            g["verify"], g["verify_why"] = _verify_knowledge(t, g.get("text") or "")
+            (verified if g["verify"] == "verified" else unverified).append(g)
+    else:
+        verified = accepted
     slug = _slug(t)
     d = DEVOURED / slug
     d.mkdir(parents=True, exist_ok=True)
     lines = ["# 胶囊 · " + t, "",
              "> 吞噬日期：" + time.strftime("%Y-%m-%d") + " ｜ 来源：未命中后取源（self_intake） ｜ 语言：" + (lang or "auto"),
              ">", "> " + STAMP_TITLE, "", "---", "", "## 一、取到的源", ""]
-    for g in got:
+    for g in accepted:
         lines.append("- `" + str(g.get("url")) + "`（" + str(len(g.get("text") or "")) + " 字符）")
+    if vetoed:
+        lines += ["", "**取到但无效**（被验证门拦下，如实列出，不编、不索引）："]
+        for g in vetoed:
+            lines.append("- `" + str(g.get("url")) + "` ⇒ " + str(g.get("vet_why")))
     if failed:
-        lines += ["", "**未读到**（如实列出，不编）："]
+        lines += ["", "**未读到**（网络/来源死，如实列出，不编）："]
         for f in failed:
             lines.append("- `" + str(f.get("url")) + "` ⇒ " + str(f.get("error")))
     lines += ["", "## 二、原文摘录（只摆原文，不转述）", ""]
-    for g in got:
+    for g in accepted:
         lines.append("### " + str(g.get("url")))
         lines.append("")
-        # 🔴 2026-10-29 修：摘录按字符硬切 1800，**会从 URL 中间切断**
-        #   （实测把 https://doi.org/10.48550/arXiv.2211.17192 切成 https://doi.org/10.48，
-        #     吸收前闸再去点它 ⇒ HTTPError，被当成"来源死了"——数据缺陷伪装成来源问题）。
-        #   处置：切完把尾巴上那段不完整的 URL 整段去掉，别留半截。
-        _ex = (g.get("text") or "").strip()[:1800]
-        _m = re.search(r"https?://[^\s)\]」'>]*$", _ex)
-        if _m and not re.search(r"[/\w]$", _m.group(0)):
-            _ex = _ex[: _m.start()].rstrip()
-        lines.append("> " + _ex)
+        lines.append("> " + (g.get("text") or "").strip()[:1800])
         lines.append("")
     if str(note or "").strip():
         lines += ["## 三、人工补注", "", str(note).strip(), ""]
@@ -359,54 +494,192 @@ def intake(topic: str = "", urls: list = None, files: list = None, note: str = "
                     "published_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                     "purpose": "未命中取源: " + t, "version": 1, "refined_rounds": 0},
         "absorbed": {"capsule": str(capsule).replace(chr(92), "/"), "bytes": len(data), "sha256": sha},
-        "trace": {"sources": [{"url": g.get("url"), "status": g.get("status")} for g in got],
+        "trace": {"sources": [{"url": g.get("url"), "status": g.get("status"), "vet": g.get("vet"),
+                              "verify": g.get("verify")} for g in accepted],
+                  "vetoed": [{"url": g.get("url"), "why": g.get("vet_why")} for g in vetoed],
+                  "unverified": [{"url": g.get("url"), "why": g.get("verify_why")}
+                                 for g in unverified],
                   "not_read": [{"url": f.get("url"), "why": f.get("error")} for f in failed]}},
         ensure_ascii=False, indent=2), encoding="utf-8")
     ref = str(passport.relative_to(ROOT)).replace(chr(92), "/")
-    toks = _tokens(t + " " + " ".join((g.get("text") or "")[:3000] for g in got))
+    toks = _tokens(t + " " + " ".join((g.get("text") or "")[:3000] for g in verified))
     indexed = False
-    # 🔴 2026-10-29 主人令：「每次吞的时候要先在镜像多维度空间里面把东西
-    #   **拆解、分析、跑通**再吸收，就不会有（吞到二道垃圾）这个弊端。」
-    #
-    #   实测缺这道门的后果：devour/self_intake 原来「取源 → 直接落胶囊 → 直接入库」，
-    #   全网一旦被 AI 生成内容填满，我们就是二道垃圾的搬运工，而且没有分辨能力。
-    #
-    #   intake_gate 做五道机检（零模型零幻觉）：
-    #     ① 拆解成原子主张  ② 分类（url/number/file/port/opinion）
-    #     ③ 可现读验的**真跑一次**（来源还在不在 / 端口 / 文件）
-    #     ④ 与本机既有知识比对  ⑤ 判决 pass/warn/reject + 逐条原因
-    #
-    #   判决**不吃掉原文**：胶囊照留（可复查），只是**不给它进知识库的资格**。
-    gate = None
     try:
-        sys.path.insert(0, str(ROOT / "tools"))
-        import intake_gate as _IG
-        import importlib as _il
-        _il.reload(_IG)
-        gate = _IG.judge(slug)
-    except Exception as exc:                                  # noqa: BLE001
-        gate = {"verdict": "warn", "reasons": ["闸跑不起来：%s" % type(exc).__name__]}
-    if (gate or {}).get("verdict") == "reject":
-        sys.stderr.write("[intake] 🔴 吸收被拒（%s）：%s\n"
-                         % (slug, "；".join(gate.get("reasons") or [])))
+        from .tools import context_vault as _CV
+        add = _CV.VaultStore().add(ref, " ".join(toks), "warm")
+        indexed = bool(add.get("ok")) and int(add.get("terms") or 0) > 0
+    except Exception:
         indexed = False
-    else:
-        try:
-            from .tools import context_vault as _CV
-            add = _CV.VaultStore().add(ref, " ".join(toks), "warm")
-            indexed = bool(add.get("ok")) and int(add.get("terms") or 0) > 0
-        except Exception:
-            indexed = False
     GROWTH.parent.mkdir(parents=True, exist_ok=True)
     with GROWTH.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "topic": t, "slug": slug,
                              "capsule": str(capsule).replace(chr(92), "/"), "sha256": sha,
-                             "sources": len(got), "failed": len(failed), "indexed": indexed,
-                             "terms": len(toks)}, ensure_ascii=False) + "\n")
+                             "sources": len(accepted), "vetoed": len(vetoed),
+                             "verified": len(verified), "unverified": len(unverified),
+                             "failed": len(failed),
+                             "indexed": indexed, "terms": len(toks)}, ensure_ascii=False) + "\n")
     return {"ok": True, "op": "intake", "topic": t, "capsule": str(capsule), "sha256": sha,
-            "passport": str(passport), "sources": len(got), "not_read": len(failed),
+            "passport": str(passport), "sources": len(accepted), "vetoed": len(vetoed),
+            "verified": len(verified), "unverified": len(unverified),
+            "not_read": len(failed),
             "indexed": indexed, "terms": len(toks),
+            "verify": [{"url": g.get("url"), "verdict": g.get("verify"), "why": g.get("verify_why")}
+                       for g in accepted] if verify else None,
             "next": "再跑 known（" + t + "）应当命中"}
+
+
+def _devoured_sources(topic: str) -> set:
+    """幂等依据：某 topic 已吞过的源 URL 集合（读 passport.trace.sources）。"""
+    slug = _slug(topic)
+    p = TRACE / (slug + ".passport.json")
+    if not p.is_file():
+        return set()
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        return {str(s.get("url")) for s in ((d.get("trace") or {}).get("sources") or [])
+                if s.get("url")}
+    except Exception:
+        return set()
+
+
+def plan(topic: str = "", urls: list = None, files: list = None, verify: bool = False) -> dict:
+    """**零写盘预演**：自己下载 + 自己判，但**不落胶囊、不入库、不记账**。
+
+    🔴 这是 GBT 说的「plan 假预演」的正解：上一版 plan 复用 intake ⇒ 必然落盘，
+       回执里还写着「入库=是」。这里只 fetch + 前闸（+ 可选验真），回执写清
+       「如果 run 会吞哪些 / 拒哪些」，**账不多一条**。
+    """
+    t = str(topic or "").strip()
+    if not t:
+        return {"ok": False, "reason": "need_topic"}
+    got, failed = [], []
+    for u in (urls or []):
+        u = str(u).strip()
+        if not u:
+            continue
+        r = _fetch(u)
+        (got if r.get("ok") else failed).append(r)
+    for f in (files or []):
+        p = (ROOT / f) if not Path(f).is_absolute() else Path(f)
+        if p.is_file():
+            got.append({"ok": True, "url": str(f), "status": "local",
+                        "text": p.read_text(encoding="utf-8", errors="replace")[:MAX_BYTES]})
+        else:
+            failed.append({"ok": False, "url": str(f), "error": "file_missing"})
+    if not got:
+        return {"ok": False, "reason": "no_source_fetched", "topic": t,
+                "failed": [{"url": f.get("url"), "why": f.get("error")} for f in failed]}
+    verdicts, would_accept, would_veto = [], 0, 0
+    for g in got:
+        v, why = _vet_source(g.get("text") or "")
+        if v != "ok":
+            verdicts.append({"url": g.get("url"), "verdict": v, "why": why, "action": "拒"})
+            would_veto += 1
+            continue
+        if verify:
+            vv, vwhy = _verify_knowledge(t, g.get("text") or "")
+            act = ("吞" if vv == "verified" else
+                   ("吞(验真不可用)" if vv == "unavailable" else "参考标记(不进索引)"))
+            verdicts.append({"url": g.get("url"), "verdict": vv, "why": vwhy, "action": act})
+            would_accept += 1
+        else:
+            verdicts.append({"url": g.get("url"), "verdict": v, "why": "", "action": "吞"})
+            would_accept += 1
+    return {"ok": True, "op": "plan", "topic": t,
+            "预演": {"会吞": would_accept, "会拒": would_veto, "未读到": len(failed)},
+            "verdicts": verdicts,
+            "_口径": "零写盘：只下载+判定，不落胶囊、不入库、不记账；run 才真正落盘"}
+
+
+def batch(items: list = None, verify: bool = False) -> dict:
+    """批量**计划**（零写盘）：对每个 item 做幂等判断 + 预演，返回「该吞 / 跳过 / 会拒」。
+
+    🔴 真吞 = 对「该吞」的逐个走 intake（`op=intake` + `items`，挂 filesystem_write 门）。
+       batch 本身零写盘、零作用域，只出计划 —— 这样写盘门不会被「batch」这个名字绕过。
+    """
+    out = []
+    for item in (items or []):
+        item = item or {}
+        topic = str(item.get("topic", "")).strip()
+        if not topic:
+            out.append({"topic": topic, "action": "拒", "why": "need_topic"})
+            continue
+        already = _devoured_sources(topic)
+        urls = [str(u).strip() for u in (item.get("urls") or []) if str(u).strip()]
+        # files 的源标识与 intake 一致：url 写的就是 str(f)（原始传入路径）
+        file_ids = [str(f) for f in (item.get("files") or []) if str(f).strip()]
+        all_sources = urls + file_ids
+        new_urls = [u for u in urls if u not in already]
+        new_files = [f for f in (item.get("files") or []) if str(f).strip() and str(f) not in already]
+        skipped = [s for s in all_sources if s in already]
+        if all_sources and not (new_urls or new_files):
+            out.append({"topic": topic, "action": "跳过", "why": "同 topic 同源已吞过（幂等）",
+                        "skipped": skipped})
+            continue
+        plan_r = plan(topic, new_urls, new_files, verify=verify)
+        out.append({"topic": topic,
+                    "action": ("吞" if plan_r.get("ok") else "拒"),
+                    "skipped": skipped, "plan": plan_r})
+    return {"ok": True, "op": "batch", "count": len(out),
+            "该吞": sum(1 for x in out if x.get("action") == "吞"),
+            "跳过": sum(1 for x in out if x.get("action") == "跳过"),
+            "会拒": sum(1 for x in out if x.get("action") == "拒"),
+            "results": out,
+            "_口径": "零写盘：只出计划（幂等 + 预演）；真吞 = op=intake + items"}
+
+
+def ledger(topic: str = "") -> dict:
+    """看账：列每条吞噬记录（每条的 topic/时间/来源数/判定/入库）。"""
+    rows = []
+    if GROWTH.is_file():
+        try:
+            for line in GROWTH.read_text(encoding="utf-8", errors="replace").splitlines():
+                if not line.strip():
+                    continue
+                j = json.loads(line)
+                if topic and str(topic).strip() not in str(j.get("topic", "")):
+                    continue
+                rows.append(j)
+        except (OSError, ValueError):
+            pass
+    return {"ok": True, "op": "ledger", "count": len(rows), "rows": rows}
+
+
+def _capsule_excerpts(capsule: str) -> str:
+    """抽出胶囊里的「原文摘录」段（## 二 之后），供 rejudge 重判。抽不到回空串。
+
+    🔴 边界用 `^## (?!#)`（行首 ## 且后面不是 #）——裸 `## ` 会误匹配 `### https://…`
+       三级标题里的 `## `（第二个#+第三个#+空格），导致抽取在第一个 `###` 处就断掉，
+       rejudge 把整段长原文判成「仅 1 字符」（WCAG 胶囊实测踩过）。
+    """
+    try:
+        txt = Path(capsule).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    m = re.search(r"## 二、原文摘录[^\n]*\n(.*?)(?=^## (?!#)|\Z)", txt, re.S | re.M)
+    if not m:
+        return ""
+    lines = [ln[2:].strip() if ln.startswith("> ") else ln.strip() for ln in m.group(1).splitlines()]
+    return "\n".join(x for x in lines if x).strip()
+
+
+def rejudge() -> dict:
+    """用**新前闸**重判历史账：读已吞胶囊的原文摘录，重新过 `_vet_source`，报差异。
+
+    🔴 只读 + 报，**不自动改历史账**（改历史是主人决策；本 op 只回答「按新判据哪些会拒」）。
+    """
+    rows = [r for r in _registered_topics() if r.get("capsule")]
+    diff = []
+    for row in rows:
+        exc = _capsule_excerpts(row.get("capsule", ""))
+        if not exc:
+            continue
+        v, why = _vet_source(exc)
+        if v != "ok":
+            diff.append({"slug": row.get("slug"), "title": row.get("title"),
+                         "verdict": v, "why": why, "capsule": row.get("capsule")})
+    return {"ok": True, "op": "rejudge", "重判": len(rows), "会拒": len(diff),
+            "diff": diff, "_口径": "只读+报差异；不自动改历史账"}
 
 
 def run(op: str = "known", **kw) -> dict:
@@ -419,8 +692,18 @@ def run(op: str = "known", **kw) -> dict:
         return gate(kw.get("topic", ""), kw.get("source_ref", ""))
     if o == "rules":
         return rules()
+    if o == "plan":
+        return plan(kw.get("topic", ""), kw.get("urls"), kw.get("files"), verify=bool(kw.get("verify")))
+    if o == "ledger":
+        return ledger(kw.get("topic", ""))
+    if o == "rejudge":
+        return rejudge()
+    if o == "batch":
+        # 批量计划（零写盘）：幂等 + 预演；真吞走 intake+items（有 filesystem_write 门）
+        return batch(kw.get("items"), verify=bool(kw.get("verify")))
     if o == "intake":
-        return intake(kw.get("topic", ""), kw.get("urls"), kw.get("files"), kw.get("note", ""), kw.get("lang", ""))
+        return intake(kw.get("topic", ""), kw.get("urls"), kw.get("files"), kw.get("note", ""),
+                      kw.get("lang", ""), verify=bool(kw.get("verify")))
     return {"ok": False, "reason": "unknown_op", "op": o,
             "known": list(READ_OPS) + list(WRITE_OPS),
             "executor": "万能插（five-dim.py cap self_intake）—— 不许另起传统执行器",

@@ -109,7 +109,7 @@ def apply(path: Path, strength: float = 1.0) -> tuple:
     if bgr is None:
         raise SystemExit("读不到图：%s" % path)
     mask = _skin_mask(bgr)
-    # 🔴 第二版实测翻车：皮肤区**局部压高光** + 遮罩有斑块 ⇒ 脸上出现白斑（像皮肤病）。
+ # 第二版实测翻车：皮肤区**局部压高光** + 遮罩有斑块 ⇒ 脸上出现白斑（像皮肤病）。
     #    结论：3D 渲染出来的皮肤本来就均匀，**不需要"压高光/提亮"这类美图动作**；
     #    只保留两件事：**羽化到几乎无边的保边磨皮** + **轻锐化** + **极轻对比**。
     out = _bilateral_smooth(bgr, mask, strength)

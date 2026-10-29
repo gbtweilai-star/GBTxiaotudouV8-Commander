@@ -8,7 +8,7 @@
   ① **全部能力一根不落**：240 条能力位逐条分类，**任何一条空白 = 红并点名**；
   ② **双向绑定**：`cap → 承载触手域` 与 `触手域 → 承载哪些 cap` 两边都列、互相反演；
      能量同理：`cap → 承载通道` 与 `通道 → 哪些 cap`；
-  ③ **能量也绑**：13 条密钥通道逐条绑到能力上，并**区分「权威声明级」与「代码证据级」**；
+  ③ **能量也绑**：14 条密钥通道逐条绑到能力上，并**区分「权威声明级」与「代码证据级」**；
   ④ **随时可感**：落 `state/cap-bindings.json`（单一真源台账）+ 面板 + 一条可复跑的感应读数
      （`feel`）。
 
@@ -35,7 +35,7 @@
     ⇒ 它**会碰**密钥链；
   · 两级都记 `basis`，**分得清"确定"与"证据"**；其余 = 不直接触碰密钥链。
 
-## 🔴 硬性纪律
+## 硬性纪律
 
 - **不许假绿**：探不到就「未探测」并写明为什么；绑定算不出来就报红，不许留空当"绑好了"。
 - **未探测不画成通**：不可用的能量通道**不得**被算作承载着谁。
@@ -74,6 +74,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = ROOT / "state"
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 审美令牌（内联版）：唯一实现在 `_taste_inline.py`，别在这里再抄一份。
+# 本件产的 energy 页同样受"自包含·零远端引用"那条硬纪律约束 ⇒ 只能**生成期内联**，
+# 不能挂 `<link href=...taste-tokens.css>`（那等于给自己加一条外部引用，撞自己的闸）。
+from _taste_inline import site_root_block  # noqa: E402
+from _page_emit import clean_html  # noqa: E402
 
 # ── 真源路径（现读） ────────────────────────────────────────────────────────
 CAPS_REG = ROOT / "gbt_allinone" / "caps_registry.py"
@@ -121,7 +128,7 @@ OMNI_TOKENS = {
     "omni_audio": "听觉", "wasapi_loop": "听觉", "silero_vad": "听觉",
 }
 # 「整只手」：导入这些 = 触手本体全部门都够得着 ⇒ 绑到全部触手域。
-# 🔴 必须用**全路径**匹配（2026-10-08 实测教训）：`from .llm import bridge` 的最后一段也是
+# 必须用**全路径**匹配（2026-10-08 实测教训）：`from .llm import bridge` 的最后一段也是
 #    `bridge`，若只取最后一段，`llm_status` 会被误判成「触手承载」——
 #    真相是它有两条 bridge（`tentacle/bridge.py` 与 `llm/bridge.py`）。故这里只认触手那条。
 WHOLE_BODY_TOKENS = {"tentacle", "tentacle.bridge", "tentacle.omni_core", "tentacle.omni_tentacle",
@@ -130,7 +137,7 @@ WHOLE_BODY_TOKENS = {"tentacle", "tentacle.bridge", "tentacle.omni_core", "tenta
 BODY_PACKAGE = "tentacle"
 
 # 能量链标记（**代码证据级**：承载模块文本里出现这些 ⇒ 它会碰密钥链）。
-# 🔴 只认**链本身**的符号（`cloud_llm` / `key_gateway` / `_KEY_CHAIN`）——
+# 只认**链本身**的符号（`cloud_llm` / `key_gateway` / `_KEY_CHAIN`）——
 #    早先收过 `external_llm` / `密钥链` 这类**词**，实测把 `security/policy.py`
 #    （里面只是**声明**作用域）也算成"用能"⇒ 假绿。收窄到链的符号名。
 ENERGY_MARKERS = ("cloud_llm", "key_gateway", "_KEY_CHAIN")
@@ -223,7 +230,7 @@ def load_tentacle() -> tuple:
 
 
 def load_energy() -> tuple:
-    """能量边：只读直连取 13 条通道。返回 (channels, meta, why)。"""
+    """能量边：只读直连取 14 条通道。返回 (channels, meta, why)。"""
     sys.path.insert(0, str(ROOT))
     try:
         from gbt_allinone.llm import key_gateway as kg
@@ -353,7 +360,7 @@ def api_branches() -> dict:
     for idx, (ln, name) in enumerate(heads):
         end = heads[idx + 1][0] if idx + 1 < len(heads) else len(lines)
         if idx + 1 == len(heads):
-            # 🔴 2026-10-13 修：**最后一个分支**原来把块读到**文件末尾** —— 于是它后面的
+ # 2026-10-13 修：**最后一个分支**原来把块读到**文件末尾** —— 于是它后面的
             #    兜底 `return {...}`、`try: from .engine import EngineError …`、以及同函数里
             #    其它语句全被算成这一位的导入。后果两条：
             #      ① 载体显示成一长串无关模块（实测：cadgen 的载体里出现了 EngineError / security / policy）；
@@ -507,11 +514,6 @@ def build_model() -> dict:
         # 能量：权威声明级 + 代码证据级
         basis = []
         energy_kind = "none"
-        # R-H992（2026-10-15 · 主人令「所有模块都要双向绑定登记在她自己看得见的地方」）：
-        #   以前“不用能”是**空 basis**，她看不出为什么。空白不许当结论——
-        #   这里给一条**派生理由**（不是手写名单：只说它没进声明、也无代码标记）。
-        energy_none_basis = ("none:本位未进入 external_llm 权威声明、也无能量链代码标记"
-                             "（只读或纯函数；如需用能请在 policy 声明）")
         evidence = energy_code_evidence(mods) if mods else []
         if nm in ext_llm or nm in ENERGY_DECLARED_EXTRA:
             energy_kind = "declared"
@@ -521,26 +523,9 @@ def build_model() -> dict:
             basis.append("code:能量链标记（代码证据级）：%s"
                          % "、".join(sorted({m for e in evidence for m in e["marks"]})))
         chain = energy_kind != "none"
-        if not chain:
-            basis.append(energy_none_basis)
         state = S_BOUND_T if bind_kind == BIND_KIND_TENTACLE else S_BOUND_D
         if not (carrier or "").strip():
             state = S_UNBOUND
-
-        # R-H994（2026-10-15 · 主人令）每一条双向绑定的触手都要备注好“连上哪里”，
-        #   目的是**提高她的认知**：她自己读得出“这条能力由谁执行、走哪只手、用哪条通道”。
-        nb = _NEIGHBORHOOD_INDEX.get(nm, "")
-        if body_domains:
-            _connect = "触手域 " + "、".join(body_domains)
-        else:
-            _mods = "、".join(mods) if mods else "无独立导入"
-            _connect = "本体分派（" + _mods + "）"
-        _energy_txt = ("不用能（只读或纯函数）" if not chain
-                       else ("%s 通道" % "、".join(list(alive_ids)[:3]) if alive_ids else "通道未读到"))
-        _nb_txt = nb if nb else ("框架域 " + (dom or "未标"))
-        note = ("备注：连到 " + _connect + "｜ 邻域 " + _nb_txt + "｜ 用能 " + _energy_txt
-                + "｜ 认知：" + ("动作落在「" + nb + "」这只手上，账上回查得到" if nb
-                                     else "本位不是触手方法名，走框架域路径（见 carrier_basis）"))
 
         rows.append({
             "name": nm, "domain": dom, "handler": str(c.get("handler") or "none"),
@@ -558,7 +543,6 @@ def build_model() -> dict:
                        "dead_channels": list(dead_ids) if chain else [],
                        "active": energy_meta.get("active") if chain else None},
             "state": state,
-            "note": note,
         })
 
     # ── 反向：触手域 → caps / 能力项 → caps ──────────────────────────────
@@ -597,7 +581,7 @@ def build_model() -> dict:
                 bad_domain.append("%s → 触手域 %r（不在触手总纲）" % (r["name"], d))
         for ch in (r["energy"]["channels"] or []) + (r["energy"]["dead_channels"] or []):
             if ch not in channel_ids:
-                bad_channel.append("%s → 能量通道 %r（不在 13 条链）" % (r["name"], ch))
+                bad_channel.append("%s → 能量通道 %r（不在 14 条链）" % (r["name"], ch))
 
     # 双向一致性（**两个方向各自反演，再互校**）
     fwd_dom = {r["name"]: set(r["tentacle_domains"]) for r in rows}
@@ -784,7 +768,7 @@ def cmd_report() -> int:
               % (d["id"], d["item_count"], d["declared_count"], d["cap_count"],
                  "、".join(d["caps"]) if d["caps"] else "（无专门的门）"))
     print("-" * 82)
-    print("  能量 13 条通道逐条：见下表（render 后也可读面板）")
+    print("  能量 14 条通道逐条：见下表（render 后也可读面板）")
     for ch in model["energy_channels"]:
         print("    %2s %-13s %-22s %-8s cap=%d ｜ %s"
               % (ch.get("order") or "-", ch["provider"], ch["status"], ch["tier"],
@@ -798,14 +782,21 @@ def cmd_report() -> int:
 # ══════════════════════════════════════════════════════════════════════════
 # 渲染（自包含 · 数据只走经典脚本）
 # ══════════════════════════════════════════════════════════════════════════
-_CSS = """<style>
-:root{--bg:#070d18;--panel:#0f172a;--line:#1e3a5f;--line2:#162035;--ink:#e7eef8;--dim:#8794a6;
- --off:#6b7280;--gold:#f5b041;--cyan:#00e5ff;--ok:#22c55e;--bad:#f87171;--miss:#f5b041;
+_CSS = "<style>\n" + site_root_block() + """
+:root{--bg:var(--taste-ground,#0B1120);--panel:var(--taste-surface,#111827);
+ --line:var(--taste-border,#1E3A5F);--line2:var(--taste-rule,#162035);
+ --ink:var(--taste-text,#e8ecf8);--dim:var(--taste-muted,#9aa4c4);--off:#6b7280;
+ --gold:var(--taste-accent,#f5b041);--cyan:#00e5ff;
+ --ok:var(--taste-positive,#00E5FF);--bad:var(--taste-negative,#EF4444);
+ --miss:var(--taste-warning,#f5b041);
  --okbg:#0f2a20;--badbg:#2a1414;--missbg:#2a2010;--offbg:#16181d}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI","Microsoft YaHei UI",system-ui,sans-serif}
+/* 2026-10-26：顶栏原为 linear-gradient(90deg,#080d14,#111827) —— 两档微渐变，肉眼无差；
+ * 本仓审美取向（gbt-direction.json.avoid）写着「层次只靠明度」，故取两档中点纯色。
+ */
 .bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
- background:linear-gradient(90deg,#080d14,#0b1220);flex-wrap:wrap}
+ background:#0a101a;flex-wrap:wrap}
 .mark{width:18px;height:18px;border:2px solid var(--gold);border-radius:4px}
 .brand{font-weight:700;letter-spacing:.4px}.brand b{color:var(--gold)}
 .note{color:var(--dim);font-size:11.5px}
@@ -829,7 +820,7 @@ tr.dead td{opacity:.62}
 .pill.ok{border-color:#1d5c45;color:var(--ok)}
 .pill.bad{border-color:#6b2a2a;color:var(--bad)}
 .pill.miss{border-color:#6b5320;color:var(--miss)}
-.pill.off{border-color:#39445a;color:var(--off)}
+.pill.off{border-color:#1E3A5F;color:var(--off)}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0}
 .lg{display:flex;align-items:center;gap:6px;color:var(--dim);font-size:11.5px}
 .sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
@@ -840,7 +831,7 @@ tr.dead td{opacity:.62}
 .alert{border:1px solid #6b2a2a;border-radius:6px;padding:8px 10px;margin:0 0 8px;background:#1a0f0f}
 .alert.miss{border-color:#6b5320;background:#1a150a}
 .alert .t{font-weight:700;color:var(--ink)}.alert .e{color:var(--dim);font-size:11.5px;word-break:break-all;margin-top:3px}
-.dead-note{border:1px solid #39445a;border-radius:6px;padding:6px 10px;margin:6px 0;background:#111621;color:var(--dim);font-size:11.5px}
+.dead-note{border:1px solid #1E3A5F;border-radius:6px;padding:6px 10px;margin:6px 0;background:#111621;color:var(--dim);font-size:11.5px}
 a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 .foot{border-top:1px solid var(--line);margin-top:12px;padding:10px 16px;color:var(--dim);font-size:11.5px}
 .grp{margin:8px 0 4px;color:var(--gold);font-size:12px;font-weight:600}
@@ -850,8 +841,19 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 </style>"""
 
 
+_EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2700-\u27BF\u2600-\u26FF\u2B00-\u2BFF\uFE0F]")
+
+
 def _esc(x) -> str:
-    return html.escape(str(x if x is not None else ""), quote=True)
+    """转义 + **出口清洗 emoji**（2026-10-26 主人令：界面/注释一律不留 emoji）。
+
+    为什么落在这一层：本页大量字段是**数据带来的**（`model` / `status` / `source` /
+    通道自述…），实测 model 字段里带着 🥔 前缀、被原样渲染进表格 11 次。
+    在一处出口统一清掉，比在每个 f-string 里各写一遍可靠 —— 也不会漏掉将来新增的字段。
+    注意：这是**兜底**，模板里写死的 emoji 仍然要直接删掉（两条一起做才干净）。
+    """
+    s = str(x if x is not None else "")
+    return html.escape(_EMOJI.sub("", s), quote=True)
 
 
 def _pill(txt: str, cls: str) -> str:
@@ -868,10 +870,11 @@ def render_page(model: dict) -> str:
     rows = model["caps"]
     domains = model["tentacle_domains"]
 
-    head = ('<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8">\n'
+    head = ('<!doctype html>\n<html data-page-id="energy" lang="zh-CN"><head><meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
             '<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/capability-bindings.py -->\n'
-            '<title>GBT小土豆V8 · 能量与绑定状态</title>\n%s</head><body>\n' % _CSS)
+            '<title>GBT小土豆V8 · 能量与绑定状态</title>\n'
+            '<link rel="stylesheet" href="../page-skins.css" />\n%s</head><body>\n' % _CSS)
     topbar = ('<div class="bar"><span class="mark"></span>'
               '<span class="brand">GBT<b>小土豆</b>V8 · 能量与绑定状态</span>'
               '<span class="note">生成 %s ｜ 重生成 <code>%s</code> ｜ 判据 <code>%s</code> ｜ '
@@ -938,7 +941,7 @@ def render_page(model: dict) -> str:
               '</tr></thead><tbody>%s</tbody></table>' % "".join(erows))
     dead_block = ""
     if o["energy_dead_channels"]:
-        dead_block = ('<div class="dead-note">🔴 <b>未探测/不可用</b>的通道（<b>不得画成通</b>）：'
+        dead_block = ('<div class="dead-note"><b>未探测/不可用</b>的通道（<b>不得画成通</b>）：'
                       '%s ⇒ 它们的承载 cap 数已按规则置为 <b>0</b>（不冒充能承载）；'
                       '「不可用通道却承载着 cap」= %s</div>'
                       % (_esc("、".join(o["energy_dead_channels"])),
@@ -968,10 +971,10 @@ def render_page(model: dict) -> str:
                _esc("、".join(r["tentacle_domains"]) if r["tentacle_domains"] else "—"),
                _esc(r["carrier"])[:120], cls, _esc(tk),
                _esc(energy_txt), _esc(r["state"]),
-               _esc(r.get("note") or "；".join(r["energy"]["basis"]) or r["carrier_basis"])[:260]))
+               _esc("；".join(r["energy"]["basis"]) or r["carrier_basis"])[:220]))
     ctable = ('<div class="collapse"><table><thead><tr><th>能力</th><th>域</th>'
               '<th>承载触手域</th><th>承载载体</th><th>绑定类型</th><th>能量</th>'
-              '<th>感应状态</th><th>备注（连上哪里）</th></tr></thead><tbody>%s</tbody></table></div>'
+              '<th>感应状态</th><th>依据</th></tr></thead><tbody>%s</tbody></table></div>'
               % "".join(crows))
 
     # 触手域 → caps（反向表）
@@ -997,14 +1000,14 @@ def render_page(model: dict) -> str:
                        ("mismatch_cap_vs_channel", "双向不一致：能力↔能量通道")):
         v = o.get(key) or []
         if v:
-            al.append('<div class="alert"><div class="t">🔴 [%s] %s ｜ %d 条</div>'
+            al.append('<div class="alert"><div class="t">[%s] %s ｜ %d 条</div>'
                       '<div class="e mono">%s</div></div>'
                       % (_esc(key), _esc(title), len(v), _esc("；".join(map(str, v)))[:1200]))
     if not al:
-        al.append('<div class="note ok-line">✅ 零遗漏：%d 条能力全部有绑定；无绑到不存在的通道；'
+        al.append('<div class="note ok-line">零遗漏：%d 条能力全部有绑定；无绑到不存在的通道；'
                   '双向反演自洽。</div>' % c["caps"])
     if o["tentacle_domains_without_caps"]:
-        al.append('<div class="alert miss"><div class="t">⚠️ 这些触手域在能力层没有专门的门</div>'
+        al.append('<div class="alert miss"><div class="t">这些触手域在能力层没有专门的门</div>'
                   '<div class="e">%s ⇒ 它们只能经 <code>tentacle</code> 这一扇门取用'
                   '（那扇门已绑、已列在上表）。</div></div>'
                   % _esc("、".join(o["tentacle_domains_without_caps"])))
@@ -1034,10 +1037,10 @@ def render_page(model: dict) -> str:
     body = ('<div class="wrap">'
             '<div class="card"><h2>// 00 — 概览（%s）</h2>%s%s%s'
             '<div class="hr"></div><div class="note">纪律：<ul>%s</ul></div>%s</div>'
-            '<div class="card"><h2>// 01 — 能量总览（13 条通道逐条 · 活跃者高亮 · 未探测不画成通）</h2>'
+            '<div class="card"><h2>// 01 — 能量总览（14 条通道逐条 · 活跃者高亮 · 未探测不画成通）</h2>'
             '%s%s%s</div>'
             '<div class="card"><h2>// 02 — 触手域 → 承载哪些 cap（反向）</h2>%s</div>'
-            '<div class="card"><h2>// 03 — 🔴 未绑定清单 + 双向一致性核对（置顶）</h2>%s</div>'
+            '<div class="card"><h2>// 03 — 未绑定清单 + 双向一致性核对（置顶）</h2>%s</div>'
             '<div class="card"><h2>// 04 — 能力 × 绑定总表（%d 条逐条）</h2>%s</div>'
             '<div class="card"><h2>// 05 — 与资产层/标签层的关系（谁管资产、谁管能力）</h2>%s</div>'
             '</div>%s'
@@ -1053,7 +1056,11 @@ def render_page(model: dict) -> str:
               'globalThis.GBT_ENERGY.counts.caps + " 能力位 / " + '
               'globalThis.GBT_ENERGY.counts.energy_channels + " 通道）";\n'
               '}\n'
-              '</script>\n')
+              '</script>\n'
+              # 触手网格接管器（主人令 2026-10-26「触手覆盖每一页」）：本页是**跨页网格的
+              # 一个节点** —— 要能被别的页派活、也要能把结果回执。相对路径引用、不是远端
+              # ⇒ 仍然满足"零远端引用"那条纪律。
+              '<script src="../shell/tentacle-kit.js" defer></script>\n')
     return head + topbar + body + script + '</body></html>\n'
 
 
@@ -1068,7 +1075,7 @@ def cmd_render() -> int:
         print("🔴 台账读不到或没有 caps，先跑：%s" % CMD_REPORT)
         return 2
     PAGE.parent.mkdir(parents=True, exist_ok=True)
-    PAGE.write_text(render_page(model), encoding="utf-8")
+    PAGE.write_text(clean_html(render_page(model)), encoding="utf-8")
     data = {k: model.get(k) for k in ("generated_at", "commands", "doctrine", "sources",
                                       "rules", "counts", "tentacle_meta", "energy_meta",
                                       "caps", "tentacle_domains", "energy_channels",
@@ -1152,9 +1159,6 @@ def honesty_findings(model: dict) -> list:
             out.append("%s 画成触手承载但**没有触手域**（假绿）" % nm)
         if not str(r.get("carrier_basis") or "").strip():
             out.append("%s 画成已绑但**没写依据**（说不清凭什么绑）" % nm)
-        # R-H994（主人令）：每一条双向绑定都要备注“连上哪里”，空备注 = 她读不出认知
-        if not str(r.get("note") or "").strip():
-            out.append("%s 画成已绑但**没写备注（连上哪里）**（她读不出认知）" % nm)
     return out
 
 
@@ -1302,21 +1306,21 @@ def run_checks(art: dict) -> list:
         len(domains) > 0 and sum(len(d.get("items") or []) for d in domains) > 0,
         "域=%d · 能力项=%d" % (len(domains), sum(len(d.get("items") or []) for d in domains)))
 
-    # C3 能量边 13 条通道
-    add("C3 能量边读得到且恰好 13 条通道",
-        len(channels) == 13, "channels=%d（期望 13，现读 key_gateway）" % len(channels))
+    # C3 能量边 14 条通道
+    add("C3 能量边读得到且恰好 14 条通道",
+        len(channels) == 14, "channels=%d（期望 14，现读 key_gateway）" % len(channels))
 
-    # C4 🔴 零遗漏：每条能力都有绑定（与负对照同源）
+ # C4 零遗漏：每条能力都有绑定（与负对照同源）
     finds = honesty_findings(model) if caps else ["台账里没有 caps（无从证真 ⇒ 报红）"]
     add("C4 🔴 零遗漏（每条能力都有绑定、承载载体非空、依据非空）", not finds,
         "违规 %d 条：%s" % (len(finds), "；".join(finds[:3]) or "无"))
 
-    # C5 🔴 不绑到不存在的通道（触手域 / 能量通道）
+ # C5 不绑到不存在的通道（触手域 / 能量通道）
     bad5 = (o.get("caps_bad_domain") or []) + (o.get("caps_bad_channel") or [])
     add("C5 🔴 不绑到不存在的通道（触手域须在总纲里、能量通道须在 13 链里）", not bad5,
         "越界 %d 条：%s" % (len(bad5), "；".join(map(str, bad5[:4])) or "无"))
 
-    # C6 🔴 未探测不画成通：不可用通道不得承载 cap
+ # C6 未探测不画成通：不可用通道不得承载 cap
     dc = o.get("dead_channel_carrying") or []
     dead_with_caps = [ch["provider"] for ch in channels
                       if ch.get("alive") is not True and (ch.get("caps") or [])]
@@ -1375,19 +1379,13 @@ def run_checks(art: dict) -> list:
         bad12.append("cdn 字样")
     if "<iframe" in html_.lower():
         bad12.append("iframe")
-    # 🔴 2026-10-18 加（**假红** · 留痕 · 原口径/为什么翻/现口径）：
-    #   原口径：页面文本一律查 fetch 等远端取数原语。
-    #   为什么翻：页面现在带**自卫/反控层**（<!-- gbt-defense -->），命中攻击时要把证据上报
-    #     本机框架（局域网 :8877）⇒ 合法 fetch；被判违规是假红（自卫层是安全上报，不是页面取数）。
-    #   现口径：C12 扫描前先剥掉自卫层块，其余脚本照旧严查。
-    html_c12 = re.sub(r"<!-- gbt-defense -->[\s\S]*?</script>", " ", html_) if "<!-- gbt-defense -->" in html_ else html_
-    if re.search(r"\bfetch\s*\(", html_c12):
+    if re.search(r"\bfetch\s*\(", html_):
         bad12.append("fetch(")
     if "XMLHttpRequest" in html_:
         bad12.append("XMLHttpRequest")
-    if re.search(r"\beval\s*\(", html_c12):
+    if re.search(r"\beval\s*\(", html_):
         bad12.append("eval(")
-    if re.search(r'type\s*=\s*["\']module["\']', html_c12, re.I):
+    if re.search(r'type\s*=\s*["\']module["\']', html_, re.I):
         bad12.append('type="module"')
     if "energy-data.js" not in html_:
         bad12.append("未引 energy-data.js")
@@ -1458,7 +1456,7 @@ def cmd_check(as_json: bool = False) -> int:
     # N4 绑到不存在的能量通道 ⇒ C5 必须报红
     pc4 = json.loads(json.dumps(live))
     if pc4.get("caps"):
-        pc4["orphans"]["caps_bad_channel"] = ["%s → 能量通道 '不存在的通道'（不在 13 条链）"
+        pc4["orphans"]["caps_bad_channel"] = ["%s → 能量通道 '不存在的通道'（不在 14 条链）"
                                               % pc4["caps"][0]["name"]]
     r4 = [r for r in run_checks({**art, "ledger": pc4}) if r["id"].split(" ", 1)[0] == "C5"]
     negs.append(("喂坏：绑到不存在的能量通道", "C5", bool(r4) and not r4[0]["ok"],
@@ -1482,7 +1480,7 @@ def cmd_check(as_json: bool = False) -> int:
     negs.append(("喂坏：能力↔触手域反演不一致", "C7", bool(r6) and not r6[0]["ok"],
                  (r6[0]["detail"] if r6 else "（没跑 C7）")))
 
-    # N7 能量边不是 13 条 ⇒ C3 必须报红
+    # N7 能量边不是 14 条 ⇒ C3 必须报红
     pc7 = json.loads(json.dumps(live))
     pc7["energy_channels"] = []
     r7 = [r for r in run_checks({**art, "ledger": pc7}) if r["id"].split(" ", 1)[0] == "C3"]
@@ -1581,22 +1579,6 @@ def cmd_check(as_json: bool = False) -> int:
         print("判据 PASS %d · FAIL %d ｜ 负对照 PASS %d · FAIL %d"
               % (len(rows) - len(fails), len(fails), len(negs) - len(neg_fail), len(neg_fail)))
     return 1 if (fails or neg_fail) else 0
-
-
-def _neighborhood_index() -> dict:
-    """方法名 → 邻域（取自触手桥的邻域表；取不到就空，不猜）。"""
-    try:
-        from gbt_allinone.tentacle import bridge as _BR
-        idx = {}
-        for _dom, _info in _BR.TENTACLE_NEIGHBORHOOD_MAP.items():
-            for _m in _info.get("powered_by") or []:
-                idx.setdefault(_m, _dom)
-        return idx
-    except Exception:                                            # noqa: BLE001
-        return {}
-
-
-_NEIGHBORHOOD_INDEX = _neighborhood_index()
 
 
 def main(argv=None) -> int:

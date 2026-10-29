@@ -71,39 +71,50 @@ def _ports_for(pid: int) -> list:
 
 
 def list_procs(limit: int = 25, **_kw) -> dict:
-    """真快照：优先 psutil；psutil 在本机读不到（/proc 字段不全）时回落到 /proc 直读。
-
-    🔴 生产口径（2026-10-25 定案）：
-       iSH 的 /proc/<pid>/stat 只有 39 字段（标准 52），psutil 6.0.0 硬取 fields[39]
-       ⇒ IndexError ⇒ 整个能力位报 error。已用 tools/procfs.py 兜住。
-       取不到的列（CPU / 内存）写 None 并在 `_口径` 里说明，**绝不编 0**。
-    """
-    from . import procfs
-    snap = procfs.snapshot()
+    """真快照：psutil 读真进程（内存/CPU/端口），按 CPU 降序。"""
+    try:
+        import psutil
+    except ImportError:
+        return {"ok": False, "error": "缺 psutil ⇒ 读不到真进程", "how_to_fix": "pip install psutil"}
     rows = []
-    for r in snap["rows"]:
-        cmd = " ".join(r.get("cmdline") or [])[:150]
-        rows.append({
-            "pid": r["pid"],
-            "name": (r.get("name") or "")[:28],
-            "mem_mb": r.get("rss_mb"),          # None ⇒ 未读到
-            "cpu": r.get("cpu"),                # None ⇒ 未读到
-            "ports": _ports_for(r["pid"]),
-            "owner": _classify(r.get("name") or "", cmd),
-            "cmd": cmd,
-        })
+    procs = list(psutil.process_iter(["pid", "name", "memory_info", "cpu_percent", "cmdline"]))
+    for p in procs:                                    # ① 预热采样（否则 cpu_percent 恒 0.0）
+        try:
+            p.cpu_percent(None)
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    time.sleep(0.5)                                    # ② 给一个采样窗口
+    for p in procs:
+        try:
+            info = p.info
+            cmd = " ".join(info.get("cmdline") or [])[:150]
+            mem = (info.get("memory_info").rss if info.get("memory_info") else 0) / 1048576
+            # ⚠️ 血账：`process_iter` 的 info 是**首次采样时缓存**的 —— 第二遍读 info["cpu_percent"]
+            # 拿到的还是那个 0.0。**必须直接再调一次** `cpu_percent(None)` 才会用上预热基线。
+            try:
+                cpu = float(p.cpu_percent(None) or 0.0)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                cpu = float(info.get("cpu_percent") or 0.0)
+            rows.append({
+                "pid": info["pid"], "name": (info.get("name") or "")[:28],
+                "mem_mb": round(mem, 1),
+                "cpu": round(cpu, 1),
+                "ports": _ports_for(info["pid"]),
+                "owner": _classify(info.get("name") or "", cmd),
+                "cmd": cmd,
+            })
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
     # 剔除噪声：System Idle / MemCompression 不是"任务"（前者是空闲计数，后者是系统压缩器）
     NOISE = {"system idle process", "memcompression", "registry", "secure system"}
     rows = [r for r in rows if r["name"].lower() not in NOISE]
-    rows.sort(key=lambda r: ((r.get("cpu") or 0), (r.get("mem_mb") or 0)), reverse=True)
+    rows.sort(key=lambda r: (r["cpu"], r["mem_mb"]), reverse=True)
     snap = {"ok": True, "op": "list", "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
             "count": len(rows), "rows": rows[:limit],
             "_口径": {"列": "任务 / 内存占用(MB) / CPU / 端口 / 进程ID",
                      "网络列的真实含义": "**是端口不是流量** —— per-process 流量本机取不到，不编",
                      "归属": "**先按进程名认**（浏览器/Node 一眼认得），再退到命令行标记；认不出写『未知』，不猜",
-                     "剔除的噪声行": "System Idle / MemCompression / Registry / Secure System —— 它们不是任务",
-                     "读数据的来源": snap.get("note", ""),
-                     "未读到的列": "CPU / 内存 若为 null ⇒ 本机 /proc 不提供（iSH 限制），不是 0"}}
+                     "剔除的噪声行": "System Idle / MemCompression / Registry / Secure System —— 它们不是任务"}}
     try:
         _SNAP.parent.mkdir(parents=True, exist_ok=True)
         tmp = _SNAP.with_name(_SNAP.name + ".tmp")

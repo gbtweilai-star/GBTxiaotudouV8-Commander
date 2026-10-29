@@ -8,12 +8,10 @@ import os
 import subprocess
 import sys
 
-for _s in (sys.stdout, sys.stderr):          # 不带 -X utf8 调用时不许静默输出空
-    try:
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        pass
-
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'outputs', 'dh2d')

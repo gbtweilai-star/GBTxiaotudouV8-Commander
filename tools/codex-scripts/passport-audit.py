@@ -52,8 +52,8 @@ def main():
         closed = str(p.get("closed_at") or "")
         if a.today and not closed.startswith(today):
             continue
-        # 🔴 2026-10-22 自纠（第 11 次，留痕）：护照里**没有 `files` 字段**，认领的文件在 `changed`（dict）。
-        #    我按 `files` 取 ⇒ 每张护照都"0 件文件、0 件缺" ⇒ 那份「47/47 ✅ 件在盘」是**空检查**。
+ # 2026-10-22 自纠（第 11 次，留痕）：护照里**没有 `files` 字段**，认领的文件在 `changed`（dict）。
+ # 我按 `files` 取 ⇒ 每张护照都"0 件文件、0 件缺" ⇒ 那份「47/47 件在盘」是**空检查**。
         files = list((p.get("changed") or {}).keys()) or (p.get("files") or [])
         missing = [x for x in files if not os.path.exists(os.path.join(ROOT, str(x).replace("/", os.sep)))]
         ev = str(p.get("evidence") or "")

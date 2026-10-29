@@ -169,7 +169,7 @@ def angle_ops() -> dict:
 
 # ── 安全 ────────────────────────────────────────────────────────────────────
 def angle_security() -> dict:
-    # 🔴 现读校准（本轮实测）：`five-dim.py cap` 的输出是 **JSON**（`"passed": 5, "total": 5`），
+ # 现读校准（本轮实测）：`five-dim.py cap` 的输出是 **JSON**（`"passed": 5, "total": 5`），
     #    不是 `passed 5 / total 5` 那种文本 —— 第一版按印象写正则，永远匹不上。
     #    加 `--full` 是因为默认会把 result 截到 1500 字，截断后解析会缺字段。
     rc, out, err, dt = _run([PY, str(ROOT / "tools" / "codex-scripts" / "five-dim.py"),
@@ -188,7 +188,7 @@ def angle_security() -> dict:
     open_p0 = []
     try:
         d = json.loads(scan_json.read_text(encoding="utf-8"))
-        # 🔴 字段名现读是 **`sev`**（不是 severity）—— 按印象写会静默取到空列表，
+ # 字段名现读是 **`sev`**（不是 severity）—— 按印象写会静默取到空列表，
         #    于是"外面无未决 P0"变成**假绿**。这条踩过。
         open_p0 = [f.get("code") for f in d.get("faults", []) if f.get("sev") == "P0"]
     except Exception:                                            # noqa: BLE001
@@ -266,7 +266,7 @@ def angle_audit() -> dict:
                 "how": "py -3.14 tools/codex-scripts/exec-deck.py"}
 
     tg_n = tagged.get("inside", 0) + tagged.get("outside", 0)
-    # 🔴 `off` 要**剔出去**：那是显式负对照（`--no-envelope`），是**设计**不是漏。
+ # `off` 要**剔出去**：那是显式负对照（`--no-envelope`），是**设计**不是漏。
     #    `exec-deck` 已经把 `off` 记在 `tagged.entry.off` 里（口径还在它那边，本件只做减法）。
     off_n = int((tagged.get("entry") or {}).get("off", 0) or 0)
     truly_out = max(0, int(tagged.get("outside", 0)) - off_n)
@@ -314,7 +314,7 @@ def angle_delivery() -> dict:
                        "且守卫还有 %d 条 PENDING（要主人真接一次对话面）"
                        % (m.group(0) if m else "?", pend),
                 "how": "cd holo_pet_w3 && npm run install-less-pack  ← 见 holo_pet_w3/package.json 的 pack"}
-    # 🔴 2026-09-23 第 46 轮：**回执文件不做数，现量一遍才算数**。
+ # 2026-09-23 第 46 轮：**回执文件不做数，现量一遍才算数**。
     # 为什么：回执是**某个时刻**的量；源码此后一改，回执照样全绿 ⇒ 一个 PASS 的回执配一个**过期的包**
     # （实测：第 40 轮打的包，第 43-45 轮改了 window.js/main.cjs/preload.cjs/index.html，
     #  回执仍是 8 项红 0，而包里那四个文件全是旧的）。

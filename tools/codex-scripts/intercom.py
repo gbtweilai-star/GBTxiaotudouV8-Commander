@@ -93,7 +93,7 @@ def cmd_status():
     out["legs"]["asr_cloud"] = r.get("asr") or "取不到"
     out["legs"]["listen_local"] = r.get("listen") or "取不到"
     out["legs"]["recognizers_zh"] = r.get("recognizers_zh") or []
-    # ── 🔴 第 59 轮补：**采集这条腿的"开机判据"** ────────────────────────────
+ # ── 第 59 轮补：**采集这条腿的"开机判据"** ────────────────────────────
     # 为什么非补不可：面板原来只有"识别器在不在"，识别器在位就标绿 ⇒ **假绿**。
     # 本机实测（四套音频 API 交叉验证）：录音端点在场的 **0** 个，
     # `waveInGetNumDevs() = 0` ⇒ **设备直连那条腿是死的，与插不插麦克风无关**。
@@ -157,7 +157,7 @@ def cmd_watch(args):
             rec["text"] = r.get("text")
             rec["confidence"] = r.get("confidence")
             heard_total += 1
-            # 🔴 听到的话**必须落到主脑能读到的地方**，否则"自动监听"只是装饰。
+ # 听到的话**必须落到主脑能读到的地方**，否则"自动监听"只是装饰。
             #    落到**只追加**的收件箱（与 advisor-note / store/*/events.jsonl 同一套纪律）：
             #    不改旧行、不覆盖、不放凭据（这里本来也没有凭据）。
             _append_inbox(rec, args.inbox)

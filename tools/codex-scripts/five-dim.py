@@ -80,7 +80,7 @@ import sys
 import time
 from pathlib import Path
 
-# 🔴 2026-09-22 补（深蒸 system 域时抓到的**假故障**）：GBK 控制台下 `cap alerts` 会直接崩 ——
+# 2026-09-22 补（深蒸 system 域时抓到的**假故障**）：GBK 控制台下 `cap alerts` 会直接崩 ——
 # `UnicodeEncodeError: 'gbk' codec can't encode '\u21d2'`、退出码 1。
 # 那**不是能力位坏了**，是这个包装器没把 stdout 转成 utf-8（`omni.py` 早转了、它没转）。
 # 结果：读的人以为"这个能力跑不了"，实际只是打不出来。修法：出口一律 utf-8 + errors=replace。
@@ -111,7 +111,7 @@ def _ensure_hook_marker():
             _m.parent.mkdir(parents=True, exist_ok=True)
             _m.write_text(repr(time.time()), encoding="utf-8")
     except Exception as _me:                                         # noqa: BLE001
-        # 🔴 不许静默吞：这里第一次写的时候漏了 `import time`，
+ # 不许静默吞：这里第一次写的时候漏了 `import time`，
         # 被 `except: pass` 吞掉 ⇒ 标记永远不落、ruler 报"钩子没被触发过"。
         # 教训（2026-09-23 当场抓到）：**吞异常可以，但必须留一行字**。
         sys.stderr.write("[five-dim] 钩子标记写入失败: %s: %s\n"
@@ -192,7 +192,7 @@ def _summarize(value):
 
 
 # 真命令清单**只写一处**：`未知命令` 提示、`--help` 用法都从它取。
-# 🔴 2026-09-23 磨（三层流畅度）：这里原先是**手写死**的 ["open","close","ruler","run","cap"]，
+# 2026-09-23 磨（三层流畅度）：这里原先是**手写死**的 ["open","close","ruler","run","cap"]，
 # 而 `check` 与 `wrap` 早就实现了却不在表里 —— 于是打错一个字的人被告知
 # "支持的命令"里**根本没有那两个真命令**。**提示本身在撒谎，比不提示更坏。**
 COMMANDS = ("ruler", "open", "close", "run", "check", "wrap", "cap", "multi")
@@ -276,7 +276,7 @@ def _multi_digest(kind, res):
     inner = res.get("result") if isinstance(res.get("result"), dict) else res
     head = json.dumps(inner, ensure_ascii=False, default=str)[:700]
     if kind == "media_run" and isinstance(inner, dict):
-        # 🔴 第 49 轮修：**按 op 分形状**。原版只按"跑一次链的报告"取键 ⇒ `op=status`
+ # 第 49 轮修：**按 op 分形状**。原版只按"跑一次链的报告"取键 ⇒ `op=status`
         #    （返回的是三条链的定义 + 可跑步，不是 report）被印成空摘要，
         #    读的人会以为"媒体域没读数"。同一个能力位不同 op 返回**不同形状**，
         #    摘要器必须跟着分。
@@ -417,7 +417,7 @@ def main(argv):
                 "outside_envelope", "agent_steps_opened", "agent_steps_closed",
                 "agent_close_rate", "agent_unclosed_on_disk", "agent_verdict")
         out_r = {k: a.get(k) for k in keys}
-        # 🔴 2026-09-23 补：全史尺子会被**历史**压住。
+ # 2026-09-23 补：全史尺子会被**历史**压住。
         # 实测：装上机械钩子后跑一次 cap，`inside_envelope` 17→19 确实涨了，
         # 但 `brainless_ratio` 只从 0.9926 动到 0.9917 —— 因为窗口里压着 2285 条历史调用。
         # ⇒ 单看全史比率会得出"钩子没用"的错觉。这里**再给一把"自钩子安装以来"的尺**，
@@ -550,7 +550,7 @@ def main(argv):
         return 0 if r.get("ok") else 1
 
     if cmd == "wrap":
-        # 🔴 2026-09-23 加（Owner：把"绕过"也堵上）：
+ # 2026-09-23 加（Owner：把"绕过"也堵上）：
         #   `wrap -- <命令...>` 把**任意外部命令**放进信封里跑。
         #   信封标记会写进环境变量 ⇒ 该命令起的**所有子进程**都算在信封内。
         #   为什么需要它：`python -m gbt_allinone ...` 这类入口本来绕过信封；
@@ -657,7 +657,7 @@ def main(argv):
         #   ② **工作目录级**：每根一个独占的 `.scratch/_multi/<本次>/jobNN/`；
         #   ③ **写面不撞的机械闸**：先算每根的"写面签名"，**撞了就整批拒跑**（fail-closed，
         #      一件都不执行）—— 这才是"免得混乱"里真正会出事的那一条。
-        # ⚠️ **镜像级隔离**（`mirror_*` 那一族）要主人发作用域，现在 `grants_available` 全 0 ⇒ 做不到。
+ # **镜像级隔离**（`mirror_*` 那一族）要主人发作用域，现在 `grants_available` 全 0 ⇒ 做不到。
         #    所以本件**不假装**做了镜像隔离：输出里只报"进程/目录/写面"这三层，
         #    镜像那一层如实写 `mirror_isolation: false`。
         run_id = time.strftime("%m%d-%H%M%S") + "-" + str(int(time.time() * 1000) % 1000)
@@ -670,7 +670,7 @@ def main(argv):
                 sig = "media_run:%s:%s" % (pl.get("kind"), pl.get("work"))
             else:
                 sig = "%s:%s" % (j.get("kind"), json.dumps(pl, sort_keys=True, ensure_ascii=False)[:60])
-            # 🔴 第 50 轮补：**目录要真建、真交给子进程、真留痕**。
+ # 第 50 轮补：**目录要真建、真交给子进程、真留痕**。
             #    上一轮只把目录名印进报告 ⇒ 那只是**标签**，不是隔离。
             #    现在：① 主进程 mkdir；② 路径随 job 传给子进程（子进程设成环境变量）；
             #          ③ 每个隔离位落一份 `_marker.json` ⇒ **盘上可查**，不用信报告里的字。
@@ -775,7 +775,7 @@ def main(argv):
 
     if cmd == "cap":
         # `--full`：不再收窄 result（默认仍收窄，为的是别把终端和上下文淹掉）。
-        # 🔴 2026-09-23 新增（Owner：三主线道设为默认，不用每次点名）：
+ # 2026-09-23 新增（Owner：三主线道设为默认，不用每次点名）：
         #   `--no-envelope` 关掉自动信封；`--watch <path...>` 给收步时的「眼」指定观察目标。
         full = "--full" in argv
         no_env = "--no-envelope" in argv
@@ -793,13 +793,13 @@ def main(argv):
             del argv[i:j]
             return vals
 
-        # 🔴 `--watch`：给收步的「眼」指定观察目标（进信封），**并且**在同一发执行里
+ # `--watch`：给收步的「眼」指定观察目标（进信封），**并且**在同一发执行里
         #    做邻域同视护栏（guard_pre → run_task → guard_post）。Owner 令：
         #    「改一个区块时同时有触手监控相关区块，不会出现修一个地方坏一个地方」。
         #    `--expect`：这次**有意**改动的文件（邻域里其余的都不许变）。
         watch = _take("--watch")
         expect = _take("--expect")
-        # 🔴 2026-10-17 固定接线（Owner 令逐字：「多路视觉监视台必须与万能插同步执行 ——
+ # 2026-10-17 固定接线（Owner 令逐字：「多路视觉监视台必须与万能插同步执行 ——
         #    万能插的**每一次操作**，触手网络都全方位监控该区块的所有分路，确保修改/部署
         #    不溅伤其他地方」「这个能力是必须同步执行的…不是的话给她固定一下，免得每次都要
         #    我提醒很累」）。
@@ -822,7 +822,7 @@ def main(argv):
         #   病因：PowerShell 吃内层双引号（`{"op":...}` ⇒ `{op:...}`）；
         #         `@p.json` 在 PS 里是展开运算符（未加引号必炸）；
         #         PS 5.1 的 `Set-Content -Encoding utf8` **写 BOM** ⇒ 读文件必须 utf-8-sig。
-        # 🔴 2026-10-19 二次修（主人当场撞上）：`--stdin` 原先**只有当它出现在 payload 位**才被认。
+ # 2026-10-19 二次修（主人当场撞上）：`--stdin` 原先**只有当它出现在 payload 位**才被认。
         #    于是最容易写错的那种调用 `cap <kind> '{…}' --stdin`（既给位置参数、又给 --stdin）
         #    会被当成"位置参数不是 JSON"直接拒 —— 而它该用管道里那份。现在：**只要 argv 里
         #    出现 `--stdin`，就以 stdin 为准**（旗标是"从管道取"的意思，不该被位置参数压住），
@@ -830,7 +830,7 @@ def main(argv):
         _stdin_flag = ("--stdin" in argv) or (_raw.strip() == "--stdin")
         _dropped = ""
         if _stdin_flag:
-            # 🔴 2026-10-19 实测：`sys.stdin.read()` 走的是**系统 locale**（Windows 中文机 = GBK），
+ # 2026-10-19 实测：`sys.stdin.read()` 走的是**系统 locale**（Windows 中文机 = GBK），
             #    于是管道里送进来的 UTF-8 中文被按 GBK 解码 ⇒ `全绿数` 变成 `鍏ㄧ豢鏁?`，
             #    回执里 key 对不上、误差永远判红（P1 判据错尺的变种：拿错码表量同一串字）。
             #    正解：**按字节读、显式 utf-8 解**（BOM 也吃掉）；解不了就 replace，不静默。
@@ -920,7 +920,7 @@ def main(argv):
             except Exception as _we:                             # noqa: BLE001
                 sys.stderr.write("[five-dim] 邻域基线拍不下（照跑，但如实说）：%s\n" % str(_we)[:120])
 
-        # 🔴 `--no-envelope` 必须**真的**关掉信封（2026-09-23 补）：
+ # `--no-envelope` 必须**真的**关掉信封（2026-09-23 补）：
         # `api._run_task_core` 现在门口默认开信封，若不把这个开关置上，
         # `--no-envelope` 就变成废话 —— 那条负对照会记成 `synced=True entry=auto`，
         # 而它本来要证明的是"信封外确实算信封外"。**测不出假的尺子不是尺子。**
@@ -948,7 +948,7 @@ def main(argv):
                         _m.parent.mkdir(parents=True, exist_ok=True)
                         _m.write_text(repr(time.time()), encoding="utf-8")
                 except Exception as _me:                             # noqa: BLE001
-                    # 🔴 不许静默吞：这里第一次写的时候漏了 `import time`，
+ # 不许静默吞：这里第一次写的时候漏了 `import time`，
                     # 被 `except: pass` 吞掉 ⇒ 标记永远不落、ruler 报"钩子没被触发过"。
                     # 教训（2026-09-23 当场抓到）：**吞异常可以，但必须留一行字**。
                     sys.stderr.write("[five-dim] 钩子标记写入失败: %s: %s\n"
@@ -966,7 +966,7 @@ def main(argv):
                 r = g.run_task(argv[1], payload)
         else:
             r = g.run_task(argv[1], payload)
-        # 🔴 R-H299（2026-09-22 实测抓到）：**授权拒绝返回的是扁平错误信封，没有 `gbt_result`**。
+ # R-H299（2026-09-22 实测抓到）：**授权拒绝返回的是扁平错误信封，没有 `gbt_result`**。
         # 原来只从 `r["gbt_result"]` 里读 ⇒ 被门拒绝时 gr 为空 ⇒ 打印出
         # `status: unknown · denied: false` —— **门明明说"拒了"，报表却说"未知、没拒"**。
         # 这正是"给故障喘息"：读的人以为只是没跑通，不会去看缺什么授权。
@@ -982,9 +982,9 @@ def main(argv):
                "stamp": bool(r.get("gbt_stamp")),
                "denied": denied,
                "result": gr.get("result") if isinstance(gr.get("result"), (dict, list, str)) else str(gr)[:400]}
-        # 🔴 2026-09-23 磨：把「这次进没进信封」**打在结果里**，不用翻 37 MB 账本。
+ # 2026-09-23 磨：把「这次进没进信封」**打在结果里**，不用翻 37 MB 账本。
         # `--no-envelope` 时它是负对照的活证据（应当 found=True 且 synced=False）。
-        # 🔴 2026-10-17 加固：信封回填失败不许把整发调用弄崩 —— 它一崩，下面的收步就执行不到，
+ # 2026-10-17 加固：信封回填失败不许把整发调用弄崩 —— 它一崩，下面的收步就执行不到，
         #    盘上就留孤儿步（实测攒出 16 个）。吞异常可以，但必须留一行字。
         try:
             out["_信封"] = _ledger_echo(argv[1], _t0)

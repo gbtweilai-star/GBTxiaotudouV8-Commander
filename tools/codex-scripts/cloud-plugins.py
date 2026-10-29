@@ -39,6 +39,12 @@ LEDGER = ROOT / "state" / "cloud_plugins.json"
 
 SKIP_DIR = ("node_modules", ".git", ".scratch", "_upstream", ".old-projects-20261004")
 
+# 审美令牌（内联版）：实现在 `_taste_inline.py` —— **唯一一份**，别在这里再抄一遍。
+# 为什么本页要内联：本页判据 V5 要求「自包含：零外链/零 CDN」，挂外部样式表是撞自己的门。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _taste_inline import site_root_block  # noqa: E402
+from _page_emit import clean_html  # noqa: E402
+
 
 def load_mesh(spec_path=None) -> dict:
     """读单一真源：默认 `deploy/cloud-10/mesh.json`（现网 10 模块）；
@@ -142,19 +148,28 @@ def build_model(mesh: dict) -> dict:
 # ── 页面（自包含：零外链、零 CDN、SVG 图标、无 emoji、品牌三色、尊重 reduced-motion）──
 
 _PAGE = """<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8">
-<!-- 🔴 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cloud-plugins.py gen
+<html data-page-id="plugins-mesh" lang="zh-CN"><head><meta charset="utf-8">
+<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cloud-plugins.py gen
      为什么补这句（2026-10-11）：本页原来**没有生成标记** ⇒ 逐页新鲜度判据
      （tools/codex-scripts/page-bind-check.py）判不出它是生成物还是手写物，
-     于是「主脑看到的它新不新」**没人能机检**。这句就是那个可机检的锚。 -->
+     于是「主脑看到的它新不新」**没人能机检**。这句就是那个可机检的锚。
+     2026-10-26：`data-page-id` 与 `tentacle-kit` **必须由模板自带**。
+     此前这两样是生成后由收尾工具补的 —— 谁跑一次 gen，本页就静默掉出触手网格
+     （27 页变 26 页，且没有任何东西会叫）。凡"生成后补"的东西，要么进模板，要么迟早掉。 -->
 <title>GBT小土豆V8 · 云插件互绑拓扑（触手串联 · 每处连接点可见）</title>
 <style>
-:root{--bg:#07090d;--pan:#0d1117;--line:#1d2635;--ink:#e6edf7;--dim:#8b97a8;
- --cy:#22d3ee;--or:#f5b041;--ok:#34d399;--bad:#f87171;--brand-or:#f5b041;--brand-cy:#22d3ee}
+/* 站点令牌（生成期内联，来源 state/taste/*.json → theme/taste-tokens.css；**不外链**） */
+__TASTE_ROOT__
+:root{--bg:var(--taste-ground,#0B1120);--pan:var(--taste-surface,#111827);--line:var(--taste-border,#1E3A5F);
+ --ink:var(--taste-text,#e8ecf8);--dim:var(--taste-muted,#9aa4c4);
+ --cy:#22d3ee;--or:#f5b041;--ok:var(--taste-positive,#00E5FF);--bad:var(--taste-negative,#EF4444);
+ --brand-or:var(--taste-accent,#f5b041);--brand-cy:#22d3ee}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI",system-ui,sans-serif}
 .gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
- background:linear-gradient(90deg,#0b1017,#0d1117)}
+ /* 2026-10-26：原为 linear-gradient(90deg,#111827,#0d1117) —— 两档差 2 个色阶、肉眼无差却是
+    审美守卫的 `gradient` 命中。取中点纯色。 */
+ background:#111827}
 .mark{width:18px;height:18px;border:2px solid var(--brand-or);border-radius:4px}
 .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--brand-or)}
 .wrap{display:grid;grid-template-columns:minmax(560px,1.35fr) minmax(360px,1fr);gap:14px;padding:14px}
@@ -177,16 +192,16 @@ svg{width:100%;height:auto;display:block}
 .lbl{fill:var(--dim);font-size:8px}
 table{border-collapse:collapse;width:100%;font-size:11px}
 th,td{border:1px solid var(--line);padding:3px 5px;text-align:left;vertical-align:top}
-th{color:var(--dim);font-weight:600;background:#0b1017;position:sticky;top:0}
+th{color:var(--dim);font-weight:600;background:#111827;position:sticky;top:0}
 td.cell{cursor:pointer;text-align:center;font-variant-numeric:tabular-nums;color:var(--dim)}
 td.cell.on{background:#12212f;color:var(--brand-cy);font-weight:700}
-td.cell.self{background:#0a0e14;color:#39445a}
+td.cell.self{background:#0a0e14;color:#1E3A5F}
 td.cell.src{background:#1a1206;color:var(--brand-or)}
 .mono{font-family:ui-monospace,Consolas,monospace}
 ul{margin:6px 0 0;padding-left:16px}
 li{margin:2px 0}
 .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin:2px 4px 2px 0;color:var(--dim);font-size:11px}
-.pill.b{border-color:#26445a;color:var(--brand-cy)}
+.pill.b{border-color:#1E3A5F;color:var(--brand-cy)}
 .note{color:var(--dim);font-size:11.5px}
 .hr{height:1px;background:var(--line);margin:10px 0}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
@@ -284,7 +299,9 @@ document.querySelectorAll(".link").forEach(l=>{
     detail.innerHTML = "<b class='mono'>c"+a+" ↔ c"+b+"</b><br><span class='note'>这一条线代表**两处**有向 ctx.call 边："+
       "c"+a+" → c"+b+" 与 c"+b+" → c"+a+"（双向互绑）。点节点看该插件全部连接点。</span>"; });
 });
-</script></body></html>
+</script>
+<script src="../shell/tentacle-kit.js" defer></script>
+</body></html>
 """
 
 
@@ -413,6 +430,7 @@ def render_page(model: dict) -> str:
                        "undirected": model["undirected"], "shared": model["shared"],
                        "generated_at": model["generated_at"]}, ensure_ascii=False)
     return (_PAGE.replace("__DATA__", data)
+                  .replace("__TASTE_ROOT__", site_root_block())
                   .replace("__RING__", ring)
                   .replace("__MATRIX__", matrix)
                   .replace("__SHARED__", shared)
@@ -427,7 +445,7 @@ def cmd_gen(spec: str = "") -> int:
     mesh = load_mesh(spec)
     model = build_model(mesh)
     PAGE.parent.mkdir(parents=True, exist_ok=True)
-    PAGE.write_text(render_page(model), encoding="utf-8")
+    PAGE.write_text(clean_html(render_page(model)), encoding="utf-8")
     LEDGER.parent.mkdir(parents=True, exist_ok=True)
     LEDGER.write_text(json.dumps(model, ensure_ascii=False, indent=1), encoding="utf-8")
     c = model["counts"]

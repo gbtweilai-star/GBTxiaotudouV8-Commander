@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """次级动力学 · **头发弹簧链**（不写死坐标版）
 
 为什么要重写（2026-09-25 实测）：
@@ -24,7 +20,7 @@ import sys
 
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-rigged.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-springs.glb"
@@ -70,7 +66,7 @@ a = J["accessors"][skin["inverseBindMatrices"]]
 bv = J["bufferViews"][a["bufferView"]]
 ibm = np.frombuffer(bytes(BIN), np.float32, a["count"] * 16,
                     bv.get("byteOffset", 0)).reshape(-1, 4, 4)
-# 🔴 glTF 的矩阵访问器是**列主序**：rig 写出时把 row-major 的 m.T 直接铺开，
+# glTF 的矩阵访问器是**列主序**：rig 写出时把 row-major 的 m.T 直接铺开，
 #    所以按 (4,4) 读回来得到的是 m.T，平移落在 **[3, :3]**（实测读 [:3,3] 会得到全 0，
 #    于是头关节 y 读成 0.000、头发候选 0 个 —— 这个坑先踩为敬）。
 jpos = {i: -ibm[i][3, :3].astype(np.float64) for i in range(len(joints))}
@@ -81,7 +77,7 @@ H = P[:, 1].max() - y_bot
 print(f"头关节 y={y_head:+.3f} · 身高 {H:.3f}")
 
 # ① 认头发
-# 🔴 判据演进（实测）：只按"主导骨 == Head"认，只能捞到**颅底薄薄一带 213 个顶点** ——
+# 判据演进（实测）：只按"主导骨 == Head"认，只能捞到**颅底薄薄一带 213 个顶点** ——
 #    因为长发垂在后背/肩上时，离 Neck/Spine1 的骨段更近，主导骨根本不在 Head。
 #    现实口径：**主导骨 ∈ {Head, Neck, Spine1}**（头颈胸这一段）＋ 低于头关节
 #    ＋ **离脊柱竖轴够远**（把脖子/后颈自身的表面排除，否则脖子会被拉成面条）。
@@ -114,7 +110,7 @@ for s in range(CHAINS):
     tip = np.array([sel[:, 0].mean(), np.percentile(sel[:, 1], 2), sel[:, 2].mean()])
     root = np.array([head_pos[0], y_head, head_pos[2]], np.float64)
     nm = f"Hair{s}"
-    # 🔴 translation 必须**相对父节点（Head）**：写成绝对坐标会被父级再累加一次，
+ # translation 必须**相对父节点（Head）**：写成绝对坐标会被父级再累加一次，
     #    骨子跑到头顶上方（实测包围盒高度 1.000 → 1.086、中心上移 0.043）。
     #    IBM 仍用**绝对** root 的逆平移 —— 两者口径不同，别混。
     rel = root - head_pos
