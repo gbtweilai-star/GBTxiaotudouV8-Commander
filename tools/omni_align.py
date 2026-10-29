@@ -196,6 +196,8 @@ def main() -> int:
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--run", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--parallel", type=int, default=0,
+                    help="并行车道数（>1 时用 tentacle_dispatch 派多根触手）")
     ap.add_argument("--prod-store", action="store_true",
                     help="不换 store（用生产账复探，读得到现成状态）")
     a = ap.parse_args()
@@ -241,16 +243,37 @@ def main() -> int:
     print("\n  === 真跑（唯一门 run_task · 单位 %ds 超时）===" % PROBE_TIMEOUT)
     t0 = time.time()
     done = 0
+    probe_rows = [r for r in rows if r["decide"] == "probe"]
     for r in rows:
         if r["decide"] != "probe":
             r["status"] = "skipped"
-            continue
-        print("    → %s" % r["name"], flush=True)
-        r.update(probe(r["name"]))
-        done += 1
-        if done % 20 == 0:
-            print("    …%d/%d  %s" % (done, probe_n,
-                                      "%.0fs" % (time.time() - t0)), flush=True)
+
+    if getattr(a, "parallel", 0) and a.parallel > 1:
+        # 2026-10-30：串行 220 位实测 253 秒。吃力就派第二根 ——
+        # 交给 tentacle_dispatch：按内存自算车道，rename 抢占不重复干。
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools"))
+        import tentacle_dispatch as TD
+        units = [{"id": "c%03d" % i, "kind": r["name"], "payload": {}}
+                 for i, r in enumerate(probe_rows)]
+        print("    派发 %d 单元 · 车道上限 %d" % (len(units), a.parallel), flush=True)
+        res = TD.dispatch(units, max_workers=a.parallel, stall_s=2.0,
+                          target_rps=3.0, verbose=False)
+        by_id = {x.get("unit"): x for x in (res.get("results") or [])}
+        for i, r in enumerate(probe_rows):
+            w = by_id.get("c%03d" % i) or {}
+            r.update({"status": w.get("status") or "error", "ms": w.get("ms"),
+                      "detail": w.get("sample") or w.get("error") or ""})
+        print("    并行完成 %d/%d · 用时 %.0fs · 车道 %d"
+              % (res.get("done"), len(units), res.get("elapsed_s") or 0,
+                 res.get("workers_used") or 0), flush=True)
+    else:
+        for r in probe_rows:
+            print("    → %s" % r["name"], flush=True)
+            r.update(probe(r["name"]))
+            done += 1
+            if done % 20 == 0:
+                print("    …%d/%d  %s" % (done, probe_n,
+                                          "%.0fs" % (time.time() - t0)), flush=True)
 
     by = Counter(r.get("status") for r in rows)
     out = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"),

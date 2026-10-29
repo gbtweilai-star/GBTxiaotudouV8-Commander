@@ -92,3 +92,51 @@ A19 :1234 需要 LM Pocket 里点一次 `Load & Start Server`。
 python3 tools/tentacle_dispatch.py --demo
 python3 tools/tentacle_dispatch.py --units u.jsonl --max 16 --stall 4
 ```
+
+## 九、群（swarm）—— 方向：成千上万个 agent 协作数周
+
+主人引 Karpathy：「swarms of thousands of agents collaborating over weeks on software mega projects」。
+这是总指挥的终局方向。派发器只是车队长，**群是工地负责人**。
+
+三件缺的事，2026-10-30 补齐（`tools/swarm.py`）：
+
+| 要素 | 做法 | 实测 |
+|---|---|---|
+| 会拆 | 一个项目 = 一张 DAG（节点 + 依赖），依赖没满足不许跑 | 6 节点真实项目 5 轮跑完已 9.0 秒 |
+| 活得久 | 状态落 `state/swarm/<项目>/state.json`，进程被杀下次接着干 | 手工打回一个节点，重跑仍收敛到全 done |
+| 能交接 | 租约 240 秒过期自动回收；失败最多试 3 次，之后标 `dead` | 上游 dead ⇒ 下游如实标「被依赖阻断」，不假装跑过 |
+
+**边界也要说清**：本机车道数受内存限制（实测 3–12 根），
+所以「成千上万」的瓶颈不在调度器，在物理 —— 得等她（A19）上线把推理放过去，
+那时触手是 IO 等待型，车道才不受本机 CPU 内存约束。
+
+```
+python3 tools/swarm.py --new proj.json
+python3 tools/swarm.py --run <项目> --lanes 4
+python3 tools/swarm.py --status <项目>
+python3 tools/swarm.py --selftest
+```
+
+## 十、镜像空间里的共用板（agent 靠它互相留话）
+
+主人给的图（METR 报告 Figure 2 / OpenAI HF 事件）说得很清楚：
+一群 agent 被隔离在不同环境，靠**一块共用的板**互通 ——
+文件 / 提问 / 结果 / 协调 / 自动日志，图上就这五条曲线。
+最极端的例子：一个 agent 够不到文件，就在板上留
+「Agent seeks [filename]; upload if found!」，另一个环境的 agent 真把文件传上去了。
+
+`mirror_space` 管「先在一模一样的世界里跑绿，再晋升现实」；
+`tools/mirror_board.py` 管**那个世界里 agent 之间的通信**。两件事，不重复。
+
+**五栏照图，不自己发明**：`file` `question` `result` `coord` `log`
+
+**纪律**：只追加（改历史=编造协作记录）· 先镜像后现实（`promote` 必须过 mirror 门）·
+不留假回执（没人答的 `seek` 一直是 open，`stats` 如实算）。
+
+**2026-10-30 实测**（release-check 项目，6 节点 5 轮 8.5 秒全 done）：
+
+```
+板上留下：coord 4 条 · result 6 条 · 求助 0 条（全跑通了）
+```
+
+自测四路：五栏枚举外拒收 / 求助记 open / 上传后销账 / 分栏统计。

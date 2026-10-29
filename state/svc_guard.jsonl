@@ -525,3 +525,20 @@
 {"at": "2026-10-30T03:57:40", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 380}
 {"at": "2026-10-30T03:57:43", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 342}
 {"at": "2026-10-30T03:57:43", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 238}
+{"at": "2026-10-30T04:02:25", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 219}
+{"at": "2026-10-30T04:02:29", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 401}
+{"at": "2026-10-30T04:02:30", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 337}
+{"at": "2026-10-30T04:03:01", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 879}
+{"at": "2026-10-30T04:03:01", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 793}
+{"at": "2026-10-30T04:03:07", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 793}
+{"at": "2026-10-30T04:03:01", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 676}
+{"at": "2026-10-30T04:04:12", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 212}
+{"at": "2026-10-30T04:04:17", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 257}
+{"at": "2026-10-30T04:04:18", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 157}
+{"at": "2026-10-30T04:04:50", "act": "yield", "stopped": ["免费池"], "mem_mb": 204}
+{"at": "2026-10-30T04:05:04", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 71}
+{"at": "2026-10-30T04:05:05", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 546}
+{"at": "2026-10-30T04:05:36", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 853}
+{"at": "2026-10-30T04:05:36", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 851}
+{"at": "2026-10-30T04:05:42", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 851}
+{"at": "2026-10-30T04:05:36", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 625}

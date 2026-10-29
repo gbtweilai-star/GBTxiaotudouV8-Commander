@@ -211,7 +211,7 @@ def dispatch(units: list, *, max_workers: int = 16, stall_s: float = 4.0,
         results.append(r)
         by_status[r.get("status")] = by_status.get(r.get("status"), 0) + 1
 
-    out = {"run": run_id, "units": total, "done": len(results),
+    out = {"run": run_id, "units": total, "done": len(results), "results": results,
            "workers_used": len(procs), "elapsed_s": round(elapsed, 1),
            "per_worker_mb": round(per_worker_mb, 1),
            "rps": round(len(results) / elapsed, 2) if elapsed else None,
