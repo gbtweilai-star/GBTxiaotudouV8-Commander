@@ -138,7 +138,17 @@ def main():
     n = sum(1 for _ in open(qf, encoding="utf-8")) if os.path.exists(qf) else 0
     add("队列可读", True, "%d 条待算" % n)
     ps = subprocess.run(["ps", "aux"], capture_output=True, text=True).stdout
-    add("worker 在跑", "a19_worker" in ps, "容器一通即补算")
+    # 2026-10-29 改：原断言在找 "a19_worker" 进程，但 docs/17 与 body.py 引用的
+    # `weights/a19_worker.py` **在仓库里从来不存在**（幽灵件），所以这条恒红。
+    # 队列的唯一实现是 `a19_ctl.py queue drain` —— 直接真跑一次那个入口，按回执判。
+    try:
+        _r = subprocess.run([sys.executable, str(ROOT / "tools" / "a19_ctl.py"),
+                             "queue", "drain"], capture_output=True, text=True, timeout=180)
+        _o = ((_r.stdout or "") + (_r.stderr or "")).strip()
+        add("队列 drain 入口可用", ("A19_OFF" in _o) or ("结果" in _o),
+            (_o.splitlines()[-1][:40] if _o else "无回执"))
+    except Exception as _e:                                       # noqa: BLE001
+        add("队列 drain 入口可用", False, "%s: %s" % (type(_e).__name__, _e))
     add("哨兵在跑", "a19_sentinel" in ps, "容器一通即验收")
 
     # 10 文档

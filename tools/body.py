@@ -269,7 +269,7 @@ DONE = "/tmp/a19_done.jsonl"
 
 
 def enqueue(text: str) -> dict:
-    """把任务塞进 A19 队列（工作器 a19_worker.py 会在端口一通时批量跑完）。"""
+    """把任务塞进 A19 队列（哨兵抓到容器时调 a19_ctl.py queue drain 批量跑完）。"""
     import json as _j, time as _t
     try:
         with open(QUEUE, "a", encoding="utf-8") as f:

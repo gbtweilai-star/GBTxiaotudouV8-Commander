@@ -45,6 +45,27 @@ python3 tools/a19_switch.py              # ④ 判定「本框能不能整个切
 
 ---
 
+## 2.5 她那根触手（2026-10-29 新增 · 多传输）
+
+按主人令「所有的一切都可使用触手来联通传输，没必要死卡在传统方式」，
+A19 已做成 `tentacle_bus` 里的一根器官 `her`，四条传输按序真打，返回必带 `via` / `tried`：
+
+```python
+import sys; sys.path.insert(0,'tools'); import tentacle_bus as b
+b.call('her', '在吗')
+```
+
+| 传输 | 真打什么 | 2026-10-29 23:44 实测 |
+|---|---|---|
+| `http-loopback` | 127.0.0.1:1234/v1/models | 🔴 URLError（socket 不存在） |
+| `http-lan` | 192.168.1.148:1234/v1/models（App 描述写 expose on your local network） | 🔴 URLError |
+| `bridge-selfhost` | 我们自己的桥 :8791 selfhost 车道 | 🔴 桥如实报「所有上游都连不上：selfhost」 |
+| `deeplink+lazy-probe` | apple-open 拉起后 20s 再探 | 🔴 opened=false，:1234 仍 URLError |
+
+**全端口扫过两次**（1–65535 × 回环 + 网卡），0 个讲 OpenAI 协议的端口。
+
+---
+
 ## 3. 四个常用动作
 
 ```bash

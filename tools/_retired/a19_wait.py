@@ -127,7 +127,7 @@ def main() -> int:
             return 0
         if n % 20 == 0:
             print("    …%ds（TCP=%s）" % (n * 3, "通" if tcp() else "断"), flush=True)
-        time.sleep(3)
+        time.sleep(2)
 
 
 if __name__ == "__main__":
