@@ -25,3 +25,7 @@
 {"at": "2026-10-29T08:05:25", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 284}
 {"at": "2026-10-29T08:06:30", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 443}
 {"at": "2026-10-29T08:06:30", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 362}
+{"at": "2026-10-29T09:25:05", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 34}
+{"at": "2026-10-29T09:26:40", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 311}
+{"at": "2026-10-29T09:27:22", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 221}
+{"at": "2026-10-29T09:28:48", "act": "start_wait", "svc": "她的界面 :8080", "mem_mb": 86, "why": "内存迟迟不回升"}
