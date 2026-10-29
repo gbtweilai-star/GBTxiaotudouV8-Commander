@@ -29,3 +29,12 @@
 {"at": "2026-10-29T09:26:40", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 311}
 {"at": "2026-10-29T09:27:22", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 221}
 {"at": "2026-10-29T09:28:48", "act": "start_wait", "svc": "她的界面 :8080", "mem_mb": 86, "why": "内存迟迟不回升"}
+{"at": "2026-10-29T09:29:19", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 48}
+{"at": "2026-10-29T09:31:18", "act": "start_wait", "svc": "她的界面 :8080", "mem_mb": 68, "why": "内存迟迟不回升"}
+{"at": "2026-10-29T09:31:49", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 215}
+{"at": "2026-10-29T09:31:27", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 319}
+{"at": "2026-10-29T09:31:49", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 263}
+{"at": "2026-10-29T09:31:27", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 267}
+{"at": "2026-10-29T09:31:27", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 217}
+{"at": "2026-10-29T09:32:31", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 233}
+{"at": "2026-10-29T09:32:31", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 304}

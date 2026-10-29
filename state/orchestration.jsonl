@@ -35,3 +35,5 @@
 {"kind": "run", "item": "A19 等待器部署", "status": "pass", "evidence": "ps 确认 pid=4343 在跑；日志首行已打印；只认 4s /v1/models 探活而非 TCP 握手", "files": ["tools/a19_wait.py"], "at": "2026-10-29T09:28:47"}
 {"kind": "run", "item": "GBT云端 provider 域名已死（Minis 显示绿点是假绿）", "status": "pass", "evidence": "gbt-potato-cloud-10.paysssk.work 与 paysssk.work 均 gaierror 不解析；github.com 正常解析", "files": ["tools/a19_wait.py"], "at": "2026-10-29T09:28:47"}
 {"kind": "run", "item": "A19 provider 配置正确（只差服务未起）", "status": "pass", "evidence": "minis-config: id=4EFFE91A… label=A19 本地(LM Pocket) url=http://127.0.0.1:1234 isEnabled=true", "files": ["tools/a19_wait.py"], "at": "2026-10-29T09:28:48"}
+{"kind": "change", "what": "彻底解决 C:\\Users\\... 垃圾目录：重启常驻(旧模块在内存里)、git rm --cached、.gitignore 加 C:*", "files": [".gitignore"], "why": "旧进程持旧代码反复重建目录，git add -A 又加回索引，形成循环", "commit": "", "at": "2026-10-29T09:33:16"}
+{"kind": "run", "item": "垃圾目录根除", "status": "pass", "evidence": "重启全部常驻后删目录，观察 60 秒未重建；bindings 仍 2397 · 缺失 0 · 幽灵 0", "files": [".gitignore"], "at": "2026-10-29T09:33:17"}
