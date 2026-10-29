@@ -151,6 +151,19 @@ def main():
         add("队列 drain 入口可用", False, "%s: %s" % (type(_e).__name__, _e))
     add("哨兵在跑", "a19_sentinel" in ps, "容器一通即验收")
 
+    # 2026-10-30：队列字段契约静态回归
+    #   彩排抓到过真 bug —— 入队写 {"id","q"}（body.py），出队读 it["prompt"]（a19_ctl.py）
+    #   ⇒ KeyError，27 条积压一条都跑不了。这里守住两端，改回去就立刻红。
+    try:
+        _body = (ROOT / "tools" / "body.py").read_text(encoding="utf-8")
+        _ctl = (ROOT / "tools" / "a19_ctl.py").read_text(encoding="utf-8")
+        _enq_ok = '"q": str(text)' in _body or '"q":' in _body
+        _drn_ok = 'it.get("q")' in _ctl
+        add("队列字段契约一致", _enq_ok and _drn_ok,
+            "入队写 q=%s · 出队认 q=%s" % (_enq_ok, _drn_ok))
+    except Exception as _e:                                       # noqa: BLE001
+        add("队列字段契约一致", False, "%s: %s" % (type(_e).__name__, _e))
+
     # 10 文档
     doc = ROOT / "docs" / "17-phone-a19-runtime.md"
     txt = doc.read_text(encoding="utf-8") if doc.exists() else ""
