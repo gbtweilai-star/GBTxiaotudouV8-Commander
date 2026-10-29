@@ -18,7 +18,17 @@ Thumbs.db
 *.bak
 *.orig
 outputs/
-state/
+state/*
+# 🔴 2026-10-29：**账本必须进版本库** —— 它们是"没跑通就不算验收"的唯一凭据，
+#   放 state/ 被整体忽略 ⇒ 容器一重置就全丢，审计无据可查。
+!state/orchestration.jsonl
+!state/svc_guard.jsonl
+!state/devour_pipe.jsonl
+!state/devour_pipe.json
+!state/page_tentacles.json
+!state/page_tentacle_hello.jsonl
+!state/intake_gate.json
+!state/asset_bindings.jsonl
 store/
 scratch/
 .scratch/
