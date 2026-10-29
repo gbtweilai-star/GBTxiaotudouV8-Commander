@@ -27,6 +27,10 @@ say() { printf '  %-26s %s\n' "$1" "$2"; }
 #   开关就是 GBT_AUTONOMOUS=1。**它不是绕过闸** —— 闸照跑，
 #   只是判定者从"人工"变成"她自己"，并且转账/黑客仍然必须主人。
 export GBT_AUTONOMOUS="${GBT_AUTONOMOUS:-1}"
+# A19（LM Pocket）只认小写 gbt；大写 401。
+# 🔴 2026-10-29 实测：不设它 ⇒ omni_plug 的 ai 插座报「没有可用钥匙（金库/环境都未读到）」，
+#   看着像"连不上 A19"，其实是**钥匙槽没给**。只写槽名，不回显。
+export GBT_A19_KEY="${GBT_A19_KEY:-gbt}"
 
 up()  { $PB tcp "$1" >/dev/null 2>&1; }
 
