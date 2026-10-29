@@ -51,6 +51,17 @@ SVCS = [
 MEM_LOW_MB = int(__import__("os").environ.get("GBT_MEM_LOW_MB") or 250)
 # 拉必要服务前，内存至少要回到这个数（低于它硬拉必死，记成假故障）
 MEM_START_MIN = int(__import__("os").environ.get("GBT_MEM_START_MB") or 260)
+# 迟滞：让位过的非必要服务，在内存没回到 LOW+HYS 之前**别再拉**。
+# 🔴 2026-10-29 实测抖动：8765 在 07:33:19 被拉起，07:34:10 又因内存 222MB 被让位
+#    ⇒ 下一轮又会拉 ⇒ 来回折腾，内存反而更紧。必须加迟滞。
+HYS_MB = int(__import__("os").environ.get("GBT_MEM_HYS_MB") or 150)
+YIELD_COOLDOWN = int(__import__("os").environ.get("GBT_YIELD_COOLDOWN") or 300)
+_YIELDED: dict[str, float] = {}
+# 去抖：iSH 的 MemFree 摆动极大（实测 886 → 298 → 222 → 334 MB，
+# 而同时只有 6 个小进程）——它反映的是**宿主层**内存，不是本容器的真实占用。
+# 拿它当让位判据必须去抖：**连续 2 次**低才动手，别被一次瞬时坑到。
+_LOW_STREAK = 0
+LOW_CONFIRM = int(__import__("os").environ.get("GBT_LOW_CONFIRM") or 2)
 MAX_FAIL = 5              # 同一服务连败上限
 
 
@@ -153,7 +164,13 @@ def ensure_all(verbose: bool = True) -> dict:
     out = {"started": [], "failed": [], "skipped": [], "mem_mb": free,
            "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
 
-    low = 0 <= free < MEM_LOW_MB
+    global _LOW_STREAK
+    raw_low = 0 <= free < MEM_LOW_MB
+    _LOW_STREAK = (_LOW_STREAK + 1) if raw_low else 0
+    low = raw_low and _LOW_STREAK >= LOW_CONFIRM
+    if raw_low and not low and verbose:
+        print("    · 内存 %d MB 偏低（第 %d 次，需连续 %d 次才让位）"
+              % (free, _LOW_STREAK, LOW_CONFIRM))
     if low:
         stopped = kill_nonessential()
         if stopped:
@@ -168,7 +185,15 @@ def ensure_all(verbose: bool = True) -> dict:
             continue
         if low and not ess:
             out["skipped"].append(name)
+            _YIELDED[name] = time.time()
             continue
+        # 迟滞：刚让位过、内存还没明显回升 ⇒ 不拉回来
+        if (not ess) and name in _YIELDED:
+            if (time.time() - _YIELDED[name] < YIELD_COOLDOWN) and \
+                    mem_free_mb() < MEM_LOW_MB + HYS_MB:
+                out["skipped"].append(name)
+                continue
+            _YIELDED.pop(name, None)
         if ess:
             # 必要服务：先把内存等回来，别在瞬时峰上硬拉（那会记成假故障）
             if not wait_mem(MEM_START_MIN, timeout=45):

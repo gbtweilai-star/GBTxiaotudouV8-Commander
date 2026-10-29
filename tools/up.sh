@@ -162,6 +162,22 @@ start_dhgate() {
   fi
 }
 
+start_guard() {
+  # 服务守护常驻：谁掉线就自己拉回来（带退避 + 内存让位 + 去抖）
+  if ps -o args 2>/dev/null | grep -v grep | grep -qF "svc_guard.py watch"; then
+    say ":GUARD 服务守护" "✅ 已在跑"
+    return
+  fi
+  setsid nohup python3 -u tools/svc_guard.py watch --interval 30 \
+    > logs/svc_guard.log 2>&1 < /dev/null &
+  sleep 2
+  if ps -o args 2>/dev/null | grep -v grep | grep -qF "svc_guard.py watch"; then
+    say ":GUARD 服务守护" "✅ 已常驻（30s 一巡）"
+  else
+    say ":GUARD 服务守护" "⚠ 没起来"
+  fi
+}
+
 start_sentinel() {
   # A19 哨兵：每 5 秒探 :1234，一出现就自动验收（模型名 / 首字 / tok/s / 身份）
   # 并落 state/a19_ready.json。**不需要改桥配置** —— 桥默认上游本来就是 selfhost。
@@ -188,7 +204,7 @@ up)
   #   桥的降级链已改成 deepseek 优先（0.8s、几乎不吃内存）。
   #   真要 259 个免费模型时：FORCE_FLR=1 sh tools/up.sh up
   if [ "${FORCE_FLR:-0}" = "1" ]; then start_flr; else say ":3001 免费模型池" "⏭ 默认不起（内存优先，要它用 FORCE_FLR=1）"; fi
-  start_mem; start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_sentinel; probe_a19
+  start_mem; start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_guard; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)

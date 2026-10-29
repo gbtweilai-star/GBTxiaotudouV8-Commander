@@ -227,7 +227,13 @@ def sec_f() -> None:
     rec("PASS" if _rate <= 0.03 else "FAIL", "跨域错位/兜底黑洞 ≤3%",
         "wrong=%d broad=%d · 样本 %d · %.1f%%"
         % (bv.get("routed_wrong", 0), bv.get("routed_broad", 0), _n, _rate * 100))
-    rec("INFO", "对齐率", "%d/%d = %.0f%%" % (aligned, tot, aligned / tot * 100 if tot else 0))
+    # 🔴 2026-10-29 修假绿：实测有一轮 brain_align.json 只剩 1 行（被 --sample 覆盖过），
+    #   报表照样打印「1/1 = 100%」—— **样本 1 条的 100% 是假绿，比不报更糟**。
+    if tot < 20:
+        rec("ENV", "对齐率", "样本仅 %d 条，不足 20 ⇒ 不报百分比（假绿比不报更糟）；"
+                             "要真数跑：gbt align --domain llm --repeat 3" % tot)
+    else:
+        rec("INFO", "对齐率", "%d/%d = %.0f%%" % (aligned, tot, aligned / tot * 100))
     for r in (d.get("rows") or []):
         if r.get("verdict") == "routed_parent":
             rec("ENV", "同域近似（素材分不开）", "%s → %s"
@@ -278,9 +284,20 @@ def sec_h() -> None:
 def sec_i() -> None:
     print("\n── I 孤儿审计 ──")
     try:
-        subprocess.run([sys.executable, str(ROOT / "tools" / "orphan_audit.py")],
-                       capture_output=True, text=True, timeout=300, cwd=str(ROOT))
-        d = json.loads((ROOT / "state" / "orphan_audit.json").read_text(encoding="utf-8"))
+        # 孤儿审计要扫活路径全树，在内存紧时会超 300 秒。放宽到 540，
+        # 超时就用上一份报告并**注明是旧的**（不拿旧数冒充新数）。
+        _fresh = True
+        try:
+            subprocess.run([sys.executable, str(ROOT / "tools" / "orphan_audit.py")],
+                           capture_output=True, text=True, timeout=540, cwd=str(ROOT))
+        except subprocess.TimeoutExpired:
+            _fresh = False
+        _op = ROOT / "state" / "orphan_audit.json"
+        if not _op.is_file():
+            raise RuntimeError("没有孤儿审计报告")
+        d = json.loads(_op.read_text(encoding="utf-8"))
+        if not _fresh:
+            rec("ENV", "孤儿审计新鲜度", "本次扫描超时，以下为**上一份报告**（非本轮实测）")
         tot = d.get("total") or 0
         w = len(d.get("wired") or [])
         orp = len(d.get("orphan") or [])
