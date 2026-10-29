@@ -24,6 +24,7 @@
 import argparse
 import json
 import os
+import pathlib
 import socket
 import subprocess
 import sys
@@ -278,6 +279,19 @@ def cmd_queue(op, prompt, tokens):
                                       "elapsed_s": round(dt, 2),
                                       "model": d.get("model")}, ensure_ascii=False) + "\n")
                 out.flush()
+                # 2026-10-30：答完就往镜像板落一条 result ——
+                # 不然「她答了什么」只躺在 /tmp 的一个文件里，协作记录是断的。
+                try:
+                    import os as _o, sys as _s
+                    _s.path.insert(0, _o.path.join(_o.path.dirname(_o.path.dirname(
+                        _o.path.abspath(__file__))), "tools"))
+                    import mirror_board as _mb
+                    _mb.post("result", "A19 答：%s" % (it.get("q") or it.get("prompt") or "")[:60],
+                             refs=[txt[:200]], by="a19", space="her-inbox")
+                except Exception as _e:                       # noqa: BLE001
+                    import os as _o2
+                    with open("/tmp/board_post_err.txt","a") as _f:
+                        _f.write("%s: %s\n" % (type(_e).__name__, _e))
                 ok += 1
                 print("答完 %d/%d  %.2fs  %s" % (ok, len(items), dt, (it.get("q") or it.get("prompt") or "")[:30]))
             except Exception as exc:                              # noqa: BLE001
