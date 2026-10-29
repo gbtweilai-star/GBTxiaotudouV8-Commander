@@ -2602,3 +2602,15 @@
 {"at": "2026-10-30T03:27:40", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
 {"at": "2026-10-30T03:38:20", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}
 {"at": "2026-10-30T03:38:23", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1992, "third_party": 0}
+{"at": "2026-10-30T03:41:23", "event": "autobind", "files": 1, "bound": 1, "hint": "source_registry_health", "pruned": 0}
+{"at": "2026-10-30T03:44:34", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:47:11", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:49:23", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:52:07", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:54:53", "event": "scan", "bindings": 2497, "missing_asset": 0, "ghost_tentacle": 0}
+{"at": "2026-10-30T03:55:38", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1993, "third_party": 0}
+{"at": "2026-10-30T03:55:57", "event": "gaps", "missing": 0, "no_kind": 342, "scanned": 1993, "third_party": 0}
+{"at": "2026-10-30T03:57:52", "event": "bind", "asset": "tools/tentacle_dispatch.py", "tentacle": "brain_route", "note": "autobind"}
+{"at": "2026-10-30T03:57:53", "event": "autobind", "files": 1, "bound": 1, "hint": "brain_route", "pruned": 0}
+{"at": "2026-10-30T04:02:09", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1993, "third_party": 0}
+{"at": "2026-10-30T04:02:11", "event": "gaps", "missing": 0, "no_kind": 341, "scanned": 1993, "third_party": 0}
