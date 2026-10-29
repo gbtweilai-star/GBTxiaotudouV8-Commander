@@ -56,3 +56,37 @@
 {"at": "2026-10-29T10:15:32", "act": "dead", "svc": "她的界面 :8080"}
 {"at": "2026-10-29T10:16:03", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 571}
 {"at": "2026-10-29T10:16:11", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:16:42", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3820}
+{"at": "2026-10-29T10:16:49", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:17:20", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3695}
+{"at": "2026-10-29T10:17:28", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:17:59", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3640}
+{"at": "2026-10-29T10:18:06", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:18:37", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3632}
+{"at": "2026-10-29T10:18:45", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:19:16", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3622}
+{"at": "2026-10-29T10:19:23", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:19:55", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 50}
+{"at": "2026-10-29T10:20:02", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:20:33", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 359}
+{"at": "2026-10-29T10:20:41", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:21:12", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 369}
+{"at": "2026-10-29T10:21:20", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:21:51", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 323}
+{"at": "2026-10-29T10:21:58", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:22:29", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 313}
+{"at": "2026-10-29T10:22:37", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:23:08", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 257}
+{"at": "2026-10-29T10:23:19", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:23:50", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 364}
+{"at": "2026-10-29T10:23:58", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:24:29", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3841}
+{"at": "2026-10-29T10:24:37", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:25:08", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3798}
+{"at": "2026-10-29T10:25:15", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:25:46", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3233}
+{"at": "2026-10-29T10:25:54", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:26:25", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3202}
+{"at": "2026-10-29T10:26:32", "act": "dead", "svc": "她的界面 :8080"}
+{"at": "2026-10-29T10:27:03", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": false, "essential": true, "mem_mb": 3090}
+{"at": "2026-10-29T10:27:11", "act": "dead", "svc": "她的界面 :8080"}

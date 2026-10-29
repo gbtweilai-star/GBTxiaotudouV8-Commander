@@ -467,7 +467,8 @@ class Handler(BaseHTTPRequestHandler):
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status",
-                 "/_cap", "/_tentacle/hello")
+                 "/_cap", "/_tentacle/hello",
+                 "/v1/messages", "/v1/messages/count_tokens")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -482,6 +483,71 @@ class Handler(BaseHTTPRequestHandler):
         #   而 iOS WebKit 的 getVoices() 首次常返回 0 ⇒ 落到错嗓音念中文 ⇒ 鬼叫。
         #   现在页面的唯一出口是这里：走 tentacle_bus 的嘴（edge-tts 曉臻·台湾腔），
         #   实在没有 edge-tts 才退 apple-speak zh-TW；两条都没有就如实说没有。
+        # ── Anthropic 兼容（免切换的关键：一个本地端点讲两套协议）──────────
+        # 学的是 EchoBird 那条原理：本地固定端点 + 上游聚合 ⇒ 应用不用改配置。
+        # 我们已经有 OpenAI 那套；这里补 /v1/messages，让 Claude Code / Codex /
+        # WorkBuddy 这类只认 Anthropic 协议的客户端也能直连，**内部照走同一条降级链**
+        # （A19 selfhost 优先 → 其它）。
+        # 实现方式是**薄适配**：转成 OpenAI 请求打自己的 /v1/chat/completions，
+        # 不重复写一遍链逻辑 —— 否则两条路的降级行为迟早漂移。
+        if self.path.startswith("/v1/messages"):
+            import urllib.request as _U
+
+            def _flat(c):
+                if isinstance(c, str):
+                    return c
+                if isinstance(c, list):
+                    return "".join(str(x.get("text") or "") for x in c if isinstance(x, dict))
+                return ""
+
+            sysmsg = _flat(body.get("system"))
+            msgs = []
+            if sysmsg:
+                msgs.append({"role": "system", "content": sysmsg})
+            for m in (body.get("messages") or []):
+                if isinstance(m, dict):
+                    msgs.append({"role": str(m.get("role") or "user"),
+                                 "content": _flat(m.get("content"))})
+            if self.path.endswith("/count_tokens"):
+                n = sum(len(m["content"]) for m in msgs)
+                return self._json(200, {"input_tokens": max(1, n // 2)})
+            oai = {"messages": msgs,
+                   "max_tokens": int(body.get("max_tokens") or 1024),
+                   "temperature": body.get("temperature", 0.7),
+                   "stream": False}
+            req = _U.Request("http://127.0.0.1:%d/v1/chat/completions"
+                             % self.server.server_address[1],
+                             data=json.dumps(oai).encode(),
+                             headers={"Content-Type": "application/json"})
+            try:
+                with _U.urlopen(req, timeout=180) as r:
+                    d = json.loads(r.read())
+                    lane = r.headers.get("X-GBT-Lane")
+                    ours = r.headers.get("X-GBT-Weights-Ours")
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"type": "error", "error": {
+                    "type": "api_error", "message": "%s: %s"
+                    % (type(exc).__name__, str(exc)[:120])}})
+            txt = _cut_at_stop((((d.get("choices") or [{}])[0] or {})
+                                .get("message") or {}).get("content", ""))
+            u = d.get("usage") or {}
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("X-GBT-Lane", lane or "")
+            self.send_header("X-GBT-Weights-Ours", ours or "")
+            self._cors()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                "id": "msg_" + str(int(time.time() * 1000)),
+                "type": "message", "role": "assistant", "model": d.get("model"),
+                "content": [{"type": "text", "text": txt}],
+                "stop_reason": "end_turn",
+                "stop_sequence": None,
+                "usage": {"input_tokens": u.get("prompt_tokens") or 0,
+                          "output_tokens": u.get("completion_tokens") or 0},
+            }, ensure_ascii=False).encode("utf-8"))
+            return
+
         # ── 触手接管器用：页面每一个可交互点都经这里调能力位 ──────────
         # 🔴 2026-10-29：tentacle-kit.js 依赖 window.gbtW3.cap()，而那只在 Electron 壳里有。
         #   在 Safari 里没有 ⇒ kit 只能报"无桥" ⇒ **20/28 个页面等于没接触手**。

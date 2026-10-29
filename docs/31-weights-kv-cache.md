@@ -721,3 +721,67 @@ App 的额度：5.24 GB 权重已在跑（App 有自己的内存 entitlement）
 而 App 起服务需要**一段不被打断的前台时间**（5.24 GB 冷加载约 100 秒）——
 这是 iOS 单前台限制，不是配置问题。
 
+
+---
+
+## 十四、学 EchoBird 那条原理：一个本地端点讲两套协议（2026-10-29）
+
+主人给了 EchoBird（`127.0.0.1:55536/v1`）的截图，问原理。看懂后照做。
+
+### 它的原理（三句话）
+
+```
+① 本地固定端点上跑一个**代理**，应用只认这一个地址 ⇒ 免切换
+② 代理**同时讲两套协议**：OpenAI(/v1/chat/completions) + Anthropic(/v1/messages)
+③ 上游挂**一堆源**（NVIDIA NIM / OpenRouter / Kilo / OpenCode Zen / Gemini / Groq…）
+   ⇒ 可负载、可故障转移、免费额度轮换
+```
+
+**它不是模型，是「插座」。** 应用换上游不用改配置，因为配置里永远只有本地那一个地址。
+
+### 我们其实已经在做，但只做了一半
+
+```
+model_bridge(:8791)
+  ✅ 本地固定端点
+  ✅ 10 个上游 + 降级链（selfhost → ours → freepool → deepseek …）
+  ✅ 回执带 X-GBT-Lane / X-GBT-Weights-Ours（谁答的、是不是自有权重）
+  ❌ 只讲 OpenAI 协议 —— Claude Code / Codex / WorkBuddy 这类只认 Anthropic 的接不进来
+```
+
+### 补上 `/v1/messages`（薄适配，不重写链逻辑）
+
+```
+POST /v1/messages            → 收 Anthropic 格式（system / messages[].content[]）
+                             → 转成 OpenAI 请求，打**自己的** /v1/chat/completions
+                             → 把回包转回 Anthropic 格式（type=message / content[].text / usage）
+POST /v1/messages/count_tokens → 粗估 input_tokens
+```
+
+**为什么走"打自己"而不是重写一遍链**：重写两条路，降级行为迟早漂移 ——
+这与 `_self_label` / `recall` 那几次"同一逻辑写两遍"的教训同源。
+
+### 实测
+
+```
+POST /v1/messages  {"system":"你是 GBT小土豆V8…","messages":[{"role":"user","content":[{"type":"text","text":"用一句话说你是谁"}]}]}
+← {type:message, stop_reason:end_turn, usage:{input_tokens:22, output_tokens:19},
+   content:[{type:text, text:"我是GBT小土豆V8，由自由的风开发的小土豆助手，随时为你服务！"}]}
+   X-GBT-Lane: deepseek · X-GBT-Weights-Ours: false   ← A19 没起，如实标降级
+```
+
+**关键：降级时如实标 `false`，不冒充自有权重。** 这是和 EchoBird 那类工具最大的不同 ——
+它们是"能用就行"，我们**必须说清这一发是谁答的**。
+
+### 现在的形状
+
+```
+任何客户端（OpenAI 系 / Anthropic 系）
+        ↓ 只认一个地址
+  http://127.0.0.1:8791
+        ↓ 内部降级链
+  A19 selfhost → ours → freepool → deepseek …
+        ↓ 回执永远带 lane / weights_ours
+```
+
+**A19 一起来，同一条链自动切 selfhost，客户端一个字都不用改。**
