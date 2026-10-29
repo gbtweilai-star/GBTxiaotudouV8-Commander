@@ -70,10 +70,10 @@ start_bridge() {
   if running 8791 "model_bridge.py"; then say ":8791 模型桥" "✅ 已在跑"; return; fi
   pkill -f 'model_bridge.py' 2>/dev/null; sleep 1
   cd "$BASE" || return
-  # 🔴 2026-10-28 主人口径：A19 不在时也要能答（可用性优先）。
-  #   GBT_ALLOW_CLOUD_FALLBACK=1 是框架留的正规开关；降级后回包照旧如实标
-  #   lane / weights_ours=false，可审计，不冒充自有权重。
-  GBT_ALLOW_CLOUD_FALLBACK=1 \
+    # 🔴 2026-10-30 改：主人今日口径优先于 10-28「可用性优先」——
+    #   不拿主人的钱、不靠云端判断 ⇒ 降级默认关，探不到就如实报错。
+    #   真要用可用性优先，自己 export GBT_ALLOW_CLOUD_FALLBACK=1，不再由脚本替你决定。
+    GBT_ALLOW_CLOUD_FALLBACK="${GBT_ALLOW_CLOUD_FALLBACK:-0}" \
     setsid nohup python3 -u runtime/model_bridge.py --port 8791 > "$LOG/bridge.log" 2>&1 < /dev/null &
   if $PB wait 8791 30 >/dev/null 2>&1; then say ":8791 模型桥" "✅ 已就绪"
   else say ":8791 模型桥" "🔴 未起 → logs/bridge.log"; fi

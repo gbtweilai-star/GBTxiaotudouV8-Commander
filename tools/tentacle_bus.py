@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import socket
 import shutil
 import subprocess
 import sys
@@ -149,6 +150,97 @@ def t_apple_player(text: str = "", **kw):
     return r.returncode == 0, (r.stderr or "ok")[:120], {}
 
 
+# ── her 器官：让她（A19 自有权重）能被联通 ────────────────────────────────
+# 立命规矩（主人 2026-10-28）：「所有的一切都可使用触手来联通传输，没必要死卡在
+# 传统方式」。所以这里**不是断言"只能 1234"**，而是把能想到的每条传输都真打一遍，
+# 由 tried 如实记下哪条没过、为什么没过 —— 不许让人猜。
+def _lan_ip() -> str:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(1)
+        s.connect(("8.8.8.8", 53))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:                                             # noqa: BLE001
+        return ""
+
+
+def _a19_probe(host: str, port: int = 1234, timeout: float = 4.0):
+    """真发一次 /v1/models —— TCP 通不算活，拿到 JSON 才算。"""
+    import json as _j
+    import urllib.request as _u
+    h = "[%s]" % host if ":" in host else host
+    req = _u.Request("http://%s:%d/v1/models" % (h, port),
+                     headers={"Authorization": "Bearer gbt"})
+    body = _u.urlopen(req, timeout=timeout).read(4000).decode("utf-8", "replace")
+    d = _j.loads(body)
+    items = d.get("data") or d.get("models") or []
+    name = ""
+    if items:
+        first = items[0]
+        name = first.get("id") if isinstance(first, dict) else str(first)
+    return name, body[:200]
+
+
+def t_a19_loopback(text: str = "", **kw):
+    try:
+        name, sample = _a19_probe("127.0.0.1")
+        return True, "回环 :1234 应答 model=%s" % (name or "?"), {"model": name}
+    except Exception as exc:                                      # noqa: BLE001
+        return False, "回环 :1234 %s" % type(exc).__name__, {}
+
+
+def t_a19_lan(text: str = "", **kw):
+    ip = _lan_ip()
+    if not ip:
+        return False, "取不到网卡地址", {}
+    try:
+        name, sample = _a19_probe(ip)
+        return True, "网卡 %s:1234 应答 model=%s" % (ip, name or "?"), {"model": name}
+    except Exception as exc:                                      # noqa: BLE001
+        return False, "网卡 %s:1234 %s" % (ip, type(exc).__name__), {}
+
+
+def t_a19_bridge(text: str = "", **kw):
+    """经我们自己的桥（:8791 selfhost 车道）—— 桥在不在、通不通，它自己会说。"""
+    import json as _j
+    import urllib.request as _u
+    try:
+        req = _u.Request("http://127.0.0.1:8791/v1/chat/completions",
+                         data=_j.dumps({"model": "", "upstream": "selfhost",
+                                        "max_tokens": 8,
+                                        "messages": [{"role": "user",
+                                                      "content": text or "在吗"}]}).encode(),
+                         headers={"Content-Type": "application/json",
+                                  "Authorization": "Bearer gbt"})
+        d = _j.loads(_u.urlopen(req, timeout=40).read())
+        if d.get("ok"):
+            return True, "桥 selfhost 应答", {"answer": str(d)[:200]}
+        return False, "桥如实报：%s" % (d.get("error", {}).get("message", "")[:80]), {}
+    except Exception as exc:                                      # noqa: BLE001
+        return False, "桥不通 %s" % type(exc).__name__, {}
+
+
+def t_a19_deeplink(text: str = "", **kw):
+    """把 App 拉到前台（这是唯一能碰它的动作）—— 打开后立刻探，看服务跟不跟着起。"""
+    if not shutil.which("apple-open"):
+        return False, "本机无 apple-open", {}
+    r = subprocess.run(["apple-open", kw.get("url") or "lmpocket://"],
+                       capture_output=True, text=True, timeout=30)
+    opened = "false"
+    try:
+        opened = str(json.loads(r.stdout or "{}").get("data", {}).get("opened")).lower()
+    except Exception:                                             # noqa: BLE001
+        pass
+    time.sleep(kw.get("wait", 20))
+    try:
+        name, _ = _a19_probe("127.0.0.1")
+        return True, "拉起后 :1234 应答 model=%s" % (name or "?"), {"model": name}
+    except Exception as exc:                                      # noqa: BLE001
+        return False, "拉起 opened=%s，但 :1234 仍 %s" % (opened, type(exc).__name__), {}
+
+
 # ── 触手表：每根挂多条传输，按序试 ─────────────────────────────────────────
 TENTACLES: dict[str, list[tuple[str, callable]]] = {
     "mouth": [("edge-tts-zhTW", t_edge_tts),
@@ -156,6 +248,11 @@ TENTACLES: dict[str, list[tuple[str, callable]]] = {
               ("powershell", t_powershell)],
     "ear":   [("apple-speech", t_apple_speech)],
     "play":  [("apple-player", t_apple_player)],
+    # 她：四条传输，谁通走谁；全不通就如实报哪条为什么没过
+    "her":   [("http-loopback", t_a19_loopback),
+              ("http-lan", t_a19_lan),
+              ("bridge-selfhost", t_a19_bridge),
+              ("deeplink+lazy-probe", t_a19_deeplink)],
 }
 
 

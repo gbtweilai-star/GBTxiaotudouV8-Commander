@@ -34,8 +34,10 @@ SVCS = [
     ("她的界面 :8080",   8080, True,
      "python3 -m http.server 8080 --bind 127.0.0.1 > logs/page.log 2>&1"),
     ("模型桥 :8791",     8791, True,
-     "GBT_ALLOW_CLOUD_FALLBACK=1 python3 -u runtime/model_bridge.py --port 8791"
-     " > logs/bridge.log 2>&1"),
+     # 🔴 2026-10-30 修：这里原来带 GBT_ALLOW_CLOUD_FALLBACK=1 —— 监控壳偷偷把
+     #   「A19 探不到就如实报错」改成了「静默降级云端」。壳无权改策略；且降级可能花钱。
+     #   主人今日口径：不拿他的钱、不靠云端判断。
+     "python3 -u runtime/model_bridge.py --port 8791 > logs/bridge.log 2>&1"),
     ("批量车道 :8790",   8790, True,
      "python3 -u runtime/async_gate.py --port 8790 > logs/async_gate.log 2>&1"),
     ("巡检",             0,    True,
@@ -104,8 +106,57 @@ def proc_up(name: str) -> bool:
         return False
 
 
+# 2026-10-30 生产硬伤修复：
+#   iSH 被 iOS 挂起时，**内核继续替进程排队接收 TCP 连接**，但进程本身不答 HTTP。
+#   实测：TCP 连上 0.02s，GET /health 6 秒零字节 ⇒ 原来只看 TCP 就永远判"活着"，
+#   冻结的服务永远不会被重启（这就是「服务偶发静默消失」的真因）。
+#   所以：有 HTTP 面的服务必须拿到真回执才算活着。
+HEALTH = {
+    8080: "/index.html",   # 她的界面
+    8791: "/health",       # 模型桥
+    8790: "/health",       # 批量车道
+    8765: "/api/state",    # 面板后端
+    8792: "/health",       # 索引层
+}
+
+KILL_PAT = {
+    "她的界面 :8080": "http.server 8080",
+    "模型桥 :8791": "model_bridge.py",
+    "批量车道 :8790": "async_gate.py",
+    "面板后端 :8765": "panel_server.py",
+    "索引层 :8792": "index_daemon.py",
+    "巡检": "duty_patrol.py",
+}
+
+
+def http_ok(port: int, timeout: float = 5.0) -> bool:
+    """真发一次 HTTP，拿到 2xx/3xx 才算活着。"""
+    import urllib.request as _u
+    path = HEALTH.get(port, "/health")
+    try:
+        r = _u.urlopen("http://127.0.0.1:%d%s" % (port, path), timeout=timeout)
+        code = getattr(r, "status", 200)
+        r.read(64)
+        return 200 <= code < 400
+    except Exception:                                             # noqa: BLE001
+        return False
+
+
 def is_up(name: str, port: int) -> bool:
-    return port_up(port) and proc_up(name)
+    if not port_up(port):
+        return False
+    if port in HEALTH:
+        return http_ok(port)          # TCP 通不算活，必须真回话
+    return proc_up(name)
+
+
+def kill_frozen(name: str) -> bool:
+    """进程在、端口不答 ⇒ 先杀掉僵尸，否则新进程绑不上端口。"""
+    pat = KILL_PAT.get(name)
+    if not pat:
+        return False
+    r = subprocess.run(["pkill", "-9", "-f", pat], capture_output=True)
+    return r.returncode == 0
 
 
 def kill_nonessential() -> list:
@@ -183,6 +234,14 @@ def ensure_all(verbose: bool = True) -> dict:
     for name, port, ess, cmd in SVCS:
         if is_up(name, port):
             continue
+        # 端口不通 / TCP 通但不答：可能是冻结的僵尸，先清掉再起
+        if port_up(port) or proc_up(name):
+            killed = kill_frozen(name)
+            if verbose:
+                print("    🔪 %-16s 进程在但不答 ⇒ 清僵尸后重起" % name)
+            _log({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "act": "kill_frozen",
+                  "svc": name, "killed": bool(killed), "mem_mb": mem_free_mb()})
+            time.sleep(1)
         if low and not ess:
             out["skipped"].append(name)
             _YIELDED[name] = time.time()

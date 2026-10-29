@@ -2414,3 +2414,25 @@
 {"at": "2026-10-29T10:29:01", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
 {"at": "2026-10-29T10:34:02", "event": "bind", "asset": "tools/a19_wait.py", "tentacle": "health", "note": "autobind"}
 {"at": "2026-10-29T10:34:03", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
+{"at": "2026-10-29T10:39:04", "event": "bind", "asset": "tools/up.sh", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-29T10:39:05", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
+{"at": "2026-10-29T10:44:37", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
+{"at": "2026-10-29T23:31:32", "event": "bind", "asset": "tools/a19_sentinel.py", "tentacle": "omni_plug", "note": "autobind"}
+{"at": "2026-10-29T23:31:32", "event": "bind", "asset": "tools/_retired/a19_hunter.py", "tentacle": "omni_plug", "note": "autobind"}
+{"at": "2026-10-29T23:31:32", "event": "bind", "asset": "tools/_retired/README.md", "tentacle": "project_context", "note": "autobind"}
+{"at": "2026-10-29T23:31:34", "event": "prune", "asset": "tools/a19_watch.sh", "tentacles": ["tentacle_bind"], "why": "不在盘上（转瞬即逝的中间产物）"}
+{"at": "2026-10-29T23:31:34", "event": "prune", "asset": "tools/a19_watch.py", "tentacles": ["tentacle_bind"], "why": "不在盘上（转瞬即逝的中间产物）"}
+{"at": "2026-10-29T23:31:34", "event": "prune", "asset": "tools/a19_catch.py", "tentacles": ["tentacle_bind"], "why": "不在盘上（转瞬即逝的中间产物）"}
+{"at": "2026-10-29T23:31:34", "event": "prune", "asset": "tools/a19_wait.py", "tentacles": ["tentacle_bind", "health"], "why": "不在盘上（转瞬即逝的中间产物）"}
+{"at": "2026-10-29T23:31:34", "event": "autobind", "files": 3, "bound": 3, "hint": "omni_plug", "pruned": 4}
+{"at": "2026-10-29T23:33:15", "event": "bind", "asset": "tools/body.py", "tentacle": "omni_plug", "note": "autobind"}
+{"at": "2026-10-29T23:33:15", "event": "bind", "asset": "tools/test_a19_chain.py", "tentacle": "omni_plug", "note": "autobind"}
+{"at": "2026-10-29T23:33:16", "event": "autobind", "files": 4, "bound": 4, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T00:15:06", "event": "bind", "asset": "tools/a19_sentinel.py", "tentacle": "brain_route", "note": "autobind"}
+{"at": "2026-10-30T00:15:07", "event": "bind", "asset": "tools/tentacle_bus.py", "tentacle": "brain_route", "note": "autobind"}
+{"at": "2026-10-30T00:15:11", "event": "autobind", "files": 3, "bound": 3, "hint": "brain_route", "pruned": 0}
+{"at": "2026-10-30T00:27:03", "event": "bind", "asset": "tools/svc_guard.py", "tentacle": "context_vault", "note": "autobind"}
+{"at": "2026-10-30T00:27:03", "event": "bind", "asset": "tools/up.sh", "tentacle": "context_vault", "note": "autobind"}
+{"at": "2026-10-30T00:27:06", "event": "autobind", "files": 2, "bound": 2, "hint": "context_vault", "pruned": 0}
+{"at": "2026-10-30T00:51:55", "event": "bind", "asset": "tools/svc_guard.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-30T00:51:56", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
