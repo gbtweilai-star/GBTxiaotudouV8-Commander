@@ -328,6 +328,20 @@ def main() -> int:
                 fn()
             except Exception as exc:                          # noqa: BLE001
                 rec("FAIL", fn.__name__, "%s: %s" % (type(exc).__name__, str(exc)[:60]))
+    # 触手页面覆盖：**每一页都要被触手覆盖**（主人令 2026-10-21/2026-10-29）
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "page_tentacle.py"), "scan"],
+                       capture_output=True, text=True, timeout=240, cwd=str(ROOT))
+        _tp = json.loads((ROOT / "state" / "page_tentacles.json").read_text(encoding="utf-8"))
+        _pg, _cv, _rp = _tp.get("pages") or 0, _tp.get("covered") or 0, _tp.get("reported") or 0
+        _miss = [r["page"] for r in (_tp.get("rows") or []) if not r.get("covered")]
+        rec("PASS" if not _miss else "FAIL", "触手页面覆盖",
+            "%d/%d 页已接（web 壳+kit）%s" % (_cv, _pg,
+            ("；缺：" + "、".join(_miss[:3])) if _miss else ""))
+        rec("INFO", "页面真报到过", "%d/%d 页（在浏览器里真跑起来并回过桥）" % (_rp, _pg))
+    except Exception as _e:                                   # noqa: BLE001
+        rec("ENV", "触手页面覆盖", "跑不起来：%s" % type(_e).__name__)
+
     # 吸收前闸：吞进来的东西必须先过拆解/分析/跑通
     try:
         subprocess.run([sys.executable, str(ROOT / "tools" / "intake_gate.py")],

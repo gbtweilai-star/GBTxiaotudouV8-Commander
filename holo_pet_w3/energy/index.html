@@ -61,4 +61,8 @@ if (globalThis.GBT_ENERGY && globalThis.GBT_ENERGY.generated_at) {
   document.title = "GBT小土豆V8 · 能量与绑定状态（" + globalThis.GBT_ENERGY.counts.caps + " 能力位 / " + globalThis.GBT_ENERGY.counts.energy_channels + " 通道）";
 }
 </script>
+
+<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
+<script src="../shell/tentacle-bridge.js?v=20261029"></script>
+<script src="../shell/tentacle-kit.js?v=20261029"></script>
 </body></html>

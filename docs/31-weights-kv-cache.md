@@ -534,3 +534,80 @@ gbt guard status / ensure / watch --interval 30
 ```
 
 **这就是闭环：坏了会自己活，让位有账，验收不会把"主动停"误判成"坏了"。**
+
+---
+
+## 十一、触手覆盖每一页（主人令 2026-10-21 / 2026-10-29）
+
+主人原话：「**所有的代码页面都要使用触手双向绑定，每一页都要使用触手覆盖每一个代码**」
+「实现以后就永远不会出现丢失能力或者打不通的硬性要求」
+
+### 实测缺口（这才是真话）
+
+```
+holo_pet_w3 下 28 个活页面：**20 个连 tentacle-kit 都没引**
+引了的那 8 个依赖 window.gbtW3 —— **只有 Electron 壳才有**
+⇒ 在 Safari / 浏览器直开时，kit 只能报「无桥」⇒ 页面等于没接触手
+tentacle_bind 实报：bindings: 0（这一仓从来没绑过，状态留在 Windows 那台）
+```
+
+**结论：`tentacle-kit.js` 的设计本来就是主人要的那套**（每个可交互点必须经能力位、
+不许有死控件、每次调用弹回执、调完盖 `data-tentacle="1"`）。
+缺的不是设计，是**两个执行件 + 一次全页注入**。
+
+### 补的三件
+
+**① 桥的两个入口（`runtime/model_bridge.py`）**
+
+```
+POST /_cap              {cap, payload} → 桥里转 run_task → 回执
+                        —— 网页版唯一门。门照跑、权限照判、页面零凭据。
+POST /_tentacle/hello   {page, kit, controls} → state/page_tentacle_hello.jsonl
+                        —— 页面报到，证明"这一页真活着、真接了触手"
+```
+
+**② 网页壳填充（`holo_pet_w3/shell/tentacle-bridge.js`）**
+
+补上 Safari 里缺的 `window.gbtW3`（`cap` / `toast` / `status`），
+并在 load 后自动报到。无桥时**如实说无桥**，不假装成功。
+
+**③ 全页注入器（`tools/page_tentacle.py`）**
+
+```
+scan     逐页量：kit？web 壳？控件几个？被触手盖章几个？报到过没？
+enforce  给缺的页面注入两行 <script>（**web 壳必须在 kit 之前**），幂等
+ledger   state/page_tentacles.json 一页一行
+命令     gbt pages scan | enforce
+```
+
+### 打磨中撞到的三个真问题
+
+**① 顺序反了 —— 11/28 页白接**
+它们本来就在 `<head>` 引了 kit，我把 web 壳注到 `</body>`
+⇒ kit 启动时 `gbtW3` 还不存在 ⇒ 等于没接。
+修：检测到顺序反了就把壳**搬到 kit 那个 script 之前**。
+
+**② 报到键对不上 —— 报到数恒 0**
+页面报上来是 `holo_pet_w3/panel/index.html`，扫描用的是 `panel/index.html`。
+**看着像"一次都没连上"，其实连上了。** 修：归一化去掉前缀。
+
+**③ 自己验一次才发现真假**
+光看"脚本引了"不算数。在**真浏览器**里实测：
+
+```
+hasShell: true · hasKit: true
+cap('health') → ok:true · 真回到能力位读数（python 3.12.14 / platform / time）
+stats: calls 1 · ok 1 · fail 0 · bridge http://127.0.0.1:8791
+controls: 53（panel 页的可交互点全在触手管辖下）
+```
+
+### 验收
+
+```
+PASS 触手页面覆盖   28/28 页已接（web 壳 + kit）
+INFO 页面真报到过    1/28 页（在浏览器里真跑起来并回过桥）
+PASS 27 · ENV 4 · INFO 4 · 退出码 0
+```
+
+> 「真报到过 1/28」这个数是**诚实的**：其余 27 页只是接好了，还没被打开过。
+> **接好 ≠ 跑过。** 这个区别必须留在报表里。

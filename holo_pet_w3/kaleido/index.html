@@ -178,4 +178,8 @@ document.getElementById('rec').onclick=function(){
 };
 c.onclick=()=>document.body.classList.toggle('ui');
 start();
-</script></body></html>
+</script>
+<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
+<script src="../shell/tentacle-bridge.js?v=20261029"></script>
+<script src="../shell/tentacle-kit.js?v=20261029"></script>
+</body></html>
