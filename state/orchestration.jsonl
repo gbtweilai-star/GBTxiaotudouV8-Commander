@@ -22,3 +22,12 @@
 {"kind": "run", "item": "编排账本文档记录", "status": "pass", "evidence": "第十二节已写入，含三条硬规矩与首日抓到的三件事", "files": ["docs/31-weights-kv-cache.md"], "at": "2026-10-29T08:18:38"}
 {"kind": "change", "what": ".gitignore 加账本白名单（账本必须进版本库）", "files": [".gitignore"], "why": "state/ 整目录被忽略 ⇒ 账本一重置就丢，审计无据可查", "commit": "", "at": "2026-10-29T08:18:53"}
 {"kind": "run", "item": "账本进版本库", "status": "pass", "evidence": "git add 后 status 显示 A state/orchestration.jsonl 等 5 个账本已入库", "files": [".gitignore"], "at": "2026-10-29T08:18:54"}
+{"kind": "change", "what": "修 tentacle_bind 的 Windows 硬编码 ROOT（bindings 恒 0 的真因）+ 删垃圾目录 + 846 文件真绑", "files": ["tools/tentacle_bind.py"], "why": "Path(r'C:\\Users\\...') 在 Linux 上是相对路径 ⇒ 造同名目录、读空绑定表", "commit": "", "at": "2026-10-29T08:24:08"}
+{"kind": "run", "item": "触手绑定修硬编码并真绑", "status": "pass", "evidence": "修前 bindings=0；auto holo_pet_w3 tentacle → 846 文件；bindings 0→2396", "files": ["tools/tentacle_bind.py"], "at": "2026-10-29T08:24:08"}
+{"kind": "change", "what": "账本修 git 路径转义（core.quotepath=false）+ 删除项单列", "files": ["tools/orch_ledger.py"], "why": "含中文路径被转义成八进制，账本按它比对永远对不上", "commit": "", "at": "2026-10-29T08:24:29"}
+{"kind": "run", "item": "账本路径转义修复", "status": "pass", "evidence": "修后 gate：账目 26 行 · 改动 24 项 · 全部有跑通记录", "files": ["tools/orch_ledger.py"], "at": "2026-10-29T08:24:29"}
+{"kind": "change", "what": "从 git 索引移除历史误提交的 Windows 路径垃圾（3 个文件）并删目录", "files": ["tools/tentacle_bind.py"], "why": "硬编码 ROOT 在 Linux 上造出 C:\\Users\\... 目录，且早前被误提交进仓", "commit": "", "at": "2026-10-29T08:34:44"}
+{"kind": "change", "what": "tentacle_bind ROOT 改仓根相对（核实 ROOT=/var/minis/shared/gbtv8）", "files": ["tools/tentacle_bind.py"], "why": "Windows 硬编码在 Linux 上造垃圾目录、读空绑定表", "commit": "", "at": "2026-10-29T08:45:47"}
+{"kind": "run", "item": "tentacle_bind ROOT 修复验证", "status": "pass", "evidence": "实测 ROOT=/var/minis/shared/gbtv8；删目录后跑 scan 与经 api 调用均不再生成 C:\\ 目录", "files": ["tools/tentacle_bind.py"], "at": "2026-10-29T08:45:48"}
+{"kind": "change", "what": "账本 git 路径解析改 -z（NUL 分隔，彻底不转义）", "files": ["tools/orch_ledger.py"], "why": "含反斜杠/中文路径被 git 引号+八进制转义，比对永远失败", "commit": "", "at": "2026-10-29T08:45:48"}
+{"kind": "run", "item": "账本路径解析", "status": "pass", "evidence": "改用 git status -z 后不再出现 345/260/217 这类八进制串", "files": ["tools/orch_ledger.py"], "at": "2026-10-29T08:45:48"}
