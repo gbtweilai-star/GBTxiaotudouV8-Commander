@@ -41,3 +41,5 @@
 {"kind": "run", "item": "本机自跑可行性实测", "status": "pass", "evidence": "单映射1.70GB/累计2.2GB/no-mmap需4.09GB；llama-gguf-split 4.21s切3片但加载仍超；单片量化需2.8GB失败", "files": ["docs/31-weights-kv-cache.md"], "at": "2026-10-29T10:16:30"}
 {"kind": "change", "what": "桥补 Anthropic 兼容 /v1/messages（学 EchoBird 免切换原理）", "files": ["runtime/model_bridge.py"], "why": "只讲 OpenAI 时 Claude Code/Codex/WorkBuddy 接不进来", "commit": "", "at": "2026-10-29T10:27:26"}
 {"kind": "run", "item": "Anthropic 协议端点", "status": "pass", "evidence": "POST /v1/messages → 200 · type=message · stop=end_turn · usage{22,19} · 文案正确 · X-GBT-Lane: deepseek（如实标降级）", "files": ["runtime/model_bridge.py"], "at": "2026-10-29T10:27:26"}
+{"kind": "change", "what": "触手插座注册表 source_registry：上游从文件读，加一行=接一个源（A19 也是一个源）", "files": ["tools/source_registry.py", "runtime/model_bridge.py", "state/upstreams.extra.json"], "why": "主人：触手可以把任何东西像这样连接起来使用", "commit": "", "at": "2026-10-29T10:28:43"}
+{"kind": "run", "item": "可插拔上游", "status": "pass", "evidence": "加 1 行后 /health 上游 10→11 认出新源；探活区分 ✅可达/🟡缺钥/🔴不可达（openai 401 判为可达）", "files": ["tools/source_registry.py", "runtime/model_bridge.py"], "at": "2026-10-29T10:28:43"}

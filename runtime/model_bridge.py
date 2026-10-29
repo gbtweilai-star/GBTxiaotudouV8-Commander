@@ -87,7 +87,28 @@ UPSTREAMS = {
 DEFAULT = "selfhost"     # A19 优先：手机自己的算力
 
 # 哪些上游算「自有权重」（页面据此标 ✅ / ⚠）。免费池和云端通用模型都不算。
-OURS_LANES = {"selfhost", "ours", "ours-alt", "local"}
+# ── 触手插座：**任何东西挂上来 = 加一行**（主人 2026-10-29「触手可以把任何东西
+#    像这样连接起来使用」）────────────────────────────────────────────
+# 学 EchoBird 那条原理：本地固定端点 + 上游聚合 ⇒ 应用免切换。
+# 差别在这里：**上游不是写死在代码里**，而是从 state/upstreams.extra.json 现读，
+# 格式与 omni_plug 的插座描述符同形 ⇒ 插一次（或加一行）就等于接上一个源。
+#   [{"name":"gemini-free","base":"https://...","model":"...","key":"env:KEY","timeout":60,
+#     "ours":false}]
+# ours=true 的源才会被算进「自有权重」；不给就是 false —— 不冒充。
+_EXTRA = ROOT / "state" / "upstreams.extra.json"
+try:
+    for _x in (json.loads(_EXTRA.read_text(encoding="utf-8")) if _EXTRA.is_file() else []):
+        _n = str(_x.get("name") or "").strip()
+        if not _n or _n in UPSTREAMS:
+            continue
+        UPSTREAMS[_n] = (str(_x.get("base") or ""), str(_x.get("model") or ""),
+                         _x.get("key") or None, float(_x.get("timeout") or 60))
+        if _x.get("ours"):
+            globals().setdefault("_EXTRA_OURS", set()).add(_n)
+except Exception as _e:                                       # noqa: BLE001
+    sys.stderr.write("[bridge] 读 %s 失败：%s\n" % (_EXTRA.name, _e))
+
+OURS_LANES = {"selfhost", "ours", "ours-alt", "local"} | set(globals().get("_EXTRA_OURS") or set())
 
 # 降级链：指定的上游**网络不可达**时，按顺序自动往下试，不让整条链路哑掉。
 # 只在「连不上/超时」时降级；上游明确回了 4xx/5xx 就如实上报，不掩盖。

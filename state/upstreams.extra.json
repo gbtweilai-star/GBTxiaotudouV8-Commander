@@ -1,0 +1,31 @@
+[
+ {
+  "name": "openai-public",
+  "base": "https://api.openai.com/v1",
+  "model": "gpt-4o-mini",
+  "key": "env:OPENAI_API_KEY",
+  "timeout": 60.0,
+  "ours": false,
+  "added_at": "2026-10-29T10:28:34",
+  "last_probe": {
+   "ok": false,
+   "reachable": true,
+   "needs_key": true,
+   "why": "HTTP 401：端点活着，缺钥匙"
+  }
+ },
+ {
+  "name": "a19-local",
+  "base": "http://127.0.0.1:1234/v1",
+  "model": "gbt-v8-v82-q5_0",
+  "key": "env:GBT_A19_KEY",
+  "timeout": 60.0,
+  "ours": true,
+  "added_at": "2026-10-29T10:28:35",
+  "last_probe": {
+   "ok": false,
+   "reachable": false,
+   "why": "URLError: <urlopen error [Errno 111] Connection refused>"
+  }
+ }
+]
