@@ -178,3 +178,68 @@ python3 tools/test_page_probe.py    # 页面回归 10 条（自动起假桥、�
 
 **这条同样解释了另一件事**：页面走「经桥」那条车道在 Safari 里本来就不可用，
 能用的只有「⚡ 直连 A19」—— 它只依赖 LM Pocket 活着。
+
+## 2.7 查证记录：为什么容器外没有入口（2026-10-30 全网查过）
+
+**这一节是为了不再重复查。** 下次有人问「能不能用深链/自动化把服务打开」，答案在这。
+
+### ① 权威结论：iOS 不允许点别人家的界面
+
+Apple 官方社区（discussions.apple.com/thread/256368048）原文：
+
+> Apple's Shortcuts framework can interact with apps when those apps expose supported
+> Shortcuts actions or App Intents. But it generally **cannot take arbitrary control of
+> another app's user interface and tap an exact location on the screen**.
+
+⇒ 除非 App 自己暴露了 App Intent / Shortcuts action，「点那一下」无解。
+
+### ② LM Pocket 没有公开任何 API / Shortcuts 文档
+
+查过的源，全部记录在案：
+
+| 源 | 结果 |
+|---|---|
+| `teobouancheau.com/projects/lmpocket`（作者项目页） | 只写特性列表，无操作说明 |
+| `teobouancheau.com/blog` | 空（"essays are on the way"） |
+| `teobouancheau.com/sitemap.xml` | 只有 projects/products/services，无文档页 |
+| `stellarwind.io`（卖家站点）sitemap | 只有房产计算器与博客，无 LM Pocket 页 |
+| App Store 元数据（iTunes lookup, id=6767252400） | 描述完整，但无「怎么开服务」 |
+| **版本说明 1.0.6** | 「Improved model loading and **server controls**」「**Persistent request logs**」 ⇒ 服务开关是 App 内的 UI 控件 |
+| App Store 用户评价（th/us/fr 三区 RSS） | 0 条 |
+| 全网检索（DDG/Bing） | 只有同名 LM Studio，无 LM Pocket 资料 |
+
+### ③ 深链系统扫描：9 个变体全灭
+
+```
+lmpocket://server/start      opened=False  :1234=断
+lmpocket://start-server      opened=False  :1234=断
+lmpocket://api/start         opened=False  :1234=断
+lmpocket://settings/server   opened=False  :1234=断
+lmpocket://?action=start     opened=False  :1234=断
+lmpocket://toggle-server     opened=False  :1234=断
+lmpocket://serve             opened=False  :1234=断
+lmpocket://begin             opened=False  :1234=断
+lmpocket://load              opened=False  :1234=断
+```
+
+（每个变体间隔 25 秒，扫完再探端口）
+
+### ④ 连 `apple-open` 本身也是间歇的
+
+同一台机器、同一时刻：
+
+```
+apple-open settings      → opened=True     （稳定）
+apple-open tel:10086     → opened=True     （稳定）
+apple-open https://example.com → opened=False
+apple-open lmpocket://   →  intermittently True（今天两次：23:06、23:35）
+```
+
+用自建监听器做过控制实验：`python` 自己打 `:8899/pytest` 有记录，
+`apple-open` 打的那发**一条都没到** ⇒ 它确实没派发。
+
+### ⑤ 目前唯一通过的实测
+
+2026-10-29 05:43:16 抓到过一次真机读数（`gbt-v8-v82-q5_0 · 10.71 tok/s · 身份自述正确`）——
+说明链是通的，只差服务被打开。**那一次是靠宿主手工点的。**
+
