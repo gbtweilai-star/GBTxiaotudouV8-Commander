@@ -92,7 +92,7 @@ def slots() -> list:
     ]
     for k in ("GBT_LLM_API_KEY", "GBT_POTATO_API_KEY", "GBT_POTATO_BASE_URL", "GBT_POTATO_MODEL",
               "GBT_LLM_PROVIDER", "UNIFIED_API_KEY"):
-        # 🔴 2026-10-01 修（真缺陷）：**读用户注册表**，不是读本进程的环境。
+ # 2026-10-01 修（真缺陷）：**读用户注册表**，不是读本进程的环境。
         #   病根：`setx` 写的是**用户级环境变量**，而已在运行的进程（含生成器、含那班自动化）
         #   继承的是它启动时那份旧环境 ⇒ 页面上会把主人**已经设过**的变量显示成「未设」，
         #   也会把旧值当现值（本会话实测：`GBT_POTATO_API_KEY` 进程里还是 `loca****`，

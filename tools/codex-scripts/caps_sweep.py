@@ -78,7 +78,7 @@ def classify(o: dict, timed_out: bool = False) -> str:
         return "超时"
     if o.get("denied"):
         return "如实拒"
-    # 🔴 先认本体自己报的错类（error_class），**不要拿 env_status==error 当崩**：
+ # 先认本体自己报的错类（error_class），**不要拿 env_status==error 当崩**：
     #    实测 browser 无参就是 `status:error + message:'缺少 url' + error_class:'user_error'` —— 那叫「要参数」。
     ec = str(o.get("error_class") or "")
     rs = str(o.get("result_status") or "")
@@ -90,7 +90,7 @@ def classify(o: dict, timed_out: bool = False) -> str:
     if ec in ("needs_dependency", "unavailable") or o.get("unavailable") or rs == "needs_dependency":
         return "缺依赖"
     if o.get("ok") is False and not ec:
-        # 🔴 实测：mcp_tools / prompt_bridge / train_recipe 无参都返回 ok=false，但**每条都带着理由**
+ # 实测：mcp_tools / prompt_bridge / train_recipe 无参都返回 ok=false，但**每条都带着理由**
         #    （note / reason_code / verdict+blockers）—— 那叫「如实否」，不是崩。
         #    只有**连理由都没有**的 ok=false 才配叫真坏（本仓旧训：不许只灰不解释）。
         if o.get("reason") or o.get("error"):
@@ -110,7 +110,7 @@ def main() -> int:
     ap.add_argument("--skip", default="")
     ap.add_argument("--out", default=str(OUT))
     # 第二阶段用：按位喂最小真实 payload（JSON 文件 {kind: {...}}）——好让「要参数」的位也能跑通闭环。
-    # 🔴 只用**真能表达业务**的最小值；编不出来的位如实留在「要参数」，**不许为凑绿编假输入**。
+ # 只用**真能表达业务**的最小值；编不出来的位如实留在「要参数」，**不许为凑绿编假输入**。
     ap.add_argument("--payloads", default="")
     a = ap.parse_args()
 
@@ -134,7 +134,7 @@ def main() -> int:
             t0 = time.time()
             to = False
             try:
-                # 🔴 2026-10-10 根因修复（全量扫报 5 个「真坏」**全是假的**）：
+ # 2026-10-10 根因修复（全量扫报 5 个「真坏」**全是假的**）：
                 #    子进程用 `sys.executable -c` 起、**不带 -X utf8** ⇒ 它在 GBK 控制台上打
                 #    中文与「⇒」(U+21D2) 直接 UnicodeEncodeError 崩掉 ⇒ 被上层判成"真坏"。
                 #    实测原文：UnicodeEncodeError: 'gbk' codec can't encode character '\u21d2'。

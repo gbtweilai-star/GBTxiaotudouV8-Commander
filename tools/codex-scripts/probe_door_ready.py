@@ -36,8 +36,8 @@ print("=" * 88)
 print("资料桥的门就位探测（只读；主人应用补丁后跑）")
 print("=" * 88)
 
-# ⚠️ 先验门是否存在：policy 对**未知 kind 一律返回 scopes=()**，
-# 所以「只读动作免卡」在没有门的时候也会假过。必须先确认门在，否则下面的 ✓ 全是假的。
+# 先验门是否存在：policy 对**未知 kind 一律返回 scopes=()**，
+# 所以「只读动作免卡」在没有门的时候也会假过。必须先确认门在，否则下面的 全是假的。
 _door = (sc("feishu_docs", {"op": "create_doc"})
          or sc("feishu_docs", {"op": "store_credentials"})
          or sc("notion_docs", {"op": "store_token"}))

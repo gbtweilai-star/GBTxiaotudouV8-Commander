@@ -85,7 +85,7 @@ def classify(path):
     if any(low.startswith(m) for m in ours_markers):
         return "托管（我们自己的技能目录）"
     if low.startswith(ROOT.lower()):
-        # 🔴 2026-10-22 口径统一（留痕）：`本仓自营` 只认**四个指定容器**
+ # 2026-10-22 口径统一（留痕）：`本仓自营` 只认**四个指定容器**
         #    （`<仓>/skills` · `<仓>/plugins` · `~/.openclaw-autoclaw/skills` · `~/.dsh/.agent-presets`），
         #    与 `d7-skill-boundary.py` 用同一把尺。容器之外的（`_upstream`/`vendor`/`third_party`/
         #    `projects/**` 里的副本）是**上游参考**，不是我们作者的技能 —— 否则同一件事会被两把尺子
@@ -151,7 +151,7 @@ def main():
         b["skills"] += r["skills"]
     total_skills = sum(r["skills"] for r in rows)
 
-    # 🔴 2026-10-22 口径统一（第二处，留痕）：我方计数改成**递归 + 按路径去重**，
+ # 2026-10-22 口径统一（第二处，留痕）：我方计数改成**递归 + 按路径去重**，
     #    与 `d7-skill-boundary.py` 用同一套算法 ⇒ 两个工具报同一个数。
     #    旧写法只数容器下的**直接子目录**（`skill-surface` 报 698，而 `d7` 报 704），
     #    同一个盘被两把尺子量出两个数 —— 那比不量还坏。
@@ -168,7 +168,7 @@ def main():
             if "SKILL.md" in fn:
                 ours_dirs.append(dp)
     ours_dirs = sorted(set(ours_dirs))
-    # 🔴 2026-10-22 落成规则（F9 的收口）：未入册**不等于缺口**。只有同时满足
+ # 2026-10-22 落成规则（F9 的收口）：未入册**不等于缺口**。只有同时满足
     #    「名字不在图鉴」+「不属于三类例外」的，才算**真缺口**：
     #      ① 上游/存档/vendored（路径含 _upstream / vendor / third_party / archive / _stale）
     #      ② 同名重复（同一个名字在我方面里出现多次 ⇒ 只算一次账，其余是副本）

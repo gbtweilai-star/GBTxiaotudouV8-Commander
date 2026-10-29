@@ -34,8 +34,7 @@ SKIP = ("node_modules", "_upstream", "_legacy_sources", "vendor", ".git", "dist"
 # 只检**在役件**（备份/测试碎片不检，但要在读数里点名放过）
 IN_SERVICE = ("projects/digital-human/out/dh-v2-rigged.glb",     # 2026-10-10 主人 Tripo 重绑（65 骨）
               "holo_pet/assets/digital-human/raw/rig/model-rigged-anim.glb",
-              # 2026-10-15 对齐（留痕）：原第 3 条 dh_rigged.glb 已被 v2 取代且**盘上已无**，
-              #   留着它会让本闸永远红（新增即清旧）。
+              "projects/digital-human/out/dh_rigged.glb",
               "holo_pet/assets/digital-human/raw/phase1/model.glb",
               "assets/treasure-chest.glb")
 

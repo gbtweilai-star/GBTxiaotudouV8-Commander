@@ -59,7 +59,7 @@ def quick():
         ("直达索引", "handler" in rd("state/direct-index.json")),
         ("语音台湾腔", "zh-TW-HsiaoChenNeural" in rd("gbt_allinone/voice_cap.py")),
         ("全项目分片", len(list((ROOT / "state" / "project-shards").glob("shard-*.html"))) > 0),
-        # 🔴 口径改了（2026-10-22 主人令留痕）：原来这里判 `state/PROJECT-INDEX.html` 在不在。
+ # 口径改了（2026-10-22 主人令留痕）：原来这里判 `state/PROJECT-INDEX.html` 在不在。
         #   主人看了那页（截图）+ 原话「把这页删了，你自己看看这种东西都能做出来？」⇒ 页面已移到
         #   `state/legacy/PROJECT-INDEX.html.20261022`。**原期望：在；翻成：不在才对**，
         #   所以判据改成「不在 = OK」，并保留一行说明谁删的、搬去哪 —— 不是静默翻。

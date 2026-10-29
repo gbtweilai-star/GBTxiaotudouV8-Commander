@@ -122,7 +122,7 @@ def main() -> int:
     for r in gone:
         print("    %-22s %5d -> 无此项    %s" % (r["cap"], r["was"], r["why"]))
     for u in unpaired:
-        # ⚠️ 这条**不是缺陷**：R-H295 已经判定「硬编码行号指向别人比不写更坏」，
+ # 这条**不是缺陷**：R-H295 已经判定「硬编码行号指向别人比不写更坏」，
         # 所以 `voice_orchestra` 是**故意**不写 `registered` 的，改走运行时 `registeredAt(cap)` 现查。
         # 因此不配静态指针**不计入退出码**，只如实报出来供人确认。
         print("    %-22s （无静态指针 · 按 R-H295 走运行时 registeredAt() 现查，不是缺陷）" % u["cap"])

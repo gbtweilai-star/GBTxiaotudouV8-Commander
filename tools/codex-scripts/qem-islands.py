@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """缝锁定 QEM（**按 UV 拆焊 + 逐岛坍缩**）—— 不需 DCC，纯 numpy/scipy/fast_simplification。
 输入：raw/rig/part-head.glb（高密度头）→ 输出：raw/rig/head-islands-low.glb（保 UV 缝的低模头）
 用法：python tools/codex-scripts/qem-islands.py <in.glb> <out.glb> <target_faces>  （用 python 3.12 跑）"""
@@ -16,7 +12,7 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "holo_pet/assets/digital-human/raw/rig/part-head.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WS / "holo_pet/assets/digital-human/raw/rig/head-islands-low.glb"
 TARGET = int(sys.argv[3]) if len(sys.argv) > 3 else 75000

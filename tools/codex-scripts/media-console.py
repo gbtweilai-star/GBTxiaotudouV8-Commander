@@ -130,7 +130,7 @@ def collect() -> dict:
     for k in kinds:
         rows = []
         for st in mf.STAGES[k]:
-            # 🔴 目录名用**连字符**那套（`projects/short-video/`）—— 第 55 轮实测：
+ # 目录名用**连字符**那套（`projects/short-video/`）—— 第 55 轮实测：
             #    我第一版这里写 `k.replace("-","_")`，于是读到的是**我自己造错的平行树**，
             #    页面上出现"缺目录 3"，而真树里那 3 格好好地在。**判据读错树 = 假读数。**
             r = mf.check_one(k, st)
@@ -171,7 +171,7 @@ def collect() -> dict:
                      "source": r.get("source"), "honest": r.get("honest")}
     # 输入口的**骨架自检**（第 75 轮）：每个"人写的步"当场跑一遍 `template`，
     # 把「给不给得出骨架 / 过不过自己的判据 / 还差什么」摆到面板上。
-    # ⚠️ 以前面板只说「待输入」—— 读的人**不知道该怎么填才进得去**，闭环只闭了一半。
+ # 以前面板只说「待输入」—— 读的人**不知道该怎么填才进得去**，闭环只闭了一半。
     skels = []
     for kd, steps in MR.CHAINS.items():
         for s in steps:
@@ -450,7 +450,7 @@ def build(d: dict) -> str:
     parts.append('<p class="dim">人写步共 <b>%d</b> 个：<span class="ok">契约判据 %d</span> · '
                  '<span class="warn">仅在场 %d</span> —— 「在场 ≠ 合格」，'
                  '下表逐个标出哪一步真在判。</p>' % (len(_hj), _c, len(_hj) - _c))
-    # 🔴 第 80 轮补：把 `release` 摆上来 —— 不然面板读的人**不知道链子还能落成品名**，
+ # 第 80 轮补：把 `release` 摆上来 —— 不然面板读的人**不知道链子还能落成品名**，
     #    会一直以为「只有彩排件」是链子的极限（第 79 轮修的那个洞）。
     _rp = d.get("run_params") or {}
     if _rp:
@@ -462,9 +462,9 @@ def build(d: dict) -> str:
                      % ("".join('<tr><td class="mono">%s</td><td>%s</td></tr>'
                                 % (esc(k), esc(v)) for k, v in _rp.items()),
                         esc(d.get("release_note") or "")))
-    # 🔴 第 107 轮补：**多职业同时执行**（第 102 轮已证）原来在面板上**点不到** ——
+ # 第 107 轮补：**多职业同时执行**（第 102 轮已证）原来在面板上**点不到** ——
     #    面板只教怎么跑**一条**链，而能力是"三条同时"。**能力在、面板指不着 = 功能没连上。**
-    # 🔴 第 116 轮再补：那条能力当时**只活在 `.scratch/_probe_multi.py` 一次性探针里**，
+ # 第 116 轮再补：那条能力当时**只活在 `.scratch/_probe_multi.py` 一次性探针里**，
     #    面板教的是"三条命令分别敲、读者自己想办法并发"。现在它已经是万能插的**一等口**
     #    `five-dim.py multi`，而且"同时"是**可机检读数**（扫描线峰值并发）+ **反向对照**。
     #    ⇒ 卡就教这个口，并把判据写出来（判据不写出来，读的人没法自己复核）。
@@ -541,7 +541,7 @@ def build(d: dict) -> str:
     parts.append("</div>")
 
     # ── AI 音乐 · 试听台 ──
-    # ⚠️ base64 在 `%` 格式化**之后**才塞进去：base64 字母表不含 `%`，所以这一步是安全的
+ # base64 在 `%` 格式化**之后**才塞进去：base64 字母表不含 `%`，所以这一步是安全的
     _au = d.get("audition") or {}
     parts.append(AU_CSS)
     parts.append(_audition_html(_au).replace("__AU_B64__", _au.get("b64") or ""))

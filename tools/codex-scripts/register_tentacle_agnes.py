@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-# 2026-10-04：本脚本大量 print ✅/❌/📌 等符号。中文 Windows 下 stdout 走管道时默认 GBK
+# 2026-10-04：本脚本大量 print // 等符号。中文 Windows 下 stdout 走管道时默认 GBK
 # ⇒ 第一个 emoji print 就 UnicodeEncodeError（脚本崩在"密钥已存好"的确认打印处）。
 # 守卫写法与 five-dim.py / quick_scan.py 同族（hasattr 兜底 + 吞异常安全）。
 if hasattr(sys.stdout, "reconfigure"):

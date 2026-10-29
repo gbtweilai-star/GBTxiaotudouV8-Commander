@@ -5,7 +5,7 @@ import sys
 import time
 import urllib.request
 
-# 🔴 2026-10-18 修（编码守门判据红）：本脚本会印中文，却没设输出编码 ——
+# 2026-10-18 修（编码守门判据红）：本脚本会印中文，却没设输出编码 ——
 #   在中文 Windows 控制台（cp936/GBK）下会抛 UnicodeEncodeError 或吐乱码，
 #   被 `encoding-guard-check.py` 判为**新增违规**（基线里没有它）。
 #   口径同全仓已有 307 件：只在**输出层**强制 UTF-8，不动任何业务逻辑。

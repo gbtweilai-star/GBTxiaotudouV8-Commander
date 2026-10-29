@@ -68,7 +68,7 @@ def scan() -> dict:
             continue
         for p in sorted(d.glob("*.mp4")):
             pr = _probe(p)
-            # 🔴 2026-10-10 补第三类：**彩排/演示件**。
+ # 2026-10-10 补第三类：**彩排/演示件**。
             #    回收掉 3 支"被取代的旧件"后，剩下 4 支全是 selftest-rehearsal / actioncam-demo。
             #    它们**不是交付物**（是流程自检与演示）⇒ 判**彩排·不判**，但**读数里必须标出来** ——
             #    这就是本仓的口径：**不是不判，是把"为什么可以不判"写进读数**（declared exception）。

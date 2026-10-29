@@ -44,7 +44,7 @@ def main(argv: list[str]) -> int:
                           "status": body.get("status")}, ensure_ascii=False, indent=1))
         return 1
     data = base64.b64decode(b64)
-    # 🔴 扩展名必须跟**真实字节**一致：能力位回的是 jpeg，第一版却默认写 `.png`，
+ # 扩展名必须跟**真实字节**一致：能力位回的是 jpeg，第一版却默认写 `.png`，
     # 于是读图工具直接拒（"扩展名声明 png，字节是别的格式"）——自作聪明的命名等于坏文件。
     fmt = str(res.get("fmt") or "").lower()
     canon = {"jpeg": ".jpg", "jpg": ".jpg", "png": ".png", "webp": ".webp"}.get(fmt)

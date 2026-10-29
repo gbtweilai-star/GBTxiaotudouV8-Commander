@@ -162,12 +162,6 @@ video{width:100%;max-height:72vh;border-radius:8px;background:#000}
 .bad{border-color:#7a3a3a;color:#f0a0a0}
 code{background:#0b0e12;padding:2px 6px;border-radius:6px;font-size:12px;color:#9fb3c8}
 footer{padding:10px 22px 26px;color:#6e7987;font-size:12px}
-/* 投射模式：APP 用 ?embed=1 把这一页直接嵌进面板 —— 只剩画面，自动跟最新在役那条 */
-body.embed header,body.embed .list,body.embed footer{display:none}
-body.embed main{grid-template-columns:1fr;padding:0;gap:0}
-body.embed .pane{border:0;border-radius:0;background:#000;padding:0}
-body.embed video{max-height:100vh;height:auto;border-radius:0}
-body.embed .qc,body.embed #url{display:none}
 </style></head><body>
 <header><h1>GBT 动作库 · 云投射到 APP</h1>
 <small id="meta">读 manifest…</small></header>
@@ -186,12 +180,6 @@ const CLIPS = __CLIPS__;
 const list = document.getElementById('list'), v = document.getElementById('v'),
       qc = document.getElementById('qc'), meta = document.getElementById('meta'),
       urlp = document.getElementById('url');
-// —— 云容器「投射模式」：APP 用 ?embed=1 把本页嵌进面板，只剩画面、自动播**最新在役**那条 ——
-// 为什么要有这一档：列表页带侧栏与表头，嵌进面板不好看；embed 只留画面 + 顶上一行状态。
-// 两种模式选中哪条是同一套规则（见文末 pick），不许两处各写一套。
-const Q = new URLSearchParams(location.search);
-const EMBED = Q.get('embed') === '1';
-const isOld = (c) => /^【旧版/.test(String(c.title || ''));
 meta.textContent = CLIPS.length + ' 条动作 · 数据来自 manifest.json（同桶同源）';
 function chip(t, cls){ const d=document.createElement('span'); d.className='chip '+(cls||''); d.textContent=t; return d; }
 function play(c, el){
@@ -209,25 +197,13 @@ function play(c, el){
   qc.appendChild(chip('sha ' + String(c.sha256||'').slice(0,12)));
   urlp.innerHTML = '直链：<code>' + c.url + '</code>';
 }
-const items = [];
 CLIPS.forEach((c,i)=>{
   const d=document.createElement('div'); d.className='item';
   d.innerHTML = '<b>'+c.title+'</b><span>'+(c.size||[]).join('×')+' · '+(c.secs||'?')+'s · '+(c.voice||'')+'</span>';
   d.onclick = ()=>play(c,d);
   list.appendChild(d);
-  items.push(d);
+  if(i===0) setTimeout(()=>play(c,d),10);
 });
-// 默认播哪条：**最新在役**那条，不是列表第 0 条。
-// （CLIPS 按入库先后排，第 0 条永远是最旧的那条 —— 原来播第 0 条，打开动作库第一眼看到的是【旧版】。）
-const pick = CLIPS.find((c) => !isOld(c)) || CLIPS[0];
-if (pick) play(pick, items[CLIPS.indexOf(pick)] || list);
-if (EMBED) {
-  document.body.classList.add('embed');
-  if (pick) {
-    if (Q.get('autoplay') === '1') { v.muted = true; v.loop = true; v.play().catch(()=>{}); }
-    meta.textContent = '投射中 · ' + (pick.title || pick.id) + ' · 云库共 ' + CLIPS.length + ' 条';
-  }
-}
 </script></body></html>"""
     INDEX.write_text(html.replace("__CLIPS__", clips), encoding="utf-8")
     return INDEX

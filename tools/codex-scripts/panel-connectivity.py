@@ -45,7 +45,7 @@ from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-# ⚠️ 换目录后 `parents[1]` 不再指仓根 —— 按全仓通用写法找带 `gbt_allinone` 的那一层。
+# 换目录后 `parents[1]` 不再指仓根 —— 按全仓通用写法找带 `gbt_allinone` 的那一层。
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "gbt_allinone").is_dir())
 sys.path.insert(0, str(ROOT))
 
@@ -141,7 +141,7 @@ def main() -> int:
                   % (res["试听秒数"], res["复核不一致"]))
 
     print("\n=== 判读 ===")
-    # ⚠️ 「+1」只对**计数**成立。试听秒数是**换了个值**（52→42→52）⇒ 判据是"变了、且复原"。
+ # 「+1」只对**计数**成立。试听秒数是**换了个值**（52→42→52）⇒ 判据是"变了、且复原"。
     #    第一版我对所有项一律用 +1 ⇒ 把**明明跟得动**的试听秒数印成「纹丝不动 = 写死的」
     #    —— **那是我的判词错，不是面板错**。**假红比不报更坏**（会让人不再信这条警告）。
     RULE = {"试听秒数": lambda x, y, z: (y != x and z == x)}

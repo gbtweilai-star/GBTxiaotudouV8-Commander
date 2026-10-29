@@ -18,29 +18,13 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-# 🔴 2026-10-25：原来写死 Windows 绝对路径 `C:\Users\ADMIN\Desktop\GBT小土豆V8`，
-#    Linux 上拼出来的路径不存在 ⇒ look_grade 整个能力位报 FileNotFoundError。
-#    改成**按本文件位置推仓根**（gbt_allinone/tools/x.py → parents[2]），换机器零改动。
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 _FG = ROOT / "tools" / "filmgrade.py"
 READ_OPS = ("list", "pick", "qc")
 WRITE_OPS = ("preview",)
 
 
-class ImplMissing(RuntimeError):
-    """实现文件不在仓库里 —— 与"代码坏了"要分开报。"""
-
-
 def _fg():
-    # 🔴 生产口径（2026-10-25）：Commander 仓库**没有随发布 tools/filmgrade.py**。
-    #    以前这里直接 exec_module ⇒ 整个能力位报 FileNotFoundError，
-    #    跟"代码写坏了"看起来一模一样。现在显式区分：缺文件走 ImplMissing。
-    if not _FG.is_file():
-        try:
-            shown = str(_FG.relative_to(ROOT))
-        except ValueError:
-            shown = str(_FG)
-        raise ImplMissing("实现文件未随仓库发布: %s" % shown)
     spec = importlib.util.spec_from_file_location("filmgrade", _FG)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
@@ -67,16 +51,7 @@ def status(**_kw) -> dict:
 
 def run(op: str = "list", **kw) -> dict:
     op = (op or "list").lower()
-    try:
-        fg = _fg()
-    except ImplMissing as e:
-        # 实现文件不在仓库 ⇒ 如实报，归到"未实现"，不是"代码坏了"
-        return {"ok": False, "op": op, "kind": "look_grade",
-                "reason_code": "impl_missing", "error": str(e),
-                "how_to_fix": "把 tools/filmgrade.py 一起纳入仓库（它是外观库的真实实现）"}
-    except Exception as e:                                   # noqa: BLE001
-        return {"ok": False, "op": op, "kind": "look_grade",
-                "reason_code": "impl_error", "error": "%s: %s" % (type(e).__name__, str(e)[:120])}
+    fg = _fg()
     if op == "status":
         return status(**kw)
     if op == "list":

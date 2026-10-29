@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """pymeshlab 缝保护 QEM → OBJ → 自建 GLB（贴图沿用 part-head.glb 的原件）。
 用 python 3.12 跑（pymeshlab 在那边）。"""
 import json
@@ -11,7 +7,7 @@ import struct
 import numpy as np
 import pymeshlab as ml
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 RIG = WS / "holo_pet/assets/digital-human/raw/rig"
 SRC = RIG / "part-head.glb"
 OBJ = pathlib.Path(r"C:\gbt_pml\head_low.obj")

@@ -66,6 +66,39 @@ def _summary(text: str):
             "skipped": got.get("skipped", 0)}
 
 
+_PYTEST_PY = None
+
+
+def _pytest_python() -> str:
+    """挑一个**真的装了 pytest** 的解释器（内层要用它跑文件）。
+
+    🔴 2026-10-25 · 真因（不是判据错）：本机跑测试的是 py -3.14，而**它没有 pytest**；
+    内层命令用的是 sys.executable -m pytest ⇒ 子进程 0.05s 就死（rc=1 · 解析不出摘要），
+    于是 	est_a_passing_file_is_reported_green 报「通过的文件被误判」——
+    其实是**量具挑错了内层解释器**，不是它分不出红绿。
+    ⇒ 先探 sys.executable；不行再按候选表找第一个 -c "import pytest" 通过的。
+    选中的解释器会写进每条回执的 py 字段（读数要能指到出处，P29）。
+    """
+    global _PYTEST_PY
+    if _PYTEST_PY:
+        return _PYTEST_PY
+    cands = [sys.executable]
+    for extra in (r"C:\\Python312\\python.exe", r"C:\\Python311\\python.exe", "python"):
+        if extra not in cands:
+            cands.append(extra)
+    for exe in cands:
+        try:
+            r = subprocess.run([exe, "-c", "import pytest"], stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL, timeout=20)
+        except Exception:                                   # noqa: BLE001
+            continue
+        if r.returncode == 0:
+            _PYTEST_PY = exe
+            return exe
+    _PYTEST_PY = sys.executable          # 一个都不行：如实用当前解释器，回执里会体现失败
+    return _PYTEST_PY
+
+
 def run_one(path: Path, timeout_s: int = 300) -> dict:
     """在**干净子进程 + 干净 store** 里跑单个测试文件。"""
     iso = tempfile.mkdtemp(prefix="gbt_iso_sweep_")
@@ -79,7 +112,7 @@ def run_one(path: Path, timeout_s: int = 300) -> dict:
     t0 = time.perf_counter()
     try:
         p = subprocess.run(
-            [sys.executable, "-m", "pytest", str(path), "-q", "--no-header",
+            [_pytest_python(), "-m", "pytest", str(path), "-q", "--no-header",
              "-p", "no:cacheprovider", "--tb=no"],
             cwd=str(ROOT), env=env, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, timeout=timeout_s)
@@ -90,7 +123,7 @@ def run_one(path: Path, timeout_s: int = 300) -> dict:
             #    126 个带 store/两个 db 的 gbt_iso_sweep_* 目录。现在**绿的当场清**；
             #    红的/超时的保留并在行里带路径（归因证据不许当场销毁）。
             shutil.rmtree(iso, ignore_errors=True)
-        return {"file": path.name, "rc": p.returncode,
+        return {"file": path.name, "py": _pytest_python(), "rc": p.returncode,
                 "ms": round((time.perf_counter() - t0) * 1000),
                 "summary": s, "tail": out[-600:], "timeout": False, "iso": iso}
     except subprocess.TimeoutExpired:

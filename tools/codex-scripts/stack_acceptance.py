@@ -92,7 +92,7 @@ def leg_browser(rows):
     t = _cap("browser", {"op": "native", "action": "create_tab", "url": "http://127.0.0.1:11434/"})
     tid = ((t.get("tab") or {}).get("id")) or ""
     txt = ""
-    # 🔴 时序纪律：新标签**要等载入完**才读得到正文（实测：不等就是 ''，等 1–2 秒就有）。
+ # 时序纪律：新标签**要等载入完**才读得到正文（实测：不等就是 ''，等 1–2 秒就有）。
     #    重试 4 次、每次 1.2s，仍空才判红 —— 判据不放松，只是把"没等"与"读不到"分开。
     for _ in range(4):
         if not tid:

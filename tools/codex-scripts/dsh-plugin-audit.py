@@ -50,7 +50,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-# 🔴 **被核对的那份名单原样留档**（出处写清）—— 事后要能对账"当时核的是哪 10 个"
+# **被核对的那份名单原样留档**（出处写清）—— 事后要能对账"当时核的是哪 10 个"
 CLAIMED = {
     "出处": "主人 2026-09-25 转来的「10 个插件」方案（未标明作者；名字看着都很像真的）",
     "名单": ["dsh-llm-qwen-local", "dsh-force-compact", "dsh-llm-qwen-abliterated",
@@ -225,7 +225,7 @@ def cmd_selftest(a) -> int:
     # ④ 每个名字都要有结论（不许静默丢）
     ck("**逐条都有结论**（不许静默丢）",
        all(x["结论"] for x in r["逐条"]) and len(r["逐条"]) == 10, "%d 条" % len(r["逐条"]))
-    # ⑤ 🔴 **我自己写的「真实对应件」也必须逐个现读核过** ——
+ # ⑤ **我自己写的「真实对应件」也必须逐个现读核过** ——
     #    否则我就在犯本件要抓的那个错：**编一个像真的包名**。
     mine, ghost = 0, []
     for claimed, mp in (CLAIMED.get("真实对应件") or {}).items():

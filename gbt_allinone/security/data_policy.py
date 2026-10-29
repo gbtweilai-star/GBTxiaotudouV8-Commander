@@ -31,9 +31,7 @@ _MAX_AUDIT_DEPTH = 8
 _SECRET_PATTERNS = (
     ("private_key", re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----", re.S)),
     ("bearer", re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/\-=]{12,}")),
-    # GBT 补丁 2026-10-23：本仓自己的统一密钥格式 gbtv8-<32hex>（key_gateway.mint 铸出）
-    # 原来不在前缀表里 ⇒ 实测 redact_text('gbtv8-2153…') 原样返回、统计 {} ⇒ 会原样进日志。
-    ("api_key", re.compile(r"\b(?:gbtv8|sk|ak|pk|ghp|github_pat|xox[baprs])[-_][A-Za-z0-9._\-]{12,}\b")),
+    ("api_key", re.compile(r"\b(?:sk|ak|pk|ghp|github_pat|xox[baprs])[-_][A-Za-z0-9._\-]{12,}\b")),
     ("assigned_secret", re.compile(
         r"(?im)\b(api[_-]?key|secret|password|passwd|token|access[_-]?key|private[_-]?key)"
         r"\s*[:=]\s*['\"]?([^'\"\s,;]{8,})")),

@@ -31,7 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 HOME = Path.home()
 
-# 🔴 2026-09-25 改：**根不许再手写**。
+# 2026-09-25 改：**根不许再手写**。
 #    起因是一次实打实的自打脸：我手写的根列表里有 3 个盘上并不存在的路径，
 #    同时又**漏掉**了 5 个真实存在的根（`~/.codex/skills`、仓内 `.autohand/.codebuddy/`
 #    `.windsurf/skills`、仓内 `.dsh/skills`）。于是"审过了"这句话在**盘点这一步**就是假的 ——
@@ -163,22 +163,22 @@ def _has_frontmatter(text: str) -> bool:
 
 
 DOC_EXT = {".md", ".txt", ".html"}
-# 🔴 第四类假阳性（跑真数据才发现的）：**否定句**。
+# 第四类假阳性（跑真数据才发现的）：**否定句**。
 #    `alchemy-mcp` 里那句是「**Don't** bypass the MCP server with raw curl」——
 #    它是在**禁止** curl，而我的规则把它读成"外网抓取"。
 #    ⇒ 命中行里匹配点**之前**若出现否定词，标记 `negated`：**照旧列出来**（是线索），
 #      但**不参与风险分级**。通用否定检测很难，这里只认最直白的那几个词，宁可漏判也不误判等级。
 NEG_CUES = re.compile(r"(don'?t|do\s+not|never|avoid|instead\s+of|不许|禁止|绝不|不要|别用|不得)", re.I)
 
-# 🔴 第五类假阳性（2026-09-25 全量审 1268 件时发现，而且撞在**最规矩**的那个技能上）：
-#    `turnstile-spin`（Cloudflare 官方 skills 仓里的 Turnstile 技能）被判 🔴 HIGH，理由是
+# 第五类假阳性（2026-09-25 全量审 1268 件时发现，而且撞在**最规矩**的那个技能上）：
+# `turnstile-spin`（Cloudflare 官方 skills 仓里的 Turnstile 技能）被判 HIGH，理由是
 #    「破坏性删除」等命中。逐字读过之后：`trap 'rm -rf "$TEMP_DIR"' EXIT` 里
 #    `TEMP_DIR` 是它自己 `mktemp -d` 出来的 —— 那是在**清自己的临时目录**，不是删用户的东西。
 #    ⇒ 规则只会看"这个词出现了"，分不清「删自己的临时目录」与「删用户的目录」。
 #      与本仓那句「提到 ≠ 用了」同族，只是这次栽在**最该被表扬**的写法上。
 #    处理方式与「否定句」一致：**照旧列出来**（是线索），标 `defensive`，**不参与分级**。
 #
-# ⚠️ 自纠（**先把前提验掉再写规则**，这次救了半条规则下来）：我原本还打算加一条"洗凭据"
+# 自纠（**先把前提验掉再写规则**，这次救了半条规则下来）：我原本还打算加一条"洗凭据"
 #    （`unset CLOUDFLARE_API_TOKEN`）的防御性规则。查真数据后发现它**根本不会触发** ——
 #    凭据规则的形状是 `(API_KEY|TOKEN|…)\s*[:=]`，而 `unset A B` 既没有 `:` 也没有 `=`。
 #    ⇒ 凭据那一侧的防御性正则**没加**：加了也永远不触发，那就是一条**死判据**
@@ -210,7 +210,7 @@ def vet(skill_dir: Path, label: str = "") -> dict:
         if p.name == "SKILL.md" and _has_frontmatter(text):
             fm_ok = True
         exec_like = p.suffix.lower() not in DOC_EXT
-        # 🔴 2026-09-25 修**第三类**假阳性（同样是跑真数据才发现的）：
+ # 2026-09-25 修**第三类**假阳性（同样是跑真数据才发现的）：
         #    6 处「改工作区外的系统文件」全是 **shebang 行**（`#!/usr/bin/env python3`）——
         #    那是**解释器指令**，不是"在改 /usr"。首跑据此把两个技能抬到 MEDIUM。
         #    ⇒ 判之前先把 shebang 行剥掉（一行正则），再扫。
@@ -229,9 +229,9 @@ def vet(skill_dir: Path, label: str = "") -> dict:
                               "line": ln, "hit": m.group(0)[:60], "exec": exec_like,
                               "negated": negated, "defensive": defensive})
         per_file[str(p.relative_to(skill_dir))] = len(text)
-    # 🔴 2026-09-25 修我自己的假阳性（**首跑就撞上，而且是撞在 skill-vetter 自己身上**）：
+ # 2026-09-25 修我自己的假阳性（**首跑就撞上，而且是撞在 skill-vetter 自己身上**）：
     #    `skill-vetter/SKILL.md` **列举**了全部红旗（curl / ~/.ssh / eval / base64…），
-    #    第一版据此把它判成 🔴 HIGH —— 可它一个字都没执行，那是在**定义**红旗。
+ # 第一版据此把它判成 HIGH —— 可它一个字都没执行，那是在**定义**红旗。
     #    这就是本仓 FR-1 同族「**提到 ≠ 用了**」，只不过这次犯错的是我这个审计器。
     #    ⇒ 风险分级**只采信可执行文件里的命中**（.py/.js/.sh/.ps1…）；
     #      文档里的命中**照旧列出来**（是线索），但标 `exec:false` 且**不单独抬高等级**。
@@ -321,7 +321,7 @@ def main(argv=None) -> int:
             if nm:
                 targets.append((nm, locate(nm)))
     if a.all_managed:
-        # ⚠️ 不许用 `SKILL_ROOTS[0]`：根列表现在是**自动发现**的，第 0 个会随盘上情况变
+ # 不许用 `SKILL_ROOTS[0]`：根列表现在是**自动发现**的，第 0 个会随盘上情况变
         #    （实测已经变成了 `~/.omp/skills`）⇒ `--all-managed` 会悄悄改指到别的根。
         #    "托管根"是**语义**，必须写死成那条语义路径。
         base = HOME / ".openclaw-autoclaw" / "skills"

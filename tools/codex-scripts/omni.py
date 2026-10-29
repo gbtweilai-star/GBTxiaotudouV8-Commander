@@ -46,13 +46,6 @@ ATLAS = ROOT / "state" / "skill_atlas.json"
 # ── 技能根：全机的职业技能都在这几处 ────────────────────────────────────────
 # channel 决定"怎么调它"，这是"人类视角操控一切"的关键一列。
 SKILL_ROOTS = [
-    # 🔴 2026-10-20 补（真实断线）：本文件第 65-68 行的 `SESSION_SKILL_ROOTS` 认定
-    #    `<仓>/.dsh/skills` 是"本会话实测真读得到"的根，`skill_reachable()` 也按它判可达 ——
-    #    但**采集用的 SKILL_ROOTS 里偏偏没有这个根**。后果：新写进 `<仓>/.dsh/skills` 的技能
-    #    （如 `gbt-digital-human-video`）**能被会话按名字加载，却永远不进图鉴 ⇒ 路由永远推不到它**。
-    #    实测：整条数字人流水线跑了两天，`omni ask` 一次都没把它当候选（图鉴 405 条里查无此条）。
-    #    ⇒ 判可达的根与采集的根必须是**同一份事实**，不许两套。
-    (ROOT / ".dsh" / "skills", "agent-skill", "本会话（DSH）实测读取的技能目录"),
     (HOME / ".agents" / "skills", "agent-skill", "本会话（DSH）实际读取的技能目录"),
     (HOME / ".claude" / "skills", "agent-skill", "Claude Code 侧"),
     (HOME / ".openclaw-autoclaw" / "skills", "agent-skill", "本仓 AGENTS.md 指定的托管目录"),
@@ -64,7 +57,7 @@ SKILL_ROOTS = [
 ]
 
 # ── 本会话**实测真读**的技能根（用来判"落点到底可不可达"）────────────────────
-# 🔴 2026-09-23 实测：本会话能加载的 gbt-* = 21 条 = `<仓>/.dsh/skills`(18) ∪ `~/.agents/skills`(5)，
+# 2026-09-23 实测：本会话能加载的 gbt-* = 21 条 = `<仓>/.dsh/skills`(18) ∪ `~/.agents/skills`(5)，
 #   交集 2 条。而 `<仓>/skills`(58) 与 `~/.openclaw-autoclaw/skills`(58) **本会话读不到** ——
 #   实测 `skill gbt-system` / `skill gbt-creation` 均报 unknown。
 #   ⇒ omni 原先**不校验落点可达性**，于是把 `gbt-system`(12.0) 这种"读不到的规程"当首选推给人。
@@ -75,7 +68,7 @@ SESSION_SKILL_ROOTS = [
 ]
 
 # ── 第三通道：本地工具面（本机**真实存在**的扫描器/操作台）───────────────────
-# 🔴 为什么必须有这一通道（2026-09-23 实测，这是"无死角"漏的那一格）：
+# 为什么必须有这一通道（2026-09-23 实测，这是"无死角"漏的那一格）：
 #   omni 原先只认「能力位」与「agent 技能」，而本机的**扫描能力**其实在命令行工具里。于是：
 #     `omni ask "扫一下这台电脑有没有病毒木马后门"`
 #        → selfscan(4.5) / cross_scan(3.0) / gbt-security   ← 前两个与病毒无关；
@@ -108,7 +101,7 @@ LOCAL_TOOLS = [
         "gate": "无需授权；退出码即门（0 只有P2 · 1 有P0 · 2 有P1 · 3 自身出错）",
     },
     {
-        # 🔴 2026-09-23 补：**这条是被一次错路由逼出来的**。
+ # 2026-09-23 补：**这条是被一次错路由逼出来的**。
         #    实测 `omni ask "把桌面壳打包成装机包并上线"` → 落到 `quick_scan`(1.4) ——
         #    因为图鉴里**根本没有"桌面壳"这件工具**，而本机**全局装着 electron-builder@26.15.3**
         #    （另有 electron@43.0.0，所以**不装包也能跑**）。
@@ -241,7 +234,7 @@ LOCAL_TOOLS = [
     },
     {
         # 2026-09-23 补：Owner 令「把该清理的清理出去到回收站就好了」。
-        # ⚠️ `.scratch` **不是**垃圾堆：`_traces`/`_dsh_home`/`vision_probe`/各 `_*.json`
+ # `.scratch` **不是**垃圾堆：`_traces`/`_dsh_home`/`vision_probe`/各 `_*.json`
         # 都是活代码在读写的目标（见模块 docstring 的白名单与引用守卫）。
         "name": "clean_residue",
         "path": "tools/codex-scripts/clean_residue.py",
@@ -286,7 +279,7 @@ DOMAIN_HINTS = {
     "pipeline": "流水线 管线 发布 提交 回滚 部署 生产 镜像",
     "dangerous": "危险 高危 破坏 （⚠️ 该域 2026-09-23 已清空；那 11 个名字**2026-09-25 已接上实现并改挂 `security` 域** —— 见下面 `unimplemented` 键上方的现读注释）",
     "unimplemented": "只登记未实现 没实现 没做 禁止已解开 危险名 被禁用的能力",
-    # 🔴 2026-09-25 现读更正（**同一条登记第二次漂移，这次是方向反了**）：
+ # 2026-09-25 现读更正（**同一条登记第二次漂移，这次是方向反了**）：
     #   第 36 轮改它是因为「`dangerous` 域在图鉴里不存在了」；
     #   现在 **`unimplemented` 域也空了** —— Owner 令「把黑客能力全部多维度全部覆盖补齐」后，
     #   那 11 个名字**接上了实现层**（`security/redteam.py`），在**注册表里挂了 `domain="security"`**
@@ -294,7 +287,7 @@ DOMAIN_HINTS = {
     #   后果（`omni.py build` 重建图鉴后实测）：`verify-distill.py --all` 判红
     #   「unimplemented FAIL · 图鉴里没有这个域（或它的能力位数为 0）」。
     #   **这不是"登记表没跟"，是"域被搬空之后这条键没人删"** —— 一条**幽灵域**。
-    #   ⚠️ 我**不擅自删这条键**：删了就等于替主人决定「`gbt-dangerous` 这份规程还要不要」——
+ # 我**不擅自删这条键**：删了就等于替主人决定「`gbt-dangerous` 这份规程还要不要」——
     #   它讲的那 11 个名字现在归 `security` 域，而 `gbt-security` 的规程还没点到它们
     #   （`verify-distill --domain security` 现读点名缺 11 位）。两条路（并进 gbt-security /
     #   保留 gbt-dangerous 并给它一个域）都得主人拍板。**在拍板前，这条红就是待办清单本身。**
@@ -330,7 +323,7 @@ DOMAIN_HINTS = {
 
 
 # ── 自动执行的判据：**默认拒绝** ────────────────────────────────────────────
-# 🔴 为什么改成默认拒绝（2026-09-22 实测教训）：
+# 为什么改成默认拒绝（2026-09-22 实测教训）：
 #   第一版只拿 `PROBE_SKIP_KINDS`（侧效应名单）当"要不要确认"，而它是**不完整**的
 #   —— `mirror_release`（镜像全量晋升生产）**根本不在那张表里**。于是我让它
 #   "把项目部署到生产"时，`omni run` **直接把它执行了**。
@@ -344,7 +337,7 @@ DANGER_DOMAINS = {"pipeline", "dangerous", "infra", "integration"}
 # 为什么用"声明映射"而不是另存一个待办 json：另存一份就会走样、就会漏。
 # 表里没有的域 = 在队里，**自动出现在队列里**，不需要谁记得去登记。
 DISTILLED_DOMAINS = {
-    # 🔴 2026-09-22 更正（机器抓出来的假账）：这两行原先都指向 `gbt-aesthetic`。
+ # 2026-09-22 更正（机器抓出来的假账）：这两行原先都指向 `gbt-aesthetic`。
     # `tools/codex-scripts/verify-distill.py` 一跑就露馅：`gbt-aesthetic` 里
     # **一个能力位都没点到**（create / drama / music_publishing / brand_outro /
     # emotion_projection / scene_anchor / code_art / render_evolution / a1art_skill 全无），
@@ -372,13 +365,13 @@ DISTILLED_DOMAINS = {
     "brain": "gbt-brain",             # 2 位：两位都只读（原以为会写盘 → 源码+AST+22 条用例证伪）
     "comms": "gbt-comms",             # 1 位：白名单默认空=全拒；send/reply/register 挂 data_export
     "devour": "gbt-devour",           # 4 位：scan 只读；reflect 零作用域但会写盘（最贵的假读数）
-    # 🔴 2026-09-23 第 36 轮改：这里原来写的是 `"dangerous": "gbt-dangerous"` ——
+ # 2026-09-23 第 36 轮改：这里原来写的是 `"dangerous": "gbt-dangerous"` ——
     # 而 **`dangerous` 这个域在图鉴里已经不存在了**（解禁时那 11 位改登记进
     # `caps_registry.UNIMPLEMENTED_CAPS`，域名字段是 `unimplemented`）。
     # 后果实测：`verify-distill.py --all` 判红「dangerous FAIL · 图鉴里没有这个域（或它的能力位数为 0）」
     # ——**域长什么样已经变了，登记表没跟**。规程本身（`gbt-dangerous`）讲的就是这 11 个名字，
     # 所以正确的键是它现在真挂的那个域。
-    # 🔴 2026-09-25 第 3 次现读：**这条映射现在指向一个空域**。
+ # 2026-09-25 第 3 次现读：**这条映射现在指向一个空域**。
     #   第 36 轮那次说"正确的键是它现在真挂的那个域" —— 那个判断当时对，现在过期了：
     #   11 位接上实现后挂的是 `domain="security"`，`UNIMPLEMENTED_CAPS` 变空表
     #   ⇒ `unimplemented` 域里**一个能力位都没有**，本键成了幽灵。
@@ -474,7 +467,7 @@ _STATE_CHANGING_CACHE: set | None = None
 
 
 # ── 只读扫描器白名单：修"域过滤器误杀"（2026-09-23 实测抓到）────────────────
-# 🔴 现象：`ghost_guard`（防复发检测）· `mirror_scan`（维度体检）· `mirror_plan`（生产前排练计划）
+# 现象：`ghost_guard`（防复发检测）· `mirror_scan`（维度体检）· `mirror_plan`（生产前排练计划）
 #   都是 `safe=True`、`enabled`、静态查出 `scopes=()` **的只读扫描器**，却因为
 #   `domain=pipeline ∈ DANGER_DOMAINS` 被**永久排除**在自动探测之外 —— 静默砍覆盖。
 # 判据：**`safe=True` 且静态零作用域 已经是比"域"更强的免后果证据**；
@@ -561,7 +554,7 @@ def read_front(path: Path) -> dict:
             continue
         val = mm.group(1).strip()
         if val in ("|", ">", "|-", ">-", "|+", ">+"):
-            # 🔴 2026-09-22 修：原先只取冒号后那一行 ⇒ YAML **块标量**（`description: |`）被读成
+ # 2026-09-22 修：原先只取冒号后那一行 ⇒ YAML **块标量**（`description: |`）被读成
             # 字面量 `"|"`。实测 fal-*(12) / figma-*(7) 等一批上游技能在 atlas 里 desc 长度全是 1、
             # 值就是 `"|"` ⇒ `omni list` 描述栏空白、`omni ask` 拿不到内容线索、只能靠名字匹配。
             # 修法：块标量往下收**连续缩进块**，拼成一行（空行跳过，缩进结束即止）。
@@ -574,14 +567,14 @@ def read_front(path: Path) -> dict:
                 lines.append(line.strip())
             val = " ".join(lines)
         elif val == "":
-            # 🔴 2026-09-22 再补一种：**多行 plain 标量** —— `description:` 后**什么都不写**，
+ # 2026-09-22 再补一种：**多行 plain 标量** —— `description:` 后**什么都不写**，
             # 换行再缩进续写（实测 `glmv-pdf-to-ppt` / `glmv-pdf-to-web` 两条）。
             # 这一种比 `|` 更隐蔽：值不是 `"|"` 而是**空串**，所以"看着没描述"不一定是真没写。
             # 判据与块标量同源：往下收连续缩进行；遇到空行 / 缩进结束 / **本身就是 `键:` 的行**（那是映射，不是标量续写）就停。
             lines = []
             for line in raw[mm.end():].splitlines():
                 if not line.strip():
-                    # ⚠️ 首个空行是 `键:` 后面那个换行本身（splitlines 会先给一个空串）——
+ # 首个空行是 `键:` 后面那个换行本身（splitlines 会先给一个空串）——
                     # 还没收到任何内容时空行要**跳过**，收到内容之后的空行才是这一段结束。
                     if not lines:
                         continue
@@ -624,7 +617,7 @@ def collect_skills() -> tuple[list[dict], list[dict]]:
             row = {
                 "name": fx.get("name") or d.name,
                 "displayName": fx.get("displayName") or "",
-                # 🔴 2026-10-13：技能侧**同一个坑**（实测 **97/386** 条描述超 400 字被静默截断
+ # 2026-10-13：技能侧**同一个坑**（实测 **97/386** 条描述超 400 字被静默截断
                 #    ⇒ 尾部触发词进不了路由）。与能力位同法修：截断只影响显示，
                 #    被切掉的那段另存 `desc_tail`，打分时接回去（见 `rank()`）。
                 #    标记**追加**在 400 字之后，不替换末尾 —— 免得再挖一次"两头都不覆盖"的洞。
@@ -668,13 +661,13 @@ def collect_caps() -> tuple[list[dict], str]:
         kind = str(row.get("name") or "")
         spec = BENIGN_CAPS.get(kind) or {}
         need = CR.required_params(kind) if hasattr(CR, "required_params") else []
-        # 🔴 2026-10-13 修（实测教训）：`desc` 截到 300 字是**静默**的 —— `cadgen` 的 desc 正好被切在
+ # 2026-10-13 修（实测教训）：`desc` 截到 300 字是**静默**的 —— `cadgen` 的 desc 正好被切在
         #    300 字，写在**尾部**的"常用说法/触发词"于是**根本没进路由**（实测：同一句人话
         #    「把这个宝箱模型渲染一张图看看」，词在尾部时 **零命中**；挪到前 300 字内 ⇒ 命中 3 词、
         #    排到第一）。静默截断是假绿的近亲：作者以为加了触发词，路由里根本没有。
         #    修法两条：① 截断时补一个**看得见**的标记（谁被切了一眼就知道）② 记下原长，供自检对账。
         _full_desc = str(row.get("desc") or "")
-        # 🔴 2026-10-13 二次修：标记**追加**在 300 字之后，不再替换掉第 280–300 那 20 个字 ——
+ # 2026-10-13 二次修：标记**追加**在 300 字之后，不再替换掉第 280–300 那 20 个字 ——
         #    上一版把标记塞进前 300（`[:280] + 标记`），于是**第 280–300 这 20 字既不在 desc
         #    也不在 desc_tail 里**（一个我自己挖的洞）。现在：desc = 前 300 字原文 + 标记；
         #    desc_tail = 第 300 字之后 ⇒ 无洞、无重叠。
@@ -685,7 +678,7 @@ def collect_caps() -> tuple[list[dict], str]:
             "kind": kind,
             "domain": str(row.get("domain") or ""),
             "desc": desc_shown,
-            # 🔴 2026-10-13 修**根**：截断从此**只影响显示、不影响路由** ——
+ # 2026-10-13 修**根**：截断从此**只影响显示、不影响路由** ——
             #    被切掉的那一段另存 `desc_tail`，打分时接回去用（见 `score_cap`）。
             #    为什么要这么修：原来截断是**静默**的 ⇒ 把触发词写在 300 字之后的位
             #    **根本进不了路由**（已经害过两个位：cadgen、comfy_native）。
@@ -700,7 +693,7 @@ def collect_caps() -> tuple[list[dict], str]:
             # 三道判据决定 run 敢不敢自动跑
             "requires_params": list(need or []),
             "params_hint": CR.params_hint(kind) if hasattr(CR, "params_hint") else "",
-            # 🔴 2026-09-22 补：原先只看 cross_scan 的 `PROBE_SKIP_KINDS` ⇒ 框架自己
+ # 2026-09-22 补：原先只看 cross_scan 的 `PROBE_SKIP_KINDS` ⇒ 框架自己
             # `preflight._STATE_CHANGING_KINDS` 里明写"会改状态"的位（深蒸 longrun 实测：`lr_tick`）
             # 在图鉴上却是 `needs_confirmation: false`、"看着免卡只读"，跟 omni 自己的判据打架。
             # 修法：**两边任一为真就算要确认**（判据别各算各的）。
@@ -764,10 +757,10 @@ def build(verbose: bool = True) -> dict:
         "counts": {
             "caps": len(caps),
             "caps_enabled": sum(1 for c in caps if c["enabled"]),
-            # 🔴 2026-09-22 修：这里原先只看注册表三个旗标（enabled/safe/无参），**不查门**
+ # 2026-09-22 修：这里原先只看注册表三个旗标（enabled/safe/无参），**不查门**
             # ⇒ 把挂着授权作用域的位也算进"免卡无参可直跑"。实测（深蒸 data 域时）：
-            # `omni list --domain data` 把 `audit_query` 标成 ✅，而它身上挂着 `audit_read`
-            # —— 当场跑必被拒。同域 `omni ask` 反而标对了（🔒）⇒ 两个出口口径不一致，**列表那个是假绿**。
+ # `omni list --domain data` 把 `audit_query` 标成 ，而它身上挂着 `audit_read`
+ # —— 当场跑必被拒。同域 `omni ask` 反而标对了（）⇒ 两个出口口径不一致，**列表那个是假绿**。
             # 改法：一律用 `auto_run_verdict()` 这一个判据（它把作用域也算进去），别再各算各的。
             "caps_safe_no_args": sum(1 for c in caps if auto_run_verdict(c)[0]),
             "skills": len(skills),
@@ -984,7 +977,7 @@ def cmd_ask(intent: str, domain: str | None) -> int:
           % (_ATLAS_SOURCE["how"], _ATLAS_SOURCE["mtime"]))
     print()
 
-    # 🔴 先给"本地工具面"（如果命中）—— 扫描/体检这类意图的真落点在这里。
+ # 先给"本地工具面"（如果命中）—— 扫描/体检这类意图的真落点在这里。
     #    为什么排在最前：能力位里**没有**一台本地扫描器；而人问"扫一下"最先想要的是扫描，
     #    不是框架自检。谁最贴意图谁在前，与通道无关。
     if r.get("tools"):
@@ -1021,7 +1014,7 @@ def cmd_ask(intent: str, domain: str | None) -> int:
             print("  [%.1f] %-30s %-12s %s" % (s["score"], s["name"], s["channel"],
                                                s["displayName"] or ""))
             print("        %s" % (s["desc"][:110] or "（无描述）"))
-            # 🔴 落点可达性：路由通了不等于能用。实测 `gbt-system`(12.0) 本会话加载不了，
+ # 落点可达性：路由通了不等于能用。实测 `gbt-system`(12.0) 本会话加载不了，
             #    原先照样当首选推给人 ⇒ 人照着做会撞 unknown。现在逐条标出来。
             print("        %s %s" % ("✅ 本会话可加载" if ok else "🔴 **本会话加载不了**", note))
     print("\n（主路说明：语义路由 `semantic_route` 走**触手方法**；本命令补的是"
@@ -1049,7 +1042,7 @@ def cmd_run(intent: str, domain: str | None, yes: bool) -> int:
         for w in why_not:
             print("     · %s" % w)
     # ── 真跑：走**五维合一的默认执行路径**（耳→手→眼→嘴 + 开步/收步）──────────
-    # 🔴 2026-09-23 补（三执行层「默认使用」的最后一格）。
+ # 2026-09-23 补（三执行层「默认使用」的最后一格）。
     # 改前：这里直接起 `five-dim.py cap <kind>` —— 只到能力位那一层，
     #   大脑（brain_*）与五维合一的**真链**一次都不参与。
     #   机检证据：装钩子后 `brain_unify = 0`、`run() 全链 = 0`，而 `call` 有 36 次。
@@ -1114,9 +1107,9 @@ def cmd_list(domain: str | None, channel: str | None) -> int:
         for d in sorted(byd):
             print("  【%s】%d 条  (%s)" % (d, len(byd[d]), DOMAIN_HINTS.get(d, "—")[:40]))
             for c in byd[d]:
-                # 🔴 同一个判据（`auto_run_verdict`）算 ✅/🔒 —— 原先这里自己算一遍旗标、
+ # 同一个判据（`auto_run_verdict`）算 / —— 原先这里自己算一遍旗标、
                 # **不查授权门**，于是 `audit_query`（挂 `audit_read`）被标成"免卡无参可直跑"，
-                # 而门当场拒它；同一份图鉴在 `omni ask` 里却标 🔒。列表出口才是那个假绿。
+ # 而门当场拒它；同一份图鉴在 `omni ask` 里却标 。列表出口才是那个假绿。
                 flag = "✅" if auto_run_verdict(c)[0] else "🔒"
                 print("     %s %-26s %s" % (flag, c["kind"], c["desc"][:70]))
     if channel in (None, "agent-skill"):
@@ -1145,7 +1138,7 @@ def cmd_caliber() -> int:
     三个数说的是同一件事，却谁也不对账 ⇒ 读的人不知道信哪个。
     这条命令把**每种口径的定义与现算值并排列出**，并指定哪一个才是权威。
     """
-    # 🔴 2026-09-23 补 import：A 行的说明改成"现算"之后用到了 `UNIMPLEMENTED_CAPS`，
+ # 2026-09-23 补 import：A 行的说明改成"现算"之后用到了 `UNIMPLEMENTED_CAPS`，
     #    而当时只改了文案没补 import ⇒ `omni caliber` 直接 NameError 崩掉（本轮实测抓到）。
     #    教训：**"把写死的数字改成现算"不是改文案，是改依赖** —— 补了算式就得补 import。
     from gbt_allinone.caps_registry import UNIMPLEMENTED_CAPS
@@ -1263,7 +1256,7 @@ def cmd_gaps(limit: int = 6) -> int:
         (done if skill else queued).append(row)
     print("\nA. 注册表 %d 个职业域" % len(by_dom))
     for dom, n, skill in done:
-        # 🔴 别只信映射（2026-09-22 的教训）：`creation → gbt-aesthetic` 在表里挂了很久，
+ # 别只信映射（2026-09-22 的教训）：`creation → gbt-aesthetic` 在表里挂了很久，
         # 而那份规程里一个能力位都没点到 —— 表说"已深蒸"，实物不干这件事，就是假绿。
         # 所以这里**现读盘**：两份产物在不在、哈希一不一致；不一致就当场降级成告警，
         # 不许再打那个绿勾。（深一层的内容判定交给 `verify-distill.py`。）

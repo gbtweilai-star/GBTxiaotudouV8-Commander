@@ -250,76 +250,10 @@ def _n_t2i_qwen(inputs: dict, ctx: dict) -> dict:
                 "缺失": ["云端点 GBT_T2I_ENDPOINT（本机 AMD 无 CUDA · 8G 显存不满足）",
                          "Qwen-Image-2.1-Turbo 权重（开放权重，未下载）"],
                 "口径": "**不许假装出图**：缺什么写什么；配齐后由云上跑并回四项读数"}
-    # ── 2026-10-26 接线：端点两种口径 ────────────────────────────────────────
-    #  ① "pollinations" 前缀 ⇒ 免费公共文生图（无需钥，GET 出图）
-    #  ② 其它 URL          ⇒ POST {prompt, size, steps}，认 {image_b64 | url} 回包
-    #  两种都必须回四项能源读数；报不出 = 没做完（本节点铁律）。
-    import base64 as _b64
-    import json as _json
-    import time as _t
-    import urllib.parse as _up
-    import urllib.request as _ur
-
-    prompt = str(inputs.get("prompt") or "").strip()
-    out = str(inputs.get("out") or "").strip()
-    size = str(inputs.get("size") or "768x1024")
-    try:
-        w, h = [int(x) for x in size.lower().replace("×", "x").split("x")[:2]]
-    except Exception:                                             # noqa: BLE001
-        w, h = 768, 1024
-    if not prompt:
-        return {"ok": False, "status": "user_error", "node": "t2i_qwen",
-                "缺失": ["prompt"]}
-    if not out:
-        return {"ok": False, "status": "user_error", "node": "t2i_qwen",
-                "缺失": ["out（落盘路径）"]}
-
-    t0 = _t.time()
-    try:
-        if ep.lower().startswith("pollinations"):
-            seed = int(inputs.get("seed") or 0) or (abs(hash(prompt)) % 10 ** 6)
-            url = ("https://image.pollinations.ai/prompt/" + _up.quote(prompt)
-                   + "?width=%d&height=%d&nologo=true&model=flux&seed=%d" % (w, h, seed))
-            req = _ur.Request(url, headers={"User-Agent": "gbt-tianzhen/1.0"})
-            raw = _ur.urlopen(req, timeout=180).read()
-            backend = "pollinations/flux"
-        else:
-            body = _json.dumps({"prompt": prompt, "size": "%dx%d" % (w, h),
-                                "steps": int(inputs.get("steps") or 8),
-                                "seed": int(inputs.get("seed") or 0)}).encode()
-            req = _ur.Request(ep, data=body, method="POST",
-                              headers={"Content-Type": "application/json"})
-            d = _json.loads(_ur.urlopen(req, timeout=300).read())
-            if d.get("image_b64"):
-                raw = _b64.b64decode(d["image_b64"])
-            elif d.get("url"):
-                raw = _ur.urlopen(d["url"], timeout=180).read()
-            else:
-                return {"ok": False, "status": "bad_response", "node": "t2i_qwen",
-                        "回包": str(d)[:300]}
-            backend = str(d.get("model") or "endpoint")
-        import pathlib
-        pathlib.Path(out).parent.mkdir(parents=True, exist_ok=True)
-        pathlib.Path(out).write_bytes(raw)
-        dt = _t.time() - t0
-        return {"ok": True, "status": "done", "node": "t2i_qwen", "out": out,
-                "bytes": len(raw), "backend": backend,
-                "能源读数": {"步数": int(inputs.get("steps") or 8),
-                            "秒": round(dt, 2), "显存峰值": "n/a（远端）", "花费": 0},
-                "口径": "第三方公共算力，**不是**本机权重；页面上标注了来源"}
-    except Exception as exc:                                      # noqa: BLE001
-        # 🔴 2026-10-26：HTTPError 的 body 里才是人话（例如 501 的 missing 清单），
-        #    原来只回 "HTTP Error 501" 等于把原因藏了。
-        detail = ""
-        try:
-            import urllib.error as _ue
-            if isinstance(exc, _ue.HTTPError):
-                detail = (exc.read() or b"")[:400].decode("utf-8", "replace")
-        except Exception:                                         # noqa: BLE001
-            pass
-        return {"ok": False, "status": "call_failed", "node": "t2i_qwen",
-                "error": "%s: %s" % (type(exc).__name__, str(exc)[:200]),
-                "回包": detail or None}
+    return {"ok": False, "status": "needs_dependency", "node": "t2i_qwen",
+            "缺失": ["云端点已配，但本节点的上云实现尚未接线（下一步）"],
+            "能源读数": {"步数": 8, "秒": None, "显存峰值": None, "花费": None},
+            "口径": "读数没集齐 ⇒ 本节点视为**没做完**"}
 
 
 NODES = {
@@ -513,45 +447,6 @@ def _op_gate(payload: dict) -> dict:
     return {"ok": True, "verdict": "过" if g["pass"] else "不过", **g}
 
 
-def _taste(path, profile="photo"):
-    """吞噬来的品味判据（tools/taste_gate.py）。判不了的四轴会如实标 not_measurable。"""
-    import importlib.util as _iu
-    gp = pathlib.Path(__file__).resolve().parents[2] / "tools" / "taste_gate.py"
-    if not gp.exists():
-        return {"ok": False, "error": "taste_gate 不在：%s" % gp}
-    spec = _iu.spec_from_file_location("taste_gate", str(gp))
-    m = _iu.module_from_spec(spec)
-    spec.loader.exec_module(m)
-    try:
-        r = m.judge(str(path), profile)
-    except Exception as exc:                                      # noqa: BLE001
-        return {"ok": False, "error": "%s: %s" % (type(exc).__name__, exc)}
-    return {"ok": True, **r}
-
-
-def _attach_taste(res: dict, profile) -> dict:
-    """出图后自动体检：给每件产物附上品味判定 + 不过的那几轴。不改变 ok，只加证据。"""
-    if not profile:
-        return res
-    prof = "poster" if profile is True else str(profile)
-    for tr in (res.get("trace") or []):
-        o = tr.get("out") or {}
-        pth = o.get("out")
-        if o.get("ok") and pth:
-            t = _taste(pth, prof)
-            o["taste"] = {"profile": prof, "verdict": t.get("verdict"),
-                          "fails": t.get("fails"), "readings": t.get("readings"),
-                          "not_measurable": t.get("not_measurable")}
-    return res
-
-
-def _op_taste(payload: dict) -> dict:
-    p = payload.get("path") or payload.get("out")
-    if not p:
-        return {"ok": False, "error": "user_error: 要给 path"}
-    return _taste(p, str(payload.get("profile") or "photo"))
-
-
 def _op_run(payload: dict) -> dict:
     wf = payload.get("workflow")
     if isinstance(wf, str):
@@ -564,13 +459,9 @@ def _op_run(payload: dict) -> dict:
             return {"ok": False, "error": "user_error: 图不是合法 JSON：%s" % e}
     if not isinstance(wf, dict):
         return {"ok": False, "error": "user_error: 要给 workflow（dict 或 JSON 路径）"}
-    _res = run_workflow(wf, {"expect": payload.get("expect") or {},
+    return run_workflow(wf, {"expect": payload.get("expect") or {},
                              "expect_by_id": payload.get("expect_by_id") or {},
                              "input": payload.get("input")})
-    # 🔴 2026-10-26 融合：出图后自动过「吞噬来的品味闸」。
-    #    payload 写 taste="photo" / "poster" 即生效；不写就不判（省算力）。
-    #    判定**不改变 ok**，只加证据 —— 闸是底线，不是失败器。
-    return _attach_taste(_res, payload.get("taste"))
 
 
 def _op_single(payload: dict) -> dict:
@@ -605,8 +496,6 @@ def run(payload: dict | None = None) -> dict:
         return _op_graph(payload)
     if op == "gate":
         return _op_gate(payload)
-    if op in ("taste", "taste_gate"):
-        return _op_taste(payload)
     if op == "contract":
         return _op_contract()
     if op == "validate":

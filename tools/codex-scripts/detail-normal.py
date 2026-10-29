@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """专业技法 · 毛孔级细节法线（detail normal bake）：从 albedo 高频提细节，混入现有 normalMap。
 
 原理（与商业材质的 detail-normal 同源）：
@@ -19,7 +15,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 GLB = WS / "holo_pet/assets/digital-human/raw/rig/model-rigged-anim.glb"
 STRENGTH = 1.0          # 细节强度（0.5=很轻 3=明显）
 

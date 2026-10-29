@@ -16,7 +16,7 @@
    - 序号必须 1..N **连续无缺口**（丢一行 = 缺口 ⇒ 报红）；
    - 每行挂**哈希链**（`prev` = 上一行的 sha）⇒ 抽改/删行/乱序都会断链 ⇒ 报红。
 
-## 🔴 本文件同时修掉的一个真缺陷
+## 本文件同时修掉的一个真缺陷
 面板 `deploy-panel.py::_invariants()` 第①条「每件恰好挂一根触手」用的判据是：
     `idx = [i for k in range(n) for i in range(len(PLUGIN_SLOTS)) if i % n == k]`
 每个下标**按构造只被选中一次** ⇒ `dup` **恒为空** ⇒ 该条**无论数据多乱都永远 ✅**。
@@ -496,7 +496,7 @@ def cmd_selftest(a) -> int:
         REG.write_text(full[0] + "\n" + full[2] + "\n", encoding="utf-8")
         va = verify_chain()
         ck("抽掉中间一行 ⇒ 序号缺口报红", bool(va["序号缺口"]), "缺口=%s" % va["序号缺口"])
-        # ⑤b 🔴 抽掉**最后**一行 ⇒ 纯连号查不出，**必须靠锚点**查出来
+ # ⑤b 抽掉**最后**一行 ⇒ 纯连号查不出，**必须靠锚点**查出来
         REG.write_text(full[0] + "\n" + full[1] + "\n", encoding="utf-8")
         vb = verify_chain()
         ck("**截尾**（连号仍是 1..2）⇒ 锚点行数不符报红",
@@ -519,7 +519,7 @@ def cmd_selftest(a) -> int:
         ck("锚点不在 ⇒ **未锚定不算完好**", verify_chain()["全过"] is False,
            str(verify_chain()["锚点"])[:46])
     REG, ANCHOR = old, olda
-    # ⑨ 🔴 「rc=0 就能用」是**坏判据**：没有 CLI 的模块 `python x.py selftest` 也会 rc=0（假过）
+ # ⑨ 「rc=0 就能用」是**坏判据**：没有 CLI 的模块 `python x.py selftest` 也会 rc=0（假过）
     pr = probe_selftest("tools/iching_king_wen.py")
     ck("**rc=0 但一条读数都没报 ⇒ 不算可用**（假过负控）",
        pr["rc"] == 0 and pr["条数"] == 0,

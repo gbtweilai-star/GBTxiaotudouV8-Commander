@@ -23,14 +23,12 @@ import os
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
-for _s in (sys.stdout, sys.stderr):          # 不带 -X utf8 调用时不许静默输出空
-    try:
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        pass
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -131,7 +129,7 @@ def main():
     srt = drawer / _house_name('short-video', a.work, 'srt')
     wav_out = drawer / _house_name('short-video', a.work, 'wav')
     # 烧字幕 + 钢印。
-    # ⚠️ Windows 下 `subtitles=C:/...` 会被 ffmpeg 把盘符冒号当成选项分隔符（报
+ # Windows 下 `subtitles=C:/...` 会被 ffmpeg 把盘符冒号当成选项分隔符（报
     #    "Unable to parse original_size"）⇒ **切到 srt 所在目录用相对文件名**，别去转义冒号。
     subprocess.run([FFMPEG, '-y', '-v', 'error', '-i', str(silent),
                     '-vf', "subtitles=dialogue.srt:force_style='FontName=Microsoft YaHei,FontSize=17,"

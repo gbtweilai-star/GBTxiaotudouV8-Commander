@@ -33,7 +33,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[2]
-# 🔴 2026-09-23 磨（本台第一次跑就抓到自己，连抓两次）：
+# 2026-09-23 磨（本台第一次跑就抓到自己，连抓两次）：
 #   第一版死写 `[PY, "-3.14", ...]` —— `sys.executable` 是**解释器本体**，对它传 `-3.14`
 #   会被当非法选项 ⇒ 每条探针 15 ms 就 exit 2（若把 exit 2 读成"跑完了"，整台就是**假绿**）。
 #   第二版想修，写的判据是 `Path(PY).name.lower().startswith("py")` —— 而
@@ -177,7 +177,7 @@ def main(argv):
         "found=%s synced=%s entry=%s" % (env.get("found"), env.get("synced"), env.get("entry")), ms)
 
     # ── 大脑执行层真干活：整条 DAG 跑通 ───────────────────────────────
-    # 🔴 加 `--full` 的理由（本台第三次抓到自己）：默认出口会**收窄 result**，
+ # 加 `--full` 的理由（本台第三次抓到自己）：默认出口会**收窄 result**，
     # 于是 `nodes` 落在 `result.preview.nodes` 而不是 `result.nodes` ——
     # 我第一版探针直接读 `result.nodes`，拿到 0 节点，报了个**假 FAIL**。
     # 教训：**机器消费方用 --full**（收窄是给人看的，给人看的东西不该被脚本当契约）。

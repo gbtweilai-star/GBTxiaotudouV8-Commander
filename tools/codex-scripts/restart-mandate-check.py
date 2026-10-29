@@ -7,7 +7,7 @@
     发现**故障和黄色警报不能无视，必须追踪根因给我彻底修复**，然后**登记写发现了什么这么修复的**，
     然后**在下一步**。」
 
-硬指令正文落在 HEARTBEAT.md 顶部那一节（重启之后按 7 步走，第 1 步就是云上模型编队账本）。
+硬指令正文落在 HEARTBEAT.md 顶部那一节（重启之后按 6 步走）。
 **本件是它的机器判据** —— 因为「靠自觉」正是主人说的那个病。
 
 ## 咬三件（每一件都要有真跑痕迹，不是文档承诺）
@@ -95,7 +95,7 @@ def check(hours: float = DEFAULT_HOURS, store=None,
 
     # 自检落痕：boot-selfcheck 由 unittest 驱动、不写 audit ⇒ 看 state 下的产物。
     # 口径从宽：任何近期的自检痕迹都算（本件先咬"做没做"，不咬"哪个文件"）。
-    # 🔴 2026-10-11 自纠：glob 原来只写了下划线的 boot_selfcheck* / selfcheck*，
+ # 2026-10-11 自纠：glob 原来只写了下划线的 boot_selfcheck* / selfcheck*，
     #    而 boot-selfcheck.py 落的痕叫 **boot-selfcheck-last.json（连字符）** ⇒
     #    落痕明明写出来了，判据却报"没有"（实测首跑就是这样）。
     #    ⇒ 两种写法都认，别让命名风格把判据弄瞎。

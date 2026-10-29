@@ -62,7 +62,7 @@
     '  d.x += uSway * (1.0 - uv.y);',
     /* 呼吸：胸腔上下 + 左右微鼓 */
     '  float chest = 1.0 - smoothstep(0.30, 0.62, uv.y);',
-    '  d.y -= uBreath * 7.0 * chest;',
+    '  d.y -= uBreath * 3.2 * chest;',
     '  d.x += (p.x - uImg.x * 0.5) * 0.0045 * uBreath * chest;',
     /* 头（含发）整体刚性部分 */
     '  float mHead = ell(p, uHeadC, vec2(uHeadR * 0.98, uHeadR * 1.24), 0.55);',
@@ -423,11 +423,11 @@
       if (st.frozen) return;          /* 截图/量具用：冻结动作，直接看某一组参数 */
       var sp = st.state;
       var lv = (sp === 'speak') ? st.level : 0;
-      var breathTarget = 0.5 + 0.5 * Math.sin(t * 1.9);   // 0..1，约 3.3s 一次呼吸
+      var breathTarget = 0.5 + 0.5 * Math.sin(t * 1.9);
       st.breath = breathTarget;
-      st.sway = Math.sin(t * 0.42) * 11.0 + Math.sin(t * 0.19) * 5.0 + (sp === 'listen' ? 2.4 * Math.sin(t * 0.9) : 0);
-      st.tilt = Math.sin(t * 0.31) * 0.030 + Math.sin(t * 0.13) * 0.012 + (sp === 'think' ? 0.05 : 0);
-      st.nod = Math.sin(t * 0.67) * 0.016 - (sp === 'listen' ? 0.020 : 0);
+      st.sway = Math.sin(t * 0.42) * 4.6 + (sp === 'listen' ? 1.2 * Math.sin(t * 0.9) : 0);
+      st.tilt = Math.sin(t * 0.31) * 0.013 + (sp === 'think' ? 0.05 : 0);
+      st.nod = Math.sin(t * 0.67) * 0.006 - (sp === 'listen' ? 0.012 : 0);
       st.look = Math.sin(t * 0.23) * 0.5 + (sp === 'think' ? 0.35 : 0);
 
       /* 嘴：音量包络 + 说话时的音节起伏（不是固定正弦，随包络走） */

@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """次级动力学 ①加骨 ②区域重权：给低模全身件加 **4 根裙摆弹簧骨**（前/后/左/右），
 根部与 Hips **混权**（0→1 渐变，防根部撕裂）—— 口径来自 VRMC_springBone-1.0（见技能 pitfalls §11）。
 区域判据（实测）：y ∈ [髋 −0.03, 裙摆底 −0.23]，且**距腿轴 > 腿半径**（剔腿）。
@@ -12,7 +8,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 import sys  # noqa: E402
 MODE = sys.argv[1] if len(sys.argv) > 1 else "both"

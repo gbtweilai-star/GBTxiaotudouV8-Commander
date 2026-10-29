@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """清晰度量规 v2（修正版）：
   · 轮廓锯齿度：每列只取**上边界行**，沿 x 求二阶差分均值（超采样应使其下降）
   · 强边缘均值：|grad| 前 5% 的均值
@@ -14,7 +10,7 @@ import sys
 import numpy as np
 from PIL import Image
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 
 
 def analyze(p):

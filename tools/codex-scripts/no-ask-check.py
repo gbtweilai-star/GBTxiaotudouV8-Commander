@@ -33,10 +33,6 @@ DECLARED: dict = {
         "文档表格：描述这个能力的设计目标（用主人自己的订阅跑编码 agent），不是让用户做事",
     "gbt_allinone/tools/agent_rig.py:28":
         "**反向句**：正文明写「不是替你去注册」——它在声明我们不做甩锅，不是在甩锅",
-    "gbt_allinone/tools/bits_kit.py:49":
-        "**许可原文**：`可以放进**你自己的**应用用`—— 它是在**赋权**（告诉用户能怎么用），不是要求用户做事",
-    "gbt_allinone/tools/warm_switch.py:21":
-        "文档串（铁律段）：在说明“开关不碰授权门、只用你自己的额度”—— **它是在描述属性，不是要求用户做事**",
     "gbt_allinone/tools/gs_h3_cap.py:260":
         "发给**模型**的提示词（『请你基于下方素材构思』里的『你』指模型，不指用户）",
 }
@@ -61,7 +57,7 @@ def scan() -> dict:
             if r.get("通过"):
                 continue
             key = "%s:%d" % (p.relative_to(ROOT).as_posix(), i)
-            row = {"件": key, "命中": (r.get("命中句式") or [])[:1], "原文": s[:110]}
+            row = {"件": key, "命中": r["命中句式"][:1], "原文": s[:110]}
             (declared_hit if key in DECLARED else hits).append(row)
     return {"ok": not hits, "扫描件数": len(files), "违规": hits,
             "已申报放行": declared_hit, "申报表条数": len(DECLARED)}
@@ -87,7 +83,7 @@ def selftest() -> int:
     print("负对照·报警闭环闸 => 已闭环 %d · 未闭环 %d · 敷衍 %d"
           % (tr["已闭环"], tr["未闭环"], tr["敷衍句"]))
     # 停点闸：只有两种理由合法
-    # 🔴 2026-10-10 修**陈了的期望值**：这条自检长期以来是红的（"停点判错: 全部跑通并交付 期望 True
+ # 2026-10-10 修**陈了的期望值**：这条自检长期以来是红的（"停点判错: 全部跑通并交付 期望 True
     #    实得 False"），而**代码是对的、期望是旧的** ——
     #    主人令 2026-10-09 把停点收紧了：光"这次活干完了 + 带证据"**不够**，
     #    还要 **completeness() 整体完善**（"看整体没完善就不停工"）。
@@ -108,14 +104,14 @@ def selftest() -> int:
             print("       ❌ 停点判错:", reason, "期望", want, "实得", got)
     print("负对照·停点闸（只许两种理由）=> 判对 %d/%d" % (n_stop, len(stops)))
 
-    # 🔴 2026-10-10 补 **扫描器级**负对照（先前只测了句子分类器）。
+ # 2026-10-10 补 **扫描器级**负对照（先前只测了句子分类器）。
     #    上面那些负对照喂的都是**字符串**，而本件的**被测单元是 scan()——它扫盘**。
     #    selftest-audit 把这件分成「纯合成(扫盘件·真缺口)」：==分类器再对，也照不到扫描器的洞==。
     #    ⇒ 真植入一个含违规句的 .py 到扫描范围里，**扫盘必须抓到**；
     #      再把它写进 DECLARED ⇒ **必须转到「已申报放行」、不许留在违规里**
     #      （这一半同样重要：申报放行是本件唯一的放行口，它坏了就等于门形同虚设）。
     NL = chr(10)
-    # 🔴 起名要避开 scan() 自己的过滤器（第 44 行有 '"test" not in p.name'）——
+ # 起名要避开 scan() 自己的过滤器（第 44 行有 '"test" not in p.name'）——
     #    我第一版叫 _selftest_noask_probe.py ⇒ 含 "test" ⇒ **被自己排除**，负控当场假绿。
     probe = ROOT / "gbt_allinone" / "_noask_probe_tmp.py"
     probe.write_text(NL.join(["# 自检植入件（跑完即删）",

@@ -98,7 +98,7 @@ def repo_files(repo: str) -> dict:
     }
 
 
-# 🔴 这些后缀对，但**不是模型权重**：imatrix 是标定用的统计表（几十 MB），
+# 这些后缀对，但**不是模型权重**：imatrix 是标定用的统计表（几十 MB），
 #    拿它当"最小量化档"会得出"装得下"的**假绿**（本轮当场踩到：27B 仓库里
 #    `imatrix_unsloth.gguf` 10 MB 被选成最小档 ⇒ 报"装得下"）。判据必须排除它们。
 NOT_WEIGHTS = ("imatrix", "calibration", "calib", "params", "config", "tokenizer")

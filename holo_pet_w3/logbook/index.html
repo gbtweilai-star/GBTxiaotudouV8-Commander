@@ -1,74 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head>
-<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0b0d10"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<html data-page-id="logbook" lang="zh-CN"><head>
+<!-- gbt-apple-config --><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="小土豆V8"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B1120"><meta name="format-detection" content="telephone=no"><style id="gbt-apple-css">:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom)}body{padding-top:calc(8px + var(--sat));padding-bottom:calc(8px + var(--sab));-webkit-text-size-adjust:100%}a,button{min-height:48px;min-width:48px;display:inline-block}</style>
 
 
 
@@ -94,20 +26,26 @@
 <meta charset="utf-8">
 <title>GBT小土豆V8 · 记录本（重启不失忆 · 只追加 · 自链哈希）</title>
 <!--
-  记录本面板 · 窗口 L · 批次 W15 · 2026-10-07
-  主人令（逐字）：「给她设计一个记录本，不管做什么都要在里面有记录，防止重启之后大模型不知道，
-    比如每天扫描扫过哪里、修改过哪里、新增了哪里，全部都要有记录。」
-  本页只说三件事：① 链有没有断（自链哈希）② 最近做过什么（append 的手记）
-    ③ 每天扫了什么、改了什么、新增了什么、删了什么（文件指纹现算，不是回忆）。
-  数据：logbook-data.js（logbook.py render 生成）—— 只读，不取网络、不 fetch、零外部引用。
+ 记录本面板 · 窗口 L · 批次 W15 · 2026-10-07
+ 主人令（逐字）：「给她设计一个记录本，不管做什么都要在里面有记录，防止重启之后大模型不知道，
+ 比如每天扫描扫过哪里、修改过哪里、新增了哪里，全部都要有记录。」
+ 本页只说三件事：① 链有没有断（自链哈希）② 最近做过什么（append 的手记）
+ ③ 每天扫了什么、改了什么、新增了什么、删了什么（文件指纹现算，不是回忆）。
+ 数据：logbook-data.js（logbook.py render 生成）—— 只读，不取网络、不 fetch、零外部引用。
 -->
+<!-- 2026-10-26：中性色吃 library 令牌（单一源 state/taste/*.json → theme/taste-tokens.css），
+ 页面只写 var(--taste-*, 兜底)。强调色 --cy/--or 是品牌语言，本轮不动。 -->
+<link rel="stylesheet" href="../theme/taste-tokens.css" />
 <style>
-:root{--bg:#07090d;--pan:#0d1117;--line:#1d2635;--ink:#e6edf7;--dim:#8b97a8;
- --cy:#22d3ee;--or:#f5b041;--ok:#34d399;--bad:#f87171;--brand-or:#f5b041;--brand-cy:#22d3ee}
+:root{--bg:#1E1E2A;--pan:#2A2A36;--line:#3E3E50;
+ --ink:#E6E3EA;--dim:#9A93A8;
+ --cy:#7EA2F6;--or:#DE1E2A;--ok:#9CCB68;--bad:#F2565E;
+ --brand-or:#DE1E2A;--brand-cy:#7EA2F6}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI",system-ui,sans-serif}
 .gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
- background:linear-gradient(90deg,#0b1017,#0d1117);flex-wrap:wrap}
+ /* 2026-10-26：同 db-fleet —— 两档微渐变改纯色中点 #111827（视觉无差，去掉一条 slop 命中）。 */
+ background:#111827;flex-wrap:wrap}
 .mark{width:18px;height:18px;flex:0 0 auto;background:url(../build/tray-logo-32.png) center/contain no-repeat}
 .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--brand-or)}
 .note{color:var(--dim);font-size:11.5px}
@@ -118,221 +56,168 @@ h2{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:600;letter-spacing
 .stat{min-width:104px}.stat b{display:block;font-size:24px;color:var(--brand-cy);font-variant-numeric:tabular-nums}
 .stat i{font-style:normal;color:var(--dim);font-size:12px}
 .chain{border-radius:8px;padding:8px 10px;font-size:12.5px;border:1px solid var(--line)}
-.chain.ok{border-color:#1c5138;background:#0a1a12;color:var(--ok)}
-.chain.bad{border-color:#5c2020;background:#1a0a0a;color:var(--bad)}
+.chain.ok{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.07);color:var(--ok)}
+.chain.bad{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.07);color:var(--bad)}
 table{border-collapse:collapse;width:100%;font-size:11.5px}
 th,td{border:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
-th{color:var(--dim);font-weight:600;background:#0b1017;position:sticky;top:0}
-tbody tr:hover td{background:#101722}
+th{color:var(--dim);font-weight:600;background:#111827;position:sticky;top:0}
+tbody tr:hover td{background:var(--taste-ground,#0B1120)}
 .mono{font-family:ui-monospace,Consolas,monospace}
 .k{display:inline-block;border-radius:999px;padding:0 7px;font-size:10.5px;border:1px solid var(--line);color:var(--dim)}
-.k.scan{border-color:#26445a;color:var(--brand-cy)}
-.k.change{border-color:#5a4a1e;color:var(--brand-or)}
-.k.deliver{border-color:#1c5138;color:var(--ok)}
-.k.decision{border-color:#3b2f5c;color:#b39ddb}
-.k.note{border-color:#333c4d;color:var(--dim)}
+.k.scan{border-color:#1E3A5F;color:var(--brand-cy)}
+.k.change{border-color:rgba(245,176,65,.45);color:var(--brand-or)}
+.k.deliver{border-color:rgba(34,197,94,.45);color:var(--ok)}
+.k.decision{border-color:rgba(124,77,255,.35);color:#b39ddb}
+.k.note{border-color:rgba(154,164,196,.28);color:var(--dim)}
 .num{font-variant-numeric:tabular-nums;text-align:right}
 .add{color:var(--ok)}.mod{color:var(--brand-or)}.del{color:var(--bad)}
 .base{color:var(--dim);font-style:italic}
 .samples{margin:4px 0 0;padding-left:16px;color:var(--dim);font-size:11px}
 .empty{color:var(--dim);padding:10px 0}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
-</style></head><body>
-<script src="../shell/nav-compact.js?v=20261026"></script>
+</style><link rel="stylesheet" href="../page-skins.css" />
+</head><body>
+<script src="../shell/nav-compact.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 <div class="gbt-topbar"><span class="mark"></span>
- <span class="brand">GBT<b>小土豆</b>V8 · 记录本</span>
- <span class="note" id="gen">…</span></div>
+<span class="brand">GBT<b>小土豆</b>V8 · 记录本</span>
+<span class="note" id="gen">…</span></div>
 
 <div class="wrap">
-  <div class="card">
-    <h2>链状态（只追加 · 自链哈希：改过一行就会断在这里）</h2>
-    <div class="chain" id="chain">…</div>
-  </div>
-
-  <div class="card">
-    <h2>总量</h2>
-    <div class="stats" id="stats"></div>
-  </div>
-
-  <div class="card">
-    <h2>扫描史（每天扫过哪里 · 改了什么 · 新增了什么 —— 文件指纹现算，不是回忆）</h2>
-    <div id="scans"></div>
-  </div>
-
-  <div class="card">
-    <h2>最近动作（不管做什么都记在这里）</h2>
-    <div id="records"></div>
-  </div>
+<div class="card">
+<h2>链状态（只追加 · 自链哈希：改过一行就会断在这里）</h2>
+<div class="chain" id="chain">…</div>
 </div>
 
-<script src="logbook-data.js?v=20261026"></script>
+<div class="card">
+<h2>总量</h2>
+<div class="stats" id="stats"></div>
+</div>
+
+<div class="card">
+<h2>扫描史（每天扫过哪里 · 改了什么 · 新增了什么 —— 文件指纹现算，不是回忆）</h2>
+<div id="scans"></div>
+</div>
+
+<div class="card">
+<h2>最近动作（不管做什么都记在这里）</h2>
+<div id="records"></div>
+</div>
+</div>
+
+<script src="logbook-data.js"></script>
 <script>
 (function () {
-  var D = window.GBT_LOGBOOK;
-  var $ = function (id) { return document.getElementById(id); };
-  if (!D) { $("chain").textContent = "读不到 logbook-data.js —— 跑 render 重新生成"; return; }
+ var D = window.GBT_LOGBOOK;
+ var $ = function (id) { return document.getElementById(id); };
+ if (!D) { $("chain").textContent = "读不到 logbook-data.js —— 跑 render 重新生成"; return; }
 
-  $("gen").textContent = "生成 " + D.generated_at + " · 源 state/logbook.jsonl · 重生成 " + D.regen;
+ $("gen").textContent = "生成 " + D.generated_at + " · 源 state/logbook.jsonl · 重生成 " + D.regen;
 
-  var c = $("chain");
-  c.className = "chain " + (D.chain.ok ? "ok" : "bad");
-  c.textContent = (D.chain.ok ? "✅ " : "❌ ") + D.chain.detail;
+ var c = $("chain");
+ c.className = "chain " + (D.chain.ok ? "ok" : "bad");
+ /* 2026-10-26：/ 当界面记号被审美守卫判「emoji 当 UI」⇒ 改用词；
+ 颜色本来就有 `.chain.ok/.bad` 在管，不靠 emoji 表达状态。 */
+ c.textContent = (D.chain.ok ? "通过 · " : "不通过 · ") + D.chain.detail;
 
-  var t = D.totals;
-  $("stats").innerHTML = [
-    ["记录", t.records], ["扫描", t.scans], ["改动", t.changes],
-    ["决策", t.decisions], ["交付", t.delivers]
-  ].map(function (p) {
-    return '<div class="stat"><b>' + p[1] + '</b><i>' + p[0] + '</i></div>';
-  }).join("");
+ var t = D.totals;
+ $("stats").innerHTML = [
+ ["记录", t.records], ["扫描", t.scans], ["改动", t.changes],
+ ["决策", t.decisions], ["交付", t.delivers]
+ ].map(function (p) {
+ return '<div class="stat"><b>' + p[1] + '</b><i>' + p[0] + '</i></div>';
+ }).join("");
 
-  var scans = (D.scans || []).slice().reverse();
-  if (!scans.length) {
-    $("scans").innerHTML = '<div class="empty">还没有扫描记录 —— 跑 logbook.py scan</div>';
-  } else {
-    $("scans").innerHTML = '<table><thead><tr><th>时刻</th><th>标签</th><th class="num">扫到</th>'
-      + '<th class="num">未变</th><th class="num">新增</th><th class="num">改动</th><th class="num">删除</th>'
-      + '<th>样例（最多 6 条）</th></tr></thead><tbody>'
-      + scans.map(function (s) {
-          var head = s.baseline
-            ? '<span class="base">建基线（首扫无旧快照）</span>'
-            : ["新增", "改动", "删除"].map(function (k, i) {
-                var key = ["added", "modified", "deleted"][i];
-                var n = s[key] || 0;
-                if (!n) return "";
-                var arr = (s.samples && s.samples[key]) || [];
-                return '<div class="' + ["add", "mod", "del"][i] + '">' + k + " " + n
-                  + '</div><ul class="samples">'
-                  + arr.slice(0, 6).map(function (p) { return "<li class=\"mono\">" + p + "</li>"; }).join("")
-                  + "</ul>";
-              }).join("") + (s.truncated ? '<div class="del">⚠ 本次扫描触顶被截断</div>' : "");
-          var cells = ["scanned", "unchanged", "added", "modified", "deleted"].map(function (k) {
-            return '<td class="num">' + (s[k] === null || s[k] === undefined ? "—" : s[k]) + "</td>";
-          }).join("");
-          return "<tr><td class='mono'>" + String(s.ts).slice(0, 19) + "</td><td>" + (s.label || "")
-            + "</td>" + cells + "<td>" + head + "</td></tr>";
-        }).join("") + "</tbody></table>";
-  }
+ var scans = (D.scans || []).slice().reverse();
+ if (!scans.length) {
+ $("scans").innerHTML = '<div class="empty">还没有扫描记录 —— 跑 logbook.py scan</div>';
+ } else {
+ $("scans").innerHTML = '<table><thead><tr><th>时刻</th><th>标签</th><th class="num">扫到</th>'
+ + '<th class="num">未变</th><th class="num">新增</th><th class="num">改动</th><th class="num">删除</th>'
+ + '<th>样例（最多 6 条）</th></tr></thead><tbody>'
+ + scans.map(function (s) {
+ var head = s.baseline
+ ? '<span class="base">建基线（首扫无旧快照）</span>'
+ : ["新增", "改动", "删除"].map(function (k, i) {
+ var key = ["added", "modified", "deleted"][i];
+ var n = s[key] || 0;
+ if (!n) return "";
+ var arr = (s.samples && s.samples[key]) || [];
+ return '<div class="' + ["add", "mod", "del"][i] + '">' + k + " " + n
+ + '</div><ul class="samples">'
+ + arr.slice(0, 6).map(function (p) { return "<li class=\"mono\">" + p + "</li>"; }).join("")
+ + "</ul>";
+ }).join("") + (s.truncated ? '<div class="del">本次扫描触顶被截断</div>' : "");
+ var cells = ["scanned", "unchanged", "added", "modified", "deleted"].map(function (k) {
+ return '<td class="num">' + (s[k] === null || s[k] === undefined ? "—" : s[k]) + "</td>";
+ }).join("");
+ return "<tr><td class='mono'>" + String(s.ts).slice(0, 19) + "</td><td>" + (s.label || "")
+ + "</td>" + cells + "<td>" + head + "</td></tr>";
+ }).join("") + "</tbody></table>";
+ }
 
-  var recs = (D.records || []).slice().reverse();
-  if (!recs.length) {
-    $("records").innerHTML = '<div class="empty">还没有记录</div>';
-  } else {
-    $("records").innerHTML = '<table><thead><tr><th class="num">#</th><th>时刻</th><th>类型</th>'
-      + '<th>谁</th><th>做了什么</th><th>涉及</th><th>链</th></tr></thead><tbody>'
-      + recs.map(function (r) {
-          var where = (r.where || []).map(function (w) { return '<span class="mono">' + w + "</span>"; }).join("<br>");
-          return "<tr><td class='num mono'>" + r.n + "</td><td class='mono'>" + String(r.ts).slice(0, 19)
-            + "</td><td><span class='k " + r.kind + "'>" + r.kind + "</span></td><td>" + (r.actor || "")
-            + "</td><td>" + r.what + "</td><td>" + where + "</td><td class='mono note'>"
-            + (r.prev || "") + " → " + (r.hash || "") + "</td></tr>";
-        }).join("") + "</tbody></table>";
-  }
+ var recs = (D.records || []).slice().reverse();
+ if (!recs.length) {
+ $("records").innerHTML = '<div class="empty">还没有记录</div>';
+ } else {
+ $("records").innerHTML = '<table><thead><tr><th class="num">#</th><th>时刻</th><th>类型</th>'
+ + '<th>谁</th><th>做了什么</th><th>涉及</th><th>链</th></tr></thead><tbody>'
+ + recs.map(function (r) {
+ var where = (r.where || []).map(function (w) { return '<span class="mono">' + w + "</span>"; }).join("<br>");
+ return "<tr><td class='num mono'>" + r.n + "</td><td class='mono'>" + String(r.ts).slice(0, 19)
+ + "</td><td><span class='k " + r.kind + "'>" + r.kind + "</span></td><td>" + (r.actor || "")
+ + "</td><td>" + r.what + "</td><td>" + where + "</td><td class='mono note'>"
+ + (r.prev || "") + " → " + (r.hash || "") + "</td></tr>";
+ }).join("") + "</tbody></table>";
+ }
 })();
 </script>
-
-
-<!-- gbt-defense -->
-<script>
-(function(){
-  if (window.__gbtDefense) return; window.__gbtDefense = 3;
-  var RULES = [
-    ["提示词注入", /(ignore|disregard|forget)\s+(all\s+)?(previous|prior|above)\s+(instructions?|prompts?)/i],
-    ["中文越狱", /(忽略|无视|忘记)(掉)?(之前|以上|前面|所有)(的)?(指令|提示|规则|要求)/],
-    ["套系统提示", /(system\s*prompt|系统提示词|开发者消息|developer\s*message|你的设定原文|把你的规则贴出来)/i],
-    ["套密钥", /(api[_\s-]?key|secret|token|密码|密钥|凭据).{0,12}(给我|发给我|贴出来|打印|显示|明文|show|print|reveal)/i],
-    ["破门指令", /(rm\s+-rf|format\s+[a-z]:|del\s+\/f|drop\s+table|truncate\s+table|shutdown\s+\/s)/i],
-    ["数据外带", /(curl\s+https?:\/\/|wget\s+https?:\/\/|upload|exfil|发送到|上传到).{0,40}(jsonl|审计|store|secrets?|dpapi|密钥)/i],
-    ["远控接管", /(执行这条命令|run\s+this\s+command|反向\s*shell|reverse\s*shell|监听端口|bind\s+shell)/i]
-  ];
-  function check(text){ var t=String(text||""); for(var i=0;i<RULES.length;i++){ if(RULES[i][1].test(t)) return {rule:RULES[i][0],hit:(t.match(RULES[i][1])||[""])[0].slice(0,60)}; } return null; }
-  function log(rec){
-    try{ var b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]"); b.push(rec); if(b.length>50) b=b.slice(-50);
-         localStorage.setItem("gbt_defense_log", JSON.stringify(b)); }catch(e){}
-  }
-  function bar(msg, tone){
-    var d=document.getElementById("gbt-defense-bar");
-    if(!d){ d=document.createElement("div"); d.id="gbt-defense-bar";
-      d.style.cssText="position:fixed;left:8px;right:8px;bottom:74px;z-index:99998;font:13px/1.6 system-ui;border-radius:12px;padding:8px 10px;display:none;"; document.body.appendChild(d); }
-    d.textContent=msg; d.style.display="block";
-    d.style.background=(tone==="hit")?"rgba(120,20,20,.94)":"rgba(10,40,30,.94)";
-    d.style.color="#eaf2ff"; d.style.border="1px solid "+(tone==="hit")?"#f5b041":"#00e5ff";
-  }
-  function baseUrl(){
-    var b = window.GBT_FRAMEWORK_URL || "";
-    if(!b){ try{ b = localStorage.getItem("gbt_framework_url") || ""; }catch(e){} }
-    if(!b && /^https?:$/.test(location.protocol)){ b = location.protocol + "//" + location.hostname + ":8877"; }
-    return b;
-  }
-  function report(rec){
-    var base = baseUrl();
-    if(!base){ log(rec); rec._status="未联网（离线仅拦截+留证，反控需框架在线）"; return Promise.resolve(rec); }
-    log(rec);
-    try{
-      return fetch(base.replace(/\/$/,"")+"/defense/report",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(rec)}).then(function(r){ rec._status="已上报框架 HTTP "+r.status; return rec; })
-        .catch(function(e){ rec._status="上报失败："+String(e).slice(0,80); return rec; });
-    }catch(e){ rec._status="上报异常："+String(e).slice(0,80); return rec; }
-  }
-  function speak(t){ /* 2026-10-18 主人令：**不许用 zh-CN SAPI 出声**（主人原话：「还有其他声音参入」）。
-       这一行原来是 `new SpeechSynthesisUtterance; u.lang="zh-CN"; speak(u)` —— 每次误报都会用大陆腔机器音
-       念一句「检测到攻击，已拦截」，和她的台湾腔神经嗓叠在一起，听起来就是"好几个声音在说话"。
-       仓规：拿不到台湾腔就不出声，不用大陆腔顶替 ⇒ 现在**只留视觉红条 + 控制台留痕**；
-       要真出声只能走能力位 `voice op=speak`（单一门）。 */
-    try{ if(String(t)) console.info("[自卫] "+t+"（不发声：不用 zh-CN SAPI）"); }catch(e){} }
-  function block(el, why){
-    var rec={ts:new Date().toISOString(),url:location.href,rule:why.rule,hit:why.hit,
-              where:(el&&(el.tagName||""))||"page-text"};
-    bar("已拦截：疑似「"+why.rule+"」（"+why.hit+"）· 证据已留本地","hit"); speak("检测到攻击，已拦截");
-    report(rec).then(function(){ bar("已拦截「"+why.rule+"」· "+((rec&&rec._status)||""),"hit"); });
-    return true;
-  }
-  // ① 拦输入/粘贴
-  function guardInputs(){
-    var els=document.querySelectorAll("input,textarea,[contenteditable=true]");
-    for(var i=0;i<els.length;i++){(function(el){
-      el.addEventListener("paste",function(e){ var t=(e.clipboardData||window.clipboardData).getData("text"); var w=check(t);
-        if(w){ e.preventDefault(); block(el,w); } });
-      el.addEventListener("input",function(){ var w=check(el.value); if(w){ el.dataset.gbtBlocked="1";
-        bar("该输入含攻击特征「"+w.rule+"」，已标记拦截 · 证据留本地","hit"); log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"input-live"}); } });
-      var f=el.form; if(f && !f.__gbtGuard){ f.__gbtGuard=1; f.addEventListener("submit",function(e){ var w=check(el.value);
-        if(w){ e.preventDefault(); block(el,w); } }); }
-    })(els[i]);}
-  }
-  // ② 扫页面可见文本（攻击内容被注入到页面时）
-  /* 🔴 2026-10-18 修（主人投诉「还有其他声音参入」时挖到的真因）：
-     原来这里对**页面自己的静态正文**跑 `block()` —— 于是像 digital-human 这种正文里写着
-     「密钥 / 明文 / 凭证」字样的页面，**一打开就自己报一次"已拦截「套密钥」"**，
-     还会念一句。这不是在拦攻击，是在拿自己的说明书当攻击。
-     ⇒ 页面正文命中只**留证（log）**，不弹条、不再出声；真正要拦的是**输入/粘贴/提交**那三条路。 */
-  function scanPage(){
-    var t=(document.body&&document.body.innerText||"").slice(0,20000); var w=check(t);
-    if(w){ log({ts:new Date().toISOString(),url:location.href,rule:w.rule,hit:w.hit,where:"page-text(仅留证)"}); }
-  }
-  // ③ 自卫条：显示状态 + 证据导出 + 反控说明
-  function panel(){
-    guardInputs();
-    var d=document.createElement("div"); d.id="gbt-defense-pill";
-    d.style.cssText="position:fixed;right:10px;bottom:124px;z-index:99999;background:rgba(8,12,20,.92);color:#9fb3c8;border:1px solid rgba(0,229,255,.35);border-radius:12px;padding:6px 10px;font:12px/1.5 system-ui;cursor:pointer";
-    d.textContent="自卫：开"; d.title="点击查看拦截记录";
-    d.onclick=function(){ var b=[]; try{b=JSON.parse(localStorage.getItem("gbt_defense_log")||"[]");}catch(e){}
-      alert("拦截记录 "+b.length+" 条\n"+(b.slice(-5).map(function(x){return x.ts+" ["+x.rule+"] "+x.hit;}).join("\n")||"暂无")+
-            "\n\n反控链：框架在线 ⇒ sec_defenses 验证 → omni_plug ai_control 反向操控攻击AI（未在线则不假装已反控）"); };
-    document.body.appendChild(d);
-  }
-  document.addEventListener("DOMContentLoaded", function(){ panel(); scanPage(); });
-  if (document.body && document.readyState!=="loading") { panel(); scanPage(); }
-})();
-</script>
-<script src="../shell/live-badge.js?v=20261026" defer></script>
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../shell/tentacle-kit.js?v=20261026" defer></script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
+<script src="../shell/tentacle-kit.js" defer></script>
 </body></html>

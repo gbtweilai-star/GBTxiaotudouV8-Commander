@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径
-#    `C:\Users\ADMIN\Desktop\GBT小土豆V8`，Linux/手机上会**造出一个同名垃圾目录**。
-#    改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """验证收窄后的加载器：三种启动目录下的绑定行为。"""
 import os
 import re
@@ -27,8 +18,8 @@ fn = m.group(0)
 print("[2] extracted %d chars" % len(fn))
 
 cases = [
-    (_GBT_ROOT, "V8 工作区", None),
-    (_GBT_ROOT + "/gbt_allinone", "V8 子目录", None),
+    (r"C:\Users\ADMIN\Desktop\GBT小土豆V8", "V8 工作区", None),
+    (r"C:\Users\ADMIN\Desktop\GBT小土豆V8\gbt_allinone", "V8 子目录", None),
     (r"C:\Users\ADMIN\Desktop\GBT小土豆", "V5 项目根", r"C:\Users\ADMIN\Desktop\GBT小土豆\brain\gatekeeper.py"),
     (r"C:\Users\ADMIN", "用户主目录", r"C:\Users\ADMIN\brain\gatekeeper.py"),
 ]

@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[3])
 """数字人 · 诊断视图：把"骨权域"和"被拉长的边"**画出来**（不是感觉，是着色）
 
 模式：
@@ -23,7 +19,7 @@ import math
 import os
 import sys
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 
 PALETTE = {
     "hips": (0.90, 0.20, 0.20), "spine": (0.95, 0.55, 0.10), "chest": (0.95, 0.90, 0.15),

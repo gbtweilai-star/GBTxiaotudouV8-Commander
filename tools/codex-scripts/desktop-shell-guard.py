@@ -7,17 +7,22 @@ Owner 的硬约束是「**不能破坏 DeepSeek Harness（我们现在对话的�
 这种话**不能靠"我小心"**——必须有**可判的边界**，否则"没破坏"只是我嘴上说的。
 本件把《一体式桌面APP-架构与路线图》§2 的 B1–B5 变成**能跑的判据**。
 
-## 三态，不许只有两态
+## 四态，不许只有两态
 
     PASS     已证实成立
     FAIL     已证实不成立（**出现任一 FAIL ⇒ 退出码 1，不许打包**）
     PENDING  **还没建/还没测**（例如"窗 A 还没做"）——
             ⚠️ PENDING **不算 PASS**。只有两态的话，"还没做"会被读成"没问题"，
             那正是本仓最恨的假绿。
+    NA       **不适用**（明确不需要，不算欠账）——
+            2026-10-28 补。此前只有三态，于是「窗 A 早改载本地页、DSH 旧路不再需要」
+            这种**明确不需要**的事只能挂在 PENDING 上，把"还没做"和"不用做"混成一堆黄灯。
+            主人口径是五档（真坏/缺依赖/未配置/**不适用**/好），那 NA 就得存在。
+            NA **不影响退出码**，但必须在汇总里显式打印个数 —— 悄悄算进 PASS 才是假绿。
 
 ## 判据（逐条对应 §2）
 
-    B1a DSH web 在听：3080 有监听           （2026-10-04 起为旧路：没跑=PENDING 不是破坏）
+    B1a DSH web 在听：3080 有监听           （2026-10-04 起为旧路；窗 A 已改载本地页 ⇒ NA）
     B1b 窗 A 真载对话面：现读=直载白名单外部 DeepSeek 网页（主人令 2026-10-04）
     B1c 不代理：壳里没有实现/转发对话协议的代码（不许在壳里重做 DSH）
     B2  不动 DSH 配置：~/.dsh 下关键文件的哈希与基线一致
@@ -68,18 +73,94 @@ INERT_SOURCES += [SHELL_DIR / "deck3d.css"]
 DSH_PORT = 3080
 PANEL_PORT = 8765
 # 外部点名白名单（2026-10-04 · 主人令：对话窗直载原生 DeepSeek 网页）。
-# 🔴 与 holo_pet_w3/shell/url-policy.cjs 的 EXTERNAL_ALLOWED_HOSTS **同名单互绑**：
+# 与 holo_pet_w3/shell/url-policy.cjs 的 EXTERNAL_ALLOWED_HOSTS **同名单互绑**：
 #    改任何一边必须同步另一边，两边不一致 = 守卫假红/假绿。
 ALLOWED_EXTERNAL_HOSTS = frozenset({"chat.deepseek.com"})
 BASELINE = ROOT / "state" / "desktop-shell-baseline.json"
 
 # B2：DSH 的配置面（**只取哈希**，绝不读内容进报告）
 DSH_HOME = Path(os.path.expanduser("~")) / ".dsh"
-DSH_WATCH = ["settings.yaml", "settings.yaml.bak", "agent-presets", ".agent-presets"]
+# 2026-10-26：0.2.x 把配置**迁进了 profile** ⇒ 取证面必须跟着搬家。
+#   实测：全局 `~/.dsh/settings.yaml` **已不存在**（只剩 settings.yaml.bak-002108，9-23 的）；
+#   `profiles/{web,desktop,headless}` 都没有 settings.yaml；
+#   唯一还带 `defaultPreset: danger-full-access` 的是 `profiles/gbt-official/settings.yaml`。
+#   只盯全局那份 ⇒ B2 会**永远红**，而且红得没有意义（真正该守的那份没人看）。
+#
+# 特意**不盯** `profiles/*/cordis.yml`：它是 223 字节的空壳（内容恒为 `[]`），
+#      dsh **每次启动都重写它**（实测 mtime 每次起服务都变）⇒ 盯它等于跑一次红一次。
+#      真正手工定制的是 `cordis.patch.yml`（11.5KB，文件里自己写着
+#      "Edit cordis.patch.yml, not this file"），那条才是该守的。
+# 也**不盯** `profiles/*/cordis.patch.yml.bak-*` / `package.json.bak-*` 等备份：
+#      备份增删是正常操作，盯了只会制造噪声。
+DSH_PROFILE = "gbt-official"          # 主人 2026-10-26 选定（带 danger-full-access）
+DSH_SETTINGS_REL = "profiles/%s/settings.yaml" % DSH_PROFILE
+DSH_WATCH = ["settings.yaml", "settings.yaml.bak", "agent-presets", ".agent-presets",
+             DSH_SETTINGS_REL,
+             "profiles/%s/cordis.patch.yml" % DSH_PROFILE]
+
+
+def _preset_of(structs: dict):
+    """当前权限档取值：**优先**读 profile 里那份（0.2.x 起真正的落点），退回全局那份。"""
+    for rel in (DSH_SETTINGS_REL, "settings.yaml"):
+        v = (structs.get(rel) or {}).get("defaultPreset")
+        if v:
+            return v
+    return None
+
+
+def _b2_verdict(base: dict, base_struct: dict, now: dict, now_struct: dict) -> tuple:
+    """B2 的**判定本体**（纯函数，不碰文件系统 —— 这样负对照才喂得进去）。
+
+    🔴 为什么必须抽出来（2026-10-26）：这条判据原来长在 `main()` 里、直接读真环境，
+       于是"权限档被改会不会红"这件事**从来没有被证明过** —— 一个只会在真环境里
+       说话的判据，等价于没有负对照。本仓纪律：**读真文件的判据，判定本体必须是纯函数**
+       （守卫 B2 到 2026-10-26 前一条负对照都没有，就是这么漏的）。
+    """
+    diff = [k for k in now if base.get(k) != now[k]]
+    struct_diff = [rel for rel in now_struct
+                   if (base_struct.get(rel) or {}).get("keys_sha256")
+                   != now_struct[rel].get("keys_sha256")]
+    perm_diff = [rel for rel in now_struct
+                 if (base_struct.get(rel) or {}).get("defaultPreset")
+                 != now_struct[rel].get("defaultPreset")]
+    if perm_diff:
+        return ("FAIL",
+                "**安全相关键被改**：%s —— 结构指纹 %s；默认档 基线=%s 现读=%s"
+                % (perm_diff, "变了" if struct_diff else "没变",
+                   [(base_struct.get(r) or {}).get("defaultPreset") for r in perm_diff],
+                   [now_struct[r].get("defaultPreset") for r in perm_diff]))
+    if diff and not struct_diff:
+        return ("PASS",
+                "哈希变了但**结构指纹与安全相关键都一致** ⇒ 是值级/空白级改动（%s）；"
+                "默认档仍是 %s" % (",".join(sorted(diff)), _preset_of(now_struct)))
+    if struct_diff:
+        return ("PENDING",
+                "**结构变了**（键增删/缩进）：%s —— 需人看一眼；默认档 %s"
+                % (struct_diff, _preset_of(now_struct)))
+    return ("PASS", "DSH 配置面哈希与基线一致（%d 项）；默认档 %s"
+            % (len(now), _preset_of(now_struct)))
 
 # B5：DSH 的内部标识 —— 壳里出现这些就说明它伸手进了 DSH 内部
-DSH_INTERNAL = ("@deepseek-ai/", "dsh-compaction", "dsh-command-",
+# 2026-10-26：`@deepseek-ai/` 从**前缀匹配**改为**按包名精确判**（见 `_dsh_internal_hits`）。
+#    原因：前缀匹配会把官方 CLI 包名 `@deepseek-ai/dsh` 也判成"内部包"，
+#    而那条 CLI 是主人 2026-10-23 明确放行的（壳靠它起对话面）。
+DSH_INTERNAL = ("dsh-compaction", "dsh-command-",
                 "node_modules/@deepseek-ai", "__DSH_BOOT__")
+# 唯一放行的官方 CLI 包（`@deepseek-ai/dsh`）。除它以外的 `@deepseek-ai/<x>` 仍算内部包。
+ALLOWED_DSH_NPM = "dsh"
+
+
+def _dsh_internal_hits(text: str) -> list:
+    """一段源码里命中的 DSH 内部标识（**精确到包名**，不是前缀）。
+
+    抽成函数是为了能单测/喂负对照：`@deepseek-ai/dsh` 必须放过，
+    `@deepseek-ai/dsh-compaction` / `@deepseek-ai/other` / `node_modules/@deepseek-ai` 必须命中。
+    """
+    hits = [t for t in DSH_INTERNAL if t in text]
+    for m in re.finditer(r"@deepseek-ai/([A-Za-z0-9._-]+)", text):
+        if m.group(1) != ALLOWED_DSH_NPM:
+            hits.append("@deepseek-ai/" + m.group(1))
+    return sorted(set(hits))
 
 
 def _sha(p: Path) -> str:
@@ -175,6 +256,75 @@ def _http_status(url: str, timeout: float = 6.0):
         return None
 
 
+def _window_a_local(srcs: dict) -> tuple:
+    """窗 A 现在载**本地页**吗 → (是否本地, windows.json 里登记的 file)。
+
+    判据只认注册表里的实参：`url` 为空 + `file` 非空 = 改道本地。**不看"出现过 3080"**。
+    """
+    for k, v in (srcs or {}).items():
+        if not k.endswith("windows.json"):
+            continue
+        try:
+            reg = json.loads(v)
+        except Exception:                                           # noqa: BLE001
+            return False, ""
+        for w in (reg.get("windows") or []):
+            if w.get("id") == "dsh-chat":
+                u, f = str(w.get("url") or ""), str(w.get("file") or "")
+                return (not u and bool(f)), f
+    return False, ""
+
+
+def _page_ok(rel: str) -> tuple:
+    """窗 A 声明的本地页**真的在盘上且非空**吗 → (ok, 字节数)。
+
+    改道的代价是"页可能根本没打包进去"。所以 NA 之前必须核这一格，
+    否则"不适用"就成了替一个坏页面打掩护。
+    """
+    name = rel.replace("\\", "/").lstrip("./")
+    for base in (SHELL_DIR, ROOT):
+        p = base / name
+        if p.is_file():
+            n = p.stat().st_size
+            return (n > 0), n
+    return False, 0
+
+
+def _b1a_verdict(dsh_pids: list, window_a_local: bool) -> tuple:
+    """B1a 的**判定本体**（纯函数 —— 读真环境的判据必须抽出来，负对照才喂得进去）。"""
+    if dsh_pids:
+        return ("PASS", "DSH web 在 %d 听，pid=%s —— 旧路活着，没被壳弄坏"
+                % (DSH_PORT, ",".join(dsh_pids)))
+    if window_a_local:
+        return ("NA", "窗 A 已改载本地页（不经 DSH）⇒ 「DSH 在听」对本产品**不适用**，"
+                      "不是欠账。旧路保留：主人起 `dsh web` 时这一条会自动回到 PASS")
+    return ("PENDING", "DSH web 未启动（%d 无监听）—— 环境态，不是壳破坏" % DSH_PORT)
+
+
+def _b1d_verdict(status, dsh_pids: list, window_a_local: bool,
+                 page_ok: bool, page_rel: str, page_bytes: int) -> tuple:
+    """B1d 的**判定本体**（纯函数）。
+
+    这一条守的是「窗 A 到底载得进来吗」。窗 A 改道本地页之后，真正该判的是
+    **那个本地页在不在、空不空**；旧路的 200/401 只在主人走 DSH 时才有意义。
+    """
+    if status == 200:
+        return ("PASS", "对话面裸 URL 就回 200 —— 可以直接嵌")
+    if status == 401:
+        return ("PENDING",
+                "对话面回 **401**（`dsh web authentication required`）⇒ 要 **`dsh web` 打印的带 token URL**；"
+                "守卫**不碰凭据**，这一格只能由「主人真接上一次」来关 —— 那是 B1e 的事")
+    if dsh_pids:
+        return ("FAIL", "DSH web 在跑但状态码异常：%s（既不是 200 也不是 401）" % status)
+    if window_a_local:
+        if page_ok:
+            return ("NA", "窗 A 载本地页 %s（%d 字节，非空且可读）⇒ 旧路对话面可载性**不适用**；"
+                          "该页存在性由本条实际核过" % (page_rel, page_bytes))
+        return ("FAIL", "窗 A 声明载本地页 %s，但**盘上找不到或为空** —— 那是真坏（不是不适用）"
+                % (page_rel or "<未登记>"))
+    return ("PENDING", "DSH web 没在跑（状态=%s）—— 无可探，且窗 A 没登记本地页" % status)
+
+
 def _source_checks(srcs: dict, dsh_port: int) -> list:
     """只依赖壳源码的那几条（B1b/B1c/B3-listen/B4/B5/B6）。
 
@@ -187,7 +337,7 @@ def _source_checks(srcs: dict, dsh_port: int) -> list:
         out.append({"id": cid, "state": state, "detail": detail})
 
     # ── B1b 窗 A 的**真实状态**（不许拿"出现过 3080 这个数字"当嵌入成功）──
-    # 🔴 自查：第一版判据是 `str(3080) in 源码` —— 于是 windows.json 里一句 `"port": 3080`
+ # 自查：第一版判据是 `str(3080) in 源码` —— 于是 windows.json 里一句 `"port": 3080`
     # 就让它报"对话面已嵌入"。**那是假的**：那个窗打开的是本地引导页（connect.html），
     # 真页面要带 token 的 URL 才载得进来。判据必须看 **`url` 实参**与 `needs_url` 声明。
     # 2026-10-04 起窗 A 改载**原生 DeepSeek 网页**（主人令，旧 DSH 链 :3080 留档）——
@@ -261,9 +411,17 @@ def _source_checks(srcs: dict, dsh_port: int) -> list:
     else:
         add("B4", "PASS", "壳里没有任何注入（自主回路模块未装或已摘）")
 
-    hits = [k for k, v in srcs.items() if any(t in v for t in DSH_INTERNAL)]
+ # 2026-10-26 精确化：`@deepseek-ai/` 作为**前缀**会把官方 CLI 包名
+    #    `@deepseek-ai/dsh` 一起判红 —— 而那条 CLI 正是**主人 2026-10-23 明确放行**的
+    #    （壳要用它起对话面；2026-10-26 又按主人令改用 npx 形式，命令里必然出现这个包名）。
+    #    "不许依赖 DSH 内部源码路径"的本意仍在：`node_modules/@deepseek-ai`（源码路径）、
+    #    `@deepseek-ai/<其它内部包>` 一律照旧红。⇒ 只在**包名第二段**上开一个精确口子。
+    hits = {k: _dsh_internal_hits(v) for k, v in srcs.items()}
+    hits = {k: v for k, v in hits.items() if v}
     add("B5", "FAIL" if hits else "PASS",
-        "壳里%s DSH 内部包/源码路径" % ("**出现**" + str(hits) if hits else "没有"))
+        "壳里%s DSH 内部包/源码路径%s"
+        % ("**出现**" + str(sorted(hits)) if hits else "没有",
+           "（已按主人 2026-10-23 令放行官方 CLI 包名 `@deepseek-ai/dsh`）" if not hits else ""))
 
     # ── B6：URL 白名单 —— 壳不许变成"通用浏览器" ──
     # `loadURL` 一旦不限域，这个常驻托盘壳就能打开任意网页（不同安全面）。
@@ -303,7 +461,7 @@ def _source_checks(srcs: dict, dsh_port: int) -> list:
     # ── B7：**带 token 的 URL 不许回显**（凭据卫生）──
     # 窗 A 的 URL 里带 DSH 的会话令牌。它一旦被回给渲染进程，就会进界面/日志/截图。
     # 这一格钉两件事：口子存在（`loadURL`）、且返回值**只给 host 不给 url**。
-    # ⚠️ 这是**钉子**不是安全边界（文本级判定，可以被绕过）—— 它的价值是"改的人当场看见"。
+ # 这是**钉子**不是安全边界（文本级判定，可以被绕过）—— 它的价值是"改的人当场看见"。
     port_hits = []
     for k, v in srcs.items():
         if not k.endswith("main.cjs"):
@@ -319,7 +477,16 @@ def _source_checks(srcs: dict, dsh_port: int) -> list:
             port_hits.append("w3ConnectDsh 没过回环白名单")
         if "host:" not in body:
             port_hits.append("返回值没有 host —— 那它多半把整条 URL 回显了")
-        if "url:" in body:
+ # 2026-10-26 修：原来这里是 `if "url:" in body` —— 全文匹配，会把
+        #    `lastDshEntry = { url: chk.url, host: … }` 这种**内部存储**也判成"回显"。
+        #    主进程**必须**留下入口 URL（`w3:dsh-mount` 要用它去 loadURL 那个 webview；
+        #    2026-10-26 起 URL 干脆不进渲染进程了）。把它判红，只会逼人把变量改名来绕判据 ——
+        #    **那才是假绿**（判据看着还在，其实被绕过去了）。
+        #    ⇒ 只认**`return` 出去的**那段里有没有 `url` 键：
+        #       "回显给渲染进程"才叫回显，"主进程自己记着"不是。
+        #    负对照钉着这条（`_selftest` 里那条 "返回值带上 url 必须见红"）。
+        returns = [m.group(1) for m in re.finditer(r"\breturn\b([^;]{0,300})", body)]
+        if any(re.search(r"\burl\s*:", seg) for seg in returns):
             port_hits.append("返回值里出现 `url:` —— **带 token 的 URL 不许回显**")
     add("B7", "FAIL" if port_hits else "PASS",
         ("口子有问题：" + str(port_hits)) if port_hits
@@ -421,7 +588,7 @@ def _inert_checks(srcs: dict) -> list:
 
 
 # B8 负对照用的**假样本**（故意做成"合格的"，再逐项破坏一项看守卫认不认）。
-# ⚠️ 它们是**合成文本**，不是真文件 —— 所以不会因为真页面改版而失效。
+# 它们是**合成文本**，不是真文件 —— 所以不会因为真页面改版而失效。
 _FAKE_CSS_OK = (
     ":root{--gbt-cyan:#00E5FF;--gbt-glass:rgba(14,19,40,.52)}\n"
     ".gbt-stage{perspective:1200px}\n"
@@ -484,8 +651,31 @@ def _selftest() -> int:
         ("只回 host", {"main.cjs":
             "function w3ConnectDsh(p){const chk=loopbackUrlOnly(p.url);"
             "win.loadURL(chk.url);return {ok:true,host:'127.0.0.1:3080'}}"}, {"B7": "PASS"}),
+ # 2026-10-26 改判据后的**边界对**（内部存储 vs 真回显）——
+        #    判据从「全文找 `url:`」改成「只看 `return` 出去的那段」，那就**必须**证明
+        #    "放宽的只有内部存储，回显照旧红"。没有这一对，这次改动就是"把判据改宽了"。
+        ("内部记着入口 url、但只回 host（合法：主进程要留 URL 去 loadURL 那个 webview）",
+         {"main.cjs":
+             "function w3ConnectDsh(p){const chk=loopbackUrlOnly(p.url);"
+             "lastDshEntry={url:chk.url,host:'h'};"
+             "win.loadURL(chk.url);return {ok:true,host:'h'}}"}, {"B7": "PASS"}),
+        ("内部记着 url **且 return 里也带 url**（负对照：真回显必须红）",
+         {"main.cjs":
+             "function w3ConnectDsh(p){const chk=loopbackUrlOnly(p.url);"
+             "lastDshEntry={url:chk.url,host:'h'};"
+             "win.loadURL(chk.url);return {ok:true,host:'h',url:chk.url}}"}, {"B7": "FAIL"}),
+ # B5 的**边界对**（2026-10-26 判据从"前缀"改"包名"之后必须证明放宽有边界）：
+        #    官方 CLI 包名 `@deepseek-ai/dsh` 放行（主人 2026-10-23 令，壳靠它起对话面）；
+        #    其余 `@deepseek-ai/<x>` 与源码路径照旧红。
+        ("B5 放行官方 CLI 包名 @deepseek-ai/dsh（壳要用它起对话面）",
+         {"dsh-launch.cjs": 'const DSH_CLI = "npx --yes @deepseek-ai/dsh";'},
+         {"B5": "PASS"}),
+        ("B5 负对照：@deepseek-ai/ 下**别的包**仍必须红",
+         {"a.cjs": 'require("@deepseek-ai/dsh-compaction")'}, {"B5": "FAIL"}),
+        ("B5 负对照：DSH 源码路径 node_modules/@deepseek-ai 仍必须红",
+         {"a.cjs": 'const p = "node_modules/@deepseek-ai/x/index.js";'}, {"B5": "FAIL"}),
         # B8：快照页惰性 + 立体层真三维（五项契约）
-        # 🔴 每条负对照都带**第二个样本 = 干净对**：既要证明"改坏了守卫会红"，
+ # 每条负对照都带**第二个样本 = 干净对**：既要证明"改坏了守卫会红"，
         #    也要证明"没改坏时守卫不红"。首跑就是靠这条抓到"内联事件那条根本没改到"——
         #    `replace("<body>", …)` 打不中 `<body class="gbt-stage">`，样本没变 ⇒ 检查看着像瞎的。
         ("立体层齐活的干净对", {"deck3d.css": _FAKE_CSS_OK,
@@ -546,6 +736,68 @@ def _selftest() -> int:
         print("  %s %-16s 期望 %s ⇒ 实得 %s%s"
               % ("✅" if ok else "🔴", name, want or "（无 FAIL/PENDING）",
                  {k: got[k] for k in (want or got)}, ("  ← " + why) if why else ""))
+
+    # ── B2 的负对照（2026-10-26 补）──
+    # 为什么以前是空的：B2 的判定长在 `main()` 里、只读真环境 ⇒ 假输入**喂不进去** ⇒
+    # "权限档被降级会不会红"从来没被证过。抽成 `_b2_verdict()` 纯函数才补得上这一组。
+    print("-" * 78)
+    print("负对照 · B2（权限档/结构 → 三态；判定本体已抽成纯函数才喂得进来）")
+    print("-" * 78)
+    REL = DSH_SETTINGS_REL
+    _ok = {REL: {"defaultPreset": "danger-full-access", "keys_sha256": "s1"}}
+    b2_cases = [
+        # (名字, 基线哈希, 基线结构, 现哈希, 现结构, 期望)
+        ("B2 一致（干净对）", {REL: "h1"}, _ok, {REL: "h1"}, _ok, "PASS"),
+        ("B2 权限档被降级", {REL: "h1"}, _ok, {REL: "h1"},
+         {REL: {"defaultPreset": "default", "keys_sha256": "s1"}}, "FAIL"),
+        ("B2 仅值级改动", {REL: "h1"}, _ok, {REL: "h9"}, _ok, "PASS"),
+        ("B2 结构变了", {REL: "h1"}, _ok, {REL: "h2"},
+         {REL: {"defaultPreset": "danger-full-access", "keys_sha256": "s2"}}, "PENDING"),
+        ("B2 新建了带权限档的配置（原来没有）", {REL: "<absent>"},
+         {REL: {"keys_sha256": "<unreadable>"}}, {REL: "h1"}, _ok, "FAIL"),
+    ]
+    clean_in = (b2_cases[0][1], b2_cases[0][2], b2_cases[0][3], b2_cases[0][4])
+    for name, bh, bs, nh, ns, want in b2_cases:
+        state, detail = _b2_verdict(bh, bs, nh, ns)
+        ok2 = (state == want)
+        why2 = ""
+        # 元检查：负对照必须**真的改了东西**（否则它证明的是"没改也不变"，不是"改了会红"）。
+ # 比的是**四个输入全体**（基线哈希/基线结构/现哈希/现结构），不是只比现侧 ——
+        #    首跑就把这条元检查自己照出了问题：有一条负对照的差异在**基线侧**（"原来没有该文件"），
+        #    只比现侧会被误判成"没改到东西"。元检查写窄了，也会变成假红源。
+        if ok2 and want != "PASS" and (bh, bs, nh, ns) == clean_in:
+            ok2, why2 = False, "样本与干净对一字不差 —— 这条负对照没改到东西，结论不算数"
+        if not ok2:
+            bad.append((name, want, state, why2))
+        print("  %s %-34s 期望 %-7s ⇒ 实得 %-7s%s"
+              % ("✅" if ok2 else "🔴", name, want, state,
+                 ("  ← " + why2) if why2 else " ｜ " + str(detail)[:58]))
+
+    # ── B1a / B1d 的负对照（2026-10-28 补）──
+    # 为什么必须有：这两条刚被改成四态，**NA 是新增的"放行"态** —— 放行态最容易被写成橡皮图章。
+    # 下面第 ⑥ 条是这条新判据的**命门**：窗 A 声明载本地页、但那页不在 ⇒ 必须 FAIL，
+    # 不许顺手判 NA。没有这一条，"不适用"就能替一个坏页面打掩护。
+    print("-" * 78)
+    print("负对照 · B1a/B1d 四态（NA 不许替坏页面打掩护）")
+    print("-" * 78)
+    b1_cases = [
+        ("B1a DSH 在听", _b1a_verdict(["4321"], False), "PASS"),
+        ("B1a 窗 A 改道本地页", _b1a_verdict([], True), "NA"),
+        ("B1a 没 DSH 也没本地页", _b1a_verdict([], False), "PENDING"),
+        ("B1d 裸 URL 回 200", _b1d_verdict(200, [], True, True, "x.html", 10), "PASS"),
+        ("B1d 回 401（要主人给 token）", _b1d_verdict(401, ["1"], False, False, "", 0), "PENDING"),
+        ("B1d DSH 在跑却回怪码", _b1d_verdict(None, ["1"], False, False, "", 0), "FAIL"),
+        ("B1d 窗 A 本地页在且非空 ⇒ NA", _b1d_verdict(None, [], True, True, "connect.html", 11035), "NA"),
+        ("B1d 窗 A 声明本地页但页不在 ⇒ 必须 FAIL（不许 NA）",
+         _b1d_verdict(None, [], True, False, "connect.html", 0), "FAIL"),
+    ]
+    for name, (state, _detail), want in b1_cases:
+        ok3 = (state == want)
+        if not ok3:
+            bad.append((name, want, state, ""))
+        print("  %s %-40s 期望 %-7s ⇒ 实得 %-7s"
+              % ("✅" if ok3 else "🔴", name, want, state))
+
     print("-" * 78)
     if bad:
         print("  🔴 负对照不过：守卫分辨不出破坏 ⇒ 它的 PASS 不算数")
@@ -575,16 +827,12 @@ def main() -> int:
         res.append({"id": cid, "state": state, "detail": detail})
 
     # ── B1a DSH 在听 ──
-    # 2026-10-04 起窗 A 直载原生 DeepSeek 网页，DSH web 是**旧路**（保留、非必需）：
-    # 它没跑 = 环境态（PENDING），不再判"壳破坏"；它在跑 = 照旧确认没被壳弄坏。
+    # 2026-10-04 起窗 A 直载原生/本地对话页，DSH web 是**旧路**（保留、非必需）。
+    # 2026-10-28 起：窗 A 走本地页时判 **NA（不适用）**，不再挂 PENDING ——
+    #   「不用做」和「还没做」是两件事，混成一个黄灯就是在制造永久噪音。
     dsh_pids = _listening(DSH_PORT)
-    if dsh_pids:
-        add("B1a", "PASS",
-            "DSH web 在 %d 听，pid=%s —— 旧路活着，没被壳弄坏" % (DSH_PORT, ",".join(dsh_pids)))
-    else:
-        add("B1a", "PENDING",
-            "DSH web 未启动（%d 无监听）—— 环境态，不是壳破坏。窗 A 已改载原生 DeepSeek 网页"
-            "（2026-10-04 主人令），DSH 旧路保留、要用时由主人 `dsh web` 起它" % DSH_PORT)
+    a_local, a_file = _window_a_local(srcs)
+    add("B1a", *_b1a_verdict(dsh_pids, a_local))
 
     # ── 只依赖壳源码的那几条（B1b/B1c/B3x/B4/B5）──
     res.extend(_source_checks(srcs, DSH_PORT))
@@ -612,33 +860,15 @@ def main() -> int:
         }, ensure_ascii=False, indent=1), encoding="utf-8")
         add("B2", "PASS", "首次记录基线（%d 项哈希 + 结构指纹）—— 此后拿它比" % len(now))
     else:
-        diff = [k for k in now if base.get(k) != now[k]]
         # 哈希变了 ⇒ 再看**结构与安全相关键**变了没有：
         #   "值变了、结构没变、权限档没变" 与 "权限档被改" 是**两个量级**的事，
-        #   糊成一句"被改过"，读的人只能自己去翻备份（本轮实测就是这样）。
+        #   糊成一句"被改过"，读的人只能自己去翻备份（2026-09-23 实测就是这样）。
+ # 判定本体已抽到 `_b2_verdict()`（纯函数）：这里只取数、只落结论。
+        #    抽出去的理由见那个函数的 docstring —— 一句话：不抽就永远没有负对照。
         st_base = (json.loads(BASELINE.read_text(encoding="utf-8")).get("dsh_structure") or {})
         st_now = {rel: _settings_structure(DSH_HOME / rel) for rel in DSH_WATCH}
-        struct_diff = [rel for rel in st_now
-                       if st_base.get(rel, {}).get("keys_sha256") != st_now[rel].get("keys_sha256")]
-        perm_diff = [rel for rel in st_now
-                     if st_base.get(rel, {}).get("defaultPreset")
-                     != st_now[rel].get("defaultPreset")]
-        if perm_diff:
-            add("B2", "FAIL",
-                "**安全相关键被改**：%s —— 结构指纹 %s；默认档 基线=%s 现读=%s"
-                % (perm_diff, "变了" if struct_diff else "没变",
-                   [st_base.get(r, {}).get("defaultPreset") for r in perm_diff],
-                   [st_now[r].get("defaultPreset") for r in perm_diff]))
-        elif diff and not struct_diff:
-            add("B2", "PASS",
-                "哈希变了但**结构指纹与安全相关键都一致** ⇒ 是值级/空白级改动（%s）；"
-                "默认档仍是 %s" % (",".join(sorted(diff)), st_now.get("settings.yaml", {}).get("defaultPreset")))
-        elif struct_diff:
-            add("B2", "PENDING",
-                "**结构变了**（键增删/缩进）：%s —— 需人看一眼；默认档 %s"
-                % (struct_diff, st_now.get("settings.yaml", {}).get("defaultPreset")))
-        else:
-            add("B2", "PASS", "DSH 配置面哈希与基线一致")
+        state, detail = _b2_verdict(base, st_base, now, st_now)
+        add("B2", state, detail)
 
     # ── B3 端口面（源码侧的"有没有监听 DSH 端口"已由 B3x 报；这里只看端口实况）──
     panel_pids = _listening(PANEL_PORT)
@@ -646,25 +876,14 @@ def main() -> int:
         "面板服务 %d %s（pid=%s）—— 桌面壳必须复用这个面，不许另起一个"
         % (PANEL_PORT, "在听" if panel_pids else "**未监听**", ",".join(panel_pids) or "无"))
 
-    # ── B1d 对话面**可载性**（这一条是 2026-09-23 实测抓出来的硬约束）──
+    # ── B1d 对话面**可载性** ──
     # 裸 URL 回 401 ⇒ 窗 A 不是"loadURL 就完事"，它要 `dsh web` 打印的**带 token URL**。
-    # 判据（2026-10-04 环境感知化）：200=PASS；401=PENDING（**要主人运行时给 URL，
-    # 本守卫绝不替他去取凭据**）；DSH 没在跑=PENDING（无可探，窗 A 已改载原生 DeepSeek）；
-    # 只有「DSH 在跑却回怪状态码」才判 FAIL。
+    # 判据（2026-10-28 四态化）：200=PASS；401=PENDING（**要主人运行时给 URL，守卫不碰凭据**）；
+    # DSH 在跑却回怪码=FAIL；DSH 没在跑**且窗 A 已改载本地页**=NA（但先核那个页在不在、空不空，
+    #   不在 ⇒ FAIL ——「不适用」不许替一个坏页面打掩护）。
     st = _http_status("http://127.0.0.1:%d/" % DSH_PORT)
-    if st == 200:
-        add("B1d", "PASS", "对话面裸 URL 就回 200 —— 可以直接嵌")
-    elif st == 401:
-        add("B1d", "PENDING",
-            "对话面回 **401**（`dsh web authentication required`）⇒ 要 **`dsh web` 打印的带 token URL**；"
-            "**运行时粘贴入口已就位**（`w3ConnectDsh` + `connect.html` + preload 动作口）。"
-            "守卫**不碰凭据**，所以这一格永远只能由「主人真接上一次」来关 —— 那是 B1e 的事")
-    elif dsh_pids:
-        add("B1d", "FAIL", "DSH web 在跑但状态码异常：%s（既不是 200 也不是 401）" % st)
-    else:
-        add("B1d", "PENDING",
-            "DSH web 没在跑（连接被拒，状态=%s）—— 无可探；窗 A 已改载原生 DeepSeek 网页，"
-            "这一格只在主人起 `dsh web` 时才有意义" % st)
+    p_ok, p_bytes = _page_ok(a_file) if a_file else (False, 0)
+    add("B1d", *_b1d_verdict(st, dsh_pids, a_local, p_ok, a_file, p_bytes))
 
     # ── B1e 真接上过一次没有（读**不含凭据**的回执）──
     # 2026-10-08 修两处误判（实测 127.0.0.1:60463 被读成 FAIL）：
@@ -701,24 +920,31 @@ def main() -> int:
     print("  看的壳源：%d 个文件 %s" % (len(srcs), sorted(srcs)))
     print("-" * 78)
     for r in res:
-        mark = {"PASS": "✅", "FAIL": "🔴", "PENDING": "⏳"}[r["state"]]
+        mark = {"PASS": "✅", "FAIL": "🔴", "PENDING": "⏳", "NA": "—"}[r["state"]]
         print("  %s %-5s %s" % (mark, r["id"], r["detail"]))
     n_fail = sum(1 for r in res if r["state"] == "FAIL")
     n_pend = sum(1 for r in res if r["state"] == "PENDING")
+    n_na = sum(1 for r in res if r["state"] == "NA")
+    n_pass = sum(1 for r in res if r["state"] == "PASS")
+ # 先把退出码算出来、**打印出来**，最后再 return（2026-10-26 加）。
+    #   为什么：`py guard.py | tail` / `| grep` / `> log` 这类写法会**吞掉进程退出码**，
+    #   终端里 `echo $?` 拿到的是管道最后一环的 0 ⇒ 明明 FAIL 1，看着像"退出码 0 能打包"。
+    #   实测已经骗过两次（一次是我自己看 --check，一次是主人看打包闸）。
+    #   ⇒ 让守卫自己把真实值打在这一行，管道怎么接都改不了它。
+    code = 1 if n_fail else (2 if (n_pend and not a.allow_pending) else 0)
     print("-" * 78)
-    print("  PASS %d · FAIL %d · PENDING %d" % (len(res) - n_fail - n_pend, n_fail, n_pend))
+    print("  PASS %d · FAIL %d · PENDING %d · NA %d" % (n_pass, n_fail, n_pend, n_na))
+    print("  — NA = 明确不需要（不算欠账，也不算 PASS）。" if n_na else "")
     print("  ⚠️ PENDING **不算 PASS**（「还没做」不许读成「没问题」）。" if n_pend else "")
     print("  退出码：**0=全过可打包 · 1=有破坏不许打包 · 2=还没做完（不许宣称完成）**")
+    print("  → **本次退出码 = %d**（这行是守卫自己打的；`| tail` / `| grep` / `> log` 都吞不掉它）"
+          % code)
     if a.json:
         Path(a.json).write_text(json.dumps({"at": __import__("time").strftime("%Y-%m-%dT%H:%M:%S"),
                                             "results": res, "fail": n_fail, "pending": n_pend},
                                            ensure_ascii=False, indent=1), encoding="utf-8")
         print("  产物: %s" % a.json)
-    if n_fail:
-        return 1
-    if n_pend and not a.allow_pending:
-        return 2
-    return 0
+    return code
 
 
 if __name__ == "__main__":

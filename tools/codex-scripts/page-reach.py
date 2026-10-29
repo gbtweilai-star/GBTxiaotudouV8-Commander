@@ -15,7 +15,7 @@ for _gbt_s in (_gbt_sys.stdout, _gbt_sys.stderr):
 
 ROOT = Path(__file__).resolve().parents[2]
 PAGE_DIRS = ["holo_pet_w3", "state", "state/blueprints", "docs"]
-# 🔴 2026-10-17 事故剪枝（**自反爆炸** · 留痕）：`PAGE_DIRS` 含 `state`，而手机包/构建产物也生成在
+# 2026-10-17 事故剪枝（**自反爆炸** · 留痕）：`PAGE_DIRS` 含 `state`，而手机包/构建产物也生成在
 #   `state/` 下 ⇒ 生成器把**自己的产物**当页面再注入/再拷，形成
 #   `state/mobile-pack/state/mobile-pack/…` 无限嵌套（实测一次 **24,150 文件 / 54.7GB / 4,768 层**，
 #   注入耗时 1722s）。⇒ 所有"页面枚举器"必须**跳过构建产物目录**；并加**页数上限 fail-closed**

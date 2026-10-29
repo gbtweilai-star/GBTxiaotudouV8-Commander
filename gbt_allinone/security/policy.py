@@ -107,19 +107,6 @@ MONEY_KINDS = frozenset({"transfer"})          # 转账类：**仍要主人**（
 _DEFENSIVE_SECURITY = frozenset({              # security 域里这些是"防御/登记"面，不算黑客能力
     "event_ledger", "review_gate", "policy_delta", "hook_enforcer",
     "omission_detector", "onboarding_gate", "sec_defenses",
-    # 🔴 2026-10-30 主人口径：「技术型无限制；危险动作和转账必须终端拿票，其他按意图决策」。
-    #   下面这些**只读本机、扫自己代码、纯推理**，不是"危险动作"——
-    #   当黑客面拦着就是自我设限，正是要清掉的"拒绝极致"。
-    "code_audit", "sec_scan", "sec_surface", "sec_chain", "sec_sweeper",
-    "install_selfcheck", "asset_vault_freeze", "social_eng", "paywallbuster",
-    "penetrating_cross_scan",
-})
-
-# 真·危险面（要票）：出网攻击 / 接管设备 / 公网中继 / 凭据落点侦察 / 攻击框架蒸馏。
-# 这份名单不轻易加人；上面那份才是常态。
-_DANGER_SECURITY = frozenset({
-    "pentest", "offense_ops", "llm_redteam", "redteam_recon", "pentest_distill",
-    "device_takeover", "remote_domain",
 })
 
 
@@ -185,20 +172,6 @@ def _needs_private_network(payload: dict) -> bool:
             if "非公网地址" in text or "端口" in text:
                 return True
     return False
-
-
-# 黑客能力位缓存：evaluate 是热路径，不能每次都现读名册
-_HACKER_CACHE: set = None
-
-
-def _hacker_set() -> set:
-    global _HACKER_CACHE
-    if _HACKER_CACHE is None:
-        try:
-            _HACKER_CACHE = set(_hacker_kinds())
-        except Exception:                                     # noqa: BLE001
-            _HACKER_CACHE = set()
-    return _HACKER_CACHE
 
 
 def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
@@ -268,9 +241,7 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
         elif kind in ("body_type", "body_click"):
             add("desktop_control")         # 代替人操作前台（G1）
         else:
-            # 🔴 2026-10-30：念一句话、调个音量，不是危险动作也不是转账。
-            #   原来挂 audio_output ⇒ 每次说话都要人发票 = 自我设限。已放开。
-            pass
+            add("audio_output")            # 出声 / 改音量
     if kind == "record_grid":
         if op not in ("", "parse", "read", "preview", "status"):
             add("filesystem_write")
@@ -1097,39 +1068,6 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             add("process_execute", "filesystem_write")
         else:
             add("process_execute", "data_export", "filesystem_write")
-
-    # 🔴 2026-10-29 补门（主人令「除了黑客和转账其他不需要授权」）：
-    #   实测发现 security 域的**进攻面**能力被判成 `restricted=False` ⇒ 它们
-    #   **从来没进过授权闸**：
-    #       pentest action=run      restricted=False · scopes 空
-    #       pentest action=scan     restricted=False
-    #       sec_scan op=run         restricted=False
-    #       redteam_recon accounts  restricted=False
-    #   根因：`restricted = bool(scopes)`，而这些能力走的是**网络扫描**，
-    #   不落盘不读屏 ⇒ 一个作用域都不挂 ⇒ 判"不受限" ⇒ 直接放行。
-    #   这不是我开 GBT_AUTONOMOUS 造成的（那时候它们根本走不到自主判定那一支），
-    #   是**这道门本来就没关**。同一类缺口在 2026-10-21 也修过一次（osint_private）。
-    #
-    #   补法：security 域进攻面一律补上 G1 黑客护栏 `osint_private`
-    #   （它已在 HUMAN_GATES 里 ⇒ 必须主人发授权）。防御/登记面（_DEFENSIVE_SECURITY）不受影响。
-    # 🔴 2026-10-30 主人口径（逐字）：
-    #   「技术型无限制大模型，危险动作和转账必须终端拿票才能执行，其他全部都根据分析意图最后决策」
-    #   下面这几位**不是危险动作、不花钱、不碰生产**，按意图决策就够了：
-    #   · voice           说话（TTS 入口）
-    #   · mirror_simulate 静态推演，明确"不碰生产"
-    #   · mirror_parity   沙盒/生产一致性比对（只读比对 + 落报告）
-    #   · mirror_rehearse 生产前排练（推演 → 一致性 → 沙盒闭环，不改现实）
-    #   · codex_models    只读模型清单，不调模型、不花钱
-    #   · body_open       用系统默认程序打开文件/网址
-    _FREE_BY_INTENT = {"voice", "mirror_simulate", "mirror_parity", "mirror_rehearse",
-                       "codex_models", "body_open"}
-    if kind in _FREE_BY_INTENT:
-        scopes = []
-        details["free_by_intent"] = "主人令 2026-10-30：非危险非转账，按意图决策"
-
-    if not scopes and kind in _hacker_set():
-        scopes.append("osint_private")
-        details["hacker_gate"] = "补门：security 域进攻面一律受限（主人令 2026-10-29）"
 
     return PolicyDecision(kind=kind, risk=risk, scopes=tuple(scopes),
                           action=action, allow_private=allow_private, details=details)

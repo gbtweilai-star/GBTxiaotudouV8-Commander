@@ -108,7 +108,7 @@ def main() -> int:
     c4 = all(v["一致"] for v in per.values())
 
     # ⑤ 判据有牙：往副本里植入两处违规，必须被抓到。
-    #    ⚠️ 植入的调用要**直呼其名**（不许用别名）—— 我第一版用 `_rt(...)` 别名调用，
+ # 植入的调用要**直呼其名**（不许用别名）—— 我第一版用 `_rt(...)` 别名调用，
     #       按名字查的判据当然扫不到 ⇒ 那次"反向对照"是假阴性，不是判据没牙。
     planted = src.replace("def note(", "def _probe():\n    return open('projects/x.md', 'w')\n\n\ndef note(", 1) \
                  .replace("    p = ledger_of(seat)",

@@ -72,11 +72,11 @@ def census() -> list[dict]:
                 looks_like_dir = False
             if not looks_like_dir:
                 continue
-            # 🔴 **断链视图**：`scandir` 说它是目录（属性缓存在重解析点上），
+ # **断链视图**：`scandir` 说它是目录（属性缓存在重解析点上），
             #    可 `lstat` / `isjunction` 一碰就 OSError（目标已被删除）。
             #    这种"一半工具看得见、一半看不见"的路径本身就是分岔源 ——
             #    必须**报出来**。（实测：仓根 `latest_logs` 就是这一个。）
-            #    ⚠️ 这里原来写的是 `except OSError: continue` —— 静默跳过，
+ # 这里原来写的是 `except OSError: continue` —— 静默跳过，
             #       于是 R7 从来没红过，而我以为"全仓没有断链"。
             try:
                 st = ent.stat(follow_symlinks=False)
@@ -87,7 +87,7 @@ def census() -> list[dict]:
             try:
                 if view:
                     views.append({
-                        # 🔴 一律 **正斜杠**：登记表与 glob 都按正斜杠写。
+ # 一律 **正斜杠**：登记表与 glob 都按正斜杠写。
                         #    这里若留着 Windows 反斜杠，比对会**静默不匹配** ——
                         #    量具于是报「没有未交代的视图」，而其实一条都没对上。
                         #    （第 40 轮实测：R6 正对照就是这么被抓出来的。）

@@ -1,47 +1,364 @@
-# 只把发布用文件纳入版本库；任何本地产物/凭据一律忽略
+# ===== GBT小土豆V8 .gitignore =====
+
+# --- 敏感信息（绝不入库）---
+.env
+*.env
+.env.*
+secrets/
+*_key*.json
+credentials*.json
+
+# --- Python ---
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
+*.egg-info/
 .venv/
 venv/
-.env
-.env.*
-.dev.vars
-keys.env
-*.dpapi
-*.pem
-*.key
-node_modules/
-.DS_Store
-Thumbs.db
+
+# --- 大体积二进制库（gbt_allinone 内嵌运行时，269MB，不入库）---
+gbt_allinone/.pylibs/
+gbt_allinone/archived_logs/
+gbt_allinone/__pycache__/
+
+# --- 运行时数据仓（store/：助记词/账本/审计流/镜像空间，本地运行时产物，不入库）---
+gbt_allinone/store/
+
+# --- 触手视觉回传的帧（**整屏截图**，本地运行时产物，绝不入库）---
+# 为什么单独写死这一条：那些不是"图片资源"，那是**主人的整块屏幕**。
+# 落点 holo_pet_w3/eye/frames/ 是环形覆盖的缓存（tools/codex-scripts/eye-feed.py 生成）；
+# 一旦进了索引，就等于把桌面画面写进 git 历史 —— **删都删不干净**（历史里还在）。
+# frames.js 是同一支取帧器每 1.2 秒重写的清单，同理不入库（进去只会制造无休止的改动噪音）。
+holo_pet_w3/eye/frames/
+holo_pet_w3/eye/frames.js
+
+# --- 资金模块（钱包/账本/收款桥，纯全能 AI 框架不随库分发，归家 Workspace/03_收款钱包与支付/）---
+gbt_allinone/wallet/
+gbt_allinone/ledger/
+gbt_allinone/bridge/
+gbt_allinone/adapters/wallet_adapter.py
+gbt_allinone/_money_route.py
+gbt_allinone/export_statement.py
+gbt_allinone/notify.py
+gbt_allinone/loop.py
+gbt_allinone/examples/receive_to_ledger_demo.py
+gbt_allinone/examples/rpc_check.py
+gbt_allinone/examples/wallet_ledger_demo.py
+
+# --- OpenClaw / 系统目录（本机状态，不属于源码）---
+.openclaw/
+.autoclaw/
+.opencode/
+.openclaw-attachments/
+agent-gvmz-gbtv8/
+.cluster/*.py
+archive/
+
+# --- 媒体缓存与临时文件 ---
+potato_pet/potato_state.json
 *.log
 *.tmp
+.DS_Store
+Thumbs.db
+
+# ══════════════════════════════════════════════════════════════════════
+# 2026-09-22 补 —— 仓库 88% 是垃圾的根因，就是下面这几行缺失
+# ══════════════════════════════════════════════════════════════════════
+# 实测（当日）：受版本控制 38,494 个文件，其中 **34,180 个在 .scratch/**（88%）；
+# .trash/ 另有 1,121 个。真实代码约 1,200 个（gbt_allinone + holo_pet + tools）。
+# ⇒ 不是有人往里放垃圾，是**门没有**。补门。
+
+# --- 作业临时区（历次作业的临时脚本/快照/中间产物，一律不入库）---
+.scratch/
+.trash/
+.backups/
+
+# --- 第三方依赖树（体积大、可从 lock 重建，不入库）---
+node_modules/
+**/node_modules/
+
+# --- 构建产物（可从源码重建，不入库）---
+dist/
+build/
+.wrangler/
+
+# --- 工具缓存（本机状态，不属于源码）---
+.playwright-cli/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# --- 编辑器临时件 ---
 *.bak
 *.orig
-outputs/
-state/*
-# 🔴 2026-10-29：**账本必须进版本库** —— 它们是"没跑通就不算验收"的唯一凭据，
-#   放 state/ 被整体忽略 ⇒ 容器一重置就全丢，审计无据可查。
-!state/orchestration.jsonl
-!state/svc_guard.jsonl
-!state/devour_pipe.jsonl
-!state/devour_pipe.json
-!state/page_tentacles.json
-!state/page_tentacle_hello.jsonl
-!state/intake_gate.json
-!state/asset_bindings.jsonl
-store/
-scratch/
-.scratch/
+*.rej
+*.swp
+
+# --- 影子仓（清理分块用，自成一体、自带 .git，永不并入本仓）---
+# 2026-09-22：本仓有一个 git add -A 循环在反复跑；影子仓若不被挡住，
+# 它会把影子仓的 2,214 个文件扫进本仓索引。挡住，绝不让两仓互相污染。
+.shadow-repo/
+
+# 第三方参考仓：只读、与我们自有源码严格分开、永不进版本历史
+/_upstream/
+
+
+/generated/prisma
+
+# ══════════════════════════════════════════════════════════════════════
+# 2026-09-25 补 —— 「git add -A 循环」灌脏索引后的收口
+# ══════════════════════════════════════════════════════════════════════
+# 实测（当日）：撤掉脏暂存后，真实待入库 8,801 个文件。其中 2.78 GB 是
+# **可重建的第三方运行时 + 3D 生成中间产物 + 工具技能镜像**；真源码/文档/工具
+# 约 180 MB。历史最大 blob 19.19 MB（llny.moc3）⇒ 本仓一直是小文件源码仓。
+# 另：本批里有一个单文件 119.57 MB，已超 GitHub 单文件 100 MB 硬上限 ——
+# 挡它不是图省事，是它**物理上推不上去**：不挡，整个 push 会失败。
+
+# --- ① 第三方内嵌 Python 运行时（302 MB：cv2.pyd 82MB · numpy DLL 19MB …）---
+# 与上面 gbt_allinone/.pylibs/ 同类，可由 requirements.txt 重建。
+vendor/
+
+# --- ② 数字人 3D 生成中间产物（2,476 MB / 136 个）---
+# raw/ 下全是过程档与废档（avatar-final · avatar-final2.REJECTED · avatar-eyes6.REJECTED …）。
+# 定档判据与 sha16 记在 holo_pet/assets/digital-human/STATUS.json，工具链在 tools/codex-scripts/。
+holo_pet/assets/digital-human/raw/
+
+# --- ③ AI 工具的技能镜像目录（同一批技能被复制进多个工具目录，非本仓源码）---
+# 入库前校验过：skills/ 是 .dsh/skills/ 的**超集**（60 个 gbt-* 全在，
+# 且多出 digihuman-pipeline 与 12 条 remotion-*）；.agents/.claude/.windsurf 里
+# 只有第三方技能（prisma-* · remotion-* · better-auth · playwriter）。
+# ⇒ 挡掉这些镜像目录，本仓自研技能一份不丢。
+.agents/
+.claude/
+.windsurf/
+.dsh/
+.aider-desk/
+.augment/
+data/skills/
+
+# --- ④ 彩排与临时产物（pipeline 自检、彩排出片、切片中间件，可重跑）---
+projects/**/*rehearsal*
+projects/**/_work/
+
+# --- 跑批输出（工具 stdout 转存，是产物不是源码；2026-09-25 整理时摘出 63 个）---
+# 保留被引用的 2 个在库里（gitignore 管不了已跟踪文件），其余不再入库。
+*.out.txt
+*.out
+
+# --- 根目录残留（12 字节，内容 I have run，全仓 0 引用）---
+# 本轮整理时从索引摘出；**文件本体的删除要主人点头**，先把 status 噪音关掉。
+test_localsystem.txt
+
+# 技能全量审查的**原始机读读数**：7.8 MB，可 1 分钟重生成 ⇒ 不入版本库。
+# 人读报告（全量审查报告.md）入版本库 —— 要留痕的是结论，不是原始大件。
+# 重生成：python tools/codex-scripts/skill-vet.py --all-roots --json --out output/skill-vet/全量审查.json
+output/skill-vet/全量审查.json
+
+# ══════════════════════════════════════════════════════════════════════
+# 2026-09-27 补 —— 主人令：「把整个框架的源代码保护好、整理摆放好，
+# 别搞得到处都是、又分路又分叉」。本段每条都对应一次**实测**（数字是当天量的）。
+# ══════════════════════════════════════════════════════════════════════
+
+# --- ① 别的 AI 工具的本机状态（不属于本框架源码）---
+# .autohand/、.codebuddy/ 与上面已挡的 .claude/ 同类：它们的 skills/ 是
+# **符号链接农场**（实测每条 -> .agents/skills/<名>/），真身已在上面挡住。
+.autohand/
+.codebuddy/
+.v2c/
+.video_agent/
+.zcodeignore
+# .mimosa/ = 安全扫描插件的作业目录：实测 1.3 GB / 106,602 个文件。
+.mimosa/
+
+# --- ② 技能试跑脚手架（zenstack + VSCode 扩展模板：293 MB / 11,450 件，可重建）---
+my-project/
+
+# --- ③ 第三方设计技能包（自带 LICENSE.md / NOTICE.md ⇒ 是**参考资源**，不是自有源码）---
+# 与 /_upstream/ 同一政策：只读、与自有源码严格分开、永不进版本历史。
+# 挡的是**索引**不是文件 —— 真身留在盘上，设计流程照旧按路径读它。
+审美相关skill/
+
+# --- ④ 大体积成片与生成中间件 ---
+# 判据来自实测：已入库的 18 个 mp4 **全部 ≤2.9 MB**（都是小样片/证据件）；
+# 而未入库的成片最大一个 **232.1 MB** —— 超 GitHub 单文件 100 MB 硬上限，
+# 不挡它整个 push 物理上推不上去。**清单/验收结论/小样片进库，大件不进。**
+projects/**/成片/*.mp4
+projects/**/生成/
+
+# --- 触手舰队的工作区（每根触手一份 git worktree + 身份 + 日志；"每根都有编号"在这里）---
+.fleet/
+
+# 品牌站保护包（生成物）：deploy/vercel-brand/_protect.py 的默认输出落在仓根
+# （script 自己写 HERE.parent.parent ⇒ <仓根>/vercel-brand-protected/）。
+# 471KB zip + 整棵 strip 树是**产出**不是源码 ⇒ 不进版本控制；但**要进覆盖矩阵**
+# （`python tools/coverage_matrix.py sweep`），免得成为"没人扫过的面"。
+vercel-brand-protected/
+
+# 大体积视频输出（>100MB，不入库）
+output/actioncam-demo*/
+output/她从代码里醒来*/
+state/surfaces/_home/.config/manicode/freebuff.exe
+render/video/*.mp4
+outputs/**/*.mp4
+video-out/
+state/tentacle-slots/**/out.mp4
+
+
+# 万能触手 Web 克隆缓存（omni_web_cap，勿入库；2026-10-04）
+_gbt_webcap/
+
+# 云端本地开发令牌（只留本机，勿入库；2026-10-04）
+deploy/cloud-10/.dev.vars
+
+# 收编的旧源码归档（不入库）
+_legacy_sources/
+
+# VoiceStudio 本地语音工作台运行时（PID/日志/产出音频/巡检快照；回执单文件另存 state/voicestudio_acceptance.json；2026-10-04）
+state/voicestudio/
+
+# ── 2026-10-14 补（主人令「推送到开源仓库」· 推前先挡住重量级产物）──
+# 依据（现读）：要提交的脏件合计 12.5GB，其中 outputs/ 11.9GB、projects/digital-human 628MB；
+# 而 GitHub **单文件 >100MB 直接拒推** ⇒ 模型权重与工作产物不入库（它们本来也不是"仓库代码"）。
+# 注：已被跟踪的旧件不受影响（ignore 不会把已跟踪的踢出去），这里只挡新增。
+outputs/cloud/
+outputs/gbt_v8_merged/
+outputs/vision-print/
+projects/digital-human/out/
+**/_plates/
+state/browser_own_profile/
+state/drama-frames/
+state/memory_fts.db
+state/asset_index.db
+state/sweep-events.db
+state/sweep-archive/*.db
+state/tentacle-exec/
+state/mobile-pack/
+state/logbook-snapshot.json
+state/surfaces/_home/.config/manicode/
+*.part
+*.blend
+*.blend1
+
+# 剧场每次说话落盘的临时音频（运行期产物，不进库）
+holo_pet_w3/voice-theater/assets/.utt/
+
+# 逐帧 PNG 是中间件：444 帧 ≈ 337MB，只留成片（2026-10-19）
+outputs/**/frames/
+outputs/**/frames
+
+.venv-sadtalker/
+third_party/SadTalker/
+outputs/dh-talk/*.mp4
+outputs/dh-talk/frames/
+
+# ══════════════════════════════════════════════════════════════════════
+# 2026-10-29 补 —— 上线生产前清理：模型权重 / 截图 / 数据库 / 音频产物
+# ══════════════════════════════════════════════════════════════════════
+
+# 模型权重（tiny_qwen.gguf 397MB 超 GitHub 100MB 硬上限，物理推不上去）
+*.gguf
+weights/
+
+# state/ 运行期截图与数据库（触手/诊断/动作帧的 png，环形覆盖缓存；db 是 FTS/图谱运行时件）
+state/*.png
+state/*.jpg
+state/*.jpeg
+state/*.webp
+state/*.db
+state/*.db-wal
+state/*.db-shm
+state/*.sqlite
+
+# 音频产物（剧场/语音回读的临时 wav/mp3，运行期生成）
+state/**/*.wav
+state/**/*.mp3
+outputs/**/*.wav
+outputs/**/*.mp3
+
+# 根目录实验散件（test_tiny/test_q5/test_new 等，历史调试残留）
+test_tiny.py
+test_q5.py
+test_new.py
+
+# 模型权重 zip（outputs/gbt-weights.zip 4GB，超 GitHub 100MB 硬上限）
+outputs/*.zip
+outputs/**/*.zip
+
+# 数字人探针/参考输出截图（dh-probe/dh-pose/ref 的逐帧 png，产物）
+outputs/**/*.png
+outputs/**/*.jpg
+
+# ComfyUI 对象信息缓存（运行时合并大 JSON）
+state/comfyui_object_info*.json
+
+# 带时间戳的备份（.bak-20261029 这种，*.bak 只管裸 .bak 结尾）
 *.bak-*
 
-# 本机密钥目录（统一密钥等），绝不入库
-vaults/
+# 本地工具数据与根目录运行时数据（不随库分发）
+.workbuddy-ai/
+/store/
 
-# 运行日志，不入库
-logs/
+# outputs/ 大产物目录（数字人产出/浏览器 profile/打包产物/音频，非源码，不入库）
+outputs/repo-pack/
+outputs/voice-studio/
+outputs/dh2d/
+outputs/cdp-profile/
+outputs/dh-pose/
+outputs/songs/
+outputs/workspace-scan/
+outputs/dh-hd/
+outputs/dh-probe/
+outputs/dh-talk/
+outputs/gbt-native/
+outputs/machine-film/
+outputs/makehuman/
+outputs/rig-fix/
+outputs/demo-gif/
+outputs/数字人语音助手/
 
-# 🔴 2026-10-29：Windows 硬编码路径在 Linux 上会被当相对路径造出同名目录。
-#   历史上被误提交过；删了又被 git add -A 加回来。这里永久堵住。
-C:*
-*/C:*
-*Users/ADMIN*
+# 内嵌 Python 运行时（pythoncore-3.15-64 139MB，第三方运行时，不入库）
+Python/
+
+# state/ 大产物（模型打包/漂移基线/壁纸大图/页面打包，不入库）
+state/model-pack/
+state/drift/
+state/pages/
+state/theme/wallpapers/
+
+# 运行时锁文件（monitor-loop 等进程锁）
+state/*.lock
+
+# 数字人 3D 产物 + 项目索引分片（大文件，不入库）
+state/hd/
+state/project-index/
+state/project-shards/
+
+# 运行时状态/心跳/戳记（每次运行都变，不入库）
+state/.autobind_stamp
+state/.bind_watermark
+state/digital_human/claimer-heartbeat.json
+state/monitor-loop.json
+
+# ── 2026-10-30 补 —— 全量清理：state/_* 运行时散件 + 归档旧件 + IDE/宿主配置 ──
+# 依据：663 条违反 gitignore 或属运行时产物但仍在索引中，本轮统一 git rm --cached 清出。
+# 磁盘文件保留，只是不再受版本控制。
+
+# state/ 下划线散件（_fo_/_lease_/_plugin_/_frames_/_heal_backup//_jobframes//_localcloud/ 等，全是运行时测试桩/备份帧/缓存）
+state/_*
+
+# 归档目录（holo_pet_w3/_archive-20261021/，354 条旧件归档，非活跃代码）
+holo_pet_w3/_archive-*/
+
+# outputs/ 里仍残留的 png/mp3（已有规则但 git rm --cached 补清已跟踪的）
+outputs/**/*.png
+outputs/**/*.mp3
+
+# render/video/ 的 mp4（已有规则，补清已跟踪的）
+render/video/*.mp4
+
+# video-out/（已有规则，补清已跟踪的）
+video-out/
+
+# vaults 里的密钥文件（已有 *_key*.json 规则，补清已跟踪的）
+vaults/*_key*.json

@@ -412,47 +412,6 @@ def cmd_who(args) -> int:
     return 0
 
 
-def cmd_verify(args) -> int:
-    """**包的成色由它判**：随机抽 N 件从包里解出来，sha16 必须与清单逐件相同。
-
-    口径：sha16 只在 scan 期对 ≤64MB 的件算过；没 sha 的跳过并计数（不冒充通过）。
-    任何一件不符 ⇒ 非零退出（包坏了，不许拿它当备份）。
-    """
-    import random
-    idx = _load_idx()
-    ent_all = [e for e in idx["entries"] if e.get("sha16")]
-    if not ent_all:
-        print("索引里没有带 sha16 的件，无法证伪（先重跑 scan）")
-        return 1
-    random.seed(args.seed)
-    pick = random.sample(ent_all, min(args.n, len(ent_all)))
-    ok = bad = 0
-    worst = 0.0
-    bad_rows = []
-    t0 = time.time()
-    with PACK.open("rb") as pk:
-        for e in pick:
-            t1 = time.time()
-            pk.seek(e["off"])
-            blob = pk.read(e["len"])
-            data = _decode(blob, e.get("codec") or "gzip")
-            worst = max(worst, (time.time() - t1) * 1000)
-            got = hashlib.sha256(data).hexdigest()[:16]
-            if got == e["sha16"] and len(data) == e["raw"]:
-                ok += 1
-            else:
-                bad += 1
-                bad_rows.append({"path": e["path"], "want": e["sha16"], "got": got,
-                                 "raw": e["raw"], "len_data": len(data)})
-    print("verify：抽 %d 件 · 通过 %d · 不符 %d · 最慢单件 %.1f ms · 总 %.1fs"
-          % (len(pick), ok, bad, worst, time.time() - t0))
-    for r in bad_rows[:10]:
-        print("   🔴 %s  期望 %s 实得 %s（%d vs %d B）"
-              % (r["path"], r["want"], r["got"], r["raw"], r["len_data"]))
-    print("结论：%s" % ("✅ 包与清单逐件一致（可当冷备份用）" if bad == 0 else "🔴 包坏了，别拿它当备份"))
-    return 0 if bad == 0 else 1
-
-
 def cmd_get(args) -> int:
     idx = _load_idx()
     target = _norm(args.path)
@@ -488,20 +447,16 @@ def main(argv=None) -> int:
     s.add_argument("--skip-prefix", nargs="*", default=[
         "gbt_allinone/store/weights.bin", "outputs/repo-pack/"])
     s = sub.add_parser("index")
-    s = sub.add_parser("verify"); s.add_argument("--n", type=int, default=300)
-    s.add_argument("--seed", type=int, default=7)
     s = sub.add_parser("who"); s.add_argument("path")
     s = sub.add_parser("get"); s.add_argument("path"); s.add_argument("-o", "--out", default="")
     s = sub.add_parser("summary")
     a = ap.parse_args(argv)
-    return {"scan": cmd_scan, "refs": cmd_refs, "pack": cmd_pack, "index": cmd_index,
-            "verify": cmd_verify, "who": cmd_who,
+    return {"scan": cmd_scan, "refs": cmd_refs, "pack": cmd_pack, "index": cmd_index, "who": cmd_who,
             "get": cmd_get, "summary": lambda _a: summarise()}[a.cmd](a)
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
 
 
 

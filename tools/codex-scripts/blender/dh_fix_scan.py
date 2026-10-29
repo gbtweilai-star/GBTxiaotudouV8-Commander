@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[3])
 """数字人 · 大帆/撕裂/浮片 —— 逐动作**定位**工具（第二轮：网格修复）
 
 目的：不猜"哪里撕了"，而是量出来：
@@ -26,7 +22,7 @@ import os
 import sys
 import time
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 
 
 def parse_args():

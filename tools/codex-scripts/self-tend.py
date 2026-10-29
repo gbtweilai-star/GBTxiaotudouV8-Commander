@@ -382,7 +382,7 @@ def check(state_path: pathlib.Path | None = None) -> tuple:
     ok = ok and c4
 
     # 负控：喂一个坏状态文件给校验逻辑，必须判红（防止判据恒真）
-    # ⚠️ 这行输出写的是**负控样本被正确拒绝**，不是「系统缺字段」——文案必须讲清，否则会被读成缺件。
+ # 这行输出写的是**负控样本被正确拒绝**，不是「系统缺字段」——文案必须讲清，否则会被读成缺件。
     probe = {"at": "x"}
     neg_missing = [k for k in ("at", "epoch", "done", "skipped", "isolation") if k not in probe]
     neg = bool(neg_missing)

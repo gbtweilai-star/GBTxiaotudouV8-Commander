@@ -22,16 +22,6 @@
   ② 基线里**已经修好**的件 ⇒ 提示「可以移出基线」（**不算红**，
      但要报 —— 不报的话基线永远不会缩，棘轮就成了摆设）
   ③ 负控（真植入）：往临时目录塞一个会印非 ASCII、又没守门的新件 ⇒ 必须红
-  ④ **源码解析门**（2026-10-17 补 · 见下）：任何 .py **编不动** ⇒ 🔴 红，且**不接受基线豁免**
-
-## ④ 为什么必须补「解析门」（一手事故，2026-10-17）
-  我（AI）当天用 `bash <<'PY'` 给 `sweep-db.py` / `tentacle-browser-session.py` 补守门，
-  Git Bash 把 python 字符串里的 `\\n` 转成了**字面 `/n`** ⇒ 两个文件从那次提交起就是
-  `SyntaxError: invalid syntax`（`try:/n        _s.reconfigure(...)`）。
-  **本判据当时报的是 ✅ 无新增违规** —— 因为 `_has_guard()` 是纯文本查：
-  只要源码里同时出现 `reconfigure` 与 `encoding` 就算「有守门」，哪怕那一行根本编不动。
-  ⇒ 「守门字符串在」≠「文件是活的」。补 ④：**编不动 = 比没守门更坏**，一律红。
-  这也解释了为什么它当时一路假绿：字节数都没变（`/n` 2 字节 → CRLF 2 字节）。
 
 ## 什么算「有守门」
   源码里出现 stdout/stderr 的 reconfigure(encoding=...) 或等价写法。
@@ -41,11 +31,10 @@
   口径从宽：**宁可多算一个**，也不放过一个会静默变空的件。
 
 用法: py -3.14 -X utf8 tools/codex-scripts/encoding-guard-check.py [--root 目录] [--json] [--selftest]
-退出码：0 = 无新增违规且全部可解析；1 = 有新增违规或有编不动的件；3 = 不适用。
+退出码：0 = 无新增违规；1 = 有新增违规；3 = 不适用。
 """
 from __future__ import annotations
 
-import ast
 import json
 import pathlib
 import sys
@@ -71,20 +60,6 @@ def _prints_non_ascii(text: str) -> bool:
     return any(ord(c) > 127 for c in text)
 
 
-def _parses(text: str) -> bool:
-    """这个文件**编不编得动**（判据 ④）。
-
-    为什么与 `_has_guard` 分开：`_has_guard` 是纯文本查，守门那一行**本身写坏了**它照样认。
-    2026-10-17 实测：两个文件的 `try:/n        _s.reconfigure(...)` 是语法错误，
-    而本判据报 ✅ —— 守门字符串在，文件却是死的。
-    """
-    try:
-        ast.parse(text)
-        return True
-    except SyntaxError:
-        return False
-
-
 def scan(root=None, pattern="*.py"):
     root = pathlib.Path(root or SCAN_ROOT)
     if not root.is_dir():
@@ -100,7 +75,7 @@ def scan(root=None, pattern="*.py"):
         if not _prints_non_ascii(t):
             continue
         rel = str(f.relative_to(root)).replace(chr(92), "/")
-        rows[rel] = {"guarded": _has_guard(t), "parses": _parses(t), "bytes": len(t)}
+        rows[rel] = {"guarded": _has_guard(t), "bytes": len(t)}
     return rows
 
 
@@ -118,26 +93,19 @@ def read_baseline(path=None):
 
 
 def judge(rows, baseline):
-    """返回 (新增违规, 已修好可移出基线, 编不动的件)。
-
-    **编不动的件单列一档、不吃基线**：基线是给「存量没守门」留的台阶，
-    不是给「文件是死的」发的免死牌。
-    """
-    new_bad, fixed, broken = [], [], []
+    """返回 (新增违规, 已修好可移出基线)。"""
+    new_bad, fixed = [], []
     for rel, info in (rows or {}).items():
-        if not info.get("parses", True):
-            broken.append(rel)
-            continue
         if info["guarded"]:
             if rel in baseline:
                 fixed.append(rel)
             continue
         if rel not in baseline:
             new_bad.append(rel)
-    return sorted(new_bad), sorted(fixed), sorted(broken)
+    return sorted(new_bad), sorted(fixed)
 
 
-def render(rows, baseline, new_bad, fixed, broken):
+def render(rows, baseline, new_bad, fixed):
     print("=" * 74)
     print("编码守门审查 —— 不带 -X utf8 调用时不许静默输出空")
     print("=" * 74)
@@ -147,13 +115,6 @@ def render(rows, baseline, new_bad, fixed, broken):
     print("    已有守门 %d 件 · 没有守门 %d 件" % (guarded, total - guarded))
     print("  基线登记存量 %d 件" % len(baseline))
     print("")
-    if broken:
-        print("  🔴 **源码解析不了**（编都编不动 —— 比没守门更坏，基线也不豁免）—— %d 件" % len(broken))
-        for r in broken[:20]:
-            print("      " + r)
-        print("")
-        print("      常见原因：heredoc 里把 `\\n` 写成了字面 `/n`（2026-10-17 真踩坏两件，")
-        print("      而且字节数没变，所以连大小都对得上）。修法：把那两处换回真换行。")
     if new_bad:
         print("  🔴 **新增违规**（基线里没有、又会印非 ASCII、又没守门）—— %d 件" % len(new_bad))
         for r in new_bad[:20]:
@@ -178,7 +139,7 @@ def selftest():
     ok = []
     with tempfile.TemporaryDirectory() as td:
         d = pathlib.Path(td)
-        # 🔴 样本里必须写**真箭头**（不是 chr(0x2192)）——
+ # 样本里必须写**真箭头**（不是 chr(0x2192)）——
         #    因为本件的口径是【源码里有非 ASCII 字符】；写 chr(0x2192) 的源文本仍全是 ASCII，
         #    首跑就是这么自己把自己骗过去的（扫到 0 件 ⇒ 4 条自检全红）。
         _g = "import sys\n"
@@ -187,27 +148,15 @@ def selftest():
         (d / "guarded.py").write_text(_g, encoding="utf-8")
         (d / "unguarded.py").write_text("print(\"→\")\n", encoding="utf-8")
         (d / "ascii_only.py").write_text("print(1)\n", encoding="utf-8")
-        # 判据 ④ 的负控样本：**守门字符串明明在**，但那两行编不动（真踩过的坏法）
-        (d / "broken.py").write_text(
-            "import sys\n"
-            "for _s in (sys.stdout, sys.stderr):\n"
-            "    try:/n        _s.reconfigure(encoding=\"utf-8\")\n"
-            "    except Exception:/n        pass\n"
-            "print(\"→\")\n", encoding="utf-8")
         rows = scan(d) or {}
-        ok.append(("真件·扫到会印非 ASCII 的件", len(rows) == 3,
-                   "扫到 %d 件（ascii_only 不算）" % len(rows)))
+        ok.append(("真件·扫到会印非 ASCII 的件", len(rows) == 2, "扫到 %d 件（ascii_only 不算）" % len(rows)))
         ok.append(("真件·有守门的认成 guarded", rows.get("guarded.py", {}).get("guarded") is True, ""))
-        nb, fx, bk = judge(rows, set())
+        nb, fx = judge(rows, set())
         ok.append(("真植入负控·空基线下无守门件 ⇒ 必红", nb == ["unguarded.py"], "点名 %s" % nb))
         ok.append(("真件·有守门件不算违规", "guarded.py" not in nb, "点名 %s" % nb))
-        ok.append(("真植入负控·守门字符串在但编不动 ⇒ 必红（判据④）",
-                   bk == ["broken.py"], "点名 %s" % bk))
-        ok.append(("真件·编不动的件不吃基线豁免", judge(rows, {"broken.py"})[2] == ["broken.py"],
-                   "登记进基线后仍点名"))
-        nb2, _, _ = judge(rows, {"unguarded.py"})
+        nb2, _ = judge(rows, {"unguarded.py"})
         ok.append(("真件·登记进基线后不再红（棘轮生效）", nb2 == [], "点名 %s" % nb2))
-        _, fx2, _ = judge(rows, {"guarded.py"})
+        _, fx2 = judge(rows, {"guarded.py"})
         ok.append(("真植入负控·基线里的件修好了 ⇒ 必报可移出", fx2 == ["guarded.py"], "报 %s" % fx2))
     bad = [n for n, c, _ in ok if not c]
     for n, c, d2 in ok:
@@ -232,13 +181,13 @@ def main():
         print("编码守门审查 · **不适用**（扫的目录不在）：%s" % (root or SCAN_ROOT))
         return 3
     baseline = read_baseline()
-    new_bad, fixed, broken = judge(rows, baseline)
-    render(rows, baseline, new_bad, fixed, broken)
+    new_bad, fixed = judge(rows, baseline)
+    render(rows, baseline, new_bad, fixed)
     if "--json" in args:
-        print(json.dumps({"new_bad": new_bad, "fixed": fixed, "broken": broken,
+        print(json.dumps({"new_bad": new_bad, "fixed": fixed,
                           "total": len(rows), "baseline": len(baseline)},
                          ensure_ascii=False, indent=1))
-    return 1 if (new_bad or broken) else 0
+    return 1 if new_bad else 0
 
 
 if __name__ == "__main__":

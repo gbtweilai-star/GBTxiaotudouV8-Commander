@@ -135,7 +135,7 @@ STAGES: dict[str, list[dict]] = {
 }
 
 # 命名规则（projects/README.md §命名一律带日期前缀）
-# 🔴 2026-09-23 自查抓到的误报：初版只允许 `<NN工序>`，把文档明文允许的**彩排件**
+# 2026-09-23 自查抓到的误报：初版只允许 `<NN工序>`，把文档明文允许的**彩排件**
 #   （第 4 段写 `rehearsal`，例 `20260921-film-彩排样板-rehearsal.md`）
 #   判成"命名不合规" —— **检查器比文档更严**。现按文档补上 `rehearsal` 这一形态。
 NAME_RE = re.compile(
@@ -208,7 +208,7 @@ def check_one(kind: str, st: dict) -> dict:
     named_bad = [p.name for p in fs if not NAME_RE.match(p.name)]
     wrong_ext = [p.name for p in fs
                  if st["ext"] and p.suffix.lower() not in st["ext"]]
-    # 🔴 彩排件 ≠ 该工序成品（README：彩排是**动作**不是抽屉；真实工序由它所在抽屉决定）
+ # 彩排件 ≠ 该工序成品（README：彩排是**动作**不是抽屉；真实工序由它所在抽屉决定）
     reel = [p.name for p in fs if REHEARSAL_RE.search(p.name)]
     real = [p.name for p in fs if not REHEARSAL_RE.search(p.name)]
     r = {"kind": kind, "drawer": st["drawer"], "mp": st["mp"],
@@ -227,10 +227,10 @@ def check_one(kind: str, st: dict) -> dict:
         r["state"] = "有货"
     # 授权闸：成品格必须有许可 —— **逐件核对**（2026-09-23 第 49 轮改）
     #
-    # 🔴 为什么必须改（本轮实测抓到的"判据太松会主动遮丑"）：
+ # 为什么必须改（本轮实测抓到的"判据太松会主动遮丑"）：
     #   旧判据是 `license_ok = len(_files(licenses)) > 0` —— **目录里随便有个文件就算过**。
     #   本轮我按新机制往 `_shared/licenses/` 写了一份 **0 条的 manifest.json**，
-    #   旧判据**立刻**就把 `short-video/04-cut` 的 P0 报成"许可 ✅"了 ——
+ # 旧判据**立刻**就把 `short-video/04-cut` 的 P0 报成"许可 "了 ——
     #   而那一格里 6 个件**一条记录都没有**。
     #   ⇒ 松判据不只是"抓不到"，它会**把红遮掉**。而"素材授权清单"（十道闸之一）
     #     问的本来就是**每一件**素材的授权。
@@ -252,10 +252,10 @@ def check_one(kind: str, st: dict) -> dict:
 def check_intel(kind: str) -> dict:
     d = PROJ / kind / "_intel"
 
-    # 🔴 第 97 轮补：原来 `got` 是**数文件个数**（`.exists()`）—— **丢一个 0 字节的空文件进去，
+ # 第 97 轮补：原来 `got` 是**数文件个数**（`.exists()`）—— **丢一个 0 字节的空文件进去，
     #    维数就会涨**，而实际什么都没调研。这和第 96 轮刚堵的那条是**同一个病**：
     #    **在场被当成了合格**。⇒ 空文件不算一维（读不动也不算）。
-    #    ⚠️ 本判据只到"非空"为止 —— **每一维各自的内容契约本机没有权威口径，
+ # 本判据只到"非空"为止 —— **每一维各自的内容契约本机没有权威口径，
     #    我不替它们编**（编了就是拿我的规矩替上游立规矩）。
     def _nonempty(n: str) -> bool:
         p = d / (n + INTEL_EXT[n])
@@ -271,7 +271,7 @@ def check_intel(kind: str) -> dict:
                    if (d / (n + INTEL_EXT[n])).exists() and n not in got]
     red_name = INTEL_ABSOLUTE + INTEL_EXT[INTEL_ABSOLUTE]
     red = d / red_name
-    # 🔴 第 96 轮补：原来只判 `.exists()` —— **在场判据**。
+ # 第 96 轮补：原来只判 `.exists()` —— **在场判据**。
     #    第 95 轮我把红线文件填上、警告就消了；可**空文件或空壳同样会让警告消失** ——
     #    那就是我刚亲手造出来的一个**假绿通道**。按本仓一贯做法推成**契约判据**：
     #    非空 · 带署名 · 红线条数达标 · **写明它没覆盖什么**（留白 ≠ 没问题）。
@@ -317,10 +317,10 @@ def gate_report(kinds: list[str], mp: dict) -> dict:
             if r["state"] == "缺目录":
                 problems.append(("%s 抽屉不存在（README 的 18 格表里列了）" % tag, "P1"))
             elif r["state"] == "仅彩排":
-                # 🔴 第 94 轮补：这条注意原来**只说"没有成品"，不说怎么才能有成品** ——
+ # 第 94 轮补：这条注意原来**只说"没有成品"，不说怎么才能有成品** ——
                 #    读的人拿到一条**照着做不了的警告**。而答案第 79 轮就有了（`release=True`）。
                 #    警告必须可行动，否则它就只是噪音。
-                #    ⚠️ 命令里的 `kind` 要**下划线**（`short_video`）—— 循环变量 `k` 是**目录名**
+ # 命令里的 `kind` 要**下划线**（`short_video`）—— 循环变量 `k` 是**目录名**
                 #    （`short-video`，连字符）。第一版我直接把 `k` 塞进命令 ⇒ 复制粘贴**会失败**
                 #    （`media_run` 不认 `short-video` 这个方向）。**可行动的提示，命令必须真的是对的。**
                 notes.append("%s 只有彩排件（%d 件），**没有该工序成品** —— "
@@ -383,7 +383,7 @@ def cmd_status(kinds: list[str]) -> int:
             mpname = st["mp"] or "（框架无对应格）"
             extra = ""
             if r.get("license_required"):
-                # ⚠️ 空格子**不该显示"❌ 缺全部"**：没有件就没有素材要许可（第 49 轮自查抓到的读数缺陷）
+ # 空格子**不该显示" 缺全部"**：没有件就没有素材要许可（第 49 轮自查抓到的读数缺陷）
                 if not r.get("license_need"):
                     extra = "  许可 —（空格，无需许可）"
                 elif r.get("license_ok"):

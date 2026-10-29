@@ -17,7 +17,7 @@
 ⇒ **危险集 = 零作用域 ∧ B 说它会改** —— 这类位的性质是：
 **门不会拦，但它会改框架状态**。本工具把这份名单**现算出来**。
 
-## 🔴 纪律
+## 纪律
 - **只读**：只 `evaluate`（纯函数）+ 读两张表，**不调任何能力位**；
 - **两个源都真读**：任一读不到就报未读到，**不拿 0 冒充**；
 - **不含糊**：`零作用域` 与 `只读` 是两件事，输出里**分开写**。
@@ -75,7 +75,7 @@ def cross() -> dict:
         return {"ok": False, "为什么": err}
     R, POL = src["注册表"], src["policy"]
     scc = src["会改状态集"]
-    # 🔴 `all_caps()` 返回的是 **list（名字表）不是 dict** —— 我第一次假设了形状 ⇒ AttributeError。
+ # `all_caps()` 返回的是 **list（名字表）不是 dict** —— 我第一次假设了形状 ⇒ AttributeError。
     #    元数据（domain/safe）从两张真表取；**两种形状都接住**，不猜。
     meta_map = {}
     for name in ("BENIGN_CAPS", "UNIMPLEMENTED_CAPS"):
@@ -83,7 +83,7 @@ def cross() -> dict:
         if isinstance(d, dict):
             meta_map.update({k: (v if isinstance(v, dict) else {}) for k, v in d.items()})
     caps = R.all_caps()
-    # 🔴 `all_caps()` 实测返回 **list of dicts**（第一版我按名字表排 ⇒ `'<' not supported … 'dict'`）。
+ # `all_caps()` 实测返回 **list of dicts**（第一版我按名字表排 ⇒ `'<' not supported … 'dict'`）。
     #    **接住三种形状**（dict / list-of-dict / list-of-name），**不猜**。
     if isinstance(caps, dict):
         items = sorted(caps.items())
@@ -136,7 +136,7 @@ def cross() -> dict:
     }
 
 
-# 🔴 **带参口径**：给"**会改状态的那个 op**"去 `evaluate`。
+# **带参口径**：给"**会改状态的那个 op**"去 `evaluate`。
 #    `evaluate` 是**纯函数**（只算不写）⇒ **带了 apply/submit 的参也不会真动手**。
 #    每条都写明"为什么这个 op 是会改的那个"。
 DEEP = {

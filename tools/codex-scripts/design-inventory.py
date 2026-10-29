@@ -83,7 +83,7 @@ def negctl() -> int:
     orig = src.read_bytes()
     sha0 = hashlib.sha256(orig).hexdigest()
     copy = src.with_name("_negctl_" + src.name)      # 必须留在同目录，ROOT 才解析得到
-    # ⚠️ 锚点**不能原样写在这里**：写全了文件里就有两处（L5 一处 + 本行一处），
+ # 锚点**不能原样写在这里**：写全了文件里就有两处（L5 一处 + 本行一处），
     #    `count != 1` 立刻把自己判红（本脚本第一版就是这么自伤的）。拆开拼，运行期等值、文件里不等值。
     anchor = '"rules": ["OUTPUT_RULES' + '.md"],'
     if orig.decode("utf-8").count(anchor) != 1:

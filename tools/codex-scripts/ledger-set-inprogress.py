@@ -58,7 +58,7 @@ def main():
         print("in_progress 已是本轮文本，未改")
         return 0
     j["in_progress"] = TEXT
-    # 🔴 2026-10-22 改（当天真栽的跟头）：这里原来直接 `open(PATH,"w")`，对这份台账会抛
+ # 2026-10-22 改（当天真栽的跟头）：这里原来直接 `open(PATH,"w")`，对这份台账会抛
     #    `OSError: [Errno 22] Invalid argument` —— 宿主正盯着它（注入会话头）。
     #    同一次操作改成「临时件 + os.replace」当场成功。台账这类被别人持有的文件只许原子替换。
     import os

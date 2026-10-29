@@ -87,7 +87,7 @@ def dyn_rows(probe: dict, caps: dict) -> list:
         why = None
         if code in DYN_CODES:
             why = "reason_code=%s" % code
-        # 🔴 **2026-09-23 修掉一个假阳性**（这条错值得单独记）：
+ # **2026-09-23 修掉一个假阳性**（这条错值得单独记）：
         #    原判据把 **整个结果转储**（`result_head`）拿去子串匹配 `未实现/not_wired/…`。
         #    于是 `sec_defenses` 被判红 —— 而它其实**跑通了**（`defense_status: 全部生效` · 5/5 通过），
         #    只不过它的**说明文字里**出现了「未实现」这四个字：
@@ -107,7 +107,7 @@ def dyn_rows(probe: dict, caps: dict) -> list:
                 if marker in blob:
                     why = "返回里带结构化标记 %s（**能力本体在跑，是某条输出通道没接线**）" % marker
                     break
-        # 🔴 **2026-09-23 第三个假阳性，与上面两处同一类错**：
+ # **2026-09-23 第三个假阳性，与上面两处同一类错**：
         #    `create` 被判"动态不成立"，而它其实**明说自己为什么没接**：
         #    `file_operation.py` 的模块头写着「**文本出口本刀未接线**……本刀不注册 `eigenflux` cap、
         #    **不发任何网络请求** —— `output` 如实报 `pending`」，并且补了一句

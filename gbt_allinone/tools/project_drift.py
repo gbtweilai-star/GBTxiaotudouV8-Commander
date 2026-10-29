@@ -387,6 +387,18 @@ def run_op(op: str = "status", **params) -> dict:
     return _op_baseline(from_pack=bool(from_pack))
 
 
+def run(op: str = "status", **params) -> dict:
+    """调度面契约（`orchestration_kernel` 调的是 `mod.run(op, **params)`）。
+
+    🔴 2026-10-25 · 落地即接线：本件原来只有 `run_op` 命名，而调度面只认 `run`
+    ⇒ 它一直**挂不上**：审计把它算成「内调型孤儿」，而主人 2026-10-19 要的
+    「第三块监控 · 要有一个看着整个项目变化的」因此**不会自己跑**（只有人点名才动）。
+    这一层是**薄适配，不加任何新语义**：默认 `op=status`（只读）；非法 op 仍由
+    `run_op` 如实回 `unknown_op`（不悄悄当 status）；要写基线仍必须显式 `op=baseline`。
+    """
+    return run_op(op, **params)
+
+
 def main(argv=None) -> int:
     import argparse
     ap = argparse.ArgumentParser(description="全项目变化监控（project_drift）")

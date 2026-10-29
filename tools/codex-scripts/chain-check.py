@@ -103,7 +103,7 @@ for ln in (proc.stdout or "").splitlines():
             ask = {}
 if proc.returncode != 0:
     print("  stderr:", (proc.stderr or "")[-400:])
-# 🔴 2026-10-21 修我自己这条判据的假绿：上一版拿 stdout 里出现 provider 就算通过，
+# 2026-10-21 修我自己这条判据的假绿：上一版拿 stdout 里出现 provider 就算通过，
 #    而子进程其实抛了 AttributeError（cloud_llm 没有 ask，入口是 unified.ask）。
 #    现在三条都要真：选路落到 potato · 回执 ok · 有非空回答。
 ok12 = (route.get("provider") == "potato" and bool(ask.get("ok"))

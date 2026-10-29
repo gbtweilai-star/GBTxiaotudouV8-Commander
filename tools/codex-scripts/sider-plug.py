@@ -161,7 +161,7 @@ def probe_page(url=ENTRY) -> dict:
         return {"打开": False, "为什么": "playwright 没装：%s" % type(exc).__name__}
     try:
         with sync_playwright() as pw:
-            # 🔴 2026-10-10 实测：playwright 按自己的期望版本找浏览器，本机只有 chromium-1223
+ # 2026-10-10 实测：playwright 按自己的期望版本找浏览器，本机只有 chromium-1223
             #    ⇒ 报 "Executable doesn't exist at ...\ms-playwright\" ⇒ **显式给可执行文件**。
             exe = _chrome_exe()
             kw = {"headless": not HEADED,

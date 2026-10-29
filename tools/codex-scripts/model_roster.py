@@ -9,7 +9,7 @@
 2. 有没有**模型允许清单**（`allowedModels`）—— 这就是模型面上的**门**；
 3. 有多少模型**在清单之外**（⇒ 自律那条：不在清单里的不许调）。
 
-## 🔴 凭据红线（写死成代码，不是嘴上说）
+## 凭据红线（写死成代码，不是嘴上说）
 读的是 **settings.yaml**（结构），**不读 `.credentials.yaml`**。
 输出一律**丢弃**形如 key/token/secret/password/credential/auth 的键，
 以及 `baseURL`（可能含内网地址）—— 只报「已省略」。`--selftest` 里有一条负控：
@@ -38,9 +38,9 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-# 🔴 出现这些形状的键**一律不输出**（大小写不敏感）
+# 出现这些形状的键**一律不输出**（大小写不敏感）
 SECRET_RE = re.compile(r"(?i)key|token|secret|password|credential|auth|cookie|session")
-# 🔴 这些键输出但**值隐去**（可能是内网地址/路径）
+# 这些键输出但**值隐去**（可能是内网地址/路径）
 MASK_VALUE = {"baseurl", "url", "endpoint", "path", "dir", "home"}
 
 
@@ -139,7 +139,7 @@ def roster(cfg: dict) -> dict:
     allow_set = set(allow_pairs)
     outside = sorted(pairs - allow_set) if allow_set else []
     allowed_but_absent = sorted(allow_set - pairs) if allow_set else []
-    # 🔴 **作用域要看它在哪个父节下面** —— 同一个键名放在不同父节，管的范围完全不同。
+ # **作用域要看它在哪个父节下面** —— 同一个键名放在不同父节，管的范围完全不同。
     #    第一版把它当成"模型面的门"，其实它在 `subagent-model-selection` 之下，
     #    **只管 subagent 的模型选择**，管不到主 agent。
     allow_scope = allow_path[0].rsplit(".", 1)[0] if allow_path else "（未知）"
@@ -200,7 +200,7 @@ def cmd_gate(a) -> int:
     if g["条数"] == 0:
         print("⚠️ **没读到 allowedModels** ⇒ 该接缝上**没有声明式门**（如实报，不假装有）")
         return 3
-    # 🔴 **判据修正**：两边差集**默认不是越界**（两个接缝各自维护）。
+ # **判据修正**：两边差集**默认不是越界**（两个接缝各自维护）。
     #    只有「**同一个 provider 名**在门里出现过、却又在配置里配了门外的模型」才算真不一致。
     in_gate_prov = {p for p, _ in g["配对"]}
     hard = [x for x in r["配置里配了、但**不在该门**里的"]["清单"] if x[0] in in_gate_prov]

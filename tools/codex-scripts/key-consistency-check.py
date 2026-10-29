@@ -95,7 +95,7 @@ def main(argv=None) -> int:
         try:
             vault_key, _src = dk.load_from_vault(name)
         except Exception as exc:  # noqa: BLE001
-            # 🔴 2026-09-26 自纠：单个 profile 的库读不动（DPAPI 损坏等）原来会让整器
+ # 2026-09-26 自纠：单个 profile 的库读不动（DPAPI 损坏等）原来会让整器
             #    traceback 退出 1 —— 而 1 的语义是"有分叉要人判"，错误信号被污染。
             #    现在该行如实记"读不动"，其余 profile 照常对账；"读不动"与"分叉"同算不绿。
             _reg = (reg.get(env_name) or "").strip()
@@ -116,7 +116,7 @@ def main(argv=None) -> int:
             "registry_fp": _fingerprint(reg_val),
         })
 
-    # 🔴 2026-09-26：**读不动 ≠ 干净** —— 库解不开的 profile 也算"不绿"，否则保险箱
+ # 2026-09-26：**读不动 ≠ 干净** —— 库解不开的 profile 也算"不绿"，否则保险箱
     #    坏了反而对出全绿的假读数（与 precommit-secret-scan 的反空洞同一条纪律）。
     split = [r for r in rows if r["verdict"] in ("分叉", "读不动")]
     diverged = [r for r in rows if r["verdict"] == "分叉"]

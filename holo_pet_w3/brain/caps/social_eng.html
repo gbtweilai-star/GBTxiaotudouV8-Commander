@@ -2,22 +2,23 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<!-- 🔴 **自动生成，别手改**。重建：py -3.14 tools/codex-scripts/cap-pages.py
+<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cap-pages.py
      版式与渲染只有一份（cap.css / cap.js）；本页只负责带一个 id。 -->
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src http://127.0.0.1:8791" />
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
 <title>social_eng · 能力页 · GBT小土豆V8</title>
-<link rel="stylesheet" href="../../window.css?v=20261026c" />
+<link rel="stylesheet" href="../../window.css" />
 <link rel="stylesheet" href="../../deck3d.css" />
 <link rel="stylesheet" href="../../skin-mission-control.css" />
 <link rel="stylesheet" href="../cap.css" />
+<link rel="stylesheet" href="../../page-skins.css" />
 </head>
 <body class="cap-page" data-kind="social_eng">
 
 <div class="cap-top">
   <span class="crumb">
-    <a href="../../index.html">神经工作台</a> /
-    <a id="crumb-bundle" href="../../index.html">（束）</a> /
+    <a href="#" data-panel-goto="godview">神经工作台</a> /
+    <a id="crumb-bundle" href="#" data-panel-goto="godview">（束）</a> /
     <span class="here" id="crumb-here">social_eng</span>
   </span>
   <span class="spacer"></span>
@@ -79,12 +80,12 @@
   <section class="cap-sec">
     <h2>全部能力页<span class="n" id="all-n">—</span></h2>
     <p class="hintline">
-      161 条能力**各自一页**。这里**不把它们铺开** —— 铺开就成了"挤在一起"，
+      161 条能力各自一页。这里不把它们铺开 —— 铺开就成了"挤在一起"，
       正是风哥要避免的样子；要看全量去总目录（那里按束分组）。
     </p>
     <div class="nav-grid">
       <a href="index.html">打开总目录 · 按束分组</a>
-      <a href="../../index.html">回神经工作台（3D 全脑）</a>
+      <a href="#" data-panel-goto="godview">回神经工作台（3D 全脑）</a>
     </div>
   </section>
 
@@ -95,7 +96,7 @@
   数据 <code>brain-data.js</code>（brain-feed.py 从真实源码算出）· 皮肤 mission-control
 </footer>
 
-<script src="../brain-data.js?v=20261026"></script>
-<script src="../cap.js?v=20261026"></script>
+<script src="../brain-data.js"></script>
+<script src="../cap.js"></script>
 </body>
 </html>

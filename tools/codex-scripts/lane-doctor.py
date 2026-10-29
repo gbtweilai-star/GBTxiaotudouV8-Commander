@@ -48,7 +48,7 @@ MIN_CTX = 32768
 
 ROWS = []
 TOLERATE_NET = False  # --gate：把「连不上」降为 WARN（离线不等于车道坏），契约坏仍是 FAIL
-# 🔴 2026-10-23 23:50 定位到的真凶：`sse_once()` 里把超时**写死 240 秒**，
+# 2026-10-23 23:50 定位到的真凶：`sse_once()` 里把超时**写死 240 秒**，
 #    而 G6/G7/G8 一次要打两发 ⇒ 单单这一组就 480s；加上前面 G1~G5 的请求，整条闸 >600s 挂起。
 #    先前我只改了 `http()` 的**默认值**（60→15）—— 调用方显式传了 240，默认值根本没用上，
 #    所以那次改动对这条闸**无效**（实测 >600s 证明了它）。
@@ -110,7 +110,7 @@ def cred_refs():
 
 
 def http(url, method="GET", body=None, token=None, timeout=15, accept=None):
-    # 🔴 2026-10-23：默认超时 60s → **15s**。
+ # 2026-10-23：默认超时 60s → **15s**。
     # 真因：F25（端点 running=0）时每个请求都要挂到 60s，整条闸 300s 才返回，
     # 开机自检被一条死车道拖了 5 分钟。判据该是"快速红"，不是"慢速等"。
     # 读数口径不变：取不到 = 未验 = 红（不因超时短就放过）。
@@ -182,7 +182,7 @@ def g2_health(key):
     init = int(w.get("initializing") or 0)
     detail = "ready=%s running=%s idle=%s initializing=%s inQueue=%s" % (
         ready, running, w.get("idle"), init, (j.get("jobs") or {}).get("inQueue"))
-    # 🔴 2026-10-22 判据翻正（留痕，不是静默改）：原口径只认 `ready>=1`。
+ # 2026-10-22 判据翻正（留痕，不是静默改）：原口径只认 `ready>=1`。
     #    实测反证：本体检自己去打端点的那一瞬，那台 worker 正在跑这次调用
     #    ⇒ 读数变成 `ready=0 running=1`，旧口径当场判红 —— 而机器其实是好的。
     #    这是本仓 P1「判据错尺」的活样本（量具自己被自己的请求占住）。
@@ -365,7 +365,7 @@ def g9_credentials(refs):
         problems.append("refs 里没有可用的 GW_AUTH（云端 Worker 的钥匙）")
     if len(rp) < 20:
         problems.append("refs 里没有可用的 GBT_POTATO_API_KEY（RunPod 引擎/控制面钥匙）")
-    # 🔴 2026-10-22 现读订正（留痕）：先前把 HKCU 的 `GBT_GATEWAY_TOKEN` 判成「过期的同一把钥匙」，
+ # 2026-10-22 现读订正（留痕）：先前把 HKCU 的 `GBT_GATEWAY_TOKEN` 判成「过期的同一把钥匙」，
     #    去查消费者才知道那是**另一个网关**的令牌 —— `gbt_allinone/tools/capability_gateway.py`
     #    读它做 `X-GBT-Token` 鉴权（第 32/84 行），`deepseek_key.py` 第 107 行也登记它。
     #    ⇒ 两者**不是**同一把：Worker 要 refs.GW_AUTH，本机能力网关卡要 HKCU GBT_GATEWAY_TOKEN。

@@ -152,7 +152,7 @@ def main() -> int:
             continue
         dst.parent.mkdir(parents=True, exist_ok=True)
         Path(it["content"]).replace(dst) if False else None
-        # 🔴 用**拷贝**不用搬：回收站那份留着，万一还要再取一次
+ # 用**拷贝**不用搬：回收站那份留着，万一还要再取一次
         with open(it["content"], "rb") as src, open(dst, "wb") as out:
             while True:
                 chunk = src.read(1 << 20)

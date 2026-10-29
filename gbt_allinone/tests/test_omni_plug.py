@@ -24,7 +24,19 @@ class OmniPlugTest(unittest.TestCase):
         r = OP.run("status")
         self.assertTrue(r["ok"])
         self.assertEqual(r["名字"], "万能插")
-        self.assertEqual(list(r["插座类型"]), ["process", "file", "api", "web", "app"])
+        # 🔴 2026-10-25 · 原期望 → 新口径 → 为什么翻：
+        #   原期望：写死五个插座 [process, file, api, web, app]。
+        #   新口径：**与派生源 OP.SOCKET_KINDS 对齐**，并仍然咬住两条：
+        #           ① 五个核心插座必须都在（少一个就是真缺件，照样红）；
+        #           ② 不许有重复项（名字重复 = 注册表被写坏）。
+        #   为什么翻：插头后来多接了一路 i，判据没跟上 ⇒ 「实得多一项」被当成失败。
+        #   这不是放宽：核心五项缺任何一个、或出现重复，都还是红。
+        kinds = list(r["插座类型"])
+        self.assertEqual(kinds, list(OP.SOCKET_KINDS),
+                         "status 报的插座类型必须与派生源 SOCKET_KINDS 一致：%r vs %r" % (kinds, list(OP.SOCKET_KINDS)))
+        for core in ("process", "file", "api", "web", "app"):
+            self.assertIn(core, kinds, "核心插座丢了：%s（现读 %r）" % (core, kinds))
+        self.assertEqual(len(kinds), len(set(kinds)), "插座类型有重复项：%r" % (kinds,))
 
     def test_plug_is_a_real_probe(self):
         good = OP.run("plug", socket="file", target="projects")
@@ -115,6 +127,41 @@ class OmniPlugTest(unittest.TestCase):
         self.assertEqual(set(policy.evaluate("omni_plug", {"op": "run", "socket": "app",
                                                             "target": "x", "do": "launch"}).scopes),
                          {"desktop_control", "privacy_read", "process_execute"})
+
+
+    def test_chat_url_handles_both_v1_forms(self):
+        """接免费 OpenAI 兼容口时，base_url 填**带不带 /v1** 都必须落到同一个端点。
+
+        🔴 2026-10-29 加：主人问「插座支不支持自定义 base_url」时查出**两处各写一套**拼接规则
+        （`_ai_call` 一律 `+"/chat/completions"`；`_local_ai_call` 三档补 `/v1`）⇒
+        `https://x` 在两处得到不同端点，表现成"有时通有时 404"。现在两处都调 `chat_url`。
+
+        负对照（两条 Gemini）：它的兼容口是 `…/v1beta/openai`，**没有** `/v1` 这一层 ——
+        无条件补 `/v1` 的实现会被这两条咬住。
+        """
+        cases = [
+            ("https://integrate.api.nvidia.com/v1",
+             "https://integrate.api.nvidia.com/v1/chat/completions"),
+            ("https://api.groq.com/openai/v1",
+             "https://api.groq.com/openai/v1/chat/completions"),
+            ("https://api.cerebras.ai/v1",
+             "https://api.cerebras.ai/v1/chat/completions"),
+            # 不带 /v1 的常见写法 ⇒ 补 /v1（DeepSeek / OpenAI 的默认）
+            ("https://api.deepseek.com", "https://api.deepseek.com/v1/chat/completions"),
+            # 已经写全的不许再加工
+            ("https://gw.example.com/chat/completions",
+             "https://gw.example.com/chat/completions"),
+            # 🔴 负对照：补了 /v1 就错
+            ("https://generativelanguage.googleapis.com/v1beta/openai",
+             "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"),
+            ("https://generativelanguage.googleapis.com/v1beta",
+             "https://generativelanguage.googleapis.com/v1beta/chat/completions"),
+            ("", ""),
+        ]
+        bad = [(b, OP.chat_url(b), want) for b, want in cases if OP.chat_url(b) != want]
+        self.assertEqual(bad, [], "base_url 拼接不符（填的 / 实得 / 应为）：%r" % (bad,))
+        self.assertEqual(OP.chat_url("https://x/v1/"), OP.chat_url("https://x/v1"),
+                         "尾斜杠不许改变结果")
 
 
 if __name__ == "__main__":

@@ -92,7 +92,7 @@ def cmd_spill(a) -> int:
     before = _free_gb()
     rows, freed = [], 0
     for p in cand:
-        # 🔴 必须在调用**之前**取 size：cloud-vault put 成功后会**删掉本地**，
+ # 必须在调用**之前**取 size：cloud-vault put 成功后会**删掉本地**，
         #    之后再 p.stat() 就是 FileNotFoundError —— 我第一次就是这么崩的
         #    （而 C 盘 +140 MB 说明搬运其实成功了：**量具坏，不是被测对象坏**）。
         size = p.stat().st_size

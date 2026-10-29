@@ -1,4 +1,11 @@
 import os, sys, time, json
+
+# 编码守门（2026-10-24 补 · encoding-guard-check 报的「新增违规」之一）
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer

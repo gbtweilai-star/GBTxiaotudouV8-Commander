@@ -63,7 +63,7 @@ def _r_plugins50():
                 "gap": "**没有实现面**：0 个 op 门表、0 个端点"}
     gslots = gt.get("slots") or []
     with_gates = [s for s in gslots if s.get("gates")]
-    # 🔴 2026-10-11 自纠（**假红**）：原来拿 (with_gates == 50) 判 —— 但 20 个**备用槽
+ # 2026-10-11 自纠（**假红**）：原来拿 (with_gates == 50) 判 —— 但 20 个**备用槽
     #    本来就没有 driver**，没有门表是**正常**的。正确判据是：**指派的 30 条个个有门表**。
     assigned_slots = [s for s in gslots if s.get("driver")]
     assigned_with = [s for s in assigned_slots if s.get("gates")]
@@ -92,7 +92,7 @@ def _r_dbfleet():
         rows.append((f.get("id"), bool(have)))
     opened = [r for r in rows if r[1]]
     shards = (pr or {}).get("shards_100") or []
-    # 🔴 2026-10-11 分档（**别把「待办」判成「病」，也别判成「完成」**）：
+ # 2026-10-11 分档（**别把「待办」判成「病」，也别判成「完成」**）：
     #    设计件自己写着「这些库一个都还没开通 … 本文件是设计+指向+**开通清单**」
     #    ⇒ 「0 开通」是**如实**、是**待办**，不是落差；但**也绝不是绿**。
     #    故：探针件+分片齐 ⇒ todo（黄）；探针件缺/分片不齐 ⇒ red（病）。
@@ -118,7 +118,7 @@ def _r_llm_lanes():
     i = txt.find("_KEY_CHAIN = [")
     j = txt.find("\n]", i) if i >= 0 else -1
     block = txt[i:j] if i >= 0 and j > i else ""
-    # 🔴 2026-10-11 自纠：**必须排除注释行** —— 上一版拿整块 block 搜主机名，
+ # 2026-10-11 自纠：**必须排除注释行** —— 上一版拿整块 block 搜主机名，
     #    把「已注释退场的那条」也算成"还挂着" ⇒ **假红**（实测：我刚把 gbt-local
     #    注释退场，判据仍报它 → 127.0.0.1:11434）。退场后的原行**留在注释里**是本仓
     #    的口径（可复线），不能被当成活的。

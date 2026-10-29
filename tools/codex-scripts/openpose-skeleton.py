@@ -129,7 +129,7 @@ def to_standard_lr(kpts):
     """
     out = {}
     for k, v in kpts.items():
-        # ⚠️ **必须大小写不敏感**：键是 `Rshoulder`（小写 s），而 `_LR_BODY` 里写的是
+ # **必须大小写不敏感**：键是 `Rshoulder`（小写 s），而 `_LR_BODY` 里写的是
         # `"Shoulder"`（大写 S）。我第一版直接 `startswith` ⇒ **恒为假 ⇒ 身体一个都没换**
         # ⇒ 关节级读数当场显示"头修好了、身体从 3.9px 掉到 80.4px"。**判据抓到的，不是我想到的。**
         suf = k[1:].lower()

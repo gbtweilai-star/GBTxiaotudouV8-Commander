@@ -80,7 +80,7 @@ class Mod:
                 elif isinstance(n, ast.ImportFrom) and n.module and n.level == 0 \
                         and n.module.startswith("gbt_allinone"):
                     for a in n.names:
-                        # 🔴 2026-10-22 第一次跑就炸（留痕）：`from gbt_allinone import api` 这种
+ # 2026-10-22 第一次跑就炸（留痕）：`from gbt_allinone import api` 这种
                         #    n.module 就是 "gbt_allinone" 本身，split 后取 [1] 会 IndexError。
                         #    不是"仓坏了"，是我的取法不覆盖"直接导入包根"的形状。
                         rel = n.module.split(".", 1)

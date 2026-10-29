@@ -106,7 +106,7 @@ def _resolve_target(spec_path: Path, rel: str) -> Path | None:
 
 # ---------------------------------------------------------------- 跑一把刀
 def _one_mutant(target: Path, mut: dict, args: list[str]) -> dict:
-    # 🔴 必填字段**缺了就写「未读到」并拒绝**，绝不拿空串顶替当锚点：
+ # 必填字段**缺了就写「未读到」并拒绝**，绝不拿空串顶替当锚点：
     #    空串的读数是「锚点出现 0 次」——那会把「字段不在」误报成「代码里没有」。
     lack = [k for k in ("名", "旧", "新")
             if not isinstance(mut.get(k), str) or mut.get(k) == ""]
@@ -288,7 +288,7 @@ def selftest() -> int:
            row["判决"] == "拒绝" and "未读到" in str(row.get("为什么")),
            str(row.get("为什么"))[:70])
         # ⑤ 确实红了、但**红在别的控制**上 ⇒ 仍须判「没咬住」（同宽控制）
-        #    🔴 这条控制差点是假绿：判据必须**证明「确实红了」**（读数真读到「不通过」，
+ # 这条控制差点是假绿：判据必须**证明「确实红了」**（读数真读到「不通过」，
         #    且红灯行里点名的那条**不是**要求的那条），否则崩溃路径也能把它喂饱。
         row = _one_mutant(tgt, WRONG, ["--selftest"])
         ck("**红在别处 ⇒ 也要判「没咬住」**（宽判据 = 假绿）",
@@ -325,7 +325,7 @@ def cmd_list() -> int:
     for p in (sorted(SPEC_DIR.glob("*.spec.json")) if SPEC_DIR.is_dir() else []):
         try:
             d = json.loads(p.read_text(encoding="utf-8"))
-            # 🔴 读不到就写「未读到」：`len(d.get("刀") or [])` 会把「字段不在」
+ # 读不到就写「未读到」：`len(d.get("刀") or [])` 会把「字段不在」
             #    静默印成 `刀数: 0` —— 那正是本工具要打的那种假读数。
             if "刀" not in d:
                 rows.append({"规格": p.name, "名字": d.get("名字", "**未读到**"),

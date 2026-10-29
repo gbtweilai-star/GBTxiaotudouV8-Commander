@@ -230,3 +230,91 @@ def safe_request_json(url: str, *, method: str = "GET", headers: dict | None = N
     except Exception:
         response["json"] = None
     return response
+
+
+# ---------------------------------------------------------------- 回环探测
+# 🔴 2026-10-28 A/B 判别实测（`scratch/proxy-loopback-ab2.py`）：
+#   本机 `HTTP_PROXY=http://127.0.0.1:28016` 是全局的，而 `urllib.request.urlopen`
+#   对 127.0.0.1 **没有**自动 bypass（no_proxy 未设）⇒ 没人监听的端口会被代理
+#   替它回 `HTTPError 502 Bad Gateway`，与「服务在跑但报错」压成同一个错误类型。
+#   判别证据：死端口上 默认 urlopen=502 / `ProxyHandler({})` 直连=WinError 10061（真拒绝）。
+#   ⇒ 回环探测**必须强制直连**，且失败要分档（没监听 ≠ 超时 ≠ 有应答但状态码不对）。
+#   影响面只到「误诊」：同实验里 21KB 长 POST（服务端 sleep 4s）走代理与直连
+#   body 完全一致、耗时只差 0.02s ⇒ 代理对功能是透传的，别当性能问题去改。
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost", "::1", "0.0.0.0"})
+
+_DIRECT = None
+
+
+def _direct_opener():
+    """进程内单例：把代理摘干净的 opener。"""
+    global _DIRECT
+    if _DIRECT is None:
+        import urllib.request
+        _DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    return _DIRECT
+
+
+def is_loopback(url: str) -> bool:
+    try:
+        host = urllib.parse.urlsplit(str(url)).hostname or ""
+    except Exception:                                   # noqa: BLE001
+        return False
+    return host.lower() in LOOPBACK_HOSTS
+
+
+def classify_probe_error(exc: BaseException) -> str:
+    """把探测异常归成机器可判的档 —— **纯函数**，负对照才喂得进来。
+
+    not_listening / timeout / http_error 三者处置完全不同
+    （没起服务 / 卡住 / 起了但不兼容），混成一个 false 就是在骗自己。
+    """
+    import urllib.error
+
+    if isinstance(exc, urllib.error.HTTPError):
+        return "http_error"                       # 端口有人应答，但状态码不对
+    reason = getattr(exc, "reason", exc)
+    text = ("%s %s" % (type(reason).__name__, reason)).lower()
+    if isinstance(reason, (ConnectionRefusedError, ConnectionResetError)):
+        return "not_listening"
+    if isinstance(reason, (TimeoutError, socket.timeout)):
+        return "timeout"
+    for token, kind in (("10061", "not_listening"), ("refused", "not_listening"),
+                        ("10054", "not_listening"), ("reset by peer", "not_listening"),
+                        ("10060", "timeout"), ("timed out", "timeout")):
+        if token in text:
+            return kind
+    return "other"
+
+
+def loopback_open(url: str, *, method: str = "GET", headers: dict | None = None,
+                  body: bytes | None = None, timeout: float = 3.0,
+                  max_bytes: int = 1_000_000) -> dict:
+    """本机口探测唯一实现：**强制直连 + 失败分档**，不回显任何凭据。
+
+    返回 {"ok", "kind", "status", "ms", "detail", "body"}；
+    kind ∈ {ok, not_listening, timeout, http_error, bad_url, other}。
+    """
+    import time
+    import urllib.error
+    import urllib.request
+
+    if not is_loopback(url):
+        return {"ok": False, "kind": "bad_url", "status": None, "ms": 0,
+                "detail": "不是回环地址，本函数只服务本机口", "body": b""}
+    req = urllib.request.Request(str(url), data=body, method=method.upper(),
+                                 headers=dict(headers or {}))
+    t0 = time.time()
+    try:
+        with _direct_opener().open(req, timeout=float(timeout)) as resp:
+            raw = resp.read(max(1, int(max_bytes)))
+            return {"ok": 200 <= resp.status < 300, "kind": "ok", "status": resp.status,
+                    "ms": int((time.time() - t0) * 1000), "detail": "", "body": raw}
+    except urllib.error.HTTPError as exc:
+        return {"ok": False, "kind": "http_error", "status": exc.code,
+                "ms": int((time.time() - t0) * 1000),
+                "detail": "HTTP %s" % exc.code, "body": b""}
+    except Exception as exc:                          # noqa: BLE001
+        return {"ok": False, "kind": classify_probe_error(exc), "status": None,
+                "ms": int((time.time() - t0) * 1000),
+                "detail": "%s: %s" % (type(exc).__name__, str(exc)[:80]), "body": b""}

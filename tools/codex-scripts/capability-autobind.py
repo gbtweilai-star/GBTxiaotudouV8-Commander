@@ -215,9 +215,9 @@ def cmd_scan() -> int:
 
 
 def _run(cmd: list, what: str) -> dict:
-    # 🔴 2026-10-11 修（实测）：子进程默认走 **GBK** 控制台编码 —— 只要它输出的文本里有 `⇒`（本仓
+ # 2026-10-11 修（实测）：子进程默认走 **GBK** 控制台编码 —— 只要它输出的文本里有 `⇒`（本仓
     #   文档/能力描述大量使用），子进程写管道时就 UnicodeEncodeError 当场死掉，父进程只看到
-    #   「家底现读 ✗」而看不出原因。解码端早就写了 encoding=utf-8，**编码端漏了**。
+ # 「家底现读 」而看不出原因。解码端早就写了 encoding=utf-8，**编码端漏了**。
     import os as _os
     _env = dict(_os.environ)
     _env["PYTHONIOENCODING"] = "utf-8"

@@ -28,7 +28,7 @@ import re
 import sys
 from pathlib import Path
 
-# 🔴 本仓老坑（这次又踩）：GBK 控制台下 `⚠️` 这类字符会直接 UnicodeEncodeError 把脚本弄崩，
+# 本仓老坑（这次又踩）：GBK 控制台下 `` 这类字符会直接 UnicodeEncodeError 把脚本弄崩，
 #   而"崩了"看起来像"这个工具坏了"。出口一律 utf-8 + errors=replace。
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / "gbt_allinone" / "security" / "policy.py"
 REGISTRY = ROOT / "gbt_allinone" / "caps_registry.py"
 
-# 🔴 **本件只到规格为止**：这三个步没有进 CHAINS。改了这里不等于链子多了三步。
+# **本件只到规格为止**：这三个步没有进 CHAINS。改了这里不等于链子多了三步。
 WIRED = False
 
 SLOTS = [
@@ -93,7 +93,7 @@ SLOTS = [
 _BRANCH_NOTE = True
 _BRANCH = (r'kind\s*==\s*["\']%s["\']\s*:\n'
            r'((?:(?![ \t]*(?:el)?if\s+kind\s*==)[ \t]+.*\n)+)')
-# 🔴 前瞻里**不能带 `\n`**（第 49 轮踩的）：循环每轮已经把行尾的 `\n` 吃掉了，
+# 前瞻里**不能带 `\n`**（第 49 轮踩的）：循环每轮已经把行尾的 `\n` 吃掉了，
 #    下一轮尝试的起点在**行首**，此时再去找 `\n[ \t]*elif` 永远找不到 ⇒ 从不刹住，
 #    于是 `voice` 的并集把后面 `audit_query`/`notion`/`codex_chat` 的 add() 全吸了进来。
 #    并集一宽，判据就退化成"什么都能过"。正确写法：前瞻只看**当前位置**（行首）起的内容。
@@ -121,7 +121,7 @@ def policy_scopes(kind: str) -> tuple[str, ...] | None:
     if not m:
         return None
     body = m.group(1)
-    # 🔴 2026-09-25 修 FR-6（`false_report_audit --scope workspace` 机检命中）：
+ # 2026-09-25 修 FR-6（`false_report_audit --scope workspace` 机检命中）：
     #    原字符类是 `[a-z_]+` —— **不吃数字与大写** ⇒ 将来一旦有人加了带数字/驼峰的作用域
     #    （比如 `tts_v2` / `osintPrivate`），这里会**静默漏掉它**，读出来是"这个分支没挂作用域"
     #    ⇒ 正是本仓最忌的**假缺失**（查不到 ≠ 不存在）。今天 15 个作用域恰好全是小写+下划线，

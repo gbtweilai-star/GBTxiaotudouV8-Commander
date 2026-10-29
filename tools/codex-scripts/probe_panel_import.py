@@ -1,12 +1,8 @@
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 import os
 import sys
 import tempfile
 import traceback
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 os.environ["GBT_STORE_DIR"] = tempfile.mkdtemp(prefix="gbt_panel_import_")
 os.environ["GBT_SERVICE_DISCOVERY"] = "0"
 os.environ["GBT_OWNER_SESSION"] = "1"

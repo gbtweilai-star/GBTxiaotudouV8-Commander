@@ -16,7 +16,7 @@
 | 故障登记（F 编号） | `PROJECT_BLUEPRINT.md` §九 | `FL1…FL10` 逐条 + 9.1 的 Q1–Q3 |
 | 装机回执读数 | `state/desktop-install-receipt.json`（若存在） | 逐项机检 |
 
-## 🔴 三条纪律（照仓内先例）
+## 三条纪律（照仓内先例）
 
 1. **一切数字现算**：章节行号、树数、窗口数、Phase 段数、FL 条数 —— 全部 `--check` 现读现数。
    源文件改了，面板就跟着变；**不写死一个数字**（写死一次就过期一次）。
@@ -48,6 +48,11 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 审美令牌（内联版）：唯一实现在 `_taste_inline.py`（别在这里再抄一份）。
+# 本页 C8 判据要求「自包含 · 零外链」，所以只能生成期内联，不能挂 <link>。
+from _taste_inline import site_root_block  # noqa: E402
+from _page_emit import clean_html  # noqa: E402
 
 BLUEPRINT = ROOT / "PROJECT_BLUEPRINT.md"
 TREES = ROOT / "state" / "tree-registry.json"
@@ -500,13 +505,17 @@ def validate(model: dict, page_html: str = None, data_js: str = None,
 # 品牌 token 与专业皮肤：值照抄 `holo_pet_w3/window.css:4-46`（品牌三色 + 语义 token）
 # 与 `holo_pet_w3/skin-mission-control.css:38-63`（MC 表面/描边/圆角/字号，@Mission Control）。
 # **内联进本页**（照 plugins-mesh/index.html 的写法）：页面走 file://，外链一步都不许有。
-_TOKENS = """
+# 2026-10-26：最前面先落一段**站点审美令牌**（`_taste_inline.site_root_block()`，
+#    来源 state/taste/*.json → theme/taste-tokens.css），再把表面/文字/描边接上去 ——
+#    **单一源仍然是 pin**，这里只是"把源搬进页面"。取不到令牌表时是空串，一切退回原值。
+_TOKENS = site_root_block() + """
 :root{
  --gbt-gold:#F5B041; --gbt-cyan:#00E5FF; --gbt-violet:#7C4DFF;
  --gbt-ok:#22C55E; --gbt-warn:#F5B041; --gbt-fault:#EF4444; --gbt-off:#6B7280;
- --gbt-text:#E8ECF8; --gbt-dim:#9AA4C4;
+ --gbt-text:var(--taste-text,#E8ECF8); --gbt-dim:var(--taste-muted,#9AA4C4);
  --gbt-warn-bg:rgba(245,176,65,.06); --gbt-cyan-bg:rgba(0,229,255,.06);
- --mc-bg:#0B1120; --mc-surface:#111827; --mc-border:#1E3A5F; --mc-border-subtle:#162035;
+ --mc-bg:var(--taste-ground,#0B1120); --mc-surface:var(--taste-surface,#111827);
+ --mc-border:var(--taste-border,#1E3A5F); --mc-border-subtle:var(--taste-rule,#162035);
  --mc-mono:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
  --mc-sans:"Segoe UI","Microsoft YaHei UI",system-ui,sans-serif;
  --mc-r:4px; --mc-r-pill:2px;
@@ -517,7 +526,8 @@ _CSS = _TOKENS + """
 *{box-sizing:border-box}
 body{margin:0;background:var(--mc-bg);color:var(--gbt-text);font:13px/1.6 var(--mc-sans)}
 .gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--mc-border);
- background:linear-gradient(90deg,#0b1017,#111827);flex-wrap:wrap}
+ /* 2026-10-26：原为 linear-gradient(90deg,#111827,#111827) —— 两档微渐变，取中点纯色。 */
+ background:#0e141f;flex-wrap:wrap}
 .mark{width:18px;height:18px;border:2px solid var(--gbt-gold);border-radius:var(--mc-r-pill)}
 .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--gbt-gold)}
 .topbar-meta{margin-left:auto;text-align:right;font:11px/1.5 var(--mc-mono);color:var(--gbt-dim)}
@@ -533,7 +543,7 @@ h2{margin:0 0 8px;font:600 13px/1.3 var(--mc-sans);color:var(--gbt-dim);text-tra
 .stat i{font-style:normal;color:var(--gbt-dim);font-size:11px}
 table{border-collapse:collapse;width:100%;font-size:11px}
 th,td{border:1px solid var(--mc-border-subtle);padding:3px 5px;text-align:left;vertical-align:top}
-th{color:var(--gbt-dim);font-weight:600;background:#0b1017}
+th{color:var(--gbt-dim);font-weight:600;background:#111827}
 td.k{font-family:var(--mc-mono);color:var(--gbt-cyan);white-space:nowrap}
 .mono{font-family:var(--mc-mono)}
 .dim{color:var(--gbt-dim)}
@@ -543,7 +553,7 @@ ul{margin:4px 0 0;padding-left:16px}li{margin:2px 0}
  margin:2px 4px 2px 0;color:var(--gbt-dim);font-size:10.5px}
 .pill.g{border-color:var(--gbt-ok);color:var(--gbt-ok)}
 .pill.w{border-color:var(--gbt-warn);color:var(--gbt-warn);background:var(--gbt-warn-bg)}
-.pill.b{border-color:#26445a;color:var(--gbt-cyan)}
+.pill.b{border-color:#1E3A5F;color:var(--gbt-cyan)}
 .pill.f{border-color:var(--gbt-fault);color:var(--gbt-fault)}
 .ring{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:760px){.ring{grid-template-columns:1fr}}
@@ -559,8 +569,17 @@ footer{padding:10px 16px;border-top:1px solid var(--mc-border);color:var(--gbt-o
 """
 
 
+_EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2700-\u27BF\u2600-\u26FF\u2B00-\u2BFF\uFE0F]")
+
+
 def _esc(s) -> str:
-    return (str("" if s is None else s).replace("&", "&amp;").replace("<", "&lt;")
+    """转义 + **出口清洗 emoji**（2026-10-26 主人令：界面/注释一律不留 emoji）。
+
+    实测：本页「近空落点」那几行里的 ⚠️ 是**数据带来的**（不是模板写死），
+    在转义口统一清掉，比去数据源头改更稳（数据是别的工具产的，会反复写回）。
+    """
+    s = _EMOJI.sub("", str("" if s is None else s))
+    return (s.replace("&", "&amp;").replace("<", "&lt;")
             .replace(">", "&gt;").replace('"', "&quot;"))
 
 
@@ -698,7 +717,7 @@ def render_blocks(model: dict) -> dict:
 
 
 _PAGE = """<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8">
+<html data-page-id="blueprint" lang="zh-CN"><head><meta charset="utf-8">
 <title>GBT小土豆V8 · 项目蓝图（一节一源 · 现算现落）</title>
 <style>__CSS__</style></head><body>
 <div class="gbt-topbar"><span class="mark"></span>
@@ -799,7 +818,7 @@ _PAGE = """<!doctype html>
   }
   if (genAt && D.generated_at) { genAt.textContent = D.generated_at; }
 })();
-</script></body></html>
+</script><script src="../shell/tentacle-kit.js" defer></script></body></html>
 """
 
 
@@ -860,8 +879,7 @@ def cmd_gen() -> int:
     model = build_model(s["blueprint_text"], s["trees"], s["windows"], s["receipt"])
     DATA_JS.parent.mkdir(parents=True, exist_ok=True)
     page_html = render_page(model)
-    page_html = page_html.replace("<head>", "<head><!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/blueprint-feed.py · 生成时刻 %s -->" % time.strftime("%Y-%m-%dT%H:%M:%S"), 1)
-    PAGE.write_text(page_html, encoding="utf-8")
+    PAGE.write_text(clean_html(page_html), encoding="utf-8")
     DATA_JS.write_text(render_data_js(model), encoding="utf-8")
     c = model["counts"]
     print("蓝图面板：%s（%d 字节）" % (_rel(PAGE), PAGE.stat().st_size))

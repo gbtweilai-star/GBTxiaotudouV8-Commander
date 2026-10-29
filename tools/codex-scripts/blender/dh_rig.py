@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[3])
 """数字人 · 绑骨 + 全肢体动作 + 导出（Blender 4.2 headless）
 
 用法（Windows）：
@@ -39,7 +35,7 @@ import sys
 import time
 import traceback
 
-WS = _GBT_ROOT
+WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 DEFAULT_GLB = os.path.join(os.path.expanduser("~"), "Downloads",
                            "futuristic cosplay outfit 3d model.glb")
 DEFAULT_OUT = os.path.join(WS, "projects", "digital-human", "out")

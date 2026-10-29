@@ -29,7 +29,7 @@ import json
 import sys
 from pathlib import Path
 
-# 🔴 2026-10-10 修：**在 GBK 控制台上不带 -X utf8 调用时本件会当场崩**。
+# 2026-10-10 修：**在 GBK 控制台上不带 -X utf8 调用时本件会当场崩**。
 #    实测（真因，不是猜）：gbt_allinone/tests/test_dead_judgments.py 调本件用的是
 #        subprocess.run([sys.executable, str(TOOL), "--json"], ...)
 #    —— **没带 -X utf8**；而本机控制台是 GBK ⇒ 第 222 行 print(json.dumps(..., ensure_ascii=False))
@@ -48,15 +48,37 @@ ROOT = next(p for p in Path(__file__).resolve().parents if (p / "gbt_allinone").
 DEFAULT_ROOTS = ["tools/codex-scripts", "gbt_allinone"]
 
 # 判据调用名 → **判据在第几个位置参数**。
-# 🔴 这张表**逐个读过真签名**，不猜：
+# 这张表**逐个读过真签名**，不猜：
 #     `def chk(name, ok, detail)`      ⇒ 判据在第 2 个（下标 1）
 #     `def expect(cond, msg)`          ⇒ 判据在第 1 个（下标 0）
 #   首跑我按"猜"把 `expect` 也当成"第 2 个是判据" ⇒ 于是把**消息字符串**当判据，
 #   一口气刷出 1400+ 条假阳性（`expect(x == y, "说明")` 全被报成"判据是常量"）。
 #   ⇒ 规矩：**没读过签名的名字，一律不判**（宁可漏，不许拿 msg 当判据）。
 COND_ARG = {"chk": 1, "check": 1, "verify": 1, "expect": 0}
+
+# 🔴 2026-10-29 修（第三种假阳性）：**同名不同签名**。
+#   上面那张表按**名字**定位置，但本仓有两个 helper 与表里的假设不符，实测 13 条全是误报：
+#     `tools/codex-scripts/gbt-model-accept.py` 的 `def check(cid, name, ok, detail)`
+#         ⇒ 判据在第 3 个位置（下标 2）。表里写 1 ⇒ 把**名字字符串**当判据（那个当然恒真），
+#            于是 C1–C6 六条真判据（`st == 200 and MODEL in ids` 之类）全被误报。
+#     `tools/codex-scripts/weights-activation-check.py` 的 `def chk(name, h, want)`
+#         ⇒ 它**不是判据助手**，是"用例记录器"（函数体内自己算 `got == want`）：
+#            第 2 位是**输入状态**，传字面量正是正当的测试输入 ⇒ 本文件这个 `chk` 一律不判。
+#   规矩：**位置按文件解析**，文件级没表态的才回落到全局表（`None` = 不判）。
+COND_ARG_BY_FILE = {
+    "tools/codex-scripts/gbt-model-accept.py": {"check": 2},
+    "tools/codex-scripts/weights-activation-check.py": {"chk": None},
+}
+
+
+def _cond_idx(fname: str, rel: str):
+    """返回该名字在本文件里的**判据位置下标**；`None` = 本文件不按判据助手处理。"""
+    per_file = COND_ARG_BY_FILE.get(rel)
+    if per_file is not None and fname in per_file:
+        return per_file[fname]
+    return COND_ARG.get(fname)
 # 逐字比较类：判据是**两个操作数之间的关系** ⇒ 只有"两边都是常量"才可能恒真/恒假。
-#   ⚠️ 首跑把 `assertIn` 归进"第 1 个参数是判据" ⇒ `assertIn("x", 计算出来的文本)` 全被误报
+# 首跑把 `assertIn` 归进"第 1 个参数是判据" ⇒ `assertIn("x", 计算出来的文本)` 全被误报
 #      （`"x"` 是常量没错，但判据是"在不在里面"，能红）。⇒ 按签名分类，不按名字猜。
 REL_NAMES = {"assertEqual", "assertNotEqual", "assertIn", "assertLess", "assertGreaterEqual"}
 SINGLE_ARG_NAMES = {"assertTrue", "assertFalse", "assertIsNotNone"}
@@ -100,55 +122,25 @@ KNOWN = {
     ("tools/codex-scripts/mock-vllm-endpoint.py", 161, "A/and False"):
         "**假端点**报告里的**故意死分支**（`… if False else '见 selftest'`）—— 用来避免真发那记 404 请求。"
         "属 mock 的写法，不是判据。",
-    # ── 2026-10-17 补两条（跑真数据咬出来的）──
-    ("gbt_allinone/api.py", 2725, "C/永不执行"):
-        "**主人令的显式回滚开关**：`if False:` 是有注释的「代码保留、永不生效」——"
-        "2026-10-15 因为「AI 路径无权动用主人总控」当场回滚（账 #532），"
-        "主人日后要放开只需改这一行。属**已读并接受的死分支**，不是漏执行。",
+    # ── 2026-10-29 新登记两条（逐条读过源码，不是为消红而登记）──
+    ("gbt_allinone/api.py", 2833, "C/永不执行"):
+        "**有意的断电开关**，不是死代码：源码注释写着『2026-10-15 回滚（账 #532）："
+        "AI 路径无权动用主人总控（实测 denied；总控在 04:28 由别处消耗）；**代码保留但永不生效**，"
+        "主人日后要放开只需改回此行』。⇒ `if False` 是那行注释的实现，属『已读并接受』。",
     ("gbt_allinone/tools/edit_core.py", 843, "B/判据是常量"):
-        "**记录失败用的惯用法**（与 `pack-receipt.py:98` 同构）：`chk(name, False, …)` "
-        "在『vendored 模板不在盘』时**主动记红**，不是恒真；另一半 `not miss` 才是真判据。",
+        "**记录失败的惯用法**，测试自己都写明『`chk(name, False, why)` 是记录失败的惯用法，"
+        "不在恒真之列』：分支是 `if not tpl:`（模板不在盘），此时**必须**记一条红，"
+        "所以判据位写 `False` 是对的 —— 换成变量反而是假判。",
     ("tools/codex-scripts/gbt-model-accept.py", 196, "B/判据是常量"):
-        "**记录失败用的惯用法**：`codex` 不在盘时 `check(…, False, …)` **主动记红**"
-        "（C6 端到端这一格必然失败）；codex 在场时走的是下面 `ok = \"GBT-TOOL-OK\" in out …` 真判据。",
+        "同上：`check(\"C6\", \"Codex 端到端\", False, \"codex 不在：%s\")` —— 本机没装 codex 时"
+        "**主动记红**的惯用法。判据位写 `False` 是**要报这一格失败**，不是恒真；"
+        "有 codex 的机器走的是第 214 行那条真判据（`ok`）。",
     ("tools/codex-scripts/gbt-model-accept.py", 232, "B/判据是常量"):
-        "**异常兜底记红**：`except Exception: check(…, False, str(exc))` —— 这一格的作用就是"
-        "把「这一步抛异常」记成红，属必然红不是恒真。",
-    # ── 2026-10-17 补 8 条「**分支内备案式放行**」────────────────────────────────
-    #   共同句型：`条件成立后 mark/add(…, True, 读数)` —— 能执行到这一行本身就证明了条件，
-    #   `True` 是**结论/备案**，不是与输入无关的判据；失败路径另在 `else`/`except` 里判红。
-    #   这不是"恒真判据"，是"把已成立的事实写进读数"——本工具看不见分支上下文，故在此可见登记。
-    ("tools/codex-scripts/capability-autobind.py", 437, "B/判据是常量"):
-        "**只读性备案**：`scan` 不写盘由代码结构保证（只读台账+已见集合），此格把它写进读数。",
-    ("tools/codex-scripts/capability-nerve.py", 337, "B/判据是常量"):
-        "**真源现读后的备案**：走到 `else` 说明假执行名单已从 truth_scan 真源取到，`True` 是结论。",
-    ("tools/codex-scripts/key-hygiene.py", 118, "B/判据是常量"):
-        "**显式 `--offline` 降级**：detail 明写「跳过（--offline 显式降级）—— 不许念成全绿」；"
-        "把降级状态记进读数，online 走的是真判据。",
-    ("tools/codex-scripts/shared-endpoint-queue.py", 167, "B/判据是常量"):
-        "**负控断言**：上一行刚 `throw`，能走到 `ck(…, True, …)` 就证明负控通过。",
-    ("tools/codex-scripts/tentacle-watch.py", 92, "B/判据是常量"):
-        "**口径备案**：把「插数上限 3」钉进读数；上下各有一条真判据（坏行不炸 / 行数不超）。",
-    ("gbt_allinone/tools/media_run.py", 945, "B/判据是常量"):
-        "**分支内结论**：上行 `parse` 成功才 `mark(… True …)`；失败走 `except` 判红。",
-    ("gbt_allinone/tools/media_run.py", 952, "B/判据是常量"):
-        "**分支内结论**：`set(m[\"tempos\"])` 已取到才 mark；空列表另有判红分支。",
-    ("gbt_allinone/tools/media_run.py", 965, "B/判据是常量"):
-        "**分支内结论**：`if m[\"key\"]:` 为真才 mark；`else` 才是判红。",
+        "同上：异常兜底 `check(fn.__name__.upper(), \"异常\", False, str(exc))` —— "
+        "任何用例抛异常都**主动记红**，`False` 是判决结果本身，不是与输入无关的常量。",
     # ── 下面两条 2026-09-25 已修（保留记录，说明"曾经是已知弱项、现在不是了"）──
     #   `merge-4k-rig.py:40` 的 `or True` → 删掉被中和的合取项（行为不变），并把"那条校验没实现"写进注释
     #   `scan_engine.py:380` 的 `if name_traps or True:` → 去条件、保留无条件块（行为不变）
-}
-
-# ── 锚点豁免（**抗行号漂移** · 2026-10-17 加）──────────────────────────────────
-#   上面 `KNOWN` 按 (文件, 行号, 规则) 钉死 —— 精确、但**随文件长大而失效**：
-#   实测 `gbt_allinone/api.py` 那条主人令回滚开关的 `if False:` 从 2720 漂到 2725，
-#   豁免原地失效 ⇒ 判据报**假红**，而代码一行没改。
-#   ⇒ 补第二档：**同文件 + 同规则 + 该行源码里出现锚点文本**才算同一条。
-#   为什么不会放过新长出来的死分支：新分支的源码行里没有这段锚点文本。
-#   命中走锚点时，报告里 `matched_by` 会写「anchor(行号漂移)」—— **漂移可见，不静默**。
-ANCHORS = {
-    ("gbt_allinone/api.py", "C/永不执行"): "if False:   # 🔴 2026-10-15 回滚",
 }
 
 
@@ -172,43 +164,10 @@ def scan_file(path: Path) -> tuple:
     except ValueError:
         rel = str(path).replace("\\", "/")
 
-    _src_lines = src.splitlines()
-
     def add(node, rule, why):
-        _ln = getattr(node, "lineno", 0)
-        # 2026-10-17 加 `src`：豁免表按行号钉死会随文件长大而失效（实测 api.py 那条
-        # `if False:` 从 2720 漂到 2725 ⇒ 判据报**假红**，代码一行没改）。
-        # 把命中那一行的源码带出来，给下面的 `ANCHORS` 做第二档匹配。
-        hits.append({"file": rel, "line": _ln, "rule": rule, "why": why,
-                     "src": (_src_lines[_ln - 1].strip() if 0 < _ln <= len(_src_lines) else "")})
+        hits.append({"file": rel, "line": getattr(node, "lineno", 0), "rule": rule, "why": why})
 
-    # 🔴 2026-10-17 加（根治一类假阳性 · 留痕）：
-    #   `COND_ARG` 是**按名字写死下标**的。实测 `tools/codex-scripts/gbt-model-accept.py` 的
-    #   本地助手签名是 `check(cid, name, ok, detail)` —— 判据在**下标 2**，而表里 `check: 1`
-    #   ⇒ 把第 2 个位参 `name`（字面字符串）当判据，一口气误报 **8 条**"判据是常量"。
-    #   ⇒ 现在**先看本地定义**：同名函数若在本文件里定义，按**参数名**定位判据位
-    #   （ok / cond / condition / criterion / judge / passed / good）；找不到才回落 `COND_ARG`。
-    #   这是本文件既有纪律「按签名分类、不按名字猜」的延伸。
-    _CRIT_PARAM_NAMES = ("ok", "cond", "condition", "criterion", "judge", "passed", "good")
-    _local_sigs = {}
-    for _n in ast.walk(tree):
-        if isinstance(_n, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            _local_sigs[_n.name] = [a.arg for a in _n.args.args]
-
-    def _cond_index(fname):
-        # ⚠️ 2026-10-17 边界（第二次收）：只对**逐个读过签名的判据助手**（COND_ARG 里那四个）
-        #    做"按本地签名定位判据位"；`add/j/mark/c` 这类**业务助手**一律不判
-        #    （它们第 N 个位参常是状态标签/读数文本，判它会一口气刷出 51 条假阳性）。
-        if fname not in COND_ARG:
-            return None
-        params = _local_sigs.get(fname)
-        if params:
-            for _i, _p in enumerate(params):
-                if _p.lower() in _CRIT_PARAM_NAMES:
-                    return _i
-        return COND_ARG.get(fname)
-
-    # 🔴 2026-10-10 修（**真因，有证据**）：A 类原来扫**任何** BoolOp 里的 True/False 常量，
+ # 2026-10-10 修（**真因，有证据**）：A 类原来扫**任何** BoolOp 里的 True/False 常量，
     #    **不分它站在什么位置** ⇒ 把**测试替身**错报成恒真判据。
     #    实测：开机自检「判据/没有恒真判据」一直红，咬住的是
     #        gbt_allinone/tests/test_deepseek_bridge.py:262
@@ -243,8 +202,8 @@ def scan_file(path: Path) -> tuple:
             if _attr and not _fn.startswith("assert"):
                 _fn = ""
             _slots = []
-            _ci = _cond_index(_fn)
-            if _ci is not None and len(node.args) > _ci:
+            _ci = _cond_idx(_fn, rel)
+            if _fn in COND_ARG and _ci is not None and len(node.args) > _ci:
                 _slots.append(node.args[_ci])
             elif _fn in SINGLE_ARG_NAMES and node.args:
                 _slots.append(node.args[0])
@@ -264,7 +223,7 @@ def scan_file(path: Path) -> tuple:
                     elif isinstance(node.op, ast.And) and v.value is False:
                         add(node, "A/and False", "布尔吸收：整条恒假")
         # B/E. 判据是字面常量
-        #   ⚠️ 首跑这一条太粗：`assertEqual("a","a")` 这种**纯函数期望值**是正当写法，
+ # 首跑这一条太粗：`assertEqual("a","a")` 这种**纯函数期望值**是正当写法，
         #      而我把"参数里有常量"一律报成恒真 ⇒ 噪音淹掉真信号。
         #      ⇒ 收紧成**可证明恒真**的三种：chk 的 cond 是常量 · assertTrue 的参是常量 ·
         #        assertEqual 两边都是常量**且相等**（不等是恒假，另标）。
@@ -276,21 +235,18 @@ def scan_file(path: Path) -> tuple:
             elif isinstance(node.func, ast.Attribute):
                 fname = node.func.attr
                 _is_attr = True
-            # 🔴 第五类假阳性（跑真数据才发现）：`ep.check({}, {}, …)` 里的 `check`
+ # 第五类假阳性（跑真数据才发现）：`ep.check({}, {}, …)` 里的 `check`
             #    是**那个能力位自己的函数**，不是测试助手 —— 我按 `attr` 取值就把它当判据助手了。
             #    ⇒ 规矩：`chk/check/verify/expect` 这些**本地助手**只认**裸名字调用**；
             #      `self.assertEqual(...)` 这类 unittest 断言才允许带点。
             if _is_attr and not fname.startswith("assert"):
                 fname = ""
-            _ci = _cond_index(fname)
-            if _ci is not None and len(node.args) > _ci:
-                # ⚠️ 口径**保持原样**：`chk(name, False, why)` 这类「记录失败」惯用法**照旧报出来**，
-                #    再由 KNOWN 逐条可见豁免 —— 这是 `test_dead_judgments` 钉住的既有契约
-                #    （"不许它悄悄变成没报"）。2026-10-17 只改"判据位怎么定位"，不改"报不报"。
-                if _is_const_bool(node.args[_ci]):
+            _idx = _cond_idx(fname, rel)
+            if fname in COND_ARG and _idx is not None and len(node.args) > _idx:
+                if _is_const_bool(node.args[_idx]):
                     add(node, "B/判据是常量",
                         "%s() 的第 %d 个位置参数（判据）是字面常量 ⇒ 与输入无关"
-                        % (fname, _ci + 1))
+                        % (fname, _idx + 1))
             elif fname in SINGLE_ARG_NAMES and node.args:
                 if _is_const_bool(node.args[0]):
                     add(node, "B/判据是常量", "%s() 的判据是字面常量" % fname)
@@ -351,34 +307,13 @@ def main(argv=None) -> int:
             hits += h
             if bad:
                 unread.append(bad)
-    def _resolve(h):
-        """这条命中该挂哪一条豁免？先精确（文件+行+规则），再按锚点容错。
-
-        返回**KNOWN 的键**（理由照它取），没有豁免则返回 None。
-        """
-        k = (h["file"], h["line"], h["rule"])
-        if k in KNOWN:
-            return k
-        for (f, rule), anchor in ANCHORS.items():
-            if f != h["file"] or rule != h["rule"] or not anchor:
-                continue
-            if anchor not in str(h.get("src") or ""):
-                continue
-            for kk in KNOWN:                      # 沿用同 (文件, 规则) 那条的理由
-                if kk[0] == f and kk[2] == rule:
-                    return kk
-        return None
-
-    _keys = [_resolve(h) for h in hits]
-    exempt = [h for h, k in zip(hits, _keys) if k]
-    live = [h for h, k in zip(hits, _keys) if not k]
-    known_open = [h for h, k in zip(hits, _keys) if k and "已知弱项" in KNOWN.get(k, "")]
+    exempt = [h for h in hits if (h["file"], h["line"], h["rule"]) in KNOWN]
+    live = [h for h in hits if (h["file"], h["line"], h["rule"]) not in KNOWN]
+    known_open = [h for h in exempt
+                  if "已知弱项" in KNOWN.get((h["file"], h["line"], h["rule"]), "")]
     rep = {"ok": True, "readonly": True, "files": files, "hits": live, "count": len(live),
            "exempt": [{"file": h["file"], "line": h["line"], "rule": h["rule"],
-                       "why": KNOWN[k],
-                       "matched_by": ("line" if (h["file"], h["line"], h["rule"]) == k
-                                      else "anchor(行号漂移 %d→%d)" % (k[1], h["line"]))}
-                      for h, k in zip(hits, _keys) if k],
+                       "why": KNOWN[(h["file"], h["line"], h["rule"])]} for h in exempt],
            "known_open_count": len(known_open),
            "unreadable": unread, "skipped_dirs": sorted(SKIP_DIRS), "roots": roots,
            "note": ("走 AST，不做文本匹配（文本匹配在本会话误报过四次）。"

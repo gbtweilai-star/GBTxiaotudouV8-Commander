@@ -80,7 +80,7 @@ def _sha(p: Path) -> str:
         for f in sorted(p.rglob("*")):
             if f.is_file():
                 h.update(str(f.relative_to(p)).encode("utf-8"))
-                # 🔴 实测坑（2026-10-14）：4GB 的 safetensors 用 read_bytes() 会 MemoryError
+ # 实测坑（2026-10-14）：4GB 的 safetensors 用 read_bytes() 会 MemoryError
                 #    ⇒ 必须**流式**只取头 1MB（指纹用途够用，且不再把整份权重读进内存）。
                 with f.open("rb") as fh:
                     h.update(fh.read(1 << 20))
@@ -108,7 +108,7 @@ def _remote_env() -> dict:
     key = _user_env("GBT_POTATO_API_KEY")
     if not key:
         return {}
-    # 🔴 实测坑（2026-10-14）：不带 UA 的 python-urllib 请求会被边缘拒（异常被 except 吞掉 ⇒ 读数全 None）。
+ # 实测坑（2026-10-14）：不带 UA 的 python-urllib 请求会被边缘拒（异常被 except 吞掉 ⇒ 读数全 None）。
     req = urllib.request.Request("https://rest.runpod.io/v1/templates/e4iwgiqa7t",
                                  headers={"Authorization": "Bearer " + key,
                                           "User-Agent": "gbt-model-binding/1.0"})
@@ -172,7 +172,7 @@ def main(argv=None) -> int:
           "模板=%s · 车道=%s（%s）" % (env.get("OPENAI_SERVED_MODEL_NAME_OVERRIDE"), lanes, MODEL in lanes))
         j("B4", "解析器口径", str(env.get("TOOL_CALL_PARSER") or "") == "hermes",
           "TOOL_CALL_PARSER=%s（Qwen2.5 口径应为 hermes）" % env.get("TOOL_CALL_PARSER"))
-        # 🔴 2026-10-14 改口径（真读数咬出来的）：**不是"必须相等"**。
+ # 2026-10-14 改口径（真读数咬出来的）：**不是"必须相等"**。
         #   实测病案：catalog 与服务端都设 32768 ⇒ Codex 按 32768 估、真实 token 略多 ⇒
         #   涨到 32769 被 vLLM 顶回 400（账本里那批 FAILED 就是它）。
         #   ⇒ 正确口径：**服务端上限 ≥ catalog 上限，且至少留 2k 头寸**（Codex 提前压缩）。

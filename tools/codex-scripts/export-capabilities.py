@@ -8,6 +8,14 @@
 from __future__ import annotations
 import json, os, sys
 
+# 编码守门（2026-10-24 补 · encoding-guard-check 报的「新增违规」之一）：
+# 不带 -X utf8 调用时中文不静默变空。
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 from gbt_allinone.caps_registry import BENIGN_CAPS          # noqa: E402

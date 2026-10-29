@@ -89,7 +89,7 @@ def main() -> int:
         errors = []
         page.on("pageerror", lambda e: errors.append(
             (getattr(e, "stack", None) or str(e))[:400]))
-        # 🔴 控制台与**失败请求**都要记：模块脚本被 CORS 挡掉时**不报 pageerror**，
+ # 控制台与**失败请求**都要记：模块脚本被 CORS 挡掉时**不报 pageerror**，
         #    只在 console 里留一行；不记它就会得到"零错误 + 空白画布"这种**假绿**。
         console = []
         page.on("console", lambda m: console.append("%s: %s" % (m.type, m.text[:200]))
@@ -106,7 +106,7 @@ def main() -> int:
                     "transition:none !important}" % a.freeze))
                 frozen = True
             except Exception as e:                                  # noqa: BLE001
-                # 🔴 页面自己的 CSP 把内联样式挡了（`style-src 'self'`）—— 这是**page 做对了**，
+ # 页面自己的 CSP 把内联样式挡了（`style-src 'self'`）—— 这是**page 做对了**，
                 # 不是渲染器坏了。如实报"没定成帧"，不许假装定了（不定帧 ⇒ 每张图落哪帧看运气）。
                 freeze_why = ("被页面 CSP 挡掉（`style-src 'self'` 不许内联样式）"
                               if "Content Security Policy" in str(e) else str(e)[:90])

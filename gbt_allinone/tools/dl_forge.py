@@ -20,10 +20,6 @@
 本件只读：不生成、不渲染、不写盘。
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import json
 import os
@@ -34,7 +30,7 @@ DOMAIN = "creation"
 CAP_TYPE = "internal"
 TRACE_SOURCE_KIND = "dl_forge"
 
-V8 = _GBT_ROOT
+V8 = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 
 # ══════════════════════════════════════════════════════════════════════════
 # ★ 秋叶 3D 节点 → 她的原生触手（96 个真名，按用途归到 8 段）

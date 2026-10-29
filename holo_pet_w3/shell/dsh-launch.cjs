@@ -27,26 +27,6 @@ const { spawn } = require("node:child_process");
 /** `dsh web` 就绪那一行的形状（现读自 dsh-web-app：`console.log("dsh web: " + url)`）。 */
 const READY_LINE = /dsh web:\s*(https?:\/\/\S+)/i;
 
-/**
- * 🔴 壳里跑的 dsh **版本钉死**（2026-10-23 主人令 A）。
- *
- * 为什么必须钉：`npx --yes @deepseek-ai/dsh` 不带版本 = 每次都从网上取最新版。
- * 2026-10-23 就撞上了：npx 拉来 0.2.1-rc.2，而 `~/.dsh/profiles` 里的插件树是 0.1.5-rc.3。
- * 0.2.x **把 preset 的包名与机制整个换掉了**：
- *   0.1.5 → `dsh-agent-presets`（复数）：**扫目录** `<dshHome>/.agent-presets/*`；
- *   0.2.1 → `dsh-agent-preset` + `dsh-agent-preset-registry`：**查注册表** `definitions` Map，
- *            由各 preset 行在加载时 register 进来，**根本不读目录**。
- * 于是主人自建的 `gbt-spine`（目录式，文件与 240 个依赖包实测全好）在 0.2.1 眼里不存在，
- * 恢复会话当场报（原文出处 `dsh-agent-preset-registry/lib/index.js:599`）：
- *   `Unknown agent preset: gbt-spine (gateway/internal)`，会话进不去。
- * ⇒ 版本必须与 profile 树对齐，故钉 0.1.5-rc.3（= 本机全局装的那一版）。
- *   将来要升 0.2.x，得整体升插件树并把 preset 改写成注册行，不能只动这一条。
- */
-const DSH_PKG = "@deepseek-ai/dsh@0.1.5-rc.3";
-
-/** 等就绪行的上限（毫秒）。npx 首次可能要下载包，给足 90 秒仍不响就如实喊。 */
-const READY_TIMEOUT_MS = 90000;
-
 /** 把文本里的 token 抹掉 —— **任何**要出到日志/界面的行都必须先过这里。 */
 function scrub(text) {
   return String(text == null ? "" : text).replace(/token=[^\s&"']+/gi, "token=***");
@@ -113,10 +93,20 @@ function startDsh(opts) {
   const onLog = typeof o.onLog === "function" ? o.onLog : () => {};
   const spawnImpl = o.spawnImpl || spawn;
   const probeImpl = o.probeImpl || isPortListening;
+  /* 心跳间隔（可注入，只为单测能 30ms 跑一遍；生产用默认 15s） */
+  const heartbeatMs = o.heartbeatMs === 0 ? 0 : (Number(o.heartbeatMs) || 15000);
   let child = null;
   let stopped = false;
+  let gotBytes = 0;          /* 收到多少字节 —— 用来区分「在装依赖」与「真卡死」 */
+  let waiting = true;        /* 还没命中就绪行 */
+  let hb = null;
+  const t0 = Date.now();
 
   const log = (msg) => { if (!stopped) onLog(scrub(msg)); };
+  const stopHeartbeat = () => {
+    waiting = false;
+    if (hb) { clearInterval(hb); hb = null; }
+  };
 
   probeImpl(port, host).then((busy) => {
     if (stopped) return;
@@ -133,30 +123,56 @@ function startDsh(opts) {
       : null;
     if (busyNote) log(busyNote);
     try {
-      /* 🔴 2026-10-22 主人令（逐字给出他自己那条命令）：
-         「对话页面是 PS C:\Users\ADMIN> cd C:\Users\ADMIN\Desktop\GBT小土豆V8
-             PS C:\Users\ADMIN\Desktop\GBT小土豆V8> npx @deepseek-ai/dsh web  你做错了给我从新换上」
-         ⇒ 壳里起的命令**改成与他一模一样**的 `npx --yes @deepseek-ai/dsh web`，**cwd 钉在仓根**。
-         为什么不再用裸 `dsh`：本机 `dsh` 是 npm 垫片（dsh.ps1/.cmd），`shell:true` 下能不能解析到
-         要看 Electron 进程的 PATH —— 那是"上次为什么你看到的是别的东西"这类事故的温床。
-         走 npx 就等于走主人手打的那条，不依赖 PATH 里有没有垫片。
-         `shell: true`：Windows 上 npx 也是 npm 垫片，不经 cmd 直接 spawn 会 EINVAL。
-         🔴 **命令整条给字符串**，不给 (cmd, [args])：Node 24 对"shell:true + 参数数组"会打 DEP0190 告警。 */
-      /* 🔴 2026-10-22 端到端实测逼出来的一条（就在刚才，不是我推的）：
-         在 3080 已被占用时直接跑 `npx --yes @deepseek-ai/dsh web --no-open`，**它不是"自动换端口"**，
-         而是当场崩：
-           Error: dsh: plugin tree failed to load … listen EADDRINUSE: address already in use 127.0.0.1:3080
-         ⇒ 只要 3080 上有东西（主人自己那条 `npx @deepseek-ai/dsh web`，或者上次硬杀留下的孤儿），
-           壳里这条命令就**必然起不来**，对话窗就停在本地引导页 —— 这正是主人说的"对话页面不对"。
-         所以：**永远带 `--port 0`**（让 OS 分配），不再赌 3080 空着。端口号从就绪行里读，本来就写不死。 */
-      /* 🔴 2026-10-23 主人令 A：**钉版本**。
-         上一版是 `npx --yes @deepseek-ai/dsh web`（与主人手打命令逐字一致）——
-         代价是每跑一次都可能悄悄换到新版：0.2.1 换掉了 preset 的包名与机制，
-         恢复 `gbt-spine` 会话直接 `Unknown agent preset`（详见上面 DSH_PKG 的注释）。
-         现在只多一个 `@0.1.5-rc.3`，仍是 npx 那条路（不依赖 PATH 里的 dsh 垫片），
-         但版本与 `~/.dsh/profiles` 的插件树对齐，不再随时间漂。 */
-      const base = `npx --yes ${DSH_PKG} web --no-open`;
-      const cmdLine = `${base} --port 0`;
+      /* `shell: true`：Windows 上 `dsh` 是 npm 的 `dsh.cmd` 垫片，
+         不经 cmd 直接 spawn 会 EINVAL（Node 对 .cmd 的改动）。
+         🔴 **命令整条给字符串**，不给 (cmd, [args])：实测（2026-10-07 端到端）
+         Node 24 对"shell:true + 参数数组"会打 DEP0190 弃用告警（参数不做转义，只拼接）——
+         落进主人的控制台就是一行莫名其妙的警告。本命令的参数全是**写死的字面量**，
+         但既然整条字符串同样正确且不告警，就用它。
+
+         🔴🔴 2026-10-26 换成 `npx --yes @deepseek-ai/dsh`（主人令，逐字给的启动方式）。
+           实测本机**版本割裂**：全局 `dsh` 是 **0.1.5-rc.3**，而 `npx @deepseek-ai/dsh`
+           已是 **0.2.1-rc.2**。壳若继续用全局那条，就是拿旧 CLI 去连主人用新 CLI 起的实例 ——
+           协议/配置不兼容（B2 那条「settings.yaml 从 684 键变 3 键」的架构迁移正是 0.2.x 做的）。
+           ⇒ **版本对齐比省那 1~2 秒重要**：跟主人用同一条命令、同一个版本。
+
+         🔴 `--yes` **不是可选项**：npx 首次见到未缓存的包会**交互式问**
+            "Need to install the following packages … Ok to proceed? (y)"；
+            而壳的 stdin 是 `ignore`，等不到那个 y ⇒ 进程挂在那儿、就绪行永远不来、
+            对话面永远停在「等壳把引擎拉起来」。`--yes` 就是让它别问。
+            （`tests/test_dsh_launch.cjs` 钉着这条，别把 `--yes` 顺手删掉。）
+
+         🔴 **钉版本，不跟 latest**（2026-10-26 加）：
+            不带版本号的 `npx @deepseek-ai/dsh` 会**拉 registry 的最新版** ——
+            实测同一天里全局包是 0.1.5-rc.3、而 npx 拉到 0.2.1-rc.2；
+            哪天官方发 0.3.0，壳会**自动跳过去**，行为和配置架构可能又变一次
+            （0.2.x 就把 `~/.dsh/settings.yaml` 迁走了，B2 因此红过）。
+            ⇒ 钉到主人 2026-10-26 实测确认可用的那一版；**主人升级 DSH 时改这里**。 */
+      /* 🔴 2026-10-26（主人选定权限档后）加 `--profile gbt-official`：
+           0.2.x 把配置迁进了 profile —— 全局 `~/.dsh/settings.yaml` 已不存在，
+           `danger-full-access` 只剩在 `profiles/gbt-official/settings.yaml` 里。
+           壳若还跑默认的 `web` profile，就等于**悄悄把主人的权限档降了**（他自己不知道），
+           表现为对话里处处要授权。主人 2026-10-26 明确选：走 gbt-official。
+
+         🔴 `web` 不是"子命令"，是 `--profile web` 的语法糖 —— 实测两条：
+           `dsh web --help` 打出来的用法是 `Usage: dsh --profile web [options]`；
+           而 `dsh --profile gbt-official web` 直接报
+           `error: too many arguments. Expected 0 arguments but got 1: web`。
+           ⇒ 换了 profile 就**不能再写 web**，否则起来就退。
+
+         ⚠️ 已知代价（实测，不是推测）：gbt-official 里有两行插件是按 **0.1.5** 编的，
+            在 0.2.1 下会被禁用并打印 `incompatible with dsh 0.2.1-rc.2`：
+              插件行 `webhook-runtime`、插件行 `hooks-codex`
+            🔴 包全名**故意不写在这里**：守卫 B5 不许壳源出现 DSH 内部包路径，写了就红
+               （本注释真红过一次）。要看包名去
+               `~/.dsh/profiles/gbt-official/cordis.patch.yml`。
+            对照实测：改用**全局 dsh 0.1.5**（`dsh --profile gbt-official --no-open`）
+            则两个插件全保留、11.0s 就绪。主人若在意这两个插件，就把下面 DSH_CLI
+            那一行换成全局 `dsh` —— **只需改这一行**，其余逻辑不动。 */
+      const DSH_PROFILE = "gbt-official";
+      const DSH_PKG = "@deepseek-ai/dsh@0.2.1-rc.2";
+      const DSH_CLI = "npx --yes " + DSH_PKG + " --profile " + DSH_PROFILE;
+      const cmdLine = busy ? DSH_CLI + " --no-open --port 0" : DSH_CLI + " --no-open";
       child = spawnImpl(cmdLine, {
         shell: true,
         windowsHide: true,
@@ -169,24 +185,35 @@ function startDsh(opts) {
         + `（对话窗停在本地引导页，主路照常）`);
       return;
     }
-    log(`已拉起 dsh web（等它就绪；就绪约需数十秒）`);
+    log(`已拉起 dsh web（等它就绪；包已在缓存里约需数十秒，首次/缓存缺失时要装依赖，可能要几分钟）`);
 
-    /* 🔴 2026-10-22：加一条**就绪超时**。上一版没有超时 —— npx 若卡在下载/解析，
-       对话窗就永远停在本地引导页，而日志里只有"已拉起"这一行（看着像成功）。
-       P19 同款：失败路径不许哑。超时不杀进程（它可能只是慢），只如实喊一句。 */
-    let ready = false;
-    const readyTimer = setTimeout(() => {
-      if (stopped || ready) return;
-      log(`等了 ${READY_TIMEOUT_MS / 1000}s 还没等到就绪行（对话窗停在本地引导页；`
-        + `可以关掉 APP 后在仓根手动跑一遍 npx @deepseek-ai/dsh web 看它报什么）`);
-    }, READY_TIMEOUT_MS);
+    /* 🔴 心跳：**这一条是 2026-10-26 实测逼出来的**。
+       现象：`npx … --version` 跑 60 秒**一个字节都不吐**，我一度判成"链路卡死"。
+       查 npm 调试日志（`%LOCALAPPDATA%\npm-cache\_logs`）才看清：它在下 tarball，
+       单个包 24s / 39s / 70s（npmmirror CDN），2400+ 行 packument 重新解析 ——
+       **它在干活，只是不出声**。而壳这边没有任何进度，主人的观感就是"死了"。
+       ⇒ 每 N 秒说一句"仍在等"，并把"零输出"这点讲明：
+         零输出 = npx 还在装依赖（正常），有输出但没就绪行 = dsh 已在启动。
+         两者的处置完全不同，所以必须分开报。 */
+    if (heartbeatMs > 0) {
+      hb = setInterval(() => {
+        if (stopped || !waiting) { stopHeartbeat(); return; }
+        const sec = Math.round((Date.now() - t0) / 1000);
+        if (gotBytes === 0) {
+          log(`仍在等就绪（已 ${sec}s，**一行输出都没有** —— npx 多半在装依赖，属正常，继续等；`
+            + `想知道它在干什么就看 npm-cache\\_logs 最新那份日志是否还在增行）`);
+        } else {
+          log(`仍在等就绪（已 ${sec}s，已收到 ${gotBytes} 字节，还没出现就绪行）`);
+        }
+      }, heartbeatMs);
+      if (hb.unref) hb.unref();        /* 不许因为一条心跳把测试/退出吊住 */
+    }
 
     let buf = "";
     const handleLine = (line) => {
       const url = parseDshUrlLine(line);
       if (url) {
-        ready = true;
-        try { clearTimeout(readyTimer); } catch (err) { /* 清不掉也不影响接上 */ }
+        stopHeartbeat();               /* 接上了就没必要再念 */
         onUrl(url);                    /* ← 只有这一处把 URL 交出去；本模块不打印、不落盘 */
         return;
       }
@@ -194,7 +221,9 @@ function startDsh(opts) {
       if (t) log(t);                   /* 非就绪行原样转达（已脱敏） */
     };
     const feed = (chunk) => {
-      buf += String(chunk);
+      const s = String(chunk);
+      gotBytes += s.length;
+      buf += s;
       let i;
       while ((i = buf.indexOf("\n")) >= 0) {
         const line = buf.slice(0, i).replace(/\r$/, "");
@@ -206,7 +235,7 @@ function startDsh(opts) {
     child.stdout.on("data", feed);
     child.stderr.on("data", feed);
     child.once("error", (err) => log(`dsh 进程出错：${String(err && err.message ? err.message : err)}`));
-    child.once("exit", (code) => { child = null; log(`dsh web 退出（code=${code}）`); });
+    child.once("exit", (code) => { child = null; stopHeartbeat(); log(`dsh web 退出（code=${code}）`); });
   }).catch((err) => {
     log(`探端口失败，按"没人在听"处理：${String(err && err.message ? err.message : err)}`);
   });
@@ -214,6 +243,7 @@ function startDsh(opts) {
   return {
     stop() {
       stopped = true;
+      stopHeartbeat();
       const c = child;
       child = null;
       if (!c) return;
@@ -238,4 +268,4 @@ function startDsh(opts) {
   };
 }
 
-module.exports = { parseDshUrlLine, maskUrl, scrub, isPortListening, startDsh, READY_LINE, READY_TIMEOUT_MS, DSH_PKG };
+module.exports = { parseDshUrlLine, maskUrl, scrub, isPortListening, startDsh, READY_LINE };

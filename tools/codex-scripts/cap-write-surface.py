@@ -82,7 +82,7 @@ def analyze(path):
         name = getattr(f, "id", None) or getattr(f, "attr", None)
         target = None
         matched = False
-        # 🔴 2026-10-22 自纠（第 10 次，留痕）：原版把 `hits.append` 写在过滤**外面**，
+ # 2026-10-22 自纠（第 10 次，留痕）：原版把 `hits.append` 写在过滤**外面**，
         #    于是 `resolve` / `frozenset` / `splitlines` / `loads` 全被当成"写盘原语"，
         #    一口气报出 492 个写盘点（其中 420 个"无 op 门"）—— **那是量具自己的假读数**。
         #    现口径：只有**真命中**（写盘原语名，或 open 且 mode 含 w/a/x/+）才记一条。

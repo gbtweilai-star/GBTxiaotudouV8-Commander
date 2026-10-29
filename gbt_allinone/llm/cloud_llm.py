@@ -126,9 +126,20 @@ def _auto_lane() -> dict:
         _k, _s = _kg.key_for("freellmapi")
         return {"provider": "freellmapi", "url": "http://127.0.0.1:31415/v1", "model": "",
                 "key": _k, "free": True, "why": "本机免费池 31415（FreeLLMAPI）"}
-    # ③ 没有免费路：默认如实报缺（不花钱），主人显式授权才退到按量车道
+    # ③ 云端免费池（Kilo AI · 免密 · 2026-10-29 接入 · 实测出字）
+    #   免 key、免付费，是「真免费」的云端车道 —— 不消耗任何按量额度，故无需 GBT_ALLOW_PAID。
+    #   no_key=True 恒在位（key_gateway 已支持）；上游可达性由调用时 net_guard 兜，
+    #   真连不上会如实冒上来（由 rank 的健康态在下一轮处置），不在这里假装"一定通"。
+    #   ⚠️ Kilo 免责：prompts 可能被上游记录用于改进，别发敏感内容。
+    _kilo = _kg._BY_NAME.get("kilo") or {}
+    if _kilo.get("url") and _kilo.get("model"):
+        _k, _s = _kg.key_for("kilo")
+        return {"provider": "kilo", "url": _kilo.get("url"), "model": _kilo.get("model"),
+                "key": _k, "free": True, "why": "云端免费池 Kilo（免密，$0）"}
+    # ④ 没有免费路：默认如实报缺（不花钱），主人显式授权才退到按量车道
     if not allow_paid:
-        return {"why": "没有免费车道：本机 8111/31415 都没在跑；要按量付费须 GBT_ALLOW_PAID=1"}
+        return {"why": "没有免费车道：本机 8111/31415 都没在跑、云端免费池 Kilo 未配；"
+                       "要按量付费须 GBT_ALLOW_PAID=1"}
     try:
         rows = [r for r in _kg.rank() if r.get("alive")]
     except Exception:                                                 # noqa: BLE001
@@ -1172,10 +1183,15 @@ def _call_once(wire, base_url, model, api_key, body, system, prompt, timeout, pr
         data = _safe_json(_url, _body, {"Content-Type": "application/json"}, timeout,
                           audit_provider=provider or "gemini", audit_model=model)
         return data["candidates"][0]["content"]["parts"][0]["text"]
-    # ── OpenAI 兼容（agnes/deepseek/kimi/openai/NVIDIA/自定义/本地）──
-    _hdrs = ({"Content-Type": "application/json", "Authorization": "Bearer " + api_key}
-             if "abliteration" not in base_url else
-             {"Content-Type": "application/json", "x-api-key": api_key})
+    # ── OpenAI 兼容（agnes/deepseek/kimi/openai/NVIDIA/自定义/本地/免密 Kilo）──
+    # 🔴 免密 provider（如 Kilo 免费池）的 api_key 是空串 ⇒ 不发任何 auth header
+    #   （Kilo 网关免 key）。有 key 时行为与原来完全一致。
+    _hdrs = {"Content-Type": "application/json"}
+    if api_key:
+        if "abliteration" in base_url:
+            _hdrs["x-api-key"] = api_key
+        else:
+            _hdrs["Authorization"] = "Bearer " + api_key
     _body = dict(body)
     _body["model"] = model
     data = _safe_json(base_url.rstrip("/") + "/chat/completions", _body, _hdrs, timeout,

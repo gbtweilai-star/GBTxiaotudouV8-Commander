@@ -47,7 +47,7 @@ def names_from_master() -> list[str]:
     row = [ln for ln in body.splitlines() if ln.startswith("| 各簇用法规程")]
     if not row:
         return []
-    # ⚠️ 那一行里**第一条**写成 `skills/gbt-aesthetic`，其余写成 `gbt-figma` ——
+ # 那一行里**第一条**写成 `skills/gbt-aesthetic`，其余写成 `gbt-figma` ——
     # 第一版正则只要紧贴反引号的 `gbt-`，于是把 `gbt-aesthetic` 漏掉（15 ≠ 16，门当场报红）。
     found = re.findall(r"`(?:skills/)?(gbt-[a-z0-9\-]+)`", row[0])
     seen, out = set(), []

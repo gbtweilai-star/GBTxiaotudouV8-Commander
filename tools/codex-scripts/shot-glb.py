@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """通用 GLB 截图工具：真浏览器渲染并截图，同时回报顶点/三角形/贴图/动作读数。
 
 前置：先起本地服务（plugins/gbt-master/tools/serve-digital-human.mjs → 8788，它服务整个工作区）
@@ -13,7 +9,7 @@ import pathlib
 import sys
 from playwright.sync_api import sync_playwright
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 BASE = "http://127.0.0.1:8788"
 

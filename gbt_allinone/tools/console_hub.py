@@ -38,6 +38,14 @@ _LEDGER = _STATE / "console_hub.jsonl"
 
 # ── 页面登记表（**单一真相**；新增页面必须登记在这里，否则 scan 会报"盘上有而清单无"）──
 PAGES = [
+    # 🔴 2026-10-25 · 补登记两页（此前**盘上有、登记表没有** ⇒ console_hub.verify 报盲区，
+    #    test_console_workspace::test_a_no_unregistered_page_on_disk 因此红）：
+    #    这两页确实在盘上、也确实有内容（数字人云投射 / 模型云端通道现状），
+    #    属于「漏登记」而不是「垃圾残留」⇒ 按单一真相补进来，不删文件。
+    {"page": "digital-human", "path": "holo_pet/assets/digital-human/index.html", "kind": "原型",
+     "workflow": "media", "what": "数字人云投射到 APP（本地资产 → 云端动作库 → APP 播放）"},
+    {"page": "llm", "path": "holo_pet/assets/llm/index.html", "kind": "监控",
+     "workflow": "engine", "what": "模型云端通道现状（读面：通道/密钥是否已配，只报状态不动手）"},
     {"page": "console", "path": "holo_pet/assets/console/index.html", "kind": "枢纽",
      "workflow": "全部", "what": "总控台（一体化工作空间骨架 · GBT 品牌：能力矩阵 · 云插件连接器 · 第二大脑 · **编队群**——职业只出本域意见，决策执行只属主脑）"},
     {"page": "home", "path": "holo_pet/assets/home/index.html", "kind": "门面",

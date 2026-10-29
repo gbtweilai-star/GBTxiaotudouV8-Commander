@@ -93,7 +93,7 @@ def call(provider: str, mode: str = "tool") -> dict:
     """mode=tool 强制调工具（拿 tool_calls）；mode=text 不给工具（拿 text）。"""
     from gbt_allinone import run_task
     cfg = PROVIDERS[provider]
-    # ⚠️ 契约要点（2026-10-21 现场抓到的）：`op=ai_control` 读的是**顶层字段**（kw），不是 args 包里。
+ # 契约要点（2026-10-21 现场抓到的）：`op=ai_control` 读的是**顶层字段**（kw），不是 args 包里。
     #    第一版照 `op=run` 的习惯塞进 args ⇒ key_env/messages 全变 None ⇒ 门回"没有可用钥匙"。
     #    只有 `op=run` 才用 args。
     payload = {"op": "ai_control", "target": cfg["target"],

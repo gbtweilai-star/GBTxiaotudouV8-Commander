@@ -96,7 +96,7 @@ def main() -> int:
 
     from gbt_allinone.tools import caps_called_audit as cca
 
-    # ⚠️ _candidate_files() 返回的是**绝对 WindowsPath**，不是相对字符串 ——
+ # _candidate_files() 返回的是**绝对 WindowsPath**，不是相对字符串 ——
     #    这里显式归一成仓库相对路径（前两版探针就是在这里炸的）。
     files = []
     for p in cca._candidate_files():

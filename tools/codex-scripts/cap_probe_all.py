@@ -34,7 +34,6 @@ import argparse
 import json
 import os
 import shutil
-import signal
 import subprocess
 import sys
 import tempfile
@@ -94,7 +93,7 @@ def collect():
                   "disabled": len(DISABLED_CAPS)}
 
 
-# 🔴 2026-09-23 自查纠正：直接把超时叫"挂死"是**错的**。
+# 2026-09-23 自查纠正：直接把超时叫"挂死"是**错的**。
 #   `cross_scan` 早前实测**真跑完要 778 秒（13.0 分钟）** —— 它在 45s 上超时是「慢」不是「死」。
 #   所以本件一律标「超时未返回」，并把**已知实测耗时**贴在旁边，让读的人自己分辨：
 #     · 已知耗时长 ⇒ 超时是正常的，把 timeout 调大再探；
@@ -110,16 +109,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(add_help=False)
     ap.add_argument("--timeout", type=int, default=60)
     ap.add_argument("--only", default="")
-    ap.add_argument("--only-list", default="")
     ap.add_argument("--json", default="")
     a = ap.parse_args(argv or sys.argv[1:])
 
     rows, counts = collect()
     if a.only:
         rows = [r for r in rows if a.only.lower() in r["kind"].lower()]
-    if a.only_list:
-        want = {x.strip() for x in open(a.only_list, encoding="utf-8") if x.strip()}
-        rows = [r for r in rows if r["kind"] in want]
     print("=" * 78)
     print("全能力位探针 · 一条都不许静默跳过")
     print("=" * 78)
@@ -141,26 +136,12 @@ def main(argv=None) -> int:
         outfile.write_text("{}", encoding="utf-8")
         st = time.time()
         try:
-            # 🔴 必须 start_new_session + killpg：
-            #    只杀直接子进程时，孙进程仍占着 stdout/stderr 管道 ⇒ communicate() 永远等不到 EOF
-            #    ⇒ 整轮探针被一条位挂死（实测 redteam_recon 卡死 900 秒）。
-            _pr = subprocess.Popen([sys.executable, "-c", CHILD, str(ROOT),
-                                    r["kind"], str(outfile)],
-                                   env=env, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, start_new_session=True)
-            try:
-                _pr.communicate(timeout=a.timeout)
-                rc = _pr.returncode
-            except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(os.getpgid(_pr.pid), signal.SIGKILL)
-                except Exception:                                # noqa: BLE001
-                    _pr.kill()
-                try:
-                    _pr.communicate(timeout=5)
-                except Exception:                                # noqa: BLE001
-                    pass
-                rc = "timeout>%ds" % a.timeout
+            p = subprocess.run([sys.executable, "-c", CHILD, str(ROOT),
+                                r["kind"], str(outfile)],
+                               timeout=a.timeout, env=env, capture_output=True)
+            rc = p.returncode
+        except subprocess.TimeoutExpired:
+            rc = "timeout>%ds" % a.timeout
         except Exception as e:                                   # noqa: BLE001
             rc = type(e).__name__
         try:
@@ -231,7 +212,7 @@ def main(argv=None) -> int:
                     elif key == "crash":
                         extra = "rc=%s" % rec.get("rc")
                     else:
-                        # 🔴 实测踩过：`.get(kind, "—")` 返回的默认值是**真值字符串**，
+ # 实测踩过：`.get(kind, "—")` 返回的默认值是**真值字符串**，
                         # 下一句 `"%dms" % _known` 当场 TypeError ⇒ **整轮 158 条探完、
                         # 结果却在最后一步打印时炸掉**（JSON 都没落盘，16 分钟白跑）。
                         # 修法：类型先分清，再决定怎么打 —— 不靠真值判断。

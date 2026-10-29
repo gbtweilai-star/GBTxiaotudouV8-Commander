@@ -112,7 +112,7 @@ def discover(outdir: Path, implemented_codes: set[str]) -> dict:
     doc = load_causes()
     causes = doc.get("causes") or []
     declared_codes = {c.get("code") for c in causes if c.get("code")}
-    # 🔴 2026-09-24 第 103 轮：**"已量过、决定不做"的必须从 `todo` 摘出去** ——
+ # 2026-09-24 第 103 轮：**"已量过、决定不做"的必须从 `todo` 摘出去** ——
     #    否则它每轮都被当成"下一轮该做这个"，而每轮都要把**同一个测量重做一遍**。
     #    实测代价：`CONFIG_PRECEDENCE_SHADOW` / `EVIDENCE_STAMP_MISSING` /
     #    `TASK_SYSTEM_WRITABLE_SCRIPT` 三条我各自重量过至少一次。
@@ -175,7 +175,7 @@ def build_fixture_tree(base: Path) -> Path:
         if content is None:
             p.write_bytes(b"@echo off\nrem \xc4\xe3\xba\xc3\n")   # GBK 汉字 ⇒ 非法 UTF-8
         else:
-            # 🔴 必须**按字节写**：`write_text` 在 Windows 上会把 \n 翻成 \r\n，
+ # 必须**按字节写**：`write_text` 在 Windows 上会把 \n 翻成 \r\n，
             # 于是 mixed_eol.py 的混合换行被抹平 ⇒ 判据"没响"（2026-09-23 自检抓到的）
             # ——那不是判据死了，是**夹具造错了**。负对照的意义就在这里：两种都可能。
             p.write_bytes(content.encode("utf-8"))
@@ -268,7 +268,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
 
     # ══════════════════════════════════════════════════════════════════
     # 依赖判据（正/负对照）—— 2026-09-24 补的一道自检。
-    # 🔴 为什么补：`--selftest` 原来只覆盖 平面①/③ · 断链 · IOC · 供应链 · 反病毒，
+ # 为什么补：`--selftest` 原来只覆盖 平面①/③ · 断链 · IOC · 供应链 · 反病毒，
     #    **恰好没有依赖判据这一家**；而当晚静默坏掉的就是它：
     #    `_declared_covers()` 的 ④ 文件归属判据用了 quick_scan.py 没导入的 `Path`，
     #    `NameError` 被紧包的 `except Exception` 吞掉 ⇒ 恒返回 False
@@ -278,7 +278,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
     #    ① **负对照**：真找一个"能导入、但没被声明"的模块 ⇒ `DEP_UNDECLARED` **必须响**；
     #    ② **正对照**：真找一个"文件落在**已声明**发行的 RECORD 里、却查不到提供关系"的
     #       模块（`win32con` 那种形状）⇒ **必须不响**（不误报）。
-    #       🔴 带 `Path` 那个 bug 时，**这一条会失败** —— 这就是它存在的全部意义。
+ # 带 `Path` 那个 bug 时，**这一条会失败** —— 这就是它存在的全部意义。
     try:
         import importlib.metadata as _imd
         import importlib.util as _ilu
@@ -308,7 +308,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
                 if not str(_f).endswith(".py"):
                     continue
                 _stem = Path(str(_f)).stem
-                # 🔴 必须连 `__main__` 一起排除：`importlib.util.find_spec('__main__')`
+ # 必须连 `__main__` 一起排除：`importlib.util.find_spec('__main__')`
                 #    在"脚本口径"下必抛 `ValueError: __main__.__spec__ is None`
                 #    （本机实测：第一版就是因为收了某个包里的 `__main__.py` 而整块自检抛错）。
                 if _stem in ("__init__", "__main__") or not _stem.isidentifier():
@@ -325,7 +325,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             rec("依赖判据 负对照（未声明的必须响）", ["DEP_UNDECLARED"], {"DEP_UNDECLARED"},
                 "命中例：%s（共 %d 个）" % (sorted(_fired)[0], len(_fired)))
         elif not _imps:
-            # ⚠️ 「造不出夹具」≠「判据是死的」。把它报成死判据，本身又是一个坏判据
+ # 「造不出夹具」≠「判据是死的」。把它报成死判据，本身又是一个坏判据
             #    ⇒ 这里判 OK，但 detail 标明未验；discover 会因此继续把它留在「可疑」里。
             checks.append({"rule": "依赖判据 负对照（未声明的必须响）",
                            "expect": ["DEP_UNDECLARED"], "hit": [], "miss": [], "ok": True,
@@ -379,7 +379,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── MTIME_ANOMALY（2026-09-24 第 96 轮）：测 `quick_scan.classify_mtime` 的**真身**
-    # 🔴 关键：这里调的是**产品里那个模块级函数**，不是自检里另写一份副本 ——
+ # 关键：这里调的是**产品里那个模块级函数**，不是自检里另写一份副本 ——
     #    复制判据去测 = 测副本，本会话反复踩的坑（§四十五·二 / §四十八·五）。
     try:
         import collections as _c
@@ -415,7 +415,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── DUP_EXACT_CONTENT（第 97 轮）：测 `quick_scan.scan_dup_exact` 的**真身**
-    # 🔴 必须有「同体积但内容不同」的负对照 —— 那正是体积分组会误报、
+ # 必须有「同体积但内容不同」的负对照 —— 那正是体积分组会误报、
     #    必须靠 sha256 救回来的地方；少了它，这个自检就只是"数了数文件"。
     try:
         _fx = base / "dup_exact"
@@ -451,7 +451,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── SKILL_DECLARED_NOT_LOADABLE（第 99 轮）：测 `declared_face` 的**真身**
-    # 🔴 两个负对照都来自我当场犯过的错：
+ # 两个负对照都来自我当场犯过的错：
     #    ① **显示名 ≠ slug**：图鉴 `name` 是 `Display Name` 而目录是 `display-name`
     #       ⇒ v1 拿 name 比目录名，报出 97 个假缺 ⇒ 这里必须证明**它不报**；
     #    ② **图鉴坏掉必须返回 err**，不许返回空集（否则"图鉴坏了"被念成"全都能加载"）。
@@ -482,7 +482,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             _bad.append("正对照 err=%s" % _r1["err"])
         if _r1.get("declared_n") != 4:
             _bad.append("declared_n=%s（应 4）" % _r1.get("declared_n"))
-        # 🔴 ① 显示名那条**必须不被报**（它 path 存在且在根下）
+ # ① 显示名那条**必须不被报**（它 path 存在且在根下）
         if any("Display Name" == m["name"] for m in (_r1.get("path_missing") or [])):
             _bad.append("🔴 显示名那条被误报成缺物（正是我 v1 犯的错）")
         if any(x["name"] == "Display Name" for x in (_r1.get("outside_roots") or [])):
@@ -511,7 +511,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── SKILL_MIRROR_OVERWRITTEN（第 105 轮）：测 `mirror_overwritten` **真身**
-    # 🔴 三个负对照**都必须不响**：内容不一致 / 时间接近 / 只有一个根。
+ # 三个负对照**都必须不响**：内容不一致 / 时间接近 / 只有一个根。
     #    少了它们，这条判据就只是"数了数文件"，而它真正要防的是**把"刚被覆盖成一致"
     #    误当成"本来就一致"**（第 104 轮 06:57 那次外部覆盖就是这么静默溜过去的）。
     try:
@@ -550,7 +550,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── TEST_CALIBER_HIJACK（第 106 轮）：测 `caliber_hijack` **真身**
-    # 🔴 这条判据本会话被我**修过一次**（`if hij:` → `if hij and not repo_local_config`），
+ # 这条判据本会话被我**修过一次**（`if hij:` → `if hij and not repo_local_config`），
     #    而修完两个方向都没验过。三个负对照正是那次修复的语义：
     #    **仓根一旦有自己的配置，上级配置就劫持不到 ⇒ 不许报**。
     try:
@@ -588,10 +588,10 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── CALIBER_MISMATCH（第 107 轮）：测 `caliber_mismatch` **真身**
-    # 🔴 重点负对照：**同 major.minor、只差补丁号**（3.14.5 vs 3.14.6）**不许响** ——
+ # 重点负对照：**同 major.minor、只差补丁号**（3.14.5 vs 3.14.6）**不许响** ——
     #    原判据写死常量 `!= "3.14.5"`，那种情况会印出「运行 3.14.6 · 声明 3.14.6」却仍叫"不符"
     #    （自己打自己的脸）。这条负对照就是钉住这个坑。
-    # 🔴 另外两个"未知不许当通过"：running 空 / declared 解析不出 ⇒ **必须响**。
+ # 另外两个"未知不许当通过"：running 空 / declared 解析不出 ⇒ **必须响**。
     try:
         _cm = quick_scan_mod.caliber_mismatch
         _d = "3.14.5 / cpython-314"
@@ -632,7 +632,7 @@ def selftest(quick_scan_mod, outdir: Path) -> dict:
             "自检自身抛错：%s: %s" % (type(_e).__name__, _e))
 
     # ── HOST_VERSION_BEHIND（第 108 轮）：测 `host_version_behind` **真身**
-    # 🔴 两个要害负对照：
+ # 两个要害负对照：
     #    ① **宿主超前**（host > pkg）**不许响** —— 原判据只查 `!=`，这种情况会把方向说反；
     #    ② **面没取到**（一侧为空）**不许响**，但要标 absent（"未生效" ≠ "一致"）；
     #    而**两侧都在、只是读不出数字** ⇒ **必须响**（未知不许当通过）。

@@ -5,7 +5,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
-# 🔴 原写 `.parent.parent` = `<repo>/tools` —— **差一层**，`import gbt_allinone` 直接 ModuleNotFoundError。
+# 原写 `.parent.parent` = `<repo>/tools` —— **差一层**，`import gbt_allinone` 直接 ModuleNotFoundError。
 # （2026-09-23 实测：从仓根跑 `py -3.14 tools/codex-scripts/make_energy_report.py` → 报错。）
 # 跑脚本时 `sys.path[0]` 是**脚本所在目录**、不是 cwd，所以必须把仓根自己塞进去，不能指望 cwd。
 BASE = next(p for p in Path(__file__).resolve().parents

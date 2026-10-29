@@ -114,7 +114,7 @@ def scan_av(workspace: Path) -> dict:
     else:
         out["unavailable"].append("Get-MpComputerStatus 无返回")
 
-    # ★ 这一格是 host_security_scan.py 缺的：排除项决定"它到底在不在看你"
+ # 这一格是 host_security_scan.py 缺的：排除项决定"它到底在不在看你"
     exc = _ps_json("Get-MpPreference -ErrorAction SilentlyContinue | "
                    "Select-Object -ExpandProperty ExclusionPath | ConvertTo-Json -Compress")
     if exc is None:
@@ -387,7 +387,7 @@ def scan_dns_proxy() -> dict:
     hp = Path(os.path.expandvars(r"%SystemRoot%\System32\drivers\etc\hosts"))
     if hp.is_file():
         try:
-            # 🔴 BOM：hosts 首行是 `\ufeff# Copyright ...`，`strip()` **不会**去掉 \ufeff，
+ # BOM：hosts 首行是 `\ufeff# Copyright ...`，`strip()` **不会**去掉 \ufeff，
             # 于是注释行被当成"非默认映射"报成 HOSTS_TAMPERED（2026-09-23 实测抓到的误报）。
             live = [line.strip() for line in hp.read_text(encoding="utf-8-sig", errors="replace").splitlines()
                     if line.strip() and not line.strip().lstrip("\ufeff").startswith("#")]

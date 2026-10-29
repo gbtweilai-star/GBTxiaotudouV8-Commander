@@ -41,13 +41,13 @@ SRC = ROOT / "output" / "blueprint-audit" / "app-sources.json"
 
 RULES = [
     ("U1", "TODO/FIXME/XXX/HACK", re.compile(r"\b(TODO|FIXME|XXX|HACK)\b")),
-    # ⚠️ 自纠（2026-09-25 首轮实测）：本规则原来写成 `placeholder|...`，
+ # 自纠（2026-09-25 首轮实测）：本规则原来写成 `placeholder|...`，
     #    于是把**正常的 HTML 输入框属性** `placeholder="you@example.com"` 也报成"占位文案"
     #    （首轮 3 处命中全是这类噪声）。**`placeholder=` 是 HTML 属性，不是未完成内容。**
     #    ⇒ 只保留"内容型占位"的措辞，并显式排除 `placeholder=` 属性形态。
     ("U2", "占位文案（内容型）",
      re.compile(r"lorem|待填|敬请期待|coming soon|placeholder text|TBD|占位符", re.I)),
-    # ⚠️ 自纠（同上）：原来含 `return\s+null\s*;`，把 `if (!isAuthenticated) return null;`
+ # 自纠（同上）：原来含 `return\s+null\s*;`，把 `if (!isAuthenticated) return null;`
     #    这种**正当守卫**报成"空实现"。⇒ 去掉裸 `return null`，只留真正空的函数体。
     ("U3", "空实现", re.compile(r"=>\s*\{\s*\}|onClick=\{\(\)\s*=>\s*\{\s*\}\}|function\s+\w+\s*\([^)]*\)\s*\{\s*\}")),
     ("U4", "死链 href=\"#\"", re.compile(r'href\s*=\s*"#"')),

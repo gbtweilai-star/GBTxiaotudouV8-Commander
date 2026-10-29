@@ -23,7 +23,7 @@
   （`<1h` / `1–6h` / `6–24h` / `1–7d` / `>7d` / `无窗口证据`）——
   用档位而非秒数 ⇒ **同一状态复跑逐字一致**（无时钟字段，满足「可复跑逐字一致」）。
 
-## 🔴 硬性纪律
+## 硬性纪律
 - **轻**：只读两份台账 + 审计尾部**有界窗口**；**不真调任何能力、不重算绑定**。
 - **幂等**：输出**无时钟字段**（不用 now/时间戳），同一状态复跑**逐字一致**。
 - **fail-closed**：读不到就「未探测 / 未判」并写明为什么，**不许留空当绿**。
@@ -216,7 +216,7 @@ def build_digest(ledger: dict, audit: dict, ev: dict, truth: dict, baseline: dic
                                             if tot[k] > btot.get(k, 0) else "%d" % (tot[k] - btot.get(k, 0))))
                                   for k in COUNTERS}
     return {
-        # 🔴 **无时钟字段**：这里出现的每个值都必须与「几点跑」无关（幂等/逐字一致）。
+ # **无时钟字段**：这里出现的每个值都必须与「几点跑」无关（幂等/逐字一致）。
         "口径": "v1 · 族=domain（现读）· 四计数=未绑/断连/未探测/假执行 · 年龄用档位",
         "rule": RULE,
         "commands": {"feel": CMD_FEEL, "json": CMD_JSON, "baseline": CMD_BASE, "check": CMD_CHECK},

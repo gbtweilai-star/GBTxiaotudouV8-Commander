@@ -216,7 +216,7 @@ def main():
             print(str(e))
             continue
         if pose_file not in imgs:
-            # 🔴 第 87 轮实测抓到的自己的 bug：`imgs` 是**循环之前**取的，
+ # 第 87 轮实测抓到的自己的 bug：`imgs` 是**循环之前**取的，
             #    而 `ensure_pose()` 可能**刚刚**把骨架生成进 input/ ⇒ 名单是陈旧的，
             #    于是新生成的骨架被判成"不在服务端"（假红）。⇒ 清掉那个节点的缓存再问一遍。
             spec.cache.pop("LoadImage", None)

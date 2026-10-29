@@ -90,7 +90,7 @@ def scan() -> dict:
         for f in les.rglob("*"):
             if f.is_file():
                 blob += f.read_bytes()
-        # 🔴 2026-10-10 **这一刀是主人要我"看到底对不对"逼出来的**：
+ # 2026-10-10 **这一刀是主人要我"看到底对不对"逼出来的**：
         #    我先前只切 blob[:400000] 且只按 (token/auth/user/login/session/email) 过滤 ⇒
         #    **漏掉了她真正的账户键** ⇒ 我下了"未登录"的结论 —— **那是错的**。
         #    她真身里的键是：WUserInfo__ · XVipInfo__ · getUserStatus__ · XWisebaseAllSavedUrl · XoiceRoleList__

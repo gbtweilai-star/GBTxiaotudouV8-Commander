@@ -360,44 +360,15 @@ def _strip_comments(src: str) -> str:
 
 
 def _root_outside(css: str) -> str | None:
-    """拆 **所有** `:root{}` 声明块：返回**块外**的文本；拆不出返回 None（读不到 ≠ 读到了）。
-
-    🔴 2026-10-17 修（**假红** · 留痕 · 原口径 / 为什么翻 / 现口径）：
-      原口径：在整页文本里 `find(":root")` 找第一处，再 `find("{")`/`find("}")` 剥一块。
-      为什么翻：实测被**正文注释里出现的 ":root" 字样**骗到（页面 §④ 就写着「裸色值只在 :root」），
-        于是真正的 :root 声明块被留在"块外"，三色 `#F5B041/#00E5FF/#7C4DFF` 明明在 :root 里却被判裸色
-        （C6 假红；且内联 style 也没被单独检查）。
-      现口径：只认 **CSS 声明块**——扫 `<style>…</style>` 内容，按**花括号配平**剥掉每一处 `:root{…}`（可多处），
-        再并上所有 `style="…"` 行内样式（行内裸露的色值一律要查）；注释/正文里的 ":root" 字样不再参与剥离。
-    """
-    import re as _re
-    parts = []
-    for m in _re.finditer(r"<style[^>]*>([\s\S]*?)</style>", css or "", _re.I):
-        body = m.group(1)
-        buf, i = [], 0
-        while True:
-            at = body.find(":root", i)
-            if at < 0:
-                buf.append(body[i:])
-                break
-            op = body.find("{", at)
-            if op < 0:
-                buf.append(body[i:])
-                break
-            depth, j = 0, op
-            while j < len(body):
-                if body[j] == "{":
-                    depth += 1
-                elif body[j] == "}":
-                    depth -= 1
-                    if depth == 0:
-                        break
-                j += 1
-            buf.append(body[i:at])
-            i = j + 1
-        parts.append("".join(buf))
-    parts += _re.findall(r'style="([^"]*)"', css or "")
-    return "\n".join(parts)
+    """拆 :root 块：返回**块外**的文本；拆不出返回 None（读不到 ≠ 读到了）。"""
+    at = css.find(":root")
+    if at < 0:
+        return None
+    op = css.find("{", at)
+    cl = css.find("}", op)
+    if op < 0 or cl < 0:
+        return None
+    return css[:op] + css[cl + 1:]
 
 
 def run_checks(art: dict) -> list:
@@ -416,7 +387,7 @@ def run_checks(art: dict) -> list:
     acounts = a.get("counts") or {}
 
     # C1 真源可读 + 计数守恒（**全部现算，不写死**：曾把 240/326 写死，能力位到 241、审计到 333 时误报红）
-    # 🔴 2026-10-13 修（**既有红**，已记在 `docs/V8-V9-能力差集-20261012.md:99`）：
+ # 2026-10-13 修（**既有红**，已记在 `docs/V8-V9-能力差集-20261012.md:99`）：
     #    这里原来只加「接上/断连/缺失/未探测」四态，而审计器/审计页/文档的口径是**五态**
     #    （第五态 = **按需未启用**：只在用到那个 provider 时才需要、凭据在主人侧 ⇒ **没跑不是故障**）。
     #    ⇒ 只要第五态非 0，C1 就**永远红**（动手前实测 355≠360，同一个失败式）。
@@ -479,26 +450,19 @@ def run_checks(art: dict) -> list:
 
     # C5 页面自包含：零外链 / 无取数原语 / 无 eval / 无 iframe / 无 module
     body = art.get("page") or ""
-    # 🔴 2026-10-17 加（**假红** · 留痕 · 原口径 / 为什么翻 / 现口径）：
-    #   原口径：整页文本一律查 `fetch(` 等远端取数原语。
-    #   为什么翻：页面里现在带**自卫/反控层**（`<!-- gbt-defense -->`），它命中攻击时要把证据
-    #     上报到**本机框架**（局域网 127.x/192.168.x:8877）⇒ 合法地用 `fetch(`。被判"页面不自包含"
-    #     是假红——自卫层是**安全上报**，不是页面远端取数/外链。
-    #   现口径：C5 扫描前先剥掉自卫层块（其余脚本照旧严查）。
-    body_c5 = re.sub(r"<!-- gbt-defense -->[\s\S]*?</script>", " ", body, count=1) if "<!-- gbt-defense -->" in body else body
     bad = []
-    if _EXT_RE.findall(body_c5):
-        bad.append("外链 %d 处" % len(_EXT_RE.findall(body_c5)))
-    if "cdn" in body_c5.lower():
+    if _EXT_RE.findall(body):
+        bad.append("外链 %d 处" % len(_EXT_RE.findall(body)))
+    if "cdn" in body.lower():
         bad.append("cdn 字样")
-    low = body_c5.lower()
+    low = body.lower()
     for tok in ("<iframe", "fetch(", "xmlhttprequest", "eval(", "websocket", "eventsource"):
         if tok in low:
             bad.append(tok)
-    if re.search(r'type\s*=\s*["\']module["\']', body_c5, re.I):
+    if re.search(r'type\s*=\s*["\']module["\']', body, re.I):
         bad.append('type="module"')
     for need in ("run-evidence.js", "../energy/energy-data.js", "../capabilities/capabilities-data.js"):
-        if need not in body_c5:
+        if need not in body:
             bad.append("未引 " + need)
     add("C5 页面自包含：零外链 · 无远端取数原语 · 无 eval/iframe/module · 数据只走经典脚本",
         not bad, "违规：%s" % (bad or "无"))
@@ -541,7 +505,7 @@ def run_checks(art: dict) -> list:
         "详页指针 %s（死链 %s）· 调用法名字 %s（不在册 %s）" % (sorted(ptr), dead or "无", sorted(calls)[:4], fake_calls or "无"))
 
     # C9 插件半边（A 腿）：加行不加锁 · 零 window.open · 只读白名单 · 不写盘/不碰 ~/.dsh
-    # 🔴 对**代码**断言、不对**文本**断言（本仓教训：注释里提到这些词不算违规）⇒ 先剥注释。
+ # 对**代码**断言、不对**文本**断言（本仓教训：注释里提到这些词不算违规）⇒ 先剥注释。
     host = _strip_comments(art.get("host_js") or "")
     client = _strip_comments(art.get("client_js") or "")
     pkg = art.get("plugin_pkg") or ""
@@ -590,7 +554,7 @@ def run_checks(art: dict) -> list:
         "自报挂钩=%s" % selfrep)
 
     # C12 能力栏顶栏一格：**全族健康摘要**（神经）已随证据件落盘且与真源自洽
-    # 🔴 口径：神经折进 run-evidence.js（页本就加载它）；页**结构**不动（holo_pet_w3 只经生成器产）。
+ # 口径：神经折进 run-evidence.js（页本就加载它）；页**结构**不动（holo_pet_w3 只经生成器产）。
     #    判据只认"证据件里有 nerve 且计数与绑定/审计自洽"，**不认页面有没有画**（那是页的事）。
     ncell = (ev or {}).get("nerve")
     doms_n = len({c.get("domain") for c in caps if c.get("domain")})
@@ -664,7 +628,7 @@ def cmd_check(as_json: bool = False, live: bool = False) -> int:
     neg("喂坏：:root 之外注入裸色值 #123456", "C6", True, a4)
 
     # N6 **死链**：把详页指针清单里塞一个不存在的页 id ⇒ C8 必须报红
-    # ⚠️ 夹具必须用**同形 id**（小写 ASCII）—— 第一版用了中文串，正则 `[a-z0-9-]+` 本来就匹配不到它，
+ # 夹具必须用**同形 id**（小写 ASCII）—— 第一版用了中文串，正则 `[a-z0-9-]+` 本来就匹配不到它，
     #    于是"喂坏"那一臂自身是空的 ⇒ C8 照样绿（负对照自己先假绿了一回，已修，留档防重犯）。
     a5 = dict(art)
     a5["page"] = art["page"].replace('"energy": "能量与绑定',

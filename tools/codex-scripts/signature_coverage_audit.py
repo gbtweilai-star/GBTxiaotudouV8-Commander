@@ -43,7 +43,7 @@ TEXT_SUFFIX = {".txt", ".csv"}               # **文本产物**：另一类，�
 TREES = ["outputs", "holo_pet", "docs", "memory", "plugins", "tools", "state",
          "scripts", "config", "gbt_allinone"]
 
-# 🔴 守卫**声明覆盖**的树（与 _scan_pages 逐条对应，改动这里必须同时改那里）
+# 守卫**声明覆盖**的树（与 _scan_pages 逐条对应，改动这里必须同时改那里）
 GUARD_COVERS = {
     "gbt_allinone": "仅 **.md**（且排除 store/__pycache__/.pylibs/archived_logs）",
     ".": "仅家根顶层 **.md**，且只签 inventory 判为 framework 的",
@@ -99,10 +99,10 @@ def tree_stats(rel: str) -> dict:
             "守卫扫吗": rel in GUARD_COVERS}
 
 
-# 🔴 **可盖章的树**（交付物）—— `--stamp` 只认这两棵，别的一律拒（fail-closed）
+# **可盖章的树**（交付物）—— `--stamp` 只认这两棵，别的一律拒（fail-closed）
 STAMPABLE = ("outputs", "holo_pet")
 
-# 🔴 **明确排除**（带理由）—— 盖章会**弄坏它自己的用途**，所以不盖也不判违规
+# **明确排除**（带理由）—— 盖章会**弄坏它自己的用途**，所以不盖也不判违规
 EXCLUDE = {
     "tools/codex-scripts/fixtures/aesthetic-sins.html":
         "**测试夹具**：故意做坏的页面，盖章会让它不再是「坏页」，弄坏对应的测试",
@@ -147,7 +147,7 @@ def do_stamp(trees) -> dict:
             if new == old:
                 skipped.append({"件": str(p.relative_to(ROOT)), "为什么没盖": "inject 没改动"})
                 continue
-            # 🔴 **必须写字节，不能 write_text**：`Path.write_text` 在 Windows 上把 `\n`
+ # **必须写字节，不能 write_text**：`Path.write_text` 在 Windows 上把 `\n`
             #    翻成 `\r\n` ⇒ 声称"只加了一行署名"，实际**改了整个文件的换行**
             #    （实测踩过：holo_pet/index.html 凭空 +590 字节 = 全文 590 个换行）。
             #    写字节可保证**除署名外逐字节不变**。
@@ -189,7 +189,7 @@ def gate(trees) -> dict:
                 continue
             if _is_data(p) or _excluded(p):
                 continue
-            # 🔴 与判据**同宽**：只数真被判过的页。
+ # 与判据**同宽**：只数真被判过的页。
             #    第一版这里用的是 `tree_stats` 的「页面数」求和，而 `tree_stats`
             #    **不过滤 `_excluded()`** ⇒ 读数比判据宽：排除表里的夹具会被**算进页数
             #    却从未被读**（读物比判据宽 = 下一页的坏判据）。
@@ -226,7 +226,7 @@ def selftest() -> int:
     g = gate(STAMPABLE)
     ck("真树现读：可盖章树全页带署名", g["过"] is True,
        "%d 页 · 缺 %d" % (g["页面"], len(g["缺署名"])))
-    # 🔴 **覆盖面控制**（2026-09-25 §一百五十一 那一类：闸**悄悄跳过一整棵树**）
+ # **覆盖面控制**（2026-09-25 §一百五十一 那一类：闸**悄悄跳过一整棵树**）
     #    口径：闸报的页数 == 独立走一遍同一批树、用同一套过滤数出来的页数。
     #    两者不同宽 ⇒ 要么闸漏树、要么读数比判据宽，两种都必须红。
     _trees = tuple(dict.fromkeys(list(TREES) + ["docs"]))
@@ -242,13 +242,13 @@ def selftest() -> int:
     _g_all = gate(TREES)
     ck("**闸的页数与独立走树同宽**（漏树/读数偏宽都红）", _g_all["页面"] == _exp,
        "闸 %d ｜ 独立数 %d" % (_g_all["页面"], _exp))
-    # 🔴 负控：只给它一棵子树 ⇒ 页数必须**严格更少且非空**。
+ # 负控：只给它一棵子树 ⇒ 页数必须**严格更少且非空**。
     #    闸若**忽略入参、偷偷扫全树**，这里就会相等 ⇒ 负控咬住。
     _g_one = gate(("docs",))
     ck("**负控：收窄到单棵树 ⇒ 页数必须变少且非零**",
        _g_one["页面"] > 0 and _g_one["页面"] < _exp,
        "docs %d ｜ 全 %d" % (_g_one["页面"], _exp))
-    # 🔴 负控：造一个**真缺署名**的临时页，判据必须报出来
+ # 负控：造一个**真缺署名**的临时页，判据必须报出来
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         f = _P(td) / "page.html"
@@ -256,7 +256,7 @@ def selftest() -> int:
         loose = SIG_MARK not in f.read_text(encoding="utf-8")
         ck("**负控：造一个缺署名的页 ⇒ 必须判为缺**", loose, str(f.name))
 
-        # 🔴 负控：`write_text` 会**偷偷把 \n 翻成 \r\n**（实测踩过：index.html 凭空 +590 字节）
+ # 负控：`write_text` 会**偷偷把 \n 翻成 \r\n**（实测踩过：index.html 凭空 +590 字节）
         raw = "<html><body>\nx\ny\n</body></html>\n"
         g = _P(td) / "eol.html"
         g.write_bytes(raw.encode("utf-8"))

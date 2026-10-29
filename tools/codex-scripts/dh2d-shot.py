@@ -10,14 +10,12 @@ import json
 import os
 import sys
 
-from playwright.sync_api import sync_playwright
-
-for _s in (sys.stdout, sys.stderr):          # 不带 -X utf8 调用时不许静默输出空
-    try:
+# ── 编码守门（encoding-guard 要求）：不带 -X utf8 调用时不许静默输出空 ──
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        pass
 
+from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PAGE = os.path.join(ROOT, 'holo_pet_w3', 'voice-theater', 'dh2d-lab.html')

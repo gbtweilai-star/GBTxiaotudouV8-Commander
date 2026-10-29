@@ -56,6 +56,11 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 审美令牌（内联版）：唯一实现在 `_taste_inline.py`。本件产两页且都要求"零远端请求"，
+# 所以只能生成期内联，不能挂 <link>（相对路径的 <link> 虽不算远端，但会让页面不再自包含）。
+from _taste_inline import site_root_block  # noqa: E402
+from _page_emit import clean_html  # noqa: E402
 MESH = ROOT / "deploy" / "cloud-10" / "mesh.json"                 # 现役真源（10 真模块）
 SPEC50 = ROOT / "deploy" / "cloud-10" / "plugins50.json"          # 蓝图（50 槽 · 不探测）
 STATE = ROOT / "state" / "cloud-status.json"                      # 探测台账
@@ -75,7 +80,7 @@ CMD_RENDER = "py -3.14 tools/codex-scripts/cloud-status.py render"
 CMD_CHECK = "py -3.14 tools/codex-scripts/cloud-status.py --check"
 
 S_OK, S_BAD, S_UNK = "通", "不通", "未探测"
-C_OK, C_BAD, C_UNK = "#34d399", "#f87171", "#6b7280"
+C_OK, C_BAD, C_UNK = "#22C55E", "#EF4444", "#6b7280"
 
 
 def now() -> str:
@@ -83,7 +88,7 @@ def now() -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# 🔴 host 校验（发请求前唯一一道闸）—— 只允许公网 http/https，其余一律 blocked、不发
+# host 校验（发请求前唯一一道闸）—— 只允许公网 http/https，其余一律 blocked、不发
 # ══════════════════════════════════════════════════════════════════════════
 def host_guard(url: str):
     """返回 (ok: bool, why: str|None, ips: list)。
@@ -478,14 +483,17 @@ def tristate_findings(model: dict) -> list:
 # ══════════════════════════════════════════════════════════════════════════
 # 渲染（自包含 · 生成期静态落图 · 数据只走经典脚本）
 # ══════════════════════════════════════════════════════════════════════════
-_CSS = """<style>
-:root{--bg:#07090d;--pan:#0d1117;--line:#1d2635;--ink:#e6edf7;--dim:#8b97a8;
- --ok:#34d399;--bad:#f87171;--off:#6b7280;--cy:#22d3ee;--brand-or:#f5b041;--brand-cy:#22d3ee;
+_CSS = "<style>\n" + site_root_block() + """
+:root{--bg:var(--taste-ground,#0B1120);--pan:var(--taste-surface,#111827);
+ --line:var(--taste-border,#1E3A5F);--ink:var(--taste-text,#e8ecf8);--dim:var(--taste-muted,#9aa4c4);
+ --ok:var(--taste-positive,#00E5FF);--bad:var(--taste-negative,#EF4444);--off:#6b7280;
+ --cy:#22d3ee;--brand-or:var(--taste-accent,#f5b041);--brand-cy:#22d3ee;
  --ok-bg:#0f2a20;--bad-bg:#2a1414;--off-bg:#16181d}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "Segoe UI",system-ui,sans-serif}
 .gbt-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);
- background:linear-gradient(90deg,#0b1017,#0d1117);flex-wrap:wrap}
+ /* 2026-10-26：原为 linear-gradient(90deg,#111827,#0d1117) —— 两档微渐变，取中点纯色。 */
+ background:#111827;flex-wrap:wrap}
 .mark{width:18px;height:18px;border:2px solid var(--brand-or);border-radius:4px}
 .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--brand-or)}
 .note{color:var(--dim);font-size:11.5px}
@@ -506,25 +514,25 @@ svg{width:100%;height:auto;display:block}
 .arm{stroke:var(--brand-or);stroke-width:1.1;stroke-opacity:.4;fill:none}
 table{border-collapse:collapse;width:100%;font-size:11px}
 th,td{border:1px solid var(--line);padding:3px 5px;text-align:left;vertical-align:top}
-th{color:var(--dim);font-weight:600;background:#0b1017}
+th{color:var(--dim);font-weight:600;background:#111827}
 td.cell{text-align:center;font-variant-numeric:tabular-nums}
 td.cell.sok{background:var(--ok-bg);color:var(--ok);font-weight:700}
 td.cell.sbad{background:var(--bad-bg);color:var(--bad);font-weight:700}
 td.cell.sunk{background:var(--off-bg);color:var(--off)}
-td.cell.self{background:#0a0e14;color:#39445a}
+td.cell.self{background:#0a0e14;color:#1E3A5F}
 .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin:2px 4px 2px 0;
  color:var(--dim);font-size:11px}
-.pill.b{border-color:#26445a;color:var(--brand-cy)}
+.pill.b{border-color:#1E3A5F;color:var(--brand-cy)}
 .pill.ok{border-color:#1d5c45;color:var(--ok)}
 .pill.bad{border-color:#6b2a2a;color:var(--bad)}
-.pill.off{border-color:#39445a;color:var(--off)}
+.pill.off{border-color:#1E3A5F;color:var(--off)}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 2px}
 .lg{display:flex;align-items:center;gap:6px;color:var(--dim);font-size:11.5px}
 .sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
 .sw.ok{background:var(--ok-bg);border-color:var(--ok)}
 .sw.bad{background:var(--bad-bg);border-color:var(--bad)}
 .sw.off{background:var(--off-bg);border-color:var(--off)}
-.pcard{border:1px solid var(--line);border-radius:8px;padding:10px;margin:0 0 10px;background:#0b1017}
+.pcard{border:1px solid var(--line);border-radius:8px;padding:10px;margin:0 0 10px;background:#111827}
 .pcard:target{border-color:var(--brand-or);box-shadow:0 0 0 1px var(--brand-or) inset}
 .pc-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
 .seq{background:#1a1206;color:var(--brand-or);border:1px solid #3a2c10;border-radius:4px;padding:0 6px;font-size:11px}
@@ -541,14 +549,17 @@ code{font-family:ui-monospace,Consolas,monospace;color:var(--brand-cy)}
 </style>"""
 
 
-def _head(title: str, gen: str) -> str:
-    # 🔴 2026-10-11 补生成标记：本函数产出的页原来**没有标记** ⇒ 逐页新鲜度判据
+def _head(title: str, gen: str, page_id: str) -> str:
+ # 2026-10-11 补生成标记：本函数产出的页原来**没有标记** ⇒ 逐页新鲜度判据
     #    （tools/codex-scripts/page-bind-check.py）判不出它是生成物还是手写物，
     #    于是「主脑看到的它新不新」**没人能机检**。重建命令写死在这里。
-    return ('<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8">\n'
+ # 2026-10-26 加 `data-page-id`（主人令「触手覆盖每一页」）：本函数产**两页**，
+    #    所以必须由调用方传自己的 id —— 不能写死，否则两页身份会撞在一起，
+    #    跨页派活时 from 认不出是谁。`gen` 参数保留（历史签名），值由页脚另给。
+    return ('<!doctype html>\n<html data-page-id="%s" lang="zh-CN"><head><meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
             '<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cloud-status.py render -->\n'
-            '<title>%s</title>\n%s</head><body>\n' % (title, _CSS))
+            '<title>%s</title>\n%s</head><body>\n' % (page_id, title, _CSS))
 
 
 def _topbar(gen: str) -> str:
@@ -630,7 +641,7 @@ def render_page_a(model: dict) -> str:
     if bp.get("present"):
         bpblock = ('<div class="note">另册 · 50 槽蓝图（<code>%s</code>）：%d 槽 = %d 指派 + %d 备用 · '
                    '%d 个带 op · 分组 %s。%s'
-                   '<br>🔴 **现役 vs 蓝图**：本页卡片只列**现役真源** <code>%s</code> 的 %d 个真模块'
+                   '<br>**现役 vs 蓝图**：本页卡片只列**现役真源** <code>%s</code> 的 %d 个真模块'
                    '（云端已部署 Worker 里真在跑的那 10 个）；50 槽蓝图**未部署 · 无端点**，不冒充现役、不探测。</div>'
                    % (bp.get("path"), bp.get("slots"), bp.get("wired"), bp.get("reserve"), bp.get("ops"),
                       "、".join(bp.get("groups") or []), bp.get("note"),
@@ -665,8 +676,11 @@ def render_page_a(model: dict) -> str:
               '  a.addEventListener("click", function(){ a.blur(); });\n'
               '});\n'
               '</script>\n')
-    return (_head("GBT小土豆V8 · 云插件独立页（每位一张卡片 · 带锚点）", gen)
-            + _topbar(gen) + body + script + '</body></html>\n')
+    return (_head("GBT小土豆V8 · 云插件独立页（每位一张卡片 · 带锚点）", gen, "cloud-plugins")
+            + _topbar(gen) + body + script
+            # 触手网格接管器（主人令 2026-10-26）：相对路径、非远端 ⇒ 仍满足"零远端请求"。
+            + '<script src="../shell/tentacle-kit.js" defer></script>\n'
+            + '</body></html>\n')
 
 
 def render_page_b(model: dict) -> str:
@@ -778,7 +792,7 @@ def render_page_b(model: dict) -> str:
               '</div>')
 
     nostate = ("" if model.get("probed") else
-               '<div class="note">🔴 <b>本页尚无真探测</b>：state/cloud-status.json 里没有探测记录 ⇒ '
+               '<div class="note"><b>本页尚无真探测</b>：state/cloud-status.json 里没有探测记录 ⇒ '
                '一律「未探测」（**不许假绿**）。请先跑 <code>%s</code>。</div>' % CMD_PROBE)
 
     body = (
@@ -828,8 +842,11 @@ def render_page_b(model: dict) -> str:
               '  });\n'
               '});\n'
               '</script>\n')
-    return (_head("GBT小土豆V8 · 可视化连接状态面板（通 / 不通 / 未探测）", gen)
-            + _topbar(gen) + body + script + '</body></html>\n')
+    return (_head("GBT小土豆V8 · 可视化连接状态面板（通 / 不通 / 未探测）", gen, "cloud-status")
+            + _topbar(gen) + body + script
+            # 触手网格接管器（主人令 2026-10-26）：相对路径、非远端 ⇒ 仍满足"零远端请求"。
+            + '<script src="../shell/tentacle-kit.js" defer></script>\n'
+            + '</body></html>\n')
 
 
 def _data_js(global_name: str, payload: dict, rebuild_note: str) -> str:
@@ -862,8 +879,8 @@ def cmd_render(base_override: str = "") -> int:
 
     PAGE_A.parent.mkdir(parents=True, exist_ok=True)
     PAGE_B.parent.mkdir(parents=True, exist_ok=True)
-    PAGE_A.write_text(render_page_a(model), encoding="utf-8")
-    PAGE_B.write_text(render_page_b(model), encoding="utf-8")
+    PAGE_A.write_text(clean_html(render_page_a(model)), encoding="utf-8")
+    PAGE_B.write_text(clean_html(render_page_b(model)), encoding="utf-8")
 
     data_a = {"generated_at": model["generated_at"], "base": base, "form": model["form"],
               "spec_path": model["spec_path"], "counts": model["counts"],

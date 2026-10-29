@@ -52,7 +52,7 @@ def _name(n) -> str:
     return ""
 
 
-# 🔴 **单次运行内的读缓存**：先前 `_mods_for()` 逐位把同一批 `.py` 各重读一遍
+# **单次运行内的读缓存**：先前 `_mods_for()` 逐位把同一批 `.py` 各重读一遍
 #    ⇒ 体检里这一道 21.5s 大半是重复 I/O。**只活在当前进程**（不落盘、不跨进程），
 #    所以读数语义**一个字不变** —— 改前/改后输出做了哈希对账。
 _TEXT: dict = {}
@@ -83,7 +83,7 @@ def _py_files() -> list:
     return _FILES
 
 
-# 🔴 2026-10-10 真根因修复（体检 rc=1：位级写目标抽样 崩 unindent does not match）：
+# 2026-10-10 真根因修复（体检 rc=1：位级写目标抽样 崩 unindent does not match）：
 #    原来边界**只认 if kind == 形态** ⇒ api.py 里那些 **if kind in (a,b,c)** 的分支
 #    **不被当边界**，于是**下一支的代码被整段吞进上一支** ⇒ 片段里出现 4 空格的代码行
 #    （正文在 8）⇒ unindent does not match（实测：datakit 那一支吞掉了 quant_strategy 那一支）。**8 支中招。**
@@ -136,7 +136,7 @@ def _branch_called(body: str):
     """
     if not body:
         return None
-    # 🔴 **没有语句**（空 / 只有注释）⇒ 如实 `None`。
+ # **没有语句**（空 / 只有注释）⇒ 如实 `None`。
     # 为什么单独判：`if True:` 套一个只有注释的块 = **合法空块**在 Python 里其实非法
     # （`expected an indented block`），会撞进下面的 `raise` ⇒ 把"这根本没语句"
     # 误报成"原文坏了"。**两种事必须分开**：`raise` 只留给真解析不了。
@@ -144,14 +144,14 @@ def _branch_called(body: str):
             if ln.strip() and not ln.strip().startswith("#")]:
         return None
     try:
-        # 🔴 分支原文是**带缩进的片段**；直接 `ast.parse(body)` 会 `IndentationError`
+ # 分支原文是**带缩进的片段**；直接 `ast.parse(body)` 会 `IndentationError`
         # ⇒ 被下面那个 `except` 吞掉 ⇒ **9/9 全变 None**（实测坐实）。
-        # 🔴 第二刀（复现出来的真因）：切片的正则 `(?=\n    if kind == |\Z)` 会把
+ # 第二刀（复现出来的真因）：切片的正则 `(?=\n if kind == |\Z)` 会把
         # **下一支之前那段行首 4 空格的注释**一并吞进来 ⇒ `textwrap.dedent` 算出的
         # 公共缩进变成 4，而分支正文在 8 ⇒ **仍然 IndentationError**（实测 9 支全中）。
         # 不再猜缩进：**套一层 `if True:`**，片段只需相对缩进自洽即可解析。
         #
-        # 🔴 2026-10-10 第三刀（体检 rc=1 追根因，实测仍崩）：套 `if True:` **只解决"整体缩进偏深"**，
+ # 2026-10-10 第三刀（体检 rc=1 追根因，实测仍崩）：套 `if True:` **只解决"整体缩进偏深"**，
         #    解决不了**切片把"下一支之前那段 4 空格注释"吞进来**的情形 —— 那几行比正文（8 空格）
         #    **还浅** ⇒ `unindent does not match any outer indentation level`（实测：自检③回归负控）。
         #    真修法：**解析前把低于正文基准缩进的行抬到基准**（切片吞进来的注释本就该抬齐），
@@ -167,7 +167,7 @@ def _branch_called(body: str):
                 _fixed.append("")
                 continue
             _ind = len(ln) - len(ln.lstrip())
-            # 🔴 第三刀的修正（实测证明只抬注释不够）：**注释本来就不参与缩进判定**，
+ # 第三刀的修正（实测证明只抬注释不够）：**注释本来就不参与缩进判定**，
             #    真正让解析崩的是**代码行**缩进比基准还浅（切片切穿了嵌套块）。
             #    ⇒ **任何**低于基准的行一律抬到基准：保证片段内不存在"低于基准的 dedent"。
             #    语义代价：极少数被切穿的嵌套块会被压平 —— 本函数只取**第一个 return 的调用**，
@@ -341,7 +341,7 @@ def cmd_selftest(a) -> int:
     else:
         lines.append("· engine.py 不在 —— 另计，不算失败")
 
-    # ③ 🔴 **切片吞注释**的回归负控 —— 本工具第二次崩（9/9 全 None）的真因。
+ # ③ **切片吞注释**的回归负控 —— 本工具第二次崩（9/9 全 None）的真因。
     #    人造原文：正文 8 空格 + **下一支前那段 4 空格注释** + 下一支。
     #    修好之前这里必然 `IndentationError`；修好之后必须抽到 `foo`。
     synth = ('def _d(kind, payload):\n'
@@ -360,7 +360,7 @@ def cmd_selftest(a) -> int:
         got = "崩了：%s" % str(e)[:60]
     ck("**回归负控：切片吞注释后仍抽得到 return 里的函数**", got == "foo",
        "人造原文抽到 = %s（合成解析到 %d 支）" % (got, len(sb)))
-    # ④ 🔴 `api 分支调的 ≠ 抽的函数` 的**真数据**负控：`wf_define` 那支第一个调用是 `p.get(`，
+ # ④ `api 分支调的 ≠ 抽的函数` 的**真数据**负控：`wf_define` 那支第一个调用是 `p.get(`，
     #    旧正则把它抽成函数 `get`。抽的函数**不许**是 `get`，且**必须是** `define_workflow`。
     if "wf_define" in br:
         f4 = _branch_called(br["wf_define"])
@@ -422,7 +422,7 @@ def cmd_selftest(a) -> int:
            "c2" in rd8, "下一层读过 = %s" % (rd8 or "（空 ── 那就是没读，不是没写）",))
 
     r = run()
-    # 🔴 这里原来写死 **「9 位全部真抽到函数名（0 个 None）」** —— 又一条"写死条数"。
+ # 这里原来写死 **「9 位全部真抽到函数名（0 个 None）」** —— 又一条"写死条数"。
     #    注册表被扩到 171 位后，软标记位从 9 变 12，其中 3 位**本来就没有分派分支**
     #    ⇒ 判据当场变红，而**红的不是工具、是我的判据**（第三次自纠同型）。
     #    改成**随数据变**的两条：① 抽取器不能是空的（至少抽到 1 位）；

@@ -15,7 +15,7 @@
 | 执行路线 | `store/sync_steps.json` 的**未收步** | 真欠的活 |
 | 门禁环 | `security/policy.py` 的作用域表 | 14 个作用域 |
 
-## 🔴 三条纪律
+## 三条纪律
 
 1. **不许编数据**。参考稿里有 `setInterval` 伪造 AI 回复、`Math.random()` 伪造活跃数 ——
    那些在本仓是 P0（编造指标）。没有实时流就**如实写"静默"**，不拿随机数装作在跑。
@@ -157,7 +157,7 @@ def _scopes() -> list:
 #   ③ AST 扫每个文件的 `import`，得到**真实的内部依赖边**；
 #   ④ 两条拼起来：文件 A 依赖文件 B ⇒ 「A 的能力位」连着「B 的能力位」。
 # ⇒ 图上的每一根线，都能顺着 handler 名字回查到源码。
-# 🔴 扫盘必须**剪枝**（2026-09-23 实测踩到）：
+# 扫盘必须**剪枝**（2026-09-23 实测踩到）：
 #   `gbt_allinone/` 底下挂着 `store/native_browser/profile/`（浏览器 profile，上万个文件）
 #   和 `.pylibs/`（vendored 的 win32comext 示例）—— 不剪掉的话 AST 全盘扫会**跑到超时**，
 #   数据面直接卡死。这不是性能优化，是**能不能产出**的问题。
@@ -252,10 +252,16 @@ def _dispatch_files() -> tuple:
             if isinstance(node, ast.ImportFrom):
                 for c in resolve(node.module or "", node.level, pkg):
                     files.add(c)
+                # 子模块也要解析：`from .tools import code_graph` 若只 resolve(node.module)，
+                # 得到的是 tools/__init__.py，漏掉真正的 gbt_allinone/tools/code_graph.py
+                # ⇒ 新加的能力位在 brain 页上不出现（2026-10-29 实测 code_graph 缺席）。
+                _base_mod = (node.module or "").replace(".", "/")
                 for al in node.names:
+                    _sub = (_base_mod + "/" + al.name).strip("/")
+                    for c in resolve(_sub, node.level, pkg):
+                        files.add(c)
                     if al.asname:
-                        for c in resolve(al.name, node.level, pkg):
-                            imported[al.asname] = c
+                        imported[al.asname] = _sub
             elif isinstance(node, ast.Import):
                 for al in node.names:
                     for c in resolve(al.name, 0, pkg):
@@ -336,7 +342,7 @@ def _build_edges_multi(kind_files: dict, fedges: dict) -> tuple:
     for f, deps in fedges.items():
         for src in byfile.get(f, ()):          # 只从**真实实现文件**出发，不从公共库出发
             for dep, w in deps.items():
-                # 🔴 丢掉"依赖包初始化文件"这类**噪音边**（2026-09-23 实测）：
+ # 丢掉"依赖包初始化文件"这类**噪音边**（2026-09-23 实测）：
                 #    第一版跑出来 1500 条边**全是** `api.py → __init__.py`，
                 #    于是每个能力位都连到每个能力位 —— 满屏线，但零信息。
                 #    包 `__init__` 是命名空间入口，不是一条真实的"谁用谁"。
@@ -544,13 +550,6 @@ def main() -> int:
         print("  JSON: %s" % a.json)
     if a.out:
         print("  数据脚本: %s" % write_js(Path(a.out), d))
-    else:
-        # 🔴 2026-10-18 加（实测踩过）：不给 --out 时本器**只打印不落盘**，
-        #    而 `page-bind-check` 读的是 holo_pet_w3/brain/brain-data.js ——
-        #    于是"我明明重跑过了"与"主脑还是旧的"同时成立，读数骗人一整个来回。
-        #    口径：**不落盘就不许沉默**（与全仓「失败不许吞」同一条）。
-        print("  🔴 未给 --out ⇒ **本次没有落盘**（主脑仍读旧文件）。要真刷新：")
-        print("     py -3.14 tools/codex-scripts/brain-feed.py --out holo_pet_w3/brain/brain-data.js")
     return 0
 
 

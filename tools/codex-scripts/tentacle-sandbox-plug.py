@@ -26,7 +26,7 @@ def _register(asset: str, tentacle: str) -> dict:
         _spec = _ilu.spec_from_file_location("_tb", _p)
         _m = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_m)
         res = _m.bind(asset, tentacle, note="sandbox·双插", quiet=True)
-        # 🔴 必须看返回值：bind 有**在册闸**（血账 2026-09-27），不在册会 fail-closed 拒收；
+ # 必须看返回值：bind 有**在册闸**（血账 2026-09-27），不在册会 fail-closed 拒收；
         #    上一版我只写 {"ok": True} ⇒ **假绿**（判据说已登记、实际被拒）。
         if isinstance(res, dict) and res.get("ok"):
             return {"ok": True}

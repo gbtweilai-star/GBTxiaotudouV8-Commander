@@ -10,7 +10,7 @@
 某个 `"` 的**左右两侧都是中日韩字符/中文标点** ⇒ 它是"文案里的内层引号"，
 按出现顺序**成对**换成 「 」。**代码里真正的字符串定界符**（左邻是 `: ( , =`、右邻是空格/英文）**一律不动**。
 
-## 🔴 它不动什么
+## 它不动什么
 - 不动 ASCII 引号的**定界符**（只换"内层"那一对）；
 - **默认不写盘**（dry-run）；要写必须显式 `--write`，写盘用**字节**（不翻换行）。
 
@@ -99,7 +99,7 @@ def cmd_scan(roots: list[str], write: bool, only: str | None = None) -> int:
                 unread.append(rel)
                 continue
             for p in sorted(base.rglob("*.py")):
-                # 🔴 `store/` 是**数据区**（里面还有权限受限的目录，实测 PermissionError）；
+ # `store/` 是**数据区**（里面还有权限受限的目录，实测 PermissionError）；
                 #    本工具是改**源码**的，不去碰数据区 —— 与署名守卫的 `_is_data()` 同口径。
                 if any(s in p.parts for s in _SKIP) or p.name.startswith("_"):
                     continue
@@ -112,7 +112,7 @@ def cmd_scan(roots: list[str], write: bool, only: str | None = None) -> int:
         except Exception:                       # 🔴 读不开 ⇒ 进「未读到」，不静默丢
             unread.append(str(p.relative_to(ROOT)) if str(p).startswith(str(ROOT)) else str(p))
             continue
-        # 🔴 这一段原来被缩进到了 `except` 里（等于"只有读不开才扫"）—— 单件模式当场报 0 命中，
+ # 这一段原来被缩进到了 `except` 里（等于"只有读不开才扫"）—— 单件模式当场报 0 命中，
         #    而 selftest 只测 fix_line/scan_text，**看不见**。⇒ 现在加了 `cmd_scan` 的控制。
         r = scan_text(src)
         odd = odd_lines(src)
@@ -170,7 +170,7 @@ def selftest() -> int:
     n = scan_text('a = "中"文"引号"\n')
     ck("**正控：scan_text 报得出行号与处数**",
        n["命中行数"] == 1 and n["命中处数"] == 2, str(n["命中处数"]))
-    # 🔴 控制必须打到 `cmd_scan` 上（原来只测纯函数 ⇒ 单件模式的缩进错了都看不见）
+ # 控制必须打到 `cmd_scan` 上（原来只测纯函数 ⇒ 单件模式的缩进错了都看不见）
     import tempfile as _tf
 
     with _tf.TemporaryDirectory() as tds:

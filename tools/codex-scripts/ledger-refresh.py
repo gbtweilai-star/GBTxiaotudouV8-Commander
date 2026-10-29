@@ -210,7 +210,7 @@ def render_sheet(led: dict, logbook: list, at: datetime) -> tuple:
         "- 人写字那一半（现在在做 / 没做 / 未清故障 / 等你拍板）**写手不代笔**，只负责量它多久没动",
         "- 体检读数不在这里转述：跑 `python tools/codex-scripts/boot-selfcheck.py`（转述会漂）",
         "",
-        # 🔴 2026-10-18 镜像体检当场逮到：mirror_scan 的 signature 一项红 —— 本仓规矩是
+ # 2026-10-18 镜像体检当场逮到：mirror_scan 的 signature 一项红 —— 本仓规矩是
         #    「文本页（.md/.html/.htm/.txt/.csv）必须携带开发者署名」，判据是 signature.has_signature
         #    里那个标记串。生产上没暴露（题面不在那一步），镜像里 4/5 一跑就现形。
         "> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属",
@@ -236,7 +236,7 @@ def rotate(led: dict, logbook: list, at: datetime) -> tuple:
         h = sha16(led.get(key))
         old = prev_sections.get(key) or {}
         changed_at = old.get("changed_at")
-        # 🔴 只有这一节的 sha 与**上次落盘记下的**不同，才算人改过 ⇒ changed_at 才前进。
+ # 只有这一节的 sha 与**上次落盘记下的**不同，才算人改过 ⇒ changed_at 才前进。
         #    拿"当前内容跟自己比"永远相等 —— 那正是本轮第一版写歪的地方。
         if old.get("sha16") != h or not changed_at:
             changed_at = stamp(at)
@@ -366,7 +366,7 @@ def main(argv=None) -> int:
         return 0 if (not bad and not rot) else 1
 
     # ── 写手模式 ──
-    # 🔴 2026-10-18 三次自纠（全是"顺序/口径"错，不是笔误 —— 记在这里防下一版又踩）：
+ # 2026-10-18 三次自纠（全是"顺序/口径"错，不是笔误 —— 记在这里防下一版又踩）：
     #   ① `rot` 原先在写一屏账**之前**算 ⇒ 首跑把「文件不存在」存进 `_写手.rot`，
     #      下次读账的人看到的是**已经不成立**的腐烂项（本仓 F15/F16/F17 栽的就是"账比事实旧"）。
     #      ⇒ 先落一屏账，**再**复算 rot。

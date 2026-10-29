@@ -397,7 +397,7 @@ def cmd_gen(as_json: bool, check_only: bool, mesh_path=None, out_root=None, quie
     for rel, content in files.items():
         p = out_root / rel
         if not p.exists():
-            # 🔴 缺件 ≠ 内容漂移：一个读不到、一个读到了但不是这份。
+ # 缺件 ≠ 内容漂移：一个读不到、一个读到了但不是这份。
             #    两者混成一个数，排查时就会把「还没生成」念成「被人改过」。
             missing.append(rel)
         old = p.read_text(encoding="utf-8") if p.exists() else None
@@ -673,7 +673,7 @@ def cmd_edges(as_json: bool) -> int:
 # ── 真跑验收：对一个**已经跑起来**的实例量读数（只读探针，不部署）────────────
 # 为什么把「收读数」与「判读数」分成两件事：判决要能被自检喂假读数**真触发**，
 # 否则这一整套判据自己就是未验分支（本仓栽过：判据进不了控制 = 判据没验过）。
-# 🔴 令牌闸（2026-09-25 起**云端已开**）：Worker 设了 `GBT_ENDPOINT_TOKEN` 之后，
+# 令牌闸（2026-09-25 起**云端已开**）：Worker 设了 `GBT_ENDPOINT_TOKEN` 之后，
 #    `/v1/chat/completions` 不带 `Authorization: Bearer <同一个值>` 一律 **401**。
 #    验收工具如果**不会带令牌**，那它量到的全是我自己的 401 —— 看着像"模型坏了"。
 #    ⇒ 令牌只从**显式入参**来（`--token` / `--token-file` / 环境变量），**不写死、不进仓**；
@@ -743,7 +743,7 @@ def collect_live(base: str, timeout: float = 20.0, expect_llm: bool = False, exp
         probes["unc_route"] = http_json(b + "/rpc/gbt-c03-uncensored-lane/route", method="POST", payload={"prompt": "ping"}, timeout=max(timeout, 60.0))
     if expect_d1:
         tag = "probe-" + str(int(time.time() * 1000))
-        # 🔴 探针文本必须**独一份**：上一版所有探针共用同一句话 ⇒ 余弦全 1.0 并列 ⇒
+ # 探针文本必须**独一份**：上一版所有探针共用同一句话 ⇒ 余弦全 1.0 并列 ⇒
         #    top-3 里不一定轮到刚写进去那条 ⇒ 判据变成看运气（假红）。
         #    "写进去读得回"这条判据要成立，探针本身就得是可分辨的。
         ptext = "探针写入的一条向量记忆：" + tag
@@ -752,7 +752,7 @@ def collect_live(base: str, timeout: float = 20.0, expect_llm: bool = False, exp
         probes["vec_stats"] = http_json(b + "/rpc/gbt-c07-memory-vector/stats", method="POST", payload={}, timeout=timeout)
     if expect_storage:
         # 存储面（05 对象存储 / 08 KV / 10 落账）：Node 桩验过不算验，要**在真运行时里真写真读**。
-        # ⚠️ 05 与 08 的部分 op 挂门（filesystem_read/write）⇒ 云上要先有主人授权，
+ # 05 与 08 的部分 op 挂门（filesystem_read/write）⇒ 云上要先有主人授权，
         #    被挡时读数会带「被门挡住：缺 …」且**仍算红**。
         stag = "probe-" + str(int(time.time() * 1000))
         probes["f_put"] = http_json(b + "/rpc/gbt-c05-tool-file/put", method="POST", payload={"key": stag + ".txt", "text": "GBT存储探针"}, timeout=timeout)
@@ -766,10 +766,10 @@ def collect_live(base: str, timeout: float = 20.0, expect_llm: bool = False, exp
         probes["f_del"] = http_json(b + "/rpc/gbt-c05-tool-file/del", method="POST", payload={"key": stag + ".txt"}, timeout=timeout)
         probes["f_get2"] = http_json(b + "/rpc/gbt-c05-tool-file/get", method="POST", payload={"key": stag + ".txt"}, timeout=timeout)
     if expect_tools:
-        # 🔴 为什么要这道开关：我曾**漏了"真把 tools 发出去"这一步**，就对外说过
+ # 为什么要这道开关：我曾**漏了"真把 tools 发出去"这一步**，就对外说过
         #    「上游不支持工具调用」——**量错了**。判据必须**先把工具发出去**，再从回包里找
         #    `tool_calls`，并且**回喂工具结果**看它用不用。
-        # 🔴 回喂的工具结果里塞一个**本次运行现生成的哨兵**（现造现用，源码里没有这个字面量）：
+ # 回喂的工具结果里塞一个**本次运行现生成的哨兵**（现造现用，源码里没有这个字面量）：
         #    早先的判据是「正文里含 `18` 或 `晴`」—— 那是**自由文本子串**，
         #    被 `criterion_bench` 的 D2 当场点名（判据太弱：`18` 可以从任何地方来）。
         #    带哨兵之后，这个值**只可能来自我们回喂的那条工具结果** ⇒ 判据才真的在判
@@ -832,7 +832,7 @@ def judge_live(rd: dict, expect_llm: bool = False, expect_d1: bool = False, expe
     fp = body("full_ping")
     fr = fp.get("full_ping") or {}
     row("全互通实跑：每位摸其余 9 位、90 发全中", fr.get("tried") == fr.get("ok") == 90, f"{fr.get('ok')}/{fr.get('tried')}")
-    # 🔴 取证必须**在同一次请求内**。上一版拿"随后另发一次的 /edges"去对账 ——
+ # 取证必须**在同一次请求内**。上一版拿"随后另发一次的 /edges"去对账 ——
     #    本机单 isolate 时能过，**真云上必红**：Cloudflare 有多个 isolate，
     #    两次请求可能落在不同副本上，谁也没见过对方的计数（实测 1/90 · 增量 0）。
     #    这不是计数坏了，是**判据跨了它量不到的边界**。⇒ 用同一次 full-ping 响应里
@@ -845,7 +845,7 @@ def judge_live(rd: dict, expect_llm: bool = False, expect_d1: bool = False, expe
     row("跨请求计数：云上多副本 ⇒ 只作参考不作判据（本项只要求读得到）", cross is not None, f"另发一次请求读到 {cross}（本机单副本时会等于 90）")
 
     g = body("gate_put")
-    # 🔴 门的拒绝面只能拿**未授权**的作用域来量。上一版探的是 filesystem_write，
+ # 门的拒绝面只能拿**未授权**的作用域来量。上一版探的是 filesystem_write，
     #    而冒烟配方里正好给它发过授权 ⇒ 有授权时这条必然假红（与"默认冷实例"同族：
     #    判据默认了某个前提却没说）。现在探 process_execute（冒烟配方从不发它），
     #    并把**在册授权**一起报出来 —— 万一它也在册，红字自己会说明原因。
@@ -863,7 +863,7 @@ def judge_live(rd: dict, expect_llm: bool = False, expect_d1: bool = False, expe
 
     # 有门的 op（external_llm）被挡时，读数要**原样念出缺哪个作用域**，
     # 否则红因离根因很远 —— 但**仍然算红**：没验过就是没验过，不许念成通过。
-    # ⚠️ 它必须定义在**所有** expect_* 分支之外：放在 expect_llm 里的话，
+ # 它必须定义在**所有** expect_* 分支之外：放在 expect_llm 里的话，
     #    单开 --expect-image 时它就是未定义名（本轮当场 NameError）。
     def blocked_note(k):
         pr = p.get(k) or {}
@@ -919,7 +919,7 @@ def judge_live(rd: dict, expect_llm: bool = False, expect_d1: bool = False, expe
         mr = body("m_remember")
         mq = body("m_recall")
         ml = body("m_list")
-        # 🔴 比的是**记忆键**（mr.k），不是文件键 —— 上一版拿 f_put 的 key（带 .txt）去比
+ # 比的是**记忆键**（mr.k），不是文件键 —— 上一版拿 f_put 的 key（带 .txt）去比
         #    记忆列表 ⇒ 必然对不上（自造假红）。
         mkey = mr.get("k")
         row("08 号 KV 写读往返成立（真落点 KV）", mr.get("ok") is True and mq.get("found") is True and mq.get("v") == "记忆探针", f"sink={mr.get('sink')} found={mq.get('found')} v={mq.get('v')}")
@@ -938,7 +938,7 @@ def judge_live(rd: dict, expect_llm: bool = False, expect_d1: bool = False, expe
         honest = ("管道" in igb) if ig.get("ok") is True else (ig.get("reason") == "未读到" and bool(igb))
         row("03 号图像面读数如实分档（接线说管道 / 没接线说明没接线）", honest, igb[:44])
     if expect_tools:
-        # 🔴 为什么要这道开关：我曾**漏了"真把 tools 发出去"这一步**，就对外说过
+ # 为什么要这道开关：我曾**漏了"真把 tools 发出去"这一步**，就对外说过
         #    「上游不支持工具调用」——**量错了**。判据必须**先把工具发出去**，再从回包里找
         #    `tool_calls`，并且**回喂工具结果**看它用不用。
         t1 = body("tool_turn1")
@@ -1080,18 +1080,10 @@ def selftest() -> int:
     # 负控 7：件漂移要红（拿真件改一个字节去对账）
     with tempfile.TemporaryDirectory() as td:
         tdp = Path(td)
-        # 手写件 + 公共件必须按**真件树**摆好 —— 否则控制本身失真。
-        # 🔴 2026-10-14 修（实测根因，别改判据掩盖）：
-        #   原夹具只搬 modules.js / worker.js，而 worker.js 静态 import "./slots.generated.js"
-        #   —— 那份是**另一个生成器**的产物（slots 面），不是 cloud-mesh gen 的活 ⇒ 临时树缺它
-        #   ⇒ 树级扫描把 src/worker.js 判成坏件，连带「正控·干净目录生成」「正控·树级扫描干净」
-        #      「负控·树级扫描抓到坏件」3 条一起红（selftest 73/76）。
-        #   现读：**真件树** import_problems(ROOT/deploy/cloud-10) == {}（干净）⇒ 红的是夹具不是成品。
-        #   修法：照"真件树 src/ 下真实存在的 .js"现读搬运，**不写死名单**（以后多一个公共件也不会再红）。
+        # 手写件（modules.js / worker.js）不是生成物，必须先按装机布局摆好 —— 否则控制本身失真
         (tdp / "src").mkdir(parents=True, exist_ok=True)
-        real_src = ROOT / "deploy/cloud-10/src"
-        for name in sorted(p.name for p in real_src.glob("*.js")):
-            shutil.copy2(real_src / name, tdp / "src" / name)
+        for hand in ("modules.js", "worker.js"):
+            shutil.copy2(ROOT / "deploy/cloud-10/src" / hand, tdp / "src" / hand)
         rc = cmd_gen(as_json=True, check_only=False, mesh_path=ROOT / MESH_REL, out_root=tdp, quiet=True)
         ck("正控·干净目录生成 rc=0", rc == 0, str(rc))
         target = tdp / GEN_REL.split("deploy/cloud-10/")[1]
@@ -1196,7 +1188,7 @@ def selftest() -> int:
     r_good = judge_live(mk_rd())
     ck("正控·真跑判决：全好 ⇒ 全过", all(x["过"] for x in r_good), f"{sum(x['过'] for x in r_good)}/{len(r_good)}")
     # expect_llm 模式：多收两条判据；喂"空内容 / 假 weights_ours"必须红
-    # ⚠️ 必须**在同一份读数上**加，不能 `mk_rd()["probes"][...] = ...` ——
+ # 必须**在同一份读数上**加，不能 `mk_rd()["probes"][...] = ...` ——
     #    那是往一个临时对象里写，下一行又新建一份 ⇒ 控制自己失真（本轮当场踩到，16/20）
     dam_ok = mk_rd()
     dam_ok["probes"]["llm_complete"] = {"status": 200, "body": {"ok": True, "content": "我是GBT小土豆V8。", "ms": 12, "model": "gbt-potato-v8", "weights_ours": True, "content_path": "choices[0].message.content", "identity_injected": True}}

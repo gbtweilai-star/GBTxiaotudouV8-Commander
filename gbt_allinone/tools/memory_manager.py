@@ -14,15 +14,30 @@
 所有语句都是**内联字面量**、**全部走 `?` 占位符**；**不用变量拼 SQL、不做字符串相加**
 （安全钩子的 SQL 注入判据就盯这一条 —— 实测被拦过两次，都是因为 SQL 放在变量里/做了拼接）。
 
-## 六类源
+## 七类源
 | type | 源 |
 |---|---|
-| 记忆 | `memory/*.md` |
+| 记忆 | `memory/*.md`（**触手**的记忆） |
 | 文档 | `docs/*.md` + 根白名单（AGENTS/LAYOUT/README/CURRENT/CODING_DISCIPLINE） |
 | 技能 | `skills/*/SKILL.md` |
 | 状态 | `state/*.jsonl` · `state/*.json` |
 | 能力 | `caps_registry.BENIGN_CAPS`（kind + 域 + 描述）——**"匹配面出现的能力"** |
 | 代理 | `~/.zcode/agents/*.md`（我们装的助理） |
+| 助手记忆 | `<repo>/.workbuddy-ai/memory/*.md` + **各 git worktree** 的同名目录（AI 助手自己写的 MEMORY/日流）。<br>2026-10-29 主人令「把她的记忆和触手记忆统一一下」：原来这两套互不索引，同一天的日流在主干与 worktree 里还是两份不同内容 ⇒ 收进同一张 FTS5，find 一次全搜到。 |
+
+## 🔴 检索局限：搜不到 ≠ 没有（实测 2026-10-29）
+
+建表写的是 `fts5(type, path, label, body)`，**没指定 tokenize** ⇒ 默认 unicode61。
+它把**连续汉字整段当成一个 token**（汉字之间没有空格），于是：
+
+| 形态 | 例子 | 能否搜到 |
+|---|---|---|
+| 表格 / 标点 / 空格隔开的词 | `一体式`、`判据` | 能 |
+| 连续句子里的词 | 「灰影棚」里的 `影棚`、正文里的 `外壳导航` | **搜不到**（实测：`影棚` 只命中 state，没命中写它的日流） |
+
+⇒ **「find 没有」不等于「记忆里没有」**。要精确定位某段话，用 3 字以上的词，或直接 `grep`。
+换 `trigram` 能让子串可搜（2 字仍不行，索引会明显变大），但那是另一件事 —— 本轮没动，
+因为改 tokenizer 要重建全库、且会改变既有检索行为。
 
 ops：index（增量）/ find（秒搜）/ store（存记忆·过写门）/ stats
 """
@@ -32,6 +47,7 @@ import glob
 import hashlib
 import json
 import sqlite3
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -41,6 +57,45 @@ _DB = _ROOT / "state" / "memory_fts.db"
 _META = _ROOT / "state" / "memory_index_meta.json"
 _MAX_DOC_BYTES = 400_000
 _AGENTS = Path.home() / ".zcode" / "agents"
+
+
+def _ai_memory_dirs() -> list:
+    """AI 助手自己的记忆目录（WorkBuddy 的 MEMORY.md + 当日流水）。
+
+    为什么要收它们（主人令 2026-10-29「把她的记忆和触手记忆统一一下」）：
+      这些记忆原来只在 `.workbuddy-ai/memory/` 里躺着，**六类源一个都不覆盖**
+      ⇒ 触手搜不到助手记得的事，助手也不查触手的记忆，两套各说各话。
+      实测同一天的日流文件，主干 `.workbuddy-ai/memory/` 与 worktree 那份**内容完全不同**
+      （一份在追「索引缺腿 101 位」，一份在做「皮肤 374/374 + 一体式」—— 是两个会话各写一处）。
+
+    为什么要扫 worktree：本仓是**多 worktree 并发写**的，每个 worktree 各有一份
+    `.workbuddy-ai`。只收 `_ROOT` 那份，等于漏掉正在干活的那个。
+    """
+    dirs = [_ROOT / ".workbuddy-ai" / "memory"]
+    try:
+        r = subprocess.run(["git", "worktree", "list", "--porcelain"], cwd=str(_ROOT),
+                           capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=10)
+        for line in (r.stdout or "").splitlines():
+            if line.startswith("worktree "):
+                dirs.append(Path(line[len("worktree "):].strip()) / ".workbuddy-ai" / "memory")
+    except (OSError, subprocess.SubprocessError):
+        pass
+    seen, out = set(), []
+    for d in dirs:
+        try:
+            key = str(d.resolve())
+        except OSError:
+            continue
+        # 排除 .scratch 下的：`git worktree list` 会把 `.scratch/_baseline_wt`
+        # 这类**临时快照**也算成 worktree，但那是旧数据，收进来只会污染检索。
+        if ".scratch" in d.parts:
+            continue
+        if key in seen or not d.is_dir():
+            continue
+        seen.add(key)
+        out.append(d)
+    return out
 
 
 def _sources() -> list:
@@ -56,6 +111,11 @@ def _sources() -> list:
         p = _ROOT / name
         if p.is_file():
             out.append(("文档", p))
+    # 第七类：AI 助手的记忆（含各 worktree 的副本）—— 与「记忆」（触手 memory/*.md）分开放，
+    # 但同在**一个索引**里：find 不传 type 时一次全搜到，这就是「统一」的落点。
+    for d in _ai_memory_dirs():
+        for f in sorted(d.glob("*.md")):
+            out.append(("助手记忆", f))
     return out
 
 

@@ -11,7 +11,7 @@
     pipeline/cache/frames/<job_id>/index.json    该作业的帧清单
     pipeline/cache/frames/index.json             作业总表
 
-## 🔴 分布式正确性闸（这是"永远不会出错"的实处）
+## 分布式正确性闸（这是"永远不会出错"的实处）
 多终端共用缓存时，**同名不同内容**是最危险的形态：别的终端会读到错的帧而不报错。
 所以 `put` 撞名时：
   · 同名**同 sha** ⇒ **幂等跳过**（rc=0，不重写）
@@ -121,7 +121,7 @@ def cmd_put(a) -> int:
     idx = _jidx(ra, a.job_id)
     old = idx.get(name)
 
-    # 🔴 撞名闸：同 sha 幂等跳过 / 不同 sha 拒（绝不静默覆盖）
+ # 撞名闸：同 sha 幂等跳过 / 不同 sha 拒（绝不静默覆盖）
     if old and old.get("sha256") == sha:
         print(json.dumps({"ok": True, "判决": "**幂等跳过**：该作业已有同名同内容帧，不重传",
                           "job_id": a.job_id, "name": name, "sha256_前16": sha[:16]},

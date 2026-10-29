@@ -31,7 +31,7 @@ SRC = ROOT / "vendor" / "node_modules" / "three"
 FILES = {
     "three.module.min.js": "build/three.module.min.js",
     "OrbitControls.js": "examples/jsm/controls/OrbitControls.js",
-    # 🔴 `Pass.js` **必须单独 vendor**（首跑漏了它，页面报 4 次
+ # `Pass.js` **必须单独 vendor**（首跑漏了它，页面报 4 次
     #    "Class extends value undefined" + "ShaderPass is not a constructor"）：
     #    three 的后处理链是 `ShaderPass extends Pass`、`MaskPass extends Pass` …，
     #    而 `Pass` 住在**自己的文件** `examples/jsm/postprocessing/Pass.js` 里，
@@ -44,20 +44,12 @@ FILES = {
     "UnrealBloomPass.js": "examples/jsm/postprocessing/UnrealBloomPass.js",
     "CopyShader.js": "examples/jsm/shaders/CopyShader.js",
     "LuminosityHighPassShader.js": "examples/jsm/shaders/LuminosityHighPassShader.js",
-    # 🔴 2026-10-18 追加（语音剧场要放**真 3D 数字人**，工程里现成 dh-v2-rigged.glb）：
-    #    `GLTFLoader` 是**唯一的 glTF 入口**，工程里从来没有 vendor 过 —— 而剧场不留静态图。
-    #    它还 import 了 `toTrianglesDrawMode`（住在 BufferGeometryUtils 里，不在入口库的导出里）
-    #    ⇒ 与 Pass.js 同型的坑：**必须单独 vendor，且依赖序在前**，否则经典脚本里拿到 undefined，
-    #    表现为「模型载入到一半报错、画面空白」。
-    "BufferGeometryUtils.js": "examples/jsm/utils/BufferGeometryUtils.js",
-    "GLTFLoader.js": "examples/jsm/loaders/GLTFLoader.js",
 }
 
 # 改写规则：裸名 → 相对路径；原来指向 `../shaders/` 的在扁平化后要去掉层级
-# 2026-10-18 补 `utils`：GLTFLoader → `../utils/BufferGeometryUtils.js` 同样要被扁平化。
 RULES = [
     (re.compile(r"""(from\s+['"])three(['"])"""), r"\1./three.module.min.js\2"),
-    (re.compile(r"""(from\s+['"])\.\./(?:shaders|postprocessing|controls|utils)/([^'"]+)(['"])"""),
+    (re.compile(r"""(from\s+['"])\.\./(?:shaders|postprocessing|controls)/([^'"]+)(['"])"""),
      r"\1./\2\3"),
 ]
 
@@ -174,7 +166,7 @@ def main() -> int:
         # 顺序 = 依赖序：先入口库，再 shader，再 pass，最后控制器
         order = ["Pass.js", "CopyShader.js", "LuminosityHighPassShader.js", "MaskPass.js",
                  "ShaderPass.js", "RenderPass.js", "EffectComposer.js", "UnrealBloomPass.js",
-                 "OrbitControls.js", "BufferGeometryUtils.js", "GLTFLoader.js"]
+                 "OrbitControls.js"]
         ok, why = (True, "")
         if a.write:
             ok, why = _emit_three_global(SRC, DST / "three.global.js")

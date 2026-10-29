@@ -8,7 +8,7 @@
 `edit_pipeline`（实现 `gbt_allinone/tools/edit_core.py`）**能不能**把**多段短视频**
 按短视频方式拼成一条片：**不同来源 → 归一化到同一画布 → 逐段切段 → 转场(xfade)串联 → 出片**。
 
-## 🔴 三条纪律
+## 三条纪律
 1. **全程走唯一门** `five-dim.py cap edit_pipeline`（`run_task`）——**不直调模块函数绕门**；
 2. **不拿「命令成功」当结论**：出片后用 `probe` **ffprobe 回读**，并把
    **模块自己算的时长** 与 **实测时长** 对账（两个独立来源必须一致）；
@@ -151,14 +151,14 @@ def run_proof() -> dict:
 
     vid = p.get("video") if isinstance(p, dict) else None
     vid = vid if isinstance(vid, dict) else {}
-    # 🔴 **按真契约取值**（`five-dim.py cap edit_pipeline '{"op":"probe",…}'` 的实读结构）
+ # **按真契约取值**（`five-dim.py cap edit_pipeline '{"op":"probe",…}'` 的实读结构）
     dur_real = p.get("duration") if isinstance(p, dict) else None
-    # 🔴 2026-09-25 补：`实测: null` 这个读数**会把人骗到 ffmpeg 上去**（实测我就被骗了一次）——
+ # 2026-09-25 补：`实测: null` 这个读数**会把人骗到 ffmpeg 上去**（实测我就被骗了一次）——
     #    真因是「能力注册表被并发重写 ⇒ probe 那条链取不到读数」。
     #    ⇒ **取不到读数时必须把"为什么取不到"一起报出来**，不许只留一个 null。
     probe_why = None
     if not isinstance(dur_real, (int, float)):
-        # 🔴 取不到读数时**必须带原因**（不然 `null` 会把人骗到 ffmpeg 上去，实测被骗过一次）。
+ # 取不到读数时**必须带原因**（不然 `null` 会把人骗到 ffmpeg 上去，实测被骗过一次）。
         #    追因那段已抽成 `why_no_reading()` —— 抽出来**就是为了能被负控真触发**：
         #    它原来长在这里、从没被触发过，真触发才发现引用了不存在的局部名。
         probe_why = why_no_reading(_keys(p))
@@ -195,7 +195,7 @@ def run_proof() -> dict:
         "🔴 对账（两个独立来源必须一致）": {
             "预期": round(expect, 3), "实测": dur_real,
             "差": round(abs(got - expect), 3), "过": ok_dur,
-            # 🔴 取不到读数时**必须带原因**（不然 `null` 会把人骗到 ffmpeg 上去，实测被骗过一次）
+ # 取不到读数时**必须带原因**（不然 `null` 会把人骗到 ffmpeg 上去，实测被骗过一次）
             **({"为什么取不到读数": probe_why} if probe_why else {}),
             "判据": "|实测 − 预期| ≤ 0.10 s（预期 = Σ段时长 − Σ转场重叠）"},
         "临时目录已清": work_cleaned,
@@ -208,7 +208,7 @@ def run_proof() -> dict:
 def cmd_run(a) -> int:
     res = run_proof()
     print(json.dumps(res, ensure_ascii=False, indent=1))
-    # 🔴 收尾打印**只引用短而稳的键**。第一版引用了那个长中文键（还带着已被换掉的
+ # 收尾打印**只引用短而稳的键**。第一版引用了那个长中文键（还带着已被换掉的
     #    ASCII 引号版本）⇒ **KeyError**：**"键名也是契约，不能凭记忆写"**。
     r = res["🔴 对账（两个独立来源必须一致）"]
     ok = bool(r["过"]) and res["文件在盘"] and res["临时目录已清"]
@@ -251,7 +251,7 @@ def cmd_selftest(a) -> int:
         lines.append("%s %s — %s" % ("✓" if cond else "✗", name, detail))
 
     # ① 门必须是**唯一入口**：不许直调 edit_core 模块
-    # 🔴 **这里原来写成 `"import edit_core" not in src`（文本判据）—— 当场自指、永远红**：
+ # **这里原来写成 `"import edit_core" not in src`（文本判据）—— 当场自指、永远红**：
     #    `src` 就是本文件自己的文本，而那个字面量**本身就在文件里** ⇒ `in src` **必然为真**。
     #    是 `criterion_bench` 的 D6「形状④（恒真自指）」抓出来的 —— **判据质量台架抓到了台架使用者**。
     #    改成 **AST 扫真 import**：语义相同，但不会被判据自己列的字面量骗到。
@@ -259,7 +259,7 @@ def cmd_selftest(a) -> int:
     bad_imports = _direct_imports(ast.parse(Path(__file__).read_text(encoding="utf-8")))
     ck("**全程走唯一门**（AST 扫真 import，不扫源码文本 —— 文本会匹配到判据自己）",
        not bad_imports, "直调 import: %s" % (bad_imports or "无"))
-    # 🔴 负控：种一段**真的直调 import** ⇒ 必须咬出来（否则判据是空的）
+ # 负控：种一段**真的直调 import** ⇒ 必须咬出来（否则判据是空的）
     planted = _direct_imports(ast.parse("from gbt_allinone.tools import edit_core\n"))
     ck("**负控：真的直调 import 必须被咬出来**", len(planted) == 1, "咬出: %s" % planted)
     # ② 判据必须**随数据变**：换一组段时长，预期值必须跟着变
@@ -286,7 +286,7 @@ def cmd_selftest(a) -> int:
                                              for s in one[1:])
     ck("**负控：只有一段时不许减重叠**", abs(e_one - 2.0) < 1e-9, "e=%.3f" % e_one)
     # ⑥–⑪ 「取不到读数」那条**诚实分支**：抽成函数就是为了能在这里真触发它。
-    # 🔴 它原来长在 `run_proof()` 里、**从未被触发过**；真触发时会 `NameError`（引用了不存在的局部名）。
+ # 它原来长在 `run_proof()` 里、**从未被触发过**；真触发时会 `NameError`（引用了不存在的局部名）。
     #    ⇒ 四种出口各一条负控 + 一条现读真体检，**"没响过"不许再当"没问题"**。
     GOOD = {"注册表可读": True, "缺的表（读了但类型不对/没有）": []}
     why_good = why_no_reading(["duration"], health_fn=lambda: GOOD)

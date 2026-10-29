@@ -42,7 +42,7 @@ for _s in (sys.stdout, sys.stderr):
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RA_PATH = ROOT / "tools" / "codex-scripts" / "render-agent.py"
 
-# 🔴 本地替身云：**只给自检用**（`selftest` 验顺序门时不能真往云上写）。
+# 本地替身云：**只给自检用**（`selftest` 验顺序门时不能真往云上写）。
 #    设了它，所有 put/get 落到本地目录，等价于把 R2 换成一块本地盘 —— 顺序门的**代码路径完全一样**。
 LOCAL_CLOUD = os.environ.get("GBT_PLUGIN_CLOUD_LOCAL", "").strip()
 
@@ -79,7 +79,7 @@ ROSTER = ROOT / "state" / "tentacle-roster.json"
 
 # ── 运用到的每一件都独立成槽（主人 2026-09-24 令：「把所有运用到的都独立使用触手根数来部署」
 #    「排列好就像计算机一样永远不会出错却一清二楚」）─────────────────────────────────
-# 🔴 这里只登记**本会话真用过**的件（有真跑读数）。**没真跑过的不许进这张表** —— 一进就等于自夸。
+# 这里只登记**本会话真用过**的件（有真跑读数）。**没真跑过的不许进这张表** —— 一进就等于自夸。
 #    字段：编号 · 名称 · 做什么（备注）· 落点 · 真命令 · 关联模块 · 状态 · 出处（读数从哪来）
 PLUGIN_SLOTS = [
     ("P01", "deploy-panel.py", "主控面板：编号·顺序·拒单·触手排班（本工具）", "LOCAL",
@@ -239,7 +239,7 @@ def _invariants(n: int) -> dict:
     if not n:
         return {"结论": "触手根数未声明 ⇒ 不排班（fail-closed）"}
     rows = _schedule(n)
-    # ⚠️ `_schedule` 返回的是 **dict 列表**（键 "负责插件" 才是编号表）——
+ # `_schedule` 返回的是 **dict 列表**（键 "负责插件" 才是编号表）——
     #    写成 `for p in row` 会把 **dict 的键**当元素（取到键首字母），是另一个刚踩的坑。
     covered = [pid for row in rows for pid in row.get("负责插件", [])]
     twice = sorted({x for x in covered if covered.count(x) > 1})
@@ -300,7 +300,7 @@ def _fusion_brief() -> list:
         aft = two.get("给参后（合并）") or {}
         return [
             ("自身融合（能力面）", "%s 位 ｜ 出处 %s" % (C.get("已探位", C.get("能力位")), C["出处"])),
-            # 🔴 **两个口径并排**：只报一个数不写口径，就是本仓反复吃的那类亏
+ # **两个口径并排**：只报一个数不写口径，就是本仓反复吃的那类亏
             #    （`16 道闸` / `现读 296 个 .py` / `len(steps) == 5`）。
             ("自身融合（授权面·**两个口径**）",
              "【空参探】已通 %s ｜ 缺授权 %s（%s 作用域）｜ 缺参 %s ｜ 真痛 %s ｜ "
@@ -457,7 +457,7 @@ def _caps_brief() -> dict:
             return {"ok": False, "why": cs.get("why")}
         inter = sorted(set(cs["可探针"]) & set(cs["须排除·改状态"]))
         # 真探快照（**带时间戳**，不是现读）——两个数分开念。
-        # 🔴 **优先读累积账** `caps-probe-accum.json`：它按 kind 合并，单点探测**冲不掉**；
+ # **优先读累积账** `caps-probe-accum.json`：它按 kind 合并，单点探测**冲不掉**；
         #    退回单轮快照只是兜底（实测事故：一次 `--kind` 单探把 138 位视图覆盖成 1 位）。
         snap = {}
         for _name in ("caps-probe-accum.json", "caps-probe-last.json"):
@@ -594,7 +594,7 @@ def cmd_html(a) -> int:
                       '<code>py -3.14 tools/codex-scripts/nerve.py map</code></span></div>')
 
     # ── 七 · 社交托管格（账号 × 触手，插件形态）────────────────────────────────
-    # 🔴 位置纪律：这一块必须挂在 **nerve_html 整个 if/else 之后**。
+ # 位置纪律：这一块必须挂在 **nerve_html 整个 if/else 之后**。
     #    我第一版把它插进了 `nerve_html = (` 的赋值中间，把赋值头吃掉了 ——
     #    语法直接崩、而且是**我自己造的崩**（不是被测对象坏）。改完立刻跑 selftest 验。
     soc = _social_section()
@@ -1158,7 +1158,7 @@ def cmd_selftest(a) -> int:
     ck("排班·五条不变式全绿（一件只挂一根 · 无漏挂 · 排数=根数 · 编号唯一 · 件不重复注册）",
        all(str(inv.get(k, "")).startswith("✅") for k in keys5),
        "根数=%s · %s" % (n, inv.get("结论")))
-    # ⑥b 🔴 负控：塞一个重名件 ⇒ 第⑤条必须变红（证明判据不是假判据）
+ # ⑥b 负控：塞一个重名件 ⇒ 第⑤条必须变红（证明判据不是假判据）
     global PLUGIN_SLOTS
     keep_slots = PLUGIN_SLOTS
     PLUGIN_SLOTS = list(keep_slots) + [

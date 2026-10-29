@@ -51,13 +51,18 @@ TEMPLATE = """/* GBT小土豆V8 · 紧凑导航（唯一一份 · 由 tools/code
  *   ① 页面里先写 window.GBT_NAV_DISABLE = true        —— 例如控制面板，它有自己的左栏；
  *   ② window.gbtW3 在（= 运行在壳里）                  —— 壳的标题栏本来就有一条窗口切换条，
  *      再画一条 = 60px 内两条导航。壳外（普通浏览器打开）照旧画，页面照样能到处跳。
+ *   ③ URL 带 embed=1（= 被一体式外壳的 iframe 载入）    —— 2026-10-28 加。
+ *      为什么需要这一条：Electron 的 preload **只注入主 frame**，iframe 里的页面拿不到
+ *      window.gbtW3，于是判据 ② 失效、子页照样画导航 ⇒ 外壳顶栏 + 子页导航 = 双层导航。
+ *      外壳（shell/app-shell.html）载页时统一加 ?embed=1，把这一层让出来。
  *   想强行画回来：window.GBT_NAV_FORCE = true
  */
 window.GBT_NAV_INDEX = __DATA__;
 (function () {
-  if (window.GBT_NAV_FORCE) { /* 强行画：跳过下面两道闸 */ }
+  if (window.GBT_NAV_FORCE) { /* 强行画：跳过下面三道闸 */ }
   else if (window.GBT_NAV_DISABLE) return;
   else if (window.gbtW3) return;   /* 壳里：标题栏已有窗口切换条，别再画一条 */
+  else if (/[?&]embed=1(&|$)/.test(String((window.location && window.location.search) || ""))) return;
   var ME = document.currentScript;
   var ROOT = (ME && ME.src || '').replace(/\\/shell\\/nav-compact\\.js.*$/, '');
   var PRIMARY = __PRIMARY__;

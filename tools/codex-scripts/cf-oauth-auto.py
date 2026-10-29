@@ -329,7 +329,7 @@ def import_chrome(limit=10):
                     copied += 1
                 except Exception:                        # noqa: BLE001
                     pass
-        # 🔴 关键：Chrome 的 cookie 用「用户级密钥」加密，那把钥匙在 User Data\Local State（配置目录之外）。
+ # 关键：Chrome 的 cookie 用「用户级密钥」加密，那把钥匙在 User Data\Local State（配置目录之外）。
         # 只拷配置目录会导致 cookie 解不开 ⇒ Cloudflare 仍把人当未登录（实测 2026-10-23：跳到 Google 登录页）。
         try:
             base_root = os.path.dirname(p["dir"])

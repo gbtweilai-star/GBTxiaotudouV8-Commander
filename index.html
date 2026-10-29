@@ -3,274 +3,438 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GBT小土豆V8 · 总指挥大模型 · 开源发布页</title>
-<meta name="description" content="7.6B 中文「总指挥」模型：348 个原生能力位的路由、讲解与授权门，335 题能力基准 PASS45 330/335（98.51%–99.10% 两轮）。">
-<meta name="theme-color" content="#0b0e13">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="小土豆V8">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<title>GBT小土豆V8 · 总入口</title>
+<!-- 内联 data: icon：不依赖路径（DSH 宿主 / file:// 都成立）。
+     ⚠️ 这条要留在**模板**里：先前它是手补在生成产物上的，一旦重新生成就被冲掉，
+     浏览器转而请求 /favicon.ico 拿 404，控制台多一条红字。 -->
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB2gAH/8kQ0dQAAAABJRU5ErkJggg==">
 <style>
-  :root{
-    --bg:#0b0e13; --bg-soft:#11161f; --line:#1d2530; --ink:#e8edf5; --ink-dim:#9aa7b8;
-    --potato:#e0a03a; --green:#2ea043; --blue:#4c8dff; --purple:#8957e5;
-    --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Consolas,"Courier New",monospace;
-    --sans:system-ui,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7}
-  a{color:var(--blue);text-decoration:none}
-  a:hover{text-decoration:underline}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  header{padding:72px 0 40px;border-bottom:1px solid var(--line);
-    background:radial-gradient(900px 320px at 18% -10%,rgba(224,160,58,.14),transparent 70%)}
-  .kicker{font:600 13px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--potato)}
-  h1{font-size:clamp(30px,4.6vw,50px);line-height:1.18;margin:14px 0 10px;letter-spacing:-.01em}
-  h1 small{display:block;font-size:.42em;font-weight:500;color:var(--ink-dim);letter-spacing:0;margin-top:12px}
-  .lead{max-width:74ch;color:#c8d2e0;font-size:17px;margin:18px 0 0}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0;padding:0;list-style:none}
-  .chips li{font:600 12px/1 var(--mono);color:#cfe0ff;background:#16202e;border:1px solid #24344a;
-    border-radius:999px;padding:7px 12px}
-  .mono{font-family:var(--mono)}
-  main{padding:8px 0 72px}
-  section{padding:38px 0;border-bottom:1px solid var(--line)}
-  section:last-of-type{border-bottom:0}
-  h2{font-size:23px;margin:0 0 6px;letter-spacing:-.01em}
-  h2 .n{font:600 12px/1 var(--mono);color:var(--potato);vertical-align:2px;margin-right:10px}
-  .sub{color:var(--ink-dim);margin:0 0 22px;font-size:14.5px}
-  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(232px,1fr))}
-  .card{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .card h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
-  .card p{margin:0;color:#b9c5d6;font-size:14px}
-  .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
-  .d-ok{background:var(--green)} .d-mid{background:var(--potato)} .d-blue{background:var(--blue)}
-  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--bg-soft);
-    border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  caption{caption-side:top;text-align:left;color:var(--ink-dim);font-size:13px;padding:0 0 10px}
-  th,td{padding:11px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-  thead th{background:#16202c;font:600 12px/1.3 var(--mono);letter-spacing:.04em;color:#b7c6da}
-  tbody tr:last-child td{border-bottom:0}
-  td.num{font-family:var(--mono);white-space:nowrap}
-  pre{background:#0e131b;border:1px solid var(--line);border-radius:12px;padding:15px 17px;
-    overflow:auto;font:13px/1.65 var(--mono);color:#cfe0ff}
-  pre .c{color:#6f7f92}
-  .honest{background:linear-gradient(180deg,#1a1512,#12100e);border:1px solid #3a2c1c;
-    border-radius:12px;padding:18px 20px}
-  .honest h3{margin:0 0 10px;font-size:15px;color:var(--potato)}
-  .honest ul{margin:0;padding-left:20px;color:#cfc2b2;font-size:14px}
-  .honest li{margin:5px 0}
-  footer{padding:34px 0 60px;color:var(--ink-dim);font-size:13px}
-  footer p{margin:6px 0}
-  .links{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px;padding:0;list-style:none}
-  .links a{display:inline-block;padding:9px 14px;border:1px solid #24344a;border-radius:9px;
-    background:#16202e;font-size:14px;font-weight:600}
-  .phones{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));align-items:start}
-  .shot{margin:0;background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:10px}
-  .shot img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid #0c1118}
-  .shot figcaption{color:#b9c5d6;font-size:13px;margin-top:9px;line-height:1.6}
-  @media (max-width:640px){header{padding:52px 0 30px}.grid{grid-template-columns:1fr}}
+/* ── 令牌：唯一允许写裸色值的地方（与上帝视角同源） ── */
+:root {
+  --gold:#F5B041; --cyan:#00E5FF; --violet:#7C4DFF;
+  --ok:#22C55E; --warn:#F5B041; --fault:#EF4444; --off:#6B7280;
+  --bg:#04060E; --bg-2:#070B18; --panel:rgba(10,15,32,.72);
+  --line:rgba(124,77,255,.26); --line-hot:rgba(0,229,255,.42);
+  --text:#E8ECF8; --dim:#93A0C0; --faint:rgba(147,160,192,.5);
+  --radius:10px; --radius-ctl:6px; --radius-pill:999px;
+  --mono:"SF Mono","JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
+}
+/* 形状系统：卡片 10px · 控件 6px · 药丸 999px。整页只此三档，不许裸值。 */
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; color:var(--text); position:relative; min-height:100vh;
+  background:
+    radial-gradient(1400px 700px at 8% -14%, rgba(0,229,255,.10), transparent 58%),
+    radial-gradient(900px 500px at 96% 4%, rgba(124,77,255,.075), transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  font:14px/1.62 "Microsoft YaHei UI","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+/* 工程网格 + 内暗角：固定背景，不随滚动跑 */
+body::before {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.045) 1px, transparent 1px);
+  background-size:64px 64px, 64px 64px;
+  -webkit-mask-image:radial-gradient(1200px 800px at 50% 0%, #000 25%, transparent 78%);
+  mask-image:radial-gradient(1200px 800px at 50% 0%, #000 25%, transparent 78%);
+}
+body::after {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(120% 90% at 50% 40%, transparent 42%, rgba(2,4,10,.72) 100%);
+}
+.wrap { position:relative; z-index:1; max-width:1460px; margin:0 auto; padding:0 34px 56px; }
 
-  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px}
-  .gallery a{display:block;border:1px solid var(--line);border-radius:10px;overflow:hidden;
-             background:var(--card);text-decoration:none;transition:border-color .15s}
-  .gallery a:hover{border-color:var(--amber)}
-  /* 🔴 这些是手机长截图（1320×2868）。原来写死 height:180px + cover
-     ⇒ 只剩状态栏一条，裁得没法看。改成按截图原比例开框，整张图都露出来。 */
-  /* 手机截图是 1320×2868，海报是 720×962 —— 比例不同。
-     cover 会把海报左右裁掉（第一版就裁了），所以用 contain：一张都不裁，
-     比例不同的那几张自动留边，底色跟卡片一致。 */
-  .gallery img{display:block;width:100%;aspect-ratio:1320/2868;object-fit:contain;
-               object-position:center top;background:#0b0f16}
-  .gallery span{display:block;padding:7px 9px;font-size:11.5px;line-height:1.45;color:var(--dim)}
+.topbar {
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:13px 0; border-bottom:1px solid var(--line);
+  font:500 11.5px/1 var(--mono); letter-spacing:.14em; color:var(--faint);
+  text-transform:uppercase;
+}
+.topbar .dot {
+  width:7px; height:7px; border-radius:var(--radius-pill);
+  background:var(--ok); box-shadow:0 0 10px var(--ok);
+  animation:beat 3.2s ease-in-out infinite;
+}
+@keyframes beat { 0%,100%{opacity:1} 50%{opacity:.3} }
+.topbar .grow { flex:1; }
+.topbar b { color:var(--text); font-weight:600; }
+
+.hero { padding:52px 0 26px; }
+.eyebrow {
+  font:600 11.5px/1 var(--mono); letter-spacing:.3em; color:var(--cyan);
+  text-transform:uppercase; margin:0 0 18px;
+}
+.eyebrow::before { content:"\25AA\25AA "; color:var(--violet); letter-spacing:.1em; }
+h1 {
+  margin:0 0 14px; font-weight:700; letter-spacing:-.03em; line-height:1.02;
+  font-size:clamp(40px, 6.2vw, 78px);
+  background:linear-gradient(180deg, #FFFFFF 0%, #C3CFEA 58%, rgba(147,160,192,.6) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+h1 em {
+  font-style:normal; color:var(--cyan);
+  text-shadow:0 0 34px rgba(0,229,255,.45);
+}
+.lede { margin:0; color:var(--dim); max-width:74ch; font-size:15px; }
+.lede b { color:var(--gold); }
+
+.stats {
+  display:flex; flex-wrap:wrap; margin:28px 0 6px;
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(0,229,255,.035), transparent);
+  overflow:hidden;
+}
+.stats div { flex:1; min-width:150px; padding:15px 20px; border-right:1px solid var(--line); }
+.stats div:last-child { border-right:none; }
+.stats .n { display:block; font:700 30px/1 var(--mono); color:var(--text); letter-spacing:-.02em; }
+.stats .n.hot { color:var(--cyan); text-shadow:0 0 22px rgba(0,229,255,.4); }
+.stats .k {
+  display:block; margin-top:6px; font:500 11px/1 var(--mono);
+  letter-spacing:.16em; color:var(--faint); text-transform:uppercase;
+}
+
+.sec-h {
+  display:flex; align-items:baseline; gap:12px; margin:42px 0 16px;
+  padding-bottom:10px; border-bottom:1px solid var(--line);
+}
+.sec-h h2 { margin:0; font-size:15px; font-weight:650; }
+.sec-h .cnt { font:500 11px/1 var(--mono); color:var(--faint); letter-spacing:.1em; }
+
+.panel-list { display:flex; flex-direction:column; gap:10px; }
+a.card {
+  position:relative; display:grid; grid-template-columns:250px 1fr; gap:18px;
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--panel); padding:13px 16px 13px 13px;
+  text-decoration:none; color:inherit; overflow:hidden;
+  transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+a.card::before {
+  content:attr(data-i); position:absolute; top:9px; right:13px;
+  font:600 11px/1 var(--mono); color:var(--faint); letter-spacing:.1em;
+}
+a.card::after {
+  content:""; position:absolute; left:0; bottom:0; width:16px; height:16px;
+  border-left:2px solid var(--violet); border-bottom:2px solid var(--violet); opacity:.55;
+}
+a.card:hover {
+  border-color:var(--line-hot);
+  box-shadow:0 0 0 1px rgba(0,229,255,.14), 0 14px 40px -18px rgba(0,229,255,.5);
+  transform:translateY(-2px);
+}
+a.card[aria-disabled="true"] { opacity:.5; }
+.thumb {
+  display:block; border-radius:var(--radius-ctl); overflow:hidden;
+  background:#02040A; aspect-ratio:16/10; border:1px solid var(--line);
+}
+.thumb img {
+  width:100%; height:100%; object-fit:cover; display:block;
+  filter:saturate(1.05) contrast(1.04); transition:transform .35s ease;
+}
+a.card:hover .thumb img { transform:scale(1.035); }
+.noimg {
+  display:flex; align-items:center; justify-content:center; height:100%;
+  color:var(--off); font:500 11px/1 var(--mono); letter-spacing:.14em;
+}
+.cbody { min-width:0; display:flex; flex-direction:column; gap:6px; justify-content:center; }
+.chead { display:flex; align-items:baseline; gap:10px; }
+.chead b { font-size:17px; font-weight:650; letter-spacing:-.01em; }
+.cdesc { color:var(--dim); font-size:13px; }
+.cmeta { color:var(--faint); font:500 11.5px/1.6 var(--mono); overflow-wrap:anywhere; }
+.miss { color:var(--fault); font-weight:600; }
+.chip {
+  border:1px solid currentColor; border-radius:var(--radius-pill);
+  padding:1px 9px; font:600 10.5px/1.6 var(--mono); letter-spacing:.08em;
+}
+.chip-ok { color:var(--ok); box-shadow:0 0 12px -3px currentColor; }
+.chip-fault { color:var(--fault); }
+code {
+  font:12px/1.5 var(--mono); color:var(--cyan);
+  background:rgba(0,229,255,.07); padding:1px 6px; border-radius:var(--radius-ctl);
+}
+
+.gal { margin:0 0 30px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:11px; }
+a.tile {
+  display:block; border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--panel); padding:8px; text-decoration:none; color:inherit;
+  transition:border-color .18s ease, transform .18s ease;
+}
+a.tile:hover { border-color:var(--line-hot); transform:translateY(-2px); }
+a.tile img {
+  width:100%; aspect-ratio:16/10; object-fit:cover; display:block;
+  border-radius:var(--radius-ctl); background:#02040A; border:1px solid var(--line);
+}
+.tname { display:block; margin-top:7px; font-size:12.5px; overflow-wrap:anywhere; }
+.tsize { display:block; color:var(--faint); font:500 10.5px/1.7 var(--mono); letter-spacing:.06em; }
+
+/* 卡内子入口（子窗口，不占顶层卡位）：形状沿用令牌，不新造档位 */
+.subs {
+  display:block; margin-top:6px; color:var(--faint);
+  font:500 11px/1.7 var(--mono); letter-spacing:.04em;
+}
+a.sub { color:var(--cyan); text-decoration:none; border-bottom:1px dotted var(--line-hot); }
+a.sub:hover { color:var(--text); border-bottom-color:var(--cyan); }
+.sub-miss { color:var(--fault); }
+
+footer.sig {
+  margin-top:34px; padding-top:15px; border-top:1px solid var(--line);
+  color:var(--faint); font:500 11.5px/1.8 var(--mono); letter-spacing:.06em;
+}
+@media (max-width:720px) {
+  .wrap { padding:0 18px 40px; }
+  a.card { grid-template-columns:1fr; }
+  .hero { padding:32px 0 20px; }
+}
 </style>
 </head>
 <body>
+<div id="gbt-project-nav" style="position:sticky;top:0;z-index:20;background:#11161c;color:#cfe0f5;font:12px/1.8 system-ui;padding:6px 10px;border-bottom:1px solid #232a33"><a style="color:#8ab4ff" href="state/PROJECT-INDEX.html">全项目索引（185452 个文件 · 全页可达）</a></div>
 
-<header>
-  <div class="wrap">
-    <p class="kicker">GBTxiaotudouV8-Commander · Apache-2.0 · 开源发布页</p>
-    <h1>🥔 GBT小土豆V8 · 总指挥大模型
-      <small>把「指挥」练进权重里的 7.6B 中文模型：不只会对话，它知道该派哪根触手、那根触手怎么调、什么时候必须先要授权。</small>
-    </h1>
-    <p class="lead">
-      被问「帮我做 X」，它先判断这件事该落到哪个<strong>能力位</strong>、要什么参数、会不会写盘 / 花钱 / 出网、
-      要不要先请人发一张授权票 —— 然后才动手。它就是本仓 348 个原生能力位的“活索引 + 门卫”。
-    </p>
-    <ul class="chips">
-      <li>7.6B params</li><li>Qwen2-7B base</li><li>348 能力位 · 30 域</li>
-      <li>335 题基准 · PASS45 330/335</li><li>两轮 99.10% / 98.51%</li><li>单一门 run_task</li>
-    </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="dot"></span>
+    <span>GBT小土豆V8</span>
+    <span class="grow"></span>
+    <span>WORKSPACE INDEX</span>
+    <span>PANELS <b id="t-panels">—</b></span>
+    <span>RENDERS <b id="t-renders">—</b></span>
   </div>
-</header>
 
-<main class="wrap">
-
-<section>
-  <h2><span class="n">01</span>它到底是什么</h2>
-  <p class="sub">不是“又一个会写文章的 7B”，而是把「派活 + 报门」当成训练目标的指挥模型。</p>
-  <div class="grid">
-    <div class="card"><h3><span class="dot d-blue"></span>路由</h3>
-      <p>自然语言需求 → 落到具体能力位（kind），连域和 op 一起给。实测第二题真落到 <span class="mono">markdown_ppt</span>。</p></div>
-    <div class="card"><h3><span class="dot d-blue"></span>讲解</h3>
-      <p>348 位每一位是干什么、属于哪个域、调用要注意什么；27 个 GBT天真原生算子、1495 个契约节点全覆盖。</p></div>
-    <div class="card"><h3><span class="dot d-mid"></span>报门</h3>
-      <p>不可逆 / 花钱 / 出网的动作，先说清缺哪张票（如 <span class="mono">deploy_publish</span>），绝不自称已放行。</p></div>
-    <div class="card"><h3><span class="dot d-ok"></span>可复核</h3>
-      <p>每条结论都能指回一次真跑：评估集、能力普查、镜像排练、多域监控，全部带原始回执。</p></div>
+  <div class="hero">
+    <p class="eyebrow">Workspace · Panel Index</p>
+    <h1>可视化面板<em>总索引</em></h1>
+    <p class="lede">一屏看全本工作区所有可视化面板与渲染留影，<b>点开即用</b>。
+       本页清单与宿主插件的 PANELS 登记表同源；<b>顶部台账与每张卡片的字节数都是打开这一页时
+       现读宿主目录</b>（同源 <code>GET /gbt-master</code>），不是写死的 —— 取不到就显示
+       <b>「取不到」</b>并写明原因，<b>不顶一个好看的假数</b>。要逐页真渲染审计请用
+       <code>plugins/gbt-master/tools/cross-scan.py</code>（真 Chrome 穿透四层：登记表 / 路由 /
+       运行时 / 数据层，抓状态码、控制台错、失败请求、canvas 是否真出画面）。</p>
   </div>
-</section>
 
-<section>
-  <h2><span class="n">02</span>硬读数（都是真跑出来的）</h2>
-  <p class="sub">下面每个数字都有对应文件可复核；<strong>没跑通的也照实写着</strong>，见 §05。</p>
-  <table>
-    <caption>口径：335 题能力基准 · 贪心解码 · repetition_penalty=1.15 · 逐题独立预算 · PASS45 = cov ≥ 0.45</caption>
-    <thead><tr><th>项</th><th>读数</th><th>怎么核</th></tr></thead>
-    <tbody>
-      <tr><td>评估第 1 轮</td><td class="num">0.9908 · 99.10% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
-      <tr><td>评估第 2 轮</td><td class="num">0.9873 · 98.51% · zero 2</td><td class="mono">docs/04-evaluation.md</td></tr>
-      <tr><td>PASS45 通过数</td><td class="num">330 / 335</td><td class="mono">data/eval-*.json</td></tr>
-      <tr><td>能力位普查（341 快照）</td><td class="num">340 ok / 1 needs_input / 0 needs_ticket / 0 needs_dependency / 0 failed = 341</td><td class="mono">docs/07-capability-proof.md</td></tr>
-      <tr><td>一次性部署链（排练→盖章→晋升）</td><td class="num">房间 release-20261021：scan 3/3 · rehearse ok · release ok · 5.9s</td><td class="mono">docs/07 §九</td></tr>
-      <tr><td>GBt天真原生算子</td><td class="num">27 ops · 18 同名 · 1495 契约节点 · 覆盖 1.2%</td><td class="mono">docs/10-gbt-tianzhen.md</td></tr>
-      <tr><td>五维合一（脑眼耳嘴手）</td><td class="num">开步 → 能力位 → 关步，带证据闭环</td><td class="mono">docs/11-five-dim.md</td></tr>
-      <tr><td>多域监控</td><td class="num">29 域 / 236 位：221 ok · 15 denied · 回归 0</td><td class="mono">docs/12-multidomain-monitor.md</td></tr>
-      <tr><td>镜面只读排练</td><td class="num">5 步 / 0.6s / 全绿</td><td class="mono">docs/09-mirror-space.md</td></tr>
-      <tr><td>并发容量</td><td class="num">512→20,000 全 ok · 20,000 档墙钟 135s · 峰值 321–340/s</td><td class="mono">docs/08-concurrency.md</td></tr>
-      <tr><td>反向调用云端算力（有钥就能调）</td><td class="num">模型 200 · 1.2s · 397 tokens ｜ 出图 3/3 · 29.7s ｜ 本机 CPU 321.1 GFLOP/s ｜ 出片 27.0s · 49,893 B · sha_match=true</td><td class="mono">docs/13-omni-plug.md</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<section>
-  <h2><span class="n">03</span>四个能立刻验证的亮点</h2>
-  <div class="grid">
-    <div class="card"><h3><span class="dot d-ok"></span>单一门，无法绕过</h3>
-      <p>一切能力调用只走 <span class="mono">run_task(kind, payload)</span>。授权、审计、钢印都在这一处；绕开它就没有留痕。</p></div>
-    <div class="card"><h3><span class="dot d-ok"></span>先排练，再上岗</h3>
-      <p>写生产前必须在隔离房间跑完 plan → simulate → parity → rehearse → release；跳过一步就卡住。</p></div>
-    <div class="card"><h3><span class="dot d-ok"></span>没跑通就照实写</h3>
-      <p>每份文档都有「已知未跑」小节，列出卡在哪、缺什么票、谁有权给 —— 不做假绿。</p></div>
-    <div class="card"><h3><span class="dot d-ok"></span>只要密钥跟云端联通了，就能反向调用</h3>
-      <p>不需要云卡、不需要本地 GPU、不要求模型跑在自家 pod 上：电缆在手、钥匙在保险箱、那头有算力在出活，就通。</p></div>
+  <div class="stats">
+    <div><span class="n hot" id="s-panels">—</span><span class="k">PANELS LIVE</span></div>
+    <div><span class="n" id="s-renders">—</span><span class="k">RENDERS</span></div>
+    <div><span class="n" id="s-payload">—</span><span class="k">PAYLOAD</span></div>
+    <div><span class="n" id="s-missing">—</span><span class="k">MISSING</span></div>
   </div>
-</section>
 
-<section>
-  <h2><span class="n">04</span>三十秒上手</h2>
-  <p class="sub">一条命令起本地端点，再问它一个“该调哪个能力位”的问题。</p>
-<pre><span class="c"># 1) 起端点（vLLM，OpenAI 兼容；权重见 docs/05-deployment.md）</span>
-vllm serve &lt;weights-path&gt; --served-model-name gbt-v8 --max-model-len 4096
+  <div class="sec-h"><h2>活面板</h2><span class="cnt" id="live-src">READING…</span></div>
+  <div class="panel-list">
+      <a class="card" data-i="01" href="capabilities.html">
+        <span class="thumb"><img src="render/能力球-violet-默认.png" alt="能力球 · 能力台 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>能力球 · 能力台</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">能力位铺在一个真 3D 球面上（手写三维引擎，零依赖）——**条数以球面页现读为准**（它会自报 source+count，这里不写死数字）。拖拽旋转，悬停读数，点节点进它自己的独立页面。形态即状态：实心=免卡、琥珀环=要授权、空心虚线=桩、暗红=禁用。配色可切（1/2/3/4）。</span>
+          <span class="cmeta">108 KB · <code>capabilities.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="02" href="holo_pet_w3/index.html">
+        <span class="thumb"><img src="render/godview/quad_四视图.png" alt="上帝视角 W3 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>上帝视角 W3</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">六页签实时驾驶舱：四视图 / 工作树 / 故障矩阵 / 驾驶舱 / 工具 / 数字人。数据走 Electron IPC 桥，独立窗口打开。</span>
+          <span class="cmeta">16 KB · <code>holo_pet_w3/index.html</code></span><span class="subs">子窗口 · <a class="sub" href="holo_pet_w3/brain/index.html">神经工作台（窗 E）</a></span>
+        </span>
+      </a>
+      <a class="card" data-i="03" href="holo_pet/index.html">
+        <span class="thumb"><img src="render/godview/pets_数字人.png" alt="主控台 W1 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>主控台 W1</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">桌面宠物主界面。需先起本地服务（holo_pet/panel_server.py），否则页面拿不到 /api/* 数据。</span>
+          <span class="cmeta">28 KB · <code>holo_pet/index.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="04" href="V22 GBT小土豆V8-可交互原型.html">
+        <span class="thumb"><img src="render/总览-58画布页.png" alt="V22 可交互原型 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>V22 可交互原型</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">本版交付物之一（App 类）。高保真可交互，单文件自带全部样式与脚本。</span>
+          <span class="cmeta">643 KB · <code>V22 GBT小土豆V8-可交互原型.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="05" href="V22 GBT小土豆V8-无限画布.html">
+        <span class="thumb"><img src="render/总览-55面板.png" alt="V22 无限画布 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>V22 无限画布</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">本版交付物之一。自由画布形态，支持拖拽 / 缩放 / 复位。</span>
+          <span class="cmeta">242 KB · <code>V22 GBT小土豆V8-无限画布.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="06" href="projects/_shared/templates/20260921-三方向-HITL1审批屏.html">
+        <span class="thumb"><img src="render/hitl1/审批屏-首屏.png" alt="HITL#1 审批屏 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>HITL#1 审批屏</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">三件作品的审批面：链状态 + 逐镜待填 + 闸口表 + 编排自审 + 独立审计判定 + 作者认账。</span>
+          <span class="cmeta">37 KB · <code>projects/_shared/templates/20260921-三方向-HITL1审批屏.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="07" href="projects/_shared/templates/20260921-三方向-HITL1-分镜契约填写页.html">
+        <span class="thumb"><img src="render/hitl1/填写页-首屏.png" alt="分镜契约填写页 预览" loading="lazy"></span>
+        <span class="cbody">
+          <span class="chead"><b>分镜契约填写页</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">把「审」变成「填」：旁白摆在输入框左边，契约「先读旁白再决定」被结构性强制的 85 格表单。</span>
+          <span class="cmeta">40 KB · <code>projects/_shared/templates/20260921-三方向-HITL1-分镜契约填写页.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="08" href="deploy/index.html">
+        <span class="thumb"><div class="noimg"><span>NO PREVIEW</span></div></span>
+        <span class="cbody">
+          <span class="chead"><b>部署版入口</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">推到部署面的那份（deploy/）：<b>V21 代快照</b>（与根上 V22 有 39 行差，页内自称 V21）。重新部署＝外网写入 → 先问主人。</span>
+          <span class="cmeta">644 KB · <code>deploy/index.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="09" href="media-console.html">
+        <span class="thumb"><div class="noimg"><span>NO PREVIEW</span></div></span>
+        <span class="cbody">
+          <span class="chead"><b>三方向自动化工作流</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">短视频 / AI电影 / AI音乐 三条链的<b>现读</b>进度：18 格抽屉（有货 · 仅彩排 · 空）+ 许可账（逐件 sha256）+ 发布包（停在主人授权门）+ 试听台 + 输入口判据强度。数据<b>生成期烘焙</b>（生成器当场读抽屉 / 许可 / 副档），非手抄。重生成走 <code>media-console.py</code>。</span>
+          <span class="cmeta">1,308 KB · <code>media-console.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="10" href="holo_pet_w3/h1/index.html">
+        <span class="thumb"><div class="noimg"><span>NO PREVIEW</span></div></span>
+        <span class="cbody">
+          <span class="chead"><b>赏金台 · h1mcp</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">HackerOne 赏金台（阶段一 · 本机只读）：二进制在位 + 侧车 sha256 比对、凭据配置状态（只报「已配置 / 未配置」，不回显值、连用户名也不回显）、本地草稿收件箱。零子进程 / 零网络 / 零写盘；取不到就灰并写明原因，<b>不假绿</b>。脚注显示本次真实通道（IPC / 同源 / 本机直连）。</span>
+          <span class="cmeta">3 KB · <code>holo_pet_w3/h1/index.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="11" href="brain.html">
+        <span class="thumb"><div class="noimg"><span>NO PREVIEW</span></div></span>
+        <span class="cbody">
+          <span class="chead"><b>大脑执行层 · 五维合一</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">五维合一脑的排布图与连接网络：结构从 brain_exec.py 的 AST 现算（Sugiyama 分层布局，不是力导向），实时态取 store/audit.jsonl 的真实事件尾部。<b>源码里查不到的边不画</b> —— 注册表声称的执行链有 3 条在代码里不存在，图上如实标 drawn=false。</span>
+          <span class="cmeta">32 KB · <code>brain.html</code></span>
+        </span>
+      </a>
+      <a class="card" data-i="12" href="holo_pet/assets/digital-human/web/avatar.html">
+        <span class="thumb"><div class="noimg"><span>NO PREVIEW</span></div></span>
+        <span class="cbody">
+          <span class="chead"><b>数字人形象页（成品）</b><span class="chip chip-ok">在</span></span>
+          <span class="cdesc">数字人主线的成品页：idle 与 walk 交叉淡入状态机 · IBL(RoomEnvironment) + PBR Neutral + PCFSoft 接触阴影 + SSAA · 皮肤 sheen（SSS 近似）+ 暖轮廓 · HUD 现读。默认全身动画件（3.37 MB）；<code>?model=bust</code> 换半身件（4.28 MB）—— <b>两件都在宿主 12 MB 单文件上限内</b>，所以能直接内嵌；4K 件 90.86 MB 超上限，别指过来。</span>
+          <span class="cmeta">18 KB · <code>holo_pet/assets/digital-human/web/avatar.html</code></span>
+        </span>
+      </a></div>
 
-<span class="c"># 2) 问一句「这件事该落到哪个能力位」</span>
-curl http://127.0.0.1:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
-  "model": "gbt-v8", "temperature": 0,
-  "messages": [{"role":"user","content":"我要把一份 Markdown 变成 PPT，该调哪个能力位？需要什么参数？"}]
-}'
+  <section class="gal">
+    <div class="sec-h"><h2>上帝视角 · 逐页留影</h2><span class="cnt">8 张</span></div>
+    <div class="grid"><a class="tile" href="render/godview/cockpit_最优基因.png"><img src="render/godview/cockpit_最优基因.png" alt="cockpit_最优基因" loading="lazy"><span class="tname">cockpit_最优基因</span><span class="tsize">135 KB</span></a><a class="tile" href="render/godview/cockpit_驾驶舱.png"><img src="render/godview/cockpit_驾驶舱.png" alt="cockpit_驾驶舱" loading="lazy"><span class="tname">cockpit_驾驶舱</span><span class="tsize">435 KB</span></a><a class="tile" href="render/godview/matrix_故障矩阵.png"><img src="render/godview/matrix_故障矩阵.png" alt="matrix_故障矩阵" loading="lazy"><span class="tname">matrix_故障矩阵</span><span class="tsize">569 KB</span></a><a class="tile" href="render/godview/pets_数字人.png"><img src="render/godview/pets_数字人.png" alt="pets_数字人" loading="lazy"><span class="tname">pets_数字人</span><span class="tsize">670 KB</span></a><a class="tile" href="render/godview/quad_四视图.png"><img src="render/godview/quad_四视图.png" alt="quad_四视图" loading="lazy"><span class="tname">quad_四视图</span><span class="tsize">452 KB</span></a><a class="tile" href="render/godview/tools_工具.png"><img src="render/godview/tools_工具.png" alt="tools_工具" loading="lazy"><span class="tname">tools_工具</span><span class="tsize">601 KB</span></a><a class="tile" href="render/godview/tree_工作树.png"><img src="render/godview/tree_工作树.png" alt="tree_工作树" loading="lazy"><span class="tname">tree_工作树</span><span class="tsize">577 KB</span></a><a class="tile" href="render/godview/全窗口_四视图.png"><img src="render/godview/全窗口_四视图.png" alt="全窗口_四视图" loading="lazy"><span class="tname">全窗口_四视图</span><span class="tsize">669 KB</span></a></div>
+  </section>
+  <section class="gal">
+    <div class="sec-h"><h2>HITL#1 · 审批与填写</h2><span class="cnt">15 张</span></div>
+    <div class="grid"><a class="tile" href="render/hitl1/作者认账-1.png"><img src="render/hitl1/作者认账-1.png" alt="作者认账-1" loading="lazy"><span class="tname">作者认账-1</span><span class="tsize">140 KB</span></a><a class="tile" href="render/hitl1/其余必填-电影.png"><img src="render/hitl1/其余必填-电影.png" alt="其余必填-电影" loading="lazy"><span class="tname">其余必填-电影</span><span class="tsize">604 KB</span></a><a class="tile" href="render/hitl1/其余必填-音乐-修正后.png"><img src="render/hitl1/其余必填-音乐-修正后.png" alt="其余必填-音乐-修正后" loading="lazy"><span class="tname">其余必填-音乐-修正后</span><span class="tsize">132 KB</span></a><a class="tile" href="render/hitl1/其余必填-音乐.png"><img src="render/hitl1/其余必填-音乐.png" alt="其余必填-音乐" loading="lazy"><span class="tname">其余必填-音乐</span><span class="tsize">240 KB</span></a><a class="tile" href="render/hitl1/填写页-其余必填.png"><img src="render/hitl1/填写页-其余必填.png" alt="填写页-其余必填" loading="lazy"><span class="tname">填写页-其余必填</span><span class="tsize">161 KB</span></a><a class="tile" href="render/hitl1/填写页-底栏.png"><img src="render/hitl1/填写页-底栏.png" alt="填写页-底栏" loading="lazy"><span class="tname">填写页-底栏</span><span class="tsize">84 KB</span></a><a class="tile" href="render/hitl1/填写页-首屏.png"><img src="render/hitl1/填写页-首屏.png" alt="填写页-首屏" loading="lazy"><span class="tname">填写页-首屏</span><span class="tsize">577 KB</span></a><a class="tile" href="render/hitl1/审批屏-全页.png"><img src="render/hitl1/审批屏-全页.png" alt="审批屏-全页" loading="lazy"><span class="tname">审批屏-全页</span><span class="tsize">2,054 KB</span></a><a class="tile" href="render/hitl1/审批屏-首屏.png"><img src="render/hitl1/审批屏-首屏.png" alt="审批屏-首屏" loading="lazy"><span class="tname">审批屏-首屏</span><span class="tsize">321 KB</span></a><a class="tile" href="render/hitl1/框架自审-1.png"><img src="render/hitl1/框架自审-1.png" alt="框架自审-1" loading="lazy"><span class="tname">框架自审-1</span><span class="tsize">124 KB</span></a><a class="tile" href="render/hitl1/框架自审-2.png"><img src="render/hitl1/框架自审-2.png" alt="框架自审-2" loading="lazy"><span class="tname">框架自审-2</span><span class="tsize">125 KB</span></a><a class="tile" href="render/hitl1/框架自审-3.png"><img src="render/hitl1/框架自审-3.png" alt="框架自审-3" loading="lazy"><span class="tname">框架自审-3</span><span class="tsize">125 KB</span></a><a class="tile" href="render/hitl1/独立判定-1.png"><img src="render/hitl1/独立判定-1.png" alt="独立判定-1" loading="lazy"><span class="tname">独立判定-1</span><span class="tsize">199 KB</span></a><a class="tile" href="render/hitl1/链状态-修正后.png"><img src="render/hitl1/链状态-修正后.png" alt="链状态-修正后" loading="lazy"><span class="tname">链状态-修正后</span><span class="tsize">109 KB</span></a><a class="tile" href="render/hitl1/链状态.png"><img src="render/hitl1/链状态.png" alt="链状态" loading="lazy"><span class="tname">链状态</span><span class="tsize">111 KB</span></a></div>
+  </section>
+  <section class="gal">
+    <div class="sec-h"><h2>总览图</h2><span class="cnt">3 张</span></div>
+    <div class="grid"><a class="tile" href="render/总览-55面板.png"><img src="render/总览-55面板.png" alt="总览-55面板" loading="lazy"><span class="tname">总览-55面板</span><span class="tsize">2,094 KB</span></a><a class="tile" href="render/总览-58画布页.png"><img src="render/总览-58画布页.png" alt="总览-58画布页" loading="lazy"><span class="tname">总览-58画布页</span><span class="tsize">1,265 KB</span></a><a class="tile" href="render/总览-上帝视角6页.png"><img src="render/总览-上帝视角6页.png" alt="总览-上帝视角6页" loading="lazy"><span class="tname">总览-上帝视角6页</span><span class="tsize">1,028 KB</span></a></div>
+  </section>
 
-<span class="c"># 3) 想复核能力面，就跑普查（只读）</span>
-py -3 tools/codex-scripts/probe-caps-live.py --out data/capability-readonly-live.json</pre>
-</section>
-
-<section>
-  <h2><span class="n">05</span>手机版实拍：iPhone 上跑我们自己的 q5_0</h2>
-  <p class="sub">三张真机截图（2026-10-24 · 00:26 / 00:28 / 00:30）：手机端用 LM Pocket 加载
-    <span class="mono">gbt-v8-v82-q5_0</span>（GGUF · 4.88 GB）在本机芯片上推理。
-    <strong>截图里的数字都是页面自报</strong>，本页没有替它重算。</p>
-  <div class="phones">
-    <figure class="shot"><img src="assets/mobile-lm-pocket-chat.png" alt="iPhone 对话：问「你是谁」，模型 chip 自报 gbt-v8-v82-q5_0，8.0 tok/s">
-      <figcaption><strong>它知道自己是谁。</strong>输入框上的模型 chip 自报 <span class="mono">gbt-v8-v82-q5_0</span>（上下文 64/4,096）· <strong>8.0 tok/s</strong>；回答带完整署名。</figcaption></figure>
-    <figure class="shot"><img src="assets/mobile-ios-worker-queue.png" alt="工作器已重启（无缓冲）· 队列 3 条 · 等端口">
-      <figcaption><strong>手机不只是手动聊。</strong>「工作器已重启（无缓冲）· 队列 3 条 · 等端口…（窗口 40 分钟）」—— 端口一通依次跑完，结果自动落到 <span class="mono">/tmp/a19_done.jsonl</span>，人不用守着。</figcaption></figure>
-    <figure class="shot"><img src="assets/mobile-ios-run-recap.png" alt="今晚这一整轮的账：Q4_0 是元凶，Q5_0/Q8_0 稳定">
-      <figcaption><strong>坏的是那份 Q4_0，不是权重。</strong>Q4_0 的 9% 量化噪声被 28 层逐层放大（0.22→605）；Q5_0/Q8_0 激活值稳定（6.19）；权重 339/339 张量、28 层全覆盖；A19 直连 8–11.7 tok/s。</figcaption></figure>
-  </div>
-  <p class="sub" style="margin:14px 0 0">限制照实说：iOS 把 App 切到后台就断服务，所以那 3 条问题是「让它开着别切走」跑完的 —— 系统约束，不是没做到。</p>
-</section>
-
-<section>
-  <h2><span class="n">06</span>诚实账：这些确实没跑通</h2>
-  <p class="sub">发布页不藏问题。下面是当前<strong>仍然卡住</strong>的项，以及它会卡在哪一步、谁有权解开。</p>
-  <div class="honest">
-    <h3>已知未跑 / 已知受限（1 位，逐条给原因）</h3>
-    <ul>
-      <li><strong><code>offense_ops</code></strong>：同一根 —— 缺授权目标（`need_target`）。</li>
-      <li><strong><code>codex_interrupt</code></strong>：同步客户端在中断指令到达前已结束回合 ⇒ 抓不到活回合。</li>
-      <li><strong><code>figure_gate</code></strong>：要 4 轮真实看图证据（记轮次会写盘）⇒ 缺 `filesystem_write` 窗口票；声明型轮次会被判
-        <span class="mono">rounds_insufficient</span>。</li>
-      <li><strong>权重托管</strong>：15.25 GB bf16 合并权重尚未上传公共仓库（需要写权限令牌）。</li>
-    </ul>
-    <p style="margin:12px 0 0;color:#bda98e;font-size:13.5px">
-      上面每一行都能在 <a href="docs/07-capability-proof.md">docs/07 §八</a> 找到机器回执原文；
-      「要票」和「缺依赖」都记成它们本来的样子，<strong>不折算成失败、也不假装通过</strong>。
-    </p>
-  </div>
-</section>
-
-<section>
-  <h2><span class="n">07</span>文档地图</h2>
-  <ul class="links">
-    <li><a href="docs/01-model-card.md">01 模型卡</a></li>
-    <li><a href="docs/02-architecture.md">02 架构</a></li>
-    <li><a href="docs/03-capabilities.md">03 348 位能力全表</a></li>
-    <li><a href="docs/04-evaluation.md">04 评估</a></li>
-    <li><a href="docs/05-deployment.md">05 部署</a></li>
-    <li><a href="docs/06-showcase.md">06 真实回执</a></li>
-    <li><a href="docs/07-capability-proof.md">07 能力普查</a></li>
-    <li><a href="docs/08-concurrency.md">08 并发</a></li>
-    <li><a href="docs/09-mirror-space.md">09 镜像多维度</a></li>
-    <li><a href="docs/10-gbt-tianzhen.md">10 GBT天真</a></li>
-    <li><a href="docs/11-five-dim.md">11 五维合一</a></li>
-    <li><a href="docs/12-multidomain-monitor.md">12 多域监控</a></li>
-    <li><a href="docs/13-omni-plug.md">13 万能插 · 反向调云端算力</a></li>
-    <li><a href="docs/14-security-and-control.md">14 安全与授权门</a></li>
-    <li><a href="docs/15-tentacle-counter.md">15 触手计数器</a></li>
-    <li><a href="docs/16-capability-audit-341.md">16 341 位能力审计</a></li>
-    <li><a href="docs/17-phone-a19-runtime.md">17 手机端 A19 全链路</a></li>
-    <li><a href="docs/18-native-cloud-catalog.md">18 能力总目录</a></li>
-    <li><a href="docs/19-taste-absorbed.md">19 吞噬记录 · taste-skill</a></li>
-    <li><a href="docs/20-t2i-endpoint-spec.md">20 生图端点契约</a></li>
-    <li><a href="docs/21-tianzhen-usage.md"><b>21 GBT天真 使用手册</b></a></li>
-    <li><a href="docs/22-a19-ops-playbook.md">22 A19 运维手册</a></li>
-    <li><a href="docs/README.md"><b>总索引 README</b></a></li>
-  </ul>
-</section>
-
-<section>
-  <h2><span class="n">08</span>实拍证据</h2>
-  <p class="dim">下面每一张都是本机真跑出来的，不是示意图。点开看原图。</p>
-  <div class="gallery">
-    <a href="docs/gallery/00-poster.jpg"><img src="docs/gallery/thumbs/00-poster.jpg" alt="开源海报" loading="lazy"><span>开源海报</span></a>
-    <a href="docs/gallery/01-a19-selfcheck.png"><img src="docs/gallery/thumbs/01-a19-selfcheck.jpg" alt="A19 自检" loading="lazy"><span>A19 自检 · q5_0 · 257/4096</span></a>
-    <a href="docs/gallery/02-tianzhen-upscale-2048x2729.png"><img src="docs/gallery/thumbs/02-tianzhen-upscale-2048x2729.jpg" alt="天真放大" loading="lazy"><span>GBT天真 665×886 → 2048×2729</span></a>
-    <a href="docs/gallery/03-tianzhen-product-closeup.png"><img src="docs/gallery/thumbs/03-tianzhen-product-closeup.jpg" alt="放大后特写" loading="lazy"><span>放大后特写：毛孔 / 毛发 / 血管 / 高光</span></a>
-    <a href="docs/gallery/04-tianzhen-pipeline-constraints.png"><img src="docs/gallery/thumbs/04-tianzhen-pipeline-constraints.jpg" alt="流水线与硬约束" loading="lazy"><span>出图流水线 + 两条硬约束</span></a>
-    <a href="docs/gallery/05-tianzhen-3frame-strip.png"><img src="docs/gallery/thumbs/05-tianzhen-3frame-strip.jpg" alt="三帧拼条" loading="lazy"><span>三帧拼条 1080×540 验动效</span></a>
-    <a href="docs/gallery/06-tianzhen-product-p5.png"><img src="docs/gallery/thumbs/06-tianzhen-product-p5.jpg" alt="P5 产物" loading="lazy"><span>P5 产物</span></a>
-    <a href="docs/gallery/07-capability-doc-alignment.png"><img src="docs/gallery/thumbs/07-capability-doc-alignment.jpg" alt="能力文档对齐" loading="lazy"><span>能力文档对齐复盘</span></a>
-  </div>
-</section>
-
-</main>
-
-<footer class="wrap">
-  <p>开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</p>
-  <p>代码 Apache-2.0 · 权重 CC BY-NC-SA 4.0（非商用）· 见 <a href="LICENSE">LICENSE</a> / <a href="NOTICE">NOTICE</a></p>
-  <p>本页为静态发布页，无外部依赖、无第三方脚本、无统计埋点。</p>
-</footer>
+  <footer class="sig">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</footer>
+</div>
 
 <script>
-/* PWA：注册 Service Worker ⇒ iPhone「添加到主屏幕」/ Android「安装应用」后离线也能打开。
-   本站是纯静态页，SW 只缓存同源静态件；注册失败也不影响阅读（静默降级）。 */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () { /* 静默：不影响页面 */ });
-  });
-}
-</script>
+/* ── 台账现读 ───────────────────────────────────────────────────────────────
+   🔴 这段**必须留在模板里**：先前它是手补在生成产物上的（顶栏写死
+   「PANELS 10 / RENDERS 26 / PAYLOAD 1,726 KB」，而宿主目录实测 total 12 / renders 67）
+   —— 页面自称"与登记表同源"、数字却是手抄的。**不诚实的自述比没有自述更坏。**
+   现在：打开这一页就同源读 `GET /gbt-master`，台账与每张卡片的字节数、在/缺全部按当次真值填；
+   **取不到就显示「取不到」并写明原因，不顶假数**。（宿主目录路由与本页同源，不需额外权限。） */
+(function () {
+  function kb(n) {
+    if (typeof n !== 'number' || !isFinite(n)) return '—';
+    if (n >= 1048576) return (n / 1048576).toFixed(2) + ' MB';
+    return Math.round(n / 1024).toLocaleString('en-US') + ' KB';
+  }
+  function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = String(v); }
+  function fail(why) {
+    ['t-panels', 't-renders', 's-panels', 's-renders', 's-payload', 's-missing'].forEach(function (i) { set(i, '取不到'); });
+    set('live-src', '宿主目录取不到：' + why);
+    document.querySelectorAll('a.card .cmeta').forEach(function (m) {
+      if (m.childNodes[0]) m.childNodes[0].nodeValue = '取不到 · ';
+    });
+  }
+  fetch('/gbt-master', { headers: { accept: 'application/json' }, cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (cat) {
+      var panels = (cat && cat.panels) || [];
+      var present = panels.filter(function (p) { return p.exists; });
+      var payload = present.reduce(function (a, p) { return a + (p.size || 0); }, 0);
+      set('t-panels', cat.total);
+      set('t-renders', cat.renders === null || cat.renders === undefined ? '—' : cat.renders);
+      set('s-panels', cat.present);
+      set('s-renders', cat.renders === null || cat.renders === undefined ? '—' : cat.renders);
+      set('s-payload', kb(payload));
+      set('s-missing', panels.length - present.length);
+      set('live-src', 'LIVE · 现读 /gbt-master · ' + new Date().toLocaleTimeString('zh-CN'));
 
+      var byFile = {};
+      panels.forEach(function (p) { byFile[p.file] = p; });
+      // ── 双向对账（第 115 轮补）─────────────────────────────────────────────
+      // 原来只测一个方向：**卡片 → 登记表**（不在登记表的卡打「不在登记表」）。
+      // 于是「登记表里有、本页却没有卡」的那一半**永远看不见** —— 实测正是它漏掉了
+      // 名册在册的 `holo_pet/index.html`（主控台 W1）。关系是对称的，两个方向都得测。
+      var listed = {};
+      var orphan = [];
+      document.querySelectorAll('a.card').forEach(function (card) {
+        var f = card.getAttribute('href');
+        listed[f] = 1;
+        var p = byFile[f];
+        var meta = card.querySelector('.cmeta');
+        var chip = card.querySelector('.chip');
+        if (!p) { orphan.push(f); if (chip) { chip.textContent = '不在登记表'; chip.className = 'chip chip-fault'; } return; }
+        if (meta && meta.childNodes[0]) meta.childNodes[0].nodeValue = kb(p.size) + ' · ';
+        if (chip) {
+          chip.textContent = p.exists ? '在' : '缺';
+          chip.className = 'chip ' + (p.exists ? 'chip-ok' : 'chip-fault');
+        }
+      });
+      // 自指豁免：名册把「总索引」本身也登记为一块面板，而**本页不该给自己一张卡**
+      // （「从索引进索引」不是导航入口）。豁免写在文案里，不藏着。
+      var SELF = 'index.html';
+      var unlisted = panels.filter(function (p) { return p.file !== SELF && !listed[p.file]; })
+                           .map(function (p) { return p.file; });
+      // 每节留影张数：按本页真实 tile 数现算（与盘上 render/ 总数不是一回事，别混）
+      document.querySelectorAll('section.gal').forEach(function (sec) {
+        var c = sec.querySelector('.cnt');
+        if (c) c.textContent = sec.querySelectorAll('.tile').length + ' 张';
+      });
+      var msg = 'LIVE · 现读 /gbt-master · ' + new Date().toLocaleTimeString('zh-CN');
+      if (orphan.length) {
+        msg += ' · 本页有 ' + orphan.length + ' 张卡片不在宿主登记表：' + orphan.join(' / ');
+      }
+      if (unlisted.length) {
+        msg += ' · 登记表有 ' + unlisted.length + ' 块面板本页没有卡片：' + unlisted.join(' / ');
+      }
+      if (orphan.length || unlisted.length) set('live-src', msg);
+      else set('live-src', msg + ' · 卡片与登记表一一对应');
+    })
+    .catch(function (e) { fail(String(e && e.message ? e.message : e)); });
+})();
+</script>
 </body>
 </html>

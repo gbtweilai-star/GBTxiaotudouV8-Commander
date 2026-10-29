@@ -6,7 +6,7 @@
 主人令 2026-10-16：「我们自己的大模型链路要统一别分叉」。
 
 旧病（仓里自己记着，长期无判据覆盖）：
-  `cloud_llm._KEY_CHAIN` 自己写一份（9~10 条），`key_gateway.PROVIDERS` 13 条，
+  `cloud_llm._KEY_CHAIN` 自己写一份（9~10 条），`key_gateway.PROVIDERS` 14 条（2026-10-29 接入免密 kilo 后 13→14），
   两表差 nvidia-glm / nvidia-flash / freellmapi / gbt-local 且长期不同。
 
 判据：`_KEY_CHAIN` 必须 **== PROVIDERS 去掉退场车道** 的派生结果（名字+顺序）。

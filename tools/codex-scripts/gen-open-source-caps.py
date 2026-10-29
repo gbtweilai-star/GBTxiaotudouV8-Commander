@@ -50,12 +50,65 @@ def summary(desc: str) -> str:
     return s or "—"
 
 
+
+def required_cell(x) -> str:
+    """表格里的「必填载荷」一格：**三态**，不把「查过没有」和「没查过」念成一句。
+
+    A 登记了必填名 → 列出；B 注册表明确 requires_params=false → 写明「无必填（登记）」；
+    C 注册表要参数、但必填名还没登记 → 写明「未登记」，不许写「无必填」。
+    """
+    req = x.get("required") or []
+    if req:
+        return "`" + "`、`".join(req) + "`"
+    if x.get("requires_params"):
+        return "**未登记**（注册表要参数，必填名待补）"
+    return "—（注册表：无必填）"
+
+
+def required_detail(x) -> str:
+    req = x.get("required") or []
+    if req:
+        hint = (x.get("required_hint") or "").strip()
+        return "`" + "`、`".join(req) + "`" + ((" —— " + hint) if hint else "")
+    if x.get("requires_params"):
+        return ("**未登记**：注册表标了 `requires_params=true`，但 `PARAM_REQUIRED` 里还没有它的必填名 —— "
+                "先按模块代码现读，不要猜（空载荷会撞 user_error）")
+    return "无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）"
+
+
+def errors_cell(x) -> str:
+    """表格里的「常见错误」一格：按**静态可判**的三层写，不编错误码。"""
+    if x["readonly"]:
+        return "`user_error`"
+    sc = x.get("scopes_static") or ""
+    if sc.startswith("零作用域") or sc.startswith("（"):
+        return "`user_error` / `failed`"
+    return "`denied: missing_scopes` / `user_error`"
+
+
+def errors_detail(x) -> str:
+    parts = []
+    sc = x.get("scopes_static") or ""
+    if not x["readonly"] and not sc.startswith("零作用域") and not sc.startswith("（"):
+        parts.append("缺票 → `denied`，回执点名 `missing_scopes`（本行静态票：%s）" % sc)
+    req = x.get("required") or []
+    if req:
+        parts.append("缺参 / 参数非法 → `user_error`（必填：%s）"
+                     % "、".join("`%s`" % q for q in req))
+    else:
+        parts.append("参数非法 → `user_error`")
+    if not x["readonly"]:
+        parts.append("依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）")
+    return "；".join(parts)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="outputs/open-source-release")
     a = ap.parse_args()
 
     from gbt_allinone import caps_registry as R
+    PARAM_REQUIRED = getattr(R, "PARAM_REQUIRED", {})
     from gbt_allinone.security import policy as P
 
     def static_scopes(name: str) -> str:
@@ -90,6 +143,8 @@ def main() -> int:
             "requires_params": bool(c.get("requires_params")),
             "params_hint": (c.get("params_hint") or ""),
             "scopes_static": static_scopes(c["name"]),
+            "required": (PARAM_REQUIRED.get(c["name"]) or {}).get("params") or [],
+            "required_hint": (PARAM_REQUIRED.get(c["name"]) or {}).get("hint") or "",
             "handler": c.get("handler") or c["name"],
         })
     rows.sort(key=lambda r: (r["domain"], r["name"]))
@@ -113,16 +168,18 @@ def main() -> int:
             "# %s · `%s`（%d 位）" % (cn, dom, len(items)),
             "",
             "> 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；"
-            "其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出。",
+            "其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。",
             "",
-            "| 能力位 | 类型 | 需参数 | 它做什么 |",
-            "|---|---|---|---|",
+            "| 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |",
+            "|---|---|---|---|---|---|",
         ]
         for x in items:
-            lines.append("| `%s` | %s | %s | %s |" % (
+            lines.append("| `%s` | %s | %s | %s | %s | %s |" % (
                 x["name"],
                 "只读" if x["readonly"] else "**需授权**",
                 "是" if x["requires_params"] else "—",
+                required_cell(x),
+                errors_cell(x),
                 summary(x["desc"]),
             ))
         lines += ["", "> 表格里是**摘要**（超过 %d 字截断）；下面每位还有**逐位详解**"
@@ -137,6 +194,8 @@ def main() -> int:
                     "只读（不改状态、不出网）" if x["readonly"] else "**需授权**（会写盘 / 花钱 / 出网）",
                     ("是 —— " + (x["params_hint"] or "见注册表 params")) if x["requires_params"] else "否"),
                 "- **要哪张票（静态）**：%s" % x["scopes_static"],
+                "- **必填载荷**：%s" % required_detail(x),
+                "- **常见错误**：%s" % errors_detail(x),
                 "- **它做什么**：%s" % (x["desc"] or "—"),
                 "- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap %s '<json>'`"
                 % x["name"],
@@ -154,6 +213,10 @@ def main() -> int:
         "# 能力总表 · 共 %d 位 / %d 个域" % (len(rows), len(by_dom)),
         "",
         "> 自动生成，数据源 `gbt_allinone/caps_registry.py`。机器可读版：[`data/capabilities.json`](../data/capabilities.json)。",
+        "",
+        "- **口径（两套数，不是一个数）**：本表 = **注册表现读**（%d 位）；其中 7 位 `body_*`"
+        "（`device` 域身体桥：see/say/open/click/type/map/volume，2026-10-24 之后补）**不在 2026-10-21 "
+        "权重发布快照的 341 位之内**。README 与海报里的 **341 指那次发布**；两边不是打架，是时点不同。" % len(rows),
         "",
         "- **只读 %d 位**：不改状态、不出网，可直接调用。" % total_ro,
         "- **改状态/出网 %d 位**：会写盘、花钱或把数据发到外部服务 —— 必须先过人给的授权门。" % (len(rows) - total_ro),
@@ -210,3 +273,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

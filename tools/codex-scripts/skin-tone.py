@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """皮肤「去蜡感」重制：把源素材的**烘焙高光**压掉、按真人血色**重新上色**、把粗糙度**夹到真人区间**。
 
 为什么必须动这一步（本轮才看清的真问题）：
@@ -33,7 +29,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import gaussian_filter
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-skin.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-real.glb"
@@ -120,7 +116,7 @@ bc_bytes = bc_new.getvalue()
 mr_bytes = None
 if mr_im is not None:
     mr = np.asarray(mr_im).astype(np.float64)
-    # 🔴 底色 2048²、金属粗糙 1024² —— **分辨率不同**：掩码必须跟着缩到 MR 的网格上，
+ # 底色 2048²、金属粗糙 1024² —— **分辨率不同**：掩码必须跟着缩到 MR 的网格上，
     #    否则 `np.where` 的结果塞不进 mr2（实测直接广播报错）。别假设两张图同尺寸。
     if mr.shape[:2] != skin.shape[:2]:
         skin_mr = np.asarray(Image.fromarray((skin * 255).astype(np.uint8)).resize(
@@ -154,7 +150,7 @@ if mr_bytes is not None:
 # 从 BIN 里按 offset 从后往前替换，避免位移互相干扰
 views = sorted([(J["images"][i]["bufferView"], i, data) for i, data in REPL],
                key=lambda t: J["bufferViews"][t[0]].get("byteOffset", 0))
-# 🔴 前两版都在"把新图放回旧位置 + 平移后续偏移"上翻车（image1/image2 轮流读不回）。
+# 前两版都在"把新图放回旧位置 + 平移后续偏移"上翻车（image1/image2 轮流读不回）。
 #    这里改成**最不可能错的写法**：新图**追加到缓冲区末尾**，指向它们的两个 bufferView
 #    改到新位置，**其他 bufferView 的偏移一律不动**。
 #    代价：旧图字节变成冗余（文件大 ~2 MB）；收益：偏移正确性**不依赖任何累加推导**。
@@ -182,7 +178,7 @@ OUT.write_bytes(b"glTF" + struct.pack("<II", 2, 12 + 8 + len(js) + 8 + len(nb))
 print(f"输出 {OUT} · {OUT.stat().st_size/1024/1024:.2f} MB · 缓冲区 {len(BIN)} → {len(nb)} 字节")
 
 # 硬自检：所有图读回 + 尺寸不变
-# 🔴 第一次写这段时，"参照图"是从**已被改过偏移的 J/BIN** 里读的 ⇒ 参照本身是垃圾，
+# 第一次写这段时，"参照图"是从**已被改过偏移的 J/BIN** 里读的 ⇒ 参照本身是垃圾，
 #    于是自检报"image1/image2 读不回"，而真正读不回的其实是参照 —— **闸自己错了**。
 #    正确做法：参照一律从**原始文件重新读**，不复用内存里被改过的对象。
 raw0 = SRC.read_bytes()

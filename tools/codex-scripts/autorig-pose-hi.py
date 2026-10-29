@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """高模姿态测试（**分块 float32**，峰值内存约 13MB —— 这台机内存紧，必须分块）
 抬 LeftArm 子树 45°，验证迁移来的权重在高模上形变正确；导出静态 GLB 供渲染验收。"""
 import json
@@ -11,7 +7,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = DH / "raw/rig/model-rigged-hi.glb"
 OUT = DH / "raw/rig/model-rigged-hi-pose.glb"

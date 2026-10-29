@@ -44,7 +44,7 @@ BRAIN = WS / "holo_pet_w3" / "brain"
 CAPS = BRAIN / "caps"
 DATA = BRAIN / "brain-data.js"
 STALE_HOURS = 24.0
-# 🔴 2026-10-11 加（主人令「确保所有的状态主脑第一时间都能知道」）：
+# 2026-10-11 加（主人令「确保所有的状态主脑第一时间都能知道」）：
 #    功能页分两种 —— **活的**（引 brain-data.js / 自己的 data.js / fetch / 全局，渲染时取数）
 #    与**快照的**（生成时把数据**烤进 HTML**）。烤的页不会自己变新：
 #    实测 ai-board 烤的是 10-10 00:41（**25 小时前**）、cloud-plugins/cloud-status 烤的
@@ -94,26 +94,26 @@ def feature_pages(brain_dir=None):
             continue
         t = f.read_text(encoding="utf-8", errors="replace")
         m = _TS.search(t)
-        # 🔴 2026-10-11 修：relative_to(WS) 在**仓外文件**上会抛 ValueError，把整条判据弄崩。
+ # 2026-10-11 修：relative_to(WS) 在**仓外文件**上会抛 ValueError，把整条判据弄崩。
         #    本仓早有这条教训（audit-dead-judgments.py 的原话：「别让打印文件名这种小事
         #    把整条判据弄崩」）—— 自检喂临时目录时我就撞上了。⇒ 相对化失败就退成绝对路径。
         try:
             _rel = str(f.relative_to(WS)).replace(chr(92), "/")
         except ValueError:
             _rel = str(f).replace(chr(92), "/")
-        # 🔴 2026-10-11 收紧（**别把设计意图当故障**）：
+ # 2026-10-11 收紧（**别把设计意图当故障**）：
         #    只有**自动生成**的页才该"跟着状态变新"——认它头部那句「自动生成，别手改」。
         #    实测：blueprint 与 digital-human 头里**没有**这句、全仓也找不到写它们的脚本
         #    ⇒ 它们是**手写页**，页里那个时间戳**不是"生成时间"**（可能是内容自己的日期）。
         #    对它们报"烤旧了"= 把设计意图当故障 ⇒ 只对自动生成页查新鲜度。
-        # 🔴 2026-10-11 放宽（**我的标记口径太窄，误判了两个页**）：
+ # 2026-10-11 放宽（**我的标记口径太窄，误判了两个页**）：
         #    本仓对"自动生成的页"有**两套**约定，我只认了第一套 ——
         #      ① 「自动生成，别手改。重建：…」（cap-pages / ai-board / brain-feed 那一家）
         #      ② **deck 家族的约定**：data-data-kind="快照" + data-data-at="<时刻>"
         #         （code-deck.py L336 · exec-deck.py L234 都是这么写的，而且 exec-deck L195
         #          的设计原话就是「页面**必须把快照时刻与重生成命令写在脸上**」）
         #    ⇒ 只认①会把②误判成"无标记页（判不了）"，而它们其实**自己把时刻写在脸上了**。
-        # 🔴 2026-10-11 加第三套约定（**手写页声明**）：
+ # 2026-10-11 加第三套约定（**手写页声明**）：
         #    实测 digital-human 是**手写页**（162KB，全仓 0 个写它的脚本）——
         #    对它报「无标记页（判不了）」= 把设计意图当故障。⇒ 页里明写「手写页」即认。
         _hand = "手写页" in t
@@ -134,7 +134,7 @@ def feature_freshness(now=None):
             untimed.append(name)
             continue
         if not info.get("auto_generated"):
-            # 🔴 2026-10-11 勘误：这里原来叫 hand（手写页），**叫错了**。
+ # 2026-10-11 勘误：这里原来叫 hand（手写页），**叫错了**。
             #    实测：cloud-plugins / cloud-status / code-deck / exec-deck / plugins-mesh / energy
             #    **都是生成器写的**（我当场跑过 cloud-plugins.py gen / code-deck.py --html，页真的变了），
             #    只是**那些生成器不在页里留标记** ⇒ 从页本身**判不出**它是生成物还是手写物。
@@ -225,7 +225,7 @@ def selftest():
     ok.append(("真植入负控·主脑数据改旧 ⇒ 必须报不新鲜", bool(r4.get("stale")),
                "旧 %.1f 小时" % (r4.get("stale_hours") or 0)))
     # 真植入负控④：造一个"烤旧了"的功能页 ⇒ 新鲜度检查必须点名
-    # 🔴 首跑这条**自己把我抓了**：feature_pages 的参数是 **brain 目录**（它内部取 .parent 得到
+ # 首跑这条**自己把我抓了**：feature_pages 的参数是 **brain 目录**（它内部取 .parent 得到
     #    holo_pet_w3），而我第一次传的是已经是父目录的 root ⇒ 它扫到临时目录的上一层去了、
     #    点名为 []。⇒ 自检的错也要当真错修，不许放水。现在按真语义传 brain 目录。
     import tempfile as _tf

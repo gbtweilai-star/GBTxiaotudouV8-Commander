@@ -10,7 +10,7 @@
      依据：本机页面文件峰值 **12,727 MB** ＞ 物理 **8 GB**（换页已在发生）；
            Remotion 默认并发 **6×**（并发=内存放大器）。云仓缓解"爆"与"盘不够"。
 
-## 🔴 搬运与校验**委托**给已验证的 `r2-move.py`（不自己造更弱的）
+## 搬运与校验**委托**给已验证的 `r2-move.py`（不自己造更弱的）
 本仓的 `r2-move.py` 自带三条我要的规矩，而且**逐字节验过**：
   · 字节级回验、**对不上不删**；· **>300 MiB 自动分片**；· `verify` **不落盘**。
 （教训出处：F18 `wrangler` 默认走本地模拟却打印 Upload complete；F20 300 MiB 硬上限；
@@ -107,7 +107,7 @@ def cmd_put(a) -> int:
         print(json.dumps({"ok": False, "why": "r2-move put 非零退出", "rc": rc,
                           "tail": out[-400:]}, ensure_ascii=False))
         return 3
-    # 🔴 不落盘的字节级校验（r2-move verify）；对不上就**不删本地**
+ # 不落盘的字节级校验（r2-move verify）；对不上就**不删本地**
     rc2, out2 = _r2move("verify", key, "--sha256", digest, "--bytes", str(size))
     ok = (rc2 == 0)
     rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "key": key, "bytes": size,

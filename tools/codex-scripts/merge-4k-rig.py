@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """把骨架/蒙皮搬到 **4K 贴图版**高模上（顶点顺序与 UV 与旧件逐一相同 ⇒ 直接搬，不重算）。
 来源：raw/rig/model-rigged-hi.glb（含 bones + skin + JOINTS_0/WEIGHTS_0）
 底子：4K 重贴后的 model.glb（4096² PNG 贴图）
@@ -12,7 +8,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 RIG = DH / "raw/rig/model-rigged-hi.glb"
 BASE = DH / "raw/phase4-4k/tripo-out/gbt-4k-tex-convert-0d1f0aa6/model.glb"
@@ -44,7 +40,7 @@ def acc(J, BIN, i, comps):
 # ① 先验证顶点一致（不同就拒绝，不硬干）
 n_r = JR["accessors"][pr_r["attributes"]["POSITION"]]["count"]
 n_b = JB["accessors"][pr_b["attributes"]["POSITION"]]["count"]
-# 🔴 2026-09-25 清掉一句死表达式：原来第二个合取项末尾写着 `or True` ⇒ 那一项**恒真、等于没写**
+# 2026-09-25 清掉一句死表达式：原来第二个合取项末尾写着 `or True` ⇒ 那一项**恒真、等于没写**
 #    （`dead_judgments` 审计器点出来的）。它显然是想再验一条"POSITION accessor 指向同一处"，
 #    但**从来没实现**。这里如实收成"只看顶点数一致"，并把"那条没实现"写下来 ——
 #    免得下一个人以为搬之前已经验过 accessor 归属。**行为逐字节不变**（原式恒等于 `n_r == n_b`）。

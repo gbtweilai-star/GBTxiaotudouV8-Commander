@@ -14,7 +14,7 @@
   **不引入第四种强调色**（`holo_pet_w3/window.css` 的硬约束）。
 - **三档转盘**：数据台 `变奏4 / 动效3 / 密度6`；3D 全景 `变奏5 / 动效4 / 密度5`。
 - **§1.5 血账（本仓实测）**：数据页**绝不整板自转、字必须正** —— "3D 冲击"只花在**签名元素**上。
-  3D 页的签名元素 = **触手全景球**（域环 ×30 → 能力节点 ×209 → 绑定弧 → 运行脉冲）：
+  3D 页的签名元素 = **触手全景球**（域环 ×30 → 能力节点 ×N → 绑定弧 → 运行脉冲；N 现算，**不写数**）：
   占首屏 ≥1/5 · 有光（自发光 + 地面光晕 + 边缘光）· 删掉就有损失 · 换标测试不成立（数据是它自己的）。
 - **§4 手感**：发丝描边（主题色 4–10% alpha）· **染色阴影**（冷向 blue-gray，多层栈）· 圆角有架构（容器 14 / 内件 8）。
 - **§3 禁令**：不用 indigo 系 · 不用 emoji 当图标（一律 SVG 描边 + currentColor）· 无编造指标
@@ -523,9 +523,18 @@ fit(); requestAnimationFrame(draw);
 """
     body = body.replace("__ND__", str(counts["domains"])).replace("__NC__", str(counts["caps"])) \
                .replace("__NB__", str(counts["binding_weight"])).replace("__NP__", str(counts["pulses"]))
-    html = _shell("触手 3D 全景", "30 个域 → 209 个能力位 → 绑定弧 → 运行脉冲（每条都来自真台账）",
+    # 🔴 2026-10-28 修（主人亲点「209/341 两处数字打架」）：副标题这半句原来**写死 209**
+    #   （更早那版图上只挂 209 位），而图例是从 counts 现算的 ⇒ 同一页两个数互相打脸。
+    #   现在两处同源：都从 `G.counts` 出。`tools/codex-scripts/tentacle3d-audit.py` 判它。
+    _mount = ("全部已挂到域图上" if int(counts["member_edges"]) >= int(counts["caps"])
+              else "其中 %d 位已挂到域图上" % int(counts["member_edges"]))
+    _sub3d = ("%d 个域 → %d 个能力位（%s）→ 绑定弧 → 运行脉冲（每条都来自真台账）"
+              % (int(counts["domains"]), int(counts["caps"]), _mount))
+    html = _shell("触手 3D 全景", _sub3d,
                   body, script, extra,
-                  hero=_hero("触手 3D 全景", "中心是 run_task（唯一门）· 30 个域从核心长出手臂 · 脉冲是真台账事件",
+                  hero=_hero("触手 3D 全景",
+                             "中心是 run_task（唯一门）· %d 个域从核心长出手臂 · 脉冲是真台账事件"
+                             % int(counts["domains"]),
                              chip="全景", accent="土豆金", seed="tentacle3d", kind="orb",
                              sub="GBT TENTACLE / SYSTEM MAP 01",
                              ctas=[{"label": "回工作台", "href": "../workbench/index.html"},
@@ -1029,9 +1038,13 @@ def render_home() -> dict:
     能力 → run_task + policy；模型 → potato（gbt-potato-v8）。第三方品牌字样零出现。
     """
     try:
-        prows = _load_hub().pages()["rows"]
+        _hub_home = _load_hub()
+        prows = _hub_home.pages()["rows"]
+        # 🔴 2026-10-28 修：页脚原本写死「217 能力位 · 30 域」（另一个时代的数）。
+        #   能力位/域一律从 console_hub 的 w1_caps 现读，**不写数**。
+        _caps_stat = _hub_home.widgets()["w1_caps"]
     except Exception:                                      # noqa: BLE001
-        prows = []
+        prows, _caps_stat = [], {"total": "?", "domains": "?"}
     link = {r["page"]: f"../../../{r['path']}" for r in prows}
 
     def _grp(title: str, items: list) -> str:
@@ -1071,7 +1084,7 @@ def render_home() -> dict:
   <section class="hm-ribbon">{ribbon}</section>
   <section class="hm-strip">
     <span id="bridge" class="rb-chip">面板桥：检测中…</span>
-    <span class="rb-chip"><b class="cy">217</b> 能力位 · 30 域</span>
+    <span class="rb-chip"><b class="cy">{_caps_stat["total"]}</b> 能力位 · {_caps_stat["domains"]} 域</span>
     <span class="rb-chip">脑层闭环 3/3</span>
     <span class="rb-chip">决策与执行权只属 GBT小土豆V8</span>
   </section>
@@ -1225,7 +1238,7 @@ def where(**_kw) -> dict:
                 "读数": "为「主人+内部操作者」做的数据台 + 一页门面级 3D 全景；深空仪器感；品牌三色冻结",
                 "档位": {"数据台": "变奏4/动效3/密度6", "3D 全景": "变奏5/动效4/密度5"},
                 "血账": "§1.5：数据页绝不整板自转、字必须正；3D 冲击只花在签名元素上",
-                "签名元素": "触手全景球（域环×30 → 能力节点×209 → 绑定弧 → 运行脉冲）",
+                "签名元素": "触手全景球（域环×N → 能力节点×M → 绑定弧 → 运行脉冲；N/M 现算，不写数）",
                 "禁令": "无 indigo / 无 emoji 当图标 / 无编造指标（每个数字带 src）/ 无外链图床"},
             "files": {"渲染台账": str(_LEDGER.relative_to(_ROOT))}}
 

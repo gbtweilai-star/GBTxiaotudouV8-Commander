@@ -1,4 +1,12 @@
-import argparse, hashlib, os, zipfile
+import argparse, hashlib, os, sys, zipfile
+
+# 编码守门（2026-10-24 补 · encoding-guard-check 报的「新增违规」之一；
+# 本件原来连 sys 都没 import，报错信息里的中文路径会印成空）
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
 
 def main():
     ap = argparse.ArgumentParser()

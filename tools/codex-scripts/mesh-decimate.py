@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """网格减面（**保 UV / 保纹理缝**）→ 直接写 GLB。用 python 3.12 跑（pymeshlab 只在那边）。
 
 为什么要自己写这一件：
@@ -30,7 +26,7 @@ import sys
 import numpy as np
 import pymeshlab as ml
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "holo_pet/assets/digital-human/raw/avatarmesh/model-facing.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WS / "holo_pet/assets/digital-human/raw/avatarmesh/model-lowpoly.glb"
 TARGET = int(sys.argv[3]) if len(sys.argv) > 3 else 40000
@@ -153,7 +149,7 @@ def project_uv_perface(V0, F0, UV0, VN, FN, ktri=4):
     V0l = V0.tolist()
     F0l = F0.tolist()
     UV0l = UV0.tolist()
-    # 🔴 UV 必须存成**逐面角**，不能存进逐顶点数组：
+ # UV 必须存成**逐面角**，不能存进逐顶点数组：
     #    一个顶点被最多 6 个面共用，而每个面各自挑源三角（跨 UV 缝时挑到的是不同侧），
     #    写进逐顶点数组就是"后写的覆盖先写的" ⇒ 渲染出来正好是放射状碎块。
     #    2026-09-25 实测教训：自投影对照测不出这个错（那时每个面挑的都是自己那个源三角、值相同）。
@@ -336,7 +332,7 @@ def main():
             NN /= np.maximum(np.linalg.norm(NN, axis=1, keepdims=True), 1e-9)
             print("    （法线缺失，已按面积加权现算）")
         V0, F0, UV0 = load_source_uv(SRC)
-        # 🔴 这里**不翻 V**：UV 是直接从源 GLB 的 TEXCOORD_0 读的（glTF 口径，原点左上），
+ # 这里**不翻 V**：UV 是直接从源 GLB 的 TEXCOORD_0 读的（glTF 口径，原点左上），
         #    本来就对。之前翻 V 是为了抵消 pymeshlab 内部的 OBJ 口径 —— 那条只在 wedge 路径成立。
         UVc = project_uv_perface(V0, F0, UV0, NV, NF)
         # 按 (顶点, UV) 唯一化拆点：UV 缝上的顶点必须一分为二，否则两侧争同一个 UV

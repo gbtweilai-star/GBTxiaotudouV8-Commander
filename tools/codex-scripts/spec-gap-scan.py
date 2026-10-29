@@ -37,11 +37,59 @@ CONTAINERS = [
 ]
 
 
-def find_spec(domain):
+def _covering_skill_map():
+    """从 `omni.py` 的 `DISTILLED_DOMAINS` **现读**「域 → 承载体」派生源。
+
+    🔴 2026-10-25 · 口径修正（原期望 → 新口径 → 为什么翻）：
+      原期望：每个域都必须有**自己的** `gbt-<域>/SKILL.md`。
+      新口径：若该域在 `omni.DISTILLED_DOMAINS` 里**显式声明**并入某个技能，
+              且那份技能**逐个点到**了本域每一位的名字 ⇒ 算「被承载体覆盖」，不算域级缺口。
+      为什么翻：`image_video` 只有 1 位（`a1art_skill`），2026-09-22 已由机器抓出假账后
+              把 `DISTILLED_DOMAINS` 从 `gbt-aesthetic` 改指 `gbt-creation`（逐位覆盖在那里），
+              并留下验收器判据。而本扫描器只认 `gbt-<域>` 目录名 ⇒ 一直把这件事报成
+              「该域没有规程件」，让真账（覆盖已存在）看起来像缺口。
+              **不是放宽**：承载体必须**逐位点名**才算数（少一位就退回域级缺口），
+              且清单来自派生源、本函数里**没有任何写死的域名**。
+    """
+    import ast
+    p = os.path.join(ROOT, "tools", "codex-scripts", "omni.py")
+    try:
+        src = open(p, encoding="utf-8", errors="replace").read()
+        tree = ast.parse(src)
+    except Exception:                                   # noqa: BLE001
+        return {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for t in node.targets:
+                if isinstance(t, ast.Name) and t.id == "DISTILLED_DOMAINS":
+                    try:
+                        val = ast.literal_eval(node.value)
+                    except Exception:                   # noqa: BLE001
+                        return {}
+                    return {str(k): str(v) for k, v in val.items() if isinstance(v, str)}
+    return {}
+
+
+def find_spec(domain, names=()):
     for base in CONTAINERS:
         p = os.path.join(base, "gbt-%s" % domain, "SKILL.md")
         if os.path.isfile(p):
             return p
+    # 承载体回退（见 _covering_skill_map 的口径说明；必须逐位点名才算覆盖）
+    skill = _covering_skill_map().get(domain)
+    if not skill:
+        return None
+    for base in CONTAINERS:
+        p = os.path.join(base, skill, "SKILL.md")
+        if not os.path.isfile(p):
+            continue
+        try:
+            text = open(p, encoding="utf-8", errors="replace").read()
+        except Exception:                               # noqa: BLE001
+            return None
+        if names and all(str(n) in text for n in names):
+            return p
+        return None
     return None
 
 
@@ -63,8 +111,8 @@ def main():
 
     rows, total_missing, no_spec = [], 0, []
     for dom in sorted(by_dom):
-        spec = find_spec(dom)
         names = by_dom[dom]
+        spec = find_spec(dom, names)
         if not spec:
             no_spec.append(dom)
             rows.append({"domain": dom, "caps": len(names), "spec": None,

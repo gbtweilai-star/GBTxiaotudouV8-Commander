@@ -78,7 +78,7 @@ def main():
         raw += findings("stale_passport")
     fs = [str(x.get("file") or "") for x in raw]
     rows = logbook()
-    # 🔴 2026-10-22 加（第一次 dry-run 就抓到假归因）：**同名文件不许拿 basename 当凭据**。
+ # 2026-10-22 加（第一次 dry-run 就抓到假归因）：**同名文件不许拿 basename 当凭据**。
     #    实测：logbook#127 里点了 "index.html"，我拿 basename 去配，一口气把 24 个不同的
     #    index.html 全归到那一条上 —— 那是把「名字撞了」当「证据」。现口径：
     #      · basename 在本批未认领件里**唯一** ⇒ 允许用 basename 匹配；
@@ -105,7 +105,7 @@ def main():
                     continue
             elif not (base and base in blob):
                 continue
-            # 🔴 2026-10-22 加（P1 第二次同型）：名字级**还不够** —— 同一个文件在几个月里
+ # 2026-10-22 加（P1 第二次同型）：名字级**还不够** —— 同一个文件在几个月里
             #    被改过很多次，一条 9 月的记录点过它，不代表 10 月这次改动就是那一次。
             #    现口径：名字级 + **时间窗**（记录时间与文件 mtime 相差 ≤12h）双证据才算。
             try:

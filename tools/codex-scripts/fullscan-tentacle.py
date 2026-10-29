@@ -125,7 +125,7 @@ def cmd_scan(args) -> int:
     con.execute("BEGIN")
     for lo in range(0, len(todo), 300):
         chunk = todo[lo:lo + 300]
-        # 🔴 先读旧行再删：第一版先 DELETE 后 SELECT，old 永远为空，
+ # 先读旧行再删：第一版先 DELETE 后 SELECT，old 永远为空，
         #   于是每次都把整个变更目录的文件报成"新增"（实测稳定 +922）。
         old_map = {d: {n: (s, t) for n, s, t in con.execute(
             "SELECT name, size, mtime_ns FROM files WHERE dir = ?", (d,))} for d in chunk}
@@ -365,7 +365,7 @@ def cmd_usn(args) -> int:
             rec_len = ctypes.c_uint32.from_buffer(buf, off).value
             if rec_len < 60:
                 break
-            # 🔴 偏移不能照 MSDN 抄：本机实测（Windows 11）V2 记录的
+ # 偏移不能照 MSDN 抄：本机实测（Windows 11）V2 记录的
             #   attributes 在 52、name_len 在 56、name_off 在 58、名字从 60 起；
             #   照文档的 44/48/50 读，attributes 恒为 0 ⇒ 目录数恒为 0（实测 415 万条、目录 0）。
             #   这里做自适应：第一次遇到记录时试三套候选偏移，取能解出合法名字的那套。
@@ -593,7 +593,7 @@ def cmd_usn_index(args) -> int:
             attrs = ctypes.c_uint32.from_buffer(buf, off + 52).value
             nlen = ctypes.c_uint16.from_buffer(buf, off + 56).value
             noff = ctypes.c_uint16.from_buffer(buf, off + 58).value
-            # 🔴 buf.raw 每次都会把整个 1 MB 缓冲区拷一份！4.16M 条 = 4 TB 的内存拷贝，
+ # buf.raw 每次都会把整个 1 MB 缓冲区拷一份！4.16M 条 = 4 TB 的内存拷贝，
             #   这就是建库 1388s 的真凶（枚举本身只要 24.8s）。改成按指针直接读。
             name = (ctypes.string_at(ctypes.addressof(buf) + off + noff, nlen)
                     .decode("utf-16-le", "replace") if nlen else "")

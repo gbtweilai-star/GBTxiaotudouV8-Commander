@@ -271,6 +271,35 @@ def _token_ok(token, parts) -> bool:
                           _token_for_bucket(now - 1, parts))
 
 
+def _reject_lexical_escape(value) -> str:
+    """**字面**拒绝（在一切授权短路之前）：绝对路径/盘符 · 任何 `..` 段 · 保留目录 `.backup`。
+
+    🔴 2026-10-25 · 为什么把它单独抽出来、并且提到短路之前：
+      `_check_rel()` 与 `_resolve_target_name()` 里都有「拿到 `filesystem_write`
+      授权 ⇒ 校验短路」的配方分支；而 F23 已实测该授权**恒为真**
+      （`auth_gate.ENFORCED_SCOPES` 里没有 `filesystem_write`）⇒ **整条路径校验被跳过**，
+      于是 `/abs.md` 被剥成相对、`a/./../b.md` 被归一化、`.backup/x.md` 落进备份区，
+      盘上真的多出三个文件。⇒ 把**与授权无关的路径规则**提到短路之前：
+      授权再大也不该让「绝对路径/上跳/写进保留目录」变成合法。
+      **这不是放宽**：以前能过的这几种怪路径，现在一律 `WriteRootError`（`CreateError` 的子类）。
+    """
+    if not isinstance(value, str):
+        raise CreateError("path 必须是字符串：%r" % (value,))
+    raw = value.strip()
+    if not raw:
+        raise CreateError("缺少 path：写入必须给写入根下的相对路径")
+    norm = raw.replace("\\", "/")
+    if norm.startswith("/") or _DRIVE_RE.match(norm):
+        raise WriteRootError("越界：`%s` 是绝对路径/带盘符 —— 写入根之外一律拒" % raw)
+    parts = [p for p in norm.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in parts):
+        raise WriteRootError("越界：`%s` 含 `..` 段 —— 不许用归一化掩盖上跳" % raw)
+    if parts and parts[0] == BACKUP_DIRNAME:
+        raise WriteRootError("越界：`%s` 落在保留目录 `%s`（写前备份区）里"
+                             % (raw, BACKUP_DIRNAME))
+    return raw
+
+
 def _check_rel(value) -> str:
     """相对路径闸门：越界一律拒（不靠"拼完再看一眼"）。
 
@@ -305,6 +334,26 @@ def _check_rel(value) -> str:
 
 def _resolve_target(rel: str) -> Path:
     root = _write_root_checked()
+    # 🔴 2026-10-25 · **字面拒绝，不靠归一化**（原口径 → 新口径 → 为什么翻）：
+    #   原口径：把 `rel` 拼到写根上再 `resolve()`，只要结果仍在写根内就放行。
+    #   新口径：**在归一化之前**先按字面拒三样 —— ① 绝对路径/带盘符 ② 任何 `..` 段
+    #           ③ 第一段是保留目录（`.backup`，即写前备份区）。
+    #   为什么翻：`test_escape_paths_are_rejected_and_disk_untouched` 的契约是
+    #   「越界一律拒，且**盘上零新增**」，而实测三种样例都**被写成了文件**
+    #   （`_tree(root)` 里出现 `['.backup/x.md', 'abs.md', 'b.md']`）：
+    #   `/abs.md` 被剥成相对、`a/./../b.md` 被归一化成 `b.md`、`.backup/x.md` 直接落在备份区。
+    #   **这不是放宽**：以前能过的这几种怪路径，现在一律 `CreateError`（WriteRootError 是它的子类）。
+    if not isinstance(rel, str) or not rel.strip():
+        raise CreateError("path 必须是非空字符串：%r" % (rel,))
+    raw = rel.replace("\\", "/")
+    if raw.startswith("/") or (len(raw) > 1 and raw[1] == ":"):
+        raise WriteRootError("越界：`%s` 是绝对路径/带盘符 —— 写入根之外一律拒" % rel)
+    parts = [p for p in raw.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in parts):
+        raise WriteRootError("越界：`%s` 含 `..` 段 —— 不许用归一化掩盖上跳" % rel)
+    if parts and parts[0] == BACKUP_DIRNAME:
+        raise WriteRootError("越界：`%s` 落在保留目录 `%s`（写前备份区）里"
+                             % (rel, BACKUP_DIRNAME))
     target = (root / rel).resolve()
     if not target.is_relative_to(root):
         raise WriteRootError("越界：%s 不在写入根 %s 之内" % (rel, root))
@@ -464,7 +513,7 @@ def _op_write(payload: dict) -> dict:
     _write_root_checked()  # R107 · 乙案：写入口闸门，先于一切副作用
     state = read_state()
     _require_enabled(state)
-    rel = _check_rel(payload.get("path"))
+    rel = _check_rel(_reject_lexical_escape(payload.get("path")))
     new_text = _check_content(payload.get("content"))
     new_bytes = new_text.encode("utf-8")
     new_sha = sha256(new_bytes).hexdigest()

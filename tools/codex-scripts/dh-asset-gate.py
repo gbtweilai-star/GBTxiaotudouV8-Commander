@@ -112,18 +112,9 @@ def main(argv):
         rows.append({"name": name, "pass": bool(passed), "detail": detail})
 
     # ① 单网格单蒙皮
-    # 🔴 2026-10-28：原来这里写的是 `joints == 65`，把**骨数**绑进了
-    #   "单网格单蒙皮"这条判据里。实测在役资产 dh-v7-detail.glb / dh-v6-skin.glb
-    #   都是 **66** 根骨（v2-rigged 才是 65），于是这条闸对在役件恒红。
-    #   但"单网格单蒙皮"的语义是 meshes==1 且 skins==1 —— 骨数不是它的判据，
-    #   写进来属于**过度指定**。改成：结构照判，骨数单独报，不一致就明确标出来
-    #   让人看得见（不静默，也不误判成"资产坏了"）。
     joints = len(skins[0]["joints"]) if skins else 0
-    EXPECT_JOINTS = 65          # v2-rigged 的口径；v6/v7 是 66，见上面的说明
-    _jnote = ("" if joints == EXPECT_JOINTS
-              else " · ⚠ 骨数与 v2 口径(%d)不同，在役件若为 v6/v7 属正常" % EXPECT_JOINTS)
-    add("① 单网格单蒙皮", len(meshes) == 1 and len(skins) == 1,
-        "meshes=%d · skins=%d · joints=%d%s" % (len(meshes), len(skins), joints, _jnote))
+    add("① 单网格单蒙皮", len(meshes) == 1 and len(skins) == 1 and joints == 65,
+        "meshes=%d · skins=%d · joints=%d" % (len(meshes), len(skins), joints))
 
     # ② 无杂物球
     vcounts = []

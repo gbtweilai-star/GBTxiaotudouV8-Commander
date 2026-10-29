@@ -94,7 +94,7 @@ def record(seconds: float):
         ch = max(1, int(dev.get("maxInputChannels") or 2))
         frames = []
 
-        # 🔴 2026-10-18 实测：**阻塞式 st.read() 会挂死**（180s 超时）。
+ # 2026-10-18 实测：**阻塞式 st.read() 会挂死**（180s 超时）。
         #    原因：WASAPI 回环在"当前没有声音在放"时不一定持续喂满缓冲，
         #    阻塞读就把整条命令吊在那里。⇒ 改**回调式 + 墙钟硬超时**，
         #    没声音时也能拿到静音帧（静音≠坏，peak=0 会如实报）。

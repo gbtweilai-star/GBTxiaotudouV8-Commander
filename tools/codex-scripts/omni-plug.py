@@ -12,7 +12,7 @@ r"""V8 的万物插（omni_plug）—— **万物皆可插 · 万物皆可控**�
 | 插法三件 | core/sider_plug.py 头 | 不破坏 · 新总线（用她真实会话接）· 掩盖（只露我们的口） |
 | 视觉钉死 | core/browser_plug.py 的 pilot 内 | 动手前新鲜取景帧龄 ≤ 400ms；取不到就拒动（禁传统瞎子操作），只读动作不受限 |
 
-## 🔴 我原来松了 3.75 倍（实测对照）
+## 我原来松了 3.75 倍（实测对照）
 V8 的 vision_loop 把 STALE_MS 定成 1500ms；V9 的 pilot 要求 ≤400ms。
 主人原话是「你截图再想再动手，别人 98K 早就打爆你的头了」=> 400ms 才是口径。
 本件把它收成 400，并留负对照（合成 900ms 的旧帧 => 必须判不新鲜）。
@@ -65,7 +65,7 @@ def plug(tentacle: str, face: str, action: str, **args) -> dict:
         try:
             from gbt_allinone import vision_loop as VL
             lk = VL.look() or {}
-            # 🔴 2026-10-10 实测撞的**键名错**：look() 真返回的键是 **age_ms**，
+ # 2026-10-10 实测撞的**键名错**：look() 真返回的键是 **age_ms**，
             #    我原来读的是 "帧龄ms"（那是我自己在别处写的别名）⇒ 恒为 None ⇒
             #    **凡是过视觉钉死的动作全被拒**（open/click/type 全线不通）。
             #    一个键名错把整条"可控"链掐死 —— 两个键都收，优先真键。
@@ -98,7 +98,7 @@ def _attach():
     from playwright.sync_api import sync_playwright
     pw = sync_playwright().start()
     br = pw.chromium.connect_over_cdp(CDP)
-    # 🔴 2026-10-10 实测第一版**假闭环**：挑到了 chrome-error://chromewebdata/ 那种**死页**
+ # 2026-10-10 实测第一版**假闭环**：挑到了 chrome-error://chromewebdata/ 那种**死页**
     #    ⇒ 闭环标成"闭上了"但**读数是空的**（0 字）—— 那是**假闭**，不是合格。
     #    修法：① 只认 **http(s) 活页**；② 优先 Sider；③ 一个活页都没有就**新开一页**。
     def alive(u: str) -> bool:

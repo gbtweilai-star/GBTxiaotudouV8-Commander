@@ -31,17 +31,13 @@
 （吃显存/内存）⇒ 过 **`filesystem_write`**。
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import os
 import sys
 import types
 from pathlib import Path
 
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 READ_OPS = ("status", "nodes", "rules", "compose")
 WRITE_OPS = ("expand", "loader", "unload")
 _MODES = ("full_ref", "T2VA", "I2VA", "FL2VA", "L2VA")

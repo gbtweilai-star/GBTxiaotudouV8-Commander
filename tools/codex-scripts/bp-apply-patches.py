@@ -63,7 +63,7 @@ def apply(name: str, code: str) -> tuple:
 
     # ── F7：RichTextEditor 的 contentEditable + dangerouslySetInnerHTML ──
     if name == "/src/components/RichTextEditor.tsx":
-        # ⚠️ 实测踩到（正是本脚本"断言命中"要抓的东西）：
+ # 实测踩到（正是本脚本"断言命中"要抓的东西）：
         #    真实 L26 是 `'      <div '` —— **带一个尾随空格**。
         #    我第一版补丁写的是 `'      <div\n'`（无空格）⇒ 命中 0 次 ⇒ 断言当场报错。
         #    一个尾随空格就能让"字面补丁"静默失效；若没有断言，读的人会以为已经改了。

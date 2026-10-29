@@ -34,7 +34,7 @@ if not (PROTO.exists() and CANVAS.exists()):
 R = []
 
 
-# emoji 判定口径：Unicode 属性 \p{Extended_Pictographic}（含 U+2B00–2BFF ⭐⬛、
+# emoji 判定口径：Unicode 属性 \p{Extended_Pictographic}（含 U+2B00–2BFF 、
 # U+1F000–1F2FF 🀄 等手写码位区间永远覆盖不到的块）。白名单只放「正文里是内容
 # 而非装饰」的活字：U+2194 ↔（实测用于「镜像 ↔ 现实」「注册↔路由」）。
 # regex 运行期不可用时退回宽区间 —— 宁可多报，也不放过 P0。

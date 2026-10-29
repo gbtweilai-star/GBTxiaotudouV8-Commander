@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """面部/皮肤微细节：程序化生成**可平铺**的毛孔 + 细纹 detail normal，
 只在**皮肤区**合成进原法线贴图（黑衣服上不该长毛孔）。
 
@@ -31,7 +27,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import gaussian_filter
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-springs.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-skin.glb"
@@ -132,7 +128,7 @@ o0 = nv.get("byteOffset", 0)
 L0 = nv["byteLength"]
 tail_off = o0 + L0
 pad = (-len(newbytes)) % 4                     # bufferView 起点要 4 字节对齐
-# 🔴 第一版只做了"新图接在原位置"，**没给后面的 bufferView 加偏移量** ⇒
+# 第一版只做了"新图接在原位置"，**没给后面的 bufferView 加偏移量** ⇒
 #    image1 / image2 立刻读不回（自检抓到）。旧图换成新图后，后面所有 bufferView
 #    的绝对偏移都要整体平移 `(len(newbytes)+pad) - L0`。
 shift = (len(newbytes) + pad) - L0
@@ -146,7 +142,7 @@ for i, bv in enumerate(J["bufferViews"]):
         bv["byteLength"] = len(newbytes)
     elif bv.get("byteOffset", 0) > o0:
         bv["byteOffset"] = bv.get("byteOffset", 0) + shift
-# 🔴 BIN 块长度必须 4 字节对齐 —— 漏了这一步 GLB 就是畸形文件。
+# BIN 块长度必须 4 字节对齐 —— 漏了这一步 GLB 就是畸形文件。
 #    实测：出厂闸 release-check.py 报 `BIN 长度 56976445 不是 4 的倍数`，
 #    而本脚本自己的自检**没有查这一项** ⇒ 闸漏了、废品差点上线。现在补上。
 while len(nb) % 4:

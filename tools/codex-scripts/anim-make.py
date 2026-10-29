@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """Phase 3 · 动画烘焙器：在**我们自己的 22 骨骨架**上写关键帧 → 烘成 glTF 动画（本地、零积分）
 
 坐标口径（由数据实测得出，不是猜）：
@@ -29,7 +25,7 @@ _ARM = ("LeftShoulder", "RightShoulder", "LeftArm", "RightArm",
 _LEG = ("LeftUpLeg", "RightUpLeg", "LeftLeg", "RightLeg",
         "LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase")
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = DH / "raw/rig/model-rigged.glb"                 # 低模绑骨件（动画挂它：小、快、随时可换高模）
 OUT = DH / "raw/rig/model-rigged-anim.glb"
@@ -47,7 +43,7 @@ print(f"骨架节点 {len(bone_node)} 个")
 
 
 # ── 世界轴 → 骨局部 的共轭换算（**采用 dh_rig.py 的同一条数学**，不另发明）──────
-# 🔴 2026-10-10 修：本件原来把 walk/idle 的**世界轴增量**直接**逐轴加进骨局部欧拉角**
+# 2026-10-10 修：本件原来把 walk/idle 的**世界轴增量**直接**逐轴加进骨局部欧拉角**
 #    （add_pose 的"角度相加"）。这只有在"骨局部轴 ≈ 世界轴"时才近似成立：
 #      · Mixamo **上臂**的局部轴与世界差得远 ⇒ 摆幅被压到 **44%**（实测）
 #      · **腿**差得近 ⇒ 摆幅反被放到 **2 倍**（实测 1.59 / 2.11）
@@ -95,7 +91,7 @@ _PW = {}
 
 
 # ── 解析 2 连杆 IK（**移植自 dh_rig.py 第 1055 行 leg_ik，逐行同数学**）──────────
-# 🔴 2026-10-10 移植的三前提（都已现读确认）：
+# 2026-10-10 移植的三前提（都已现读确认）：
 #   ① 几何量：L1(大腿)=0.2335 · L2(小腿)=0.2315 · 髋/膝/踝静止位置（从节点层级现算）
 #   ② 沿骨轴在**该骨自己的局部系**里 = **+Y**（LeftUpLeg/LeftLeg/LeftFoot 都是）
 #   ③ 左右互为镜像（右腿 Y/Z 取反）—— 已在 walk 里修
@@ -212,7 +208,7 @@ def _leg_walk_ik(side, phase, hips_world, pelvis_y):
     swing = max(0.0, -math.sin(ph))                        # 摆动相
     fwd = np.array([1.0, 0.0, 0.0])                        # 正面 = +X（头注已实测）
     up = np.array([0.0, 1.0, 0.0])
-    # 🔴 2026-10-10 关键：踝目标**不加骨盆偏移** —— 目标地点是**地面**。
+ # 2026-10-10 关键：踝目标**不加骨盆偏移** —— 目标地点是**地面**。
     #    我第一版写成 L["ankle"] + off + …，于是**支撑脚跟着骨盆一起抬**（实测两脚都 1.5%H
     #    ⇒ 谁都不"独立" ⇒ 交替恒 0）。而 IK 存在的意义正是"骨盆怎么动，脚踝都钉在目标上"。
     tgt = (L["ankle"]
@@ -264,7 +260,7 @@ BASE = {
     "LeftForeArm": (8, -12, 0), "RightForeArm": (-8, -12, 0),  # 肘部微屈 + 略内收
     "LeftHand": (4, 0, 0), "RightHand": (-4, 0, 0),
     "Spine": (2, 0, 0), "Spine1": (1, 0, 0), "Neck": (-2, 0, 0),
-    # 🔴 2026-10-10 修镜像：左右大腿骨的静止旋转**x 分量符号相反**（LeftUpLeg -0.9996 vs
+ # 2026-10-10 修镜像：左右大腿骨的静止旋转**x 分量符号相反**（LeftUpLeg -0.9996 vs
     #    RightUpLeg +0.9994，现读）⇒ **左右互为镜像** ⇒ 同一个"绕 Z"在左右会转到**相反方向**。
     #    所以左右腿的角度**必须反号**，不能同号（同号就是这里和 walk 里那个 58% 差异的真因）。
     "LeftLeg": (0, 0, -3), "RightLeg": (0, 0, 3),              # 膝盖微屈（镜像：右腿反号）
@@ -296,7 +292,7 @@ def ease(t, p):
 
 # ── ① 走路：标准四关键帧 + 镜像（1.10s / 一个完整步幅 = 左右各一步）────────
 # ── 走路：**一条腿的自身相位函数**（左右共用同一函数 ⇒ 对称由结构保证）──────────
-# 🔴 2026-10-10 重写动机（几何基线量出来的真账）：
+# 2026-10-10 重写动机（几何基线量出来的真账）：
 #   旧版是"四关键帧 + 手写左右两份"，实测 **左右极不对称**（抬幅 11.14%H vs 21.50%、
 #   步幅 37.20%H vs 43.36%），源头是同一相位下左右膝的**常数偏置差 5 倍**（-6 vs -30）。
 #   而规程 §5.1 给的是**与骨架无关的几何规格**：**抬脚 0.045H · 步幅 0.060H · 脚尖抬 15°**。
@@ -307,17 +303,17 @@ KNEE_SWING = float(os.environ.get("GBT_WALK_KSW", "16.0"))   # 摆动相膝弯�
 KNEE_STANCE = float(os.environ.get("GBT_WALK_KST", "6.0"))   # 支撑相膝微屈（度）
 ANKLE_LIFT = float(os.environ.get("GBT_WALK_ANK", "8.0"))    # 摆动相踝勾（度）—— 管脚尖抬
 ARM_SWING = float(os.environ.get("GBT_WALK_ARM", "18.0"))
-# 🔴 2026-10-10 **骨盆起伏就是"支撑脚残动的地板"**（实测，且旋钮接上后才看见）：
+# 2026-10-10 **骨盆起伏就是"支撑脚残动的地板"**（实测，且旋钮接上后才看见）：
 #    它是**共模**（两只脚一起抬），且**不随腿幅缩放** ⇒ 比值 = 残动/抬幅 永远过不了 0.2。
 #    实测 BOB 0.011→0.001：比值 0.230→**0.002**，交替 0→**36 帧**；抬幅几乎不变。
-#    ⚠️ 我先前"证伪骨盆起伏"那次是在**旋钮还没接上**（HipsY 行仍用硬编码）时测的 ⇒ **那次证伪无效**。
+# 我先前"证伪骨盆起伏"那次是在**旋钮还没接上**（HipsY 行仍用硬编码）时测的 ⇒ **那次证伪无效**。
 WALK_BOB = float(os.environ.get("GBT_WALK_BOB", "0.001"))     # 骨盆起伏幅度（米/模型单位）
-# 🔴 2026-10-10 新增：**支撑相髋摆系数**。实测（BOB 0.011→0.003 数字一模一样 ⇒ 骨盆起伏对幅度免疫）
+# 2026-10-10 新增：**支撑相髋摆系数**。实测（BOB 0.011→0.003 数字一模一样 ⇒ 骨盆起伏对幅度免疫）
 #    证明支撑脚的残动**来自关节角本身**：hip = HIP_SWING*sin(2πu) 在 u=0.25（正支撑中期）取最大
 #    ⇒ **把支撑脚拖着走**。真实步态里支撑相髋也摆，但那正是 IK 用来"把脚钉住"的一段；
 #    没有 IK 时只能把支撑相的髋摆压下去（代价：步态略不如真实，但换来支撑脚站得住）。
 STANCE_K = float(os.environ.get("GBT_WALK_STANCEK", "0.60"))
-# 🔴 2026-10-10 再定位一处**共模**驱动：骨盆扭转 "Hips": (0, 5*s, -2*s) 的两条腿根**一起动**。
+# 2026-10-10 再定位一处**共模**驱动：骨盆扭转 "Hips": (0, 5*s, -2*s) 的两条腿根**一起动**。
 #    估算：骨盆中心到腿根 ~0.1 · 扭 5° ⇒ 0.1*sin(5°) = 0.0087 = **0.89%H** —— 与实测支撑脚残动 0.94%H 吻合。
 #    （逐帧：zL 升到 3.47% 时 zR 仍 0.94% ⇒ 比值 0.27 > 判据的 0.2 ⇒ 交替判 0。）
 PELVIS_YAW = float(os.environ.get("GBT_WALK_YAW", "5.0"))     # 骨盆绕竖轴扭转幅（度）
@@ -350,16 +346,16 @@ def walk_pose(phase):
     s = math.sin(ph)
     pelvis_y = -0.36 * WALK_BOB + WALK_BOB * abs(s)
     out = {
-        # 🔴 2026-10-10 骨盆起伏压到交替门槛以下：原为 -0.012 + 0.024*|s|（峰值 0.012 = **1.2%H**），
+ # 2026-10-10 骨盆起伏压到交替门槛以下：原为 -0.012 + 0.024*|s|（峰值 0.012 = **1.2%H**），
         #    而 §6.1 的"独立离地"门槛是 **1%H = 0.00979** ⇒ **骨盆一抬，支撑脚也被算成离地**
         #    ⇒ 两脚永远"同起同落" ⇒ 交替恒 0。压到峰值 ~0.7%H（0.007）就不越门槛。
-        # 🔴 2026-10-10 **我自己的账目错误**：上一版我算了 pelvis_y、还加了 GBT_WALK_BOB 旋钮，
+ # 2026-10-10 **我自己的账目错误**：上一版我算了 pelvis_y、还加了 GBT_WALK_BOB 旋钮，
         #    但这一行**仍在用硬编码的 -0.004 + 0.011*abs(s)** ⇒ 旋钮根本没接上（那两组"一模一样"的
         #    读数不是"骨盆无效"，是**我改的那一行没被用**）。同时把骨盆扭转/侧倾也接成旋钮。
         "Hips": (0, PELVIS_YAW * s, -PELVIS_ROL * s), "HipsY": pelvis_y, "HipsX": None,
         "Spine": (0, -2 * s, 1.0), "Spine1": (0, -1.5 * s, 0.6),
         "Neck": (0, 1 * s, 0), "Head": (0, 1 * s, 0),
-        # 🔴 右腿的 Y/Z 分量**取反**（镜像修正，见 BASE 处的说明）：
+ # 右腿的 Y/Z 分量**取反**（镜像修正，见 BASE 处的说明）：
         #    左右大腿骨静止旋转 x 分量符号相反 ⇒ 同一角度在右侧会转到相反方向。
         #    不加这一步，左右必然不对称（实测抬幅 4.69% vs 7.48%、步幅 15.38% vs 21.18%）。
         "LeftUpLeg": (0, 0, hL), "LeftLeg": (0, 0, kL), "LeftFoot": (0, 0, aL),
@@ -428,7 +424,7 @@ def idle_at(t):
 
 
 def walk_at(t, T=1.10):
-    # 🔴 改成**直接求值**（不再四关键帧插值）：连续 ⇒ 更平滑，且 u 走满一圈天然回到起点
+ # 改成**直接求值**（不再四关键帧插值）：连续 ⇒ 更平滑，且 u 走满一圈天然回到起点
     #    ⇒ 闭合误差仍是 0，而不会因插值端点引入拐点。
     p = (t % T) / T
     out = dict(walk_pose(p))
@@ -462,14 +458,14 @@ def build_clip(name, length, fps, fn, root_motion):
         raw = fn(float(t))
         pose = add_pose(raw)                       # 仍供 HipsX/HipsY/_stride 这些**标量**用
         for b in bone_node:
-            # 🔴 2026-10-10 第二版（第一版回退过，见下面的失败记录）：**正确式子**
+ # 2026-10-10 第二版（第一版回退过，见下面的失败记录）：**正确式子**
             #     new_local = conj(P_world, q_world) · R_rest
             #   ① R_rest = 该骨**自己**的静止局部旋转（从节点 rotation 现读，不再拿 BASE 顶替）
             #   ② q_world = BASE 的角度 **复合** 增量角度 —— 两者本来就是按**世界轴**量的
             #      （BASE 的 LeftArm (82,0,0) 就是"绕世界 X 把手臂放下"）
             #   ③ P_world = 该骨**父节点**的静止世界朝向（自根向下累乘静止旋转）
             #   ④ conj(P,q)=P⁻¹qP 把世界旋转换算到父节点的局部系，再右乘 R_rest 得到该骨的局部旋转
-            # 🔴 2026-10-10 第三版：**把复合顺序做成可扫的参数**，让数字选（不再我猜一版量一版）。
+ # 2026-10-10 第三版：**把复合顺序做成可扫的参数**，让数字选（不再我猜一版量一版）。
             #    动机：我推了一遍数学 ⇒ "把增量绕 BASE 转过的轴" 恰好 = BASE·delta，
             #    而那正是第二版在跑的 —— 所以甲1 不是没试的路，是已经在跑。
             #    剩下真正没试的是：复合顺序(谁先谁后) / BASE 归世界还是归局部。
@@ -479,7 +475,7 @@ def build_clip(name, length, fps, fn, root_motion):
             qb = quat(*BASE.get(b, (0, 0, 0)))
             d = raw.get(b)
             if isinstance(d, tuple) and len(d) == 4:
-                # 🔴 IK 路直接给的**该骨局部四元数**（leg_ik → by_dir 已算好）⇒ 原样落通道
+ # IK 路直接给的**该骨局部四元数**（leg_ik → by_dir 已算好）⇒ 原样落通道
                 per_bone.setdefault(b, []).append(np.array(d, np.float32))
                 continue
             if isinstance(d, tuple) and any(d):
@@ -496,7 +492,7 @@ def build_clip(name, length, fps, fn, root_motion):
             else:  # L_B：BASE 归局部（它是"T-pose→手臂放下"的局部贴合），只让增量走世界轴
                 local = _qmul(_qmul(_qconj_by(_parent_world(b), qd), _node_rest(bone_node[b])), qb)
             per_bone.setdefault(b, []).append(local)
-        # 🔴 2026-10-10 **这一版共轭换算我试了、又回退了**（真账，不许当成没试过）：
+ # 2026-10-10 **这一版共轭换算我试了、又回退了**（真账，不许当成没试过）：
         #    我按 new_local = conj(P_world, q_world) · q_base 改了一版，重跑产物、用规程 §5.1 复量
         #    ⇒ **数字几乎没动**（hand_L 54.09→57.45 · hand_R 53.61→52.43 · foot_L 98.82→95.54
         #      · foot_R 125.15→108.97 · 独立离地 2/12→2/10；规程正解 123.92 / 119.11 / 62.21 / 59.27
@@ -508,7 +504,7 @@ def build_clip(name, length, fps, fn, root_motion):
         #        new_local = conj(P_world, q_world) · R_rest
         #      其中 P_world = 该骨**父节点**的静止世界朝向，R_rest = 该骨**自己**的静止局部旋转。
         #    ⇒ 下一轮按这个式子重做，**验收就是 §5.1 那四个数字要回到正解量级**（否则就是没改对）。
-        # 🔴🔴🔴 2026-10-10 **整整十三轮没看见的根因，就在这里**（45→57 轮）：
+ # 2026-10-10 **整整十三轮没看见的根因，就在这里**（45→57 轮）：
         #    glTF 里节点的 translation 是**父空间绝对位移**，不是增量。而这里原来写的是
         #        [HipsX, HipsY, _stride]
         #    ⇒ **把 Hips 的静止 translation 整个替换掉了**（原始件是 y = **0.5678**）
@@ -519,7 +515,7 @@ def build_clip(name, length, fps, fn, root_motion):
         #    这是同一族病的**第五副副本**：把"增量"当成了"绝对值"
         #    （前四副：清动画≠回绑定姿势 · 注释说不用三点光 · JS 按当前姿势量缩放 · 取景基准没冻结）。
         #    ⇒ 修：**静止位移 + 增量**。
-        # 🔴🔴 2026-10-10 又一副（**同族第六副：轴混淆**）——**两道判据都抓不到**：
+ # 2026-10-10 又一副（**同族第六副：轴混淆**）——**两道判据都抓不到**：
         #    _stride（前进位移）原来落在 **index 2 = Z**，而头注写着「**臂轴 = Z**（双臂沿 Z 展开）·
         #    **正面 = +X**」⇒ **Z 是左右轴** ⇒ 角色**横着走**（实测：X 幅度 0.0000、Z 幅度 0.5500）。
         #    而**腿是在 X 轴前后摆的**（IK 用 fwd=(+1,0,0)）⇒ 两者内部不一致。
@@ -563,7 +559,7 @@ def build_clip(name, length, fps, fn, root_motion):
         add(tin, len(J["accessors"]) - 1, bone_node["Hips"], "translation")
     # 闭合误差：首末关键帧四元数最大差（旋转须闭合，位移按 stride 故意不闭合）
     closes = [float(np.abs(np.array(v[0]) - np.array(v[-1])).max()) for v in per_bone.values()]
-    # 🔴 2026-10-10 同一盲点的**第二处**：这里原来读 hips_pos[-1][2]（Z 轴末值）报"根位移/步幅"，
+ # 2026-10-10 同一盲点的**第二处**：这里原来读 hips_pos[-1][2]（Z 轴末值）报"根位移/步幅"，
     #    而前进位移修到 X 轴之后它会读出 ~0。改成**跨距**（轴无关），与本仓 gate_anim 的口径一致。
     _st = (max(p[0] for p in hips_pos) - min(p[0] for p in hips_pos)) if root_motion else 0.0
     return {"name": name, "channels": channels, "samplers": samplers}, float(max(closes)), float(times[-1]), float(_st)

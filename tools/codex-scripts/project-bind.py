@@ -19,7 +19,7 @@ SHARD = ROOT / "state" / "project-shards"
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".backups", "vendor", ".venv", "dist", "build", ".scratch"}
 SKIP_EXT = {".pyc", ".pyo", ".log", ".tmp", ".bak"}
 
-# 🔴 2026-10-17 事故剪枝（**生产面/快照区被注入** · 留痕）：`SKIP_DIRS` 只挡了 .git/vendor 这类，
+# 2026-10-17 事故剪枝（**生产面/快照区被注入** · 留痕）：`SKIP_DIRS` 只挡了 .git/vendor 这类，
 #   漏了**交付区与快照区** —— 而镜像多维度空间就住在 `gbt_allinone/store/mirror_space/`：
 #     reality/    生产现实（零修改纪律）
 #     dimension/  镜像维度
@@ -33,7 +33,7 @@ SKIP_EXT = {".pyc", ".pyo", ".log", ".tmp", ".bak"}
 #   也不该被注入 —— `page-reach.py` 早就在 SKIP_PARTS 里挡了这两类，本件没同步。
 #   ⇒ ① 注入范围**必须跳过交付区/上游/构建产物**；② 页数加**上限 fail-closed**
 #      （同 page-reach 2026-10-17 自反爆炸事故：24,150 文件 / 54.7GB / 4,768 层）。
-#   ⚠️ 本补丁只改**写入范围**，不改 `walk()`：全项目索引照旧覆盖每个文件（只读，无害）。
+# 本补丁只改**写入范围**，不改 `walk()`：全项目索引照旧覆盖每个文件（只读，无害）。
 SKIP_PAGES = {"_upstream", "mobile-pack", ".pylibs", ".mimosa", ".wrangler"}
 # 交付区/镜像/时间线：只许经跨维晋升写，不许页面注入
 # `plugins`（2026-10-17 补）：那是**包源**，会被装进 `~/.dsh/profiles/*/node_modules/`。
@@ -110,7 +110,7 @@ def inject(ps, total):
     for p in ps:
         t = p.read_text(encoding="utf-8", errors="replace")
         to_idx = os.path.relpath(str(IDX), str(p.parent)).replace(os.sep, "/")
-        # 🔴 2026-10-22 主人令（第二次，逐字）：「不是让你清理这个页面为什么还在」
+ # 2026-10-22 主人令（第二次，逐字）：「不是让你清理这个页面为什么还在」
         #   真因不是"没删索引页"，而是**本函数还在往每一页顶上注入那条"全项目索引 · 全页可达"**：
         #   上一轮只删了 state/PROJECT-INDEX.html 与面板入口，注入器没关 ⇒ 老的 holo_pet/ 树里
         #   12 页仍挂着它（`_strip-project-nav.py` 本轮已扫两棵树清掉 12 页）。
@@ -182,7 +182,7 @@ def main():
                      if not any(x in SKIP_DIRS for x in q.relative_to(ROOT).parts)])
     print("注入范围：%d 页可注入 · 已排除 %d 页（交付区/上游/构建产物 —— 见 SKIP_PAGES）"
           % (len(ps), max(0, _all_html - len(ps))))
-    # 🔴 2026-10-22 主人令：`state/PROJECT-INDEX.html` 已下线（搬到 state/legacy/，见 panel/index.html
+ # 2026-10-22 主人令：`state/PROJECT-INDEX.html` 已下线（搬到 state/legacy/，见 panel/index.html
     #   与 selfcheck-all.py 的同日留痕）。本工具因此**不再以"索引在盘"为通过条件**：
     #   原期望 ok_idx = IDX.is_file()；翻成「索引可以不在」，但分片/注入那两条判据一条没放松。
     ok_idx = IDX.is_file() or True

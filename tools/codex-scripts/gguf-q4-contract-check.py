@@ -680,7 +680,7 @@ def cmd_fixids(args) -> int:
     delta = new_data_start - data_start
 
     # 布局：[head][kv][raw 紧贴][tensor_info][padding + extra][data]
-    # 🔴 第一版把 padding 放在 raw 后面 ⇒ tensor_info 被整体推后 31 字节，
+ # 第一版把 padding 放在 raw 后面 ⇒ tensor_info 被整体推后 31 字节，
     #    读库按"KV 读完就是 info"解析，于是把 info 读成空名字/空形状（实测 n_kv=10 但 tensor=('',F32,())）。
     #    padding 只能放在 info 与 data 之间，且要让数据段起点仍是 alignment 的整数倍。
     with open(src, "rb") as fi, open(dst, "wb") as fo:

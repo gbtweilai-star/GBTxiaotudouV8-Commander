@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import pathlib
 import re
 import sys
@@ -41,7 +40,7 @@ CORRECTIONS = WS / "state" / "corrections.jsonl"
 
 # 只看**活跃代码/脚本**（文档里的示例不算调用 —— 否则满仓假红）
 ACTIVE_EXT = (".py", ".ps1", ".cmd", ".bat", ".cjs", ".mjs")
-# 🔴 2026-10-11 自纠（**假红**）：原来只写 "_legacy"，而实际目录叫 **_legacy_sources**
+# 2026-10-11 自纠（**假红**）：原来只写 "_legacy"，而实际目录叫 **_legacy_sources**
 #    ⇒ 没跳过 ⇒ 报「85 处 wrangler 没带 --name」，列出来的**全在那个历史源里**
 #    ⇒ 跳过名单改成**前缀匹配**，并把历史/遗留源一并纳入。
 SKIP_DIRS = ("_baseline_wt", "_legacy", "_legacy_sources", "_upstream", "node_modules",
@@ -52,24 +51,14 @@ HAS_NAME = re.compile(r"--name\b|--config\b|wrangler\.(toml|json)")
 
 
 def _active_files():
-    """扫**活跃代码/脚本**——**剪枝遍历**（跳过的目录根本不进）。
-
-    🔴 2026-10-17 修（挂死根因 · 留痕 · 原口径 / 为什么翻 / 现口径）：
-      原口径：`WS.rglob("*")` —— **先遍历全仓**（18 万级入口 + junction/worktree），
-        再在循环体里按 SKIP_DIRS 字符串跳过。跳过写在循环体里对 rglob **无效**。
-      为什么翻：全量测试跑到 `test_iron_rules` 时卡在 `p.is_file()` **超时**（120s），
-        整个会话被 pytest-timeout 打断 ⇒ 一轮全量白跑（本仓已有同族教训：
-        `test_precommit_secret_scan` 的 `rglob` 挂死）。
-      现口径：`os.walk` + **剪枝** `dirnames`，跳过的目录根本不进；语义不变。
-    """
-    skip = set(SKIP_DIRS)
-    for dirpath, dirnames, filenames in os.walk(str(WS)):
-        dirnames[:] = [d for d in dirnames if d not in skip]
-        for name in filenames:
-            p = pathlib.Path(dirpath) / name
-            if p.suffix.lower() not in ACTIVE_EXT:
-                continue
-            yield p
+    for p in WS.rglob("*"):
+        if not p.is_file() or p.suffix.lower() not in ACTIVE_EXT:
+            continue
+        s = str(p).replace("\\", "/")
+        # 前缀匹配（不是精确段匹配）—— 免得 "_legacy" 漏掉 "_legacy_sources"
+        if any(("/" + d) in s for d in SKIP_DIRS):
+            continue
+        yield p
 
 
 def rule2() -> dict:
@@ -84,7 +73,7 @@ def rule2() -> dict:
             if not WRANGLER_CALL.search(ln) or ln.strip().startswith("#"):
                 continue
             m = WRANGLER_CALL.search(ln)
-            # 🔴 2026-10-11 自纠（假红）：把「字符串字面量里的 wrangler」也当成了调用
+ # 2026-10-11 自纠（假红）：把「字符串字面量里的 wrangler」也当成了调用
             #    （实测：cliproxy.py 的 print(...) 帮助文本、keys-page.py 的 dict 值、以及
             #    本判据自己的负控探针 probe='wrangler deployments list' 全被误报）。
             #    ⇒ 正解：**调用行里 wrangler 不该在引号里**；引号里的只是说明文字。
@@ -117,11 +106,11 @@ def rule1() -> dict:
         except Exception:                          # noqa: BLE001
             continue
         n += 1
-        # 🔴 2026-10-11 自纠（**假红**）：原来拿 evidence 字段判"读数形状"，但本仓声明把
+ # 2026-10-11 自纠（**假红**）：原来拿 evidence 字段判"读数形状"，但本仓声明把
         #    期望读数存在 **expect_contains** 里（cmd + expect_contains 是 delivery-claims 的写死形状）
         #    ⇒ 改成查 expect_contains。实测：closed-loop-gate --sweep 已证明那 15 条**全部**带
         #    cmd+expect_contains 且复跑命中，而本判据却报"15 条缺读数形状" ⇒ 是我查错字段。
-        # 🔴 2026-10-11 自纠（又一处假红）：声明里**根本没有 evidence 字段** ——
+ # 2026-10-11 自纠（又一处假红）：声明里**根本没有 evidence 字段** ——
         #    字段写死是 id/what/cmd/expect_contains/scope/at。cmd+expect_contains **就是**
         #    「命令→读数」形状。上一版多查了 evidence 并判「太短」，把 15 条全冤枉了。
         has_cmd = bool(r.get("cmd"))

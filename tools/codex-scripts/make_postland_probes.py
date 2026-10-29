@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 """由镜像探针生成"落生产后"探针：只把目标路径从镜像2 改成生产，逻辑一字不动。"""
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 import difflib
 import hashlib
 import sys
 from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(_GBT_ROOT)
+ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 PAIRS = [(".scratch/block2_probe.py", ".scratch/block2_probe_postland.py"),
          (".scratch/block2_m5_probe.py", ".scratch/block2_m5_probe_postland.py")]
 for src_rel, dst_rel in PAIRS:

@@ -109,7 +109,7 @@ def judge(src_path: Path) -> dict:
     conf = None
     if isinstance(r, dict):
         conf = r.get("判据是否配置")
-    # 🔴 判据也要**结构化**：除了给人看的 `为什么`，再给机器看的 `问题类别`
+ # 判据也要**结构化**：除了给人看的 `为什么`，再给机器看的 `问题类别`
     #    —— 控制据此断言，就不必去断言打印出来的文本（文本判据是台架 D2/D6 要抓的东西）。
     bad, kinds = [], []
     if lied:
@@ -221,14 +221,14 @@ def cmd_selftest(a) -> int:
         c = contract()
         ck("**契约里写明「空表时禁止肯定结论」**",
            any("肯定结论" in x for x in c["空表时**禁止**"]), str(c["空表时**禁止**"])[:70])
-        # ⑤–⑨ 🔴 四条**从来没被走到过**的拒法（§一百五十九 的猎手点出来的）+ 线上实况那条
+ # ⑤–⑨ 四条**从来没被走到过**的拒法（§一百五十九 的猎手点出来的）+ 线上实况那条
         broken = td / "broken.py"
         broken.write_text("def content_verdict(text, wordlist)\n    return {}\n", encoding="utf-8")
         r4 = judge(broken)
         ck("**负控：源码读不到（语法坏）⇒ 必须报『未读到源码』**",
            r4.get("ok") is False and "未读到" in str(r4.get("为什么"))
            and "源码" in str(r4.get("为什么")), str(r4.get("为什么"))[:70])
-        # 🔴 探针必须**既能被找到、又导入即炸**：只写 `raise` 而不定义 `content_verdict`，
+ # 探针必须**既能被找到、又导入即炸**：只写 `raise` 而不定义 `content_verdict`，
         #    走到的是「未接线」那条分支 ⇒ 控制**咬错地方**（第一版就是这么错的）。
         boom = td / "boom.py"
         boom.write_text("def content_verdict(text, wordlist):\n"
@@ -253,7 +253,7 @@ def cmd_selftest(a) -> int:
            r7.get("ok") is False and "判据配置字段不为False" in (r7.get("问题类别") or []),
            "问题类别=%s" % r7.get("问题类别"))
         # ⑨ 线上实况那条：「仓里找不到判定函数 ⇒ rc=0 且如实标未接线」
-        #    🔴 搜索根必须是**另一个空目录**：上面那几个人造靶里都定义了 `content_verdict`，
+ # 搜索根必须是**另一个空目录**：上面那几个人造靶里都定义了 `content_verdict`，
         #       拿 `td` 当搜索根会**找得到** ⇒ 控制又是咬错地方（第一版就这么错的）。
         empty_root = td / "no_entry_here"
         empty_root.mkdir()

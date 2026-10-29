@@ -53,7 +53,7 @@ CAPS = [
     ("shared_resources", "门", "共享资源占用"),
     ("hook_registry", "门", "钩子登记"),
     ("orchestration_kernel", "门", "编排内核"),
-    # 🔴 2026-10-13 深扫补盲区（原清单只有旧件 ⇒ 新件**从没被扫过**=盲点）：
+ # 2026-10-13 深扫补盲区（原清单只有旧件 ⇒ 新件**从没被扫过**=盲点）：
     #    旧 cross_scan 实测给到 300s 仍超时（结构问题，不是预算），已在册的增强版
     #    penetrating_cross_scan（钩子强制/步骤锁/双路交叉互扫/遗漏补扫/留痕）才是要用的那件。
     ("penetrating_cross_scan", "交叉", "穿透式交叉扫描（增强版·新件：钩子+步骤锁+双路互扫+遗漏补扫+留痕）"),
@@ -74,7 +74,7 @@ CAPS = [
     ("ghost_guard", "交付", "幽灵守卫"),
 ]
 
-# 🔴 只列不跑：名字即写动作，或 omni 标了 needs_confirmation（深修后单一真源：
+# 只列不跑：名字即写动作，或 omni 标了 needs_confirmation（深修后单一真源：
 # `PROBE_SKIP_KINDS = 探测专项 ∪ preflight.state_changing_kinds()`，原"口径分裂 9 条"已闭合）
 NOT_RUN = [
     ("root_fix", "修（会改状态）：口径分裂名单里就有它 ⇒ 不许自动跑"),
@@ -95,18 +95,18 @@ def unwrap(res):
     return res, False
 
 
-# 🔴 2026-10-13 修（深扫报红 1 条：cross_scan 超时 90s）：
+# 2026-10-13 修（深扫报红 1 条：cross_scan 超时 90s）：
 #    它是"扫全项目"的重活，90 秒不是它的预算——**慢位要给自己的预算**，不是当故障念。
 SLOW_CAPS = {"cross_scan": 300}
 
-# 🔴 2026-10-13：**已退场件·只列不探**（「新增即清旧」）。不藏、也不当红：
+# 2026-10-13：**已退场件·只列不探**（「新增即清旧」）。不藏、也不当红：
 #    旧 `cross_scan` 给到 300s 仍超时（结构问题），同族增强版 `penetrating_cross_scan`
 #    已入探针清单且通过 ⇒ 旧件不再探；但**在此显式登记**，谁读总扫都能看见它被退场了。
 #    注意：这是**扫描层退场**；**登记层退场**（caps_registry 里的在位登记 + handler 文件回收）
 #    仍待做 —— 那一步要按清旧判据走，不许在这个文件里假装已完成。
 RETIRED_CAPS = [("cross_scan", "旧跨域扫描：300s 仍超时；已由 penetrating_cross_scan 取代（登记层退场待做）")]
 
-# 🔴 2026-10-13 修（深扫"认不出 5 条"）：**纯数据位**的已知形状表。
+# 2026-10-13 修（深扫"认不出 5 条"）：**纯数据位**的已知形状表。
 #    这几位只回数据、不报 verdict/ok/quiet ⇒ 旧逻辑一律归"形状看不懂"（那是尺子的问题，不是对象的）。
 DATA_CAPS = {
     "health": ("platform", "python", "time"),
@@ -167,7 +167,7 @@ def classify(rec):
     # ② 明确说"干净"
     if res.get("verdict") in ("clean", "ok") or res.get("ok") is True or res.get("quiet") is True:
         return "通过", "%s%s" % (res.get("verdict") or ("ok" if res.get("ok") is True else "quiet"), tag)
-    # ②b 🔴 2026-10-13 修：**纯数据位**（只回数据、不报 verdict/ok/quiet 的只读解释器）
+ # ②b 2026-10-13 修：**纯数据位**（只回数据、不报 verdict/ok/quiet 的只读解释器）
     #     不许被归成"形状看不懂"——它有已知形状，按形状核对；对不上才算认不出。
     #     实测这五位命中：health / platform_profile / project_context / pipeline_status / svc_inspect。
     _exp = DATA_CAPS.get(rec.get("cap"))

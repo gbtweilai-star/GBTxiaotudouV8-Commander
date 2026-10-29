@@ -209,7 +209,7 @@ def cmd_scan(args) -> int:
     deleted = sorted(set(old) - set(new))
     modified = sorted(k for k in (set(new) & set(old)) if new[k] != old[k])
 
-    # 🔴 2026-10-08 修的真缺陷（我自己撞出来的）：**改了排除集，下一次扫描会报出巨量「删除」** ——
+ # 2026-10-08 修的真缺陷（我自己撞出来的）：**改了排除集，下一次扫描会报出巨量「删除」** ——
     # 实测：把工具状态目录 .mimosa（87,361 个文件 / 1.1 GB）排除后，复扫报「删除 91355」。
     # 那不是真删了 9 万个工程件，是**基线口径变了**。一条会报假红的账目比没有账目更坏
     # （下一个人会去追这 9 万个「删除」）。⇒ 规矩：**排除集一变就按「重建基线」记**，不报增删改。
@@ -286,7 +286,7 @@ def cmd_append(args) -> int:
     ev = {"evidence": args.evidence} if args.evidence else None
     rec = append_record(args.kind, args.what, args.where, args.actor, ev)
     print("已记第 %d 条（%s）· hash=%s" % (rec["n"], rec["kind"], rec["hash"][:22]))
-    # 🔴 2026-10-09 根因修复（主人令「生产面板禁止有任何污点」）：
+ # 2026-10-09 根因修复（主人令「生产面板禁止有任何污点」）：
     #    原来 append 与 render **是断开的** —— 记一条就让派生件（logbook-data.js / logbook-digest.md）
     #    落后源件；超过审计的 600s 宽限后，面板立刻多一条「陈旧 · 断连」。
     #    **每记一条就欠一个红**，这是自触发回路。⇒ append 默认顺手渲染（--no-render 可关）。

@@ -39,7 +39,7 @@ CMD = "py -3.14 tools/codex-scripts/supersede-check.py"
 
 # 我们自己的目录（**别人的一律不碰**：V9 / _upstream / plugins / holo_pet / node_modules）
 SCOPE = ("tools/codex-scripts", "gbt_allinone", "docs", "holo_pet_w3", "state")
-# 🔴 2026-10-10 增补（**这台扫描器在狼来了**）：它把任何 *.old 都当"被超越未回收"，
+# 2026-10-10 增补（**这台扫描器在狼来了**）：它把任何 *.old 都当"被超越未回收"，
 #    实测报出的 24 件**全是** state/browser_own_profile/Default/**/LOG.old —— 那是 **Chrome 自己的
 #    用户配置内部件**，不是我造的旧件。判据比对象宽 = **假红**；而假红多了，真抓到那次也没人信。
 #    browser_own_profile 是浏览器自管的目录，一律不扫（与 store/_upstream 同级）。
@@ -83,7 +83,7 @@ def scan() -> dict:
         if BACKUP_MARK.search(p.name):
             backup_marked.append(rel)
         # ① 同功能两份（按规范名分组，取 .py/.md/.js/.html 之类"功能件"）
-        # 🔴 2026-10-10 修（**这一整类原来是死代码**）。原判据只看 **后缀**：
+ # 2026-10-10 修（**这一整类原来是死代码**）。原判据只看 **后缀**：
         #      x.py + x.py.bak  —— 规范名同为 x.py，但 .bak **后缀不在名单里** ⇒ 备份件进不了分组；
         #      x_bak.py         —— 后缀过了，但规范名是 x_bak.py ≠ x.py ⇒ 也配不成对。
         #    实测真植入一对（_probe_samefn.py + .bak）⇒ **一类永远不响**。四类判据里躺着一类死码，
@@ -101,7 +101,7 @@ def scan() -> dict:
     # ③ 指针仍指旧版：根启动件引用被超越件
     superseded_names = {Path(x).name for x in backup_marked}
     launchers = list(ROOT.glob("*.cmd")) + list(ROOT.glob("*.bat"))
-    # 🔴 2026-10-10 补（**实测出来的缺口**）：本件文档第 11 行写的是
+ # 2026-10-10 补（**实测出来的缺口**）：本件文档第 11 行写的是
     #    「根目录启动件（*.cmd / *.bat）**或 canonical 名（AGENTS.md / INDEX.md）**」，
     #    而代码只 glob 了前半 —— 我用真植入验过：把被超越件写进 **.cmd** ⇒ 抓到；
     #    同样写进 **AGENTS.md** ⇒ **看不见**。
@@ -204,7 +204,7 @@ def cmd_check(as_json: bool = False) -> int:
         synth[k] = ["合成旧件"] if k != "同功能两份" else [{"canonical": "x", "files": ["x.py", "x.py.bak"]}]
         negs.append(("喂坏：合成 %s" % k, k, classify_findings(synth)[k],
                      "判定红=%s（应红）" % classify_findings(synth)[k]))
-    # 🔴 2026-10-10 补一条**扫描器级**负对照：上面那些喂的是**合成 dict**（只测分类器）。
+ # 2026-10-10 补一条**扫描器级**负对照：上面那些喂的是**合成 dict**（只测分类器）。
 #    而这次真出问题的地方在**扫描器**（过度匹配 Chrome 配置）—— 分类器再对也看不出来。
 #    做法：往我们自己的树里**真放一个 .old**，扫描必须**扫到它**；同时**浏览器配置里的 .old 不许被扫到**。
     _scan_neg = None
@@ -227,7 +227,7 @@ def cmd_check(as_json: bool = False) -> int:
     except Exception as _e:                                      # noqa: BLE001
         _scan_neg = (False, "扫描器级负对照跑不起来：%s" % type(_e).__name__)
 
-    # 🔴 2026-10-10 补**四类全真植入**的常驻负对照。
+ # 2026-10-10 补**四类全真植入**的常驻负对照。
     #    原有四条喂的是**合成 dict** ⇒ 只测分类器；而真出问题的两处都在**扫描器**：
     #      ① 曾整类是死代码（x.py.bak 进不了分组）· ③ 文档说查 AGENTS.md 而代码只查了 .cmd。
     #    这两处**分类器再对也看不出来**。⇒ 四类各真植入一个，**每一类都必须在实扫里被点出**。
@@ -270,7 +270,7 @@ def cmd_check(as_json: bool = False) -> int:
     except Exception as _e3:                                        # noqa: BLE001
         _live_neg = (False, "四类真植入负对照跑不起来：%s" % type(_e3).__name__)
 
-    # 🔴 2026-10-10 补扫描器级负对照 2：**③ 指针仍指旧版** 的两半都要有牙。
+ # 2026-10-10 补扫描器级负对照 2：**③ 指针仍指旧版** 的两半都要有牙。
     #    真植入：一个被超越件 + 两个真指针（根 .cmd 一个、AGENTS.md 一个）⇒ **两半都必须被抓到**。
     _ptr_neg = None
     try:
@@ -327,7 +327,7 @@ def cmd_check(as_json: bool = False) -> int:
         if _live_neg is not None:
             _o, _d = _live_neg
             negs.append(("四类全真植入：每类都必须在实扫里被点出", "扫描器", _o, _d))
-        # 🔴 2026-10-13 修（坏尺子·把失败漏成 0）：`nfr` 原先在三段 `negs.append(...)` **之前**就算完了，
+ # 2026-10-13 修（坏尺子·把失败漏成 0）：`nfr` 原先在三段 `negs.append(...)` **之前**就算完了，
         #    于是后追加的扫描器级负对照**永远进不了失败表** ⇒ 逐行打印有 FAIL、总数却报 FAIL 0
         #    （"没验的/失败的被记成绿"，比对象坏了更危险）。这里追加完**重算一次**。
         nfr = [n for n in negs if not n[2]]

@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-# 🔴 本文件从 `.scratch/` 搬到了 `tools/codex-scripts/` ⇒ `parents[N]` 含义变了：
+# 本文件从 `.scratch/` 搬到了 `tools/codex-scripts/` ⇒ `parents[N]` 含义变了：
 #    在 `.scratch/` 时 `parents[1]` 是仓库根；搬来后必须 `parents[2]`，否则 ROOT 指到 `tools/`。
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -53,13 +53,6 @@ A("| ⛔ 真痛 | **%d** | `%s`（300s 仍未返回 ⇒ 要另查它卡在哪）
 A("| ✅ 已通 | **%d** | 不用管 |" % okn)
 A("")
 A("合计 **%d / 138**（可探针集）· 另有 **129 / 157** 零作用域（门不会拦）。" % len(rows))
-A("")
-# 总数行（与 capability-bindings.py 的 P1 判据同一口径）：
-#   P1 会用正则从本页读「注册表现读 N 条」并要求 N = 活注册表条数。
-#   原页面靠本来源不明的其他生成器写这一行，重跑本生成器就丢了（实测踩过：P1 报 295 vs 300）。
-#   现在**现算现写**，不再脱节。
-from gbt_allinone import caps_tables as _CT  # noqa: E402
-A("> 注册表**现读 %d 条**（`caps_registry.all_caps()`）。" % len(_CT.all_caps()))
 A("")
 A("## 一 · 按作用域发授权（**发一次覆盖多位，不必逐条找**）")
 A("")

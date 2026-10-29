@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """头身缝合 · **重叠壳法**（纯 numpy，不需要 DCC）
 
 为什么用"重叠"而不是"焊接"（这一轮想通的）：
@@ -28,7 +24,7 @@ import sys
 
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 BODY = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-real.glb"
 HEAD = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/head-hi/head-facing.glb"

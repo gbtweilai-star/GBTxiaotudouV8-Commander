@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # gbt-capability: browser
-# ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
+# 开发者：自由的风 · 永久钢印 · 禁止删除
 """bp-js.py —— 蓝图排障用的「CDP 直读直写」命令行（不经 PowerShell 引号地狱）。
 
 为什么存在

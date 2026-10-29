@@ -30,9 +30,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE = Path(tempfile.gettempdir()) / 'gbt-deliver'
-# 字面像素高 / 画面宽。0.0462 = 68px / 1472px（头肩片 dh-talk-v3 亲眼看过的合适值）。
-# 换画幅只改这一个比值，字号由它按宽度自动算 —— 不许再在 style 里写死 FontSize。
-SUB_PX_PER_WIDTH = 0.0462
 
 
 def _ffprobe(p: Path) -> dict:
@@ -52,9 +49,6 @@ def main() -> int:
     ap.add_argument('--qc-python', default='',
                     help='跑量具用哪个解释器（默认 .venv-sadtalker，那里才有 cv2/numpy）')
     ap.add_argument('--no-qc', action='store_true')
-    ap.add_argument('--font-size', type=float, default=0,
-                    help='字幕字号（0=按画面宽度自动算）。单位是 libass 288 高参考空间，'
-                         '不是像素；写死它会在竖屏大画面上变成巨型字幕')
     a = ap.parse_args()
 
     raw, out = Path(a.raw), Path(a.out)
@@ -72,7 +66,6 @@ def main() -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     cmd = ['ffmpeg', '-y', '-v', 'error', '-i', str(raw)]
     vf = []
-    sub_used = None                          # 回执里要能读到自己用了什么字号
     if h % 2 or w % 2:                       # libx264 要偶数边
         vf.append('scale=%d:%d' % (w - w % 2, h - h % 2))
     if a.srt:
@@ -82,27 +75,8 @@ def main() -> int:
             return 4
         srt_ascii = STAGE / 'sub.srt'
         shutil.copyfile(srt, srt_ascii)
-        # 🔴 字号必须按**画面宽度**定，不能写死。踩过的坑（2026-10-20 亲眼看到）：
-        #    FontSize 的单位是 libass 的 288 高参考空间 ⇒ 实际像素 = FontSize/288*画面高。
-        #    同一个 FontSize=22：896 高视频上 68px（正好），2496 高的全身竖屏上 190px（巨型，
-        #    两行字幕吃掉画面 1/10）。宽度相同（都 1472）而高度翻了近三倍，所以「按宽定」才对。
-        #    基准：1472 宽上要 68px ⇒ FontSize = 68*288/896 = 21.86 ≈ 22（老读数原样复现）。
-        target_px = w * SUB_PX_PER_WIDTH          # 期望的字面像素高
-        fsize = a.font_size or round(target_px * 288.0 / h, 1)
-        # 描边随字号缩（同比例），但**边距不跟着缩**：MarginV=18 在 288 空间里 = 画面高 6.25%，
-        # 这是 v3 头肩片上认可的留白。头一版把边距也乘了 0.36 ⇒ 字幕贴到画面底边 52px，
-        # 手机上正好压在手势条/UI 底下。边距要按**画面高**相对，不受字号影响。
-        k = fsize / 22.0
-        outline = max(1, round(2 * k))
-        marginv = 18
-        style = ('FontName=Microsoft YaHei,FontSize=%s,PrimaryColour=&H00FFFFFF,'
-                 'OutlineColour=&H00000000,BorderStyle=1,Outline=%d,Shadow=0,MarginV=%d'
-                 % (fsize, outline, marginv))
-        sub_used = {'frame': '%dx%d' % (w, h), 'font_size': fsize,
-                    'cap_px_est': round(fsize / 288.0 * h, 1),
-                    'target_px': round(target_px, 1),
-                    'outline': outline, 'margin_v': marginv,
-                    'auto': not bool(a.font_size)}
+        style = ('FontName=Microsoft YaHei,FontSize=22,PrimaryColour=&H00FFFFFF,'
+                 'OutlineColour=&H00000000,BorderStyle=1,Outline=2,Shadow=0,MarginV=18')
         # 反斜杠一律正斜杠；'=' ':' 在 filter 里要转义
         p = str(srt_ascii).replace('\\', '/')
         vf.append("subtitles='%s':force_style='%s'" % (p.replace(':', r'\:'), style))
@@ -119,7 +93,7 @@ def main() -> int:
 
     rep = {'ok': True, 'raw': str(raw), 'out': str(out),
            'raw_bytes': raw.stat().st_size, 'out_bytes': out.stat().st_size,
-           'crf': a.crf, 'srt': a.srt or None, 'sub_style': sub_used, 'probe': _ffprobe(out)}
+           'crf': a.crf, 'srt': a.srt or None, 'probe': _ffprobe(out)}
     print(json.dumps(rep, ensure_ascii=False, indent=1))
 
     if not a.no_qc:

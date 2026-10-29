@@ -31,7 +31,7 @@ TS = re.compile(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})")
 CMD = re.compile(r"(py -3\.14 [^<\n\"]{0,160})")
 SELF = Path(__file__).name
 
-# 🔴 2026-10-17 加固（留痕：原口径 / 为什么翻 / 现口径）
+# 2026-10-17 加固（留痕：原口径 / 为什么翻 / 现口径）
 #   原口径：`CMD.findall(整页)` —— 取页里**第一处** `py -3.14 …` 就当作重生成命令、直接 shell 执行。
 #   为什么翻（2026-10-17 08:44 实测事故，已拦下但差点真跑）：
 #     · code-deck 页第一处是 `-m gbt_allinone auth grant --scope filesystem_write --ttl 600`
@@ -47,7 +47,7 @@ CUT = re.compile(r"·|｜|\||-->|<|\s{2,}")
 DANGER = ("--loop", "auth grant", "grant --scope", " watch", "serve", "daemon",
           "--rounds", "--seconds", "watchdog")
 
-# 🔴 2026-10-17 再加（留痕）：本件只该烤**快照页**（数据在生成时烤进 HTML）。
+# 2026-10-17 再加（留痕）：本件只该烤**快照页**（数据在生成时烤进 HTML）。
 #   原口径把 21 个功能页**一视同仁**，于是把「活页」（静态壳 + `*-data.js` 渲染取数）也算成
 #   「无重建标记 ⇒ 未跑」—— 那是**把设计意图当故障**（`page-bind-check` 的原话）。
 #   证据：brain/capability-bar/db-fleet/digital-human/logbook 全都在页里引 `*-data.js`，
@@ -171,7 +171,7 @@ def run(apply: bool = True, only: str = "") -> dict:
         ts2 = TS.findall(f.read_text(encoding="utf-8", errors="replace")) if f.is_file() else []
         row["after"] = ts2[0] if ts2 else ""
         row["rc"] = r.returncode
-        # 🔴 2026-10-20 口径修正（留痕，P1「判据错尺」实证）：
+ # 2026-10-20 口径修正（留痕，P1「判据错尺」实证）：
         #    原来把 `rc != 0` 直接记失败。实测 exec-deck.py --html 每次**都写出了页**
         #    （data-at/mtime 前进、内容是本轮的），但它把"有 1 条要人看的事项"也编码成 rc=2
         #    ⇒ 页面明明写好了却报"失败"。改成：**页时间戳没前进 + rc!=0** 才算失败；

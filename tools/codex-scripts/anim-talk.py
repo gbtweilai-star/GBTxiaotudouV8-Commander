@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """程序化 **talk（说话手势）动作** —— 给自研 26 关节骨架加一条循环闭合的说话摆动
 
 与 idle 的分工（`anim-idle.py`）：
@@ -28,7 +24,7 @@ import sys
 
 import numpy as np
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-anim.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-talk.glb"
@@ -129,7 +125,7 @@ for c in an["channels"]:
     if c["target"]["node"] not in joints:
         bad.append("通道目标不是 skin 关节")
 # 左右对称：成对的左右骨振幅应互为相反数
-# 🔴 第一版写成 `next((a for a,_ in [(amp,nm) ...] if nm == l), None)` ——
+# 第一版写成 `next((a for a,_ in [(amp,nm) ...] if nm == l), None)` ——
 #    生成器里的 `nm` 取的是**外层列表推导残留的最后一个值**（永远是 Head），
 #    于是永远匹配不上、恒判"不对称"。改用**字典直接查**，不靠闭包变量。
 AMPMAP = {nm: amp for nm, ax, amp, cyc in CH}

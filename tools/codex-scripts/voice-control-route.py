@@ -37,7 +37,7 @@
     py -3.14 tools/codex-scripts/voice-control-route.py --check      # 判据（9 条）+ 负对照（每条变异必须报红）
     py -3.14 tools/codex-scripts/voice-control-route.py --emit-state # 落 state/voice-control-route.json
 
-## 🔴 纪律
+## 纪律
   · 全程**只读**：探针只调免卡只读动作（list_windows / status / scan / pulse / keys…）
     与自探（netsh 读类子命令）；**一个动手动作都不试**（缺票就是缺票，不绕）。
   · 能力位调用走**唯一门**（`py -3.14 -m gbt_allinone run <kind> <json>` = api.run_task）。

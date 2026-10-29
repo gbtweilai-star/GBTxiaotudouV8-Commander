@@ -312,7 +312,7 @@ def esc(s: str) -> str:
 
 
 # 状态字形 → 中文语义标签。**不许把 emoji 当界面图标**（anti-ai-slop 第 3 条）：
-# 产物 markdown 里用 ✅/⛔/⚠️ 是可读的，直接搬进 HTML 就变成"emoji 当 UI 元件"。
+# 产物 markdown 里用 // 是可读的，直接搬进 HTML 就变成"emoji 当 UI 元件"。
 # 所以在这一层做转换：字形丢弃，换成带语义色的中文词，颜色由 CSS 类承担。
 _STATE_MAP = [
     ("\u2705", "就绪", "ok"),      # ✅

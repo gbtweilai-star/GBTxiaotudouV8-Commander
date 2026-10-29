@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 """本地自动绑骨 · 第 1 步：从网格**量出**人形骨架（不联网、不花积分、不猜轴）
 
 输入：低模 GLB（本仓现有 28382 顶点级；**不要求 T-pose**）
@@ -28,7 +24,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 
-WS = pathlib.Path(_GBT_ROOT)
+WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
 GLB = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "holo_pet/assets/digital-human/raw/avatarmesh/avatar-lowpoly.glb"
 OUT_JSON = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WS / "holo_pet/assets/digital-human/raw/rig/skeleton.json"
 OUT_IMG = WS / "render/绑骨-骨架落在实体上.png"
@@ -68,7 +64,7 @@ print(f"高度 {H:.3f} · 臂轴 = {'XYZ'[axis_arm]}（跨度 {ext[axis_arm]:.3f
 
 # ② 表面邻接（CSR）：测地线要它
 n = len(P)
-# 🔴 必须先**按位置焊接**：本网格是逐顶点 UV 口径，UV 缝两侧是**重复顶点**，
+# 必须先**按位置焊接**：本网格是逐顶点 UV 口径，UV 缝两侧是**重复顶点**，
 #    直接拿顶点索引建图，表面会沿缝断成好几个岛 —— 实测那样跑出来"胸->最远 = inf"、
 #    回溯路径只有 1 个点（等于根本没走到手）。焊接后图才连成一张完整的皮。
 key = np.round(P / 1e-5).astype(np.int64)
@@ -121,7 +117,7 @@ def trace(prev, end):
 
 
 # ③ 躯干：按标准人形比例（站姿不影响这一段）
-# 🔴 `head` 这一条是 2026-09-25 补的：旧稿把 Head 关节放在**头顶质心**（y=0.485），
+# `head` 这一条是 2026-09-25 补的：旧稿把 Head 关节放在**头顶质心**（y=0.485），
 #    于是 Head 骨段只剩 0.485→0.5 一小截 —— 蒙皮按"到骨段距离"分权时，
 #    **整张脸都离 Neck 段更近**（Neck 段 0.386→0.485 正好盖住脸），
 #    实测主导骨统计：Neck 4756 顶点 / **Head 只有 300 顶点**。后果是"头一转，脸不跟"。
@@ -180,7 +176,7 @@ side_name = {1: "Left", -1: "Right"}
 for sign, side in side_name.items():
     side_mask = np.sign(GP[:, axis_arm]) == sign
     # 肩：**肩高带内该侧最外的焊点**（解剖位置）。
-    # 🔴 不能从"胸→手"的测地路径上截：胸种子 Spine1 在肩线**以下**（实测 y=0.22 vs 肩高 0.325），
+ # 不能从"胸→手"的测地路径上截：胸种子 Spine1 在肩线**以下**（实测 y=0.22 vs 肩高 0.325），
     #    最短路径一路向下走，**根本够不到肩高**；上一版因此把肩放到 y=0.105 的腰侧。
     band = np.abs(GP[:, 1] - y_shoulder) < 0.03 * H
     bs = GP[band & side_mask]

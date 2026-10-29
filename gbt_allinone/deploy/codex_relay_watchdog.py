@@ -27,10 +27,6 @@
 开发者：自由的风 · GBT小土豆V8
 """
 from __future__ import annotations
-# 🔴 GBT 加固 2026-10-25：原来写死 Windows 绝对路径 `C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8`，
-#    Linux/手机 上拼出来的路径不存在。改成按本文件位置推仓根，换机器零改动。
-from pathlib import Path as _GBTPath
-_GBT_ROOT = str(_GBTPath(__file__).resolve().parents[2])
 
 import argparse
 import json
@@ -45,7 +41,7 @@ from datetime import datetime
 
 # ---------------------------------------------------------------- 常量
 PROXY = r"C:\Users\ADMIN\.codex\deepseek_proxy.py"
-REPO = _GBT_ROOT
+REPO = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
 PORT = int(os.environ.get("GBT_RELAY_PORT", "4446"))
 HEALTH_URL = os.environ.get("GBT_RELAY_HEALTH_URL", "http://127.0.0.1:%d/health" % PORT)
 LOG_DIR = os.environ.get("GBT_RELAY_LOG_DIR", r"C:\Users\ADMIN\.codex\log")

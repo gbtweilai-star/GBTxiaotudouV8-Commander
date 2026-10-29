@@ -129,61 +129,12 @@ def probe_f4() -> tuple:
 
 # ── F5：cross_scan 的 D/E/F/V 只有名字没有实现 ─────────────────────────────
 def probe_f5() -> tuple:
-    """可机检：**交叉扫的「声明」与「覆盖」有没有分账**（F5 的真实内容）。
-
-    🔴 2026-10-22 实测改写（留痕，旧口径见本函数末尾的历史注）：
-      真跑一次 `cross_scan.scan()`（52s）拿到的是：
-        `dims = [A,B,G,V,W,X,H]`（V **已实现**）· `dims_unimplemented = [D,E,F]`
-      ⇒ F5 原话「D/E/F/**V** 只有名字没有实现」里，**V 那半句已经过期**；
-        D/E/F 则是**声明不实现并写明理由**（参考集不存在/会报 86 条假警/抄第二份判据被禁止）。
-      所以本条不再问「实现了吗」，而问**三件能机检的事**：
-        ① `_DIMS_NOT_IMPL` 到底声明了哪几维（源码级现读）；
-        ② 那几维的**理由**在 `cross_scan.py` 文档里有没有逐条写明（不写理由 = 静默不实现）；
-        ③ V 不在未实现清单里（证明"已实现"这一半不是空话）。
-      三条都成立 ⇒ 这是**分账清楚的设计决定**，不是缺陷。任何一条垮掉 ⇒ 仍成立。
+    """⚠️ 首版这里栽了一次，记下来：`_DIMS_NOT_IMPL` 是**定义在函数内部**的常量
+    （`cross_scan.py:459`，缩进 4 空格）⇒ `getattr(module, ...)` 拿不到 ⇒ 我的探针
+    把"**没读到**"直接判成了"**已不成立**"。那正是本器存在的理由的反面。
+    ⇒ 改成两层：先试模块属性；拿不到就**静态读源码**（`ast.literal_eval` 解析那行字面量）；
+    两层都拿不到才报 `需人读`。**永远不允许由"读不到"推出"已不成立"。**
     """
-    f = ROOT / "gbt_allinone" / "cross_scan.py"
-    if not f.is_file():
-        return "需人读", {"说明": "cross_scan.py 不在，读不到"}
-    txt = f.read_text(encoding="utf-8", errors="replace")
-    import ast
-    import re
-    m = re.search(r"_DIMS_NOT_IMPL\s*=\s*(\[[^\]]*\])", txt)
-    if not m:
-        return "需人读", {"说明": "源码里没读到 _DIMS_NOT_IMPL —— **读不到 ≠ 不成立**"}
-    try:
-        declared = ast.literal_eval(m.group(1))
-    except Exception:  # noqa: BLE001
-        return "需人读", {"说明": "_DIMS_NOT_IMPL 字面量解析失败"}
-    ln = txt[: m.start()].count("\n") + 1
-    # ② 每一维的理由必须在文档里出现（按本仓文档的写法认这几种关键词）
-    reasons = {
-        "D": ("抄第二份判据", "audit-injection-honesty", "已经存在"),
-        "E": ("没有", "声称的测试数"),
-        "F": ("参考集", "86 条假警"),
-    }
-    missing_reason = []
-    for d in declared:
-        keys = reasons.get(d)
-        if not keys:
-            missing_reason.append("%s（本条没有登记理由模板）" % d)
-            continue
-        if not any(k in txt for k in keys):
-            missing_reason.append(d)
-    v_impl = "V" not in declared
-    ok = bool(declared) and not missing_reason and v_impl
-    return ("已不成立" if ok else "仍成立"), {
-        "声明未实现（源码 cross_scan.py:%d）": declared,
-        "理由是否逐条写明": "缺：%s" % missing_reason if missing_reason else "齐",
-        "V 已在实现侧": v_impl,
-        "实测：scan() 的 dims / dims_unimplemented": "[A,B,G,V,W,X,H] / [D,E,F]（2026-10-22 真跑 52s）",
-        "口径": "声明不实现 + 理由逐条写明 + V 已实现 ⇒ 这是分账清楚的决定，不是缺陷",
-    }
-
-
-def probe_f5_old_readme_only() -> tuple:
-    """（历史口径，保留供手工单跑）⚠️ 首版这里栽过一次：`_DIMS_NOT_IMPL` 定义在函数内部，
-    `getattr(module, ...)` 拿不到 ⇒ 探针把"**没读到**"判成"**已不成立**"。"""
     # 一层：模块属性
     sys.path.insert(0, str(ROOT))
     try:
@@ -240,58 +191,19 @@ def probe_f8() -> tuple:
 
 # ── F9：28 个技能根 / 多人份第三方技能 ────────────────────────────────────
 def probe_f9() -> tuple:
-    """可机检：读**技能面盘点**的回执（`state/skill-surface-inventory.json`）。
-
-    🔴 2026-10-22 改（留痕）：旧口径读 `skill-vet.py` 的 `discover_roots()` 只数"根 > 8"，
-    既不数技能、也不分「谁的面」，所以永远只能回一句"仍成立"。现在尺子换成
-    `skill-surface-inventory.py` 的机读回执，判三件事：
-      ① 面有多大（根数 / 技能数 / 四桶分账）；
-      ② **我们自营+托管** 面里有多少**未入账**（未进 `state/skill_atlas.json`）——
-         这才是 F9 真正要盯的"没人管"；
-      ③ 自上次清册以来**新长出来的根**（面在长，要看得见）。
-    口径：只要"我方未入账 > 0"或"有新根" ⇒ **仍成立**（面确实还没管完）；
-    两个都为 0 才算这条前提垮了。回执过期（>7 天）⇒ 需人读并点名重跑命令。
-    """
-    import datetime as _dt
-    p = ROOT / "state" / "skill-surface-inventory.json"
-    if not p.is_file():
-        return "需人读", {"为什么": "还没有盘点回执",
-                          "怎么补": "py -3.14 tools/codex-scripts/skill-surface-inventory.py"}
-    try:
-        j = json.loads(p.read_text(encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
-        return "需人读", {"为什么": "回执解析不了：%s" % e}
-    at = str(j.get("at") or "")
-    try:
-        age_h = round((_dt.datetime.now().timestamp()
-                       - _dt.datetime.fromisoformat(at.replace("Z", "+00:00")).timestamp()) / 3600, 1)
-    except Exception:  # noqa: BLE001
-        age_h = None
-    # 🔴 2026-10-22 改（F9 收口）：未入册**不等于缺口**。现在读盘点器落成规则后的
-    #    `ours_gap_count`（真缺口：未入册 且 不属于上游/存档/同名重复/嵌套素材(料)）。
-    #    例外数单列出来只为看得见 —— 它**不**让本条红。
-    gap = j.get("ours_gap") or []
-    n_gap = j.get("ours_gap_count")
-    if n_gap is None:
-        n_gap = len(gap)
-    n_exc = j.get("ours_exceptions")
-    new_roots = j.get("new_roots_since_last") or []
-    detail = {
-        "回执": at, "龄（小时）": age_h,
-        "根数": j.get("total_roots"), "技能数": j.get("total_skills"),
-        "四桶": j.get("by_bucket"),
-        "我方目录": j.get("ours_dirs"), "图鉴有名": j.get("ours_in_atlas"),
-        "未入册（含例外）": j.get("ours_unaccounted_dirs"),
-        "例外（上游/存档/重复/嵌套料）": n_exc,
-        "**真缺口**": n_gap,
-        "真缺口样例": [x.get("name") if isinstance(x, dict) else x for x in gap[:12]],
-        "新长出来的根": (len(new_roots), new_roots[:5]),
-        "口径": "**真缺口 > 0 或有新根** ⇒ 仍成立；例外再多也不算（那是分层，不是欠账）",
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("skill_vet", ROOT / "tools" / "codex-scripts" / "skill-vet.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    roots = mod.discover_roots()
+    total = 0
+    for r in roots:
+        if r.is_dir():
+            total += len([x for x in r.iterdir() if x.is_dir() and (x / "SKILL.md").is_file()])
+    return ("仍成立" if len(roots) > 8 else "已不成立"), {
+        "自动发现的技能根": len(roots), "在场技能": total,
+        "样本": [str(r) for r in roots[:4]],
     }
-    if age_h is not None and age_h > 24 * 7:
-        detail["说明"] = "回执超过 7 天，建议重跑盘点"
-        return "需人读", detail
-    return ("仍成立" if (n_gap > 0 or new_roots) else "已不成立"), detail
 
 
 # ── F10：生产许可账里有不以 projects/ 开头的路径 ──────────────────────────
@@ -357,7 +269,7 @@ def probe_f11() -> tuple:
         if vk and rv and vk != rv:
             split.append({"profile": name, "库": dk.mask(vk), "库指纹": fp(vk),
                           "注册表": dk.mask(rv), "注册表指纹": fp(rv)})
-    # 🔴 自纠（本题第一次跑就栽了）：**整个保险箱是空的**时，上面会得出"没有分叉"⇒ 判"已不成立"。
+ # 自纠（本题第一次跑就栽了）：**整个保险箱是空的**时，上面会得出"没有分叉"⇒ 判"已不成立"。
     #    而空保险箱**不代表主人的分叉修好了**，只代表**我这次看的 store 不对**
     #    （开机自检强制跑在隔离 store 里，所以它必然看到空库）。
     #    ⇒ 一个库都没读到 ⇒ 报 `需人读` + 打机器键 `_读不到_主数据`，**绝不由"没读到"推出"已不成立"**。
@@ -377,41 +289,24 @@ def probe_f11() -> tuple:
 
 # ── F12：注册表没收生产管线原语 ────────────────────────────────────────────
 def probe_f12() -> tuple:
-    """可机检：**注册表覆盖全部「能当 kind 分派」的入口**吗（F12 的真实判据）。
+    """可机检：逐个查那批"真在跑却没在册"的名字还在不在 `all_caps()` 之外。
 
-    🔴 2026-10-22 实测改写（留痕）：
-      旧口径拿 `["room_space","mirror_space","qiankun","deployment_rehearsal",...]` 当"能力位名"
-      去注册表里找 —— 但 `qiankun` / `mirror_space` / `deployment_rehearsal` 是**模块名**，
-      `peer_register` 是 `collab_gateway` 的**op**，`room_*` 是 `room_space` 的 **op**：
-      它们**本来就不该**以自己名字出现在注册表里（P16：两套名字空间不许互抄）。
-      实测：api.py 有 305 个 `kind` 分支，**注册表 341 条把它们全盖住（差集 0）**。
-      现判据（用现成的尺子 `registry-dispatch-audit.py`，不重写）：
-        ① 能被 kind 分派、却不在注册表的入口数 == 0；
-        ② F12 点名的那批名字，每一个都能落到「注册表里的某个 kind 或它的 op」上。
-      两条都成立 ⇒ 不是缺收录，是账里把模块名/op 名写成了能力位名。
+    主人一旦拍板（补进注册表 / 或明确登记只收能力位），本探针会自己报 `已不成立` 提醒结条目。
     """
-    import subprocess
-    r = subprocess.run([sys.executable, "-X", "utf8",
-                        str(ROOT / "tools" / "codex-scripts" / "registry-dispatch-audit.py"), "--json"],
-                       cwd=str(ROOT), capture_output=True)
-    out = r.stdout.decode("utf-8", "replace")
-    i = out.find("{")
-    if i < 0:
-        return "需人读", {"说明": "对账器没回 JSON：%s" % (out[:200] or r.stderr.decode("utf-8", "replace")[:200]),
-                          "_读不到_主数据": True}
-    j = json.loads(out[i:])
-    orphan = j.get("kinds_not_in_registry") or []
-    gap = j.get("gap") or []
-    if j.get("kinds") is None or j.get("registry") is None:
-        return "需人读", {"说明": "对账结果缺字段，无法判", "键": list(j.keys())[:10]}
-    ok = not orphan and not gap
-    return ("已不成立" if ok else "仍成立"), {
-        "注册表条数": j.get("registry"),
-        "api.py 的 kind 分支": j.get("kinds"),
-        "能分派但不在注册表": orphan or "无（差集 0）",
-        "F12 点名的真缺口": gap or "无",
-        "点名的那批各自的落点": {x["name"]: x["判定"] for x in (j.get("watch") or [])},
-        "口径": "模块名 ≠ 能力位名；room_*/peer_register 是 op，qiankun/mirror_space/deployment_rehearsal 是模块",
+    sys.path.insert(0, str(ROOT))
+    try:
+        from gbt_allinone import caps_registry as CR
+        names = {c["name"] for c in CR.all_caps()}
+    except Exception as exc:  # noqa: BLE001
+        return "需人读", {"说明": "读不到注册表：%s: %s" % (type(exc).__name__, str(exc)[:80]),
+                       "_读不到_主数据": True}
+    watch = ["room_space", "mirror_space", "qiankun", "deployment_rehearsal", "collab_gateway",
+             "notion", "tripo"]
+    absent = [n for n in watch if n not in names]
+    return ("仍成立" if absent else "已不成立"), {
+        "注册表条数": len(names),
+        "仍不在册的": absent,
+        "边界": "只查『在不在册』；**不判该不该在册**（那是主人拍板的口径问题，见 D13）",
     }
 
 
@@ -442,11 +337,11 @@ def probe_f13() -> tuple:
     tt = tst.read_text(encoding="utf-8", errors="replace")
     lib_mit = ("_cannot_tell" in lt) and ("本次无法判定" in lt)
     tst_mit = ("_cannot_tell" in tt) and ("本次无法判定" in tt)
-    # 🔴 这一格我第一版又栽了（**第四次**同一类错）：我凭记忆写成 `assertEqual(1, rc)` 去找，
+ # 这一格我第一版又栽了（**第四次**同一类错）：我凭记忆写成 `assertEqual(1, rc)` 去找，
     #    而盘上写的是 `self.assertEqual(1, r["rc"], …)` ⇒ 探针报 False，
     #    读起来像"负控没钉死"，其实**钉死了**。教训与第 54 轮那三次一模一样：
     #    **工具说它在，就去读那一行，别猜它的写法。**
-    #    ⚠️ 第二版我还在正则尾巴上写了 `\b` —— `]` 与 `,` 都不是词字符 ⇒ **那里没有词边界**，
+ # 第二版我还在正则尾巴上写了 `\b` —— `]` 与 `,` 都不是词字符 ⇒ **那里没有词边界**，
     #       于是照样匹配不上。尾巴必须写成显式的分隔符 `[,)]`，不许用 `\b` 蒙。
     neg_pinned = bool(re.search(r'assertEqual\(\s*1\s*,\s*(?:r\["rc"\]|rc)\s*[,)]', tt))
     neg_old = len(re.findall(r"assertNotEqual\(\s*r\[\"rc\"\]\s*,\s*0", tt))
@@ -638,46 +533,28 @@ def probe_f18() -> tuple:
 
 # ── F19：横扫里那条复现不出来的假红 ───────────────────────────────────────
 def probe_f19() -> tuple:
-    """**现在机判得了**：读「满载红灯猎手」的回执（`state/load-red-hunt.json`）。
-
-    🔴 2026-10-22 改（前提变了，留痕）：
-      原先本条判「需人读」，理由写着「本探针**不制造负载** ⇒ 复现不了就永远拿不到用例名」。
-      那句是诚实的，但也是可修的 —— 当天就补了 `tools/codex-scripts/load-red-hunt.py`：
-      起 N 个纯 CPU 负载进程，反复跑目标模块，**把失败用例名逐条写进回执**。
-      口径（写死）：
-        · 回执里 reproduced=true ⇒ **仍成立**，并且**带上用例名**（这就是当初没留住的东西）；
-        · 回执里 reproduced=false ⇒ **仍成立**（未复现 ≠ 不存在），但读数带「负载 × 轮次 × 耗时」，
-          任何人可以照着复跑；不再占「需人读」。
-        · 没有回执 / 回执过期（>7 天）⇒ 需人读（并点名跑哪条命令去补回执）。
+    """**机器判不了**，但能把"落盘日志里这个文件红过几次"现数一遍 ——
+    复现一次就自动把它从"未复现"变成"有据可查"。**未复现 ≠ 不存在。**
     """
-    p = ROOT / "state" / "load-red-hunt.json"
-    if not p.is_file():
-        return "需人读", {"为什么": "还没有满载复跑回执",
-                          "怎么补": "py -3.14 tools/codex-scripts/load-red-hunt.py --runs 5 --load 4"}
-    try:
-        j = json.loads(p.read_text(encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
-        return "需人读", {"为什么": "回执解析不了：%s" % e}
-    import datetime as _dt
-    at = str(j.get("at") or "")
-    try:
-        ts = _dt.datetime.fromisoformat(at.replace("Z", "+00:00")).timestamp()
-        age_h = round((_dt.datetime.now().timestamp() - ts) / 3600, 1)
-    except Exception:  # noqa: BLE001
-        age_h = None
-    runs = j.get("runs") or []
-    detail = {
-        "回执": at, "龄（小时）": age_h,
-        "目标": j.get("target"), "负载进程": j.get("load"), "轮次": len(runs),
-        "每轮耗时ms": [r.get("ms") for r in runs][:8],
-        "复现": bool(j.get("reproduced")),
-        "失败用例名": j.get("failure_names") or "无",
-        "口径": "reproduced=false 仍是『仍成立（未复现≠不存在）』；但读数可复跑，不再需人读",
+    logs = sorted((ROOT / "output" / "blueprint-audit").glob("2026-09-26-满仓横扫-第*.log"))
+    red = green = 0
+    hits = []
+    for f in logs:
+        for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
+            if "test_regression_stamp" not in line:
+                continue
+            if ("❌" in line) or ("FAILED" in line):
+                red += 1
+                hits.append("%s: %s" % (f.name, line.strip()[:110]))
+            else:
+                green += 1
+    return "需人读", {
+        "落盘日志份数": len(logs),
+        "该文件红过的行": red, "绿过的行": green,
+        "红的那几行": hits[:4] or "无",
+        "为什么判不了": "本探针**不制造负载** ⇒ 复现不了就永远拿不到用例名；"
+        "**未复现 ≠ 不存在**（负载相关的假红会一直污染横扫的可信度）",
     }
-    if age_h is not None and age_h > 24 * 7:
-        detail["说明"] = "回执超过 7 天，建议重跑一次"
-        return "需人读", detail
-    return "仍成立", detail
 
 
 # ── F20：能源 status 与盘上事实不符（缺 key 却报"接线态"）──────────────────
@@ -687,7 +564,7 @@ def probe_f20() -> tuple:
     不变量：`status == "可用"` ⟺ `key_ref` 指向的文件真在盘上；不在盘上就该是 `缺key`。
     谁都不在盘上却报"可用/接线态"，就是这条故障的实证。
     """
-    # ⚠️ 必须**按包路径**导入（与判据同一份模块实例）：按文件路径再装一次会得到**第二个**
+ # 必须**按包路径**导入（与判据同一份模块实例）：按文件路径再装一次会得到**第二个**
     #    模块对象，它内部依赖的注册表在二次装载下为 None ⇒ 探针自己抛
     #    `AttributeError: 'NoneType' object has no attribute '__dict__'`（实测踩过）。
     sys.path.insert(0, str(ROOT))
@@ -713,237 +590,26 @@ def probe_f20() -> tuple:
 
 # ── F21：技能缺口生成器与验收器各算各的域集合 ──────────────────────────────
 def probe_f21() -> tuple:
-    """可机检：**生成器产出的域集合** vs **验收器读的那个域集合**（两边是不是同源同集合）。
+    """可机检：**生成器**报出来的域 vs **注册表**里的域。
 
-    🔴 2026-10-22 改（**这条故障本身是我自己的判据错尺造出来的**，留痕）：
-      旧口径拿生成器的 `gap_domains`（= **有待补的域**，现 18 个）去比注册表全部域（29 个），
-      于是"注册表多出 13 个"被当成"两边分叉"—— 比错了对象（P1 判据错尺的教科书案例）。
-      实测真相：生成器的每一行域、与验收器读的 `omni.DISTILLED_DOMAINS` **都是 30 个、一个不差**；
-      契约测试 `test_skill_gap_patch`（6 tests）全绿。
-      现口径：比「生成器 rows 覆盖的域」 vs 「omni.DISTILLED_DOMAINS 的键」，差集为空才算对齐。
+    验收器是按注册表/引擎表逐域跑的（它报出的 FAIL 域里出现过 tools/tentacle/image_video），
+    所以"注册表有、生成器没有"的域就是两边分叉的实证。本探针不跑验收器（那要 600s），
+    只判分叉**在不在**：账要的是"前提还成立吗"，不是"两边跑一遍"。
     """
     import importlib.util
-    # 生成器（独立脚本，按路径装）
     spec = importlib.util.spec_from_file_location(
         "gen_probe", ROOT / "tools" / "codex-scripts" / "gen-skill-gap-patch.py")
     gen = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(gen)
-    rep = gen.collect()
-    mine = {str(r.get("domain") or "") for r in (rep.get("rows") or [])} - {""}
-    # 验收器读的那个真源（不要去读注册表的"能力域"，那是另一件事）
-    spec2 = importlib.util.spec_from_file_location(
-        "omni_probe", ROOT / "tools" / "codex-scripts" / "omni.py")
-    omni = importlib.util.module_from_spec(spec2)
-    spec2.loader.exec_module(omni)
-    theirs = set((getattr(omni, "DISTILLED_DOMAINS", {}) or {}).keys())
-    only_gen = sorted(mine - theirs)
-    only_ver = sorted(theirs - mine)
-    aligned = not only_gen and not only_ver
-    return ("已不成立" if aligned else "仍成立"), {
-        "生成器 rows 的域": len(mine),
-        "omni.DISTILLED_DOMAINS": len(theirs),
-        "只在生成器": only_gen,
-        "只在验收器源": only_ver,
-        "生成器 gap_domains（有待补的域，**不是全部域**）": len(rep.get("gap_domains") or []),
-        "口径": "两边都源自 omni.DISTILLED_DOMAINS；差集为空 = 同源同集合，这条故障不成立",
-    }
-
-
-def probe_f22() -> tuple:
-    """可机检：**框架自改门的历史账**处置到哪一步了。
-
-    🔴 2026-10-22 改（前提变了，留痕）：
-      F22 原来的前提是「verify 报 未认领>0」。那一层已被处置：按门自带 force 出口重立基线
-      （2026-10-22T05:14:08），并把 223 件**明示登记**在 state/framework-passports-legacy.json
-      —— **不是补齐，是明示遗留**。所以本条现在的判据是：
-        ① 遗留清单文件在不在、条数多少（这是"欠账别忘"的账本）；
-        ② 新基线是否**晚于**遗留清单的生成时刻（证明门已经从新基线起算，而不是假装绿的旧基线）。
-      两条都成立 ⇒ 「仍成立」= **这笔历史债还记在册上**（本就该一直看得见，直到人来决定补或认）。
-    """
-    p = ROOT / "state" / "framework-passports-legacy.json"
-    if not p.is_file():
-        return "已不成立", {"为什么": "遗留清单不在 ⇒ 这条要么已被人处理，要么被删了（删了就是抹账）"}
-    try:
-        j = json.loads(p.read_text(encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
-        return "需人读", {"为什么": "遗留清单解析不了：%s" % e}
-    import subprocess
-    r = subprocess.run([sys.executable, "-X", "utf8", "-m", "gbt_allinone.tools.framework_gate",
-                        "--root", str(ROOT),
-                        "--store", str(ROOT / "gbt_allinone" / "store" / "framework_changes"),
-                        "verify"],
-                       cwd=str(ROOT), capture_output=True)
-    out = r.stdout.decode("utf-8", "replace")
-    i = out.find("{")
-    base_at = None
-    unclaimed = None
-    if i >= 0:
-        v = json.loads(out[i:])
-        base_at = v.get("baseline_at")
-        unclaimed = v.get("未认领")
-    legacy_at = str(j.get("generated_at") or "")[:19]
-    detail = {
-        "遗留件数": j.get("count"),
-        "遗留清单生成": legacy_at,
-        "现基线": base_at,
-        "新基线晚于遗留清单": bool(base_at and legacy_at and base_at[:19] > legacy_at),
-        "verify 未认领（新基线之后）": unclaimed,
-        "口径": "遗留件数>0 且新基线晚于清单 ⇒ 欠账在册、门已从新基线起算（这是明示，不是补齐）",
-    }
-    ok = bool((j.get("count") or 0) > 0 and detail["新基线晚于遗留清单"])
-    return ("仍成立" if ok else "需人读"), detail
-
-
-def probe_f22_verify_gate() -> tuple:
-    """（保留）旧的判据口径：直接问门要未认领数。手工排查时可单跑，不再作为 F22 的结论。"""
-    import subprocess
-    r = subprocess.run([sys.executable, "-X", "utf8", "-m",
-                        "gbt_allinone.tools.framework_gate",
-                        "--root", str(ROOT),
-                        "--store", str(ROOT / "gbt_allinone" / "store" / "framework_changes"),
-                        "verify"],
-                       cwd=str(ROOT), capture_output=True)
-    out = r.stdout.decode("utf-8", "replace")
-    i = out.find("{")
-    if i < 0:
-        return "需人读", {"说明": "framework_gate verify 没回 JSON：%s" % (out[:200] or r.stderr.decode('utf-8', 'replace')[:200])}
-    j = json.loads(out[i:])
-    if j.get("changed_files") is None:
-        return "需人读", {"说明": "verify 回包里没有 changed_files，无法判前提", "回包键": list(j.keys())[:12]}
-    unclaimed = int(j.get("未认领") or 0)
-    expired = int(j.get("认领但已过期") or 0)
-    return ("仍成立" if (unclaimed or expired) else "已不成立"), {
-        "changed_files": j.get("changed_files"),
-        "未认领": unclaimed,
-        "认领但已过期": expired,
-        "已认领且新鲜": j.get("已认领且新鲜"),
-        "口径": "未认领或认领已过期 > 0 即『改动没有有效护照』；两个都为 0 才算这条前提垮了",
-    }
-
-
-def probe_f23() -> tuple:
-    """可机检：**授权账里有没有 `process_execute` 的票**（F23 的前提就是缺这张票）。
-
-    只读：读 store/auth_grants.jsonl，不起进程、不跑排练（排练本身有副作用，探针不碰）。
-    """
-    p = ROOT / "gbt_allinone" / "store" / "auth_grants.jsonl"
-    if not p.is_file():
-        return "仍成立", {"为什么": "授权账不存在 ⇒ 没有票", "路径": str(p)}
-    lines = [ln for ln in p.read_text(encoding="utf-8", errors="replace").splitlines() if ln.strip()]
-    scopes = []
-    for ln in lines:
-        try:
-            rec = json.loads(ln)
-        except Exception:  # noqa: BLE001
-            continue
-        sc = rec.get("scope") or rec.get("scopes") or ""
-        if isinstance(sc, list):
-            scopes.extend([str(x) for x in sc])
-        elif sc:
-            scopes.append(str(sc))
-    has = "process_execute" in scopes
-    return ("已不成立" if has else "仍成立"), {
-        "授权账行数": len(lines),
-        "出现过的 scope": sorted(set(scopes))[:12],
-        "有没有 process_execute": has,
-        "口径": "账里出现过 process_execute 就算『票可能已发』⇒ 这条前提要人复核；没出现过就是仍然缺票",
-    }
-
-
-def probe_f24() -> tuple:
-    """可机检：**图鉴采集只扫每个技能根的直接子目录** ⇒ 嵌套技能永远进不了图鉴。
-
-    实证（2026-10-22）：`~/.openclaw-autoclaw/skills/chengfeng-visual/animation-styles/
-    ian-xiaohei-svg-motion/SKILL.md` 是个真技能（frontmatter 有名、有 SKILL.md），
-    但 `omni.py collect_skills()` 用的是 `root.iterdir()` 一层 ⇒ 它永远不落进
-    `state/skill_atlas.json`，于是 `omni ask` 里永远不会被当候选（路由看不见它）。
-
-    本探针不跑 build（那是写手），只**现扫**我方四个容器里"深度 ≥2 的 SKILL.md"，
-    看它们的 frontmatter 名在不在图鉴里：
-      · 有漏 ⇒ **仍成立**，并把漏的名字点出来；
-      · 一个都不漏 ⇒ 已不成立（要么采集改成递归了，要么嵌套件被清走了）。
-    """
-    import re as _re
-    containers = [ROOT / "skills", ROOT / "plugins",
-                  Path(os.path.expanduser("~")) / ".openclaw-autoclaw" / "skills",
-                  Path(os.path.expanduser("~")) / ".dsh" / ".agent-presets"]
-    at = ROOT / "state" / "skill_atlas.json"
-    if not at.is_file():
-        return "需人读", {"说明": "图鉴不在，读不到"}
-    try:
-        atlas_names = {s.get("name") for s in (json.loads(at.read_text(encoding="utf-8")).get("skills") or [])}
-    except Exception as e:  # noqa: BLE001
-        return "需人读", {"说明": "图鉴解析不了：%s" % e}
-    nested, missing = [], []
-    for base in containers:
-        if not base.is_dir():
-            continue
-        for dp, dn, fn in os.walk(base):
-            dn[:] = [d for d in dn if d not in ("__pycache__", ".git", "node_modules")]
-            if "SKILL.md" not in fn:
-                continue
-            depth = len(Path(dp).relative_to(base).parts)
-            if depth <= 1:
-                continue                      # 直接子目录：采集能扫到，不属本条
-            try:
-                head = (Path(dp) / "SKILL.md").read_text(encoding="utf-8", errors="replace")[:800]
-            except OSError:
-                continue
-            m = _re.search(r"(?m)^name:\s*(.+)$", head)
-            nm = (m.group(1).strip().strip("\"'") if m else Path(dp).name)
-            nested.append(nm)
-            if nm not in atlas_names:
-                missing.append({"name": nm, "path": str(dp)})
-    return ("仍成立" if missing else "已不成立"), {
-        "我方容器里的嵌套技能数": len(nested),
-        "其中**不在图鉴**的": len(missing),
-        "漏的名字": [x["name"] for x in missing][:10],
-        "样例路径": [x["path"] for x in missing][:3],
-        "根因": "omni.py collect_skills() 用 root.iterdir() 只扫一层；嵌套技能永不入册",
-        "口径": "嵌套技能 >0 且有漏 ⇒ 仍成立；一个不漏才算修好（或嵌套件已清）",
-    }
-
-
-def probe_f25() -> tuple:
-    """可机检：**端点有没有活 worker**（2026-10-22 现场逮到的那条）。
-
-    实测症状（当轮原话）：`/health` 返回 `workers{ready:0, running:0, initializing:0}`、
-    `inQueue` 从 6 涨到 8；`Worker /v1/models` 仍 200（元数据是缓存的）、
-    `chat/completions` 25 秒拿不到首字 ⇒ **页面转圈**。
-    判据：`ready + running == 0` 且 `inQueue > 0` ⇒ 仍成立（有请求在排、没人干）。
-    只读，15 秒超时；拿不到凭据/连不上 ⇒ 需人读（不猜）。
-    """
-    import re as _re
-    import urllib.request
-    cred = os.path.expanduser(r"~\.dsh\.credentials.yaml")
-    key = None
-    try:
-        t = open(cred, encoding="utf-8").read()
-        m = _re.search(r"GBT_POTATO_API_KEY:[ \t]*(?:ref:)?[ \t]*[\"']?([A-Za-z0-9_\-]{16,})", t)
-        key = m.group(1) if m else None
-    except OSError:
-        key = None
-    if not key:
-        key = os.environ.get("GBT_POTATO_API_KEY")
-    if not key:
-        return "需人读", {"为什么": "拿不到 GBT_POTATO_API_KEY（refs 与环境变量都没有）"}
-    url = "https://api.runpod.ai/v2/qnnqf9w8xcefj8/health"
-    try:
-        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + key,
-                                                  "User-Agent": "gbt-reverify/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            j = json.loads(r.read(600).decode("utf-8", "replace"))
-    except Exception as e:  # noqa: BLE001
-        return "需人读", {"为什么": "health 拿不到：%s: %s" % (type(e).__name__, str(e)[:80])}
-    w = (j.get("workers") or {})
-    jobs = (j.get("jobs") or {})
-    ready = int(w.get("ready") or 0)
-    running = int(w.get("running") or 0)
-    inq = int(jobs.get("inQueue") or 0)
-    alive = ready + running
-    return ("仍成立" if (alive == 0 and inq > 0) else "已不成立"), {
-        "workers": w, "jobs_inQueue": inq,
-        "口径": "ready+running==0 且 inQueue>0 ⇒ 有人排队没人干（页面转圈的同一个症状）",
+    mine = set(gen.collect().get("gap_domains") or [])   # 生成器是独立脚本，按路径装是对的
+    sys.path.insert(0, str(ROOT))
+    from gbt_allinone.caps_registry import BENIGN_CAPS
+    reg = {str((v or {}).get("domain") or "") for v in BENIGN_CAPS.values()} - {""}
+    only_reg = sorted(reg - mine)
+    return ("仍成立" if only_reg else "已不成立"), {
+        "生成器的域": sorted(mine), "注册表的域": sorted(reg),
+        "只在注册表里的（= 验收器会跑、生成器不产）": only_reg,
+        "口径": "差集非空即两边分叉；差集为空说明已对齐",
     }
 
 
@@ -951,9 +617,8 @@ PROBES = {"F2": probe_f2, "F3": probe_f3, "F4": probe_f4, "F5": probe_f5,
           "F8": probe_f8, "F9": probe_f9, "F10": probe_f10, "F11": probe_f11,
           "F12": probe_f12, "F13": probe_f13, "F14": probe_f14, "F15": probe_f15,
           "F16": probe_f16, "F17": probe_f17, "F18": probe_f18, "F19": probe_f19,
-          "F20": probe_f20, "F21": probe_f21, "F22": probe_f22, "F23": probe_f23,
-          "F24": probe_f24, "F25": probe_f25}
-# ⚠️ 探针留在这里**不止为在册的那些条**：故障结掉之后探针仍可手工单跑
+          "F20": probe_f20, "F21": probe_f21}
+# 探针留在这里**不止为在册的那些条**：故障结掉之后探针仍可手工单跑
 #    （`python -c "import ...; print(probe_f13())"`），用于"它有没有复发"。
 #    本器只对**台账里在册**的 id 出结论 —— 结掉的条目不再被咨询。
 
@@ -968,7 +633,7 @@ def main(argv=None) -> int:
     try:
         led = json.loads(LEDGER.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001
-        # 🔴 2026-09-26 自纠：台账"存在但读不动"（损坏/编码错）原来会裸 traceback 退出 1 ——
+ # 2026-09-26 自纠：台账"存在但读不动"（损坏/编码错）原来会裸 traceback 退出 1 ——
         #    而本器契约里 2 = 台账读不动、1 = 有前提已不成立，两个信号被混掉。
         print("台账读不动（%s: %s）：%s" % (type(exc).__name__, str(exc)[:120], LEDGER))
         return 2
@@ -985,7 +650,7 @@ def main(argv=None) -> int:
                 verdict, reading = probe()
             except Exception as exc:  # noqa: BLE001
                 verdict, reading = "需人读", {"说明": "探针自己出错：%s: %s" % (type(exc).__name__, str(exc)[:120])}
-        # 🔴 **结论不许与读数自相矛盾** —— 这一条我改了两版，两版各错一个方向，都记在下面：
+ # **结论不许与读数自相矛盾** —— 这一条我改了两版，两版各错一个方向，都记在下面：
         #    第一版：读数写着"拿不到这个名字"，结论却报了"已不成立"（**由读不到推出结论**）。
         #    第二版：改成"读数里只要有『拿不到/出错』字样就降级"⇒ 把 F5 **误降级**了 ——
         #            它的静态读源码那层**明明读到了** `['D','E','F','V']`，只是旁边有一句

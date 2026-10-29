@@ -12,6 +12,15 @@
 
 行为：最小请求（max_tokens=1）→ 记录往返毫秒 → 写 `outputs/model-bridge/keep-warm.log`；
       失败不重试轰炸（上限 1 次/轮，间隔固定 120s），并把原因如实写进日志。
+
+## 🔴 2026-10-27 实测修正：光保温是错的，必须先过闸门
+
+实测（见 `_engine_gate.py` 头部）：端点可以处在
+**`ready=0 · initializing=0 · inQueue=26`** 这种"没有 worker、也没在起、队列在堆"的状态。
+那种状态下每 120s 发一次保温请求，**只会把积压推得更高**，一次都换不来"热"。
+⇒ 现在每轮先读 `/health`（498ms、不占 worker、不排队），按读数决定发不发：
+    · ready/initializing > 0 ⇒ 照发（那才叫保温）；
+    · 全零且有积压 ⇒ **不发**，把读数原样写进日志（这比"发了超时"信息量大得多）。
 """
 from __future__ import annotations
 
@@ -21,6 +30,11 @@ import pathlib
 import sys
 import time
 import urllib.request
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+# 激活闸门：**唯一判定**在 _engine_gate.decide()，本件不重写一份。
+from _engine_gate import decide, health  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 STOP = ROOT / "outputs" / "model-bridge" / "keep-warm.stop"
@@ -79,6 +93,28 @@ def main() -> int:
         if STOP.exists():
             log("STOP (发现 keep-warm.stop)")
             return 0
+        # ── 先过闸门：队列不通就不发 ────────────────────────────────────────
+        # 发一条保温请求 = 往队列里再塞一个任务。没有 worker 时它不是"保温"，
+        # 是"加积压"。所以先读 /health（只读、不排队），按读数决定。
+        base = (env_or_reg("GBT_POTATO_BASE_URL") or "").rstrip("/")
+        key = env_or_reg("GBT_POTATO_API_KEY")
+        if base and key:
+            h = health(base, key)
+            ok2, why2 = decide(h)
+            if h.get("_ok"):
+                w = h.get("workers") or {}
+                j = h.get("jobs") or {}
+                log("GATE %s ｜ ready=%s init=%s queue=%s done=%s failed=%s (health %sms)"
+                    % ("发" if ok2 else "不发", w.get("ready"), w.get("initializing"),
+                       j.get("inQueue"), j.get("completed"), j.get("failed"), h.get("_ms")))
+            else:
+                log("GATE 不发 ｜ %s" % why2)
+            if not ok2:
+                for _ in range(int(INTERVAL_S)):
+                    if STOP.exists():
+                        break
+                    time.sleep(1)
+                continue
         ok, ms, why = ping()
         rounds += 1
         if ok:

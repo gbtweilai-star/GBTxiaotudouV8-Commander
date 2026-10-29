@@ -50,7 +50,7 @@ for _s in (sys.stdout, sys.stderr):
 
 # 可能装着源码文本的变量名（用于 D2 的自指风险判断）
 TEXTISH = re.compile(r"^(src|txt|text|blob|body|out|s|raw|content|source)$")
-# 🔴 **单一来源**：检测器只在这里列一次。
+# **单一来源**：检测器只在这里列一次。
 #    原来 `DETECTORS` / `scan_file` / `selftest` 各列一遍 —— **加一个检测器忘了改一处
 #    就会静默漏检**（维护隐患）。现在全部从这张表派生，并有一条自检咬「两处是否一致」。
 
@@ -151,7 +151,7 @@ def d1_always_true(tree) -> list:
     out = []
     for n in ast.walk(tree):
         # all(...)/any(...) 迭代的是**单元素字面量**且**元素没用到那个循环变量** ⇒ 才恒真
-        # 🔴 **第一版漏了后半句** ⇒ 把 `any(k in r for k in ("静帧",))` 误判成恒假
+ # **第一版漏了后半句** ⇒ 把 `any(k in r for k in ("静帧",))` 误判成恒假
         #    （`media_run.py:398`）—— 那个元素**用到了 `k`**，条件**依赖数据**。
         #    **读代码才发现：这是假阳性，不是框架的缺陷。** 已补"元素是否用到循环变量"。
         if (isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
@@ -265,10 +265,10 @@ def d3_zero_masquerade(tree) -> list:
     out = []
     for fn in [x for x in ast.walk(tree) if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef))]:
         nodes = list(ast.walk(fn))
-        # 🔴 **前提**：真的在读某个可能不存在的东西 —— 否则「源缺失」这件事不存在
+ # **前提**：真的在读某个可能不存在的东西 —— 否则「源缺失」这件事不存在
         if not any(isinstance(n, ast.Call) and _call_name(n) in READISH for n in nodes):
             continue
-        # 🔴 出路用 **AST 查字符串常量**，不查源码文本（查文本恰好是 D2/D6 要抓的坑）
+ # 出路用 **AST 查字符串常量**，不查源码文本（查文本恰好是 D2/D6 要抓的坑）
         if any(isinstance(n, ast.Constant) and isinstance(n.value, str)
                and any(k in n.value for k in UNREAD_KEYS) for n in nodes):
             continue
@@ -406,14 +406,14 @@ def d6_self_reference(tree, src_text: str) -> list:
                 continue
             hits = [ln for ln in coll.get(left.value, []) if ln != n.lineno]
             if hits:
-                # 🔴 **同一处分档**：形状③也要按位置分档（否则会与形状④重复报高危）
+ # **同一处分档**：形状③也要按位置分档（否则会与形状④重复报高危）
                 dec = _in_deciding_position(n, par3)
                 tag = ("🔴 **高危·自指**" if dec else "🟡 提示·自指（不定胜负）")
                 out.append((n.lineno,
                             '%s：`"%s" in %s`，同一字面量又是集合元素（L%s）'
                             % (tag, left.value[:20], rname, hits[:3])))
     # ── 形状③：同一字符串**常量**在本文件里出现 ≥2 次（一次在判据里、一次在别处）──────
-    #    🔴 **这个洞是实测发现的**：我自己新写的判据
+ # **这个洞是实测发现的**：我自己新写的判据
     #    `"import edit_core" not in src and "from … import edit_core" not in src`
     #    —— 字面量**直接列在判据里**、**不是集合元素** ⇒ 形状①②都看不见它。
     #    数常量（AST）而不是数源码文本（文本会被注释/文档串骗到）。
@@ -444,7 +444,7 @@ def d6_self_reference(tree, src_text: str) -> list:
                                "in" if isinstance(op, ast.In) else "not in",
                                rname, others[:3])))
     # ── 形状④（**最锋利**）：`"L" in <__file__ 绑定变量>` —— **必然恒真** ─────────────
-    #    🔴 推理：`src` 就是本文件自己的文本，而字面量 `L` **本身就在这个文件里**
+ # 推理：`src` 就是本文件自己的文本，而字面量 `L` **本身就在这个文件里**
     #    ⇒ `L in src` **必然为真**（`not in` 必然为假）。**不需要出现两次，一次就够。**
     #    这条是实测逼出来的：我新写的 `"import edit_core" not in src` 就是它，
     #    形状①②③**都看不见**（字面量只出现一次、且不在集合里）。
@@ -463,7 +463,7 @@ def d6_self_reference(tree, src_text: str) -> list:
                 rname = right.id if isinstance(right, ast.Name) else ""
                 if rname not in src_bound:
                     continue
-                # 🔴 **分档**：定胜负的位置 ⇒ 高危；前置筛/守卫 ⇒ 提示（优化失效）
+ # **分档**：定胜负的位置 ⇒ 高危；前置筛/守卫 ⇒ 提示（优化失效）
                 dec = _in_deciding_position(n, par)
                 tag = ("🔴 **高危·自指（恒真）**" if dec else
                        "🟡 提示·自指前置筛（恒真但不定胜负）")
@@ -531,7 +531,7 @@ def tally(findings) -> dict:
     return t
 
 
-# 🔴 **指纹**：一条命中的**稳定身份** = 检测器 + 文件 + 代码片段。
+# **指纹**：一条命中的**稳定身份** = 检测器 + 文件 + 代码片段。
 #    为什么要它（2026-09-24 实测踩出来的）：棘轮原来只存**分类计数**，
 #    我改完代码后 D1 少了 1 条，**归因不了**（是"删了坏判据"还是"检测器漏了"？）。
 #    于是我按 `为什么` 全文做逐条对差 ⇒ **报了 49 条"消失" + 48 条"新增"**，
@@ -679,7 +679,7 @@ def cmd_check(a) -> int:
 PLANT = {
     "D1 恒真判据": "def f(xs):\n    return all(x for _ in [1])\n",
     "D2 文本子串判据": 'def f(src):\n    return "forbidden(" in src\n',
-    # 🔴 这是本仓**真踩过**的形状：判据把禁止项列成一张表，再拿表里的项去搜**自己读进来的源码**
+ # 这是本仓**真踩过**的形状：判据把禁止项列成一张表，再拿表里的项去搜**自己读进来的源码**
     "D6 自指判据（高危）":
         ("def f():\n"
          "    src = Path(__file__).read_text()\n"
@@ -691,10 +691,10 @@ PLANT = {
                 "    return b\n"),
     "D4 死代码": "def f():\n    if False:\n        return 1\n    return 2\n",
     "D5 判据与自己比": "def f(y):\n    return y == y\n",
-    # 🔴 2026-09-25：这条负控是**被自检逼出来的** ——
+ # 2026-09-25：这条负控是**被自检逼出来的** ——
     #    我给台架加了 D7 却忘了加负控，自检当场红：「检测器 7 个 ｜ 负控 6 个 ｜ 缺负控: ['D7 …']」。
     #    形状取自**我自己真犯的那次**（拿"最后一行"答"有没有署名"）。
-    # 🔴 负控必须与判据**同宽**：我一度把 `lines[0]` 也写进来，但判据**收窄后不收 `[0]`**
+ # 负控必须与判据**同宽**：我一度把 `lines[0]` 也写进来，但判据**收窄后不收 `[0]`**
     #    ⇒ 那行是**永远咬不到的死重量**，还会让人以为 `[0]` 被覆盖了。**删掉它。**
     "D7 位置型存在性判据": ('def f(lines):\n'
                     '    return "本署名不可删除" in lines[-1]\n'),
@@ -705,26 +705,26 @@ CLEAN = ("def f(d):\n"
          "    return {'n': len(d), 'why': '读到 %d 项' % len(d)}\n")
 # D6 的**假阳性**控制：合法文本判据 —— 字面量**不在**任何集合里 ⇒ 不该判自指
 FP_TEXT = 'def f(txt):\n    return "TODO" in txt\n'
-# D6 的**档次**控制：被搜的是**输入数据**（不是读进来的源码）⇒ 只能算 🟡 提示，不许报 🔴 高危
+# D6 的**档次**控制：被搜的是**输入数据**（不是读进来的源码）⇒ 只能算 提示，不许报 高危
 FP_TIER = ('def f(body):\n'
            '    return any(t in body for t in ("我是 AI", "新人类"))\n')
-# D6 的**读别人文件**控制：读的是**别人的文件**（不是 `__file__`）⇒ 只能 🟡，不许报 🔴
-#   🔴 这条是**实测发现的假阳性**：首跑"高危"档 2/2 全是这个形状
+# D6 的**读别人文件**控制：读的是**别人的文件**（不是 `__file__`）⇒ 只能 ，不许报
+# 这条是**实测发现的假阳性**：首跑"高危"档 2/2 全是这个形状
 #      （`audit-skill-roots.py` / `make-delivery-ledger.py` 读别人的 `SKILL.md` 审计署名）
 FP_OTHER = ('def f(sk):\n'
             '    body = sk.read_text()\n'
             '    return any(t in body for t in ("GBT小土豆", "自由的风"))\n')
 # D3 的**纯汇报函数**控制：不读任何外部源 ⇒ 「源缺失」不存在 ⇒ **不许报 D3**
-#   🔴 这条也是**实测发现的假阳性**：棘轮抓到我自己新写的 `cmd_gate`/`_checks` 被误报
+# 这条也是**实测发现的假阳性**：棘轮抓到我自己新写的 `cmd_gate`/`_checks` 被误报
 FP_PURE = ('def report(items):\n'
            '    return {"n": len(items), "m": len([x for x in items]), '
            '"k": len(set(items))}\n')
 # D1 的**用到循环变量**控制：`any(k in r for k in ("静帧",))` 条件**依赖数据** ⇒ 不许报恒真/恒假
-#   🔴 实测假阳性：我第一版 D1 漏查"元素是否用到循环变量"，误告了 `media_run.py:398`
+# 实测假阳性：我第一版 D1 漏查"元素是否用到循环变量"，误告了 `media_run.py:398`
 FP_LOOPVAR = ('def f(r):\n'
               '    return any(k in r for k in ("静帧",))\n')
-# D6 的**前置筛**控制：恒真但**不定胜负**（真判据是别处）⇒ 只能 🟡，不许报 🔴
-#   🔴 实测逼出来的（§一百一十八）：`stigmergy.py:315` 就是"故意的廉价前置筛"
+# D6 的**前置筛**控制：恒真但**不定胜负**（真判据是别处）⇒ 只能 ，不许报
+# 实测逼出来的（§一百一十八）：`stigmergy.py:315` 就是"故意的廉价前置筛"
 FP_PREFILTER = ('def judge():\n'
                 '    src = Path(__file__).read_text()\n'
                 '    _u = (uses_name(src, "locked_append_text")'
@@ -789,12 +789,12 @@ def _checks(pre_scan=None):
         names = [k for k, v in res.items() if v]
         ck("**负控·%s 必须咬得住**" % want, want in names,
            "咬出: %s（共 %d 处）" % (names or "无", sum(len(v) for v in res.values())))
-    # ①b 🔴 **单一来源自检**：检测器表与负控表必须齐 —— 加了检测器却没加负控 ⇒ 报红
+ # ①b **单一来源自检**：检测器表与负控表必须齐 —— 加了检测器却没加负控 ⇒ 报红
     ck("**每个检测器都有负控**（加了检测器却忘了加负控 ⇒ 这里红）",
        set(PLANT) == set(DETECTORS),
        "检测器 %d 个 ｜ 负控 %d 个 ｜ 缺负控: %s" % (len(DETECTORS), len(PLANT),
                                          sorted(set(DETECTORS) - set(PLANT)) or "无"))
-    # ①c 🔴 **负控必须与判据同宽**（2026-09-25 我手工犯过、现在机检）：
+ # ①c **负控必须与判据同宽**（2026-09-25 我手工犯过、现在机检）：
     #     我把 D7 的判据收窄成"只认尾部负下标"，**负控里却还留着 `lines[0]`** ——
     #     那行**永远咬不到**，还会让人以为 `[0]` 被覆盖了。
     #     **机检定义**：把负控里某一行去掉，若命中数**不变** ⇒ 那行是**死重量**。
@@ -804,7 +804,7 @@ def _checks(pre_scan=None):
                       for ln in inert_plant_lines(want, code)]
     ck("**负控与判据同宽**（负控里不许有永远咬不到的死重量）", not inert_all,
        "死重量: %s" % (inert_all or "无"))
-    # ①d 🔴 **这条控制本身会不会咬**（不然它自己就是假绿）：
+ # ①d **这条控制本身会不会咬**（不然它自己就是假绿）：
     #     把 D7 收窄前那种"宽负控"（多塞一行 `lines[0]`）喂进去 ⇒ **必须**被点名。
     _wide = ('def f(lines):\n'
              '    a = "署名" in lines[0]\n'
@@ -817,38 +817,38 @@ def _checks(pre_scan=None):
     clean_hits = [h for v in run_detectors(t, CLEAN).values() for h in v]
     ck("**假阳性控制：干净代码不许被误报**", not clean_hits,
        "误报 %d 处：%s" % (len(clean_hits), clean_hits[:2]))
-    # ②b 🔴 **D6 假阳性控制**：合法的文本判据（字面量**不在**集合里）不许被误报成自指
+ # ②b **D6 假阳性控制**：合法的文本判据（字面量**不在**集合里）不许被误报成自指
     fp_tree = ast.parse(FP_TEXT)
     d6_fp = d6_self_reference(fp_tree, FP_TEXT)
     ck("**D6 假阳性控制：合法文本判据不许被误报成自指**", not d6_fp,
        "误报 %d 处：%s" % (len(d6_fp), d6_fp[:1]))
-    # ②c 🔴 **D6 档次控制**：被搜的是**输入数据** ⇒ 只能 🟡，**不许报 🔴 高危**
+ # ②c **D6 档次控制**：被搜的是**输入数据** ⇒ 只能 ，**不许报 高危**
     #     （首跑 13 条里大多数就是这种 —— 不区分档次，D6 就是个噪音器）
     ft_tree = ast.parse(FP_TIER)
     d6_ft = d6_self_reference(ft_tree, FP_TIER)
     ck("**D6 档次控制：搜「输入数据」不许报高危**（只能 🟡 提示）",
        bool(d6_ft) and all("🟡" in w for _, w in d6_ft) and not any("🔴" in w for _, w in d6_ft),
        (d6_ft[0][1][:72] if d6_ft else "**没报出来**（那也不行）"))
-    # ②d 🔴 **D6 读别人文件控制**：读**别人的文件**（非 `__file__`）不许报高危
+ # ②d **D6 读别人文件控制**：读**别人的文件**（非 `__file__`）不许报高危
     #     （这是实测抓到的假阳性：高危档 2/2 全错在这个形状上）
     fo_tree = ast.parse(FP_OTHER)
     d6_fo = d6_self_reference(fo_tree, FP_OTHER)
     ck("**D6 控制：读「别人的文件」不许报高危**（只能 🟡 提示）",
        bool(d6_fo) and all("🟡" in w for _, w in d6_fo) and not any("🔴" in w for _, w in d6_fo),
        (d6_fo[0][1][:72] if d6_fo else "**没报出来**（那也不行）"))
-    # ②e 🔴 **D3 纯汇报函数控制**：不读外部源 ⇒ 「源缺失」不存在 ⇒ 不许报 D3
+ # ②e **D3 纯汇报函数控制**：不读外部源 ⇒ 「源缺失」不存在 ⇒ 不许报 D3
     #     （这是棘轮抓到的我自己的假阳性：`cmd_gate`/`_checks`/`cmd_selftest`）
     fp2_tree = ast.parse(FP_PURE)
     d3_fp = d3_zero_masquerade(fp2_tree)
     ck("**D3 控制：纯汇报函数不许报「用 0 冒充」**（它不读任何外部源）",
        not d3_fp, "误报 %d 处：%s" % (len(d3_fp), d3_fp[:1]))
-    # ②f 🔴 **D1 控制：元素用到循环变量 ⇒ 条件依赖数据 ⇒ 不许报恒真/恒假**
+ # ②f **D1 控制：元素用到循环变量 ⇒ 条件依赖数据 ⇒ 不许报恒真/恒假**
     #     （实测假阳性：误告 `media_run.py:398` 的 `any(k in r for k in ("静帧",))`）
     lv_tree = ast.parse(FP_LOOPVAR)
     d1_lv = d1_always_true(lv_tree)
     ck("**D1 控制：用到循环变量的 any/all 不许报恒真**（条件依赖数据）",
        not d1_lv, "误报 %d 处：%s" % (len(d1_lv), d1_lv[:1]))
-    # ②g 🔴 **D6 分档控制**：恒真但只是**前置筛**（不定胜负）⇒ 只能 🟡，不许报 🔴
+ # ②g **D6 分档控制**：恒真但只是**前置筛**（不定胜负）⇒ 只能 ，不许报
     #     （实测：`stigmergy.py:315` 是故意的廉价前置筛，真判据是别处的 AST 调用）
     pf_tree = ast.parse(FP_PREFILTER)
     d6_pf = d6_self_reference(pf_tree, FP_PREFILTER)
@@ -866,17 +866,17 @@ def _checks(pre_scan=None):
     f = state["scan"] if state["scan"] is not None else scan(DEFAULT_ROOTS)
     ck("**真扫读数自洽**（逐条数 == 合计）", tally(f)["合计"] == len(f),
        "合计 %d" % len(f))
-    # ⑤ 🔴 负控：**重叠根不许重复计数**
+ # ⑤ 负控：**重叠根不许重复计数**
     #    判据要**随数据变**：`tools` 的 rglob 已包含 `tools/codex-scripts`，
     #    所以「单根」与「根+子根」的条数**必须相等**。
     #    （第一版判据写成 `len(keys)==len(set((文件,行,检测器)))` —— **那是坏判据**：
     #     同一行上两个不同表达式会给出同一个三元组，合法重复被误判成没去重。）
-    #    ⚡ 用 `_walk_py`（**不解析**）测去重机制 —— 判据不变弱，耗时降一个量级。
+ # 用 `_walk_py`（**不解析**）测去重机制 —— 判据不变弱，耗时降一个量级。
     a1, a2 = _walk_py(("tools",)), _walk_py(("tools", "tools/codex-scripts"))
     ck("**负控：重叠根不许重复计数**（加子根后文件数必须不变）",
        len(a1) == len(a2) and len(a1) > 0,
        "单根 tools = %d 个 .py ｜ 再加 tools/codex-scripts = %d 个" % (len(a1), len(a2)))
-    # ⑥ 🔴 **指纹必须不被措辞影响**（本节这条是实测踩出来的）：
+ # ⑥ **指纹必须不被措辞影响**（本节这条是实测踩出来的）：
     #    同一条命中，只把提示语**换个说法**，指纹必须**不变**；
     #    否则逐条对差会像上次那样凭空报出 49 条"消失" + 48 条"新增"。
     it_a = {"检测器": "D2 文本子串判据", "文件": "x.py", "行": 10,
@@ -889,14 +889,14 @@ def _checks(pre_scan=None):
             "为什么": "`\"another(\" in src` —— 文本判据"}
     ck("**指纹：代码片段不同 ⇒ 指纹必须不同**（别把两条不同的命中合成一条）",
        指纹(it_a) != 指纹(it_c), "%s vs %s" % (指纹(it_a), 指纹(it_c)))
-    # 🔴 **指纹：措辞把"变量名"提前了也不许换片段**（实测真坑）
+ # **指纹：措辞把"变量名"提前了也不许换片段**（实测真坑）
     it_d = {"检测器": "D6 自指判据（高危）", "文件": "y.py",
             "为什么": "🟡 提示·表式文本判据（被搜变量 `out` 不是读文件来的）：`\"🔴\" in out`，而…"}
     it_e = {"检测器": "D6 自指判据（高危）", "文件": "y.py",
             "为什么": "🟡 提示·自指（不定胜负）：`\"🔴\" in out`，而…"}
     ck("**指纹：老措辞把变量名放在前一个反引号里 ⇒ 仍要认成同一条**（取最长片段）",
        指纹(it_d) == 指纹(it_e), "%s\n      vs %s" % (指纹(it_d), 指纹(it_e)))
-    # ⑦ 🔴 **点名对差要真点名**：基线里多一条、现在没有 ⇒ 「消失」里必须点到它
+ # ⑦ **点名对差要真点名**：基线里多一条、现在没有 ⇒ 「消失」里必须点到它
     named = _named_diff([it_a], [it_a, it_c])
     ck("**点名对差：真消失的那条被点到名**（不是只报个数）",
        named["消失条数"] == 1 and 指纹(it_c) in named["消失"],

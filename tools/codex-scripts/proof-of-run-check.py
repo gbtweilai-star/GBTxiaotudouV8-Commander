@@ -84,7 +84,7 @@ def _shell(cmd, timeout=300):
 
 
 def judge(rows, runner=None, isolated=False):
-    # 🔴 2026-10-10 加 scope（**第三次自纠，还是被我自己的判据咬出来的**）：
+ # 2026-10-10 加 scope（**第三次自纠，还是被我自己的判据咬出来的**）：
     #    声明分两种 ——
     #      · scope="any"（默认）：在哪儿都能量（判据/selftest/文件存在/框架门…）
     #      · scope="production" ：**只能在生产环境量**（镜像干净 / 镜像排练 / 框架门 verify）
@@ -171,7 +171,7 @@ def selftest():
 def main():
     if "--selftest" in sys.argv[1:]:
         return selftest()
-    # 🔴 2026-10-10 自纠：我原来在这里加了「隔离 store ⇒ 不适用」，**那是设计错误**。
+ # 2026-10-10 自纠：我原来在这里加了「隔离 store ⇒ 不适用」，**那是设计错误**。
     #    本仓开机自检（boot-selfcheck.py）**永远**在隔离 store 里跑 ⇒ 那样这条律
     #    **永远不被执行** = 等于没绑（而主人令是「把这个验证方式也给框架绑死了」）。
     #    而台账里每条声明的命令**本来就是自足的**（需要隔离 store 的那条，自己带上了）
