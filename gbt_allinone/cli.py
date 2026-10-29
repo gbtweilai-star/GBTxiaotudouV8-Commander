@@ -103,6 +103,64 @@ def cmd_auth(argv):
     return 1
 
 
+def cmd_heartbeat(argv):
+    """heartbeat 子命令：十二根分类心跳触手（主人令 2026-10-30）。
+
+    为什么走 CLI 而不是只留 Python 接口：这套东西的价值在"随手就能问一句
+    '现在哪儿坏了'"，藏在模块里就等于没有。
+
+      heartbeat            打一次 light 心跳 + 出执行指令（约 0.3 秒）
+      heartbeat --full     加 body_map 全身扫描（七感官六动作逐根回读，约 6.5 秒）
+      heartbeat --clean    顺手清自己抽屉里的垃圾与超额扫描
+      heartbeat --act      把可自动的指令真的执行掉（表外的一律跳过并写明原因）
+      heartbeat --dry      配合 --act 只演练
+      heartbeat status     读上次心跳（不打新的）
+      heartbeat taxonomy   12 类分类总览 + 严格自校验
+    """
+    from . import brain_exec as _be
+    from . import heartbeat_tentacle as _hb
+    from . import cap_taxonomy as _tx
+
+    args = [a for a in (argv or [])[1:]]
+    pos = [a for a in args if not a.startswith("-")]
+    mode = "full" if "--full" in args else "light"
+
+    if "taxonomy" in pos:
+        print(json.dumps(_tx.describe(_hb.PROBES), ensure_ascii=False, indent=1))
+        return 0 if _tx.audit().get("ok") else 1
+
+    if "status" in pos:
+        print(json.dumps(_hb.latest(), ensure_ascii=False, indent=1))
+        return 0
+
+    if "--act" in args:
+        r = _be.act(mode=mode, dry_run=("--dry" in args))
+        print(json.dumps(r, ensure_ascii=False, indent=1))
+        return 0 if r.get("ok") else 1
+
+    # 默认：打一跳 + 出指令
+    rep = _hb.scan_all(mode=mode, persist=True, clean=("--clean" in args))
+    adv = _be.advise(rep)
+    brief = {
+        "at": rep.get("at"), "mode": rep.get("mode"), "clean": rep.get("clean"),
+        "tentacles": "%s/%s" % (rep.get("tentacles_ok"), rep.get("tentacles_total")),
+        "score": rep.get("score"), "ms": rep.get("ms"),
+        "taxonomy_ok": (rep.get("taxonomy") or {}).get("ok"),
+        "hygiene": rep.get("hygiene"),
+        "signals_by_level": rep.get("signals_by_level"),
+        "verdict": adv.get("verdict"),
+        "headline": adv.get("headline"),
+        "counts": adv.get("counts"),
+    }
+    print(json.dumps(brief, ensure_ascii=False, indent=1))
+    if adv.get("instructions"):
+        print("\n== 执行指令 ==")
+        for x in adv["instructions"]:
+            print("  [%s] %s\n       动作: %s\n       依据: %s"
+                  % (x["priority"], x.get("id"), x.get("action"), str(x.get("why"))[:110]))
+    return 0 if adv.get("verdict") == "green" else 1
+
+
 def main(argv):
     # 🔴 2026-10-14 修（实测根因）：Windows 控制台默认 GBK，而能力描述里有 "⇒"（\u21d2）
     #    ⇒ `py -3.14 -m gbt_allinone list` 打到一半抛 UnicodeEncodeError('gbk')，命令整条死。
@@ -121,6 +179,8 @@ def main(argv):
         return 0
     if argv[0] == "auth":
         return cmd_auth(argv)
+    if argv[0] in ("heartbeat", "hb"):
+        return cmd_heartbeat(argv)
     if argv[0] in ("run", "call"):
         kind = argv[1] if len(argv) > 1 else "health"
         payload, err = {}, ""
@@ -145,7 +205,8 @@ def main(argv):
         cmd_run(kind, payload)
         return 0
         return 0
-    print("用法: gbt_allinone [list|audit|auth|run <kind> [json]]")
+    print("用法: gbt_allinone [list|audit|auth|heartbeat|run <kind> [json]]")
+    print("      heartbeat [--full|--clean|--act [--dry]|status|taxonomy]")
     return 1
 
 
