@@ -448,3 +448,168 @@ def unify(goal: str, payload: dict = None, expectation: str = "") -> dict:
     return {"ok": ok, "goal": goal[:200], "kind": kind, "chain": chain,
             "elapsed_s": round(time.time() - t0, 1),
             "note": "五维合一：route→execute→verify→health 全链留痕"}
+
+
+# ═══════════════ 第六维：heartbeat（12 根分类心跳触手的接收口）· 2026-10-30 ═══════════════
+# 主人令：「每一个分类部署一根心跳触手…状态返回给大脑执行层分析，再返回执行指令」。
+# 分工写死在注释里，免得以后有人把分析塞回触手：
+#   触手只管**自检和报状态**（heartbeat_tentacle），不许自己下结论；
+#   分析、定级、出指令**只在本文件**（大脑执行层），触手不越界。
+
+
+@_spanned
+def heartbeat(mode: str = "light", persist: bool = True) -> dict:
+    """收 12 根分类心跳触手的定点自检状态（大脑执行层的"体检台"）。
+
+    mode:
+      light（默认）只跑快探针，全套 12 根实测约 0.3 秒 —— 这是心跳该有的节奏；
+      full 加上 `body_map` 全身扫描（七感官六动作逐根回读，约 6.5 秒）。
+    返回里**不含**每根触手的 349 条成员清单（那会淹掉读数），成员数单独给。
+    """
+    from . import heartbeat_tentacle as HB
+
+    rep = HB.scan_all(mode=mode, persist=persist)
+    brief = {}
+    for code, s in (rep.get("statuses") or {}).items():
+        brief[code] = {
+            "tentacle": s.get("tentacle"),
+            "title": s.get("title"),
+            "ok": s.get("ok"),
+            "score": s.get("score"),
+            "members": s.get("members_total"),
+            "beat": s.get("beat"),
+            "at": s.get("at"),
+            "ms": s.get("ms"),
+            "checks": {k: (v or {}).get("ok") for k, v in (s.get("checks") or {}).items()},
+            "probe_detail": ((s.get("checks") or {}).get("probe") or {}).get("detail"),
+            "hygiene_detail": ((s.get("checks") or {}).get("hygiene") or {}).get("detail"),
+            "signals": s.get("signals"),
+        }
+    return {
+        "ok": rep.get("tentacles_red", 1) == 0,
+        "at": rep.get("at"),
+        "mode": rep.get("mode"),
+        "score": rep.get("score"),
+        "tentacles_total": rep.get("tentacles_total"),
+        "tentacles_ok": rep.get("tentacles_ok"),
+        "tentacles_red": rep.get("tentacles_red"),
+        "taxonomy": rep.get("taxonomy"),
+        "signals_by_level": rep.get("signals_by_level"),
+        "tentacles": brief,
+        "elapsed_ms": rep.get("ms"),
+        "note": "触手只报状态；定级与指令在 advise()",
+    }
+
+
+# 信号码 → 执行指令模板（只在这里定义一次，避免两处口径）
+_ADVICE_RULES: dict = {
+    "tentacle_crash": ("P0", "这根触手自身崩了，先修它自己 —— 它崩着就等于这个分类没人看"),
+    "registry_gap": ("P0", "分类表与真源对不上，先对齐分类表（caps_registry 为唯一真源）"),
+    "dispatch_gap": ("P0", "有能力的 handler 不在分派表内 —— 登记了却调不到，等于假绿"),
+    "dispatch_unreadable": ("P0", "分派表解析失败 —— 心跳的判据本身失明，先修解析"),
+    "policy_break": ("P0", "策略门对某些能力位抛异常 —— 门坏了，任何放行结论都不可信"),
+    "probe_dead": ("P1", "该分类的器官探针报红 —— 这个器官当下不能用，改走邻类路径"),
+    "members_removed": ("P1", "成员消失 —— 不是正常下线就是被误删，必须逐个核对"),
+    "state_flip": ("P1", "状态翻转 —— 上一跳与这一跳结论相反，先确认哪一次是对的"),
+    # ── 卫生层（主人令 2026-10-30 追加：触手自检要会清垃圾、整理自身、防混入）──
+    "foreign_intrusion": ("P1", "抽屉里有不是我们产的件 —— 只报不删（别人的东西不由触手处置），要么人认领要么人清走"),
+    "misplaced_state": ("P1", "状态文件被写脏（category 与文件名不符）—— 说明有别的进程在写我们的格，先查谁写的"),
+    "garbage_found": ("P2", "抽屉里有垃圾/超额扫描件 —— 跑 `scan --clean` 就清（默认 dry-run 不删，删除属写面）"),
+    "garbage_cleaned": ("P2", "垃圾已清（信息态）"),
+}
+
+
+@_spanned
+def advise(report: dict = None, mode: str = "light") -> dict:
+    """大脑执行层：把触手状态**分析**成**执行指令**（带优先级、依据、证据）。
+
+    这是主人令里「返回执行指令」那一步。判据不新造，全部落在 `_ADVICE_RULES`
+    与分类自校验上 —— 新加一类问题就要先在规则表里加一行，不许临场发挥。
+
+    规格：
+      · P0 = 现在就不许用（假绿 / 门坏 / 触手崩）→ 必须先修，修完再谈别的
+      · P1 = 这个分类当下降级（器官失灵 / 成员消失 / 状态翻转）→ 改道或复检
+      · P2 = 信息态（探针被档位跳过等）→ 不必动作，但要知道
+      · 全绿 ⇒ 指令就一条：维持，按需执行
+    """
+    from . import heartbeat_tentacle as HB
+
+    rep = report or HB.scan_all(mode=mode, persist=True)
+    tax = rep.get("taxonomy") or {}
+    instructions = []
+
+    # ⓪ 分类自校验不通过 ⇒ 一切读数都不作数，这是最上游的 P0
+    if not tax.get("ok", True):
+        instructions.append({
+            "priority": "P0", "id": "taxonomy_broken",
+            "action": "先修分类表：有未归类/重复归类/孤儿 domain/未映射动作域",
+            "why": "分类一旦不严格，12 根触手看的就不是全集 —— 后面的绿都是假绿",
+            "evidence": {k: tax.get(k) for k in
+                         ("unclassified", "duplicated", "orphan_domains",
+                          "unmapped_action_domains", "source_total", "classified_total")},
+        })
+
+    # ① 逐条信号 → 指令
+    seen = set()
+    for s in rep.get("signals") or []:
+        code = s.get("code")
+        level = s.get("level")
+        if level == "INFO":
+            instructions.append({
+                "priority": "P2", "id": f"{s.get('category')}:{code}",
+                "action": "无需动作（信息态）",
+                "why": s.get("msg"),
+                "evidence": {"category": s.get("category"), "tentacle": s.get("tentacle")},
+            })
+            continue
+        rule = _ADVICE_RULES.get(code)
+        prio = rule[0] if rule else ("P0" if level == "P0" else "P1")
+        hint = rule[1] if rule else "未登记的信号码 —— 先补 _ADVICE_RULES 再谈处置"
+        key = (prio, code, s.get("category"))
+        if key in seen:
+            continue
+        seen.add(key)
+        instructions.append({
+            "priority": prio,
+            "id": f"{s.get('category')}:{code}",
+            "category": s.get("category"),
+            "tentacle": s.get("tentacle"),
+            "action": hint,
+            "why": s.get("msg"),
+            "evidence": {"signal_code": code, "level": level},
+        })
+
+    # ② 按优先级排序：P0 先，P1 次，P2 后；同级别按分类顺序（稳定可复现）
+    order = {"P0": 0, "P1": 1, "P2": 2}
+    instructions.sort(key=lambda x: (order.get(x["priority"], 9), str(x.get("id"))))
+
+    p0 = [x for x in instructions if x["priority"] == "P0"]
+    p1 = [x for x in instructions if x["priority"] == "P1"]
+
+    if p0:
+        verdict, headline = "red", f"先修 {len(p0)} 条 P0：现在有假绿，任何「能跑」的结论都不作数"
+    elif p1:
+        verdict, headline = "yellow", f"{len(p1)} 条 P1：系统整体在，但有分类降级，改道或复检"
+    elif not tax.get("ok", True):
+        verdict, headline = "red", "分类表不严格，读数不可信"
+    else:
+        verdict, headline = "green", "12 根全绿，分类严格自校验通过 —— 维持，按需执行"
+
+    audit("brain_advise", {"verdict": verdict, "p0": len(p0), "p1": len(p1),
+                           "score": rep.get("score")})
+
+    return {
+        "ok": verdict == "green",
+        "verdict": verdict,
+        "headline": headline,
+        "score": rep.get("score"),
+        "tentacles_ok": rep.get("tentacles_ok"),
+        "tentacles_total": rep.get("tentacles_total"),
+        "taxonomy_ok": tax.get("ok"),
+        "instructions": instructions,
+        "counts": {"P0": len(p0), "P1": len(p1),
+                   "P2": len([x for x in instructions if x["priority"] == "P2"])},
+        "mode": rep.get("mode"),
+        "at": rep.get("at"),
+        "note": "指令由 brain_exec 出；触手只报状态，不越界下结论",
+    }
