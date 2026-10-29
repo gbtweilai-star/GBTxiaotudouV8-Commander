@@ -613,3 +613,78 @@ def advise(report: dict = None, mode: str = "light") -> dict:
         "at": rep.get("at"),
         "note": "指令由 brain_exec 出；触手只报状态，不越界下结论",
     }
+
+
+# ── 指令 → 执行（把闭环合上：只有清单没有动作，链条就断在最后一米）──
+# 哪些能自动干，写死在表里；**表外的一律不自动**。
+# 判据只有一条：这个动作**出错时只伤自己的抽屉**，才配自动。
+#   · 清垃圾 —— 只删 state/heartbeat/ 里自己的 tmp/pyc/超额扫描 ⇒ 可自动
+#   · 复检   —— 只是重打一跳读一次 ⇒ 可自动
+#   · 登记缺/分派缺/策略抛/成员消失 —— 要改代码或改分类表 ⇒ **必须人来做**
+_AUTO_ACTIONS: dict = {
+    "garbage_found": {"op": "heartbeat_clean",
+                      "why": "只在心跳自己的抽屉里清垃圾与超额扫描，不碰任何用户内容"},
+    "state_flip": {"op": "heartbeat_recheck",
+                   "why": "重打一跳确认哪次读数对（只读，无副作用）"},
+}
+
+
+@_spanned
+def act(report: dict = None, mode: str = "light", dry_run: bool = False) -> dict:
+    """把 advise() 里**可自动**的指令真的执行掉，然后重新定级 —— 闭环的最后一米。
+
+    为什么不全部自动：P0 那几条（登记缺/分派缺/策略抛/成员消失）都要改代码或改分类表，
+    自动改等于让系统自己给自己签字。**能自动的只有"出错只伤自己抽屉"的动作**（见
+    `_AUTO_ACTIONS`），表外一律跳过并写明为什么跳过。
+
+    返回 before/after 两次定级，让"执行完到底有没有变好"是可对照的，不是感觉。
+    """
+    from . import heartbeat_tentacle as HB
+
+    adv = advise(report, mode=mode)
+    executed, skipped = [], []
+
+    for ins in adv.get("instructions") or []:
+        code = (ins.get("evidence") or {}).get("signal_code")
+        auto = _AUTO_ACTIONS.get(code)
+        if not auto:
+            skipped.append({"id": ins.get("id"), "priority": ins.get("priority"),
+                            "why": "不在 _AUTO_ACTIONS 表内 —— 要改代码或改分类表，留给人",
+                            "action": ins.get("action")})
+            continue
+        if dry_run:
+            skipped.append({"id": ins.get("id"), "priority": ins.get("priority"),
+                            "why": "dry_run=True，只演练不执行", "would": auto["op"]})
+            continue
+        try:
+            if auto["op"] == "heartbeat_clean":
+                HB.scan_all(mode=mode, persist=True, clean=True)
+            elif auto["op"] == "heartbeat_recheck":
+                HB.scan_all(mode=mode, persist=True)
+            executed.append({"id": ins.get("id"), "op": auto["op"], "ok": True,
+                             "note": auto["why"]})
+        except Exception as e:  # noqa: BLE001
+            executed.append({"id": ins.get("id"), "op": auto["op"], "ok": False,
+                             "error": f"{type(e).__name__}: {str(e)[:140]}"})
+
+    # 执行完重新定级（对着刚落的盘读，不是拿旧报告糊弄）
+    after = advise(HB.latest(), mode=mode) if executed else {
+        "verdict": adv.get("verdict"), "counts": adv.get("counts"),
+        "headline": adv.get("headline")}
+
+    audit("brain_act", {"before": adv.get("verdict"), "after": after.get("verdict"),
+                        "executed": len(executed), "skipped": len(skipped),
+                        "dry_run": bool(dry_run)})
+
+    return {
+        "ok": all(x.get("ok") for x in executed) if executed else True,
+        "dry_run": bool(dry_run),
+        "before": {"verdict": adv.get("verdict"), "counts": adv.get("counts"),
+                   "headline": adv.get("headline")},
+        "after": {"verdict": after.get("verdict"), "counts": after.get("counts"),
+                  "headline": after.get("headline")},
+        "improved": (adv.get("verdict") != "green" and after.get("verdict") == "green"),
+        "executed": executed,
+        "skipped": skipped,
+        "note": "只执行 _AUTO_ACTIONS 表内的动作；表外一律留给人",
+    }

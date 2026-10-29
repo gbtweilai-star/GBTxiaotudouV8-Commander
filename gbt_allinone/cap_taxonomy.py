@@ -36,78 +36,69 @@ import sys
 
 # ── 12 大类（严格、互斥、全覆盖）──────────────────────────────────────────
 # key 用单字代号：既是分类 id，也是触手命名（heartbeat-身 / heartbeat-感 …）
+# 🔴 这里**不写探针名**。2026-10-30 实测踩过：本表原带 `"probe": "selfscan"`
+#    之类的标注，而触手实际跑的是 modules/policy/runtime ⇒ 两处口径打架，
+#    `taxonomy` 打印出来的"怎么自检"是假的。探针唯一真源 = `heartbeat_tentacle.PROBES`。
 CATEGORIES: dict = {
     "身": {
         "title": "身 · 操控部位",
         "domains": ["device", "desktop", "tentacle"],
         "desc": "这台机器的七根感官与六根动作，以及桌面操控与触手本体。",
-        "probe": "body_map",
     },
     "感": {
         "title": "感 · 感知输入",
         "domains": ["vision", "voice"],
         "desc": "看（屏幕/图像/接地）与听（语音识别/合成/编队）。",
-        "probe": "tentacle_status",
     },
     "知": {
         "title": "知 · 认知推理",
         "domains": ["mind", "brain"],
         "desc": "思维、意图、好奇、探索、议会、深推理等内在认知。",
-        "probe": "selfscan",
     },
     "言": {
         "title": "言 · 语言与模型",
         "domains": ["llm"],
         "desc": "大模型接入、密钥网关、上下文环、云端/本地推理。",
-        "probe": "selfscan",
     },
     "造": {
         "title": "造 · 内容生产",
         "domains": ["creation", "video", "image_video"],
         "desc": "图文、视频、音频、数字人、剪辑、调色、发布准备。",
-        "probe": "wf_status",
     },
     "工": {
         "title": "工 · 工具与流水线",
         "domains": ["tools", "engine", "pipeline"],
         "desc": "工具链、执行引擎、镜像房间与流水线编排。",
-        "probe": "wf_status",
     },
     "察": {
         "title": "察 · 侦察溯源",
         "domains": ["recon"],
         "desc": "溯源、窗口链、UI 元素抽取、域穿透侦察。",
-        "probe": "tentacle_status",
     },
     "守": {
         "title": "守 · 安全与许可",
         "domains": ["security"],
         "desc": "授权门、策略、出网硬钉、数据分级、审计、密钥保护。",
-        "probe": "policy_selftest",
     },
     "调": {
         "title": "调 · 系统运维",
         "domains": ["system", "infra"],
         "desc": "进程、文件、注册表、网络、巡检、基础设施。",
-        "probe": "selfscan",
     },
     "数": {
         "title": "数 · 数据与资产",
         "domains": ["data", "project", "finance"],
         "desc": "数据结构、项目台账、量化与账目。",
-        "probe": "selfscan",
     },
     "群": {
         "title": "群 · 协作与集成",
         "domains": ["social", "collab", "comms", "integration"],
         "desc": "社交平台、协作、通讯、第三方集成的接入面。",
-        "probe": "selfscan",
     },
     "进": {
         "title": "进 · 进化与自动化",
         "domains": ["devour", "automation", "longrun", "life", "framework"],
         "desc": "吞噬学习、自动化链、长跑任务、生命账、框架自身。",
-        "probe": "selfscan",
     },
 }
 
@@ -247,18 +238,25 @@ def audit() -> dict:
     }
 
 
-def describe() -> dict:
-    """人读总览：12 大类各自管什么、多少条、怎么自检。"""
+def describe(probes: dict = None) -> dict:
+    """人读总览：12 大类各自管什么、多少条、怎么自检。
+
+    探针名**不从这里出** —— 唯一真源是 `heartbeat_tentacle.PROBES`，要显示就传进来；
+    不传就如实写 None，绝不拿旧标注冒充现读（2026-10-30 踩过：分类表写 selfscan、
+    触手实际跑 modules，两处口径打架，打印出来的"怎么自检"是假的）。
+    """
     buckets = all_members()
     out = []
     for code, spec in CATEGORIES.items():
+        p = (probes or {}).get(code) or {}
         out.append({
             "code": code,
             "title": spec["title"],
             "desc": spec["desc"],
             "domains": spec["domains"],
             "cap_count": len(buckets[code]),
-            "probe": spec["probe"],
+            "probe": p.get("name") if p.get("kind") == "cap" else (p.get("kind") or None),
+            "probe_note": p.get("note"),
             "action_domains": [d for d, c in ACTION_DOMAIN_TO_CATEGORY.items() if c == code],
         })
     return {

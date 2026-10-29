@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T07:27:03+08:00",
+ "generated_at": "2026-10-30T07:46:49+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 763
+  "records": 764
  },
  "totals": {
-  "records": 763,
+  "records": 764,
   "scans": 30,
-  "changes": 598,
+  "changes": 599,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 464,
-   "ts": "2026-10-14T08:02:30+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "自家模型工具调用跑通:根因=chat_template.jinja 工具示范误写成双花括号,模型照抄致 hermes 解析器认不出;修法=改正模板(仓内两份+RunPod CUSTOM_CHAT_TEMPLATE)+解析器换 hermes+MAX_MODEL_LEN 16384->32768;实测 finish_reason=tool_calls",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:0ace5fa57f60d1c",
-   "prev": "sha256:bce04853f79ccd7"
-  },
   {
    "n": 465,
    "ts": "2026-10-14T08:23:50+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:574b8e4ebc1d05e",
    "prev": "genesis"
+  },
+  {
+   "n": 764,
+   "ts": "2026-10-30T07:46:49+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "建成12类心跳触手体系: cap_taxonomy分类真源349条精确覆盖 + heartbeat_tentacle六层自检(含卫生层) + brain_exec第六维heartbeat/advise; 私人仓c36c1b79 公开仓38adaaaa 双仓零差异",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:ef28661fe23d3ca",
+   "prev": "sha256:574b8e4ebc1d05e"
   }
  ]
 };
