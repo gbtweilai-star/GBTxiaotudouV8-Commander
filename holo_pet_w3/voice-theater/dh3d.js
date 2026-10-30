@@ -633,7 +633,7 @@
 
     renderer.render(scene, camera);
     S.frames += 1;
-    requestAnimationFrame(tick);
+    if (!_timerMode) requestAnimationFrame(tick);   /* 定时器兜底时不重复排队 */
   }
 
   /* 对外接口（真接线，不是占位） */
@@ -666,4 +666,24 @@
 
   resize();
   requestAnimationFrame(tick);
+
+  /* 🔴 2026-10-30 实测：本 WebView 里 requestAnimationFrame **可能完全不触发**
+     （stage3d.html 上 frames 一直是 0、triangles 只有 12 ⇒ 画面是空的）。
+     rAF 被节流/禁用时没有别的信号，所以加一道停滞检测：0.8 秒还一帧没走，就切定时器驱动。
+     这条只影响"没渲染"的环境，rAF 正常时完全不生效。 */
+  var _timerMode = false, _timer = null;
+  function goTimer(why) {
+    if (_timerMode) return;
+    _timerMode = true;
+    _timer = setInterval(function () { try { tick(performance.now()); } catch (e) {} }, 33);
+    if (window.console) console.warn("[dh3d] rAF 停摆（" + why + "）⇒ 切定时器驱动");
+  }
+  (function watchFrames() {
+    var last = -1, still = 0;
+    setInterval(function () {
+      var f = renderer && renderer.info && renderer.info.render ? renderer.info.render.frame : -1;
+      if (f === last) { still += 1; if (still >= 2) goTimer("frame 停在 " + f); }
+      else { still = 0; last = f; }
+    }, 1000);
+  })();
 })();

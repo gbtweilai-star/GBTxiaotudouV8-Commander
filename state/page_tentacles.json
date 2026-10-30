@@ -1,9 +1,9 @@
 {
  "ok": true,
- "at": "2026-10-30T13:51:58",
+ "at": "2026-10-30T14:22:58",
  "pages": 28,
  "covered": 28,
- "reported": 1,
+ "reported": 2,
  "rows": [
   {
    "page": "activity/index.html",
@@ -255,8 +255,8 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": null,
-   "reachable": false
+   "reported": "2026-10-30T14:13:56",
+   "reachable": true
   },
   {
    "page": "panel/index.html",
