@@ -2,88 +2,90 @@
 <html lang="zh-Hans">
 <head>
 <meta charset="utf-8">
-<title>本机权重 · 工人模式（极简）</title>
+<title>本机权重 · 工人（极简 v2）</title>
 <style>body{margin:0;background:#0b0e14;color:#cfe;font:13px/1.6 ui-monospace,monospace;padding:10px}
-#l{white-space:pre-wrap}#t{color:#7ef}</style>
+#t{color:#7ef;margin-bottom:8px}#l{white-space:pre-wrap}</style>
 </head>
 <body>
-<div id="t">工人模式启动中…</div>
+<div id="t">工人启动中…</div>
 <div id="l"></div>
 <script type="module">
-/* 🔴 2026-10-30：极简工人页 —— 只做一件事：长轮询领活 → 用整机 GPU 跑我们的权重 → 交回。
-   为什么不放 local-llm.html 里：那页要载 3D/自检，重得很，execute_js 都会超时，
-   出错时根本看不到日志。这里只有循环，出什么错一眼可见。 */
+/* 2026-10-31 极简 v2：只做三件事 —— 载引擎、报心跳、轮询领活并交回。
+   这次不用长轮询（桥重启会把工人挂死），2 秒一次短轮询 + 8 秒超时。 */
 const BASE = "http://127.0.0.1:8791";
 const L = document.getElementById("l");
 const T = document.getElementById("t");
-const log = (m) => { L.textContent += m + "\n"; if (L.textContent.length > 6000) L.textContent = L.textContent.slice(-4000); };
-window.__wlog = [];
-const push = (m) => { window.__wlog.push(m); if (window.__wlog.length > 60) window.__wlog.shift(); log(m); };
+window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, last: null };
+const say = (m) => { L.textContent += m + "\n"; if (L.textContent.length > 4000) L.textContent = L.textContent.slice(-2500); };
 
-window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, lastAt: null };
+async function post(path, body) {
+  const r = await fetch(BASE + path, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body || {})
+  });
+  return r.json();
+}
 
-(async function boot() {
-  let llm = null;
+function startHeartbeat(backend) {
+  const beat = () => { post("/_local/hb", { backend }).catch(() => {}); };
+  beat(); setInterval(beat, 10000);
+}
+
+(async () => {
+  let llm;
   try {
-    push("载入引擎…");
+    say("载入引擎…");
     const mod = await import("./local-llm.js");
     llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
     window.__worker.state = "ready";
     window.__worker.backend = llm.backend;
-    T.textContent = "工人就绪 · backend=" + llm.backend + " · 等下派活…";
-    push("引擎就绪 backend=" + llm.backend);
-    // 心跳：让我们这一侧知道"工人活着"，桥据此决定要不要把活儿派过来
-    (function hb(){ try { fetch(BASE + "/_local/hb", {method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({backend: llm.backend, at: Date.now()})}); } catch(e){}
-      setTimeout(hb, 10000); })();
+    T.textContent = "工人就绪 · backend=" + llm.backend;
+    say("引擎就绪 backend=" + llm.backend);
+    startHeartbeat(llm.backend);
   } catch (e) {
     window.__worker.state = "boot-failed";
     T.textContent = "引擎载入失败：" + (e && e.message || e);
-    push("引擎载入失败：" + (e && e.message || e));
+    say("引擎载入失败：" + (e && e.message || e));
     return;
   }
 
-  /* 短轮询（2s 一次，带 8s 超时）：比长轮询稳 —— 桥重启时旧连接不会把工人挂死。
-     这是实测踩出来的：长轮询 + 无超时 ⇒ jobs 卡住不动，桥上看到"工人不在岗"。 */
-  const done = new Set();
   for (;;) {
     try {
       const ac = new AbortController();
-      const to = setTimeout(() => ac.abort(), 8000);
+      const timer = setTimeout(() => ac.abort(), 8000);
       let d = null;
       try {
         const r = await fetch(BASE + "/_local/next?wait=0", { cache: "no-store", signal: ac.signal });
         d = await r.json();
-      } finally { clearTimeout(to); }
+      } finally { clearTimeout(timer); }
       const job = d && d.job;
-      if (job && !done.has(job.id)) {
-        done.add(job.id);
+      if (job) {
         window.__worker.jobs += 1;
-        window.__worker.lastAt = new Date().toISOString();
-        push("领活 " + job.id + "：" + String(job.text || "").slice(0, 30));
-        let payload = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
+        window.__worker.last = new Date().toISOString();
+        say("领活 " + job.id);
+        let out = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
         try {
-          const out = await llm.chat(String(job.text || ""), job.max_tokens || 48);
-          payload = { id: job.id, text: out.text, backend: llm.backend,
-                      tokPerSec: out.tokPerSec, tokens: out.tokens };
+          const r = await llm.chat(String(job.text || ""), job.max_tokens || 48);
+          out = { id: job.id, text: r.text, backend: llm.backend, tokPerSec: r.tokPerSec, tokens: r.tokens };
           window.__worker.ok += 1;
-        } catch (e) { window.__worker.fail += 1; push("算失败：" + (e && e.message || e)); }
-        await fetch(BASE + "/_local/result", { method: "POST",
-          headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-        push("交回 " + job.id + " → " + String(payload.text || "").slice(0, 40));
+        } catch (e) {
+          window.__worker.fail += 1;
+          say("算失败 " + (e && e.message || e));
+        }
+        /* 把交回的 id 与 HTTP 回执一起说出来：这一步是"桥等不到结果"的断点所在，
+           必须能看见它到底交了哪条、服务端收没收。 */
+        try {
+          const r = await post("/_local/result", out);
+          say("交回回执 " + JSON.stringify(r).slice(0, 90));
+        } catch (e) {
+          say("交回失败 " + (e && e.message || e));
+        }
+        say("交回 " + job.id + " → " + String(out.text || "").slice(0, 40));
       }
-    } catch (e) { /* 超时或桥不在，下一轮再试 */ }
-    await new Promise(z => setTimeout(z, 2000));
+    } catch (e) { /* 超时/桥不在：下一轮 */ }
+    await new Promise((z) => setTimeout(z, 2000));
   }
 })();
 </script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-boot.js?v=20261030"></script>
-
-<!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
-<script src="../shell/tentacle-bridge.js?v=20261029"></script>
-<script src="../shell/tentacle-boot.js?v=20261030"></script>
 </body>
 </html>
