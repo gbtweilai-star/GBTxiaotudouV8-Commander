@@ -666,6 +666,62 @@
      本 WebKit 里 browser screenshot 抓不到 WebGL、canvas.readPixels 又被 JS 桥拒收，
      所以**渲到离屏 RenderTarget 再 readRenderTargetPixels** —— 不依赖合成层、不依赖 preserveDrawingBuffer。
      读数：平均亮度 / 最大值 / 非黑像素占比。人物在画时应明显 > 0，全黑就是 0。 */
+  /* A/B 扫参：把「调这个参数画面会怎样」变成对照表，而不是靠肉眼。
+     每个候选值都：设参数 → 渲一帧 → 读中心 32×32 像素 → 记录 → 复原。
+     返回 [{name, avg, max, non}]，baseline 一定在第一行。 */
+  window.GBT_DH3D.ab = function () {
+    var R = renderer, SC = scene, CAM = camera, gl = R.getContext();
+    var N = 32;
+    function stat() {
+      R.render(SC, CAM);
+      var W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+      var px = new Uint8Array(N * N * 4);
+      gl.readPixels((W - N) >> 1, (H - N) >> 1, N, N, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      var s = 0, mx = 0, nb = 0;
+      for (var i = 0; i < px.length; i += 4) {
+        var v = px[i] + px[i + 1] + px[i + 2];
+        s += v; if (v > mx) mx = v; if (v > 12) nb += 1;
+      }
+      return { avg: Math.round(s / (N * N)), max: mx, non: Math.round(nb / (N * N) * 100) };
+    }
+    var lights = [], mats = [];
+    SC.traverse(function (o) {
+      if (o.isLight) lights.push(o);
+      if ((o.isMesh || o.isSkinnedMesh) && o.material) {
+        (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { if (m) mats.push(m); });
+      }
+    });
+    var out = [{ name: 'baseline' }];
+    var b = stat(); out[0].avg = b.avg; out[0].max = b.max; out[0].non = b.non;
+
+    var e0 = R.toneMappingExposure;
+    [0.85, 1.2].forEach(function (e) {
+      R.toneMappingExposure = e;
+      var r = stat(); out.push({ name: 'exposure=' + e, avg: r.avg, max: r.max, non: r.non });
+    });
+    R.toneMappingExposure = e0;
+
+    var pt = null;
+    for (var i = 0; i < lights.length; i++) if (lights[i].type === 'PointLight') { pt = lights[i]; break; }
+    if (pt) {
+      var i0 = pt.intensity;
+      [0.9, 1.3].forEach(function (v) {
+        pt.intensity = v;
+        var r = stat(); out.push({ name: 'faceLight=' + v, avg: r.avg, max: r.max, non: r.non });
+      });
+      pt.intensity = i0;
+    }
+    if (mats.length && ('envMapIntensity' in mats[0])) {
+      var v0 = mats[0].envMapIntensity;
+      [1.3, 1.8].forEach(function (v) {
+        mats.forEach(function (x) { if ('envMapIntensity' in x) x.envMapIntensity = v; });
+        var r = stat(); out.push({ name: 'envMap=' + v, avg: r.avg, max: r.max, non: r.non });
+      });
+      mats.forEach(function (x) { if ('envMapIntensity' in x) x.envMapIntensity = v0; });
+    }
+    return out;
+  };
+
   window.GBT_DH3D.pixels = function (n) {
     var N = n || 96;
     try {
