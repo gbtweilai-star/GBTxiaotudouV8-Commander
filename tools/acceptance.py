@@ -325,6 +325,30 @@ def sec_j() -> None:
         rec("ENV", "树规成立", "跑不起来：%s" % type(e).__name__)
 
 
+# ── K 页面自报（页面自己说它好不好）───────────────────────────────────
+#  2026-10-30：以前"页面好不好"只能打开肉眼看。现在页面带 ?_probe=1 会把
+#  真实读数（tris/frames/tps/top1）POST 给桥的 /_probe，落 state/page_probes.jsonl。
+#  这里读那份账并**按规则判决**（规则本身有 selftest 8/8 证明会亮红灯）。
+def sec_k() -> None:
+    print("\n── K 页面自报 ──")
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "page_probe.py"),
+                            "status", "--json"], capture_output=True, text=True,
+                           timeout=60, cwd=str(ROOT))
+        d = json.loads(r.stdout or "{}")
+        tot, okn, warn, red = d.get("total", 0), d.get("ok", 0), d.get("warn", 0), d.get("fail", 0)
+        if not tot:
+            rec("ENV", "页面自报", "还没有任何页面自报过（带 ?_probe=1 打开一次即可）")
+            return
+        rec("PASS" if red == 0 else "FAIL", "页面自报无红灯",
+            "%d 页 · ok %d / 警告 %d / 红 %d" % (tot, okn, warn, red))
+        for it in (d.get("pages") or [])[:6]:
+            if it.get("verdict") == "red":
+                rec("FAIL", "  ↳ " + str(it.get("page"))[-28:], str(it.get("why"))[:70])
+    except Exception as e:                                        # noqa: BLE001
+        rec("ENV", "页面自报", "读不起来：%s" % type(e).__name__)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
@@ -406,6 +430,7 @@ def main() -> int:
     # 孤儿审计放在汇总**之前**跑 —— 否则它记的 PASS/INFO 进不了总数（实测踩到）
     sec_i()
     sec_j()
+    sec_k()
 
     from collections import Counter
     c = Counter(s for s, _, _ in RESULTS)
