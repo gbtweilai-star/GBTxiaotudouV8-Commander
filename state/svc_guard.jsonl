@@ -1068,3 +1068,5 @@
 {"at": "2026-10-30T20:15:26", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 340}
 {"at": "2026-10-30T21:28:23", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 4194}
 {"at": "2026-10-30T21:28:23", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 4194}
+{"at": "2026-10-30T22:58:48", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 2024}
+{"at": "2026-10-30T22:58:48", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 2018}

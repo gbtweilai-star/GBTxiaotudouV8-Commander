@@ -635,7 +635,7 @@ class Handler(BaseHTTPRequestHandler):
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status",
-                 "/_cap", "/_tentacle/hello", "/_probe", "/_local", "/_see",
+                 "/_cap", "/_tentacle/hello", "/_probe", "/_local", "/_see", "/_proactive",
                  "/v1/messages", "/v1/messages/count_tokens")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -814,6 +814,36 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, {"ok": True, "id": rec["id"]})
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
+        if self.path.startswith("/_proactive"):
+            # 主动性引擎出口（2026-10-30）：页面心跳 / 取话 / 待办 / 睡觉
+            try:
+                import importlib.util as _iu3
+                _sp3 = _iu3.spec_from_file_location("_pa", str(ROOT / "tools" / "proactive.py"))
+                _m3 = _iu3.module_from_spec(_sp3)
+                _sp3.loader.exec_module(_m3)                       # type: ignore[union-attr]
+                _q = body or {}
+                sub = self.path.split("/_proactive")[-1].strip("/").split("?")[0] or "pull"
+                if sub == "heartbeat":
+                    return self._json(200, _m3.heartbeat(str(_q.get("surface") or "web")))
+                if sub == "tick":
+                    return self._json(200, _m3.tick(force=bool(_q.get("force"))))
+                if sub == "pull":
+                    return self._json(200, _m3.pull(int(_q.get("limit") or 10)))
+                if sub == "todo":
+                    if str(_q.get("do") or "list") == "add":
+                        return self._json(200, _m3.todo_add(str(_q.get("text") or ""),
+                                                            _q.get("due")))
+                    if str(_q.get("do")) == "done":
+                        return self._json(200, _m3.todo_done(str(_q.get("id") or "")))
+                    return self._json(200, _m3.todo_list())
+                if sub == "sleep":
+                    return self._json(200, _m3.set_sleep(bool(_q.get("on"))))
+                return self._json(200, {"ok": False, "error": "未知子路径：%s" % sub})
+            except Exception as exc:                               # noqa: BLE001
+                return self._json(200, {"ok": False,
+                                        "error": {"message": "%s: %s"
+                                                  % (type(exc).__name__, str(exc)[:120])}})
 
         if self.path.startswith("/_probe"):
             # 2026-10-30：页面自报读数。目的：巡检能像读 /health 一样读"页面现在好不好"，

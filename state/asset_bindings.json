@@ -18619,5 +18619,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T19:48:14"
+ },
+ "tools/proactive.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T23:14:23"
  }
 }
