@@ -662,6 +662,34 @@
      量到的姿势取决于"它慢到哪一帧"，同一份资产两次量出两个结果。
      拨钟之后量出来的就是"这段动作在 t 秒时的姿势"，可复现、可对比。
      返回 true = 真的拨了；false = 没有动作（bind 模式）或还没 ready。 */
+  /* 🔴 2026-10-30：证明"画面上到底有没有东西"的唯一可靠办法。
+     本 WebKit 里 browser screenshot 抓不到 WebGL、canvas.readPixels 又被 JS 桥拒收，
+     所以**渲到离屏 RenderTarget 再 readRenderTargetPixels** —— 不依赖合成层、不依赖 preserveDrawingBuffer。
+     读数：平均亮度 / 最大值 / 非黑像素占比。人物在画时应明显 > 0，全黑就是 0。 */
+  window.GBT_DH3D.pixels = function (n) {
+    var N = n || 96;
+    try {
+      var rt = new THREE.WebGLRenderTarget(N, N);
+      var old = renderer.getRenderTarget();
+      renderer.setRenderTarget(rt);
+      renderer.render(scene, camera);
+      var buf = new Uint8Array(N * N * 4);
+      renderer.readRenderTargetPixels(rt, 0, 0, N, N, buf);
+      renderer.setRenderTarget(old);
+      rt.dispose();
+      var sum = 0, mx = 0, non = 0;
+      for (var i = 0; i < buf.length; i += 4) {
+        var v = buf[i] + buf[i + 1] + buf[i + 2];
+        sum += v; if (v > mx) mx = v;
+        if (v > 12) non += 1;
+      }
+      return { ok: true, n: N, avg: Math.round(sum / (N * N)), max: mx,
+               nonblackPct: Math.round(non / (N * N) * 1000) / 10 };
+    } catch (e) {
+      return { ok: false, err: String(e && e.message || e) };
+    }
+  };
+
   window.GBT_DH3D._pose = function (t) {
     if (!mixer) return false;
     try {

@@ -641,6 +641,27 @@
  /* 可验读数口：帧号 / 三角形 / 定时器模式 —— 没有它就只能"看着像在动" */
  /* 调试口（只读）：定位"渲染在跑但画面空"这类问题必须能拿到真对象 */
  /* 手动渲一帧并回报统计：区分"没在跑"和"跑了但画不出" */
+ /* 像素探针：证明"画面上到底有没有东西"。
+    本 WebKit 里 browser screenshot 抓不到 WebGL —— 只能靠 readPixels 拿真值。
+    读数：平均亮度 / 最大值 / 非黑像素占比（人物在画时非黑占比应明显 > 0）。 */
+ window.GBT_RIG_PIXELS = function (n) {
+   var N = n || 16;
+   try {
+     renderer.render(scene, camera);
+     var gl = renderer.getContext();
+     var W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+     var px = new Uint8Array(N * N * 4);
+     gl.readPixels((W - N) >> 1, (H - N) >> 1, N, N, gl.RGBA, gl.UNSIGNED_BYTE, px);
+     var sum = 0, mx = 0, nb = 0;
+     for (var i = 0; i < px.length; i += 4) {
+       var v = px[i] + px[i + 1] + px[i + 2];
+       sum += v; if (v > mx) mx = v; if (v > 12) nb += 1;
+     }
+     return { ok: true, buffer: [W, H], avg: Math.round(sum / (N * N)), max: mx,
+              nonblackPct: Math.round(nb / (N * N) * 100) };
+   } catch (e) { return { ok: false, err: String(e && e.message || e) }; }
+ };
+
  window.GBT_RIG_RENDER_ONCE = function () {
    try {
      renderer.render(scene, camera);

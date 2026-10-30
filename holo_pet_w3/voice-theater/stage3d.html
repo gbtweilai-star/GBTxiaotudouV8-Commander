@@ -6,7 +6,7 @@
 <title>数字人 3D 舞台 · 读数专用</title>
 <!--
   2026-10-30 立。为什么单独一页：
-    ① 主页面 voice-theater/index.html 走 2D 画布，dh3d.js?v=1793345298 一直没被引用（孤儿）；
+    ① 主页面 voice-theater/index.html 走 2D 画布，dh3d.js?v=1793345962 一直没被引用（孤儿）；
     ② 想按 ?dh3d=1 懒加载，但实测 WebView 会把 query 吞掉（location.search 为空），
        懒加载器永不触发；
     ③ 所以给 3D 一个**独立入口**：脚本直挂、不经 query，用来读数与调试。
@@ -28,6 +28,6 @@
 <script src="vendor/three.min.js?v=1793345019"></script>
 <script src="vendor/BufferGeometryUtils.js"></script>
 <script src="vendor/GLTFLoader.js"></script>
-<script src="dh3d.js?v=1793345298"></script>
+<script src="dh3d.js?v=1793345962"></script>
 </body>
 </html>
