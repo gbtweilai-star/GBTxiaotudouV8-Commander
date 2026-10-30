@@ -8801,7 +8801,8 @@
  },
  "gbt_allinone/tests/test_iron_rules.py": {
   "tentacles": [
-   "tentacle_bind"
+   "tentacle_bind",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-29T08:20:36"
@@ -18535,5 +18536,19 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T07:28:29"
+ },
+ "tools/codex-scripts/iron-rules-negctl.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T09:29:15"
+ },
+ "tools/dh_readings.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T09:40:19"
  }
 }
