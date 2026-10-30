@@ -520,6 +520,25 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
         #   门只在 api 那条（net_guard）。门留在 V8 这边，能力才敢放出去。
         _pop = str(p.get("op") or p.get("action") or "status").lower()
         _sock = str(p.get("socket") or "").lower()
+        # 🔴 2026-10-30：万能插座 —— 不给 socket 时**现场判类**（同一个 classify，
+        #   纯字符串分析、不联网），再按判出的类挂门。门和执行看同一个判断。
+        if _pop in ("universal", "任意", "插") or (_pop == "run" and not _sock):
+            try:
+                import importlib.util as _iu2
+                import pathlib as _pl2
+                _sp = _iu2.spec_from_file_location(
+                    "_oa_pol",
+                    str(_pl2.Path(__file__).resolve().parents[2] / "tools" / "omni_adapter.py"))
+                _ma = _iu2.module_from_spec(_sp)
+                _sp.loader.exec_module(_ma)                        # type: ignore[union-attr]
+                _k = (_ma.classify(str(p.get("target") or "")).get("kind") or "unknown")
+            except Exception:                                      # noqa: BLE001
+                _k = "unknown"
+            _sock = {"http": "api", "ws": "api", "tcp": "api",
+                     "path": "file", "dir": "file", "bin": "process", "cmd": "process",
+                     "scheme": "app", "unix": "process",
+                     "mcp": "process", "remote": "process"}.get(_k, "process")
+            _pop = "run"
         if _pop == "run":
             if _sock == "process":
                 add("process_execute")
