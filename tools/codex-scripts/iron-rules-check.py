@@ -48,6 +48,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import pathlib
 import re
@@ -357,6 +358,112 @@ def rule12() -> dict:
             "gap": "" if (calls and records) else "常驻循环没真执行指令 —— 闭环只是纸面上的"}
 
 
+def rule13() -> dict:
+    """铁律13 自我描述自洽：她的总纲/自我介绍里的数字必须是**现算值**，写死的当场抓。
+
+    🔴 为什么单列一条（2026-10-30 深度对齐实测）：同一句"我有几个域"，
+       在这份仓里有**四个不同的数**，而且**同一份文件里前后矛盾**：
+         · `omni_tentacle.TENTACLE_MANIFEST` 标题写 `(8域)`，正文实有 9 个 `###` 小节 + 听觉段 = **10**
+         · `### 点击(15)` 后面实列 **16** 条；`### 窗口等待监控(19)` 后面实列 **20** 条
+         · AGENTS.md（开工必读）与 welcome.py（自我介绍）都抄了这个写死的「十域」
+       这不是笔误，是**她连自己有几个域都说不准** —— 报告的"能力自知"从第一句就是假的。
+
+    判据怎么才有牙：**不复用被测函数**。
+      源码字面量独立重算一遍（本条自己实现的 `_real_items`）→ 再读运行时 `get_manifest()`
+      → 断言两者相等。若哪天有人把 `_sync_manifest_counts/_sync_manifest_title` 删了、
+      或正则被改坏，运行时会**回落到源码手写值**（15/19/8），本条立刻红。
+      如果反过来"调被测函数算出期望值"，那是自己判自己，永远绿 —— 等于没写。
+    """
+    src_p = WS / "gbt_allinone" / "tentacle" / "omni_tentacle.py"
+    try:
+        src = src_p.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return {"ok": False, "gap": "omni_tentacle.py 读不到：%s" % exc}
+
+    # ① 源码字面量 → 独立重算期望值
+    parts = src.split('TENTACLE_MANIFEST = """', 1)
+    if len(parts) != 2:
+        return {"ok": False, "gap": "找不到 TENTACLE_MANIFEST 字面量（改名了？判据要跟着改）"}
+    body = parts[1].split('"""', 1)[0]
+
+    def _real_items(chunk: str) -> int:
+        n = 0
+        for it in [x.strip() for x in chunk.split(",") if x.strip()]:
+            agg = re.match(r"^\S+\(\s*(\d+)\s*\)$", it)      # 聚合缩写 `task_guide_*(6)`
+            n += int(agg.group(1)) if agg else 1
+        return n
+
+    want = {m.group(1): _real_items(m.group(2))
+            for m in re.finditer(r"(?m)^###\s+([^(\n]+?)\(\d+\)\s*[:：]\s*(.+)$", body)}
+    want_dom = max([len(want)] + [int(x) for x in re.findall(r"第\s*(\d+)\s*域", body)])
+
+    # ② 运行时读数
+    if str(WS) not in sys.path:
+        sys.path.insert(0, str(WS))
+    try:
+        from gbt_allinone.tentacle import bridge as TB
+        got = TB.get_manifest()
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "gap": "get_manifest() 跑不起来：%s: %s" % (type(exc).__name__, exc)}
+    head = (got.splitlines() or [""])[0]
+    mh = re.search(r"\((\d+)\s*域\)", head)
+    got_dom = int(mh.group(1)) if mh else -1
+
+    drift = []
+    if got_dom != want_dom:
+        drift.append("标题写 %d 域 / 正文明算 %d 域" % (got_dom, want_dom))
+    for m2 in re.finditer(r"(?m)^###\s+([^(\n]+?)\((\d+)\)\s*[:：]", got):
+        name, n = m2.group(1), int(m2.group(2))
+        if name in want and want[name] != n:
+            drift.append("%s 写 %d 条 / 实列 %d 条" % (name, n, want[name]))
+
+    # ③ 自我介绍里不许出现写死的域数（只查正文字符串，不查注释/说明引用 —— 否则假红）
+    #
+    # 🔴 2026-10-30 负控抓出来的洞：原来这里写 `from gbt_allinone.welcome import WELCOME`，
+    #    结果**喂进"十域触手"它照样绿** —— 因为模块缓存（sys.modules）里还是老值，
+    #    改磁盘根本不影响它。判据读的是"进程内存里那份"，不是"盘上那份"。
+    #    ⇒ 改成**直接解析源文件**（ast.literal_eval 还原 \n 转义）：零缓存、零副作用，
+    #      盘上是什么就判什么。这也是负控存在的意义 —— 它当场把这个假判据咬出来了。
+    hard = []
+    wl_p = WS / "gbt_allinone" / "welcome.py"
+    try:
+        wl_src = wl_p.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        wl_src = ""
+    mw = re.search(r'(?m)^WELCOME\s*=\s*("(?:[^"\\]|\\.)*")', wl_src)
+    if not mw:
+        hard.append("welcome.py 里抽不出 WELCOME 字面量（自我介绍是必含件，抽不出本身就是红）")
+        welcome_text = ""
+    else:
+        try:
+            welcome_text = ast.literal_eval(mw.group(1))
+        except Exception:  # noqa: BLE001
+            welcome_text = ""
+            hard.append("welcome.WELCOME 字面量解析不了")
+        hit = re.search(r"[一二两三四五六七八九十百零〇\d]+\s*(域|大类)", welcome_text)
+        if hit:
+            hard.append("welcome.WELCOME 写死了数量：%r" % hit.group(0))
+
+    # ④ 生成物不许漂移：WELCOME 里的长句必须都出现在启动页上（页面由 WELCOME 逐行渲染）
+    page = WS / "holo_pet_w3" / "welcome" / "index.html"
+    if page.exists():
+        try:
+            html = page.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            html = ""
+        miss = [ln for ln in welcome_text.splitlines()
+                if len(ln.strip()) >= 8 and ln.strip() not in html]
+        if miss:
+            hard.append("启动页没跟上自我介绍（%d 句没渲进去，例：%r）" % (len(miss), miss[0][:24]))
+    else:
+        hard.append("启动页 holo_pet_w3/welcome/index.html 不存在")
+
+    bad = drift + hard
+    return {"ok": not bad, "标题域数": got_dom, "正文明算域数": want_dom,
+            "小节数": len(want), "漂移": drift, "写死": hard,
+            "gap": "；".join(bad) if bad else ""}
+
+
 _NEW_RULES = [
     ("铁律4·双仓不许搞错", rule4),
     ("铁律5·非法路径零容忍", rule5),
@@ -367,6 +474,7 @@ _NEW_RULES = [
     ("铁律10·缺字段≠假", rule10),
     ("铁律11·全局根因单票", rule11),
     ("铁律12·闭环真接上", rule12),
+    ("铁律13·自我描述自洽", rule13),
 ]
 
 

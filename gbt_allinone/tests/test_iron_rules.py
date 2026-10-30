@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""十二条铁律的判据（1~3 主人令 2026-10-11 · 4~12 主人令 2026-10-30）。
+"""十三条铁律的判据（1~3 主人令 2026-10-11 · 4~13 主人令 2026-10-30）。
 
 硬指令正文：HEARTBEAT.md 顶部「十二条铁律」那一节；条款与实测后果见 AGENTS.md
 「🔒 习惯与部署铁律」。本件只做一件事：**把那份判据挂进开机自检**，让铁律每次都现算。
@@ -32,18 +32,33 @@ class TestIronRules(unittest.TestCase):
         for k in ("铁律1·禁止脑补", "铁律2·必须带参", "铁律3·先纠错再回答"):
             self.assertIn(k, self.rep.get("parts") or {}, "缺这一条：%s" % k)
 
-    def test_all_twelve_rules_present(self):
-        """4~12（2026-10-30 定死）必须都在，且 check() 一起判。
+    def test_all_thirteen_rules_present(self):
+        """4~13（2026-10-30 定死）必须都在，且 check() 一起判。
 
         锁这条的理由：铁律被"续写"进同一个入口，最容易出的问题是**新加的悄悄掉了**
         —— 脚本还能跑、还是全绿，但少判了一半。总数对不上就是掉了。
         """
         parts = self.rep.get("parts") or {}
-        self.assertEqual(len(parts), 12, "铁律条数应为 12，实际 %d：%s" % (len(parts), list(parts)))
+        self.assertEqual(len(parts), 13, "铁律条数应为 13，实际 %d：%s" % (len(parts), list(parts)))
         for k in ("铁律4·双仓不许搞错", "铁律5·非法路径零容忍", "铁律6·抽屉有上限",
                   "铁律7·跳过≠通过", "铁律8·必须有负控", "铁律9·护栏只增不减",
-                  "铁律10·缺字段≠假", "铁律11·全局根因单票", "铁律12·闭环真接上"):
+                  "铁律10·缺字段≠假", "铁律11·全局根因单票", "铁律12·闭环真接上",
+                  "铁律13·自我描述自洽"):
             self.assertIn(k, parts, "缺这一条：%s" % k)
+
+    def test_rule13_domain_count_is_computed_not_written(self):
+        """铁律13 的核心读数：标题域数必须等于正文明算值（写死就会不等）。
+
+        负控（喂故障必须判红）在 `tools/codex-scripts/iron-rules-negctl.py` 里跑完整三路；
+        这里只锁**正控读数**，保证条目在、且给的是数不是布尔。
+        """
+        r = self.rep["parts"]["铁律13·自我描述自洽"]
+        self.assertEqual(r.get("标题域数"), r.get("正文明算域数"),
+                         "标题域数与正文明算值打架：%s vs %s"
+                         % (r.get("标题域数"), r.get("正文明算域数")))
+        self.assertIsInstance(r.get("小节数"), int)
+        self.assertEqual(r.get("漂移"), [], "总纲里还有写死没现算的行：%s" % r.get("漂移"))
+        self.assertEqual(r.get("写死"), [], "自我介绍/启动页还有写死数量：%s" % r.get("写死"))
 
     def test_every_rule_reports_a_verdict(self):
         """每条都必须给出布尔裁决 —— 缺 ok 就等于"没法判"，不许混在全绿里。"""
