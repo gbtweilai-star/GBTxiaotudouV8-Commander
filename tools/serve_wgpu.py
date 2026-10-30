@@ -33,6 +33,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    # 🔴 2026-10-30：页面里的脚本 URL 带固定版本号（?v=20261029），
+    #   改了内容但 URL 不变 ⇒ 浏览器一直吃旧缓存，改了等于没改（今天踩了两次）。
+    #   在服务端禁掉缓存，比去改 401 个 page 的 script 标签干净。
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
     def end_headers(self):
         # 这两行是 SharedArrayBuffer 的门
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")

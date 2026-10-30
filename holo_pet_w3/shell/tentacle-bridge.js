@@ -100,3 +100,45 @@
     }, 600);
   });
 })();
+  /* ── 统一自证（2026-10-30）──────────────────────────────────────────
+     为什么放在壳里：401 个页面各自实现一遍既重复又会走偏。
+     只要页面带 ?_probe=1 打开，就由壳替它做两件事：
+       ① 真调一次能力位（走 /_cap → run_task），证明"本页真能穿透到执行层"
+       ② 把证据 POST 给桥 /_probe，落 state/page_probes.jsonl
+     不带 ?_probe=1 时**完全零开销**（连这个函数都不会执行）。 */
+  (function autoProbe() {
+    if (!/[?&]_probe=1/.test(location.search)) return;
+    function bridgeBase() {
+      // ⚠️ 本段在 IIFE 之外，`BR` 不可见（踩过：ReferenceError 被 catch 吞掉，自报永远不发生）
+      return (window.gbtW3 && window.gbtW3.bridge) || "http://127.0.0.1:8791";
+    }
+    function report() {
+      var t0 = performance.now();
+      var BR2 = bridgeBase();
+      window.gbtW3.cap("health", {}).then(function (r) {
+        var payload = {
+          page: (location.pathname || "").replace(/^\//, ""),
+          ok: !!(r && r.ok),
+          readings: {
+            cap_ok: !!(r && r.ok),
+            cap_ms: Math.round(performance.now() - t0),
+            cap_python: (r && r.result && r.result.python) || null
+          }
+        };
+        return fetch(BR2 + "/_probe", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      }).catch(function (e) {
+        try {
+          fetch(bridgeBase() + "/_probe", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ page: (location.pathname || "").replace(/^\//, ""),
+              ok: false, readings: { cap_ok: false, cap_err: String(e && e.message || e).slice(0, 80) } })
+          });
+        } catch (e2) { /* 桥也不在，就什么都不做（页面照常可用） */ }
+      });
+    }
+    if (document.readyState === "complete") setTimeout(report, 1200);
+    else window.addEventListener("load", function () { setTimeout(report, 1200); });
+  })();

@@ -41,3 +41,6 @@
 {"at": "2026-10-30T14:14:33", "role": "user", "text": "What is the capital of France?", "upstream": "local:gpu", "model": null, "source": "page"}
 {"at": "2026-10-30T14:14:33", "role": "assistant", "text": "The French language french english-englishlanguage is a native EnglishEnglishis not only has been translated into french english to French language is in the English.\nEnglishlanguageis a native of french english to French language is in the English.", "upstream": "local:gpu", "model": null, "source": "page"}
 {"at": "2026-10-30T14:14:33", "role": "sensor", "text": "{\"event\":\"answer\",\"lane\":\"local:gpu\",\"ours\":true,\"ttft_s\":\"0.2\",\"total_s\":1.37,\"chars\":249}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T15:28:22", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T15:29:24", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T15:31:13", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
