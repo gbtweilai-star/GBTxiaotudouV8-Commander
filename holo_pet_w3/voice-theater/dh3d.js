@@ -564,7 +564,18 @@
     }
   }
 
+  /* 🔴 2026-10-30 铁证：把"帧驱动到底走到哪一步"记进可读数组 —— 不再靠猜 rAF 为什么不跑。 */
+  window.__wfLog = [];
+  function _wf(ev, extra) {
+    if (window.__wfLog.length < 200) {
+      window.__wfLog.push({ at: Date.now(), ev: ev, extra: extra === undefined ? null : extra,
+                            timerMode: !!_timerMode, frames: DH.frames });
+    }
+  }
+  _wf('module-init-done');
+
   function tick(now) {
+    _wf('tick');
     var t = (now - clockStart) / 1000;
     if (mixer) mixer.update(0.016);    if (mixer) {
       mixer.update(0.016);
@@ -767,7 +778,8 @@
   function goTimer(why) {
     if (_timerMode) return;
     _timerMode = true;
-    _timer = setInterval(function () { try { tick(performance.now()); } catch (e) {} }, 33);
+    _wf('goTimer', why);
+    _timer = setInterval(function () { try { tick(performance.now()); } catch (e) { _wf('tick-throw', String(e && e.message || e)); } }, 33);
     if (window.console) console.warn("[dh3d] rAF 停摆（" + why + "）⇒ 切定时器驱动");
   }
   (function watchFrames() {
@@ -776,6 +788,7 @@
       var f = renderer && renderer.info && renderer.info.render ? renderer.info.render.frame : -1;
       if (f === last) { still += 1; if (still >= 2) goTimer("frame 停在 " + f); }
       else { still = 0; last = f; }
+      _wf('watch', { frame: f, still: still });
     }, 1000);
   })();
 })();
