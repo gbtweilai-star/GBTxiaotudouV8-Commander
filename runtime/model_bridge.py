@@ -96,7 +96,9 @@ UPSTREAMS = {
 # 🔴 2026-10-31 主人令（最终口径）：**A19 是必须的主脑，不是可选**。
 #   默认车道 = selfhost（A19 · 我们的 7.6B 权重，LM Pocket 提供推理运行时）；
 #   我们自己的整机 GPU 权重（ownweights）作为**触手侧后备**：A19 不可用时顶上。
-DEFAULT = "selfhost"
+# 🔴 2026-10-31 主人令（最终）：**弃用 LM Pocket**。
+#   我们自己的无限制权重（整机 GPU · 浏览器内 GGUF）就是唯一主车道。
+DEFAULT = "ownweights"
 
 # 🔴 2026-10-31（主人令：本机算力限流给他去掉）：
 #   429 是 **LM Pocket 容器**给的（"Too many inference requests"），不是我们设的。
@@ -194,9 +196,9 @@ if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
     #   A19 被它的 429/挂起卡住时，不允许我们这边变成"没答案"。
     #   所以默认链就是 selfhost → ownweights（我们自己的整机 GPU 权重）。
     #   工人不在岗时由 _worker_alive() 快速跳过，不会挂 180 秒。
-    # A19 为主；不可用时落到**我们自己的整机 GPU 权重**（不是云）。
-    FALLBACK["selfhost"] = ["ownweights"]
-    FALLBACK["local"] = ["ownweights"]
+    # 只走我们自己的权重；A19 已弃用，不再进任何链。
+    FALLBACK["selfhost"] = []
+    FALLBACK["local"] = []
     FALLBACK["ownweights"] = []
 
 

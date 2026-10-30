@@ -18657,7 +18657,8 @@
  },
  "tools/weights.py": {
   "tentacles": [
-   "omni_plug"
+   "omni_plug",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-31T05:51:19"

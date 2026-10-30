@@ -44,40 +44,37 @@ window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, la
     return;
   }
 
+  /* 短轮询（2s 一次，带 8s 超时）：比长轮询稳 —— 桥重启时旧连接不会把工人挂死。
+     这是实测踩出来的：长轮询 + 无超时 ⇒ jobs 卡住不动，桥上看到"工人不在岗"。 */
+  const done = new Set();
   for (;;) {
     try {
-      /* 必须带超时：桥重启/挂起时旧连接会**永远挂着**，工人就此僵死（实测 jobs 卡在 1 不动）。
-         35s > 服务端 25s 长轮询，正常不会误杀。 */
       const ac = new AbortController();
-      const _to = setTimeout(() => ac.abort(), 35000);
-      let r;
+      const to = setTimeout(() => ac.abort(), 8000);
+      let d = null;
       try {
-        r = await fetch(BASE + "/_local/next?wait=25", { cache: "no-store", signal: ac.signal });
-      } finally { clearTimeout(_to); }
-      const d = await r.json();
+        const r = await fetch(BASE + "/_local/next?wait=0", { cache: "no-store", signal: ac.signal });
+        d = await r.json();
+      } finally { clearTimeout(to); }
       const job = d && d.job;
-      if (!job) continue;
-      window.__worker.jobs += 1;
-      window.__worker.lastAt = new Date().toISOString();
-      push("领活 " + job.id + "：" + String(job.text || "").slice(0, 40));
-      let payload = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
-      try {
-        const out = await llm.chat(String(job.text || ""), job.max_tokens || 48);
-        payload = { id: job.id, text: out.text, backend: llm.backend,
-                    tokPerSec: out.tokPerSec, tokens: out.tokens };
-        window.__worker.ok += 1;
-      } catch (e) {
-        window.__worker.fail += 1;
-        push("算失败：" + (e && e.message || e));
+      if (job && !done.has(job.id)) {
+        done.add(job.id);
+        window.__worker.jobs += 1;
+        window.__worker.lastAt = new Date().toISOString();
+        push("领活 " + job.id + "：" + String(job.text || "").slice(0, 30));
+        let payload = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
+        try {
+          const out = await llm.chat(String(job.text || ""), job.max_tokens || 48);
+          payload = { id: job.id, text: out.text, backend: llm.backend,
+                      tokPerSec: out.tokPerSec, tokens: out.tokens };
+          window.__worker.ok += 1;
+        } catch (e) { window.__worker.fail += 1; push("算失败：" + (e && e.message || e)); }
+        await fetch(BASE + "/_local/result", { method: "POST",
+          headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        push("交回 " + job.id + " → " + String(payload.text || "").slice(0, 40));
       }
-      await fetch(BASE + "/_local/result", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      push("交回 " + job.id + " → " + String(payload.text || "(空)").slice(0, 50));
-    } catch (e) {
-      await new Promise(z => setTimeout(z, 1200));
-    }
+    } catch (e) { /* 超时或桥不在，下一轮再试 */ }
+    await new Promise(z => setTimeout(z, 2000));
   }
 })();
 </script>

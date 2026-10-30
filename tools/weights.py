@@ -113,17 +113,16 @@ def _via_queue(text: str, max_tokens: int, wait_s: float = 90.0) -> dict:
 
 
 def chat(text: str, max_tokens: int = 128, wait_s: float = 90.0) -> dict:
-    """唯一入口：我们的权重。① A19 在线 → 直接答；② 否则入队由后台大脑拉起；③ 都不行如实报。"""
-    if a19_ok():
-        r = _a19_chat(text, max_tokens)
-        if r.get("ok"):
-            return r
-    if _fresh(BRAIN_HB, 60):
+    """唯一入口：**我们自己的无限制权重**（整机 GPU · 浏览器内 GGUF）。
+    2026-10-31 主人令：LM Pocket 已弃用，这里不再碰它。"""
+    if _fresh(WORKER_HB, 45):
         r = _via_queue(text, max_tokens, wait_s)
         if r.get("ok"):
             return r
+        return {"ok": False, "lane": "ownweights", "weights_ours": True,
+                "error": "工人页在岗但没交回（%s）—— 不换外部模型" % (r.get("err") or "")}
     return {"ok": False, "lane": None, "weights_ours": False,
-            "error": "我们的权重此刻不可用（A19 被挂起且后台大脑不在岗）—— 不换外部模型"}
+            "error": "我们的工人页不在岗（需要开着 worker.html）—— 不换外部模型"}
 
 
 if __name__ == "__main__":

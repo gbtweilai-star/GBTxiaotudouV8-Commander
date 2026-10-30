@@ -19,3 +19,7 @@
 {"id": "L1793396289238", "at": "2026-10-31T04:38:22", "text": "I'm a little bit of an old", "backend": "gpu", "tokPerSec": 37.1, "tokens": 8}
 {"id": "L1793396333319", "at": "2026-10-31T05:45:26", "text": "The answer to this question is: 102573", "backend": "gpu", "tokPerSec": 34.3, "tokens": 14}
 {"id": "L1793400369524", "at": "2026-10-31T05:50:09", "text": "", "backend": "err", "tokPerSec": null, "tokens": null, "sec": null, "err": "RemoteDisconnected"}
+{"id": "L1793400658017", "at": "2026-10-31T05:57:36", "text": "I'm a little girl with the bestselling author and writer, I've been doing this story's got a little bit", "backend": "gpu", "tokPerSec": 38.52, "tokens": 24}
+{"id": "W1793400717528", "at": "2026-10-31T05:57:36", "text": "I'm a seasoned sailor and pirate captain of the \"The Adventures Ofy-the_of _a sailor and a", "backend": "gpu", "tokPerSec": 37.42, "tokens": 24}
+{"id": "W1793400825312", "at": "2026-10-31T05:57:37", "text": "I'm a little girl with the most amazing and super coolest of you.", "backend": "gpu", "tokPerSec": 39.4, "tokens": 16}
+{"id": "L1793401100939", "at": "2026-10-31T06:00:45", "text": "The answer for this question is it a city in France", "backend": "gpu", "tokPerSec": 38.82, "tokens": 11}

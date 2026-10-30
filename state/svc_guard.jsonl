@@ -1712,3 +1712,7 @@
 {"at": "2026-10-31T05:50:26", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 932}
 {"at": "2026-10-31T05:51:32", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 4194}
 {"at": "2026-10-31T05:51:32", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 4194}
+{"at": "2026-10-31T05:57:37", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 3002}
+{"at": "2026-10-31T05:57:37", "act": "kill_frozen", "svc": "哨兵 a19", "killed": true, "mem_mb": 3002}
+{"at": "2026-10-31T05:57:36", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 2943}
+{"at": "2026-10-31T05:57:36", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 2943}
