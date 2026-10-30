@@ -312,41 +312,97 @@ def execute(kind: str = "", payload: dict = None, parallel: list = None,
 # ── 维度三：verify（触手肉眼验证——先看再动）──
 
 @_spanned
-def verify(expectation: str = "", window: str = None) -> dict:
-    """用触手的眼睛验证现实：抓全屏帧 + 感知指纹 + （可选）目标窗口内容读回。
+def _probe_port(port: int, host: str = "127.0.0.1", timeout: float = 2.0) -> tuple:
+    """真连一次。TCP 通只算"在听"，能不能答还得看调用方要不要 HTTP。"""
+    import socket as _s
+    sk = _s.socket()
+    sk.settimeout(timeout)
+    try:
+        sk.connect((host, port))
+        return True, "TCP 可连"
+    except Exception as exc:                                      # noqa: BLE001
+        return False, type(exc).__name__
+    finally:
+        sk.close()
 
-    expectation 只是记录预期（供人对照），验证证据是视觉/读回的原始数据。
+
+_VERIFY_PATTERNS = (
+    # 「panel_server :8765 应该在线」/「static_pages :8080 应该在线」
+    (r":(\d{2,5})\s*应该在线", "port"),
+    # 「文件 holo_pet/panel_server.py 存在」/「文件 X 在」
+    (r"文件\s+(\S+)\s*(?:存在|在)", "file"),
+)
+
+
+def _reality_faces(expectation: str) -> list:
+    """把一句人话翻成**机器能验的现实面**。翻不出来就返回空（= 没有可验证面）。"""
+    import os as _os
+    import re as _re
+    root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    faces = []
+    for pat, kind in _VERIFY_PATTERNS:
+        for m in _re.finditer(pat, expectation):
+            if kind == "port":
+                port = int(m.group(1))
+                ok, detail = _probe_port(port)
+                faces.append({"face": "port:%d" % port, "ok": ok, "detail": detail})
+            else:
+                rel = m.group(1).strip().strip("，,。.\"'")
+                path = rel if _os.path.isabs(rel) else _os.path.join(root, rel)
+                ok = _os.path.exists(path)
+                faces.append({"face": "file:%s" % rel, "ok": ok,
+                              "detail": "存在" if ok else "不在盘上：%s" % path})
+    return faces
+
+
+def verify(expectation: str = "", window: str = None) -> dict:
+    """验证现实。两路证据，先机器面、再视觉面。
+
+    2026-10-30 修：mirror_panel 期望 `verdict` / `counted_faces`，而本函数原来只返回
+    vision/window 两项 —— 在 Linux 上没有 GDI/DXGI ⇒ 永远 unverified_no_surface，
+    于是"放行前验现实"这道门形同虚设（全都判 unknown）。
+    现在先把人话翻成可验的现实面（端口在听 / 文件在盘），验得出就用它下判；
+    验不出才退回视觉面，并如实标 unverified_no_surface。
     """
-    from .tentacle import bridge as TB
-    from .tentacle import vision_bus as VB
     t0 = time.time()
     checks = {}
-    # 1) 视觉证据（全屏帧 + 指纹）
+    faces = _reality_faces(expectation or "")
+
+    if faces:
+        ok = all(f["ok"] for f in faces)
+        return {"ok": ok,
+                "verdict": "verified" if ok else "failed",
+                "expectation": expectation[:200],
+                "counted_faces": faces,
+                "faces": len(faces),
+                "checks": {"reality": {"ok": ok, "faces": len(faces)}},
+                "elapsed_ms": round((time.time() - t0) * 1000, 1)}
+
+    # 退回视觉面（原行为，保留）
     try:
+        from .tentacle import bridge as TB
+        from .tentacle import vision_bus as VB
         eye = TB.get_eye()
         snap = VB.snapshot(eye, ttl=30)
         checks["vision"] = {"ok": bool(snap.get("ok")),
-                             "fingerprint": snap.get("fingerprint"),
-                             "size": snap.get("size")}
+                            "fingerprint": snap.get("fingerprint"),
+                            "size": snap.get("size")}
     except Exception as e:  # noqa: BLE001
         checks["vision"] = {"ok": False, "error": str(e)[:80]}
-    # 2) 目标窗口读回（domain_read——UIA 穿透）
     if window:
         try:
+            from .tentacle import bridge as TB
             r = TB.invoke("domain_read", window)
-            checks["window_read"] = {"ok": bool(r.get("ok")),
-                                      "sample": str(r)[:200]}
+            checks["window_read"] = {"ok": bool(r.get("ok")), "sample": str(r)[:200]}
         except Exception as e:  # noqa: BLE001
             checks["window_read"] = {"ok": False, "error": str(e)[:80]}
     ok = all(c.get("ok") for c in checks.values()) if checks else False
     audit("brain_verify", {"ok": ok, "expectation": expectation[:60]})
     return {"ok": ok, "expectation": expectation[:200], "checks": checks,
+            "verdict": "verified" if ok else "unverified_no_surface",
+            "counted_faces": [], "faces": 0,
             "elapsed_ms": round((time.time() - t0) * 1000, 1)}
 
-
-# ── 维度四：health（执行层自检评分）──
-
-@_spanned
 def health() -> dict:
     """五维各自健康度 + 总分（大脑执行层的体检）。"""
     from .api import run_task
