@@ -83,7 +83,9 @@ def heal_bind(check_only: bool) -> dict:
 def check_pages() -> dict:
     """③④ 每页覆盖 + 互通直达：kit/壳/gbtW3 三样都要在。"""
     rc, out = _run([str(TOOLS / "page_tentacle.py"), "scan"])
-    lines = [l.strip() for l in out.splitlines() if "index.html" in l]
+    # 🔴 2026-10-30：原来只统计 "index.html" 的行 ⇒ 独立页（wgpu/local-llm.html 等）
+    #   全被漏掉，树规嘴上说通过、实际没看它们。改成认所有 .html 行。
+    lines = [l.strip() for l in out.splitlines() if ".html" in l]
     bad = []
     for l in lines:
         if "kit=有" not in l or "壳=有" not in l:

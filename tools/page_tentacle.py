@@ -39,9 +39,12 @@ HELLO = ROOT / "state" / "page_tentacle_hello.jsonl"
 
 def pages() -> list:
     out = []
-    for p in sorted(W3.rglob("index.html")):
+    # 🔴 2026-10-30：原来只扫 index.html ⇒ **独立页（local-llm.html / bench-matvec.html /
+    #   probe.html 这类）根本不在规则视野里**，等于树规对它们不存在。
+    #   改成扫所有 .html，排除 _archive / _retired / vendor（第三方件不注入）。
+    for p in sorted(W3.rglob("*.html")):
         rel = p.relative_to(W3).as_posix()
-        if "_archive" in rel:
+        if "_archive" in rel or "_retired" in rel or rel.startswith("vendor/") or "/vendor/" in rel:
             continue
         out.append(p)
     return out
