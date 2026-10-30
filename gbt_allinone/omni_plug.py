@@ -920,6 +920,22 @@ def run(op: str = "status", **kw) -> dict:
             except Exception as _e:                                  # noqa: BLE001
                 pass   # iOS 实现不可用 ⇒ 落到桌面路径，失败原因由那条路如实报
 
+    # 🔴 2026-10-30 主人令：**不要固定的六类插座**，要真正的万能插座。
+    #   op=universal（或不给 socket 的 run）⇒ 现场判断 target 是什么，再生成适配器执行。
+    #   这样「第 7 种、第 8 种」不需要我预先加类目：认得出就能干，认不出会如实说认不出。
+    if op in ("universal", "任意", "插") or (
+            op == "run" and not str(kw.get("socket") or "").strip()):
+        import importlib.util as _iu
+        _ap = _iu.spec_from_file_location(
+            "_omni_adapter",
+            str(__file__).replace("gbt_allinone/omni_plug.py", "tools/omni_adapter.py"))
+        _m = _iu.module_from_spec(_ap)
+        _ap.loader.exec_module(_m)                                # type: ignore[union-attr]
+        tgt = str(kw.get("target") or "")
+        info = _m.classify(tgt)
+        r = _m.execute(tgt, str(kw.get("do") or kw.get("verb") or ""), kw.get("args") or {})
+        return dict({"op": "universal", "socket": "auto", "classify": info}, **r)
+
     if op in ("discover", "scan_local", "可插面"):
         return discover(deep=bool(kw.get("deep")))
     if op in ("wb", "wb_chat", "workbuddy_chat"):

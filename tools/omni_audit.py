@@ -107,6 +107,15 @@ def run_audit() -> dict:
         rows.append({"what": "socket:" + kind + "/" + do, "verdict": v, "ms": ms,
                      "note": (why or "")[:80]})
 
+    # 🔴 2026-10-30 主人令：不要固定六类 —— 加「万能插座」项（不给 socket，现场判类）
+    for tgt, verb in (("https://example.com", "get"), ("/etc/hostname", "read"),
+                      ("settings", "launch"), ("127.0.0.1:8791", "probe")):
+        st, res, ms = _call({"op": "universal", "target": tgt, "do": verb})
+        v, why = _verdict(st, res)
+        k = (res.get("classify") or {}).get("kind")
+        rows.append({"what": "universal:" + tgt[:18] + "/" + verb, "verdict": v, "ms": ms,
+                     "note": ("%s · %s" % (k, why or ""))[:80]})
+
     tally = {}
     for r in rows:
         tally[r["verdict"]] = tally.get(r["verdict"], 0) + 1

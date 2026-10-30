@@ -18604,5 +18604,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T17:55:43"
+ },
+ "tools/omni_adapter.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T18:06:20"
  }
 }

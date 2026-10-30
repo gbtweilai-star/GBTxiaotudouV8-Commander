@@ -30759,3 +30759,7 @@
 {"at": "2026-10-30T17:57:53", "event": "gaps", "missing": 0, "no_kind": 251, "scanned": 2004, "third_party": 0}
 {"at": "2026-10-30T18:00:16", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
 {"at": "2026-10-30T18:02:47", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T18:06:20", "event": "bind", "asset": "tools/omni_adapter.py", "tentacle": "omni_plug", "note": "autobind"}
+{"at": "2026-10-30T18:06:22", "event": "autobind", "files": 3, "bound": 3, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T18:07:26", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T18:08:36", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
