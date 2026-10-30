@@ -1,8 +1,6 @@
 {
- "at": "2026-10-31T04:54:23",
- "up": true,
+ "at": "2026-10-31T05:51:34",
+ "up": false,
  "ok": false,
- "phase": "port open",
- "host": "127.0.0.1",
- "waited_s": 1793397263.7
+ "phase": "waiting"
 }

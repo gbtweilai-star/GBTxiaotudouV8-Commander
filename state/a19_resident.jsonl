@@ -12,3 +12,14 @@
 {"at": "2026-10-31T04:56:28", "act": "wake_failed", "tcp_only": true}
 {"at": "2026-10-31T04:57:38", "act": "wake_failed", "tcp_only": true}
 {"at": "2026-10-31T04:58:48", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T04:59:59", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:42:17", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:46:24", "act": "wake_failed", "tcp_only": true}
+{"at": "2026-10-31T05:47:55", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:49:22", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:49:42", "act": "up", "down_for_s": 3309.7}
+{"at": "2026-10-31T05:50:07", "act": "down", "up_for_s": 25.0, "tcp_only": true}
+{"at": "2026-10-31T05:52:01", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:53:07", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:54:12", "act": "wake_failed", "tcp_only": false}
+{"at": "2026-10-31T05:55:17", "act": "wake_failed", "tcp_only": false}

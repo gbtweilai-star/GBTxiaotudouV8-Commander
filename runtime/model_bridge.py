@@ -91,9 +91,12 @@ UPSTREAMS = {
     #   ownweights = 我们自己的权重，跑在整机 GPU 的浏览器里（页面工人）。
     #   **不是云端、不是第三方** —— OURS_LANES 里算自有。
     #   特殊性：它不由本进程发 HTTP，而是 route 到 /_local 队列（见 _local_worker_chat）。
-    "ownweights": ("local://worker", "gbt-local", "raw:gbt", 25),
+    "ownweights": ("local://worker", "gbt-local", "raw:gbt", 90),
 }
-DEFAULT = "selfhost"     # A19 优先：手机自己的算力
+# 🔴 2026-10-31 主人令（最终口径）：**A19 是必须的主脑，不是可选**。
+#   默认车道 = selfhost（A19 · 我们的 7.6B 权重，LM Pocket 提供推理运行时）；
+#   我们自己的整机 GPU 权重（ownweights）作为**触手侧后备**：A19 不可用时顶上。
+DEFAULT = "selfhost"
 
 # 🔴 2026-10-31（主人令：本机算力限流给他去掉）：
 #   429 是 **LM Pocket 容器**给的（"Too many inference requests"），不是我们设的。
@@ -191,8 +194,10 @@ if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
     #   A19 被它的 429/挂起卡住时，不允许我们这边变成"没答案"。
     #   所以默认链就是 selfhost → ownweights（我们自己的整机 GPU 权重）。
     #   工人不在岗时由 _worker_alive() 快速跳过，不会挂 180 秒。
+    # A19 为主；不可用时落到**我们自己的整机 GPU 权重**（不是云）。
     FALLBACK["selfhost"] = ["ownweights"]
     FALLBACK["local"] = ["ownweights"]
+    FALLBACK["ownweights"] = []
 
 
 def key_for(profile: str | None) -> tuple[str, str]:
@@ -301,7 +306,16 @@ def _shortlist(question: str, cat: dict, k: int = 18) -> tuple[list[str], str]:
 
 
 def _worker_alive(max_age: float = 30.0) -> bool:
-    """我们自己的规矩：工人 30 秒内有心跳才算在岗。没有就**快速失败**，不挂 180 秒。"""
+    """在岗判据（我们自己的规矩）：
+       · 浏览器工人（整机 GPU）心跳，或
+       · **A19 后台大脑**心跳（它能把 LM Pocket 拉到前台真算）
+    两者任一在岗就派活；都没有则快速失败，不挂 180 秒。"""
+    brain = ROOT / "state" / "a19_brain.json"
+    try:
+        if brain.is_file() and (time.time() - brain.stat().st_mtime) <= max_age:
+            return True
+    except Exception:                                              # noqa: BLE001
+        pass
     hb = ROOT / "state" / "local_worker.json"
     try:
         if not hb.is_file():
