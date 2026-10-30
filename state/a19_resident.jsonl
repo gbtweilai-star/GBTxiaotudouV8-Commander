@@ -9,3 +9,6 @@
 {"at": "2026-10-31T04:54:07", "act": "up", "down_for_s": 21.6}
 {"at": "2026-10-31T04:54:32", "act": "down", "up_for_s": 25.0, "tcp_only": true}
 {"at": "2026-10-31T04:55:17", "act": "wake_failed", "tcp_only": true}
+{"at": "2026-10-31T04:56:28", "act": "wake_failed", "tcp_only": true}
+{"at": "2026-10-31T04:57:38", "act": "wake_failed", "tcp_only": true}
+{"at": "2026-10-31T04:58:48", "act": "wake_failed", "tcp_only": false}

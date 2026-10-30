@@ -1651,3 +1651,21 @@
 {"at": "2026-10-31T04:55:35", "act": "yield", "stopped": ["免费池"], "mem_mb": 131}
 {"at": "2026-10-31T04:55:39", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 125}
 {"at": "2026-10-31T04:55:40", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 131}
+{"at": "2026-10-31T04:56:11", "act": "yield", "stopped": ["免费池"], "mem_mb": 155}
+{"at": "2026-10-31T04:56:16", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 149}
+{"at": "2026-10-31T04:56:17", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 154}
+{"at": "2026-10-31T04:56:48", "act": "yield", "stopped": ["免费池"], "mem_mb": 161}
+{"at": "2026-10-31T04:56:52", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 163}
+{"at": "2026-10-31T04:56:53", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 156}
+{"at": "2026-10-31T04:57:24", "act": "yield", "stopped": ["免费池"], "mem_mb": 150}
+{"at": "2026-10-31T04:57:28", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 148}
+{"at": "2026-10-31T04:57:29", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 149}
+{"at": "2026-10-31T04:58:00", "act": "yield", "stopped": ["免费池"], "mem_mb": 145}
+{"at": "2026-10-31T04:58:04", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 75}
+{"at": "2026-10-31T04:58:05", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 78}
+{"at": "2026-10-31T04:58:36", "act": "yield", "stopped": ["免费池"], "mem_mb": 122}
+{"at": "2026-10-31T04:58:40", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 123}
+{"at": "2026-10-31T04:58:41", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 121}
+{"at": "2026-10-31T04:59:12", "act": "yield", "stopped": ["免费池"], "mem_mb": 107}
+{"at": "2026-10-31T04:59:17", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 115}
+{"at": "2026-10-31T04:59:18", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 108}
