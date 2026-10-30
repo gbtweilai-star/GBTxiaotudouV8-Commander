@@ -1,0 +1,38 @@
+{
+ "holo_pet_w3/panel/index.html": {
+  "cap_reached": true,
+  "cap_ok": true,
+  "func_ok": true,
+  "cap_domain": "system",
+  "cap_name": "health",
+  "func_name": "panel_state"
+ },
+ "holo_pet_w3/voice-theater/index.html": {
+  "cap_reached": true,
+  "cap_ok": true,
+  "func_ok": true,
+  "cap_domain": "voice",
+  "cap_name": "voice_orchestra",
+  "func_name": "voice_asset"
+ },
+ "holo_pet_w3/welcome/index.html": {
+  "cap_reached": true,
+  "cap_ok": true,
+  "cap_domain": "system",
+  "cap_name": "health"
+ },
+ "holo_pet_w3/model-chat/index.html": {
+  "cap_reached": true,
+  "cap_ok": false,
+  "cap_domain": "llm",
+  "cap_name": "codex_status"
+ },
+ "wgpu/local-llm.html": {
+  "cap_ok": true,
+  "top1": " Paris",
+  "tps": 37.65
+ },
+ "voice-theater/stage3d.html": {
+  "tris": 20545
+ }
+}

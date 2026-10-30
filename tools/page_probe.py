@@ -25,6 +25,61 @@ import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "state" / "page_probes.jsonl"
+BASELINE = ROOT / "state" / "page_probe_baseline.json"
+
+# 只盯**会说话**的键：布尔类严格一致；tps 掉 30% 以上算退化；tris 变少算退化。
+BOOL_KEYS = ("cap_reached", "cap_ok", "func_ok")
+STR_KEYS = ("top1", "cap_domain", "cap_name", "func_name")
+
+
+def load_baseline() -> dict:
+    if not BASELINE.is_file():
+        return {}
+    try:
+        return json.loads(BASELINE.read_text(encoding="utf-8"))
+    except Exception:                                            # noqa: BLE001
+        return {}
+
+
+def save_baseline(data: dict) -> None:
+    BASELINE.parent.mkdir(parents=True, exist_ok=True)
+    BASELINE.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def make_baseline() -> dict:
+    """把当前每页最后一次读数存成基线（只存可比的键）。"""
+    cur = aggregate()
+    out = {}
+    for it in cur["pages"]:
+        rd = it.get("readings") or {}
+        keep = {}
+        for k in BOOL_KEYS + STR_KEYS:
+            if k in rd and rd[k] is not None:
+                keep[k] = rd[k]
+        for k in ("tps", "tris"):
+            if rd.get(k) is not None:
+                keep[k] = rd[k]
+        if keep:
+            out[it["page"]] = keep
+    return out
+
+
+def diff_baseline(rd: dict, base: dict) -> list:
+    """→ [『键: 旧 → 新』...]。空列表 = 无退化。"""
+    bad = []
+    for k in BOOL_KEYS:
+        if k in base and base[k] is True and rd.get(k) is not True:
+            bad.append("%s: True → %s" % (k, rd.get(k)))
+    for k in STR_KEYS:
+        if k in base and rd.get(k) is not None and rd.get(k) != base[k]:
+            bad.append("%s: %r → %r" % (k, base[k], rd.get(k)))
+    if base.get("tps") and rd.get("tps") is not None:
+        if rd["tps"] < base["tps"] * 0.7:
+            bad.append("tps: %s → %s（掉 30%%+）" % (base["tps"], rd["tps"]))
+    if base.get("tris") and rd.get("tris") is not None:
+        if rd["tris"] < base["tris"]:
+            bad.append("tris: %s → %s" % (base["tris"], rd["tris"]))
+    return bad
 
 
 def load() -> list:
@@ -104,7 +159,7 @@ def judge(readings: dict, ok_flag: bool) -> tuple:
     return "ok", "ok"
 
 
-def aggregate(max_age: float | None = None) -> dict:
+def aggregate(max_age: float | None = None, compare: bool = True) -> dict:
     rows = load()
     now = time.time()
     per = {}
@@ -121,10 +176,18 @@ def aggregate(max_age: float | None = None) -> dict:
             per[page] = {"page": page, "at": r.get("at"), "ok": bool(r.get("ok")),
                          "readings": r.get("readings") or {}, "_ts": t,
                          "age_s": int(now - t)}
+    base_all = load_baseline() if compare else {}
     items = sorted(per.values(), key=lambda x: x["_ts"], reverse=True)
     for it in items:
         it.pop("_ts", None)
         v, why = judge(it.get("readings"), it.get("ok"))
+        base = base_all.get(it.get("page")) or {}
+        deg = diff_baseline(it.get("readings") or {}, base) if base else []
+        it["regressions"] = deg
+        if deg and v == "ok":
+            v, why = "warn", "相对基线退化：" + " · ".join(deg[:3])
+        elif deg:
+            why = why + " ｜退化：" + " · ".join(deg[:2])
         it["verdict"], it["why"] = v, why
     ok_n = sum(1 for x in items if x["verdict"] == "ok")
     warn_n = sum(1 for x in items if x["verdict"] == "warn")
@@ -135,11 +198,19 @@ def aggregate(max_age: float | None = None) -> dict:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("op", nargs="?", default="status", choices=["status", "selftest"])
+    ap.add_argument("op", nargs="?", default="status", choices=["status", "selftest", "baseline"])
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--max-age", type=float, default=None,
                     help="只认这么多秒内的自报（默认不限）")
     a = ap.parse_args(argv)
+
+    if a.op == "baseline":
+        b = make_baseline()
+        save_baseline(b)
+        print("  已存基线：%d 页 → %s" % (len(b), BASELINE))
+        for k, v in list(b.items())[:8]:
+            print("   %-34s %s" % (k[-34:], json.dumps(v, ensure_ascii=False)[:80]))
+        return 0
 
     if a.op == "selftest":
         # 铁证：证明判决规则真的会亮红灯（不是只会在绿的时候显示绿）
@@ -165,9 +236,37 @@ def main(argv=None) -> int:
                           "cap_name": "health", "cap_python": "3.12.14",
                           "func_name": "panel_state", "func_ok": False,
                           "func_evidence": "Load failed"}, True, "warn"),
+            # 基线退化（diff_baseline 的判据本身也要被证明）
+            ("基线-布尔退化", "__DIFF__", {"base": {"cap_ok": True}, "cur": {"cap_ok": False},
+                                          "expect": "cap_ok: True → False"}),
+            ("基线-top1变",   "__DIFF__", {"base": {"top1": " Paris"}, "cur": {"top1": " London"},
+                                          "expect": "top1"}),
+            ("基线-速度掉",   "__DIFF__", {"base": {"tps": 38}, "cur": {"tps": 20},
+                                          "expect": "掉 30%+"}),
+            ("基线-无退化",   "__DIFF__", {"base": {"tps": 38}, "cur": {"tps": 37},
+                                          "expect": None}),
         ]
         bad = 0
-        for name, rd, okf, want in cases:
+        for case in cases:
+            name, rd = case[0], case[1]
+            okf = case[2] if len(case) > 2 else None
+            want = case[3] if len(case) > 3 else None
+            if rd == "__DIFF__":
+                _b, _c, _e = okf["base"], okf["cur"], okf["expect"]
+                deg = diff_baseline(_c, _b)
+                want_deg = _e if False else _e
+                if want_deg:
+                    good = any(want_deg in d for d in deg)
+                    print("   %s %-14s → %s（期望含 %r）· %s"
+                          % ("✅" if good else "🔴", name, deg, want_deg, ""))
+                    if not good:
+                        bad += 1
+                else:
+                    good = not deg
+                    print("   %s %-14s → %s（期望无退化）" % ("✅" if good else "🔴", name, deg))
+                    if not good:
+                        bad += 1
+                continue
             v, why = judge(rd, okf)
             good = (v == want)
             if not good:
