@@ -561,7 +561,12 @@
 <section class="scene" aria-label="数字人">
 <div class="scene__halo" id="halo"></div>
 <div class="scene__ring"></div>
-<div class="stage3d"><canvas id="dh2d" data-crop-h="0.66" aria-label="数字人"></canvas></div>
+<div class="stage3d">
+      <canvas id="dh2d" data-crop-h="0.66" aria-label="数字人"></canvas>
+      <!-- 2026-10-30：3D 舞台原来是**孤儿**（dh3d.js 没人加载、three 没 vendor、连 #dh3d 元素都没有）。
+           这里补上画布，默认隐藏；只有 ?dh3d=1 才懒加载 three+GLTFLoader+dh3d.js 并显示。 -->
+      <canvas id="dh3d" aria-label="数字人 3D" style="display:none"></canvas>
+    </div>
 <div class="scene__glow" id="glow"></div>
 <div class="scene__veil"></div>
 <div class="scene__floor"></div>
@@ -651,6 +656,29 @@
 <!-- 点站内链接不跳窗：同窗拉起抽屉 iframe（主人令 2026-10-18「一体式，别点一下再跳转」） -->
 <script src="nav-drawer.js"></script>
 <script src="dh2d.js"></script>
+<!-- 2026-10-30：3D 是孤儿（dh3d.js 没人加载、three 没 vendor、无 #dh3d 元素）。
+     做成 ?dh3d=1 懒加载，全本地 vendor（零 CDN），按依赖序。默认页面不受影响。 -->
+<script>
+(function () {
+  if (!/[?&]dh3d=1/.test(location.search)) return;
+  var c3 = document.getElementById("dh3d"), c2 = document.getElementById("dh2d");
+  if (c3) c3.style.display = "block";
+  if (c2) c2.style.display = "none";
+  var files = ["vendor/three.min.js", "vendor/BufferGeometryUtils.js",
+               "vendor/GLTFLoader.js", "dh3d.js"];
+  (function next(i) {
+    if (i >= files.length) return;
+    var sc = document.createElement("script");
+    sc.src = files[i];
+    sc.onload = function () { next(i + 1); };
+    sc.onerror = function () {
+      var st = document.getElementById("dh3dStatus");
+      if (st) { st.textContent = "3D 载入失败：" + files[i]; st.setAttribute("data-tone", "fault"); }
+    };
+    document.body.appendChild(sc);
+  })(0);
+})();
+</script>
 
 <script>
 (function () {

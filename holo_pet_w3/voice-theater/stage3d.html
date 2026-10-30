@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>数字人 3D 舞台 · 读数专用</title>
+<!--
+  2026-10-30 立。为什么单独一页：
+    ① 主页面 voice-theater/index.html 走 2D 画布，dh3d.js 一直没被引用（孤儿）；
+    ② 想按 ?dh3d=1 懒加载，但实测 WebView 会把 query 吞掉（location.search 为空），
+       懒加载器永不触发；
+    ③ 所以给 3D 一个**独立入口**：脚本直挂、不经 query，用来读数与调试。
+  全部本地 vendor（零 CDN）。
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0f16; }
+  #dh3d { display: block; width: 100vw; height: 100vh; }
+  #dh3dStatus { position: fixed; left: 12px; bottom: 12px; font: 12px/1.4 -apple-system, sans-serif;
+                color: rgba(255,255,255,.55); }
+  #dh3dStatus[data-tone="fault"] { color: #ff8a8a; }
+  #dh3dStatus[data-tone="ok"] { color: #34d399; }
+</style>
+</head>
+<body>
+<canvas id="dh3d" aria-label="数字人 3D"></canvas>
+<p id="dh3dStatus" data-tone="warn">数字人 3D · 载入中…</p>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/BufferGeometryUtils.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="dh3d.js"></script>
+</body>
+</html>
