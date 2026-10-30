@@ -51,6 +51,24 @@ TPS_MIN = {"gpu": 30.0, "js": 8.0}
 def judge(readings: dict, ok_flag: bool) -> tuple:
     """→ (verdict, reason)。verdict ∈ ok / red / warn"""
     rd = readings or {}
+    # ②b 穿透证据：能调能力位，且分三态（门没通 / 门通了该位报错 / 全 OK）
+    if "cap_reached" in rd or "cap_ok" in rd:
+        dom = rd.get("cap_domain")
+        cap = rd.get("cap_name") or "?"
+        ms = rd.get("cap_ms")
+        if rd.get("cap_reached") is False and not rd.get("cap_ok"):
+            return "red", "页面调不到能力位（%s）" % (rd.get("cap_err") or "no-json")
+        if not rd.get("cap_ok"):
+            return "warn", "门通了，但 %s 自身报错（域=%s）· %s" % (
+                cap, dom, (rd.get("cap_err") or "")[:50])
+        parts = ["穿透 ok", "域=%s" % dom, cap, "%sms" % ms, "python %s" % rd.get("cap_python")]
+        if rd.get("tps") is not None:
+            parts.append("%s tok/s" % rd.get("tps"))
+        if rd.get("top1") is not None:
+            parts.append("top-1 %r" % rd.get("top1"))
+        return "ok", " · ".join(parts)
+
+
     if not ok_flag:
         return "red", "页面自己报了 ok=false"
     # ① 3D 页：看三角形与帧
@@ -64,17 +82,6 @@ def judge(readings: dict, ok_flag: bool) -> tuple:
         if frames < 10:
             return "warn", "帧数偏低（frames=%s）—— 疑似后台标签节流" % frames
         return "ok", "tris=%s · frames=%s · 非黑 %s%%" % (tris, frames, rd.get("nonblack"))
-    # ②b 穿透证据：页面必须真的能调能力位（gbtW3.cap → /_cap → run_task）
-    if "cap_ok" in rd:
-        if not rd.get("cap_ok"):
-            return "red", "页面调不到能力位（cap_ok=false %s）" % (rd.get("cap_err") or "")
-        parts = ["穿透 ok", "%sms" % rd.get("cap_ms"), "python %s" % rd.get("cap_python")]
-        if rd.get("tps") is not None:
-            parts.append("%s tok/s" % rd.get("tps"))
-        if rd.get("top1") is not None:
-            parts.append("top-1 %r" % rd.get("top1"))
-        return "ok", " · ".join(parts)
-
     # ② 推理页：看 top-1 与速度
     if "top1" in rd or "tps" in rd:
         top1 = str(rd.get("top1") or "")
@@ -140,8 +147,11 @@ def main(argv=None) -> int:
             ("推理慢",    {"backend": "gpu", "tps": 10, "top1": " Paris"}, True, "red"),
             ("推理正常",  {"backend": "gpu", "tps": 38, "top1": " Paris"}, True, "ok"),
             ("页面自报失败", {"tris": 20545, "frames": 40}, False, "red"),
-            ("穿透成功",   {"cap_ok": True, "cap_ms": 27, "cap_python": "3.12.14", "tps": 37, "top1": " Paris"}, True, "ok"),
-            ("穿透失败",   {"cap_ok": False, "cap_err": "TypeError"}, True, "red"),
+            ("穿透成功",   {"cap_reached": True, "cap_ok": True, "cap_domain": "llm",
+                            "cap_name": "codex_status", "cap_ms": 27, "cap_python": "3.12.14"}, True, "ok"),
+            ("门没通",     {"cap_reached": False, "cap_ok": False, "cap_err": "TypeError"}, True, "red"),
+            ("门通位不可用", {"cap_reached": True, "cap_ok": False, "cap_domain": "llm",
+                            "cap_name": "codex_status", "cap_err": "缺 codex 可执行文件"}, True, "warn"),
         ]
         bad = 0
         for name, rd, okf, want in cases:

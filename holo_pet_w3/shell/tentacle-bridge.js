@@ -108,36 +108,67 @@
      不带 ?_probe=1 时**完全零开销**（连这个函数都不会执行）。 */
   (function autoProbe() {
     if (!/[?&]_probe=1/.test(location.search)) return;
+
+    /* 2026-10-30：不再只测 health —— 那只能证明"桥在"，证明不了"这一页能打通它自己那一域"。
+       做法：按页面归属的域，挑该域一个**免票免参数**的位去调（映射表由 caps_registry 现算生成）。
+       三种结果要分开，判决才准：
+         · 门没通（连 JSON 都没拿到）        → 页面调不到能力位
+         · 门通了但该位自身报错              → 域内该位不可用（不是接线问题）
+         · 都 OK                             → 穿透 ok（附域与耗时） */
     function bridgeBase() {
-      // ⚠️ 本段在 IIFE 之外，`BR` 不可见（踩过：ReferenceError 被 catch 吞掉，自报永远不发生）
       return (window.gbtW3 && window.gbtW3.bridge) || "http://127.0.0.1:8791";
     }
+    function domainOf() {
+      var d = (document.documentElement.dataset || {}).gbtDomain || (document.body && document.body.dataset || {}).gbtDomain;
+      if (d) return d;
+      var p = location.pathname;
+      if (/model-chat|wgpu\//.test(p)) return "llm";
+      if (/voice-theater|digital-human/.test(p)) return "voice";
+      if (/panel/.test(p)) return "system";
+      if (/kernel/.test(p)) return "mind";
+      return "system";
+    }
     function report() {
+      var dom = domainOf();
       var t0 = performance.now();
-      var BR2 = bridgeBase();
-      window.gbtW3.cap("health", {}).then(function (r) {
-        var payload = {
-          page: (location.pathname || "").replace(/^\//, ""),
-          ok: !!(r && r.ok),
-          readings: {
-            cap_ok: !!(r && r.ok),
-            cap_ms: Math.round(performance.now() - t0),
-            cap_python: (r && r.result && r.result.python) || null
-          }
-        };
-        return fetch(BR2 + "/_probe", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      }).catch(function (e) {
-        try {
-          fetch(bridgeBase() + "/_probe", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ page: (location.pathname || "").replace(/^\//, ""),
-              ok: false, readings: { cap_ok: false, cap_err: String(e && e.message || e).slice(0, 80) } })
+      /* 必须用**绝对路径**：相对路径会跟着页面所在目录走
+         （/holo_pet_w3/model-chat/shell/... 直接 404 ⇒ 映射表拿不到，永远退回 health）。 */
+      fetch("/holo_pet_w3/shell/page-domain-caps.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : {}; })
+        .catch(function () { return {}; })
+        .then(function (map) {
+          var cap = (map && map[dom]) || "health";
+          return window.gbtW3.cap(cap, {}).then(function (res) {
+            var reached = !!(res && res.cap);
+            return {
+              page: (location.pathname || "").replace(/^\//, ""),
+              ok: !!(res && res.ok),
+              readings: {
+                cap_domain: dom, cap_name: cap, cap_reached: reached,
+                cap_ok: !!(res && res.ok),
+                cap_ms: Math.round(performance.now() - t0),
+                cap_python: (res && res.result && res.result.python) || null,
+                cap_err: (res && res.error && res.error.message) || null
+              }
+            };
           });
-        } catch (e2) { /* 桥也不在，就什么都不做（页面照常可用） */ }
-      });
+        })
+        .then(function (payload) {
+          return fetch(bridgeBase() + "/_probe", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+        })
+        .catch(function (e) {
+          try {
+            fetch(bridgeBase() + "/_probe", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ page: (location.pathname || "").replace(/^\//, ""),
+                ok: false, readings: { cap_reached: false,
+                  cap_err: String(e && e.message || e).slice(0, 80) } })
+            });
+          } catch (e2) { /* 桥也不在：页面照常可用，只是没账 */ }
+        });
     }
     if (document.readyState === "complete") setTimeout(report, 1200);
     else window.addEventListener("load", function () { setTimeout(report, 1200); });
