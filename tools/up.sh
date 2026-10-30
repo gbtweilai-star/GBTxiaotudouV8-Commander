@@ -66,6 +66,14 @@ start_page() {
   else say ":8080 她的界面" "🔴 未起"; fi
 }
 
+start_wgpu() {
+  if running 8081 "serve_wgpu.py"; then say ":8081 WebGPU 页" "✅ 已在跑"; return; fi
+  cd "$BASE" || return
+  setsid nohup python3 -u tools/serve_wgpu.py --port 8081 > "$LOG/wgpu.log" 2>&1 < /dev/null &
+  if $PB wait 8081 20 >/dev/null 2>&1; then say ":8081 WebGPU 页" "✅ 已就绪（COOP/COEP）"
+  else say ":8081 WebGPU 页" "🔴 未起 → logs/wgpu.log"; fi
+}
+
 start_bridge() {
   if running 8791 "model_bridge.py"; then say ":8791 模型桥" "✅ 已在跑"; return; fi
   pkill -f 'model_bridge.py' 2>/dev/null; sleep 1
@@ -208,7 +216,7 @@ up)
   #   桥的降级链已改成 deepseek 优先（0.8s、几乎不吃内存）。
   #   真要 259 个免费模型时：FORCE_FLR=1 sh tools/up.sh up
   if [ "${FORCE_FLR:-0}" = "1" ]; then start_flr; else say ":3001 免费模型池" "⏭ 默认不起（内存优先，要它用 FORCE_FLR=1）"; fi
-  start_mem; start_dhgate; start_page; start_bridge; start_gate; start_panel; start_index; start_patrol; start_guard; start_sentinel; probe_a19
+  start_mem; start_dhgate; start_page; start_wgpu; start_bridge; start_gate; start_panel; start_index; start_patrol; start_guard; start_sentinel; probe_a19
   echo; echo "  她: http://127.0.0.1:8080/index.html"
   ;;
 status)
