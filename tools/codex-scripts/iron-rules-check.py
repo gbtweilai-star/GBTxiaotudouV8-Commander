@@ -173,6 +173,7 @@ def rule3() -> dict:
 HB_STATE = WS / "state" / "heartbeat"
 IRON_BASELINE = WS / "state" / "iron-rules-baseline.json"
 HB_TESTS = WS / "gbt_allinone" / "tests" / "test_heartbeat_tentacle.py"
+IRON_TESTS = WS / "gbt_allinone" / "tests" / "test_iron_rules.py"
 PRIVATE_MUST = "paysssk-creator/GBT-V8"
 PUBLIC_REF = "refs/remotes/realtarget/main"
 
@@ -275,12 +276,21 @@ def rule8() -> dict:
 
 
 def rule9() -> dict:
-    """铁律9 护栏只增不减（基线存 state/iron-rules-baseline.json）。"""
-    try:
-        src = HB_TESTS.read_text(encoding="utf-8", errors="replace")
-    except Exception:  # noqa: BLE001
-        return {"ok": False, "gap": "护栏测试文件不在"}
-    n = len(re.findall(r"^    def test_", src, re.M))
+    """铁律9 护栏只增不减（基线存 state/iron-rules-baseline.json）。
+
+    2026-10-30 补：原来只数 test_heartbeat_tentacle.py 一个文件 —— 那等于
+    "只有心跳那套有护栏"。现在把 test_iron_rules.py 一并纳入，按**总数**比基线。
+    """
+    files = [HB_TESTS, IRON_TESTS]
+    per, total = {}, 0
+    for f in files:
+        try:
+            src = f.read_text(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001
+            return {"ok": False, "gap": "护栏测试文件不在：%s" % f.name}
+        n = len(re.findall(r"^    def test_", src, re.M))
+        per[f.name] = n
+        total += n
     base = {}
     if IRON_BASELINE.is_file():
         try:
@@ -288,18 +298,19 @@ def rule9() -> dict:
         except Exception:  # noqa: BLE001
             base = {}
     prev = int((base or {}).get("guardrail_count") or 0)
-    if n < prev:
-        return {"ok": False, "now": n, "baseline": prev,
-                "gap": "护栏从 %d 掉到 %d —— 有用例被删了" % (prev, n)}
-    if n > prev:
+    if total < prev:
+        return {"ok": False, "now": total, "baseline": prev, "per_file": per,
+                "gap": "护栏从 %d 掉到 %d —— 有用例被删了" % (prev, total)}
+    if total > prev:
         try:
             IRON_BASELINE.parent.mkdir(parents=True, exist_ok=True)
-            base["guardrail_count"] = n
+            base["guardrail_count"] = total
+            base["per_file"] = per
             IRON_BASELINE.write_text(json.dumps(base, ensure_ascii=False, indent=1),
                                      encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
-    return {"ok": True, "now": n, "baseline": prev or "本次建立"}
+    return {"ok": True, "now": total, "baseline": prev or "本次建立", "per_file": per}
 
 
 def rule10() -> dict:
