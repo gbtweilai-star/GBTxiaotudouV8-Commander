@@ -61,7 +61,12 @@ def judge(readings: dict, ok_flag: bool) -> tuple:
         if not rd.get("cap_ok"):
             return "warn", "门通了，但 %s 自身报错（域=%s）· %s" % (
                 cap, dom, (rd.get("cap_err") or "")[:50])
+        if rd.get("func_ok") is False:
+            return "warn", "功能没发生：%s · %s" % (rd.get("func_name"),
+                                                   (rd.get("func_evidence") or "")[:50])
         parts = ["穿透 ok", "域=%s" % dom, cap, "%sms" % ms, "python %s" % rd.get("cap_python")]
+        if rd.get("func_name"):
+            parts.append("功能 %s ✓（%s）" % (rd.get("func_name"), (rd.get("func_evidence") or "")[:30]))
         if rd.get("tps") is not None:
             parts.append("%s tok/s" % rd.get("tps"))
         if rd.get("top1") is not None:
@@ -152,6 +157,14 @@ def main(argv=None) -> int:
             ("门没通",     {"cap_reached": False, "cap_ok": False, "cap_err": "TypeError"}, True, "red"),
             ("门通位不可用", {"cap_reached": True, "cap_ok": False, "cap_domain": "llm",
                             "cap_name": "codex_status", "cap_err": "缺 codex 可执行文件"}, True, "warn"),
+            ("功能发生",   {"cap_reached": True, "cap_ok": True, "cap_domain": "voice",
+                          "cap_name": "voice_orchestra", "cap_python": "3.12.14",
+                          "func_name": "voice_asset", "func_ok": True,
+                          "func_evidence": "voice-greet.mp3 57312 B"}, True, "ok"),
+            ("功能没发生", {"cap_reached": True, "cap_ok": True, "cap_domain": "system",
+                          "cap_name": "health", "cap_python": "3.12.14",
+                          "func_name": "panel_state", "func_ok": False,
+                          "func_evidence": "Load failed"}, True, "warn"),
         ]
         bad = 0
         for name, rd, okf, want in cases:

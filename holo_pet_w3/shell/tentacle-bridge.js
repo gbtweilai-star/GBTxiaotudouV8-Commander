@@ -138,18 +138,33 @@
         .catch(function () { return {}; })
         .then(function (map) {
           var cap = (map && map[dom]) || "health";
-          return window.gbtW3.cap(cap, {}).then(function (res) {
+          /* 功能探针：页面可以自己声明 window.GBT_FUNC_PROBE = async () => ({name, ok, evidence})
+             用来证明"这一页的活真的发生过"（拿到了真数据 / 真出了声 / 真答了话），
+             而不只是"接线通"。没声明就跳过，不当成失败。 */
+          var funcP = (typeof window.GBT_FUNC_PROBE === "function")
+            ? Promise.resolve().then(window.GBT_FUNC_PROBE).catch(function (e) {
+                return { name: "func", ok: false, evidence: String(e && e.message || e).slice(0, 60) };
+              })
+            : Promise.resolve(null);
+          return Promise.all([funcP, window.gbtW3.cap(cap, {})]).then(function (pair) {
+            var fr = pair[0], res = pair[1];
             var reached = !!(res && res.cap);
+            var rd = {
+              cap_domain: dom, cap_name: cap, cap_reached: reached,
+              cap_ok: !!(res && res.ok),
+              cap_ms: Math.round(performance.now() - t0),
+              cap_python: (res && res.result && res.result.python) || null,
+              cap_err: (res && res.error && res.error.message) || null
+            };
+            if (fr) {
+              rd.func_name = fr.name || "func";
+              rd.func_ok = !!fr.ok;
+              rd.func_evidence = String(fr.evidence || "").slice(0, 120);
+            }
             return {
               page: (location.pathname || "").replace(/^\//, ""),
-              ok: !!(res && res.ok),
-              readings: {
-                cap_domain: dom, cap_name: cap, cap_reached: reached,
-                cap_ok: !!(res && res.ok),
-                cap_ms: Math.round(performance.now() - t0),
-                cap_python: (res && res.result && res.result.python) || null,
-                cap_err: (res && res.error && res.error.message) || null
-              }
+              ok: !!(res && res.ok) && (!fr || !!fr.ok),
+              readings: rd
             };
           });
         })
