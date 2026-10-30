@@ -12,6 +12,7 @@ const want=q.get("backend")||"auto";
   try{
     const t0=performance.now();
     const llm=await createLocalLLM({backend:want});
+    window.GBT_PAGE_LLM = llm;   /* worker 模式复用它，不另建引擎 */
     say(`统一入口就绪 · backend=<b>${llm.backend}</b> · 载入 ${(performance.now()-t0|0)} ms`);
     if(llm.note) say(`  <span class="dim">${llm.note}</span>`);
     say(`  模型 ${llm.model.arch} · ${llm.model.layers} 层 · emb ${llm.model.emb} · 头 ${llm.model.heads}/${llm.model.kvHeads} · 词表 ${llm.model.vocab}`);
@@ -77,4 +78,57 @@ const want=q.get("backend")||"auto";
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
 <script src="../shell/tentacle-kit.js?v=20261029"></script>
+
+<script type="module">
+/* ── 工人模式（2026-10-30）──────────────────────────────────────────
+   主人令：她需要什么接口，就把触手插座做成什么接口；权重完全融入触手。
+   于是这里让**页面成为触手的服务端**：轮询桥 /_local/next 领活，
+   用浏览器内 GPU 跑我们自己的权重，再把结果交回 /_local/result。
+   好处：完全不依赖 LM Pocket 的 :1234 —— 权重在页里、算力在整机。 */
+const WORKER = /[?&]_worker=1/.test(location.search);
+if (WORKER) {
+  (async function () {
+    const BR = "http://127.0.0.1:8791";
+    const el = document.getElementById("o");
+    const log = (m) => { if (el) el.innerHTML += "\n<span style='color:#7dd3fc'>[worker]</span> " + m; };
+    let llm = null;
+    for (let i = 0; i < 60 && !llm; i++) {
+      if (window.GBT_PAGE_LLM) { llm = window.GBT_PAGE_LLM; break; }
+      await new Promise(r => setTimeout(r, 500));
+    }
+    if (!llm) {
+      const mod = await import("./local-llm.js");
+      llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
+    }
+    log("就绪 · backend=" + llm.backend);
+    const done = new Set();
+    setInterval(async function () {
+      let job = null;
+      try {
+        const r = await fetch(BR + "/_local/next", { cache: "no-store" });
+        job = (await r.json()).job;
+      } catch (e) { return; }
+      if (!job || done.has(job.id)) return;
+      done.add(job.id);
+      log("领活 " + job.id + "：" + String(job.text).slice(0, 30));
+      try {
+        const out = await llm.chat(job.text, job.max_tokens || 48);
+        await fetch(BR + "/_local/result", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: job.id, text: out.text, backend: llm.backend,
+                                 tokPerSec: out.tokPerSec, tokens: out.tokens })
+        });
+        log("交回 " + job.id + "：" + String(out.text).slice(0, 40));
+      } catch (e) {
+        await fetch(BR + "/_local/result", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: job.id, text: "", backend: "err",
+                                 tokPerSec: null, tokens: 0 })
+        });
+        log("失败 " + job.id + "：" + (e && e.message || e));
+      }
+    }, 2000);
+  })();
+}
+</script>
 </body></html>
