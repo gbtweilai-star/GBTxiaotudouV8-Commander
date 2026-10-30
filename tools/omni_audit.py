@@ -66,8 +66,12 @@ SOCKETS = [
     ("file", "README.md", "read"),
     ("api", "https://example.com", "get"),
     ("ai", "https://api.deepseek.com/v1", "chat"),
+    # 2026-10-30：web/app 在 iOS 上有等价实现（apple-open / URL scheme），
+    # 所以这里按 iOS 口径测：web/open、app/launch 应当免票可用；
+    # app/see（看屏幕）属于隐私载体，单独一列，需要票 —— 这是设计，不是坏。
     ("web", "https://example.com", "open"),
-    ("app", "list_windows", "see"),
+    ("app", "settings", "launch"),
+    ("app", "", "see"),
 ]
 OPS = ("status", "sockets", "energy", "selftest", "discover")
 
