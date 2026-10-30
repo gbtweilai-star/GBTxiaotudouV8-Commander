@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>matvec 基准 · JS vs WebGPU</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  pre{white-space:pre-wrap;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}
+</style>
+</head>
+<body>
+<pre id="o">跑基准…</pre>
+<script type="module">
+import { GGUFModel, matvec } from "./gguf-llm.js";
+
+const L = [], out = document.getElementById("o");
+const say = (s) => { L.push(s); out.innerHTML = L.join("\n"); };
+
+/* ── WGSL：y[o] = Σ W[o*nIn + i] * x[i] ───────────────────────────── */
+const WGSL = `
+struct P { nIn: u32, nOut: u32, pad0: u32, pad1: u32 };
+@group(0) @binding(0) var<storage, read> W: array<f32>;
+@group(0) @binding(1) var<storage, read> X: array<f32>;
+@group(0) @binding(2) var<storage, read_write> Y: array<f32>;
+@group(0) @binding(3) var<uniform> P0: P;
+
+@compute @workgroup_size(64)
+fn main(@builtin(global_invocation_id) gid: vec3<u32>) {
+  let o = gid.x;
+  if (o >= P0.nOut) { return; }
+  var s: f32 = 0.0;
+  let base = o * P0.nIn;
+  for (var i: u32 = 0u; i < P0.nIn; i = i + 1u) {
+    s = s + W[base + i] * X[i];
+  }
+  Y[o] = s;
+}`;
+
+function timeIt(fn, reps){
+  return new Promise(async (resolve) => {
+    await fn();                       // 预热
+    const t0 = performance.now();
+    for (let r = 0; r < reps; r++) await fn();
+    resolve((performance.now() - t0) / reps);
+  });
+}
+
+(async function(){
+  try {
+    if (!navigator.gpu) { say("<span class='bad'>🔴 没有 navigator.gpu</span>"); window.__bench={ok:false}; return; }
+    const t0 = performance.now();
+    const buf = await (await fetch("models/tiny.gguf")).arrayBuffer();
+    const M = new GGUFModel(buf);
+    say(`模型载入 ${(performance.now()-t0|0)} ms`);
+
+    /* 用真实权重：blk.0.attn_q.weight  [576, 576]（Q5_0） */
+    const nIn = M.nEmbd, nOut = M.nEmbd;
+    const tD = performance.now();
+    const W = M.tensor("blk.0.attn_q.weight").slice(0, nIn*nOut);
+    const tDeq = performance.now() - tD;
+    const x = M.row("token_embd.weight", 504).slice();
+    const sizes = { nIn, nOut, mib: +(W.byteLength/1048576).toFixed(2) };
+    say(`张量 ${nOut}×${nIn} · 反量化 ${tDeq|0} ms · ${sizes.mib} MiB(f32)`);
+
+    /* ① JS 版 */
+    const js = await timeIt(() => { matvec(W, x, nIn, nOut); }, 20);
+    const yJS = matvec(W, x, nIn, nOut);
+    say(`  JS  matvec: ${js.toFixed(2)} ms/次`);
+
+    /* ② WebGPU 版 */
+    const ad = await navigator.gpu.requestAdapter();
+    const dev = await ad.requestDevice();
+    const lim = ad.limits;
+    say(`  适配器 ${ad.info?.vendor||"?"} · maxBuffer ${(lim.maxBufferSize/1048576)|0} MiB`);
+
+    const mod = dev.createShaderModule({ code: WGSL });
+    const info = await mod.getCompilationInfo?.();
+    if (info && info.messages.length) {
+      for (const m of info.messages) say(`  <span class="bad">WGSL ${m.type}: ${m.message}</span>`);
+    }
+    const pipe = dev.createComputePipeline({ layout: "auto", compute: { module: mod, entryPoint: "main" } });
+
+    const bufW = dev.createBuffer({ size: W.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+    dev.queue.writeBuffer(bufW, 0, W);
+    const bufX = dev.createBuffer({ size: x.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+    dev.queue.writeBuffer(bufX, 0, x);
+    const bufY = dev.createBuffer({ size: nOut*4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+    /* WebGPU 规定：要 mapAsync(READ) 的 buffer 必须是 MAP_READ，而 MAP_READ 不能与 STORAGE 同用
+       ⇒ 中间用 bufY(STORAGE|COPY_SRC) 再 copy 到 bufRead(MAP_READ|COPY_DST)。 */
+    const bufRead = dev.createBuffer({ size: nOut*4, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST });
+    const bufP = dev.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+    dev.queue.writeBuffer(bufP, 0, new Uint32Array([nIn, nOut, 0, 0]));
+
+    const bind = dev.createBindGroup({ layout: pipe.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: { buffer: bufW } },
+      { binding: 1, resource: { buffer: bufX } },
+      { binding: 2, resource: { buffer: bufY } },
+      { binding: 3, resource: { buffer: bufP } } ] });
+
+    const gpuRun = async () => {
+      const enc = dev.createCommandEncoder();
+      const pass = enc.beginComputePass();
+      pass.setPipeline(pipe); pass.setBindGroup(0, bind);
+      pass.dispatchWorkgroups(Math.ceil(nOut/64));
+      pass.end();
+      enc.copyBufferToBuffer(bufY, 0, bufRead, 0, nOut*4);
+      dev.queue.submit([enc.finish()]);
+      await bufRead.mapAsync(GPUMapMode.READ);
+      const a = new Float32Array(bufRead.getMappedRange()).slice();
+      bufRead.unmap();
+      return a;
+    };
+
+    const yGPU = await gpuRun();
+    /* 数值对照：GPU vs JS */
+    let maxAbs = 0, maxRel = 0;
+    for (let i = 0; i < nOut; i++){
+      const d = Math.abs(yGPU[i] - yJS[i]);
+      if (d > maxAbs) maxAbs = d;
+      const rel = d / Math.max(1e-6, Math.abs(yJS[i]));
+      if (rel > maxRel) maxRel = rel;
+    }
+    const gpu = await timeIt(gpuRun, 20);
+    say(`  GPU matvec: ${gpu.toFixed(2)} ms/次`);
+    say(`  数值对照：maxAbs=${maxAbs.toExponential(2)} · maxRel=${maxRel.toExponential(2)}`);
+    const same = maxRel < 1e-4;
+    say(same ? `<span class="ok">✅ GPU 与 JS 结果一致</span>`
+             : `<span class="bad">🔴 GPU 与 JS 结果不一致</span>`);
+    const speed = js / gpu;
+    say(`  加速比：${speed.toFixed(2)}×（${speed >= 1.5 ? "GPU 值得上" : "GPU 不值得，这个尺寸 JS 更快"}）`);
+
+    /* ③ 纯派发（不回读）：这才是上全 GPU 流水线时的真实成本。
+       0.98ms 里含 mapAsync 的同步往返，而流水线里只需最后回读一次。 */
+    const pureRun = async () => {
+      const enc = dev.createCommandEncoder();
+      const pass = enc.beginComputePass();
+      pass.setPipeline(pipe); pass.setBindGroup(0, bind);
+      pass.dispatchWorkgroups(Math.ceil(nOut/64));
+      pass.end();
+      dev.queue.submit([enc.finish()]);
+      await dev.queue.onSubmittedWorkDone();     /* 必须等真算完，否则量的是入队开销 */
+    };
+    const pure = await timeIt(pureRun, 100);
+    say(`  GPU 纯派发（不回读）: ${pure.toFixed(3)} ms/次`);
+
+    /* ④ 一批 210 次派发 ≈ 一个 token 的算子数量（30 层 × 7）*/
+    const batch = async () => {
+      const enc = dev.createCommandEncoder();
+      for (let i = 0; i < 210; i++){
+        const pass = enc.beginComputePass();
+        pass.setPipeline(pipe); pass.setBindGroup(0, bind);
+        pass.dispatchWorkgroups(Math.ceil(nOut/64));
+        pass.end();
+      }
+      dev.queue.submit([enc.finish()]);
+      await dev.queue.onSubmittedWorkDone();
+    };
+    const batchMs = await timeIt(batch, 5);
+    say(`  GPU 一批 210 次派发: ${batchMs.toFixed(2)} ms（≈ 一个 token 的算子量）`);
+    say(`  ⇒ 全 GPU 流水线理论上限 ≈ ${(1000/batchMs).toFixed(1)} tok/s`);
+
+    window.__bench = { pureMs:+pure.toFixed(3), batch210Ms:+batchMs.toFixed(2), ok: true, nIn, nOut, jsMs:+js.toFixed(3), gpuMs:+gpu.toFixed(3),
+                       maxRel, same, speed:+speed.toFixed(2) };
+  } catch (e) {
+    say(`<span class="bad">🔴 ${String(e && e.message || e)}</span>`);
+    window.__bench = { ok:false, error:String(e && e.message || e) };
+  }
+})();
+</script>
+</body></html>
