@@ -241,6 +241,53 @@ def t_a19_deeplink(text: str = "", **kw):
         return False, "拉起 opened=%s，但 :1234 仍 %s" % (opened, type(exc).__name__), {}
 
 
+def t_local_worker(text: str = "", **kw):
+    """传输：本机权重 · 页面工人（2026-10-30）。
+
+    为什么要有这条：A19（LM Pocket 的 :1234）要在 App 私有界面里点一下才起，
+    那不归我们控制。但我们自己的权重还有第二条路 —— 页面里用整机 GPU 跑 GGUF。
+    于是把**插座做成她需要的形状**：框架往桥的 /_local 派活，页面领活算完交回。
+    页面侧见 holo_pet_w3/wgpu/local-llm.html?_worker=1。
+    """
+    import json as _j
+    import urllib.request as _u
+    BR = kw.get("bridge") or "http://127.0.0.1:8791"
+    # 2026-10-30：**不阻塞**。页面工人在后台标签会被 WebView 节流（实测一轮 30–90s），
+    # 死等只会把整根触手拖死。改成：入队 → 短等（默认 12s）→ 没到就如实报"已入队"。
+    wait_s = float(kw.get("wait") or 12)
+    body = _j.dumps({"text": text, "max_tokens": int(kw.get("max_tokens") or 48)}).encode()
+    try:
+        rq = _u.Request(BR + "/_local/enqueue", data=body,
+                        headers={"Content-Type": "application/json"})
+        jid = _j.loads(_u.urlopen(rq, timeout=10).read()).get("id")
+        if not jid:
+            return False, "入队失败", {}
+        t0 = time.time()
+        while time.time() - t0 < wait_s:
+            time.sleep(1.0)
+            try:
+                rows = pathlib.Path("/var/minis/shared/gbtv8/state/local_results.jsonl")
+                if not rows.is_file():
+                    continue
+                for ln in rows.read_text(encoding="utf-8").splitlines():
+                    try:
+                        d = _j.loads(ln)
+                    except Exception:                             # noqa: BLE001
+                        continue
+                    if d.get("id") == jid:
+                        txt = (d.get("text") or "").strip()
+                        if not txt:
+                            return False, "工人交了空回包", {"id": jid}
+                        return True, txt, {"id": jid, "backend": d.get("backend"),
+                                           "tok_s": d.get("tokPerSec")}
+            except Exception:                                     # noqa: BLE001
+                continue
+        return False, "已入队 %s（工人算完会交回 state/local_results.jsonl；后台标签被节流时较慢）" % jid, {
+            "id": jid, "queued": True}
+    except Exception as exc:                                      # noqa: BLE001
+        return False, "%s: %s" % (type(exc).__name__, str(exc)[:80]), {}
+
+
 # ── 触手表：每根挂多条传输，按序试 ─────────────────────────────────────────
 TENTACLES: dict[str, list[tuple[str, callable]]] = {
     "mouth": [("edge-tts-zhTW", t_edge_tts),
@@ -252,6 +299,9 @@ TENTACLES: dict[str, list[tuple[str, callable]]] = {
     "her":   [("http-loopback", t_a19_loopback),
               ("http-lan", t_a19_lan),
               ("bridge-selfhost", t_a19_bridge),
+              # 2026-10-30：她需要什么接口，就把插座做成什么接口 ——
+              # 页面工人用整机 GPU 跑我们的权重，框架经桥派活，不依赖 LM Pocket 的 :1234
+              ("local-worker", t_local_worker),
               ("deeplink+lazy-probe", t_a19_deeplink)],
 }
 

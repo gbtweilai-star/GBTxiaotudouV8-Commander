@@ -979,7 +979,7 @@
    "kind": "omni_plug",
    "verdict": "real",
    "file": "gbt_allinone/omni_plug.py",
-   "lines": 989,
+   "lines": 1006,
    "io_marks": 123,
    "spec_keys": 4,
    "returns": 36

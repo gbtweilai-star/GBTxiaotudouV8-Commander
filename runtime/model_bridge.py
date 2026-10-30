@@ -483,6 +483,34 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:                              # noqa: BLE001
                 return self._json(500, {"ok": False,
                                         "error": "%s: %s" % (type(exc).__name__, exc)})
+        if self.path.startswith("/_local/next"):
+            # 2026-10-30：本机权重派活口。页面（浏览器内 GPU 跑我们自己的权重）来领活。
+            try:
+                import json as _j
+                jobs_f = ROOT / "state" / "local_jobs.jsonl"
+                res_f = ROOT / "state" / "local_results.jsonl"
+                if not jobs_f.is_file():
+                    return self._json(200, {"ok": True, "job": None, "why": "还没有活"})
+                done = set()
+                if res_f.is_file():
+                    for ln in res_f.read_text(encoding="utf-8").splitlines():
+                        try:
+                            done.add(_j.loads(ln).get("id"))
+                        except Exception:                     # noqa: BLE001
+                            pass
+                job = None
+                for ln in jobs_f.read_text(encoding="utf-8").splitlines():
+                    try:
+                        j = _j.loads(ln)
+                    except Exception:                         # noqa: BLE001
+                        continue
+                    if j.get("id") not in done:
+                        job = j
+                        break
+                return self._json(200, {"ok": True, "job": job})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
         if self.path.startswith("/v1/models"):
             return self._json(200, {"object": "list", "data": [
                 {"id": m, "owned_by": n, "base_url": b} for n, (b, m, _p, _t) in UPSTREAMS.items()]})
@@ -492,7 +520,7 @@ class Handler(BaseHTTPRequestHandler):
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status",
-                 "/_cap", "/_tentacle/hello", "/_probe",
+                 "/_cap", "/_tentacle/hello", "/_probe", "/_local",
                  "/v1/messages", "/v1/messages/count_tokens")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -605,6 +633,34 @@ class Handler(BaseHTTPRequestHandler):
                 with _HELLO_FILE.open("a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 return self._json(200, {"ok": True, "seen": rec["page"]})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
+        if self.path.startswith("/_local/enqueue"):
+            try:
+                f = ROOT / "state" / "local_jobs.jsonl"
+                f.parent.mkdir(parents=True, exist_ok=True)
+                jid = "L%d" % int(time.time() * 1000)
+                rec = {"id": jid, "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "text": str(body.get("text") or "")[:2000],
+                       "max_tokens": int(body.get("max_tokens") or 48)}
+                with f.open("a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                return self._json(200, {"ok": True, "id": jid})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
+        if self.path.startswith("/_local/result"):
+            try:
+                f = ROOT / "state" / "local_results.jsonl"
+                f.parent.mkdir(parents=True, exist_ok=True)
+                rec = {"id": str(body.get("id") or ""), "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "text": str(body.get("text") or "")[:4000],
+                       "backend": str(body.get("backend") or "")[:12],
+                       "tokPerSec": body.get("tokPerSec"), "tokens": body.get("tokens")}
+                with f.open("a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                return self._json(200, {"ok": True, "id": rec["id"]})
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
 

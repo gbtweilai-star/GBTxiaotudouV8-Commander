@@ -1,0 +1,40 @@
+{
+ "at": "2026-10-30T16:42:24",
+ "plugs": [
+  {
+   "name": "bridge",
+   "kind": "bridge",
+   "target": "http://127.0.0.1:8791",
+   "protocol": null,
+   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T16:42:24\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
+  },
+  {
+   "name": "index",
+   "kind": "static",
+   "target": "http://127.0.0.1:8792",
+   "protocol": null,
+   "evidence": "{\"ok\": false, \"error\": \"unknown\", \"routes\": [\"/ping\", \"/stats\", \"/find?q=\", \"/page?text=\"]}"
+  },
+  {
+   "name": "page",
+   "kind": "static",
+   "target": "http://127.0.0.1:8080",
+   "protocol": null,
+   "evidence": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>GBT小土豆V8 · "
+  },
+  {
+   "name": "wgpu-page",
+   "kind": "static",
+   "target": "http://127.0.0.1:8081",
+   "protocol": null,
+   "evidence": "<!DOCTYPE html><html lang=\"zh-Hans\"><head><meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>本机权重 · 统�"
+  },
+  {
+   "name": "local-worker",
+   "kind": "worker",
+   "target": "bridge:/_local/enqueue",
+   "protocol": "gguf-in-browser",
+   "evidence": "已交回 3 / 派过 4 单"
+  }
+ ]
+}

@@ -683,6 +683,23 @@ def discover(deep: bool = False, **_kw) -> dict:
     out["_口径"] = ("只读枚举：发现→归一化→门→插上就用→拔掉；读不到的写未读到；"
                     "本地模型口按 kind 分档（not_listening=没起服务，不是「不兼容」）")
     out.setdefault("插座能源", {}).update(SOCKET_ENERGY)
+    # 2026-10-30 主人令：万能插必须**自己认出所有接口并生成插入**。
+    # 上面那些是通用枚举（进程/端口）；这一段做的是**有目的的探测**：
+    #   候选 → TCP → HTTP → 协议分类（openai / bridge / panel / static / worker）→ 生成插座表。
+    try:
+        import importlib.util as _iud
+        from pathlib import Path as _Pd
+        _sp = _iud.spec_from_file_location(
+            "omni_disc", _Pd(__file__).resolve().parents[1] / "tools" / "omni_discover.py")
+        _od = _iud.module_from_spec(_sp)
+        _sp.loader.exec_module(_od)
+        _d = _od.discover()
+        out["接口插座"] = {"candidates": _d.get("total"), "alive": _d.get("alive"),
+                          "by_kind": _d.get("by_kind"),
+                          "bound": _od.bind(_d),
+                          "rows": _d.get("rows")}
+    except Exception as _e:                                     # noqa: BLE001
+        out["接口插座"] = {"error": "%s: %s" % (type(_e).__name__, str(_e)[:100])}
     return out
 
 
