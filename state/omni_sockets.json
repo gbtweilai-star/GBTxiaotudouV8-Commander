@@ -1,13 +1,6 @@
 {
- "at": "2026-10-30T19:29:35",
+ "at": "2026-10-30T19:41:39",
  "plugs": [
-  {
-   "name": "bridge",
-   "kind": "bridge",
-   "target": "http://127.0.0.1:8791",
-   "protocol": null,
-   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T19:29:34\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
-  },
   {
    "name": "page",
    "kind": "static",
