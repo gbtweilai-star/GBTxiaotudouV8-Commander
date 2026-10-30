@@ -98,7 +98,7 @@ UPSTREAMS = {
 #   我们自己的整机 GPU 权重（ownweights）作为**触手侧后备**：A19 不可用时顶上。
 # 🔴 2026-10-31 主人令（最终）：**弃用 LM Pocket**。
 #   我们自己的无限制权重（整机 GPU · 浏览器内 GGUF）就是唯一主车道。
-DEFAULT = "ownweights"
+DEFAULT = "selfhost"   # 主人令：A19 常驻驱动（不可用时入队由后台大脑补齐）
 
 # 🔴 2026-10-31（主人令：本机算力限流给他去掉）：
 #   429 是 **LM Pocket 容器**给的（"Too many inference requests"），不是我们设的。
@@ -197,8 +197,10 @@ if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
     #   所以默认链就是 selfhost → ownweights（我们自己的整机 GPU 权重）。
     #   工人不在岗时由 _worker_alive() 快速跳过，不会挂 180 秒。
     # 只走我们自己的权重；A19 已弃用，不再进任何链。
-    FALLBACK["selfhost"] = []
-    FALLBACK["local"] = []
+    # A19 优先；A19 被 iOS 挂起时，**入队交后台大脑**（它会把 A19 拉回前台算），
+    # 这条路仍然是我们自己的权重，不是云。
+    FALLBACK["selfhost"] = ["ownweights"]
+    FALLBACK["local"] = ["ownweights"]
     FALLBACK["ownweights"] = []
 
 
