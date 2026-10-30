@@ -23,11 +23,27 @@ LOG = ROOT / "state" / "a19_keeper.jsonl"
 KEY = "gbt"
 
 
-def up(host="127.0.0.1", port=1234, tmo=1.5):
+def tcp(host="127.0.0.1", port=1234, tmo=1.5):
     try:
         s = socket.create_connection((host, port), timeout=tmo)
         s.close()
         return True
+    except Exception:                                               # noqa: BLE001
+        return False
+
+
+def up(host="127.0.0.1", port=1234, tmo=6.0):
+    """🔴 2026-10-31 修正：**TCP 通不算活**。
+    iOS 把 App 挂起后，内核仍替它排队收连接（实测：端口 connect 成功、/v1/models 立刻 URLError）。
+    只有真拿到 HTTP 2xx 才算活着 —— 这和 svc_guard 对自家服务的口径一致。"""
+    if not tcp(host, port):
+        return False
+    import urllib.request
+    try:
+        req = urllib.request.Request("http://%s:%d/v1/models" % (host, port),
+                                     headers={"Authorization": "Bearer " + KEY})
+        with urllib.request.urlopen(req, timeout=tmo) as r:
+            return r.status == 200
     except Exception:                                               # noqa: BLE001
         return False
 
@@ -74,7 +90,10 @@ def once(wait=12.0, verbose=True):
             if verbose:
                 print("  ✅ 拉起成功 · %.1fs · models=%s" % (rec["sec"], m))
             return True
-    log({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "act": "still_down"})
+    act = "still_down"
+    if tcp():
+        act = "tcp_only"     # 端口在、HTTP 不应答 ⇒ App 被挂起（这是最容易被误读成"通了"的状态）
+    log({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "act": act})
     if verbose:
         print("  🔴 拉起后 %.0fs 仍不通（Auto-Start 关了？需要人在 App 里点一次 Start）" % wait)
     return False

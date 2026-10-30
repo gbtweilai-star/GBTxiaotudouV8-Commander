@@ -32,6 +32,11 @@ window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, la
     window.__worker.backend = llm.backend;
     T.textContent = "工人就绪 · backend=" + llm.backend + " · 等下派活…";
     push("引擎就绪 backend=" + llm.backend);
+    // 心跳：让我们这一侧知道"工人活着"，桥据此决定要不要把活儿派过来
+    (function hb(){ try { fetch(BASE + "/_local/hb", {method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({backend: llm.backend, at: Date.now()})}); } catch(e){}
+      setTimeout(hb, 10000); })();
   } catch (e) {
     window.__worker.state = "boot-failed";
     T.textContent = "引擎载入失败：" + (e && e.message || e);
