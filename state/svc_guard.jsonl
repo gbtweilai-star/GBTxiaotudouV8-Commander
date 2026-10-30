@@ -693,3 +693,9 @@
 {"at": "2026-10-30T07:30:24", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 642}
 {"at": "2026-10-30T07:30:23", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": false, "essential": false, "mem_mb": 635}
 {"at": "2026-10-30T07:30:32", "act": "dead", "svc": "面板后端 :8765"}
+{"at": "2026-10-30T07:31:03", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 346}
+{"at": "2026-10-30T07:31:03", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": false, "essential": false, "mem_mb": 452}
+{"at": "2026-10-30T07:31:11", "act": "dead", "svc": "面板后端 :8765"}
+{"at": "2026-10-30T07:31:41", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 491}
+{"at": "2026-10-30T07:31:41", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": false, "essential": false, "mem_mb": 498}
+{"at": "2026-10-30T07:31:49", "act": "dead", "svc": "面板后端 :8765"}
