@@ -405,6 +405,58 @@ class ScanRetentionTest(unittest.TestCase):
         self.assertLessEqual(left, HB.KEEP_SCANS,
                              "clean 跑完仍有 %d 份 > KEEP=%d" % (left, HB.KEEP_SCANS))
 
+    def test_scan_without_clean_also_converges(self) -> None:
+        """打磨四：环形保留必须**无条件**收敛。
+
+        踩过：prune 只在 clean=True 时跑，而定时链路（monitor-loop）从不传 clean
+        ⇒ 扫描件无限增长（实测连跑 6 次 23→28 份）。按 5 分钟一拍是 288 份/天。
+        语义要分清：**环形保留是设计（缓冲区上限），不是"清理别人的东西"**。
+        """
+        orig = HB.KEEP_SCANS
+        HB.KEEP_SCANS = 3            # 缩小预算，免得跑几十秒
+        self.addCleanup(setattr, HB, "KEEP_SCANS", orig)
+        for _ in range(6):
+            HB.scan_all(mode="light", persist=True)      # 注意：**不传 clean**
+        left = len(list(Path(self._tmp).glob("scan-*.json")))
+        self.assertLessEqual(left, HB.KEEP_SCANS,
+                             "不带 clean 就连着涨：%d 份 > KEEP=%d" % (left, HB.KEEP_SCANS))
+
+
+class ModuleProbeDepthTest(unittest.TestCase):
+    """十一、2026-10-30 打磨四：模块探针 `find_spec` 只证在位，不证能起来。
+
+    缺 DLL / 缺可选依赖时 find_spec 仍 True，import 却会炸 —— 那是"看着绿其实没测"。
+    实测本机 18 个目标目前 0 假绿，但判据没牙就不是判据：full 档追加真 import。
+    """
+
+    def test_full_mode_really_imports(self) -> None:
+        st = HB.HeartbeatTentacle("知").pulse(mode="full", persist=False)
+        d = st["checks"]["probe"]["detail"]
+        self.assertTrue(d.get("import_probed"), "full 档却没做真 import：%s" % d)
+        self.assertGreaterEqual(d.get("imported", 0), 1, "一个模块都没导进来：%s" % d)
+        self.assertEqual(d.get("import_failed"), [], "有模块 import 失败：%s" % d)
+
+    def test_light_mode_does_not_import(self) -> None:
+        """浅检不能做真 import —— 那是每拍要付的代价（实测 ~290ms）。"""
+        st = HB.HeartbeatTentacle("知").pulse(mode="light", persist=False)
+        d = st["checks"]["probe"]["detail"]
+        self.assertFalse(d.get("import_probed"), "light 档不该做真 import：%s" % d)
+
+    def test_missing_module_still_red(self) -> None:
+        """在位检查不能被深检取代：模块不存在时，两档都必须红。"""
+        for mode in ("light", "full"):
+            st = HB.HeartbeatTentacle("知").pulse(mode=mode, persist=False)
+            self.assertIs(st["checks"]["probe"]["ok"], True, "正常模块被误判：%s" % st)
+        # 反向：临时把目标改成不存在的模块 → 必须红
+        orig = dict(HB.PROBES["知"])
+        HB.PROBES["知"] = {"kind": "modules", "tier": "light",
+                           "targets": ["gbt_allinone.根本不存在"], "note": "负控"}
+        self.addCleanup(HB.PROBES.__setitem__, "知", orig)
+        for mode in ("light", "full"):
+            st = HB.HeartbeatTentacle("知").pulse(mode=mode, persist=False)
+            self.assertIs(st["checks"]["probe"]["ok"], False,
+                          "%s 档对不存在的模块没报红" % mode)
+
 
 class CliJsonPurityTest(unittest.TestCase):
     """八、CLI 的 stdout 必须是**纯 JSON**。
