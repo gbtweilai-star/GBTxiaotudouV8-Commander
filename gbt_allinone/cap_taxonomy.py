@@ -275,4 +275,13 @@ if __name__ == "__main__":
         except Exception:  # noqa: BLE001
             pass
 
-    print(json.dumps(describe(), ensure_ascii=False, indent=1))
+    # 单独跑本件时也把真探针带出来（否则 probe 全是 null，读数像没配）。
+    # 延迟 import 避开循环：heartbeat_tentacle 反过来 import 本件。
+    try:
+        from .heartbeat_tentacle import PROBES as _P
+    except Exception:  # noqa: BLE001
+        try:
+            from heartbeat_tentacle import PROBES as _P   # 直接跑文件时的兜底
+        except Exception:  # noqa: BLE001
+            _P = None
+    print(json.dumps(describe(_P), ensure_ascii=False, indent=1))

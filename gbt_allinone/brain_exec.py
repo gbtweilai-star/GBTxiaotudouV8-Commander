@@ -516,7 +516,17 @@ _ADVICE_RULES: dict = {
     "misplaced_state": ("P1", "状态文件被写脏（category 与文件名不符）—— 说明有别的进程在写我们的格，先查谁写的"),
     "garbage_found": ("P2", "抽屉里有垃圾/超额扫描件 —— 跑 `scan --clean` 就清（默认 dry-run 不删，删除属写面）"),
     "garbage_cleaned": ("P2", "垃圾已清（信息态）"),
+    # 落盘失败是 P0：状态没写进去，后面所有读数（含 act 的重定级）都在读旧账。
+    "persist_failed": ("P0", "心跳写不进盘 —— 状态没落盘，读数与重定级全部基于旧数据，先修写权限/磁盘"),
+    "hygiene_error": ("P1", "卫生层清理时出错 —— 该删没删或该留没留，逐条看 errors"),
 }
+
+# 根因是**全局**的信号码：它们的病根不在某个分类，而在共享的那一层。
+# 12 根会各报一次同一条，必须合成一条并列出受影响分类 —— 否则一个磁盘写不进
+# 就被念成 12 个问题，真正的病灶反而被淹掉。
+_SYSTEMIC_CODES: frozenset = frozenset({
+    "persist_failed", "dispatch_unreadable", "taxonomy_broken",
+})
 
 
 @_spanned
@@ -527,10 +537,12 @@ def advise(report: dict = None, mode: str = "light") -> dict:
     与分类自校验上 —— 新加一类问题就要先在规则表里加一行，不许临场发挥。
 
     规格：
-      · P0 = 现在就不许用（假绿 / 门坏 / 触手崩）→ 必须先修，修完再谈别的
+      · P0 = 现在就不许用（假绿 / 门坏 / 触手崩 / 状态写不进盘）→ 必须先修，修完再谈别的
       · P1 = 这个分类当下降级（器官失灵 / 成员消失 / 状态翻转）→ 改道或复检
-      · P2 = 信息态（探针被档位跳过等）→ 不必动作，但要知道
-      · 全绿 ⇒ 指令就一条：维持，按需执行
+      · P2 = 可做可不做的整理（清垃圾）→ 在 instructions 里，因为它是**动作**
+      · INFO = 纯信息（探针被档位跳过等）→ 进 `notes`，**不进 instructions**
+        （2026-10-30 打磨：原来 INFO 也塞成 P2 指令，每跳稳定多一条无依据的噪音）
+      · 全绿 ⇒ instructions 为空，verdict=green
     """
     from . import heartbeat_tentacle as HB
 
@@ -550,34 +562,49 @@ def advise(report: dict = None, mode: str = "light") -> dict:
         })
 
     # ① 逐条信号 → 指令
+    # 🔴 2026-10-30 打磨：INFO 原来被塞成一条 P2 指令（"无需动作（信息态）"），
+    #    而且连 signal_code 都没带 ⇒ 每跳都稳定多一条既无依据又不可追溯的噪音，
+    #    真问题就被淹在里面。现在 INFO 走独立的 notes，不进 instructions。
     seen = set()
+    notes = []
     for s in rep.get("signals") or []:
         code = s.get("code")
         level = s.get("level")
         if level == "INFO":
-            instructions.append({
-                "priority": "P2", "id": f"{s.get('category')}:{code}",
-                "action": "无需动作（信息态）",
-                "why": s.get("msg"),
-                "evidence": {"category": s.get("category"), "tentacle": s.get("tentacle")},
-            })
+            notes.append({"code": code, "category": s.get("category"),
+                          "msg": s.get("msg")})
             continue
         rule = _ADVICE_RULES.get(code)
         prio = rule[0] if rule else ("P0" if level == "P0" else "P1")
         hint = rule[1] if rule else "未登记的信号码 —— 先补 _ADVICE_RULES 再谈处置"
-        key = (prio, code, s.get("category"))
+        # 全局根因：按 code 去重并把受影响分类汇总，不按分类各开一张单
+        systemic = code in _SYSTEMIC_CODES
+        key = (prio, code) if systemic else (prio, code, s.get("category"))
         if key in seen:
+            # 已有一张单：把这条分类补进 affected，而不是再开一张
+            if systemic:
+                for x in instructions:
+                    if x.get("evidence", {}).get("signal_code") == code:
+                        aff = x.setdefault("affected", [])
+                        _c = s.get("category")
+                        if _c not in aff:      # 汇总层用值日根名义也会报一次，别重复计
+                            aff.append(_c)
+                        break
             continue
         seen.add(key)
-        instructions.append({
+        ins = {
             "priority": prio,
-            "id": f"{s.get('category')}:{code}",
+            "id": code if systemic else f"{s.get('category')}:{code}",
             "category": s.get("category"),
             "tentacle": s.get("tentacle"),
             "action": hint,
             "why": s.get("msg"),
             "evidence": {"signal_code": code, "level": level},
-        })
+        }
+        if systemic:
+            ins["affected"] = [s.get("category")]
+            ins["root_cause_scope"] = "全局（不是某个分类的问题，别按类各修一遍）"
+        instructions.append(ins)
 
     # ② 按优先级排序：P0 先，P1 次，P2 后；同级别按分类顺序（稳定可复现）
     order = {"P0": 0, "P1": 1, "P2": 2}
@@ -607,6 +634,7 @@ def advise(report: dict = None, mode: str = "light") -> dict:
         "tentacles_total": rep.get("tentacles_total"),
         "taxonomy_ok": tax.get("ok"),
         "instructions": instructions,
+        "notes": notes,
         "counts": {"P0": len(p0), "P1": len(p1),
                    "P2": len([x for x in instructions if x["priority"] == "P2"])},
         "mode": rep.get("mode"),
