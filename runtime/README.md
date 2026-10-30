@@ -39,7 +39,7 @@ PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / au
 | `gbt_allinone/security/policy.py` | 67 KB | **写盘 / 花钱 / 出网必须人工授权**；`HUMAN_GATES` 是那张正表 | 搜 `HUMAN_GATES` 与 `MECHANISM_GATES` |
 | `gbt_allinone/auth_gate.py` | 23 KB | **票只有主人能发**；时段票 vs 一次性票 | 搜 `ONE_SHOT` |
 | `gbt_allinone/caps_registry.py` | 239 KB | **349 位能力**的注册表本体（不是手抄清单） | 搜任一能力位名 |
-| `gbt_allinone/omni_plug.py` | 47 KB | **万能插**：六类插座 + 反向调用 | 搜 `socket` / `_ai_call` |
+| `gbt_allinone/omni_plug.py` | 47 KB | **万能插**：万能插座（现场判类 12 形态）+ 反向调用 | 搜 `socket` / `_ai_call` |
 | `gbt_allinone/preflight.py` | 44 KB | 调用前的**预检层**（已知缺口：抛异常时 fail-open，见 `docs/14` §六） | 搜 `def preflight` |
 | `gbt_allinone/store.py` | 13 KB | **审计账本**（`audit()`）；只追加 | 搜 `def audit` |
 | `gbt_allinone/room_space.py` | 54 KB | 隔离房间：plan → simulate → parity → rehearse → release | 搜 `ENTRY_NAMES` |

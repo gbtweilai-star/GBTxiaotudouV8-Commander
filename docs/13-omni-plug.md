@@ -1,5 +1,24 @@
 # 13 · 万能插：万物皆可插 · 万物皆可控 · 反向调用云端算力
 
+> **2026-10-30 更新（主人令）：万能插不再是"六类插座"**
+>
+> 六类（process / file / api / web / app / ai）是**从前的固定格子** —— 给不出第七种。
+> 现在真正的入口是 `op=universal`（或不给 `socket` 的 `run`）：**你给什么，它现场判断那是什么，再生成适配器。**
+>
+> ```bash
+> cap omni_plug '{"op":"universal","target":"https://example.com","do":"get"}'
+> cap omni_plug '{"op":"universal","target":"/etc/hostname","do":"read"}'
+> cap omni_plug '{"op":"universal","target":"127.0.0.1:8791","do":"probe"}'
+> cap omni_plug '{"op":"universal","target":"settings","do":"launch"}'
+> cap omni_plug '{"op":"universal","target":"python3","do":"exec"}'
+> ```
+>
+> 判得出的形态（不封闭）：`http · ws · tcp · unix · path · dir · bin · cmd · scheme · mcp · remote`。
+> **认不出也不说"不支持"**：按命令试跑一次，并标明"这是猜的"。
+> 门与执行共用同一个 `classify()` —— 不会出现门按 A 类判、执行按 B 类干。
+>
+> 六类仍然可用（向后兼容），但它们只是**十二种形态里的一部分**。
+
 > 一句话：**万能插（`omni_plug`）不是"又一个工具集"，是把"她能碰的东西"和"她能烧的算力"统一成插座的装置。**
 > 插上就有能量（本机 CPU / 云卡 GPU / 云端模型 / 任意 OpenAI 兼容端点），拔掉就落账。
 > 页面里的回执都是**今天现读**的，不是设计稿。

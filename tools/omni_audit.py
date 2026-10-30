@@ -7,7 +7,8 @@
 
 它跑两层：
   ① 只读 op：status / sockets / energy / selftest / discover
-  ② 六类插座 plug+run：process · file · api · ai · web · app
+  ② 固定六类 plug+run（向后兼容）：process · file · api · ai · web · app
+  ③ 万能插座 universal：不给 socket，现场判类（http/path/tcp/scheme/bin…）
 
 判定分四态（不许含糊）：
   ok           真回包且业务成功

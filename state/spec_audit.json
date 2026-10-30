@@ -979,10 +979,10 @@
    "kind": "omni_plug",
    "verdict": "real",
    "file": "gbt_allinone/omni_plug.py",
-   "lines": 1006,
-   "io_marks": 123,
+   "lines": 1050,
+   "io_marks": 130,
    "spec_keys": 4,
-   "returns": 36
+   "returns": 38
   },
   {
    "kind": "media_stamp",

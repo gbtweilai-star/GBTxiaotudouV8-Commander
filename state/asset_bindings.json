@@ -18593,7 +18593,8 @@
  },
  "tools/omni_audit.py": {
   "tentacles": [
-   "omni_plug"
+   "omni_plug",
+   "brain_route"
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T17:16:22"

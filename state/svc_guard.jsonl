@@ -733,3 +733,9 @@
 {"at": "2026-10-30T16:42:24", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 363}
 {"at": "2026-10-30T16:42:35", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 363}
 {"at": "2026-10-30T16:42:24", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 169}
+{"at": "2026-10-30T18:11:27", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 173}
+{"at": "2026-10-30T18:12:14", "act": "start_wait", "svc": "批量车道 :8790", "mem_mb": 106, "why": "内存迟迟不回升"}
+{"at": "2026-10-30T18:19:35", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 619}
+{"at": "2026-10-30T18:19:35", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 373}
+{"at": "2026-10-30T18:19:41", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 376}
+{"at": "2026-10-30T18:19:35", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 431}
