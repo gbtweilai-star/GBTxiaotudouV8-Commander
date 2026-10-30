@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>本机权重 · 统一入口</title>
+<style>body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;font:13px/1.5 ui-monospace,Menlo,monospace}
+pre{white-space:pre-wrap;background:#111827;padding:12px;border-radius:8px}.ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}</style>
+</head><body><pre id="o">载入…</pre>
+<script type="module">
+import { createLocalLLM } from "./local-llm.js";
+const L=[],out=document.getElementById("o"),say=(s)=>{L.push(s);out.innerHTML=L.join("\n");};
+const q=new URLSearchParams(location.search);
+const want=q.get("backend")||"auto";
+(async()=>{
+  try{
+    const t0=performance.now();
+    const llm=await createLocalLLM({backend:want});
+    say(`统一入口就绪 · backend=<b>${llm.backend}</b> · 载入 ${(performance.now()-t0|0)} ms`);
+    if(llm.note) say(`  <span class="dim">${llm.note}</span>`);
+    say(`  模型 ${llm.model.arch} · ${llm.model.layers} 层 · emb ${llm.model.emb} · 头 ${llm.model.heads}/${llm.model.kvHeads} · 词表 ${llm.model.vocab}`);
+
+    /* ① 金标准：同一条提示必须出 Paris */
+    const t1=performance.now();
+    const nx=await llm.nextToken("The capital of France is");
+    const firstMs=performance.now()-t1;
+    say(`  首 token ${firstMs|0} ms · top-1 = ${JSON.stringify(nx.text)}`);
+
+    /* ② 对话 */
+    const t2=performance.now();
+    const c=await llm.chat("What is the capital of France?",16);
+    say(`  chat → ${JSON.stringify(c.text)} · ${c.tokens} token · ${c.tokPerSec} tok/s`);
+    const c2=await llm.chat("Name two colors.",16);
+    say(`  chat → ${JSON.stringify(c2.text)} · ${c2.tokens} token · ${c2.tokPerSec} tok/s`);
+    const tChat=(performance.now()-t2)/1000;
+
+    const rows=[
+      [`backend = ${llm.backend}${want!=="js"?"（auto 时应为 gpu）":"（显式指定）"}`, want==="js"? llm.backend==="js" : llm.backend==="gpu"],
+      ["top-1 是 Paris（金标准）", /Paris/.test(nx.text)],
+      /* 判据按后端分开：GPU 与 JS 是两条路，用同一个门槛既不公平也不专业。
+         gpu 门槛 30（实测 ~38-42）；js 门槛 8（实测 ~8.9-9.8）。 */
+      [`速度 ≥ ${llm.backend === "gpu" ? 30 : 8} tok/s（实测 ${c.tokPerSec}）`,
+       (c.tokPerSec || 0) >= (llm.backend === "gpu" ? 30 : 8)],
+      [`首 token ≤ 3000 ms（实测 ${firstMs|0}）`, firstMs<=3000],
+      ["chat 出的是英文句子（不是乱码/不重复打转）", /[A-Za-z]{3,}/.test(c.text) && !/(\b\w+\b)(\s+\1){2,}/.test(c.text)],
+    ];
+    const bad=rows.filter(r=>!r[1]).length;
+    say("");
+    for(const [t,ok] of rows) say(ok?`<span class="ok">✅ ${t}</span>`:`<span class="bad">🔴 ${t}</span>`);
+    say(bad===0?`<span class="ok">统一入口自检通过（${rows.length}/${rows.length}）</span>`:`<span class="bad">未达标：${bad} 项红</span>`);
+    window.__llm={ok:bad===0,backend:llm.backend,note:llm.note,firstMs:firstMs|0,
+                  tps:c.tokPerSec,top1:nx.text,chat:c.text,rows};
+  }catch(e){
+    say(`<span class="bad">🔴 ${String(e&&e.message||e)}</span>`);
+    if(e&&e.stack) say(`<span class="dim">${String(e.stack).split("\n").slice(0,4).join("\n")}</span>`);
+    window.__llm={ok:false,error:String(e&&e.message||e)};
+  }
+})();
+</script></body></html>
