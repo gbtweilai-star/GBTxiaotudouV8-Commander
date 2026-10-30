@@ -372,6 +372,23 @@ class DeepCheckTest(unittest.TestCase):
         self.assertIn("heartbeat_full", ops, "深检缺失时 act 应自动补：%s" % ops)
         self.assertTrue(HB.latest()["deep"]["ever"], "act 补齐后 deep 仍未记账")
 
+    def test_missing_deep_field_is_not_treated_as_never(self) -> None:
+        """打磨五：缺字段 ≠ 从未深检。
+
+        踩过：`heartbeat()` 的简报没带 deep，常驻循环把它递给 act()
+        ⇒ advise 判"从未深检" ⇒ **每拍**都自动补跑一次 full（实测每拍多 4~8 秒）。
+        这是 churn，不是勤快。
+        """
+        adv = BE.advise({"taxonomy": {"ok": True}, "signals": []})
+        ids = [x["id"] for x in adv["instructions"]]
+        self.assertNotIn("never_deep_checked", ids,
+                         "缺 deep 字段被当成'从未深检' —— 会让调用方每拍补跑 full：%s" % ids)
+
+    def test_heartbeat_brief_carries_deep(self) -> None:
+        hb = BE.heartbeat()
+        self.assertIn("deep", hb, "简报必须带 deep，否则下游会读成'从未深检'")
+        self.assertIsInstance(hb["deep"], dict)
+
 
 class ScanRetentionTest(unittest.TestCase):
     """七、扫描件环形保留必须是**真不变量**（≤ KEEP_SCANS），不是"大概"。
@@ -456,6 +473,35 @@ class ModuleProbeDepthTest(unittest.TestCase):
             st = HB.HeartbeatTentacle("知").pulse(mode=mode, persist=False)
             self.assertIs(st["checks"]["probe"]["ok"], False,
                           "%s 档对不存在的模块没报红" % mode)
+
+
+class ResidentLoopWiringTest(unittest.TestCase):
+    """十二、2026-10-30 打磨五：常驻循环必须**真执行**可自动指令，不能只出清单。
+
+    踩到的洞：monitor-loop 原来只调 `advise()`，全仓**没有一处**在自动链路里调 `act()`
+    ⇒ 我造的"深检过期自动补""垃圾自动清"在真实运行里根本不会发生，
+    只有人手跑 `heartbeat --act` 才生效。闭环⑤ 实际上只对着一个假的门关上了。
+
+    这条用结构断言守（读源码查关键调用）—— 真正的行为验证要起常驻进程，代价过大；
+    行为本身已由 ActClosedLoopTest / DeepCheckTest 覆盖。
+    """
+
+    def setUp(self) -> None:
+        self._src = (Path(__file__).resolve().parents[2]
+                     / "tools" / "codex-scripts" / "monitor-loop.py").read_text(encoding="utf-8")
+
+    def test_loop_calls_act_not_only_advise(self) -> None:
+        self.assertIn("_be.act(", self._src,
+                      "常驻循环没有调 act() —— 可自动的指令会永远停在清单上")
+
+    def test_loop_records_what_it_actually_did(self) -> None:
+        self.assertIn('"acted"', self._src,
+                      "必须把本拍真执行了什么记进读数，否则'自动补齐'只是纸面上的")
+        self.assertIn("act_ok", self._src, "act 的成败要能看出来")
+
+    def test_loop_still_reports_skipped(self) -> None:
+        self.assertIn("act_skipped", self._src,
+                      "跳过的条数也要报 —— 不然看不出'有指令但没执行'")
 
 
 class CliJsonPurityTest(unittest.TestCase):

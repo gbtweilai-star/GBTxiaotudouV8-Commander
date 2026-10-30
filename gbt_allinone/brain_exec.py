@@ -530,6 +530,9 @@ def heartbeat(mode: str = "light", persist: bool = True) -> dict:
         "tentacles_red": rep.get("tentacles_red"),
         "taxonomy": rep.get("taxonomy"),
         "signals_by_level": rep.get("signals_by_level"),
+        # 深检记账必须跟着简报走：少了它，下游（含本文件 advise）会把它读成"从未深检"，
+        # 于是每拍都自动补跑一次全身扫描 —— 那是 churn，不是勤快。
+        "deep": rep.get("deep"),
         "tentacles": brief,
         "elapsed_ms": rep.get("ms"),
         "note": "触手只报状态；定级与指令在 advise()",
@@ -600,8 +603,14 @@ def advise(report: dict = None, mode: str = "light") -> dict:
     # ⓪b 深检记账：light 档永远跳过「身」的 body_map（七感官六动作全身扫描）。
     #     自动链路一直 light ⇒ 全身扫描**从来没跑过**，而报告照样 12/12 绿。
     #     "看着绿其实没测"必须被抓出来，而不是靠人记得手动跑 --full。
-    deep = rep.get("deep") or {}
-    if not deep.get("ever"):
+    #     🔴 2026-10-30 打磨五：**缺字段 ≠ 从未深检**。
+    #     原来 `deep.get("ever")` 对"没带 deep 的报告"恒为假 ⇒ 只要调用方递进来的是精简简报
+    #     （如 heartbeat() 的返回），就永远被判"从未深检"，于是常驻循环**每拍**都自动补跑
+    #     一次 full（实测每拍多 4~8 秒，纯 churn，而且看起来还挺勤快）。
+    #     现在只在 deep **确实给了** 时才判定；没给就如实说不知道，不替它编一个"从未"。
+    _deep_given = isinstance(rep.get("deep"), dict)
+    deep = rep.get("deep") if _deep_given else {}
+    if _deep_given and not deep.get("ever"):
         instructions.append({
             "priority": "P2", "id": "never_deep_checked",
             "action": "跑一次全身扫描：python -m gbt_allinone heartbeat --full（约 6.5 秒）",
@@ -609,7 +618,7 @@ def advise(report: dict = None, mode: str = "light") -> dict:
             "evidence": {"signal_code": "never_deep_checked", "level": "P2",
                          "deep": deep},
         })
-    elif deep.get("stale"):
+    elif _deep_given and deep.get("stale"):
         instructions.append({
             "priority": "P2", "id": "deep_check_stale",
             "action": "该跑全身扫描了：python -m gbt_allinone heartbeat --full",

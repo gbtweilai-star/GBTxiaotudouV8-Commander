@@ -101,19 +101,31 @@ def _tick(deep: bool = False) -> int:
         from gbt_allinone import brain_exec as _be
 
         _hb = _be.heartbeat(mode="full" if deep else "light")
-        _adv = _be.advise(_hb)
+        # 🔴 2026-10-30 打磨五：这里原来只 `advise()` —— **常驻循环从来不调 act()**，
+        #    于是"可自动的指令"永远停在清单上：深检过期不补、垃圾不清。
+        #    act() 内部自带 advise（不重复扫），且只执行 _AUTO_ACTIONS 表内的安全动作
+        #    （出错只伤自己抽屉），所以放在常驻循环里是安全的。
+        #    实测代价：无动作时只多一次 advise（几毫秒）；有动作时才多一次扫描。
+        _act = _be.act(_hb)
+        _after = _act.get("after") or {}
+        _before = _act.get("before") or {}
         hb_summary = {
             "tentacles_ok": _hb.get("tentacles_ok"),
             "tentacles_total": _hb.get("tentacles_total"),
             "score": _hb.get("score"),
-            "verdict": _adv.get("verdict"),
-            "counts": _adv.get("counts"),
-            "headline": _adv.get("headline"),
+            "verdict": _after.get("verdict"),
+            "verdict_before": _before.get("verdict"),
+            "counts": _after.get("counts"),
+            "headline": _after.get("headline"),
             "signals_by_level": _hb.get("signals_by_level"),
             "ms": _hb.get("elapsed_ms"),
             "deep": deep,
+            # 这一拍**真执行了**什么（不是"建议"）。空列表 = 没有可自动的事。
+            "acted": [x.get("op") for x in (_act.get("executed") or [])],
+            "act_ok": _act.get("ok"),
+            "act_skipped": len(_act.get("skipped") or []),
         }
-        hb_red = _adv.get("verdict") == "red"
+        hb_red = _after.get("verdict") == "red" or _act.get("ok") is False
     except Exception as e:                      # noqa: BLE001
         hb_err = "%s: %s" % (type(e).__name__, str(e)[:120])
 
@@ -138,6 +150,10 @@ def _tick(deep: bool = False) -> int:
         _tags.append("心跳 %s/%s 分%s"
                      % (hb_summary.get("tentacles_ok"),
                         hb_summary.get("tentacles_total"), hb_summary.get("score")))
+        # 这一拍真做了什么，必须说出来 —— 不然"自动补齐"只是纸面上的
+        _acted = hb_summary.get("acted") or []
+        if _acted:
+            _tags.append("已自动执行 " + ",".join(str(x) for x in _acted))
     print("[monitor-loop] %s · ran=%d · 心跳%s · %.0f ms · %s"
           % (rec["at"], rec["count"],
              ("%s/%s" % (hb_summary.get("tentacles_ok"), hb_summary.get("tentacles_total")))
