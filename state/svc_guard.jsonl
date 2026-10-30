@@ -1737,3 +1737,7 @@
 {"at": "2026-10-31T06:21:46", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 438}
 {"at": "2026-10-31T06:21:52", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 439}
 {"at": "2026-10-31T06:21:46", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 367}
+{"at": "2026-10-31T06:27:38", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 2988}
+{"at": "2026-10-31T06:27:33", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 3009}
+{"at": "2026-10-31T06:27:40", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 3010}
+{"at": "2026-10-31T06:27:33", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 2977}

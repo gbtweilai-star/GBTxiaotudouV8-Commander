@@ -1,8 +1,8 @@
 {
  "ok": true,
- "at": "2026-10-31T05:58:00",
+ "at": "2026-10-31T06:28:49",
  "pages": 402,
- "covered": 402,
+ "covered": 401,
  "reported": 8,
  "rows": [
   {
@@ -4420,11 +4420,11 @@
    "page": "wgpu/worker.html",
    "file": "/var/minis/shared/gbtv8/holo_pet_w3/wgpu/worker.html",
    "controls": 0,
-   "kit": true,
-   "web_shell": true,
+   "kit": false,
+   "web_shell": false,
    "stamped": 0,
-   "covered": true,
-   "reported": "2026-10-31T05:57:35",
+   "covered": false,
+   "reported": "2026-10-31T06:00:44",
    "reachable": true
   }
  ]
