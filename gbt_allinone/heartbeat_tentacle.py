@@ -372,9 +372,28 @@ class HeartbeatTentacle:
                 exists, why = _module_exists(t)
                 if not exists:
                     miss.append({"module": t, "why": why})
-            return {"ok": not miss, "tier": tier, "probe": "modules", "note": p.get("note"),
+            # 🔴 2026-10-30 打磨四：`find_spec` 只证明**模块在位**，不证明**能起来**。
+            #    缺 DLL / 缺可选依赖时 find_spec 仍 True，import 却会炸 —— 那是"看着绿其实没测"。
+            #    实测本机 18 个目标目前 0 假绿（都能 import），但判据没牙就不是判据。
+            #    full 档追加**真 import**（约 290ms，频率低可接受）；light 档只查在位保快。
+            import_failed, imported = [], []
+            if mode == TIER_FULL:
+                for t in targets:
+                    if any(m["module"] == t for m in miss):
+                        continue
+                    try:
+                        __import__(t)
+                        imported.append(t)
+                    except Exception as e:  # noqa: BLE001
+                        import_failed.append({"module": t,
+                                              "why": f"{type(e).__name__}: {str(e)[:80]}"})
+            ok = not miss and not import_failed
+            return {"ok": ok, "tier": tier, "probe": "modules", "note": p.get("note"),
                     "detail": {"checked": len(targets), "missing": miss,
-                               "present": [t for t in targets if t not in [x["module"] for x in miss]]},
+                               "import_probed": bool(mode == TIER_FULL),
+                               "imported": len(imported), "import_failed": import_failed,
+                               "present": [t for t in targets
+                                           if t not in [x["module"] for x in miss]]},
                     "ms": round((time.time() - t0) * 1000)}
 
         if kind == "eye":
@@ -436,7 +455,7 @@ class HeartbeatTentacle:
         | 类 | 判定 | 处置 |
         |---|---|---|
         | 垃圾 | `*.tmp/.pyc/.orig…`、`__pycache__`、`Thumbs.db` | 有 `clean` 才删，否则只列 |
-        | 超额 | `scan-*.json` 超过 KEEP_SCANS 份（按 mtime 由新到旧保留） | 有 `clean` 才删最旧的 |
+        | 超额 | `scan-*.json` 超过 KEEP_SCANS 份（按 mtime 由新到旧保留） | 只报；真收敛由 scan_all 的 `_prune_scans` **无条件**做（环形保留是设计，不是清理） |
         | 混入 | 既不是我们那三种件、也不是垃圾 ⇒ **别人的东西** | **只报不删**（没资格处置） |
 
         另做「整理」：各触手 `tentacle-*.json` 的 `category` 必须与文件名一致 ——
@@ -830,6 +849,16 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
         _ok_latest = _write_json(_STATE_DIR / "latest.json", report)
         _ok_scan = _write_json(
             _STATE_DIR / f"scan-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", report)
+        # 🔴 2026-10-30 打磨四：环形保留**无条件执行**，不受 --clean 控制。
+        #    踩到的洞：prune 原来只在 clean=True 时跑，而定时链路（monitor-loop）
+        #    **从不传 clean** ⇒ 扫描件无限增长（实测连跑 6 次 23→28 份）。
+        #    按 5 分钟一拍 = 288 份/天，每份是完整报告（含 12 根 statuses）⇒ 一年 GB 级。
+        #    语义要分清：**环形保留是设计（缓冲区上限），不是"清理别人的东西"**，
+        #    不需要人授权；--clean 只管垃圾（tmp/pyc）与外来物判断。
+        if _ok_scan:
+            _pruned = _prune_scans(KEEP_SCANS)
+            if _pruned:
+                report["scan_pruned"] = _pruned
         # 清单**每跳都写**（原来只在 --clean 时才写）：它是"什么才算属于这个抽屉"的
         # 书面依据，靠"记得加 --clean"才有，就等于没有。
         _write_json(_STATE_DIR / "MANIFEST.json", {

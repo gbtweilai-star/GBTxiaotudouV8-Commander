@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T08:24:16+08:00",
+ "generated_at": "2026-10-30T08:30:20+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 768
+  "records": 769
  },
  "totals": {
-  "records": 768,
+  "records": 769,
   "scans": 30,
-  "changes": 603,
+  "changes": 604,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 469,
-   "ts": "2026-10-14T08:41:58+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "触手连接层吸收冷热+清旧:①up --preload 启动即叫醒全部车道 ②加冷却自愈(503 auth_unavailable/401 invalid token 自动重启代理清冷却) ③堵根因 cliproxy.py 加注册表兜底 _env(老环境块缺钥时仍拿对钥,实测清空 env 后照样起3车道) ④config.toml 清掉死口4446 provider/被忽略的 preferred_auth_method/DeepSeek 明文密钥",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e363ea943ccd8f1",
-   "prev": "sha256:d53185e5e29d702"
-  },
   {
    "n": 470,
    "ts": "2026-10-14T15:40:52+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:49c59554789914e",
    "prev": "sha256:1e49d183be64b82"
+  },
+  {
+   "n": 769,
+   "ts": "2026-10-30T08:30:20+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "心跳打磨四轮: 修扫描件无限增长(prune改无条件)+模块探针full档真import; 护栏27->31",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:b85ca0a731a799c",
+   "prev": "sha256:49c59554789914e"
   }
  ]
 };
