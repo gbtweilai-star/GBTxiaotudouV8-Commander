@@ -85,7 +85,10 @@ function parseGGUF(buf){
     tensors.push({name,dims,type,off});
   }
   const dataStart=r.p;
-  return {magic,version,nTensors,nKV,kv,tensors,dataStart,fileSize:buf.byteLength};
+  const al=Number(kv["general.alignment"]||32);
+  const aligned=Math.ceil(dataStart/al)*al;   // 张量数据段要按 alignment 对齐
+  return {magic,version,nTensors,nKV,kv,tensors,dataStart:aligned,dataStartRaw:dataStart,
+          alignment:al,fileSize:buf.byteLength};
 }
 
 /* 2026-10-30 修正：这张表原来错位了（把 6 漏掉、8/9 写成 Q5_0/Q5_1）——
