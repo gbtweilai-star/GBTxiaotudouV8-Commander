@@ -550,11 +550,15 @@
  }
  window.addEventListener("resize", resize);
 
+ /* 🔴 2026-10-30：和 dh3d.js 同一个坑 —— 本 WebView 里 requestAnimationFrame 跑一阵就停
+    （实测 stage3d 停在第 34 帧，画面冻结但页面显示"就绪"）。
+    加同样兜底：盯 renderer.info.render.frame，停滞 2 秒切 33ms 定时器。 */
+ var _timerMode = false;
  function tick() {
  if (mixer) mixer.update(0.016);
  if (controls) controls.update();
  renderer.render(scene, camera);
- requestAnimationFrame(tick);
+ if (!_timerMode) requestAnimationFrame(tick);
  }
 
  var loader = new T.GLTFLoader();
@@ -613,7 +617,31 @@
  tag("tagStage", "引擎：three " + (T.REVISION || "?") + " · 模型载入中…", true);
  requestAnimationFrame(tick);
 
- window.GBT_RIG = { state: function () { return STATE; }, select: selectBone };
+ /* rAF 停滞检测：连续两个 1 秒窗口帧号不动就切定时器驱动（≈30fps）。rAF 正常时不生效。 */
+ (function watchFrames() {
+   var last = -1, still = 0;
+   setInterval(function () {
+     var f = (renderer && renderer.info && renderer.info.render) ? renderer.info.render.frame : -1;
+     if (f === last) {
+       still += 1;
+       if (still >= 2 && !_timerMode) {
+         _timerMode = true;
+         setInterval(function () { try { tick(); } catch (e) {} }, 33);
+         if (window.console) console.warn("[digital-human] rAF 停摆 ⇒ 切定时器（frame=" + f + "）");
+       }
+     } else { still = 0; last = f; }
+   }, 1000);
+ })();
+
+ /* 可验读数口：帧号 / 三角形 / 定时器模式 —— 没有它就只能"看着像在动" */
+ window.GBT_RIG = {
+   state: function () { return STATE; },
+   select: selectBone,
+   frames: function () {
+     var r = (renderer && renderer.info && renderer.info.render) ? renderer.info.render : {};
+     return { frame: r.frame || 0, triangles: r.triangles || 0, timerMode: !!_timerMode };
+   }
+ };
 })();
 </script>
 <!-- gbt-defense -->
