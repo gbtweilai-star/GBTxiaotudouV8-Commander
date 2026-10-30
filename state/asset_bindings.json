@@ -18612,5 +18612,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T18:06:20"
+ },
+ "docs/37-a19-handoff-20261030.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T19:48:14"
  }
 }
