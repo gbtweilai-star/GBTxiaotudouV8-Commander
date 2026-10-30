@@ -30756,3 +30756,6 @@
 {"at": "2026-10-30T17:55:44", "event": "bind", "asset": "tools/omni_ios.py", "tentacle": "omni_plug", "note": "autobind"}
 {"at": "2026-10-30T17:55:46", "event": "autobind", "files": 3, "bound": 3, "hint": "omni_plug", "pruned": 0}
 {"at": "2026-10-30T17:57:03", "event": "autobind", "files": 2, "bound": 2, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T17:57:53", "event": "gaps", "missing": 0, "no_kind": 251, "scanned": 2004, "third_party": 0}
+{"at": "2026-10-30T18:00:16", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}
+{"at": "2026-10-30T18:02:47", "event": "autobind", "files": 1, "bound": 1, "hint": "omni_plug", "pruned": 0}

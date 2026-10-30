@@ -188,3 +188,51 @@
     if (document.readyState === "complete") setTimeout(report, 1200);
     else window.addEventListener("load", function () { setTimeout(report, 1200); });
   })();
+  /* ── 取帧提供者（2026-10-30）───────────────────────────────────────
+     为什么放在壳里：iOS 沙箱不提供"程序化截屏"，但**页面能截自己的画布**。
+     所以把"看屏幕"拆成两步：桥说"我要一帧"→ 页面截最大画布交上去 →
+     框架侧再用 apple-vision(OCR/分类) 读图。这样 app/see 在 iOS 上也有真实现。
+     只在桥置位 want 时才截（不常驻、不偷跑）。 */
+  (function frameProvider() {
+    function bridgeBase() {
+      return (window.gbtW3 && window.gbtW3.bridge) || "http://127.0.0.1:8791";
+    }
+    function biggestCanvas() {
+      var best = null, area = 0;
+      var cs = document.querySelectorAll("canvas");
+      for (var i = 0; i < cs.length; i++) {
+        var a = (cs[i].width || 0) * (cs[i].height || 0);
+        if (a > area) { area = a; best = cs[i]; }
+      }
+      return area > 10000 ? best : null;
+    }
+    async function tick() {
+      try {
+        var r = await fetch(bridgeBase() + "/_see/want", { cache: "no-store" });
+        var d = await r.json();
+        if (!d || !d.want) return;
+        var cv = biggestCanvas();
+        if (!cv) {
+          await fetch(bridgeBase() + "/_see/frame", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ page: location.pathname, dataUrl: "" })
+          }).catch(function () {});
+          return;
+        }
+        /* 🔴 2026-10-30：3D 舞台的画布是 5760×3240（3300 万像素），直接 toDataURL
+           会卡死/超时 ⇒ 先缩到最长边 800 再编码。OCR 用不到原分辨率。 */
+        var W = cv.width, H = cv.height, k = Math.min(1, 800 / Math.max(W, H));
+        var t = document.createElement("canvas");
+        t.width = Math.max(1, Math.round(W * k));
+        t.height = Math.max(1, Math.round(H * k));
+        var cx = t.getContext("2d");
+        cx.drawImage(cv, 0, 0, t.width, t.height);
+        var url = t.toDataURL("image/png");
+        await fetch(bridgeBase() + "/_see/frame", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ page: location.pathname, dataUrl: url })
+        });
+      } catch (e) { /* 桥不在就静默，页面照常可用 */ }
+    }
+    setInterval(tick, 1500);
+  })();

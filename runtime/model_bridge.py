@@ -483,6 +483,25 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:                              # noqa: BLE001
                 return self._json(500, {"ok": False,
                                         "error": "%s: %s" % (type(exc).__name__, exc)})
+        if self.path.startswith("/_see/latest"):
+            f = ROOT / "state" / "last_frame.json"
+            if not f.is_file():
+                return self._json(200, {"ok": True, "frame": None})
+            try:
+                return self._json(200, {"ok": True, "frame": json.loads(f.read_text(encoding="utf-8"))})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:80]}})
+
+        if self.path.startswith("/_see/want"):
+            f = ROOT / "state" / "see_want.json"
+            want = False
+            if f.is_file():
+                try:
+                    want = bool(json.loads(f.read_text(encoding="utf-8")).get("want"))
+                except Exception:                                 # noqa: BLE001
+                    want = False
+            return self._json(200, {"ok": True, "want": want})
+
         if self.path.startswith("/_local/next"):
             # 2026-10-30：本机权重派活口。页面（浏览器内 GPU 跑我们自己的权重）来领活。
             try:
@@ -520,7 +539,7 @@ class Handler(BaseHTTPRequestHandler):
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status",
-                 "/_cap", "/_tentacle/hello", "/_probe", "/_local",
+                 "/_cap", "/_tentacle/hello", "/_probe", "/_local", "/_see",
                  "/v1/messages", "/v1/messages/count_tokens")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -633,6 +652,42 @@ class Handler(BaseHTTPRequestHandler):
                 with _HELLO_FILE.open("a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 return self._json(200, {"ok": True, "seen": rec["page"]})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
+        if self.path.startswith("/_see/want"):
+            try:
+                f = ROOT / "state" / "see_want.json"
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_text(json.dumps({"want": True,
+                                         "at": time.strftime("%Y-%m-%dT%H:%M:%S")}),
+                             encoding="utf-8")
+                return self._json(200, {"ok": True, "want": True})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:80]}})
+
+        if self.path.startswith("/_see/frame"):
+            # 页面把画布帧交上来：base64 → 存 PNG → 记 last_frame
+            try:
+                import base64 as _b64
+                import re as _re
+                raw = str(body.get("dataUrl") or "")
+                m = _re.match(r"data:image/\w+;base64,(.*)$", raw, _re.S)
+                if not m:
+                    return self._json(400, {"ok": False, "error": {"message": "缺 dataUrl(base64)"}})
+                png = _b64.b64decode(m.group(1))
+                outdir = ROOT / "state" / "frames"
+                outdir.mkdir(parents=True, exist_ok=True)
+                fp = outdir / ("f%d.png" % int(time.time() * 1000))
+                fp.write_bytes(png)
+                rec = {"path": str(fp), "bytes": len(png),
+                       "page": str(body.get("page") or "")[:120],
+                       "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+                (ROOT / "state" / "last_frame.json").write_text(
+                    json.dumps(rec, ensure_ascii=False), encoding="utf-8")
+                (ROOT / "state" / "see_want.json").write_text(json.dumps({"want": False}),
+                                                              encoding="utf-8")
+                return self._json(200, {"ok": True, **rec})
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
 
