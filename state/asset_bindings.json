@@ -1145,7 +1145,8 @@
   "tentacles": [
    "tentacle_bind",
    "brain_route",
-   "health"
+   "health",
+   "platform_profile"
   ],
   "note": "autobind",
   "bound_at": "2026-10-29T08:19:27"

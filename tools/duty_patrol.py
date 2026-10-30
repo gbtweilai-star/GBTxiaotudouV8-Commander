@@ -138,6 +138,25 @@ def gene_tree_rules(rnd: int) -> dict:
         return {"round": rnd, "ok": False, "why": "%s: %s" % (type(exc).__name__, exc)}
 
 
+def domain_heartbeat_tick(rnd: int) -> dict:
+    """分域心跳（每 4 轮跑一次 ≈ 20 分钟，预算 4 域轮转）。
+
+    主人 2026-10-30：30 个分类各一根心跳触手，定点自检 → 交大脑执行层。
+    原来只能手动 `--once`；接进巡检后才真的是"心跳"，不是一次性的演示。
+    """
+    if rnd % 4 != 0:
+        return {}
+    try:
+        r = subprocess.run([sys.executable, "-u", str(ROOT / "tools" / "domain_heartbeat.py"),
+                            "--once", "--budget", "4"],
+                           capture_output=True, text=True, timeout=600, cwd=str(ROOT))
+        out = ((r.stdout or "") + (r.stderr or "")).strip()
+        tail = [l.strip() for l in out.splitlines() if l.strip()][-4:]
+        return {"round": rnd, "ok": r.returncode == 0, "rc": r.returncode, "tail": tail}
+    except Exception as exc:                                      # noqa: BLE001
+        return {"round": rnd, "ok": False, "why": "%s: %s" % (type(exc).__name__, exc)}
+
+
 def one_round(rnd: int) -> dict:
     from gbt_allinone.api import run_task
     rows, ok, bad, skipped = [], 0, 0, 0
@@ -181,6 +200,11 @@ def one_round(rnd: int) -> dict:
                     pass
     rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "round": rnd,
            "ok": ok, "bad": bad, "skipped": skipped, "items": rows}
+    _hb = domain_heartbeat_tick(rnd)
+    if _hb:
+        rec["heartbeat"] = _hb
+        if not _hb.get("ok"):
+            print("    🔴 分域心跳有域报红（详见 state/heartbeat/brain.json）")
     _gt = gene_tree_rules(rnd)
     if _gt:
         rec["tree_rules"] = _gt
