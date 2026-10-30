@@ -143,17 +143,29 @@ function dequant(u8, off, type, nElem){
     const nb = nElem / 256;
     for (let b=0;b<nb;b++){
       const o = off + b*210;
-      const ql = o, qh = o+128, sc = o+192, d = f16(u8, o+208);
+      const ql0 = o, qh0 = o+128, sc0 = o+192, d = f16(u8, o+208);
       const o256 = b*256;
-      for (let n=0;n<2;n++){                     /* 两个 128 半块 */
+      /* 🔴 2026-10-30 按 llama.cpp dequantize_row_q6_K 重写：
+         原来只写 q1/q2（128 个值只解一半 —— 实测 ffn_down 有 51.37% 权重是 0），
+         而且四个子块共用同一个 scale。标准是四子块各用 sc[is+0/2/4/6]。 */
+      for (let g=0;g<2;g++){                     /* 两个 128 组：ql+64 qh+32 sc+8 */
+        const ql = ql0 + g*64, qh = qh0 + g*32, sc = sc0 + g*8;
         for (let l=0;l<32;l++){
-          const is = n*8 + (l/16|0);             /* scales 索引 */
-          const s = (((u8[sc+is] << 24) >> 24)) * d;   /* int8 有符号 */
-          const qhb = u8[qh + n*32 + l];
-          const lo = (u8[ql + n*64 + l] & 0x0f) | (((qhb >> 0) & 3) << 4);
-          const hi = (u8[ql + n*64 + l + 32] & 0x0f) | (((qhb >> 2) & 3) << 4);
-          out[o256 + n*128 + l]      = s * (lo - 32);
-          out[o256 + n*128 + l + 32] = s * (hi - 32);
+          const is = l >> 4;                      /* 0 或 1 */
+          const qhb = u8[qh + l];
+          const q1 = (((u8[ql + l])      & 0x0F) | (((qhb >> 0) & 3) << 4)) - 32;
+          const q2 = (((u8[ql + l + 32]) & 0x0F) | (((qhb >> 2) & 3) << 4)) - 32;
+          const q3 = (((u8[ql + l])      >> 4  ) | (((qhb >> 4) & 3) << 4)) - 32;
+          const q4 = (((u8[ql + l + 32]) >> 4  ) | (((qhb >> 6) & 3) << 4)) - 32;
+          const s1 = (u8[sc + is + 0] << 24) >> 24;
+          const s2 = (u8[sc + is + 2] << 24) >> 24;
+          const s3 = (u8[sc + is + 4] << 24) >> 24;
+          const s4 = (u8[sc + is + 6] << 24) >> 24;
+          const base = o256 + g*128;
+          out[base + l +  0] = d * s1 * q1;
+          out[base + l + 32] = d * s2 * q2;
+          out[base + l + 64] = d * s3 * q3;
+          out[base + l + 96] = d * s4 * q4;
         }
       }
     }
