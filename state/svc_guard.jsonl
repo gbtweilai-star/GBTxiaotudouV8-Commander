@@ -739,3 +739,5 @@
 {"at": "2026-10-30T18:19:35", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 373}
 {"at": "2026-10-30T18:19:41", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 376}
 {"at": "2026-10-30T18:19:35", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 431}
+{"at": "2026-10-30T18:26:00", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 1432}
+{"at": "2026-10-30T18:25:58", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 1393}
