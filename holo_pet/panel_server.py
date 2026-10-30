@@ -59,8 +59,30 @@ from gbt_allinone.security import policy  # noqa: E402
 from gbt_allinone.tentacle import vision_watch  # noqa: E402
 from gbt_allinone.tentacle.brain import tentacle_transmission  # noqa: E402
 
-import research_status  # noqa: E402
-import social_platforms  # noqa: E402
+# 🔴 2026-10-30：这两个模块全仓都没有，但这里是**裸 import** ⇒ 面板后端起不来
+#   （实测 ModuleNotFoundError: research_status），连带 mirror 五项全红。
+#   而 tools/mirror_panel.py 里已经立了判据：「面板后端在缺 research_status /
+#   social_platforms 时仍能启动」。所以按那条判据改成可选导入 + 如实降级。
+try:
+    import research_status  # noqa: E402
+except Exception:                                                 # noqa: BLE001
+    class _MissingResearchStatus:
+        present = False
+        reason = "缺 research_status 模块（未随仓库发布）"
+
+        @staticmethod
+        def build_status(*_a, **_k):
+            return {"counts": {}, "unavailable": True,
+                    "reason": _MissingResearchStatus.reason}
+    research_status = _MissingResearchStatus()
+
+try:
+    import social_platforms  # noqa: E402
+except Exception:                                                 # noqa: BLE001
+    class _MissingSocial:
+        present = False
+        reason = "缺 social_platforms 模块（未随仓库发布）"
+    social_platforms = _MissingSocial()
 
 try:
     from chat_client import ChatClient
