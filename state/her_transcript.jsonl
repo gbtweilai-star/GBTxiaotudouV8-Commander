@@ -36,3 +36,8 @@
 {"at": "2026-10-28T20:58:19", "role": "sensor", "text": "{\"event\":\"answer\",\"lane\":\"selfhost\",\"ours\":true,\"ttft_s\":\"?\",\"total_s\":\"178.88\",\"chars\":0}", "upstream": null, "model": null, "source": "page"}
 {"at": "2026-10-28T20:58:19", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
 {"at": "2026-10-28T22:40:53", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T14:11:02", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T14:13:56", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T14:14:33", "role": "user", "text": "What is the capital of France?", "upstream": "local:gpu", "model": null, "source": "page"}
+{"at": "2026-10-30T14:14:33", "role": "assistant", "text": "The French language french english-englishlanguage is a native EnglishEnglishis not only has been translated into french english to French language is in the English.\nEnglishlanguageis a native of french english to French language is in the English.", "upstream": "local:gpu", "model": null, "source": "page"}
+{"at": "2026-10-30T14:14:33", "role": "sensor", "text": "{\"event\":\"answer\",\"lane\":\"local:gpu\",\"ours\":true,\"ttft_s\":\"0.2\",\"total_s\":1.37,\"chars\":249}", "upstream": null, "model": null, "source": "page"}

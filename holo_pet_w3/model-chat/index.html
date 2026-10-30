@@ -511,6 +511,46 @@ async function send() {
        和 her.py 在 Minis 那边看到的是同一句实话。
        风险：浏览器跨源。llama.cpp 系服务端一般带 Access-Control-Allow-Origin:*，
        如果这版容器不带，fetch 会抛 TypeError —— 下面单独报这句，不混进"桥连不上"。 */
+    /* 🔴 2026-10-30：本机权重（浏览器内）优先。
+       目的：不依赖 LM Pocket 里那个 Load & Start Server 开关，用整机算力答。
+       只在 ?local=1 时启用，默认不动原有桥路（不悄悄改掉熟悉的行为）。
+       后端由 local-llm.js 自选（GPU 可用走 GPU，否则退 JS），并把真实 backend 报回来。 */
+    window.__LD = window.__LD || [];
+    window.__LD.push(["branch-check", !!(window.GBT_LOCAL), !!(window.GBT_LOCAL && window.GBT_LOCAL.enabled())]);
+    if (window.GBT_LOCAL && window.GBT_LOCAL.enabled()) {
+      window.__LD.push(["enter", Date.now()]);
+      node.dataset.got = "1";
+      node.textContent = "（本机权重载入中…首次约 0.5 s，权重传显存约 0.3 s）";
+      try {
+        window.__LD.push(["ask-start", Date.now()]);
+        const out = await window.GBT_LOCAL.ask(messages);
+        window.__LD.push(["ask-done", Date.now(), out && out.tokens, out && out.backend]);
+        stopWake();
+        node.textContent = out.text || "(空回包)";
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = "自有权重 · 浏览器内 " + out.backend + " · " +
+                           out.tokens + " token · " + out.tokPerSec + " tok/s · " + out.seconds + "s";
+        node.appendChild(meta);
+        history.push({role: "user", content: text}, {role: "assistant", content: out.text || ""});
+        if (history.length > 16) history.splice(0, history.length - 16);
+        logMsg("user", text, "local:" + out.backend, null);
+        logMsg("assistant", out.text || "", "local:" + out.backend, "");
+        logMsg("sensor", JSON.stringify({event: "answer", lane: "local:" + out.backend,
+          ours: true, ttft_s: out.firstMs ? (out.firstMs/1000).toFixed(1) : null,
+          total_s: out.seconds, chars: (out.text || "").length}));
+        autoSpeak(out.text || "");
+        busy = false;
+        return;
+      } catch (e) {
+        window.__LD.push(["err", String(e && e.message || e)]);
+        node.className = "msg ai err";
+        node.textContent = "本机权重不可用（" + (e && e.message || e) + "）—— 去掉 ?local=1 走原来的桥路。";
+        busy = false;
+        return;
+      }
+    }
+
     const DIRECT = "http://127.0.0.1:1234/v1";
     const direct = upstream === "direct";
     let url = BRIDGE + "/v1/chat/completions";
@@ -731,5 +771,40 @@ document.getElementById("input").addEventListener("keydown", (e) => {
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
 <script src="../shell/tentacle-kit.js?v=20261029"></script>
+
+<!-- 2026-10-30：本机权重（浏览器内推理）。?local=1 才启用；不启用时零开销。 -->
+<script type="module">
+const ON = /[?&]local=1/.test(location.search);
+let eng = null, loading = null;
+async function ensure() {
+  if (eng) return eng;
+  if (!loading) {
+    loading = (async () => {
+      const mod = await import("../wgpu/local-llm.js");
+      eng = await mod.createLocalLLM({ backend: "auto", modelUrl: "../wgpu/models/tiny.gguf" });
+      return eng;
+    })();
+  }
+  return loading;
+}
+window.GBT_LOCAL = {
+  enabled() { return ON; },
+  async status() {
+    if (!eng) return { loaded: false, enabled: ON };
+    return { loaded: true, backend: eng.backend, model: eng.model, note: eng.note };
+  },
+  async ask(messages) {
+    const e = await ensure();
+    const last = (messages || []).filter(m => m.role === "user").slice(-1)[0] || {content: ""};
+    const q = last.content || "你好";
+    let firstMs = null;
+    try { const t1 = performance.now(); await e.nextToken(q); firstMs = Math.round(performance.now() - t1); } catch (_) {}
+    const out = await e.chat(q, 48);
+    return { text: out.text, backend: e.backend, tokens: out.tokens,
+             seconds: out.seconds, tokPerSec: out.tokPerSec, firstMs };
+  }
+};
+window.__GBT_LOCAL_READY = ON;
+</script>
 </body>
 </html>
