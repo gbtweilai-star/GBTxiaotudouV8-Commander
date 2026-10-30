@@ -52,7 +52,11 @@ UPSTREAMS = {
     #    model 留空 ⇒ 桥每次问 /v1/models 拿当前加载的模型名，换权重零改动。
     # 页面（holo_pet_w3/model-chat）认的名字是 selfhost —— 名字对齐，页面不用改逻辑。
     # 指向手机自己的 A19（LM Pocket，OpenAI 兼容口）。
-    "selfhost": ("http://127.0.0.1:1234/v1", "", "raw:gbt", 30),
+    # 2026-10-30：模型名对齐 Minis 里的 provider 条目（gbt-v8-v82-q5_0），
+    # 原来传空串 —— 对面按空名可能直接 400。可用环境变量覆盖（换权重时不用改代码）。
+    "selfhost": ("http://127.0.0.1:1234/v1",
+                 __import__("os").environ.get("GBT_A19_MODEL") or "gbt-v8-v82-q5_0",
+                 "raw:gbt", 30),
     "ours":     ("https://api.runpod.ai/v2/qnnqf9w8xcefj8/openai/v1",
                  "/runpod-volume/gbt-v8-v83", "potato", 300),
     "ours-alt": ("https://api.runpod.ai/v2/7b5inowyar12yh/openai/v1",
