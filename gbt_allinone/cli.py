@@ -148,6 +148,9 @@ def cmd_heartbeat(argv):
         "taxonomy_ok": (rep.get("taxonomy") or {}).get("ok"),
         "hygiene": rep.get("hygiene"),
         "signals_by_level": rep.get("signals_by_level"),
+        # 深检记账：light 档跳过 body_map ⇒ 七感官六动作靠 full 才体检。
+        # 不把"上次深检什么时候"带出来，用户看不出那 12/12 绿是不是"没测的绿"。
+        "deep": rep.get("deep"),
         "verdict": adv.get("verdict"),
         "headline": adv.get("headline"),
         "counts": adv.get("counts"),

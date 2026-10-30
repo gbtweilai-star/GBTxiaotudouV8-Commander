@@ -13,7 +13,7 @@
 ```
 cap_taxonomy(12 类)                       ← 分类真源（349 条精确覆盖，自校验）
         ↓ 每类一根
-HeartbeatTentacle.pulse()                 ← 定点自检（五层，只读，零授权）
+HeartbeatTentacle.pulse()                 ← 定点自检（六层，只读，零授权）
         ↓ status
 state/heartbeat/tentacle-<类>.json        ← 落盘（可回看、可比对漂移）
         ↓ 汇总
@@ -86,6 +86,9 @@ TIER_FULL = "full"
 #   ② **外来物只报不删**：判定为"不是我们的东西"时**一律不动** —— 别人的东西不该由触手处置。
 #   ③ **默认 dry-run**：不显式要 `--clean` 就只出清单。删除属写面，得有人明确要。
 KEEP_SCANS = 20          # scan-*.json 环形保留份数（再多就是垃圾）
+# 深检过期阈值：超过这么久没跑过 full，「七感官六动作」就等于没体检。
+# 24 小时 —— 一天至少一次全身扫描，是该有的底线。
+DEEP_MAX_AGE_S = 24 * 3600
 # 原子写的临时后缀：写盘时先落这个再 os.replace。卫生层对它**豁免**
 # （既不当垃圾扫掉，也不当外来物报红）—— 否则会扫掉别人正在写的那一份。
 _SWAP_SUFFIX = ".swapping"
@@ -785,6 +788,25 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
                 if h.get(k):
                     hyg[k].extend(h[k])
 
+    # ── 深检记账（2026-10-30 打磨三）──────────────────────────────────────
+    # 踩到的洞：自动链路（monitor-loop）永远跑 light，而「身」的器官探针是 full 档的
+    # `body_map`（七感官六动作逐根回读）⇒ **全身扫描从来没在自动监控里跑过**，
+    # 报告却显示 12/12 绿（probe.ok=None 不参与判定）。这是"看着绿其实没测"。
+    # 现在把「上一次深检是什么时候」显式记账，过期/从未都要能被 advise 抓到。
+    prev_rep = _read_json(_STATE_DIR / "latest.json")
+    _prev_deep = (prev_rep.get("deep") or {}) if isinstance(prev_rep, dict) else {}
+    last_full = _prev_deep.get("last_full_at")
+    if mode == TIER_FULL:
+        last_full = _now()
+    deep = {"last_full_at": last_full, "ever": bool(last_full)}
+    if last_full:
+        try:
+            deep["age_s"] = int((datetime.now() - datetime.strptime(
+                str(last_full), "%Y-%m-%dT%H:%M:%S")).total_seconds())
+        except Exception:  # noqa: BLE001
+            deep["age_s"] = None
+        deep["stale"] = bool(deep["age_s"] is not None and deep["age_s"] > DEEP_MAX_AGE_S)
+
     report = {
         "at": _now(),
         "mode": mode,
@@ -798,6 +820,7 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
         "signals": all_sig,
         "signals_by_level": by_level,
         "hygiene": {k: (len(v) if isinstance(v, list) else v) for k, v in hyg.items()},
+        "deep": deep,
         "ms": round((time.time() - t0) * 1000),
     }
 

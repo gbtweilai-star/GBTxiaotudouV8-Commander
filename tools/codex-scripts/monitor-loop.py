@@ -36,6 +36,9 @@ sys.path.insert(0, str(ROOT))
 HEART = ROOT / "state" / "monitor-loop.json"
 LOCK = ROOT / "state" / "monitor-loop.lock"
 INTERVAL = 300
+# 每多少拍做一次全身扫描（full 档）。10 拍 × 300s ≈ 50 分钟一次。
+# 为什么必须有：light 档跳过 body_map，七感官六动作等于不体检 —— 那 12/12 绿是"没测"的绿。
+DEEP_EVERY = 10
 
 
 def _alive(pid: int) -> bool:
@@ -63,7 +66,7 @@ def _claim_lock() -> bool:
     return True
 
 
-def _tick() -> int:
+def _tick(deep: bool = False) -> int:
     t0 = time.time()
     ran, err = [], None
     try:
@@ -87,11 +90,17 @@ def _tick() -> int:
     # 为什么接在这里而不是另开一个常驻进程：**已经有一个每分钟级别在跑的循环**，
     # 再起一个就是两份心跳、两处口径。这一拍顺手打一次心跳，代价实测 light 档约 0.3 秒。
     # 心跳红了要不要动手，交给 brain_exec.advise 定级 —— 循环只负责**报**，不越界处置。
+    #
+    # 🔴 2026-10-30 打磨三（分频深检）：原来这里**永远 light**，而「身」的器官探针
+    #    （body_map：七感官六动作逐根回读）是 full 档的 ⇒ **全身扫描从来没在自动链路里跑过**，
+    #    报告却 12/12 绿（probe.ok=None 不参与判定）。"看着绿其实没测"就是这么来的。
+    #    现在：每拍 light，每 DEEP_EVERY 拍跑一次 full。light 约 0.3s，full 约 6.5s，
+    #    默认 10 拍一次 ⇒ 平均每拍多 0.62s，换"七感官一天至少体检一次"。
     hb_summary, hb_err, hb_red = None, None, False
     try:
         from gbt_allinone import brain_exec as _be
 
-        _hb = _be.heartbeat(mode="light")
+        _hb = _be.heartbeat(mode="full" if deep else "light")
         _adv = _be.advise(_hb)
         hb_summary = {
             "tentacles_ok": _hb.get("tentacles_ok"),
@@ -102,6 +111,7 @@ def _tick() -> int:
             "headline": _adv.get("headline"),
             "signals_by_level": _hb.get("signals_by_level"),
             "ms": _hb.get("elapsed_ms"),
+            "deep": deep,
         }
         hb_red = _adv.get("verdict") == "red"
     except Exception as e:                      # noqa: BLE001
@@ -142,6 +152,7 @@ def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     once = "--once" in args
     interval = INTERVAL
+    deep_every = DEEP_EVERY
     if "--interval" in args:
         i = args.index("--interval")
         if i + 1 < len(args):
@@ -149,18 +160,29 @@ def main(argv=None) -> int:
                 interval = max(30, int(args[i + 1]))
             except ValueError:
                 pass
+    if "--deep-every" in args:
+        i = args.index("--deep-every")
+        if i + 1 < len(args):
+            try:
+                deep_every = max(1, int(args[i + 1]))
+            except ValueError:
+                pass
     if not _claim_lock():
         print("[monitor-loop] 已有实例在跑（见 %s）—— 本进程退出" % LOCK.name)
         return 0
     if once:
-        return _tick()
-    print("[monitor-loop] 常驻启动 pid=%d · 每 %d 秒一拍（Ctrl+C 停）" % (os.getpid(), interval),
-          flush=True)
+        return _tick(deep=("--deep" in args))
+    print("[monitor-loop] 常驻启动 pid=%d · 每 %d 秒一拍 · 每 %d 拍深检一次（Ctrl+C 停）"
+          % (os.getpid(), interval, deep_every), flush=True)
+    n = 0
     while True:
+        # 第 1 拍就深检（先拿一个全身基线），之后每 deep_every 拍一次
+        deep = (n % deep_every == 0)
         try:
-            _tick()
+            _tick(deep=deep)
         except Exception as e:                      # noqa: BLE001
             print("[monitor-loop] 这一拍炸了：%s: %s" % (type(e).__name__, e), flush=True)
+        n += 1
         time.sleep(interval)
 
 

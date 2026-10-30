@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import tempfile
@@ -316,6 +317,60 @@ class PolishRound2Test(unittest.TestCase):
         hb = h["heartbeat"]
         self.assertTrue(hb.get("tentacles_total") or hb.get("never_scanned"),
                         "心跳摘要要么有读数要么明确说没扫过：%s" % hb)
+
+
+class DeepCheckTest(unittest.TestCase):
+    """十、2026-10-30 打磨三：分频深检 —— 不许"看着绿其实没测"。
+
+    踩到的洞：自动链路永远 light，而「身」的器官探针是 full 档的 body_map
+    ⇒ 七感官六动作在自动监控里**从来没跑过**，报告却 12/12 绿（probe.ok=None 不参与判定）。
+    现在把「上次深检是什么时候」显式记账，从未/过期都要出指令，且能自动补齐。
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.mkdtemp(prefix="gbt_hb_deep_")
+        self._orig = HB._STATE_DIR
+        HB._STATE_DIR = Path(self._tmp)
+
+    def tearDown(self) -> None:
+        HB._STATE_DIR = self._orig
+        shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def test_light_only_is_reported_as_never_deep_checked(self) -> None:
+        rep = HB.scan_all(mode="light", persist=True)
+        self.assertFalse(rep["deep"]["ever"], "只有 light 却报 ever=True")
+        ids = [x["id"] for x in BE.advise(rep)["instructions"]]
+        self.assertIn("never_deep_checked", ids,
+                      "从没深检过却不提示 —— 七感官等于没体检：%s" % ids)
+
+    def test_full_marks_deep_and_clears_the_hint(self) -> None:
+        HB.scan_all(mode="light", persist=True)
+        rep = HB.scan_all(mode="full", persist=True)
+        self.assertTrue(rep["deep"]["ever"], "跑过 full 却报 ever=False")
+        self.assertIsNotNone(rep["deep"]["last_full_at"])
+        self.assertFalse(rep["deep"]["stale"])
+        ids = [x["id"] for x in BE.advise(rep)["instructions"]]
+        self.assertNotIn("never_deep_checked", ids, "深检完还在提示从未深检")
+        self.assertNotIn("deep_check_stale", ids, "刚深检完就说过期")
+
+    def test_stale_deep_check_is_flagged(self) -> None:
+        # 伪造一份"两天前深检过"的账
+        old = "2026-10-28T00:00:00"
+        (Path(self._tmp) / "latest.json").write_text(
+            json.dumps({"at": old, "deep": {"last_full_at": old, "ever": True}},
+                       ensure_ascii=False), encoding="utf-8")
+        rep = HB.scan_all(mode="light", persist=True)
+        self.assertTrue(rep["deep"]["stale"], "两天没深检却不判过期：%s" % rep["deep"])
+        ids = [x["id"] for x in BE.advise(rep)["instructions"]]
+        self.assertIn("deep_check_stale", ids)
+
+    def test_act_auto_completes_deep_check(self) -> None:
+        HB.scan_all(mode="light", persist=True)
+        self.assertFalse(HB.latest()["deep"]["ever"])
+        r = BE.act()
+        ops = [x["op"] for x in r["executed"]]
+        self.assertIn("heartbeat_full", ops, "深检缺失时 act 应自动补：%s" % ops)
+        self.assertTrue(HB.latest()["deep"]["ever"], "act 补齐后 deep 仍未记账")
 
 
 class ScanRetentionTest(unittest.TestCase):
