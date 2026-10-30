@@ -89,6 +89,19 @@
       out.diffuse_roughness = avg(rgh);
       out.body_tex_px = bodyPx || null;
       out.detail_normal = hasNormal;
+      out.model_in_scene = !!(modelRoot && modelRoot.parent);
+      out.model_visible = modelRoot ? !!modelRoot.visible : null;
+      out.model_scale = modelRoot ? +modelRoot.scale.x.toFixed(4) : null;
+      out.model_pos = modelRoot ? [+modelRoot.position.x.toFixed(2),
+                                   +modelRoot.position.y.toFixed(2),
+                                   +modelRoot.position.z.toFixed(2)] : null;
+      out.camera_pos = camera ? [+camera.position.x.toFixed(2),
+                                 +camera.position.y.toFixed(2),
+                                 +camera.position.z.toFixed(2)] : null;
+      out.ssaa = DH_SSAA;
+      out.pixel_ratio = renderer ? renderer.getPixelRatio() : null;
+      out.buffer_px = renderer ? [renderer.domElement.width, renderer.domElement.height] : null;
+      out.face_light = faceLight ? +Number(faceLight.intensity || 0).toFixed(3) : null;
       out.state_machine = {
         state: DH.state, prev: DH.prev, blend_s: DH.blend,
         weights: DH.weights, foot_lock: DH.footLock,
@@ -104,6 +117,8 @@
   }
 
   window.GBT_DH3D = { setState: function () {}, level: function () {}, info: info,
+                      exportPNG: exportPNG, getSSAA: function () { return DH_SSAA; },
+                      setSSAA: function (n) { DH_SSAA = Math.max(1, Math.min(4, Number(n) || 1)); dhApplyPixelRatio(); resize(); return DH_SSAA; },
                       readings: readings };
 
   if (!canvas) { S.status = "no-canvas"; return; }
@@ -293,6 +308,17 @@
       _lastFootWorld.copy(fw);
     }
   }
+  /* ② 脸部/眼部补光（2026-10-30）：贴在相机上的小补光，专给眼睛高光点。
+     挂在相机上 ⇒ 转视角时灯跟着走，不会一转脸就黑。 */
+  var faceLight = null;   /* 在 try 之前声明：strict 模式下给未声明变量赋值会抛 ReferenceError，
+                             而我原来的 catch{} 把它吞了 ⇒ 读数里 face_light 恒为 null */
+  try {
+    faceLight = new THREE.PointLight(0xfff1e2, 0.55, 2.4, 2.0);
+    faceLight.position.set(0.16, 0.10, 0.30);
+    camera.add(faceLight);
+    scene.add(camera);
+  } catch (eFL) {}
+
   var CAM = null;                      /* 取景基准（fitCamera 算一次，tick 只做微动） */
   var B = {};                          /* 骨骼名 → Bone */
   var base = {};                       /* 每根要叠加的骨骼：记 idle 姿势基准旋转 */
@@ -467,8 +493,28 @@
     CAM = { aim: aim, dist: dist, pos0: camera.position.clone() };
   }
 
+  /* ── 渲染端清晰度（2026-10-30 主人第 3 条）──────────────────────────
+     ① SSAA 超采样：按 SSAA 倍率提高 drawing buffer，浏览器降采样回 CSS 尺寸
+        —— 零依赖、立刻见效（边缘不再锯齿、细发丝不再断）。
+     ② 脸部/眼部补光：一盏贴着相机的小面积补光，专打头部 —— 眼睛要有高光点，
+        脸不能靠环境漫反射吃饭。
+     ③ 高分辨率出图：exportPNG(scale) 临时放大画布渲染一帧再取 dataURL，出完恢复。
+     ─────────────────────────────────────────────────────────────────── */
+  var DH_SSAA = 2;                     /* 默认 2× 超采样 */
+  /* faceLight 已在上面创建：这里**不能**再赋 null（var 会覆盖前值，实测 face_light 读成 null） */
+
+  function dhApplyPixelRatio() {
+    if (!renderer) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    /* 2026-10-30 实测：dpr2 × SSAA2 = 4 ⇒ buffer 7680×4320（3300 万像素），
+       WebView 里模型加载被拖到 40 秒以上甚至卡在 loading。
+       总倍率封顶 3（≈900 万像素），SSAA 只在还能提的时候才真加。 */
+    var total = Math.min(3, Math.max(1, dpr * DH_SSAA));
+    renderer.setPixelRatio(total);
+  }
   function resize() {
     var w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    dhApplyPixelRatio();                       /* ① SSAA：先设倍率再 setSize */
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -483,6 +529,31 @@
   function addRot(name, ax, val) {
     var b = B[name] || B[boneKey(name)];
     if (b) b.rotation[ax] += val;
+  }
+
+  /* ③ 高分辨率出图：临时放大 pixelRatio 渲一帧取 dataURL，然后恢复。
+     不改画布 CSS 尺寸 ⇒ 不动布局；出图分辨率 = CSS 尺寸 × pixelRatio × scale。 */
+  function exportPNG(scale) {
+    scale = Math.max(1, Math.min(4, Number(scale) || 2));
+    if (!renderer) return { ok: false, why: "no-renderer" };
+    var w = canvas.clientWidth || 800, h = canvas.clientHeight || 800;
+    var oldPR = renderer.getPixelRatio();
+    try {
+      renderer.setPixelRatio(oldPR * scale);
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+      var url = canvas.toDataURL("image/png");
+      return { ok: true, url: url, scale: scale,
+               pixels: [Math.round(w * oldPR * scale), Math.round(h * oldPR * scale)] };
+    } catch (eEx) {
+      return { ok: false, why: String(eEx && eEx.message || eEx).slice(0, 120) };
+    } finally {
+      renderer.setPixelRatio(oldPR);
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    }
   }
 
   function tick(now) {
