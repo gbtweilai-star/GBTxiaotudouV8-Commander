@@ -33,5 +33,34 @@
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
 <script src="../shell/tentacle-kit.js?v=20261029"></script>
+
+<script>
+/* ?_probe=1 时自报：三角形数 + 中心像素亮度（用 dh3d.pixels 的离屏回读，不依赖截图） */
+(function () {
+  if (!/[?&]_probe=1/.test(location.search)) return;
+  var tries = 0;
+  var iv = setInterval(async function () {
+    tries++;
+    if (window.GBT_DH3D && window.GBT_DH3D.readings && window.GBT_DH3D.pixels) {
+      try {
+        var r = window.GBT_DH3D.readings();
+        /* 🔴 2026-10-30：readings 一出现就报，会拿到"模型还没进画面"那一刻的值
+           （tris=12 = 只有地面、frames=0）。这里等到**真画出人物**再报，超过 30 秒才服输。 */
+        if (!(r.triangles > 100) && tries < 30) return;
+        var px = window.GBT_DH3D.pixels(24);
+        clearInterval(iv);
+        await fetch("http://127.0.0.1:8791/_probe", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ page: "voice-theater/stage3d.html",
+            ok: px.ok && px.nonblackPct > 0,
+            readings: { status: r.status, bones: r.bones, tris: r.triangles,
+                        avg: px.avg, nonblack: px.nonblackPct, frames: r.state_machine.frames } })
+        });
+      } catch (e) { clearInterval(iv); }
+    }
+    if (tries > 60) clearInterval(iv);
+  }, 1000);
+})();
+</script>
 </body>
 </html>

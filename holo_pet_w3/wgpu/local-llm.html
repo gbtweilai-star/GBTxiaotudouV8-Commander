@@ -46,6 +46,18 @@ const want=q.get("backend")||"auto";
     say(bad===0?`<span class="ok">统一入口自检通过（${rows.length}/${rows.length}）</span>`:`<span class="bad">未达标：${bad} 项红</span>`);
     window.__llm={ok:bad===0,backend:llm.backend,note:llm.note,firstMs:firstMs|0,
                   tps:c.tokPerSec,top1:nx.text,chat:c.text,rows};
+    /* 🔴 2026-10-30：带 ?_probe=1 时把读数自报给桥，巡检就能像读 /health 一样读本页 */
+    if (/[?&]_probe=1/.test(location.search)) {
+      try {
+        await fetch((location.port === "8081" ? "http://127.0.0.1:8791" : "http://127.0.0.1:8791") + "/_probe", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ page: "wgpu/local-llm.html", ok: bad === 0,
+            readings: { backend: llm.backend, tps: c.tokPerSec, top1: nx.text,
+                        first_ms: firstMs|0, rows_bad: bad } })
+        });
+        say("<span class='dim'>已向桥自报读数（/_probe）</span>");
+      } catch (e) { say("<span class='dim'>自报失败：" + (e && e.message || e) + "</span>"); }
+    }
   }catch(e){
     say(`<span class="bad">🔴 ${String(e&&e.message||e)}</span>`);
     if(e&&e.stack) say(`<span class="dim">${String(e.stack).split("\n").slice(0,4).join("\n")}</span>`);
