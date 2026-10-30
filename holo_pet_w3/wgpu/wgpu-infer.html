@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本机推理 · WebGPU 流水线</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  pre{white-space:pre-wrap;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}
+</style>
+</head>
+<body>
+<pre id="o">载入…</pre>
+<script type="module">
+import { GGUFModel } from "./gguf-llm.js";
+import { WGPUModel } from "./wgpu-llm.js";
+
+const L = [], out = document.getElementById("o");
+const say = (s) => { L.push(s); out.innerHTML = L.join("\n"); };
+
+const argmax = (a) => { let bi = 0, bv = -1e30; for (let i = 0; i < a.length; i++) if (a[i] > bv) { bv = a[i]; bi = i; } return bi; };
+
+(async function () {
+  try {
+    const t0 = performance.now();
+    const buf = await (await fetch("models/tiny.gguf")).arrayBuffer();
+    const M = new GGUFModel(buf);
+    say(`GGUF 载入 ${(performance.now() - t0|0)} ms · ${M.nLayer} 层 · 词表 ${M.tokens.length}`);
+
+    const t1 = performance.now();
+    const G = await WGPUModel.create(M);
+    say(`WebGPU 就绪（WGSL 编译无错）· ${(performance.now() - t1|0)} ms`);
+
+    const t2 = performance.now();
+    const up = G.upload((i, n, bytes) => { if (i % 90 === 0) say(`  上传 ${i}/${n} · ${(bytes/1048576)|0} MiB`); });
+    say(`权重上传 ${up.tensors} 个张量 · ${up.mib} MiB · ${(performance.now() - t2|0)} ms`);
+
+    const t3 = performance.now();
+    G.prepare(64);
+    say(`bind group 预建完成 · ${(performance.now() - t3|0)} ms`);
+
+    /* 与 JS 路径同一提示词 */
+    const PROMPT_IDS = [504, 3575, 282, 4649, 314];   /* "The capital of France is" */
+    const dec = (ids) => ids.map(i => (M.tokens[i] || "").replace(/Ġ/g, " ").replace(/Ċ/g, "\n")).join("");
+
+    /* 逐算子二分：找出第一个真正报错的算子 */
+    {
+      const dev = G.dev;
+      const one = async (label, fn) => {
+        dev.pushErrorScope("validation");
+        try { fn(); } catch (e) { say(`  ${label}: 抛异常 ${e.message}`); await dev.popErrorScope(); return; }
+        const err = await dev.popErrorScope();
+        if (err) say(`  <span class='bad'>🔴 ${label}: ${err.message.slice(0,120)}</span>`);
+        else say(`  ✅ ${label}`);
+      };
+      const enc1 = () => {
+        const e = dev.createCommandEncoder();
+        e.copyBufferToBuffer(G.buf.get("token_embd.weight"), 504*576*4, G.A.x, 0, 576*4);
+        dev.queue.submit([e.finish()]);
+        return e;
+      };
+      await one("copy 词嵌入 → act.x", () => { enc1(); });
+      await one("rms(attn_norm) → h", () => {
+        const e = dev.createCommandEncoder();
+        const p1 = e.beginComputePass();
+        p1.setPipeline(G.pipes.rms); p1.setBindGroup(0, G.B.mv[0].rn1);
+        p1.dispatchWorkgroups(3); p1.end();
+        dev.queue.submit([e.finish()]);
+      });
+      await one("mv(attn_q) → q", () => {
+        const e = dev.createCommandEncoder();
+        const p1 = e.beginComputePass();
+        p1.setPipeline(G.pipes.mv); p1.setBindGroup(0, G.B.mv[0].q);
+        p1.dispatchWorkgroups(9); p1.end();
+        dev.queue.submit([e.finish()]);
+      });
+      await one("rope(q)", () => {
+        const e = dev.createCommandEncoder();
+        const p1 = e.beginComputePass();
+        p1.setPipeline(G.pipes.rope); p1.setBindGroup(0, G.B.mv[0].rq);
+        p1.dispatchWorkgroups(5); p1.end();
+        dev.queue.submit([e.finish()]);
+      });
+    }
+
+    /* 校验错误捕获：WebGPU 的失败是静默的，只有 error scope 能给出真话 */
+    {
+      const dev = G.dev;
+      dev.pushErrorScope("validation");
+      const lgx = await G.step(PROMPT_IDS[0], 0);
+      const e1 = await dev.popErrorScope();
+      say(`  校验错误(step): ${e1 ? e1.message : "无"}`);
+      dev.pushErrorScope("out-of-memory");
+      const e2 = await dev.popErrorScope();
+      say(`  OOM: ${e2 ? e2.message : "无"}`);
+      say(`  设备丢失: ${dev.lost ? "(有 lost promise)" : "n/a"}`);
+      G.dev.lost && G.dev.lost.then((i) => say(`  <span class='bad'>device lost: ${i.reason} ${i.message}</span>`));
+    }
+    /* 调试探针：看一眼各阶段激活有没有真算出来 */
+    {
+      const lg0 = await G.step(PROMPT_IDS[0], 0);
+      const px = await G.peek("x", 4), ph = await G.peek("h", 4),
+            pq = await G.peek("q", 4), pctx = await G.peek("ctx", 4);
+      say(`  探针 x=${JSON.stringify(Array.from(px).map(v=>+v.toFixed(4)))}`);
+      say(`  探针 h=${JSON.stringify(Array.from(ph).map(v=>+v.toFixed(4)))}`);
+      say(`  探针 q=${JSON.stringify(Array.from(pq).map(v=>+v.toFixed(4)))}`);
+      say(`  探针 ctx=${JSON.stringify(Array.from(pctx).map(v=>+v.toFixed(4)))}`);
+      say(`  探针 logits 前4=${JSON.stringify(Array.from(lg0.slice(0,4)).map(v=>+v.toFixed(3)))} · 非零=${Array.from(lg0).filter(v=>v!==0).length}`);
+    }
+
+    /* 预热一次（首次编译/上传抖动不计入） */
+    await G.step(PROMPT_IDS[0], 0);
+
+    G.reset();
+    let lg = null;
+    const tF = performance.now();
+    for (let i = 0; i < PROMPT_IDS.length; i++) lg = await G.step(PROMPT_IDS[i], i);
+    const firstMs = performance.now() - tF;
+    const top1 = argmax(lg);
+    say(`  首 token（prompt ${PROMPT_IDS.length} 步）${firstMs|0} ms · top-1 = ${JSON.stringify(M.tokens[top1])}`);
+    if (G.gpuErrors && G.gpuErrors.length) {
+      say(`<span class='bad'>GPU 报错 ${G.gpuErrors.length} 条：</span>`);
+      for (const e of G.gpuErrors.slice(0, 3)) say(`  <span class='bad'>${e}</span>`);
+    }
+
+    let gen = PROMPT_IDS.slice();
+    let nxt = top1;
+    const N = 8;
+    const tG = performance.now();
+    let pos = PROMPT_IDS.length;
+    for (let i = 0; i < N; i++) {
+      gen.push(nxt);
+      lg = await G.step(nxt, pos++);
+      nxt = argmax(lg);
+    }
+    const tAll = (performance.now() - tG) / 1000;
+    const tps = N / tAll;
+    say("");
+    say(`<span class='ok'>生成 ${N} token · ${tAll.toFixed(2)} s · ${tps.toFixed(2)} tok/s</span>`);
+    say(`  文本：${JSON.stringify(dec(gen))}`);
+
+    /* 交付自检 */
+    const rows = [
+      ["top-1 是 Paris（与 JS 路径一致）", /Paris/.test(M.tokens[top1] || "")],
+      ["速度 ≥ 9.83 tok/s（JS 标量路径的成绩）", tps >= 9.83],
+      [`首 token ≤ 3000 ms（实测 ${firstMs|0}）`, (firstMs|0) <= 3000],
+    ];
+    const bad = rows.filter(r => !r[1]).length;
+    say("");
+    for (const [t, ok] of rows) say(ok ? `<span class='ok'>✅ ${t}</span>` : `<span class='bad'>🔴 ${t}</span>`);
+    say(bad === 0 ? `<span class='ok'>WebGPU 自检通过</span>` : `<span class='bad'>WebGPU 未达标：${bad} 项红</span>`);
+    window.__wgpu = { ok: bad === 0, top1: M.tokens[top1], tps: +tps.toFixed(2),
+                      firstMs: firstMs|0, text: dec(gen), rows };
+  } catch (e) {
+    say(`<span class='bad'>🔴 ${String(e && e.message || e)}</span>`);
+    if (e && e.stack) say(`<span class='dim'>${String(e.stack).split("\n").slice(0, 5).join("\n")}</span>`);
+    window.__wgpu = { ok: false, error: String(e && e.message || e) };
+  }
+})();
+</script>
+</body></html>
