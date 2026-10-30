@@ -185,8 +185,13 @@
  var scene = new T.Scene();
  var camera = new T.PerspectiveCamera(35, 1, 0.05, 80);
  camera.position.set(1.6, 1.5, 3.2);
+ /* 🔴 2026-10-30：这里原来**没有 lookAt** —— 相机朝 −Z，模型站在原点 ⇒ 偏在视锥外。
+    表现极具欺骗性：renderer.info 显示 triangles=22017、calls=3（几何确实提交了），
+    但画面中间全黑。TrackOrbit 的 target 也一并对齐到胸口高度。 */
+ camera.lookAt(0, 0.9, 0);
 
  var controls = (T.OrbitControls ? new T.OrbitControls(camera, renderer.domElement) : null);
+ if (controls) { controls.target.set(0, 0.9, 0); controls.update(); }
  if (controls) { controls.target.set(0, 0.95, 0); controls.enableDamping = true; controls.dampingFactor = 0.08; }
 
  scene.add(new T.HemisphereLight(0xdfe6f0, 0x30343a, 1.35));
@@ -634,6 +639,28 @@
  })();
 
  /* 可验读数口：帧号 / 三角形 / 定时器模式 —— 没有它就只能"看着像在动" */
+ /* 调试口（只读）：定位"渲染在跑但画面空"这类问题必须能拿到真对象 */
+ /* 手动渲一帧并回报统计：区分"没在跑"和"跑了但画不出" */
+ window.GBT_RIG_RENDER_ONCE = function () {
+   try {
+     renderer.render(scene, camera);
+     var r = renderer.info.render;
+     return { ok: true, frame: r.frame, calls: r.calls, triangles: r.triangles };
+   } catch (e) { return { ok: false, err: String(e && e.message || e) }; }
+ };
+ window.GBT_RIG_DEBUG = function () {
+   var box = null;
+   try { box = new T.Box3().setFromObject(model); } catch (e) {}
+   var cw = canvas.clientWidth, ch = canvas.clientHeight;
+   return { camera: camera ? [+camera.position.x.toFixed(2), +camera.position.y.toFixed(2), +camera.position.z.toFixed(2)] : null,
+            fov: camera ? camera.fov : null,
+            box: box ? { min: [+box.min.x.toFixed(2), +box.min.y.toFixed(2), +box.min.z.toFixed(2)],
+                         max: [+box.max.x.toFixed(2), +box.max.y.toFixed(2), +box.max.z.toFixed(2)] } : null,
+            canvasCss: [cw, ch],
+            canvasPx: [canvas.width, canvas.height],
+            sceneChildren: scene ? scene.children.length : null,
+            renderInfo: renderer && renderer.info ? renderer.info.render : null };
+ };
  window.GBT_RIG = {
    state: function () { return STATE; },
    select: selectBone,
