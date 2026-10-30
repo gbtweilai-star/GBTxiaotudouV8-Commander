@@ -46,3 +46,7 @@
 {"at": "2026-10-30T15:31:13", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
 {"at": "2026-10-30T15:33:14", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
 {"at": "2026-10-30T15:33:35", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T16:24:18", "role": "sensor", "text": "{\"event\":\"container_down\",\"why\":\"refused\"}", "upstream": null, "model": null, "source": "page"}
+{"at": "2026-10-30T16:24:34", "role": "user", "text": "What is the capital of France?", "upstream": "local:gpu", "model": null, "source": "page"}
+{"at": "2026-10-30T16:24:34", "role": "assistant", "text": "The answer to this question is:\n\n105", "upstream": "local:gpu", "model": null, "source": "page"}
+{"at": "2026-10-30T16:24:34", "role": "sensor", "text": "{\"event\":\"answer\",\"lane\":\"local:gpu\",\"ours\":true,\"ttft_s\":\"0.2\",\"total_s\":0.3,\"chars\":36}", "upstream": null, "model": null, "source": "page"}

@@ -517,7 +517,11 @@ async function send() {
        后端由 local-llm.js 自选（GPU 可用走 GPU，否则退 JS），并把真实 backend 报回来。 */
     window.__LD = window.__LD || [];
     window.__LD.push(["branch-check", !!(window.GBT_LOCAL), !!(window.GBT_LOCAL && window.GBT_LOCAL.enabled())]);
-    if (window.GBT_LOCAL && window.GBT_LOCAL.enabled()) {
+    var _takeLocal = false;
+    if (window.GBT_LOCAL && window.GBT_LOCAL.shouldTakeOver) {
+      try { _takeLocal = await window.GBT_LOCAL.shouldTakeOver(); } catch (e) { _takeLocal = false; }
+    }
+    if (_takeLocal) {
       window.__LD.push(["enter", Date.now()]);
       node.dataset.got = "1";
       node.textContent = "（本机权重载入中…首次约 0.5 s，权重传显存约 0.3 s）";
@@ -774,7 +778,12 @@ document.getElementById("input").addEventListener("keydown", (e) => {
 
 <!-- 2026-10-30：本机权重（浏览器内推理）。?local=1 才启用；不启用时零开销。 -->
 <script type="module">
-const ON = /[?&]local=1/.test(location.search);
+/* 2026-10-30：默认**允许**用本机权重（?local=0 才关）。
+   理由：A19（LM Pocket 的 :1234）需要 App 里点一下才起，那不归我们控制；
+   我们自己的权重还有第二条路 —— 整机 GPU 的浏览器内推理（local-llm.js）。
+   策略：A19 探得到 → 走它；探不到 → 走本机浏览器权重；两条都不行 → 如实报错（不碰云端）。 */
+const FORCE_OFF = /[?&]local=0/.test(location.search);
+const ON = !FORCE_OFF;
 let eng = null, loading = null;
 async function ensure() {
   if (eng) return eng;
@@ -787,8 +796,27 @@ async function ensure() {
   }
   return loading;
 }
+let _a19 = null;
+async function a19Alive() {
+  if (_a19 !== null) return _a19;
+  try {
+    var ctl = new AbortController();
+    var t = setTimeout(function () { ctl.abort(); }, 900);
+    var r = await fetch("http://127.0.0.1:1234/v1/models", { signal: ctl.signal, cache: "no-store" });
+    clearTimeout(t);
+    _a19 = r.ok;
+  } catch (e) { _a19 = false; }
+  return _a19;
+}
 window.GBT_LOCAL = {
-  enabled() { return ON; },
+  /* 只在「A19 不在」时接管；A19 在就让桥那条路走（她那边的权重优先） */
+  enabled() { return ON && !this._a19Now; },
+  async shouldTakeOver() {
+    if (!ON) return false;
+    this._a19Now = await a19Alive();
+    if (!this._a19Now) console.warn("[model-chat] A19 不在 ⇒ 改用整机浏览器内权重");
+    return !this._a19Now;
+  },
   async status() {
     if (!eng) return { loaded: false, enabled: ON };
     return { loaded: true, backend: eng.backend, model: eng.model, note: eng.note };
