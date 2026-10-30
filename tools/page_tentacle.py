@@ -60,7 +60,7 @@ def inspect(p: pathlib.Path) -> dict:
     t = p.read_text(encoding="utf-8", errors="replace")
     rel = p.relative_to(W3).as_posix()
     ctrls = len(re.findall(r"<(button|select|input)\b", t, re.I))
-    has_kit = bool(re.search(r"tentacle-kit\.js", t))
+    has_kit = bool(re.search(r"tentacle-(kit|boot)\.js", t))
     has_shell = bool(re.search(r"tentacle-bridge\.js", t))
     # 触手盖章：kit 会给每个接管过的元素写 data-tentacle="1"
     stamped = len(re.findall(r'data-tentacle\s*=\s*"1"', t))
@@ -97,7 +97,8 @@ def inject(p: pathlib.Path) -> dict:
     if "tentacle-bridge.js" not in t:
         add.append('<script src="%sshell/tentacle-bridge.js?v=20261029"></script>' % prefix)
     if "tentacle-kit.js" not in t:
-        add.append('<script src="%sshell/tentacle-kit.js?v=20261029"></script>' % prefix)
+        # 2026-10-30：改成**按需激活**引导器（立即放代理 gbtW3，真件空闲/首次调用才加载）
+        add.append('<script src="%sshell/tentacle-boot.js?v=20261030"></script>' % prefix)
     if not add:
         # 两件都有，但要查**顺序**：kit 依赖 window.gbtW3（由 web 壳提供），
         # 壳排在 kit 后面 ⇒ kit 启动时 gbtW3 还不存在 ⇒ 等于没接。
