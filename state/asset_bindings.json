@@ -18574,5 +18574,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T12:10:22"
+ },
+ "tools/page_probe.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T14:54:45"
  }
 }

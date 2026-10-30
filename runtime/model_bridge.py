@@ -492,7 +492,7 @@ class Handler(BaseHTTPRequestHandler):
         KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/_log/message",
                  "/v1/recall", "/v1/context",
                  "/voice/speak", "/voice/status",
-                 "/_cap", "/_tentacle/hello",
+                 "/_cap", "/_tentacle/hello", "/_probe",
                  "/v1/messages", "/v1/messages/count_tokens")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
@@ -605,6 +605,23 @@ class Handler(BaseHTTPRequestHandler):
                 with _HELLO_FILE.open("a", encoding="utf-8") as fh:
                     fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 return self._json(200, {"ok": True, "seen": rec["page"]})
+            except Exception as exc:                          # noqa: BLE001
+                return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
+
+        if self.path.startswith("/_probe"):
+            # 2026-10-30：页面自报读数。目的：巡检能像读 /health 一样读"页面现在好不好"，
+            # 而不是靠人打开页面肉眼看。只追加一行 JSON，不动任何别的状态。
+            try:
+                f = ROOT / "state" / "page_probes.jsonl"
+                f.parent.mkdir(parents=True, exist_ok=True)
+                rec = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                       "page": str(body.get("page") or "")[:160],
+                       "ok": bool(body.get("ok")),
+                       "readings": body.get("readings") or {},
+                       "ua": str(self.headers.get("User-Agent") or "")[:60]}
+                with f.open("a", encoding="utf-8") as fh:
+                    fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                return self._json(200, {"ok": True, "logged": rec["page"]})
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
 
