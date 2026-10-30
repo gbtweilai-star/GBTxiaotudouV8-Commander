@@ -366,6 +366,14 @@
       modelRoot.traverse(function (o) {
         if (o.isMesh || o.isSkinnedMesh) {
           o.frustumCulled = false;                 /* 蒙皮网格用静态包围盒会被错误裁掉（真采过的坑） */
+          /* ⛔ 2026-10-30 两次实测失败，记在这里免得再撞：
+             想把 GLB 的 MeshStandardMaterial 升成 MeshPhysicalMaterial（为了 ior/specularIntensity/
+             clearcoat 三条皮肤判据），两种写法都试过：
+               ① 在 traverse 回调里就地替换 ⇒ 加载卡死、tris 掉到 12
+               ② 遍历只收集、遍历结束后用 new MeshPhysicalMaterial().copy(m) 统一替换
+                  ⇒ 仍然 status=loading、tris=2（本 WebKit + three r147 组合不吃）
+             结论：这版引擎上不换材质，ior/specular/clearcoat 三条按"该材质类型没有这些属性"如实报，
+             不硬凑数字。真要做，得换 three 版本或在 Blender 侧直接导出 physical 材质。 */
           var mats = Array.isArray(o.material) ? o.material : [o.material];
           mats.forEach(function (m) {
             if (!m) return;
