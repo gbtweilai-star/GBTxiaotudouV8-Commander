@@ -257,6 +257,67 @@ class PolishRegressionTest(unittest.TestCase):
         self.assertFalse(HB.HeartbeatTentacle(others[0])._hygiene(clean=False)["keeper"])
 
 
+class PolishRound2Test(unittest.TestCase):
+    """九、2026-10-30 打磨二：值日失守 / 两套健康口径 / 非原子写。
+
+    三条都是**先查证再改**：
+      ① KEEPER 指向不存在的类 ⇒ 12 根 keeper 全 False、抽屉再没人报，而报告照绿
+      ② health() 五维与 heartbeat() 十二根互不相识 ⇒ 问"系统好不好"得到两个答案
+      ③ write_text 是截断再写 ⇒ 并发时可能读到半截 JSON，且静默变成"首跳"
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.mkdtemp(prefix="gbt_hb_p2_")
+        self._orig_dir = HB._STATE_DIR
+        self._orig_keeper = HB.KEEPER
+        HB._STATE_DIR = Path(self._tmp)
+
+    def tearDown(self) -> None:
+        HB._STATE_DIR = self._orig_dir
+        HB.KEEPER = self._orig_keeper
+        shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def test_keeper_lost_is_loud_and_still_covered(self) -> None:
+        HB.KEEPER = "这个类不存在"
+        code, broken = HB._resolve_keeper()
+        self.assertTrue(broken, "KEEPER 不在分类表里，必须被识别为配置损坏")
+        self.assertIn(code, TX.CATEGORIES, "降级代值根必须是个真实分类，否则抽屉没人看")
+        rep = HB.scan_all(mode="light", persist=False)
+        lost = [s for s in rep["signals"] if s["code"] == "keeper_lost"]
+        self.assertEqual(len(lost), 1, "keeper_lost 应报且只报一次，实际 %d 次" % len(lost))
+        adv = BE.advise(rep)
+        self.assertEqual(adv["verdict"], "red", "值日配置坏了必须判红")
+        self.assertIn("keeper_lost", [x["id"] for x in adv["instructions"]])
+
+    def test_state_written_atomically(self) -> None:
+        HB.HeartbeatTentacle(HB.KEEPER).pulse(mode="light", persist=True)
+        d = Path(self._tmp)
+        leftovers = [p.name for p in d.iterdir() if p.name.endswith(HB._SWAP_SUFFIX)]
+        self.assertEqual(leftovers, [], "原子写后不该留临时件：%s" % leftovers)
+        st = HB.HeartbeatTentacle(HB.KEEPER).status()
+        self.assertEqual(st.get("category"), HB.KEEPER, "状态读回来不完整：%s" % st)
+
+    def test_swapping_file_is_exempt_from_hygiene(self) -> None:
+        d = Path(self._tmp)
+        swap = d / ("x.json" + HB._SWAP_SUFFIX)
+        swap.write_text("{}", encoding="utf-8")
+        h = HB.HeartbeatTentacle(HB.KEEPER)._hygiene(clean=True)
+        self.assertFalse(any(HB._SWAP_SUFFIX in g for g in h["garbage"]),
+                         "正在写的临时件被当垃圾了：%s" % h["garbage"])
+        self.assertFalse(any(HB._SWAP_SUFFIX in f for f in h["foreign"]),
+                         "正在写的临时件被当外来物了：%s" % h["foreign"])
+        self.assertTrue(swap.exists(), "临时件被扫掉了 —— 会打断别的进程写盘")
+
+    def test_health_carries_heartbeat_summary(self) -> None:
+        HB.scan_all(mode="light", persist=True)      # 先落一次，health 才有东西可读
+        h = BE.health()
+        self.assertIn("heartbeat", h, "health() 必须带上心跳摘要，否则是两套口径")
+        self.assertIn("scope_note", h, "分工说明必须写出来，不然没人知道该看哪套")
+        hb = h["heartbeat"]
+        self.assertTrue(hb.get("tentacles_total") or hb.get("never_scanned"),
+                        "心跳摘要要么有读数要么明确说没扫过：%s" % hb)
+
+
 class ScanRetentionTest(unittest.TestCase):
     """七、扫描件环形保留必须是**真不变量**（≤ KEEP_SCANS），不是"大概"。
 
