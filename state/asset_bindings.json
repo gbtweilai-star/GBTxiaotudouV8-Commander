@@ -1265,7 +1265,8 @@
  },
  "tools/mirror_panel.py": {
   "tentacles": [
-   "tentacle_bind"
+   "tentacle_bind",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-29T08:19:27"

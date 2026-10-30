@@ -27,13 +27,14 @@ NAME = "panel-mirror"
 HOST, PORT = "127.0.0.1", 8765
 
 
-def call(op: str, payload: dict | None = None) -> dict:
-    body = json.dumps({"op": op, "payload": payload or {}}).encode()
+def _via_panel(kind: str, payload: dict) -> dict:
+    """经面板 :8765 调 /api/capability（面板没有 /api/mirror，实测 404）。"""
+    body = json.dumps({"kind": kind, "payload": payload, "confirm": True}).encode()
     s = socket.socket()
-    s.settimeout(300)
+    s.settimeout(30)
     try:
         s.connect((HOST, PORT))
-        s.sendall(b"POST /api/mirror HTTP/1.0\r\nHost: x\r\n"
+        s.sendall(b"POST /api/capability HTTP/1.0\r\nHost: x\r\n"
                   b"Content-Type: application/json\r\n"
                   b"Content-Length: " + str(len(body)).encode() + b"\r\n\r\n" + body)
         buf = b""
@@ -42,9 +43,43 @@ def call(op: str, payload: dict | None = None) -> dict:
             if not c:
                 break
             buf += c
-        return json.loads(buf.split(b"\r\n\r\n", 1)[1])
+        d = json.loads(buf.split(b"\r\n\r\n", 1)[1])
+        d["_via"] = "panel"
+        return d
+    except Exception as exc:                                      # noqa: BLE001
+        return {"ok": False, "_via": "panel",
+                "_error": "%s: %s" % (type(exc).__name__, exc)}
     finally:
         s.close()
+
+
+def call(op: str, payload: dict | None = None) -> dict:
+    """调镜像能力：**进程内优先，面板兜底**。
+
+    2026-10-30 两处修正，都是实测出来的：
+      ① 原来 POST /api/mirror —— 面板没这个路由（直接 404），六步全"未输出"。
+      ② 改打 /api/capability 后，面板是**异步受理**，还会撞 action_guard 去重，
+         回一个 `{in_flight:true, reused:true}` 的空壳（没有 ok 字段）⇒ ok=None。
+         面板内部本来就是 `api.run_task(kind, payload)`，所以直接走同一条路：
+         少一跳 HTTP、少一层空壳。`_via` 如实标走的哪条。
+    """
+    kind = op if op.startswith("mirror_") else ("mirror_" + op)
+    payload = dict(payload or {})
+    sys.path.insert(0, ROOT)
+    try:
+        from gbt_allinone.api import run_task
+        res = run_task(kind, payload)
+        body = res.get("gbt_result", res) if isinstance(res, dict) else res
+        out = body.get("result") if isinstance(body, dict) and "result" in body else body
+        out = dict(out or {})
+        out.setdefault("_via", "in-process")
+        if out.get("ok") is not None:
+            return out
+    except Exception:                                             # noqa: BLE001
+        pass
+    r = _via_panel(kind, payload)
+    r.setdefault("_via", "panel")
+    return r
 
 
 def result(r: dict) -> dict:

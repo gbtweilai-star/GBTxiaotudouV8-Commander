@@ -95,12 +95,20 @@ class RingContext:
         self._init_db()
 
     def _conn(self):
-        c = sqlite3.connect(str(self.db_path))
-        c.execute('PRAGMA journal_mode=WAL')
+        # 2026-10-30 三条实测修正：
+        #   ① iSH 上 WAL 跨进程不可见（本仓踩过两次）⇒ 用 DELETE 模式；
+        #   ② **但 journal_mode 不能在每次连接时设** —— 多连接时它要独占锁，
+        #      抛 "database is locked" ⇒ _spill 返回 False ⇒ 挤出逻辑 break ⇒ 窗口无限长；
+        #   ③ 连接加 timeout，把偶发锁等掉，而不是立刻失败。
+        c = sqlite3.connect(str(self.db_path), timeout=10)
         return c
 
     def _init_db(self):
         with self._conn() as c:
+            try:
+                c.execute('PRAGMA journal_mode=DELETE')   # 只在建库时设一次
+            except sqlite3.OperationalError:
+                pass
             c.execute('CREATE TABLE IF NOT EXISTS turns ('
                       'seq INTEGER PRIMARY KEY, at TEXT, role TEXT, content TEXT, chars INTEGER)')
             try:
@@ -108,8 +116,43 @@ class RingContext:
                           "content, tokenize='unicode61')")
             except sqlite3.OperationalError:
                 pass
+            # 🔴 2026-10-30：`name` 以前只赋值、从不入表 ⇒ **所有会话共用一条环**
+            #   （实测 acc_ring 与 acc_ring2 互相串）。补列 + 老库 ALTER 兼容。
+            try:
+                c.execute("ALTER TABLE turns ADD COLUMN name TEXT DEFAULT ''")
+            except sqlite3.OperationalError:
+                pass
             row = c.execute('SELECT MAX(seq) FROM turns').fetchone()
             self._seq = int(row[0] or 0)
+        self._restore()
+
+    def _restore(self) -> None:
+        """新进程起来时把本会话最近的历史装回内存 —— 窗口跨进程才活得下去。
+
+        2026-10-30：原来 __init__ 里 `self._ring = []`，从不回读，
+        所以「跨进程窗口恢复」实测恒为 0 条。
+        """
+        rows = []
+        try:
+            with self._conn() as c:
+                rows = c.execute(
+                    'SELECT seq, role, content, chars, at FROM turns WHERE name=? '
+                    'ORDER BY seq DESC LIMIT 800', (self.name,)).fetchall()
+        except sqlite3.OperationalError:
+            rows = []
+        ring, used = [], 0
+        for seq, role, content, chars, at in rows:  # DESC ⇒ 从最新往回装
+            ch = int(chars or len(content or ''))
+            if ring and used + ch > self.window_chars:
+                break
+            # ⚠️ 必须带 'at'：挤出时会 _spill(item) 读 item['at']，
+            #    缺了要 KeyError ⇒ 被吞成 False ⇒ 挤出 break ⇒ 窗口无限长（实测 2580）。
+            ring.append({'seq': int(seq), 'role': role, 'content': content,
+                         'chars': ch, 'at': at})
+            used += ch
+        ring.reverse()
+        self._ring = ring
+        self._chars = used
 
     # ── ① 入环：超预算就把最老的挤出去（先落库，再挤出）──────────────────
     def push(self, role: str, content: str, meta: dict | None = None) -> dict:
@@ -135,12 +178,17 @@ class RingContext:
         """把一个被挤出的条目落库（FTS5 同步）。返回是否落库成功。"""
         try:
             with self._conn() as c:
-                c.execute('INSERT OR REPLACE INTO turns (seq, at, role, content, chars) VALUES (?,?,?,?,?)',
-                          (item['seq'], item['at'], item['role'], item['content'], item['chars']))
+                c.execute('INSERT OR REPLACE INTO turns '
+                          '(seq, at, role, content, chars, name) VALUES (?,?,?,?,?,?)',
+                          (item['seq'], item['at'], item['role'], item['content'],
+                           item['chars'], self.name))
                 try:
-                    c.execute('INSERT INTO turns_fts (rowid, content) VALUES (?,?)',
+                    # 🔴 2026-10-30：同 seq 重放会撞 rowid 唯一约束，抛的是 IntegrityError，
+                    #   而这里只兜 OperationalError ⇒ 被外层吞成 False ⇒ 挤出 break，
+                    #   窗口无限长（实测 2580 > 1200）。
+                    c.execute('INSERT OR REPLACE INTO turns_fts (rowid, content) VALUES (?,?)',
                               (item['seq'], item['content']))
-                except sqlite3.OperationalError:
+                except Exception:                             # noqa: BLE001
                     pass
             return True
         except Exception:

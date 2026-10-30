@@ -1676,8 +1676,8 @@
    "kind": "ring_context",
    "verdict": "real",
    "file": "gbt_allinone/llm/ring_context.py",
-   "lines": 225,
-   "io_marks": 14,
+   "lines": 273,
+   "io_marks": 16,
    "spec_keys": 0,
    "returns": 6
   },

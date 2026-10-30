@@ -1,26 +1,26 @@
 {
   "sample": {
-    "at": "2026-10-30T07:33:24",
-    "seq": 9990349,
-    "spilled": 2011,
-    "window_n": 21,
-    "window_chars": 2608,
+    "at": "2026-10-30T09:06:46",
+    "seq": 9990380,
+    "spilled": 2062,
+    "window_n": 51,
+    "window_chars": 2890,
     "budget": 3000,
-    "fill": 0.869,
-    "chars_now": 2608,
-    "fingerprint": "0b50741efb65"
+    "fill": 0.963,
+    "chars_now": 2890,
+    "fingerprint": "9c2374032185"
   },
   "anomalies": [
     {
       "code": "near_overflow",
-      "why": "填充 87% > 85% 阈值（粒度 124 字/条自适应）"
+      "why": "填充 96% > 85% 阈值（粒度 57 字/条自适应）"
     }
   ],
   "tentacle": "context_overflow_guard",
   "brain": {
     "called": true,
     "ok": true,
-    "intent": "上下文异常纠正：near_overflow。当前窗口 2608 字符 / 预算 3000，条数 21。请给出纠正动作（缩小窗口 / 强制落库 / 丢弃重复 / 回主线）。",
+    "intent": "上下文异常纠正：near_overflow。当前窗口 2890 字符 / 预算 3000，条数 51。请给出纠正动作（缩小窗口 / 强制落库 / 丢弃重复 / 回主线）。",
     "routed": "libtv_workflow",
     "routed_domain": "video",
     "degraded": true,
@@ -50,15 +50,15 @@
       }
     ],
     "after": {
-      "at": "2026-10-30T07:33:28",
-      "seq": 9990351,
-      "spilled": 2011,
-      "window_n": 23,
-      "window_chars": 2658,
+      "at": "2026-10-30T09:06:49",
+      "seq": 9990382,
+      "spilled": 2062,
+      "window_n": 53,
+      "window_chars": 2940,
       "budget": 3000,
-      "fill": 0.886,
-      "chars_now": 2658,
-      "fingerprint": "afb3c00dfd4e"
+      "fill": 0.98,
+      "chars_now": 2940,
+      "fingerprint": "6a4207783adb"
     }
   },
   "level": "warn"
