@@ -55,7 +55,10 @@ class Threaded(socketserver.ThreadingTCPServer):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8081)
-    ap.add_argument("--root", default="holo_pet_w3/wgpu")
+    # 🔴 2026-10-30：根原来只到 holo_pet_w3/wgpu ⇒ 页面里 `../shell/tentacle-kit.js`
+    #   这类相对路径**跳出根直接 404**，于是 gbtW3 永远 undefined（页面调不到能力位）。
+    #   改成以仓库根为服务根：路径语义与 :8080 一致，只是多了 COOP/COEP。
+    ap.add_argument("--root", default=".")
     ap.add_argument("--bind", default="127.0.0.1")
     a = ap.parse_args()
     base = (ROOT / a.root).resolve()

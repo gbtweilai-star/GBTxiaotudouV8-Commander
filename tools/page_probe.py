@@ -64,6 +64,13 @@ def judge(readings: dict, ok_flag: bool) -> tuple:
         if frames < 10:
             return "warn", "帧数偏低（frames=%s）—— 疑似后台标签节流" % frames
         return "ok", "tris=%s · frames=%s · 非黑 %s%%" % (tris, frames, rd.get("nonblack"))
+    # ②b 穿透证据：页面必须真的能调能力位（gbtW3.cap → /_cap → run_task）
+    if "cap_ok" in rd:
+        if not rd.get("cap_ok"):
+            return "red", "页面调不到能力位（cap_ok=false %s）" % (rd.get("cap_err") or "")
+        return "ok", "穿透 ok · %sms · python %s · %s tok/s · top-1 %r" % (
+            rd.get("cap_ms"), rd.get("cap_python"), rd.get("tps"), rd.get("top1"))
+
     # ② 推理页：看 top-1 与速度
     if "top1" in rd or "tps" in rd:
         top1 = str(rd.get("top1") or "")
@@ -129,6 +136,8 @@ def main(argv=None) -> int:
             ("推理慢",    {"backend": "gpu", "tps": 10, "top1": " Paris"}, True, "red"),
             ("推理正常",  {"backend": "gpu", "tps": 38, "top1": " Paris"}, True, "ok"),
             ("页面自报失败", {"tris": 20545, "frames": 40}, False, "red"),
+            ("穿透成功",   {"cap_ok": True, "cap_ms": 27, "cap_python": "3.12.14", "tps": 37, "top1": " Paris"}, True, "ok"),
+            ("穿透失败",   {"cap_ok": False, "cap_err": "TypeError"}, True, "red"),
         ]
         bad = 0
         for name, rd, okf, want in cases:

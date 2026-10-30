@@ -1,9 +1,9 @@
 {
  "ok": true,
- "at": "2026-10-30T15:12:35",
+ "at": "2026-10-30T15:24:49",
  "pages": 401,
  "covered": 401,
- "reported": 4,
+ "reported": 5,
  "rows": [
   {
    "page": "activity/index.html",
@@ -4402,8 +4402,8 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": null,
-   "reachable": false
+   "reported": "2026-10-30T15:15:33",
+   "reachable": true
   },
   {
    "page": "wgpu/probe.html",
