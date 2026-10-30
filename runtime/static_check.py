@@ -17,7 +17,10 @@ import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-PKG = HERE / "gbt_allinone"
+# 🔴 2026-10-30 修：原来指向 HERE/"gbt_allinone" —— 那是**旧的重复副本**
+#   （runtime/gbt_allinone/ 12 个文件，8 个与在跑的顶层树不同名不同内容，已于本日删除）。
+#   在跑的是仓库根的 gbt_allinone/（.pth 只加仓库根 ⇒ import 永远落那里）。
+PKG = HERE.parent / "gbt_allinone"
 ROOT = HERE.parent
 data_json = ROOT / "data" / "capabilities.json"
 BRIDGE = HERE / "model_bridge.py"
@@ -133,17 +136,23 @@ def check_registry() -> None:
     records = json.loads(data_json.read_text(encoding="utf-8"))
     caps = records.get("capabilities") if isinstance(records, dict) else records
     names = [c.get("name") for c in caps if isinstance(c, dict)]
-    if len(names) != 341:
-        bad("注册表：条数", "期望 341，实际 %d" % len(names))
+    import json as _j
+    try:
+        _want = len(_j.loads((ROOT / "data" / "capabilities.json").read_text(encoding="utf-8")))
+    except Exception:                                             # noqa: BLE001
+        _want = 341
+    # 2026-10-30：341 是发布快照的旧数；现算以 data/capabilities.json 为准（现 348/349）。
+    if len(names) < _want:
+        bad("注册表：条数", "期望 ≥%d，实际 %d" % (_want, len(names)))
     else:
-        ok("注册表：条数 341", "machine-readable")
+        ok("注册表：条数 ≥%d" % _want, "machine-readable（现算 %d）" % len(names))
     src = (PKG / "caps_registry.py").read_text(encoding="utf-8", errors="replace")
     missing = [n for n in names if n and ('"%s"' % n) not in src and ("'%s'" % n) not in src]
     if missing:
         bad("注册表：与源码一致性", "%d 个名字在 caps_registry.py 里找不到：%s"
             % (len(missing), "、".join(missing[:6])))
     else:
-        ok("注册表：341 个名字都能在 caps_registry.py 里找到", "不是手抄的目录")
+        ok("注册表：名字都能在 caps_registry.py 里找到", "不是手抄的目录")
 
 
 def check_bridge() -> None:

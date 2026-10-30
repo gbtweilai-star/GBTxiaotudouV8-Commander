@@ -2,6 +2,11 @@
 
 这里放的是**真源码**，不是示意代码。你可以在 GitHub 上逐行读完"门、授权、审计、注册表、万能插"这五件事是怎么写的。
 
+> 🔴 2026-10-30 更正：**在跑的源码在仓库根的 `gbt_allinone/`**（`.pth` 只加仓库根 ⇒
+> `import gbt_allinone` 永远落那里）。`runtime/` 只放**运行时组件**（模型桥 / 自适应队列 /
+> 批量车道 / 静态自检）。原来这里有一份 `runtime/gbt_allinone/` 重复副本，
+> 12 个文件里 9 个与在跑的树内容不同 —— 已删除，能力位 `code_graph` 已并回根树。
+
 先跑一次机械自检（零依赖、只读 AST、**不导入引擎、不执行任何能力**）：
 
 ```bash
@@ -33,7 +38,7 @@ PASS  派活桥：没有绕门导入 · mirror_space / qiankun / room_space / au
 | `gbt_allinone/api.py` | 177 KB | **一切调用只走 `run_task` 这一个门**；信封归一、结果校验、产出即绑 | `def run_task`（文件里有**两处**，先看下面那段说明） |
 | `gbt_allinone/security/policy.py` | 67 KB | **写盘 / 花钱 / 出网必须人工授权**；`HUMAN_GATES` 是那张正表 | 搜 `HUMAN_GATES` 与 `MECHANISM_GATES` |
 | `gbt_allinone/auth_gate.py` | 23 KB | **票只有主人能发**；时段票 vs 一次性票 | 搜 `ONE_SHOT` |
-| `gbt_allinone/caps_registry.py` | 239 KB | **348 位能力**的注册表本体（不是手抄清单） | 搜任一能力位名 |
+| `gbt_allinone/caps_registry.py` | 239 KB | **349 位能力**的注册表本体（不是手抄清单） | 搜任一能力位名 |
 | `gbt_allinone/omni_plug.py` | 47 KB | **万能插**：六类插座 + 反向调用 | 搜 `socket` / `_ai_call` |
 | `gbt_allinone/preflight.py` | 44 KB | 调用前的**预检层**（已知缺口：抛异常时 fail-open，见 `docs/14` §六） | 搜 `def preflight` |
 | `gbt_allinone/store.py` | 13 KB | **审计账本**（`audit()`）；只追加 | 搜 `def audit` |
