@@ -18669,5 +18669,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-31T05:51:20"
+ },
+ "docs/38-a19-resident-wake.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-31T06:52:58"
  }
 }

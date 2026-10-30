@@ -1741,3 +1741,5 @@
 {"at": "2026-10-31T06:27:33", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 3009}
 {"at": "2026-10-31T06:27:40", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 3010}
 {"at": "2026-10-31T06:27:33", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 2977}
+{"at": "2026-10-31T06:52:58", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 478}
+{"at": "2026-10-31T06:52:58", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 645}
