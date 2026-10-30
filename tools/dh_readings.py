@@ -34,8 +34,11 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PAGE = "holo_pet_w3/voice-theater/index.html"
 JS = ROOT / "holo_pet_w3" / "voice-theater" / "dh3d.js"
-URLS = ("http://127.0.0.1:8080/holo_pet_w3/voice-theater/index.html",
-        "http://127.0.0.1:8765/holo_pet_w3/voice-theater/index.html")
+# 2026-10-30：3D 舞台是 ?dh3d=1 才懒加载的（默认页面走 2D，不拉 600K 的 three）
+# 2026-10-30：3D 读数走**独立页**。原因实测：WebView 会吞掉 query（location.search 为空），
+# 所以主页面上的 ?dh3d=1 懒加载器永不触发。stage3d.html 直挂脚本，不靠 query。
+URLS = ("http://127.0.0.1:8080/holo_pet_w3/voice-theater/stage3d.html",
+        "http://127.0.0.1:8765/holo_pet_w3/voice-theater/stage3d.html")
 
 
 def _alive(url: str, timeout: float = 4.0) -> bool:
@@ -47,27 +50,46 @@ def _alive(url: str, timeout: float = 4.0) -> bool:
 
 
 def collect_live() -> dict:
-    """真开页面取运行时读数。取不到就返回 {ok:False}，不编。"""
-    url = next((u for u in URLS if _alive(u)), None)
+    """真开页面取运行时读数。取不到就返回 {ok:False}，不编。
+
+    2026-10-30 实测：`minis-browser-use execute_js` 的回包是
+        {"ok":true,"data":{"success":true,"text":"<JSON 字符串>"}}
+    结果在 data.text 里**且是字符串** —— 第一次按 dict 解析所以永远失败。
+    """
+    url = next((u for u in URLS if _alive(u.split("?")[0])), None)
     if not url:
         return {"ok": False, "why": "页面打不开（8080/8765 都不通）"}
-    js = ("var r = (window.GBT_DH3D && window.GBT_DH3D.readings)"
-          " ? window.GBT_DH3D.readings() : null; return r;")
+    js = ("var r=(window.GBT_DH3D&&window.GBT_DH3D.readings)?window.GBT_DH3D.readings():null;"
+          " return r;")
     try:
-        p = subprocess.run(["minis-browser-use", "navigate", "--url", url],
-                           capture_output=True, text=True, timeout=90)
-        if p.returncode != 0:
-            return {"ok": False, "why": "navigate 失败：%s" % (p.stderr or "")[:120]}
-        p = subprocess.run(["minis-browser-use", "execute_js", "--script", js],
-                           capture_output=True, text=True, timeout=90)
-        out = (p.stdout or "").strip()
-        i = out.find("{")
-        d = json.loads(out[i:]) if i >= 0 else {}
-        r = d.get("result") or d.get("data") or d
-        if isinstance(r, dict) and r.get("webgl") is not None:
-            return {"ok": True, "readings": r, "url": url}
-        return {"ok": False, "why": "页面没回 readings（WebGL 可能没起）",
-                "raw": json.dumps(r, ensure_ascii=False)[:200]}
+        subprocess.run(["minis-browser-use", "navigate", "--url", url],
+                       capture_output=True, text=True, timeout=90)
+        # 3D 是懒加载：等 three + GLB 落地
+        for _ in range(6):
+            import time as _t
+            _t.sleep(5)
+            p2 = subprocess.run(["minis-browser-use", "execute_js", "--script", js],
+                                capture_output=True, text=True, timeout=90)
+            out = p2.stdout or ""
+            i = out.find("{")
+            if i < 0:
+                continue
+            try:
+                env = json.loads(out[i:out.rfind("}") + 1])
+            except Exception:                                     # noqa: BLE001
+                continue
+            txt = (env.get("data") or {}).get("text") or ""
+            txt = txt.split("  tab_id:")[0].strip()
+            j = txt.find("{")
+            if j < 0:
+                continue
+            try:
+                r = json.loads(txt[j:txt.rfind("}") + 1])
+            except Exception:                                     # noqa: BLE001
+                continue
+            if isinstance(r, dict) and r.get("webgl") is not None and r.get("status") == "ready":
+                return {"ok": True, "readings": r, "url": url}
+        return {"ok": False, "why": "页面没回 readings（3D 未 ready / WebGL 没起）"}
     except Exception as exc:                                      # noqa: BLE001
         return {"ok": False, "why": "%s: %s" % (type(exc).__name__, exc)}
 

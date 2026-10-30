@@ -1,6 +1,7 @@
 {
- "at": "2026-10-30T08:29:36",
+ "at": "2026-10-30T09:59:37",
  "up": false,
  "ok": false,
- "phase": "waiting"
+ "phase": "timeout",
+ "note": "LM Pocket 的 :1234 始终没开（App 要在前台点 Load & Start Server）"
 }

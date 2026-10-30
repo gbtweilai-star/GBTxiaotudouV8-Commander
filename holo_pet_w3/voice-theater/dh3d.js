@@ -89,6 +89,12 @@
       out.diffuse_roughness = avg(rgh);
       out.body_tex_px = bodyPx || null;
       out.detail_normal = hasNormal;
+      out.state_machine = {
+        state: DH.state, prev: DH.prev, blend_s: DH.blend,
+        weights: DH.weights, foot_lock: DH.footLock,
+        foot_drift_mm: DH.drift_mm, foot_drift_max_mm: DH.drift_max_mm,
+        frames: DH.frames
+      };
       out.draw_calls = (renderer.info && renderer.info.render && renderer.info.render.calls) || null;
       out.triangles = (renderer.info && renderer.info.render && renderer.info.render.triangles) || null;
     } catch (e) {
@@ -201,6 +207,92 @@
   scene.add(stage);
 
   var mixer = null, actionIdle = null, actionWalk = null;
+
+  /* ── 动作状态机（2026-10-30 补）───────────────────────────────────────
+     原来 setState 只存一个字符串：walk 从不播放、切换没有过渡、脚会打滑。
+     这里给三件真东西：
+       ① 交叉淡入：idle ↔ walk ↔ speak 用 crossFadeTo（默认 0.35s），不是硬切
+       ② 脚部锁定：过渡/行走时把着地脚的**世界位置**钉住，用根位移反向补偿
+       ③ 可读数：当前状态 / 各动作权重 / 脚漂移毫米数（readings() 会带上）
+     ─────────────────────────────────────────────────────────────────── */
+  var DH = {
+    state: "idle", prev: null, blend: 0.35,
+    actions: {},                 /* name → AnimationAction */
+    weights: {},                 /* name → 当前权重 */
+    footLock: true, lockFoot: null,
+    drift_mm: 0, drift_max_mm: 0, frames: 0
+  };
+  var FOOT_NAMES = ["mixamorig:LeftFoot", "mixamorig:RightFoot",
+                    "LeftFoot", "RightFoot"];
+  var _lastFootWorld = null;
+
+  function dhAction(name) {
+    if (DH.actions[name]) return DH.actions[name];
+    if (!mixer) return null;
+    var clip = null;
+    var clips = (window.__DH_CLIPS || []);
+    for (var i = 0; i < clips.length; i++) if (clips[i].name === name) clip = clips[i];
+    if (!clip) return null;
+    var a = mixer.clipAction(clip);
+    a.enabled = true; a.setEffectiveWeight(0);
+    DH.actions[name] = a;
+    return a;
+  }
+
+  function dhSetState(name, blend) {
+    name = String(name || "idle");
+    if (DH.state === name) return DH.state;
+    blend = (blend == null) ? DH.blend : Number(blend);
+    var from = DH.actions[DH.state], to = dhAction(name);
+    DH.prev = DH.state;
+    DH.state = name;
+    st.state = name; S.state = name;
+    if (!mixer) return DH.state;
+    if (to) {
+      to.reset(); to.enabled = true; to.setEffectiveTimeScale(1);
+      to.setEffectiveWeight(1);
+      to.play();
+      if (from && from !== to) {
+        try { from.crossFadeTo(to, blend, false); }
+        catch (eCF) { from.stop(); }
+      } else {
+        to.fadeIn(blend);
+      }
+    } else if (from) {
+      from.fadeOut(blend);         /* 没有对应 clip：至少淡出，不硬停 */
+    }
+    return DH.state;
+  }
+
+  function dhFootWorld() {
+    if (!B) return null;
+    for (var i = 0; i < FOOT_NAMES.length; i++) {
+      var b = B[FOOT_NAMES[i]];
+      if (b) { var v = new THREE.Vector3(); b.getWorldPosition(v); return v; }
+    }
+    return null;
+  }
+
+  /* 脚部锁定：着地脚不该漂。每帧比对脚的世界 XZ，把偏差从模型根上反向扣掉。
+     这是根位移补偿法：不改骨骼动画，只改根位置 —— 换个模型也照样能用。 */
+  function dhFootLockStep() {
+    if (!DH.footLock || !modelRoot) return;
+    var fw = dhFootWorld();
+    if (!fw) return;
+    if (!_lastFootWorld) { _lastFootWorld = fw.clone(); return; }
+    var dx = fw.x - _lastFootWorld.x, dz = fw.z - _lastFootWorld.z;
+    var d = Math.sqrt(dx * dx + dz * dz) * 1000;      /* mm */
+    DH.drift_mm = +d.toFixed(2);
+    if (d > DH.drift_max_mm) DH.drift_max_mm = +d.toFixed(2);
+    if (d > 0.4) {                                     /* 超过 0.4mm 才算在滑 */
+      modelRoot.position.x -= dx;
+      modelRoot.position.z -= dz;
+      var fw2 = dhFootWorld();
+      if (fw2) _lastFootWorld.copy(fw2);
+    } else {
+      _lastFootWorld.copy(fw);
+    }
+  }
   var CAM = null;                      /* 取景基准（fitCamera 算一次，tick 只做微动） */
   var B = {};                          /* 骨骼名 → Bone */
   var base = {};                       /* 每根要叠加的骨骼：记 idle 姿势基准旋转 */
@@ -271,7 +363,14 @@
 
       stage.add(modelRoot);
 
-      var clips = (gltf.animations || []);
+      var clips = (gltf.animations || []);      window.__DH_CLIPS = gltf.animations || [];
+      /* 初始化：把 idle 真正挂上状态机并占满权重（原来只 a.play()，DH 里是空的） */
+      if (mixer) {
+        var _idle = dhAction("idle");
+        if (_idle) { _idle.enabled = true; _idle.setEffectiveWeight(1); _idle.play(); }
+        DH.state = "idle"; DH.actions.idle = _idle || DH.actions.idle;
+      }
+
       S.clips = clips.map(function (c) { return c.name + "(" + c.duration.toFixed(2) + "s)"; });
       if (clips.length && !POSE_BIND) {
         mixer = new THREE.AnimationMixer(modelRoot);
@@ -388,7 +487,16 @@
 
   function tick(now) {
     var t = (now - clockStart) / 1000;
-    if (mixer) mixer.update(0.016);
+    if (mixer) mixer.update(0.016);    if (mixer) {
+      mixer.update(0.016);
+      DH.frames += 1;
+      for (var _k in DH.actions) {
+        var _a2 = DH.actions[_k];
+        DH.weights[_k] = _a2 && _a2.isRunning() ? +(_a2.getEffectiveWeight() || 0).toFixed(3) : 0;
+      }
+      dhFootLockStep();
+    }
+
 
     smooth.level += ((st.state === "speak" ? S.level : 0) - smooth.level) * 0.22;
 
@@ -458,7 +566,9 @@
   }
 
   /* 对外接口（真接线，不是占位） */
-  window.GBT_DH3D.setState = function (name) { st.state = String(name || "idle"); S.state = st.state; };
+  window.GBT_DH3D.setState = function (name, blend) {
+    return dhSetState(name, blend);       /* 2026-10-30：真交叉淡入，不再只存字符串 */
+  };
   window.GBT_DH3D.level = function (v) {
     var x = Number(v);
     S.level = isFinite(x) ? Math.max(0, Math.min(1, x)) : 0;

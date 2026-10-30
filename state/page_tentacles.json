@@ -1,8 +1,8 @@
 {
  "ok": true,
- "at": "2026-10-30T09:15:20",
+ "at": "2026-10-30T09:50:52",
  "pages": 28,
- "covered": 28,
+ "covered": 27,
  "reported": 1,
  "rows": [
   {
@@ -307,9 +307,9 @@
    "file": "/var/minis/shared/gbtv8/holo_pet_w3/welcome/index.html",
    "controls": 0,
    "kit": true,
-   "web_shell": true,
+   "web_shell": false,
    "stamped": 0,
-   "covered": true,
+   "covered": false,
    "reported": null,
    "reachable": false
   }
