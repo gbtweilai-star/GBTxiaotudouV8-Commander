@@ -41,7 +41,64 @@
 
   function info() { return S; }
   /* 早失败也要能读：页面在引擎缺失时照样要给得出原因 */
-  window.GBT_DH3D = { setState: function () {}, level: function () {}, info: info };
+  /* 2026-10-30 增：运行时读数。dh_realism.check() 要的就是这一份，
+     没有它后面全是盲改（主人令：先补读数采集）。
+     只读，不改任何状态；WebGL 起不来时也照样回一份 status，不假装有数。 */
+  function readings() {
+    var out = { ok: true, at: new Date().toISOString(),
+                status: S.status, bones: S.bones, clips: S.clips,
+                has_jaw: !!S.hasJaw, webgl: true };
+    try {
+      out.environment = !!(scene && scene.environment);
+      var dirSum = 0, hemi = 0;
+      scene.traverse(function (o) {
+        if (o.isDirectionalLight) dirSum += (o.intensity || 0);
+        if (o.isHemisphereLight) hemi += (o.intensity || 0);
+      });
+      out.dir_light_sum = +dirSum.toFixed(3);
+      out.hemi = +hemi.toFixed(3);
+      out.exposure = +Number(renderer.toneMappingExposure || 0).toFixed(3);
+      out.tone_mapping = (renderer.toneMapping === THREE.ACESFilmicToneMapping)
+        ? "ACESFilmic" : String(renderer.toneMapping);
+      out.color_space = String(renderer.outputColorSpace || "");
+      var mm = [], iors = [], sps = [], ccs = [], rgh = [];
+      var bodyPx = 0, hasNormal = false, meshes = 0, skinned = 0;
+      scene.traverse(function (o) {
+        if (!(o.isMesh || o.isSkinnedMesh)) return;
+        meshes += 1; if (o.isSkinnedMesh) skinned += 1;
+        var mats = Array.isArray(o.material) ? o.material : [o.material];
+        mats.forEach(function (m) {
+          if (!m) return;
+          if (typeof m.metalness === "number") mm.push(m.metalness);
+          if (typeof m.ior === "number") iors.push(m.ior);
+          if (typeof m.specularIntensity === "number") sps.push(m.specularIntensity);
+          if (typeof m.clearcoat === "number") ccs.push(m.clearcoat);
+          if (typeof m.roughness === "number") rgh.push(m.roughness);
+          if (m.normalMap) hasNormal = true;
+          if (m.map && m.map.image && m.map.image.width) {
+            bodyPx = Math.max(bodyPx, m.map.image.width);
+          }
+        });
+      });
+      function avg(a) { return a.length ? +(a.reduce(function (x, y) { return x + y; }, 0) / a.length).toFixed(3) : null; }
+      out.meshes = meshes; out.skinned = skinned;
+      out.metalness_mean = avg(mm);
+      out.ior = avg(iors);
+      out.specular = avg(sps);
+      out.clearcoat = avg(ccs);
+      out.diffuse_roughness = avg(rgh);
+      out.body_tex_px = bodyPx || null;
+      out.detail_normal = hasNormal;
+      out.draw_calls = (renderer.info && renderer.info.render && renderer.info.render.calls) || null;
+      out.triangles = (renderer.info && renderer.info.render && renderer.info.render.triangles) || null;
+    } catch (e) {
+      out.ok = false; out.error = String(e && e.message || e).slice(0, 160);
+    }
+    return out;
+  }
+
+  window.GBT_DH3D = { setState: function () {}, level: function () {}, info: info,
+                      readings: readings };
 
   if (!canvas) { S.status = "no-canvas"; return; }
   if (!window.THREE) {
@@ -69,26 +126,45 @@
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   if ("outputColorSpace" in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.18;
+  renderer.toneMappingExposure = 1.00;   /* 2026-10-30：1.18 → 1.0（读数判据 ⑤ 要求 ≤1.0） */
   renderer.setClearAlpha(0);
 
   var scene = new THREE.Scene();
+  /* ① IBL 环境（2026-10-30）：没有 scene.environment ⇒ 皮肤只有方向光镜面高光、无环境包裹，
+     这是「像 CG」的头号原因。零外部 HDRI：PMREM 从程序化场景烘一张。 */
+  try {
+    if (THREE.PMREMGenerator) {
+      var pmrem = new THREE.PMREMGenerator(renderer);
+      var envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x101822);
+      envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0x9fb6d6, side: THREE.BackSide })));
+      var pA = new THREE.Mesh(new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshBasicMaterial({ color: 0xffe3b8 }));
+      pA.position.set(-6, 8, 6); pA.lookAt(0, 0, 0); envScene.add(pA);
+      var pB = new THREE.Mesh(new THREE.PlaneGeometry(16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x00e5ff }));
+      pB.position.set(8, 4, -8); pB.lookAt(0, 0, 0); envScene.add(pB);
+      scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+      pmrem.dispose();
+    }
+  } catch (eIbl) {}
   var camera = new THREE.PerspectiveCamera(32, 1, 0.05, 60);
   camera.position.set(0.62, 1.16, 3.3);
   camera.lookAt(0, 1.02, 0);
 
   /* ── 灯：跟着剧场的金/青配色走（不是随便打的棚灯） ────────────────── */
-  scene.add(new THREE.HemisphereLight(0x9fb6d6, 0x141821, 0.85));
+  scene.add(new THREE.HemisphereLight(0x9fb6d6, 0x141821, 0.30)   /* 0.85 → 0.30：半球只做底色 */);
 
-  var key = new THREE.DirectionalLight(0xffe3b8, 2.5);          /* 暖金主光 · 前左 */
+  var key = new THREE.DirectionalLight(0xffe3b8, 1.10);          /* 暖金主光 · 前左 */
   key.position.set(-1.9, 2.6, 2.2);
   scene.add(key);
 
-  var rim = new THREE.DirectionalLight(0x00e5ff, 1.9);           /* 青色轮廓光 · 后右 */
+  var rim = new THREE.DirectionalLight(0x00e5ff, 0.65);           /* 青色轮廓光 · 后右 */
   rim.position.set(2.3, 2.0, -2.4);
   scene.add(rim);
 
-  var fill = new THREE.DirectionalLight(0xb9c8ff, 0.95);         /* 冷调补光 · 正面弱 */
+  var fill = new THREE.DirectionalLight(0xb9c8ff, 0.30);         /* 冷调补光 · 正面弱 */
   fill.position.set(0.6, 1.2, 3.0);
   scene.add(fill);
 
@@ -176,6 +252,12 @@
           mats.forEach(function (m) {
             if (!m) return;
             if ("envMapIntensity" in m) m.envMapIntensity = 0.7;
+            if ("metalness" in m) m.metalness = 0.0;
+            if ("roughness" in m) m.roughness = 0.65;
+            if ("ior" in m) m.ior = 1.4;
+            if ("specularIntensity" in m) m.specularIntensity = 0.42;
+            if ("clearcoat" in m) m.clearcoat = 0.05;
+            if ("sheen" in m) m.sheen = 0.12;
             m.needsUpdate = true;
           });
         }
