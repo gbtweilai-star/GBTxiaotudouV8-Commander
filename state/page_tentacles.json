@@ -1,9 +1,9 @@
 {
  "ok": true,
- "at": "2026-10-30T15:26:26",
+ "at": "2026-10-30T15:35:18",
  "pages": 401,
  "covered": 401,
- "reported": 5,
+ "reported": 6,
  "rows": [
   {
    "page": "activity/index.html",
@@ -4259,7 +4259,7 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": "2026-10-30T14:13:56",
+   "reported": "2026-10-30T15:33:35",
    "reachable": true
   },
   {
@@ -4270,7 +4270,7 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": "2026-10-29T07:52:12",
+   "reported": "2026-10-30T15:33:47",
    "reachable": true
   },
   {
@@ -4380,8 +4380,8 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": null,
-   "reachable": false
+   "reported": "2026-10-30T15:33:59",
+   "reachable": true
   },
   {
    "page": "wgpu/bench-matvec.html",
