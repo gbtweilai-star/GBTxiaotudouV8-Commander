@@ -102,12 +102,21 @@ if (WORKER) {
     }
     log("就绪 · backend=" + llm.backend);
     const done = new Set();
-    setInterval(async function () {
-      let job = null;
-      try {
-        const r = await fetch(BR + "/_local/next", { cache: "no-store" });
-        job = (await r.json()).job;
-      } catch (e) { return; }
+    /* 长轮询循环：fetch 挂着等桥给活（后台标签也不会被节流打死）；拿不到就继续挂。 */
+    (async function loop() {
+      for (;;) {
+        try {
+          const r = await fetch(BR + "/_local/next?wait=25", { cache: "no-store" });
+          const d = await r.json();
+          if (d && d.job) { await handleJob(d.job); }
+        } catch (e) { await new Promise(z => setTimeout(z, 1500)); }
+      }
+    })();
+
+    /* 🔴 2026-10-30：原来这里是个内联 setInterval（后台标签被节流到几十秒一次），
+       而长轮询循环调用的 handleJob **根本不存在** ⇒ 一直落 catch，工人从不干活。
+       现在提取成具名函数，长轮询直接调它。 */
+    async function handleJob(job) {
       if (!job || done.has(job.id)) return;
       done.add(job.id);
       log("领活 " + job.id + "：" + String(job.text).slice(0, 30));
@@ -127,7 +136,60 @@ if (WORKER) {
         });
         log("失败 " + job.id + "：" + (e && e.message || e));
       }
-    }, 2000);
+    }
+  })();
+}
+</script>
+
+<script type="module">
+/* 🔴 2026-10-30：工人模式改**独立自包含**（自己 import 引擎，不依赖页面内变量）。
+   原因：之前写在页面闭包里，handleJob 引用的 llm 在作用域上拿不到，结果一直 err。
+   长轮询（wait=25）而不是 setInterval —— 后台标签的定时器会被节流，fetch 回调不会。 */
+window.__workerBoot = "module-loaded";
+if (/[?&]_worker=1/.test(location.search)) {
+  window.__workerLog = [];
+  const push = (m) => { try { window.__workerLog.push(m); if (window.__workerLog.length > 40) window.__workerLog.shift(); } catch (e) {} };
+  const BASE = (location.port === "8081") ? "http://127.0.0.1:8791" : "http://127.0.0.1:8791";
+  const log = (m) => { push(m); try { console.log("[worker] " + m); } catch (e) {} };
+  let llm = null, backoff = 500;
+  async function ensureLLM() {
+    if (llm) return llm;
+    const mod = await import("./local-llm.js");
+    llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
+    log("引擎就绪 backend=" + llm.backend);
+    return llm;
+  }
+  const done = new Set();
+  (async function loop() {
+    for (;;) {
+      try {
+        await ensureLLM();
+        const r = await fetch(BASE + "/_local/next?wait=25", { cache: "no-store" });
+        const d = await r.json();
+        const job = d && d.job;
+        if (!job) { backoff = 500; continue; }
+        if (done.has(job.id)) continue;
+        done.add(job.id);
+        log("领活 " + job.id);
+        let payload = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
+        try {
+          const out = await llm.chat(String(job.text || ""), job.max_tokens || 48);
+          payload = { id: job.id, text: out.text, backend: llm.backend,
+                      tokPerSec: out.tokPerSec, tokens: out.tokens };
+        } catch (e) {
+          payload.text = "";
+          log("算失败 " + job.id + "：" + (e && e.message || e));
+        }
+        await fetch(BASE + "/_local/result", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        log("交回 " + job.id + "：" + String(payload.text).slice(0, 40));
+      } catch (e) {
+        await new Promise(z => setTimeout(z, backoff));
+        backoff = Math.min(5000, backoff * 2);
+      }
+    }
   })();
 }
 </script>

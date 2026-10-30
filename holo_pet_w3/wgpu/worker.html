@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>本机权重 · 工人模式（极简）</title>
+<style>body{margin:0;background:#0b0e14;color:#cfe;font:13px/1.6 ui-monospace,monospace;padding:10px}
+#l{white-space:pre-wrap}#t{color:#7ef}</style>
+</head>
+<body>
+<div id="t">工人模式启动中…</div>
+<div id="l"></div>
+<script type="module">
+/* 🔴 2026-10-30：极简工人页 —— 只做一件事：长轮询领活 → 用整机 GPU 跑我们的权重 → 交回。
+   为什么不放 local-llm.html 里：那页要载 3D/自检，重得很，execute_js 都会超时，
+   出错时根本看不到日志。这里只有循环，出什么错一眼可见。 */
+const BASE = "http://127.0.0.1:8791";
+const L = document.getElementById("l");
+const T = document.getElementById("t");
+const log = (m) => { L.textContent += m + "\n"; if (L.textContent.length > 6000) L.textContent = L.textContent.slice(-4000); };
+window.__wlog = [];
+const push = (m) => { window.__wlog.push(m); if (window.__wlog.length > 60) window.__wlog.shift(); log(m); };
+
+window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, lastAt: null };
+
+(async function boot() {
+  let llm = null;
+  try {
+    push("载入引擎…");
+    const mod = await import("./local-llm.js");
+    llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
+    window.__worker.state = "ready";
+    window.__worker.backend = llm.backend;
+    T.textContent = "工人就绪 · backend=" + llm.backend + " · 等下派活…";
+    push("引擎就绪 backend=" + llm.backend);
+  } catch (e) {
+    window.__worker.state = "boot-failed";
+    T.textContent = "引擎载入失败：" + (e && e.message || e);
+    push("引擎载入失败：" + (e && e.message || e));
+    return;
+  }
+
+  for (;;) {
+    try {
+      /* 必须带超时：桥重启/挂起时旧连接会**永远挂着**，工人就此僵死（实测 jobs 卡在 1 不动）。
+         35s > 服务端 25s 长轮询，正常不会误杀。 */
+      const ac = new AbortController();
+      const _to = setTimeout(() => ac.abort(), 35000);
+      let r;
+      try {
+        r = await fetch(BASE + "/_local/next?wait=25", { cache: "no-store", signal: ac.signal });
+      } finally { clearTimeout(_to); }
+      const d = await r.json();
+      const job = d && d.job;
+      if (!job) continue;
+      window.__worker.jobs += 1;
+      window.__worker.lastAt = new Date().toISOString();
+      push("领活 " + job.id + "：" + String(job.text || "").slice(0, 40));
+      let payload = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
+      try {
+        const out = await llm.chat(String(job.text || ""), job.max_tokens || 48);
+        payload = { id: job.id, text: out.text, backend: llm.backend,
+                    tokPerSec: out.tokPerSec, tokens: out.tokens };
+        window.__worker.ok += 1;
+      } catch (e) {
+        window.__worker.fail += 1;
+        push("算失败：" + (e && e.message || e));
+      }
+      await fetch(BASE + "/_local/result", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      push("交回 " + job.id + " → " + String(payload.text || "(空)").slice(0, 50));
+    } catch (e) {
+      await new Promise(z => setTimeout(z, 1200));
+    }
+  }
+})();
+</script>
+</body>
+</html>

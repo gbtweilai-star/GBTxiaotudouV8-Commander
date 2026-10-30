@@ -1,3 +1,17 @@
 {"id": "L1793352438925", "at": "2026-10-30T16:28:55", "text": "assassassassassassassassassassuserassass<|im_start|>assass\nassassassassassassass", "backend": "gpu", "tokPerSec": 71.12, "tokens": 24}
 {"id": "L1793352631482", "at": "2026-10-30T16:36:16", "text": "for to I. can is depends has was: would", "backend": "gpu", "tokPerSec": 77.15, "tokens": 11}
 {"id": "L1793352820992", "at": "2026-10-30T16:39:52", "text": "The French language and EnglishEnglishlanguage is a native speaker of the United States are not\nThe French", "backend": "gpu", "tokPerSec": 37.11, "tokens": 20}
+{"id": "L1793353022268", "at": "2026-10-30T18:43:53", "text": "", "backend": "err", "tokPerSec": null, "tokens": 0}
+{"id": "L1793360104053", "at": "2026-10-30T18:43:53", "text": "", "backend": "err", "tokPerSec": null, "tokens": 0}
+{"id": "L1793360409515", "at": "2026-10-30T18:43:53", "text": "", "backend": "err", "tokPerSec": null, "tokens": 0}
+{"id": "L1793360676412", "at": "2026-10-30T18:47:54", "text": "The French language and EnglishEnglishlanguageis a native speaker", "backend": "gpu", "tokPerSec": 38.24, "tokens": 11}
+{"id": "L1793360932536", "at": "2026-10-30T18:56:00", "text": "The answer to this question is it a city in France", "backend": "gpu", "tokPerSec": 38.21, "tokens": 11}
+{"id": "L1793361124233", "at": "2026-10-30T18:56:01", "text": "The answer to this question is:\n\n105", "backend": "gpu", "tokPerSec": 38.82, "tokens": 11}
+{"id": "L1793361250741", "at": "2026-10-30T18:56:02", "text": "The answer to this question is it a city in France", "backend": "gpu", "tokPerSec": 38.85, "tokens": 11}
+{"id": "L1793361522944", "at": "2026-10-30T18:58:43", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 67.83, "tokens": 11}
+{"id": "L1793361522944", "at": "2026-10-30T18:58:50", "text": "The French language and EnglishEnglishlanguageis a native speaker of the United States is", "backend": "gpu", "tokPerSec": 38.08, "tokens": 16}
+{"id": "L1793361613247", "at": "2026-10-30T19:00:14", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 85.8, "tokens": 11}
+{"id": "T1793361831790", "at": "2026-10-30T19:03:52", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 77.02, "tokens": 11}
+{"id": "L1793361839240", "at": "2026-10-30T19:03:59", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 78.39, "tokens": 11}
+{"id": "L1793361940593", "at": "2026-10-30T19:05:40", "text": "is.?, has andis", "backend": "gpu", "tokPerSec": 61.24, "tokens": 8}
+{"id": "L1793361984300", "at": "2026-10-30T19:06:24", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 58.27, "tokens": 11}

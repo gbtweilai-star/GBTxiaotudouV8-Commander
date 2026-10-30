@@ -87,6 +87,11 @@ UPSTREAMS = {
     "deepseek-pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro",
                  "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 300),
     "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
+    # 🔴 2026-10-30（主人：A19 那个开关我碰不到，但也不能没得用）：
+    #   ownweights = 我们自己的权重，跑在整机 GPU 的浏览器里（页面工人）。
+    #   **不是云端、不是第三方** —— OURS_LANES 里算自有。
+    #   特殊性：它不由本进程发 HTTP，而是 route 到 /_local 队列（见 _local_worker_chat）。
+    "ownweights": ("local://worker", "gbt-local", "raw:gbt", 180),
 }
 DEFAULT = "selfhost"     # A19 优先：手机自己的算力
 
@@ -112,7 +117,7 @@ try:
 except Exception as _e:                                       # noqa: BLE001
     sys.stderr.write("[bridge] 读 %s 失败：%s\n" % (_EXTRA.name, _e))
 
-OURS_LANES = {"selfhost", "ours", "ours-alt", "local"} | set(globals().get("_EXTRA_OURS") or set())
+OURS_LANES = {"selfhost", "ours", "ours-alt", "local", "ownweights"} | set(globals().get("_EXTRA_OURS") or set())
 
 # 降级链：指定的上游**网络不可达**时，按顺序自动往下试，不让整条链路哑掉。
 # 只在「连不上/超时」时降级；上游明确回了 4xx/5xx 就如实上报，不掩盖。
@@ -170,8 +175,15 @@ PERSONA_LITE = str(ROOT / "state" / "her_persona_lite.txt")
 #    宁可如实报错（调用方自己决定要不要换车道），也不许拿别人的模型冒充她的。
 #    确需旧行为（可用性优先）时：export GBT_ALLOW_CLOUD_FALLBACK=1
 if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
-    FALLBACK["selfhost"] = []
-    FALLBACK["local"] = []
+    # 不降级到**云**。ownweights（整机 GPU 的页面工人）默认**不挂在降级链上**：
+    #   实测它会让页面进入忙轮询、把标签拖死（navigate 300s 无响应），且后台时被节流到不可用。
+    #   想试可显式开：export GBT_LOCAL_WORKER=1
+    if __import__("os").environ.get("GBT_LOCAL_WORKER") == "1":
+        FALLBACK["selfhost"] = ["ownweights"]
+        FALLBACK["local"] = ["ownweights"]
+    else:
+        FALLBACK["selfhost"] = []
+        FALLBACK["local"] = []
 
 
 def key_for(profile: str | None) -> tuple[str, str]:
@@ -276,6 +288,54 @@ def _shortlist(question: str, cat: dict, k: int = 18) -> tuple[list[str], str]:
         raise RuntimeError("search 空")
     except Exception as exc:                                  # noqa: BLE001
         return sorted(cat)[:k], "fallback-first-%d(%s)" % (k, type(exc).__name__)
+
+
+
+def _local_worker_chat(body: dict, timeout_s: int = 180) -> dict:
+    """把请求派给「页面工人」（整机 GPU 跑我们自己的 GGUF），同步等结果。
+
+    为什么要有这条：LM Pocket 的 :1234 要人点一下才起，那个开关不在我们手里；
+    而整机 GPU 这条路由我们完全掌控。两条都是**我们自己的权重**，不是云。
+    """
+    import time as _t
+    msgs = body.get("messages") or []
+    text = ""
+    for m in reversed(msgs):
+        if isinstance(m, dict) and m.get("role") == "user":
+            text = str(m.get("content") or "")
+            break
+    if not text and msgs:
+        text = str((msgs[-1] or {}).get("content") or "")
+    max_tokens = int(body.get("max_tokens") or 200)
+    q = ROOT / "state" / "local_jobs.jsonl"
+    d = ROOT / "state" / "local_results.jsonl"
+    jid = "L%d" % int(_t.time() * 1000)
+    rec = {"id": jid, "at": _t.strftime("%Y-%m-%dT%H:%M:%S"), "text": text[:2000],
+           "max_tokens": max(8, min(512, max_tokens))}
+    try:
+        q.parent.mkdir(parents=True, exist_ok=True)
+        with q.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    except Exception as exc:                                       # noqa: BLE001
+        return {"ok": False, "error": {"message": "入队失败：%s" % exc}}
+
+    t0 = _t.time()
+    while _t.time() - t0 < timeout_s:
+        try:
+            if d.is_file():
+                for line in d.read_text(encoding="utf-8").splitlines():
+                    try:
+                        r = json.loads(line)
+                    except Exception:                              # noqa: BLE001
+                        continue
+                    if r.get("id") == jid:
+                        return {"ok": True, "text": str(r.get("text") or ""),
+                                "tokPerSec": r.get("tokPerSec"), "backend": r.get("backend")}
+        except Exception:                                          # noqa: BLE001
+            pass
+        _t.sleep(0.4)
+    return {"ok": False, "error": {"message": "页面工人 %.0fs 内没交回（需要开着 local-llm.html?_worker=1）" % timeout_s}}
+
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -508,8 +568,21 @@ class Handler(BaseHTTPRequestHandler):
                 import json as _j
                 jobs_f = ROOT / "state" / "local_jobs.jsonl"
                 res_f = ROOT / "state" / "local_results.jsonl"
+                import time as _tw
+                _wait = 0.0
+                try:
+                    _qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                    _wait = float((_qs.get("wait") or ["0"])[0])
+                except Exception:                                  # noqa: BLE001
+                    _wait = 0.0
+                _t0w = _tw.time()
                 if not jobs_f.is_file():
-                    return self._json(200, {"ok": True, "job": None, "why": "还没有活"})
+                    if _wait <= 0:
+                        return self._json(200, {"ok": True, "job": None, "why": "还没有活"})
+                    while _tw.time() - _t0w < _wait and not jobs_f.is_file():
+                        _tw.sleep(0.3)
+                    if not jobs_f.is_file():
+                        return self._json(200, {"ok": True, "job": None, "why": "等到超时也没活"})
                 done = set()
                 if res_f.is_file():
                     for ln in res_f.read_text(encoding="utf-8").splitlines():
@@ -526,6 +599,29 @@ class Handler(BaseHTTPRequestHandler):
                     if j.get("id") not in done:
                         job = j
                         break
+                # 没活且要求等待 ⇒ 挂着等（长轮询），不让页面频繁打点
+                if job is None and _wait > 0:
+                    while _tw.time() - _t0w < _wait and job is None:
+                        _tw.sleep(0.3)
+                        try:
+                            if jobs_f.is_file():
+                                _d2 = set()
+                                if res_f.is_file():
+                                    for _l in res_f.read_text(encoding="utf-8").splitlines():
+                                        try:
+                                            _d2.add(_j.loads(_l).get("id"))
+                                        except Exception:              # noqa: BLE001
+                                            pass
+                                for _l in reversed(jobs_f.read_text(encoding="utf-8").splitlines()):
+                                    try:
+                                        _o = _j.loads(_l)
+                                    except Exception:              # noqa: BLE001
+                                        continue
+                                    if _o.get("id") not in _d2:
+                                        job = _o
+                                        break
+                        except Exception:                          # noqa: BLE001
+                            pass
                 return self._json(200, {"ok": True, "job": job})
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
@@ -1003,6 +1099,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 
+        sys.stderr.write("[chat] 进入分派 name=%s stream=%s\n" % (name, bool(body.get("stream"))))
         stream = bool(body.get("stream"))
 
         # 降级链：**默认就开**，即使调用方显式点名了上游也照样降级。
@@ -1021,6 +1118,21 @@ class Handler(BaseHTTPRequestHandler):
         tried = []
         for cand in chain:
             base, model_default, profile, timeout_s = UPSTREAMS[cand]
+            if base.startswith("local://"):
+                # 我们自己的权重（页面工人 · 整机 GPU）：不走 HTTP，派队列后同步等
+                r = _local_worker_chat(body, timeout_s)
+                if r.get("ok"):
+                    txt = r.get("text") or ""
+                    return {"ok": True, "lane": cand, "weights_ours": True,
+                            "backend": r.get("backend"), "tokPerSec": r.get("tokPerSec"),
+                            "payload": {"choices": [{"message": {"role": "assistant",
+                                                                 "content": txt},
+                                                     "finish_reason": "stop"}],
+                                        "usage": {"prompt_tokens": 0,
+                                                  "completion_tokens": len(txt)}}}
+                tried.append({"upstream": cand,
+                              "net_error": (r.get("error") or {}).get("message")})
+                continue
             # 首个沿用调用方给的 model；降级时换成本游默认模型（各家认的名字不同）
             if cand == name:
                 body.setdefault("model", model_default)

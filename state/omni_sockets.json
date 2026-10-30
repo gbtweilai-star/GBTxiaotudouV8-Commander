@@ -1,26 +1,12 @@
 {
- "at": "2026-10-30T18:25:34",
+ "at": "2026-10-30T19:29:35",
  "plugs": [
   {
    "name": "bridge",
    "kind": "bridge",
    "target": "http://127.0.0.1:8791",
    "protocol": null,
-   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T18:25:34\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
-  },
-  {
-   "name": "panel",
-   "kind": "panel",
-   "target": "http://127.0.0.1:8765",
-   "protocol": null,
-   "evidence": "{\"ok\": true, \"codex\": {\"ok\": false, \"codex_path\": null, \"connected\": false, \"protocol\": \"json-rpc/stdio app-server\", \"note\": \"未找到内核可执行文件；�"
-  },
-  {
-   "name": "index",
-   "kind": "static",
-   "target": "http://127.0.0.1:8792",
-   "protocol": null,
-   "evidence": "{\"ok\": false, \"error\": \"unknown\", \"routes\": [\"/ping\", \"/stats\", \"/find?q=\", \"/page?text=\"]}"
+   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T19:29:34\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
   },
   {
    "name": "page",
@@ -37,11 +23,18 @@
    "evidence": "<!DOCTYPE html><html lang=\"zh-Hans\"><head><meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>本机权重 · 统�"
   },
   {
+   "name": "async_gate",
+   "kind": "static",
+   "target": "http://127.0.0.1:8790",
+   "protocol": null,
+   "evidence": "{\"ok\": true, \"service\": \"gbt-async-gate\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1:1234/v1\", \"model\": \"gbt-v8-v82"
+  },
+  {
    "name": "local-worker",
    "kind": "worker",
    "target": "bridge:/_local/enqueue",
    "protocol": "gguf-in-browser",
-   "evidence": "已交回 3 / 派过 4 单"
+   "evidence": "已交回 16 / 派过 16 单"
   }
  ]
 }
