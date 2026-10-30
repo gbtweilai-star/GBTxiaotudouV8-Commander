@@ -112,9 +112,25 @@ def worker_main(args: list) -> int:
         try:
             sys.path.insert(0, str(ROOT))
             from gbt_allinone.api import run_task
-            r = run_task(unit.get("kind") or "health", unit.get("payload") or {})
+            # 2026-10-30：单任务硬超时。有些位会挂很久（网络/外部服务），
+            # 不设上限会让整批派发被一个位拖死（实测心跳一轮 14 分钟跑不完）。
+            _to = float(unit.get("timeout") or 8.0)
+            try:
+                import signal as _sig
+
+                def _alarm(_s, _f):
+                    raise TimeoutError("unit timeout %.0fs" % _to)
+                _old = _sig.signal(_sig.SIGALRM, _alarm)
+                _sig.setitimer(_sig.ITIMER_REAL, _to)
+                try:
+                    r = run_task(unit.get("kind") or "health", unit.get("payload") or {})
+                finally:
+                    _sig.setitimer(_sig.ITIMER_REAL, 0)
+                    _sig.signal(_sig.SIGALRM, _old)
+            except TimeoutError as _te:
+                r = {"status": "timeout", "error": str(_te)}
             st = r.get("status") or "?"
-            rec = {"unit": unit.get("id"), "status": st, "ok": st not in ("denied", "error"),
+            rec = {"unit": unit.get("id"), "status": st, "ok": st not in ("denied", "error", "timeout"),
                    "ms": round((time.time() - t0) * 1000),
                    "sample": str(r.get("result") or {})[:200]}
         except Exception as exc:                                  # noqa: BLE001

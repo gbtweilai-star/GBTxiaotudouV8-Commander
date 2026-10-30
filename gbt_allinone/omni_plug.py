@@ -921,6 +921,55 @@ def run(op: str = "status", **kw) -> dict:
         s = p.plug(Socket(str(kw.get("socket") or "file"), str(kw.get("target") or "")))
         return {"ok": s.state == "plugged", "op": "plug",
                 "插座": {"kind": s.kind, "target": s.target, "state": s.state, "detail": s.detail}}
+    # ── 2026-10-30 补：conn_check 一直在等这四个 op，而两套 omni_plug 里都没有 ──
+    #   不重写检索：分别委托 page_route / page_lazy / disk_index（各自已有实现）。
+    if op in ("page_route", "page_stats", "disk_find", "disk_stats"):
+        import importlib.util as _iu
+        from pathlib import Path as _P
+        _tools = _P(__file__).resolve().parents[1] / "tools"
+
+        def _load_mod(nm, path):
+            spec = _iu.spec_from_file_location(nm, path)
+            m = _iu.module_from_spec(spec)
+            spec.loader.exec_module(m)
+            return m
+
+        _txt = str(kw.get("text") or kw.get("q") or "")
+        if op == "page_route":
+            m = _load_mod("_pr_op", _tools / "page_route.py")
+            caps = m.route_caps(_txt, int(kw.get("limit") or 5))
+            try:
+                pages = m.route_pages(_txt, int(kw.get("limit") or 6))
+            except Exception:                                     # noqa: BLE001
+                pages = {}
+            return {"ok": True, "op": "page_route",
+                    "route": {"能力位": caps, "页面": pages}}
+        if op == "page_stats":
+            m = _load_mod("_pl_op", _tools / "page_lazy.py")
+            out = {"ok": True, "op": "page_stats"}
+            for fn in ("stats", "status", "scan"):
+                f = getattr(m, fn, None)
+                if callable(f):
+                    try:
+                        out["stats"] = f()
+                        break
+                    except Exception:                             # noqa: BLE001
+                        continue
+            return out
+        m = _load_mod("_di_op", _tools / "disk_index.py")
+        try:
+            st = m.load()
+        except SystemExit:
+            return {"ok": False, "op": op, "error": "还没索引 ⇒ 先 build"}
+        if op == "disk_stats":
+            return {"ok": True, "op": "disk_stats", "files": st.get("files"),
+                    "dirs": st.get("dirs"), "built_at": st.get("built_at")}
+        q = _txt.lower()
+        rows = st.get("rows") or []
+        hit = [str(x[0]) for x in rows if q in str(x[0]).lower()]
+        return {"ok": True, "op": "disk_find", "q": q,
+                "hits": len(hit), "sample": hit[:int(kw.get("limit") or 20)]}
+
     if op == "run":
         return dict({"op": "run"}, **plug_and_run(
             str(kw.get("target") or ""), kind=str(kw.get("socket") or "process"),

@@ -199,14 +199,15 @@ def c_omni_two_copies():
     两份 omni_plug 并存 ⇒ 谁被调用取决于 _ROOT 层级，op 不一致就是"同一个问题两个答案"。"""
     ops = ("page_route", "page_stats", "disk_find", "disk_stats")
     out = {}
-    for label, path in (("真身", ROOT / "gbt_allinone" / "omni_plug.py"),
-                        ("切片", ROOT / "runtime" / "gbt_allinone" / "omni_plug.py")):
-        if not path.is_file():
-            out[label] = "缺"
-            continue
-        txt = path.read_text(encoding="utf-8", errors="replace")
-        out[label] = [o for o in ops if o in txt]
-    return out.get("真身") == out.get("切片") and out.get("真身") is not None, out
+    # 2026-10-30 主人口径「严禁保留旧代码」：切片副本已整体删除，
+    # 判据因此反转 —— **副本必须不存在**（存在就是旧代码复活）。
+    real = ROOT / "gbt_allinone" / "omni_plug.py"
+    slice_ = ROOT / "runtime" / "gbt_allinone" / "omni_plug.py"
+    out["真身"] = ([o for o in ops
+                    if o in real.read_text(encoding="utf-8", errors="replace")]
+                   if real.is_file() else "缺")
+    out["切片"] = "已删除" if not slice_.is_file() else "仍在（旧代码复活）"
+    return out["真身"] != "缺" and out["切片"] == "已删除", out
 
 
 def c_engine_is_real():
@@ -245,11 +246,15 @@ def c_page_bridge_port():
     if not f.is_file():
         return False, {"缺": "model-chat/index.html"}
     t = f.read_text(encoding="utf-8", errors="replace")
-    m = re.search(r'BRIDGE\s*=\s*["\']([^"\']+)["\']', t)
+    # 2026-10-30 修：老正则只认 `BRIDGE = "字面量"`，而页面现在是
+    #   `const BRIDGE = (params.get("bridge") || "http://127.0.0.1:8791")...`
+    #   ⇒ 明明指向 :8791 却判红。改成取赋值片段再判里面有没有 :8791。
+    m = re.search(r"BRIDGE\s*=([\s\S]{0,300})", t)
     if not m:
-        return False, {"判定": "页面里没找到 BRIDGE 常量"}
-    url = m.group(1)
-    return (":8791" in url), {"页面 BRIDGE": url, "判定": "应指向 :8791"}
+        return False, {"判定": "页面里没找到 BRIDGE 赋值"}
+    seg = m.group(1)
+    return (":8791" in seg), {"页面 BRIDGE 片段": seg.strip().splitlines()[0][:80],
+                              "判定": "应指向 :8791"}
 
 
 def c_manifest_start_url():
