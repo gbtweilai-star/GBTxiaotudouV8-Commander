@@ -1126,6 +1126,19 @@ def _run_benign(kind, payload, policy_decision=None):
         if op == "wire":
             return _ai.wire(dry=bool(p.get("dry", True)), limit=int(p.get("limit") or 0))
         return {"ok": False, "error": f"未知 op:{op}（build/wire/find/stats）", "fail_closed": True}
+    if kind == "i2v_agnes":
+        # 图生视频（agnes-video-2.5-flash）：接线与判据在 tools/i2v_agnes.py；
+        # 缺钥 fail-closed（不发空请求、不造假产物）。
+        import importlib.util as _iu4
+        from pathlib import Path as _P4
+        _spec4 = _iu4.spec_from_file_location(
+            "i2v_agnes_mod",
+            _P4(__file__).resolve().parents[1] / "tools" / "i2v_agnes.py")
+        _i2v = _iu4.module_from_spec(_spec4)
+        _spec4.loader.exec_module(_i2v)
+        _p4 = payload or {}
+        return _i2v.run(str(_p4.get("op") or "status"),
+                        **{k: v for k, v in _p4.items() if k != "op"})
     if kind == "control_loop":
         # 快慢双脑控制回路（蒸馏自 Jev/TypeSafe System One）：**只决策不动手**，动作仍走 desktop_control 等门。
         # ⚠️ `selftest`/`demo` 会打印人读行 —— run_task 的返回是 **JSON 契约**，人读行混进 stdout 会把严格消费者
