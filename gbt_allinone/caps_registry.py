@@ -1855,7 +1855,16 @@ BENIGN_CAPS = {
         "handler": 'memory_manager',
         "safe": True,
     },
-    "code_graph": {
+    "i2v_agnes": {
+        "domain": 'video',
+        "desc": '图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** '
+                '（HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 '
+                'op=status/dryrun/submit/verify。**缺钥 fail-closed** 并说清缺哪把（AGNES_API_KEY）， '
+                '绝不发空请求、绝不生成假产物。',
+        "handler": 'i2v_agnes',
+        "safe": True,
+    },
+"code_graph": {
         "domain": 'mind',
         "desc": '代码知识图谱（主人令 2026-10-29，蒸馏自 symchenry/codegraph 的机制、不抄代码）：'
                 '**本地 AST 预索引 → SQLite 图谱（symbols/edges/files + FTS5）→ 结构化查询**。'

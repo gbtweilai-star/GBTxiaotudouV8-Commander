@@ -18550,5 +18550,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T09:40:19"
+ },
+ "tools/i2v_agnes.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T10:46:40"
  }
 }

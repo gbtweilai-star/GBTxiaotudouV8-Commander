@@ -1,6 +1,6 @@
 {
- "count": 349,
- "at": "2026-10-30T07:30:00",
+ "count": 350,
+ "at": "2026-10-30T10:30:00",
  "capabilities": [
   {
    "name": "body_map",
@@ -2271,6 +2271,15 @@
    "name": "memory_manager",
    "domain": "mind",
    "desc": "记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·七类源（记忆/文档/技能/状态/**能力位**/代理/助手记忆）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（\"想到匹配面出现的能力\"）；index 增量（mtime+sha 未变即跳过；**不许整表清空** —— 实测因此丢过索引）；store 存记忆过 filesystem_write 门。SQL 纪律：全部内联字面量 + `?` 占位符，不用变量拼 SQL（安全钩子实测拦过两次）。op=index/find/store/stats",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "i2v_agnes",
+   "domain": "video",
+   "desc": "图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** （HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 op=status/dryrun/submit/verify。**缺钥 fail-closed** 并说清缺哪把（AGNES_API_KEY）， 绝不发空请求、绝不生成假产物。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
