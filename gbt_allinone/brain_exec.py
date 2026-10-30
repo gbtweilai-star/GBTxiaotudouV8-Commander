@@ -394,9 +394,44 @@ def health() -> dict:
 
     ok_count = sum(1 for d in dims.values() if d.get("ok"))
     score = round(ok_count / len(dims) * 100, 1) if dims else 0
+    # 🔴 2026-10-30 打磨二：本函数（五维）与 heartbeat()（十二根）原来是**两套互不相识的
+    #    健康口径** —— 问"系统好不好"会得到两个答案，而五维只覆盖执行链的五个面，
+    #    **一条能力位都没看**。现在把十二根的摘要并进来（读上一次落盘，不重跑，零成本），
+    #    并写明分工，让读数只有一个入口。
+    hb = None
+    try:
+        from . import heartbeat_tentacle as _HB
+
+        _latest = _HB.latest()
+        if not _latest.get("never_scanned"):
+            hb = {
+                "tentacles_ok": _latest.get("tentacles_ok"),
+                "tentacles_total": _latest.get("tentacles_total"),
+                "score": _latest.get("score"),
+                "at": _latest.get("at"),
+                "mode": _latest.get("mode"),
+                "taxonomy_ok": (_latest.get("taxonomy") or {}).get("ok"),
+                "stale_s": None,
+            }
+            try:
+                from datetime import datetime as _dt
+                hb["stale_s"] = int((_dt.now() - _dt.strptime(
+                    str(_latest.get("at")), "%Y-%m-%dT%H:%M:%S")).total_seconds())
+            except Exception:  # noqa: BLE001
+                pass
+        else:
+            hb = {"never_scanned": True,
+                  "detail": "还没打过心跳（python -m gbt_allinone heartbeat）"}
+    except Exception as e:  # noqa: BLE001
+        hb = {"error": f"{type(e).__name__}: {str(e)[:80]}"}
+
     return {"ok": ok_count == len(dims), "score": score,
             "healthy_dims": ok_count, "total_dims": len(dims),
             "dims": dims,
+            "heartbeat": hb,
+            "scope_note": ("本函数五维只查执行链的五个面（路由/执行/触手/眼/审计），"
+                           "不覆盖 349 条能力位；覆盖全部能力位的是 heartbeat 十二根。"
+                           "两套读数都要看，谁也替代不了谁。"),
             "elapsed_ms": round((time.time() - t0) * 1000, 1)}
 
 
@@ -518,6 +553,7 @@ _ADVICE_RULES: dict = {
     "garbage_cleaned": ("P2", "垃圾已清（信息态）"),
     # 落盘失败是 P0：状态没写进去，后面所有读数（含 act 的重定级）都在读旧账。
     "persist_failed": ("P0", "心跳写不进盘 —— 状态没落盘，读数与重定级全部基于旧数据，先修写权限/磁盘"),
+    "keeper_lost": ("P0", "值日根配置失效 —— 已降级代值保证抽屉不空白，但必须把 KEEPER 修回分类表内"),
     "hygiene_error": ("P1", "卫生层清理时出错 —— 该删没删或该留没留，逐条看 errors"),
 }
 
@@ -525,7 +561,7 @@ _ADVICE_RULES: dict = {
 # 12 根会各报一次同一条，必须合成一条并列出受影响分类 —— 否则一个磁盘写不进
 # 就被念成 12 个问题，真正的病灶反而被淹掉。
 _SYSTEMIC_CODES: frozenset = frozenset({
-    "persist_failed", "dispatch_unreadable", "taxonomy_broken",
+    "persist_failed", "dispatch_unreadable", "taxonomy_broken", "keeper_lost",
 })
 
 

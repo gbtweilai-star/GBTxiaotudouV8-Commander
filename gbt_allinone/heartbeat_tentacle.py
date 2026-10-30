@@ -86,6 +86,9 @@ TIER_FULL = "full"
 #   ② **外来物只报不删**：判定为"不是我们的东西"时**一律不动** —— 别人的东西不该由触手处置。
 #   ③ **默认 dry-run**：不显式要 `--clean` 就只出清单。删除属写面，得有人明确要。
 KEEP_SCANS = 20          # scan-*.json 环形保留份数（再多就是垃圾）
+# 原子写的临时后缀：写盘时先落这个再 os.replace。卫生层对它**豁免**
+# （既不当垃圾扫掉，也不当外来物报红）—— 否则会扫掉别人正在写的那一份。
+_SWAP_SUFFIX = ".swapping"
 _GARBAGE_SUFFIX = (".tmp", ".temp", ".pyc", ".pyo", ".orig", ".rej", ".swp", ".part")
 _GARBAGE_NAMES = ("thumbs.db", ".ds_store", "desktop.ini")
 _GARBAGE_DIRS = ("__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache")
@@ -138,6 +141,20 @@ PROBES: dict = {
 # 2026-10-30 打磨：原来写的是 `next(iter(TX.CATEGORIES))` —— 那是**依赖字典插入顺序**，
 # 谁要重排一下分类表，值日根就悄悄换人，而报告里看不出来。钉成常量，重排也不动。
 KEEPER = "身"
+
+
+def _resolve_keeper() -> tuple:
+    """返回 (实际值日的分类代号, 是否配置有问题)。
+
+    🔴 2026-10-30 打磨二：KEEPER 若被改名/删掉，原来会**静默失守** ——
+    12 根的 `keeper` 全变 False，抽屉里的垃圾与外来物**再没有任何一根上报**，
+    而报告照样 12/12 绿（实测：KEEPER 指向不存在的类时 keeper 数=0、零信号）。
+    现在降级到第一个分类继续值日（保证不出现监控空白），并把"配置坏了"如实报红。
+    """
+    if KEEPER in TX.CATEGORIES:
+        return KEEPER, False
+    fallback = next(iter(TX.CATEGORIES), "")
+    return fallback, True
 
 
 def _now() -> str:
@@ -197,9 +214,21 @@ def _read_json(p: Path) -> dict:
 
 
 def _write_json(p: Path, data: dict) -> bool:
+    """原子写：先写 `.swapping` 再 os.replace。
+
+    2026-10-30 打磨二：原来 `write_text` 是**截断再写**，两个进程同时跑
+    （monitor-loop 一拍 + 人手一条 CLI）时，读的那一方可能读到**半截 JSON**，
+    `_read_json` 拿到 {} ⇒ 漂移层当成"首跳"、advise 读到空账，而且不报错。
+    原子替换后，读到的要么是旧的完整版，要么是新的完整版，没有第三种。
+
+    `.swapping` 后缀在卫生层里是**明确豁免**（不算垃圾也不算外来）——
+    否则另一根触手的卫生层会把正在写的临时件当垃圾扫掉。
+    """
     try:
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        tmp = p.with_name(p.name + _SWAP_SUFFIX)
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        os.replace(str(tmp), str(p))
         return True
     except Exception:  # noqa: BLE001
         return False
@@ -412,10 +441,12 @@ class HeartbeatTentacle:
 
         判定：值日那根的 `ok` 含"外来混入"；其余各根只管自己那格是否错位。
         """
-        keeper = (self.code == KEEPER)
+        keeper_code, keeper_broken = _resolve_keeper()
+        keeper = (self.code == keeper_code)
         d = _STATE_DIR
         res = {"ok": True, "dir": str(d), "clean_requested": bool(clean),
-               "keeper": keeper,
+               "keeper": keeper, "keeper_code": keeper_code,
+               "keeper_misconfigured": keeper_broken,
                "garbage": [], "overflow": [], "foreign": [], "misplaced": [],
                "cleaned": [], "errors": []}
         if not d.exists():
@@ -433,6 +464,11 @@ class HeartbeatTentacle:
         for p in entries:
             name = p.name
             low = name.lower()
+
+            # ⓪ 原子写的临时件：正被别人（或我自己）写着，**豁免**。
+            #    既不能当垃圾扫掉，也不能当外来物报红 —— 它活不过一次 os.replace。
+            if p.is_file() and low.endswith(_SWAP_SUFFIX):
+                continue
 
             # ① 垃圾目录（整个子树都是垃圾）
             if p.is_dir() and low in _GARBAGE_DIRS:
@@ -666,6 +702,12 @@ class HeartbeatTentacle:
             add("P1", "misplaced_state",
                 f"{self.title} 状态文件被写脏（category 与文件名不符）：{hy['misplaced'][:4]}")
         if hy.get("keeper"):
+            # 值日根配置坏了：虽然降级继续值日（监控不空白），但必须报红 ——
+            # 否则"谁在值日"这种事悄悄变了、没人知道。
+            if hy.get("keeper_misconfigured"):
+                add("P0", "keeper_lost",
+                    f"值日根配置失效：KEEPER={KEEPER!r} 不在分类表里，已降级由「{hy.get('keeper_code')}」代值。"
+                    f"抽屉仍在被看着，但这条必须修回去（否则下次改名还会静默）")
             if hy.get("foreign"):
                 add("P1", "foreign_intrusion",
                     f"心跳抽屉（值日：{self.title}）里有 {len(hy['foreign'])} 个不是我们产的件："
@@ -765,6 +807,18 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
         _ok_latest = _write_json(_STATE_DIR / "latest.json", report)
         _ok_scan = _write_json(
             _STATE_DIR / f"scan-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", report)
+        # 清单**每跳都写**（原来只在 --clean 时才写）：它是"什么才算属于这个抽屉"的
+        # 书面依据，靠"记得加 --clean"才有，就等于没有。
+        _write_json(_STATE_DIR / "MANIFEST.json", {
+            "at": _now(),
+            "purpose": "12 根分类心跳触手的自有抽屉；除下列件外一律视为外来混入",
+            "allowed_exact": list(_ALLOWED_EXACT) + ["MANIFEST.json"],
+            "allowed_prefix": list(_ALLOWED_PREFIX),
+            "exempt_suffix": [_SWAP_SUFFIX],
+            "keep_scans": KEEP_SCANS,
+            "keeper": _resolve_keeper()[0],
+            "tentacles": {c: f"tentacle-{c}.json" for c in TX.CATEGORIES},
+        })
         report["persisted"] = bool(_ok_latest and _ok_scan)
         if not report["persisted"]:
             report["signals"].append({"level": "P0", "code": "persist_failed",

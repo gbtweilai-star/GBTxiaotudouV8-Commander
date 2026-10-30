@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T08:03:08+08:00",
+ "generated_at": "2026-10-30T08:14:22+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 766
+  "records": 767
  },
  "totals": {
-  "records": 766,
+  "records": 767,
   "scans": 30,
-  "changes": 601,
+  "changes": 602,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 467,
-   "ts": "2026-10-14T08:29:38+08:00",
-   "kind": "deliver",
-   "actor": "unknown",
-   "what": "自家模型加速验收 6/6 全绿:Codex 端到端 600s -> 14.8s(40x);长上下文 7567ms -> 1230ms(6.2x);纯聊 3342 -> 928ms;三刀=常驻保温(消冷启动)+ENABLE_PREFIX_CACHING(true)+车道冷却自愈(代理重启)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:e612c08016c1522",
-   "prev": "sha256:877a659d77392a3"
-  },
   {
    "n": 468,
    "ts": "2026-10-14T08:35:59+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:5002b50153fe4a1",
    "prev": "sha256:c5f2bf517517f1f"
+  },
+  {
+   "n": 767,
+   "ts": "2026-10-30T08:14:22+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "心跳打磨二轮: 修值日根失效静默失守/health与heartbeat两套口径/状态非原子写; MANIFEST改常驻; 护栏19->23",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:1e49d183be64b82",
+   "prev": "sha256:5002b50153fe4a1"
   }
  ]
 };
