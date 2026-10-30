@@ -1,12 +1,12 @@
 {
- "at": "2026-10-30T17:16:22",
+ "at": "2026-10-30T17:57:00",
  "plugs": [
   {
    "name": "bridge",
    "kind": "bridge",
    "target": "http://127.0.0.1:8791",
    "protocol": null,
-   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T17:16:21\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
+   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T17:56:56\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
   },
   {
    "name": "panel",

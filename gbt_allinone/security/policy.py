@@ -114,6 +114,15 @@ def autonomous_enabled() -> bool:
     return (os.environ.get(AUTONOMOUS_ENV) or "").strip() in ("1", "true", "yes", "on")
 
 
+def _ios_native_available() -> bool:
+    """有没有 iOS 原生接口层（apple-open）。有 ⇒ web/app 插座能走原生实现，不必靠桌面控制。"""
+    try:
+        import shutil as _sh
+        return bool(_sh.which("apple-open"))
+    except Exception:                                             # noqa: BLE001
+        return False
+
+
 def _hacker_kinds() -> set:
     """黑客能力位 = security 域全部进攻面（动态现读名册，去掉防御/登记面）；读不到就保守返回空集。"""
     try:
@@ -520,12 +529,24 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             elif _sock == "api":
                 add("external_llm", "data_export")
             elif _sock == "web":
-                add("desktop_control", "privacy_read")
+                # iOS 上 web 不靠桌面控制：等价实现是 apple-open（系统浏览器），与 body_open 同风险 ⇒ 按意图放行
+                if str(p.get("via") or "").lower() == "desktop" or not _ios_native_available():
+                    add("desktop_control", "privacy_read")
             elif _sock == "app":
                 # 插任意 APP 并操控 = 她的眼+手（看屏幕=隐私载体；点键鼠=桌面控制）
-                add("desktop_control", "privacy_read")
-                if str(p.get("do") or "").lower() == "launch":
-                    add("process_execute")
+                # iOS：see 的等价实现是 apple-vision（截图+OCR），不读 UI 树、不点按 ⇒ 只留 privacy_read
+                _ios_app = (str(p.get("via") or "").lower() != "desktop" and _ios_native_available())
+                if not _ios_app:
+                    add("desktop_control", "privacy_read")
+                    if str(p.get("do") or "").lower() == "launch":
+                        add("process_execute")
+                else:
+                    # 🔴 2026-10-30：iOS 上 launch = 打开 URL scheme，与 body_open（打开网址）
+                    #   同一风险等级 ⇒ 按意图放行，不额外要票。
+                    #   而 see = 看屏幕内容（隐私载体）⇒ 仍要票，且 iOS 沙箱不提供程序化截屏，
+                    #   没有截图路径时如实报做不到（不冒充成功）。
+                    if str(p.get("do") or "").lower() != "launch":
+                        add("privacy_read")
             else:
                 add("process_execute", "filesystem_write")   # 插座类型判不出 ⇒ 按最重收口
         elif _pop == "plug" and _sock == "app":

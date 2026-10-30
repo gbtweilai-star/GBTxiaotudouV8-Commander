@@ -892,6 +892,34 @@ def run(op: str = "status", **kw) -> dict:
         except Exception:                                           # noqa: BLE001
             pass
         return {"ok": True, "op": "energy", "energy": e}
+    if op == "run":
+        # 🔴 2026-10-30 主人令：「iOS 需要什么接口，万能插就自动识别并生成接口接入」。
+        #   桌面的 web/app 靠 Win32/UIA；iOS 没有这些，但有等价接口（apple-open / apple-vision）。
+        #   这里先走 iOS 原生实现，成功了就返回；失败了再落到原来的桌面路径（不挡路）。
+        _sock_ios = str(kw.get("socket") or "").lower()
+        _do_ios = str(kw.get("do") or "run").lower()
+        if _sock_ios in ("web", "app"):
+            try:
+                import importlib.util as _iu6
+                from pathlib import Path as _P6
+                _sp6 = _iu6.spec_from_file_location(
+                    "omni_ios", _P6(__file__).resolve().parents[1] / "tools" / "omni_ios.py")
+                _iom = _iu6.module_from_spec(_sp6)
+                _sp6.loader.exec_module(_iom)
+                _av = _iom.available()
+                if _av.get("apple-open"):
+                    if _sock_ios == "web" and _do_ios in ("open", "get", "run"):
+                        _r = _iom.web_open(str(kw.get("target") or ""))
+                        return {"ok": _r["ok"], "socket": "web", "via": _r["via"],
+                                "evidence": _r["evidence"], "target": kw.get("target")}
+                    if _sock_ios == "app" and _do_ios in ("launch", "open", "run", "see"):
+                        _r = (_iom.app_launch(str(kw.get("target") or "")) if _do_ios != "see"
+                              else _iom.app_see(str(kw.get("target") or "")))
+                        return {"ok": _r["ok"], "socket": "app", "via": _r["via"],
+                                "evidence": _r["evidence"], "target": kw.get("target")}
+            except Exception as _e:                                  # noqa: BLE001
+                pass   # iOS 实现不可用 ⇒ 落到桌面路径，失败原因由那条路如实报
+
     if op in ("discover", "scan_local", "可插面"):
         return discover(deep=bool(kw.get("deep")))
     if op in ("wb", "wb_chat", "workbuddy_chat"):

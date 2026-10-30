@@ -881,7 +881,8 @@
  "tools/acceptance.py": {
   "tentacles": [
    "tentacle_bind",
-   "brain_route"
+   "brain_route",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-29T08:19:27"
@@ -18596,5 +18597,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T17:16:22"
+ },
+ "tools/omni_ios.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T17:55:43"
  }
 }
