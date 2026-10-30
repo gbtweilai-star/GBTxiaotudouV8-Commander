@@ -103,13 +103,76 @@ def app_launch(name: str) -> dict:
                                                         "" if ok else "（未确认已拉起）")}
 
 
-def app_see(window: str = "") -> dict:
-    """app 插座的 see：iOS 没有 UIA 读窗口，等价接口是「截图 + OCR」。"""
+def app_see(window: str = "", wait_s: float = 12.0) -> dict:
+    """app 插座的 see：iOS 没有 UIA 读窗口，真等价实现是「页面截画布 → apple-vision 读」。
+
+    链路（全实测）：
+      ① 桥 POST /_see/want 置位
+      ② 页面壳（tentacle-bridge.js 的 frameProvider）截最大画布 → POST /_see/frame
+      ③ 桥存 state/frames/*.png 并记 last_frame.json
+      ④ 这里读 last_frame → 跑 apple-vision ocr / analyze → 把文字/标签返回
+    拿不到帧就如实报，不冒充"看到了"。
+    """
+    import json as _j
+    import time as _t
+    import urllib.request as _u
+
+    BR = "http://127.0.0.1:8791"
+    try:
+        req = _u.Request(BR + "/_see/want", data=b"{}", headers={"Content-Type": "application/json"})
+        _u.urlopen(req, timeout=6).read()
+    except Exception as exc:                                      # noqa: BLE001
+        return {"ok": False, "via": "ios:page-frame+vision",
+                "evidence": "桥不在，取不到帧：%s" % type(exc).__name__}
+
+    frame = None
+    stale_s = None
+    t0 = _t.time()
+    import os as _os
+    while _t.time() - t0 < wait_s:
+        _t.sleep(0.5)
+        try:
+            d = _j.loads(_u.urlopen(BR + "/_see/latest", timeout=6).read())
+            f = d.get("frame") or {}
+            if f.get("path"):
+                # 只要"这一轮"的新帧：mtime 晚于请求前 6 秒（原来给 -2s 太紧：
+                # 页面 2s 才拉一次 /_see/want，帧常常落在窗口外，于是永远等不到）
+                if _os.path.getmtime(f["path"]) >= t0 - 6 and _os.path.getsize(f["path"]) > 500:
+                    frame = f
+                    break
+        except Exception:                                         # noqa: BLE001
+            continue
+
+    if not frame:
+        # 等不到新帧：退用最近一帧，但**明确标 stale_s**，不冒充新鲜画面
+        try:
+            d = _j.loads(_u.urlopen(BR + "/_see/latest", timeout=6).read())
+            f = d.get("frame") or {}
+            if f.get("path") and _os.path.isfile(f["path"]):
+                frame = f
+                stale_s = int(_t.time() - _os.path.getmtime(f["path"]))
+        except Exception:                                         # noqa: BLE001
+            pass
+        if not frame:
+            return {"ok": False, "via": "ios:page-frame+vision",
+                    "evidence": "%.0fs 内没有页面交帧，且历史里也没有可用帧" % wait_s}
+
     if not _has("apple-vision"):
-        return {"ok": False, "via": "ios:vision", "evidence": "缺 apple-vision"}
-    return {"ok": True, "via": "ios:vision",
-            "evidence": "iOS 无 UIA 窗口；等价能力 = apple-vision ocr/analyze（截图后 OCR/分类），"
-                        "需要画面时传 window=屏幕"}
+        return {"ok": False, "via": "ios:page-frame+vision",
+                "evidence": "有帧但缺 apple-vision：%s" % frame.get("path")}
+
+    rc, out = _run(["apple-vision", "ocr", frame["path"], "-q"], timeout=60)
+    txt = ""
+    try:
+        d = _json.loads(out)
+        txt = d.get("text") or d.get("data", {}).get("text") or ""
+    except Exception:                                             # noqa: BLE001
+        txt = out.strip()[:300]
+    return {"ok": rc == 0, "via": "ios:page-frame+vision",
+            "evidence": "帧 %s（%sB）→ OCR %s 字：%s"
+                        % (str(frame.get("path")).split("/")[-1], frame.get("bytes"),
+                           len(txt), (txt or "").replace("\n", " ")[:90]),
+            "ocr": txt[:600]}
 
 
 if __name__ == "__main__":
