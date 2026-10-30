@@ -1587,3 +1587,39 @@
 {"at": "2026-10-31T04:42:20", "act": "yield", "stopped": ["免费池"], "mem_mb": 103}
 {"at": "2026-10-31T04:42:24", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 113}
 {"at": "2026-10-31T04:42:25", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 112}
+{"at": "2026-10-31T04:42:57", "act": "yield", "stopped": ["免费池"], "mem_mb": 228}
+{"at": "2026-10-31T04:43:01", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 236}
+{"at": "2026-10-31T04:43:02", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 242}
+{"at": "2026-10-31T04:43:33", "act": "yield", "stopped": ["免费池"], "mem_mb": 108}
+{"at": "2026-10-31T04:43:38", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 94}
+{"at": "2026-10-31T04:43:39", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 203}
+{"at": "2026-10-31T04:44:10", "act": "yield", "stopped": ["免费池"], "mem_mb": 85}
+{"at": "2026-10-31T04:44:14", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 80}
+{"at": "2026-10-31T04:44:15", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 65}
+{"at": "2026-10-31T04:44:46", "act": "yield", "stopped": ["免费池"], "mem_mb": 112}
+{"at": "2026-10-31T04:44:50", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 329}
+{"at": "2026-10-31T04:44:51", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 332}
+{"at": "2026-10-31T04:45:22", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 367}
+{"at": "2026-10-31T04:45:23", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 375}
+{"at": "2026-10-31T04:45:54", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 349}
+{"at": "2026-10-31T04:45:55", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 346}
+{"at": "2026-10-31T04:46:27", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 221}
+{"at": "2026-10-31T04:46:28", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 241}
+{"at": "2026-10-31T04:46:59", "act": "yield", "stopped": ["免费池"], "mem_mb": 219}
+{"at": "2026-10-31T04:47:03", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 233}
+{"at": "2026-10-31T04:47:04", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 225}
+{"at": "2026-10-31T04:47:35", "act": "yield", "stopped": ["免费池"], "mem_mb": 241}
+{"at": "2026-10-31T04:47:39", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 226}
+{"at": "2026-10-31T04:47:40", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 229}
+{"at": "2026-10-31T04:48:11", "act": "yield", "stopped": ["免费池"], "mem_mb": 209}
+{"at": "2026-10-31T04:48:15", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 211}
+{"at": "2026-10-31T04:48:16", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 205}
+{"at": "2026-10-31T04:48:47", "act": "yield", "stopped": ["免费池"], "mem_mb": 81}
+{"at": "2026-10-31T04:48:51", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 70}
+{"at": "2026-10-31T04:48:52", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 112}
+{"at": "2026-10-31T04:49:23", "act": "yield", "stopped": ["免费池"], "mem_mb": 128}
+{"at": "2026-10-31T04:49:28", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 131}
+{"at": "2026-10-31T04:49:29", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 130}
+{"at": "2026-10-31T04:50:00", "act": "yield", "stopped": ["免费池"], "mem_mb": 99}
+{"at": "2026-10-31T04:50:04", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 65}
+{"at": "2026-10-31T04:50:05", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 73}
