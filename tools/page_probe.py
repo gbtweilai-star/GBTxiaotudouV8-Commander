@@ -68,8 +68,12 @@ def judge(readings: dict, ok_flag: bool) -> tuple:
     if "cap_ok" in rd:
         if not rd.get("cap_ok"):
             return "red", "页面调不到能力位（cap_ok=false %s）" % (rd.get("cap_err") or "")
-        return "ok", "穿透 ok · %sms · python %s · %s tok/s · top-1 %r" % (
-            rd.get("cap_ms"), rd.get("cap_python"), rd.get("tps"), rd.get("top1"))
+        parts = ["穿透 ok", "%sms" % rd.get("cap_ms"), "python %s" % rd.get("cap_python")]
+        if rd.get("tps") is not None:
+            parts.append("%s tok/s" % rd.get("tps"))
+        if rd.get("top1") is not None:
+            parts.append("top-1 %r" % rd.get("top1"))
+        return "ok", " · ".join(parts)
 
     # ② 推理页：看 top-1 与速度
     if "top1" in rd or "tps" in rd:
