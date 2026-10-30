@@ -146,6 +146,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="/tmp/tiny.gguf")
     ap.add_argument("--token", type=int, default=504)
+    ap.add_argument("--tokens", default="", help="逗号分隔的 token id 序列")
+    ap.add_argument("--top", type=int, default=8)
+    ap.add_argument("--track", default="Paris,ĠParis, Paris")
+    ap.add_argument("--noattn", action="store_true", help="消融：把注意力上下文清零")
     a = ap.parse_args()
     kv, tens, data, blob = parse(a.model)
     arch = kv.get("general.architecture", "llama")
@@ -186,37 +190,63 @@ def main() -> int:
         x[:, half:] = a_ * s + b_ * c
         return x.reshape(-1)
 
-    x = T("token_embd.weight")[a.token * nE:(a.token + 1) * nE].copy()
-    print("  layer    |x|均值      attnQ      attnCtx    afterAttn   afterFfn")
-    print("  %-7s %10.5f" % ("emb", np.abs(x).mean()))
-    for l in range(nL):
-        pre = "blk.%d." % l
-        h = rms(x, T(pre + "attn_norm.weight"))
-        q = rope1(matvec(T(pre + "attn_q.weight"), h, nE, nE), nH)
-        k = rope1(matvec(T(pre + "attn_k.weight"), h, nE, nKV * hd), nKV)
-        v = matvec(T(pre + "attn_v.weight"), h, nE, nKV * hd)
-        ctx = np.empty(nE, np.float32)
-        for hh in range(nH):
-            kvh = int(hh * nKV / nH)
-            ctx[hh * hd:(hh + 1) * hd] = v[kvh * hd:(kvh + 1) * hd]
-        ao = matvec(T(pre + "attn_output.weight"), ctx, nE, nE)
-        x = x + ao
-        aA = np.abs(x).mean()
-        h2 = rms(x, T(pre + "ffn_norm.weight"))
-        g = matvec(T(pre + "ffn_gate.weight"), h2, nE, nFF)
-        u = matvec(T(pre + "ffn_up.weight"), h2, nE, nFF)
-        act = (g / (1 + np.exp(-g))) * u
-        dn = matvec(T(pre + "ffn_down.weight"), act, nFF, nE)
-        x = x + dn
-        if l < 4 or l == nL - 1:
-            print("  %-7d %10.5f %10.5f %10.5f %10.5f %10.5f"
-                  % (l, np.abs(x).mean(), np.abs(q).mean(), np.abs(ctx).mean(),
-                     aA, np.abs(x).mean()))
+    if a.tokens:
+        ids = [int(t) for t in a.tokens.split(",") if t.strip()]
+    else:
+        ids = [a.token]
+    print("  序列:", ids)
+
+    # KV cache：每层两份 [pos][nKV*hd]
+    kc = [np.zeros((len(ids), nKV * hd), np.float32) for _ in range(nL)]
+    vc = [np.zeros((len(ids), nKV * hd), np.float32) for _ in range(nL)]
+    x = None
+    for pos, tid in enumerate(ids):
+        x = T("token_embd.weight")[tid * nE:(tid + 1) * nE].copy()
+        for l in range(nL):
+            pre = "blk.%d." % l
+            h = rms(x, T(pre + "attn_norm.weight"))
+            q = rope1(matvec(T(pre + "attn_q.weight"), h, nE, nE), nH, pos)
+            k = rope1(matvec(T(pre + "attn_k.weight"), h, nE, nKV * hd), nKV, pos)
+            v = matvec(T(pre + "attn_v.weight"), h, nE, nKV * hd)
+            kc[l][pos] = k
+            vc[l][pos] = v
+            ctx = np.empty(nE, np.float32)
+            scale = 1.0 / np.sqrt(hd)
+            for hh in range(nH):
+                kvh = int(hh * nKV / nH)
+                qh_ = q[hh * hd:(hh + 1) * hd]
+                ks = kc[l][:pos + 1, kvh * hd:(kvh + 1) * hd]      # (pos+1, hd)
+                sc = (ks @ qh_) * scale
+                sc = sc - sc.max()
+                p_ = np.exp(sc); p_ /= p_.sum()
+                ctx[hh * hd:(hh + 1) * hd] = p_ @ vc[l][:pos + 1, kvh * hd:(kvh + 1) * hd]
+            if a.noattn:
+                ctx = np.zeros(nE, np.float32)
+            ao = matvec(T(pre + "attn_output.weight"), ctx, nE, nE)
+            x = x + ao
+            h2 = rms(x, T(pre + "ffn_norm.weight"))
+            g = matvec(T(pre + "ffn_gate.weight"), h2, nE, nFF)
+            u = matvec(T(pre + "ffn_up.weight"), h2, nE, nFF)
+            act = (g / (1 + np.exp(-g))) * u
+            dn = matvec(T(pre + "ffn_down.weight"), act, nFF, nE)
+            x = x + dn
+        if pos < 4:
+            print("  pos %d tok %-6d |x|=%.5f" % (pos, tid, np.abs(x).mean()))
+
     xf = rms(x, T("output_norm.weight"))
     logits = (T("token_embd.weight").reshape(-1, nE) @ xf).astype(np.float32)
-    top = np.argsort(-logits)[:5]
+    top = np.argsort(-logits)[:a.top]
     toks = kv["tokenizer.ggml.tokens"]
-    print("  top-5:", [(toks[i], round(float(logits[i]), 3)) for i in top])
+    for want in [w for w in a.track.split(",") if w]:
+        if want in toks:
+            wi = toks.index(want)
+            rank = int((logits > logits[wi]).sum()) + 1
+            print("  追踪 %-10r id=%-6d logit=%.4f rank=%d" % (want, wi, logits[wi], rank))
+    print("  末位 top-%d:" % a.top)
+    for i2 in top:
+        t = str(toks[i2]).replace("Ġ", " ").replace("Ċ", "\\n")
+        print("    %-14r %.4f" % (t[:14], float(logits[i2])))
+    return 0
     return 0
 
 

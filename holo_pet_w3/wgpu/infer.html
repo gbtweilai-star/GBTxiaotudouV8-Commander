@@ -107,18 +107,50 @@ function decode(ids){
   return ids.map(i => (M.tokens[i]||"").replace(/Ġ/g," ").replace(/Ċ/g,"\n")).join("");
 }
 
-function encodeSimple(text){
-  /* 只为 demo：单 token 最长匹配 + 空格前缀处理（够跑英文短句） */
-  const t2i = new Map(); M.tokens.forEach((t,i)=>t2i.set(t,i));
-  const ids = [];
-  const pieces = text.match(/\s?[A-Za-z]+|\s?[0-9]+|\s?[^\sA-Za-z0-9]+|\s+/g) || [];
-  for (const pc of pieces){
-    const s = pc.replace(/^ /, "Ġ");
-    if (t2i.has(s)) { ids.push(t2i.get(s)); continue; }
-    for (const ch of Array.from(pc)){
-      const k = ch===" "?"Ġ":ch;
-      if (t2i.has(k)) ids.push(t2i.get(k));
+/* 真 BPE（2026-10-30 换掉原来的正则匹配版）：
+   ① 先切出特殊 token（<|endoftext|>=0 / <|im_start|>=1 / <|im_end|>=2）直接给 id；
+   ② 其余按 GPT2 预分词切段，段内做 merges 贪心合并。
+   原来的正则版把 "<|im_start|>" 拆成字节 ⇒ 41 个垃圾 token，模型当然答不对。 */
+let RANK = null, T2I = null;
+function ensureTok(){
+  if (RANK) return;
+  RANK = new Map();
+  (M.kv["tokenizer.ggml.merges"] || []).forEach((m, idx) => {
+    const pp = String(m).split(" ");
+    if (pp.length === 2) RANK.set(pp[0] + "\u0000" + pp[1], idx);
+  });
+  T2I = new Map();
+  M.tokens.forEach((t, idx) => { if (!T2I.has(t)) T2I.set(t, idx); });
+}
+function bpePiece(piece){
+  ensureTok();
+  let seq = Array.from(piece).map(ch => {
+    const t = ch === " " ? "Ġ" : (ch === "\n" ? "Ċ" : (ch === "\t" ? "ĉ" : ch));
+    return T2I.has(t) ? t : null;
+  });
+  if (seq.some(x => x === null)) return [];
+  let merged = true;
+  while (merged && seq.length > 1){
+    merged = false;
+    let bestRank = Infinity, bestAt = -1;
+    for (let k = 0; k < seq.length - 1; k++){
+      const rk = RANK.get(seq[k] + "\u0000" + seq[k + 1]);
+      if (rk !== undefined && rk < bestRank){ bestRank = rk; bestAt = k; }
     }
+    if (bestAt >= 0){ seq.splice(bestAt, 2, seq[bestAt] + seq[bestAt + 1]); merged = true; }
+  }
+  return seq.map(t => T2I.get(t)).filter(x => x !== undefined);
+}
+function encodeSimple(text){
+  ensureTok();
+  const SPECIALS = { "<|endoftext|>": 0, "<|im_start|>": 1, "<|im_end|>": 2 };
+  const ids = [];
+  const re = /(<\|endoftext\|>|<\|im_start\|>|<\|im_end\|>)/;
+  for (const seg of text.split(re)){
+    if (!seg) continue;
+    if (SPECIALS[seg] !== undefined){ ids.push(SPECIALS[seg]); continue; }
+    const pieces = seg.match(/\s?[A-Za-z]+|\s?[0-9]+|\s?[^\sA-Za-z0-9]+|\s+/g) || [];
+    for (const pc of pieces) ids.push(...bpePiece(pc));
   }
   return ids;
 }
@@ -134,7 +166,9 @@ function encodeSimple(text){
     say(`  rope θ=${M.ropeTheta} · eps=${M.eps} · 词表 ${M.tokens.length} · 载入 ${(performance.now()-t0|0)} ms`);
     say("");
 
-    const prompt = "The capital of France is";
+    /* SmolLM2-135M-Instruct 是对话模型：裸续写不在分布内，
+       必须用它自己的 chat 模板（元数据 tokenizer.chat_template 同形状）。 */
+    const prompt = "<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n";
     const ids = encodeSimple(prompt);
     say(`  提示 ${JSON.stringify(prompt)} → ${ids.length} tokens ${JSON.stringify(ids)}`);
     say("  首次前向（会把权重反量化进缓存，慢）…");
