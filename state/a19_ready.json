@@ -1,6 +1,66 @@
 {
- "at": "2026-10-31T02:07:36",
- "up": false,
- "ok": false,
- "phase": "waiting"
+ "at": "2026-10-31T03:13:33",
+ "up": true,
+ "phase": "models ok",
+ "models": [
+  "gbt-v8-v82-q5_0"
+ ],
+ "models_latency_s": 0.1,
+ "ok": true,
+ "model_reported": "gbt-v8-v82-q5_0",
+ "wall_s": 13.61,
+ "prompt_tokens": 0,
+ "completion_tokens": 142,
+ "gen_tok_s": 10.44,
+ "identity": "我叫 **GBT小土豆V8**（可称「GBT」）——智能助手，**汉印科技** ��台，**Apache-2.0**；开发者：**@atmospherc**（GitHub ���名 daniellawrence21 / 2026-09-28 ���项目）。守护：**gbt-codex-guard**（MIT + No-Reverse-Engineering）。**全框架自包含、无外挂**。守护护 what需@少写一个字试一下；取读数 cap op=stats。（现读自 capability-audit，不编）<|im_end|>",
+ "queue_drain": {
+  "rc": 0,
+  "tail": "队列空\n"
+ },
+ "prefill": {
+  "at": "2026-10-31T03:14:09",
+  "model": "gbt-v8-v82-q5_0",
+  "window_s": 45.0,
+  "rows": [
+   {
+    "chars": 500,
+    "prompt_tokens": 0,
+    "elapsed_s": 1.78,
+    "prefill_tok_s": 0.0,
+    "trustworthy": true,
+    "ok": true
+   },
+   {
+    "chars": 1000,
+    "prompt_tokens": 0,
+    "elapsed_s": 3.22,
+    "prefill_tok_s": 0.0,
+    "trustworthy": true,
+    "ok": true
+   },
+   {
+    "chars": 2000,
+    "prompt_tokens": 0,
+    "elapsed_s": 5.51,
+    "prefill_tok_s": 0.0,
+    "trustworthy": true,
+    "ok": true
+   },
+   {
+    "chars": 4000,
+    "prompt_tokens": 0,
+    "elapsed_s": 11.42,
+    "prefill_tok_s": 0.0,
+    "trustworthy": true,
+    "ok": true
+   },
+   {
+    "chars": 8000,
+    "ok": false,
+    "http": 500,
+    "error": "{\"error\":{\"code\":\"internal_error\",\"type\":\"server_error\",\"message\":\"上下文窗口已满。\"}}"
+   }
+  ],
+  "window_prompt_budget_tokens": 0
+ }
 }

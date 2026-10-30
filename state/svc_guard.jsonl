@@ -1253,3 +1253,25 @@
 {"at": "2026-10-31T02:24:21", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 1295}
 {"at": "2026-10-31T02:24:27", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 1295}
 {"at": "2026-10-31T02:24:21", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 1239}
+{"at": "2026-10-31T03:14:13", "act": "yield", "stopped": ["免费池", "面板后端 :8765", "索引层 :8792"], "mem_mb": 94}
+{"at": "2026-10-31T03:14:17", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 166}
+{"at": "2026-10-31T03:15:04", "act": "start_wait", "svc": "哨兵 a19", "mem_mb": 89, "why": "内存迟迟不回升"}
+{"at": "2026-10-31T03:15:04", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 89}
+{"at": "2026-10-31T03:15:05", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 94}
+{"at": "2026-10-31T03:15:06", "act": "dead", "svc": "哨兵 a19"}
+{"at": "2026-10-31T03:15:36", "act": "yield", "stopped": ["免费池"], "mem_mb": 178}
+{"at": "2026-10-31T03:15:40", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 131}
+{"at": "2026-10-31T03:15:36", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 130}
+{"at": "2026-10-31T03:16:03", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 130}
+{"at": "2026-10-31T03:16:51", "act": "start_wait", "svc": "哨兵 a19", "mem_mb": 198, "why": "内存迟迟不回升"}
+{"at": "2026-10-31T03:16:51", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 198}
+{"at": "2026-10-31T03:16:52", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 201}
+{"at": "2026-10-31T03:16:53", "act": "dead", "svc": "哨兵 a19"}
+{"at": "2026-10-31T03:17:23", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 251}
+{"at": "2026-10-31T03:17:23", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 169}
+{"at": "2026-10-31T03:17:28", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 171}
+{"at": "2026-10-31T03:18:16", "act": "start_wait", "svc": "哨兵 a19", "mem_mb": 184, "why": "内存迟迟不回升"}
+{"at": "2026-10-31T03:18:16", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": false, "mem_mb": 184}
+{"at": "2026-10-31T03:18:17", "act": "kill_frozen", "svc": "索引层 :8792", "killed": false, "mem_mb": 194}
+{"at": "2026-10-31T03:18:18", "act": "dead", "svc": "哨兵 a19"}
+{"at": "2026-10-31T03:18:48", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 212}
