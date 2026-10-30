@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>wgpu probe</title></head>
+<body><pre id="o">probing…</pre>
+<script>
+(async function(){
+  var out = {};
+  out.sab = (typeof SharedArrayBuffer !== "undefined");
+  out.gpu = !!navigator.gpu;
+  out.webgl2 = !!document.createElement("canvas").getContext("webgl2");
+  out.cores = navigator.hardwareConcurrency || null;
+  out.crossOriginIsolated = (typeof crossOriginIsolated !== "undefined") ? crossOriginIsolated : null;
+  try {
+    if (navigator.gpu) {
+      var ad = await navigator.gpu.requestAdapter();
+      out.adapter = ad ? "ok" : "null";
+      if (ad && ad.limits) out.maxBuffer = ad.limits.maxBufferSize || null;
+    }
+  } catch (e) { out.adapter = "err:" + String(e.message||e).slice(0,60); }
+  document.getElementById("o").textContent = JSON.stringify(out);
+  window.__probe = out;
+})();
+</script></body></html>
