@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T07:46:49+08:00",
+ "generated_at": "2026-10-30T07:55:56+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 764
+  "records": 765
  },
  "totals": {
-  "records": 764,
+  "records": 765,
   "scans": 30,
-  "changes": 599,
+  "changes": 600,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 465,
-   "ts": "2026-10-14T08:23:50+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "加速自家模型:RunPod 模板加 ENABLE_PREFIX_CACHING=true(同一 18038 提示 7567ms -> 1268ms,6x);新增两份测试码/绑定件 gbt-model-accept.py(全链验收C1-C6) 与 model-binding.py(模型全家文件双向绑定+漂移告警)",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:165ad8ac21e3889",
-   "prev": "sha256:0ace5fa57f60d1c"
-  },
   {
    "n": 466,
    "ts": "2026-10-14T08:25:49+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:ef28661fe23d3ca",
    "prev": "sha256:574b8e4ebc1d05e"
+  },
+  {
+   "n": 765,
+   "ts": "2026-10-30T07:55:56+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "心跳触手全部闭环跑通: act()指令执行 + monitor-loop定时 + CLI主入口 + 12护栏用例 + 运行手册; 私ac1769c5 公385d06f8 零差异",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:c5f2bf517517f1f",
+   "prev": "sha256:ef28661fe23d3ca"
   }
  ]
 };
