@@ -18589,5 +18589,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T16:41:02"
+ },
+ "tools/omni_audit.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T17:16:22"
  }
 }

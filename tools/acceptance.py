@@ -349,6 +349,21 @@ def sec_k() -> None:
         rec("ENV", "页面自报", "读不起来：%s" % type(e).__name__)
 
 
+# ── L 万能插（所有能力可复跑自审）─────────────────────────────────────
+def sec_l() -> None:
+    print("\n── L 万能插 ──")
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "omni_audit.py"), "--json"],
+                           capture_output=True, text=True, timeout=600, cwd=str(ROOT))
+        d = json.loads(r.stdout or "{}")
+        rec("PASS" if d.get("failed", 1) == 0 else "FAIL", "万能插无失败项",
+            "可用 %s · 需票 %s · 平台不支持 %s · 失败 %s"
+            % (d.get("usable"), d.get("blocked_by_ticket"), d.get("platform_na"), d.get("failed")))
+        rec("INFO", "万能插需票项", "%s 项要人发票（设计如此，不是坏）" % d.get("blocked_by_ticket"))
+    except Exception as e:                                        # noqa: BLE001
+        rec("ENV", "万能插自审", "跑不起来：%s" % type(e).__name__)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
@@ -431,6 +446,7 @@ def main() -> int:
     sec_i()
     sec_j()
     sec_k()
+    sec_l()
 
     from collections import Counter
     c = Counter(s for s, _, _ in RESULTS)

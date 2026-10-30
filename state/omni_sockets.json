@@ -1,12 +1,19 @@
 {
- "at": "2026-10-30T16:42:24",
+ "at": "2026-10-30T17:16:22",
  "plugs": [
   {
    "name": "bridge",
    "kind": "bridge",
    "target": "http://127.0.0.1:8791",
    "protocol": null,
-   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T16:42:24\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
+   "evidence": "{\"ok\": true, \"service\": \"gbt-model-bridge\", \"at\": \"2026-10-30T17:16:21\", \"default\": \"selfhost\", \"upstreams\": [{\"name\": \"selfhost\", \"base_url\": \"http://127.0.0.1"
+  },
+  {
+   "name": "panel",
+   "kind": "panel",
+   "target": "http://127.0.0.1:8765",
+   "protocol": null,
+   "evidence": "{\"ok\": true, \"codex\": {\"ok\": false, \"codex_path\": null, \"connected\": false, \"protocol\": \"json-rpc/stdio app-server\", \"note\": \"未找到内核可执行文件；�"
   },
   {
    "name": "index",
