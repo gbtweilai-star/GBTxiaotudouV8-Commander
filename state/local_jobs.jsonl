@@ -24,3 +24,14 @@
 {"id": "L1793401100939", "at": "2026-10-31T05:58:20", "text": "What is the capital of France?", "max_tokens": 20}
 {"id": "L1793401306271", "at": "2026-10-31T06:01:46", "text": "Say OK only.", "max_tokens": 16}
 {"id": "L1793401404296", "at": "2026-10-31T06:03:24", "text": "Say OK only.", "max_tokens": 8}
+{"id": "L1793401543558", "at": "2026-10-31T06:05:43", "text": "Say a short greeting.", "max_tokens": 16}
+{"id": "L1793401658355", "at": "2026-10-31T06:07:38", "text": "Say a short greeting.", "max_tokens": 16}
+{"id": "L1793401748935", "at": "2026-10-31T06:09:08", "text": "Say a short greeting.", "max_tokens": 16}
+{"id": "L1793401839427", "at": "2026-10-31T06:10:39", "text": "Say a short greeting.", "max_tokens": 16}
+{"id": "L1793401969135", "at": "2026-10-31T06:12:49", "text": "Say OK.", "max_tokens": 8}
+{"id": "L1793402056958", "at": "2026-10-31T06:14:16", "text": "Say hi.", "max_tokens": 12}
+{"id": "L1793402147457", "at": "2026-10-31T06:15:47", "text": "Say hi.", "max_tokens": 12}
+{"id": "L1793402310706", "at": "2026-10-31T06:18:30", "text": "Say hi in one word.", "max_tokens": 12}
+{"id": "L1793402401324", "at": "2026-10-31T06:20:01", "text": "Say hi in one word.", "max_tokens": 12}
+{"id": "L1793402491998", "at": "2026-10-31T06:21:31", "text": "Say hi in one word.", "max_tokens": 12}
+{"id": "L1793402623119", "at": "2026-10-31T06:23:43", "text": "hi", "max_tokens": 10}

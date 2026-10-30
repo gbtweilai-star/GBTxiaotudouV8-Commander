@@ -627,7 +627,7 @@ class Handler(BaseHTTPRequestHandler):
                         except Exception:                     # noqa: BLE001
                             pass
                 job = None
-                for ln in jobs_f.read_text(encoding="utf-8").splitlines():
+                for ln in reversed(jobs_f.read_text(encoding="utf-8").splitlines()):
                     try:
                         j = _j.loads(ln)
                     except Exception:                         # noqa: BLE001
@@ -1196,9 +1196,9 @@ class Handler(BaseHTTPRequestHandler):
         for cand in chain:
             base, model_default, profile, timeout_s = UPSTREAMS[cand]
             if base.startswith("local://"):
-                if not _worker_alive():
-                    tried.append({"upstream": cand, "skip": "工人不在岗（30s 无心跳）"})
-                    continue
+                # 2026-10-31：不再靠"心跳文件"当门（它坏过两次，导致明明工人活着却被判不在岗）。
+                #   规矩改成：**直接派活，按结果判** —— 工人答了就成，超时才如实说没答。
+                #   没有任何外部模型参与。
                 # 我们自己的权重（页面工人 · 整机 GPU）：不走 HTTP，派队列后同步等
                 r = _local_worker_chat(body, timeout_s)
                 if r.get("ok"):
