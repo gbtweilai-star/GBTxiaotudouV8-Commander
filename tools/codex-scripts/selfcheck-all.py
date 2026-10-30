@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""selfcheck-all -- --quick = 8 项纯文件检查（秒级，零子进程）；无参 = 全量清册 + 15 判据。
+"""selfcheck-all -- --quick = 9 项检查（秒级；第 9 项调铁律机检 --quick）；无参 = 全量清册 + 14 判据。
 """
 from __future__ import annotations
 import json, subprocess, sys, time
@@ -65,6 +65,11 @@ def quick():
         #   所以判据改成「不在 = OK」，并保留一行说明谁删的、搬去哪 —— 不是静默翻。
         ("总索引已下线", not (ROOT / "state" / "PROJECT-INDEX.html").is_file()),
         ("接线门账本", (ROOT / "state" / "wire-dispositions.json").is_file()),
+        # 铁律机检（主人令 2026-10-30「把她的习惯和部署规则给我定死了」）：
+        # 挂在这里 = **开工就拦**。只跑 --quick（跳过铁律2 的全仓扫描 2.4s），
+        # 但保留铁律5（非法路径 266ms）—— 那是能把整个仓在 Windows 上写成「检不出」的那条。
+        ("铁律机检", run([str(ROOT / "tools" / "codex-scripts" / "iron-rules-check.py"),
+                          "--quick"], t=180)[0] == 0),
     ]
     red = [n for n, ok in checks if not ok]
     for n, ok in checks:
@@ -104,6 +109,8 @@ def main():
         ("肌肉训练", ["tools/codex-scripts/muscle-drill.py", "check", "--min-rate", "0.9"]),
         ("题面唯一性", ["tools/train/check_instruction_unique.py", "--corpus", ".scratch/self_knowledge_v47.jsonl"]),
         ("语义唯一性", ["tools/train/check_instruction_semantic.py", "--corpus", ".scratch/self_knowledge_v47.jsonl"]),
+        # 铁律全量（含铁律2 全仓扫描，约 6.7s）：全量模式跑，quick 只跑 --quick 版
+        ("铁律机检", ["tools/codex-scripts/iron-rules-check.py"]),
     ]
     rows, red = [], 0
     for name, cmd in JUDGES:
