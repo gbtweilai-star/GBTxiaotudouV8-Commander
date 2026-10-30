@@ -74,6 +74,12 @@ start_wgpu() {
   else say ":8081 WebGPU 页" "🔴 未起 → logs/wgpu.log"; fi
 }
 
+start_brain() {
+  if pgrep -f "a19_brain.py" > /dev/null 2>&1; then say ":brain  A19 常驻大脑" "✅ 已在跑"; return; fi
+  setsid nohup python3 -u tools/a19_brain.py 6 > logs/a19_brain.log 2>&1 < /dev/null &
+  say ":brain  A19 常驻大脑" "✅ 已拉起（每 6s 探活 · 通了就消费队列）"
+}
+
 start_bridge() {
   if running 8791 "model_bridge.py"; then say ":8791 模型桥" "✅ 已在跑"; return; fi
   pkill -f 'model_bridge.py' 2>/dev/null; sleep 1
