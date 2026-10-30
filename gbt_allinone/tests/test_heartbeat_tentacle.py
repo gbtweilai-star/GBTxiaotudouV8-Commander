@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 
+import os
 import shutil
 import tempfile
 import unittest
@@ -192,6 +193,127 @@ class ActClosedLoopTest(unittest.TestCase):
         r = BE.act(dry_run=True)
         for s in r["skipped"]:
             self.assertTrue(s.get("why"), "跳过必须写明原因，不许静默：%s" % s)
+
+
+class PolishRegressionTest(unittest.TestCase):
+    """六、2026-10-30 打磨轮修掉的四件事，各留一条护栏。
+
+    都是**实测踩到**的，不是假想：
+      ① 落盘失败被静默吞掉 ⇒ 报告照绿（最坏的假绿）
+      ② INFO 被塞成 P2 指令且不带 signal_code ⇒ 每跳一条无依据噪音
+      ③ 全局根因（磁盘写不进）被 12 根各报一遍 ⇒ 一个病灶念成 12 个
+      ④ 值日根靠 dict 插入顺序 ⇒ 谁重排分类表，值日根就悄悄换人
+    """
+
+    def setUp(self) -> None:
+        self._orig = HB._STATE_DIR
+
+    def tearDown(self) -> None:
+        HB._STATE_DIR = self._orig
+
+    def _unwritable(self) -> None:
+        """把抽屉指向一个**文件**（不是目录），mkdir 必失败 ⇒ 稳定的写失败场景。"""
+        tf = tempfile.NamedTemporaryFile(delete=False, suffix=".blocker")
+        tf.close()
+        self.addCleanup(lambda: os.path.exists(tf.name) and os.unlink(tf.name))
+        HB._STATE_DIR = Path(tf.name)
+
+    def test_persist_failure_goes_red_not_green(self) -> None:
+        self._unwritable()
+        st = HB.HeartbeatTentacle(HB.KEEPER).pulse(mode="light", persist=True)
+        self.assertFalse(st.get("persisted"), "写不进盘却报 persisted=True")
+        self.assertIs(st.get("ok"), False, "写不进盘还报绿 —— 这就是假绿")
+        codes = [s["code"] for s in st.get("signals") or []]
+        self.assertIn("persist_failed", codes)
+
+    def test_every_instruction_is_traceable(self) -> None:
+        adv = BE.advise(HB.scan_all(mode="light", persist=False))
+        bad = [x for x in adv["instructions"]
+               if (x.get("evidence") or {}).get("signal_code") is None]
+        self.assertEqual(bad, [], "指令必须能追溯到 signal_code，否则就是噪音：%s" % bad)
+        skipped = [x for x in adv["instructions"]
+                   if (x.get("evidence") or {}).get("signal_code") == "probe_skipped"]
+        self.assertEqual(skipped, [], "INFO(probe_skipped) 不该进 instructions")
+        self.assertIsInstance(adv.get("notes"), list, "INFO 应落到 notes")
+
+    def test_systemic_root_cause_single_ticket(self) -> None:
+        self._unwritable()
+        adv = BE.advise(HB.scan_all(mode="light", persist=True))
+        p0 = [x for x in adv["instructions"] if x["priority"] == "P0"]
+        self.assertIn("persist_failed", [x["id"] for x in p0],
+                      "落盘失败必须出 P0：%s" % [x["id"] for x in p0])
+        persist = [x for x in p0 if x["id"] == "persist_failed"]
+        self.assertEqual(len(persist), 1, "全局根因只许开一张单，实际 %d 张" % len(persist))
+        aff = persist[0].get("affected") or []
+        self.assertEqual(len(aff), len(set(aff)), "affected 里有重复分类：%s" % aff)
+        self.assertLessEqual(len(aff), 12, "affected 不该超过 12 个分类：%s" % aff)
+
+    def test_keeper_is_a_constant_not_dict_order(self) -> None:
+        self.assertEqual(HB.KEEPER, "身")
+        self.assertIn(HB.KEEPER, TX.CATEGORIES,
+                      "KEEPER=%r 不在分类表里，值日就没人值了" % HB.KEEPER)
+        self.assertTrue(HB.HeartbeatTentacle(HB.KEEPER)._hygiene(clean=False)["keeper"])
+        others = [c for c in TX.CATEGORIES if c != HB.KEEPER]
+        self.assertFalse(HB.HeartbeatTentacle(others[0])._hygiene(clean=False)["keeper"])
+
+
+class ScanRetentionTest(unittest.TestCase):
+    """七、扫描件环形保留必须是**真不变量**（≤ KEEP_SCANS），不是"大概"。
+
+    踩过：卫生层在"写这一份之前"跑，清完再写稳定多 1 份（实测 21 > 20）。
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.mkdtemp(prefix="gbt_hb_ret_")
+        self._orig = HB._STATE_DIR
+        HB._STATE_DIR = Path(self._tmp)
+
+    def tearDown(self) -> None:
+        HB._STATE_DIR = self._orig
+        shutil.rmtree(self._tmp, ignore_errors=True)
+
+    def test_prune_keeps_at_most_keep_scans(self) -> None:
+        d = Path(self._tmp)
+        total = HB.KEEP_SCANS + 7
+        for i in range(total):
+            (d / ("scan-x%03d.json" % i)).write_text("{}", encoding="utf-8")
+        removed = HB._prune_scans(HB.KEEP_SCANS)
+        left = len(list(d.glob("scan-*.json")))
+        self.assertEqual(removed, 7, "应删 7 份，实删 %d" % removed)
+        self.assertLessEqual(left, HB.KEEP_SCANS, "保留 %d 份 > KEEP=%d" % (left, HB.KEEP_SCANS))
+
+    def test_clean_scan_ends_within_budget(self) -> None:
+        for _ in range(2):
+            HB.scan_all(mode="light", persist=True, clean=True)
+        left = len(list(Path(self._tmp).glob("scan-*.json")))
+        self.assertLessEqual(left, HB.KEEP_SCANS,
+                             "clean 跑完仍有 %d 份 > KEEP=%d" % (left, HB.KEEP_SCANS))
+
+
+class CliJsonPurityTest(unittest.TestCase):
+    """八、CLI 的 stdout 必须是**纯 JSON**。
+
+    踩过：默认模式把 JSON 和"== 执行指令 =="都打到 stdout ⇒ 下游 json.load 报
+    Extra data。机器读不了，这套东西就白做。
+    """
+
+    def test_stdout_is_pure_json(self) -> None:
+        import json as _json
+        import subprocess
+        import sys as _sys
+
+        root = Path(__file__).resolve().parents[2]
+        r = subprocess.run([_sys.executable, "-X", "utf8", "-m", "gbt_allinone", "heartbeat",
+                            "--act", "--dry"],
+                           cwd=str(root), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=600)
+        self.assertEqual(r.returncode, 0, "exit=%s stderr=%s" % (r.returncode, r.stderr[-400:]))
+        try:
+            d = _json.loads(r.stdout)
+        except Exception as exc:  # noqa: BLE001
+            self.fail("stdout 不是纯 JSON（%s）：%r" % (type(exc).__name__, r.stdout[:300]))
+        self.assertIn("dry_run", d)
+        self.assertIn("skipped", d)
 
 
 if __name__ == "__main__":

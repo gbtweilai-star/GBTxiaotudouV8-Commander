@@ -134,9 +134,20 @@ PROBES: dict = {
 
 # ── 基础工具 ──────────────────────────────────────────────────────────────
 
+# 值日根（显式钉死，不靠 dict 顺序）：12 根共用一个抽屉，抽屉层面的问题由它上报。
+# 2026-10-30 打磨：原来写的是 `next(iter(TX.CATEGORIES))` —— 那是**依赖字典插入顺序**，
+# 谁要重排一下分类表，值日根就悄悄换人，而报告里看不出来。钉成常量，重排也不动。
+KEEPER = "身"
+
 
 def _now() -> str:
     return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+
+# csv 缓存：(api.py 的 mtime, kind 集合)。api.py 一动就重解析，不动就复用。
+# 2026-10-30 打磨：原来 12 根各自调一次 `_dispatch_kinds()` ⇒ 同一份 api.py 被
+# 正则扫 12 遍（实测 18ms，占热跑 114ms 的 16%）。缓存后只扫 1 遍。
+_DISPATCH_CACHE: dict = {"mtime": None, "kinds": None}
 
 
 def _dispatch_kinds() -> set:
@@ -147,6 +158,12 @@ def _dispatch_kinds() -> set:
     """
     src_path = _ROOT / "api.py"
     try:
+        mt = src_path.stat().st_mtime
+    except Exception:  # noqa: BLE001
+        mt = None
+    if mt is not None and _DISPATCH_CACHE["mtime"] == mt and _DISPATCH_CACHE["kinds"] is not None:
+        return _DISPATCH_CACHE["kinds"]
+    try:
         src = src_path.read_text(encoding="utf-8", errors="replace")
     except Exception:  # noqa: BLE001
         return set()
@@ -154,6 +171,8 @@ def _dispatch_kinds() -> set:
     kinds |= set(re.findall(r'kind == ["\']([A-Za-z0-9_]+)["\']', src))
     for m in re.finditer(r"if kind in \(([^)]*)\)", src):
         kinds |= set(re.findall(r'["\']([A-Za-z0-9_]+)["\']', m.group(1)))
+    _DISPATCH_CACHE["mtime"] = mt
+    _DISPATCH_CACHE["kinds"] = kinds
     return kinds
 
 
@@ -393,7 +412,7 @@ class HeartbeatTentacle:
 
         判定：值日那根的 `ok` 含"外来混入"；其余各根只管自己那格是否错位。
         """
-        keeper = (self.code == next(iter(TX.CATEGORIES)))
+        keeper = (self.code == KEEPER)
         d = _STATE_DIR
         res = {"ok": True, "dir": str(d), "clean_requested": bool(clean),
                "keeper": keeper,
@@ -585,7 +604,19 @@ class HeartbeatTentacle:
         }
 
         if persist:
-            _write_json(_state_path(self.code), status)
+            # 🔴 2026-10-30 打磨：落盘失败原来被**静默吞掉** —— 状态没写进去，报告照样绿。
+            #    那是典型的假绿：大脑读的是上一次的旧盘，漂移层还以为"首跳"。
+            #    写不进就如实报红，不许瞒。
+            if not _write_json(_state_path(self.code), status):
+                status["ok"] = False
+                status["persisted"] = False
+                status["signals"] = list(status.get("signals") or []) + [{
+                    "level": "P0", "code": "persist_failed",
+                    "msg": f"{self.title} 心跳写不进盘（{_state_path(self.code)}）—— "
+                           f"状态没落盘，后续读数全是旧的",
+                }]
+            else:
+                status["persisted"] = True
         return status
 
     def _signals(self, checks: dict, drift: dict) -> list:
@@ -729,8 +760,18 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
     }
 
     if persist:
-        _write_json(_STATE_DIR / "latest.json", report)
-        _write_json(_STATE_DIR / f"scan-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", report)
+        # 汇总件落盘同样不许静默：`latest.json` 是大脑读的那一份，写不进去
+        # 后面 advise/act 全在读旧账（见 pulse 里 persist_failed 同一口径）。
+        _ok_latest = _write_json(_STATE_DIR / "latest.json", report)
+        _ok_scan = _write_json(
+            _STATE_DIR / f"scan-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", report)
+        report["persisted"] = bool(_ok_latest and _ok_scan)
+        if not report["persisted"]:
+            report["signals"].append({"level": "P0", "code": "persist_failed",
+                                      "category": KEEPER, "tentacle": f"heartbeat-{KEEPER}",
+                                      "msg": f"心跳汇总写不进盘（{_STATE_DIR}）—— "
+                                             f"latest.json 是旧的，advise/act 会读旧账"})
+            report["signals_by_level"]["P0"] = report["signals_by_level"].get("P0", 0) + 1
         # 收敛到 KEEP_SCANS：触手的卫生层是在**写这一份之前**跑的，所以清完再写
         # 会稳定多出 1 份（实测 21 > 20）。这里写完再收一次，让"≤20"成为真不变量。
         if clean:
