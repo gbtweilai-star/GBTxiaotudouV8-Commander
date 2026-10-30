@@ -26,7 +26,9 @@ let M = null, KVK = [], KVK2 = [], embCache = null;
 function silu(x){ return x / (1 + Math.exp(-x)); }
 
 /* 前向一次：tokens → 最后一位的 logits */
-function forward(ids){
+let KVC = [];
+function resetKV(){ KVC = []; }
+function forward(ids, opts){
   const nE = M.nEmbd, nH = M.nHead, nKV = M.nKV, hd = M.headDim, nFF = M.nFF;
   const T = M.tensor.bind(M);
 
@@ -35,11 +37,13 @@ function forward(ids){
     embCache = T("token_embd.weight");        /* [576, 49152] ⇒ 49152 行 × 576 */
   }
   const seq = ids.length;
-  /* KV cache 每层：k/v 各 seq × (nKV*hd) */
-  const cache = [];
+  /* 🔴 2026-10-30 性能修：原来每次 forward 都新建 cache ⇒ 每生成一个 token 都把整段提示重算
+     一遍（O(n²)，实测 1.39 tok/s）。改成**持久 KV + 增量解码**：只算 from 之后的 token。 */
+  const cache = KVC;
+  const start = (opts && opts.from) || 0;
 
   let logits = null;
-  for (let pos=0; pos<seq; pos++){
+  for (let pos=start; pos<seq; pos++){
     let x = embCache.subarray(ids[pos]*nE, ids[pos]*nE + nE).slice();
 
     for (let l=0; l<M.nLayer; l++){
@@ -176,8 +180,9 @@ function encodeSimple(text){
     say("  首次前向（会把权重反量化进缓存，慢）…");
 
     let gen = ids.slice();
+    resetKV();
     const tF = performance.now();
-    const lg = forward(gen);
+    const lg = forward(gen, {from: 0});
     const tFirst = performance.now() - tF;
     let nxt = argmax(lg);
     say(`  首 token 前向 ${(tFirst/1000).toFixed(1)} s · top-1 = ${JSON.stringify((M.tokens[nxt]||"").replace(/Ġ/g," "))}`);
@@ -186,7 +191,8 @@ function encodeSimple(text){
     const N = 8;
     const tG = performance.now();
     for (let i=1;i<N;i++){
-      const l2 = forward(gen);
+      /* 增量：只算刚追加的那一位（KV 里已有前缀） */
+      const l2 = forward(gen, {from: gen.length - 1});
       nxt = argmax(l2);
       gen.push(nxt);
     }
@@ -200,6 +206,65 @@ function encodeSimple(text){
       tokPerSec: +(N/tAll).toFixed(2),
       text: decode(gen)
     };
+
+    /* ── 对外 API：让她的页面（和触手）能直接调本机推理 ───────────────
+       2026-10-30：这条路的意义就是"不求 App 开端口也能用整机算力"，
+       所以必须有个稳定入口，而不是只有一个人看的 demo 页。 */
+    window.GBT_LOCAL_LLM = {
+      get ready(){ return !!M; },
+      model(){ return { arch:M.arch, layers:M.nLayer, emb:M.nEmbd, heads:M.nHead,
+                        kvHeads:M.nKV, headDim:M.headDim, vocab:M.tokens.length }; },
+      /* 她说一句话：走它自己的 chat 模板，遇到 eos 就停 */
+      chat(userText, maxTokens, opts){
+        const N2 = Math.max(1, Math.min(64, maxTokens || 24));
+        /* 贪心解码会复读（实测 "…\n\nThe capital of France"）⇒ 加**重复惩罚**：
+           最近 16 个 token 里出现过的，logit 按正负各扣/加 penalty，避免原地打转。 */
+        const pen = (opts && opts.repetitionPenalty) || 1.25;
+        const repeat = (lg2, ids) => {
+          const seen = new Set(ids.slice(-16));
+          for (const t of seen){
+            if (lg2[t] > 0) lg2[t] /= pen; else lg2[t] *= pen;
+          }
+          return lg2;
+        };
+        const p = "<|im_start|>user\n" + String(userText) + "<|im_end|>\n<|im_start|>assistant\n";
+        const pids = encodeSimple(p);
+        resetKV();
+        let lg = forward(pids, {from:0});
+        let g = pids.slice();
+        let nxt = argmax(repeat(lg, g));
+        const t0 = performance.now();
+        for (let i=0;i<N2;i++){
+          g.push(nxt);
+          if (nxt === 2) break;                 /* <|im_end|> */
+          lg = forward(g, {from: g.length-1});
+          nxt = argmax(repeat(lg, g));
+        }
+        const dt = (performance.now()-t0)/1000;
+        const outIds = g.slice(pids.length).filter(x => x !== 2);
+        return { ok:true, text: decode(outIds).trim(), ids: outIds,
+                 tokens: outIds.length, seconds: +dt.toFixed(2),
+                 tokPerSec: dt > 0 ? +(outIds.length/dt).toFixed(2) : null };
+      },
+      /* 裸续写（给对照/测试用） */
+      generate(promptText, maxTokens){ return this.chat(promptText, maxTokens); }
+    };
+
+    /* ── 交付自检：不达标就是这个页面自己红 ───────────────────────── */
+    (function selfCheck(){
+      const need = { minTokPerSec: 5, maxFirstMs: 3000 };
+      const rows = [];
+      rows.push(['模型 30 层 / 词表 49152', M.nLayer === 30 && M.tokens.length === 49152]);
+      rows.push(['top-1 是 Paris（Q6_K 修复的硬判据）', /Paris/.test(decode([argmax(forward(gen.slice(0,5), {from:0}))]))]);
+      rows.push([`速度 ≥ ${need.minTokPerSec} tok/s（实测 ${(N/tAll).toFixed(2)}）`, (N/tAll) >= need.minTokPerSec]);
+      rows.push([`首 token ≤ ${need.maxFirstMs} ms（实测 ${tFirst|0}）`, (tFirst|0) <= need.maxFirstMs]);
+      const bad = rows.filter(r => !r[1]).length;
+      say("");
+      for (const [t, ok2] of rows) say(ok2 ? `<span class='ok'>✅ ${t}</span>` : `<span class='bad'>🔴 ${t}</span>`);
+      say(bad === 0 ? `<span class='ok'>交付自检通过（${rows.length}/${rows.length}）</span>`
+                    : `<span class='bad'>交付自检不通过：${bad} 项红了</span>`);
+      window.__inferSelfCheck = { ok: bad === 0, rows };
+    })();
   }catch(e){
     say(`<span class='bad'>🔴 ${String(e&&e.message||e)}</span>`);
     if (e && e.stack) say(`<span class='dim'>${String(e.stack).split("\n").slice(0,4).join("\n")}</span>`);
