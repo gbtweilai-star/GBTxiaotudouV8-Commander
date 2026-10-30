@@ -1,3 +1,54 @@
 {"at": "2026-10-31T03:14:48", "act": "alive", "models": ["gbt-v8-v82-q5_0"]}
 {"at": "2026-10-31T03:17:00", "act": "alive", "models": "ERR:TimeoutError"}
 {"at": "2026-10-31T03:19:06", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:21:12", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:23:18", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:25:25", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:27:31", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:29:37", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:31:43", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T03:33:57", "act": "still_down"}
+{"at": "2026-10-31T03:36:11", "act": "still_down"}
+{"at": "2026-10-31T03:38:25", "act": "still_down"}
+{"at": "2026-10-31T03:40:39", "act": "still_down"}
+{"at": "2026-10-31T03:42:53", "act": "still_down"}
+{"at": "2026-10-31T03:45:07", "act": "still_down"}
+{"at": "2026-10-31T03:47:21", "act": "still_down"}
+{"at": "2026-10-31T03:49:35", "act": "still_down"}
+{"at": "2026-10-31T03:51:49", "act": "still_down"}
+{"at": "2026-10-31T03:54:03", "act": "still_down"}
+{"at": "2026-10-31T03:56:18", "act": "still_down"}
+{"at": "2026-10-31T03:58:32", "act": "still_down"}
+{"at": "2026-10-31T04:00:46", "act": "still_down"}
+{"at": "2026-10-31T04:03:00", "act": "still_down"}
+{"at": "2026-10-31T04:05:14", "act": "still_down"}
+{"at": "2026-10-31T04:07:28", "act": "still_down"}
+{"at": "2026-10-31T04:09:42", "act": "still_down"}
+{"at": "2026-10-31T04:11:56", "act": "still_down"}
+{"at": "2026-10-31T04:13:13", "act": "still_down"}
+{"at": "2026-10-31T04:13:59", "act": "relaunched", "sec": 2.7, "models": ["gbt-v8-v82-q5_0"]}
+{"at": "2026-10-31T04:16:05", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T04:18:11", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T04:20:17", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T04:22:17", "act": "alive", "models": ["gbt-v8-v82-q5_0"]}
+{"at": "2026-10-31T04:24:23", "act": "alive", "models": "ERR:TimeoutError"}
+{"at": "2026-10-31T04:26:35", "act": "still_down"}
+{"at": "2026-10-31T04:27:00", "act": "still_down"}
+{"at": "2026-10-31T04:28:08", "act": "still_down"}
+{"at": "2026-10-31T04:28:23", "act": "still_down"}
+{"at": "2026-10-31T04:29:00", "act": "still_down"}
+{"at": "2026-10-31T04:29:52", "act": "still_down"}
+{"at": "2026-10-31T04:30:44", "act": "still_down"}
+{"at": "2026-10-31T04:31:36", "act": "still_down"}
+{"at": "2026-10-31T04:32:28", "act": "still_down"}
+{"at": "2026-10-31T04:33:21", "act": "still_down"}
+{"at": "2026-10-31T04:34:13", "act": "still_down"}
+{"at": "2026-10-31T04:35:05", "act": "still_down"}
+{"at": "2026-10-31T04:35:57", "act": "still_down"}
+{"at": "2026-10-31T04:36:49", "act": "still_down"}
+{"at": "2026-10-31T04:37:42", "act": "still_down"}
+{"at": "2026-10-31T04:38:34", "act": "still_down"}
+{"at": "2026-10-31T04:39:26", "act": "still_down"}
+{"at": "2026-10-31T04:40:18", "act": "still_down"}
+{"at": "2026-10-31T04:41:10", "act": "still_down"}
+{"at": "2026-10-31T04:42:03", "act": "still_down"}

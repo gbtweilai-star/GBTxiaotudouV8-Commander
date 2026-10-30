@@ -91,9 +91,18 @@ UPSTREAMS = {
     #   ownweights = 我们自己的权重，跑在整机 GPU 的浏览器里（页面工人）。
     #   **不是云端、不是第三方** —— OURS_LANES 里算自有。
     #   特殊性：它不由本进程发 HTTP，而是 route 到 /_local 队列（见 _local_worker_chat）。
-    "ownweights": ("local://worker", "gbt-local", "raw:gbt", 180),
+    "ownweights": ("local://worker", "gbt-local", "raw:gbt", 25),
 }
 DEFAULT = "selfhost"     # A19 优先：手机自己的算力
+
+# 🔴 2026-10-31（主人令：本机算力限流给他去掉）：
+#   429 是 **LM Pocket 容器**给的（"Too many inference requests"），不是我们设的。
+#   我们能做的是：**自有车道严格串行 + 最小间隔**，从源头不撞限流；撞上了按 5s/12s 退避重试，
+#   而不是把 429 当失败抛给用户。
+_A19_LOCK = __import__("threading").Lock()
+_A19_LAST = [0.0]
+_A19_MIN_GAP = 0.8        # 两发之间至少 0.8 秒
+_A19_RETRY_WAITS = (5, 12)  # 撞 429 后的退避序列（秒）
 
 # 哪些上游算「自有权重」（页面据此标 ✅ / ⚠）。免费池和云端通用模型都不算。
 # ── 触手插座：**任何东西挂上来 = 加一行**（主人 2026-10-29「触手可以把任何东西
@@ -178,12 +187,12 @@ if not os.environ.get("GBT_ALLOW_CLOUD_FALLBACK"):
     # 不降级到**云**。ownweights（整机 GPU 的页面工人）默认**不挂在降级链上**：
     #   实测它会让页面进入忙轮询、把标签拖死（navigate 300s 无响应），且后台时被节流到不可用。
     #   想试可显式开：export GBT_LOCAL_WORKER=1
-    if __import__("os").environ.get("GBT_LOCAL_WORKER") == "1":
-        FALLBACK["selfhost"] = ["ownweights"]
-        FALLBACK["local"] = ["ownweights"]
-    else:
-        FALLBACK["selfhost"] = []
-        FALLBACK["local"] = []
+    # 🔴 2026-10-31 主人令「本机规矩我们自己定」：
+    #   A19 被它的 429/挂起卡住时，不允许我们这边变成"没答案"。
+    #   所以默认链就是 selfhost → ownweights（我们自己的整机 GPU 权重）。
+    #   工人不在岗时由 _worker_alive() 快速跳过，不会挂 180 秒。
+    FALLBACK["selfhost"] = ["ownweights"]
+    FALLBACK["local"] = ["ownweights"]
 
 
 def key_for(profile: str | None) -> tuple[str, str]:
@@ -289,6 +298,17 @@ def _shortlist(question: str, cat: dict, k: int = 18) -> tuple[list[str], str]:
     except Exception as exc:                                  # noqa: BLE001
         return sorted(cat)[:k], "fallback-first-%d(%s)" % (k, type(exc).__name__)
 
+
+
+def _worker_alive(max_age: float = 30.0) -> bool:
+    """我们自己的规矩：工人 30 秒内有心跳才算在岗。没有就**快速失败**，不挂 180 秒。"""
+    hb = ROOT / "state" / "local_worker.json"
+    try:
+        if not hb.is_file():
+            return False
+        return (time.time() - hb.stat().st_mtime) <= max_age
+    except Exception:                                              # noqa: BLE001
+        return False
 
 
 def _local_worker_chat(body: dict, timeout_s: int = 180) -> dict:
@@ -787,6 +807,17 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:                          # noqa: BLE001
                 return self._json(200, {"ok": False, "error": {"message": str(exc)[:100]}})
 
+        if self.path.startswith("/_local/hb"):
+            try:
+                hb = ROOT / "state" / "local_worker.json"
+                hb.parent.mkdir(parents=True, exist_ok=True)
+                hb.write_text(json.dumps({"at": time.time(),
+                                          "backend": body.get("backend")}, ensure_ascii=False),
+                              encoding="utf-8")
+                return self._json(200, {"ok": True})
+            except Exception as exc:                               # noqa: BLE001
+                return self._json(200, {"ok": False, "error": str(exc)[:80]})
+
         if self.path.startswith("/_local/enqueue"):
             try:
                 f = ROOT / "state" / "local_jobs.jsonl"
@@ -1149,6 +1180,9 @@ class Handler(BaseHTTPRequestHandler):
         for cand in chain:
             base, model_default, profile, timeout_s = UPSTREAMS[cand]
             if base.startswith("local://"):
+                if not _worker_alive():
+                    tried.append({"upstream": cand, "skip": "工人不在岗（30s 无心跳）"})
+                    continue
                 # 我们自己的权重（页面工人 · 整机 GPU）：不走 HTTP，派队列后同步等
                 r = _local_worker_chat(body, timeout_s)
                 if r.get("ok"):
@@ -1178,7 +1212,35 @@ class Handler(BaseHTTPRequestHandler):
                 headers={"Content-Type": "application/json", "User-Agent": UA,
                          "Authorization": "Bearer " + key})
             try:
-                resp = urllib.request.urlopen(req, timeout=timeout_s)
+                # 🔴 2026-10-31：A19 实测有 429 rate_limit（"Too many inference requests"），
+                #   冷却是 20 秒级。原来 429 直接往上抛 ⇒ 用户看到"失败"，
+                #   其实等一会儿就好。这里对本机自有车道做一次退避重试。
+                if cand in OURS_LANES:
+                    # 串行 + 最小间隔 + 429 退避重试（本机算力不设人为限流，但要避免连撞）
+                    with _A19_LOCK:
+                        gap = _A19_MIN_GAP - (time.time() - _A19_LAST[0])
+                        if gap > 0:
+                            time.sleep(gap)
+                        resp = None
+                        last_exc = None
+                        for _k, _w in enumerate((0,) + _A19_RETRY_WAITS):
+                            if _w:
+                                sys.stderr.write("[bridge] %s 429 ⇒ 退避 %ds 后重试（第 %d 次）\n"
+                                                 % (cand, _w, _k))
+                                time.sleep(_w)
+                            try:
+                                resp = urllib.request.urlopen(req, timeout=timeout_s)
+                                last_exc = None
+                                break
+                            except urllib.error.HTTPError as _e:
+                                last_exc = _e
+                                if _e.code != 429:
+                                    break
+                        _A19_LAST[0] = time.time()
+                        if resp is None and last_exc is not None:
+                            raise last_exc
+                else:
+                    resp = urllib.request.urlopen(req, timeout=timeout_s)
                 used, used_slot = cand, slot
                 if cand != name:
                     sys.stderr.write("[bridge] fallback %s → %s\n" % (name, cand))

@@ -15,3 +15,5 @@
 {"id": "L1793361839240", "at": "2026-10-30T19:03:59", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 78.39, "tokens": 11}
 {"id": "L1793361940593", "at": "2026-10-30T19:05:40", "text": "is.?, has andis", "backend": "gpu", "tokPerSec": 61.24, "tokens": 8}
 {"id": "L1793361984300", "at": "2026-10-30T19:06:24", "text": "., has andis is  in's that?", "backend": "gpu", "tokPerSec": 58.27, "tokens": 11}
+{"id": "L1793396033547", "at": "2026-10-31T04:37:02", "text": "The answer I'm reading is a question. 10?", "backend": "gpu", "tokPerSec": 36.78, "tokens": 13}
+{"id": "L1793396289238", "at": "2026-10-31T04:38:22", "text": "I'm a little bit of an old", "backend": "gpu", "tokPerSec": 37.1, "tokens": 8}
