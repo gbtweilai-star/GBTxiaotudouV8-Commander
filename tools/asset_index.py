@@ -34,7 +34,10 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+# 🔴 2026-10-30 修：硬编码 Windows 根在 Linux 上会被当成**相对路径**，
+#   于是每次运行都在仓里造一个叫 `C:\Users\ADMIN\...` 的垃圾目录。
+ROOT = Path(__import__("os").environ.get("GBT_ROOT")
+            or Path(__file__).resolve().parents[1])
 DB = ROOT / "state" / "asset_index.db"
 SKIP_DIRS = {".git", "__pycache__", "node_modules", ".pylibs", ".mimosa", ".scratch",
              ".trash", ".backups", "dist", "vendor", "_upstream", ".fleet"}

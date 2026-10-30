@@ -33,7 +33,10 @@ for _s in (sys.stdout, sys.stderr):
     if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+# 🔴 2026-10-30 修：硬编码 Windows 根在 Linux 上会被当成**相对路径**，
+#   于是每次运行都在仓里造一个叫 `C:\Users\ADMIN\...` 的垃圾目录。
+ROOT = Path(__import__("os").environ.get("GBT_ROOT")
+            or Path(__file__).resolve().parents[1])
 STATE = ROOT / "state"
 BINDINGS = STATE / "asset_bindings.json"
 LEDGER = STATE / "asset_bindings.jsonl"

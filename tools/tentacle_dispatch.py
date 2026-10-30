@@ -163,6 +163,11 @@ def dispatch(units: list, *, max_workers: int = 16, stall_s: float = 4.0,
     total = len(units)
     last_done, last_t = 0, t_start
 
+    # 2026-10-30 实测：worker 里的 SIGALRM 打不断**阻塞在 C 层**的调用
+    # （socket recv 之类），于是单个单元能把整批拖死（实测 290/291 卡住 15 分钟）。
+    # 派发器这边补一道**硬杀**：某批跑超 KILL_AFTER 秒就把 worker 全清掉，记一笔再收尾。
+    KILL_AFTER = 120.0
+
     def spawn() -> bool:
         nonlocal per_worker_mb
         p = subprocess.Popen([sys.executable, "-u", str(pathlib.Path(__file__).resolve()),
@@ -197,6 +202,14 @@ def dispatch(units: list, *, max_workers: int = 16, stall_s: float = 4.0,
                   % (time.strftime("%H:%M:%S"), done, total, running, left, len(procs)),
                   flush=True)
         if done >= total or (left == 0 and running == 0):
+            break
+        if time.time() - t_start > KILL_AFTER and (total - done) <= 2:
+            # 只剩个别卡死单元：清掉 worker，按已完成数收尾（如实记 stuck）
+            for p_ in procs:
+                try: p_.kill()
+                except Exception: pass
+            history.append({"at": time.strftime("%H:%M:%S"), "act": "kill_stuck",
+                            "done": done, "total": total})
             break
         now = time.time()
         dt = now - last_t
