@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T08:14:22+08:00",
+ "generated_at": "2026-10-30T08:24:16+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 767
+  "records": 768
  },
  "totals": {
-  "records": 767,
+  "records": 768,
   "scans": 30,
-  "changes": 602,
+  "changes": 603,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 468,
-   "ts": "2026-10-14T08:35:59+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "修上下文顶爆:Codex catalog context_window 32768->28672 + auto_compact 24000(给服务端 32768 留 4k 头寸);账本里那批 FAILED 真因是 prompt 涨到 32769 被 vLLM 400 顶回,不是冷启动;model-binding B5 判据改口径为服务端须多留 2k",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:d53185e5e29d702",
-   "prev": "sha256:e612c08016c1522"
-  },
   {
    "n": 469,
    "ts": "2026-10-14T08:41:58+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:1e49d183be64b82",
    "prev": "sha256:5002b50153fe4a1"
+  },
+  {
+   "n": 768,
+   "ts": "2026-10-30T08:24:16+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "心跳打磨三轮: 分频深检(浅每拍/深每10拍)+deep记账+act可自动补齐; 修'12/12绿但全身扫描从没跑过'的没测的绿; 护栏23->27",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:49c59554789914e",
+   "prev": "sha256:1e49d183be64b82"
   }
  ]
 };

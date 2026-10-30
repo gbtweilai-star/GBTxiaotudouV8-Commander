@@ -597,10 +597,28 @@ def advise(report: dict = None, mode: str = "light") -> dict:
                           "unmapped_action_domains", "source_total", "classified_total")},
         })
 
+    # ⓪b 深检记账：light 档永远跳过「身」的 body_map（七感官六动作全身扫描）。
+    #     自动链路一直 light ⇒ 全身扫描**从来没跑过**，而报告照样 12/12 绿。
+    #     "看着绿其实没测"必须被抓出来，而不是靠人记得手动跑 --full。
+    deep = rep.get("deep") or {}
+    if not deep.get("ever"):
+        instructions.append({
+            "priority": "P2", "id": "never_deep_checked",
+            "action": "跑一次全身扫描：python -m gbt_allinone heartbeat --full（约 6.5 秒）",
+            "why": "从来没有跑过 full 档 —— 七根感官六根动作等于没体检，只有静态检查在绿",
+            "evidence": {"signal_code": "never_deep_checked", "level": "P2",
+                         "deep": deep},
+        })
+    elif deep.get("stale"):
+        instructions.append({
+            "priority": "P2", "id": "deep_check_stale",
+            "action": "该跑全身扫描了：python -m gbt_allinone heartbeat --full",
+            "why": f"上次全身扫描在 {deep.get('last_full_at')}（{deep.get('age_s')} 秒前），"
+                   f"已超过 {int(HB.DEEP_MAX_AGE_S // 3600)} 小时 —— 期间七感官六动作没被回读过",
+            "evidence": {"signal_code": "deep_check_stale", "level": "P2", "deep": deep},
+        })
+
     # ① 逐条信号 → 指令
-    # 🔴 2026-10-30 打磨：INFO 原来被塞成一条 P2 指令（"无需动作（信息态）"），
-    #    而且连 signal_code 都没带 ⇒ 每跳都稳定多一条既无依据又不可追溯的噪音，
-    #    真问题就被淹在里面。现在 INFO 走独立的 notes，不进 instructions。
     seen = set()
     notes = []
     for s in rep.get("signals") or []:
@@ -690,6 +708,11 @@ _AUTO_ACTIONS: dict = {
                       "why": "只在心跳自己的抽屉里清垃圾与超额扫描，不碰任何用户内容"},
     "state_flip": {"op": "heartbeat_recheck",
                    "why": "重打一跳确认哪次读数对（只读，无副作用）"},
+    # 深检过期/从未深检 ⇒ 跑一次 full。代价 6.5 秒、只读、不动任何文件，最适合自动补齐。
+    "never_deep_checked": {"op": "heartbeat_full",
+                           "why": "从没跑过全身扫描，自动补一次（只读，约 6.5 秒）"},
+    "deep_check_stale": {"op": "heartbeat_full",
+                         "why": "深检过期，自动补一次（只读，约 6.5 秒）"},
 }
 
 
@@ -725,6 +748,8 @@ def act(report: dict = None, mode: str = "light", dry_run: bool = False) -> dict
                 HB.scan_all(mode=mode, persist=True, clean=True)
             elif auto["op"] == "heartbeat_recheck":
                 HB.scan_all(mode=mode, persist=True)
+            elif auto["op"] == "heartbeat_full":
+                HB.scan_all(mode="full", persist=True)
             executed.append({"id": ins.get("id"), "op": auto["op"], "ok": True,
                              "note": auto["why"]})
         except Exception as e:  # noqa: BLE001
