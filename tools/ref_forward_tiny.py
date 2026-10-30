@@ -101,7 +101,7 @@ def deq(blob, off, ty, n):
         out[:, :16] = lo * d[:, None]
         out[:, 16:] = hi * d[:, None]
         return out.reshape(-1)
-    if ty == 14:                                 # Q6_K（256 值/210 字节）向量化
+    if ty == 14:                                 # Q6_K（256 值/210 字节）——照 llama.cpp
         nb = n // 256
         blk = np.frombuffer(b[off:off + nb * 210], dtype=np.uint8).reshape(nb, 210)
         ql = blk[:, 0:128]
@@ -109,16 +109,24 @@ def deq(blob, off, ty, n):
         sc = blk[:, 192:208].copy().view(np.int8).astype(np.float32)   # (nb,16)
         d = blk[:, 208:210].copy().view('<f2').astype(np.float32).reshape(nb)
         out = np.empty((nb, 256), np.float32)
-        for nn_ in range(2):
+        for g in range(2):                       # 两个 128 组：ql+64 qh+32 sc+8
             for l in range(32):
-                isb = nn_ * 8 + (l // 16)
-                s = sc[:, isb] * d
-                qhb = qh[:, nn_ * 32 + l].astype(np.int32)
-                lo = (ql[:, nn_ * 64 + l].astype(np.int32) & 0x0f) | (((qhb >> 0) & 3) << 4)
-                hi = (ql[:, nn_ * 64 + l + 32].astype(np.int32) & 0x0f) | (((qhb >> 2) & 3) << 4)
-                out[:, nn_ * 128 + l] = s * (lo - 32)
-                out[:, nn_ * 128 + l + 32] = s * (hi - 32)
-        return out.reshape(-1)
+                isb = l // 16
+                qhb = qh[:, g * 32 + l].astype(np.int32)
+                q1 = ((ql[:, g*64 + l].astype(np.int32) & 0x0F) | (((qhb >> 0) & 3) << 4)) - 32
+                q2 = ((ql[:, g*64 + l + 32].astype(np.int32) & 0x0F) | (((qhb >> 2) & 3) << 4)) - 32
+                q3 = ((ql[:, g*64 + l].astype(np.int32) >> 4) | (((qhb >> 4) & 3) << 4)) - 32
+                q4 = ((ql[:, g*64 + l + 32].astype(np.int32) >> 4) | (((qhb >> 6) & 3) << 4)) - 32
+                s1 = sc[:, g*8 + isb + 0] * d
+                s2 = sc[:, g*8 + isb + 2] * d
+                s3 = sc[:, g*8 + isb + 4] * d
+                s4 = sc[:, g*8 + isb + 6] * d
+                base = g * 128
+                out[:, base + l +  0] = s1 * q1
+                out[:, base + l + 32] = s2 * q2
+                out[:, base + l + 64] = s3 * q3
+                out[:, base + l + 96] = s4 * q4
+        return out.reshape(-1)[:n]
     if ty == 12:                                 # Q4_K（256 值/144 字节）向量化
         nb = n // 256
         blk = np.frombuffer(b[off:off + nb * 144], dtype=np.uint8).reshape(nb, 144)
@@ -150,6 +158,7 @@ def main() -> int:
     ap.add_argument("--top", type=int, default=8)
     ap.add_argument("--track", default="Paris,ĠParis, Paris")
     ap.add_argument("--noattn", action="store_true", help="消融：把注意力上下文清零")
+    ap.add_argument("--normone", action="store_true", help="对照：norm 权重强制为 1")
     a = ap.parse_args()
     kv, tens, data, blob = parse(a.model)
     arch = kv.get("general.architecture", "llama")
@@ -173,6 +182,8 @@ def main() -> int:
         return arr
 
     def rms(x, w):
+        if a.normone:
+            w = np.ones_like(w)
         return (x / np.sqrt((x * x).mean() + eps)) * w
 
     def matvec(W, x, nin, nout):
