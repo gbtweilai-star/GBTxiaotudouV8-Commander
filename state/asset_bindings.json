@@ -18559,5 +18559,12 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T10:46:40"
+ },
+ "tools/serve_wgpu.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-30T11:54:51"
  }
 }

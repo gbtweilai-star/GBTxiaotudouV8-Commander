@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>本机推理 · GGUF 前向 + 生成</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1{font-size:15px;color:#7dd3fc;margin:0 0 10px}
+  pre{white-space:pre-wrap;word-break:break-word;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}
+</style>
+</head>
+<body>
+<h1>本机推理（浏览器内 · 零依赖 · 自己算）</h1>
+<pre id="o">载入模型…</pre>
+<script type="module">
+import { GGUFModel, rmsnorm, matvec, rope, softmax } from "./gguf-llm.js";
+
+const L = [];
+const out = document.getElementById("o");
+const say = (s) => { L.push(s); out.innerHTML = L.join("\n"); };
+
+let M = null, KVK = [], KVK2 = [], embCache = null;
+
+function silu(x){ return x / (1 + Math.exp(-x)); }
+
+/* 前向一次：tokens → 最后一位的 logits */
+function forward(ids){
+  const nE = M.nEmbd, nH = M.nHead, nKV = M.nKV, hd = M.headDim, nFF = M.nFF;
+  const T = M.tensor.bind(M);
+
+  /* 词嵌入（tied：logits 也用它） */
+  if (!embCache) {
+    embCache = T("token_embd.weight");        /* [576, 49152] ⇒ 49152 行 × 576 */
+  }
+  const seq = ids.length;
+  /* KV cache 每层：k/v 各 seq × (nKV*hd) */
+  const cache = [];
+
+  let logits = null;
+  for (let pos=0; pos<seq; pos++){
+    let x = embCache.subarray(ids[pos]*nE, ids[pos]*nE + nE).slice();
+
+    for (let l=0; l<M.nLayer; l++){
+      const pre = "blk."+l+".";
+      if (!cache[l]) cache[l] = {k: [], v: []};
+
+      /* ── 注意力 ── */
+      let h = rmsnorm(x, T(pre+"attn_norm.weight"), M.eps);
+      let q = matvec(T(pre+"attn_q.weight"), h, nE, nE);
+      let k = matvec(T(pre+"attn_k.weight"), h, nE, nKV*hd);
+      let v = matvec(T(pre+"attn_v.weight"), h, nE, nKV*hd);
+      rope(q, nH, hd, pos, M.ropeTheta);
+      rope(k, nKV, hd, pos, M.ropeTheta);
+      cache[l].k.push(k); cache[l].v.push(v);
+
+      const ctx = new Float32Array(nE);
+      const scale = 1 / Math.sqrt(hd);
+      for (let hh=0; hh<nH; hh++){
+        const kvh = Math.floor(hh * nKV / nH);      /* GQA 映射 */
+        const scores = new Float32Array(pos+1);
+        for (let t=0; t<=pos; t++){
+          const kk = cache[l].k[t];
+          let s = 0;
+          for (let d=0; d<hd; d++) s += q[hh*hd+d] * kk[kvh*hd+d];
+          scores[t] = s * scale;
+        }
+        const p = softmax(scores);
+        for (let d=0; d<hd; d++){
+          let acc = 0;
+          for (let t=0; t<=pos; t++) acc += p[t] * cache[l].v[t][kvh*hd+d];
+          ctx[hh*hd+d] = acc;
+        }
+      }
+      const ao = matvec(T(pre+"attn_output.weight"), ctx, nE, nE);
+      for (let i=0;i<nE;i++) x[i] += ao[i];
+
+      /* ── FFN（SwiGLU）── */
+      const h2 = rmsnorm(x, T(pre+"ffn_norm.weight"), M.eps);
+      const g = matvec(T(pre+"ffn_gate.weight"), h2, nE, nFF);
+      const u = matvec(T(pre+"ffn_up.weight"),   h2, nE, nFF);
+      const act = new Float32Array(nFF);
+      for (let i=0;i<nFF;i++) act[i] = silu(g[i]) * u[i];
+      const dn = matvec(T(pre+"ffn_down.weight"), act, nFF, nE);
+      for (let i=0;i<nE;i++) x[i] += dn[i];
+    }
+
+    if (pos === seq-1){
+      const xf = rmsnorm(x, T("output_norm.weight"), M.eps);
+      const V = M.tokens.length;
+      logits = new Float32Array(V);
+      for (let t=0; t<V; t++){
+        const row = embCache.subarray(t*nE, t*nE+nE);
+        let s = 0;
+        for (let i=0;i<nE;i++) s += row[i]*xf[i];
+        logits[t] = s;
+      }
+    }
+  }
+  return logits;
+}
+
+function argmax(a){ let b=0; for (let i=1;i<a.length;i++) if (a[i]>a[b]) b=i; return b; }
+
+function decode(ids){
+  return ids.map(i => (M.tokens[i]||"").replace(/Ġ/g," ").replace(/Ċ/g,"\n")).join("");
+}
+
+function encodeSimple(text){
+  /* 只为 demo：单 token 最长匹配 + 空格前缀处理（够跑英文短句） */
+  const t2i = new Map(); M.tokens.forEach((t,i)=>t2i.set(t,i));
+  const ids = [];
+  const pieces = text.match(/\s?[A-Za-z]+|\s?[0-9]+|\s?[^\sA-Za-z0-9]+|\s+/g) || [];
+  for (const pc of pieces){
+    const s = pc.replace(/^ /, "Ġ");
+    if (t2i.has(s)) { ids.push(t2i.get(s)); continue; }
+    for (const ch of Array.from(pc)){
+      const k = ch===" "?"Ġ":ch;
+      if (t2i.has(k)) ids.push(t2i.get(k));
+    }
+  }
+  return ids;
+}
+
+(async function(){
+  try{
+    const t0 = performance.now();
+    const resp = await fetch("models/tiny.gguf");
+    const buf = await resp.arrayBuffer();
+    M = new GGUFModel(buf);
+    say(`<span class='ok'>✅ 模型就绪</span>`);
+    say(`  ${M.arch} · ${M.nLayer} 层 · emb ${M.nEmbd} · 头 ${M.nHead}/${M.nKV} · ff ${M.nFF} · head_dim ${M.headDim}`);
+    say(`  rope θ=${M.ropeTheta} · eps=${M.eps} · 词表 ${M.tokens.length} · 载入 ${(performance.now()-t0|0)} ms`);
+    say("");
+
+    const prompt = "The capital of France is";
+    const ids = encodeSimple(prompt);
+    say(`  提示 ${JSON.stringify(prompt)} → ${ids.length} tokens ${JSON.stringify(ids)}`);
+    say("  首次前向（会把权重反量化进缓存，慢）…");
+
+    let gen = ids.slice();
+    const tF = performance.now();
+    const lg = forward(gen);
+    const tFirst = performance.now() - tF;
+    let nxt = argmax(lg);
+    say(`  首 token 前向 ${(tFirst/1000).toFixed(1)} s · top-1 = ${JSON.stringify((M.tokens[nxt]||"").replace(/Ġ/g," "))}`);
+    gen.push(nxt);
+
+    const N = 8;
+    const tG = performance.now();
+    for (let i=1;i<N;i++){
+      const l2 = forward(gen);
+      nxt = argmax(l2);
+      gen.push(nxt);
+    }
+    const tAll = (performance.now()-tG)/1000;
+    say("");
+    say(`<span class='ok'>生成 ${N} token · ${tAll.toFixed(1)} s · ${(N/tAll).toFixed(2)} tok/s</span>`);
+    say(`  文本：${JSON.stringify(decode(gen))}`);
+    window.__infer = {
+      ok:true, prompt, promptIds:ids.length,
+      firstMs: tFirst|0, genTokens:N, genS:+tAll.toFixed(2),
+      tokPerSec: +(N/tAll).toFixed(2),
+      text: decode(gen)
+    };
+  }catch(e){
+    say(`<span class='bad'>🔴 ${String(e&&e.message||e)}</span>`);
+    if (e && e.stack) say(`<span class='dim'>${String(e.stack).split("\n").slice(0,4).join("\n")}</span>`);
+    window.__infer = {ok:false, error:String(e&&e.message||e)};
+  }
+})();
+</script>
+</body></html>
