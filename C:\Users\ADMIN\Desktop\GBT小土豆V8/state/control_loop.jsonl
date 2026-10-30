@@ -1,0 +1,14 @@
+{"at": "2026-10-30T11:08:55", "goal": "在搜索框输入关键词", "op": "TYPE_TEXT", "path": "fast", "ok": true, "elapsed_ms": 0.1, "guard": "两查通过（新鲜 + 未遮挡 + 目标真实存在）"}
+{"at": "2026-10-30T11:08:55", "goal": "在搜索框输入关键词", "op": "TYPE_TEXT", "path": "fast", "ok": false, "elapsed_ms": 0.1, "guard": "观测已过期 9000ms > 1500ms ⇒ 拒绝执行，要求重新观测"}
+{"at": "2026-10-30T11:08:55", "goal": "点击 SearchBox 打开", "op": "CLICK", "path": "fast", "ok": false, "elapsed_ms": 0.0, "guard": "目标 7 被遮挡 ⇒ 拒绝（它自己写明的遮挡复查）"}
+{"at": "2026-10-30T11:08:55", "goal": "随便做点什么", "op": "BLOCKED", "path": "fast", "ok": true, "elapsed_ms": 0.1, "guard": "无需两查（不是落点动作）"}
+{"at": "2026-10-30T11:08:55", "goal": "这单收工", "op": "DONE", "path": "fast", "ok": false, "elapsed_ms": 0.0, "guard": "DONE 缺独立验证证据 ⇒ 拒绝（不许自己宣布成功）"}
+{"at": "2026-10-30T11:08:55", "goal": "无解任务", "op": "BLOCKED", "path": "fast", "ok": true, "elapsed_ms": 0.1, "guard": "无需两查（不是落点动作）"}
+{"at": "2026-10-30T11:08:55", "goal": "无解任务", "op": "DONE", "path": "slow", "ok": false, "elapsed_ms": 0.0, "guard": "DONE 缺独立验证证据 ⇒ 拒绝（不许自己宣布成功）"}
+{"at": "2026-10-30T11:35:37", "goal": "在搜索框输入关键词", "op": "TYPE_TEXT", "path": "fast", "ok": true, "elapsed_ms": 0.1, "guard": "两查通过（新鲜 + 未遮挡 + 目标真实存在）"}
+{"at": "2026-10-30T11:35:37", "goal": "在搜索框输入关键词", "op": "TYPE_TEXT", "path": "fast", "ok": false, "elapsed_ms": 0.1, "guard": "观测已过期 9000ms > 1500ms ⇒ 拒绝执行，要求重新观测"}
+{"at": "2026-10-30T11:35:37", "goal": "点击 SearchBox 打开", "op": "CLICK", "path": "fast", "ok": false, "elapsed_ms": 0.0, "guard": "目标 7 被遮挡 ⇒ 拒绝（它自己写明的遮挡复查）"}
+{"at": "2026-10-30T11:35:37", "goal": "随便做点什么", "op": "BLOCKED", "path": "fast", "ok": true, "elapsed_ms": 0.1, "guard": "无需两查（不是落点动作）"}
+{"at": "2026-10-30T11:35:37", "goal": "这单收工", "op": "DONE", "path": "fast", "ok": false, "elapsed_ms": 0.0, "guard": "DONE 缺独立验证证据 ⇒ 拒绝（不许自己宣布成功）"}
+{"at": "2026-10-30T11:35:37", "goal": "无解任务", "op": "BLOCKED", "path": "fast", "ok": true, "elapsed_ms": 0.0, "guard": "无需两查（不是落点动作）"}
+{"at": "2026-10-30T11:35:37", "goal": "无解任务", "op": "DONE", "path": "slow", "ok": false, "elapsed_ms": 0.0, "guard": "DONE 缺独立验证证据 ⇒ 拒绝（不许自己宣布成功）"}

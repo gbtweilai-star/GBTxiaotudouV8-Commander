@@ -1,9 +1,9 @@
 {
- "at": "2026-10-30T04:06:51",
- "count": 348,
+ "at": "2026-10-30T11:34:33",
+ "count": 350,
  "by_permission": {
-  "open": 207,
-  "owner": 141
+  "open": 221,
+  "owner": 129
  },
  "duplicate_tags": {},
  "tags": {
@@ -291,29 +291,23 @@
   "sec_surface": {
    "tag": "GBT-SECURITY-SEC-SURFACE",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "sec_scan": {
    "tag": "GBT-SECURITY-SEC-SCAN",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "sec_chain": {
    "tag": "GBT-SECURITY-SEC-CHAIN",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "sec_defenses": {
    "tag": "GBT-SECURITY-SEC-DEFENSES",
@@ -720,10 +714,8 @@
    "tag": "GBT-SECURITY-OFFENSE-OPS",
    "domain": "security",
    "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
   },
   "skill_forge": {
    "tag": "GBT-RECON-SKILL-FORGE",
@@ -1598,11 +1590,9 @@
   "pentest_distill": {
    "tag": "GBT-SECURITY-PENTEST-DISTILL",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "diagram_distill": {
    "tag": "GBT-CREATION-DIAGRAM-DISTILL",
@@ -1649,11 +1639,9 @@
   "code_audit": {
    "tag": "GBT-SECURITY-CODE-AUDIT",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "agent_rig": {
    "tag": "GBT-SYSTEM-AGENT-RIG",
@@ -1714,11 +1702,9 @@
   "install_selfcheck": {
    "tag": "GBT-SECURITY-INSTALL-SELFCHECK",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "room_space": {
    "tag": "GBT-SYSTEM-ROOM-SPACE",
@@ -1848,14 +1834,26 @@
    "scopes": [],
    "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
+  "i2v_agnes": {
+   "tag": "GBT-VIDEO-I2V-AGNES",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "code_graph": {
+   "tag": "GBT-MIND-CODE-GRAPH",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
   "sec_sweeper": {
    "tag": "GBT-SECURITY-SEC-SWEEPER",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "task_manager": {
    "tag": "GBT-SYSTEM-TASK-MANAGER",
@@ -1958,11 +1956,9 @@
   "penetrating_cross_scan": {
    "tag": "GBT-SECURITY-PENETRATING-CROSS-SCAN",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "hook_enforcer": {
    "tag": "GBT-SECURITY-HOOK-ENFORCER",
@@ -2248,19 +2244,15 @@
    "tag": "GBT-SECURITY-REDTEAM-RECON",
    "domain": "security",
    "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
   },
   "pentest": {
    "tag": "GBT-SECURITY-PENTEST",
    "domain": "security",
    "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
   },
   "keylogger": {
    "tag": "GBT-SECURITY-KEYLOGGER",
@@ -2284,19 +2276,15 @@
    "tag": "GBT-SECURITY-REMOTE-DOMAIN",
    "domain": "security",
    "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
   },
   "device_takeover": {
    "tag": "GBT-SECURITY-DEVICE-TAKEOVER",
    "domain": "security",
    "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
   },
   "credential_steal": {
    "tag": "GBT-SECURITY-CREDENTIAL-STEAL",
@@ -2319,29 +2307,23 @@
   "social_eng": {
    "tag": "GBT-SECURITY-SOCIAL-ENG",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "paywallbuster": {
    "tag": "GBT-SECURITY-PAYWALLBUSTER",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "asset_vault_freeze": {
    "tag": "GBT-SECURITY-ASSET-VAULT-FREEZE",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "onboarding_gate": {
    "tag": "GBT-SECURITY-ONBOARDING-GATE",
@@ -2453,11 +2435,9 @@
   "llm_redteam": {
    "tag": "GBT-SECURITY-LLM-REDTEAM",
    "domain": "security",
-   "permission": "owner",
-   "scopes": [
-    "osint_private"
-   ],
-   "why": "policy 要求作用域：osint_private"
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
   },
   "notion_bridge": {
    "tag": "GBT-INTEGRATION-NOTION-BRIDGE",

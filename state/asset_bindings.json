@@ -17792,7 +17792,8 @@
    "brain_route",
    "absorb_loop",
    "health",
-   "mirror_shape"
+   "mirror_shape",
+   "body_map"
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T03:57:52"

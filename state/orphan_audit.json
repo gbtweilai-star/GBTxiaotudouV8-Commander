@@ -1,5 +1,5 @@
 {
- "total": 349,
+ "total": 350,
  "wired": [
   "answer_shaper",
   "belief_forge",
@@ -175,6 +175,7 @@
   "hook_enforcer",
   "hook_registry",
   "humanizer",
+  "i2v_agnes",
   "image_scout",
   "impact_check",
   "install_selfcheck",
