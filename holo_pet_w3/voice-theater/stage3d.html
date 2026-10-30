@@ -6,7 +6,7 @@
 <title>数字人 3D 舞台 · 读数专用</title>
 <!--
   2026-10-30 立。为什么单独一页：
-    ① 主页面 voice-theater/index.html 走 2D 画布，dh3d.js?v=1793346317 一直没被引用（孤儿）；
+    ① 主页面 voice-theater/index.html 走 2D 画布，dh3d.js?v=1793347126 一直没被引用（孤儿）；
     ② 想按 ?dh3d=1 懒加载，但实测 WebView 会把 query 吞掉（location.search 为空），
        懒加载器永不触发；
     ③ 所以给 3D 一个**独立入口**：脚本直挂、不经 query，用来读数与调试。
@@ -28,7 +28,7 @@
 <script src="vendor/three.min.js?v=1793345019"></script>
 <script src="vendor/BufferGeometryUtils.js"></script>
 <script src="vendor/GLTFLoader.js"></script>
-<script src="dh3d.js?v=1793346317"></script>
+<script src="dh3d.js?v=1793347126"></script>
 
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
@@ -46,7 +46,9 @@
         var r = window.GBT_DH3D.readings();
         /* 🔴 2026-10-30：readings 一出现就报，会拿到"模型还没进画面"那一刻的值
            （tris=12 = 只有地面、frames=0）。这里等到**真画出人物**再报，超过 30 秒才服输。 */
-        if (!(r.triangles > 100) && tries < 30) return;
+        /* 铁证口径：必须**人物已进画面**(tris>100) 且**帧真的在走**(frames>0) 才报，
+           否则报出来的只是"半初始化"的值（曾出现 tris=12 / frames=0 这种假读数）。 */
+        if (!(r.triangles > 100 && r.state_machine.frames > 0) && tries < 40) return;
         var px = window.GBT_DH3D.pixels(24);
         clearInterval(iv);
         await fetch("http://127.0.0.1:8791/_probe", {
