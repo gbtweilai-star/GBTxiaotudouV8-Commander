@@ -2,18 +2,18 @@
  * 重生成：py -3.14 tools/codex-scripts/logbook.py render
  * 口径：只追加 + 自链哈希；数字全部现算自 state/logbook.jsonl。 */
 window.GBT_LOGBOOK = {
- "generated_at": "2026-10-30T07:55:56+08:00",
+ "generated_at": "2026-10-30T08:03:08+08:00",
  "regen": "py -3.14 tools/codex-scripts/logbook.py render",
  "source": "state/logbook.jsonl（只追加 · 自链哈希）",
  "chain": {
   "ok": false,
   "detail": "第 760 行的 prev_hash 与上一行的 hash 不接（被改过或被插过行）",
-  "records": 765
+  "records": 766
  },
  "totals": {
-  "records": 765,
+  "records": 766,
   "scans": 30,
-  "changes": 600,
+  "changes": 601,
   "decisions": 22,
   "delivers": 92
  },
@@ -1001,18 +1001,6 @@ window.GBT_LOGBOOK = {
   }
  ],
  "records": [
-  {
-   "n": 466,
-   "ts": "2026-10-14T08:25:49+08:00",
-   "kind": "change",
-   "actor": "unknown",
-   "what": "新增决策直达绑定 tools/codex-scripts/decision-direct.py:本地快尺(semantic_route heuristic 89方法 + llm/decision 本地打分)走 A 向直达,B 向读数回写 state/decision-binding.json;实测 P50 2.2ms/P95 3.3ms/命中80%,对比主模型每轮16-20s",
-   "where": [
-    "(未点名)"
-   ],
-   "hash": "sha256:877a659d77392a3",
-   "prev": "sha256:165ad8ac21e3889"
-  },
   {
    "n": 467,
    "ts": "2026-10-14T08:29:38+08:00",
@@ -4600,6 +4588,18 @@ window.GBT_LOGBOOK = {
    ],
    "hash": "sha256:c5f2bf517517f1f",
    "prev": "sha256:ef28661fe23d3ca"
+  },
+  {
+   "n": 766,
+   "ts": "2026-10-30T08:03:08+08:00",
+   "kind": "change",
+   "actor": "AI",
+   "what": "心跳触手打磨: 修落盘静默假绿/INFO噪音/全局根因12份单/值日根靠字典序 四处; 热跑114->88ms; 护栏12->19条; 私7c27d017 公322470f0",
+   "where": [
+    "(未点名)"
+   ],
+   "hash": "sha256:5002b50153fe4a1",
+   "prev": "sha256:c5f2bf517517f1f"
   }
  ]
 };
