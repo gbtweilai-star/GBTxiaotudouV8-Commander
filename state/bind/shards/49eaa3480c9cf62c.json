@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/verify_active.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/resolve.py", "tools/codex-scripts/README.md", "tools/codex-scripts/make-delivery-ledger.py", "tools/codex-scripts/verify_v21.py", "tools/codex-scripts/verify_v22.py", "tools/codex-scripts/verify_v3.py"], "defs": []}

@@ -1,0 +1,2666 @@
+{
+ "at": "2026-10-30T04:06:51",
+ "count": 348,
+ "by_permission": {
+  "open": 207,
+  "owner": 141
+ },
+ "duplicate_tags": {},
+ "tags": {
+  "body_map": {
+   "tag": "GBT-DEVICE-BODY-MAP",
+   "domain": "device",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "body_see": {
+   "tag": "GBT-DEVICE-BODY-SEE",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "body_say": {
+   "tag": "GBT-DEVICE-BODY-SAY",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "audio_output"
+   ],
+   "why": "policy 要求作用域：audio_output"
+  },
+  "body_type": {
+   "tag": "GBT-DEVICE-BODY-TYPE",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "desktop_control"
+   ],
+   "why": "policy 要求作用域：desktop_control"
+  },
+  "body_click": {
+   "tag": "GBT-DEVICE-BODY-CLICK",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "desktop_control"
+   ],
+   "why": "policy 要求作用域：desktop_control"
+  },
+  "body_volume": {
+   "tag": "GBT-DEVICE-BODY-VOLUME",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "audio_output"
+   ],
+   "why": "policy 要求作用域：audio_output"
+  },
+  "body_open": {
+   "tag": "GBT-DEVICE-BODY-OPEN",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute"
+  },
+  "codex_status": {
+   "tag": "GBT-LLM-CODEX-STATUS",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "codex_tools": {
+   "tag": "GBT-LLM-CODEX-TOOLS",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "codex_thread_new": {
+   "tag": "GBT-LLM-CODEX-THREAD-NEW",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute"
+  },
+  "codex_turn_send": {
+   "tag": "GBT-LLM-CODEX-TURN-SEND",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：process_execute、external_llm"
+  },
+  "codex_interrupt": {
+   "tag": "GBT-LLM-CODEX-INTERRUPT",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute"
+  },
+  "codex_chat": {
+   "tag": "GBT-LLM-CODEX-CHAT",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：process_execute、external_llm"
+  },
+  "codex_models": {
+   "tag": "GBT-LLM-CODEX-MODELS",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm"
+  },
+  "desktop_commander": {
+   "tag": "GBT-TENTACLE-DESKTOP-COMMANDER",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "health": {
+   "tag": "GBT-SYSTEM-HEALTH",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "echo": {
+   "tag": "GBT-DATA-ECHO",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "count_words": {
+   "tag": "GBT-DATA-COUNT-WORDS",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "audit_query": {
+   "tag": "GBT-DATA-AUDIT-QUERY",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "quant_strategy": {
+   "tag": "GBT-FINANCE-QUANT-STRATEGY",
+   "domain": "finance",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "quant_backtest": {
+   "tag": "GBT-FINANCE-QUANT-BACKTEST",
+   "domain": "finance",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "platform_profile": {
+   "tag": "GBT-PROJECT-PLATFORM-PROFILE",
+   "domain": "project",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "quant_params": {
+   "tag": "GBT-FINANCE-QUANT-PARAMS",
+   "domain": "finance",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "osint_scan": {
+   "tag": "GBT-RECON-OSINT-SCAN",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "record_grid": {
+   "tag": "GBT-DATA-RECORD-GRID",
+   "domain": "data",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "wf_define": {
+   "tag": "GBT-ENGINE-WF-DEFINE",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wf_run": {
+   "tag": "GBT-ENGINE-WF-RUN",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wf_status": {
+   "tag": "GBT-ENGINE-WF-STATUS",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wf_resume": {
+   "tag": "GBT-ENGINE-WF-RESUME",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "lr_submit": {
+   "tag": "GBT-LONGRUN-LR-SUBMIT",
+   "domain": "longrun",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "lr_tick": {
+   "tag": "GBT-LONGRUN-LR-TICK",
+   "domain": "longrun",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "lr_status": {
+   "tag": "GBT-LONGRUN-LR-STATUS",
+   "domain": "longrun",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "selfscan": {
+   "tag": "GBT-SYSTEM-SELFSCAN",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "alerts": {
+   "tag": "GBT-SYSTEM-ALERTS",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tentacle": {
+   "tag": "GBT-TENTACLE-TENTACLE",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "desktop_control",
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：desktop_control、privacy_read"
+  },
+  "tentacle_manifest": {
+   "tag": "GBT-TENTACLE-TENTACLE-MANIFEST",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sec_surface": {
+   "tag": "GBT-SECURITY-SEC-SURFACE",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "sec_scan": {
+   "tag": "GBT-SECURITY-SEC-SCAN",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "sec_chain": {
+   "tag": "GBT-SECURITY-SEC-CHAIN",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "sec_defenses": {
+   "tag": "GBT-SECURITY-SEC-DEFENSES",
+   "domain": "security",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sec_llm": {
+   "tag": "GBT-SECURITY-SEC-LLM",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm"
+  },
+  "truth_scan": {
+   "tag": "GBT-SYSTEM-TRUTH-SCAN",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "autopilot": {
+   "tag": "GBT-LLM-AUTOPILOT",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm"
+  },
+  "llm_chat": {
+   "tag": "GBT-LLM-LLM-CHAT",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm"
+  },
+  "llm_status": {
+   "tag": "GBT-LLM-LLM-STATUS",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cloud_llm": {
+   "tag": "GBT-LLM-CLOUD-LLM",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "key_gateway": {
+   "tag": "GBT-LLM-KEY-GATEWAY",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "multimodal_port": {
+   "tag": "GBT-LLM-MULTIMODAL-PORT",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm；图鉴标了 safe=false"
+  },
+  "genoffice_bridge": {
+   "tag": "GBT-LLM-GENOFFICE-BRIDGE",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm；图鉴标了 safe=false"
+  },
+  "brain_route": {
+   "tag": "GBT-LLM-BRAIN-ROUTE",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brain_execute": {
+   "tag": "GBT-LLM-BRAIN-EXECUTE",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brain_verify": {
+   "tag": "GBT-LLM-BRAIN-VERIFY",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brain_health": {
+   "tag": "GBT-LLM-BRAIN-HEALTH",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brain_unify": {
+   "tag": "GBT-LLM-BRAIN-UNIFY",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "root_fix": {
+   "tag": "GBT-SYSTEM-ROOT-FIX",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cross_scan": {
+   "tag": "GBT-SYSTEM-CROSS-SCAN",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "inventory": {
+   "tag": "GBT-SYSTEM-INVENTORY",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brain_vault": {
+   "tag": "GBT-MIND-BRAIN-VAULT",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "think_loop": {
+   "tag": "GBT-LLM-THINK-LOOP",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：external_llm"
+  },
+  "one_key_deploy": {
+   "tag": "GBT-PIPELINE-ONE-KEY-DEPLOY",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish",
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：deploy_publish、process_execute、filesystem_write"
+  },
+  "deploy_queue": {
+   "tag": "GBT-PIPELINE-DEPLOY-QUEUE",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish"
+   ],
+   "why": "policy 要求作用域：deploy_publish"
+  },
+  "mirror_shape": {
+   "tag": "GBT-PIPELINE-MIRROR-SHAPE",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "mirror_scan": {
+   "tag": "GBT-PIPELINE-MIRROR-SCAN",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "mirror_plan": {
+   "tag": "GBT-PIPELINE-MIRROR-PLAN",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "mirror_simulate": {
+   "tag": "GBT-PIPELINE-MIRROR-SIMULATE",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "mirror_parity": {
+   "tag": "GBT-PIPELINE-MIRROR-PARITY",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "mirror_rehearse": {
+   "tag": "GBT-PIPELINE-MIRROR-REHEARSE",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、filesystem_write"
+  },
+  "mirror_release": {
+   "tag": "GBT-PIPELINE-MIRROR-RELEASE",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish",
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：deploy_publish、process_execute、filesystem_write"
+  },
+  "mirror_ascend": {
+   "tag": "GBT-PIPELINE-MIRROR-ASCEND",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish"
+   ],
+   "why": "policy 要求作用域：deploy_publish"
+  },
+  "mirror_status": {
+   "tag": "GBT-PIPELINE-MIRROR-STATUS",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "mirror_rewind": {
+   "tag": "GBT-PIPELINE-MIRROR-REWIND",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish"
+   ],
+   "why": "policy 要求作用域：deploy_publish"
+  },
+  "auth_gate_status": {
+   "tag": "GBT-SYSTEM-AUTH-GATE-STATUS",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "transfer": {
+   "tag": "GBT-ENGINE-TRANSFER",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wf_cache_clear": {
+   "tag": "GBT-ENGINE-WF-CACHE-CLEAR",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "signature_guard": {
+   "tag": "GBT-SYSTEM-SIGNATURE-GUARD",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "file_hygiene": {
+   "tag": "GBT-SYSTEM-FILE-HYGIENE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "devour_scan": {
+   "tag": "GBT-DEVOUR-DEVOUR-SCAN",
+   "domain": "devour",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "devour_github": {
+   "tag": "GBT-DEVOUR-DEVOUR-GITHUB",
+   "domain": "devour",
+   "permission": "owner",
+   "scopes": [
+    "data_export",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：data_export、filesystem_write"
+  },
+  "tentacle_equip": {
+   "tag": "GBT-TENTACLE-TENTACLE-EQUIP",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "tool_bay": {
+   "tag": "GBT-TENTACLE-TOOL-BAY",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "remote_confinement": {
+   "tag": "GBT-TENTACLE-REMOTE-CONFINEMENT",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute；图鉴标了 safe=false"
+  },
+  "cli_ify": {
+   "tag": "GBT-INTEGRATION-CLI-IFY",
+   "domain": "integration",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "tentacle_learn": {
+   "tag": "GBT-RECON-TENTACLE-LEARN",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "skill_finder": {
+   "tag": "GBT-DATA-SKILL-FINDER",
+   "domain": "data",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "humanizer": {
+   "tag": "GBT-DATA-HUMANIZER",
+   "domain": "data",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "chart_html": {
+   "tag": "GBT-DATA-CHART-HTML",
+   "domain": "data",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "workflow_forge": {
+   "tag": "GBT-ENGINE-WORKFLOW-FORGE",
+   "domain": "engine",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "forge_mastery": {
+   "tag": "GBT-CREATION-FORGE-MASTERY",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "showcase_ops": {
+   "tag": "GBT-CREATION-SHOWCASE-OPS",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "spider_ops": {
+   "tag": "GBT-RECON-SPIDER-OPS",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "offense_ops": {
+   "tag": "GBT-SECURITY-OFFENSE-OPS",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+  },
+  "skill_forge": {
+   "tag": "GBT-RECON-SKILL-FORGE",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "shot_director": {
+   "tag": "GBT-CREATION-SHOT-DIRECTOR",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "book_skill": {
+   "tag": "GBT-RECON-BOOK-SKILL",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "music_auto": {
+   "tag": "GBT-CREATION-MUSIC-AUTO",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "train_ground": {
+   "tag": "GBT-LLM-TRAIN-GROUND",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "quant_plan": {
+   "tag": "GBT-LLM-QUANT-PLAN",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "know_map": {
+   "tag": "GBT-RECON-KNOW-MAP",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "topic_web": {
+   "tag": "GBT-RECON-TOPIC-WEB",
+   "domain": "recon",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "self_intake": {
+   "tag": "GBT-MIND-SELF-INTAKE",
+   "domain": "mind",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "comfy_forge": {
+   "tag": "GBT-CREATION-COMFY-FORGE",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "scan_cap": {
+   "tag": "GBT-SYSTEM-SCAN-CAP",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "figure_gate": {
+   "tag": "GBT-SYSTEM-FIGURE-GATE",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "theme_cap": {
+   "tag": "GBT-SYSTEM-THEME-CAP",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "omarchy_bridge": {
+   "tag": "GBT-TENTACLE-OMARCHY-BRIDGE",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute；图鉴标了 safe=false"
+  },
+  "delivery_gate": {
+   "tag": "GBT-SYSTEM-DELIVERY-GATE",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute；图鉴标了 safe=false"
+  },
+  "ux_doctrine": {
+   "tag": "GBT-SYSTEM-UX-DOCTRINE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "welcome": {
+   "tag": "GBT-SYSTEM-WELCOME",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "god_view": {
+   "tag": "GBT-SYSTEM-GOD-VIEW",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "vision_loop": {
+   "tag": "GBT-VISION-VISION-LOOP",
+   "domain": "vision",
+   "permission": "owner",
+   "scopes": [
+    "desktop_control",
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：desktop_control、privacy_read；图鉴标了 safe=false"
+  },
+  "agency_tentacles": {
+   "tag": "GBT-TENTACLE-AGENCY-TENTACLES",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "media_pipeline": {
+   "tag": "GBT-VIDEO-MEDIA-PIPELINE",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "edit_pipeline": {
+   "tag": "GBT-VIDEO-EDIT-PIPELINE",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "tentacle_pipeline": {
+   "tag": "GBT-TENTACLE-TENTACLE-PIPELINE",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "long_run_supervisor": {
+   "tag": "GBT-TENTACLE-LONG-RUN-SUPERVISOR",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "devour_reflect": {
+   "tag": "GBT-DEVOUR-DEVOUR-REFLECT",
+   "domain": "devour",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "devour_pulse": {
+   "tag": "GBT-DEVOUR-DEVOUR-PULSE",
+   "domain": "devour",
+   "permission": "owner",
+   "scopes": [
+    "data_export",
+    "filesystem_write",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：data_export、filesystem_write、external_llm"
+  },
+  "mcp_connect": {
+   "tag": "GBT-TENTACLE-MCP-CONNECT",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute"
+  },
+  "mcp_tools": {
+   "tag": "GBT-TENTACLE-MCP-TOOLS",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "mcp_call": {
+   "tag": "GBT-TENTACLE-MCP-CALL",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：process_execute"
+  },
+  "coze_mail": {
+   "tag": "GBT-COMMS-COZE-MAIL",
+   "domain": "comms",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "create": {
+   "tag": "GBT-CREATION-CREATE",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "drama": {
+   "tag": "GBT-CREATION-DRAMA",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tentacle_status": {
+   "tag": "GBT-TENTACLE-TENTACLE-STATUS",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tactics_advise": {
+   "tag": "GBT-LONGRUN-TACTICS-ADVISE",
+   "domain": "longrun",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "pipeline_submit": {
+   "tag": "GBT-PIPELINE-PIPELINE-SUBMIT",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish"
+   ],
+   "why": "policy 要求作用域：deploy_publish"
+  },
+  "pipeline_versions": {
+   "tag": "GBT-PIPELINE-PIPELINE-VERSIONS",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "pipeline_rollback": {
+   "tag": "GBT-PIPELINE-PIPELINE-ROLLBACK",
+   "domain": "pipeline",
+   "permission": "owner",
+   "scopes": [
+    "deploy_publish"
+   ],
+   "why": "policy 要求作用域：deploy_publish"
+  },
+  "pipeline_status": {
+   "tag": "GBT-PIPELINE-PIPELINE-STATUS",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "ghost_guard": {
+   "tag": "GBT-PIPELINE-GHOST-GUARD",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sched_define": {
+   "tag": "GBT-ENGINE-SCHED-DEFINE",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sched_tick": {
+   "tag": "GBT-ENGINE-SCHED-TICK",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sched_status": {
+   "tag": "GBT-ENGINE-SCHED-STATUS",
+   "domain": "engine",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "svc_inspect": {
+   "tag": "GBT-PIPELINE-SVC-INSPECT",
+   "domain": "pipeline",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "vision": {
+   "tag": "GBT-VISION-VISION",
+   "domain": "vision",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：privacy_read"
+  },
+  "vlx_flow": {
+   "tag": "GBT-VISION-VLX-FLOW",
+   "domain": "vision",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "prompt_bridge": {
+   "tag": "GBT-LLM-PROMPT-BRIDGE",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "external_llm",
+    "data_export"
+   ],
+   "why": "policy 要求作用域：external_llm、data_export"
+  },
+  "audio_extract": {
+   "tag": "GBT-VIDEO-AUDIO-EXTRACT",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "audio_mix": {
+   "tag": "GBT-VIDEO-AUDIO-MIX",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "media_license": {
+   "tag": "GBT-VIDEO-MEDIA-LICENSE",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "datakit": {
+   "tag": "GBT-DATA-DATAKIT",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "media_run": {
+   "tag": "GBT-VIDEO-MEDIA-RUN",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "omni_plug": {
+   "tag": "GBT-LLM-OMNI-PLUG",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write",
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：filesystem_write、process_execute；图鉴标了 safe=false"
+  },
+  "media_stamp": {
+   "tag": "GBT-VIDEO-MEDIA-STAMP",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "media_publish": {
+   "tag": "GBT-VIDEO-MEDIA-PUBLISH",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "voice": {
+   "tag": "GBT-VOICE-VOICE",
+   "domain": "voice",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "voice_orchestra": {
+   "tag": "GBT-VOICE-VOICE-ORCHESTRA",
+   "domain": "voice",
+   "permission": "owner",
+   "scopes": [
+    "data_export",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：data_export、external_llm"
+  },
+  "browser": {
+   "tag": "GBT-AUTOMATION-BROWSER",
+   "domain": "automation",
+   "permission": "owner",
+   "scopes": [
+    "browser_control"
+   ],
+   "why": "policy 要求作用域：browser_control"
+  },
+  "bluetooth": {
+   "tag": "GBT-DEVICE-BLUETOOTH",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "device_control"
+   ],
+   "why": "policy 要求作用域：device_control"
+  },
+  "bt_control": {
+   "tag": "GBT-DEVICE-BT-CONTROL",
+   "domain": "device",
+   "permission": "owner",
+   "scopes": [
+    "device_control"
+   ],
+   "why": "policy 要求作用域：device_control"
+  },
+  "quant": {
+   "tag": "GBT-FINANCE-QUANT",
+   "domain": "finance",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "life": {
+   "tag": "GBT-LIFE-LIFE",
+   "domain": "life",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "mind": {
+   "tag": "GBT-MIND-MIND",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "project_context": {
+   "tag": "GBT-PROJECT-PROJECT-CONTEXT",
+   "domain": "project",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "topic_watch": {
+   "tag": "GBT-RECON-TOPIC-WATCH",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "trend_watch": {
+   "tag": "GBT-RECON-TREND-WATCH",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "projection_card": {
+   "tag": "GBT-TOOLS-PROJECTION-CARD",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "trace_store": {
+   "tag": "GBT-SYSTEM-TRACE-STORE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wave_probe": {
+   "tag": "GBT-SYSTEM-WAVE-PROBE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "dream_replay": {
+   "tag": "GBT-BRAIN-DREAM-REPLAY",
+   "domain": "brain",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "capability_net": {
+   "tag": "GBT-TOOLS-CAPABILITY-NET",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "director_mood": {
+   "tag": "GBT-MIND-DIRECTOR-MOOD",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "music_publishing": {
+   "tag": "GBT-CREATION-MUSIC-PUBLISHING",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "dh_pose": {
+   "tag": "GBT-CREATION-DH-POSE",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "anatomy_figures": {
+   "tag": "GBT-CREATION-ANATOMY-FIGURES",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "machine_film": {
+   "tag": "GBT-CREATION-MACHINE-FILM",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "rig_audit": {
+   "tag": "GBT-CREATION-RIG-AUDIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "rig_fix": {
+   "tag": "GBT-CREATION-RIG-FIX",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "anim_audit": {
+   "tag": "GBT-CREATION-ANIM-AUDIT",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "anim_fix": {
+   "tag": "GBT-CREATION-ANIM-FIX",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "dh_asset_gate": {
+   "tag": "GBT-CREATION-DH-ASSET-GATE",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "omni_arm": {
+   "tag": "GBT-CREATION-OMNI-ARM",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "tentacle_arm": {
+   "tag": "GBT-SYSTEM-TENTACLE-ARM",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "project_drift": {
+   "tag": "GBT-SYSTEM-PROJECT-DRIFT",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "impact_check": {
+   "tag": "GBT-SYSTEM-IMPACT-CHECK",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "music_intel": {
+   "tag": "GBT-RECON-MUSIC-INTEL",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "video_intel": {
+   "tag": "GBT-RECON-VIDEO-INTEL",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "film_intel": {
+   "tag": "GBT-RECON-FILM-INTEL",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "account_registry": {
+   "tag": "GBT-DATA-ACCOUNT-REGISTRY",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "verification_watch": {
+   "tag": "GBT-RECON-VERIFICATION-WATCH",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "shared_resources": {
+   "tag": "GBT-SYSTEM-SHARED-RESOURCES",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "brand_outro": {
+   "tag": "GBT-CREATION-BRAND-OUTRO",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "emotion_projection": {
+   "tag": "GBT-CREATION-EMOTION-PROJECTION",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "proactive_report": {
+   "tag": "GBT-MIND-PROACTIVE-REPORT",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "observer_anchor": {
+   "tag": "GBT-MIND-OBSERVER-ANCHOR",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "persona_kernel": {
+   "tag": "GBT-MIND-PERSONA-KERNEL",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "hook_registry": {
+   "tag": "GBT-SYSTEM-HOOK-REGISTRY",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "scene_anchor": {
+   "tag": "GBT-CREATION-SCENE-ANCHOR",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "code_art": {
+   "tag": "GBT-CREATION-CODE-ART",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "orchestration_kernel": {
+   "tag": "GBT-SYSTEM-ORCHESTRATION-KERNEL",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "render_evolution": {
+   "tag": "GBT-CREATION-RENDER-EVOLUTION",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "caps_called_audit": {
+   "tag": "GBT-SYSTEM-CAPS-CALLED-AUDIT",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tentacle_cognition": {
+   "tag": "GBT-SYSTEM-TENTACLE-COGNITION",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "coverage_auditor": {
+   "tag": "GBT-SYSTEM-COVERAGE-AUDITOR",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "gods_eye": {
+   "tag": "GBT-SYSTEM-GODS-EYE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "obsidian_vault": {
+   "tag": "GBT-MIND-OBSIDIAN-VAULT",
+   "domain": "mind",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "cap_tags": {
+   "tag": "GBT-SYSTEM-CAP-TAGS",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "action_gate": {
+   "tag": "GBT-SYSTEM-ACTION-GATE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "growth_hooks": {
+   "tag": "GBT-SYSTEM-GROWTH-HOOKS",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "devour_fusion": {
+   "tag": "GBT-DEVOUR-DEVOUR-FUSION",
+   "domain": "devour",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "wiki_graph": {
+   "tag": "GBT-MIND-WIKI-GRAPH",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "doc_intake": {
+   "tag": "GBT-MIND-DOC-INTAKE",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "llm_watch": {
+   "tag": "GBT-LLM-LLM-WATCH",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "task_graph": {
+   "tag": "GBT-LLM-TASK-GRAPH",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "replan_loop": {
+   "tag": "GBT-LLM-REPLAN-LOOP",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "duty_board": {
+   "tag": "GBT-LLM-DUTY-BOARD",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "rea_reverse": {
+   "tag": "GBT-RECON-REA-REVERSE",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "recon_distill": {
+   "tag": "GBT-RECON-RECON-DISTILL",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "desktop_distill": {
+   "tag": "GBT-TENTACLE-DESKTOP-DISTILL",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "pentest_distill": {
+   "tag": "GBT-SECURITY-PENTEST-DISTILL",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "diagram_distill": {
+   "tag": "GBT-CREATION-DIAGRAM-DISTILL",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "machine_distill": {
+   "tag": "GBT-CREATION-MACHINE-DISTILL",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cad_distill": {
+   "tag": "GBT-CREATION-CAD-DISTILL",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "bi_distill": {
+   "tag": "GBT-DATA-BI-DISTILL",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "memory_bank": {
+   "tag": "GBT-MIND-MEMORY-BANK",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "agent_console": {
+   "tag": "GBT-SYSTEM-AGENT-CONSOLE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "code_audit": {
+   "tag": "GBT-SECURITY-CODE-AUDIT",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "agent_rig": {
+   "tag": "GBT-SYSTEM-AGENT-RIG",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "console_hub": {
+   "tag": "GBT-SYSTEM-CONSOLE-HUB",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "console_pages": {
+   "tag": "GBT-CREATION-CONSOLE-PAGES",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "freebuff_term": {
+   "tag": "GBT-TOOLS-FREEBUFF-TERM",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "hf_voice": {
+   "tag": "GBT-VOICE-HF-VOICE",
+   "domain": "voice",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "voice_studio": {
+   "tag": "GBT-VOICE-VOICE-STUDIO",
+   "domain": "voice",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "digital_human": {
+   "tag": "GBT-VIDEO-DIGITAL-HUMAN",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "image_scout": {
+   "tag": "GBT-CREATION-IMAGE-SCOUT",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "install_selfcheck": {
+   "tag": "GBT-SECURITY-INSTALL-SELFCHECK",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "room_space": {
+   "tag": "GBT-SYSTEM-ROOM-SPACE",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "collab_gateway": {
+   "tag": "GBT-COLLAB-COLLAB-GATEWAY",
+   "domain": "collab",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "lobehub": {
+   "tag": "GBT-CREATION-LOBEHUB",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "comfyui": {
+   "tag": "GBT-CREATION-COMFYUI",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "comfy_native": {
+   "tag": "GBT-CREATION-COMFY-NATIVE",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "ring_context": {
+   "tag": "GBT-LLM-RING-CONTEXT",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "skill_watch": {
+   "tag": "GBT-SYSTEM-SKILL-WATCH",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "vision_grounding": {
+   "tag": "GBT-VISION-VISION-GROUNDING",
+   "domain": "vision",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tentacle_comfy_bridge": {
+   "tag": "GBT-CREATION-TENTACLE-COMFY-BRIDGE",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "repo_publish": {
+   "tag": "GBT-TOOLS-REPO-PUBLISH",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "pulse_direct": {
+   "tag": "GBT-TOOLS-PULSE-DIRECT",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "warm_switch": {
+   "tag": "GBT-LLM-WARM-SWITCH",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "page_scan": {
+   "tag": "GBT-SYSTEM-PAGE-SCAN",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "fact_gate": {
+   "tag": "GBT-LLM-FACT-GATE",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "policy_gate": {
+   "tag": "GBT-LLM-POLICY-GATE",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "one_shot": {
+   "tag": "GBT-CREATION-ONE-SHOT",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "surface_bind": {
+   "tag": "GBT-SYSTEM-SURFACE-BIND",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "memory_manager": {
+   "tag": "GBT-MIND-MEMORY-MANAGER",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "sec_sweeper": {
+   "tag": "GBT-SECURITY-SEC-SWEEPER",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "task_manager": {
+   "tag": "GBT-SYSTEM-TASK-MANAGER",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "transformer": {
+   "tag": "GBT-LLM-TRANSFORMER",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "automation_keys": {
+   "tag": "GBT-LLM-AUTOMATION-KEYS",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "model_key_pool": {
+   "tag": "GBT-LLM-MODEL-KEY-POOL",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "meta_cognition": {
+   "tag": "GBT-MIND-META-COGNITION",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "libtv_skill": {
+   "tag": "GBT-VIDEO-LIBTV-SKILL",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "a1art_skill": {
+   "tag": "GBT-IMAGE-VIDEO-A1ART-SKILL",
+   "domain": "image_video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "energy_pool": {
+   "tag": "GBT-SYSTEM-ENERGY-POOL",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "scrapling": {
+   "tag": "GBT-RECON-SCRAPLING",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "genoffice": {
+   "tag": "GBT-CREATION-GENOFFICE",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "blender": {
+   "tag": "GBT-CREATION-BLENDER",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "gs_h3": {
+   "tag": "GBT-CREATION-GS-H3",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "actioncam": {
+   "tag": "GBT-VIDEO-ACTIONCAM",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "look_grade": {
+   "tag": "GBT-VIDEO-LOOK-GRADE",
+   "domain": "video",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "penetrating_cross_scan": {
+   "tag": "GBT-SECURITY-PENETRATING-CROSS-SCAN",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "hook_enforcer": {
+   "tag": "GBT-SECURITY-HOOK-ENFORCER",
+   "domain": "security",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "omission_detector": {
+   "tag": "GBT-SECURITY-OMISSION-DETECTOR",
+   "domain": "security",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "zimage_rewash": {
+   "tag": "GBT-CREATION-ZIMAGE-REWASH",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "n8n_wf": {
+   "tag": "GBT-AUTOMATION-N8N-WF",
+   "domain": "automation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "filmkit": {
+   "tag": "GBT-CREATION-FILMKIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "tentacle_bind": {
+   "tag": "GBT-SYSTEM-TENTACLE-BIND",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "asset_index": {
+   "tag": "GBT-SYSTEM-ASSET-INDEX",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "control_loop": {
+   "tag": "GBT-DESKTOP-CONTROL-LOOP",
+   "domain": "desktop",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "local_brain": {
+   "tag": "GBT-MIND-LOCAL-BRAIN",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "auto_switch": {
+   "tag": "GBT-MIND-AUTO-SWITCH",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "context_vault": {
+   "tag": "GBT-SYSTEM-CONTEXT-VAULT",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "feishu_embed": {
+   "tag": "GBT-INTEGRATION-FEISHU-EMBED",
+   "domain": "integration",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "dl_forge": {
+   "tag": "GBT-CREATION-DL-FORGE",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "dh_realism": {
+   "tag": "GBT-CREATION-DH-REALISM",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cloud_plugin": {
+   "tag": "GBT-INFRA-CLOUD-PLUGIN",
+   "domain": "infra",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "db_plugin": {
+   "tag": "GBT-DATA-DB-PLUGIN",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "telegram_embed": {
+   "tag": "GBT-INTEGRATION-TELEGRAM-EMBED",
+   "domain": "integration",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "whatsapp_embed": {
+   "tag": "GBT-INTEGRATION-WHATSAPP-EMBED",
+   "domain": "integration",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "libtv_workflow": {
+   "tag": "GBT-VIDEO-LIBTV-WORKFLOW",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "gate_visibility": {
+   "tag": "GBT-FRAMEWORK-GATE-VISIBILITY",
+   "domain": "framework",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "dh_brain": {
+   "tag": "GBT-CREATION-DH-BRAIN",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "eigenflux": {
+   "tag": "GBT-SOCIAL-EIGENFLUX",
+   "domain": "social",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "h3_video_gen": {
+   "tag": "GBT-VIDEO-H3-VIDEO-GEN",
+   "domain": "video",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "absorb_loop": {
+   "tag": "GBT-BRAIN-ABSORB-LOOP",
+   "domain": "brain",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cloud_pc": {
+   "tag": "GBT-INFRA-CLOUD-PC",
+   "domain": "infra",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "auto_publish": {
+   "tag": "GBT-SOCIAL-AUTO-PUBLISH",
+   "domain": "social",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "awesome_tools_index": {
+   "tag": "GBT-TOOLS-AWESOME-TOOLS-INDEX",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "stigmergy": {
+   "tag": "GBT-COLLAB-STIGMERGY",
+   "domain": "collab",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "ledger_note": {
+   "tag": "GBT-SYSTEM-LEDGER-NOTE",
+   "domain": "system",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "code_patch": {
+   "tag": "GBT-TOOLS-CODE-PATCH",
+   "domain": "tools",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "git_read": {
+   "tag": "GBT-TOOLS-GIT-READ",
+   "domain": "tools",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "git_write": {
+   "tag": "GBT-TOOLS-GIT-WRITE",
+   "domain": "tools",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write；图鉴标了 safe=false"
+  },
+  "brain_council": {
+   "tag": "GBT-MIND-BRAIN-COUNCIL",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "omni_web": {
+   "tag": "GBT-TENTACLE-OMNI-WEB",
+   "domain": "tentacle",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write",
+    "privacy_read",
+    "data_export"
+   ],
+   "why": "policy 要求作用域：filesystem_write、privacy_read、data_export；图鉴标了 safe=false"
+  },
+  "ul_tars_desktop": {
+   "tag": "GBT-DESKTOP-UL-TARS-DESKTOP",
+   "domain": "desktop",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：process_execute、external_llm；图鉴标了 safe=false"
+  },
+  "claude_code": {
+   "tag": "GBT-LLM-CLAUDE-CODE",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：process_execute、external_llm；图鉴标了 safe=false"
+  },
+  "codebuddy": {
+   "tag": "GBT-LLM-CODEBUDDY",
+   "domain": "llm",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "external_llm"
+   ],
+   "why": "policy 要求作用域：process_execute、external_llm；图鉴标了 safe=false"
+  },
+  "redteam_recon": {
+   "tag": "GBT-SECURITY-REDTEAM-RECON",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+  },
+  "pentest": {
+   "tag": "GBT-SECURITY-PENTEST",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+  },
+  "keylogger": {
+   "tag": "GBT-SECURITY-KEYLOGGER",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：privacy_read；图鉴标了 safe=false"
+  },
+  "screen_sniff": {
+   "tag": "GBT-SECURITY-SCREEN-SNIFF",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：privacy_read；图鉴标了 safe=false"
+  },
+  "remote_domain": {
+   "tag": "GBT-SECURITY-REMOTE-DOMAIN",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+  },
+  "device_takeover": {
+   "tag": "GBT-SECURITY-DEVICE-TAKEOVER",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private；图鉴标了 safe=false"
+  },
+  "credential_steal": {
+   "tag": "GBT-SECURITY-CREDENTIAL-STEAL",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：privacy_read；图鉴标了 safe=false"
+  },
+  "data_hijack": {
+   "tag": "GBT-SECURITY-DATA-HIJACK",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read"
+   ],
+   "why": "policy 要求作用域：privacy_read；图鉴标了 safe=false"
+  },
+  "social_eng": {
+   "tag": "GBT-SECURITY-SOCIAL-ENG",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "paywallbuster": {
+   "tag": "GBT-SECURITY-PAYWALLBUSTER",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "asset_vault_freeze": {
+   "tag": "GBT-SECURITY-ASSET-VAULT-FREEZE",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "onboarding_gate": {
+   "tag": "GBT-SECURITY-ONBOARDING-GATE",
+   "domain": "security",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "agent_control": {
+   "tag": "GBT-SYSTEM-AGENT-CONTROL",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "agent_council": {
+   "tag": "GBT-MIND-AGENT-COUNCIL",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "answer_shaper": {
+   "tag": "GBT-SYSTEM-ANSWER-SHAPER",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "belief_forge": {
+   "tag": "GBT-MIND-BELIEF-FORGE",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "case_mine": {
+   "tag": "GBT-RECON-CASE-MINE",
+   "domain": "recon",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "cli_chat": {
+   "tag": "GBT-INTEGRATION-CLI-CHAT",
+   "domain": "integration",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "command_chain": {
+   "tag": "GBT-MIND-COMMAND-CHAIN",
+   "domain": "mind",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "creation_camp": {
+   "tag": "GBT-CREATION-CREATION-CAMP",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "db_probe": {
+   "tag": "GBT-DATA-DB-PROBE",
+   "domain": "data",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "energy_scheduler": {
+   "tag": "GBT-LLM-ENERGY-SCHEDULER",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "event_ledger": {
+   "tag": "GBT-SECURITY-EVENT-LEDGER",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "flow_canvas": {
+   "tag": "GBT-CREATION-FLOW-CANVAS",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "freellmapi": {
+   "tag": "GBT-LLM-FREELLMAPI",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "handoff": {
+   "tag": "GBT-SYSTEM-HANDOFF",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "llm_redteam": {
+   "tag": "GBT-SECURITY-LLM-REDTEAM",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "osint_private"
+   ],
+   "why": "policy 要求作用域：osint_private"
+  },
+  "notion_bridge": {
+   "tag": "GBT-INTEGRATION-NOTION-BRIDGE",
+   "domain": "integration",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "policy_delta": {
+   "tag": "GBT-SECURITY-POLICY-DELTA",
+   "domain": "security",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "slim_profile": {
+   "tag": "GBT-SYSTEM-SLIM-PROFILE",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "spend_guard": {
+   "tag": "GBT-SYSTEM-SPEND-GUARD",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "thebrain_bridge": {
+   "tag": "GBT-INTEGRATION-THEBRAIN-BRIDGE",
+   "domain": "integration",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "train_recipe": {
+   "tag": "GBT-LLM-TRAIN-RECIPE",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tripo": {
+   "tag": "GBT-CREATION-TRIPO",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [],
+   "why": "图鉴标了 safe=false"
+  },
+  "ui_render": {
+   "tag": "GBT-CREATION-UI-RENDER",
+   "domain": "creation",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "review_gate": {
+   "tag": "GBT-SECURITY-REVIEW-GATE",
+   "domain": "security",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "detail_habit": {
+   "tag": "GBT-SYSTEM-DETAIL-HABIT",
+   "domain": "system",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "tentacle_scale": {
+   "tag": "GBT-TENTACLE-TENTACLE-SCALE",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "express_direct": {
+   "tag": "GBT-TENTACLE-EXPRESS-DIRECT",
+   "domain": "tentacle",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "vision_print": {
+   "tag": "GBT-VISION-VISION-PRINT",
+   "domain": "vision",
+   "permission": "owner",
+   "scopes": [
+    "privacy_read",
+    "filesystem_write",
+    "process_execute"
+   ],
+   "why": "policy 要求作用域：privacy_read、filesystem_write、process_execute"
+  },
+  "cadgen": {
+   "tag": "GBT-CREATION-CADGEN",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、filesystem_write；图鉴标了 safe=false"
+  },
+  "ui_kit": {
+   "tag": "GBT-CREATION-UI-KIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "design_atlas": {
+   "tag": "GBT-CREATION-DESIGN-ATLAS",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "art_chain": {
+   "tag": "GBT-CREATION-ART-CHAIN",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、filesystem_write；图鉴标了 safe=false"
+  },
+  "motion_kit": {
+   "tag": "GBT-CREATION-MOTION-KIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、filesystem_write"
+  },
+  "bits_kit": {
+   "tag": "GBT-CREATION-BITS-KIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "art_brief": {
+   "tag": "GBT-CREATION-ART-BRIEF",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、filesystem_write；图鉴标了 safe=false"
+  },
+  "intake_kit": {
+   "tag": "GBT-CREATION-INTAKE-KIT",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：filesystem_write"
+  },
+  "offload_distill": {
+   "tag": "GBT-LLM-OFFLOAD-DISTILL",
+   "domain": "llm",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域 + 图鉴 safe 且无需确认"
+  },
+  "pod_link": {
+   "tag": "GBT-CREATION-POD-LINK",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "data_export",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、data_export、filesystem_write；图鉴标了 safe=false"
+  },
+  "comfy_cloud": {
+   "tag": "GBT-CREATION-COMFY-CLOUD",
+   "domain": "creation",
+   "permission": "owner",
+   "scopes": [
+    "process_execute",
+    "data_export",
+    "filesystem_write"
+   ],
+   "why": "policy 要求作用域：process_execute、data_export、filesystem_write；图鉴标了 safe=false"
+  }
+ },
+ "_口径": "标签=从注册表现算；权限类=policy.evaluate 逐 op 问作用域 + 图鉴声明；**读不到就是 owner**"
+}

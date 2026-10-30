@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/security/malware_sense.py", "neighbors": ["anchor:scope_root", "gbt_allinone/api.py", "gbt_allinone/tools/code_audit.py", "runtime/gbt_allinone/api.py", "tools/codex-scripts/fault-sweep.py"], "defs": ["_str_lines", "scan", "scan_file", "selftest"]}

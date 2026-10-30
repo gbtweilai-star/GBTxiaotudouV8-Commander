@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/brain/cross_validation.py", "neighbors": ["anchor:scope_root", "gbt_allinone/brain/curiosity_engine.py", "gbt_allinone/brain/neural_tentacle.py", "gbt_allinone/brain/penetration_scan.py", "gbt_allinone/tentacle/omni_process.py", "tools/codex-scripts/brain-closure-check.py", "tools/codex-scripts/quick_scan.py"], "defs": ["mesh_scan"]}

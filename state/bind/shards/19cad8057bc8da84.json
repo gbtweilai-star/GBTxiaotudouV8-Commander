@@ -1,0 +1,1 @@
+{"id": "docs/06-showcase.md", "neighbors": ["anchor:scope_root", "data/capabilities.json", "docs/capabilities/creation.md", "docs/capabilities/llm.md", "examples/curl.md", "gbt_allinone/api.py", "gbt_allinone/brain_exec.py", "gbt_allinone/chain.py", "gbt_allinone/tests/test_framework.py", "gbt_allinone/worker.py", "runtime/gbt_allinone/api.py", "tools/verify.sh"], "defs": []}

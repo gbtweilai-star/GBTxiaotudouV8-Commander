@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/verify_v5.py", "neighbors": ["anchor:scope_root", "docs/capabilities/brain.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tools/pulse.py", "tools/verify.sh"], "defs": ["ok", "bad", "warn", "script_of", "lin", "lum", "ratio", "over"]}

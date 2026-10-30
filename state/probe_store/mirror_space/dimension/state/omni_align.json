@@ -1,0 +1,2694 @@
+{
+  "at": "2026-10-30T03:22:30",
+  "total": 348,
+  "probed": 220,
+  "skipped": 128,
+  "elapsed_s": 253.1,
+  "by_status": {
+    "skipped": 128,
+    "ok": 184,
+    "needs_dep": 2,
+    "error": 22,
+    "denied": 12
+  },
+  "rows": [
+    {
+      "name": "browser",
+      "domain": "automation",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "n8n_wf",
+      "domain": "automation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "absorb_loop",
+      "domain": "brain",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 431
+    },
+    {
+      "name": "dream_replay",
+      "domain": "brain",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 36
+    },
+    {
+      "name": "collab_gateway",
+      "domain": "collab",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "stigmergy",
+      "domain": "collab",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 62
+    },
+    {
+      "name": "coze_mail",
+      "domain": "comms",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "needs_dep",
+      "ms": 42
+    },
+    {
+      "name": "anatomy_figures",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "anim_audit",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 39
+    },
+    {
+      "name": "anim_fix",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "art_brief",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "art_chain",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "bits_kit",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 34
+    },
+    {
+      "name": "blender",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "brand_outro",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 15
+    },
+    {
+      "name": "cad_distill",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 14
+    },
+    {
+      "name": "cadgen",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "code_art",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 20
+    },
+    {
+      "name": "comfy_cloud",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "comfy_forge",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 20,
+      "detail": "{\"ok\": false, \"reason\": \"no_snapshot\", \"detail\": \"节点快照读不到\", \"path\": \"/var/minis/shared/gbtv8/state/comfyui_object_info.json\"}"
+    },
+    {
+      "name": "comfy_native",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "needs_dep",
+      "ms": 612
+    },
+    {
+      "name": "comfyui",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 116,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"error\": \"连不上 ComfyUI（URLError）：先启动它（绘世启动器 / 8188）\"}"
+    },
+    {
+      "name": "console_pages",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 1002
+    },
+    {
+      "name": "create",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 37
+    },
+    {
+      "name": "creation_camp",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 21
+    },
+    {
+      "name": "design_atlas",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 30
+    },
+    {
+      "name": "dh_asset_gate",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 8
+    },
+    {
+      "name": "dh_brain",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 22,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"kind\": \"dh_brain\", \"unprobed\": true, \"why\": \"核心真源读不到 ⇒ 未探测（不折绿）：不在盘：state/digital-human-rig.json；不在盘：state/digital-human.json\"}"
+    },
+    {
+      "name": "dh_pose",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "dh_realism",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 27
+    },
+    {
+      "name": "diagram_distill",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 16
+    },
+    {
+      "name": "dl_forge",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 24
+    },
+    {
+      "name": "drama",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 35
+    },
+    {
+      "name": "emotion_projection",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 19
+    },
+    {
+      "name": "filmkit",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "flow_canvas",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 20
+    },
+    {
+      "name": "forge_mastery",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "genoffice",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "gs_h3",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "image_scout",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 8245,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"未读到\": \"_Timeout: \", \"note\": \"Openverse 不可达 ⇒ 如实报未读到（不编候选）\"}"
+    },
+    {
+      "name": "intake_kit",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 72
+    },
+    {
+      "name": "lobehub",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 670,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"state\": \"not_installed\", \"reason_code\": \"not_installed\", \"installed\": false, \"exe\": \"\", \"exe_source\": \"未找到\", \"version\": \"\", \"running\": false, \"pids\":"
+    },
+    {
+      "name": "machine_distill",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 27
+    },
+    {
+      "name": "machine_film",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "motion_kit",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 37
+    },
+    {
+      "name": "music_auto",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "music_publishing",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "omni_arm",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "one_shot",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 22,
+      "detail": "{\"ok\": false, \"why\": \"还没有计划 ⇒ 先跑 plan\"}"
+    },
+    {
+      "name": "pod_link",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "render_evolution",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 28
+    },
+    {
+      "name": "rig_audit",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "rig_fix",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "scene_anchor",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 14
+    },
+    {
+      "name": "shot_director",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "showcase_ops",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "tentacle_comfy_bridge",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 58,
+      "detail": "{\"ok\": false, \"bridge\": \"1530 · tentacle_comfy_bridge\", \"base\": \"http://127.0.0.1:8188\", \"in_position\": false, \"node_count\": null, \"system_stats\": \"ComfyUI 不在位（URLError）：先起它（127.0."
+    },
+    {
+      "name": "tripo",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "ui_kit",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 26
+    },
+    {
+      "name": "ui_render",
+      "domain": "creation",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 18
+    },
+    {
+      "name": "zimage_rewash",
+      "domain": "creation",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "account_registry",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 18
+    },
+    {
+      "name": "audit_query",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 13
+    },
+    {
+      "name": "bi_distill",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 14
+    },
+    {
+      "name": "chart_html",
+      "domain": "data",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "count_words",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 5
+    },
+    {
+      "name": "datakit",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "db_plugin",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 22
+    },
+    {
+      "name": "db_probe",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 2208
+    },
+    {
+      "name": "echo",
+      "domain": "data",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "humanizer",
+      "domain": "data",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "record_grid",
+      "domain": "data",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "skill_finder",
+      "domain": "data",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "control_loop",
+      "domain": "desktop",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 32
+    },
+    {
+      "name": "ul_tars_desktop",
+      "domain": "desktop",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "bluetooth",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `device_control`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_click",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `desktop_control`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_map",
+      "domain": "device",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 326
+    },
+    {
+      "name": "body_open",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_say",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `audio_output`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_see",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `filesystem_write`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_type",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `desktop_control`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "body_volume",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `audio_output`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "bt_control",
+      "domain": "device",
+      "decide": "skip",
+      "why": "有作用域 `device_control`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "devour_fusion",
+      "domain": "devour",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 35
+    },
+    {
+      "name": "devour_github",
+      "domain": "devour",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "devour_pulse",
+      "domain": "devour",
+      "decide": "skip",
+      "why": "有作用域 `data_export`、`filesystem_write`、`external_llm`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "devour_reflect",
+      "domain": "devour",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 166
+    },
+    {
+      "name": "devour_scan",
+      "domain": "devour",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "sched_define",
+      "domain": "engine",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "sched_status",
+      "domain": "engine",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "sched_tick",
+      "domain": "engine",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "transfer",
+      "domain": "engine",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 17
+    },
+    {
+      "name": "wf_cache_clear",
+      "domain": "engine",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "wf_define",
+      "domain": "engine",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "wf_resume",
+      "domain": "engine",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "wf_run",
+      "domain": "engine",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "wf_status",
+      "domain": "engine",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "workflow_forge",
+      "domain": "engine",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "quant",
+      "domain": "finance",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 18
+    },
+    {
+      "name": "quant_backtest",
+      "domain": "finance",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "quant_params",
+      "domain": "finance",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "quant_strategy",
+      "domain": "finance",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "gate_visibility",
+      "domain": "framework",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 73
+    },
+    {
+      "name": "a1art_skill",
+      "domain": "image_video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 51
+    },
+    {
+      "name": "cloud_pc",
+      "domain": "infra",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 21
+    },
+    {
+      "name": "cloud_plugin",
+      "domain": "infra",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "cli_chat",
+      "domain": "integration",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "cli_ify",
+      "domain": "integration",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "feishu_embed",
+      "domain": "integration",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "notion_bridge",
+      "domain": "integration",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "telegram_embed",
+      "domain": "integration",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "thebrain_bridge",
+      "domain": "integration",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "whatsapp_embed",
+      "domain": "integration",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "life",
+      "domain": "life",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 225
+    },
+    {
+      "name": "automation_keys",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 54
+    },
+    {
+      "name": "autopilot",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "brain_execute",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "brain_health",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 1282
+    },
+    {
+      "name": "brain_route",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "brain_unify",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "brain_verify",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 109,
+      "detail": "{\"ok\": false, \"verdict\": \"unverified_no_surface\", \"expectation\": \"\", \"checks\": {\"vision\": {\"ok\": false, \"counted\": false, \"available\": false, \"error\": \"capture_requires_windows: 非交"
+    },
+    {
+      "name": "claude_code",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "cloud_llm",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 42
+    },
+    {
+      "name": "codebuddy",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "codex_chat",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "codex_interrupt",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "codex_models",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "有作用域 `external_llm`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "codex_status",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 88,
+      "detail": "{\"ok\": false, \"codex_path\": null, \"connected\": false, \"protocol\": \"json-rpc/stdio app-server\", \"note\": \"未找到内核可执行文件；面板改用备用大脑\"}"
+    },
+    {
+      "name": "codex_thread_new",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "codex_tools",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "codex_turn_send",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "duty_board",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 279
+    },
+    {
+      "name": "energy_scheduler",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 70
+    },
+    {
+      "name": "fact_gate",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 19
+    },
+    {
+      "name": "freellmapi",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 38
+    },
+    {
+      "name": "genoffice_bridge",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "key_gateway",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "llm_chat",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "有作用域 `external_llm`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "llm_status",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 160
+    },
+    {
+      "name": "llm_watch",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 10
+    },
+    {
+      "name": "model_key_pool",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 34
+    },
+    {
+      "name": "multimodal_port",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "offload_distill",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 27
+    },
+    {
+      "name": "omni_plug",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "policy_gate",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 17
+    },
+    {
+      "name": "prompt_bridge",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 13,
+      "detail": "{\"ok\": false, \"reason_code\": \"empty_input\", \"prompt\": null, \"elapsed_ms\": 0.0}"
+    },
+    {
+      "name": "quant_plan",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "replan_loop",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "ring_context",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 36
+    },
+    {
+      "name": "task_graph",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 8
+    },
+    {
+      "name": "think_loop",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "train_ground",
+      "domain": "llm",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "train_recipe",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 25,
+      "detail": "{\"ok\": false, \"op\": \"readiness\", \"checks\": {\"torch\": false, \"cuda\": {\"available\": null, \"why\": \"torch 不在 ⇒ 判不了（未验≠没有）\"}, \"磁盘余量_GB\": 362.4, \"语料目录\": [\"data\"]}, \"blockers\": [{\"缺\": \"to"
+    },
+    {
+      "name": "transformer",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 41
+    },
+    {
+      "name": "warm_switch",
+      "domain": "llm",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 398
+    },
+    {
+      "name": "lr_status",
+      "domain": "longrun",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 15
+    },
+    {
+      "name": "lr_submit",
+      "domain": "longrun",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "lr_tick",
+      "domain": "longrun",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 33
+    },
+    {
+      "name": "tactics_advise",
+      "domain": "longrun",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "agent_council",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "auto_switch",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 51
+    },
+    {
+      "name": "belief_forge",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "brain_council",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 13
+    },
+    {
+      "name": "brain_vault",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 10
+    },
+    {
+      "name": "command_chain",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 46
+    },
+    {
+      "name": "director_mood",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 19
+    },
+    {
+      "name": "doc_intake",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 32
+    },
+    {
+      "name": "local_brain",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 24
+    },
+    {
+      "name": "memory_bank",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 30
+    },
+    {
+      "name": "memory_manager",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 36
+    },
+    {
+      "name": "meta_cognition",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "mind",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 8
+    },
+    {
+      "name": "observer_anchor",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 22
+    },
+    {
+      "name": "obsidian_vault",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 39
+    },
+    {
+      "name": "persona_kernel",
+      "domain": "mind",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "proactive_report",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 44
+    },
+    {
+      "name": "self_intake",
+      "domain": "mind",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "wiki_graph",
+      "domain": "mind",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "name": "deploy_queue",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "ghost_guard",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6616
+    },
+    {
+      "name": "mirror_ascend",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `deploy_publish`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_parity",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `filesystem_write`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_plan",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 217,
+      "detail": "{\"status\": \"error\", \"kind\": \"mirror_plan\", \"message\": \"排练计划不存在: default\", \"error_class\": \"user_error\"}"
+    },
+    {
+      "name": "mirror_rehearse",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`、`filesystem_write`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_release",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `deploy_publish`、`process_execute`、`filesystem_write`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_rewind",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `deploy_publish`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_scan",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 13,
+      "detail": "{\"ok\": false, \"passed\": 4, \"total\": 5, \"checks\": {\"non_empty\": {\"ok\": true, \"detail\": \"1 文件\"}, \"no_empty_files\": {\"ok\": true, \"detail\": \"无\"}, \"signature\": {\"ok\": true, \"detail\": \"全"
+    },
+    {
+      "name": "mirror_shape",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 22
+    },
+    {
+      "name": "mirror_simulate",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `filesystem_write`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mirror_status",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "one_key_deploy",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "pipeline_rollback",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "pipeline_status",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 22
+    },
+    {
+      "name": "pipeline_submit",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "有作用域 `deploy_publish`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "pipeline_versions",
+      "domain": "pipeline",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "svc_inspect",
+      "domain": "pipeline",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 297
+    },
+    {
+      "name": "platform_profile",
+      "domain": "project",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 39
+    },
+    {
+      "name": "project_context",
+      "domain": "project",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 35,
+      "detail": "{\"status\": \"error\", \"kind\": \"project_context\", \"message\": \"文档不存在: PROJECT_BLUEPRINT.md\"}"
+    },
+    {
+      "name": "book_skill",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "case_mine",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 56
+    },
+    {
+      "name": "film_intel",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 45
+    },
+    {
+      "name": "know_map",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "music_intel",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 19
+    },
+    {
+      "name": "osint_scan",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "rea_reverse",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "recon_distill",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 46
+    },
+    {
+      "name": "scrapling",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 25
+    },
+    {
+      "name": "skill_forge",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "spider_ops",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "tentacle_learn",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "topic_watch",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "topic_web",
+      "domain": "recon",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "trend_watch",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 72,
+      "detail": "{\"ok\": false, \"chain\": [\"youtube-watcher\", \"video-transcript-downloader\", \"reddit-readonly\", \"web-search-plus\"], \"gaps\": [\"youtube-watcher\", \"video-transcript-downloader\", \"reddit-"
+    },
+    {
+      "name": "verification_watch",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "video_intel",
+      "domain": "recon",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 12
+    },
+    {
+      "name": "asset_vault_freeze",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 8
+    },
+    {
+      "name": "code_audit",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 15
+    },
+    {
+      "name": "credential_steal",
+      "domain": "security",
+      "decide": "skip",
+      "why": "有作用域 `privacy_read`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "data_hijack",
+      "domain": "security",
+      "decide": "skip",
+      "why": "有作用域 `privacy_read`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "device_takeover",
+      "domain": "security",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "event_ledger",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 24
+    },
+    {
+      "name": "hook_enforcer",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 26
+    },
+    {
+      "name": "install_selfcheck",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 16
+    },
+    {
+      "name": "keylogger",
+      "domain": "security",
+      "decide": "skip",
+      "why": "有作用域 `privacy_read`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "llm_redteam",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 8
+    },
+    {
+      "name": "offense_ops",
+      "domain": "security",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "omission_detector",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 17
+    },
+    {
+      "name": "onboarding_gate",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 144
+    },
+    {
+      "name": "paywallbuster",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 9
+    },
+    {
+      "name": "penetrating_cross_scan",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 21
+    },
+    {
+      "name": "pentest",
+      "domain": "security",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "pentest_distill",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 17
+    },
+    {
+      "name": "policy_delta",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 16
+    },
+    {
+      "name": "redteam_recon",
+      "domain": "security",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "remote_domain",
+      "domain": "security",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "review_gate",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 58
+    },
+    {
+      "name": "screen_sniff",
+      "domain": "security",
+      "decide": "skip",
+      "why": "有作用域 `privacy_read`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "sec_chain",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 17
+    },
+    {
+      "name": "sec_defenses",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 283
+    },
+    {
+      "name": "sec_llm",
+      "domain": "security",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "sec_scan",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 9
+    },
+    {
+      "name": "sec_surface",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 23
+    },
+    {
+      "name": "sec_sweeper",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 9
+    },
+    {
+      "name": "social_eng",
+      "domain": "security",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "denied",
+      "ms": 17
+    },
+    {
+      "name": "auto_publish",
+      "domain": "social",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 37
+    },
+    {
+      "name": "eigenflux",
+      "domain": "social",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 63,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"kind\": \"eigenflux\", \"unprobed\": true, \"why\": \"数据面读不到（config/profile/contacts 全缺）⇒ 未探测（不折绿）：不在盘：/root/.eigenflux/config.json；不在盘：/root/.eigenflux/serv"
+    },
+    {
+      "name": "action_gate",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 49
+    },
+    {
+      "name": "agent_console",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 52
+    },
+    {
+      "name": "agent_control",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 61
+    },
+    {
+      "name": "agent_rig",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 52
+    },
+    {
+      "name": "alerts",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 40
+    },
+    {
+      "name": "answer_shaper",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 24,
+      "detail": "{\"ok\": false, \"fail_closed\": true, \"error\": \"text 要给（非空）\"}"
+    },
+    {
+      "name": "asset_index",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 479
+    },
+    {
+      "name": "auth_gate_status",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "cap_tags",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 416
+    },
+    {
+      "name": "caps_called_audit",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 49619
+    },
+    {
+      "name": "console_hub",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 77
+    },
+    {
+      "name": "context_vault",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 67
+    },
+    {
+      "name": "coverage_auditor",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 40
+    },
+    {
+      "name": "cross_scan",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 160426,
+      "detail": "{\"ok\": false, \"verdict\": \"findings\", \"findings\": [{\"dim\": \"G\", \"issue\": \"tools/media_run.py: 解析失败（该文件断链检测未执行）: _Timeout: \"}, {\"dim\": \"W\", \"issue\": \"家根影子子目录（与 gbt_allinone/ 同名）: ass"
+    },
+    {
+      "name": "delivery_gate",
+      "domain": "system",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "detail_habit",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "energy_pool",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 12
+    },
+    {
+      "name": "figure_gate",
+      "domain": "system",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "file_hygiene",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 8009,
+      "detail": "{\"status\": \"error\", \"kind\": \"file_hygiene\", \"message\": \"\"}"
+    },
+    {
+      "name": "god_view",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "gods_eye",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 23
+    },
+    {
+      "name": "growth_hooks",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 32
+    },
+    {
+      "name": "handoff",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 16
+    },
+    {
+      "name": "health",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "hook_registry",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "impact_check",
+      "domain": "system",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "inventory",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 154
+    },
+    {
+      "name": "ledger_note",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 37
+    },
+    {
+      "name": "orchestration_kernel",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "page_scan",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 24
+    },
+    {
+      "name": "project_drift",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 18
+    },
+    {
+      "name": "room_space",
+      "domain": "system",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "root_fix",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 29
+    },
+    {
+      "name": "scan_cap",
+      "domain": "system",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "selfscan",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 151
+    },
+    {
+      "name": "shared_resources",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 10
+    },
+    {
+      "name": "signature_guard",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 554
+    },
+    {
+      "name": "skill_watch",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 303
+    },
+    {
+      "name": "slim_profile",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "spend_guard",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 17
+    },
+    {
+      "name": "surface_bind",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "task_manager",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 614
+    },
+    {
+      "name": "tentacle_arm",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 45
+    },
+    {
+      "name": "tentacle_bind",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 827
+    },
+    {
+      "name": "tentacle_cognition",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 26
+    },
+    {
+      "name": "theme_cap",
+      "domain": "system",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "trace_store",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "truth_scan",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "ux_doctrine",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 13
+    },
+    {
+      "name": "wave_probe",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 1530
+    },
+    {
+      "name": "welcome",
+      "domain": "system",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "agency_tentacles",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "desktop_commander",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "name": "desktop_distill",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 20
+    },
+    {
+      "name": "express_direct",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 6,
+      "detail": "{\"ok\": false, \"fail_closed\": true, \"error\": \"没给能力名 —— 指名直达**不许猜**（要猜请走 express，并自担不确定性）\"}"
+    },
+    {
+      "name": "long_run_supervisor",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "name": "mcp_call",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mcp_connect",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "mcp_tools",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 17,
+      "detail": "{\"ok\": false, \"servers\": {}, \"count\": 0, \"note\": \"桥里没有可用工具 —— **这不是坏了**：MCP 工具要先用 `mcp_connect` 连上（本机现读无健康 MCP 工具）\"}"
+    },
+    {
+      "name": "omarchy_bridge",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "omni_web",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "remote_confinement",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "有作用域 `process_execute`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "tentacle",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "tentacle_equip",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "tentacle_manifest",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "tentacle_pipeline",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "tentacle_scale",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 17
+    },
+    {
+      "name": "tentacle_status",
+      "domain": "tentacle",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 35
+    },
+    {
+      "name": "tool_bay",
+      "domain": "tentacle",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "awesome_tools_index",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 188
+    },
+    {
+      "name": "capability_net",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 137
+    },
+    {
+      "name": "code_patch",
+      "domain": "tools",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "freebuff_term",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 9
+    },
+    {
+      "name": "git_read",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 659
+    },
+    {
+      "name": "git_write",
+      "domain": "tools",
+      "decide": "skip",
+      "why": "需参数（不瞎跑）",
+      "status": "skipped"
+    },
+    {
+      "name": "projection_card",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 20
+    },
+    {
+      "name": "pulse_direct",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 93
+    },
+    {
+      "name": "repo_publish",
+      "domain": "tools",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 534
+    },
+    {
+      "name": "actioncam",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "audio_extract",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "audio_mix",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "digital_human",
+      "domain": "video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 11
+    },
+    {
+      "name": "edit_pipeline",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "h3_video_gen",
+      "domain": "video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 28
+    },
+    {
+      "name": "libtv_skill",
+      "domain": "video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "libtv_workflow",
+      "domain": "video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "look_grade",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "media_license",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "media_pipeline",
+      "domain": "video",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 6
+    },
+    {
+      "name": "media_publish",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "media_run",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "media_stamp",
+      "domain": "video",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "vision",
+      "domain": "vision",
+      "decide": "skip",
+      "why": "有作用域 `privacy_read`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "vision_grounding",
+      "domain": "vision",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 21
+    },
+    {
+      "name": "vision_loop",
+      "domain": "vision",
+      "decide": "skip",
+      "why": "非只读且未标只读（不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "vision_print",
+      "domain": "vision",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 16
+    },
+    {
+      "name": "vlx_flow",
+      "domain": "vision",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "hf_voice",
+      "domain": "voice",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 7
+    },
+    {
+      "name": "voice",
+      "domain": "voice",
+      "decide": "skip",
+      "why": "有作用域 `audio_output`（会触发副作用，不盲探）",
+      "status": "skipped"
+    },
+    {
+      "name": "voice_orchestra",
+      "domain": "voice",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "ok",
+      "ms": 38
+    },
+    {
+      "name": "voice_studio",
+      "domain": "voice",
+      "decide": "probe",
+      "why": "只读·无作用域·无参数",
+      "status": "error",
+      "ms": 77,
+      "detail": "{\"ok\": false, \"op\": \"status\", \"base\": \"http://127.0.0.1:3900\", \"未读到\": \"URLError: <urlopen error [Errno 111] Connection refused>\", \"note\": \"VoiceStudio 后端未部署/未启动 ⇒ 如实报未读到（不会自动下载模型）\""
+    }
+  ]
+}

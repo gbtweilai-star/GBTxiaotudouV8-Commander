@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_door_ready.py", "neighbors": ["SECURITY.md", "anchor:scope_root", "docs/capabilities/security.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/security/policy.py", "runtime/gbt_allinone/security/policy.py"], "defs": ["chk", "sc"]}

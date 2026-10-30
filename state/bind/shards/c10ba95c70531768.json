@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/ai-control-reverse-probe.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/llm.md", "docs/capabilities/system.md", "docs/capabilities/tools.md", "gbt_allinone/api.py", "gbt_allinone/llm/key_gateway.py", "runtime/gbt_allinone/api.py", "tools/codex-scripts/encoding-guard-check.py"], "defs": ["post"]}

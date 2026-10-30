@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_route_scoring.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tentacle.md", "gbt_allinone/llm/bridge.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tentacle/bridge.py"], "defs": []}

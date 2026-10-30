@@ -1,0 +1,29 @@
+{
+ "name": "selftest_block",
+ "created": "2026-10-30T04:08:50",
+ "nodes": {
+  "x": {
+   "kind": "no_such_capability_xyz",
+   "payload": {},
+   "needs": [],
+   "status": "dead",
+   "tries": 3,
+   "lease": null,
+   "ms": 1210,
+   "why": "error"
+  },
+  "y": {
+   "kind": "health",
+   "payload": {},
+   "needs": [
+    "x"
+   ],
+   "status": "pending",
+   "tries": 0,
+   "lease": null,
+   "ms": null,
+   "why": null
+  }
+ },
+ "at": "2026-10-30T04:08:54"
+}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/tentacle-browser-session.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_commander/__main__.py", "tools/codex-scripts/encoding-guard-check.py", "tools/codex-scripts/tentacle-gear.py"], "defs": ["main"]}

@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/tools/console_hero.py", "neighbors": ["anchor:scope_root", "docs/capabilities/framework.md", "docs/capabilities/system.md", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tools/console_pages.py"], "defs": ["_hash", "pick_archetype", "hero_svg", "hero_band", "plan_batch"]}

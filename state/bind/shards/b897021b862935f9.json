@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/nested-skill-probe.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_commander/__main__.py", "tools/codex-scripts/omni.py"], "defs": ["atlas_names", "front_name", "main"]}

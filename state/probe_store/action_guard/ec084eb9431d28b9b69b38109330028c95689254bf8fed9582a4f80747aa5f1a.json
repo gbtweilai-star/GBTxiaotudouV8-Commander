@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "autopilot",
+  "fingerprint": "ec084eb9431d28b9b69b38109330028c95689254bf8fed9582a4f80747aa5f1a",
+  "pid": 1872,
+  "started_at": 1793234718.6276639,
+  "started_iso": "2026-10-29T07:45:18",
+  "finished_at": 1793234718.6353788,
+  "finished_iso": "2026-10-29T07:45:18",
+  "detail": {
+    "error": "缺少 goal：请给出要自主完成的目标"
+  }
+}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/panels_v6.js", "neighbors": ["anchor:scope_root", "docs/capabilities/device.md", "docs/capabilities/voice.md", "gbt_allinone/chain.py", "gbt_allinone/integration/auth.py", "tools/codex-scripts/build_v6.py"], "defs": ["panelVoice", "panelBluetooth"]}

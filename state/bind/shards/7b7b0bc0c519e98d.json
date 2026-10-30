@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_voice_bt.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "docs/capabilities/voice.md", "gbt_allinone/api.py", "gbt_allinone/bt_control.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/voice_orchestra.py", "runtime/gbt_allinone/api.py"], "defs": ["call"]}

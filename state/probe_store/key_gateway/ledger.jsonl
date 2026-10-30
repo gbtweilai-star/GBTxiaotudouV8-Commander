@@ -1,0 +1,30 @@
+{"ts": "2026-10-28T08:51:51", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": null}
+{"ts": "2026-10-28T08:51:54", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T09:14:57", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T09:15:00", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T09:35:57", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T09:36:00", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T09:54:23", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T09:54:25", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T09:56:31", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T09:56:32", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T09:56:34", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T09:56:36", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:02:19", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:02:22", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:33:15", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:33:17", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:42:22", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:42:25", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:45:38", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:45:40", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:45:42", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:45:44", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T10:54:52", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T10:54:56", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T11:16:06", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T11:16:08", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T14:54:40", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T14:54:47", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}
+{"ts": "2026-10-28T19:11:54", "brand": "GBT小土豆V8", "event": "plan", "provider": "deepseek", "source": "env:DEEPSEEK_API_KEY", "fp": "2dd8e5d4", "candidates": 1, "switched_from": "deepseek"}
+{"ts": "2026-10-28T19:12:00", "brand": "GBT小土豆V8", "event": "call_ok", "provider": "deepseek", "tokens": 0}

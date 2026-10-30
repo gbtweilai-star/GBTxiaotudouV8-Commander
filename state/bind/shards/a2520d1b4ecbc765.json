@@ -1,0 +1,1 @@
+{"id": "data/offense-pentest-live.json", "neighbors": ["anchor:scope_root", "gbt_allinone/offense_ops.py", "gbt_allinone/recon/last30days/engine/schema.py", "tools/codex-scripts/gen-capability-proof.py", "tools/codex-scripts/probe-offense-live.py", "tools/verify.sh"], "defs": []}

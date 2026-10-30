@@ -1,0 +1,10 @@
+{"cat": "coord", "text": "第 1 轮派发：svc", "refs": [], "by": "swarm:release-check", "at": "2026-10-30T04:13:16", "id": "m1793308396808"}
+{"cat": "result", "text": "节点 svc 完成（2238 ms）", "refs": ["health"], "by": "swarm:release-check", "at": "2026-10-30T04:13:19", "id": "m1793308399517"}
+{"cat": "coord", "text": "第 2 轮派发：assets,mem", "refs": [], "by": "swarm:release-check", "at": "2026-10-30T04:13:19", "id": "m1793308399522"}
+{"cat": "result", "text": "节点 assets 完成（1135 ms）", "refs": ["asset_index"], "by": "swarm:release-check", "at": "2026-10-30T04:13:21", "id": "m1793308401800"}
+{"cat": "result", "text": "节点 mem 完成（61 ms）", "refs": ["memory_manager"], "by": "swarm:release-check", "at": "2026-10-30T04:13:21", "id": "m1793308401805"}
+{"cat": "coord", "text": "第 3 轮派发：ctx,mirror", "refs": [], "by": "swarm:release-check", "at": "2026-10-30T04:13:21", "id": "m1793308401812"}
+{"cat": "result", "text": "节点 ctx 完成（1057 ms）", "refs": ["project_context"], "by": "swarm:release-check", "at": "2026-10-30T04:13:24", "id": "m1793308404091"}
+{"cat": "result", "text": "节点 mirror 完成（167 ms）", "refs": ["mirror_plan"], "by": "swarm:release-check", "at": "2026-10-30T04:13:24", "id": "m1793308404096"}
+{"cat": "coord", "text": "第 4 轮派发：tree", "refs": [], "by": "swarm:release-check", "at": "2026-10-30T04:13:24", "id": "m1793308404103"}
+{"cat": "result", "text": "节点 tree 完成（826 ms）", "refs": ["hook_enforcer"], "by": "swarm:release-check", "at": "2026-10-30T04:13:25", "id": "m1793308405233"}

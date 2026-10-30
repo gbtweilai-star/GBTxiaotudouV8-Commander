@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "pipeline_submit",
+  "fingerprint": "8d82f45cbf1617bc4afbc60f1ffa149efd59b268b52c482ae8c863064512ba73",
+  "pid": 7363,
+  "started_at": 1793305333.173332,
+  "started_iso": "2026-10-30T03:22:13",
+  "finished_at": 1793305333.198258,
+  "finished_iso": "2026-10-30T03:22:13",
+  "detail": {
+    "ok": true,
+    "result_status": "blocked"
+  }
+}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/build_v20_manifest.py", "neighbors": ["SECURITY.md", "anchor:scope_root", "docs/capabilities/automation.md", "docs/capabilities/data.md", "docs/capabilities/security.md", "docs/capabilities/social.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tools/handoff.py"], "defs": ["domains_of", "hue_for"]}

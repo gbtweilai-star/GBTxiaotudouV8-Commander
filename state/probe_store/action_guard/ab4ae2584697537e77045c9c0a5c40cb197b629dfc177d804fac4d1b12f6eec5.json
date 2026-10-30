@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "git_write",
+  "fingerprint": "ab4ae2584697537e77045c9c0a5c40cb197b629dfc177d804fac4d1b12f6eec5",
+  "pid": 4017,
+  "started_at": 1793162238.584762,
+  "started_iso": "2026-10-28T11:37:18",
+  "finished_at": 1793162238.6811452,
+  "finished_iso": "2026-10-28T11:37:18",
+  "detail": {
+    "error": "git_write 不认 op=（只认 stage/add/commit）"
+  }
+}

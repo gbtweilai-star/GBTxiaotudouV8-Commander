@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_sse_shape.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "gbt_allinone/api.py", "gbt_allinone/recon/last30days/engine/http.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tools/coverage_auditor.py", "runtime/gbt_allinone/api.py"], "defs": ["listen"]}

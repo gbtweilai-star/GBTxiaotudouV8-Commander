@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/vision_ocr.py", "neighbors": ["anchor:scope_root", "gbt_allinone/vision_cap.py", "gbt_allinone/vision_unified.py", "tools/codex-scripts/vision-unified-check.py"], "defs": ["_lane_winrt", "_lane_tess", "ocr"]}

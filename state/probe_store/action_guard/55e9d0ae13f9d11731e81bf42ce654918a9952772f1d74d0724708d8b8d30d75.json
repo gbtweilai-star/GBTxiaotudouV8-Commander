@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "wf_run",
+  "fingerprint": "55e9d0ae13f9d11731e81bf42ce654918a9952772f1d74d0724708d8b8d30d75",
+  "pid": 3943,
+  "started_at": 1793159212.379435,
+  "started_iso": "2026-10-28T10:46:52",
+  "finished_at": 1793159212.484621,
+  "finished_iso": "2026-10-28T10:46:52",
+  "detail": {
+    "error": "工作流不存在: （先 wf_define）"
+  }
+}

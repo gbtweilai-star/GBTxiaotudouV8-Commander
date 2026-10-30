@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/audit-narrow-rule.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/tools/caps_called_audit.py", "tools/codex-scripts/audit-caller-rule-probe.py"], "defs": []}

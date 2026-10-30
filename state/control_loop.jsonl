@@ -1,0 +1,96 @@
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:10:18"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:10:18"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:10:18"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:10:18"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:10:18"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:10:19"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:10:19"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:10:19"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:10:19"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:10:19"}
+{"action": "CLICK", "target": "保存", "conf": 0.92, "reason": "", "at": "2026-10-30T03:10:20"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:11:12"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:11:12"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:11:12"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:11:12"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:11:12"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:16:14"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:16:14"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:16:14"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:16:14"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:16:14"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:18:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:18:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:18:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:18:31"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:18:31"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:21:56"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:21:56"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:21:56"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:21:56"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:21:56"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:24:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:24:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:24:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:24:06"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:24:06"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:27:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:27:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:27:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:27:07"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:27:07"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:44:13"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:44:13"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:44:13"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:44:13"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:44:13"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:46:54"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:46:54"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:46:54"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:46:54"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:46:54"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:49:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:49:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:49:06"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:49:06"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:49:06"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:51:50"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:51:50"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:51:50"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:51:50"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:51:50"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T03:54:35"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T03:54:35"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T03:54:35"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T03:54:35"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T03:54:35"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T04:04:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T04:04:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T04:04:07"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T04:04:07"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T04:04:07"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T04:06:51"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T04:06:51"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T04:06:51"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T04:06:51"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T04:06:51"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T06:29:45"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T06:29:45"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T06:29:45"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T06:29:45"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T06:29:45"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T06:44:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T06:44:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T06:44:31"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T06:44:31"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T06:44:31"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T06:59:05"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T06:59:05"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T06:59:05"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T06:59:05"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T06:59:05"}
+{"action": "CLICK", "target": "ok", "conf": 0.9, "reason": "", "at": "2026-10-30T07:13:43"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "观测过期 999.0s（上限 8s）", "at": "2026-10-30T07:13:43"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "没有可用目标（或全被遮挡）", "at": "2026-10-30T07:13:43"}
+{"action": "BLOCKED", "target": null, "conf": 0.0, "reason": "报了完成但没有证据 ⇒ 不许 DONE", "at": "2026-10-30T07:13:43"}
+{"action": "BLOCKED", "target": "x", "conf": 0.2, "reason": "置信度 0.20 < 0.55 ⇒ 应交慢脑；本机无慢脑 ⇒ BLOCKED", "at": "2026-10-30T07:13:43"}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe-workbuddy-models.mjs", "neighbors": ["anchor:scope_root", "docs/capabilities/llm.md", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/log.py", "index.html"], "defs": ["profile", "pkg", "mod", "freeHints"]}

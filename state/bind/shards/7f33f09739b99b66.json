@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/bp-apply-patches.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_commander/__main__.py"], "defs": ["sub_once", "apply", "main"]}

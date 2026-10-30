@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/paper_guard.py", "neighbors": ["anchor:scope_root", "gbt_allinone/__main__.py", "gbt_allinone/see_first.py", "gbt_commander/__main__.py", "tools/codex-scripts/blueprint-first.py", "tools/codex-scripts/landing-checklist.py", "tools/codex-scripts/paper_loop.py", "tools/codex-scripts/today-report.py"], "defs": ["is_public_safe", "selftest"]}

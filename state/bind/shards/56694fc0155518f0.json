@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/verify-panel-live.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/recon/last30days/engine/http.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_commander/__main__.py"], "defs": ["rail", "brandish", "headerHits", "main"]}

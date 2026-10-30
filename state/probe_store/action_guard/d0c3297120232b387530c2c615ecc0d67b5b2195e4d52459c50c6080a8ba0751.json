@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "root_fix",
+  "fingerprint": "d0c3297120232b387530c2c615ecc0d67b5b2195e4d52459c50c6080a8ba0751",
+  "pid": 7363,
+  "started_at": 1793305344.416896,
+  "started_iso": "2026-10-30T03:22:24",
+  "finished_at": 1793305344.4314601,
+  "finished_iso": "2026-10-30T03:22:24",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

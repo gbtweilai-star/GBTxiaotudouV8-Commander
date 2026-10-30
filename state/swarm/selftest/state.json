@@ -1,0 +1,54 @@
+{
+ "name": "selftest",
+ "created": "2026-10-30T04:08:44",
+ "nodes": {
+  "a": {
+   "kind": "health",
+   "payload": {},
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 872,
+   "why": null
+  },
+  "b": {
+   "kind": "health",
+   "payload": {},
+   "needs": [
+    "a"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 909,
+   "why": null
+  },
+  "c": {
+   "kind": "health",
+   "payload": {},
+   "needs": [
+    "a"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 8,
+   "why": null
+  },
+  "d": {
+   "kind": "health",
+   "payload": {},
+   "needs": [
+    "b",
+    "c"
+   ],
+   "status": "done",
+   "tries": 2,
+   "lease": null,
+   "ms": 866,
+   "why": null
+  }
+ },
+ "at": "2026-10-30T04:08:50"
+}

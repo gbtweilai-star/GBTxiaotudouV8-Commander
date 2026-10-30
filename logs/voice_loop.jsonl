@@ -1,0 +1,1 @@
+{"at": "2026-10-28T06:23:27", "seconds": 5, "ear": {"ok": true, "tentacle": "ear", "via": "apple-speech", "detail": "识别到 0 字", "ms": 7174, "tried": [{"engine": "apple-speech", "ok": true, "ms": 7174, "detail": "识别到 0 字"}], "text": ""}, "ok": false, "stage": "ear_empty", "why": "没识别到字：要么没说话，要么识别服务不可用（文件路径实测一律超时）"}

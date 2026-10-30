@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/verify_proxy_reasoning.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/http.py"], "defs": ["call"]}

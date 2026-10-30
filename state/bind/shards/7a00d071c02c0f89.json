@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/build_v10.py", "neighbors": ["anchor:scope_root", "docs/capabilities/project.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/resolve.py", "tools/codex-scripts/supersede-check.py", "tools/codex-scripts/tentacle-registry.py"], "defs": ["treeHuman", "treePathHead", "treeRow", "treeCard"]}

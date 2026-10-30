@@ -191,7 +191,7 @@
     "detail": "https://img.shields.io/npm/v/@colbymchenry/codegraph.svg)](h → HTTP 200"
    }
   ],
-  "checked_at": "2026-10-30T07:15:26"
+  "checked_at": "2026-10-30T07:23:25"
  },
  {
   "ok": true,
@@ -321,7 +321,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:26"
+  "checked_at": "2026-10-30T07:23:25"
  },
  {
   "ok": true,
@@ -333,8 +333,10 @@
   "unverifiable": 16,
   "ai_smell": 0,
   "conflict": {
-   "existing": 0,
-   "sample": []
+   "existing": 1,
+   "sample": [
+    "你是 GBT小土豆V8，开发者：自由的风，守护者：公主土豆。本署名不可删除、不可篡改归属。用简洁的中文回答，像跟主人当面"
+   ]
   },
   "reasons": [],
   "rows": [
@@ -472,7 +474,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:27"
+  "checked_at": "2026-10-30T07:23:26"
  },
  {
   "ok": true,
@@ -602,7 +604,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:27"
+  "checked_at": "2026-10-30T07:23:26"
  },
  {
   "ok": true,
@@ -788,7 +790,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:33"
+  "checked_at": "2026-10-30T07:23:33"
  },
  {
   "ok": true,
@@ -918,7 +920,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:34"
+  "checked_at": "2026-10-30T07:23:34"
  },
  {
   "ok": false,
@@ -1063,7 +1065,7 @@
     "detail": "这类主张本机无可验面"
    }
   ],
-  "checked_at": "2026-10-30T07:15:35"
+  "checked_at": "2026-10-30T07:23:35"
  },
  {
   "ok": false,

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/rigify-skeleton.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tools.md", "gbt_allinone/app.py", "gbt_allinone/recon/last30days/engine/schema.py", "index.html", "tools/codex-scripts/rig-source-check.py"], "defs": ["main", "proj"]}

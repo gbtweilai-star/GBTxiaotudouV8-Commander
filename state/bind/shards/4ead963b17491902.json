@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/tools/edit_rules.py", "neighbors": ["anchor:scope_root", "gbt_allinone/__main__.py", "gbt_allinone/tools/edit_core.py", "gbt_allinone/tools/skill_vetting.py", "gbt_commander/__main__.py"], "defs": ["_positions", "check", "report", "main"]}

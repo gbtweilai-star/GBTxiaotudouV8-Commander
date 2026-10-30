@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/add-eyes.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/docs/数字人逼真度-专业口径/assets.txt", "gbt_allinone/recon/last30days/engine/render.py", "index.html", "tools/codex-scripts/head-orient.py", "tools/codex-scripts/skin-detail.py"], "defs": ["acc", "place", "add_view", "add_acc"]}

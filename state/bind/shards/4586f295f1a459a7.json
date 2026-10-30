@@ -1,0 +1,1 @@
+{"id": "docs/02-architecture.md", "neighbors": ["anchor:scope_root", "data/capabilities.json", "docs/capabilities/data.md", "gbt_allinone/caps_registry.py", "gbt_allinone/integration/auth.py", "runtime/gbt_allinone/caps_registry.py"], "defs": []}

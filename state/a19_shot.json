@@ -1,0 +1,15 @@
+{
+ "at": "2026-10-29T06:13:54",
+ "models": [
+  "gbt-v8-v82-q5_0"
+ ],
+ "direct_err": "HTTPError",
+ "bridge": {
+  "elapsed_s": 3.41,
+  "lane": "deepseek",
+  "weights_ours": "false",
+  "answer": "我是DeepSeek，由深度求索公司创造的AI助手，致力于为你提供热情、细腻的帮助！"
+ },
+ "total_s": 3.4,
+ "ok": true
+}

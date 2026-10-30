@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/mesh-verify.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/services.py", "gbt_allinone/worker.py", "gbt_commander/__main__.py", "tools/codex-scripts/boot-selfcheck.py"], "defs": ["nodes", "get", "probe", "evaluate", "selftest", "main"]}

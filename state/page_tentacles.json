@@ -1,6 +1,6 @@
 {
  "ok": true,
- "at": "2026-10-30T07:20:15",
+ "at": "2026-10-30T07:30:48",
  "pages": 28,
  "covered": 28,
  "reported": 1,
@@ -140,7 +140,7 @@
   {
    "page": "digital-human/index.html",
    "file": "/var/minis/shared/gbtv8/holo_pet_w3/digital-human/index.html",
-   "controls": 19,
+   "controls": 6,
    "kit": true,
    "web_shell": true,
    "stamped": 0,
@@ -261,7 +261,7 @@
   {
    "page": "panel/index.html",
    "file": "/var/minis/shared/gbtv8/holo_pet_w3/panel/index.html",
-   "controls": 10,
+   "controls": 3,
    "kit": true,
    "web_shell": true,
    "stamped": 0,

@@ -1,0 +1,10 @@
+[
+ {
+  "role": "user",
+  "content": "继续"
+ },
+ {
+  "role": "assistant",
+  "content": "MOCK：我是 GBT小土豆V8 的彩排替身，用来验证链路，不是真权重。"
+ }
+]

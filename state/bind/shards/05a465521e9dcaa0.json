@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/panels_v7.js", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tentacle.md", "gbt_allinone/transfer.py", "tools/codex-scripts/build_v7.py"], "defs": ["panelPlug", "drawDag", "panelTentacle"]}

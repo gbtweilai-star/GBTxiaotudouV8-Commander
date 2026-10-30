@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/compare-mesh.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tools.md", "index.html"], "defs": ["load", "acc_bytes", "slots"]}

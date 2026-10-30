@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/fixtures/test_code_taste_ghost.py", "neighbors": ["anchor:scope_root", "tools/codex-scripts/audit_code_taste.py"], "defs": ["test_nothing_is_asserted", "test_calls_but_never_checks", "test_this_one_is_fine"]}

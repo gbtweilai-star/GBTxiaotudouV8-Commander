@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/docs/面板侧导入与自建实例形态调查报告.md", "neighbors": ["anchor:scope_root", "docs/capabilities/llm.md", "gbt_allinone/api.py", "gbt_allinone/codex_bridge.py", "gbt_allinone/security/policy.py", "runtime/gbt_allinone/api.py", "runtime/gbt_allinone/security/policy.py", "tools/codex-scripts/publish.py"], "defs": ["_run_turn"]}

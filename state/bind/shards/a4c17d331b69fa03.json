@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/brain/market_intelligence.py", "neighbors": ["anchor:scope_root", "gbt_allinone/brain/curiosity_engine.py", "gbt_allinone/brain/neural_tentacle.py", "gbt_allinone/tentacle/direction.py"], "defs": ["analyze_trend", "analyze_competitor", "find_opportunities", "strategic_advice"]}

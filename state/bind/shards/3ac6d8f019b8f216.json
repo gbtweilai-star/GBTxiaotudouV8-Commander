@@ -1,0 +1,1 @@
+{"id": "data/codex-interrupt-live.json", "neighbors": ["anchor:scope_root", "data/capability-live-test.json", "docs/07-capability-proof.md", "gbt_allinone/recon/last30days/engine/schema.py", "tools/codex-scripts/gen-capability-proof.py", "tools/codex-scripts/probe-codex-interrupt.py"], "defs": []}

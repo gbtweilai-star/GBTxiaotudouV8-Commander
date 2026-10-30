@@ -1,0 +1,111 @@
+{
+ "name": "crash-test",
+ "created": "2026-10-30T04:35:45",
+ "nodes": {
+  "n1": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10948
+  },
+  "n2": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3002,
+   "why": null,
+   "owner": 10948
+  },
+  "n3": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  },
+  "n4": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  },
+  "n5": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  },
+  "n6": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  },
+  "n7": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  },
+  "n8": {
+   "kind": "health",
+   "payload": {
+    "_sleep": 3
+   },
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 3006,
+   "why": null,
+   "owner": 10958
+  }
+ },
+ "at": "2026-10-30T04:36:08"
+}

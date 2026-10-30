@@ -1,0 +1,10 @@
+{"ts": 1793152768.038, "iso": "2026-10-28T08:59:28", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793154202.821, "iso": "2026-10-28T09:23:22", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793155484.735, "iso": "2026-10-28T09:44:44", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793155990.307, "iso": "2026-10-28T09:53:10", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793157790.573, "iso": "2026-10-28T10:23:10", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793158794.422, "iso": "2026-10-28T10:39:54", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793181587.281, "iso": "2026-10-28T16:59:47", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793304154.096, "iso": "2026-10-30T03:02:34", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793304659.171, "iso": "2026-10-30T03:10:59", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793305098.067, "iso": "2026-10-30T03:18:18", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}

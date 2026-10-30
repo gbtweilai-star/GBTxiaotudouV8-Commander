@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/panels_v18.js", "neighbors": ["anchor:scope_root", "data/capabilities.json", "gbt_allinone/api.py", "gbt_allinone/caps_registry.py", "runtime/gbt_allinone/api.py", "runtime/gbt_allinone/caps_registry.py", "tools/codex-scripts/build_v18.py"], "defs": ["csState", "csNum", "csRow", "panelCapSrc", "capSourceCard"]}

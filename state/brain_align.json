@@ -1,0 +1,179 @@
+{
+  "at": "2026-10-29T07:45:21",
+  "total": 8,
+  "by_verdict": {
+    "aligned": 4,
+    "needs_params": 4
+  },
+  "note_verify": "verify 恒 vision:False（本机无交互桌面）",
+  "rows": [
+    {
+      "name": "automation_keys",
+      "domain": "llm",
+      "verdict": "aligned",
+      "routed_to": "automation_keys",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": true,
+      "exec_status": "ok",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": true,
+      "skip_why": "",
+      "ms": 2
+    },
+    {
+      "name": "autopilot",
+      "domain": "llm",
+      "verdict": "needs_params",
+      "routed_to": "autopilot",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": false,
+      "exec_status": "error",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": false,
+      "skip_why": "需参数",
+      "ms": 1
+    },
+    {
+      "name": "brain_execute",
+      "domain": "llm",
+      "verdict": "needs_params",
+      "routed_to": "brain_execute",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": false,
+      "exec_status": "error",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": false,
+      "skip_why": "需参数",
+      "ms": 1
+    },
+    {
+      "name": "brain_health",
+      "domain": "llm",
+      "verdict": "aligned",
+      "routed_to": "brain_health",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": true,
+      "exec_status": "ok",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": true,
+      "skip_why": "",
+      "ms": 1
+    },
+    {
+      "name": "brain_route",
+      "domain": "llm",
+      "verdict": "needs_params",
+      "routed_to": "brain_route",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": false,
+      "exec_status": "error",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": false,
+      "skip_why": "需参数",
+      "ms": 1
+    },
+    {
+      "name": "brain_unify",
+      "domain": "llm",
+      "verdict": "needs_params",
+      "routed_to": "brain_unify",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": false,
+      "exec_status": "error",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": false,
+      "skip_why": "需参数",
+      "ms": 1
+    },
+    {
+      "name": "brain_verify",
+      "domain": "llm",
+      "verdict": "aligned",
+      "routed_to": "brain_verify",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": true,
+      "exec_status": "ok",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": true,
+      "skip_why": "",
+      "ms": 1
+    },
+    {
+      "name": "claude_code",
+      "domain": "llm",
+      "verdict": "aligned",
+      "routed_to": "claude_code",
+      "route_path": "self_label",
+      "degraded": false,
+      "exec_ok": true,
+      "exec_status": "ok",
+      "verify_ok": false,
+      "verify_verdict": "unverified_no_surface",
+      "verify_faces": [],
+      "verify_checks": {
+        "vision": false,
+        "reality": false
+      },
+      "health": 100.0,
+      "ran": false,
+      "skip_why": "非只读",
+      "ms": 1
+    }
+  ]
+}

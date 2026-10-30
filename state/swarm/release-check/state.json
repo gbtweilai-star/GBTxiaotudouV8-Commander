@@ -1,0 +1,84 @@
+{
+ "name": "release-check",
+ "created": "2026-10-30T04:13:16",
+ "nodes": {
+  "svc": {
+   "kind": "health",
+   "payload": {},
+   "needs": [],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 2238,
+   "why": null
+  },
+  "assets": {
+   "kind": "asset_index",
+   "payload": {
+    "op": "stats"
+   },
+   "needs": [
+    "svc"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 1135,
+   "why": null
+  },
+  "mem": {
+   "kind": "memory_manager",
+   "payload": {
+    "op": "stats"
+   },
+   "needs": [
+    "svc"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 61,
+   "why": null
+  },
+  "ctx": {
+   "kind": "project_context",
+   "payload": {},
+   "needs": [
+    "assets"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 1057,
+   "why": null
+  },
+  "mirror": {
+   "kind": "mirror_plan",
+   "payload": {},
+   "needs": [
+    "assets",
+    "mem"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 167,
+   "why": null
+  },
+  "tree": {
+   "kind": "hook_enforcer",
+   "payload": {
+    "target": "tools"
+   },
+   "needs": [
+    "ctx"
+   ],
+   "status": "done",
+   "tries": 1,
+   "lease": null,
+   "ms": 826,
+   "why": null
+  }
+ },
+ "at": "2026-10-30T04:13:25"
+}

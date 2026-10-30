@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/tests/mcp_fixture_server.py", "neighbors": ["anchor:scope_root", "data/capabilities.json", "docs/capabilities/tools.md", "gbt_allinone/tests/test_mcp_connect_then.py"], "defs": ["_send"]}

@@ -1,0 +1,65 @@
+{
+  "sample": {
+    "at": "2026-10-30T07:22:04",
+    "seq": 9990343,
+    "spilled": 2005,
+    "window_n": 21,
+    "window_chars": 2608,
+    "budget": 3000,
+    "fill": 0.869,
+    "chars_now": 2608,
+    "fingerprint": "0b50741efb65"
+  },
+  "anomalies": [
+    {
+      "code": "near_overflow",
+      "why": "填充 87% > 85% 阈值（粒度 124 字/条自适应）"
+    }
+  ],
+  "tentacle": "context_overflow_guard",
+  "brain": {
+    "called": true,
+    "ok": true,
+    "intent": "上下文异常纠正：near_overflow。当前窗口 2608 字符 / 预算 3000，条数 21。请给出纠正动作（缩小窗口 / 强制落库 / 丢弃重复 / 回主线）。",
+    "routed": "libtv_workflow",
+    "routed_domain": "video",
+    "degraded": true,
+    "path": "semantic",
+    "candidates": 229,
+    "reason": "LibTV 节点式工作流（只读骨架·门）：五动作 create_node/connect/set_p"
+  },
+  "queue": {
+    "ok": true,
+    "severity": 2,
+    "codes": [
+      "near_overflow"
+    ]
+  },
+  "fix": {
+    "rule_from": "near_overflow",
+    "acts": [
+      {
+        "action": "force_spill",
+        "ok": true,
+        "note": "True"
+      },
+      {
+        "action": "resume_mainline",
+        "ok": true,
+        "mainline": "main.task"
+      }
+    ],
+    "after": {
+      "at": "2026-10-30T07:22:08",
+      "seq": 9990345,
+      "spilled": 2005,
+      "window_n": 23,
+      "window_chars": 2658,
+      "budget": 3000,
+      "fill": 0.886,
+      "chars_now": 2658,
+      "fingerprint": "afb3c00dfd4e"
+    }
+  },
+  "level": "warn"
+}

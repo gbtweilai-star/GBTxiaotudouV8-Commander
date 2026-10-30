@@ -1,0 +1,33 @@
+{
+ "at": "2026-10-30T04:06:54",
+ "count": 3,
+ "top": [
+  {
+   "dim": "读数",
+   "weight": 100,
+   "what": "六面读数取不到：FileNotFoundError: [Errno 2] No such file or directory: '/var/minis/shared/gbtv8/tools/framework_state.py'",
+   "src": "tools/framework_state.py",
+   "how": "先修 framework_state.collect()，别的判断都建立在这上面"
+  },
+  {
+   "dim": "永久记忆",
+   "weight": 75,
+   "what": "触手库索引不在 ⇒ 记忆层没建起来",
+   "src": "state/obsidian_vaults.json",
+   "how": "run_task('obsidian_vault', {'op':'provision'})"
+  },
+  {
+   "dim": "许可",
+   "weight": 40,
+   "what": "141 个能力位属 owner 类（要主人逐项许可才可调）",
+   "src": "state/cap_tags.json",
+   "how": "主人在终端发许可；我没许可的不许动"
+  }
+ ],
+ "all_dims": {
+  "读数": 100,
+  "永久记忆": 75,
+  "许可": 40
+ },
+ "_口径": "每条带 src（哪个读数文件）；权重=影响面×堵塞度，**不许凭印象**"
+}

@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "browser",
+  "fingerprint": "58f0097d40cd3ec90b94ee7033f4e3ee62b585f6ad8334c66c70ba6bc4a8dba9",
+  "pid": 7363,
+  "started_at": 1793305315.56864,
+  "started_iso": "2026-10-30T03:21:55",
+  "finished_at": 1793305315.590006,
+  "finished_iso": "2026-10-30T03:21:55",
+  "detail": {
+    "error": "缺少 url"
+  }
+}

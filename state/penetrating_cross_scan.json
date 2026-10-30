@@ -1,0 +1,22 @@
+{
+ "ok": false,
+ "target": "/var/minis/shared/gbtv8/tools",
+ "units": 400,
+ "hooked": 18,
+ "missing": 1,
+ "no_kind": 381,
+ "coverage_pct": 4.5,
+ "missing_list": [
+  "tools/penetrating_cross_scan.py"
+ ],
+ "note": "只读交叉核对（盘上/账里/标签三路）；missing 是清单不是计数，没标签可挂的单元单列 no_kind，不折叠进覆盖率的分子分母",
+ "sample_hooked": [
+  "tools/mirror_rewind.py",
+  "tools/tentacle_bind.py",
+  "tools/asset_index.py",
+  "tools/control_loop.py",
+  "tools/_retired/README.md"
+ ],
+ "at": "2026-10-30T03:10:52",
+ "mode": "scan"
+}

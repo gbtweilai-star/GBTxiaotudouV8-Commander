@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/installed-drift-inspect.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/vendor/bird-search/package.json", "gbt_commander/__main__.py"], "defs": ["walk", "sha", "text_or_none", "main"]}

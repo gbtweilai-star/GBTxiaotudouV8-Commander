@@ -1,0 +1,63 @@
+{
+  "total_devours": 0,
+  "total_absorbed": 0,
+  "total_caps_created": 0,
+  "last_devour_at": null,
+  "absorbed_skills": [],
+  "reflections": [
+    {
+      "at": "2026-10-28T08:53:34.247167",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-28T09:16:58.146323",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-28T09:38:14.950810",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-28T09:56:49.767827",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-28T10:46:20.762445",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-28T16:48:54.313351",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-30T03:02:48.071367",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-30T03:11:13.189660",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-10-30T03:18:32.289052",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    }
+  ]
+}

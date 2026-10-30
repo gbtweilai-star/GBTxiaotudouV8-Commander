@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/autorig-skeleton.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "gbt_allinone/docs/数字人逼真度-专业口径/assets.txt", "gbt_allinone/recon/last30days/engine/render.py", "gbt_allinone/tools/dl_forge.py"], "defs": ["acc", "dijkstra", "trace", "at_height", "centroid", "pick", "nearest_weld", "at", "at2", "shot", "to_px"]}

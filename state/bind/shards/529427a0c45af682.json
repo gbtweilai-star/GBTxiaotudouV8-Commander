@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/fixtures/code-taste-clean.py", "neighbors": ["anchor:scope_root", "tools/codex-scripts/audit_code_taste.py", "tools/codex-scripts/fixtures/code-taste-clean.ts"], "defs": ["RecordError", "parse_record", "load_records", "count_keys"]}

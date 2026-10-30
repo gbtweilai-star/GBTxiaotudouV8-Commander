@@ -1,0 +1,2048 @@
+[
+ {
+  "cap": "a1art_skill",
+  "domain": "image_video",
+  "status": "ok",
+  "ms": 2726
+ },
+ {
+  "cap": "absorb_loop",
+  "domain": "brain",
+  "status": "ok",
+  "ms": 2579
+ },
+ {
+  "cap": "account_registry",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2561
+ },
+ {
+  "cap": "action_gate",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2550
+ },
+ {
+  "cap": "actioncam",
+  "domain": "video",
+  "status": "ok",
+  "ms": 2491
+ },
+ {
+  "cap": "agency_tentacles",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 2620
+ },
+ {
+  "cap": "agent_console",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2417
+ },
+ {
+  "cap": "agent_control",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2530
+ },
+ {
+  "cap": "agent_council",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 2879
+ },
+ {
+  "cap": "agent_rig",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3860
+ },
+ {
+  "cap": "alerts",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2324
+ },
+ {
+  "cap": "anatomy_figures",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2311
+ },
+ {
+  "cap": "anim_audit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3009
+ },
+ {
+  "cap": "anim_fix",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 47263
+ },
+ {
+  "cap": "answer_shaper",
+  "domain": "system",
+  "status": "ok",
+  "ms": 26602
+ },
+ {
+  "cap": "art_brief",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2652
+ },
+ {
+  "cap": "art_chain",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2701
+ },
+ {
+  "cap": "asset_index",
+  "domain": "system",
+  "status": "error",
+  "ms": 3815
+ },
+ {
+  "cap": "asset_vault_freeze",
+  "domain": "security",
+  "status": "error",
+  "ms": 3077
+ },
+ {
+  "cap": "audio_extract",
+  "domain": "video",
+  "status": "ok",
+  "ms": 22074
+ },
+ {
+  "cap": "audio_mix",
+  "domain": "video",
+  "status": "ok",
+  "ms": 2442
+ },
+ {
+  "cap": "audit_query",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2366
+ },
+ {
+  "cap": "auth_gate_status",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2809
+ },
+ {
+  "cap": "auto_publish",
+  "domain": "social",
+  "status": "ok",
+  "ms": 3962
+ },
+ {
+  "cap": "auto_switch",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3108
+ },
+ {
+  "cap": "automation_keys",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 16813
+ },
+ {
+  "cap": "autopilot",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 2291
+ },
+ {
+  "cap": "awesome_tools_index",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 3187
+ },
+ {
+  "cap": "belief_forge",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3028
+ },
+ {
+  "cap": "bi_distill",
+  "domain": "data",
+  "status": "ok",
+  "ms": 4117
+ },
+ {
+  "cap": "bits_kit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3271
+ },
+ {
+  "cap": "blender",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 18143
+ },
+ {
+  "cap": "bluetooth",
+  "domain": "device",
+  "status": "denied",
+  "ms": 2337
+ },
+ {
+  "cap": "book_skill",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 2629
+ },
+ {
+  "cap": "brain_council",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 2909
+ },
+ {
+  "cap": "brain_execute",
+  "domain": "llm",
+  "status": "error",
+  "ms": 3399
+ },
+ {
+  "cap": "brain_health",
+  "domain": "llm",
+  "status": "None",
+  "ms": 33329
+ },
+ {
+  "cap": "brain_route",
+  "domain": "llm",
+  "status": "error",
+  "ms": 18419
+ },
+ {
+  "cap": "brain_unify",
+  "domain": "llm",
+  "status": "error",
+  "ms": 2599
+ },
+ {
+  "cap": "brain_vault",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 2730
+ },
+ {
+  "cap": "brain_verify",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 5747
+ },
+ {
+  "cap": "brand_outro",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 8099
+ },
+ {
+  "cap": "browser",
+  "domain": "automation",
+  "status": "error",
+  "ms": 2170
+ },
+ {
+  "cap": "bt_control",
+  "domain": "device",
+  "status": "denied",
+  "ms": 1875
+ },
+ {
+  "cap": "cad_distill",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2234
+ },
+ {
+  "cap": "cadgen",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3461
+ },
+ {
+  "cap": "cap_tags",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2488
+ },
+ {
+  "cap": "capability_net",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 2285
+ },
+ {
+  "cap": "caps_called_audit",
+  "domain": "system",
+  "status": "None",
+  "ms": 120133
+ },
+ {
+  "cap": "case_mine",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 29450
+ },
+ {
+  "cap": "chart_html",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2230
+ },
+ {
+  "cap": "claude_code",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 2440
+ },
+ {
+  "cap": "cli_chat",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 2958
+ },
+ {
+  "cap": "cli_ify",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 1996
+ },
+ {
+  "cap": "cloud_llm",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 2116
+ },
+ {
+  "cap": "cloud_pc",
+  "domain": "infra",
+  "status": "ok",
+  "ms": 3048
+ },
+ {
+  "cap": "cloud_plugin",
+  "domain": "infra",
+  "status": "ok",
+  "ms": 2940
+ },
+ {
+  "cap": "code_art",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3317
+ },
+ {
+  "cap": "code_audit",
+  "domain": "security",
+  "status": "ok",
+  "ms": 4831
+ },
+ {
+  "cap": "code_patch",
+  "domain": "tools",
+  "status": "error",
+  "ms": 3006
+ },
+ {
+  "cap": "codebuddy",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 24114
+ },
+ {
+  "cap": "codex_chat",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 2460
+ },
+ {
+  "cap": "codex_interrupt",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 2657
+ },
+ {
+  "cap": "codex_models",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 3210
+ },
+ {
+  "cap": "codex_status",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3562
+ },
+ {
+  "cap": "codex_thread_new",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 20074
+ },
+ {
+  "cap": "codex_tools",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 2560
+ },
+ {
+  "cap": "codex_turn_send",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 2377
+ },
+ {
+  "cap": "collab_gateway",
+  "domain": "collab",
+  "status": "ok",
+  "ms": 3177
+ },
+ {
+  "cap": "comfy_cloud",
+  "domain": "creation",
+  "status": "denied",
+  "ms": 4288
+ },
+ {
+  "cap": "comfy_forge",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3643
+ },
+ {
+  "cap": "comfy_native",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 17587
+ },
+ {
+  "cap": "comfyui",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2840
+ },
+ {
+  "cap": "command_chain",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3036
+ },
+ {
+  "cap": "console_hub",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4096
+ },
+ {
+  "cap": "console_pages",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 49721
+ },
+ {
+  "cap": "context_vault",
+  "domain": "system",
+  "status": "ok",
+  "ms": 17521
+ },
+ {
+  "cap": "control_loop",
+  "domain": "desktop",
+  "status": "error",
+  "ms": 2675
+ },
+ {
+  "cap": "count_words",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2780
+ },
+ {
+  "cap": "coverage_auditor",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3329
+ },
+ {
+  "cap": "coze_mail",
+  "domain": "comms",
+  "status": "ok",
+  "ms": 4947
+ },
+ {
+  "cap": "create",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2792
+ },
+ {
+  "cap": "creation_camp",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 15424
+ },
+ {
+  "cap": "credential_steal",
+  "domain": "security",
+  "status": "denied",
+  "ms": 2590
+ },
+ {
+  "cap": "cross_scan",
+  "domain": "system",
+  "status": "None",
+  "ms": 34020
+ },
+ {
+  "cap": "data_hijack",
+  "domain": "security",
+  "status": "denied",
+  "ms": 25768
+ },
+ {
+  "cap": "datakit",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2920
+ },
+ {
+  "cap": "db_plugin",
+  "domain": "data",
+  "status": "ok",
+  "ms": 2967
+ },
+ {
+  "cap": "db_probe",
+  "domain": "data",
+  "status": "ok",
+  "ms": 14898
+ },
+ {
+  "cap": "delivery_gate",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3020
+ },
+ {
+  "cap": "deploy_queue",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 8267
+ },
+ {
+  "cap": "design_atlas",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3420
+ },
+ {
+  "cap": "desktop_commander",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 3361
+ },
+ {
+  "cap": "desktop_distill",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 3701
+ },
+ {
+  "cap": "detail_habit",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3196
+ },
+ {
+  "cap": "device_takeover",
+  "domain": "security",
+  "status": "ok",
+  "ms": 17461
+ },
+ {
+  "cap": "devour_fusion",
+  "domain": "devour",
+  "status": "ok",
+  "ms": 2921
+ },
+ {
+  "cap": "devour_github",
+  "domain": "devour",
+  "status": "denied",
+  "ms": 2901
+ },
+ {
+  "cap": "devour_pulse",
+  "domain": "devour",
+  "status": "denied",
+  "ms": 3303
+ },
+ {
+  "cap": "devour_reflect",
+  "domain": "devour",
+  "status": "ok",
+  "ms": 5096
+ },
+ {
+  "cap": "devour_scan",
+  "domain": "devour",
+  "status": "None",
+  "ms": 30795
+ },
+ {
+  "cap": "dh_asset_gate",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 17421
+ },
+ {
+  "cap": "dh_brain",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2959
+ },
+ {
+  "cap": "dh_pose",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3107
+ },
+ {
+  "cap": "dh_realism",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3424
+ },
+ {
+  "cap": "diagram_distill",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 4509
+ },
+ {
+  "cap": "digital_human",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3574
+ },
+ {
+  "cap": "director_mood",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 15533
+ },
+ {
+  "cap": "dl_forge",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2897
+ },
+ {
+  "cap": "doc_intake",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3144
+ },
+ {
+  "cap": "drama",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3377
+ },
+ {
+  "cap": "dream_replay",
+  "domain": "brain",
+  "status": "ok",
+  "ms": 4447
+ },
+ {
+  "cap": "duty_board",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4881
+ },
+ {
+  "cap": "echo",
+  "domain": "data",
+  "status": "ok",
+  "ms": 16814
+ },
+ {
+  "cap": "edit_pipeline",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3349
+ },
+ {
+  "cap": "eigenflux",
+  "domain": "social",
+  "status": "ok",
+  "ms": 3123
+ },
+ {
+  "cap": "emotion_projection",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3418
+ },
+ {
+  "cap": "energy_pool",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4498
+ },
+ {
+  "cap": "energy_scheduler",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 46274
+ },
+ {
+  "cap": "event_ledger",
+  "domain": "security",
+  "status": "ok",
+  "ms": 18810
+ },
+ {
+  "cap": "express_direct",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 2911
+ },
+ {
+  "cap": "fact_gate",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3231
+ },
+ {
+  "cap": "feishu_embed",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 3354
+ },
+ {
+  "cap": "figure_gate",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4193
+ },
+ {
+  "cap": "file_hygiene",
+  "domain": "system",
+  "status": "None",
+  "ms": 30424
+ },
+ {
+  "cap": "film_intel",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 17510
+ },
+ {
+  "cap": "filmkit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3025
+ },
+ {
+  "cap": "flow_canvas",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3142
+ },
+ {
+  "cap": "forge_mastery",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3441
+ },
+ {
+  "cap": "freebuff_term",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 4380
+ },
+ {
+  "cap": "freellmapi",
+  "domain": "llm",
+  "status": "None",
+  "ms": 33655
+ },
+ {
+  "cap": "gate_visibility",
+  "domain": "framework",
+  "status": "ok",
+  "ms": 14801
+ },
+ {
+  "cap": "genoffice",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2968
+ },
+ {
+  "cap": "genoffice_bridge",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4004
+ },
+ {
+  "cap": "ghost_guard",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 61960
+ },
+ {
+  "cap": "git_read",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 22547
+ },
+ {
+  "cap": "git_write",
+  "domain": "tools",
+  "status": "error",
+  "ms": 3194
+ },
+ {
+  "cap": "god_view",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3212
+ },
+ {
+  "cap": "gods_eye",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4014
+ },
+ {
+  "cap": "growth_hooks",
+  "domain": "system",
+  "status": "ok",
+  "ms": 21748
+ },
+ {
+  "cap": "gs_h3",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 29271
+ },
+ {
+  "cap": "h3_video_gen",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3216
+ },
+ {
+  "cap": "handoff",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3217
+ },
+ {
+  "cap": "health",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3774
+ },
+ {
+  "cap": "hf_voice",
+  "domain": "voice",
+  "status": "ok",
+  "ms": 4473
+ },
+ {
+  "cap": "hook_enforcer",
+  "domain": "security",
+  "status": "error",
+  "ms": 2736
+ },
+ {
+  "cap": "hook_registry",
+  "domain": "system",
+  "status": "ok",
+  "ms": 18083
+ },
+ {
+  "cap": "humanizer",
+  "domain": "data",
+  "status": "ok",
+  "ms": 3002
+ },
+ {
+  "cap": "image_scout",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 20401
+ },
+ {
+  "cap": "impact_check",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2940
+ },
+ {
+  "cap": "install_selfcheck",
+  "domain": "security",
+  "status": "ok",
+  "ms": 6865
+ },
+ {
+  "cap": "intake_kit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3213
+ },
+ {
+  "cap": "inventory",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3674
+ },
+ {
+  "cap": "key_gateway",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4201
+ },
+ {
+  "cap": "keylogger",
+  "domain": "security",
+  "status": "denied",
+  "ms": 4466
+ },
+ {
+  "cap": "know_map",
+  "domain": "recon",
+  "status": "None",
+  "ms": 30488
+ },
+ {
+  "cap": "ledger_note",
+  "domain": "system",
+  "status": "ok",
+  "ms": 16463
+ },
+ {
+  "cap": "libtv_skill",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3175
+ },
+ {
+  "cap": "libtv_workflow",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3223
+ },
+ {
+  "cap": "life",
+  "domain": "life",
+  "status": "ok",
+  "ms": 4214
+ },
+ {
+  "cap": "llm_chat",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 3987
+ },
+ {
+  "cap": "llm_redteam",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3187
+ },
+ {
+  "cap": "llm_status",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 16363
+ },
+ {
+  "cap": "llm_watch",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3080
+ },
+ {
+  "cap": "lobehub",
+  "domain": "creation",
+  "status": "error",
+  "ms": 3786
+ },
+ {
+  "cap": "local_brain",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 4723
+ },
+ {
+  "cap": "long_run_supervisor",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 3641
+ },
+ {
+  "cap": "look_grade",
+  "domain": "video",
+  "status": "error",
+  "ms": 16905
+ },
+ {
+  "cap": "lr_status",
+  "domain": "longrun",
+  "status": "ok",
+  "ms": 2990
+ },
+ {
+  "cap": "lr_submit",
+  "domain": "longrun",
+  "status": "error",
+  "ms": 3109
+ },
+ {
+  "cap": "lr_tick",
+  "domain": "longrun",
+  "status": "ok",
+  "ms": 3539
+ },
+ {
+  "cap": "machine_distill",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 4252
+ },
+ {
+  "cap": "machine_film",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 4622
+ },
+ {
+  "cap": "mcp_call",
+  "domain": "tentacle",
+  "status": "denied",
+  "ms": 16090
+ },
+ {
+  "cap": "mcp_connect",
+  "domain": "tentacle",
+  "status": "denied",
+  "ms": 2899
+ },
+ {
+  "cap": "mcp_tools",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 3254
+ },
+ {
+  "cap": "media_license",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3473
+ },
+ {
+  "cap": "media_pipeline",
+  "domain": "video",
+  "status": "ok",
+  "ms": 4312
+ },
+ {
+  "cap": "media_publish",
+  "domain": "video",
+  "status": "ok",
+  "ms": 45833
+ },
+ {
+  "cap": "media_run",
+  "domain": "video",
+  "status": "ok",
+  "ms": 18386
+ },
+ {
+  "cap": "media_stamp",
+  "domain": "video",
+  "status": "ok",
+  "ms": 3618
+ },
+ {
+  "cap": "memory_bank",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3300
+ },
+ {
+  "cap": "memory_manager",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3677
+ },
+ {
+  "cap": "meta_cognition",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 5004
+ },
+ {
+  "cap": "mind",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3474
+ },
+ {
+  "cap": "mirror_ascend",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 16929
+ },
+ {
+  "cap": "mirror_parity",
+  "domain": "pipeline",
+  "status": "error",
+  "ms": 3527
+ },
+ {
+  "cap": "mirror_plan",
+  "domain": "pipeline",
+  "status": "error",
+  "ms": 3653
+ },
+ {
+  "cap": "mirror_rehearse",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 3473
+ },
+ {
+  "cap": "mirror_release",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 4325
+ },
+ {
+  "cap": "mirror_rewind",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 2790
+ },
+ {
+  "cap": "mirror_scan",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 13779
+ },
+ {
+  "cap": "mirror_shape",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 3044
+ },
+ {
+  "cap": "mirror_simulate",
+  "domain": "pipeline",
+  "status": "error",
+  "ms": 3733
+ },
+ {
+  "cap": "mirror_status",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 4006
+ },
+ {
+  "cap": "model_key_pool",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 5376
+ },
+ {
+  "cap": "motion_kit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3312
+ },
+ {
+  "cap": "multimodal_port",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 13809
+ },
+ {
+  "cap": "music_auto",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 2941
+ },
+ {
+  "cap": "music_intel",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 3153
+ },
+ {
+  "cap": "music_publishing",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3540
+ },
+ {
+  "cap": "n8n_wf",
+  "domain": "automation",
+  "status": "ok",
+  "ms": 5737
+ },
+ {
+  "cap": "notion_bridge",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 3956
+ },
+ {
+  "cap": "observer_anchor",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 15060
+ },
+ {
+  "cap": "obsidian_vault",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3119
+ },
+ {
+  "cap": "offense_ops",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3132
+ },
+ {
+  "cap": "offload_distill",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3496
+ },
+ {
+  "cap": "omarchy_bridge",
+  "domain": "tentacle",
+  "status": "denied",
+  "ms": 3888
+ },
+ {
+  "cap": "omission_detector",
+  "domain": "security",
+  "status": "None",
+  "ms": 33170
+ },
+ {
+  "cap": "omni_arm",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 15582
+ },
+ {
+  "cap": "omni_plug",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3153
+ },
+ {
+  "cap": "omni_web",
+  "domain": "tentacle",
+  "status": "denied",
+  "ms": 2925
+ },
+ {
+  "cap": "onboarding_gate",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3612
+ },
+ {
+  "cap": "one_key_deploy",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 3657
+ },
+ {
+  "cap": "one_shot",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 24106
+ },
+ {
+  "cap": "orchestration_kernel",
+  "domain": "system",
+  "status": "ok",
+  "ms": 22756
+ },
+ {
+  "cap": "osint_scan",
+  "domain": "recon",
+  "status": "error",
+  "ms": 3277
+ },
+ {
+  "cap": "page_scan",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3514
+ },
+ {
+  "cap": "paywallbuster",
+  "domain": "security",
+  "status": "ok",
+  "ms": 4664
+ },
+ {
+  "cap": "penetrating_cross_scan",
+  "domain": "security",
+  "status": "None",
+  "ms": 30131
+ },
+ {
+  "cap": "pentest",
+  "domain": "security",
+  "status": "ok",
+  "ms": 18512
+ },
+ {
+  "cap": "pentest_distill",
+  "domain": "security",
+  "status": "ok",
+  "ms": 2985
+ },
+ {
+  "cap": "persona_kernel",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3199
+ },
+ {
+  "cap": "pipeline_rollback",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 3287
+ },
+ {
+  "cap": "pipeline_status",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 4417
+ },
+ {
+  "cap": "pipeline_submit",
+  "domain": "pipeline",
+  "status": "denied",
+  "ms": 25915
+ },
+ {
+  "cap": "pipeline_versions",
+  "domain": "pipeline",
+  "status": "error",
+  "ms": 18527
+ },
+ {
+  "cap": "platform_profile",
+  "domain": "project",
+  "status": "ok",
+  "ms": 2891
+ },
+ {
+  "cap": "pod_link",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3248
+ },
+ {
+  "cap": "policy_delta",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3553
+ },
+ {
+  "cap": "policy_gate",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4206
+ },
+ {
+  "cap": "proactive_report",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 2878
+ },
+ {
+  "cap": "project_context",
+  "domain": "project",
+  "status": "error",
+  "ms": 15435
+ },
+ {
+  "cap": "project_drift",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2965
+ },
+ {
+  "cap": "projection_card",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 3104
+ },
+ {
+  "cap": "prompt_bridge",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3451
+ },
+ {
+  "cap": "pulse_direct",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 4529
+ },
+ {
+  "cap": "quant",
+  "domain": "finance",
+  "status": "ok",
+  "ms": 23515
+ },
+ {
+  "cap": "quant_backtest",
+  "domain": "finance",
+  "status": "ok",
+  "ms": 1869
+ },
+ {
+  "cap": "quant_params",
+  "domain": "finance",
+  "status": "ok",
+  "ms": 1924
+ },
+ {
+  "cap": "quant_plan",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 2017
+ },
+ {
+  "cap": "quant_strategy",
+  "domain": "finance",
+  "status": "ok",
+  "ms": 1978
+ },
+ {
+  "cap": "rea_reverse",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 1974
+ },
+ {
+  "cap": "recon_distill",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 2048
+ },
+ {
+  "cap": "record_grid",
+  "domain": "data",
+  "status": "error",
+  "ms": 2132
+ },
+ {
+  "cap": "redteam_recon",
+  "domain": "security",
+  "status": "None",
+  "ms": 125299
+ },
+ {
+  "cap": "remote_confinement",
+  "domain": "tentacle",
+  "status": "denied",
+  "ms": 27990
+ },
+ {
+  "cap": "remote_domain",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3548
+ },
+ {
+  "cap": "render_evolution",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3784
+ },
+ {
+  "cap": "replan_loop",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4486
+ },
+ {
+  "cap": "repo_publish",
+  "domain": "tools",
+  "status": "ok",
+  "ms": 8096
+ },
+ {
+  "cap": "review_gate",
+  "domain": "security",
+  "status": "None",
+  "ms": 33499
+ },
+ {
+  "cap": "rig_audit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 9568
+ },
+ {
+  "cap": "rig_fix",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3364
+ },
+ {
+  "cap": "ring_context",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3893
+ },
+ {
+  "cap": "room_space",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4478
+ },
+ {
+  "cap": "root_fix",
+  "domain": "system",
+  "status": "ok",
+  "ms": 5276
+ },
+ {
+  "cap": "scan_cap",
+  "domain": "system",
+  "status": "None",
+  "ms": 32898
+ },
+ {
+  "cap": "scene_anchor",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 13395
+ },
+ {
+  "cap": "sched_define",
+  "domain": "engine",
+  "status": "error",
+  "ms": 3270
+ },
+ {
+  "cap": "sched_status",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 3419
+ },
+ {
+  "cap": "sched_tick",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 3965
+ },
+ {
+  "cap": "scrapling",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 4686
+ },
+ {
+  "cap": "screen_sniff",
+  "domain": "security",
+  "status": "denied",
+  "ms": 6451
+ },
+ {
+  "cap": "sec_chain",
+  "domain": "security",
+  "status": "None",
+  "ms": 124682
+ },
+ {
+  "cap": "sec_defenses",
+  "domain": "security",
+  "status": "ok",
+  "ms": 10178
+ },
+ {
+  "cap": "sec_llm",
+  "domain": "security",
+  "status": "denied",
+  "ms": 3101
+ },
+ {
+  "cap": "sec_scan",
+  "domain": "security",
+  "status": "None",
+  "ms": 32225
+ },
+ {
+  "cap": "sec_surface",
+  "domain": "security",
+  "status": "None",
+  "ms": 30049
+ },
+ {
+  "cap": "sec_sweeper",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3523
+ },
+ {
+  "cap": "self_intake",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3967
+ },
+ {
+  "cap": "selfscan",
+  "domain": "system",
+  "status": "None",
+  "ms": 34619
+ },
+ {
+  "cap": "shared_resources",
+  "domain": "system",
+  "status": "ok",
+  "ms": 16898
+ },
+ {
+  "cap": "shot_director",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3059
+ },
+ {
+  "cap": "showcase_ops",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3324
+ },
+ {
+  "cap": "signature_guard",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4891
+ },
+ {
+  "cap": "skill_finder",
+  "domain": "data",
+  "status": "ok",
+  "ms": 4493
+ },
+ {
+  "cap": "skill_forge",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 2606
+ },
+ {
+  "cap": "skill_watch",
+  "domain": "system",
+  "status": "ok",
+  "ms": 14647
+ },
+ {
+  "cap": "slim_profile",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3256
+ },
+ {
+  "cap": "social_eng",
+  "domain": "security",
+  "status": "ok",
+  "ms": 3632
+ },
+ {
+  "cap": "spend_guard",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3753
+ },
+ {
+  "cap": "spider_ops",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 4074
+ },
+ {
+  "cap": "stigmergy",
+  "domain": "collab",
+  "status": "ok",
+  "ms": 3085
+ },
+ {
+  "cap": "surface_bind",
+  "domain": "system",
+  "status": "ok",
+  "ms": 16259
+ },
+ {
+  "cap": "svc_inspect",
+  "domain": "pipeline",
+  "status": "ok",
+  "ms": 6423
+ },
+ {
+  "cap": "tactics_advise",
+  "domain": "longrun",
+  "status": "ok",
+  "ms": 3250
+ },
+ {
+  "cap": "task_graph",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4089
+ },
+ {
+  "cap": "task_manager",
+  "domain": "system",
+  "status": "error",
+  "ms": 3448
+ },
+ {
+  "cap": "telegram_embed",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 19515
+ },
+ {
+  "cap": "tentacle",
+  "domain": "tentacle",
+  "status": "error",
+  "ms": 3945
+ },
+ {
+  "cap": "tentacle_arm",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3864
+ },
+ {
+  "cap": "tentacle_bind",
+  "domain": "system",
+  "status": "error",
+  "ms": 3647
+ },
+ {
+  "cap": "tentacle_cognition",
+  "domain": "system",
+  "status": "ok",
+  "ms": 4919
+ },
+ {
+  "cap": "tentacle_comfy_bridge",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 4077
+ },
+ {
+  "cap": "tentacle_equip",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 12778
+ },
+ {
+  "cap": "tentacle_learn",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 3173
+ },
+ {
+  "cap": "tentacle_manifest",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 4713
+ },
+ {
+  "cap": "tentacle_pipeline",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 3682
+ },
+ {
+  "cap": "tentacle_scale",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 5177
+ },
+ {
+  "cap": "tentacle_status",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 48372
+ },
+ {
+  "cap": "thebrain_bridge",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 16394
+ },
+ {
+  "cap": "theme_cap",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3290
+ },
+ {
+  "cap": "think_loop",
+  "domain": "llm",
+  "status": "denied",
+  "ms": 3069
+ },
+ {
+  "cap": "tool_bay",
+  "domain": "tentacle",
+  "status": "ok",
+  "ms": 4732
+ },
+ {
+  "cap": "topic_watch",
+  "domain": "recon",
+  "status": "error",
+  "ms": 5131
+ },
+ {
+  "cap": "topic_web",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 2780
+ },
+ {
+  "cap": "trace_store",
+  "domain": "system",
+  "status": "ok",
+  "ms": 11949
+ },
+ {
+  "cap": "train_ground",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3164
+ },
+ {
+  "cap": "train_recipe",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 3156
+ },
+ {
+  "cap": "transfer",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 3521
+ },
+ {
+  "cap": "transformer",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 4080
+ },
+ {
+  "cap": "trend_watch",
+  "domain": "recon",
+  "status": "None",
+  "ms": 30125
+ },
+ {
+  "cap": "tripo",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 19275
+ },
+ {
+  "cap": "truth_scan",
+  "domain": "system",
+  "status": "ok",
+  "ms": 3148
+ },
+ {
+  "cap": "ui_kit",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3416
+ },
+ {
+  "cap": "ui_render",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3597
+ },
+ {
+  "cap": "ul_tars_desktop",
+  "domain": "desktop",
+  "status": "ok",
+  "ms": 4406
+ },
+ {
+  "cap": "ux_doctrine",
+  "domain": "system",
+  "status": "ok",
+  "ms": 2909
+ },
+ {
+  "cap": "verification_watch",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 17785
+ },
+ {
+  "cap": "video_intel",
+  "domain": "recon",
+  "status": "ok",
+  "ms": 3050
+ },
+ {
+  "cap": "vision",
+  "domain": "vision",
+  "status": "denied",
+  "ms": 3027
+ },
+ {
+  "cap": "vision_grounding",
+  "domain": "vision",
+  "status": "ok",
+  "ms": 3474
+ },
+ {
+  "cap": "vision_loop",
+  "domain": "vision",
+  "status": "ok",
+  "ms": 4357
+ },
+ {
+  "cap": "vision_print",
+  "domain": "vision",
+  "status": "ok",
+  "ms": 3983
+ },
+ {
+  "cap": "vlx_flow",
+  "domain": "vision",
+  "status": "ok",
+  "ms": 17297
+ },
+ {
+  "cap": "voice",
+  "domain": "voice",
+  "status": "denied",
+  "ms": 2851
+ },
+ {
+  "cap": "voice_orchestra",
+  "domain": "voice",
+  "status": "ok",
+  "ms": 3142
+ },
+ {
+  "cap": "voice_studio",
+  "domain": "voice",
+  "status": "ok",
+  "ms": 3968
+ },
+ {
+  "cap": "warm_switch",
+  "domain": "llm",
+  "status": "ok",
+  "ms": 7202
+ },
+ {
+  "cap": "wave_probe",
+  "domain": "system",
+  "status": "None",
+  "ms": 30199
+ },
+ {
+  "cap": "welcome",
+  "domain": "system",
+  "status": "ok",
+  "ms": 15278
+ },
+ {
+  "cap": "wf_cache_clear",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 2961
+ },
+ {
+  "cap": "wf_define",
+  "domain": "engine",
+  "status": "error",
+  "ms": 3362
+ },
+ {
+  "cap": "wf_resume",
+  "domain": "engine",
+  "status": "error",
+  "ms": 3484
+ },
+ {
+  "cap": "wf_run",
+  "domain": "engine",
+  "status": "error",
+  "ms": 4323
+ },
+ {
+  "cap": "wf_status",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 3566
+ },
+ {
+  "cap": "whatsapp_embed",
+  "domain": "integration",
+  "status": "ok",
+  "ms": 18622
+ },
+ {
+  "cap": "wiki_graph",
+  "domain": "mind",
+  "status": "ok",
+  "ms": 3137
+ },
+ {
+  "cap": "workflow_forge",
+  "domain": "engine",
+  "status": "ok",
+  "ms": 3147
+ },
+ {
+  "cap": "zimage_rewash",
+  "domain": "creation",
+  "status": "ok",
+  "ms": 3484
+ }
+]

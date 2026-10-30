@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/fixtures/code-taste-cross-a.py", "neighbors": ["anchor:scope_root", "tools/codex-scripts/audit_code_taste.py", "tools/codex-scripts/fixtures/code-taste-cross-b.py"], "defs": ["totals", "create_user", "create_user_record"]}

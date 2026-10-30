@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/blender/dh_sail_weights.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_commander/__main__.py", "index.html"], "defs": ["parse_args", "main", "stats"]}

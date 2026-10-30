@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "devour_reflect",
+  "fingerprint": "8873ff196337146d1d88d6299d6e337ab085c5ab6f3d8cad15a1d52dbc640cbd",
+  "pid": 7363,
+  "started_at": 1793305112.144921,
+  "started_iso": "2026-10-30T03:18:32",
+  "finished_at": 1793305112.2911549,
+  "finished_iso": "2026-10-30T03:18:32",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

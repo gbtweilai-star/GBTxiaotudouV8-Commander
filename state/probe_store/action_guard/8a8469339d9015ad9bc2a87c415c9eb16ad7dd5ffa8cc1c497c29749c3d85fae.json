@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "mirror_shape",
+  "fingerprint": "8a8469339d9015ad9bc2a87c415c9eb16ad7dd5ffa8cc1c497c29749c3d85fae",
+  "pid": 6333,
+  "started_at": 1793304427.973878,
+  "started_iso": "2026-10-30T03:07:07",
+  "finished_at": 1793304428.022121,
+  "finished_iso": "2026-10-30T03:07:08",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

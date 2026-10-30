@@ -1,0 +1,1376 @@
+gbt_allinone/__init__.py                         17  GBT小土豆V8 · 统一框架核心。
+gbt_allinone/__main__.py                          4  
+gbt_allinone/_paths.py                           32  统一路径解析 — 全框架 store 基址单一来源，支持 GBT_STORE_DIR 隔离（测试用）。
+gbt_allinone/adapters/__init__.py                 1  
+gbt_allinone/adapters/workspace_adapter.py       75  
+gbt_allinone/api.py                            3138  
+gbt_allinone/app.py                             319  
+gbt_allinone/auth_gate.py                       417  
+gbt_allinone/autopilot.py                       169  
+gbt_allinone/bluetooth_cap.py                   197  
+gbt_allinone/body_bridge.py                      38  身体的六根动作 —— 挂成正式能力位（body_see/body_say/…）。
+gbt_allinone/book_skill.py                       96  
+gbt_allinone/brain/__init__.py                    5  GBT小土豆V8 脑层 — 主动智能核心模块。
+gbt_allinone/brain/brain_council.py              90  
+gbt_allinone/brain/cap_optimizer.py              94  
+gbt_allinone/brain/cognition.py                  56  GBT小土豆V8 认知脑 — 认知·决策。
+gbt_allinone/brain/cross_validation.py           71  
+gbt_allinone/brain/curiosity_engine.py           59  GBT小土豆V8 好奇引擎 — 缺口检测·薄弱点发问。
+gbt_allinone/brain/deep_reasoner.py              75  GBT小土豆V8 深度推理脑 — 意图识别·深度推理·协同决策。
+gbt_allinone/brain/exploration_engine.py         55  GBT小土豆V8 探索引擎 — 遍历·发现·机缘。
+gbt_allinone/brain/intent_broker.py              62  GBT小土豆V8 意图代理脑 — 意图路由到能力链。
+gbt_allinone/brain/market_intelligence.py        66  GBT小土豆V8 市场调研脑 — 趋势·竞品·机会·战略。
+gbt_allinone/brain/neural_tentacle.py           163  
+gbt_allinone/brain/penetration_scan.py          374  GBT小土豆V8 穿透扫描层 — L0~L7 全层扫描 + 智能评分 + 修复建议。
+gbt_allinone/brain/tentacle_reasoner.py          93  
+gbt_allinone/brain/topology_index.py            124  
+gbt_allinone/brain/vision_tentacle.py            69  GBT小土豆V8 视觉触手 — 视觉采集·视觉记忆。
+gbt_allinone/brain_exec.py                      596  
+gbt_allinone/brain_supervisor.py                489  
+gbt_allinone/brain_vault.py                     140  
+gbt_allinone/browser_cap.py                     190  
+gbt_allinone/bt_control.py                      307  
+gbt_allinone/caps_registry.py                  3125  
+gbt_allinone/caps_tables.py                      86  
+gbt_allinone/chain.py                           100  
+gbt_allinone/chart_html.py                      150  
+gbt_allinone/checkpoint.py                      857  
+gbt_allinone/cli.py                             153  
+gbt_allinone/cli_agents.py                      209  
+gbt_allinone/cli_chat.py                        414  
+gbt_allinone/cli_ify.py                         165  
+gbt_allinone/codex_bridge.py                   1697  
+gbt_allinone/coding_discipline.py               279  
+gbt_allinone/collab_gateway.py                  823  
+gbt_allinone/comfy_forge.py                     221  
+gbt_allinone/coze_mail_cap.py                   601  通信域 · coze_mail —— 对主人**自有的单一地址**做收发与整理（方案稿 §一–§六）。
+gbt_allinone/cross_scan.py                      636  
+gbt_allinone/deepseek_key.py                    508  
+gbt_allinone/delivery_gate.py                   217  
+gbt_allinone/dependency_paths.py                 67  ABI-aware local dependency paths.
+gbt_allinone/deploy/codex_relay_watchdog.py     406  
+gbt_allinone/deploy/panel_gate.py               352  GBT小土豆 · 全息面板鉴权门（本地反向代理）
+gbt_allinone/deploy/selfcheck_configs.py        240  gbt_allinone.deploy.selfcheck_configs — 用标准库校验部署配置(本机无 PyYAML 也能跑)。
+gbt_allinone/deployment_rehearsal.py           1494  
+gbt_allinone/detail_habit.py                    213  
+gbt_allinone/devour.py                         1388  
+gbt_allinone/digital_human.py                   499  
+gbt_allinone/dimension_naming.py                253  
+gbt_allinone/drama.py                           246  
+gbt_allinone/engine.py                          595  
+gbt_allinone/feishu_bridge.py                   507  
+gbt_allinone/figure_gate.py                     233  
+gbt_allinone/file_operation.py                  548  
+gbt_allinone/forge_mastery.py                   132  
+gbt_allinone/ghost_guard.py                     284  GBT小土豆V8 · 注册表防复发检测（Ghost Guard）。
+gbt_allinone/god_view.py                        565  上帝视角（god_view）—— **超级导航 + 意见与建议**（定心丸）。
+gbt_allinone/humanizer.py                        97  humanizer -- 去 AI 味改写器（蒸馏自 skills.sh humanizer-zh：只蒸思想）。
+gbt_allinone/hygiene.py                         286  
+gbt_allinone/image_scout.py                     277  
+gbt_allinone/install_selfcheck.py               230  
+gbt_allinone/integration/__init__.py             14  gbt_allinone.integration — 平台与收款钱包(gbt_wallet)的接轨层。
+gbt_allinone/integration/auth.py                191  gbt_allinone.integration.auth — gbt_wallet API 的可选令牌鉴权 + CORS 装配(仅标准库)
+gbt_allinone/integration/platform_client.py     384  
+gbt_allinone/integration/smoke_test.py          298  gbt_allinone.integration.smoke_test — 接轨层冒烟自测(标准库 + 现有依赖, 零新增依赖)。
+gbt_allinone/inventory.py                       195  
+gbt_allinone/know_map.py                        388  理解任何事（know_map）—— 蒸馏自 GitHub Trending #1 「Understand Anything」
+gbt_allinone/knowledge_base.py                  605  
+gbt_allinone/knowledge_lib.py                   346  
+gbt_allinone/life_archive.py                   1562  
+gbt_allinone/llm/__init__.py                      1  
+gbt_allinone/llm/bridge.py                       89  
+gbt_allinone/llm/cloud_llm.py                  1498  
+gbt_allinone/llm/cloud_llm_cap.py               203  
+gbt_allinone/llm/decision.py                    227  
+gbt_allinone/llm/fact_gate.py                   134  
+gbt_allinone/llm/freellmapi.py                  397  GBT小土豆V8 · FreeLLMAPI 接入层（本地免费大模型池）
+gbt_allinone/llm/genoffice_bridge.py           1284  
+gbt_allinone/llm/key_gateway.py                1076  
+gbt_allinone/llm/multimodal_port.py             659  
+gbt_allinone/llm/policy_gate.py                 118  
+gbt_allinone/llm/ring_context.py                301  
+gbt_allinone/llm/route_lexicon.py               317  
+gbt_allinone/llm/unified.py                      91  GBT小土豆V8 · 统一大模型入口（Owner 2026-09-19 拍：**全部统一大模型**）。
+gbt_allinone/longrun.py                         192  
+gbt_allinone/mind_engine.py                    1874  
+gbt_allinone/mirror_space.py                    359  
+gbt_allinone/music_auto.py                      113  
+gbt_allinone/native_browser.py                 1676  
+gbt_allinone/notion_bridge.py                   472  
+gbt_allinone/offense_ops.py                     120  
+gbt_allinone/omni_plug.py                       936  
+gbt_allinone/omni_web.py                         16  gbt_allinone/omni_web.py — 万能触手·Web 六态（**真名门面**）。
+gbt_allinone/omni_web_cap.py                    600  
+gbt_allinone/pipeline.py                        511  
+gbt_allinone/positions.py                       214  
+gbt_allinone/preflight.py                      1086  
+gbt_allinone/project_context.py                 307  
+gbt_allinone/prompt_bridge.py                    98  
+gbt_allinone/qiankun.py                         441  GBT小土豆V8 · 一指定江山乾坤换位 + AI 接管部署队列。
+gbt_allinone/quant_plan.py                      138  
+gbt_allinone/quant_tech.py                      155  
+gbt_allinone/recon/__init__.py                    7  V8 侦察核心（自 src/core 内迁，实现源码完全自包含）。
+gbt_allinone/recon/arxiv.py                     533  
+gbt_allinone/recon/guard.py                      79  GBT小土豆V8 · 目标安全校验。
+gbt_allinone/recon/last30days/__init__.py        26  GBT小土豆V8 · 外源情报检索引擎（last30days 同化件）。
+gbt_allinone/recon/last30days/_pids.py           41  GBT小土豆V8 · last30days 原生层 · 子进程 PID 登记表（同化改写件）。
+gbt_allinone/recon/last30days/briefing.py       261  
+gbt_allinone/recon/last30days/cli.py            894  last30days v3.0.0 CLI.
+gbt_allinone/recon/last30days/engine/__init__.py    1  
+gbt_allinone/recon/last30days/engine/bird_x.py  467  
+gbt_allinone/recon/last30days/engine/bluesky.py  249  Bluesky search via AT Protocol (requires app password).
+gbt_allinone/recon/last30days/engine/categories.py  283  
+gbt_allinone/recon/last30days/engine/cluster.py  271  Candidate clustering and representative selection.
+gbt_allinone/recon/last30days/engine/competitors.py  199  
+gbt_allinone/recon/last30days/engine/dates.py   120  
+gbt_allinone/recon/last30days/engine/dedupe.py  130  
+gbt_allinone/recon/last30days/engine/entity_extract.py  127  Entity extraction from initial search results for supplemental searche
+gbt_allinone/recon/last30days/engine/env.py     533  
+gbt_allinone/recon/last30days/engine/fanout.py   85  
+gbt_allinone/recon/last30days/engine/fusion.py  207  
+gbt_allinone/recon/last30days/engine/github.py  918  
+gbt_allinone/recon/last30days/engine/grounding.py  266  
+gbt_allinone/recon/last30days/engine/hackernews.py  301  
+gbt_allinone/recon/last30days/engine/html_render.py  674  
+gbt_allinone/recon/last30days/engine/http.py    204  HTTP utilities for last30days skill (stdlib only).
+gbt_allinone/recon/last30days/engine/instagram.py  500  
+gbt_allinone/recon/last30days/engine/log.py      28  Shared logging utilities for last30days skill.
+gbt_allinone/recon/last30days/engine/normalize.py  499  
+gbt_allinone/recon/last30days/engine/perplexity.py  164  Perplexity Sonar Pro / Deep Research via OpenRouter API.
+gbt_allinone/recon/last30days/engine/pinterest.py  182  
+gbt_allinone/recon/last30days/engine/pipeline.py 1069  v3.0.0 orchestration pipeline.
+gbt_allinone/recon/last30days/engine/planner.py  712  
+gbt_allinone/recon/last30days/engine/polymarket.py  786  
+gbt_allinone/recon/last30days/engine/preflight.py  119  
+gbt_allinone/recon/last30days/engine/providers.py  408  
+gbt_allinone/recon/last30days/engine/quality_nudge.py  190  
+gbt_allinone/recon/last30days/engine/query.py   117  Shared query preprocessing utilities: noise-word stripping, core subje
+gbt_allinone/recon/last30days/engine/reddit.py  703  
+gbt_allinone/recon/last30days/engine/reddit_enrich.py  322  
+gbt_allinone/recon/last30days/engine/reddit_public.py  377  
+gbt_allinone/recon/last30days/engine/relevance.py  168  
+gbt_allinone/recon/last30days/engine/render.py 1722  
+gbt_allinone/recon/last30days/engine/rerank.py  425  
+gbt_allinone/recon/last30days/engine/resolve.py  258  
+gbt_allinone/recon/last30days/engine/schema.py  319  Core data model for the v3.0.0 last30days pipeline.
+gbt_allinone/recon/last30days/engine/signals.py  251  
+gbt_allinone/recon/last30days/engine/snippet.py   51  Best-window extraction for rerankable evidence snippets.
+gbt_allinone/recon/last30days/engine/subproc.py   94  
+gbt_allinone/recon/last30days/engine/threads.py  224  Threads keyword search via ScrapeCreators API for /last30days.
+gbt_allinone/recon/last30days/engine/tiktok.py  677  
+gbt_allinone/recon/last30days/engine/truthsocial.py  168  
+gbt_allinone/recon/last30days/engine/ui.py      610  
+gbt_allinone/recon/last30days/engine/xai_x.py   228  xAI API client for X (Twitter) discovery.
+gbt_allinone/recon/last30days/engine/xiaohongshu_api.py  162  
+gbt_allinone/recon/last30days/engine/xquik.py   227  
+gbt_allinone/recon/last30days/engine/xurl_x.py  188  
+gbt_allinone/recon/last30days/engine/youtube_yt.py  967  
+gbt_allinone/recon/last30days/redlines.py       436  
+gbt_allinone/recon/last30days/store.py          803  
+gbt_allinone/recon/last30days/watchlist.py      296  
+gbt_allinone/recon/scanner.py                   442  GBT小土豆V8 · OSINT 扫描核心模块
+gbt_allinone/record_grid.py                     734  
+gbt_allinone/room_space.py                     1404  GBT小土豆V8 · 内置沙盒会议室（room_space）。
+gbt_allinone/root_fix.py                        365  
+gbt_allinone/safe_io.py                         515  
+gbt_allinone/scan_cap.py                        518  
+gbt_allinone/schedule.py                        134  
+gbt_allinone/security/__init__.py                 1  
+gbt_allinone/security/abl_gateway.py            129  
+gbt_allinone/security/ai_audit.py               585  
+gbt_allinone/security/data_policy.py            240  
+gbt_allinone/security/malware_sense.py           99  
+gbt_allinone/security/net_guard.py              232  
+gbt_allinone/security/policy.py                1178  
+gbt_allinone/security/redteam.py               1245  
+gbt_allinone/security/security_brain.py         857  
+gbt_allinone/see_first.py                        98  
+gbt_allinone/self_intake.py                     428  
+gbt_allinone/selfscan.py                        529  
+gbt_allinone/semantic_route.py                  247  
+gbt_allinone/services.py                        122  
+gbt_allinone/shot_director.py                   122  
+gbt_allinone/showcase_ops.py                    112  
+gbt_allinone/signature.py                       140  GBT小土豆V8 · 开发者署名守卫（Signature Guard）。
+gbt_allinone/skill_finder.py                    115  
+gbt_allinone/skill_forge.py                     125  
+gbt_allinone/soul.py                             74  GBT小土豆V8 · 为人处世理念（SOUL）与钢印（Stamp）。
+gbt_allinone/spider_ops.py                      102  
+gbt_allinone/store.py                           265  
+gbt_allinone/store/devoured/agent信誉系统/run.py     49  caps/agent信誉系统/run.py
+gbt_allinone/store/devoured/agent谈判协议/run.py     49  caps/agent谈判协议/run.py
+gbt_allinone/store/devoured/taste_skill/run.py   22  caps/taste_skill/run.py — 吞噬知识胶囊: Leonxlnx/taste-skill
+gbt_allinone/store/devoured/卫星互联网终端/run.py       49  caps/卫星互联网终端/run.py
+gbt_allinone/store/devoured/太赫兹成像/run.py         49  caps/太赫兹成像/run.py
+gbt_allinone/store/devoured/水下声学通信/run.py        49  caps/水下声学通信/run.py
+gbt_allinone/store/mirror_space/dimension/holo_pet/panel_server.py 3731  GBT小土豆V8 · 3D 全息面板本地桥接服务。
+gbt_allinone/store/pipeline/production/run.py    22  caps/taste_skill/run.py — 吞噬知识胶囊: Leonxlnx/taste-skill
+gbt_allinone/tactics.py                         175  
+gbt_allinone/tentacle/__init__.py                 1  
+gbt_allinone/tentacle/brain/__init__.py           3  brain 兼容垫片包：把旧 brain.* 寻址映射到 V8 触手包内的降级实现。
+gbt_allinone/tentacle/brain/gatekeeper.py        37  brain.gatekeeper 兼容垫片：旧 omni_* 的截图写盘改走 V8 镜像管线（submit）。
+gbt_allinone/tentacle/brain/tentacle_transmission.py   24  brain.tentacle_transmission 兼容垫片：V8 审计总线降级实现。
+gbt_allinone/tentacle/brain/transmit.py          68  
+gbt_allinone/tentacle/brain/visual_cortex.py    715  
+gbt_allinone/tentacle/brain/visual_memory.py    436  GBT小土豆V8 · 视觉记忆（visual_memory）
+gbt_allinone/tentacle/bridge.py                1222  
+gbt_allinone/tentacle/capture_environment.py    549  
+gbt_allinone/tentacle/desktop_commander.py      258  
+gbt_allinone/tentacle/direction.py               83  GBT小土豆V8 · 方向语义判别层（Owner 2026-09-19）。
+gbt_allinone/tentacle/express_bridge.py         217  
+gbt_allinone/tentacle/mcp_bridge.py             173  
+gbt_allinone/tentacle/nav_etiology.py           546  
+gbt_allinone/tentacle/omarchy_bridge.py         935  
+gbt_allinone/tentacle/omni_audio.py             590  audio 域 mixin — **听与说**（第 10 域，2026-09-22 加入触手）
+gbt_allinone/tentacle/omni_controller.py        757  
+gbt_allinone/tentacle/omni_core.py              628  
+gbt_allinone/tentacle/omni_domain.py            520  
+gbt_allinone/tentacle/omni_fs.py                402  fs 域 mixin — 文件操作（第 9 域，2026-09-22 加入触手）
+gbt_allinone/tentacle/omni_keyboard.py           92  
+gbt_allinone/tentacle/omni_mouse.py             304  
+gbt_allinone/tentacle/omni_process.py           613  
+gbt_allinone/tentacle/omni_read.py              379  
+gbt_allinone/tentacle/omni_tentacle.py          358  
+gbt_allinone/tentacle/omni_vision.py            269  
+gbt_allinone/tentacle/omni_web.py              1178  
+gbt_allinone/tentacle/omni_window.py            442  
+gbt_allinone/tentacle/remote_confinement.py     229  
+gbt_allinone/tentacle/scale.py                  178  
+gbt_allinone/tentacle/silero_vad.py             452  
+gbt_allinone/tentacle/vision_bus.py             363  
+gbt_allinone/tentacle/vision_watch.py           710  
+gbt_allinone/tentacle/wasapi_loop.py            334  
+gbt_allinone/tentacle_equip.py                  309  
+gbt_allinone/tentacle_learn.py                   96  
+gbt_allinone/thebrain_bridge.py                 846  
+gbt_allinone/theme_cap.py                       187  主题能力位（theme_cap）—— 把“单一色源”接成框架内的一等能力。
+gbt_allinone/think_loop.py                      200  
+gbt_allinone/tool_bay.py                        134  装备坞（tool_bay）—— 触手的「自配装备」走的那道门。
+gbt_allinone/tools/__init__.py                    9  gbt_allinone.tools —— 只读工具 / 常驻防线子包。
+gbt_allinone/tools/a1art_skill.py               829  a1.art API 技能（a1art_skill）· R-H206 只读骨架。
+gbt_allinone/tools/absorb_loop.py               247  
+gbt_allinone/tools/account_registry.py          150  AI 账号登记表 · 只读校验（account_registry）· R-H179。
+gbt_allinone/tools/action_gate.py               276  先看 → 动脑 → 执行 前置闸（主人令 2026-09-27）。
+gbt_allinone/tools/actioncam_cap.py             167  
+gbt_allinone/tools/agency_tentacles.py          340  Agency Agents 职业触手中枢。
+gbt_allinone/tools/agent_console.py             292  
+gbt_allinone/tools/agent_control.py             150  
+gbt_allinone/tools/agent_council.py             293  多智能体议事会：**角色 + 轮次 + 发言权 + 终止投票 + 纪要**（蒸馏自 AutoGen，只取架构）。
+gbt_allinone/tools/agent_rig.py                 302  编码智能体编队：**把本机已装的 CLI agent 编成并行流水线**（蒸馏自 GitHub 周榜 #02 `stablyai/orca`
+gbt_allinone/tools/ai_capability_net.py         264  
+gbt_allinone/tools/anatomy_cap.py               270  Anatomy 等轴详解图能力位 —— 把「一个概念」做成**一台真机器**的等轴图 + 可交互页 + A4 印张。
+gbt_allinone/tools/answer_shaper.py             134  
+gbt_allinone/tools/art_brief.py                 237  
+gbt_allinone/tools/art_chain.py                 177  
+gbt_allinone/tools/audio_extract.py             297  
+gbt_allinone/tools/audio_mix.py                 557  
+gbt_allinone/tools/auto_publish.py              237  
+gbt_allinone/tools/auto_switch.py               700  
+gbt_allinone/tools/automation_keys.py           692  
+gbt_allinone/tools/awareness_gap_guard.py       262  
+gbt_allinone/tools/awesome_tools_index.py      4124  
+gbt_allinone/tools/belief_forge.py              229  信念锻造：**观察 → 信念（会学习，不改写历史）→ 心智模型**（蒸馏自 hindsight 的"学习半"）。
+gbt_allinone/tools/bi_distill.py                112  
+gbt_allinone/tools/bits_kit.py                  392  
+gbt_allinone/tools/blender_cap.py               117  Blender 4.2 三维引擎能力（本机已装 4.2.16 LTS · 2026-09-26 主人令编入工具栏）。
+gbt_allinone/tools/blender_surface.py           318  
+gbt_allinone/tools/brain_deploy.py              187  GBT小土豆V8 · 脑库部署器：把"我们自己研发的脑"接到每个集群小弟身上。
+gbt_allinone/tools/brain_graph.py               357  GBT小土豆V8 · 大脑执行层 —— 排布图与连接网络的**数据层**
+gbt_allinone/tools/brand_outro.py               189  
+gbt_allinone/tools/cad_distill.py               108  蒸馏件：**把 CAD 内核挂成 agent 工作区**的取法（挂真内核 · 脚本即接口 · 改前读回 · 结论要算）。
+gbt_allinone/tools/cadgen_cap.py                180  
+gbt_allinone/tools/call_graph.py                579  
+gbt_allinone/tools/cap_tags.py                  326  
+gbt_allinone/tools/capability_gateway.py         97  
+gbt_allinone/tools/caps_called_audit.py         323  
+gbt_allinone/tools/case_mine.py                 282  
+gbt_allinone/tools/cloud_pc.py                  202  
+gbt_allinone/tools/cloud_plugin.py              345  
+gbt_allinone/tools/code_art_kernel.py           150  
+gbt_allinone/tools/code_audit.py                417  
+gbt_allinone/tools/code_exhaustive_scan.py      448  
+gbt_allinone/tools/code_patch.py                313  
+gbt_allinone/tools/code_structure.py            308  GBT小土豆V8 · **项目级代码结构四面**（2026-09-23 接，补 `project_context` 的代码面）。
+gbt_allinone/tools/comfy_cloud.py               622  
+gbt_allinone/tools/comfy_native.py             1272  
+gbt_allinone/tools/comfyui_surface.py           315  
+gbt_allinone/tools/command_chain.py             627  
+gbt_allinone/tools/compute_router.py            160  
+gbt_allinone/tools/console_hero.py              219  
+gbt_allinone/tools/console_hub.py               338  
+gbt_allinone/tools/console_pages.py            1239  
+gbt_allinone/tools/context_vault.py             441  
+gbt_allinone/tools/coverage_auditor.py          251  
+gbt_allinone/tools/creation_camp.py             180  
+gbt_allinone/tools/datakit.py                   184  
+gbt_allinone/tools/db_plugin.py                 245  数据库插件（db_plugin）· 存储后端注册表 + **触手双向连接**。
+gbt_allinone/tools/db_probe.py                  265  
+gbt_allinone/tools/dd_squadron.py               356  
+gbt_allinone/tools/dd_visualizer.py             890  DD小分队 · 立体作战沙盘（Owner 2026-09-19 设计）。
+gbt_allinone/tools/design_atlas.py              259  
+gbt_allinone/tools/desktop_distill.py           180  
+gbt_allinone/tools/devour_fusion.py             264  
+gbt_allinone/tools/dh_brain.py                  208  
+gbt_allinone/tools/dh_pose.py                   327  
+gbt_allinone/tools/dh_realism.py                360  
+gbt_allinone/tools/dh_rig.py                    391  
+gbt_allinone/tools/diagram_distill.py           150  
+gbt_allinone/tools/director_mood.py             247  
+gbt_allinone/tools/dl_forge.py                  334  
+gbt_allinone/tools/dream_replay.py              160  
+gbt_allinone/tools/edit_core.py                 973  
+gbt_allinone/tools/edit_rules.py                158  
+gbt_allinone/tools/eigenflux.py                 549  
+gbt_allinone/tools/emotion_projection.py        174  
+gbt_allinone/tools/energy_pool.py               493  
+gbt_allinone/tools/energy_scheduler.py          234  
+gbt_allinone/tools/event_ledger.py              190  签名事件账：**哈希链 + HMAC 签名，每条都是签名记录**（蒸馏自 buzz，只取账本纪律）。
+gbt_allinone/tools/exec_trace.py                170  执行留痕器 —— 每一步逐字记，报告可复算。
+gbt_allinone/tools/external_content_check.py    546  
+gbt_allinone/tools/false_report_audit.py       1014  
+gbt_allinone/tools/feishu_embed.py              212  飞书镶嵌窗口（feishu_embed）· R-H239 只读骨架。
+gbt_allinone/tools/filmkit_cap.py               142  filmkit 柔性影片产线能力（清单制装配 · 任意段加减重制）。
+gbt_allinone/tools/flow_canvas.py               199  
+gbt_allinone/tools/framework_gate.py            734  框架自改门（framework_gate）· R-H99（Owner 2026-09-19 拍板：下一刀做框架自改门，含测试）
+gbt_allinone/tools/freebuff_term.py             341  
+gbt_allinone/tools/gate_visibility.py           468  
+gbt_allinone/tools/genoffice_cap.py             220  
+gbt_allinone/tools/git_repo.py                  184  
+gbt_allinone/tools/gods_eye.py                 1207  
+gbt_allinone/tools/growth_hooks.py              341  
+gbt_allinone/tools/gs_h3_cap.py                 375  GS-prompt-extend（高尚 GS 提示词工作台）· **三节点一个不差接到触手**。
+gbt_allinone/tools/h3_video_gen.py             1359  H3mini 视频生成（h3_video_gen）· R-H250 只读骨架。
+gbt_allinone/tools/handoff.py                   174  
+gbt_allinone/tools/hf_voice.py                  390  Hugging Face 歌声/语音（**3 臂轮询，避免单点卡壳**）—— 主人令 2026-09-28。
+gbt_allinone/tools/hook_registry.py             293  
+gbt_allinone/tools/host_security_scan.py        424  
+gbt_allinone/tools/html_video.py                375  
+gbt_allinone/tools/hunyuan_video.py             177  
+gbt_allinone/tools/impact_check.py              327  
+gbt_allinone/tools/intake_kit.py                538  
+gbt_allinone/tools/isolation_sweep.py           362  
+gbt_allinone/tools/launcher_inventory.py         74  
+gbt_allinone/tools/ledger_note.py               209  
+gbt_allinone/tools/libtv_skill.py               910  
+gbt_allinone/tools/libtv_workflow.py            193  
+gbt_allinone/tools/llm_redteam.py               258  
+gbt_allinone/tools/lobehub.py                   611  LobeHub 桌面端全控（主人令 2026-09-27）。
+gbt_allinone/tools/local_brain.py               341  
+gbt_allinone/tools/long_run_supervisor.py       315  
+gbt_allinone/tools/look_grade_cap.py            109  
+gbt_allinone/tools/machine_cap.py               362  
+gbt_allinone/tools/machine_distill.py           155  
+gbt_allinone/tools/media_license.py             267  素材许可登记（native 能力位 `media_license`）—— 三方向流程台「家规第 2 条」的数据源。
+gbt_allinone/tools/media_pipeline.py            253  
+gbt_allinone/tools/media_publish.py             204  
+gbt_allinone/tools/media_run.py                2215  
+gbt_allinone/tools/media_stamp.py                94  
+gbt_allinone/tools/memory_bank.py               310  
+gbt_allinone/tools/memory_manager.py            210  
+gbt_allinone/tools/meta_cognition.py            284  
+gbt_allinone/tools/model_key_pool.py            239  
+gbt_allinone/tools/module_sweep.py              271  
+gbt_allinone/tools/motion_kit.py                445  
+gbt_allinone/tools/music_publishing.py          124  AI 音乐发布平台 · 只读三层归位（music_publishing）· R-H173。
+gbt_allinone/tools/n8n_wf_cap.py                144  
+gbt_allinone/tools/native_rc.py                  57  判据基础设施 · 退出码只认原生 rc（R97 · 改法 2 · 风哥 2026-09-18 拍）。
+gbt_allinone/tools/observer_anchor.py           235  
+gbt_allinone/tools/obsidian_vault.py            424  
+gbt_allinone/tools/offload_distill.py           218  
+gbt_allinone/tools/omni_arm.py                  158  
+gbt_allinone/tools/one_shot.py                  242  
+gbt_allinone/tools/orchestration_kernel.py      298  
+gbt_allinone/tools/organ_check.py               375  
+gbt_allinone/tools/page_scan.py                 130  
+gbt_allinone/tools/pentest_distill.py           147  
+gbt_allinone/tools/performance_monitor.py       161  
+gbt_allinone/tools/persona_kernel.py            363  性格内核 v4.0（persona_kernel）· 外温 + 内刚 两层结构。
+gbt_allinone/tools/pod_link.py                  647  
+gbt_allinone/tools/policy_delta.py              146  
+gbt_allinone/tools/proactive_report.py          528  
+gbt_allinone/tools/procfs.py                    193  进程读取安全层 —— 优先 psutil，坏了就自己读 /proc。
+gbt_allinone/tools/project_drift.py             404  
+gbt_allinone/tools/projection_skill.py          196  
+gbt_allinone/tools/pulse.py                     289  
+gbt_allinone/tools/pulse_agent.py               339  万能插 · 每日脉冲情报 Agent
+gbt_allinone/tools/pulse_direct.py              158  
+gbt_allinone/tools/rea_reverse.py               245  
+gbt_allinone/tools/reclaim_sweep.py             279  
+gbt_allinone/tools/recon_distill.py             257  
+gbt_allinone/tools/regression_stamp.py          665  
+gbt_allinone/tools/render_evolution.py          222  
+gbt_allinone/tools/repo_publish.py              144  repo_publish —— **远端发布面**（补 git_write 的另一半）。
+gbt_allinone/tools/research_intel.py            395  
+gbt_allinone/tools/responses_bridge.py          247  
+gbt_allinone/tools/scan_engine.py               719  多维穷尽扫描引擎 —— **扫过之处，无所遁形**。
+gbt_allinone/tools/scan_scope.py                275  
+gbt_allinone/tools/scene_anchor.py              135  
+gbt_allinone/tools/scrapling_cap.py             130  
+gbt_allinone/tools/sec_sweeper.py               455  
+gbt_allinone/tools/shadow_check.py              224  
+gbt_allinone/tools/shared_resources.py          155  
+gbt_allinone/tools/skill_slim.py                311  技能描述瘦身刀（GBT小土豆V8 · 原生能力预算）
+gbt_allinone/tools/skill_vetting.py             406  
+gbt_allinone/tools/skill_watch.py               173  
+gbt_allinone/tools/slim_profile.py              285  瘦身画像：**按命名类别裁 + 三档闸 + 裁后复核**（蒸馏自 simslim，只取剪裁架构）。
+gbt_allinone/tools/source_judge.py              192  源码判据器：把「提到 ≠ 用了」这条家规做成**可调用的判据**。
+gbt_allinone/tools/spend_guard.py               184  
+gbt_allinone/tools/stigmergy.py                 376  
+gbt_allinone/tools/surface_bind.py              369  
+gbt_allinone/tools/sync_exec.py                 992  
+gbt_allinone/tools/task_manager.py              209  
+gbt_allinone/tools/telegram_embed.py            230  
+gbt_allinone/tools/tentacle_arm.py              330  
+gbt_allinone/tools/tentacle_cognition.py        177  触手认知包（tentacle_cognition）· R-H195 只读骨架。
+gbt_allinone/tools/tentacle_comfy_bridge.py     166  
+gbt_allinone/tools/tentacle_pipeline.py         170  
+gbt_allinone/tools/train_recipe.py              158  训练配方与就绪闸：**七阶段配方 + 如实报缺什么**（蒸馏自 train-llm-from-scratch，只取流程核）。
+gbt_allinone/tools/transformer_cap.py           401  
+gbt_allinone/tools/ui_kit.py                    283  ui_kit —— **UI 组件库的口**（吞天吞来的素材 → 可检索 · 可取件 · 读数如实）。
+gbt_allinone/tools/ui_render.py                 192  受控界面渲染：**模型输出只能落在预定义组件与动作里**（蒸馏自 json-render，只取约束核）。
+gbt_allinone/tools/verification_watch.py        142  
+gbt_allinone/tools/visible_write.py             206  
+gbt_allinone/tools/vision_grounding.py          114  
+gbt_allinone/tools/vision_print.py              995  视觉打印 —— 看到的东西 → 打成代码（自包含 HTML）→ 真渲染 → 与所见帧比。
+gbt_allinone/tools/vision_probe.py              207  
+gbt_allinone/tools/vlx_flow_cap.py              272  
+gbt_allinone/tools/warm_switch.py               382  
+gbt_allinone/tools/wave_probe.py                178  痕迹触手 wave_probe · 第 2 步第二小刀（Owner 2026-09-19 图纸 §3）。
+gbt_allinone/tools/whatsapp_embed.py            212  
+gbt_allinone/tools/zimage_rewash_cap.py         256  
+gbt_allinone/topic_watch.py                     433  GBT小土豆V8 · 话题追踪（topic_watch）—— 发现与命中层，不是又一套调研实现。
+gbt_allinone/topic_web.py                       521  
+gbt_allinone/trace_store.py                     270  
+gbt_allinone/train_ground.py                    706  train_ground —— **回炉训练场**（主人令 2026-10-16：必须用万能插无死角训练；
+gbt_allinone/transfer.py                        145  
+gbt_allinone/trend_watch.py                     145  
+gbt_allinone/tripo.py                           420  
+gbt_allinone/truth_scan.py                      144  
+gbt_allinone/ux_doctrine.py                     449  
+gbt_allinone/vision_cap.py                      306  vision 能力 — 本地真实视觉分析（PIL 像素级）+ 可选云端识别。
+gbt_allinone/vision_loop.py                     323  
+gbt_allinone/vision_ocr.py                       68  vision_ocr -- 把屏幕/图片上的**字**读出来（零密钥优先，离线）。
+gbt_allinone/vision_unified.py                   89  
+gbt_allinone/voice_cap.py                       856  
+gbt_allinone/voice_orchestra.py                 322  
+gbt_allinone/voice_studio.py                    775  VoiceStudio 原生桥（**只提炼接口，不下载任何模型**）—— 主人令 2026-10-17。
+gbt_allinone/welcome.py                          76  
+gbt_allinone/worker.py                           38  GBT小土豆V8 · 可终止的执行子进程入口。
+gbt_allinone/workflow_forge.py                  143  
+gbt_allinone/xingyun_bridge.py                  275  
+runtime/adaptive_context.py                     157  
+runtime/adaptive_http.py                        132  自适应监听队列 —— 按压力自动跟随，不写死数字
+runtime/async_gate.py                           373  
+runtime/gbt_allinone/api.py                    3098  
+runtime/gbt_allinone/auth_gate.py               417  
+runtime/gbt_allinone/caps_registry.py          3081  
+runtime/gbt_allinone/deployment_rehearsal.py   1494  
+runtime/gbt_allinone/mirror_space.py            359  
+runtime/gbt_allinone/omni_plug.py               936  
+runtime/gbt_allinone/preflight.py              1086  
+runtime/gbt_allinone/qiankun.py                 441  GBT小土豆V8 · 一指定江山乾坤换位 + AI 接管部署队列。
+runtime/gbt_allinone/room_space.py             1404  GBT小土豆V8 · 内置沙盒会议室（room_space）。
+runtime/gbt_allinone/security/policy.py        1136  
+runtime/gbt_allinone/signature.py               140  GBT小土豆V8 · 开发者署名守卫（Signature Guard）。
+runtime/gbt_allinone/store.py                   265  
+runtime/model_bridge.py                        1109  
+runtime/static_check.py                         190  
+tools/a19_ask.py                                128  a19_ask —— 在本对话框里直接调 A19 的原生权重（绕过 Minis 的模型注入）。
+tools/a19_attach.py                             207  
+tools/a19_catch.py                              133  
+tools/a19_ctl.py                                334  
+tools/a19_draw.py                                94  
+tools/a19_dual_tentacle.py                      326  A19 双触手 —— 以大脑执行层为核心，一根喂推理、一根把输出交回排布
+tools/a19_hunter.py                             184  
+tools/a19_persona_test.py                        87  a19_persona_test —— 把"她傻不傻"变成可量的五项。
+tools/a19_prefill.py                            129  
+tools/a19_quality.py                            214  
+tools/a19_sentinel.py                           136  
+tools/a19_shot.py                                96  
+tools/a19_stub.py                                94  
+tools/a19_switch.py                             116  
+tools/a19_t2i.py                                 92  
+tools/a19_wait.py                               134  
+tools/a19_watch.py                               61  a19_watch —— 探到 :1234 **真能应答**（不只是 TCP 通）就立刻打一发快枪。
+tools/acceptance.py                             409  
+tools/async_bench.py                            106  
+tools/batch_polish.py                           182  
+tools/body.py                                   518  
+tools/brain_align.py                            358  
+tools/brain_attention.py                        180  主脑注意力消费端 —— 把队列里的疑点排布成动作，只对**真解决了的**销账
+tools/cap_first.py                              148  
+tools/cap_probe.py                               69  单能力探活（供多域监控当**可杀子进程**用）
+tools/cinema.py                                  86  
+tools/codegraph_native.py                       263  
+tools/codex-scripts/_gen_plugins50_spec.py      116  
+tools/codex-scripts/_patch_mesh_drivers.py       46  给 mesh.json 的每个云插件补 `local_driver`（插件 → 本机触手能力位）—— 单一真源改表。
+tools/codex-scripts/accept-all-angles.py        408  
+tools/codex-scripts/accept-all.py               142  
+tools/codex-scripts/action-ledger.py            217  
+tools/codex-scripts/add-encoding-guard.py       158  
+tools/codex-scripts/add-eyes.py                 267  
+tools/codex-scripts/advisor-audit.py            138  
+tools/codex-scripts/advisor-note.py             143  顾问席 · **只追加**的建议账写入器（Claude / DSH 两个席位）
+tools/codex-scripts/agnes-video-probe.py         65  agnes-video-probe.py — 摸清 agnes 视频模型的真实接口契约（只读探路，不猜）。
+tools/codex-scripts/agnes-video-probe2.py        59  agnes-video-probe2.py — 摸清 /v1/videos 的 mode 与图片字段名（只读探路）。
+tools/codex-scripts/ai-board.py                 235  AI 工作可视化面板（ai-board）—— **一页看全：谁是谁、什么职位、在休息还是在干活**。
+tools/codex-scripts/ai-control-reverse-probe.py  113  
+tools/codex-scripts/anim-audit.py               187  anim-audit.py —— 读 GLB 里的动画数据，量出"哪根骨头被动画扭坏了"。
+tools/codex-scripts/anim-hipfix.py              342  anim-hipfix.py —— 把自动绑骨跑坏的**髋骨轨道**归位到静止姿势（GLB 层面动手术，不动别的）。
+tools/codex-scripts/anim-idle.py                151  
+tools/codex-scripts/anim-make.py                597  
+tools/codex-scripts/anim-talk.py                149  
+tools/codex-scripts/app-page-audit.py           116  
+tools/codex-scripts/app-surface-scan.py          92  
+tools/codex-scripts/append-ledger-tianzhen.py   103  把这一批（GBT天真 / 五维合一 / 多域监控 + 三处真修）追加进编排账本。
+tools/codex-scripts/apply-context-align.py       87  
+tools/codex-scripts/asr-offline.py              292  离线语音输入那条腿 · 把本机识别器（Windows System.Speech）接起来。
+tools/codex-scripts/assemble.py                 290  
+tools/codex-scripts/asset-pool.py               313  模块 03 · asset-pool（素材池）—— 插件云侧素材登记与取回
+tools/codex-scripts/audit-ast-vs-text.py         19  已废弃 —— 本脚本是「AST 口径」探针的**第一版**，方案已被自己的读数否掉。
+tools/codex-scripts/audit-caller-rule-probe.py  174  
+tools/codex-scripts/audit-dead-judgments.py     411  **永远不会红的判据**审计器（AST 版）。
+tools/codex-scripts/audit-dh-status.py          209  
+tools/codex-scripts/audit-injection-honesty.py  190  
+tools/codex-scripts/audit-integrity.py          127  
+tools/codex-scripts/audit-line-refs.py          179  audit-line-refs.py —— 全仓扫「`文件:行号`」形态的引用，把**飘了的锚**挑出来（**只读，不改任何代码**）。
+tools/codex-scripts/audit-narrow-rule.py         19  已废弃 —— 本脚本是「窄规则」探针的**第二版**，测量有 bug，结论不可采信。
+tools/codex-scripts/audit-regulations.py        118  
+tools/codex-scripts/audit-skill-roots.py        272  
+tools/codex-scripts/audit-timeline-check.py      64  audit-timeline-check · 动作时间线判据（蒸馏自 ifixai-ai/iFixAi）。
+tools/codex-scripts/audit_aesthetic.py          264  
+tools/codex-scripts/audit_code_taste.py        1457  
+tools/codex-scripts/audit_craft_gate.py         151  
+tools/codex-scripts/audit_deliverable_craft.py  190  
+tools/codex-scripts/audit_skin.py               279  皮肤分流机检器（2026-09-23 起）—— 把「别跟旧皮肤混」从口头约定变成读数。
+tools/codex-scripts/audit_token_context.py      163  
+tools/codex-scripts/audition-render.py          280  试听曲渲染器 —— 给「AI 音乐」面板做一件**真能听**的排练垫乐。
+tools/codex-scripts/auth-shape.py               106  
+tools/codex-scripts/autorig-pose-hi.py          140  
+tools/codex-scripts/autorig-skeleton.py         284  
+tools/codex-scripts/autorig-skin.py             252  
+tools/codex-scripts/autorig-transfer.py         184  
+tools/codex-scripts/avatar-orient.py            176  
+tools/codex-scripts/bake-all-pages.py           216  重烤所有生成页（bake-all-pages）
+tools/codex-scripts/beauty-pass.py              146  
+tools/codex-scripts/bench-cap-concurrency.py    135  
+tools/codex-scripts/bench-tentacle-ceiling.py   154  
+tools/codex-scripts/bigfiles-manifest.py        142  
+tools/codex-scripts/blender/dh_fix_scan.py      255  
+tools/codex-scripts/blender/dh_fix_view.py      218  
+tools/codex-scripts/blender/dh_rig.py          1702  
+tools/codex-scripts/blender/dh_sail_weights.py  207  
+tools/codex-scripts/block-neighborhood-watch.py  528  
+tools/codex-scripts/blocker-research-check.py   545  
+tools/codex-scripts/blueprint-check.py          118  
+tools/codex-scripts/blueprint-feed.py           916  
+tools/codex-scripts/blueprint-first.py          141  blueprint-first -- 接令先出立体蓝图，主人确认后才推进（主人令 2026-10-16）。
+tools/codex-scripts/blueprint-look.py           345  
+tools/codex-scripts/boot-selfcheck.py           608  
+tools/codex-scripts/bp-app-scan.py              204  bp-app-scan.py —— 对已抽取的 projectaal App 源码做「未完成形态」机检。
+tools/codex-scripts/bp-apply-patches.py         165  
+tools/codex-scripts/bp-js.py                    126  bp-js.py —— 蓝图排障用的「CDP 直读直写」命令行（不经 PowerShell 引号地狱）。
+tools/codex-scripts/brain-closure-check.py      114  脑层闭环核验（可复跑判据）— 2026-10-04 由审查端口落盘。
+tools/codex-scripts/brain-feed.py               565  
+tools/codex-scripts/brain-step-track.py         133  
+tools/codex-scripts/brand-lock-check.py         107  
+tools/codex-scripts/build_api_mirror.py          73  
+tools/codex-scripts/build_deliverables.py        73  构建两件交付物：
+tools/codex-scripts/build_hud_manifest.py       204  
+tools/codex-scripts/build_manifest.py           183  
+tools/codex-scripts/build_panel_mirror2.py      291  
+tools/codex-scripts/build_shadow_repo.py        374  影子仓库 —— 把"我们的文件"复制成一个干净分块。
+tools/codex-scripts/build_v10.py                142  
+tools/codex-scripts/build_v10_canvas.py          96  
+tools/codex-scripts/build_v10_manifest.py        32  V10 数据层：V9 + 真实项目树。
+tools/codex-scripts/build_v11.py                147  
+tools/codex-scripts/build_v11_canvas.py         206  
+tools/codex-scripts/build_v11_manifest.py       131  
+tools/codex-scripts/build_v12.py                128  
+tools/codex-scripts/build_v12_canvas.py         199  
+tools/codex-scripts/build_v12_manifest.py       207  
+tools/codex-scripts/build_v13.py                159  
+tools/codex-scripts/build_v13_canvas.py         156  
+tools/codex-scripts/build_v13_manifest.py        66  
+tools/codex-scripts/build_v14.py                151  
+tools/codex-scripts/build_v14_canvas.py         153  
+tools/codex-scripts/build_v14_manifest.py       179  
+tools/codex-scripts/build_v15.py                 78  构建 V15：影视氛围层（每一页都加）。
+tools/codex-scripts/build_v15_canvas.py          57  构建 V15 画布：影视氛围层（每一页都加）+ 开场镜头落位。
+tools/codex-scripts/build_v16.py                 89  
+tools/codex-scripts/build_v17.py                173  
+tools/codex-scripts/build_v17_canvas.py         130  
+tools/codex-scripts/build_v17_manifest.py       194  
+tools/codex-scripts/build_v18.py                104  
+tools/codex-scripts/build_v18_canvas.py          77  构建 V18 画布：加一页「能力 → 源码」（58 → 59）。
+tools/codex-scripts/build_v18_manifest.py        88  
+tools/codex-scripts/build_v19.py                113  
+tools/codex-scripts/build_v19_canvas.py          82  构建 V19 画布：加一页「AI朋友圈 · 用户社交」（59 → 60）。
+tools/codex-scripts/build_v19_manifest.py       151  
+tools/codex-scripts/build_v20.py                 97  构建 V20：AI朋友圈关系场可视化面板。
+tools/codex-scripts/build_v20_canvas.py          76  
+tools/codex-scripts/build_v20_manifest.py       133  
+tools/codex-scripts/build_v21.py                 60  构建 V21：修「列向 flex 压扁面板」这个影响所有面板的布局 bug。
+tools/codex-scripts/build_v3.py                  99  构建 V3 双交付（HUD 版）：
+tools/codex-scripts/build_v4.py                  91  
+tools/codex-scripts/build_v4_manifest.py        102  
+tools/codex-scripts/build_v5.py                  71  
+tools/codex-scripts/build_v5_manifest.py        105  
+tools/codex-scripts/build_v6.py                  55  构建 V6：V5 基础上加「语音」「蓝牙」两块真面板。归档 V5 → 写 V6。
+tools/codex-scripts/build_v6_canvas.py          136  
+tools/codex-scripts/build_v6_manifest.py         74  
+tools/codex-scripts/build_v7.py                  47  构建 V7：V6 基础上加「万能插」「亿万触手」两块真面板。归档 V6 → 写 V7。
+tools/codex-scripts/build_v7_canvas.py          165  
+tools/codex-scripts/build_v7_manifest.py        111  
+tools/codex-scripts/build_v8.py                  55  构建 V8：V7 基础上补齐八块缺口面板（镜像/大模型/心智/情报/安全/长程工具/创作吞噬/其余域）。
+tools/codex-scripts/build_v8_canvas.py          271  
+tools/codex-scripts/build_v8_manifest.py        134  
+tools/codex-scripts/build_v9.py                  42  构建 V9：V8 基础上加「插件市场（蒸馏件）」面板。归档 V8 → 写 V9。
+tools/codex-scripts/build_v9_canvas.py          101  
+tools/codex-scripts/build_v9_manifest.py         35  V9 数据层：V8 + 插件市场蒸馏结果。
+tools/codex-scripts/bust-rig.py                 224  
+tools/codex-scripts/cap-pages.py                266  
+tools/codex-scripts/cap-probe.py                244  
+tools/codex-scripts/cap-write-reach.py          253  写口**可达性**分析（只读静态）：从「api.py 的分派入口」一路 BFS 到写盘调用，回答
+tools/codex-scripts/cap-write-surface.py        188  把「零作用域·有写口」那批位**逐个摊开**：写到哪、在哪个函数、有没有 op 门（只读，不跑位）。
+tools/codex-scripts/cap_probe_all.py            282  
+tools/codex-scripts/capability-audit.py        1462  能力审计 · **逐项真探**（主人令 2026-10-07）。
+tools/codex-scripts/capability-autobind.py      524  
+tools/codex-scripts/capability-bar-check.py     815  
+tools/codex-scripts/capability-bindings.py     1630  
+tools/codex-scripts/capability-family-deepscan.py  429  
+tools/codex-scripts/capability-nerve.py         516  
+tools/codex-scripts/capability-runthrough.py     67  capability-runthrough -- 摆设清单：登记了但**从未真跑通**的能力位。
+tools/codex-scripts/capability-supervisor.py    581  能力超级visor · **自动报警 + 自我修复 + 安全回滚**（主人令 2026-10-07）。
+tools/codex-scripts/capbinding-gaps.py           71  gap-scan-capbindings -- 逐条列出能力位 desc 里的「未接线/未读到/缺」，并给处置分类。
+tools/codex-scripts/caps-census.py              328  
+tools/codex-scripts/caps-registry-guard.py      509  caps-registry-guard · 能力注册表的**哨兵**：坏了就叫、并给一条命令复原
+tools/codex-scripts/caps-restriction-audit.py   169  
+tools/codex-scripts/caps-runtime-census.py      182  
+tools/codex-scripts/caps-two-plane-census.py    223  
+tools/codex-scripts/caps-write-gate-census.py   218  
+tools/codex-scripts/caps_surface_bind.py        155  
+tools/codex-scripts/caps_sweep.py               177  
+tools/codex-scripts/cdp-colab-run.py            156  
+tools/codex-scripts/cdp-open-hn.py               64  把一个**已在 9222 上开着 CDP** 的 Chrome 导航到 HN 投稿页，并截图确认（只读观察）。
+tools/codex-scripts/cf-oauth-auto.py            511  
+tools/codex-scripts/cf-oauth-check.py            95  Cloudflare 多账号「登入授权」检查器（OAuth 路线，不碰 API 密钥）。
+tools/codex-scripts/chain-check.py              191  
+tools/codex-scripts/check-cap-links.py           75  
+tools/codex-scripts/check-glb-uv.py              51  查宝箱 GLB 每个材质组的 UV 落区：图集象限 = 左上木 / 右上铁 / 右下金 / 左下(未使用,暗)。
+tools/codex-scripts/checkup.py                  490  
+tools/codex-scripts/clean_residue.py            711  
+tools/codex-scripts/cli-surface-check.py         67  
+tools/codex-scripts/cliproxy.py                 454  
+tools/codex-scripts/close-fault.py               69  结掉一条未清故障：从 open_faults 移进 closed_faults + 记一笔 log。
+tools/codex-scripts/closed-loop-gate.py         159  
+tools/codex-scripts/cloud-config-wiring.py      272  
+tools/codex-scripts/cloud-mesh.py              1360  
+tools/codex-scripts/cloud-plugins-bind-check.py  140  判据：**4 个云插件的双向绑定**（`state/cloud-plugins-edges.json`）到底成不成立。
+tools/codex-scripts/cloud-plugins-check.py      188  
+tools/codex-scripts/cloud-plugins.py            525  
+tools/codex-scripts/cloud-slots50.py             48  把 50 槽规格编译成 Worker 内数据模块（deploy/cloud-10/src/slots.generated.js）。
+tools/codex-scripts/cloud-status.py            1177  
+tools/codex-scripts/cloud-vault.py              180  云数据仓（无限扩容 · 按触手根数扩 · 目标 32 GB）
+tools/codex-scripts/code-deck.py                595  
+tools/codex-scripts/codex-drive.py              171  
+tools/codex-scripts/colab-takeover.py           187  接管 Colab：CDP 点格子 + **系统级键盘**粘贴运行（绕开 shadow DOM 吃不到注入的问题）。
+tools/codex-scripts/comfy-pose-lora.py          338  
+tools/codex-scripts/comfy-run.py                214  
+tools/codex-scripts/comfy-surface.py            400  
+tools/codex-scripts/command-ai-mcp.py            68  
+tools/codex-scripts/compact-app-nav.py          125  compact-app-nav.py —— 把 App 每个页面顶上那坨「直达」巨型导航收成**一条紧凑导航**。
+tools/codex-scripts/compare-mesh.py              60  对比两个 GLB 的几何与贴图，判断能否**直接移植骨架**（顶点顺序一致才可）。
+tools/codex-scripts/compare-renders.py           21  
+tools/codex-scripts/compose-strip.py             35  
+tools/codex-scripts/concurrency-capacity-test.py  123  
+tools/codex-scripts/context-anchor.py           131  
+tools/codex-scripts/context-retrieval-boost.py  135  context-retrieval-boost · 检索增强层（补 context_vault 缺的那条链）。
+tools/codex-scripts/context-window-watch.py     338  
+tools/codex-scripts/criterion_bench.py          932  
+tools/codex-scripts/d7-skill-boundary.py        213  
+tools/codex-scripts/db-fleet.py                 247  
+tools/codex-scripts/dbfleet-check.py            152  
+tools/codex-scripts/decision-annotate.py         62  给 `owner_decisions` 里的某几条**标注实测解答**（不删、不改写原问题）。
+tools/codex-scripts/decision-direct.py          203  
+tools/codex-scripts/deepseek_bridge.py          652  DeepSeek 免费决策桥 · GBT小土豆V8 全能力接入（2026-10-04 主人令）。
+tools/codex-scripts/defense-report-server.py    208  defense-report-server -- 本机最小「自卫上报/反控」端点（主人 2026-10-17 批准）。
+tools/codex-scripts/deform-aware-check.py       211  形变盲区检查（deform-aware）· 扫出**「按对象当前状态量尺寸」**这一族的代码形状。
+tools/codex-scripts/deliver-report.py            65  
+tools/codex-scripts/delivery-checklist.py       127  
+tools/codex-scripts/deploy-panel.py            1216  
+tools/codex-scripts/deploy-targets.py            76  
+tools/codex-scripts/deployment-law-check.py     160  部署法制审查 —— **只出品生产，不出品废物**（主人令 2026-10-10，逐字）
+tools/codex-scripts/design-inventory.py         247  
+tools/codex-scripts/design-vs-reality-sweep.py  253  
+tools/codex-scripts/desktop-shell-guard.py      732  桌面壳 · 「不破坏 DSH」守卫（2026-09-23 立）。
+tools/codex-scripts/detail-check.py             102  
+tools/codex-scripts/detail-normal.py            103  
+tools/codex-scripts/device-deploy.py            135  
+tools/codex-scripts/dh-asset-gate.py            241  dh-asset-gate.py —— 数字人资产闸：一条命令验完"她现在是不是站着、绑对了、动作没扭坏"。
+tools/codex-scripts/dh-basebuild.py             203  
+tools/codex-scripts/dh-bone-map.py              300  
+tools/codex-scripts/dh-rig-check-rig.py         618  
+tools/codex-scripts/dh-rig-check.py             514  
+tools/codex-scripts/dh2d-live-check.py           74  dh2d-live-check.py — 验**活链路**：音量 → step() → 嘴开合，在真剧场页上跑。
+tools/codex-scripts/dh2d-receipt.py              41  dh2d-receipt.py — 把三条要求的验收读数落成一份收据（可复跑、可核对）。
+tools/codex-scripts/dh2d-shot.py                106  
+tools/codex-scripts/dh2d-theater-shot.py         73  
+tools/codex-scripts/dh2d-video.py               253  dh2d-video.py — 用**真音频**驱动 2.5D 数字人出片，并给出三条要求的可量读数。
+tools/codex-scripts/dh2d-zoom.py                 89  
+tools/codex-scripts/dh_source_probe.py          160  
+tools/codex-scripts/dh_source_topo.py           166  
+tools/codex-scripts/dingtalk-live-page.py        72  
+tools/codex-scripts/doc-drift.py                235  
+tools/codex-scripts/drift.py                    128  
+tools/codex-scripts/dsh-bus.py                  117  
+tools/codex-scripts/dsh-census.py               614  
+tools/codex-scripts/dsh-plugin-audit.py         259  
+tools/codex-scripts/dsh-route-check.py          920  
+tools/codex-scripts/dup-pages.py                134  
+tools/codex-scripts/dup-source-inventory.py     192  重份源码普查 —— 只读。
+tools/codex-scripts/encoding-guard-check.py     245  
+tools/codex-scripts/eval-live-full.py           142  
+tools/codex-scripts/exec-deck.py                438  
+tools/codex-scripts/export-capabilities.py       34  把注册表导出成 data/capabilities.json（桥的目录快照）。
+tools/codex-scripts/export-gguf-q4.py           316  
+tools/codex-scripts/export_renders.py            58  把真渲染结果导出到工作区根目录 render/（转 JPEG 压体积），并生成索引。
+tools/codex-scripts/exposure-scan.py            178  
+tools/codex-scripts/eye-feed.py                 248  
+tools/codex-scripts/eye-hand-bench.py           206  眼手同步基准（eye-hand-bench）—— **打磨到射击级**（真抓帧 · 真驱动鼠标 · 真画面复核）。
+tools/codex-scripts/eye-stream.py               226  
+tools/codex-scripts/failover.py                 309  
+tools/codex-scripts/failure-attribution-check.py  111  
+tools/codex-scripts/family-inject-run.py        128  
+tools/codex-scripts/fault-sweep.py              235  
+tools/codex-scripts/fetch_iching_table.py       300  从公开来源取六十四卦的**三个不歧义字段**：卦名 · 下卦 · 上卦。
+tools/codex-scripts/fg_claim_scope_repro.py     218  
+tools/codex-scripts/figma-fetch.py              295  Figma REST 客户端（只读为主）—— 让本机**真的能碰 Figma**
+tools/codex-scripts/fill-hn-submit.py           144  
+tools/codex-scripts/film-audio-guard.py         125  
+tools/codex-scripts/first-axiom-gate.py         182  
+tools/codex-scripts/five-dim-gate.py             87  
+tools/codex-scripts/five-dim.py                1080  
+tools/codex-scripts/fix-base-paths.py            70  **一次性的路径迁移**：`tools/codex-scripts/*.py` 里 `.parent.parent` 算错了一层。
+tools/codex-scripts/fix-cjk-quotes.py           207  
+tools/codex-scripts/fix-dead-undefined-check.py   66  把 `verify_v11..v21` 里那 **11 条「永远不会红」的判据**改成真的能红。
+tools/codex-scripts/fix_exit_pointers.py        163  出口清单登记指针 · 自动对齐器（R121 后续 · 2026-09-23）。
+tools/codex-scripts/fix_nested_quotes.py         73  修 .py 里「字符串内嵌同类引号」并报告 —— 顺带当机械闸用。
+tools/codex-scripts/fixtures/code-taste-clean.py   43  正对照 · 一份能过机的代码。
+tools/codex-scripts/fixtures/code-taste-cross-a.py   26  跨文件重复块 · 负对照 A（P1-11）+ 中文叙述性注释（P1-9）。
+tools/codex-scripts/fixtures/code-taste-cross-b.py   16  跨文件重复块 · 负对照 B（只有 P1-11：与 A 有同一坨 8 行）。
+tools/codex-scripts/fixtures/code-taste-sins.py  240  
+tools/codex-scripts/fixtures/test_code_taste_ghost.py   19  负对照 · 空壳测试（P0-4 专用）。
+tools/codex-scripts/forbidden-lists.py          177  
+tools/codex-scripts/forget-list-check.py        245  
+tools/codex-scripts/frame-cache.py              347  
+tools/codex-scripts/framework-gate-bite-test.py  132  
+tools/codex-scripts/freellm-alive.py            202  
+tools/codex-scripts/fullscan-tentacle.py        813  
+tools/codex-scripts/gap-ledger.py                79  gap-ledger -- 未读到/未跑通总账（分两桶：待办桶 / 已如实留痕桶）。
+tools/codex-scripts/gate-blind-audit.py         448  
+tools/codex-scripts/gate-blind-kinds.py         454  gate-blind-kinds · **位级**写目标（`api.py` 分支 → 它调的函数 → 只抽那个函数）
+tools/codex-scripts/gate-blindspot-scan.py       53  gate-blindspot-scan -- 门盲区扫描：现读 policy 分支 + 各模块 ops，
+tools/codex-scripts/gate-redirect.py            106  
+tools/codex-scripts/gbt-checkup.py              169  一条命令体检「深蒸交付」三件事 —— 省得每次手敲三条、也省得漏掉其中一条。
+tools/codex-scripts/gbt-defense-inject.py       221  
+tools/codex-scripts/gbt-local-infer.py          414  
+tools/codex-scripts/gbt-model-accept.py         246  
+tools/codex-scripts/gbt-model-align.py          494  
+tools/codex-scripts/gen-authz-page.py           302  
+tools/codex-scripts/gen-capability-proof.py     314  
+tools/codex-scripts/gen-caps-tiers.py           153  能力位分档账的生产者（修 P9「账没有写手必烂」）。
+tools/codex-scripts/gen-native-live.py          256  
+tools/codex-scripts/gen-nav-compact.py          186  
+tools/codex-scripts/gen-open-source-caps.py     212  
+tools/codex-scripts/gen-scope-page.py           159  
+tools/codex-scripts/gen-skill-gap-patch.py      160  **生成「域规程待补清单」** —— 只出补丁内容，**绝不改技能件**。
+tools/codex-scripts/generator.py                237  
+tools/codex-scripts/genrouter.py                960  
+tools/codex-scripts/gguf-q4-contract-check.py   755  GGUF Q4_0 契约检查 —— 判定「是量化调用错了，还是 Q4_0 本来就不够」。
+tools/codex-scripts/glb-inline.py                95  把 .glb **内联成经典脚本**（`window.GBT_GLB_B64="…"`），给 `file://` 下的舞台兜底。
+tools/codex-scripts/gpu_lane.py                 160  
+tools/codex-scripts/guardrail-check.py          193  
+tools/codex-scripts/hacker_matrix_check.py      127  靶标矩阵判据（hacker_matrix_check）—— 每一类靶标**必须被 V8 自己的扫描器咬到**。
+tools/codex-scripts/hair-final.py               200  
+tools/codex-scripts/hair-rebind.py              175  
+tools/codex-scripts/hair-retip.py               132  
+tools/codex-scripts/hair-springs.py             147  
+tools/codex-scripts/hands-on-aa-check.py         98  
+tools/codex-scripts/hands-on-aa-fetch.py         31  hands-on-aa-fetch · 逐字节落 vendor/hands-on-aa 并出 sha256 manifest（一字不差的机器
+tools/codex-scripts/head-fix-decimate.py         95  
+tools/codex-scripts/head-graft-np.py            207  
+tools/codex-scripts/head-graft.py               227  
+tools/codex-scripts/head-orient.py              225  
+tools/codex-scripts/health-ledger.py            178  
+tools/codex-scripts/honest-branch-audit.py      387  
+tools/codex-scripts/human-tone-check.py          60  human-tone-check -- 「AI 味」机检：禁词表 + 结构味（三连同长句/平衡三项/连接词开头）。
+tools/codex-scripts/iching_order_repro.py        66  判别性复现：证明「位序镜像」缺陷是真的，且新自检**真咬得住**。
+tools/codex-scripts/identity-acceptance-probe.py  179  
+tools/codex-scripts/img-reverse.py               78  img-reverse -- 洗图「反推环」v2：本机像素读数(vision analyze) -> 形式化反推；语义反推缺通道时如实标。
+tools/codex-scripts/impact-monitor-tick.py      161  impact-monitor-tick.py —— 多域监控的**驱动轮**（把"每小时一次"真的转起来）。
+tools/codex-scripts/impact.py                   135  
+tools/codex-scripts/index-roster-parity.py      174  
+tools/codex-scripts/inkstone-gbt-bridge.py      272  
+tools/codex-scripts/install-design-mastery.py   132  
+tools/codex-scripts/installed-drift-inspect.py  110  装机副本漂移的**方向判定**：逐文件比源稿与装机副本，并打印差异摘要。
+tools/codex-scripts/integrated-check.py         158  
+tools/codex-scripts/intercom.py                 236  
+tools/codex-scripts/ios-voice-bridge.py          87  
+tools/codex-scripts/iron-rules-check.py         218  
+tools/codex-scripts/judge-health.py              95  judge-health -- 判据健康度：一眼分清「是她没练到」还是「我判据太死」。
+tools/codex-scripts/keep-warm.py                 96  
+tools/codex-scripts/key-consistency-check.py    158  **密钥一致性对账**（只读 · 只印掩码）—— 同一个密钥如有两份，它们还一样吗？
+tools/codex-scripts/key-hygiene.py              226  
+tools/codex-scripts/keys-page.py                151  
+tools/codex-scripts/landing-checklist.py         73  
+tools/codex-scripts/lane-bench.py               158  
+tools/codex-scripts/lane-doctor.py              495  
+tools/codex-scripts/lane-gate-free.py            99  
+tools/codex-scripts/lark_deletable_list.py      131  
+tools/codex-scripts/lark_delete_caches.py       138  
+tools/codex-scripts/lark_inventory.py           174  飞书云空间 · 递归盘点（只读）。
+tools/codex-scripts/lark_inventory_analysis.py  112  
+tools/codex-scripts/lark_verify_delete.py        67  云空间 · 删除验证（fresh read 比对，不信自己的日志）。
+tools/codex-scripts/ledger-add-faults.py         57  往台账 open_faults 里**追加**本轮新登记的两条（只追加，不动既有条目；原子替换落盘）。
+tools/codex-scripts/ledger-append-notdone.py     49  往台账 `not_done` 追加一条「决定/待办」（只追加、原子替换）。
+tools/codex-scripts/ledger-append.py            307  
+tools/codex-scripts/ledger-apply-spec.py         87  
+tools/codex-scripts/ledger-d3-landed.py          63  
+tools/codex-scripts/ledger-p33-full.py           47  把今天 **11 次自纠**完整写进 P33（原来是 4 条，与事实不符）—— 原子替换台账字段。
+tools/codex-scripts/ledger-refresh.py           438  
+tools/codex-scripts/ledger-restore-from-git.py   86  
+tools/codex-scripts/ledger-set-inprogress.py     76  
+tools/codex-scripts/legacy-grouping.py          127  
+tools/codex-scripts/legacy-mark-missing.py       71  给 F22 遗留清单里**已缺**的件标 `已不存在`（纯记账，不补理由、不改基线）。
+tools/codex-scripts/lint_cjk_quotes.py           82  
+tools/codex-scripts/llm-fit-table.py            176  
+tools/codex-scripts/llm-lane-direct.py          416  
+tools/codex-scripts/llm-lane-unify-check.py      88  
+tools/codex-scripts/llm-lanes.py                622  
+tools/codex-scripts/load-red-hunt.py            148  
+tools/codex-scripts/local-comfy-image.py        195  
+tools/codex-scripts/local-image-endpoint.py     229  
+tools/codex-scripts/local-stream-try.py          35  
+tools/codex-scripts/logbook.py                  510  
+tools/codex-scripts/mail-bind.py                439  
+tools/codex-scripts/mail-takeover.py            176  mail-takeover —— 用触手（眼睛+手）直接接管浏览器，把「别名密码」取回来并封起来。
+tools/codex-scripts/make-delivery-ledger.py     230  
+tools/codex-scripts/make-repo-banner.py         153  生成开源仓门面横幅 `assets/brand/repo-banner.png`（**确定性、可复跑、零外链**）。
+tools/codex-scripts/make-video.py               223  
+tools/codex-scripts/make_ark_surface.py         195  生成「Ark 云端能力面」的单一声明：holo_pet/ark_surface.json
+tools/codex-scripts/make_block3_baseline_final.py   66  
+tools/codex-scripts/make_brand_preview.py        94  
+tools/codex-scripts/make_capability_console.py 1078  
+tools/codex-scripts/make_cinematic_preview.py   158  按 cinematic.css 的真实参数，把氛围层合成成图 —— 用来实际看效果。
+tools/codex-scripts/make_contact_sheet.py        70  
+tools/codex-scripts/make_energy_report.py       117  
+tools/codex-scripts/make_godview_sheet.py        61  把 render/godview/ 六个标签页拼成一张总览图（带标签），便于一眼看全。
+tools/codex-scripts/make_hitl1_screen.py        817  生成「三方向 HITL#1 审批屏」。
+tools/codex-scripts/make_logo_assets.py          96  
+tools/codex-scripts/make_logo_embed_choice.py    60  决定内嵌规格：比 PNG vs WebP；并把 Logo 压到本 App 的真实底色上出预览图看效果。
+tools/codex-scripts/make_postland_probes.py      31  由镜像探针生成"落生产后"探针：只把目标路径从镜像2 改成生产，逻辑一字不动。
+tools/codex-scripts/make_storyboard_fill_page.py  718  
+tools/codex-scripts/make_treasure_chest.py      268  
+tools/codex-scripts/make_typography_preview.py  185  
+tools/codex-scripts/make_workspace_index.py     593  
+tools/codex-scripts/measure-clarity.py           62  
+tools/codex-scripts/measure-regions.py           80  
+tools/codex-scripts/media-console.py            711  
+tools/codex-scripts/media-gen-slots.py          202  
+tools/codex-scripts/media-panel-perturb-a.py    103  常驻件（第 35 轮从 `.scratch/` 提升）：media-panel-perturb-a.py
+tools/codex-scripts/media-panel-perturb-b.py     99  
+tools/codex-scripts/media-panel-perturb-c.py     99  
+tools/codex-scripts/media_flow.py               540  
+tools/codex-scripts/memory-local-guard.py       173  记忆本地闸 + 本机摘要（Owner 令 2026-10-14：「记忆永远保留本地不出网在框架上」）。
+tools/codex-scripts/merge-4k-rig.py             123  
+tools/codex-scripts/merge-panel-tier.py         337  
+tools/codex-scripts/merge_storyboard_fill.py    311  
+tools/codex-scripts/mesh-decimate.py            454  
+tools/codex-scripts/mesh-verify.py              152  
+tools/codex-scripts/mic-listen.py               128  
+tools/codex-scripts/mic-probe.py                105  
+tools/codex-scripts/min-quant-fit.py            254  
+tools/codex-scripts/mirror-design-regulations.py  118  
+tools/codex-scripts/mobile-deploy.py            237  
+tools/codex-scripts/mock-vllm-endpoint.py       238  本地假 vLLM（OpenAI 兼容）—— 没 GPU 也能把「DSH → 适配器 → 端点」这条链**跑通并验收**。
+tools/codex-scripts/model-align.py              461  
+tools/codex-scripts/model-binding.py            199  
+tools/codex-scripts/model_roster.py             305  
+tools/codex-scripts/monitor-loop-health.py       82  monitor-loop-health.py —— 判「多域监控的循环是不是真的还在转」。
+tools/codex-scripts/monitor-loop.py             271  
+tools/codex-scripts/monitor-once.py              75  monitor-once.py —— 多域监控的**心跳发条**（一次 = 一拍）。
+tools/codex-scripts/mouth-lab.py                186  mouth-lab.py — 量真实嘴唇 + 用**她的唇像素**做一个口型原型，和现在那版放一起比。
+tools/codex-scripts/mouthsheet-gen.py           268  
+tools/codex-scripts/multi-domain-monitor.py     199  
+tools/codex-scripts/muscle-actions.py           116  
+tools/codex-scripts/muscle-drill.py             215  
+tools/codex-scripts/mutation-proof.py           357  
+tools/codex-scripts/nerve.py                    843  
+tools/codex-scripts/nested-skill-probe.py        95  
+tools/codex-scripts/neural-scan.py              146  
+tools/codex-scripts/no-ask-check.py             164  不开口闸（no-ask-check）—— 框架里**不许有要求用户帮忙的路径**。
+tools/codex-scripts/normalize-image.py           13  按**内容**识别图片格式并规范化输出（Tripo 的产物常把 JPEG 写成 .png，读取前先规范化）。
+tools/codex-scripts/office-roundtrip-check.py   108  
+tools/codex-scripts/old-pages.py                259  旧页面判决器（只读；`--check` 有过期页面则非零退出）。
+tools/codex-scripts/omission-gate.py             80  
+tools/codex-scripts/omni-arm-build.py           320  
+tools/codex-scripts/omni-plug.py                260  
+tools/codex-scripts/omni.py                    1347  
+tools/codex-scripts/omni_arm_bpy.py             170  omni_arm_bpy.py —— Omni-Arm 的 **bpy 侧**：按 spec 建骨架 + 真几何 + 刚体权重，导出 GLB
+tools/codex-scripts/omni_daemon.py               40  omni_daemon · 常驻直达（框架只 import 一次；每请求仍走 api.run_task = 统一门）。
+tools/codex-scripts/omni_daemon_bench.py         65  
+tools/codex-scripts/omni_nav.py                 278  
+tools/codex-scripts/openpose-extract.py         286  
+tools/codex-scripts/openpose-skeleton.py        225  
+tools/codex-scripts/orch-note.py                142  
+tools/codex-scripts/orchestrator.py             331  
+tools/codex-scripts/p0-drills.py               1120  GBT小土豆V8 · P0 故障演练（五条「未测」的落地）
+tools/codex-scripts/pack-files-check.py          90  
+tools/codex-scripts/pack-receipt.py             239  
+tools/codex-scripts/pack-weights.py              33  
+tools/codex-scripts/page-bind-check.py          315  
+tools/codex-scripts/page-bindings.py            168  神经系统部署法 · 页级双向绑定（page-bindings）—— **每一页都要有双向绑定，扫描即穿透**。
+tools/codex-scripts/page-caps-verify.py         168  申报可信度检查：`state/page-caps.json` 里申报的能力位，**在页面里找得到证据吗**。
+tools/codex-scripts/page-evidence.py             85  
+tools/codex-scripts/page-live-wire.py            78  
+tools/codex-scripts/page-live-wiring.py         102  
+tools/codex-scripts/page-reach.py               128  
+tools/codex-scripts/page-tentacle-coverage.py   104  
+tools/codex-scripts/panel-connectivity.py       165  
+tools/codex-scripts/paper_guard.py               75  
+tools/codex-scripts/paper_loop.py                95  
+tools/codex-scripts/passport-attribution.py     145  框架自改门 · 未认领件的**证据归因清单**（只读）。
+tools/codex-scripts/passport-audit.py           142  
+tools/codex-scripts/passport-backfill.py        183  框架自改门 · **按 logbook 名字级证据**分批补护照（只补有据的，不洗账）。
+tools/codex-scripts/patch-cap-proof-docs.py     114  
+tools/codex-scripts/patch-proof-numbers.py       58  fig-caps 的副标题/脚注 + README 里的旧读数 → 三路真跑新口径（CRLF 安全，逐处断言命中）。
+tools/codex-scripts/patch-release-finish.py     102  
+tools/codex-scripts/patch-release-readme.py     159  
+tools/codex-scripts/pipeline-preflight.py       221  
+tools/codex-scripts/pipeline_status.py          272  
+tools/codex-scripts/plugin-mesh.py              274  plugin-mesh · **插件全互通矩阵**（主人令 2026-09-25）
+tools/codex-scripts/plugins50-check.py          170  plugins50 判据 —— 咬「50 槽设计有没有落成真件、门表是不是真的」。
+tools/codex-scripts/pml-decimate.py              31  
+tools/codex-scripts/pml-to-glb.py               135  
+tools/codex-scripts/pose-batch.py               308  
+tools/codex-scripts/post-install-selfcheck.py    92  
+tools/codex-scripts/precommit-secret-scan.py    261  
+tools/codex-scripts/probe-all-remaining.py      148  
+tools/codex-scripts/probe-cable-all.py          381  四根电缆一次接满：出片 + 批量出图 + 本机 CPU 基准 + 我们的模型（云端算力），各带产物 sha256 与耗时。
+tools/codex-scripts/probe-caps-live.py          132  
+tools/codex-scripts/probe-caps-params-fix4.py   132  
+tools/codex-scripts/probe-caps-params.py        134  
+tools/codex-scripts/probe-caps-write.py         120  
+tools/codex-scripts/probe-codex-interrupt.py    132  
+tools/codex-scripts/probe-file-cache.py          80  决定性实验：`file://` 下换 query 到底能不能绕开浏览器缓存重读？
+tools/codex-scripts/probe-offense-live.py       127  
+tools/codex-scripts/probe-page-consumers.py     105  
+tools/codex-scripts/probe-pure-compute.py       134  
+tools/codex-scripts/probe-reparse-points.py     126  
+tools/codex-scripts/probe-reverse-llm.py        177  
+tools/codex-scripts/probe-safefalse.py          265  
+tools/codex-scripts/probe-video-lanes.py         84  
+tools/codex-scripts/probe-with-tickets.py       144  
+tools/codex-scripts/probe_appserver.py           91  
+tools/codex-scripts/probe_brain.py               45  探测「大脑执行层」五维能否真调，拿到真读数就给可视化用（拿不到就如实标注）。
+tools/codex-scripts/probe_brain2.py              42  补齐大脑执行层：路由维（intent）与五维合一（brain_unify）。
+tools/codex-scripts/probe_cockpit.py             66  
+tools/codex-scripts/probe_default_ops.py        107  
+tools/codex-scripts/probe_door_ready.py          93  
+tools/codex-scripts/probe_eigenflux.py           51  实探 AI朋友圈（EigenFlux）能不能连：CLI 在不在、登没登、feed/friends 取不取得到。只读。
+tools/codex-scripts/probe_encoding.py            73  字节级探测：确认 codex app-server stdio 的中文编码约定。
+tools/codex-scripts/probe_gaps.py                66  缺口域真调探测：看哪些缺口能力能给出真数据（决定面板能画到什么程度）。
+tools/codex-scripts/probe_gene_block.py          64  
+tools/codex-scripts/probe_god_view.py            91  
+tools/codex-scripts/probe_health.py              16  
+tools/codex-scripts/probe_holdout_batches.py    115  把「留出集命中率」这条**承诺过的测量**补齐：一批一批地量，并只测不动。
+tools/codex-scripts/probe_hygiene.py             15  
+tools/codex-scripts/probe_iching_src.py          58  探 Wikipedia 六十四卦列表的源码结构（只读·只为看清格式，不落库）。
+tools/codex-scripts/probe_metrics.py             36  
+tools/codex-scripts/probe_needparam.py          257  
+tools/codex-scripts/probe_panel_import.py        29  
+tools/codex-scripts/probe_plug_tentacle.py       54  实测「万能插」与「亿万触手」的真实数据出口，全部走 run_task 正规入口。
+tools/codex-scripts/probe_record_grid.py         72  
+tools/codex-scripts/probe_route_scoring.py       76  
+tools/codex-scripts/probe_run_op.py              53  把 run_op 当门面跑一遍：profile / draft / parse 三条路都要通。
+tools/codex-scripts/probe_semantic_fields_gap.py   65  量两个数：① SEMANTIC_FIELDS 的空洞率 ② 留出集命中率（当前基线）。
+tools/codex-scripts/probe_social_graph.py        49  抓可视化所需的真实数据：好友名单 / 好友请求 / 我的资料 / 动态全量。只读。
+tools/codex-scripts/probe_social_live.py         58  抓取 AI朋友圈（EigenFlux）与用户社交（社交发布）的真实状态。只读。
+tools/codex-scripts/probe_sse_raw.py             69  裸 socket 读 /api/events 20 秒 —— 区分「流是死的」与「我的读法有问题」。
+tools/codex-scripts/probe_sse_shape.py           70  抓 /api/events 的原始 SSE 事件，看 cap_result 到底长什么样。
+tools/codex-scripts/probe_thread_params.py       51  真实协议验证：thread/start 是否接受 developerInstructions 与 dynamicTools。
+tools/codex-scripts/probe_tree_contrast.py       77  
+tools/codex-scripts/probe_turn.py               132  
+tools/codex-scripts/probe_view_geometry.py      161  
+tools/codex-scripts/probe_voice_bt.py            53  实测：语音与蓝牙到底能不能真跑（走 run_task 正规入口）。
+tools/codex-scripts/probe_voice_bt2.py           44  装了 bleak 之后复测蓝牙；同时确认语音的授权门依旧（不该变）。
+tools/codex-scripts/probe_wiring.py              58  探明接线现状：140 个可执行能力里，哪些没接上（routed but not wired）、
+tools/codex-scripts/probe_wiring2.py             38  看清 list_capabilities 的真实字段，并定位「接线缺口」的口径出处。只读。
+tools/codex-scripts/probe_wiring3.py             48  取接线全量：wired / orphan 两张清单 + 每个 orphan 的域与说明。只读。
+tools/codex-scripts/probe_wiring4.py             59  接线全量 · 取对字段名。只读。
+tools/codex-scripts/probe_wiring5.py             48  接线缺口逐个真调：它们是不是真的没实现，还是只是没有被内部调用。只读。
+tools/codex-scripts/project-bind.py             216  project-bind -- 全项目双向绑定：分片索引覆盖**每一个文件**；每个 HTML 页挂直达条指向总索引。
+tools/codex-scripts/proof-of-run-check.py       192  
+tools/codex-scripts/prune-glb.py                 80  
+tools/codex-scripts/publish.py                  211  
+tools/codex-scripts/push-open-source.py         173  把发布件一次性推到 GitHub（Git Data API，不 clone 大仓库）。
+tools/codex-scripts/qem-islands.py              179  
+tools/codex-scripts/quant-plan-check.py         122  压缩方案判据（quant-plan-check）—— 把“8GB 跑 27B”变成**能算能咬**的判据
+tools/codex-scripts/quick_scan.py              2146  
+tools/codex-scripts/quickscan_evolve.py         700  quick_scan 自动进化层 · 自动收集 / 病因对账 / 负对照自检（只读）
+tools/codex-scripts/quickscan_security.py       656  
+tools/codex-scripts/qwen2-forward-selftest.py    99  
+tools/codex-scripts/r2-move.py                  437  大件搬 R2 · **搬运 + 字节级回验 + 才敢删本地**（含 300 MiB 上限的分片）
+tools/codex-scripts/readonly-scope-drift.py     102  
+tools/codex-scripts/refusal-census.py           586  
+tools/codex-scripts/refusal-equivalence-probe.py  363  
+tools/codex-scripts/refusal-rate-probe.py       183  拒答率探针（只读 · 可打假端点）—— 把「无限制」变成**可算读数**。
+tools/codex-scripts/register_tentacle_agnes.py  363  
+tools/codex-scripts/registry-dispatch-audit.py   86  
+tools/codex-scripts/relax-gates-20261019.py     277  
+tools/codex-scripts/release-check.py            161  
+tools/codex-scripts/render-agent.py             354  
+tools/codex-scripts/render-cable-all.py         149  
+tools/codex-scripts/render-compute-proof.py     186  
+tools/codex-scripts/render-concurrency-card.py  127  
+tools/codex-scripts/render-demo-gif.py          154  
+tools/codex-scripts/render-pure-compute.py      149  
+tools/codex-scripts/render-pwa-icons.py          69  生成 PWA 图标（192 / 512 / apple-touch 180），给 iPhone「添加到主屏幕」与 Android「安装应用」
+tools/codex-scripts/render-social-preview.py     93  
+tools/codex-scripts/render-tentacle3d-gif.py     89  
+tools/codex-scripts/render-test-figures.py      454  
+tools/codex-scripts/render_all_panels.py        125  
+tools/codex-scripts/render_canvas.py             70  
+tools/codex-scripts/render_full.py              124  
+tools/codex-scripts/render_god_view.py          127  
+tools/codex-scripts/render_page.py              156  
+tools/codex-scripts/render_pw.py                 34  用 Playwright 驱动系统 Chrome，真渲染交付件并截图（不是合成样张）。
+tools/codex-scripts/render_v18_panel.py          41  渲染 V18 的源码驱动能力广场（上/下两屏）。
+tools/codex-scripts/render_v20.py                42  渲染 V20 的 AI朋友圈关系场 + 上帝视角里的关系场缩略图。
+tools/codex-scripts/render_v21_all.py            34  V21 全量真渲染：面板（截满，不再被压扁）+ 画布 + 视口 + 总览。
+tools/codex-scripts/repo-pack.py                508  
+tools/codex-scripts/repo-root-pin.py             77  把**仓根**钉到大家都知道的地方（repo-root-pin）—— 让**打包态**的壳能认家。
+tools/codex-scripts/restart-mandate-check.py    189  
+tools/codex-scripts/restore_from_recyclebin.py  180  
+tools/codex-scripts/restore_missing_caps.py     239  
+tools/codex-scripts/reverify-open-faults.py    1027  
+tools/codex-scripts/rig-audit.py                307  
+tools/codex-scripts/rig-fix.py                  166  
+tools/codex-scripts/rig-gate-check.py            72  轻量级门限检查（只看节点/层级，不遍历顶点，秒级）——大网格（76 万顶点）用这个。
+tools/codex-scripts/rig-source-check.py         125  
+tools/codex-scripts/rig_fix_bpy.py              357  Blender 侧脚本（由 `rig-fix.py` 用 `blender --background --python` 驱动）
+tools/codex-scripts/rigify-skeleton.py          156  
+tools/codex-scripts/round-compact.py            141  
+tools/codex-scripts/round-pipeline.py           129  
+tools/codex-scripts/run-all-tests.py            357  
+tools/codex-scripts/run-tests.py                147  **仓库自带测试**的统一入口 —— 把"有测试但没人跑"变成一条命令 + 一个退出码。
+tools/codex-scripts/run_gbt_gpu.py              112  免费 GPU 上跑我们自己的权重 —— Colab / Kaggle 一键服务脚本。
+tools/codex-scripts/sample-baseline.py          266  
+tools/codex-scripts/sec-family-audit.py         112  安全域 26 能力位 · 经统一门真调审计（本线 GBT小土豆V8 · 只读采集）。
+tools/codex-scripts/self-correct-loop.py        140  self-correct-loop · 自纠环（主人令 2026-10-15）：她执行任务时，**上下文里一出现异常就第一时间纠正**。
+tools/codex-scripts/self-tend.py                495  self-tend -- 框架的**身体自整理**能力位（主人令 2026-10-17）
+tools/codex-scripts/selfcheck-all.py            123  
+tools/codex-scripts/selftest-audit.py           150  自检成色审计（selftest-audit）· 扫出**负对照只喂合成数据、从不真植入**的机检器。
+tools/codex-scripts/semantic-fill.py             60  
+tools/codex-scripts/shared-endpoint-queue.py    205  
+tools/codex-scripts/short-drama-build.py        262  
+tools/codex-scripts/shorts-stitch-proof.py      330  
+tools/codex-scripts/shortvideo-demo.py          183  shortvideo-demo.py — 一条命令跑完「AI 短剧」的一个镜头，产物落**抽屉树**并登记许可。
+tools/codex-scripts/shot-glb.py                  57  
+tools/codex-scripts/shot-page.py                 58  
+tools/codex-scripts/shot-screen.py               66  用触手之眼截屏 —— **走能力位**（`tentacle {"action":"see"}` → run_task 唯一门）。
+tools/codex-scripts/shrink-glb-textures.py       53  把 GLB 里**作为 metalRough 使用**的大图替换成 4×4 中性灰 JPEG（面板档省体积）。
+tools/codex-scripts/sider-crossscan.py          151  
+tools/codex-scripts/sider-plug.py               214  
+tools/codex-scripts/signature_coverage_audit.py  340  
+tools/codex-scripts/skill-discovery-lint.py     203  
+tools/codex-scripts/skill-recon.py              138  
+tools/codex-scripts/skill-surface-inventory.py  294  
+tools/codex-scripts/skill-switch.py             140  
+tools/codex-scripts/skill-vet-report.py         219  把 `skill-vet.py --all-roots --json` 的原始读数转成一份**人读得下去、且覆盖率是算出来的**报告。
+tools/codex-scripts/skill-vet.py                448  
+tools/codex-scripts/skin-apply.py               115  
+tools/codex-scripts/skin-detail.py              192  
+tools/codex-scripts/skin-preview.py             346  
+tools/codex-scripts/skin-specular.py            221  
+tools/codex-scripts/skin-tone.py                231  
+tools/codex-scripts/slot_bridge_agent.py        163  
+tools/codex-scripts/socket-drive.py              54  socket-drive.py — 用框架自己的插座函数驱动算力插座，证明"主脑 → 插座 → 算力"这条链。
+tools/codex-scripts/spec-gap-patch.py           144  
+tools/codex-scripts/spec-gap-priority.py        141  
+tools/codex-scripts/spec-gap-scan.py            144  规程缺口量具（D3 的尺子）—— 只读，回答「哪些能力位在册但规程没写」。
+tools/codex-scripts/split-parts.py              100  
+tools/codex-scripts/spring-bones.py             133  
+tools/codex-scripts/spring-hair.py              210  
+tools/codex-scripts/sql-anti-check.py            46  sql-anti-check -- 数据库反模式机检（胶囊第 8 节 12 条）。命中即报，退出码非零。
+tools/codex-scripts/stack_acceptance.py         266  
+tools/codex-scripts/stale-sweep.py              148  旧件扫描判据（stale-sweep）—— 主人令：「旧的东西别留直接清理」
+tools/codex-scripts/static-freshness.py         141  静态交付件的**新鲜度**审计器 —— 三类判据，一件工具。
+tools/codex-scripts/structure-snapshot.py       220  
+tools/codex-scripts/supersede-check.py          374  
+tools/codex-scripts/sweep-db.py                 571  sweep-db.py — 排查/扫雷事件库访问层（专业配置 · 单一入口）
+tools/codex-scripts/sweep-union-coverage.py      78  
+tools/codex-scripts/sync-panel-snapshot.py      273  
+tools/codex-scripts/system-slots-scan.py        101  
+tools/codex-scripts/takeover-v9.py              143  
+tools/codex-scripts/talk-socket-cloud-check.py   88  
+tools/codex-scripts/ten-plugin-equivalence.py   189  
+tools/codex-scripts/tentacle-browser-session.py   83  
+tools/codex-scripts/tentacle-double-plug.py     127  
+tools/codex-scripts/tentacle-gear.py            643  tentacle-gear -- 触手装备自主配置驱动器（⑥万能插执行器 / ⑦无痕浏览器 / ⑧密钥库 的实备与调用）。
+tools/codex-scripts/tentacle-inventory.py       169  
+tools/codex-scripts/tentacle-link-registry.py   118  
+tools/codex-scripts/tentacle-mail-zoho.py       443  
+tools/codex-scripts/tentacle-mail.py            905  
+tools/codex-scripts/tentacle-provision.py       201  
+tools/codex-scripts/tentacle-pulse-check.py     185  
+tools/codex-scripts/tentacle-registry.py        553  
+tools/codex-scripts/tentacle-sandbox-plug.py     95  
+tools/codex-scripts/tentacle-stress.py          134  tentacle-stress -- capability (tentacle) execution STRESS TEST.
+tools/codex-scripts/tentacle-trunk-check.py     217  
+tools/codex-scripts/tentacle-vault.py           515  
+tools/codex-scripts/tentacle-watch.py           110  
+tools/codex-scripts/terminal-review.py          319  
+tools/codex-scripts/today-report.py             138  
+tools/codex-scripts/tokenize-shell-bare-colors.py  121  
+tools/codex-scripts/tokenize_deliverable.py     210  
+tools/codex-scripts/tree-registry.py            304  仓根树登记闸 —— 只读。
+tools/codex-scripts/tri-layer-bench.py          233  三层操作流畅度基准台 · 把「流畅」从感觉变成**能复跑的读数**。
+tools/codex-scripts/tts-default-check.py         72  
+tools/codex-scripts/unattended-chain.py         365  
+tools/codex-scripts/unimplemented_scan.py       332  
+tools/codex-scripts/untracked-snapshot.py       220  版本库外的回滚点（只读工作区 · 只写自己的快照目录）—— 现读那 22 件"孤岛"。
+tools/codex-scripts/v42-page.py                 107  
+tools/codex-scripts/validate-glb.py              43  校验 GLB 引用完整性（越界/缺字段）。加载器报怪错时先用它，别猜。
+tools/codex-scripts/vault-spill.py              153  
+tools/codex-scripts/vendor-node-trim.py         195  
+tools/codex-scripts/vendor_three.py             217  
+tools/codex-scripts/verify-3d-asset.py          199  
+tools/codex-scripts/verify-brain-objective.py   268  
+tools/codex-scripts/verify-design-mastery.py    166  
+tools/codex-scripts/verify-distill.py           240  
+tools/codex-scripts/verify-panel-live.py        114  真浏览器验收：拿一个干净页面加载本机 DSH（127.0.0.1:3080），
+tools/codex-scripts/verify_active.py             68  **现役那一代的验脚本在哪？** —— 一个入口，按盘上现役自动派发，缺了就明说。
+tools/codex-scripts/verify_ark_face.py           90  
+tools/codex-scripts/verify_deliverables.py      279  
+tools/codex-scripts/verify_ledger_sink.py       133  
+tools/codex-scripts/verify_loader_scope.py       56  
+tools/codex-scripts/verify_loader_scope2.py      50  验证收窄后的加载器（第 4 例改用 cwd 桩，避免 chdir 权限限制）。
+tools/codex-scripts/verify_m9_alignment.py      124  
+tools/codex-scripts/verify_meta_persist.py      159  
+tools/codex-scripts/verify_panel_ledger.py       39  
+tools/codex-scripts/verify_proxy_reasoning.py    53  独立复验代理 thinking-mode 修复：跑出真正的帧序，看上游还拒不拒。
+tools/codex-scripts/verify_raw_tid_stamp.py     102  
+tools/codex-scripts/verify_roothfix.py          218  
+tools/codex-scripts/verify_shapes_remaining.py  133  
+tools/codex-scripts/verify_v10.py               145  
+tools/codex-scripts/verify_v11.py               136  
+tools/codex-scripts/verify_v12.py               141  
+tools/codex-scripts/verify_v13.py               195  
+tools/codex-scripts/verify_v14.py               217  
+tools/codex-scripts/verify_v15.py               285  V15 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v16.py               325  V16 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v17.py               358  V17 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v18.py               390  V18 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v19.py               423  V19 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v20.py               444  V20 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v21.py               491  V21 交付校验：契约 + 静态口径 + 数据自洽。只读，不改文件。
+tools/codex-scripts/verify_v22.py               290  
+tools/codex-scripts/verify_v3.py                180  
+tools/codex-scripts/verify_v4.py                186  V4 交付前自检：对话面板 + 上帝视角 + 双主题对比度。
+tools/codex-scripts/verify_v5.py                173  
+tools/codex-scripts/verify_v6.py                170  
+tools/codex-scripts/verify_v7.py                149  
+tools/codex-scripts/verify_v8.py                186  
+tools/codex-scripts/verify_v9.py                128  
+tools/codex-scripts/verify_vision_shapes.py     160  
+tools/codex-scripts/verify_wiring.py            139  
+tools/codex-scripts/verify_zero_touch_b2.py      47  
+tools/codex-scripts/vision-pinned-check.py       86  
+tools/codex-scripts/vision-unified-check.py      54  vision-unified-check -- 视觉必须走统一入口 vision op=see，不许散用 analyze/ocr。
+tools/codex-scripts/voice-catalog.py            140  
+tools/codex-scripts/voice-census.py             139  
+tools/codex-scripts/voice-control-route.py      882  语音 → 全机操控 · **路由表 + 实时可用性探针**（只读）。
+tools/codex-scripts/voice-link-readiness.py     284  
+tools/codex-scripts/voice-theater-check.py      383  
+tools/codex-scripts/voicestudio.py              447  GBT小土豆V8 × VoiceStudio · 本地语音工作台接道（主人令 2026-10-04「下一步」）。
+tools/codex-scripts/wasapi-loopback.py          193  
+tools/codex-scripts/wasapi-record.py            217  
+tools/codex-scripts/watch-workbuddy-cn.py       109  watch-workbuddy-cn.py —— 等 WorkBuddy **中国站**桌面凭据落盘。
+tools/codex-scripts/watchdog-run.py              91  
+tools/codex-scripts/weights-completeness.py     163  
+tools/codex-scripts/welcome-page.py              99  
+tools/codex-scripts/wire-gate.py                 69  wire-gate -- 接线门：每个「未接线/未读到/缺依赖」项必须有一条**处置**，否则红。
+tools/codex-scripts/wire_media_pipeline.py      150  
+tools/codex-scripts/wiring-build.py             335  wiring-build.py —— `state/model-pack/wiring.json` 的**写手**（以前没有写手，只有 .s
+tools/codex-scripts/wordlist-guard.py           280  
+tools/codex-scripts/zero-scope-audit.py         312  zero-scope-audit · 「**零作用域 ≠ 只读**」的**可实测交叉审计**
+tools/conn_check.py                             308  
+tools/context_guard.py                          374  
+tools/deck.py                                   494  
+tools/deck_check.py                              87  
+tools/declutter.py                               72  
+tools/devour_pipe.py                            288  
+tools/dh_preflight.py                            76  dh_preflight —— 数字人上场前必过的一道门（把孤儿能力接成活路径）。
+tools/digihuman/add_jaw.py                      151  add_jaw.py —— 给底模加**下颚骨**并渲三档张口（语音嘴对齐的前置：嘴得先能动）。
+tools/digihuman/body-motion.py                  140  
+tools/digihuman/body-sway.py                    133  
+tools/digihuman/deliver.py                      180  
+tools/digihuman/dh-add-jaw.py                   121  
+tools/digihuman/dh-blender-inspect.py            88  
+tools/digihuman/dh-doctor.py                    209  
+tools/digihuman/dh-face-profile.py               40  脸部中线纵剖面：每 2mm 高度带上「最靠前（最小 y）」的表面点，用来**读**出嘴唇/下巴在哪。
+tools/digihuman/dh-glb-textures.py               79  
+tools/digihuman/dh-grade-texture.py             182  
+tools/digihuman/dh-jaw-fix.py                   182  重绑下颌权重（修 2026-10-21 那个"张嘴把眼睛挤闭"的错）。
+tools/digihuman/dh-jaw-report.py                 84  
+tools/digihuman/dh-live.py                      378  
+tools/digihuman/dh-puppet.py                    266  dh-puppet.py — 把一张形象图**拆件**成浏览器里能转的"纸片人"（Live2D 那套思路，零 GPU）。
+tools/digihuman/dh-skin-detail.py               230  
+tools/digihuman/dh-tex-extract.py                52  把 GLB 里的贴图抠出来落盘（二进制原样），并裁一张 1:1 特写看压缩痕迹。
+tools/digihuman/dh2d-build.py                   363  dh2d-build.py — 把主人指定的那张形象图做成 **2.5D 分层数字人**的素材件。
+tools/digihuman/ear-regress.py                  152  
+tools/digihuman/ear-server.py                   136  ear-server.py —— 本机「耳朵桥」：把离线中文听令开放给 App（只监听回环）
+tools/digihuman/finish-clip.py                  398  
+tools/digihuman/glb-material-probe.py           109  
+tools/digihuman/gpu-avatar.py                   204  
+tools/digihuman/i2v-ark.py                      232  i2v-ark.py —— 图生视频闭环（BytePlus Ark · 会动的她）
+tools/digihuman/look.py                         148  look.py — 只看不动：把 GLB 摆到镜头前拍全身 + 脸特写，回执 JSON。
+tools/digihuman/motion-publish.py               347  
+tools/digihuman/obj2glb.py                      326  
+tools/digihuman/photo-motion.py                 185  
+tools/digihuman/pod-hud.py                      276  
+tools/digihuman/pod-link-selftest.py            121  
+tools/digihuman/pod-omniavatar.py               246  
+tools/digihuman/qc-video.py                     285  
+tools/digihuman/render-shot.py                  693  
+tools/digihuman/rigify_bind.py                  162  
+tools/digihuman/talk-claimer.py                 128  
+tools/digihuman/talk-photo.py                   165  
+tools/digihuman/talk-socket.py                  183  
+tools/digihuman/upscale-hd.py                   116  
+tools/digihuman/voice-emote.py                  427  
+tools/disk_index.py                             113  全盘索引 · 扫一次，之后全靠查（主人的「全量自捡 · 秒级响应」）
+tools/doctor.py                                 141  
+tools/duty_patrol.py                            199  
+tools/ear_listen.py                             155  
+tools/executor.py                               246  
+tools/fanout_bench.py                           182  
+tools/file-serve.py                              44  临时文件服务：给浏览器页面用（带 CORS），只读、只回环、用完就关。
+tools/gbt.py                                    309  
+tools/gen_loop.py                               126  
+tools/gguf-fix-variants.py                      151  
+tools/gguf-vanavana-doctor.py                   286  
+tools/gguf_meta.py                              193  
+tools/guard.py                                  241  
+tools/her.py                                    180  
+tools/her_chat.py                               157  
+tools/index_daemon.py                           230  
+tools/ingest.py                                 139  ingest —— 把文件收进素材库：拷贝 + sha256 + 登记清单（deck 用）。
+tools/intake_gate.py                            220  intake_gate —— 「先拆解、分析、跑通，才准吸收」。
+tools/lens.py                                   145  
+tools/make_strike_video.py                      120  
+tools/make_strike_video2.py                     161  
+tools/make_strike_video3.py                     199  
+tools/make_strike_video4.py                     215  make_strike_video2 —— 三处打磨，每一处都对着上一版的真问题：
+tools/memory_unify.py                           363  memory_unify —— 把她的记忆统一成一册（一个索引，跨源可查）。
+tools/mirror_check.py                            88  
+tools/mirror_panel.py                           228  
+tools/mirror_rewind.py                           31  镜像空间回滚动作（供 rehearsal.rollback 调用）
+tools/mock_a19.py                                52  mock_a19 —— 假容器（:1234），只为**彩排**：验证她一起来，整条链能不能自动跑通。
+tools/mock_bridge.py                            129  
+tools/model-bridge/account-probe.py              52  只读：账号面 + 另一条端点状态（判是不是"账号级并发配额被那条端点占着"）。
+tools/model-bridge/body.py                      280  
+tools/model-bridge/dc-check.py                   46  只读：两条端点的数据中心 + 卷挂载（DC 不匹配 ⇒ 卷挂不上 ⇒ 容器起不来 ⇒ 0 worker）。
+tools/model-bridge/doctor.py                    109  
+tools/model-bridge/dump-worker-sse.py            65  把 Worker 的流式 SSE 原样抓回来（看它到底有没有发 finish_reason）。
+tools/model-bridge/endpoint-diff.py              72  
+tools/model-bridge/endpoint-on-demand-test.py   110  
+tools/model-bridge/endpoint-rebuild-template.py  123  
+tools/model-bridge/endpoint-rescue.py           149  
+tools/model-bridge/endpoints-list.py             59  只读：列本账号所有端点 + 各自 health（判"是账号级问题"还是"只有这条端点"）。
+tools/model-bridge/gpu-stock.py                  75  只读：GPU 现货 + 模板 env 结构（定位 F25 到底是"没容量"还是"卷/模板问题"）。
+tools/model-bridge/gpu_lane.py                  131  
+tools/model-bridge/lane-failover.py             135  
+tools/model-bridge/llm-fallback-proxy.py        461  
+tools/model-bridge/local_llm_server.py          205  本机自有权重服务（OpenAI 兼容）—— 给 main.cjs / 桥的 selfhost 车道用。
+tools/model-bridge/probe-page-lane.py           208  三条车道实测：Worker（云上拼接网）· 直连 vLLM · 本地兜底代理。
+tools/model-bridge/probe-worker.py               58  用 .credentials.yaml 里的 GW_AUTH 打一次 Worker，量首字与整轮（不打印密钥）。
+tools/model-bridge/read-session-tail.py          87  
+tools/model-bridge/runpod-epctl.py              151  
+tools/model-bridge/server.py                    892  原生 APP ⇄ 原生大模型 的本地桥（127.0.0.1:8791，只监听回环）。
+tools/model-bridge/tpu-register.py              125  把一台已在跑的 TPU(vLLM TorchTPU) 服务**验活后**登记进车道表（只读探测 + 写本地登记）。
+tools/model-bridge/verify-arch.py               171  
+tools/model-bridge/verify-dispatch.py           100  
+tools/model-bridge/verify-in-app.py              65  真跑验收：模型桥 + APP 内“模型对话”面板，必须看到**真回执**才算通。
+tools/model-bridge/worker-body-matrix.py        123  
+tools/model-bridge/worker-watch.py               66  只读：轮询 RunPod 端点 /health，看 worker 有没有起来（不打印密钥）。
+tools/monitor.py                                434  多域监控 · 逐位真调 + 基线 diff（发现异常第一时间报）
+tools/native_surface.py                         182  
+tools/omni_align.py                             275  万能插主执行器 · 348 位原生能力全量对齐
+tools/optics.py                                 190  
+tools/orch_ledger.py                            223  
+tools/orphan_audit.py                           174  
+tools/pack.py                                   284  
+tools/page_bind.py                              194  
+tools/page_lazy.py                              235  按需激活 · 分片索引（内存随答案走，不随语料走）
+tools/page_route.py                             237  
+tools/page_tentacle.py                          183  
+tools/plug_a19.py                               105  plug_a19 —— 用**万能插**把 A19 当插座插进来并操控
+tools/polish.py                                  93  
+tools/polish2.py                                109  polish2 —— 第二轮打磨：局部对比（clarity）+ 分离色调 + 边缘感知锐化。
+tools/projector_kit.py                          252  projector_kit —— 手机闪光灯投影套件（本机后置 LED + 透明胶片 + 凸透镜）
+tools/ref_forward_gguf.py                       197  参考实现：直接读 GGUF 权重，用 numpy 亲手算一次 Qwen2 前向。
+tools/reframe.py                                176  
+tools/sd_local.py                                76  sd_local —— 本机真·扩散生图（stable-diffusion.cpp 后端，纯 CPU，不用 torch）。
+tools/single_file.py                             62  single_file —— 把 deck.html 里引用的本地图片内联成 base64，产出单文件版。
+tools/slide.py                                  135  
+tools/source_registry.py                        134  
+tools/spec_audit.py                             125  
+tools/strike_video.py                           300  strike_video —— 静帧 → 动作镜头的唯一入口（v1~v6 的合并版）。
+tools/svc_guard.py                              282  
+tools/svcprobe.py                               106  端口/服务探针 —— 只用 TCP socket，不依赖 curl。
+tools/t2i_endpoint.py                           104  
+tools/taste_gate.py                             201  
+tools/taste_lint.py                             255  
+tools/tentacle_bench.py                         144  触手并发压测 —— 本机到底能同时伸几根
+tools/tentacle_bind.py                          817  
+tools/tentacle_bus.py                           232  触手总线 —— 把"传输"抽象成可插拔的触手，不卡死在一种接口上
+tools/tentacle_llm_bench.py                     142  触手 · LLM 并发压测（不设上限）
+tools/tentacle_project.py                        98  
+tools/test_a19_chain.py                         227  
+tools/test_page_probe.py                        204  
+tools/tianzhen_a19_bench.py                     139  
+tools/train/accept_comfy.py                     126  
+tools/train/accept_infer.py                      68  
+tools/train/accept_main54.py                    108  
+tools/train/card_accept.py                       46  
+tools/train/card_accept_all.py                   44  card_accept_all -- **卡上一发跑完全部验收套件**（主 54 + 6 族，串行、题库/答案文件各自独立）。
+tools/train/card_launch.py                       44  
+tools/train/card_merge.py                        41  
+tools/train/check_family_binding.py              54  check_family_binding -- 撞名题面的**答案层教学覆盖**判据。
+tools/train/check_family_discrimination.py       47  check_family_discrimination -- 族判别判据：看模型答的是不是**本族**。
+tools/train/check_instruction_semantic.py        98  
+tools/train/gen_corpus_v31.py                    91  
+tools/train/gen_corpus_v46.py                    56  gen_corpus_v46 -- 以 v43 为底：只改答案（不动题面），对**全部撞名签名**的行统一绑族名与位名。
+tools/train/gen_corpus_v48.py                    61  
+tools/train/gen_corpus_v49.py                   219  gen_corpus_v49 -- v48 逐字节不动 + 追加“秋叶版目录契约”教学行。
+tools/train/gen_corpus_v50.py                   124  
+tools/train/gen_corpus_v51.py                   113  
+tools/train/gen_corpus_v52.py                   128  
+tools/train/gen_corpus_v53.py                    81  gen_corpus_v53 -- v52 逐字节不动 + **看清再动手 / 看图放大看细节** 教学行。
+tools/train/gen_corpus_v54.py                   179  
+tools/train/gen_corpus_v55.py                   126  
+tools/train/gen_corpus_v56.py                   149  
+tools/train/gen_corpus_v57.py                   154  
+tools/train/gen_corpus_v58.py                   197  
+tools/train/gen_corpus_v59.py                   247  
+tools/train/merge_lora.py                        21  
+tools/train/train_v26_qlora.py                   89  
+tools/upscale_hi.py                              64  
+tools/visualizer.py                             119  
+tools/voice_fix.py                              120  voice_fix —— 把 espeak 那种"机器人"音修得顺耳一点（纯 numpy，不联网）。
+tools/voice_loop.py                             486  
+tools/wake_word.py                              263  
+tools/walkable_world.py                         360  

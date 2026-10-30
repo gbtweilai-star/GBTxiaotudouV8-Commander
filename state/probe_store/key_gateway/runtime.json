@@ -1,0 +1,13 @@
+{
+ "deepseek": {
+  "used": {},
+  "cooldown": {},
+  "disabled": [],
+  "exhausted": [],
+  "active": "deepseek",
+  "switches": 0,
+  "calls": 15,
+  "fails": 0
+ },
+ "__active__": "deepseek"
+}

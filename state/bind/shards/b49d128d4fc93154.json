@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/tests/fake_codex_app_server.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "gbt_allinone/__main__.py", "gbt_allinone/app.py", "gbt_allinone/tests/test_codex_bridge.py", "gbt_commander/__main__.py"], "defs": ["send", "notify", "server_request", "_emit_turn_events", "handle", "main"]}

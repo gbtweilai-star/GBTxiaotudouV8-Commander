@@ -1,0 +1,1 @@
+{"id": "gbt_allinone/tests/test_voice_normalize16k.py", "neighbors": ["anchor:scope_root", "gbt_allinone/__main__.py", "gbt_allinone/voice_cap.py", "gbt_commander/__main__.py"], "defs": ["_write_wav", "TestNormalizeWav16k", "setUp", "tearDown", "_rate", "test_24k_stereo_is_converted", "test_already_16k_is_left_alone", "test_unreadable_reports_honestly"]}

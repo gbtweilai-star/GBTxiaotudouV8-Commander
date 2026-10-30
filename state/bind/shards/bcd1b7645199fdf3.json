@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/merge-4k-rig.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "gbt_allinone/docs/数字人逼真度-专业口径/assets.txt", "gbt_allinone/tentacle/scale.py", "tools/codex-scripts/audit-dead-judgments.py"], "defs": ["load", "acc", "add_view"]}

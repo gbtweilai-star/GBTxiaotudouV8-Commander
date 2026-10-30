@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/sql-anti-check.py", "neighbors": ["anchor:scope_root", "gbt_allinone/__main__.py", "gbt_commander/__main__.py"], "defs": ["main"]}

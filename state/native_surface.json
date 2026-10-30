@@ -1,0 +1,576 @@
+{
+ "built_at": "2026-10-24T03:51:53",
+ "tools": 21,
+ "commands": 124,
+ "probed": 29,
+ "ok": 25,
+ "fail": 4,
+ "inventory": [
+  {
+   "tool": "apple-alarm",
+   "cmds": [
+    "set",
+    "timer",
+    "list",
+    "cancel"
+   ],
+   "n": 4,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-bluetooth",
+   "cmds": [
+    "status",
+    "scan",
+    "connect",
+    "disconnect",
+    "services",
+    "read",
+    "write",
+    "notify"
+   ],
+   "n": 8,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-calendar",
+   "cmds": [
+    "list",
+    "reminders",
+    "freebusy",
+    "calendars",
+    "create",
+    "update",
+    "delete",
+    "remind",
+    "update-reminder",
+    "complete-reminder",
+    "delete-reminder"
+   ],
+   "n": 11,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-clipboard",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  },
+  {
+   "tool": "apple-device",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  },
+  {
+   "tool": "apple-healthkit",
+   "cmds": [
+    "steps",
+    "basal-energy",
+    "heart-rate",
+    "resting-heart-rate",
+    "vo2-max",
+    "sleep",
+    "workouts",
+    "cadence",
+    "elevation",
+    "weight",
+    "blood-oxygen",
+    "blood-glucose",
+    "hrv",
+    "nutrition",
+    "summary",
+    "characteristic",
+    "ecg",
+    "audiogram",
+    "vision-rx",
+    "assessment",
+    "state-of-mind",
+    "types",
+    "use",
+    "read",
+    "characteristic_types,",
+    "batch",
+    "Subcommand",
+    "blood-oxygen",
+    "name",
+    "One",
+    "returns",
+    "single",
+    "energy,",
+    "samples.",
+    "log",
+    "log-blood-pressure",
+    "Required",
+    "a",
+    "save",
+    "delete"
+   ],
+   "n": 40,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-homekit",
+   "cmds": [
+    "list",
+    "search",
+    "get",
+    "set",
+    "scenes",
+    "trigger"
+   ],
+   "n": 6,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-location",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  },
+  {
+   "tool": "apple-maps",
+   "cmds": [
+    "search",
+    "route",
+    "eta"
+   ],
+   "n": 3,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-media",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  },
+  {
+   "tool": "apple-nfc",
+   "cmds": [
+    "read-emv"
+   ],
+   "n": 1,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-nlp",
+   "cmds": [
+    "language",
+    "tokenize",
+    "pos",
+    "ner",
+    "sentiment",
+    "embed",
+    "analyze"
+   ],
+   "n": 7,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-notification",
+   "cmds": [
+    "pending",
+    "delivered",
+    "settings",
+    "schedule",
+    "cancel"
+   ],
+   "n": 5,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-open",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  },
+  {
+   "tool": "apple-photos",
+   "cmds": [
+    "list",
+    "near",
+    "albums",
+    "album",
+    "stats",
+    "export",
+    "import",
+    "create-album",
+    "add-to-album",
+    "favorite",
+    "delete"
+   ],
+   "n": 11,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-player",
+   "cmds": [
+    "play",
+    "pause",
+    "resume",
+    "seek",
+    "status",
+    "stop",
+    "list"
+   ],
+   "n": 7,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-reminders",
+   "cmds": [
+    "list",
+    "lists",
+    "read",
+    "create",
+    "update",
+    "complete",
+    "delete"
+   ],
+   "n": 7,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-speak",
+   "cmds": [
+    "speak",
+    "voices",
+    "stop"
+   ],
+   "n": 3,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-speech",
+   "cmds": [
+    "transcribe",
+    "languages",
+    "status"
+   ],
+   "n": 3,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-vision",
+   "cmds": [
+    "ocr",
+    "barcode",
+    "classify",
+    "detect",
+    "faces",
+    "analyze",
+    "similarity",
+    "overlap"
+   ],
+   "n": 8,
+   "mode": "help"
+  },
+  {
+   "tool": "apple-weather",
+   "cmds": [],
+   "n": 0,
+   "mode": "default-action"
+  }
+ ],
+ "probes": [
+  {
+   "ok": true,
+   "ms": 16,
+   "action": "info",
+   "err": null,
+   "sample": "{\"active_processor_count\": 6, \"app_memory_bytes\": 827998208, \"battery\": {\"level\": 0.6000000238418579, \"level_percent\": 60, \"monitoring_enabled\": true,",
+   "raw_head": null,
+   "tool": "apple-device",
+   "cmd": "info",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 17,
+   "action": "current",
+   "err": null,
+   "sample": "{\"apparent_temperature_c\": 27.853084564208984, \"cloud_cover\": 0.83, \"condition\": \"大部多云\", \"dew_point_c\": 24.714553833007812, \"humidity\": 0.94, \"is_dayl",
+   "raw_head": null,
+   "tool": "apple-weather",
+   "cmd": [],
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 133,
+   "action": "current",
+   "err": null,
+   "sample": "{\"accuracy_m\": 5.344719386026908, \"address\": {\"administrative_area\": \"巴吞他尼府\", \"country\": \"泰国\", \"country_code\": \"TH\", \"locality\": \"巴吞他尼\", \"name\": \"131/",
+   "raw_head": null,
+   "tool": "apple-location",
+   "cmd": [],
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "get",
+   "err": null,
+   "sample": "{\"has_images\": false, \"has_strings\": false, \"has_urls\": false, \"types\": []}",
+   "raw_head": null,
+   "tool": "apple-clipboard",
+   "cmd": [],
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 2,
+   "action": "now-playing",
+   "err": null,
+   "sample": "{\"album\": null, \"artist\": null, \"artwork_available\": false, \"duration_seconds\": null, \"playback_state\": \"stopped\", \"playback_time\": null, \"title\": nul",
+   "raw_head": null,
+   "tool": "apple-media",
+   "cmd": [],
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 12,
+   "action": "calendars",
+   "err": null,
+   "sample": "{\"calendars\": [{\"color\": \"#8295AF\", \"id\": \"528452AF-9DD7-4FD5-9714-2CA75C9B96D1\", \"is_default\": false, \"source\": \"Other\", \"title\": \"生日\", \"type\": \"loca",
+   "raw_head": null,
+   "tool": "apple-calendar",
+   "cmd": "calendars",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 7,
+   "action": "list",
+   "err": null,
+   "sample": "{\"count\": 1, \"events\": [{\"calendar\": \"วันหยุดไทย\", \"end\": \"2026-10-23T23:59:59+07:00\", \"id\": \"97EC4D30-8479-4C03-A094-AFE64EDBA668:cafe160b-ee15-303e-",
+   "raw_head": null,
+   "tool": "apple-calendar",
+   "cmd": "list",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 6,
+   "action": "lists",
+   "err": null,
+   "sample": "{\"count\": 1, \"lists\": [{\"allows_content_modifications\": true, \"color\": \"#FF8D28\", \"id\": \"52338A92-C0AA-43AD-8690-FD23F5CB69EB\", \"is_default\": true, \"s",
+   "raw_head": null,
+   "tool": "apple-reminders",
+   "cmd": "lists",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 5,
+   "action": "reminders",
+   "err": null,
+   "sample": "{\"count\": 0, \"reminders\": []}",
+   "raw_head": null,
+   "tool": "apple-reminders",
+   "cmd": "list",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 24,
+   "action": "stats",
+   "err": null,
+   "sample": "{\"bursts\": 0, \"live_photos\": 0, \"panoramas\": 0, \"screenshots\": 98, \"selfies\": 0, \"total_photos\": 137, \"total_videos\": 4}",
+   "raw_head": null,
+   "tool": "apple-photos",
+   "cmd": "stats",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "list",
+   "err": null,
+   "sample": "{\"alarms\": [], \"backend\": \"alarmkit\", \"count\": 0, \"view_url\": \"minis://views/alarm\"}",
+   "raw_head": null,
+   "tool": "apple-alarm",
+   "cmd": "list",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "pending",
+   "err": null,
+   "sample": "{\"count\": 0, \"notifications\": []}",
+   "raw_head": null,
+   "tool": "apple-notification",
+   "cmd": "pending",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "settings",
+   "err": null,
+   "sample": "{\"alert_enabled\": 1, \"authorization_status\": \"authorized\", \"badge_enabled\": 1, \"critical_alert_enabled\": 0, \"lock_screen_enabled\": 1, \"notification_ce",
+   "raw_head": null,
+   "tool": "apple-notification",
+   "cmd": "settings",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 2,
+   "action": "list",
+   "err": null,
+   "sample": "{\"hint\": \"Use 'apple-homekit search' to filter or 'apple-homekit get --name <name>' for full details.\", \"home_count\": 0, \"homes\": []}",
+   "raw_head": null,
+   "tool": "apple-homekit",
+   "cmd": "list",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 2,
+   "action": "status",
+   "err": null,
+   "sample": "{\"has_connected_peripheral\": false, \"hint\": \"Bluetooth is ready. Use 'apple-bluetooth scan' to discover nearby BLE peripherals.\", \"is_scanning\": false",
+   "raw_head": null,
+   "tool": "apple-bluetooth",
+   "cmd": "status",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 75,
+   "action": "voices",
+   "err": null,
+   "sample": "{\"count\": 180, \"voices\": [{\"gender\": \"female\", \"id\": \"com.apple.voice.super-compact.zh-CN.Tingting\", \"language\": \"zh-CN\", \"name\": \"婷婷\", \"quality\": \"de",
+   "raw_head": null,
+   "tool": "apple-speak",
+   "cmd": "voices",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "status",
+   "err": null,
+   "sample": "{\"authorization_status\": \"not_determined\", \"is_available\": true, \"locale\": \"zh-CN\", \"supports_on_device\": false}",
+   "raw_head": null,
+   "tool": "apple-speech",
+   "cmd": "status",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "languages",
+   "err": null,
+   "sample": "{\"count\": 63, \"locales\": [{\"display_name\": \"阿拉伯语（沙特阿拉伯）\", \"locale\": \"ar-SA\"}, {\"display_name\": \"加泰罗尼亚语（西班牙）\", \"locale\": \"ca-ES\"}, {\"display_name\": \"捷克",
+   "raw_head": null,
+   "tool": "apple-speech",
+   "cmd": "languages",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 2,
+   "action": "list",
+   "err": null,
+   "sample": "{\"count\": 0, \"sessions\": []}",
+   "raw_head": null,
+   "tool": "apple-player",
+   "cmd": "list",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 6,
+   "action": "language",
+   "err": null,
+   "sample": "{\"dominant\": {\"confidence\": 0.9999996423721313, \"language\": \"zh-Hans\"}, \"hypotheses\": [{\"confidence\": 0.9999996423721313, \"language\": \"zh-Hans\"}, {\"co",
+   "raw_head": null,
+   "tool": "apple-nlp",
+   "cmd": "language",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 14,
+   "action": "sentiment",
+   "err": null,
+   "sample": "{\"label\": \"positive\", \"score\": 0.4}",
+   "raw_head": null,
+   "tool": "apple-nlp",
+   "cmd": "sentiment",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "tokenize",
+   "err": null,
+   "sample": "{\"count\": 10, \"tokens\": [\"GBT\", \"小\", \"土豆\", \"V\", \"8\", \"是\", \"一\", \"个\", \"指挥官\", \"模型\"], \"unit\": \"word\"}",
+   "raw_head": null,
+   "tool": "apple-nlp",
+   "cmd": "tokenize",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "ner",
+   "err": null,
+   "sample": "{\"count\": 1, \"entities\": [{\"range\": {\"length\": 2, \"location\": 5}, \"text\": \"北京\", \"type\": \"PlaceName\"}]}",
+   "raw_head": null,
+   "tool": "apple-nlp",
+   "cmd": "ner",
+   "status": "ok"
+  },
+  {
+   "ok": true,
+   "ms": 3,
+   "action": "pos",
+   "err": null,
+   "sample": "{\"count\": 4, \"tokens\": [{\"tag\": \"OtherWord\", \"token\": \"我\"}, {\"tag\": \"OtherWord\", \"token\": \"今天\"}, {\"tag\": \"OtherWord\", \"token\": \"很\"}, {\"tag\": \"OtherWor",
+   "raw_head": null,
+   "tool": "apple-nlp",
+   "cmd": "pos",
+   "status": "ok"
+  },
+  {
+   "tool": "apple-maps",
+   "cmd": null,
+   "status": "need-args",
+   "why": "该命令需要必填参数或硬件，未盲跑"
+  },
+  {
+   "tool": "apple-vision",
+   "cmd": null,
+   "status": "need-args",
+   "why": "该命令需要必填参数或硬件，未盲跑"
+  },
+  {
+   "ok": true,
+   "ms": 542,
+   "action": "steps",
+   "err": null,
+   "sample": "{\"days\": [{\"date\": \"2026-10-23T00:00:00+07:00\", \"steps\": 31}, {\"date\": \"2026-10-24T00:00:00+07:00\", \"steps\": 265}], \"range\": {\"end\": \"2026-10-24T03:51",
+   "raw_head": null,
+   "tool": "apple-healthkit",
+   "cmd": "steps",
+   "status": "ok"
+  },
+  {
+   "tool": "apple-nfc",
+   "cmd": null,
+   "status": "need-args",
+   "why": "该命令需要必填参数或硬件，未盲跑"
+  },
+  {
+   "tool": "apple-open",
+   "cmd": null,
+   "status": "need-args",
+   "why": "该命令需要必填参数或硬件，未盲跑"
+  }
+ ]
+}

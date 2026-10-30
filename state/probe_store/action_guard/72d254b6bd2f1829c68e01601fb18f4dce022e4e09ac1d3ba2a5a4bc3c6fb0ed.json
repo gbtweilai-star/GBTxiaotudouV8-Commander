@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "wf_resume",
+  "fingerprint": "72d254b6bd2f1829c68e01601fb18f4dce022e4e09ac1d3ba2a5a4bc3c6fb0ed",
+  "pid": 3942,
+  "started_at": 1793159200.411689,
+  "started_iso": "2026-10-28T10:46:40",
+  "finished_at": 1793159200.500834,
+  "finished_iso": "2026-10-28T10:46:40",
+  "detail": {
+    "error": "运行记录不存在: "
+  }
+}

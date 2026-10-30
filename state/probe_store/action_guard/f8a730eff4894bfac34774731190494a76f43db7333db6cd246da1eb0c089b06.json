@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "body_see",
+  "fingerprint": "f8a730eff4894bfac34774731190494a76f43db7333db6cd246da1eb0c089b06",
+  "pid": 7363,
+  "started_at": 1793305314.886893,
+  "started_iso": "2026-10-30T03:21:54",
+  "finished_at": 1793305315.389846,
+  "finished_iso": "2026-10-30T03:21:55",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

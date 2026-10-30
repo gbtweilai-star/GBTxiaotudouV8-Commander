@@ -1,0 +1,23 @@
+{"cat": "coord", "text": "第 1 轮派发：n1,n2,n3,n4,n5,n6,n7,n8", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:16", "id": "m1793309716326-10914"}
+{"cat": "coord", "text": "第 1 轮派发：n1,n2,n3,n4,n5,n6,n7,n8", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:23", "id": "m1793309723568-10922"}
+{"cat": "result", "text": "节点 n1 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737759-10922"}
+{"cat": "result", "text": "节点 n2 完成（3005 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737761-10922"}
+{"cat": "result", "text": "节点 n3 完成（3005 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737764-10922"}
+{"cat": "result", "text": "节点 n4 完成（3005 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737767-10922"}
+{"cat": "result", "text": "节点 n5 完成（3005 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737770-10922"}
+{"cat": "result", "text": "节点 n6 完成（3005 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737772-10922"}
+{"cat": "result", "text": "节点 n7 完成（3004 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737774-10922"}
+{"cat": "result", "text": "节点 n8 完成（3004 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:37", "id": "m1793309737775-10922"}
+{"cat": "coord", "text": "第 1 轮派发：n1,n2", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:45", "id": "m1793309745263-10948"}
+{"cat": "result", "text": "节点 n1 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:50", "id": "m1793309750133-10948"}
+{"cat": "result", "text": "节点 n2 完成（3002 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:50", "id": "m1793309750135-10948"}
+{"cat": "coord", "text": "第 2 轮派发：n3,n4", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:50", "id": "m1793309750141-10948"}
+{"cat": "coord", "text": "第 1 轮派发：n3,n4", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:53", "id": "m1793309753609-10958"}
+{"cat": "result", "text": "节点 n3 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:58", "id": "m1793309758511-10958"}
+{"cat": "result", "text": "节点 n4 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:35:58", "id": "m1793309758516-10958"}
+{"cat": "coord", "text": "第 2 轮派发：n5,n6", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:35:58", "id": "m1793309758528-10958"}
+{"cat": "result", "text": "节点 n5 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:36:03", "id": "m1793309763397-10958"}
+{"cat": "result", "text": "节点 n6 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:36:03", "id": "m1793309763403-10958"}
+{"cat": "coord", "text": "第 3 轮派发：n7,n8", "refs": [], "by": "swarm:crash-test", "at": "2026-10-30T04:36:03", "id": "m1793309763415-10958"}
+{"cat": "result", "text": "节点 n7 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:36:08", "id": "m1793309768272-10958"}
+{"cat": "result", "text": "节点 n8 完成（3006 ms）", "refs": ["health"], "by": "swarm:crash-test", "at": "2026-10-30T04:36:08", "id": "m1793309768278-10958"}

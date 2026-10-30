@@ -1,0 +1,1 @@
+{"id": "docs/09-mirror-space.md", "neighbors": ["anchor:scope_root", "data/mirror-space-live.json", "docs/capabilities/data.md", "gbt_allinone/integration/auth.py", "gbt_allinone/mirror_space.py", "gbt_allinone/qiankun.py", "gbt_allinone/room_space.py", "runtime/gbt_allinone/mirror_space.py", "runtime/gbt_allinone/qiankun.py", "runtime/gbt_allinone/room_space.py"], "defs": []}

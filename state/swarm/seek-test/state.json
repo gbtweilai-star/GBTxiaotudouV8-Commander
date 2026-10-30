@@ -1,0 +1,32 @@
+{
+ "name": "seek-test",
+ "created": "2026-10-30T04:19:20",
+ "nodes": {
+  "need": {
+   "kind": "no_such_cap_xyz",
+   "payload": {
+    "_board_file": "state/mirror_board/seek-test/files/420ee29f5cb4_contrib.dat"
+   },
+   "needs": [],
+   "status": "dead",
+   "tries": 3,
+   "lease": null,
+   "ms": 811,
+   "why": "error",
+   "seek": "m1793308774348-10575"
+  },
+  "after": {
+   "kind": "health",
+   "payload": {},
+   "needs": [
+    "need"
+   ],
+   "status": "pending",
+   "tries": 0,
+   "lease": null,
+   "ms": null,
+   "why": null
+  }
+ },
+ "at": "2026-10-30T04:19:34"
+}

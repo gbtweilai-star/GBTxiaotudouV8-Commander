@@ -1,0 +1,2602 @@
+{
+ "total": 349,
+ "spec_only": [
+  "tentacle_pipeline",
+  "bt_control",
+  "music_publishing",
+  "verification_watch",
+  "shared_resources",
+  "brand_outro",
+  "emotion_projection",
+  "proactive_report",
+  "persona_kernel",
+  "hook_registry",
+  "scene_anchor",
+  "render_evolution",
+  "tentacle_cognition",
+  "coverage_auditor",
+  "model_key_pool",
+  "libtv_workflow",
+  "auto_publish"
+ ],
+ "no_impl": [],
+ "rows": [
+  {
+   "kind": "body_map",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_see",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_say",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_type",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_click",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_volume",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "body_open",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_tools",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_thread_new",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_turn_send",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_interrupt",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_chat",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codex_models",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "desktop_commander",
+   "verdict": "real",
+   "file": "gbt_allinone/tentacle/desktop_commander.py",
+   "lines": 259,
+   "io_marks": 31,
+   "spec_keys": 2,
+   "returns": 10
+  },
+  {
+   "kind": "health",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "echo",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "count_words",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "audit_query",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "quant_strategy",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "quant_backtest",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "platform_profile",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "quant_params",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "osint_scan",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "record_grid",
+   "verdict": "real",
+   "file": "gbt_allinone/record_grid.py",
+   "lines": 735,
+   "io_marks": 14,
+   "spec_keys": 3,
+   "returns": 11
+  },
+  {
+   "kind": "wf_define",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "wf_run",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "wf_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "wf_resume",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "lr_submit",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "lr_tick",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "lr_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "selfscan",
+   "verdict": "real",
+   "file": "gbt_allinone/selfscan.py",
+   "lines": 530,
+   "io_marks": 9,
+   "spec_keys": 7,
+   "returns": 6
+  },
+  {
+   "kind": "alerts",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tentacle",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tentacle_manifest",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_surface",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_scan",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_chain",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_defenses",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_llm",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "truth_scan",
+   "verdict": "real",
+   "file": "gbt_allinone/truth_scan.py",
+   "lines": 145,
+   "io_marks": 15,
+   "spec_keys": 1,
+   "returns": 1
+  },
+  {
+   "kind": "autopilot",
+   "verdict": "real",
+   "file": "gbt_allinone/autopilot.py",
+   "lines": 170,
+   "io_marks": 3,
+   "spec_keys": 1,
+   "returns": 0
+  },
+  {
+   "kind": "llm_chat",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "llm_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "cloud_llm",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/cloud_llm.py",
+   "lines": 1515,
+   "io_marks": 57,
+   "spec_keys": 0,
+   "returns": 28
+  },
+  {
+   "kind": "key_gateway",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/key_gateway.py",
+   "lines": 1097,
+   "io_marks": 27,
+   "spec_keys": 2,
+   "returns": 32
+  },
+  {
+   "kind": "multimodal_port",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/multimodal_port.py",
+   "lines": 660,
+   "io_marks": 7,
+   "spec_keys": 10,
+   "returns": 13
+  },
+  {
+   "kind": "genoffice_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/genoffice_bridge.py",
+   "lines": 1285,
+   "io_marks": 33,
+   "spec_keys": 7,
+   "returns": 10
+  },
+  {
+   "kind": "brain_route",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "brain_execute",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "brain_verify",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "brain_health",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "brain_unify",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "root_fix",
+   "verdict": "real",
+   "file": "gbt_allinone/root_fix.py",
+   "lines": 366,
+   "io_marks": 15,
+   "spec_keys": 0,
+   "returns": 9
+  },
+  {
+   "kind": "cross_scan",
+   "verdict": "real",
+   "file": "gbt_allinone/cross_scan.py",
+   "lines": 637,
+   "io_marks": 25,
+   "spec_keys": 1,
+   "returns": 0
+  },
+  {
+   "kind": "inventory",
+   "verdict": "real",
+   "file": "gbt_allinone/inventory.py",
+   "lines": 196,
+   "io_marks": 4,
+   "spec_keys": 3,
+   "returns": 2
+  },
+  {
+   "kind": "brain_vault",
+   "verdict": "real",
+   "file": "gbt_allinone/brain_vault.py",
+   "lines": 141,
+   "io_marks": 9,
+   "spec_keys": 4,
+   "returns": 3
+  },
+  {
+   "kind": "think_loop",
+   "verdict": "real",
+   "file": "gbt_allinone/think_loop.py",
+   "lines": 201,
+   "io_marks": 6,
+   "spec_keys": 5,
+   "returns": 10
+  },
+  {
+   "kind": "one_key_deploy",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "deploy_queue",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_shape",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_scan",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_plan",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_simulate",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_parity",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_rehearse",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_release",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_ascend",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mirror_rewind",
+   "verdict": "real",
+   "file": "tools/mirror_rewind.py",
+   "lines": 32,
+   "io_marks": 4,
+   "spec_keys": 0,
+   "returns": 0
+  },
+  {
+   "kind": "auth_gate_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "transfer",
+   "verdict": "real",
+   "file": "gbt_allinone/transfer.py",
+   "lines": 146,
+   "io_marks": 2,
+   "spec_keys": 0,
+   "returns": 4
+  },
+  {
+   "kind": "wf_cache_clear",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "signature_guard",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "file_hygiene",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "devour_scan",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "devour_github",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tentacle_equip",
+   "verdict": "real",
+   "file": "gbt_allinone/tentacle_equip.py",
+   "lines": 310,
+   "io_marks": 10,
+   "spec_keys": 0,
+   "returns": 15
+  },
+  {
+   "kind": "tool_bay",
+   "verdict": "real",
+   "file": "gbt_allinone/tool_bay.py",
+   "lines": 135,
+   "io_marks": 21,
+   "spec_keys": 5,
+   "returns": 12
+  },
+  {
+   "kind": "remote_confinement",
+   "verdict": "real",
+   "file": "gbt_allinone/tentacle/remote_confinement.py",
+   "lines": 230,
+   "io_marks": 18,
+   "spec_keys": 4,
+   "returns": 22
+  },
+  {
+   "kind": "cli_ify",
+   "verdict": "real",
+   "file": "gbt_allinone/cli_ify.py",
+   "lines": 166,
+   "io_marks": 2,
+   "spec_keys": 9,
+   "returns": 12
+  },
+  {
+   "kind": "tentacle_learn",
+   "verdict": "real",
+   "file": "gbt_allinone/tentacle_learn.py",
+   "lines": 97,
+   "io_marks": 1,
+   "spec_keys": 19,
+   "returns": 9
+  },
+  {
+   "kind": "skill_finder",
+   "verdict": "real",
+   "file": "gbt_allinone/skill_finder.py",
+   "lines": 116,
+   "io_marks": 7,
+   "spec_keys": 2,
+   "returns": 7
+  },
+  {
+   "kind": "humanizer",
+   "verdict": "real",
+   "file": "gbt_allinone/humanizer.py",
+   "lines": 98,
+   "io_marks": 8,
+   "spec_keys": 1,
+   "returns": 4
+  },
+  {
+   "kind": "chart_html",
+   "verdict": "real",
+   "file": "gbt_allinone/chart_html.py",
+   "lines": 151,
+   "io_marks": 12,
+   "spec_keys": 0,
+   "returns": 7
+  },
+  {
+   "kind": "workflow_forge",
+   "verdict": "real",
+   "file": "gbt_allinone/workflow_forge.py",
+   "lines": 144,
+   "io_marks": 1,
+   "spec_keys": 29,
+   "returns": 13
+  },
+  {
+   "kind": "forge_mastery",
+   "verdict": "real",
+   "file": "gbt_allinone/forge_mastery.py",
+   "lines": 133,
+   "io_marks": 1,
+   "spec_keys": 14,
+   "returns": 9
+  },
+  {
+   "kind": "showcase_ops",
+   "verdict": "real",
+   "file": "gbt_allinone/showcase_ops.py",
+   "lines": 113,
+   "io_marks": 1,
+   "spec_keys": 16,
+   "returns": 10
+  },
+  {
+   "kind": "spider_ops",
+   "verdict": "real",
+   "file": "gbt_allinone/spider_ops.py",
+   "lines": 103,
+   "io_marks": 1,
+   "spec_keys": 9,
+   "returns": 10
+  },
+  {
+   "kind": "offense_ops",
+   "verdict": "real",
+   "file": "gbt_allinone/offense_ops.py",
+   "lines": 121,
+   "io_marks": 1,
+   "spec_keys": 9,
+   "returns": 11
+  },
+  {
+   "kind": "skill_forge",
+   "verdict": "real",
+   "file": "gbt_allinone/skill_forge.py",
+   "lines": 126,
+   "io_marks": 1,
+   "spec_keys": 9,
+   "returns": 9
+  },
+  {
+   "kind": "shot_director",
+   "verdict": "real",
+   "file": "gbt_allinone/shot_director.py",
+   "lines": 123,
+   "io_marks": 1,
+   "spec_keys": 7,
+   "returns": 10
+  },
+  {
+   "kind": "book_skill",
+   "verdict": "real",
+   "file": "gbt_allinone/book_skill.py",
+   "lines": 97,
+   "io_marks": 2,
+   "spec_keys": 6,
+   "returns": 9
+  },
+  {
+   "kind": "music_auto",
+   "verdict": "real",
+   "file": "gbt_allinone/music_auto.py",
+   "lines": 114,
+   "io_marks": 5,
+   "spec_keys": 4,
+   "returns": 9
+  },
+  {
+   "kind": "train_ground",
+   "verdict": "real",
+   "file": "gbt_allinone/train_ground.py",
+   "lines": 707,
+   "io_marks": 38,
+   "spec_keys": 7,
+   "returns": 42
+  },
+  {
+   "kind": "quant_plan",
+   "verdict": "real",
+   "file": "gbt_allinone/quant_plan.py",
+   "lines": 139,
+   "io_marks": 2,
+   "spec_keys": 5,
+   "returns": 9
+  },
+  {
+   "kind": "know_map",
+   "verdict": "real",
+   "file": "gbt_allinone/know_map.py",
+   "lines": 389,
+   "io_marks": 17,
+   "spec_keys": 3,
+   "returns": 20
+  },
+  {
+   "kind": "topic_web",
+   "verdict": "real",
+   "file": "gbt_allinone/topic_web.py",
+   "lines": 522,
+   "io_marks": 16,
+   "spec_keys": 0,
+   "returns": 30
+  },
+  {
+   "kind": "self_intake",
+   "verdict": "real",
+   "file": "gbt_allinone/self_intake.py",
+   "lines": 712,
+   "io_marks": 31,
+   "spec_keys": 12,
+   "returns": 33
+  },
+  {
+   "kind": "comfy_forge",
+   "verdict": "real",
+   "file": "gbt_allinone/comfy_forge.py",
+   "lines": 222,
+   "io_marks": 2,
+   "spec_keys": 0,
+   "returns": 11
+  },
+  {
+   "kind": "scan_cap",
+   "verdict": "real",
+   "file": "gbt_allinone/scan_cap.py",
+   "lines": 519,
+   "io_marks": 11,
+   "spec_keys": 3,
+   "returns": 19
+  },
+  {
+   "kind": "figure_gate",
+   "verdict": "real",
+   "file": "gbt_allinone/figure_gate.py",
+   "lines": 234,
+   "io_marks": 6,
+   "spec_keys": 2,
+   "returns": 14
+  },
+  {
+   "kind": "theme_cap",
+   "verdict": "real",
+   "file": "gbt_allinone/theme_cap.py",
+   "lines": 188,
+   "io_marks": 9,
+   "spec_keys": 0,
+   "returns": 17
+  },
+  {
+   "kind": "omarchy_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/tentacle/omarchy_bridge.py",
+   "lines": 936,
+   "io_marks": 112,
+   "spec_keys": 2,
+   "returns": 56
+  },
+  {
+   "kind": "delivery_gate",
+   "verdict": "real",
+   "file": "gbt_allinone/delivery_gate.py",
+   "lines": 218,
+   "io_marks": 12,
+   "spec_keys": 0,
+   "returns": 17
+  },
+  {
+   "kind": "ux_doctrine",
+   "verdict": "real",
+   "file": "gbt_allinone/ux_doctrine.py",
+   "lines": 450,
+   "io_marks": 7,
+   "spec_keys": 0,
+   "returns": 33
+  },
+  {
+   "kind": "welcome",
+   "verdict": "real",
+   "file": "gbt_allinone/welcome.py",
+   "lines": 76,
+   "io_marks": 3,
+   "spec_keys": 0,
+   "returns": 4
+  },
+  {
+   "kind": "god_view",
+   "verdict": "real",
+   "file": "gbt_allinone/god_view.py",
+   "lines": 566,
+   "io_marks": 9,
+   "spec_keys": 0,
+   "returns": 24
+  },
+  {
+   "kind": "vision_loop",
+   "verdict": "real",
+   "file": "gbt_allinone/vision_loop.py",
+   "lines": 324,
+   "io_marks": 12,
+   "spec_keys": 1,
+   "returns": 19
+  },
+  {
+   "kind": "agency_tentacles",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/agency_tentacles.py",
+   "lines": 341,
+   "io_marks": 7,
+   "spec_keys": 1,
+   "returns": 9
+  },
+  {
+   "kind": "media_pipeline",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/media_pipeline.py",
+   "lines": 254,
+   "io_marks": 4,
+   "spec_keys": 0,
+   "returns": 14
+  },
+  {
+   "kind": "edit_pipeline",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tentacle_pipeline",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/tentacle_pipeline.py",
+   "lines": 171,
+   "io_marks": 0,
+   "spec_keys": 5,
+   "returns": 11
+  },
+  {
+   "kind": "long_run_supervisor",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/long_run_supervisor.py",
+   "lines": 316,
+   "io_marks": 3,
+   "spec_keys": 1,
+   "returns": 17
+  },
+  {
+   "kind": "devour_reflect",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "devour_pulse",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mcp_connect",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mcp_tools",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mcp_call",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "coze_mail",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "create",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "drama",
+   "verdict": "real",
+   "file": "gbt_allinone/drama.py",
+   "lines": 247,
+   "io_marks": 0,
+   "spec_keys": 1,
+   "returns": 11
+  },
+  {
+   "kind": "tentacle_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tactics_advise",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "pipeline_submit",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "pipeline_versions",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "pipeline_rollback",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "pipeline_status",
+   "verdict": "real",
+   "file": "tools/codex-scripts/pipeline_status.py",
+   "lines": 273,
+   "io_marks": 9,
+   "spec_keys": 0,
+   "returns": 2
+  },
+  {
+   "kind": "ghost_guard",
+   "verdict": "real",
+   "file": "gbt_allinone/ghost_guard.py",
+   "lines": 285,
+   "io_marks": 12,
+   "spec_keys": 2,
+   "returns": 2
+  },
+  {
+   "kind": "sched_define",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sched_tick",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sched_status",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "svc_inspect",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "vision",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "vlx_flow",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "prompt_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/prompt_bridge.py",
+   "lines": 99,
+   "io_marks": 0,
+   "spec_keys": 1,
+   "returns": 5
+  },
+  {
+   "kind": "audio_extract",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/audio_extract.py",
+   "lines": 298,
+   "io_marks": 13,
+   "spec_keys": 11,
+   "returns": 25
+  },
+  {
+   "kind": "audio_mix",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/audio_mix.py",
+   "lines": 558,
+   "io_marks": 14,
+   "spec_keys": 5,
+   "returns": 33
+  },
+  {
+   "kind": "media_license",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/media_license.py",
+   "lines": 268,
+   "io_marks": 13,
+   "spec_keys": 6,
+   "returns": 18
+  },
+  {
+   "kind": "datakit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/datakit.py",
+   "lines": 185,
+   "io_marks": 6,
+   "spec_keys": 2,
+   "returns": 18
+  },
+  {
+   "kind": "media_run",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/media_run.py",
+   "lines": 2216,
+   "io_marks": 44,
+   "spec_keys": 9,
+   "returns": 46
+  },
+  {
+   "kind": "omni_plug",
+   "verdict": "real",
+   "file": "gbt_allinone/omni_plug.py",
+   "lines": 989,
+   "io_marks": 123,
+   "spec_keys": 4,
+   "returns": 36
+  },
+  {
+   "kind": "media_stamp",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/media_stamp.py",
+   "lines": 95,
+   "io_marks": 3,
+   "spec_keys": 1,
+   "returns": 8
+  },
+  {
+   "kind": "media_publish",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/media_publish.py",
+   "lines": 205,
+   "io_marks": 10,
+   "spec_keys": 6,
+   "returns": 15
+  },
+  {
+   "kind": "voice",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "voice_orchestra",
+   "verdict": "real",
+   "file": "gbt_allinone/voice_orchestra.py",
+   "lines": 323,
+   "io_marks": 1,
+   "spec_keys": 4,
+   "returns": 3
+  },
+  {
+   "kind": "browser",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "bluetooth",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "bt_control",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/bt_control.py",
+   "lines": 308,
+   "io_marks": 0,
+   "spec_keys": 3,
+   "returns": 20
+  },
+  {
+   "kind": "quant",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "life",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "mind",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "project_context",
+   "verdict": "real",
+   "file": "gbt_allinone/project_context.py",
+   "lines": 308,
+   "io_marks": 8,
+   "spec_keys": 1,
+   "returns": 5
+  },
+  {
+   "kind": "topic_watch",
+   "verdict": "real",
+   "file": "gbt_allinone/topic_watch.py",
+   "lines": 434,
+   "io_marks": 8,
+   "spec_keys": 5,
+   "returns": 7
+  },
+  {
+   "kind": "trend_watch",
+   "verdict": "real",
+   "file": "gbt_allinone/trend_watch.py",
+   "lines": 146,
+   "io_marks": 6,
+   "spec_keys": 5,
+   "returns": 8
+  },
+  {
+   "kind": "projection_card",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "trace_store",
+   "verdict": "real",
+   "file": "gbt_allinone/trace_store.py",
+   "lines": 271,
+   "io_marks": 8,
+   "spec_keys": 2,
+   "returns": 14
+  },
+  {
+   "kind": "wave_probe",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/wave_probe.py",
+   "lines": 179,
+   "io_marks": 7,
+   "spec_keys": 0,
+   "returns": 3
+  },
+  {
+   "kind": "dream_replay",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/dream_replay.py",
+   "lines": 161,
+   "io_marks": 4,
+   "spec_keys": 8,
+   "returns": 8
+  },
+  {
+   "kind": "capability_net",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "director_mood",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/director_mood.py",
+   "lines": 248,
+   "io_marks": 0,
+   "spec_keys": 0,
+   "returns": 2
+  },
+  {
+   "kind": "music_publishing",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/music_publishing.py",
+   "lines": 125,
+   "io_marks": 0,
+   "spec_keys": 14,
+   "returns": 2
+  },
+  {
+   "kind": "dh_pose",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/dh_pose.py",
+   "lines": 328,
+   "io_marks": 17,
+   "spec_keys": 0,
+   "returns": 19
+  },
+  {
+   "kind": "anatomy_figures",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "machine_film",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "rig_audit",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "rig_fix",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "anim_audit",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "anim_fix",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "dh_asset_gate",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "omni_arm",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/omni_arm.py",
+   "lines": 159,
+   "io_marks": 8,
+   "spec_keys": 1,
+   "returns": 15
+  },
+  {
+   "kind": "tentacle_arm",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/tentacle_arm.py",
+   "lines": 331,
+   "io_marks": 10,
+   "spec_keys": 3,
+   "returns": 15
+  },
+  {
+   "kind": "project_drift",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/project_drift.py",
+   "lines": 417,
+   "io_marks": 12,
+   "spec_keys": 9,
+   "returns": 13
+  },
+  {
+   "kind": "impact_check",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/impact_check.py",
+   "lines": 328,
+   "io_marks": 5,
+   "spec_keys": 1,
+   "returns": 12
+  },
+  {
+   "kind": "music_intel",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "video_intel",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "film_intel",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "account_registry",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/account_registry.py",
+   "lines": 151,
+   "io_marks": 5,
+   "spec_keys": 10,
+   "returns": 5
+  },
+  {
+   "kind": "verification_watch",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/verification_watch.py",
+   "lines": 143,
+   "io_marks": 0,
+   "spec_keys": 6,
+   "returns": 5
+  },
+  {
+   "kind": "shared_resources",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/shared_resources.py",
+   "lines": 156,
+   "io_marks": 0,
+   "spec_keys": 5,
+   "returns": 8
+  },
+  {
+   "kind": "brand_outro",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/brand_outro.py",
+   "lines": 190,
+   "io_marks": 0,
+   "spec_keys": 3,
+   "returns": 5
+  },
+  {
+   "kind": "emotion_projection",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/emotion_projection.py",
+   "lines": 175,
+   "io_marks": 0,
+   "spec_keys": 5,
+   "returns": 12
+  },
+  {
+   "kind": "proactive_report",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/proactive_report.py",
+   "lines": 528,
+   "io_marks": 0,
+   "spec_keys": 23,
+   "returns": 20
+  },
+  {
+   "kind": "observer_anchor",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/observer_anchor.py",
+   "lines": 235,
+   "io_marks": 6,
+   "spec_keys": 13,
+   "returns": 11
+  },
+  {
+   "kind": "persona_kernel",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/persona_kernel.py",
+   "lines": 363,
+   "io_marks": 0,
+   "spec_keys": 24,
+   "returns": 11
+  },
+  {
+   "kind": "hook_registry",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/hook_registry.py",
+   "lines": 294,
+   "io_marks": 0,
+   "spec_keys": 11,
+   "returns": 14
+  },
+  {
+   "kind": "scene_anchor",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/scene_anchor.py",
+   "lines": 136,
+   "io_marks": 0,
+   "spec_keys": 6,
+   "returns": 9
+  },
+  {
+   "kind": "code_art",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "orchestration_kernel",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/orchestration_kernel.py",
+   "lines": 307,
+   "io_marks": 2,
+   "spec_keys": 3,
+   "returns": 21
+  },
+  {
+   "kind": "render_evolution",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/render_evolution.py",
+   "lines": 223,
+   "io_marks": 0,
+   "spec_keys": 18,
+   "returns": 18
+  },
+  {
+   "kind": "caps_called_audit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/caps_called_audit.py",
+   "lines": 324,
+   "io_marks": 11,
+   "spec_keys": 1,
+   "returns": 3
+  },
+  {
+   "kind": "tentacle_cognition",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/tentacle_cognition.py",
+   "lines": 178,
+   "io_marks": 0,
+   "spec_keys": 17,
+   "returns": 21
+  },
+  {
+   "kind": "coverage_auditor",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/coverage_auditor.py",
+   "lines": 252,
+   "io_marks": 0,
+   "spec_keys": 13,
+   "returns": 12
+  },
+  {
+   "kind": "gods_eye",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/gods_eye.py",
+   "lines": 1208,
+   "io_marks": 47,
+   "spec_keys": 25,
+   "returns": 40
+  },
+  {
+   "kind": "obsidian_vault",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/obsidian_vault.py",
+   "lines": 425,
+   "io_marks": 36,
+   "spec_keys": 2,
+   "returns": 19
+  },
+  {
+   "kind": "cap_tags",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/cap_tags.py",
+   "lines": 327,
+   "io_marks": 20,
+   "spec_keys": 2,
+   "returns": 20
+  },
+  {
+   "kind": "action_gate",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/action_gate.py",
+   "lines": 277,
+   "io_marks": 14,
+   "spec_keys": 12,
+   "returns": 10
+  },
+  {
+   "kind": "growth_hooks",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/growth_hooks.py",
+   "lines": 342,
+   "io_marks": 21,
+   "spec_keys": 5,
+   "returns": 13
+  },
+  {
+   "kind": "devour_fusion",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/devour_fusion.py",
+   "lines": 265,
+   "io_marks": 16,
+   "spec_keys": 4,
+   "returns": 13
+  },
+  {
+   "kind": "wiki_graph",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "doc_intake",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "llm_watch",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "task_graph",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "replan_loop",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "duty_board",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "rea_reverse",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/rea_reverse.py",
+   "lines": 246,
+   "io_marks": 21,
+   "spec_keys": 4,
+   "returns": 12
+  },
+  {
+   "kind": "recon_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/recon_distill.py",
+   "lines": 258,
+   "io_marks": 13,
+   "spec_keys": 1,
+   "returns": 15
+  },
+  {
+   "kind": "desktop_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/desktop_distill.py",
+   "lines": 181,
+   "io_marks": 10,
+   "spec_keys": 1,
+   "returns": 8
+  },
+  {
+   "kind": "pentest_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/pentest_distill.py",
+   "lines": 148,
+   "io_marks": 8,
+   "spec_keys": 1,
+   "returns": 7
+  },
+  {
+   "kind": "diagram_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/diagram_distill.py",
+   "lines": 151,
+   "io_marks": 9,
+   "spec_keys": 1,
+   "returns": 7
+  },
+  {
+   "kind": "machine_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/machine_distill.py",
+   "lines": 156,
+   "io_marks": 9,
+   "spec_keys": 1,
+   "returns": 7
+  },
+  {
+   "kind": "cad_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/cad_distill.py",
+   "lines": 109,
+   "io_marks": 7,
+   "spec_keys": 0,
+   "returns": 7
+  },
+  {
+   "kind": "bi_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/bi_distill.py",
+   "lines": 113,
+   "io_marks": 6,
+   "spec_keys": 0,
+   "returns": 7
+  },
+  {
+   "kind": "memory_bank",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/memory_bank.py",
+   "lines": 311,
+   "io_marks": 16,
+   "spec_keys": 7,
+   "returns": 26
+  },
+  {
+   "kind": "agent_console",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/agent_console.py",
+   "lines": 299,
+   "io_marks": 13,
+   "spec_keys": 8,
+   "returns": 25
+  },
+  {
+   "kind": "code_audit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/code_audit.py",
+   "lines": 418,
+   "io_marks": 38,
+   "spec_keys": 10,
+   "returns": 19
+  },
+  {
+   "kind": "agent_rig",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/agent_rig.py",
+   "lines": 303,
+   "io_marks": 29,
+   "spec_keys": 5,
+   "returns": 21
+  },
+  {
+   "kind": "console_hub",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/console_hub.py",
+   "lines": 347,
+   "io_marks": 12,
+   "spec_keys": 2,
+   "returns": 11
+  },
+  {
+   "kind": "console_pages",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/console_pages.py",
+   "lines": 1253,
+   "io_marks": 44,
+   "spec_keys": 1,
+   "returns": 10
+  },
+  {
+   "kind": "freebuff_term",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/freebuff_term.py",
+   "lines": 342,
+   "io_marks": 23,
+   "spec_keys": 5,
+   "returns": 20
+  },
+  {
+   "kind": "hf_voice",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/hf_voice.py",
+   "lines": 391,
+   "io_marks": 23,
+   "spec_keys": 5,
+   "returns": 24
+  },
+  {
+   "kind": "voice_studio",
+   "verdict": "real",
+   "file": "gbt_allinone/voice_studio.py",
+   "lines": 776,
+   "io_marks": 52,
+   "spec_keys": 18,
+   "returns": 55
+  },
+  {
+   "kind": "digital_human",
+   "verdict": "real",
+   "file": "gbt_allinone/digital_human.py",
+   "lines": 500,
+   "io_marks": 62,
+   "spec_keys": 0,
+   "returns": 34
+  },
+  {
+   "kind": "image_scout",
+   "verdict": "real",
+   "file": "gbt_allinone/image_scout.py",
+   "lines": 278,
+   "io_marks": 13,
+   "spec_keys": 2,
+   "returns": 9
+  },
+  {
+   "kind": "install_selfcheck",
+   "verdict": "real",
+   "file": "gbt_allinone/install_selfcheck.py",
+   "lines": 231,
+   "io_marks": 9,
+   "spec_keys": 0,
+   "returns": 9
+  },
+  {
+   "kind": "room_space",
+   "verdict": "real",
+   "file": "gbt_allinone/room_space.py",
+   "lines": 1405,
+   "io_marks": 25,
+   "spec_keys": 4,
+   "returns": 31
+  },
+  {
+   "kind": "collab_gateway",
+   "verdict": "real",
+   "file": "gbt_allinone/collab_gateway.py",
+   "lines": 824,
+   "io_marks": 17,
+   "spec_keys": 2,
+   "returns": 46
+  },
+  {
+   "kind": "lobehub",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/lobehub.py",
+   "lines": 609,
+   "io_marks": 67,
+   "spec_keys": 3,
+   "returns": 45
+  },
+  {
+   "kind": "comfyui",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "comfy_native",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/comfy_native.py",
+   "lines": 1162,
+   "io_marks": 109,
+   "spec_keys": 3,
+   "returns": 90
+  },
+  {
+   "kind": "ring_context",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/ring_context.py",
+   "lines": 225,
+   "io_marks": 14,
+   "spec_keys": 0,
+   "returns": 6
+  },
+  {
+   "kind": "skill_watch",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/skill_watch.py",
+   "lines": 173,
+   "io_marks": 13,
+   "spec_keys": 0,
+   "returns": 8
+  },
+  {
+   "kind": "vision_grounding",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/vision_grounding.py",
+   "lines": 114,
+   "io_marks": 7,
+   "spec_keys": 0,
+   "returns": 5
+  },
+  {
+   "kind": "tentacle_comfy_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/tentacle_comfy_bridge.py",
+   "lines": 166,
+   "io_marks": 24,
+   "spec_keys": 0,
+   "returns": 11
+  },
+  {
+   "kind": "repo_publish",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/repo_publish.py",
+   "lines": 145,
+   "io_marks": 12,
+   "spec_keys": 1,
+   "returns": 12
+  },
+  {
+   "kind": "pulse_direct",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/pulse_direct.py",
+   "lines": 159,
+   "io_marks": 11,
+   "spec_keys": 2,
+   "returns": 5
+  },
+  {
+   "kind": "warm_switch",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/warm_switch.py",
+   "lines": 383,
+   "io_marks": 44,
+   "spec_keys": 4,
+   "returns": 15
+  },
+  {
+   "kind": "page_scan",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/page_scan.py",
+   "lines": 158,
+   "io_marks": 9,
+   "spec_keys": 0,
+   "returns": 11
+  },
+  {
+   "kind": "fact_gate",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/fact_gate.py",
+   "lines": 135,
+   "io_marks": 6,
+   "spec_keys": 0,
+   "returns": 3
+  },
+  {
+   "kind": "policy_gate",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/policy_gate.py",
+   "lines": 119,
+   "io_marks": 1,
+   "spec_keys": 0,
+   "returns": 5
+  },
+  {
+   "kind": "one_shot",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/one_shot.py",
+   "lines": 243,
+   "io_marks": 4,
+   "spec_keys": 1,
+   "returns": 4
+  },
+  {
+   "kind": "surface_bind",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/surface_bind.py",
+   "lines": 370,
+   "io_marks": 24,
+   "spec_keys": 1,
+   "returns": 16
+  },
+  {
+   "kind": "memory_manager",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/memory_manager.py",
+   "lines": 271,
+   "io_marks": 24,
+   "spec_keys": 3,
+   "returns": 10
+  },
+  {
+   "kind": "code_graph",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "sec_sweeper",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/sec_sweeper.py",
+   "lines": 456,
+   "io_marks": 24,
+   "spec_keys": 2,
+   "returns": 12
+  },
+  {
+   "kind": "task_manager",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/task_manager.py",
+   "lines": 221,
+   "io_marks": 8,
+   "spec_keys": 2,
+   "returns": 7
+  },
+  {
+   "kind": "transformer",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "automation_keys",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/automation_keys.py",
+   "lines": 693,
+   "io_marks": 17,
+   "spec_keys": 9,
+   "returns": 37
+  },
+  {
+   "kind": "model_key_pool",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/model_key_pool.py",
+   "lines": 240,
+   "io_marks": 0,
+   "spec_keys": 19,
+   "returns": 20
+  },
+  {
+   "kind": "meta_cognition",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/meta_cognition.py",
+   "lines": 285,
+   "io_marks": 3,
+   "spec_keys": 14,
+   "returns": 23
+  },
+  {
+   "kind": "libtv_skill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/libtv_skill.py",
+   "lines": 911,
+   "io_marks": 2,
+   "spec_keys": 67,
+   "returns": 79
+  },
+  {
+   "kind": "a1art_skill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/a1art_skill.py",
+   "lines": 830,
+   "io_marks": 1,
+   "spec_keys": 71,
+   "returns": 72
+  },
+  {
+   "kind": "energy_pool",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/energy_pool.py",
+   "lines": 494,
+   "io_marks": 5,
+   "spec_keys": 29,
+   "returns": 31
+  },
+  {
+   "kind": "scrapling",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "genoffice",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "blender",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "gs_h3",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "actioncam",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "look_grade",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "penetrating_cross_scan",
+   "verdict": "real",
+   "file": "tools/penetrating_cross_scan.py",
+   "lines": 703,
+   "io_marks": 24,
+   "spec_keys": 4,
+   "returns": 28
+  },
+  {
+   "kind": "hook_enforcer",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "omission_detector",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "zimage_rewash",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "n8n_wf",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "filmkit",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "tentacle_bind",
+   "verdict": "real",
+   "file": "tools/tentacle_bind.py",
+   "lines": 812,
+   "io_marks": 45,
+   "spec_keys": 5,
+   "returns": 16
+  },
+  {
+   "kind": "asset_index",
+   "verdict": "real",
+   "file": "tools/asset_index.py",
+   "lines": 246,
+   "io_marks": 13,
+   "spec_keys": 0,
+   "returns": 6
+  },
+  {
+   "kind": "control_loop",
+   "verdict": "real",
+   "file": "tools/control_loop.py",
+   "lines": 320,
+   "io_marks": 12,
+   "spec_keys": 2,
+   "returns": 9
+  },
+  {
+   "kind": "local_brain",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/local_brain.py",
+   "lines": 342,
+   "io_marks": 2,
+   "spec_keys": 30,
+   "returns": 31
+  },
+  {
+   "kind": "auto_switch",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/auto_switch.py",
+   "lines": 701,
+   "io_marks": 2,
+   "spec_keys": 44,
+   "returns": 60
+  },
+  {
+   "kind": "context_vault",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/context_vault.py",
+   "lines": 442,
+   "io_marks": 16,
+   "spec_keys": 25,
+   "returns": 29
+  },
+  {
+   "kind": "feishu_embed",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/feishu_embed.py",
+   "lines": 213,
+   "io_marks": 2,
+   "spec_keys": 11,
+   "returns": 17
+  },
+  {
+   "kind": "dl_forge",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/dl_forge.py",
+   "lines": 331,
+   "io_marks": 2,
+   "spec_keys": 3,
+   "returns": 11
+  },
+  {
+   "kind": "dh_realism",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/dh_realism.py",
+   "lines": 357,
+   "io_marks": 1,
+   "spec_keys": 12,
+   "returns": 9
+  },
+  {
+   "kind": "cloud_plugin",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/cloud_plugin.py",
+   "lines": 346,
+   "io_marks": 6,
+   "spec_keys": 36,
+   "returns": 23
+  },
+  {
+   "kind": "db_plugin",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/db_plugin.py",
+   "lines": 246,
+   "io_marks": 1,
+   "spec_keys": 28,
+   "returns": 21
+  },
+  {
+   "kind": "telegram_embed",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/telegram_embed.py",
+   "lines": 231,
+   "io_marks": 2,
+   "spec_keys": 12,
+   "returns": 19
+  },
+  {
+   "kind": "whatsapp_embed",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/whatsapp_embed.py",
+   "lines": 213,
+   "io_marks": 2,
+   "spec_keys": 12,
+   "returns": 18
+  },
+  {
+   "kind": "libtv_workflow",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/libtv_workflow.py",
+   "lines": 194,
+   "io_marks": 0,
+   "spec_keys": 14,
+   "returns": 17
+  },
+  {
+   "kind": "gate_visibility",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/gate_visibility.py",
+   "lines": 469,
+   "io_marks": 6,
+   "spec_keys": 5,
+   "returns": 15
+  },
+  {
+   "kind": "dh_brain",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/dh_brain.py",
+   "lines": 209,
+   "io_marks": 4,
+   "spec_keys": 2,
+   "returns": 13
+  },
+  {
+   "kind": "eigenflux",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/eigenflux.py",
+   "lines": 550,
+   "io_marks": 9,
+   "spec_keys": 2,
+   "returns": 24
+  },
+  {
+   "kind": "h3_video_gen",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/h3_video_gen.py",
+   "lines": 1360,
+   "io_marks": 5,
+   "spec_keys": 74,
+   "returns": 64
+  },
+  {
+   "kind": "absorb_loop",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/absorb_loop.py",
+   "lines": 248,
+   "io_marks": 6,
+   "spec_keys": 11,
+   "returns": 18
+  },
+  {
+   "kind": "cloud_pc",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/cloud_pc.py",
+   "lines": 203,
+   "io_marks": 1,
+   "spec_keys": 16,
+   "returns": 17
+  },
+  {
+   "kind": "auto_publish",
+   "verdict": "spec_only",
+   "file": "gbt_allinone/tools/auto_publish.py",
+   "lines": 238,
+   "io_marks": 0,
+   "spec_keys": 24,
+   "returns": 24
+  },
+  {
+   "kind": "awesome_tools_index",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/awesome_tools_index.py",
+   "lines": 4125,
+   "io_marks": 2,
+   "spec_keys": 254,
+   "returns": 184
+  },
+  {
+   "kind": "stigmergy",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/stigmergy.py",
+   "lines": 377,
+   "io_marks": 8,
+   "spec_keys": 14,
+   "returns": 24
+  },
+  {
+   "kind": "ledger_note",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/ledger_note.py",
+   "lines": 210,
+   "io_marks": 5,
+   "spec_keys": 0,
+   "returns": 3
+  },
+  {
+   "kind": "code_patch",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/code_patch.py",
+   "lines": 314,
+   "io_marks": 18,
+   "spec_keys": 5,
+   "returns": 3
+  },
+  {
+   "kind": "git_read",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "git_write",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "brain_council",
+   "verdict": "real",
+   "file": "gbt_allinone/brain/brain_council.py",
+   "lines": 91,
+   "io_marks": 0,
+   "spec_keys": 0,
+   "returns": 2
+  },
+  {
+   "kind": "omni_web",
+   "verdict": "real",
+   "file": "gbt_allinone/omni_web.py",
+   "lines": 17,
+   "io_marks": 0,
+   "spec_keys": 0,
+   "returns": 0
+  },
+  {
+   "kind": "ul_tars_desktop",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "claude_code",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "codebuddy",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "redteam_recon",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "pentest",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "keylogger",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "screen_sniff",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "remote_domain",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "device_takeover",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "credential_steal",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "data_hijack",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "social_eng",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "paywallbuster",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "asset_vault_freeze",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "onboarding_gate",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "agent_control",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/agent_control.py",
+   "lines": 151,
+   "io_marks": 12,
+   "spec_keys": 0,
+   "returns": 4
+  },
+  {
+   "kind": "agent_council",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/agent_council.py",
+   "lines": 294,
+   "io_marks": 16,
+   "spec_keys": 2,
+   "returns": 26
+  },
+  {
+   "kind": "answer_shaper",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/answer_shaper.py",
+   "lines": 135,
+   "io_marks": 3,
+   "spec_keys": 1,
+   "returns": 6
+  },
+  {
+   "kind": "belief_forge",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/belief_forge.py",
+   "lines": 230,
+   "io_marks": 13,
+   "spec_keys": 2,
+   "returns": 14
+  },
+  {
+   "kind": "case_mine",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/case_mine.py",
+   "lines": 283,
+   "io_marks": 17,
+   "spec_keys": 1,
+   "returns": 14
+  },
+  {
+   "kind": "cli_chat",
+   "verdict": "real",
+   "file": "gbt_allinone/cli_chat.py",
+   "lines": 415,
+   "io_marks": 12,
+   "spec_keys": 2,
+   "returns": 13
+  },
+  {
+   "kind": "command_chain",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/command_chain.py",
+   "lines": 628,
+   "io_marks": 17,
+   "spec_keys": 3,
+   "returns": 24
+  },
+  {
+   "kind": "creation_camp",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/creation_camp.py",
+   "lines": 181,
+   "io_marks": 3,
+   "spec_keys": 0,
+   "returns": 6
+  },
+  {
+   "kind": "db_probe",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/db_probe.py",
+   "lines": 266,
+   "io_marks": 17,
+   "spec_keys": 0,
+   "returns": 14
+  },
+  {
+   "kind": "energy_scheduler",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/energy_scheduler.py",
+   "lines": 235,
+   "io_marks": 16,
+   "spec_keys": 0,
+   "returns": 11
+  },
+  {
+   "kind": "event_ledger",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/event_ledger.py",
+   "lines": 191,
+   "io_marks": 11,
+   "spec_keys": 1,
+   "returns": 10
+  },
+  {
+   "kind": "flow_canvas",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/flow_canvas.py",
+   "lines": 200,
+   "io_marks": 7,
+   "spec_keys": 1,
+   "returns": 7
+  },
+  {
+   "kind": "freellmapi",
+   "verdict": "real",
+   "file": "gbt_allinone/llm/freellmapi.py",
+   "lines": 398,
+   "io_marks": 14,
+   "spec_keys": 2,
+   "returns": 32
+  },
+  {
+   "kind": "handoff",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/handoff.py",
+   "lines": 175,
+   "io_marks": 11,
+   "spec_keys": 1,
+   "returns": 10
+  },
+  {
+   "kind": "llm_redteam",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/llm_redteam.py",
+   "lines": 259,
+   "io_marks": 8,
+   "spec_keys": 2,
+   "returns": 9
+  },
+  {
+   "kind": "notion_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/notion_bridge.py",
+   "lines": 473,
+   "io_marks": 20,
+   "spec_keys": 0,
+   "returns": 11
+  },
+  {
+   "kind": "policy_delta",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/policy_delta.py",
+   "lines": 147,
+   "io_marks": 5,
+   "spec_keys": 0,
+   "returns": 8
+  },
+  {
+   "kind": "slim_profile",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/slim_profile.py",
+   "lines": 286,
+   "io_marks": 27,
+   "spec_keys": 1,
+   "returns": 13
+  },
+  {
+   "kind": "spend_guard",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/spend_guard.py",
+   "lines": 185,
+   "io_marks": 12,
+   "spec_keys": 1,
+   "returns": 10
+  },
+  {
+   "kind": "thebrain_bridge",
+   "verdict": "real",
+   "file": "gbt_allinone/thebrain_bridge.py",
+   "lines": 847,
+   "io_marks": 36,
+   "spec_keys": 9,
+   "returns": 49
+  },
+  {
+   "kind": "train_recipe",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/train_recipe.py",
+   "lines": 159,
+   "io_marks": 8,
+   "spec_keys": 1,
+   "returns": 7
+  },
+  {
+   "kind": "tripo",
+   "verdict": "real",
+   "file": "gbt_allinone/tripo.py",
+   "lines": 421,
+   "io_marks": 10,
+   "spec_keys": 0,
+   "returns": 34
+  },
+  {
+   "kind": "ui_render",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/ui_render.py",
+   "lines": 193,
+   "io_marks": 6,
+   "spec_keys": 2,
+   "returns": 8
+  },
+  {
+   "kind": "review_gate",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "detail_habit",
+   "verdict": "real",
+   "file": "gbt_allinone/detail_habit.py",
+   "lines": 214,
+   "io_marks": 2,
+   "spec_keys": 0,
+   "returns": 7
+  },
+  {
+   "kind": "tentacle_scale",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "express_direct",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "vision_print",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/vision_print.py",
+   "lines": 996,
+   "io_marks": 39,
+   "spec_keys": 8,
+   "returns": 45
+  },
+  {
+   "kind": "cadgen",
+   "verdict": "inline_api",
+   "file": "gbt_allinone/api.py"
+  },
+  {
+   "kind": "ui_kit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/ui_kit.py",
+   "lines": 284,
+   "io_marks": 14,
+   "spec_keys": 2,
+   "returns": 16
+  },
+  {
+   "kind": "design_atlas",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/design_atlas.py",
+   "lines": 260,
+   "io_marks": 11,
+   "spec_keys": 2,
+   "returns": 10
+  },
+  {
+   "kind": "art_chain",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/art_chain.py",
+   "lines": 178,
+   "io_marks": 10,
+   "spec_keys": 5,
+   "returns": 13
+  },
+  {
+   "kind": "motion_kit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/motion_kit.py",
+   "lines": 446,
+   "io_marks": 20,
+   "spec_keys": 3,
+   "returns": 17
+  },
+  {
+   "kind": "bits_kit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/bits_kit.py",
+   "lines": 393,
+   "io_marks": 16,
+   "spec_keys": 2,
+   "returns": 14
+  },
+  {
+   "kind": "art_brief",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/art_brief.py",
+   "lines": 238,
+   "io_marks": 9,
+   "spec_keys": 2,
+   "returns": 7
+  },
+  {
+   "kind": "intake_kit",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/intake_kit.py",
+   "lines": 539,
+   "io_marks": 23,
+   "spec_keys": 1,
+   "returns": 12
+  },
+  {
+   "kind": "offload_distill",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/offload_distill.py",
+   "lines": 219,
+   "io_marks": 7,
+   "spec_keys": 0,
+   "returns": 10
+  },
+  {
+   "kind": "pod_link",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/pod_link.py",
+   "lines": 648,
+   "io_marks": 38,
+   "spec_keys": 9,
+   "returns": 65
+  },
+  {
+   "kind": "comfy_cloud",
+   "verdict": "real",
+   "file": "gbt_allinone/tools/comfy_cloud.py",
+   "lines": 623,
+   "io_marks": 90,
+   "spec_keys": 10,
+   "returns": 14
+  }
+ ]
+}

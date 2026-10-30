@@ -1,0 +1,13 @@
+{"cat": "coord", "text": "第 1 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:20", "id": "m1793308760994-10549"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：error]; upload if found!", "refs": ["no_such_cap_xyz 失败：error"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:23", "id": "m1793308763728-10549"}
+{"cat": "coord", "text": "第 2 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:23", "id": "m1793308763741-10549"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：error]; upload if found!", "refs": ["no_such_cap_xyz 失败：error"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:24", "id": "m1793308764879-10549"}
+{"cat": "coord", "text": "第 3 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:24", "id": "m1793308764883-10549"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：error]; upload if found!", "refs": ["no_such_cap_xyz 失败：error"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:26", "id": "m1793308766001-10549"}
+{"cat": "file", "text": "answer to m1793308766001-10549", "refs": ["state/mirror_board/seek-test/files/420ee29f5cb4_contrib.dat"], "answers": "m1793308766001-10549", "sha": "420ee29f5cb4", "size": 44, "by": "other-agent", "at": "2026-10-30T04:19:30", "id": "m1793308770664-10574"}
+{"cat": "coord", "text": "第 1 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:30", "id": "m1793308770863-10575"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：板上有人交付了：['state/mirror_board/seek-test/files/420ee29f5cb4_contrib.dat']]; upload if found!", "refs": ["no_such_cap_xyz 失败：板上有人交付了：['state/mirror_board/seek-test/files/420ee29f5cb4_contrib.dat']"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:32", "id": "m1793308772040-10575"}
+{"cat": "coord", "text": "第 2 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:32", "id": "m1793308772046-10575"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：error]; upload if found!", "refs": ["no_such_cap_xyz 失败：error"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:33", "id": "m1793308773177-10575"}
+{"cat": "coord", "text": "第 3 轮派发：need", "refs": [], "by": "swarm:seek-test", "at": "2026-10-30T04:19:33", "id": "m1793308773182-10575"}
+{"cat": "question", "text": "Agent seeks [no_such_cap_xyz 失败：error]; upload if found!", "refs": ["no_such_cap_xyz 失败：error"], "by": "swarm:seek-test", "at": "2026-10-30T04:19:34", "id": "m1793308774348-10575"}

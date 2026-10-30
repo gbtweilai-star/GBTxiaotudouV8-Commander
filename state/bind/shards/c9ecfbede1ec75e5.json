@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_wiring.py", "neighbors": ["anchor:scope_root", "data/capabilities.json", "gbt_allinone/api.py", "gbt_allinone/recon/last30days/engine/resolve.py", "runtime/gbt_allinone/api.py"], "defs": []}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/render_god_view.py", "neighbors": ["anchor:scope_root", "docs/capabilities/data.md", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/render.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tools/eigenflux.py", "index.html"], "defs": ["payload", "call"]}

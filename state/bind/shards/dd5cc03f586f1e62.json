@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/probe_semantic_fields_gap.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tentacle.md", "gbt_allinone/llm/bridge.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/tentacle/bridge.py", "tools/codex-scripts/probe_holdout_batches.py"], "defs": []}

@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/apply-context-align.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_commander/__main__.py", "tools/codex-scripts/context-window-watch.py"], "defs": ["patch", "main"]}

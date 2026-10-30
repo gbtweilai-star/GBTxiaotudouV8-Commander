@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/ledger-add-faults.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/integration/auth.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/tools/framework_gate.py", "tools/codex-scripts/five-dim.py", "tools/verify.sh"], "defs": []}

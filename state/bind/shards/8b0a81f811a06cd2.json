@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/verify_loader_scope2.py", "neighbors": ["anchor:scope_root"], "defs": ["StubPath", "cwd", "home", "run", "StubPath2", "cwd", "home"]}

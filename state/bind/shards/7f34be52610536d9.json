@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/close-fault.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/__main__.py", "gbt_allinone/recon/last30days/engine/env.py", "gbt_allinone/recon/last30days/engine/log.py", "gbt_commander/__main__.py", "tools/codex-scripts/framework-gate-bite-test.py"], "defs": ["main"]}

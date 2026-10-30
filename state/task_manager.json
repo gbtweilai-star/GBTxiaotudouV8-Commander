@@ -1,0 +1,241 @@
+{
+ "ok": true,
+ "op": "list",
+ "at": "2026-10-30T04:05:16",
+ "count": 26,
+ "rows": [
+  {
+   "pid": 1,
+   "name": "[pid 1]",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": ""
+  },
+  {
+   "pid": 2415,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u tools/a19_attach.py"
+  },
+  {
+   "pid": 4940,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u tools/svc_guard.py watch --interval 30"
+  },
+  {
+   "pid": 5847,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u tools/duty_patrol.py --interval 5"
+  },
+  {
+   "pid": 6266,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -m http.server 8080 --bind 127.0.0.1"
+  },
+  {
+   "pid": 6271,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u runtime/model_bridge.py --port 8791"
+  },
+  {
+   "pid": 6272,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u runtime/model_bridge.py --port 8791"
+  },
+  {
+   "pid": 6277,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u runtime/async_gate.py --port 8790"
+  },
+  {
+   "pid": 6712,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u tools/a19_sentinel.py --wait 5400"
+  },
+  {
+   "pid": 9306,
+   "name": "sh",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/bin/sh"
+  },
+  {
+   "pid": 9307,
+   "name": "sh",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/bin/sh"
+  },
+  {
+   "pid": 9311,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "python3 -u tools/omni_align.py --run --prod-store --parallel 6"
+  },
+  {
+   "pid": 9312,
+   "name": "tail",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "tail -14"
+  },
+  {
+   "pid": 9313,
+   "name": "sed",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "sed s/^/  /"
+  },
+  {
+   "pid": 9315,
+   "name": "timeout",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "timeout 850 python3 -u tools/omni_align.py --run --prod-store --parallel 6"
+  },
+  {
+   "pid": 9316,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9317,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9318,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9319,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9320,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9321,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9340,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9341,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9379,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  },
+  {
+   "pid": 9380,
+   "name": "python3",
+   "mem_mb": null,
+   "cpu": null,
+   "ports": [],
+   "owner": "未知（不在我们的标记里）",
+   "cmd": "/usr/bin/python3 -u /var/minis/shared/gbtv8/tools/tentacle_dispatch.py --worker /tmp/dispatch_1793307826058/queue /tmp/dispatch_1793307826058/done"
+  }
+ ],
+ "_口径": {
+  "列": "任务 / 内存占用(MB) / CPU / 端口 / 进程ID",
+  "网络列的真实含义": "**是端口不是流量** —— per-process 流量本机取不到，不编",
+  "归属": "**先按进程名认**（浏览器/Node 一眼认得），再退到命令行标记；认不出写『未知』，不猜",
+  "剔除的噪声行": "System Idle / MemCompression / Registry / Secure System —— 它们不是任务",
+  "读数据的来源": "psutil 在本机读不到进程（/proc/<pid>/stat 字段不全），已回落到 /proc 直读｜本机 /proc 不提供 CPU/内存 ⇒ 该列写『未读到』，不编 0",
+  "未读到的列": "CPU / 内存 若为 null ⇒ 本机 /proc 不提供（iSH 限制），不是 0"
+ }
+}

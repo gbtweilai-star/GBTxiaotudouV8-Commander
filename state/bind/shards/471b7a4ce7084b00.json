@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/build_v5_manifest.py", "neighbors": ["anchor:scope_root", "docs/capabilities/brain.md", "docs/capabilities/tools.md", "docs/capabilities/vision.md", "gbt_allinone/chain.py", "gbt_allinone/recon/last30days/engine/resolve.py", "tools/verify.sh"], "defs": []}

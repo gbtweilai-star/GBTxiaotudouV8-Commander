@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/build_v4_manifest.py", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/integration/auth.py", "gbt_allinone/recon/last30days/engine/resolve.py", "gbt_allinone/recon/last30days/store.py", "gbt_allinone/store.py", "runtime/gbt_allinone/store.py"], "defs": ["sh"]}

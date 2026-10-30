@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/anim-talk.py", "neighbors": ["anchor:scope_root", "docs/capabilities/desktop.md", "docs/capabilities/tools.md", "gbt_allinone/docs/数字人逼真度-专业口径/assets.txt", "index.html", "tools/codex-scripts/anim-idle.py"], "defs": ["quat", "add_view", "add_acc"]}

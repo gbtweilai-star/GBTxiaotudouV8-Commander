@@ -1,0 +1,1 @@
+{"id": "tools/codex-scripts/bp-transpile-check.js", "neighbors": ["anchor:scope_root", "docs/capabilities/tools.md", "gbt_allinone/recon/last30days/engine/log.py", "gbt_allinone/recon/last30days/engine/resolve.py"], "defs": ["fs", "path", "verifyDir", "babelPath", "Babel", "check", "dir", "files", "ok", "bad", "src", "filename", "orig", "patched"]}
