@@ -708,6 +708,23 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
     """**插上并驱动它**（真执行）。不攻击、不绕授权校验。"""
     a = args or {}
     sock = Socket(kind=kind, target=target)
+    # 🔴 2026-10-31 主人令：权重融合进触手主干。
+    #   ai 插座 + 指向"我们自己的权重" ⇒ **不需要 plug**（不是外部端点，没有 https 可插），
+    #   直接由 tools/weights.py 供能。这条判断必须在 plug 之前，否则会被判"只认 https 端点"。
+    if sock.kind == "ai" and str(target or "").strip().lower() in (
+            "", "our", "ours", "weights", "selfhost", "local"):
+        import importlib.util as _iu6
+        _sp6 = _iu6.spec_from_file_location(
+            "_w_plug3", str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
+        _m6 = _iu6.module_from_spec(_sp6)
+        _sp6.loader.exec_module(_m6)                              # type: ignore[union-attr]
+        _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
+        _r = _m6.chat(_txt, int((a or {}).get("max_tokens") or 128))
+        return {"ok": bool(_r.get("ok")), "socket": "ai", "engine": _r.get("lane"),
+                "weights_ours": bool(_r.get("weights_ours")),
+                "text": _r.get("text") or "",
+                "error": _r.get("error") or _r.get("err")}
+
     Pulse(ledger=ledger).plug(sock)
     res = {"ok": False, "socket": sock.kind, "target": target, "action": action,
            "energy": SOCKET_ENERGY.get(sock.kind, "未知"), "plug": sock.state}
@@ -809,6 +826,22 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
                 res.update({"ok": False, "reason": "app 插座支持 see / act / launch",
                             "提示": "看图定下一步的闭环规划器本仓尚未接线；先按动作原语驱动"})
         elif sock.kind == "ai":
+            # 🔴 2026-10-31 主人令：权重融合进触手主干 —— ai 插座**默认用我们自己的权重**。
+            #   只有显式给了 base/url（要外接别的服务）才走原来那条。
+            _t = str(target or "").strip().lower()
+            if _t in ("", "our", "ours", "weights", "selfhost", "local"):
+                import importlib.util as _iu5
+                _sp5 = _iu5.spec_from_file_location(
+                    "_w_plug2",
+                    str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
+                _m5 = _iu5.module_from_spec(_sp5)
+                _sp5.loader.exec_module(_m5)                       # type: ignore[union-attr]
+                _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
+                _r = _m5.chat(_txt, int((a or {}).get("max_tokens") or 128))
+                return {"ok": bool(_r.get("ok")), "socket": "ai",
+                        "engine": _r.get("lane"), "weights_ours": bool(_r.get("weights_ours")),
+                        "text": _r.get("text") or "",
+                        "error": _r.get("error") or _r.get("err")}
             # 插上 AI ⇒ 输能 + 操控一次（chat / tools）；action 可用 chat/ask/control
             res.update(_ai_call(target, a, timeout=timeout if timeout and timeout > 5 else 90.0))
         else:
@@ -962,6 +995,19 @@ def run(op: str = "status", **kw) -> dict:
                 "硬钉": ["只对攻击源发", "只认 https", "拒重定向", "钥匙只回槽名", "缺啥如实报"],
                 "边界": "反控≠报复：只要求攻击源停止并回报来源；不越权、不外带敏感数据"}
     if op in ("ai", "ai_chat", "ai_control"):
+        # 🔴 2026-10-31 主人令：权重融合进触手主干 —— ai 插座默认走**我们自己的权重**
+        #   （tools/weights.py 是唯一入口，A19 主 / 后台大脑队列 / 整机 GPU 工人）。
+        if not kw.get("base") and str(kw.get("target") or "") in ("", "our", "weights", "selfhost"):
+            import importlib.util as _iu4
+            _sp4 = _iu4.spec_from_file_location(
+                "_w_plug", str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
+            _m4 = _iu4.module_from_spec(_sp4)
+            _sp4.loader.exec_module(_m4)                           # type: ignore[union-attr]
+            txt = str(kw.get("prompt") or kw.get("text") or "")
+            r = _m4.chat(txt, int(kw.get("max_tokens") or 128))
+            return {"ok": bool(r.get("ok")), "socket": "ai", "engine": r.get("lane"),
+                    "weights_ours": bool(r.get("weights_ours")),
+                    "text": r.get("text") or "", "error": r.get("error") or r.get("err")}
         target = str(kw.get("target") or "")
         p = Pulse()
         s = p.plug(Socket("ai", target, options={"key_env": kw.get("key_env"),
