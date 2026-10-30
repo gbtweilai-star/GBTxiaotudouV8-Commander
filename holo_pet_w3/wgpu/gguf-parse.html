@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>GGUF 解析 · 本机算力第一步</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1{font-size:15px;color:#7dd3fc;margin:0 0 10px}
+  pre{white-space:pre-wrap;word-break:break-all;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}
+</style>
+</head>
+<body>
+<h1>GGUF 解析器（浏览器内 · 零依赖）</h1>
+<pre id="o">载入中…</pre>
+<script>
+/* ── 零依赖 GGUF v2/v3 解析器（2026-10-30）──────────────────────────
+   为什么要在浏览器里解析：本机跑权重的第一步是「能不能把 GGUF 正确读进来」。
+   读对了（张量数/架构/量化类型/偏移全对上）才有资格谈前向计算。
+   口径：不依赖任何库，纯 DataView；只读不写；解不出来的字段如实报 null。 */
+const T_U8=0,T_I8=1,T_U16=2,T_I16=3,T_U32=4,T_I32=5,T_F32=6,T_BOOL=7,
+      T_STR=8,T_ARR=9,T_U64=10,T_I64=11,T_F64=12;
+
+class Reader {
+  constructor(buf){ this.b=new DataView(buf); this.u=new Uint8Array(buf); this.p=0; }
+  u32(){ const v=this.b.getUint32(this.p,true); this.p+=4; return v; }
+  u64(){ const v=Number(this.b.getBigUint64(this.p,true)); this.p+=8; return v; }
+  i32(){ const v=this.b.getInt32(this.p,true); this.p+=4; return v; }
+  i64(){ const v=Number(this.b.getBigInt64(this.p,true)); this.p+=8; return v; }
+  f32(){ const v=this.b.getFloat32(this.p,true); this.p+=4; return v; }
+  f64(){ const v=this.b.getFloat64(this.p,true); this.p+=8; return v; }
+  str(){ const n=this.u64(); const d=this.u.slice(this.p,this.p+n); this.p+=n;
+         return new TextDecoder().decode(d); }
+  skip(n){ this.p+=n; }
+  val(t){
+    switch(t){
+      case T_U8: { const v=this.u[this.p]; this.p+=1; return v; }
+      case T_I8: { const v=this.b.getInt8(this.p); this.p+=1; return v; }
+      case T_U16:{ const v=this.b.getUint16(this.p,true); this.p+=2; return v; }
+      case T_I16:{ const v=this.b.getInt16(this.p,true); this.p+=2; return v; }
+      case T_U32: return this.u32();
+      case T_I32: return this.i32();
+      case T_F32: return this.f32();
+      case T_F64: return this.f64();
+      case T_U64: case T_I64: return this.u64();
+      case T_BOOL:{ const v=this.u[this.p]; this.p+=1; return !!v; }
+      case T_STR: return this.str();
+      case T_ARR: {
+        const et=this.u32(); const n=this.u64();
+        const out=[];
+        if (et===T_STR || et===T_ARR || et>12) {           // 只展开小数组，别把 49152 词表撑爆
+          for(let i=0;i<n;i++) out.push(et===T_STR?this.str():this.val(et));
+        } else if (et===T_I32 || et===T_U32) {
+          this.skip(n*4); out.push("["+n+" × i32]");
+        } else if (et===T_F32) { this.skip(n*4); out.push("["+n+" × f32]"); }
+        else if (et===T_U8 || et===T_I8 || et===T_BOOL) { this.skip(n); out.push("["+n+" × u8]"); }
+        else { for(let i=0;i<n;i++) this.val(et); out.push("["+n+" × 其他]"); }
+        return out;
+      }
+      default: throw new Error("未知类型 "+t+" @ "+this.p);
+    }
+  }
+}
+
+function parseGGUF(buf){
+  const r=new Reader(buf);
+  const magic=String.fromCharCode(r.u[0],r.u[1],r.u[2],r.u[3]);
+  if(magic!=="GGUF") throw new Error("不是 GGUF：magic="+magic);
+  r.p=4;
+  const version=r.u32();
+  const nTensors=r.u64();
+  const nKV=r.u64();
+  const kv={};
+  for(let i=0;i<nKV;i++){
+    const k=r.str(); const t=r.u32(); kv[k]=r.val(t);
+  }
+  const tensors=[];
+  for(let i=0;i<nTensors;i++){
+    const name=r.str();
+    const nDims=r.u32();
+    const dims=[]; for(let d=0;d<nDims;d++) dims.push(r.u64());
+    const type=r.u32();
+    const off=r.u64();
+    tensors.push({name,dims,type,off});
+  }
+  const dataStart=r.p;
+  return {magic,version,nTensors,nKV,kv,tensors,dataStart,fileSize:buf.byteLength};
+}
+
+/* 2026-10-30 修正：这张表原来错位了（把 6 漏掉、8/9 写成 Q5_0/Q5_1）——
+   实测文件里出现 166 次 "type6"，逼我去对 ggml 真实枚举：
+     0 F32 · 1 F16 · 2 Q4_0 · 3 Q4_1 · **6 Q5_0** · 7 Q5_1 · 8 Q8_0 · 9 Q8_1
+     10 Q2_K · 11 Q3_K · 12 Q4_K · 13 Q5_K · 14 Q6_K · 15 Q8_K
+     16 IQ2_XXS · 17 IQ2_XS · 18 IQ3_XXS · 19 IQ1_S · 20 IQ4_NL
+     21 IQ3_S · 22 IQ2_S · 23 IQ4_XS · 24 I8 · 25 I16 · 26 I32 · 27 I64
+     28 F64 · 29 IQ1_M · 30 BF16 */
+const TYPE_NAME={0:"F32",1:"F16",2:"Q4_0",3:"Q4_1",6:"Q5_0",7:"Q5_1",8:"Q8_0",9:"Q8_1",
+                 10:"Q2_K",11:"Q3_K",12:"Q4_K",13:"Q5_K",14:"Q6_K",15:"Q8_K",
+                 16:"IQ2_XXS",17:"IQ2_XS",18:"IQ3_XXS",19:"IQ1_S",20:"IQ4_NL",
+                 21:"IQ3_S",22:"IQ2_S",23:"IQ4_XS",24:"I8",25:"I16",26:"I32",
+                 27:"I64",28:"F64",29:"IQ1_M",30:"BF16"};
+
+(async function(){
+  const out=document.getElementById("o");
+  const lines=[];
+  try{
+    const t0=performance.now();
+    const resp=await fetch("models/tiny.gguf");
+    const buf=await resp.arrayBuffer();
+    const tLoad=performance.now()-t0;
+    const g=parseGGUF(buf);
+    const tParse=performance.now()-t0-tLoad;
+    const arch=g.kv["general.architecture"]||"?";
+    const L=g.kv[arch+".block_count"]??null;
+    const E=g.kv[arch+".embedding_length"]??null;
+    const H=g.kv[arch+".attention.head_count"]??null;
+    const HK=g.kv[arch+".attention.head_count_kv"]??null;
+    const FF=g.kv[arch+".feed_forward_length"]??null;
+    const vocab=(g.kv["tokenizer.ggml.tokens"]||[]).length||null;
+    lines.push("<span class='ok'>✅ 解析成功</span>");
+    lines.push(`  文件        ${(g.fileSize/1048576).toFixed(1)} MB · 取回 ${(tLoad|0)} ms · 解析 ${(tParse|0)} ms`);
+    lines.push(`  版本        GGUF v${g.version}`);
+    lines.push(`  张量/键值   ${g.nTensors} / ${g.nKV}`);
+    lines.push(`  数据起点    ${g.dataStart} 字节`);
+    lines.push(`  架构        ${arch} · layers=${L} · emb=${E} · heads=${H} · kv_heads=${HK} · ff=${FF}`);
+    lines.push(`  词表        ${vocab} tokens`);
+    const byType={};
+    for(const t of g.tensors){ const n=TYPE_NAME[t.type]||("type"+t.type); byType[n]=(byType[n]||0)+1; }
+    lines.push(`  量化分布    ${JSON.stringify(byType)}`);
+    lines.push("");
+    lines.push("  前 8 个张量：");
+    for(const t of g.tensors.slice(0,8)){
+      lines.push(`    ${t.name.padEnd(38)} ${TYPE_NAME[t.type]||t.type}  [${t.dims.join("×")}]  off=${t.off}`);
+    }
+    const okArch = arch==="llama" && g.nTensors===272;
+    lines.push("");
+    lines.push(okArch ? "<span class='ok'>✅ 与已知元数据一致（llama / 272 张量）</span>"
+                       : "<span class='bad'>⚠ 与已知元数据不一致</span>");
+    window.__gguf = {ok:true, arch, nTensors:g.nTensors, nKV:g.nKV, vocab,
+                     layers:L, emb:E, heads:H, kvHeads:HK, ff:FF,
+                     types:byType, dataStart:g.dataStart,
+                     bytes:g.fileSize, loadMs:tLoad|0, parseMs:tParse|0};
+  }catch(e){
+    lines.push("<span class='bad'>🔴 "+String(e&&e.message||e)+"</span>");
+    window.__gguf={ok:false, error:String(e&&e.message||e)};
+  }
+  out.innerHTML=lines.join("\n");
+})();
+</script>
+</body></html>

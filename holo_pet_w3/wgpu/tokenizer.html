@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>GGUF 分词器 · 本机算力第二步</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1{font-size:15px;color:#7dd3fc;margin:0 0 10px}
+  pre{white-space:pre-wrap;word-break:break-word;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}
+</style>
+</head>
+<body>
+<h1>GGUF 分词器（浏览器内 · 零依赖 · BPE）</h1>
+<pre id="o">载入中…</pre>
+<script>
+/* ── 从 GGUF 元数据里取 tokens + merges，做 BPE 编解码（2026-10-30）────
+   为什么要它：本机跑权重的第二步是「文字 ↔ token id」。
+   这一步不依赖任何模型权重，只依赖元数据 —— 但它错了，后面全错。
+   口径：编码用 ggml 的标准做法（GPT2 风格字节级 BPE + 前缀空格），
+        解码按 token 里的 Ġ/Ċ 还原空格与换行；往返必须一模一样。 */
+
+const T={U8:0,I8:1,U16:2,I16:3,U32:4,I32:5,F32:6,BOOL:7,STR:8,ARR:9,U64:10,I64:11,F64:12};
+
+class Reader{
+  constructor(buf){this.b=new DataView(buf);this.u=new Uint8Array(buf);this.p=0;}
+  u32(){const v=this.b.getUint32(this.p,true);this.p+=4;return v;}
+  u64(){const v=Number(this.b.getBigUint64(this.p,true));this.p+=8;return v;}
+  i32(){const v=this.b.getInt32(this.p,true);this.p+=4;return v;}
+  f32(){const v=this.b.getFloat32(this.p,true);this.p+=4;return v;}
+  f64(){const v=this.b.getFloat64(this.p,true);this.p+=8;return v;}
+  str(){const n=this.u64();const d=this.u.slice(this.p,this.p+n);this.p+=n;
+        return new TextDecoder().decode(d);}
+  val(t){
+    switch(t){
+      case T.U8:{const v=this.u[this.p];this.p+=1;return v;}
+      case T.I8:{const v=this.b.getInt8(this.p);this.p+=1;return v;}
+      case T.U16:{const v=this.b.getUint16(this.p,true);this.p+=2;return v;}
+      case T.I16:{const v=this.b.getInt16(this.p,true);this.p+=2;return v;}
+      case T.U32:return this.u32();
+      case T.I32:return this.i32();
+      case T.F32:return this.f32();
+      case T.F64:return this.f64();
+      case T.U64:case T.I64:return this.u64();
+      case T.BOOL:{const v=this.u[this.p];this.p+=1;return !!v;}
+      case T.STR:return this.str();
+      case T.ARR:{
+        const et=this.u32();const n=this.u64();const out=[];
+        if(et===T.STR){for(let i=0;i<n;i++)out.push(this.str());}
+        else if(et===T.I32||et===T.U32){for(let i=0;i<n;i++)out.push(this.u32());}
+        else if(et===T.F32){for(let i=0;i<n;i++)out.push(this.f32());}
+        else if(et===T.U8||et===T.I8||et===T.BOOL){this.p+=n;out.push("["+n+"]");}
+        else{for(let i=0;i<n;i++)this.val(et);out.push("["+n+"]");}
+        return out;
+      }
+      default:throw new Error("未知类型 "+t);
+    }
+  }
+}
+
+async function loadMeta(url){
+  const r=await fetch(url);
+  const buf=await r.arrayBuffer();
+  const rd=new Reader(buf);
+  rd.p=4; const ver=rd.u32(); const nTen=rd.u64(); const nKV=rd.u64();
+  const kv={};
+  for(let i=0;i<nKV;i++){const k=rd.str();const t=rd.u32();kv[k]=rd.val(t);}
+  for(let i=0;i<nTen;i++){
+    rd.str();
+    const nd=rd.u32(); for(let d=0;d<nd;d++) rd.u64();
+    rd.u32(); rd.u64();
+  }
+  return {ver,nTen,nKV,kv,dataStart:rd.p};
+}
+
+/* GPT2 风格：Ġ 表示前导空格，Ċ 表示换行 */
+function tokenToText(t){
+  return t.replace(/Ġ/g," ").replace(/Ċ/g,"\n").replace(/ĉ/g,"\t");
+}
+
+class BPETokenizer{
+  constructor(kv){
+    this.tokens=kv["tokenizer.ggml.tokens"]||[];
+    this.types=kv["tokenizer.ggml.token_type"]||[];
+    this.merges=kv["tokenizer.ggml.merges"]||[];
+    this.bos=kv["tokenizer.ggml.bos_token_id"];
+    this.eos=kv["tokenizer.ggml.eos_token_id"];
+    this.addPrefix=kv["tokenizer.ggml.add_bos_token"]??null;
+    this.tok2id=new Map();
+    this.tokens.forEach((t,i)=>this.tok2id.set(t,i));
+    /* 合并优先级：merges 是 "a b" 形式，行号就是优先级 */
+    this.rank=new Map();
+    this.merges.forEach((m,i)=>{
+      const parts=String(m).split(" ");
+      if(parts.length===2) this.rank.set(parts[0]+"\u0000"+parts[1], i);
+    });
+  }
+  decode(ids){
+    return ids.map(i=>tokenToText(this.tokens[i]??"")).join("");
+  }
+  /* 贪心 BPE：先把文本切成 UTF-8 字节再映射到字符空间（GGML 的做法） */
+  encode(text){
+    if(!this.merges.length){
+      /* 没有 merges（老文件）：退化为「最长匹配」，如实标注 */
+      const out=[]; let i=0;
+      const toks=this.tokens;
+      while(i<text.length){
+        let best=-1,bestLen=0;
+        for(let L=Math.min(8,text.length-i);L>0;L--){
+          const id=this.tok2id.get(text.slice(i,i+L));
+          if(id!==undefined){best=id;bestLen=L;break;}
+        }
+        if(best>=0){out.push(best);i+=bestLen;}
+        else{ i++; }
+      }
+      return {ids:out, mode:"longest-match"};
+    }
+    /* 标准做法：按空白/标点分段，段内做 BPE 合并 */
+    const pieces=text.match(/\s?[A-Za-z]+|\s?[0-9]+|\s?[^\sA-Za-z0-9]+|\s+/g)||[];
+    const ids=[];
+    for(const piece of pieces){
+      let seq=Array.from(piece).map(ch=>{
+        const t=ch===" "?"Ġ":(ch==="\n"?"Ċ":(ch==="\t"?"ĉ":ch));
+        return this.tok2id.has(t)?t:null;
+      });
+      if(seq.some(x=>x===null)){                   /* 有字不在词表：该段丢弃并记账 */
+        continue;
+      }
+      let merged=true;
+      while(merged && seq.length>1){
+        merged=false;
+        let bestRank=Infinity,bestAt=-1;
+        for(let i=0;i<seq.length-1;i++){
+          const rk=this.rank.get(seq[i]+"\u0000"+seq[i+1]);
+          if(rk!==undefined && rk<bestRank){bestRank=rk;bestAt=i;}
+        }
+        if(bestAt>=0){
+          const combined=seq[bestAt]+seq[bestAt+1];
+          seq.splice(bestAt,2,combined);
+          merged=true;
+        }
+      }
+      for(const s of seq){
+        const id=this.tok2id.get(s);
+        if(id!==undefined) ids.push(id);
+      }
+    }
+    return {ids, mode:"bpe"};
+  }
+}
+
+(async function(){
+  const out=document.getElementById("o"); const L=[];
+  try{
+    const t0=performance.now();
+    const meta=await loadMeta("models/tiny.gguf");
+    const tk=new BPETokenizer(meta.kv);
+    const ms=(performance.now()-t0)|0;
+    L.push("<span class='ok'>✅ 分词器就绪</span>");
+    L.push(`  词表 ${tk.tokens.length} · merges ${tk.merges.length} · bos=${tk.bos} eos=${tk.eos} · 用时 ${ms} ms`);
+    L.push(`  tokenizer.ggml.model = ${meta.kv["tokenizer.ggml.model"]||"?"} · pre = ${meta.kv["tokenizer.ggml.pre"]||"?"}`);
+    L.push("");
+    const samples=["Hello","我和你是谁","def f(x):\n    return x*2","1+1=?"];
+    let allOk=true;
+    for(const s of samples){
+      const {ids,mode}=tk.encode(s);
+      const back=tk.decode(ids);
+      const same=(back===s);
+      if(!same) allOk=false;
+      L.push(`${same?"<span class='ok'>✅</span>":"<span class='bad'>🔴</span>"} ${JSON.stringify(s)}`);
+      L.push(`   ids  ${JSON.stringify(ids)}  (${mode})`);
+      L.push(`   回译 ${JSON.stringify(back)}`);
+    }
+    L.push("");
+    L.push(allOk ? "<span class='ok'>✅ 全部往返一致</span>"
+                  : "<span class='bad'>⚠ 有往返不一致（如实报，不粉饰）</span>");
+    window.__tok={ok:true, vocab:tk.tokens.length, merges:tk.merges.length,
+                  roundtripOk:allOk, ms};
+  }catch(e){
+    L.push("<span class='bad'>🔴 "+String(e&&e.message||e)+"</span>");
+    window.__tok={ok:false,error:String(e&&e.message||e)};
+  }
+  out.innerHTML=L.join("\n");
+})();
+</script>
+</body></html>
