@@ -3402,7 +3402,12 @@ class _Handler(BaseHTTPRequestHandler):
     # 于是凡声明 apiShim 的页在宿主内都拿不到本机服务。
     # 放行之后，宿主里的页可以直连 `http://127.0.0.1:8765/api/*`；
     # 反代一旦生效，前端会优先走同源那条，这段就成了兜底 —— 两条路都在明面上。
-    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080")
+    # 🔴 2026-10-30：原来只放 Electron 壳的 :3080 ⇒ 我们自己的静态页（:8080 她的界面 /
+    #   :8081 WebGPU 页）跨源读 /api/state 一律被拒，页面报 "Load failed"（实测）。
+    #   只补本机回环的静态源，**不放 "*"**，也不放任何外部源。
+    CORS_ORIGINS = ("http://127.0.0.1:3080", "http://localhost:3080",
+                    "http://127.0.0.1:8080", "http://localhost:8080",
+                    "http://127.0.0.1:8081", "http://localhost:8081")
 
     def _send_cors(self) -> None:
         origin = self.headers.get("Origin")

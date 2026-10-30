@@ -1160,6 +1160,23 @@
 
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
+
+<script>
+/* 功能探针：证明"她的声音产物真的在、真能取到字节" */
+window.GBT_FUNC_PROBE = async function () {
+  var cands = ["assets/voice-greet-zh-tw.mp3", "assets/welcome-gbt-v8-zh.wav"];
+  for (var i = 0; i < cands.length; i++) {
+    try {
+      var r = await fetch(cands[i], { cache: "no-store" });
+      if (!r.ok) continue;
+      var b = await r.blob();
+      if (b.size > 1000) return { name: "voice_asset", ok: true,
+        evidence: cands[i].split("/").pop() + " " + b.size + " B" };
+    } catch (e) {}
+  }
+  return { name: "voice_asset", ok: false, evidence: "没取到音频产物" };
+};
+</script>
 </body>
 </html>
 

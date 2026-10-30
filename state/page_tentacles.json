@@ -1,9 +1,9 @@
 {
  "ok": true,
- "at": "2026-10-30T15:35:18",
+ "at": "2026-10-30T16:00:54",
  "pages": 401,
  "covered": 401,
- "reported": 6,
+ "reported": 7,
  "rows": [
   {
    "page": "activity/index.html",
@@ -4270,7 +4270,7 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": "2026-10-30T15:33:47",
+   "reported": "2026-10-30T15:44:20",
    "reachable": true
   },
   {
@@ -4358,8 +4358,8 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
-   "reported": null,
-   "reachable": false
+   "reported": "2026-10-30T15:43:25",
+   "reachable": true
   },
   {
    "page": "voice-theater/stage3d.html",

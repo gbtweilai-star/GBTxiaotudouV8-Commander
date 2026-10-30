@@ -308,5 +308,17 @@ else window.addEventListener("load", firstPick, { once: true });
 
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 <script src="../shell/tentacle-bridge.js?v=20261029"></script>
+
+<script>
+/* 功能探针：证明"面板真的能拿到数据"，不是只有接线通 */
+window.GBT_FUNC_PROBE = async function () {
+  try {
+    var r = await fetch("http://127.0.0.1:8765/api/state", { cache: "no-store" });
+    var t = await r.text();
+    return { name: "panel_state", ok: r.ok && t.length > 20,
+             evidence: "http=" + r.status + " bytes=" + t.length };
+  } catch (e) { return { name: "panel_state", ok: false, evidence: String(e && e.message || e).slice(0, 60) }; }
+};
+</script>
 </body>
 </html>
