@@ -168,7 +168,9 @@ function encodeSimple(text){
 
     /* SmolLM2-135M-Instruct 是对话模型：裸续写不在分布内，
        必须用它自己的 chat 模板（元数据 tokenizer.chat_template 同形状）。 */
-    const prompt = "<|im_start|>user\nWhat is the capital of France?<|im_end|>\n<|im_start|>assistant\n";
+    /* 2026-10-30：Q6_K 修好后，裸续写就能出正确答案（numpy 参考 top-1 = ' Paris'）。
+       这里也用这条提示，便于两边直接对。 */
+    const prompt = "The capital of France is";
     const ids = encodeSimple(prompt);
     say(`  提示 ${JSON.stringify(prompt)} → ${ids.length} tokens ${JSON.stringify(ids)}`);
     say("  首次前向（会把权重反量化进缓存，慢）…");
