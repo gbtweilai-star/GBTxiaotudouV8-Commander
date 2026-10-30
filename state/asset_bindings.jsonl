@@ -30706,3 +30706,5 @@
 {"at": "2026-10-30T11:54:51", "event": "bind", "asset": "tools/serve_wgpu.py", "tentacle": "health", "note": "autobind"}
 {"at": "2026-10-30T11:54:52", "event": "autobind", "files": 2, "bound": 2, "hint": "health", "pruned": 0}
 {"at": "2026-10-30T12:05:21", "event": "gaps", "missing": 0, "no_kind": 251, "scanned": 1999, "third_party": 0}
+{"at": "2026-10-30T12:10:22", "event": "bind", "asset": "tools/ref_forward_tiny.py", "tentacle": "health", "note": "autobind"}
+{"at": "2026-10-30T12:10:25", "event": "autobind", "files": 1, "bound": 1, "hint": "health", "pruned": 0}
