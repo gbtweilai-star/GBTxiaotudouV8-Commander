@@ -63,7 +63,7 @@
 
 | 文档 | 一句话 |
 |---|---|
-| [`13-omni-plug.md`](13-omni-plug.md) | **万能插**：六类插座 · 万物皆可控 · **反向调用云端算力**（12 个云源 / 五原语） |
+| [`13-omni-plug.md`](13-omni-plug.md) | **万能插**：万能插座（现场判类）· 万物皆可控 · **反向调用云端算力**（12 个云源 / 五原语） |
 | [`05-deployment.md`](05-deployment.md) | 从权重到一条能打的线上接口 |
 
 **命令：** `run_task("cloud_plugin", {"op":"sources"})` · `{"op":"primitives"}`

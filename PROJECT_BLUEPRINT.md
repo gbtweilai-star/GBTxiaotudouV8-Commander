@@ -1974,3 +1974,27 @@ README 文档缺陷（`~/.config/h1mcp/drafts` vs 实际 `%APPDATA%\h1mcp\drafts
 - **A 的第一步（零副作用）通过**：`codex.exe` 在位 · `--version = codex-cli 0.155.0` · **未 login**。
 
 > 本段为 **R-H52 落盘时裁定快照**，时间性表述以最新段为准。
+
+## 十一、万能插座（2026-10-30 主人令：不要固定的六类）
+
+| 文件 | 干什么 |
+|---|---|
+| `tools/omni_adapter.py` | `classify(target)` 现场判类（纯分析、不联网）→ `execute()` 动态生成适配器 |
+| `gbt_allinone/omni_plug.py` | `op=universal`（或不给 `socket` 的 `run`）走万能入口 |
+| `gbt_allinone/security/policy.py` | **共用同一个 classify** 挂作用域 ⇒ 门与执行同一判断 |
+| `tools/omni_discover.py` | 自动认出机器上所有接口，生成 `state/omni_sockets.json` |
+| `tools/omni_ios.py` | iOS 侧等价接口：`web`→apple-open · `app`→URL scheme · `see`→页面截帧+apple-vision |
+| `tools/omni_audit.py` | 四态自审（ok / needs_ticket / platform_na / fail），固定六类 + universal 都测 |
+
+**判得出的形态（不封闭）**：`http · ws · tcp · unix · path · dir · bin · cmd · scheme · mcp · remote`
+**认不出也不说"不支持"**：按命令试跑一次并标明是猜的（`via=omni:fallback`）。
+
+**门按类精确挂**（实测）：
+```
+read /etc/hostname → ()                          免票
+settings launch    → ()                          免票
+https://...        → (external_llm, data_export) 要票
+python3 exec       → (process_execute,)          要票
+```
+
+**自审（有票）**：可用 16 · 需票 0 · 平台不支持 0 · **失败 0**
