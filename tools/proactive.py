@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import random
+import sys
 import time
 import pathlib
 
@@ -141,6 +142,83 @@ def _say(st: dict, kind: str, text: str, key: str) -> None:
     st["last_said"][key] = now()
 
 
+
+# ── initiative 真执行（2026-10-30：说了就得做，不许只喊口号）─────────────
+def _run_checkup() -> str:
+    """真巡：起一遍服务守护（真 HTTP 探活）+ 数页面覆盖与绑定缺口。"""
+    import subprocess
+    out = []
+    try:
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "svc_guard.py"), "ensure"],
+                           capture_output=True, text=True, timeout=180, cwd=str(ROOT))
+        line = [l for l in (r.stdout or "").splitlines() if "拉起" in l]
+        out.append((line[-1].strip() if line else "服务守护无输出"))
+    except Exception as e:                                          # noqa: BLE001
+        out.append("服务守护失败：%s" % type(e).__name__)
+    try:
+        r2 = subprocess.run([sys.executable, str(ROOT / "tools" / "gene_guard.py"), "--check"],
+                            capture_output=True, text=True, timeout=180, cwd=str(ROOT))
+        tail = [l.strip() for l in (r2.stdout or "").splitlines() if "页已接" in l or "树规" in l]
+        out.append(tail[-1] if tail else "树规无输出")
+    except Exception as e:                                          # noqa: BLE001
+        out.append("树规检查失败：%s" % type(e).__name__)
+    return "巡完：%s" % " · ".join(out)
+
+
+def _run_tidy() -> str:
+    """真清：删 /tmp 下 3 小时前的临时件，报清掉多少、腾了多少 KB。"""
+    import glob
+    import os
+    cut = now() - 3 * 3600
+    n = sz = 0
+    for f in glob.glob("/tmp/*") + glob.glob("/tmp/dispatch_*"):
+        try:
+            if not os.path.isfile(f) or os.path.getmtime(f) > cut:
+                continue
+            sz += os.path.getsize(f)
+            os.remove(f)
+            n += 1
+        except Exception:                                           # noqa: BLE001
+            pass
+    return "清了 %d 个临时件，腾出 %d KB" % (n, sz // 1024)
+
+
+def _run_learn() -> str:
+    """真读：从今天的记忆日志里挑最后一段，摘一句存到 state/learn_notes.md。"""
+    # 本机记忆文件用的是佛历年份（2569-…），同时兼容公历，两种都试
+    _d = pathlib.Path("/var/minis/memory")
+    _names = [time.strftime("%Y-%m-%d.md"),
+              "%d-%s" % (int(time.strftime("%Y")) + 543, time.strftime("%m-%d.md"))]
+    mem = next((_d / n for n in _names if (_d / n).is_file()), _d / _names[0])
+    note = ""
+    if mem.is_file():
+        try:
+            txt = mem.read_text(encoding="utf-8")
+            heads = [l.strip() for l in txt.splitlines() if l.startswith("## ")]
+            note = heads[-1][3:60] if heads else ""
+        except Exception:                                           # noqa: BLE001
+        #
+            note = ""
+    out = ROOT / "state" / "learn_notes.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("a", encoding="utf-8") as fh:
+        fh.write("- %s %s\n" % (time.strftime("%H:%M"), note or "（今天还没写记忆）"))
+    return "记下一条：%s" % (note or "（今天还没写记忆）")
+
+
+def run_initiative(kind: str) -> str:
+    try:
+        if kind == "checkup":
+            return _run_checkup()
+        if kind == "tidy":
+            return _run_tidy()
+        if kind == "learn":
+            return _run_learn()
+    except Exception as e:                                          # noqa: BLE001
+        return "自己找活失败（%s）：%s" % (kind, type(e).__name__)
+    return "未知的 initiative：%s" % kind
+
+
 def tick(force: bool = False) -> dict:
     """一次心跳：算所有该说的话，写进 feed。"""
     st = _load()
@@ -180,7 +258,9 @@ def tick(force: bool = False) -> dict:
     for kind, every, text in INITIATIVES:
         key = "ini:%s" % kind
         if t - st.get("last_initiative", {}).get(key, 0) >= every:
-            _say(st, "initiative", text, key)
+            # 🔴 说了就得做：先真执行，再把**真实结果**说出来（不是喊口号）
+            result = run_initiative(kind)
+            _say(st, "initiative", "%s → %s" % (text.split("：")[0], result), key)
             st.setdefault("last_initiative", {})[key] = t
             out["said"].append(key)
 
