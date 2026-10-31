@@ -18594,7 +18594,8 @@
  "tools/omni_audit.py": {
   "tentacles": [
    "omni_plug",
-   "brain_route"
+   "brain_route",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T17:16:22"
@@ -18608,7 +18609,8 @@
  },
  "tools/omni_adapter.py": {
   "tentacles": [
-   "omni_plug"
+   "omni_plug",
+   "health"
   ],
   "note": "autobind",
   "bound_at": "2026-10-30T18:06:20"
@@ -18676,5 +18678,19 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-31T06:52:58"
+ },
+ "tools/llm_guard.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-31T07:51:11"
+ },
+ "tools/omni_guard.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-31T08:12:04"
  }
 }

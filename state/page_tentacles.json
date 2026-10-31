@@ -1,7 +1,7 @@
 {
  "ok": true,
- "at": "2026-10-31T07:34:46",
- "pages": 402,
+ "at": "2026-10-31T08:23:11",
+ "pages": 403,
  "covered": 401,
  "reported": 8,
  "rows": [
@@ -4391,6 +4391,17 @@
    "web_shell": true,
    "stamped": 0,
    "covered": true,
+   "reported": null,
+   "reachable": false
+  },
+  {
+   "page": "wgpu/her-console.html",
+   "file": "/var/minis/shared/gbtv8/holo_pet_w3/wgpu/her-console.html",
+   "controls": 2,
+   "kit": false,
+   "web_shell": false,
+   "stamped": 0,
+   "covered": false,
    "reported": null,
    "reachable": false
   },

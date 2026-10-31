@@ -1757,3 +1757,39 @@
 {"at": "2026-10-31T07:33:58", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 2412}
 {"at": "2026-10-31T07:34:29", "act": "kill_frozen", "svc": "索引层 :8792", "killed": true, "mem_mb": 2432}
 {"at": "2026-10-31T07:33:58", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 2338}
+{"at": "2026-10-31T07:52:31", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 556}
+{"at": "2026-10-31T07:52:31", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 633}
+{"at": "2026-10-31T07:52:33", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": true, "mem_mb": 634}
+{"at": "2026-10-31T07:52:31", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": true, "essential": true, "mem_mb": 795}
+{"at": "2026-10-31T07:52:39", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 795}
+{"at": "2026-10-31T07:52:31", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 794}
+{"at": "2026-10-31T07:52:45", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": true, "mem_mb": 798}
+{"at": "2026-10-31T07:52:31", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 771}
+{"at": "2026-10-31T07:52:51", "act": "kill_frozen", "svc": "索引层 :8792", "killed": true, "mem_mb": 771}
+{"at": "2026-10-31T07:52:31", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 806}
+{"at": "2026-10-31T08:00:59", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 380}
+{"at": "2026-10-31T08:00:59", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 1957}
+{"at": "2026-10-31T08:01:03", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": true, "mem_mb": 1957}
+{"at": "2026-10-31T08:00:59", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": true, "essential": true, "mem_mb": 1998}
+{"at": "2026-10-31T08:01:09", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 1999}
+{"at": "2026-10-31T08:00:59", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 2049}
+{"at": "2026-10-31T08:01:15", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": true, "mem_mb": 2049}
+{"at": "2026-10-31T08:00:59", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 1983}
+{"at": "2026-10-31T08:01:21", "act": "kill_frozen", "svc": "索引层 :8792", "killed": true, "mem_mb": 2037}
+{"at": "2026-10-31T08:00:59", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 2053}
+{"at": "2026-10-31T08:03:51", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 1995}
+{"at": "2026-10-31T08:03:51", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 1700}
+{"at": "2026-10-31T08:03:54", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": true, "mem_mb": 1700}
+{"at": "2026-10-31T08:03:51", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": false, "essential": true, "mem_mb": 1956}
+{"at": "2026-10-31T08:04:04", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 1956}
+{"at": "2026-10-31T08:03:51", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 1986}
+{"at": "2026-10-31T08:04:10", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": true, "mem_mb": 1986}
+{"at": "2026-10-31T08:03:51", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 2010}
+{"at": "2026-10-31T08:04:17", "act": "kill_frozen", "svc": "索引层 :8792", "killed": true, "mem_mb": 2067}
+{"at": "2026-10-31T08:03:51", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 1926}
+{"at": "2026-10-31T08:04:57", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": false, "mem_mb": 1801}
+{"at": "2026-10-31T08:04:57", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": true, "essential": true, "mem_mb": 1864}
+{"at": "2026-10-31T08:16:52", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": true, "mem_mb": 824}
+{"at": "2026-10-31T08:16:46", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": true, "essential": true, "mem_mb": 818}
+{"at": "2026-10-31T08:20:58", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 946}
+{"at": "2026-10-31T08:20:48", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 936}

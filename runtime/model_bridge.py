@@ -57,10 +57,6 @@ UPSTREAMS = {
     "selfhost": ("http://127.0.0.1:1234/v1",
                  __import__("os").environ.get("GBT_A19_MODEL") or "gbt-v8-v82-q5_0",
                  "raw:gbt", 30),
-    "ours":     ("https://api.runpod.ai/v2/qnnqf9w8xcefj8/openai/v1",
-                 "/runpod-volume/gbt-v8-v83", "potato", 300),
-    "ours-alt": ("https://api.runpod.ai/v2/7b5inowyar12yh/openai/v1",
-                 "/runpod-volume/gbt-v8-v83", "potato", 300),
     "local":    ("http://127.0.0.1:8000/v1", "gbt-v8", None, 120),
     # 🔴 2026-10-25：本机免费模型池（FreeLLMAPI，127.0.0.1:3001，259 个模型零注册零付费）。
     #    作用：A19 那个 App 的服务是手动开关，一关整条链路就哑。接上这个，
@@ -72,21 +68,11 @@ UPSTREAMS = {
     #    Qwen3.5/3.6 和回包乱码的 dots-3。改成两档**已知可用**的模型轮换：
     #    mistral 1 秒、llama 2 秒，都被限流才落到 deepseek。
     #    （模型名大小写必须照抄池子里的写法，否则 404。）
-    "freepool":   ("http://127.0.0.1:3001/v1", "mistral-small-3.2-24b",
-                   "file:/var/minis/shared/gbtv8/vaults/freellmapi/unified_api_key", 180),
-    "freepool-b": ("http://127.0.0.1:3001/v1", "llama-3.3-70b",
-                   "file:/var/minis/shared/gbtv8/vaults/freellmapi/unified_api_key", 180),
-    "agnes":    ("https://apihub.agnes-ai.com/v1", "agnes-2.5-flash", "agnes", 180),
     # 🔴 2026-10-26：DeepSeek 侧已换代为 V4.1-Flash（发布日 1017）。
     #    口径：API 只认 deepseek-flash / deepseek-v4-pro（传 -1017 后缀直接 400）；
     #    deepseek-chat 仍可用但已被静默映射到 flash —— 显式写 flash，别靠别名。
     #    上下文 1,048,576 / 单次输出上限 393,216 / 吃图 / effort=low|high|max。
     #    钥走 0600 文件槽：本机没有 DPAPI 保险箱，profile 名取不到钥（实测 key_ready=false）。
-    "deepseek": ("https://api.deepseek.com/v1", "deepseek-chat",
-                 "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 180),
-    "deepseek-pro": ("https://api.deepseek.com/v1", "deepseek-v4-pro",
-                 "file:/var/minis/shared/gbtv8/vaults/deepseek/api_key", 300),
-    "openai":   ("https://api.openai.com/v1", "gpt-4o-mini", "openai", 180),
     # 🔴 2026-10-30（主人：A19 那个开关我碰不到，但也不能没得用）：
     #   ownweights = 我们自己的权重，跑在整机 GPU 的浏览器里（页面工人）。
     #   **不是云端、不是第三方** —— OURS_LANES 里算自有。
