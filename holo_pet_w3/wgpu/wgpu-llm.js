@@ -200,6 +200,32 @@ export class WGPUModel {
     return { tensors: names.length, mib: +(this.bytes / 1048576).toFixed(1) };
   }
 
+  /* Range 模式：并行预取所有权重块，再逐个写入 GPU */
+  async uploadAsync(onProgress) {
+    const M = this.M, dev = this.dev;
+    const names = ["token_embd.weight", "output_norm.weight"];
+    for (let l = 0; l < M.nLayer; l++) {
+      const p = "blk." + l + ".";
+      for (const t of ["attn_norm.weight", "attn_q.weight", "attn_k.weight", "attn_v.weight",
+                       "attn_output.weight", "ffn_norm.weight", "ffn_gate.weight",
+                       "ffn_up.weight", "ffn_down.weight"]) names.push(p + t);
+    }
+    /* 并行预取所有 tensor（RangeBuffer 内部用 64MB 块缓存，实际网络请求 ≤ ceil(total/64MB)） */
+    const tasks = names.map(n => M.tensorAsync(n));
+    const arrays = await Promise.all(tasks);
+    let i = 0;
+    for (const arr of arrays) {
+      const n = names[i++];
+      const b = dev.createBuffer({ size: arr.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC });
+      dev.queue.writeBuffer(b, 0, arr);
+      this.buf.set(n, b);
+      this.bytes += arr.byteLength;
+      if (onProgress) onProgress(i, names.length, this.bytes);
+    }
+    return { tensors: names.length, mib: +(this.bytes / 1048576).toFixed(1) };
+  }
+
   _act(name, count) {
     if (!this.buf.has(name)) {
       /* 🔴 2026-10-30：必须带 COPY_DST —— 词嵌入那一步是 copyBufferToBuffer 写进 act.x 的，

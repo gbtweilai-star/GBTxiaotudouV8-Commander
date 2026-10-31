@@ -18692,5 +18692,19 @@
   ],
   "note": "autobind",
   "bound_at": "2026-10-31T08:12:04"
+ },
+ "tools/fetch_weights.sh": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-31T09:04:14"
+ },
+ "tools/agnes_client.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-10-31T09:09:25"
  }
 }

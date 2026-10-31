@@ -2,21 +2,33 @@
 <html lang="zh-Hans">
 <head>
 <meta charset="utf-8">
-<title>本机权重 · 工人（极简 v2）</title>
+<title>本机权重 · 工人（Range 按需版）</title>
 <style>body{margin:0;background:#0b0e14;color:#cfe;font:13px/1.6 ui-monospace,monospace;padding:10px}
-#t{color:#7ef;margin-bottom:8px}#l{white-space:pre-wrap}</style>
+#t{color:#7ef;margin-bottom:8px}#l{white-space:pre-wrap}#pr{display:none;margin:6px 0}
+#pb{height:4px;background:#1a1f2e;border-radius:2px;overflow:hidden}
+#pf{height:100%;background:#7ef;width:0%;transition:width .3s}</style>
 </head>
 <body>
 <div id="t">工人启动中…</div>
+<div id="pr"><div id="pb"><div id="pf"></div></div><span id="pp">加载中…</span></div>
 <div id="l"></div>
 <script type="module">
-/* 2026-10-31 极简 v2：只做三件事 —— 载引擎、报心跳、轮询领活并交回。
-   这次不用长轮询（桥重启会把工人挂死），2 秒一次短轮询 + 8 秒超时。 */
+/* 2026-10-31 Range 按需版：大模型通过 RangeBuffer 分块加载，
+   每层权重在 uploadAsync() 时逐个 fetch，不再一次读 1GB。 */
 const BASE = "http://127.0.0.1:8791";
 const L = document.getElementById("l");
 const T = document.getElementById("t");
+const PR = document.getElementById("pr");
+const PF = document.getElementById("pf");
+const PP = document.getElementById("pp");
 window.__worker = { state: "booting", backend: null, jobs: 0, ok: 0, fail: 0, last: null };
 const say = (m) => { L.textContent += m + "\n"; if (L.textContent.length > 4000) L.textContent = L.textContent.slice(-2500); };
+const setProgress = (loaded, total, bytes) => {
+  PR.style.display = "block";
+  const pct = total > 0 ? Math.round(loaded / total * 100) : 0;
+  PF.style.width = pct + "%";
+  PP.textContent = `${loaded}/${total} 张量 · ${bytes/1024/1024|0} MB`;
+};
 
 async function post(path, body) {
   const r = await fetch(BASE + path, {
@@ -34,13 +46,18 @@ function startHeartbeat(backend) {
 (async () => {
   let llm;
   try {
-    say("载入引擎…");
+    say("载入引擎（Range 按需模式）…");
     const mod = await import("./local-llm.js");
-    llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
+    llm = await mod.createLocalLLM({
+      backend: "auto",
+      modelUrl: "models/qwen2.5-1.5b-q4.gguf",
+      onProgress: setProgress,
+    });
     window.__worker.state = "ready";
     window.__worker.backend = llm.backend;
     T.textContent = "工人就绪 · backend=" + llm.backend;
-    say("引擎就绪 backend=" + llm.backend);
+    say("引擎就绪 backend=" + llm.backend + " · " + (llm.gpu?.bytes/1048576|0) + " MB 已上传");
+    PR.style.display = "none";
     startHeartbeat(llm.backend);
   } catch (e) {
     window.__worker.state = "boot-failed";
@@ -65,22 +82,23 @@ function startHeartbeat(backend) {
         say("领活 " + job.id);
         let out = { id: job.id, text: "", backend: "err", tokPerSec: null, tokens: 0 };
         try {
-          const r = await llm.chat(String(job.text || ""), job.max_tokens || 48);
+          const r = await Promise.race([
+            llm.chat(String(job.text || ""), job.max_tokens || 128),
+            new Promise((_, rej) => setTimeout(() => rej(new Error("推理超时45s")), 45000)),
+          ]);
           out = { id: job.id, text: r.text, backend: llm.backend, tokPerSec: r.tokPerSec, tokens: r.tokens };
           window.__worker.ok += 1;
         } catch (e) {
           window.__worker.fail += 1;
           say("算失败 " + (e && e.message || e));
         }
-        /* 把交回的 id 与 HTTP 回执一起说出来：这一步是"桥等不到结果"的断点所在，
-           必须能看见它到底交了哪条、服务端收没收。 */
         try {
           const r = await post("/_local/result", out);
           say("交回回执 " + JSON.stringify(r).slice(0, 90));
         } catch (e) {
           say("交回失败 " + (e && e.message || e));
         }
-        say("交回 " + job.id + " → " + String(out.text || "").slice(0, 40));
+        say("交回 " + job.id + " → " + String(out.text || "").slice(0, 50));
       }
     } catch (e) { /* 超时/桥不在：下一轮 */ }
     await new Promise((z) => setTimeout(z, 2000));

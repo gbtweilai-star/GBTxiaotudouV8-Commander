@@ -37,12 +37,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     #   改了内容但 URL 不变 ⇒ 浏览器一直吃旧缓存，改了等于没改（今天踩了两次）。
     #   在服务端禁掉缓存，比去改 401 个 page 的 script 标签干净。
     def end_headers(self):
-        self.send_header("Cache-Control", "no-store, must-revalidate")
-        self.send_header("Pragma", "no-cache")
-        self.send_header("Expires", "0")
-        super().end_headers()
-
-    def end_headers(self):
         # 这两行是 SharedArrayBuffer 的门
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
@@ -51,6 +45,55 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Accept-Ranges", "bytes")
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
+
+    def do_RANGE(self):
+        """处理 Range 请求（返回 206 Partial Content）"""
+        self.do_GET(range_mode=True)
+
+    def do_GET(self, range_mode=False):
+        """重写 GET 以支持 HTTP Range 请求（GGUF 大文件分块加载）"""
+        path = self.path.split('?')[0]
+        full_path = self.translate_path(path)
+        if not full_path or not os.path.isfile(full_path):
+            self.send_error(404)
+            return
+        f = open(full_path, 'rb')
+        try:
+            fs = os.fstat(f.fileno())
+            size = fs[6]
+            # 检查 Range 头
+            range_hdr = self.headers.get('Range')
+            if range_hdr and range_hdr.startswith('bytes='):
+                # 解析 Range: bytes=START-END 或 bytes=START-
+                parts = range_hdr[6:].split('-')
+                start = int(parts[0]) if parts[0] else 0
+                end = int(parts[1]) if len(parts) > 1 and parts[1] else size - 1
+                end = min(end, size - 1)
+                length = end - start + 1
+                # 只读需要的字节
+                f.seek(start)
+                data = f.read(length)
+                self.send_response(206)
+                self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Content-Type", self.guess_type(path))
+                self.end_headers()
+                self.wfile.write(data)
+            else:
+                # 普通请求：完整文件
+                self.send_response(200)
+                self.send_header("Content-Length", str(size))
+                self.send_header("Content-Type", self.guess_type(path))
+                self.end_headers()
+                # 流式发送，避免一次性加载大文件到内存
+                buf_size = 64 * 1024
+                while True:
+                    chunk = f.read(buf_size)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+        finally:
+            f.close()
 
     def log_message(self, fmt, *args):
         sys.stderr.write("[wgpu] %s - %s\n" % (self.address_string(), fmt % args))

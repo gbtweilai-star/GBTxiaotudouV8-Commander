@@ -84,7 +84,7 @@ UPSTREAMS = {
 #   我们自己的整机 GPU 权重（ownweights）作为**触手侧后备**：A19 不可用时顶上。
 # 🔴 2026-10-31 主人令（最终）：**弃用 LM Pocket**。
 #   我们自己的无限制权重（整机 GPU · 浏览器内 GGUF）就是唯一主车道。
-DEFAULT = "selfhost"   # 主人令：A19 常驻驱动（不可用时入队由后台大脑补齐）
+DEFAULT = "ownweights"   # 主人令：LM Pocket 已删除，用整机 GPU 浏览器推理
 
 # 🔴 2026-10-31（主人令：本机算力限流给他去掉）：
 #   429 是 **LM Pocket 容器**给的（"Too many inference requests"），不是我们设的。
