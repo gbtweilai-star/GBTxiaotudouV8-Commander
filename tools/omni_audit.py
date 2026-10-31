@@ -66,7 +66,7 @@ SOCKETS = [
     ("process", "python3 -c print(6*7)", "run"),
     ("file", "README.md", "read"),
     ("api", "https://example.com", "get"),
-    ("ai", "https://api.deepseek.com/v1", "chat"),
+    ("ai", "our", "chat"),
     # 2026-10-30：web/app 在 iOS 上有等价实现（apple-open / URL scheme），
     # 所以这里按 iOS 口径测：web/open、app/launch 应当免票可用；
     # app/see（看屏幕）属于隐私载体，单独一列，需要票 —— 这是设计，不是坏。

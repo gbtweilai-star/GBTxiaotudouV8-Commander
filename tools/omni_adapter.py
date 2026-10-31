@@ -206,15 +206,24 @@ def execute(target: str, verb: str = "", args: dict | None = None) -> dict:
 def main(argv):
     import json
     if len(argv) < 2:
-        print(json.dumps({"usage": "omni_adapter.py <target> [verb]",
-                          "examples": ["https://example.com get", "/etc/hostname read",
-                                       "127.0.0.1:8791 probe", "settings launch",
-                                       "python3 stat"]}, ensure_ascii=False, indent=1))
+        print(json.dumps({"usage": "omni_guard.py [--strict]",
+                          "checks": ["omni_enforce: 所有执行走万能插",
+                                     "llm_enforce: 所有 LLM 走 weights.py"],
+                          "exit_codes": [0, 1]},
+                         ensure_ascii=False, indent=1))
         return 2
-    target = argv[1]
-    verb = argv[2] if len(argv) > 2 else ""
-    print(json.dumps({"classify": classify(target), "run": execute(target, verb)},
-                     ensure_ascii=False, indent=1))
+    if "--strict" not in argv:
+        # 默认宽松：只报告不 raise
+        omni_v = enforce(strict=False)
+        llm_v = enforce_llm(strict=False)
+        total = len(omni_v) + len(llm_v)
+        if total:
+            print("\n  合计 %d 处违犯，请改完再 commit" % total)
+        sys.exit(total)
+    # strict 模式：两条一起跑，任意一条失败都 raise
+    omni_v = enforce(strict=True)
+    llm_v = enforce_llm(strict=True)
+    print("  ✅ 执行纪律 + LLM 纪律 全部通过")
     return 0
 
 
