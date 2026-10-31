@@ -1743,3 +1743,17 @@
 {"at": "2026-10-31T06:27:33", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 2977}
 {"at": "2026-10-31T06:52:58", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 478}
 {"at": "2026-10-31T06:52:58", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 645}
+{"at": "2026-10-31T07:33:58", "act": "kill_frozen", "svc": "她的界面 :8080", "killed": true, "mem_mb": 1631}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "她的界面 :8080", "spawned": true, "alive": true, "essential": true, "mem_mb": 2319}
+{"at": "2026-10-31T07:34:01", "act": "kill_frozen", "svc": "模型桥 :8791", "killed": true, "mem_mb": 2318}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "模型桥 :8791", "spawned": true, "alive": true, "essential": true, "mem_mb": 2436}
+{"at": "2026-10-31T07:34:06", "act": "kill_frozen", "svc": "批量车道 :8790", "killed": false, "mem_mb": 2436}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "批量车道 :8790", "spawned": true, "alive": true, "essential": true, "mem_mb": 2437}
+{"at": "2026-10-31T07:34:12", "act": "kill_frozen", "svc": "巡检", "killed": false, "mem_mb": 2427}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "巡检", "spawned": true, "alive": true, "essential": true, "mem_mb": 2501}
+{"at": "2026-10-31T07:34:17", "act": "kill_frozen", "svc": "哨兵 a19", "killed": false, "mem_mb": 2501}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "哨兵 a19", "spawned": true, "alive": true, "essential": true, "mem_mb": 2460}
+{"at": "2026-10-31T07:34:22", "act": "kill_frozen", "svc": "面板后端 :8765", "killed": true, "mem_mb": 2460}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "面板后端 :8765", "spawned": true, "alive": true, "essential": false, "mem_mb": 2412}
+{"at": "2026-10-31T07:34:29", "act": "kill_frozen", "svc": "索引层 :8792", "killed": true, "mem_mb": 2432}
+{"at": "2026-10-31T07:33:58", "act": "start", "svc": "索引层 :8792", "spawned": true, "alive": true, "essential": false, "mem_mb": 2338}
