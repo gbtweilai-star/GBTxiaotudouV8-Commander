@@ -189,10 +189,157 @@
   fill.position.set(0.6, 1.2, 3.0);
   scene.add(fill);
 
+  /* 2026-10-31 眼神光（catchlight）· 照提示词"眼部具备清晰的眼光神光"。
+     做法：在双眼前方各放一盏极小半径、极弱衰减的暖白点光 —— 打到角膜上就是一点高光，
+     这比改材质安全（上次换 MeshPhysicalMaterial 把模型加载搞挂过）。 */
+  var eyeL = new THREE.PointLight(0xfff6ee, 0.35, 0.55, 2.5);
+  eyeL.position.set(-0.075, 1.60, 0.42);
+  scene.add(eyeL);
+  var eyeR = new THREE.PointLight(0xfff6ee, 0.35, 0.55, 2.5);
+  eyeR.position.set(0.075, 1.60, 0.42);
+  scene.add(eyeR);
+
+  /* 2026-10-31 背景层次（照提示词"背景层次丰富有真实氛围感"·负面"干净无层次的背景"）。
+     用雾 + 后方两层半透明平面做出景深：近处人物清晰，远处空气浑厚。 */
+  scene.fog = new THREE.FogExp2(0x0d1017, 0.055);
+  (function bgLayers() {
+    function plane(z, color, opacity) {
+      var m = new THREE.Mesh(
+        new THREE.PlaneGeometry(18, 12),
+        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: opacity,
+                                      depthWrite: false })
+      );
+      m.position.set(0, 1.6, z);
+      scene.add(m);
+      return m;
+    }
+    plane(-6.2, 0x141c2b, 0.34);   /* 远层：实测全幅 avg 43→72 才出层次 */
+    plane(-4.4, 0x1b2438, 0.20);   /* 中层 */
+  })();
+
   /* 脚灯：给腿补一点暖光。第一版实拍下半身全黑（纱幕+背光），补这盏才看得见靴子线条 */
   var foot = new THREE.PointLight(0xf5b041, 1.7, 3.4, 2.0);
   foot.position.set(0, 0.18, 1.1);
   scene.add(foot);
+
+  /* ── 2026-10-31 写实化（主人令：用写实提示词把数字人调到自然）─────────
+     目标（照图片提示词）：去 AI 感 · 体积光 · 悬浮微粒 · 胶片颗粒 ·
+     背景层次 · 眼神光 · 皮肤不塑料不陶瓷 · 保留微瑕疵。 */
+
+  /* ① 体积光（Volumetric light）：两束锥形光柱，加色叠加，带柔和衰减。
+     2026-10-31：第一版纯色锥体边缘锐利像几何体（提示词负面"干净无层次"）⇒ 改径向渐变贴图。 */
+  (function volumetricLight() {
+    function beamTexture() {
+      var cv = document.createElement("canvas");
+      cv.width = 64; cv.height = 256;
+      var g = cv.getContext("2d");
+      var lg = g.createLinearGradient(0, 0, 0, 256);
+      lg.addColorStop(0.0, "rgba(255,255,255,0.00)");
+      lg.addColorStop(0.25, "rgba(255,255,255,0.55)");
+      lg.addColorStop(1.0, "rgba(255,255,255,0.00)");
+      g.fillStyle = lg; g.fillRect(0, 0, 64, 256);
+      var id = g.getImageData(0, 0, 64, 256), d = id.data;
+      for (var y = 0; y < 256; y++) {
+        for (var x = 0; x < 64; x++) {
+          var dx = (x - 31.5) / 31.5;
+          var feather = Math.max(0, 1 - dx * dx);
+          var i = (y * 64 + x) * 4;
+          d[i + 3] = Math.round(d[i + 3] * feather);
+        }
+      }
+      g.putImageData(id, 0, 0);
+      var t = new THREE.CanvasTexture(cv);
+      if ("colorSpace" in t) t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }
+    var TEX = beamTexture();
+    function beam(color, x, y, z, len, rTop, rBot, op) {
+      var g = new THREE.CylinderGeometry(rTop, rBot, len, 16, 1, true);
+      var m = new THREE.MeshBasicMaterial({
+        color: color, map: TEX, transparent: true, opacity: op,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      var mesh = new THREE.Mesh(g, m);
+      mesh.position.set(x, y, z);
+      scene.add(mesh);
+      return mesh;
+    }
+    var b1 = beam(0xffe3b8, -0.9, 2.8, -1.8, 5.2, 0.16, 1.15, 0.075);
+    b1.rotation.z = 0.32; b1.rotation.x = -0.18;
+    var b2 = beam(0x00e5ff, 1.1, 2.6, -2.2, 5.0, 0.10, 0.90, 0.050);
+    b2.rotation.z = -0.28; b2.rotation.x = -0.14;
+  })();
+
+  /* ② 空气悬浮微粒：400 个极小点，缓慢上浮+随机漂移（体积光的"空气感"靠它）*/
+  (function dustMotes() {
+    /* 2026-10-31 调参依据（全幅离屏回读，不是眼看）：
+       400 个 / size 0.012 / opacity 0.28 ⇒ 加法叠加把整屏糊爆。
+       定稿：200 个 / 0.009 / 0.16，并给圆形 sprite —— 不给 map 时每个点渲染成方块，
+       离屏渲图里一眼就看出是"AI 感"。 */
+    var N = 200, pos = new Float32Array(N * 3), vel = new Float32Array(N * 3);
+    for (var i = 0; i < N; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * 5.0;
+      pos[i * 3 + 1] = Math.random() * 3.2;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 4.0 + 0.5;
+      vel[i * 3]     = (Math.random() - 0.5) * 0.0008;
+      vel[i * 3 + 1] = 0.0004 + Math.random() * 0.0012;
+      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.0008;
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    if (!window.__DH_DUST_TEX) {
+      var dcv = document.createElement("canvas");
+      dcv.width = dcv.height = 32;
+      var dg = dcv.getContext("2d");
+      var rg = dg.createRadialGradient(16, 16, 0, 16, 16, 16);
+      rg.addColorStop(0, "rgba(255,255,255,1)");
+      rg.addColorStop(0.45, "rgba(255,255,255,0.55)");
+      rg.addColorStop(1, "rgba(255,255,255,0)");
+      dg.fillStyle = rg;
+      dg.beginPath(); dg.arc(16, 16, 16, 0, Math.PI * 2); dg.fill();
+      var dt = new THREE.CanvasTexture(dcv);
+      if ("colorSpace" in dt) dt.colorSpace = THREE.SRGBColorSpace;
+      window.__DH_DUST_TEX = dt;
+    }
+    var m = new THREE.PointsMaterial({
+      color: 0xfff0d8, size: 0.009, transparent: true, opacity: 0.16,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+      map: window.__DH_DUST_TEX, alphaTest: 0.02
+    });
+    var pts = new THREE.Points(g, m);
+    scene.add(pts);
+    window.__DH_DUST = { pts: pts, pos: pos, vel: vel, N: N };
+  })();
+
+  /* ③ 胶片颗粒（film grain）：全屏 canvas 叠加噪点，低透明度，给画面"呼吸感"。
+     这是"去 AI 感"最廉价有效的一步：干净到无瑕的画面本身就是 AI 的特征。 */
+  (function filmGrain() {
+    var cv = document.createElement("canvas");
+    cv.width = 320; cv.height = 180;
+    var ctx = cv.getContext("2d");
+    var img = ctx.createImageData(320, 180);
+    function refresh() {
+      var d = img.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var v = (Math.random() * 255) | 0;
+        d[i] = d[i + 1] = d[i + 2] = v;
+        d[i + 3] = 22;                     /* 极低 alpha：只在暗部微微可见 */
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    refresh();
+    var el = document.createElement("div");
+    el.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:6;" +
+      "mix-blend-mode:overlay;opacity:.55;background-repeat:repeat;" +
+      "background-image:url(" + cv.toDataURL() + ")";
+    canvas.parentNode.appendChild(el);
+    /* 每 80ms 换一帧噪点：静态噪点像脏屏幕，动态噪点才像胶片 */
+    setInterval(refresh, 80);
+    setInterval(function () {
+      el.style.backgroundImage = "url(" + cv.toDataURL() + ")";
+    }, 160);
+  })();
 
   /* 接地影：**程序生成**的椭圆软影（不引任何外部贴图，仍是零 CDN）。
      没有它，人像会像"吊在半空"——这是第一版实拍最直白的破绽。 */
@@ -379,11 +526,45 @@
             if (!m) return;
             if ("envMapIntensity" in m) m.envMapIntensity = 0.7;
             if ("metalness" in m) m.metalness = 0.0;
-            if ("roughness" in m) m.roughness = 0.65;
+            /* 2026-10-31 按提示词分区：皮肤 0.62（保留油光）/ 衣物 0.78（布不该反光）/ 其他 0.65 */
+            var mn = String(m.name || "");
+            var isSkin = /skin|body|face|head|arm|leg|hand|chest|torso|neck/i.test(mn);
+            var isCloth = /cloth|shirt|pants|dress|skirt|shoe|boot|fabric|hair/i.test(mn);
+            if ("roughness" in m) m.roughness = isSkin ? 0.62 : (isCloth ? 0.78 : 0.65);
             if ("ior" in m) m.ior = 1.4;
             if ("specularIntensity" in m) m.specularIntensity = 0.42;
             if ("clearcoat" in m) m.clearcoat = 0.05;
             if ("sheen" in m) m.sheen = 0.12;
+            /* 破"陶瓷/磨皮"：皮肤贴程序生成的微粗糙噪点图 ⇒ 高光不再是一条平整反光带。
+               canvas 现画，零 CDN；只在皮肤材质上挂，衣物不动。 */
+            if (isSkin && !m.roughnessMap) {
+              if (!window.__DH_SKIN_NOISE) {
+                var nc = document.createElement("canvas");
+                nc.width = nc.height = 256;
+                var nx = nc.getContext("2d");
+                var nid = nx.createImageData(256, 256), nd = nid.data;
+                for (var ni = 0; ni < nd.length; ni += 4) {
+                  var fine = Math.random(), mid = Math.random();
+                  var v = Math.round(128 + (fine - 0.5) * 90 + (mid - 0.5) * 55);
+                  v = Math.max(0, Math.min(255, v));
+                  nd[ni] = nd[ni + 1] = nd[ni + 2] = v;
+                  nd[ni + 3] = 255;
+                }
+                nx.putImageData(nid, 0, 0);
+                var nt = new THREE.CanvasTexture(nc);
+                nt.wrapS = nt.wrapT = THREE.RepeatWrapping;
+                nt.repeat.set(6, 6);
+                window.__DH_SKIN_NOISE = nt;
+              }
+              m.roughnessMap = window.__DH_SKIN_NOISE;
+              m.roughness = 0.62;
+            }
+            /* 肤色偏暖：红多一点、蓝少一点（提示词"肤色自然红润"） */
+            if (isSkin && m.color) {
+              m.color.r = Math.min(1, m.color.r * 1.04);
+              m.color.g = Math.min(1, m.color.g * 0.985);
+              m.color.b = Math.min(1, m.color.b * 0.955);
+            }
             m.needsUpdate = true;
           });
         }
@@ -648,6 +829,25 @@
       camera.position.copy(CAM.pos0);
       camera.position.y += 0.010 * Math.sin(t * 0.5);
       camera.lookAt(CAM.aim.x, CAM.aim.y + 0.005 * smooth.look, CAM.aim.z);
+    }
+
+    /* 2026-10-31 微粒上浮（体积光的"空气感"动态化）*/
+    var dust = window.__DH_DUST;
+    if (dust) {
+      var p = dust.pos, v = dust.vel;
+      for (var di = 0; di < dust.N; di++) {
+        var o3 = di * 3;
+        p[o3]     += v[o3];
+        p[o3 + 1] += v[o3 + 1];
+        p[o3 + 2] += v[o3 + 2];
+        /* 越界回底：看起来像"空气里一直有浮尘" */
+        if (p[o3 + 1] > 3.4) {
+          p[o3 + 1] = 0;
+          p[o3]     = (Math.random() - 0.5) * 5.0;
+          p[o3 + 2] = (Math.random() - 0.5) * 4.0 + 0.5;
+        }
+      }
+      dust.pts.geometry.attributes.position.needsUpdate = true;
     }
 
     renderer.render(scene, camera);

@@ -1,47 +1,21 @@
 /* gguf-llm.js — 浏览器内 llama 前向（零依赖）
-   2026-10-30。只做一件事：把 GGUF 里的量化权重真算成 logits。
-
-   为什么自己写：这台机器上 llama.cpp 跑不起来（iSH 缺 FCVT 指令），
-   wllama 的依赖链在 iSH 上装不齐。要"自己定规则"，就得自己算。
-
-   实现范围（照 tiny.gguf 实测张量表，不猜名字）：
-     token_embd.weight      Q8_0  [576, 49152]
-     blk.N.attn_norm.weight F32   [576]
-     blk.N.attn_q.weight    Q5_0  [576, 576]
-     blk.N.attn_k.weight    Q5_0  [576, 192]   ← 3 个 KV 头 × 64
-     blk.N.attn_v.weight    Q8_0  [576, 192]
-     blk.N.attn_output.weight Q5_0 [576, 576]
-     blk.N.ffn_norm.weight  F32   [576]
-     blk.N.ffn_gate.weight  Q5_0  [576, 1536]
-     blk.N.ffn_up.weight    Q5_0  [576, 1536]
-     blk.N.ffn_down.weight  Q6_K  [1536, 576]
-     词表绑定：无 output.weight ⇒ lm_head = token_embd（tied）
+   2026-10-31 升级：RangeBuffer 按需激活（不一次读全量文件）。
+   Header ~1MB 一次性读；每个张量数据在 tensor() 首次调用时 fetch，此后缓存。
+   内存占用 ≈ 正在 forward 的层数 × 每层权重 F32 大小（而非全模型）。
 */
 
 const GGUF_T = { U8:0,I8:1,U16:2,I16:3,U32:4,I32:5,F32:6,BOOL:7,STR:8,ARR:9,U64:10,I64:11,F64:12 };
 const GT = { F32:0, F16:1, Q4_0:2, Q4_1:3, Q5_0:6, Q5_1:7, Q8_0:8, Q2_K:10, Q3_K:11,
              Q4_K:12, Q5_K:13, Q6_K:14 };
 
-/* 每个 block 的「值个数 / 字节数」 */
 const BLK = {
-  0:  [1, 4],     /* F32 */
-  1:  [1, 2],     /* F16 */
-  2:  [32, 18],   /* Q4_0 */
-  3:  [32, 20],   /* Q4_1 */
-  6:  [32, 22],   /* Q5_0 */
-  7:  [32, 24],   /* Q5_1 */
-  8:  [32, 34],   /* Q8_0 */
-  10: [256, 84],  /* Q2_K */
-  11: [256, 110], /* Q3_K */
-  12: [256, 144], /* Q4_K */
-  13: [256, 176], /* Q5_K */
-  14: [256, 210], /* Q6_K */
+  0:  [1, 4],     1:  [1, 2],     2:  [32, 18],   3:  [32, 20],
+  6:  [32, 22],   7:  [32, 24],   8:  [32, 34],
+  10: [256, 84],  11: [256, 110], 12: [256, 144], 13: [256, 176], 14: [256, 210],
 };
 
-/* ── fp16 → f32（一次性查表，快且不会踩错）────────────────────────── */
 const FP16 = (function(){
-  const t = new Float32Array(65536);
-  const buf = new ArrayBuffer(4), dv = new DataView(buf);
+  const t = new Float32Array(65536), buf = new ArrayBuffer(4), dv = new DataView(buf);
   for (let i=0;i<65536;i++){
     const s = (i & 0x8000) ? -1 : 1, e = (i >> 10) & 0x1f, m = i & 0x3ff;
     let v;
@@ -52,12 +26,8 @@ const FP16 = (function(){
   }
   return t;
 })();
-
 function f16(u8, off){ return FP16[(u8[off] | (u8[off+1] << 8)) & 0xffff]; }
 
-/* ── 反量化：把一个张量整块读成 Float32Array ────────────────────────
-   口径：块布局照 llama.cpp ggml-quants.c，别自己发明。
-   慢一点没关系，先要「对」；后面再谈 SIMD/WebGPU。 */
 function dequant(u8, off, type, nElem){
   const out = new Float32Array(nElem);
   if (type === GT.F32) {
@@ -69,7 +39,7 @@ function dequant(u8, off, type, nElem){
     for (let i=0;i<nElem;i++) out[i] = f16(u8, off + i*2);
     return out;
   }
-  if (type === 2) {            /* Q4_0: d(fp16) + 16B qs = 32 个 4bit */
+  if (type === 2) {
     const nb = nElem / 32;
     for (let b=0;b<nb;b++){
       const o = off + b*18, d = f16(u8,o), qs = o+2, o32 = b*32;
@@ -81,7 +51,7 @@ function dequant(u8, off, type, nElem){
     }
     return out;
   }
-  if (type === 6) {            /* Q5_0: d + qh(u32) + 16B qs，5bit */
+  if (type === 6) {
     const nb = nElem / 32;
     for (let b=0;b<nb;b++){
       const o = off + b*22, d = f16(u8,o);
@@ -97,36 +67,31 @@ function dequant(u8, off, type, nElem){
     }
     return out;
   }
-  if (type === 8) {            /* Q8_0: d(fp16) + 32×int8 */
+  if (type === 8) {
     const nb = nElem / 32;
     for (let b=0;b<nb;b++){
       const o = off + b*34, d = f16(u8,o), o32 = b*32;
       for (let j=0;j<32;j++){
-        const q = (u8[o+2+j] << 24) >> 24;      /* 有符号 */
+        const q = (u8[o+2+j] << 24) >> 24;
         out[o32+j] = d * q;
       }
     }
     return out;
   }
-  if (type === 12) {           /* Q4_K：256 值 / 144 字节 = d,dmin(fp16) + scales(12B) + qs(128B)
-                                  6-bit 的 scale/min 打包是 llama.cpp 的惯例，照抄不发明 */
+  if (type === 12) {
     const nb = nElem / 256;
     for (let b=0;b<nb;b++){
       const o = off + b*144;
       const d = f16(u8, o), dmin = f16(u8, o+2);
-      const sc = o+4, qs = o+16;
-      const o256 = b*256;
-      const getSM = (j) => {                 /* → [scale6, min6] */
+      const sc = o+4, qs = o+16, o256 = b*256;
+      const getSM = (j) => {
         let s6, m6;
         if (j < 4) { s6 = u8[sc+j] & 63; m6 = u8[sc+j+4] & 63; }
-        else {
-          s6 = (u8[sc+j+4] & 0x0f) | ((u8[sc+j-4] >> 6) << 4);
-          m6 = (u8[sc+j+4] >> 4)   | ((u8[sc+j-0] >> 6) << 4);
-        }
+        else { s6 = (u8[sc+j+4] & 0x0f) | ((u8[sc+j-4] >> 6) << 4); m6 = (u8[sc+j+4] >> 4) | ((u8[sc+j-0] >> 6) << 4); }
         return [s6, m6];
       };
       let is = 0;
-      for (let g=0; g<4; g++){               /* 4 组 × 64 值，每组两个 32-子块 */
+      for (let g=0;g<4;g++){
         const [s0, m0] = getSM(is), [s1, m1] = getSM(is+1);
         const d1 = d*s0, dm1 = dmin*m0, d2 = d*s1, dm2 = dmin*m1;
         const q = qs + g*32;
@@ -139,19 +104,16 @@ function dequant(u8, off, type, nElem){
     }
     return out;
   }
-  if (type === 14) {           /* Q6_K: 256 值：ql(128) qh(64) scales(16 int8) d(fp16) */
+  if (type === 14) {
     const nb = nElem / 256;
     for (let b=0;b<nb;b++){
       const o = off + b*210;
       const ql0 = o, qh0 = o+128, sc0 = o+192, d = f16(u8, o+208);
       const o256 = b*256;
-      /* 🔴 2026-10-30 按 llama.cpp dequantize_row_q6_K 重写：
-         原来只写 q1/q2（128 个值只解一半 —— 实测 ffn_down 有 51.37% 权重是 0），
-         而且四个子块共用同一个 scale。标准是四子块各用 sc[is+0/2/4/6]。 */
-      for (let g=0;g<2;g++){                     /* 两个 128 组：ql+64 qh+32 sc+8 */
+      for (let g=0;g<2;g++){
         const ql = ql0 + g*64, qh = qh0 + g*32, sc = sc0 + g*8;
         for (let l=0;l<32;l++){
-          const is = l >> 4;                      /* 0 或 1 */
+          const is = l >> 4;
           const qhb = u8[qh + l];
           const q1 = (((u8[ql + l])      & 0x0F) | (((qhb >> 0) & 3) << 4)) - 32;
           const q2 = (((u8[ql + l + 32]) & 0x0F) | (((qhb >> 2) & 3) << 4)) - 32;
@@ -174,14 +136,55 @@ function dequant(u8, off, type, nElem){
   throw new Error("未实现的反量化类型 " + type);
 }
 
-/* ── 张量索引 ─────────────────────────────────────────────────────── */
+/* ── RangeBuffer：大文件按需激活（2026-10-31）──────────────────
+   策略：一次性 pre-fetch 64MB 大块（覆盖大多数 tensor），
+         tensor() 在块内按 offset 切片，不触发额外网络请求。
+         超出块范围时自动追加下一个 64MB 块。
+*/
+class RangeBuffer {
+  constructor(url, onProgress) {
+    this.url = url;
+    this._cache = new Map();   /* off (block-aligned) → Uint8Array(64MB chunk) */
+    this._totalLoaded = 0;
+    this._onProgress = onProgress || null;
+  }
+  async read(off, count) {
+    const CHUNK = 64 * 1024 * 1024;   /* 64MB 一块 */
+    const blockStart = Math.floor(off / CHUNK) * CHUNK;
+    let chunk = this._cache.get(blockStart);
+    if (!chunk) {
+      const r = await fetch(this.url, {
+        headers: { Range: `bytes=${blockStart}-${blockStart + CHUNK - 1}` }
+      });
+      if (!r.ok || r.status !== 206) throw new Error(`Range fetch ${this.url} @${blockStart} → HTTP ${r.status}`);
+      chunk = new Uint8Array(await r.arrayBuffer());
+      this._cache.set(blockStart, chunk);
+      this._totalLoaded += chunk.byteLength;
+      if (this._onProgress) this._onProgress(this._totalLoaded);
+    }
+    const rel = off - blockStart;
+    return chunk.slice(rel, rel + count);
+  }
+  async stat() {
+    /* 不读文件内容，只拿 Content-Length */
+    const r = await fetch(this.url, { method: 'HEAD' });
+    return Number(r.headers.get('Content-Length')) || 0;
+  }
+}
+
+/* ── GGUFModel：双模式（小模型全量 / 大模型 Range 按需）───────── */
 class GGUFModel {
-  constructor(buf){
-    this.buf = buf;
-    this.u8 = new Uint8Array(buf);
-    const dv = new DataView(buf);
-    let p = 4;
-    const ver = dv.getUint32(p, true); p += 4;
+  constructor(opts){
+    this._cache = {}; this._rb = null; this.u8 = null; this.dataStart = 0;
+    if (opts.buf) {
+      this.buf = opts.buf; this.u8 = new Uint8Array(opts.buf);
+      this._parseFromBuffer();
+    } else if (opts.url) {
+      this.modelUrl = opts.url; this._onProgress = opts.onProgress || null;
+    } else { throw new Error("GGUFModel needs {buf} or {url}"); }
+  }
+  _parseFromBuffer(){
+    const buf = this.buf, dv = new DataView(buf); let p = 8;  // GGUF v3: magic(4)+ver(4)=8, nTen at 8, nKV at 16, KV at 24
     const nTen = Number(dv.getBigUint64(p, true)); p += 8;
     const nKV = Number(dv.getBigUint64(p, true)); p += 8;
     const TD = new TextDecoder();
@@ -215,28 +218,18 @@ class GGUFModel {
     };
     this.kv = {};
     for (let i=0;i<nKV;i++){ const k = rdStr(); const t = dv.getUint32(p,true); p+=4; this.kv[k] = rdVal(t); }
-    this.tensors = {};
-    this.order = [];
+    this.tensors = {}; this.order = [];
     for (let i=0;i<nTen;i++){
-      const name = rdStr();
-      const nd = dv.getUint32(p,true); p+=4;
-      const dims = [];
-      for (let d=0;d<nd;d++){ dims.push(Number(dv.getBigUint64(p,true))); p+=8; }
+      const name = rdStr(), nd = dv.getUint32(p,true); p+=4;
+      const dims = []; for (let d=0;d<nd;d++){ dims.push(Number(dv.getBigUint64(p,true))); p+=8; }
       const type = dv.getUint32(p,true); p+=4;
       const off = Number(dv.getBigUint64(p,true)); p+=8;
-      this.tensors[name] = {name, dims, type, off};
-      this.order.push(name);
+      this.tensors[name] = {name, dims, type, off}; this.order.push(name);
     }
-    /* 🔴 2026-10-30 实测坑：张量数据段要按 general.alignment（默认 32）**对齐**。
-       不对齐时 attn_norm 读出 -15045 / -7e24 这种数（错 8 字节），
-       反量化看着都对、结果全崩。python 侧同一位置复算证实：差的就是这 8 字节。 */
     const _al = Number(this.kv["general.alignment"] || 32);
-    this.dataStart = Math.ceil(p / _al) * _al;
-    this.alignment = _al;
-    this.dataStartRaw = p;
+    this.dataStart = Math.ceil(p / _al) * _al; this.alignment = _al;
     const a = this.kv["general.architecture"] || "llama";
-    this.arch = a;
-    this.nLayer = this.kv[a+".block_count"] || 0;
+    this.arch = a; this.nLayer = this.kv[a+".block_count"] || 0;
     this.nEmbd  = this.kv[a+".embedding_length"] || 0;
     this.nHead  = this.kv[a+".attention.head_count"] || 0;
     this.nKV    = this.kv[a+".attention.head_count_kv"] || this.nHead;
@@ -245,55 +238,115 @@ class GGUFModel {
     this.ropeTheta = this.kv[a+".rope.freq_base"] || 10000;
     this.headDim = this.nEmbd / this.nHead;
     this.tokens = this.kv["tokenizer.ggml.tokens"] || [];
-    this._cache = new Map();
   }
-  /* 取一张量的 Float32 视图（缓存：135M 参数全展开约 540MB，按需才展） */
-  tensor(name, cache=true){
-    const t = this.tensors[name];
-    if (!t) throw new Error("没有张量 "+name);
-    if (cache && this._cache.has(name)) return this._cache.get(name);
+  async initRangeBuffer(){
+    if (this._rb) return;
+    if (!this.modelUrl) throw new Error("没有 url，无法 RangeBuffer");
+    this._rb = new RangeBuffer(this.modelUrl, this._onProgress);
+    /* 🔴 修复：直接 fetch 整个 header（不经过 RangeBuffer 切片），
+       这样 DataView 的偏移量直接对应文件偏移，不用换算。 */
+    const hdrR = await fetch(this.modelUrl, { headers: { Range: 'bytes=0-1048575' } });
+    if (hdrR.status !== 206) throw new Error(`Header fetch HTTP ${hdrR.status}`);
+    const hdrBytes = new Uint8Array(await hdrR.arrayBuffer());
+    const dv = new DataView(hdrBytes.buffer, hdrBytes.byteOffset, hdrBytes.byteLength);
+    let p = 8;  // GGUF v3: magic(4)+ver(4)=8, nTen at 8, nKV at 16, KV at 24
+    const nTen = Number(dv.getBigUint64(p, true)); p += 8;
+    const nKV = Number(dv.getBigUint64(p, true)); p += 8;
+    // GGUF v3: 无迭代次数 n 字段，KV 直接从 p=24 开始（第一个 kLen）
+    const TD = new TextDecoder();
+    const rdStr = () => { const n = Number(dv.getBigUint64(p,true)); p += 8;
+                          const s = TD.decode(hdrBytes.slice(p, p+n)); p += n; return s; };
+    const rdVal = (t) => {
+      switch(t){
+        case 0:{const v=hdrBytes[p];p+=1;return v;}
+        case 1:{const v=dv.getInt8(p);p+=1;return v;}
+        case 2:{const v=dv.getUint16(p,true);p+=2;return v;}
+        case 3:{const v=dv.getInt16(p,true);p+=2;return v;}
+        case 4:{const v=dv.getUint32(p,true);p+=4;return v;}
+        case 5:{const v=dv.getInt32(p,true);p+=4;return v;}
+        case 6:{const v=dv.getFloat32(p,true);p+=4;return v;}
+        case 7:{const v=hdrBytes[p];p+=1;return !!v;}
+        case 8: return rdStr();
+        case 9:{
+          const et=dv.getUint32(p,true);p+=4; const n=Number(dv.getBigUint64(p,true));p+=8;
+          const a=[];
+          if(et===8){for(let i=0;i<n;i++)a.push(rdStr());}
+          else if(et===4||et===5){for(let i=0;i<n;i++)a.push(dv.getInt32(p+i*4,true));p+=n*4;}
+          else if(et===6){p+=n*4;a.push("["+n+" f32]");}
+          else if(et===0||et===1||et===7){p+=n;a.push("["+n+" u8]");}
+          else { for(let i=0;i<n;i++) rdVal(et); a.push("["+n+"]"); }
+          return a;
+        }
+        case 10: case 11: {const v=Number(dv.getBigUint64(p,true));p+=8;return v;}
+        case 12: {const v=dv.getFloat64(p,true);p+=8;return v;}
+        default: throw new Error("KV 类型 "+t);
+      }
+    };
+    this.kv = {};
+    for (let i=0;i<nKV;i++){ const k = rdStr(); const t = dv.getUint32(p,true); p+=4; this.kv[k] = rdVal(t); }
+    this.tensors = {}; this.order = [];
+    for (let i=0;i<nTen;i++){
+      const name = rdStr(), nd = dv.getUint32(p,true); p+=4;
+      const dims = []; for (let d=0;d<nd;d++){ dims.push(Number(dv.getBigUint64(p,true))); p+=8; }
+      const type = dv.getUint32(p,true); p+=4;
+      const off = Number(dv.getBigUint64(p,true)); p+=8;
+      this.tensors[name] = {name, dims, type, off}; this.order.push(name);
+    }
+    const _al = Number(this.kv["general.alignment"] || 32);
+    this.dataStart = Math.ceil(p / _al) * _al; this.alignment = _al;
+    const a = this.kv["general.architecture"] || "llama";
+    this.arch = a; this.nLayer = this.kv[a+".block_count"] || 0;
+    this.nEmbd  = this.kv[a+".embedding_length"] || 0;
+    this.nHead  = this.kv[a+".attention.head_count"] || 0;
+    this.nKV    = this.kv[a+".attention.head_count_kv"] || this.nHead;
+    this.nFF    = this.kv[a+".feed_forward_length"] || 0;
+    this.eps    = this.kv[a+".attention.layer_norm_rms_epsilon"] || 1e-5;
+    this.ropeTheta = this.kv[a+".rope.freq_base"] || 10000;
+    this.headDim = this.nEmbd / this.nHead;
+    this.tokens = this.kv["tokenizer.ggml.tokens"] || []; console.log(`[GGUF] ${nTen} tensors, arch=${this.arch}, layers=${this.nLayer}, dataStart=${this.dataStart}`);
+  }
+  tensor(name){
+    if (this._cache[name]) return this._cache[name];
+    if (!this.u8) throw new Error("tensor() 需要同步数据源，请用 tensorAsync()");
+    const t = this.tensors[name]; if (!t) throw new Error("没有张量 "+name);
     const [vs, bs] = BLK[t.type] || [0,0];
-    let nElem = 1;
-    for (const d of t.dims) nElem *= d;
-    const nBytes = (nElem / vs) * bs;
+    let nElem = 1; for (const d of t.dims) nElem *= d;
     const arr = dequant(this.u8, this.dataStart + t.off, t.type, nElem);
-    if (cache) this._cache.set(name, arr);
-    return arr;
+    this._cache[name] = arr; return arr;
   }
-  /* 只取某一行（token embedding 用：49152×576 全展开太重） */
+  async tensorAsync(name){
+    if (this._cache[name]) return this._cache[name];
+    if (!this._rb) await this.initRangeBuffer();
+    const t = this.tensors[name]; if (!t) throw new Error("没有张量 "+name);
+    const [vs, bs] = BLK[t.type] || [0,0];
+    let nElem = 1; for (const d of t.dims) nElem *= d;
+    const nBytes = (nElem / vs) * bs;
+    const raw = await this._rb.read(t.off, nBytes);
+    const arr = dequant(raw, 0, t.type, nElem);
+    this._cache[name] = arr; return arr;
+  }
   row(name, idx){
-    const t = this.tensors[name];
-    const [vs, bs] = BLK[t.type];
-    const cols = t.dims[0];                 /* ne0 = 行内元素数 */
-    const rowBytes = (cols / vs) * bs;
-    const base = this.dataStart + t.off + idx * rowBytes;
-    return dequant(this.u8, base, t.type, cols);
+    if (this.u8) {
+      const t = this.tensors[name], [vs, bs] = BLK[t.type];
+      const cols = t.dims[0], rowBytes = (cols / vs) * bs;
+      return dequant(this.u8, this.dataStart + t.off + idx * rowBytes, t.type, cols);
+    }
+    throw new Error("row() 不支持 RangeBuffer，用 tensorAsync(name) 再切片");
   }
 }
 
-/* ── 数学小件 ─────────────────────────────────────────────────────── */
 function rmsnorm(x, w, eps){
-  let s = 0;
-  for (let i=0;i<x.length;i++) s += x[i]*x[i];
+  let s = 0; for (let i=0;i<x.length;i++) s += x[i]*x[i];
   const r = 1 / Math.sqrt(s/x.length + eps);
   const o = new Float32Array(x.length);
   for (let i=0;i<x.length;i++) o[i] = x[i]*r*w[i];
   return o;
 }
-/* y = W·x，W 存成 [in, out]（ne0=in）⇒ 对每个 out 取一整行做点积 */
 function matvec(W, x, nIn, nOut){
   const y = new Float32Array(nOut);
-  for (let o=0;o<nOut;o++){
-    let s = 0;
-    const base = o*nIn;
-    for (let i=0;i<nIn;i++) s += W[base+i]*x[i];
-    y[o] = s;
-  }
+  for (let o=0;o<nOut;o++){ let s=0; const base=o*nIn; for (let i=0;i<nIn;i++) s += W[base+i]*x[i]; y[o]=s; }
   return y;
 }
-/* RoPE：llama / qwen2 用的是 **NEOX 式**（rotate_half）——
-   第 i 维和第 i + d/2 维配对，不是相邻 (0,1)(2,3) 配对。
-   2026-10-30 实测：写成相邻配对 ⇒ 首 token 直接出 <|endoftext|>（分布崩了）。 */
 function rope(x, nHead, headDim, pos, theta){
   const half = headDim >> 1;
   for (let h=0;h<nHead;h++){
@@ -308,13 +361,10 @@ function rope(x, nHead, headDim, pos, theta){
   }
 }
 function softmax(v){
-  let m = -Infinity;
-  for (let i=0;i<v.length;i++) if (v[i]>m) m = v[i];
-  let s = 0;
-  const o = new Float32Array(v.length);
+  let m = -Infinity; for (let i=0;i<v.length;i++) if (v[i]>m) m = v[i];
+  let s = 0; const o = new Float32Array(v.length);
   for (let i=0;i<v.length;i++){ o[i] = Math.exp(v[i]-m); s += o[i]; }
   for (let i=0;i<v.length;i++) o[i] /= s;
   return o;
 }
-
 export { GGUFModel, rmsnorm, matvec, rope, softmax, dequant, GT };

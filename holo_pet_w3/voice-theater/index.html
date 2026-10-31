@@ -657,15 +657,18 @@
 <script src="nav-drawer.js"></script>
 <script src="dh2d.js"></script>
 <!-- 2026-10-30：3D 是孤儿（dh3d.js 没人加载、three 没 vendor、无 #dh3d 元素）。
-     做成 ?dh3d=1 懒加载，全本地 vendor（零 CDN），按依赖序。默认页面不受影响。 -->
+     做成 ?dh3d=1 懒加载，全本地 vendor（零 CDN），按依赖序。默认页面不受影响。
+     2026-10-31 主人令：数字人默认要**真 3D 写实版**。原来只认 ?dh3d=1，
+     而实测本 WebView 会吞 query（location.search 为空）⇒ 懒加载器永不触发，
+     等于她永远看不到 3D。改成**默认加载**，只有显式 ?dh3d=0 才留在 2D。 -->
 <script>
 (function () {
-  if (!/[?&]dh3d=1/.test(location.search)) return;
+  if (/[?&]dh3d=0/.test(location.search)) return;   /* 显式要 2D 才跳过 */
   var c3 = document.getElementById("dh3d"), c2 = document.getElementById("dh2d");
   if (c3) c3.style.display = "block";
   if (c2) c2.style.display = "none";
   var files = ["vendor/three.min.js", "vendor/BufferGeometryUtils.js",
-               "vendor/GLTFLoader.js", "dh3d.js"];
+               "vendor/GLTFLoader.js", "dh3d.js?v=20261031c"];
   (function next(i) {
     if (i >= files.length) return;
     var sc = document.createElement("script");
@@ -674,6 +677,9 @@
     sc.onerror = function () {
       var st = document.getElementById("dh3dStatus");
       if (st) { st.textContent = "3D 载入失败：" + files[i]; st.setAttribute("data-tone", "fault"); }
+      /* 3D 挂了要回落到 2D，不能让人像消失（空白=看起来像没做） */
+      if (c3) c3.style.display = "none";
+      if (c2) c2.style.display = "block";
     };
     document.body.appendChild(sc);
   })(0);

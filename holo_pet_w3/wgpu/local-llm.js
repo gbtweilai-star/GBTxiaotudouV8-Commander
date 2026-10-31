@@ -151,17 +151,30 @@ export async function createLocalLLM(opts = {}) {
   const url = opts.modelUrl || "models/tiny.gguf";
   const backend = (opts.backend || "auto").toLowerCase();
   const t0 = performance.now();
-  const buf = await (await fetch(url)).arrayBuffer();
-  const M = new GGUFModel(buf);
+  /* 🔴 先 HEAD 拿 Content-Length，避免全量下载再决定策略（大模型直接 OOM） */
+  const head = await fetch(url, { method: 'HEAD' });
+  const sz = Number(head.headers.get('Content-Length')) || 0;
+  let M;
+  if (sz < 64 * 1024 * 1024) {
+    /* 小模型（<64MB）：一次读完 */
+    const buf = await (await fetch(url)).arrayBuffer();
+    M = new GGUFModel({buf});
+  } else {
+    /* 大模型（≥64MB）：Range 按需，只读 header 建立元数据 */
+    M = new GGUFModel({url, onProgress: opts.onProgress});
+    await M.initRangeBuffer();
+  }
   const tk = makeTokenizer(M);
-  const loadMs = performance.now() - t0;
-
   let engine = null, note = "";
   if (backend === "auto" || backend === "gpu") {
     try {
       if (!navigator.gpu) throw new Error("没有 navigator.gpu");
       const G = await WGPUModel.create(M);
-      G.upload();
+      if (sz >= 64 * 1024 * 1024) {
+        await G.uploadAsync(opts.onProgress);
+      } else {
+        G.upload();
+      }
       G.prepare(opts.maxPos || 64);
       engine = makeGPULlm(G);
       engine.gpu = G;
