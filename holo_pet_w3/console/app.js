@@ -540,10 +540,22 @@
     return MIND_P;
   }
 
+  /* ───────── 穿透扫描：按需动态 import ───────── */
+  var SCAN_P = null;
+  function ensureScan() {
+    if (SCAN_P) return SCAN_P;
+    SCAN_P = import("./scan3d.js").then(function (m) { return m; })
+      .catch(function (e) {
+        document.documentElement.dataset.scan3d = "import-err:" + String((e && e.message) || e).slice(0, 80);
+        return null;
+      });
+    return SCAN_P;
+  }
+
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "dash"];
+    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "dash"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
@@ -561,6 +573,9 @@
     }
     if (name === "mind") {
       ensureMind().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+    }
+    if (name === "scan") {
+      ensureScan().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
     }
     if (name === "space") {
       ensure3d().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });

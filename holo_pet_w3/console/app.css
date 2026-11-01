@@ -537,6 +537,42 @@ body.graph-on .grid-overlay { display: block; }
 .mind-wrap:active { cursor: grabbing; }
 .mind-wrap canvas { touch-action: none; }
 #mindmap-canvas { display: block; width: 100%; height: 100%; }
+
+/* ═══ 视图：穿透式交叉扫描 ═══ */
+.console[data-view="scan"] { top: 20px; bottom: 20px; background: #05070c; }
+.console[data-view="scan"] .view-scan { display: flex; flex-direction: column; }
+.view-scan { min-height: 0; }
+.scan-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; cursor: grab; }
+.scan-wrap:active { cursor: grabbing; }
+.scan-wrap canvas { touch-action: none; }
+#scan3d-canvas { display: block; width: 100%; height: 100%; }
+.scan-hud {
+  position: absolute; left: 18px; top: 14px; z-index: 2; display: flex; gap: 14px;
+  align-items: center; padding: 7px 12px; border-radius: 10px;
+  background: rgba(10, 16, 26, .78); border: 1px solid var(--line);
+  font: 500 10.5px/1 var(--mono); color: var(--dim); letter-spacing: .02em;
+}
+.scan-hud b { color: var(--warm); font-weight: 600; font-variant-numeric: tabular-nums; }
+/* 五感特写：眼睛不是 OCR（视觉全谱 11 个真实能力位） */
+.scan-senses {
+  position: absolute; left: 18px; bottom: 16px; z-index: 2; display: flex; flex-direction: column;
+  gap: 6px; max-width: min(430px, 42%);
+}
+.scan-sense {
+  display: grid; grid-template-columns: 44px 1fr; gap: 2px 10px; align-items: baseline;
+  padding: 6px 10px; border-radius: 9px; background: rgba(8, 13, 22, .74);
+  border: 1px solid var(--line); font: 500 10px/1.35 var(--mono); color: var(--dim);
+}
+.scan-sense b { color: var(--warm); font-weight: 600; letter-spacing: .04em; }
+.scan-sense span { color: var(--text2); }
+.scan-sense i {
+  grid-column: 2; font-style: normal; color: #7f8ea6; font-size: 9px; line-height: 1.45;
+  max-height: 0; overflow: hidden; transition: max-height .2s ease;
+}
+.scan-sense[data-sense="eye"] i { max-height: 44px; }
+.scan-sense.is-lit { border-color: rgba(255, 159, 28, .55); }
+.scan-sense.is-lit b { color: #ffd166; }
+.scan-hud .scan-state { color: var(--ok); }
 .space3d-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 #space3d-canvas { display: block; width: 100%; height: 100%; }
 .space3d-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }

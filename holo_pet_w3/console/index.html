@@ -141,6 +141,7 @@
       <button class="view-tab" data-view="plug" type="button">万能插</button>
       <button class="view-tab" data-view="team" type="button">触手协作</button>
       <button class="view-tab" data-view="mind" type="button">思维导图</button>
+      <button class="view-tab" data-view="scan" type="button">穿透扫描</button>
       <button class="view-tab" data-view="dash" type="button">仪表盘</button>
     </nav>
 
@@ -249,6 +250,34 @@
         <div class="space3d-hud">
           <span class="space3d-title">思维导图 · 任务指引（框架真在用的流程）</span>
           <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 6 分支（理解/计划/执行/验证/留痕/交付）× 每支 3 条具体动作</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 10：穿透式交叉扫描（385 真实能力位 · 疑点→大脑反思→手穿透） -->
+    <div class="view view-scan">
+      <div class="scan-wrap">
+        <canvas id="scan3d-canvas"></canvas>
+        <div class="scan-hud">
+          <span>扫过 <b id="scan-swept">0</b>/385</span>
+          <span>疑点 <b id="scan-doubt">0</b></span>
+          <span>反思 <b id="scan-refl">0</b></span>
+          <span>穿透 <b id="scan-pen">0</b></span>
+          <span class="scan-state" id="scan-state">扫描中</span>
+        </div>
+        <div class="scan-senses" aria-label="五感覆盖（真实能力位）">
+          <div class="scan-sense" data-sense="eye">
+            <b>眼睛</b><span>视觉全谱 · 不止 OCR</span>
+            <i>vision_loop · vision · vision_grounding · vision_print · body_see · gods_eye · screen_sniff · video_intel · image_scout · zimage_rewash · chart_html</i>
+          </div>
+          <div class="scan-sense" data-sense="ear"><b>耳朵</b><span>听异常 / 语音 / 音频</span><i>音频与语音输入，扫到异常会静下来听</i></div>
+          <div class="scan-sense" data-sense="mouth"><b>嘴巴</b><span>报结论 / 对话</span><i>每轮扫完把结论说出来，不闷着</i></div>
+          <div class="scan-sense" data-sense="hand"><b>手</b><span>执行 / 穿透</span><i>疑点处纵深穿透，run_task 真做</i></div>
+          <div class="scan-sense" data-sense="brain"><b>大脑</b><span>反思 / 推理 / 规划</span><i>遇到疑点先想：为什么红、该不该穿透</i></div>
+        </div>
+        <div class="space3d-hud">
+          <span class="space3d-title">穿透式交叉扫描 · 385 位全量（绿=只读 / 红=需授权疑点）</span>
+          <span class="space3d-hint">拖动旋转 · 滚轮缩放 · 扫描线自上而下 · 遇红点：大脑反思 → 手穿透（冲击波+纵深束）</span>
         </div>
       </div>
     </div>
