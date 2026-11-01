@@ -400,3 +400,32 @@ render/video/
 # 依据主人令 2026-10-30「每个分类部署一根心跳触手」；本目录由 heartbeat_tentacle 自管，
 # 它的卫生层只在这个抽屉里清垃圾，不碰别处。
 state/heartbeat/
+
+# ── 2026-11-01 仓库整理：运行态/产物/二进制不进版本库 ──
+state/
+store/
+gbt_allinone/store/
+gbt_allinone/archived_logs/
+dist/
+runtime/
+logs/
+vaults/
+vendor/
+__pycache__/
+*.pyc
+*.pyo
+*.gguf
+*.zip
+*.tar.gz
+*.7z
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.wav
+*.mp4
+*.bin
+*.db
+*.log
+*.jsonl
+C:*/
