@@ -289,9 +289,13 @@ class Handler(BaseHTTPRequestHandler):
                                     steps=str(d.get("steps") or ""),
                                     impact=str(d.get("impact") or ""),
                                     remediation=str(d.get("remediation") or ""),
-                                    evidence=[str(x) for x in (d.get("evidence") or [])])
+                                    evidence=[str(x) for x in (d.get("evidence") or [])],
+                                    fix_diff=str(d.get("fix_diff") or ""),
+                                    attachments=[str(x) for x in (d.get("attachments") or [])])
             elif op == "report":
                 out = B.report(str(d.get("finding") or ""))
+            elif op == "bundle":
+                out = B.bundle(str(d.get("finding") or ""))
             elif op == "submit":
                 out = B.submit(str(d.get("finding") or ""),
                                platform=str(d.get("platform") or ""),

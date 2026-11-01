@@ -101,6 +101,38 @@ def main() -> int:
     check("→ paid", B.set_status(fid, "paid").get("to") == "paid")
     check("summary 有状态计数", "paid" in (B.summary().get("by_status") or {}))
 
+    print("[4c] 时间分/环境分 + 修复 diff + 附件 + 可提交包")
+    tvec = ("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RL:O/RC:C")
+    tc = core.cvss3(tvec)
+    check("Temporal 8.8（9.8×0.94×0.95）", tc.get("temporal_score") == 8.8, tc)
+    evec = ("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/CR:H/IR:H/AR:H")
+    ec = core.cvss3(evec)
+    check("Environmental 算得出", isinstance(ec.get("env_score"), float)
+          and 0 <= ec["env_score"] <= 10, ec)
+
+    ev2 = ROOT / "state" / "bounty" / "selftest-attach.png"
+    try:
+        from PIL import Image
+        Image.new("RGB", (64, 40), (30, 40, 60)).save(ev2)
+    except Exception:  # noqa: BLE001
+        ev2.write_bytes(b"\x89PNG\r\n")
+    f2 = B.add_finding(pid, "带 diff 与附件的发现", "high", "api.lab.local",
+                       cwe="CWE-89", cvss="", steps="只读探测", impact="演示",
+                       remediation="参数化查询", evidence=[str(ev)],
+                       vector=tvec, fix_diff="--- a/app.py\n+++ b/app.py\n- q = \"...\" + user\n+ q = \"SELECT ... WHERE id=?\"; exec(q,(user,))",
+                       attachments=[str(ev2)])
+    fid2 = (f2.get("finding") or {}).get("id")
+    check("带向量发现 ok", f2.get("ok") is True and bool(fid2), fid2)
+    rep2 = B.report(fid2)
+    md2 = pathlib.Path(rep2["report"]).read_text(encoding="utf-8")
+    for sec in ("CVSS Temporal", "CVSS Environmental", "修复 Diff", "附件"):
+        check("报告含 " + sec, sec in md2)
+    bd = B.bundle(fid2)
+    check("提交包目录", bd.get("ok") is True and pathlib.Path(bd.get("dir", "")).is_dir(), bd.get("dir"))
+    check("提交包 ZIP", pathlib.Path(bd.get("zip", "")).is_file(), bd.get("zip"))
+    mf = pathlib.Path(bd.get("manifest", ""))
+    check("manifest 有 sha256", mf.is_file() and '"sha256"' in mf.read_text(encoding="utf-8"))
+
     print("[5] 赔付只记账")
     po = B.payout(pid, fid, 0, "USD", note="selftest")
     check("payout ok", po.get("ok") is True)

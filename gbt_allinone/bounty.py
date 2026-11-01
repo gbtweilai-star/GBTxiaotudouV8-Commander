@@ -154,7 +154,8 @@ def check(program_id: str, target: str, action: str = "read-only-recon") -> dict
 def add_finding(program_id: str, title: str, severity: str, target: str,
                 cwe: str = "", cvss: str = "", steps: str = "",
                 impact: str = "", remediation: str = "", evidence: list | None = None,
-                vector: str = "", repro: list | None = None) -> dict:
+                vector: str = "", repro: list | None = None,
+                fix_diff: str = "", attachments: list | None = None) -> dict:
     g = check(program_id, target, action="record-finding")
     if not g.get("ok"):
         return {"ok": False, "blocked": True, "reason": g.get("reason"),
@@ -187,6 +188,18 @@ def add_finding(program_id: str, title: str, severity: str, target: str,
                        "sha256": _sha256(p), "bytes": p.stat().st_size})
         else:
             ev.append({"path": str(ep), "sha256": None, "missing": True})
+    # 附件：图片/文本，带 sha256（图片可在报告里直接预览）
+    atts = []
+    for ap_ in (attachments or []):
+        pp = Path(ap_)
+        if pp.is_file():
+            ext = pp.suffix.lower()
+            atts.append({"path": str(pp.relative_to(ROOT)) if pp.is_relative_to(ROOT) else str(pp),
+                         "sha256": _sha256(pp), "bytes": pp.stat().st_size,
+                         "kind": "image" if ext in (".png", ".jpg", ".jpeg", ".webp", ".gif")
+                                 else "file"})
+        else:
+            atts.append({"path": str(ap_), "sha256": None, "missing": True, "kind": "file"})
     row = {"id": fid, "at": _now(), "program": program_id, "title": title,
            "severity": sev, "target": target,
            "cwe": cwe or (info.get("cwe") or ""), "cwe_name": info.get("name"),
@@ -194,6 +207,7 @@ def add_finding(program_id: str, title: str, severity: str, target: str,
            "steps": steps, "impact": impact,
            "remediation": remediation or info.get("fix") or "",
            "repro": [str(x) for x in (repro or [])],
+           "fix_diff": str(fix_diff or ""), "attachments": atts,
            "evidence": ev, "status": "draft",
            "authorization_ref": g.get("authorization_ref")}
     _append(FINDINGS, row)
@@ -266,15 +280,32 @@ def report(finding_id: str) -> dict:
     score_txt = ("%s（%s）" % (score, core.severity_of(score))) if score is not None else \
         ("%s（按严重度映射）" % core.severity_of({"low": 2.6, "medium": 5.4, "high": 8.1,
                                                 "critical": 9.8}.get(f.get("severity"), 5.4)))
+    _c = core.cvss3(f.get("cvss_vector") or "")
+    temporal_txt = ("%s（%s）" % (_c.get("temporal_score"), _c.get("temporal_severity"))
+                    if _c.get("temporal_score") is not None else "未提供（E/RL/RC）")
+    env_txt = ("%s（%s）" % (_c.get("env_score"), _c.get("env_severity"))
+               if _c.get("env_score") is not None else "未提供（M*/CR/IR/AR）")
     repro_txt = "\n".join(repro)
     ev_txt = "\n".join(ev_lines) or "（无）"
+    att_lines = []
+    for a in (f.get("attachments") or []):
+        if a.get("kind") == "image" and a.get("sha256"):
+            att_lines.append("- ![%s](%s) sha256=`%s`" %
+                             (Path(a.get("path", "")).name, a.get("path"), a.get("sha256")))
+        else:
+            att_lines.append("- `%s` sha256=`%s`%s" %
+                             (a.get("path"), a.get("sha256"),
+                              "（缺失）" if a.get("missing") else ""))
+    att_txt = "\n".join(att_lines) or "（无）"
     body = f"""# {f["title"]}
 
 ## 摘要
 - **项目**: {prog.get("name", f.get("program"))}（{prog.get("platform", "")}）
 - **目标**: {f.get("target")}
 - **严重度**: {f.get("severity")} · CVSS: {f.get("cvss_vector") or "-"}
-- **CVSS 分数**: {score_txt}
+- **CVSS Base**: {score_txt}
+- **CVSS Temporal**: {temporal_txt}
+- **CVSS Environmental**: {env_txt}
 - **CWE**: {f.get("cwe") or "-"}（{f.get("cwe_name") or "未收录"}）
 - **状态**: {f.get("status")}
 - **授权依据**: {f.get("authorization_ref")}
@@ -294,13 +325,22 @@ def report(finding_id: str) -> dict:
 ## 修复建议
 {f.get("remediation") or "（待补）"}
 
+## 修复 Diff
+```diff
+{f.get("fix_diff") or "（未提供补丁 diff：建议给出最小修复 diff，平台 triage 更快）"}
+```
+
 ## 证据（sha256 可核）
 {ev_txt}
+
+## 附件
+{att_txt}
 
 ## 提交建议
 - 平台: {prog.get("platform") or "（未指定，自建项目）"}
 - 提交前确认：只在授权 scope 内、证据齐全、复现命令可逐条跑通
 - 报告 SHA256 与发现 JSON 一起提交（侧车文件 `{outp.stem}.json`）
+- 或直接用 `bounty.bundle(finding)` 生成可提交包（报告+JSON+证据+附件+ZIP）
 
 ---
 > 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
@@ -312,6 +352,59 @@ def report(finding_id: str) -> dict:
                     encoding="utf-8")
     return {"ok": True, "report": str(outp), "json": str(side), "sha256": _sha256(outp),
             "bytes": outp.stat().st_size}
+
+
+def bundle(finding_id: str) -> dict:
+    """生成可提交包：outputs/bounty/<finding>/（报告+JSON+证据+附件+manifest）+ ZIP。"""
+    import shutil as _sh
+    import zipfile
+    rows = list_findings()["findings"]
+    f = next((x for x in rows if x.get("id") == finding_id), None)
+    if not f:
+        return {"ok": False, "reason": "没有这个 finding"}
+    rep = report(finding_id)
+    if not rep.get("ok"):
+        return rep
+    outdir = REPORTS / finding_id
+    if outdir.is_dir():
+        _sh.rmtree(outdir, ignore_errors=True)
+    outdir.mkdir(parents=True, exist_ok=True)
+    files = []
+    # 报告 + 侧车 JSON
+    for src in (Path(rep["report"]), Path(rep["json"])):
+        dst = outdir / src.name
+        _sh.copy2(src, dst)
+        files.append(dst)
+    # 证据 + 附件
+    for item in (f.get("evidence") or []) + (f.get("attachments") or []):
+        rel = item.get("path")
+        if not rel:
+            continue
+        srcp = Path(rel) if Path(rel).is_absolute() else ROOT / rel
+        if srcp.is_file():
+            dst = outdir / ("ev-" + srcp.name)
+            _sh.copy2(srcp, dst)
+            files.append(dst)
+    manifest = {
+        "finding": f.get("id"), "title": f.get("title"),
+        "severity": f.get("severity"), "cvss_vector": f.get("cvss_vector"),
+        "cvss_score": f.get("cvss_score"), "target": f.get("target"),
+        "authorization_ref": f.get("authorization_ref"),
+        "files": [{"name": x.name, "sha256": _sha256(x), "bytes": x.stat().st_size}
+                  for x in files],
+        "built_at": _now(),
+        "notice": "仅授权范围内提交；不在 scope 的资产不要测、不要交。",
+    }
+    mf = outdir / "manifest.json"
+    mf.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    files.append(mf)
+    zpath = REPORTS / (finding_id + "-bundle.zip")
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        for x in files:
+            z.write(x, x.name)
+    return {"ok": True, "dir": str(outdir), "manifest": str(mf), "zip": str(zpath),
+            "files": len(files), "zip_sha256": _sha256(zpath),
+            "zip_bytes": zpath.stat().st_size}
 
 
 # ── 赔付 ───────────────────────────────────────────────────────────────

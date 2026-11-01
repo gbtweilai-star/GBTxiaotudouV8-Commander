@@ -749,6 +749,22 @@
             });
         });
         card.appendChild(subBtn);
+        var bdBtn = document.createElement("button");
+        bdBtn.type = "button";
+        bdBtn.className = "scan-target";
+        bdBtn.textContent = "生成提交包";
+        bdBtn.style.marginLeft = "6px";
+        bdBtn.addEventListener("click", function () {
+          bountyApi("bundle", { finding: f.id }).then(function (r) {
+            var el = $("bounty-gate-result");
+            if (el) {
+              el.className = r.ok ? "ok" : "blocked";
+              el.textContent = r.ok ? ("提交包：" + r.zip + " · " + r.files + " 个文件 · sha256 "
+                + (r.zip_sha256 || "").slice(0, 12)) : ("打包失败：" + (r.reason || ""));
+            }
+          });
+        });
+        card.appendChild(bdBtn);
         box.appendChild(card);
       });
     }
