@@ -418,3 +418,6 @@ __pycache__/
 *.db
 *.jsonl
 C:*/
+# 产物目录（不同步到 GitHub）
+交付成片/
+outputs/
