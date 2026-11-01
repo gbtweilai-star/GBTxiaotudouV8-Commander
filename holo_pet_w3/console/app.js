@@ -310,6 +310,7 @@
     }
     renderCaps(d);
     renderSkills(d);
+    renderProfessions(d);
     renderDash(d);
     var cs = $("caps-sub"), ss = $("skills-sub");
     if (cs) cs.textContent = (d.caps && d.caps.total) + " 位 · " + ((d.domains && d.domains.length) || 0) + " 域";
@@ -475,6 +476,67 @@
     }
   }
 
+  /* ───────── 职业视图：12 种触手职业（编程为首席） ───────── */
+  function renderProfessions(d) {
+    var wrap = $("prof-grid");
+    var box = d && d.professions;
+    var items = (box && box.professions) || [];
+    document.documentElement.dataset.prof =
+      "ok:" + items.length + "职业" + (items.some(function (p) { return p.chief; }) ? "+编程首席" : "");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    items.forEach(function (p) {
+      var card = document.createElement("section");
+      card.className = "prof-card" + (p.chief ? " is-chief" : "");
+      var url = "https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander";
+      card.innerHTML = "";
+      var top = document.createElement("div");
+      top.className = "prof-top";
+      var ti = document.createElement("span");
+      ti.className = "prof-title";
+      ti.textContent = p.title + (p.chief ? "（首席）" : "");
+      top.appendChild(ti);
+      if (p.chief) {
+        var pill = document.createElement("span");
+        pill.className = "prof-chief-pill";
+        pill.textContent = "CHIEF";
+        top.appendChild(pill);
+      }
+      var cnt = document.createElement("span");
+      cnt.className = "prof-count";
+      cnt.textContent = (p.cap_count || 0) + " 能力位";
+      top.appendChild(cnt);
+      card.appendChild(top);
+
+      var head = document.createElement("div");
+      head.className = "prof-line";
+      head.textContent = p.headline || "";
+      card.appendChild(head);
+
+      var kv = document.createElement("div");
+      kv.className = "prof-kv";
+      function row(k, v) {
+        var b = document.createElement("b"); b.textContent = k; kv.appendChild(b);
+        var s2 = document.createElement("span"); s2.textContent = v; kv.appendChild(s2);
+      }
+      row("域", (p.domains || []).join(" · "));
+      row("工具", (p.tools || []).join(" · "));
+      row("KPI", p.kpi || "");
+      card.appendChild(kv);
+
+      var caps = document.createElement("div");
+      caps.className = "prof-caps";
+      (p.caps || []).slice(0, 10).forEach(function (name) {
+        var chip = document.createElement("span");
+        chip.className = "prof-cap";
+        chip.textContent = name;
+        caps.appendChild(chip);
+      });
+      card.appendChild(caps);
+      wrap.appendChild(card);
+    });
+  }
+
   /* ───────── 3D 视图按需加载（动态 import，file:// 下会失败→走兜底提示） ───────── */
   var SPACE_P = null;
   function ensure3d() {
@@ -555,7 +617,7 @@
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "dash"];
+    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "dash"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {

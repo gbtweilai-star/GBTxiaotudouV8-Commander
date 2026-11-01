@@ -230,3 +230,4 @@
 | 112 | [112-penetrating-cross-scan.md](112-penetrating-cross-scan.md) | 穿透式交叉扫描：385 节点/85 疑点 + 五感过程 + 视觉全谱（不止 OCR） |
 | 113 | [113-real-scan-data.md](113-real-scan-data.md) | 穿透扫描接真跑结果：unit_details 驱动（agree/arbitrated/unhooked）+ 三目标切换 |
 | 114 | [114-no-blind-spot-scan.md](114-no-blind-spot-scan.md) | 无死角扫描：coverage=1.0 + full_coverage + dead_spots + 现场重扫补扫（最多3轮） |
+| 115 | [115-tentacle-professions.md](115-tentacle-professions.md) | 触手职业表：12 职业（编程首席）·真实能力位映射·#prof 视图 |

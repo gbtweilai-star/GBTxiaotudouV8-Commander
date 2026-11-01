@@ -116,6 +116,15 @@ def build() -> dict:
             flow.append({"at": r.get("at"), "action": r.get("action"),
                          "target": r.get("target"), "result": r.get("result")})
 
+    # 触手职业表（tools/gen-professions.py 产出；「职业」视图用）
+    professions = None
+    prof_path = REPO / "data" / "professions.json"
+    if prof_path.is_file():
+        try:
+            professions = _json.loads(prof_path.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            professions = None
+
     # 真实穿透扫描数据（tools/export-scan-data.py 产出；给"穿透扫描"视图用）
     scan = None
     scan_path = REPO / "state" / "scan-data.json"
@@ -165,6 +174,7 @@ def build() -> dict:
         "domains": all_domains, "domains_top": domains,
         "pulse": pulse, "pulse_total": sum(x["n"] for x in pulse),
         "scan": scan,
+        "professions": professions,
         "flow": flow,
         "ledger": [{"at": r.get("at"), "action": r.get("action"),
                     "target": r.get("target"), "result": (r.get("result") or "")[:60]}

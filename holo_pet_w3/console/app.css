@@ -610,3 +610,29 @@ body.graph-on .grid-overlay { display: block; }
 }
 .scan-target.is-active { border-color: rgba(255, 159, 28, .6); color: var(--warm); }
 .scan-target:hover { color: var(--text2); }
+
+/* ═══ 视图：触手职业 ═══ */
+.console[data-view="prof"] { top: 20px; bottom: 20px; background: #070b12; }
+.console[data-view="prof"] .view-prof { display: block; overflow-y: auto; padding: 14px 18px 20px; }
+.prof-head { display: flex; flex-direction: column; gap: 3px; margin: 2px 0 12px; }
+.prof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.prof-card {
+  border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+  background: rgba(20, 28, 40, .66); display: flex; flex-direction: column; gap: 7px;
+}
+.prof-card.is-chief { border-color: rgba(255, 159, 28, .55); background: rgba(34, 26, 14, .6); }
+.prof-top { display: flex; align-items: baseline; gap: 8px; }
+.prof-title { font: 600 15px/1.2 var(--sans); color: var(--text); }
+.prof-chief-pill {
+  font: 600 9px/1 var(--mono); color: #151517; background: var(--warm);
+  padding: 3px 6px; border-radius: 999px;
+}
+.prof-count { margin-left: auto; font: 500 10px/1 var(--mono); color: var(--dim); }
+.prof-line { font: 400 11px/1.6 var(--sans); color: var(--text2); }
+.prof-kv { display: grid; grid-template-columns: 60px 1fr; gap: 2px 8px; font: 400 9.5px/1.55 var(--mono); color: var(--dim); }
+.prof-kv b { color: var(--warm); font-weight: 500; }
+.prof-caps { display: flex; flex-wrap: wrap; gap: 4px; }
+.prof-cap {
+  font: 500 8.5px/1 var(--mono); color: #9fb8d8; border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px 6px;
+}

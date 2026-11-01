@@ -141,6 +141,17 @@ def main() -> int:
     check("页面有覆盖率/死角 HUD", 'id="scan-coverage"' in html and 'id="scan-dead"' in html)
     check("可视化有漏扫计数", "scan3dMissed" in sjs)
     check("可视化有现场重扫", "async function rescan" in sjs and "/api/scan?target=" in sjs)
+    check("职业视图在页面里", 'data-view="prof"' in html and 'id="prof-grid"' in html)
+    check("职业生成器存在", (ROOT / "tools" / "gen-professions.py").is_file())
+    check("职业数据存在", (ROOT / "data" / "professions.json").is_file())
+    import json as _json2
+    _pj = _json2.loads((ROOT / "data" / "professions.json").read_text(encoding="utf-8"))
+    _profs = _pj.get("professions") or []
+    check("12 种职业", len(_profs) >= 12, str(len(_profs)))
+    check("编程是首席", any(p.get("chief") and p.get("title") == "编程工程师" for p in _profs))
+    check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))
+    _appj = (con / "app.js").read_text(encoding="utf-8")
+    check("职业有渲染函数", "renderProfessions" in _appj and "data-prof" in _appj)
     check("有拖动自检", "selfTestDrag" in sj and "space3dDrag" in sj)
     check("中心有她的头像", "avatarBall" in sj and "space3dAvatar" in sj)
     css3 = (con / "app.css").read_text(encoding="utf-8")
