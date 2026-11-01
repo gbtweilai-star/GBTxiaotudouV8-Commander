@@ -16236,3 +16236,7 @@
 {"ts": 1793564258.94, "iso": "2026-11-02T03:17:38", "event": "ok", "meta": {"kind": "body_see", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
 {"ts": 1793564259.064, "iso": "2026-11-02T03:17:39", "event": "call", "meta": {"kind": "body_say", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
 {"ts": 1793564259.526, "iso": "2026-11-02T03:17:39", "event": "ok", "meta": {"kind": "body_say", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564273.837, "iso": "2026-11-02T03:17:53", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 2}}
+{"ts": 1793564273.993, "iso": "2026-11-02T03:17:53", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793564290.325, "iso": "2026-11-02T03:18:10", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 2}}
+{"ts": 1793564329.242, "iso": "2026-11-02T03:18:49", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}

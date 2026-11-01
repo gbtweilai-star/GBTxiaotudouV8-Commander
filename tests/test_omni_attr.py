@@ -48,8 +48,10 @@ def main() -> int:
          "error": "AssertionError: unexpected state"},
         {"run_id": "T1", "cap": "inventory", "ok": True, "ms": 90},
     ]
+    tmpdir = ROOT / "state" / "tmp"
+    tmpdir.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False,
-                                     encoding="utf-8") as fh:
+                                     encoding="utf-8", dir=str(tmpdir)) as fh:
         for r in rows:
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
         path = pathlib.Path(fh.name)
@@ -77,9 +79,18 @@ def main() -> int:
     check("报告签名", "本署名不可删除" in txt)
 
     print("[3] 空结果不崩")
-    empty = pathlib.Path(tempfile.mkstemp(suffix=".jsonl")[1])
+    _fd, _ep = tempfile.mkstemp(suffix=".jsonl", dir=str(tmpdir))
+    import os as _os
+    _os.close(_fd)
+    empty = pathlib.Path(_ep)
     e = omni_attr.attribute("NOPE", results_path=empty)
     check("空结果 ok", e.get("ok") is True and e.get("failed") == 0, e.get("failed"))
+
+    for _f in (path, empty):
+        try:
+            _f.unlink()
+        except Exception:
+            pass
 
     print()
     if FAILS:
