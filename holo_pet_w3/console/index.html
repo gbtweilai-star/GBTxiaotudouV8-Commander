@@ -143,6 +143,7 @@
       <button class="view-tab" data-view="mind" type="button">思维导图</button>
       <button class="view-tab" data-view="scan" type="button">穿透扫描</button>
       <button class="view-tab" data-view="prof" type="button">职业</button>
+      <button class="view-tab" data-view="bounty" type="button">赏金</button>
       <button class="view-tab" data-view="dash" type="button">仪表盘</button>
     </nav>
 
@@ -302,6 +303,23 @@
         <span class="prof-route-result" id="dispatch-result"></span>
       </div>
       <div class="prof-grid" id="prof-grid"></div>
+    </div>
+
+    <!-- 视图 12：赏金工作台（授权范围 → 发现 → 报告 → 赔付） -->
+    <div class="view view-bounty">
+      <div class="bounty-head">
+        <span class="view-title">赏金工作台 · 只做授权范围</span>
+        <span class="view-sub" id="bounty-sub">项目 / 发现 / 报告 / 赔付（本模块不扫网络，扫描走安全能力位且必须过范围闸）</span>
+      </div>
+      <div class="bounty-strip" id="bounty-summary"></div>
+      <div class="bounty-gate">
+        <select id="bounty-program"></select>
+        <input id="bounty-target" type="text" placeholder="目标域名或 IP（例：example.com）" />
+        <button id="bounty-check" type="button">范围检查</button>
+        <button id="bounty-add-demo" type="button">录入示例发现</button>
+        <span id="bounty-gate-result"></span>
+      </div>
+      <div class="bounty-list" id="bounty-findings"></div>
     </div>
 
     <!-- 视图 4：仪表盘（可视化：域分布 / 门占比 / 守卫 / 电表 / 流水） -->

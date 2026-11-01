@@ -173,6 +173,13 @@ def main() -> int:
     _srv3 = (ROOT / "tools" / "console-server.py").read_text(encoding="utf-8")
     check("派单接口在服务端", "/api/dispatch" in _srv3 and "_api_dispatch" in _srv3)
     check("派单按钮在页面", 'id="dispatch-btn"' in html and "wireProfDispatch" in _appj2)
+    check("赏金视图在页面", 'data-view="bounty"' in html and 'id="bounty-gate"' not in html
+          and 'id="bounty-program"' in html)
+    check("赏金模块存在", (ROOT / "gbt_allinone" / "bounty.py").is_file())
+    _bounty_py = (ROOT / "gbt_allinone" / "bounty.py").read_text(encoding="utf-8")
+    check("赏金有授权闸", "authorization_ref" in _bounty_py and "拒绝建项" in _bounty_py)
+    check("赏金有范围闸", "def in_scope" in _bounty_py and "out_of_scope" in _bounty_py)
+    check("赏金证据 sha256", "_sha256" in _bounty_py and "evidence" in _bounty_py)
     check("有短视频/音乐/电影职业", {"短视频编导", "音乐制作", "影视 / 电影"} <= _titles,
           str(sorted(_titles))[:120])
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))

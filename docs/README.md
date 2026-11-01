@@ -233,3 +233,4 @@
 | 115 | [115-tentacle-professions.md](115-tentacle-professions.md) | 触手职业表：12 职业（编程首席）·真实能力位映射·#prof 视图 |
 | 116 | [116-profession-routing.md](116-profession-routing.md) | 职业路由：任务→职业→候选能力位（safe/gated 分栏，代码动词优先） |
 | 117 | [117-landing-closed-loop.md](117-landing-closed-loop.md) | 落地闭环：路由→派单→账本 + 全景清单（11 视图/385 位/21 职业/无死角/自启） |
+| 118 | [118-bounty-direction.md](118-bounty-direction.md) | 方向转向：安全研究/赏金工作台（授权闸/scope闸/报告/赔付账本 #bounty） |

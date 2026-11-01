@@ -103,6 +103,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_route(raw)
         if path == "/api/dispatch":
             return self._api_dispatch(raw)
+        if path == "/api/bounty":
+            return self._api_bounty(raw)
         if path == "/api/scan":
             from urllib.parse import parse_qs as _pq
             from urllib.parse import urlparse as _urlparse
@@ -262,6 +264,55 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
                           "application/json; charset=utf-8")
 
+    def _api_bounty(self, raw=b"{}"):
+        """赏金工作台：summary / check / add_finding / report / payout。"""
+        import json as _json
+        try:
+            d = _json.loads((raw or b"{}").decode("utf-8", "replace") or "{}")
+        except Exception:  # noqa: BLE001
+            d = {}
+        try:
+            sys.path.insert(0, str(REPO))
+            from gbt_allinone import bounty as B
+            op = str(d.get("op") or "summary")
+            if op == "summary":
+                out = B.summary()
+                out["programs_list"] = B.list_programs().get("programs") or []
+                out["findings_list"] = B.list_findings().get("findings") or []
+            elif op == "check":
+                out = B.check(str(d.get("program") or ""), str(d.get("target") or ""),
+                              str(d.get("action") or "read-only-recon"))
+            elif op == "add_finding":
+                out = B.add_finding(str(d.get("program") or ""), str(d.get("title") or ""),
+                                    str(d.get("severity") or "medium"), str(d.get("target") or ""),
+                                    cwe=str(d.get("cwe") or ""), cvss=str(d.get("cvss") or ""),
+                                    steps=str(d.get("steps") or ""),
+                                    impact=str(d.get("impact") or ""),
+                                    remediation=str(d.get("remediation") or ""),
+                                    evidence=[str(x) for x in (d.get("evidence") or [])])
+            elif op == "report":
+                out = B.report(str(d.get("finding") or ""))
+            elif op == "payout":
+                out = B.payout(str(d.get("program") or ""), str(d.get("finding") or ""),
+                               float(d.get("amount") or 0), str(d.get("currency") or "USD"),
+                               str(d.get("status") or "pending"), str(d.get("note") or ""))
+            elif op == "add_program":
+                out = B.add_program(str(d.get("name") or ""), [str(x) for x in (d.get("scope") or [])],
+                                    [str(x) for x in (d.get("out_of_scope") or [])],
+                                    platform=str(d.get("platform") or ""),
+                                    url=str(d.get("url") or ""),
+                                    authorization_ref=str(d.get("authorization_ref") or ""),
+                                    reward_range=str(d.get("reward_range") or ""),
+                                    rules=str(d.get("rules") or ""))
+            else:
+                out = {"ok": False, "error": "unknown op"}
+        except Exception as e:  # noqa: BLE001
+            return self._send(500, _json.dumps({"ok": False, "error": str(e)[:200]},
+                                               ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
+
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""
         import json as _json
@@ -330,6 +381,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_route(raw)
         if path == "/api/dispatch":
             return self._api_dispatch(raw)
+        if path == "/api/bounty":
+            return self._api_bounty(raw)
         if path == "/api/chat":
             text = str(body.get("text") or "").strip()
             if not text:

@@ -639,6 +639,150 @@
     });
   }
 
+  /* ───────── 赏金工作台（授权 → 发现 → 报告 → 赔付账本） ───────── */
+  var BOUNTY = null;
+  function bountyApi(op, extra) {
+    var body = Object.assign({ op: op }, extra || {});
+    return fetch("/api/bounty", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (r) { return r.json(); });
+  }
+  function renderBounty(d) {
+    var strip = $("bounty-summary");
+    if (!strip) return;
+    strip.innerHTML = "";
+    function kpi(label, val) {
+      var el = document.createElement("div");
+      el.className = "bounty-kpi";
+      var b = document.createElement("b");
+      b.textContent = String(val);
+      el.appendChild(b);
+      el.appendChild(document.createTextNode(" " + label));
+      strip.appendChild(el);
+    }
+    kpi("授权项目", d.programs || 0);
+    kpi("已记录发现", d.findings || 0);
+    var by = d.by_severity || {};
+    kpi("critical", by.critical || 0);
+    kpi("high", by.high || 0);
+    kpi("medium", by.medium || 0);
+    var pay = d.payout_total || {};
+    var keys = Object.keys(pay);
+    if (!keys.length) kpi("赔付账本", "0");
+    keys.forEach(function (c) { kpi("赔付 " + c, pay[c]); });
+
+    var sel = $("bounty-program");
+    if (sel) {
+      sel.innerHTML = "";
+      (d.programs_list || []).forEach(function (p) {
+        var o = document.createElement("option");
+        o.value = p.id;
+        o.textContent = p.name + " (" + (p.platform || "自有") + ")";
+        sel.appendChild(o);
+      });
+      if (!(d.programs_list || []).length) {
+        var o2 = document.createElement("option");
+        o2.value = "";
+        o2.textContent = "还没有授权项目（点右侧按钮建自有靶场）";
+        sel.appendChild(o2);
+      }
+    }
+
+    var box = $("bounty-findings");
+    if (box) {
+      box.innerHTML = "";
+      (d.findings_list || []).forEach(function (f) {
+        var card = document.createElement("div");
+        card.className = "bounty-finding";
+        var ti = document.createElement("div");
+        ti.className = "bf-title";
+        ti.textContent = f.title;
+        card.appendChild(ti);
+        var sev = document.createElement("span");
+        sev.className = "sev sev-" + (f.severity || "info");
+        sev.textContent = "[" + (f.severity || "info").toUpperCase() + "] ";
+        card.appendChild(sev);
+        card.appendChild(document.createTextNode(
+          f.target + " · " + (f.cwe || "-") + " · " + (f.cvss || "-")
+          + " · 证据 " + ((f.evidence || []).length) + " 个"));
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "scan-target";
+        btn.textContent = "生成报告";
+        btn.style.marginLeft = "8px";
+        btn.addEventListener("click", function () {
+          bountyApi("report", { finding: f.id }).then(function (r) {
+            var el = $("bounty-gate-result");
+            if (el) {
+              el.className = r.ok ? "ok" : "blocked";
+              el.textContent = r.ok ? ("报告已生成：" + r.report + " · sha256 " + (r.sha256 || "").slice(0, 12))
+                : ("生成失败：" + (r.reason || "")); 
+            }
+          });
+        });
+        card.appendChild(btn);
+        box.appendChild(card);
+      });
+    }
+    document.documentElement.dataset.bounty =
+      "ok:" + (d.programs || 0) + "项目:" + (d.findings || 0) + "发现";
+  }
+  function ensureBounty() {
+    if (BOUNTY) { renderBounty(BOUNTY); }
+    return bountyApi("summary").then(function (d) {
+      BOUNTY = d;
+      renderBounty(d);
+      return d;
+    }).catch(function (e) {
+      document.documentElement.dataset.bounty = "error:" + String((e && e.message) || e).slice(0, 80);
+      return null;
+    });
+  }
+  function wireBounty() {
+    var checkBtn = $("bounty-check");
+    var demoBtn = $("bounty-add-demo");
+    if (!checkBtn) return;
+    checkBtn.addEventListener("click", function () {
+      var prog = ($("bounty-program") || {}).value || "";
+      var target = (($("bounty-target") || {}).value || "").trim();
+      var out = $("bounty-gate-result");
+      if (!target) { if (out) out.textContent = "先填目标"; return; }
+      bountyApi("check", { program: prog, target: target }).then(function (d) {
+        if (!out) return;
+        if (d.ok) {
+          out.className = "ok";
+          out.textContent = "允许：" + target + " 在授权范围（" + (d.authorization_ref || "") + "）";
+          document.documentElement.dataset.scopeCheck = "allowed";
+        } else {
+          out.className = "blocked";
+          out.textContent = "拒绝：" + (d.reason || "不在授权范围");
+          document.documentElement.dataset.scopeCheck = "blocked";
+        }
+      });
+    });
+    if (demoBtn) {
+      demoBtn.addEventListener("click", function () {
+        var prog = ($("bounty-program") || {}).value || "";
+        var target = (($("bounty-target") || {}).value || "127.0.0.1").trim();
+        bountyApi("add_finding", {
+          program: prog, title: "示例发现（自有靶场）", severity: "medium",
+          target: target, cwe: "CWE-000", cvss: "0.0",
+          steps: "1) 自建靶场 2) 只读验证 3) 记录证据", impact: "演示用",
+          remediation: "演示用",
+        }).then(function (d) {
+          var out = $("bounty-gate-result");
+          if (out) {
+            out.className = d.ok ? "ok" : "blocked";
+            out.textContent = d.ok ? ("已录入：" + d.finding.id) : ("拒绝：" + (d.reason || ""));
+          }
+          ensureBounty();
+        });
+      });
+    }
+  }
+
   /* ───────── 3D 视图按需加载（动态 import，file:// 下会失败→走兜底提示） ───────── */
   var SPACE_P = null;
   function ensure3d() {
@@ -719,7 +863,7 @@
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "dash"];
+    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "bounty", "dash"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
@@ -740,6 +884,10 @@
     }
     if (name === "scan") {
       ensureScan().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+    }
+    if (name === "bounty") {
+      wireBounty();
+      ensureBounty();
     }
     if (name === "space") {
       ensure3d().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
