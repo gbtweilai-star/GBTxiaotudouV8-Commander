@@ -259,12 +259,14 @@
       <div class="scan-wrap">
         <canvas id="scan3d-canvas"></canvas>
         <div class="scan-hud">
-          <span>扫过 <b id="scan-swept">0</b>/385</span>
+          <span>目标 <b id="scan-target">—</b></span>
+          <span>扫过 <b id="scan-swept">0</b>/<span id="scan-total">0</span></span>
           <span>疑点 <b id="scan-doubt">0</b></span>
           <span>反思 <b id="scan-refl">0</b></span>
           <span>穿透 <b id="scan-pen">0</b></span>
           <span class="scan-state" id="scan-state">扫描中</span>
         </div>
+        <div class="scan-targets" id="scan-targets" aria-label="扫描目标（真实扫描结果）"></div>
         <div class="scan-senses" aria-label="五感覆盖（真实能力位）">
           <div class="scan-sense" data-sense="eye">
             <b>眼睛</b><span>视觉全谱 · 不止 OCR</span>

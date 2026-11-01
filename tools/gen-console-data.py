@@ -116,6 +116,17 @@ def build() -> dict:
             flow.append({"at": r.get("at"), "action": r.get("action"),
                          "target": r.get("target"), "result": r.get("result")})
 
+    # 真实穿透扫描数据（tools/export-scan-data.py 产出；给"穿透扫描"视图用）
+    scan = None
+    scan_path = REPO / "state" / "scan-data.json"
+    if scan_path.is_file():
+        try:
+            scan = _json.loads(scan_path.read_text(encoding="utf-8"))
+            for sc in (scan.get("scans") or []):
+                sc["unit_details"] = (sc.get("unit_details") or [])[:2000]
+        except Exception:  # noqa: BLE001
+            scan = None
+
     # 最近实际调用（给 3D 触手点亮）：读 store/audit.jsonl 尾部，按事件(=能力位)计数
     pulse = []
     audit_path = REPO / "gbt_allinone" / "store" / "audit.jsonl"
@@ -153,6 +164,7 @@ def build() -> dict:
                    "legacy": _cap("legacy_guard", {"op": "status"}).get("verdict")},
         "domains": all_domains, "domains_top": domains,
         "pulse": pulse, "pulse_total": sum(x["n"] for x in pulse),
+        "scan": scan,
         "flow": flow,
         "ledger": [{"at": r.get("at"), "action": r.get("action"),
                     "target": r.get("target"), "result": (r.get("result") or "")[:60]}

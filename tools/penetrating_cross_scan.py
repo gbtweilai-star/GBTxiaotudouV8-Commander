@@ -339,10 +339,20 @@ def _report(target: str, units: list, verdicts: dict, missing: list, mode: str) 
     cov = round(1.0 - len(missing) / max(1, len(units)), 4)
     agree = sum(1 for v in verdicts.values() if v["status"] == "agree")
     arb = sum(1 for v in verdicts.values() if v["status"] == "arbitrated")
+    # 🔴 2026-11-01：补 per-unit 明细（给穿透扫描可视化用）。
+    #    原来只回聚合数（units/hooked/agree），可视化只能画"假点"；
+    #    现在每个 unit 的 status 原样带出（agree / arbitrated / unhooked），一个不造。
+    details = []
+    for u in units[:4000]:
+        v = verdicts.get(u) or {}
+        details.append({"unit": str(u), "status": v.get("status") or "unknown",
+                        "detail": str(v.get("detail") or "")[:80]})
     return {"ok": not missing, "mode": mode, "target": target,
             "units": len(units), "hooked": len(units) - len(missing),
             "coverage": cov, "agree": agree, "arbitrated": arb,
             "missing": missing[:30],
+            "unit_details": details,
+            "unit_details_truncated": len(units) > 4000,
             "red_lines": ["钩子未触发=失败", "步骤锁生效", "交叉验证≥2路", "遗漏必须补扫", "全程留痕"],
             "trace": str(TRACE), "source_kind": "cross_scan",
             "口径": "覆盖率=已钩住/总数；missing 非空 ⇒ 不许念成通过"}

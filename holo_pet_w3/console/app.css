@@ -601,3 +601,12 @@ body.graph-on .grid-overlay { display: block; }
 .space3d-wrap { cursor: grab; }
 .space3d-wrap:active { cursor: grabbing; }
 .space3d-wrap canvas { touch-action: none; }
+/* 扫描目标切换（真实扫描结果） */
+.scan-targets { position: absolute; right: 18px; top: 14px; z-index: 2; display: flex; gap: 6px; }
+.scan-target {
+  padding: 5px 9px; border-radius: 8px; cursor: pointer;
+  background: rgba(10, 16, 26, .78); border: 1px solid var(--line);
+  color: var(--dim); font: 500 9.5px/1 var(--mono);
+}
+.scan-target.is-active { border-color: rgba(255, 159, 28, .6); color: var(--warm); }
+.scan-target:hover { color: var(--text2); }

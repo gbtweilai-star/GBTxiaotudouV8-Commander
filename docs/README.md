@@ -228,3 +228,4 @@
 | 110 | [110-team-collab-and-mindmap.md](110-team-collab-and-mindmap.md) | 触手协作（8角色×16协作链）+ 思维导图任务指引（6支×18叶） |
 | 111 | [111-team-pulse-effect.md](111-team-pulse-effect.md) | 触手协作脉冲特效：冲击波环/拖尾/核心闪光 + 真实事件映射 |
 | 112 | [112-penetrating-cross-scan.md](112-penetrating-cross-scan.md) | 穿透式交叉扫描：385 节点/85 疑点 + 五感过程 + 视觉全谱（不止 OCR） |
+| 113 | [113-real-scan-data.md](113-real-scan-data.md) | 穿透扫描接真跑结果：unit_details 驱动（agree/arbitrated/unhooked）+ 三目标切换 |
