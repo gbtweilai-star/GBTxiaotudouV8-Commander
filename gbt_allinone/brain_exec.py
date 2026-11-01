@@ -163,9 +163,14 @@ def route(intent: str) -> dict:
     if isinstance(main, dict) and main.get("path") == "semantic" and main.get("ok"):
         method = main.get("method")
         out.update({"path": "semantic", "degraded": False,
+                    # 2026-10-31：主路的**车道**要能看出来 —— commander_local_weights = 本机权重，
+                    # 不是云端。降级链读的人得知道这次是「她自己的脑子」还是「外部通道」。
+                    "lane": main.get("lane") or "cloud_llm",
                     "semantic": {"method": method, "confidence": main.get("confidence"),
                                  "reason": main.get("reason"),
                                  "provider": main.get("provider"),
+                                 "lane": main.get("lane"),
+                                 "model": main.get("model"),
                                  "second_opinion": main.get("heuristic_second_opinion")}})
         if method and str(method) in BENIGN_CAPS:
             info = BENIGN_CAPS[str(method)]
@@ -492,6 +497,22 @@ def health() -> dict:
 
 
 # ── 维度五：unify（五维合一总入口）──
+
+@_spanned
+def energy() -> dict:
+    """能源核心读数：本机权重是**唯一一块电池**，五维都从它取电。
+
+    主人 2026-11-01：「把本地算力比喻成能源核心，把能源核心放到大脑执行层为大脑提供
+    源源不断的能源」—— 所以它是执行层的一个维，不是外挂服务。
+    """
+    from . import energy_core as EC
+    st = EC.status()
+    m = EC.meter(limit=50)
+    return {"ok": st.get("ok"), "core": st.get("core"), "busy": st.get("busy"),
+            "power_tok_s": m.get("power_tok_s"), "avg_ms": m.get("avg_ms"),
+            "calls": m.get("calls"), "waited_s_total": m.get("waited_s_total"),
+            "note": "一块电池供五维；排队与功率都在电表里"}
+
 
 @_spanned
 def unify(goal: str, payload: dict = None, expectation: str = "") -> dict:

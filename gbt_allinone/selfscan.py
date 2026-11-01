@@ -378,6 +378,27 @@ def check_audit(last=500):
             "ok": runtime == 0}
 
 
+def _socket_alerts() -> dict:
+    """插口变化（2026-11-01）：万能插扫出来的洞变了（拔掉/断线）也是异常，必须进声带。
+
+    口径：只读 state/omni_open.json 的 diff（它由 omni_open.scan 落盘），
+    不在这里重扫（重扫 25s，声带要秒回）。拔掉或通断翻转 ⇒ alert。
+    """
+    try:
+        from .tentacle import omni_open as _OO
+        snap = _OO._load()
+        d = snap.get("diff") or {}
+        if not d or d.get("first_scan"):
+            return {"alert": False, "note": "还没有第二轮的插口快照（首扫不算漂移）"}
+        return {"alert": bool(d.get("alert")), "counts": d.get("counts"),
+                "removed": (d.get("removed") or [])[:5],
+                "flipped": (d.get("flipped") or [])[:5],
+                "at": snap.get("at"),
+                "how": "omni_open op=diff 看全量；op=scan 立刻重扫"}
+    except Exception as e:                                    # noqa: BLE001
+        return {"alert": False, "error": "%s: %s" % (type(e).__name__, str(e)[:120])}
+
+
 def alerts(last=500):
     """声带：近期异常摘要 + 根源线索（分级版）。
 
@@ -390,9 +411,17 @@ def alerts(last=500):
     并把「quiet 到底代表什么」在 `quiet_means` 与 `note` 里写死。
     """
     a = check_audit(last)
+    _sk = _socket_alerts()
     if a["anomalies"] == 0:
+        if _sk.get("alert"):
+            return {"quiet": False,
+                    "quiet_means": "审计窗口内无异常，但**插口变了**（拔掉/断线）⇒ 仍需人看",
+                    "any_signal": True, "needs_a_look": True, "anomalies": 0,
+                    "sockets": _sk,
+                    "note": "插口变化来自 omni_open 的增量对比（拔掉/翻转会 alert）"}
         return {"quiet": True, "quiet_means": "窗口内确实什么都没有",
                 "any_signal": False, "needs_a_look": False, "anomalies": 0,
+                "sockets": _sk,
                 "note": "窗口期内无异常事件"}
     top = sorted(a["errors_by_kind"].items(),
                  key=lambda x: -(int(x[1].get("runtime", 0) or 0) * 100
@@ -416,7 +445,7 @@ def alerts(last=500):
     for _k, _v in (a.get("errors_by_kind") or {}).items():
         (_reg_hits if _k in _names else _stray)[_k] = _v
     _guard = int((a.get("by_signal") or {}).get("guard", 0) or 0)
-    _look = bool(runtime_faults or _guard or _reg_hits)
+    _look = bool(runtime_faults or _guard or _reg_hits or _sk.get("alert"))
     return {"quiet": runtime_faults == 0,
             "quiet_means": ("窗口内没有**现行故障**（runtime_faults=0）；"
                             "但异常事件数不为 0 ⇒ 仍需人逐条看一眼"),
@@ -424,6 +453,7 @@ def alerts(last=500):
             "needs_a_look": _look,
             "needs_a_look_means": ("真故障(runtime/guard) 或 在册能力位异常 ⇒ True；"
                                    "只有不在册名字上的测试足迹 ⇒ False"),
+            "sockets": _sk,
             "registered_anomalies": len(_reg_hits),
             "unregistered_footprints": sorted(_stray)[:8],
             "anomalies": a["anomalies"],

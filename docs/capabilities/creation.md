@@ -1,4 +1,4 @@
-# 创作 · `creation`（54 位）
+# 创作 · `creation`（57 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -12,7 +12,7 @@
 | `bits_kit` | 只读 | — | —（注册表：无必填） | `user_error` | **动效组件图鉴的口**（人话 → react-bits 哪个组件 · 干什么 · **源码在哪 · 会不会联网 · 依赖什么**）。素材：`DavidHDev/react-bits`（**MIT + Commons Clause v1.0** · ★49005 · 216 组件… |
 | `blender` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 三维电影引擎（Blender 4.2.16 LTS·本机）：Cycles 电影级光追/EEVEE 实时/几何节点/VSE 剪辑/bpy 全脚本自动化；3D 场景（义庄/血月/墨线阵）、摄影机动画、GPU 渲染；status 免门，一切 run（渲染/脚本/导出）过 filesys… |
 | `brand_outro` | 只读 | — | —（注册表：无必填） | `user_error` | 品牌片尾只读渲染：署名/自述/致谢三层 + 四条红线（署名不造假·致谢不套话·承诺可追溯·观众不当流量） |
-| `cad_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）… |
+| `cad_distill` | 只读 | — | —（注册表：无必填） | `user_error` | 【蒸馏·CAD 件】**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM… |
 | `cadgen` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **本机 CAD 链的口**（2026-10-13 建位）：只调真件 `cadgen`，不手搓几何。常用说法（人这么问就命得中）：建模 / 零件 / 三维 / 模型渲染 / 渲染 / 出图 / 看图 / 看件 / 工程图 / 导出 STEP / STL / 3MF / GLB /… |
 | `code_art` | 只读 | — | —（注册表：无必填） | `user_error` | 代码艺术内核（只读骨架）：INDEX/SEED/CANVAS/LAYER/EXPORT 五原语；无种子不许导出 |
 | `comfy_cloud` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | **云卡 ComfyUI 触手**（主人令 2026-10-13「她不需要 ComfyUI，直接使用触手就可以生产出高质量视频」）：把云卡上的 ComfyUI **包成她自己的器官**——她不用知道 ComfyUI 是什么。本机到 8188 没路（实测代理 404），所以所有调用… |
@@ -30,6 +30,7 @@
 | `diagram_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **蒸馏件**（不是外挂）：把吞入件 wheresryan22/anatomy（MIT · 7551★ · 零依赖 Node）的 **craft 取法**提炼成我们自己的**概念物化图判据**：①概念物化（先把抽象概念发明成一个「它怎么转就是这个概念」的物理机构）②单一数源（图上… |
 | `dl_forge` | 只读 | — | —（注册表：无必填） | `user_error` | 3D 锻造融合位（只读骨架）：**秋叶节点 × 原生触手 × 专业标尺 三合一**。主人令「把学到的跟秋叶版的哪些节点以及契约，和我们的原生触手融合，实现原生能力也能做出高级作品和 3D 建模，都要达到专业水准」。**八段链**：①形象进件(控图预处理) ②图生3D ③网格(体素… |
 | `drama` | 只读 | — | —（注册表：无必填） | `user_error` | 剧本转分镜/拆分镜/分镜/短剧/故事板/剧本理解：剧本 → 结构化镜头表（景别·运镜·时长·情绪·角色位置·描述），字段齐全度与时长和逐条如实报；确定性路径离线只做切分，语义路径走她的模型通道，两条不互相冒充 |
+| `drama_forge` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 短剧产线（2026-11-01）：剧本（0s–4s 时间码）→ 分镜（复用 drama 链头）→ 本地 SAPI 旁白 + 同源 SRT 字幕 → ffmpeg 竖屏 1080×1920 成片（H.264/AAC/软字幕）；给 assets_dir 用自有图，没给就渲染**分镜卡… |
 | `emotion_projection` | 只读 | — | —（注册表：无必填） | `user_error` | 情感投射只读骨架：叙事四问 → 投射细节 → 四项校验；『身临其境』只有人能判 |
 | `filmkit` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 柔性影片产线（清单制·任意场/镜增删重制·主人令 2026-09-26）：manifest.json 为唯一真相（场=音频+3镜prompt，镜=图+运镜）；list/gen/seg/build/add/rm 六命令；产出自动绑触手（asset_bindings 台账）；跳过/指… |
 | `flow_canvas` | 只读 | — | —（注册表：无必填） | `user_error` | 工作流画布（蒸馏自 2026-09-28 主人给的周榜卡 Langflow 155.3k★，只取**可视化架构**，不引拖拽编辑器）：工作流定义 → 图（nodes/edges，数据只走引擎正规出口 `engine.list_workflows()`，R-H99b，不偷读 sto… |
@@ -53,10 +54,12 @@
 | `scene_anchor` | 只读 | — | —（注册表：无必填） | `user_error` | 场景锚定只读骨架：8 大类场景 + 灵魂四要素 + 钩子锚场景不锚情绪（作品是为场景做的） |
 | `shot_director` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **镜头导演**（主人令 2026-10-16：把 **Seedance 2.0 Skill OS** 蒸进来）：蒸自 **Emily2040/seedance-2.0**（**MIT** · v6.7.0）的思想—— 视频模型 = **一个从没见过你的剧组**（不能提问 · 按… |
 | `showcase_ops` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **作品解剖与展示**（主人令 2026-10-16：让每一次的作品都能完美的展示能力）：蒸自 **wheresryan22/anatomy**（MIT · 13,459 星 · agent-skill）的**思路与架构**—— 「**用一个真会动的实物来讲解一个概念**」：概念… |
+| `taste_guard` | 只读 | — | —（注册表：无必填） | `user_error` | 反 AI 烂大街设计闸（2026-11-01 蒸馏 Leonxlnx/taste-skill · MIT · 只蒸规则未搬代码）：把上游 house rules 钉成可离线数的 18 条：渐变/玻璃/阴影/眉标/等宽/编号/图标卡阵/emoji/紫靛助手色/lorem/无 h1/… |
 | `tentacle_comfy_bridge` | 只读 | — | —（注册表：无必填） | `user_error` | **第 1530 根触手 · ComfyUI 桥**（主人令 2026-10-11「ComfyUI 不是生图工具，是第 1530 根触手的底座」）：把外部 ComfyUI 当**贴图工厂／概念工厂**用，并**双向绑定** —— ① 工作流 = 契约（`state/comfy_w… |
 | `tripo` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | Tripo3D 三维生成（文/图→3D 模型 + 自动绑骨 + 动作库）：status/balance/text_to_model/image_to_model/multiview_to_model/upload_file/rig_check/rig/animate/wait_t… |
 | `ui_kit` | 只读 | — | —（注册表：无必填） | `user_error` | **UI 组件库的口**（吞天吞来的素材 → 可检索 · 可取件 · 读数如实）。素材：`uiverse-io/galaxy`（**MIT** · ★13478 · 3802 件 · 11 类目）落 `_upstream/galaxy`。常用说法：UI 组件 / 按钮 / 卡片… |
 | `ui_render` | 只读 | — | —（注册表：无必填） | `user_error` | 受控界面渲染（json-render #09 蒸馏）：模型只产 spec，组件必须命中白名单；未知组件/未列动作/脚本/外链一律拒 ⇒ 先 check 再 render；产物自包含零脚本零外链；指标必须带 src（没带的照渲但标红）。op=spec/check/render/wh… |
+| `viral_forge` | 只读 | — | —（注册表：无必填） | `user_error` | 爆款拆解·克隆配方（2026-11-01 吸收 hypit-ai/hypit 设计，未复制其代码）：字幕/逐句稿 → ①爆款拆解（时长/语速/黄金 3 秒钩子/钩子类型/每 5 秒节奏/段落角色/CTA）②词锚克隆配方 viral_clone_v1（场景表/变体槽位/N 条模板钩… |
 | `zimage_rewash` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 洗图流水线（看图→反推提示词→重绘→放大）：**放大环已可用**（ffmpeg lanczos+unsharp，零依赖）；反推环**已接线**（2026-10-15 起 zimage_rewash_cap 走 vision 通道；2026-10-16 增形式化反推件 tools/… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
@@ -160,7 +163,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）的**挂载取法**提炼成我们自己的判据：①挂真内核不另起（addon 装在 FreeCAD 里面 + 只连在跑的那个 RPC server）②脚本即接口（run Python scripts，不把动作硬编码成几百条命令）③改前先读回（inspect documents，同铁律1先看再动）④工程结论必须算（run FEM analyses，同 machine_distill ①）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：改 claude_desktop_config.json + 起 RPC 服务不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 cadgen；本位只蒸取法，**不建平行位**。op=method/source/provenance/where
+- **它做什么**：【蒸馏·CAD 件】**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）的**挂载取法**提炼成我们自己的判据：①挂真内核不另起（addon 装在 FreeCAD 里面 + 只连在跑的那个 RPC server）②脚本即接口（run Python scripts，不把动作硬编码成几百条命令）③改前先读回（inspect documents，同铁律1先看再动）④工程结论必须算（run FEM analyses，同 machine_distill ①）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：改 claude_desktop_config.json + 起 RPC 服务不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 cadgen；本位只蒸取法，**不建平行位**。op=method/source/provenance/where
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap cad_distill '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -349,6 +352,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：剧本转分镜/拆分镜/分镜/短剧/故事板/剧本理解：剧本 → 结构化镜头表（景别·运镜·时长·情绪·角色位置·描述），字段齐全度与时长和逐条如实报；确定性路径离线只做切分，语义路径走她的模型通道，两条不互相冒充
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap drama '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `drama_forge`
+
+- **域**：`creation`（创作）
+- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **它做什么**：短剧产线（2026-11-01）：剧本（0s–4s 时间码）→ 分镜（复用 drama 链头）→ 本地 SAPI 旁白 + 同源 SRT 字幕 → ffmpeg 竖屏 1080×1920 成片（H.264/AAC/软字幕）；给 assets_dir 用自有图，没给就渲染**分镜卡 animatic**（明标，不冒充 AI 成片）；ffprobe 六条硬指标逐条判。op=status/storyboard/make/verify/where。边界：不生成 AI 画面/视频、不下载/不复制/不发布；TTS 离线本地；动作用例见 docs/77
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap drama_forge '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `emotion_projection`
@@ -604,6 +618,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap showcase_ops '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `taste_guard`
+
+- **域**：`creation`（创作）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：反 AI 烂大街设计闸（2026-11-01 蒸馏 Leonxlnx/taste-skill · MIT · 只蒸规则未搬代码）：把上游 house rules 钉成可离线数的 18 条：渐变/玻璃/阴影/眉标/等宽/编号/图标卡阵/emoji/紫靛助手色/lorem/无 h1/真图不足/字体过多/动效不足；op=status/rules/audit/brief/where。FAIL/WARN 分开、分数可复核；诚实标注 not_implemented（Chrome 三宽度 inspector）与 not_checked（留白/边距/构图）。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap taste_guard '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `tentacle_comfy_bridge`
 
 - **域**：`creation`（创作）
@@ -648,6 +673,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap ui_render '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `viral_forge`
+
+- **域**：`creation`（创作）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：爆款拆解·克隆配方（2026-11-01 吸收 hypit-ai/hypit 设计，未复制其代码）：字幕/逐句稿 → ①爆款拆解（时长/语速/黄金 3 秒钩子/钩子类型/每 5 秒节奏/段落角色/CTA）②词锚克隆配方 viral_clone_v1（场景表/变体槽位/N 条模板钩子，可交 edit_pipeline）③可选 ffmpeg 视频帧分析（场景切分/镜头时长/每分钟切点/关键帧/亮度饱和度/音量；可导关键帧缩略图+首帧封面到 outputs/viral-forge/；切点自动对齐字幕段落）+ ④pipeline 一条调用串起 analyze→teardown→recipe；⑤inbox/batch 目录投放自动拆解（报告落 outputs/viral-forge/reports/，已拆台账 state/viral_forge_done.json；缺 ffmpeg/ffprobe 如实 needs_dependency；本仓优先找 vendor/ffmpeg/bin 或 GBT_FFMPEG/GBT_FFPROBE）。**不是**：不下载/不复制原视频、不自动发布、不调模型生成；"克隆"=结构复刻，素材必须自有或已授权（红线写进 recipe.guardrails）。op=status/teardown/blueprint/where
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap viral_forge '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `zimage_rewash`
 
 - **域**：`creation`（创作）
@@ -662,3 +698,7 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

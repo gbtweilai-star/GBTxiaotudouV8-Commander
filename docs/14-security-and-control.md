@@ -128,3 +128,7 @@ py -3.14 -X utf8 tools/codex-scripts/five-dim.py cap sec_defenses
 py -3.14 -X utf8 tools/codex-scripts/five-dim.py cap auth_gate_status
 py -3.14 -X utf8 -m unittest discover -s tests -q
 ```
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

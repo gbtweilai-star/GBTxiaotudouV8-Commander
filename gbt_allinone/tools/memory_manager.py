@@ -102,7 +102,7 @@ def _sources() -> list:
     out = []
     for pat, t in (("memory/*.md", "记忆"), ("docs/*.md", "文档"),
                    ("skills/*/SKILL.md", "技能"), ("state/*.jsonl", "状态"),
-                   ("state/*.json", "状态")):
+                   ("state/*.json", "状态"), ("state/experience_forge/*.jsonl", "状态")):
         for f in glob.glob(str(_ROOT / pat)):
             out.append((t, Path(f)))
     for f in glob.glob(str(_AGENTS / "*.md")):

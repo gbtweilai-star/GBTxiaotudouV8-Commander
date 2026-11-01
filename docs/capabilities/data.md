@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | `account_registry` | 只读 | — | —（注册表：无必填） | `user_error` | AI 账号登记表只读校验：一人一号（不共用账号/不共用凭证/只记路径/不许无主账号） |
 | `audit_query` | 只读 | — | —（注册表：无必填） | `user_error` | 查审计账本（只读）：`event` 可选，按事件名过滤；回 `total` 与最近 10 条 `sample`。它是「无痕即不存在」这条公理的读口 —— 能力有没有真跑、门有没有真拦，都从这里取证。作用域 `audit_read`（读审计历史本身也要票）。 |
-| `bi_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即… |
+| `bi_distill` | 只读 | — | —（注册表：无必填） | `user_error` | 【蒸馏·BI 件】**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+… |
 | `chart_html` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **数据 → 自包含交互 ECharts HTML**（蒸馏自 skills.sh smart-charts，只蒸思想不搬代码；2026-10-17）：CSV/TSV/JSON/XLSX → 单文件 HTML（ECharts 内联，零外链、离线可开）；自动推题型（bar/line… |
 | `count_words` | 只读 | — | —（注册表：无必填） | `user_error` | 数词数：吃 `text`，回 `words`（按空白切分）与 `chars`（字符数，含中文）。只读、零作用域；用于产出字数核对（比如「这段旁白是不是 300 字」）。 |
 | `datakit` | 只读 | — | —（注册表：无必填） | `user_error` | 本地数据工具（**只读**）：html→markdown · html→表格结构 · xlsx 字节→JSON · JSON 美化/排序 · 多段 CSV 合并（`op` 分派，见 `tools/datakit.py` 的 OPS）。🔴 **结果从返回里给、不落盘** ⇒ 作用域… |
@@ -52,7 +52,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即建模（先把数据做成可拖拽的字段模型，再谈图）②连接面如实列（「支持 X」= 真连得上；OLTP/OLAP/数仓/文件/API 五类照实登记，连不上如实说）③可分享是产品属性（分析产物必须能交出去，不留在自己盘里）④🔴**许可红线 GPL-3.0：只引用不复制**（复用其实现要先过 GPL）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：离线安装包/install.sh 不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 genoffice/datakit/record_grid；本位只蒸取法，**不建平行位**。op=method/source/provenance/where
+- **它做什么**：【蒸馏·BI 件】**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即建模（先把数据做成可拖拽的字段模型，再谈图）②连接面如实列（「支持 X」= 真连得上；OLTP/OLAP/数仓/文件/API 五类照实登记，连不上如实说）③可分享是产品属性（分析产物必须能交出去，不留在自己盘里）④🔴**许可红线 GPL-3.0：只引用不复制**（复用其实现要先过 GPL）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：离线安装包/install.sh 不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 genoffice/datakit/record_grid；本位只蒸取法，**不建平行位**。op=method/source/provenance/where
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap bi_distill '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -158,3 +158,7 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

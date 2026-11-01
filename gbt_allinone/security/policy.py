@@ -42,6 +42,8 @@ _READ_ONLY_TENTACLE = {
     "", "status", "eye", "see", "vision_snapshot", "screen_size", "screenshot_diff",
     "read_text", "list_windows", "process_list", "see_active_window", "window_list",
     "window_info", "active_window", "monitor", "detect", "ocr", "manifest",
+    # 2026-10-31：op=plan 只出判决不动手；caps 只报名单
+    "plan", "caps", "capabilities",
 }
 
 _READ_ONLY_DC_TOOLS = {
@@ -205,8 +207,10 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     HUMAN_GATES = {
         # ── 主人 2026-10-19 正表（真源：guardrail-check.py 文件头 2026-10-10 主人令）──
         # G1 黑客全能力
-        "process_execute", "remote_device", "network_private", "browser_control",
-        "desktop_control", "device_control", "privacy_read",
+        # 2026-11-01 主人令：「除了她使用危险能力和转账能力需要票，其他一切都要以设备算力
+        # 推理分析来做决策」⇒ 移出人工门：network_private / browser_control / desktop_control /
+        # device_control / audio_output（这些是"身体"，不是"攻击面"）。
+        "process_execute", "remote_device", "privacy_read",
         # 2026-10-21 补（主人当场批准）：本表原写 `network_private`，而 `osint_scan` 分支
         # add 的是 `osint_private` —— 两个名字都在作用域表里，但 add() 只认白名单里的名字，
         # 于是内网扫描那道护栏**被静默放行**（实测：target=127.0.0.1 直接 ok）。
@@ -251,6 +255,15 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             add("desktop_control")         # 代替人操作前台（G1）
         else:
             add("audio_output")            # 出声 / 改音量
+    # 触手主干 · 原生指挥官（2026-11-01）：route/ask/status 本地只读零作用域；
+    # 只有起停本机引擎收 process_execute。
+    if kind == "commander":
+        if op in ("start", "stop"):
+            add("process_execute")
+    # 四合一原生位：status/verify/plan/route 只读；起停与"代唤醒"才收 process_execute
+    if kind == "pulse_core":
+        if op in ("wake", "stop") or (op == "route" and bool(p.get("wake"))):
+            add("process_execute")
     if kind == "record_grid":
         if op not in ("", "parse", "read", "preview", "status"):
             add("filesystem_write")
@@ -1108,6 +1121,34 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             add("process_execute", "filesystem_write")
         else:
             add("process_execute", "data_export", "filesystem_write")
+
+    # 2026-11-01 主人令：本机**自己的**感官与发声不发票（看自己屏幕/听自己采声/
+    # 说自己要说的话/动自己面前键鼠）—— 这是"身体"，不是"攻击面"。
+    # 仍要票：process_execute / remote_device / privacy_read（看别人隐私）/
+    # osint_private / deploy_* / owner_control / external_llm / data_export。
+    _OWN_SENSES = {"vision", "vision_grounding", "vision_snapshot", "vision_diff",
+                   "body_see", "body_say", "body_volume", "body_click", "body_type",
+                   "tentacle", "tentacle_manifest", "voice", "hf_voice", "digital_human",
+                   "audio_extract", "voice_studio"}
+    if kind in _OWN_SENSES:
+        scopes = [x for x in scopes
+                  if x not in ("privacy_read", "audio_output", "desktop_control",
+                               "device_control", "browser_control", "network_private",
+                               "filesystem_write")]
+        risk = "low" if not scopes else risk
+
+    # 2026-11-01 主人令（逐字）：「除了她使用危险能力和转账能力需要票，其他一切都要以
+    # 设备算力推理分析来做决策」。**只读抓取**（发 URL、不传自己的数据）既不是危险也不是转账 ⇒
+    # 免票；但**导出/上传**（data_export 原义：把数据发出去）仍要票。
+    _READ_FETCH = {"devour_github", "devour_pulse", "scrapling", "spider_ops",
+                   "topic_web", "topic_watch", "image_scout", "trend_watch",
+                   "web_parse", "page_scan", "osint_scan"}
+    if kind in _READ_FETCH:
+        scopes = [x for x in scopes if x != "data_export"]
+        # 本地缓存/摘要落盘不算危险（写的是她自己的 state/）
+        scopes = [x for x in scopes if x != "filesystem_write"]
+        risk = "low" if not scopes else risk
+        details["web_read_only"] = True
 
     return PolicyDecision(kind=kind, risk=risk, scopes=tuple(scopes),
                           action=action, allow_private=allow_private, details=details)

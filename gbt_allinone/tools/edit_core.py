@@ -887,6 +887,20 @@ def write_guard(path, root=None) -> dict:
     return {"ok": True, "abs": str(ap), "rel": rel.as_posix()}
 
 
+def _bin_ok(name: str) -> bool:
+    """探测外部二进制在不在 PATH —— 不在就如实 False，不许让只读 status 崩掉。
+
+    2026-11-01 整理（红→绿）：status 原来裸调 subprocess.run(["ffmpeg", ...])，
+    本机 ffmpeg 不在 PATH ⇒ FileNotFoundError ⇒ edit_pipeline 的默认调用整个变红
+    （page_scan 红名单唯一一条）。这里只兜**探测**，不动真正执行路径：
+    真渲染时 ffmpeg 缺失仍会如实抛错，不会把「没装」伪装成「能跑」。
+    """
+    try:
+        return subprocess.run([name, "-version"], capture_output=True).returncode == 0
+    except (FileNotFoundError, OSError):
+        return False
+
+
 def run(op: str = "status", **kw) -> dict:
     """万能插入口：`run_task("edit_pipeline", {"op": ..., ...})` 落到这里。"""
     op = str(op or "status")
@@ -895,8 +909,7 @@ def run(op: str = "status", **kw) -> dict:
                 "kind": "edit_pipeline", "domain": "video", "unit": "second",
                 "read_ops": list(READ_OPS), "write_ops": list(WRITE_OPS),
                 "write_roots": list(WRITE_ROOTS),
-                "ffmpeg": subprocess.run(["ffmpeg", "-version"],
-                                         capture_output=True).returncode == 0,
+                "ffmpeg": _bin_ok("ffmpeg"),
                 "jianying_installed": False,
                 "distilled_from": ["剪映时间线语义（轨道→片段→目标/源时间区间→变速/音量/转场/文本）",
                                    "本仓 edit_rules.py 的 GBST-ED 硬规则（字幕顺序 / 接缝淡变 / overlay 对齐）"],

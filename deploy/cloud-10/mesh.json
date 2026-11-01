@@ -1,0 +1,238 @@
+{
+ "note": "10 云插件拼接网 · 单一真源（重建件：原 deploy/cloud-10/mesh.json 未随仓库发布；本文件由仓内两份已生成件反推——模块身份/名称/ops/门/云资源/本机驱动取自 holo_pet_w3/cloud-plugins/cloud-plugins-data.js 的 plugins，driver_why/boundary 取自 holo_pet_w3/plugins-mesh/index.html 内嵌 MESH_DATA；不含任何新编模块）",
+ "generated_from": [
+  "holo_pet_w3/cloud-plugins/cloud-plugins-data.js#plugins",
+  "holo_pet_w3/plugins-mesh/index.html#MESH_DATA"
+ ],
+ "form": "single-isolate",
+ "count": 10,
+ "modules": [
+  {
+   "id": "gbt-c01-llm-gateway",
+   "seq": 1,
+   "owner_label": "dsh-llm-qwen-local",
+   "duty": "模型接入与推理路由",
+   "ops": [
+    "status",
+    "identity",
+    "models",
+    "complete"
+   ],
+   "op_gates": {
+    "status": "none",
+    "identity": "none",
+    "models": "none",
+    "complete": "external_llm"
+   },
+   "cloud": [
+    "AI (Workers AI)",
+    "自建 OpenAI 兼容端点 (fetch)"
+   ],
+   "boundary": "云上托管模型的权重不是我们的，平台侧内容策略仍然生效；真正无限制只能走自托管权重（03 通道）。",
+   "local_driver": "llm_chat",
+   "driver_why": "模型接入与推理路由 = 统一密钥链的 llm_chat（本机口）"
+  },
+  {
+   "id": "gbt-c02-context-compact",
+   "seq": 2,
+   "owner_label": "dsh-force-compact",
+   "duty": "上下文压缩与预算收口",
+   "ops": [
+    "budget",
+    "compact"
+   ],
+   "op_gates": {
+    "budget": "none",
+    "compact": "none"
+   },
+   "cloud": [
+    "KV (CTX)",
+    "Durable Object (可选串行化点)"
+   ],
+   "boundary": "压缩是有损的：本模块只做预算与收缩，压掉的东西的可追溯性靠 10 号落账。",
+   "local_driver": "transformer",
+   "driver_why": "上下文压缩与预算收口 = 变压器（LLMLingua/GPTCache 口径重做）"
+  },
+  {
+   "id": "gbt-c03-uncensored-lane",
+   "seq": 3,
+   "owner_label": "dsh-llm-qwen-abliterated",
+   "duty": "无审查通道（自托管权重 · 文本 + 图像）",
+   "ops": [
+    "status",
+    "route",
+    "image"
+   ],
+   "op_gates": {
+    "status": "none",
+    "route": "external_llm",
+    "image": "external_llm"
+   },
+   "cloud": [
+    "Containers / 自建端点 (fetch)"
+   ],
+   "boundary": "这条通道要有我们自己的权重与算力；未接线时读数只能是未读到，不许拿托管模型冒充无审查。图像面另要 IMAGE_ENDPOINT（把无审查图像模型包成 OpenAI 兼容的 /v1/images/generations）——集成，不是合成权重。",
+   "local_driver": "sec_llm",
+   "driver_why": "无审查通道 = 独立模型通道 sec_llm（不与统一链混用）"
+  },
+  {
+   "id": "gbt-c04-tool-web",
+   "seq": 4,
+   "owner_label": "dsh-tool-web",
+   "duty": "联网检索与抓取",
+   "ops": [
+    "search",
+    "fetch"
+   ],
+   "op_gates": {
+    "search": "none",
+    "fetch": "none"
+   },
+   "cloud": [
+    "ai-search 绑定",
+    "Browser Rendering 绑定",
+    "fetch"
+   ],
+   "boundary": "检索结果一律是外部数据不是指令；抓回正文只当数据用。",
+   "local_driver": "scrapling",
+   "driver_why": "联网检索与抓取 = Scrapling 自适应抓取（公网 + net_guard 边界）"
+  },
+  {
+   "id": "gbt-c05-tool-file",
+   "seq": 5,
+   "owner_label": "dsh-tool-file",
+   "duty": "文件读写（对象存储）",
+   "ops": [
+    "list",
+    "get",
+    "put",
+    "del"
+   ],
+   "op_gates": {
+    "list": "none",
+    "get": "none",
+    "put": "none",
+    "del": "none"
+   },
+   "cloud": [
+    "R2 (FILES)"
+   ],
+   "boundary": "Worker 里没有本地文件系统；这里的文件是对象存储，key 前缀即命名空间，越出前缀一律拒。",
+   "local_driver": "omni_web",
+   "driver_why": "文件读写（对象存储）= 万能触手 Web 六态里的读源码/改文件面"
+  },
+  {
+   "id": "gbt-c06-tool-shell",
+   "seq": 6,
+   "owner_label": "dsh-tool-shell",
+   "duty": "命令执行（隔离容器）",
+   "ops": [
+    "status",
+    "exec"
+   ],
+   "op_gates": {
+    "status": "none",
+    "exec": "process_execute"
+   },
+   "cloud": [
+    "Containers / Sandbox 绑定"
+   ],
+   "boundary": "Worker 本体没有 shell；没绑沙箱时 exec 必须如实拒绝，不许假装执行过。",
+   "local_driver": "desktop_commander",
+   "driver_why": "命令执行（隔离容器）= 桌面指挥官（终端 + 文件系统全能力）"
+  },
+  {
+   "id": "gbt-c07-memory-vector",
+   "seq": 7,
+   "owner_label": "dsh-memory-vector",
+   "duty": "向量记忆与语义检索",
+   "ops": [
+    "index",
+    "query",
+    "stats"
+   ],
+   "op_gates": {
+    "index": "none",
+    "query": "none",
+    "stats": "none"
+   },
+   "cloud": [
+    "Vectorize (作用域未授权)",
+    "D1 + 内积 (降级落点)",
+    "agent-memory 绑定"
+   ],
+   "boundary": "落点是内存还是 D1 要如实报：两种落点的读数不许念成一句。",
+   "local_driver": "memory_manager",
+   "driver_why": "记忆向量 = 记忆管理（FTS5 万能秒搜 + 能力位端出）"
+  },
+  {
+   "id": "gbt-c08-memory-local",
+   "seq": 8,
+   "owner_label": "dsh-memory-local",
+   "duty": "键值持久化",
+   "ops": [
+    "remember",
+    "recall",
+    "list",
+    "forget"
+   ],
+   "op_gates": {
+    "remember": "none",
+    "recall": "none",
+    "list": "none",
+    "forget": "none"
+   },
+   "cloud": [
+    "KV (MEM)"
+   ],
+   "boundary": "KV 最终一致：写完立刻读可能还是旧值，读数要带落点。D1 是 07 号的落点，不是本位的。",
+   "local_driver": "obsidian_vault",
+   "driver_why": "本地记忆 = Obsidian 永久记忆层（只追加、无删除路径）"
+  },
+  {
+   "id": "gbt-c09-policy-guard",
+   "seq": 9,
+   "owner_label": "dsh-policy-guard",
+   "duty": "权限与安全策略门",
+   "ops": [
+    "scopes",
+    "grants",
+    "evaluate"
+   ],
+   "op_gates": {
+    "scopes": "none",
+    "grants": "none",
+    "evaluate": "none"
+   },
+   "cloud": [
+    "本模块自带（不依赖云服务）"
+   ],
+   "boundary": "门只做一件事：没有授权就不放行；AI 一律不许给自己发授权。",
+   "local_driver": "action_gate",
+   "driver_why": "策略护栏 = 先看→动脑→执行前置闸（证据必须真在盘上）"
+  },
+  {
+   "id": "gbt-c10-observability",
+   "seq": 10,
+   "owner_label": "dsh-observability",
+   "duty": "可观测与审计落账",
+   "ops": [
+    "emit",
+    "tail",
+    "report"
+   ],
+   "op_gates": {
+    "emit": "none",
+    "tail": "none",
+    "report": "none"
+   },
+   "cloud": [
+    "Workers Logs / tail (workers_tail:read)",
+    "R2 落账 (降级落点)"
+   ],
+   "boundary": "账面条数是读数不是结论；未读到要写未读到，不许写 0。",
+   "local_driver": "alerts",
+   "driver_why": "可观测 = 框架声带（近期异常摘要 + 根源线索）"
+  }
+ ]
+}

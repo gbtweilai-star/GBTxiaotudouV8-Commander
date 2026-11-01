@@ -468,6 +468,9 @@ def _run_benign(kind, payload, policy_decision=None):
         op = str(p.get("op") or "").strip().lower()
         if op in ("caps", "capabilities"):
             return TB.capabilities()
+        # op=plan：**只让脑子出判决，不动手**（2026-10-31「先想后动」与逐手核对共用这一口）
+        if op == "plan":
+            return TB.plan(str(p.get("intent") or p.get("goal") or p.get("text") or ""))
         action = (p.get("action") or p.get("method")
                   or ("auto" if str(p.get("intent") or "").strip() else ""))
         if not action:
@@ -486,11 +489,94 @@ def _run_benign(kind, payload, policy_decision=None):
     if kind == "tentacle_manifest":
         from .tentacle import bridge as TB
         return {"manifest": TB.get_manifest(), "eye_ready": TB.eye_ready()}
+    # ── 触手主干 · 原生指挥官（2026-10-31 主人令：把自有大模型权重彻底融合进主干）──
+    # 门这一层只做分派：权重/引擎/判决全在 `tentacle/commander.py`，它自己会如实报缺什么。
+    if kind == "commander":
+        from .tentacle import commander as _CMD
+        p = dict(payload or {})
+        return _CMD.run(str(p.pop("op", "status")), **p)
+    # ── 四合一原生位（2026-10-31）：脉冲/量化/按需/直达 焊成一位，自带 verify 判据 ──
+    if kind == "pulse_core":
+        from .tentacle import pulse_core as _PC
+        p = dict(payload or {})
+        return _PC.run(str(p.pop("op", "status")), **p)
+    # 能力自知（2026-10-31）：她问"我有什么"时，只认注册表现读，快照过期就红
+    if kind == "cap_self":
+        from .tentacle import cap_self as _CS
+        p = dict(payload or {})
+        return _CS.run(str(p.pop("op", "list")), **p)
+    # 触手覆盖（2026-11-01）：每个代码文件归哪根触手，认领不了的单列缺口
+    if kind == "trunk_cover":
+        from .tentacle import trunk_cover as _TC
+        p = dict(payload or {})
+        return _TC.run(str(p.pop("op", "status")), **p)
+    # 身体知觉（2026-11-01）：本体感觉 / 痛觉 / 神经邻域
+    if kind == "body_sense":
+        from .tentacle import body_sense as _BS
+        p = dict(payload or {})
+        return _BS.run(str(p.pop("op", "status")), **p)
+    # 自主吞食（2026-11-01）：自己找食 → 自己判有用 → 有用才吞 → 拒的也留痕
+    if kind == "devour_auto":
+        from .tentacle import devour_auto as _DA
+        p = dict(payload or {})
+        return _DA.run(str(p.pop("op", "status")), **p)
+    # 触手推理环（2026-11-01）：看 → 想 → 动 → 再想
+    if kind == "trunk_reason":
+        from .tentacle import trunk_reason as _TR
+        p = dict(payload or {})
+        return _TR.run(str(p.pop("op", "status")), **p)
+    # 上下文守卫（2026-11-01）：把 tools/context_guard.py 正式接成能力位
+    if kind == "context_guard":
+        from .tentacle import context_guard_cap as _CG
+        p = dict(payload or {})
+        return _CG.run(str(p.pop("op", "status")), **p)
+    # 2026-11-01 部署反查补分派：四份有实现没登记的能力位（各自签名不同，逐个接）
+    if kind == "research_intel":
+        from .tools import research_intel as _RI
+        p = dict(payload or {})
+        return _RI.run(str(p.pop("op", "coverage")), **p)
+    if kind == "hunyuan_video":
+        from .tools import hunyuan_video as _HV
+        p = dict(payload or {})
+        return _HV.run(str(p.pop("op", "status")), **p)
+    # 能源核心（2026-11-01）：一块电池的统一读数/电表
+    if kind == "energy_core":
+        from . import energy_core as _EC
+        p = dict(payload or {})
+        return _EC.run(str(p.pop("op", "status")), **p)
+    # 编排账本（2026-11-01）：扫哪/改哪/新增什么，记账 + 重启看面板
+    if kind == "orchestration":
+        from . import orchestration as _OB
+        p = dict(payload or {})
+        return _OB.run(str(p.pop("op", "panel")), **p)
+    # 自主契约（2026-11-01 主人严令）：架构给完后除危险能力/转账，不许打扰主人
+    if kind == "autonomy":
+        from .tentacle import autonomy as _AU
+        p = dict(payload or {})
+        return _AU.run(str(p.pop("op", "status")), **p)
+    # 蓝图主链（2026-11-01）：架构→蓝图→过目→思维导图→派遣→落地
+    if kind == "blueprint":
+        from .tentacle import blueprint as _BP
+        p = dict(payload or {})
+        return _BP.run(str(p.pop("op", "status")), **p)
+
+    # 旧物守卫（2026-11-01 主人严令）：项目里不许有旧代码/旧面板/重复物
+    if kind == "legacy_guard":
+        from .tentacle import legacy_guard as _LG
+        p = dict(payload or {})
+        return _LG.run(str(p.pop("op", "status")), **p)
+    # 万能插·全自动打开（2026-11-01）：六类插座现状与一次性重算
+    if kind == "omni_open":
+        from .tentacle import omni_open as _OO
+        p = dict(payload or {})
+        return _OO.run(str(p.pop("op", "status")), **p)
     # 署名守卫（V8：开发者署名完整性，禁止删除）
     if kind == "signature_guard":
         from . import signature
         p = payload or {}
-        return signature.audit(restore=bool(p.get("restore", False)))
+        # scope=all：连仓库 docs/ 一起查（2026-11-01 补：那里 77 页只有 8 页带署名，旧口径从不看它）
+        return signature.audit(restore=bool(p.get("restore", False)),
+                               scope=str(p.get("scope") or "framework"))
 
     # 大脑执行层（V8：五维合一——V7 execution_router 复活）
     if kind == "brain_route":
@@ -957,6 +1043,53 @@ def _run_benign(kind, payload, policy_decision=None):
         from .tools import omni_arm as _oa
         p = payload or {}
         return _oa.run_op(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "hand_retarget":
+        # 手部姿态重定向（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：21 点 → 关节角。
+        # 纯计算、零依赖；不是 IK，接触/触觉未建模（模块头写死边界）。
+        from .tentacle import hand_retarget as _hrt
+        p = payload or {}
+        return _hrt.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "hand_bridge":
+        # 灵巧手 HAL（2026-11-01）：loopback 仿真真跑 / Modbus TCP 真帧 / 串口·CAN 缺依赖如实报；
+        # 真机必须 register_map，写操作默认 dry_run 且要 confirm（模块自己收口，不碰 policy.py）。
+        from .tentacle import hand_bridge as _hbr
+        p = payload or {}
+        return _hbr.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "sync_guard":
+        # 双仓同步巡检（2026-11-01）：只读 sha1 对账；DRIFT 出 alerts；不自动 pull/push。
+        from .tentacle import sync_guard as _sg
+        p = payload or {}
+        return _sg.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "viral_forge":
+        # 爆款拆解/克隆配方（2026-11-01 吸收 hypit 设计）：纯计算；不下载/不复制/不发布。
+        from .tentacle import viral_forge as _vf
+        p = payload or {}
+        return _vf.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "drama_forge":
+        # 短剧产线（2026-11-01）：剧本→分镜→SAPI 旁白/字幕→ffmpeg 竖屏成片；写 outputs。
+        from .tentacle import drama_forge as _df
+        p = payload or {}
+        return _df.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "taste_guard":
+        # 反-slop 设计闸（2026-11-01 蒸馏 taste-skill）：纯读静态规则，不写盘。
+        from .tentacle import taste_guard as _tg
+        p = payload or {}
+        return _tg.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "experience_forge":
+        # 成长闭环：外部验证通过才准固化；存 state/experience_forge/（不写权重）。
+        from .tentacle import experience_forge as _ef
+        p = payload or {}
+        return _ef.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "mirror_stage":
+        # 镜像工作空间：生产只读 → 候选 → 验证 → 整页原子替换；不含远程桌面。
+        from .tentacle import mirror_stage as _ms
+        p = payload or {}
+        return _ms.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "remote_controller":
+        # 远程接管授权内核：远端用户明确同意 + agent 签名才发 session；媒体通道未接。
+        from .tentacle import remote_controller as _rc
+        p = payload or {}
+        return _rc.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
     if kind == "project_drift":
         # 全项目变化监控（主人 2026-10-19「第三块监控：全控变化」）：读面（status/drift/where）纯读免门；
         # baseline 会写 state/drift/baseline.json ⇒ filesystem_write 挂在**处理器层**（本模块自己判），不碰 policy.py。
@@ -2604,6 +2737,14 @@ def run_task(kind, payload=None, stamp=True, safe=False, probe=False):
     同一个 kind 在别的调用方那里照旧留痕（否则等于给一个能力永久摘掉审计）。
     默认 ``probe=False``（既有调用方零改动）；payload 里的 ``_probe`` 继续认。
     """
+    # 2026-11-01 编排账本：**非 probe** 的每次调用都记一条（扫了/改了/跑了什么）
+    if not probe:
+        try:
+            from . import orchestration as _OB
+            _OB.record('run', str(kind), detail=str(payload)[:160],
+                       evidence='run_task', actor='gate')
+        except Exception:  # noqa: BLE001
+            pass
     if __import__("os").environ.get("GBT_CONTRACT_LEGACY") == "1":
         # 基线对照开关：临时绕过归一化层，用于回归归因；默认关闭，不影响正常运行。
         return _run_task_core(kind, payload, stamp=stamp, probe=probe)
@@ -3023,6 +3164,14 @@ def _run_task_core_body(kind, payload=None, stamp=True, probe=False):
         if stamp:
             body = stamp_result(body)
         return body
+
+    # ── 万能插·全自动打开（2026-11-01 主人令：用她的全部能力之前必须全部自动打开）──
+    # 只做**廉价探针 + 缓存**；异常一律吞掉，绝不因为它把主调用弄坏。
+    try:
+        from .tentacle import omni_open as _OO
+        _OO.ensure()
+    except Exception:                                             # noqa: BLE001
+        pass
 
     lease = guard.get("lease")
     try:

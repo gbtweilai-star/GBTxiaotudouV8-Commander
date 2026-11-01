@@ -30,7 +30,8 @@ def _home_allowed(p) -> bool:
         if _is_environment(name):
             return True
         from .inventory import _classify
-        return _classify(p if hasattr(p, "name") else __import__("pathlib").Path(str(p))) == "transient"
+        # 2026-11-01：checkout 形态下仓库顶层项被判为 framework —— 那也是**本体的东西**，不是散件。
+        return _classify(p if hasattr(p, "name") else __import__("pathlib").Path(str(p))) in ("transient", "framework")
     except Exception:
         return False
 PKG_MD_ALLOWED = {"README.md", "SOUL.md", "CODING_DISCIPLINE.md", "LAYOUT.md"}

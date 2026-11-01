@@ -1,4 +1,4 @@
-# 系统 · `system`（51 位）
+# 系统 · `system`（54 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -12,6 +12,7 @@
 | `answer_shaper` | 只读 | — | —（注册表：无必填） | `user_error` | 行动优先输出核（蒸馏自 2026-09-28 主人给的周榜截图 ayghri/i-have-adhd——截图只给仓库名，**未联网核验、未引用该仓任何代码/文本**；纪律取自本仓自己的沟通纪律与已有技能 gbt-adhd-mode，本件补**运行时可机检的核**）：`check`… |
 | `asset_index` | 只读 | — | —（注册表：无必填） | `user_error` | 资产索引：**整棵树都连上 + 连上即可秒查**（主人令 2026-09-27）。build 把全树扫进 state/asset_index.db（键=跟随软链的物理真身，与绑定系统同口径，软链别名去重）；wire 给每个资产补触手标签（启发式优先，认不出用回退标签 projec… |
 | `auth_gate_status` | 只读 | — | —（注册表：无必填） | `user_error` | 人工授权门状态：各作用域可用授权数（只读；授权只能人发放） |
+| `cap_self` | 只读 | — | —（注册表：无必填） | `user_error` | 能力自知：**问自己有什么**时只有一个真源（注册表现读）。op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；op=brief 压成能进上下文的 30 域自述；… |
 | `cap_tags` | 只读 | — | —（注册表：无必填） | `user_error` | GBT 技能标签 + 主人调用许可（主人令「将所有的原生能力注册出专属的 GBT 技能标签，只有我允许了才能调用我的能力」）：每个能力位一个稳定标签 `GBT-<域>-<能力位>`，**从注册表现算**；权限类**由框架自己的判据推**（`policy.evaluate` 逐 o… |
 | `caps_called_audit` | 只读 | — | —（注册表：无必填） | `user_error` | 能力位调用点审计（只读）：动态算 called_by，列出零调用点孤儿清单（同名模块自称不算接线） |
 | `console_hub` | 只读 | — | —（注册表：无必填） | `user_error` | 工作台中枢：**所有独立页面的唯一数据源**（主人令 2026-09-28「把所有触手连接全面专业化 3D 可视化…每个工作流的独立页面需要精细设计排布…必须先全面扫描确保不能遗漏」）：`pages` 页面登记表（单一真相）· `graph` 3D 图（30 域→209 能力→绑… |
@@ -32,6 +33,8 @@
 | `impact_check` | 只读 | 是 | **未登记**（注册表要参数，必填名待补） | `user_error` | **影响面检查（多域监控的读数面）**（主人令 2026-10-19：「修改一个地方的时候要分出触手关注跟这个修复的地方相连的所有地方，确保你修改其他地方不会被连带故障」）：读 `state/model-pack/wiring.json` 邻接图（现读 **6301 节点 / 9… |
 | `inventory` | 只读 | — | —（注册表：无必填） | `user_error` | 全息盘点：一次输出你的视图+框架的视图（归属四分类：框架/环境/数据/异物）——对齐两个世界 |
 | `ledger_note` | 只读 | — | —（注册表：无必填） | `user_error` | **台账登记**（R-H600 立）：三原语 RULES（读七道硬闸）/ PREVIEW（只读预演，不落盘）/ APPEND（**唯一写原语**）。七道机械闸全做成闸、不是口号：**目标固定**（只能写 gbt_allinone/docs/待落刀登记.md，**调用方传不了路径*… |
+| `mirror_stage` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 镜像工作空间（2026-11-01 主人口径：生产永不被试验污染，跑通才整页原子替换）：create 把生产目标复制进 state/mirror/stage/<id>/（生产只读）→ write 只写镜像候选（可多候选）→ verify 在镜像 work/ 跑外部验证器（cmd+… |
+| `orchestration` | 只读 | — | —（注册表：无必填） | `user_error` | 编排账本与面板：六类动作 scan/add/edit/deploy/fix/run 只追加落 state/orchestration-ledger.jsonl。op=record 手记一条；op=panel 重启先看这一屏（本会话动作计数·最近条目·各类扫描最后时间·能力位 vs… |
 | `orchestration_kernel` | 只读 | — | —（注册表：无必填） | `user_error` | 编排内核（三源蒸馏）：状态/动作空间 + 角色/流程 + 可存储图/挂起恢复；只读能力真执行 |
 | `page_scan` | 只读 | — | —（注册表：无必填） | `user_error` | **按绑定逐页并发扫**（主人 2026-10-12 定的架构「触手随每一页绑定好，扫的时候按绑定一页一页传回来」）：源 = state/page-bindings.json 的逐页（页→落点→正向_能力位，全在盘）；**按契约判色**——绿=跑通 / 黄=需参数或需授权（契约与… |
 | `project_drift` | 只读 | — | —（注册表：无必填） | `user_error` | **全项目变化监控（第三块监控：全控变化）**（主人 2026-10-19：「多余监控还缺了一个全控变化，也就是要有一个看着整个项目变化的」）：跟 heartbeat（每根触手还通不通）与 impact_check（这一刀会撞到谁）并列 —— 本位回答「**整个项目从基线到现在变… |
@@ -148,6 +151,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：人工授权门状态：各作用域可用授权数（只读；授权只能人发放）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap auth_gate_status '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `cap_self`
+
+- **域**：`system`（系统）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：能力自知：**问自己有什么**时只有一个真源（注册表现读）。op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；op=brief 压成能进上下文的 30 域自述；op=verify **三源对账**（注册表 ↔ data 快照 ↔ api 分派 + desc + policy），任何一处漂移当场红并给差集与修法。全只读、零作用域。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap cap_self '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `cap_tags`
@@ -368,6 +382,28 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：**台账登记**（R-H600 立）：三原语 RULES（读七道硬闸）/ PREVIEW（只读预演，不落盘）/ APPEND（**唯一写原语**）。七道机械闸全做成闸、不是口号：**目标固定**（只能写 gbt_allinone/docs/待落刀登记.md，**调用方传不了路径**）· **只追加**（目标末尾必须是换行，否则拒写，不修不补）· **单物理行**（行内不许换行 ⇒ 一刀一个物理行）· **禁半角双引号**（中文串用「」）· **行首形状**（`> **<label> 补记`，复核脚本按行首锚定）· **幂等**（同 label 已存在 ⇒ 拒写）· **缺前驱拒写**（给了 after 就必须是当前最后一条，防插队防回填）。⚠️ 它**不判内容对错**（那是取证 + 独立复核的活）；写失败一律抛错，不返回半成功。type=internal
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap ledger_note '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `mirror_stage`
+
+- **域**：`system`（系统）
+- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **它做什么**：镜像工作空间（2026-11-01 主人口径：生产永不被试验污染，跑通才整页原子替换）：create 把生产目标复制进 state/mirror/stage/<id>/（生产只读）→ write 只写镜像候选（可多候选）→ verify 在镜像 work/ 跑外部验证器（cmd+exit_code）→ promote 仅在 verify.exit_code=0 且 confirm=true 时做**整文件 os.replace 原子替换**（先备份，支持 rollback）。没验过/失败/越界一律拒。op=status/create/list/write/verify/promote/rollback/where。边界：不含远程桌面/隧道/语音（另位）。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap mirror_stage '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `orchestration`
+
+- **域**：`system`（系统）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：编排账本与面板：六类动作 scan/add/edit/deploy/fix/run 只追加落 state/orchestration-ledger.jsonl。op=record 手记一条；op=panel 重启先看这一屏（本会话动作计数·最近条目·各类扫描最后时间·能力位 vs 快照漂移·自上次看图以来新增）；op=seen 标记已看；op=status 账本概况。闸门对**非 probe** 调用自动记 run。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap orchestration '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `orchestration_kernel`

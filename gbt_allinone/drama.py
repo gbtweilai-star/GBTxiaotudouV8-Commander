@@ -127,6 +127,9 @@ def parse_timed(text: str) -> dict:
         tm = re.match(r"[（(]([^）)]*)[）)]", body)
         if tm:
             title = tm.group(1).strip()
+        # 旁白/台词：与画面描述分开（字幕/配音只用这一句，不把整段分镜说明当字幕）
+        vm = re.search(r"(?:旁白|台词|字幕)[：:]\s*([^\n]+)", body)
+        voice = vm.group(1).strip() if vm else ""
         shots.append({
             "idx": i + 1,
             "t0": start, "t1": end, "dur": round(end - start, 3),
@@ -140,7 +143,7 @@ def parse_timed(text: str) -> dict:
                      "emotion": _hits(body, _EMO_MAP)},
             "subject": "",            # 确定性路径不猜人物位置
             "desc": " ".join(body.split())[:400],
-            "dialogue": "",           # 分镜稿里没有就是没有，不编
+            "dialogue": voice,        # 分镜稿里没有就是没有，不编
         })
     total = shots[-1]["t1"]
     return {"ok": True, "source": "rule-based", "verdict": _validate(shots, total),

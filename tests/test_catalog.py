@@ -28,9 +28,10 @@ class TestCatalog(unittest.TestCase):
     def setUpClass(cls):
         cls.cat = Catalog.load(ROOT / "data" / "capabilities.json")
 
-    def test_loads_341(self):
-        self.assertEqual(len(self.cat), 341)
-        self.assertEqual(self.cat.meta.get("count"), 341)
+    def test_loads_catalog(self):
+        # 条数现算：早期写死 341，能力位增长后测试自己变红（2026-11-01 修正）。
+        self.assertEqual(len(self.cat), self.cat.meta.get("count"))
+        self.assertGreaterEqual(len(self.cat), 341)
 
     def test_domains_30(self):
         self.assertEqual(len(self.cat.domains()), 30)

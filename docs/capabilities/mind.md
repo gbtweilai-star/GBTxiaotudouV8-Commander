@@ -1,4 +1,4 @@
-# 心智 · `mind`（19 位）
+# 心智 · `mind`（21 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -9,12 +9,14 @@
 | `belief_forge` | 只读 | — | —（注册表：无必填） | `user_error` | 信念锻造（hindsight 学习半蒸馏）：**观察 → 信念（会学习，不改写历史）→ 心智模型**——`observe` 登记观察（**必须带证据与来源**）· `consolidate` 把同类观察巩固成信念（置信度=证据加权；move ∈ strengthen/weaken… |
 | `brain_council` | 只读 | — | —（注册表：无必填） | `user_error` | 脑会·编队群决策引擎：各脑出本域提案，委员长聚合裁决（纯推演·不出网·不落盘）；执行仍走主脑既有授权门 |
 | `brain_vault` | 只读 | — | —（注册表：无必填） | `user_error` | 脑库接入：Obsidian 记忆库的读（recall=记忆总纲+收集箱）/ 写（remember=追加一条）/ 体检（status）—— 追加式、**没有任何删除路径**，写进去的想忘都忘不了 |
+| `code_graph` | 只读 | — | —（注册表：无必填） | `user_error` | 代码知识图谱（主人令 2026-10-29，蒸馏自 symchenry/codegraph 的机制、不抄代码）：**本地 AST 预索引 → SQLite 图谱（symbols/edges/files + FTS5）→ 结构化查询**。给 AI 的是「文件:行 + 类型 + 签名… |
 | `command_chain` | 只读 | — | —（注册表：无必填） | `user_error` | 指挥链·总指挥参谋部（主人令 2026-10-01「全部统一品牌统一智能体以 GBT小土豆V8 为主延申…不能重复和错误指挥」）：五段全踩已有件不重造 —— ①接令·理解意图（brain_route）②双顾问意见（大脑执行层读数 + gods_eye 顾问席，主人 9-28 分工… |
 | `director_mood` | 只读 | — | —（注册表：无必填） | `user_error` | 导演 AI 情绪内核（只读）：七情六欲 + 半衰期；情绪只改『怎么看』，不改『看到什么』 |
 | `doc_intake` | 只读 | — | —（注册表：无必填） | `user_error` | 知识库·**解析 → 入库 → 同步**那条链（吞 WeKnora 后蒸的另一面：本仓原来只有单件 `datakit`/`genoffice`）。三条口径：① **只吃本地文件**（出网那条路另挂门，本位不偷偷下载）② **不新造解析器**：md/txt 直读、html 只做去标… |
+| `experience_forge` | 只读 | — | —（注册表：无必填） | `user_error` | 成长闭环（2026-11-01 主人判据：跑通由外部验证器判，固化进记忆/工具/规则而非权重）：record 只收**带外部验证证据**的经验（cmd+exit_code=0+evidence），缺验证或非零一律 needs_verify 拒收；query 检索「问题→尝试→验证… |
 | `local_brain` | 只读 | — | —（注册表：无必填） | `user_error` | 本地原生脑（只读骨架·内调）：本地模型=脑皮层（可换）·主机=纪律层（不可换）；五层链路（模型只做意图解析与结果解释）；五条红线（不许直接执行命令/不可逆必卡/缺参不许猜/每次留痕/身份不许改写） |
 | `memory_bank` | 只读 | — | —（注册表：无必填） | `user_error` | 记忆银行：**来源追踪 + 别名 + 零停机迁移**（蒸馏自 GitHub 周榜 #01 hindsight，只取架构）：`stamp` 给每条记忆打来源印章（ref/sha256/origin/session/why/evidence）；`trace` 同时报**印章在不在**… |
-| `memory_manager` | 只读 | — | —（注册表：无必填） | `user_error` | 记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·六类源（记忆/文档/技能/状态/**能力位**/代理）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（"想到匹配面出现的能力"）… |
+| `memory_manager` | 只读 | — | —（注册表：无必填） | `user_error` | 记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·七类源（记忆/文档/技能/状态/**能力位**/代理/助手记忆）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（"想到匹配面出现… |
 | `meta_cognition` | 只读 | — | —（注册表：无必填） | `user_error` | 元认知循环（只读骨架）：自省→查内部→查外部→问主人→沉淀 + 五条红线（自省不是自责/不许硬猜/先查后问/问完沉淀/大脑也自省） |
 | `mind` | 只读 | — | —（注册表：无必填） | `user_error` | 心智引擎：开工前预演 pre_work、评估、内部状态、经验召回与反思（写框架 store，不出网） |
 | `observer_anchor` | 只读 | — | —（注册表：无必填） | `user_error` | 观察者锚点律只读骨架：三公理 + 六短板补齐 + 五条红线（同一方不许既扫又报/审计器必须被审/递归封顶/终止点只能由人设/关键节点人在场） |
@@ -85,6 +87,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap brain_vault '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `code_graph`
+
+- **域**：`mind`（心智）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：代码知识图谱（主人令 2026-10-29，蒸馏自 symchenry/codegraph 的机制、不抄代码）：**本地 AST 预索引 → SQLite 图谱（symbols/edges/files + FTS5）→ 结构化查询**。给 AI 的是「文件:行 + 类型 + 签名 + 调用链」，**不是文件正文** —— 省 token 就在这一点。.py 用标准库 `ast` 精确解析（exact=1，实测占 96%）；.js/.cjs 用正则粗解析并标 `exact=false`（本仓零新依赖原则，不引 tree-sitter）。**改名导入已还原**（`import x as _tf` 后调 `_tf()` 仍能追到真名 —— 不还原的话 `callers` 会漏掉真正调用方，实测漏过 omni_plug/gpu_lane）；`edges` 带 `src_file`，所以**同名函数不会串**（按名字 JOIN 曾把 5 个不同的 `discover` 混成一处）。扫描面排除 `node_modules`/`.pylibs`/`native_browser`/`mirror_space`（第三方与生成代码）。op=index/find/callers/callees/summary/stats
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap code_graph '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `command_chain`
 
 - **域**：`mind`（心智）
@@ -118,6 +131,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap doc_intake '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `experience_forge`
+
+- **域**：`mind`（心智）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：成长闭环（2026-11-01 主人判据：跑通由外部验证器判，固化进记忆/工具/规则而非权重）：record 只收**带外部验证证据**的经验（cmd+exit_code=0+evidence），缺验证或非零一律 needs_verify 拒收；query 检索「问题→尝试→验证→方案」；promote 升成 rule（验证规则）或 tool（可调用模板）；verify 只校验库与证据字段，不重放历史命令。op=status/record/query/show/promote/verify/where。边界：不写权重、不训练；存 state/experience_forge/（可后续接 memory_manager 索引）。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap experience_forge '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `local_brain`
 
 - **域**：`mind`（心智）
@@ -147,7 +171,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·六类源（记忆/文档/技能/状态/**能力位**/代理）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（"想到匹配面出现的能力"）；index 增量（mtime+sha 未变即跳过；**不许整表清空** —— 实测因此丢过索引）；store 存记忆过 filesystem_write 门。SQL 纪律：全部内联字面量 + `?` 占位符，不用变量拼 SQL（安全钩子实测拦过两次）。op=index/find/store/stats
+- **它做什么**：记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·七类源（记忆/文档/技能/状态/**能力位**/代理/助手记忆）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（"想到匹配面出现的能力"）；index 增量（mtime+sha 未变即跳过；**不许整表清空** —— 实测因此丢过索引）；store 存记忆过 filesystem_write 门。SQL 纪律：全部内联字面量 + `?` 占位符，不用变量拼 SQL（安全钩子实测拦过两次）。op=index/find/store/stats
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap memory_manager '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -242,3 +266,7 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

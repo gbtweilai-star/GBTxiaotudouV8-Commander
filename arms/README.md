@@ -7,7 +7,7 @@
 | `omni-arm-rigged.glb` | 绑好骨的 glTF 二进制（1 网格 / 1 蒙皮 / **40 骨**） | **60,444 B** · verts **1,080** · 高度 **0.6002 m** |
 | `omni-arm-spec.json` | 骨架规格（**零随机**，可复现） | 40 骨 · 手指自由度 `dof_fingers` 在文件里 |
 | `omni-arm-report.json` | 八条自检读数（可逐条复核） | 8/8 过 |
-| `omni_arm.py` | 这一位能力的实现（`status`/`spec` 免门，`build` 挂 `filesystem_write`） | 7,375 B |
+| `gbt_allinone/tools/omni_arm.py` | 这一位能力的实现**真源（仓内唯一一份，不在本目录）**（`status`/`spec` 免门，`build` 挂 `filesystem_write`） | 7,375 B |
 | `tentacle3d.html` | 2 万触手的 3D 看件页（自包含，零外部依赖，双击即开） | 110,549 B |
 | `tentacle3d.png` | 上面那个页面的截图 | 645,175 B |
 
@@ -30,7 +30,7 @@
 
 - **看 3D**：双击 `tentacle3d.html`（或 `python -m http.server` 后打开），页里带骨架开关、骨骼树、资产 sha16 自证。
 - **用 GLB**：任何 glTF 工具/引擎直接加载 `omni-arm-rigged.glb`（Babylon / three.js / Blender / Unity 都可）。
-- **重建**：`python arms/omni_arm.py` 的 `build` 面会调 Blender 重新建件（需要本机装 Blender 4.2+）。
+- **重建**：走唯一门 `python -c "import sys;sys.path.insert(0,'.');from gbt_allinone import api;print(api.run_task('omni_arm',{'op':'build'}))"`（要 `filesystem_write` 票；实现真源 `gbt_allinone/tools/omni_arm.py`，会调 Blender 重新建件，需要本机装 Blender 4.2+）。
 
 ## 老实话（设计稿不能直接跑）
 

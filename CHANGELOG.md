@@ -1,5 +1,60 @@
 # 变更记录
 
+## 2026-11-01 · 第十五批：手部两枚原生位 + 双仓同步 + 巡检位
+
+- **手部原生位**：`hand_retarget`（21 点 → 关节角，几何法/非 IK）· `hand_bridge`（loopback 真跑 + Modbus TCP 真帧；真机需 register_map）；能力位 **368**。
+- **双仓同步工具**：`tools/two-way-sync.ps1` + `tools/codex-scripts/two-way-sync.py`（sha1 对账/静默守卫/备份/刷新链）；交付树与 live 现为 **ALIGNED（368/368）**。
+- **巡检位 `sync_guard`**：status/verify/patrol/where；DRIFT 出 alerts；`notify=true` 写审计 + 推送（webhook/飞书/n8n/桌面 toast）；工作流 `双仓同步巡检` + 每 6 小时计划任务 + 登录自启。
+- **补齐**：`test_catalog` 条数改现算（不再写死 341）；`docs/README` 索引补 51–54、74–75；`capabilities-full.json` 仍为 2026-10-25 的 349 旧快照（已在索引注明）。
+- 交付读数：**2707 文件 / 135.5 MB**；`cap_self` 368=368=368；audit 14/0（462 项）；bindings 18/0。
+
+## 2026-11-01 · 第十四批：主干换成自己的脑子（权重融合 + 四合一 + 自知 + 自动插口）
+
+- **主干判决改走自有权重**：新增能力位 `commander`（`gbt_allinone/tentacle/commander.py`）——
+  盘上的 `gbt-v8-v82-q5_0.gguf`（5.24 GB，sha256 与 WEIGHTS.md 逐字相同）经 llama-server
+  在 `127.0.0.1:8792` 本地推理，`semantic_route.choose()` 的第一顺位换成它，云端车道退居第二档。
+  实测：「塞进剪贴板」→ `clipboard_copy`、「扫描漏洞」→ `sec_scan`、「有哪些窗口」→ `see`；
+  冷启 2.6 s、生成约 2.8 tok/s（纯 CPU 12 线程）；`tentacle op=plan` 返回 `lane=commander_local_weights`。
+- **四合一原生位 `pulse_core`**：脉冲（一次拿全身状态）· 量化压缩（Q5_0 相对 fp16 **2.71×**）·
+  按需激活（`--sleep-idle-seconds 600`，闲置卸权重、来请求再醒）· 精准直达（召回先兜住全部能力位+触手方法）。
+  `op=verify` 真跑四条判据，任一不成立即红。
+- **能力自知 `cap_self`**：`has` / `list` / `ask` / `brief` / `verify`。`verify` 做**三源对账**
+  （注册表 ↔ `data/capabilities.json` ↔ `api.py` 分派）；实测 **354 = 354 = 354**，漂移即红。
+- **万能插自动打开 `omni_open`**：不再写死六类插座，而是**扫出来的**——本轮 35 根
+  （port24 / ai5 / file3 / process3）；每次能力调用前自动过一遍（廉价探针 + 60s 缓存，重扫在后台不挡调用）；
+  增量对比（新增/拔掉/通断翻转）会进 `alerts`。
+- **代码图谱补齐**：`gbt_allinone/tools/code_graph.py` 此前**模块不存在**（注册表有、分派有、一调 ImportError），
+  现按 desc 实现：665 文件 / 10,137 符号 / 98,280 条边 / 0 未解析。
+- **修一个静默坑**：10 个 `.py` 带 UTF-8 BOM —— Python 导入无感，但任何 `ast.parse` 的工具都会静默少扫一批文件；
+  已全仓剥除，并让 `code_graph` 用 `utf-8-sig` 读。
+- **署名覆盖补漏**：`signature_guard` 的扫描面此前**不含仓库 `docs/**/*.md`**（77 页只有 8 页带署名却一直报绿）；
+  新增 `scope=all` 口径并用工具自己的 restore 补回 69 页，现 **100/100 clean**。
+- **诊断栈清零**：`selfscan` clean（补建 `store/wf_runs`）· `ghost_guard` clean · `sec_defenses` 5/5 ·
+  `truth_scan` FAKE=0 · `cross_scan` hard=0（仅剩 4 条 W 维 latent：根与包内同名目录，属形态非缺陷）·
+  `inventory`/`file_hygiene` clean（新增 checkout 形态判定，29 项假异物归零，home 形态读数不变）。
+- **落地脚本**：`tools/commander-install.ps1`（六步幂等：权重→sha256→指针→起引擎→自检→可选守护/自启）·
+  `tools/commander-supervisor.ps1`（health 守护，实测 kill 后 **7 秒自愈**）。登录自启因沙箱无权限**未注册**，如实记在 docs/47。
+- **判决层**：478 项逐项真跑（`tools/codex-scripts/commander-coverage.py`，可断点续跑），抽样 60 项 **56/60 = 93.3%**；
+  7 个 miss 全部是**模型辨别力**问题（目标全在候选里，最差排第 9），不是接线问题。
+- **短意图路由修复（docs/52–53）**：人写短意图（"审计"/"体检"/"镜像"）命中只有 1/6，而**召回 100%** ——
+  进一步定位到"模型在 12 个候选里选错兄弟位"。改法不是调模型而是**收窄候选**：
+  命中 `data/intent-lexicon.json`（人写词表）时，把候选压到人点名的那几位（`route(..., use_lexicon=True)` 默认开，可关）。
+  实测同一批短意图 **1/6 → 5/5**；词表从 24 条扩到 **36 条**，并消解了 6 组重复 `say` 词（重复会让收窄并集变脏，实测 `体检` 因此选错）。
+  新增 `tests/test_lexicon_scope.py`（9 条，离线）钉住三条性质：**命中才收窄 · 收窄不替模型拍板 · 词表自身干净**。
+- **两把尺子分开报（docs/50–52）**：478 项合成基准（desc 回环）量"可达性上限"；24 条人写词量"短意图真实可用性"，
+  两个数**并列写、不混成一个**。实测结论：召回两把尺子都接近满，错在判决；且**置信度区分"有没有把握"、不区分"对不对"**
+  （孪生位误选的置信度 0.993/0.999）。
+- 新增测试 8 份：`test_commander_trunk` / `test_pulse_core` / `test_cap_self` / `test_omni_open` /
+  `test_omni_open_diff` / `test_alerts_sockets` / `test_inventory_checkout` / `test_code_graph`，全绿。
+- **换机器重装的三个工具收编进仓**（此前只躺在工作区临时区，换台机器就得重写）：
+  `tools/dl-weights.js`（分片下载，带重试/断点跳过）· `tools/merge-weights.py`（按序合并 + 魔数/大小校验）·
+  `tools/probe-all.py` + `tools/probe-one.py`（逐能力过唯一门探针，`PROBE_LIMIT=N` 限量）。
+  收编时做了三处仓化：路径按 `tools/` 的上一级算仓库根、能力清单改读仓内 `data/capabilities.json`、
+  解释器走 `GBT_PYTHON` 或 `pyembed/python.exe`；无参调用给用法而不是抛栈（实测 `PROBE_LIMIT=3` → `{"ok": 3}`）。
+- **文档索引对齐**：`docs/README.md` 的 348 → 354（现读）、`能力总表.md` 死链换成 `03-capabilities.md` + `capabilities/`，
+  另 9 份本快照不存在的文档改为纯文本 + 「本快照无此文件」标注；根 README 的 `docs/并发容量登记.md` 同样标注。
+  两个索引现在**死链 0**；`docs/01-model-card.md` 的只读/需授权数改为现算（313 / 41）。
+
 ## 2026-10-25 · 第十三批：能力面统一 348 + 采纳朋友圈三条建议
 
 - **口径统一到注册表现读 348 位 / 30 域**（原 README 写 341 = 2026-10-21 权重发布快照）。
@@ -240,3 +295,63 @@
 - 多轮容量/配方实验（LoRA r=16→64、词表补齐、bf16 合并、量化对比）。
 - 能力位从 172 扩到 341；评测从 118 题扩到 335 题。
 - 详见仓库历史（本页只保留对外可读的摘要）。
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+
+## 2026-11-01 · 闭环固化（脉冲·能源核心·无限制上下文）
+
+- **能力位 354 → 362**：新增 `body_sense`（本体感觉/痛觉/神经邻域）、`trunk_cover`（每个代码文件归哪根触手）、
+  `trunk_reason`（接在 `brain_exec` 五维链上的"想"）、`context_guard`（原来是脚本，现在正式成位）、
+  `devour_auto`（锁缺口才吃、必须有转化物）、`energy_core`（一块电池/4 个取电口/电表）、
+  `research_intel` / `hunyuan_video`（部署反查查出来的"有实现没能力位"，本轮补登记）。
+  `knowledge_lib` / `brain_supervisor` **不登记**：它们是已登记位的模块外壳，重复登记会双计数。
+- **脉冲直达**（提速来源）：`pulse_core.direct()` 四级命中（精确名/别名/词表唯一/唯一子串），
+  24 条人写基准：命中 15/24（其中正确 13），**平均 4ms**；权重判决基线 16/24、平均 66s。
+- **能源核心**：`/props` 实测 `total_slots=4`；4 个触手同时取电全部 32.6s 内完成、等待 2–4ms。
+  撤掉"一把全局锁"的旧实现（那把 4 个取电口锁成了 1 个）。单路变慢是共享功率的代价，如实记录。
+- **无限制上下文接进对话路径**：`energy_core.think(context=…)` → 环形有界窗口（120 条压到 72 条/3996 字符）、
+  溢出落 sqlite（48 条）、`recall` 秒查。此前 `ring_context` 只有实现、**从未接进对话**（docs/31 自己写着）。
+- **门政策收窄**（主人 2026-11-01 令）：41 → 31 个能力位要票；看/听/说/动手/只读抓取移出人工门，
+  仍要票：`process_execute` / `remote_device` / `privacy_read`（看别人）/ `deploy_*` / `external_llm` / `data_export`。
+- **部署反查** `tools/codex-scripts/audit-deployed.py`：三张清单（标了没登记 / 文档提了没登记 / 登记没实现），
+  首跑 89 条假警报 → 收紧后 11 候选 → **真缺 2 个**（已部署）。README 与 docs/README 已同步。
+- **固化**：`docs/55-tonight-ledger.md` 记全部读数与复跑命令；`cap_self brief` 记忆条 844 字符，
+  含 energy_core/trunk_cover/body_sense 等新器官，**每次判决默认注入**。
+- 闭环终值：9/9 测试全绿 · `cap_self` 362=362=362 · `selfscan` clean · `signature` clean 106 页 ·
+  `trunk_cover` orphan 0 · `pulse_core verify` ok。
+- **编排账本 + 面板**（第 363 位 `orchestration`）：六类动作 scan/add/edit/deploy/fix/run 只追加落 `state/orchestration-ledger.jsonl`；闸门对非 probe 调用自动记 run；`op=panel` 一屏给本会话计数 / 最近条目 / 各类扫描最后时间 / 能力位漂移 / 自上次看图以来新增。今晚的 20 条动作已补记。
+- **别名锻造 + 直达第⑤级**（`tools/codex-scripts/gen-aliases.py`）：从 desc/名字自动生成口语别名，去歧义（丢 90 个一词多位）后只增不改写入词表（320 条，`auto: true`）；`pulse_core.direct()` 新增「别名唯一包含」级 ⇒ 能力位题面**可直达率 7.5% → 57.3%**（205/358，0 token）。起因：全量基准 485 项里今晚新加的 8 个器官全部 MISS（不可达 = 等于没长）。docs/57。
+- **直达证据门 + 消歧**（`pulse_core._evidence_ok`）：别名多了会撞，长句里多别名命中先按（权重+长度+位置）打分，再要求**字面证据**（意图含该位真名 或 意图 ≤32 字），否则不直达。358 条能力位题面：直达 234（65.4%）、正确 204（57.0%）、错 30（其中多数是基准自身的兄弟位歧义）。阈值扫描 12/16/24/32/48/无门 全部记在 docs/57。
+- **脉冲优先路由**（`commander.route(pulse=True)`）：路由入口先过 0 token 直达，命中即返回、不叫醒电池；未命中照旧走权重。人写 24 条：直达 17/24、正确 15、**2.3ms**（同批权重 16/24、66s）；真实入口实测 17ms（vs 40s 级）。`test_lexicon_scope` 改判据 + 新增三条（默认直达/0 token/毫秒级）。docs/58。
+- **脉冲直达铺满（docs/58）**：按域逐批补「唯一短语」，直达率 7.5% → **89.7%（321/358）**、正确 288（80.4%），全程 0 token；词表 24 → **479** 条（人工 + 自动别名，自动条目可整批回滚）。原则：安全进攻类（data_hijack / llm_redteam / sec_chain）**故意不补**；真歧义不补；每批同一把尺子复测 + 契约测试（词表冲突判据本轮响了 6 次，全部消解后复绿）。
+- **速度写进肌肉记忆 + 直达收尾**：脉冲直达 322/358 = **89.9%**（0 token、≈4ms），人写 24 条基准 **24/24 命中、22/24 正确**；`cap_self brief` 新增「十次请求约九次直达…」一句（读 `state/pulse-summary.json`，每次判决默认注入）。`direct()` ③ 增加整串命中例外（最高权重严格大于次高即可，不再要求 2×）；longrun 补 `长程任务看板` 至 4/4。
+- **GBT天真 节点 42 → 50**（docs/59 第六节）：补遮罩/透明通道族 8 个 ComfyUI 核心同名节点（InvertMask/CropMask/FeatherMask/ThresholdMask/MaskPreview/SplitImageWithAlpha/JoinImageWithAlpha/GetImageSize），真跑遮罩链 5/5 ok。新增 `tools/collect-object-info.ps1`：在秋叶版机器上一条命令取 `/object_info` 真快照（只读、无 BOM、节点数异常会警告）。
+- **GBT天真 家族统计 + 写进记忆条**：50 节点按族（Image 22 · Mask 13 · Text 4 · 其它 11），统计落 `state/comfy-families.json`；`cap_self brief`（1033 字符）新增构图行（节点数/传统缺口 0/无 CUDA 不接/采集入口）。纪律：真快照到手前**不再凭感觉造节点名**，先采集再补、每批同一把尺子量。
+- **GBT天真 执行引擎加固（docs/60）**：`run_workflow` 补四条语义 —— `skip` 旁路 · `times` 重复（上限 50）· `on_error=stop|continue` · **失败回滚**（只删本次新产物，旧文件不碰）；未接线节点明确报 `unwired`（另有白名单 fail-closed 两道）。新增 `tests/test_comfy_engine.py`（5 组 11 条判据）全绿。
+- **秋叶版取食器（docs/61）**：新增 `tools/comfy-harvest.py` —— 只取「我们没有 + 纯 CPU 可用」的节点契约，**权重一个不下**、模型面/云端一律跳过。同时修了两个真问题：① 分类顺序（ModelMergeFlux1 被误判云端 ⇒ 模型面优先）；② 补 Loop 结构性节点 5 个（StartLoop/EndLoop/LoopIteration/LoopResult/LoopProgress，writes=False，EndLoop 校验配对）。节点 50 → **55**，核心面同名覆盖 17（13.4%）、traditional 缺口 0。
+- **GBT天真 校验期检查（docs/61 第六节）**：`validate` 把「契约里有、原生没接」**一次列全**（每条带处置说明），不再只报第一个；新增只读 `op=coverage`（契约/原生/缺失/覆盖率/按类）；契约快照缺失时退到**核心面参照**并标 `core_ref_fallback`（不冒充秋叶整包）。实测 coverage：127 契约 · 17 原生 · 110 缺失 · 13.4%；`test_comfy_engine` 增第 [6] 组 5 条判据。
+- **GBT天真 覆盖读数进记忆条 + 校验留痕**：`cap_self brief`（1053 字符）构图行补「契约面覆盖 13.4%（17/127）」（读 `state/comfy-parity.json`，毫秒级）；`validate` 每次追加审计到 `state/comfy-validate.jsonl`；`test_comfy_engine` 补第 [7] 组「校验后审计行数 +1」。
+- **取食器接成能力位**：`comfy_native op=harvest`（只读）—— 她自己就能看「缺哪些 / 哪些值得补 / 哪些不取」，返回分类计数 + useful_list + 规则；实测核心面 127/55/17/0/103/0/7。`test_comfy_engine` 补第 [8] 组 3 条判据。
+- **补节点脚手架（docs/62）**：`tools/comfy-add-node.py` 三族模板（image/mask/passthrough）生成 `_n_*` 骨架 + 注册行，落到独立模块 `comfy_nodes_extra.py`（主模块末尾合并，绝不自动追加主模块）。首个用脚手架补的节点 `ImageFlipX` 真跑通（节点 55→56）；顺手修了模板缺 `import pathlib` 的坑（回滚机制正确删掉半成品，判据 [9] 钉住）。
+- **补节点脚手架支持批量**（docs/62 第六节）：`--from-harvest` 读 `op=harvest` 的 useful_list，一次生成**待审骨架文件** + 待办清单（**不直接进 extras** —— TODO 骨架进去会变成「能跑但做错事」的假绿）。实测模拟清单 3 个名字流程通过；演示件已清理并用真实 harvest 覆盖，不留假清单。
+- **参照重建（127→1000）+ 分类升级 + 批次 A（docs/63）**：新版 ComfyUI 用 `node_id="X"`（v3 API），旧解析只认 `NODE_CLASS_MAPPINGS` ⇒ 参照从 127 修到 **1000** 节点；分类改五级（Node 结尾/厂商前缀/3D/模型/传统），可补清单从 214（混着云端）收敛到 **130**；按清单补 **12 个纯 CPU 算子**（节点 56→68），真跑 7 节点混合链通过。覆盖率 13.4% → **5.1%**（分母变真，不是退步）；traditional 缺口 118。
+- **GBT天真 批次 B（10 个纯 CPU 算子，68→78）**：裁剪/bbox/直方图/颜色空间/色彩迁移/图像对比/静音音频/数组字典转字符串等，全部 ComfyUI 同名同契约；6 节点链真跑通；`test_comfy_engine` 补第 [11] 组 3 条判据。
+- **GBT天真 批次 C（14 个算子，78→92）**：音频三件（音量/拼接/裁剪，stdlib wave）、图像六件（合成/去重指纹/归一/重复/长边缩放/缩放补边）、文本五件（写图/大小写/截断/替换）；8 节点混合链真跑通；`test_comfy_engine` 补第 [12] 组 3 条判据。
+- **GBT天真 批次 D（11 个算子，92→103）**：音频通道三件（Load/Save/Preview）+ 均衡器 + 拆合声道、图像三件（重分批/随机裁剪 seed 可复现/短边缩放/总像素缩放）、文本落盘；7 节点链真跑通；`test_comfy_engine` 补第 [13] 组 3 条判据。traditional 缺口 94 → 83。
+- **原生 workflow 导入（docs/64）**：`op=import` + `validate/run` 自动识别 ComfyUI 原生格式（`nodes[].type` + `widgets_values` + `links`），转成我们的图再校验；`widget_mapping=best_effort` 如实标注；实测合成图 3 节点/2 边转换正确，KSampler 归 contract_only 并给出「要 GPU/权重」原因。判据补第 [15] 组 3 条。
+- **批量导入目录（docs/65）**：`op=import_dir` 扫一个 workflow 目录，逐张转换+校验，四分类（runnable / needs_gpu / unknown_only / invalid），结果落 `state/comfy-import-manifest.json`；顺手修了相对路径按 CWD 解析的 bug（改为按仓库根）。判据补第 [16] 组 3 条。
+- **可复跑快照（docs/66）**：每次 `run_workflow` 落 `state/comfy-runs/<hash>.json`（图+产物 sha256+闸结论+依赖版本）；新增只读 `op=runs`（列表）与 `op=replay`（重跑比对 sha256）；实测 replay 可复现 same=2/diff=0。判据补第 [17] 组 3 条。
+- **自主契约（docs/67，第 364 位 autonomy）**：主人严令「架构给完后除终端危险能力与转账，禁止打扰用户/要求用户帮助」落成可判定契约 —— `declare` 生效、`check` 只放行 danger/transfer、其余 deny 并记账、`guard` 把「需要你确认/要不要我/请提供」改写为自主推进；接入 `trunk_reason`（LLM 的下一步先过 guard）与记忆条（铁律一行）；`tests/test_autonomy.py` 4 组 10 条判据全绿。
+- **架构驱动蓝图 + 真实落地（docs/68 第七/八节）**：`blueprint.make` 增加「架构关键词 → 专项任务」（8 组关键词，全部只挑安全能力位）；用主人的完整架构跑通全链 —— 23 任务（12 模板 + 11 专项）→ 过目 → 思维导图 → 派遣 → **done=23/23 · landed=True · 49s**。\n- **跑到落地（docs/69）**：`blueprint.land` 一轮轮 dispatch 直到 landed —— 已完成不重跑、失败只重试失败项、全程不问主人（只有剩票任务时 blocked）；新增 `tools/blueprint-land.py`（无人值守入口，退出码 0=落地/1=未落地）。实测 21 任务 1 轮全通过；第二遍 land 识别"已落地"不重跑。判据补 [6][7]。\n
+- **卡点研究环（docs/70）**：`blueprint.land` 遇失败（非票类）自动 —— 判卡点类型 → 只读查资料（白名单 raw.github/arxiv/docs，不传自己数据）→ 落 `state/knowledge/*.md` + research-ledger → 往思维导图**追加研究任务**（重排任务指引）→ 继续下一轮；全程**不问主人**。新增 `op=research` 可单独调用。判据补 [8][9]。
+- **深推理 + 规则兜底（docs/70 第六节）**：`deep_reason()` 让本机权重读「卡点+摘录」判断如何改任务，输出写进思维导图（深推理.N）；实测 7.6B 两次都给 `tasks: []` ⇒ **不逼它编**，改规则兜底（按卡点类型落可执行任务），来源分开标 `energy_core` / `fallback_rule`。判据补 [10]。
+- **诊断质量门（docs/70 第八节）**：`_score_diagnosis` 用「诊断词 ∩ (摘录+卡点)」重合率判依据，零重合/低于 0.08 标 `energy_core_unsupported` 并**不采信**、只走规则兜底；三处来源分开标（energy_core / energy_core_unsupported / fallback_rule, source_was）。实测胡话 score=0.0 被拦、有依据 0.25 放行。判据补 [11]。
+- **死循环保护（docs/71）**：`blueprint.land` 对连续 2 轮失败的任务标 `stuck` 并写 `state/blueprints/<id>.stuck.json`，后续轮次跳过；`status` 暴露 stuck 列表；`landed` 仍要求全部通过（有 stuck 就如实报未落地）。实测 3 轮：fail→fail→跳过，stuck=['实现.1']。判据补 [12] 5 条。
+- **蓝图模板库（docs/72）**：落地成功的蓝图自动沉淀 `state/blueprint-templates/<name>.json`（任务图+验收口径+关键词签名）；`make` 遇相似架构（关键词重合 ≥2）自动复用已验证任务图并补专项；新增 `op=templates` / `op=save_template`。实测 21 任务模板复用后 26 任务、不再从零拆。判据补 [13]（测试会清掉自己建的模板）。
+- **一句话入口（docs/73）**：`blueprint op=go` 自然语言 → 蓝图 →（已确认则）过目 → 跑到落地；`parse_intent` 剥口语前缀并识别「已确认/直接跑」等；**没写已确认就只到蓝图**（不替你确认）。实测：未确认 stage=blueprint（26 任务，复用模板）；已确认 29 任务 1 轮落地并沉淀新模板。判据补 [14]（测试自清蓝图）。
+- **固化收尾：测试全局自清（docs/73 第六节）**：`test_blueprint` 开头快照 `state/blueprints` 与 `state/blueprint-templates`，结束删除全部新增文件（实测跑一遍蓝图数 6→6 不增长）；顺手清掉历史残留（蓝图 78 个、重复模板 6 个）并补齐 `docs/capabilities` 30 页署名（套件前后 missing=0）。\n- **旧物守卫（docs/79）**：主人严令「项目里不允许旧代码/旧面板/重复物」—— 新增 `legacy_guard`（六类检查 + clean，重复文档只报不删）；实清 840 MB / 17,008 个旧文件（sync-backup 30 快照、6 个旧 worktree、旧面板归档、*.bak、tmp、重复文档 2 页）；因为 api/caps 会被外部同步整文件覆盖，做成 **包导入层自注册插件**（每次 import 自愈）。\n
+- **旧覆盖新根治（2026-11-01）**：查出外部同步用 -Force 绕过了 newer-wins（所以新改动被旧副本打回）。改：-Force 只表示允许并发推送，**不再**能覆盖更新的一侧；要覆盖须显式 -ForceOverwrite。同时补 state/obsolete-files.json 淘汰清单（删掉的文件不会被 push 复活）、legacy_guard op=authority（唯一真相=live 当前文件+账本）、记忆条三条禁令（不留旧/唯一真相/不打扰）。
+- **原始仓库整理（docs/82）**：GitHub 仓被运行态撑到 ~200MB（5108 文件，state/ 1876 个、dist/ 40.6MB、vendor/ 二进制，还有一个以 Windows 绝对路径命名的目录）。新增 	ools/github-repo-clean.py：只删运行态/产物（2323 文件 / 154MB）+ 重写 .gitignore，用 Git Data API 建一次 commit（本机无 git）。源文件与文档一律不动。
+- **原始仓库整理完成（docs/83）**：用 Git Data API 一次 commit（19d2b06）把 GitHub 仓 HEAD 从 **5108 → 2708 文件**（删 2323 个 / 154.1MB：state/ 1876、dist/ 40.6MB、runtime/logs/vaults/vendor、C:\Users\ADMIN\Desktop\GBT小土豆V8 目录、>2MB 大二进制），并追加 .gitignore 阻断块；源码与 docs/ 未动。历史体积仍 ~200MB（需 filter-repo 才能缩）。

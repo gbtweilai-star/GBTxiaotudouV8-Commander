@@ -82,3 +82,7 @@ curl -s $GBT_T2I_ENDPOINT/../health            # 端点自报
 python3 -c "…run_task('comfy_native', {'op':'run','workflow':…})"   # 真出图 + 四项读数
 python3 tools/taste_gate.py --judge <产物> --profile photo          # 过闸
 ```
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

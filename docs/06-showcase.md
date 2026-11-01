@@ -107,3 +107,7 @@ curl -sS "$BASE/chat/completions" -H "Authorization: Bearer $TOKEN" \
   -d '{"model":"'"$MODEL"'","messages":[{"role":"user","content":"能力位 brain_unify 是干什么的？它属于哪个域？"}],
        "max_tokens":400,"temperature":0}'
 ```
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

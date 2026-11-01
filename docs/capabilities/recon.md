@@ -1,4 +1,4 @@
-# 只读侦察 · `recon`（17 位）
+# 只读侦察 · `recon`（18 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -12,6 +12,7 @@
 | `osint_scan` | 只读 | 是 | `target` | `user_error` | OSINT 扫描（DNS/WHOIS/子域名/端口/指纹/邮箱/IP归属/社交；拒绝内网目标） |
 | `rea_reverse` | 只读 | — | —（注册表：无必填） | `user_error` | REA 桥 —— 吞天吞进来的第一件「能装能跑」的外部能力（主人 2026-10-11 图片 ⇒ devour_github 真吞成胶囊 devoured_morluto_rea；上游 https://rea.tools/ · morluto/rea · npm rea-agen… |
 | `recon_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **蒸馏件**（不是外挂）：把吞入件 morluto/rea 的方法论提炼成**我们自己的**逆向取证骨架（主人令 2026-10-12「我们吞噬都是加入蒸馏提炼出契合我们的能力」「蒸馏提炼出契合我们的能力才是我们的」）。四条蒸馏：①证据契约 op=evidence（claim/… |
+| `research_intel` | 只读 | — | —（注册表：无必填） | `user_error` | 调研 AI 情报部门：三组只读骨架（画禁区 / 找流量 / 定方向）。op=coverage 覆盖读数，op=group 分组。**只读**，不发布、不改生产。 |
 | `scrapling` | 只读 | — | —（注册表：无必填） | `user_error` | 网页抓取（Scrapling 0.4）：自适应选择器+反爬对抗；只抓公网（每个 URL 过 net_guard 边界，内网一律拒）；缺库如实报缺不冒充；响应体限量 2MB；浏览器级隐身抓取需另装内核，缺哪个说哪个 |
 | `skill_forge` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **技能蒸馏五式**（主人令 2026-10-16：把五个 skill 蒸成我们的原生能力）：蒸自五个 MIT 仓的思想—— ① **女娃**（nuwa-skill）不是复制人、是提炼思维框架（心智模型/决策启发式/表达 DNA/边界）② **last30days**：agent… |
 | `spider_ops` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **自适应抓取编排**（主人令 2026-10-16：把 **Scrapling** 蒸成原生能力）：蒸自 **D4Vinci/Scrapling**（BSD-3-Clause · Python · 88,008 星）的思想—— 核心是 **adaptive**：页面结构一变选择… |
@@ -116,6 +117,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap recon_distill '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `research_intel`
+
+- **域**：`recon`（只读侦察）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：调研 AI 情报部门：三组只读骨架（画禁区 / 找流量 / 定方向）。op=coverage 覆盖读数，op=group 分组。**只读**，不发布、不改生产。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap research_intel '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `scrapling`
 
 - **域**：`recon`（只读侦察）
@@ -218,3 +230,7 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

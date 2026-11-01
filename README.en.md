@@ -105,3 +105,7 @@ Bypassing it means bypassing audit, which the project treats as the failure mode
 ## License
 
 Apache-2.0 © 自由的风 (GBT Xiaotudou V8). The signature in this file must not be removed.
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

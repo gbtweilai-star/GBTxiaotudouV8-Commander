@@ -94,3 +94,7 @@ python -m gbt_allinone auth grant --scope deploy_publish --ttl 600
 1. 本页的写面**没有真跑**（无票）—— 所以"晋升一定成功"这句话这里**没有**证据；
 2. `mirror_parity` 的 `same_host` 模式只证明"同机同解释器"；跨机一致性要另开沙盒验；
 3. 房间（room）那层的 `room_create/plan/simulate/parity/rehearse/release` 同理：只读面免费、写面要票。
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

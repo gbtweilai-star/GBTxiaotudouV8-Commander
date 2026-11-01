@@ -1,0 +1,21 @@
+/* GBT小土豆V8 · 站点审美令牌（共享层） —— 重建版（2026-11-01 补齐）
+ * ============================================================================
+ * 为什么有这个文件：`holo_pet_w3/` 下多页 `<link rel="stylesheet" href="../theme/taste-tokens.css" />`，
+ * 但该文件从未随仓库发布（全仓 0 文件，上游 main 逐路径实测 404）。
+ * 原注释写的单一源是 `state/taste/*.json` → 本文件；盘上两处都不存在。
+ *
+ * 本文件的令牌**逐字对齐** `tools/codex-scripts/_taste_inline.py` 的冻结快照，
+ * 而那份快照取自 2026-10-27 之后已生成页的内联块（`holo_pet_w3/capabilities/index.html`）。
+ * ⇒ 新页内联的令牌 = 本文件挂出去的令牌，**不会出现两套色板**。
+ *
+ * 纪律：本文件只声明令牌，不写元素规则（不覆盖各页自己的版式）。
+ */
+:root{
+ --taste-ground:#0B1120;--taste-surface:#111827;--taste-raised:#1A2535;
+ --taste-border:#1E3A5F;--taste-rule:#162035;--taste-control:#1E3A5F;
+ --taste-text:#E8ECF8;--taste-muted:#9AA4C4;--taste-faint:#6B7280;
+ --taste-accent:#F5B041;--taste-positive:#00E5FF;--taste-negative:#EF4444;
+ --taste-warning:#F5B041;--taste-unknown:#7C4DFF;
+ --taste-radius:10px;--taste-font:Segoe UI, system-ui, sans-serif;
+ --taste-fs-title:22px;--taste-fs-section:16px;--taste-fs-kpi:22px;
+ --taste-fs-body:13px;--taste-fs-small:11.5px}

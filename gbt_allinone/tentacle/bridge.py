@@ -1126,6 +1126,39 @@ def invoke(method: str, *args, **kwargs) -> dict:
     return {"ok": True, "result": result, "cognition": cog}
 
 
+def plan(intent: str) -> dict:
+    """**先想后动**：让主干自己的权重决定这一步该用哪只手（只出判决，不动手）。
+
+    与 `invoke("auto", ...)` 的唯一区别：那个会**执行**；plan 只回答"我会选哪个、为什么"。
+    用途有两个：
+      ① 真动手之前对齐（选错了先纠，不先撞）；
+      ② 逐条核对「这根触手能不能被自己的脑子选中」—— owner 2026-10-31 的要求
+         「所有的触手都要能通过我们自己的大模型权重」，验的就是这个函数。
+
+    判决来自 `semantic_route`，而它现在的第一顺位是本机权重车道
+    （`tentacle/commander.py`）；本机没起时按原降级链走，并把降级**如实标注**。
+    """
+    from .. import semantic_route as SR
+    t0 = time.time()
+    text = str(intent or "").strip()
+    if not text:
+        return {"ok": False, "error": "需要 intent：一句话说明你要做什么"}
+    try:
+        r = SR.route(text, mode="auto")
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:160]), "intent": text[:120]}
+    best = r.get("best") or {}
+    method = r.get("method") or best.get("method")
+    lane = r.get("lane") or ("heuristic" if r.get("path") == "heuristic" else "cloud_llm")
+    return {"ok": bool(method), "intent": text[:120], "method": method, "lane": lane,
+            "space": r.get("space"),
+            "path": r.get("path"), "degraded": bool(r.get("degraded")),
+            "degraded_reason": r.get("degraded_reason"),
+            "why": r.get("reason") or best.get("why"),
+            "candidates": r.get("candidates"),
+            "ms": int((time.time() - t0) * 1000)}
+
+
 def is_capability(kind: str) -> bool:
     """这个名字是不是本体能力？真相只有一处：`caps_registry`。"""
     try:

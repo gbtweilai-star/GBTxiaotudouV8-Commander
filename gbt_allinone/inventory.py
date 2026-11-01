@@ -26,6 +26,52 @@ _HOME_IS_WORKSPACE = (_HOME / ".openclaw").is_dir() or (
     (_HOME / "SOUL.md").exists() and (_HOME / "AGENTS.md").exists())
 _FRAMEWORK_ROOT = {"README.md", "requirements.txt", "gbt_allinone"}
 
+# ── 部署形态（2026-11-01 主人令「按源码推荐落地」后补的真判据，不是改尺子）──
+# 旧分类器只有一种形态假设：**家根是收过的目录、仓库包在子目录里**（作者机器 /var/minis/shared/gbtv8）。
+# 于是把仓库根当工作目录（checkout）时，docs/ assets/ tests/ tools/ 这些**本来属于仓库**的顶层项
+# 全被判成"异物"（实测 29 项假阳性，file_hygiene/cross_scan 跟着一起红）。
+# 修法不是搬目录、也不是把分类表调松，而是**多认一种形态**：
+#   checkout：根上有 pyproject.toml + gbt_allinone/ ⇒ 根就是仓库，仓库自己声明过的顶层项归 framework；
+#   home    ：保持旧口径不动（旧机器的读数一个数都不变）。
+_CHECKOUT = (_HOME / "pyproject.toml").exists() and (_HOME / "gbt_allinone").is_dir()
+_REPO_TOP: set = set()
+
+
+def _repo_top() -> set:
+    """checkout 形态下「仓库自己声明过的顶层项」——来源是**仓库自己的页图**，不是手写清单。
+
+    取 state/page_bind.json 的页面前缀（1706 页现读）；取不到就只认固定件，
+    **绝不猜**（猜出来的白名单就是假绿）。
+    """
+    global _REPO_TOP
+    if _REPO_TOP:
+        return _REPO_TOP
+    names: set = set()
+    # ① 首选：**声明清单** state/repo-layout.json（由仓库快照生成，不是手写）
+    try:
+        import json as _json
+        lay = _json.loads((_HOME / "state" / "repo-layout.json").read_text(encoding="utf-8"))
+        names |= {str(x) for x in (lay.get("top_level") or []) if str(x).strip()}
+    except Exception:                                    # noqa: BLE001
+        pass
+    # ② 兜底：页图的顶层前缀
+    try:
+        import json as _json
+        d = _json.loads((_HOME / "state" / "page_bind.json").read_text(encoding="utf-8"))
+        for page in d.get("pages") or []:
+            top = str(page).split("/")[0].strip()
+            if top and not top.startswith(".") :
+                names.add(top)
+    except Exception:                                    # noqa: BLE001
+        pass
+    names |= {"pyproject.toml", "LICENSE", "NOTICE", "CITATION.cff", "CHANGELOG.md",
+              "README.md", "README.en.md", "SECURITY.md", "CONTRIBUTING.md",
+              "WEIGHTS.md", "PROOF-weights.md", "PROJECT_BLUEPRINT.md", "install.ps1",
+              "index.html", "sw.js", "manifest.webmanifest", "demo.py", "worker.html",
+              "gbt_allinone", "requirements.txt"}
+    _REPO_TOP = names
+    return names
+
 # 环境文件的单一来源（归属裁判在此）：
 # 规则化判定（结构性特征）+ 显式清单兜底——桌面端新增文件类型时规则自动覆盖。
 _ENV_FILES = {
@@ -88,6 +134,9 @@ def _classify(p: Path) -> str:
         return "framework"
     if name in ("README.md", "requirements.txt", "gbt_allinone"):
         return "framework"
+    # checkout 形态：仓库自己声明过的顶层项 = 框架本体（**不是**异物）
+    if _CHECKOUT and name in _repo_top():
+        return "framework"
     # 环境文件（OpenClaw workspace——规则化判定，单一来源在此）
     if _is_environment(name):
         return "environment"
@@ -95,6 +144,9 @@ def _classify(p: Path) -> str:
     # 与 hygiene 铁律2 对齐——不算框架异物
     if (name.startswith("_") and name.endswith((".py", ".txt"))) or name.endswith((".tmp", ".deleted")):
         return "transient"
+    # 2026-11-01 主人令：**交付产物**（根下 交付* / outputs/**）归 data，不是异物
+    if name.startswith("交付") or rel.startswith("outputs/"):
+        return "data"
     # 其他皆异物
     return "foreign"
 
@@ -183,6 +235,9 @@ def scan(fix: bool = False) -> dict:
         "framework_detail": fw_detail,
         "data_detail": data_detail,
         "fixed": fixed,
+        "mode": "checkout" if _CHECKOUT else "home",
+        "assumption": ("checkout：根即仓库，仓库声明过的顶层项算 framework" if _CHECKOUT
+                        else "home：家根是收过的目录，仓库包在子目录里"),
         "law": "framework=她的本体 environment=桌面端的家 data=她记得的 foreign=要处置的",
         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "elapsed_ms": round((time.time() - t0) * 1000, 1),

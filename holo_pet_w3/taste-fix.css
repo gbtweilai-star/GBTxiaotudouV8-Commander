@@ -1,0 +1,209 @@
+/* taste-guard fix · 2026-11-01
+   只作用于上帝视角 index：让 taste_guard deep_audit 的 FAIL 归零。
+   不动 window.js / 数据契约；只修版式、字体、影、线、标题、图与动效。 */
+
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+body.gbt-body {
+  padding: 20px 24px 72px !important;
+  background: #0b1120 !important;
+  color: #e8eef8;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.gbt-topbar, .gbt-tabs, .gbt-main, .gbt-statusbar {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.gbt-topbar, .gbt-tabs, .gbt-statusbar, .gbt-card, #card-workbench, h2, h3 {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+.gbt-topbar {
+  border: 0 !important;
+  border-bottom: 0 !important;
+  padding: 8px 0 16px !important;
+  background: transparent !important;
+}
+.gbt-tabs {
+  border: 0 !important;
+  padding: 8px 0 20px !important;
+  background: transparent !important;
+}
+.gbt-tab {
+  border: 0 !important;
+  background: transparent !important;
+  color: #b8c4d8 !important;
+  min-height: 44px;
+  padding: 10px 14px !important;
+  font-size: 15px !important;
+}
+.gbt-tab[data-active="true"] { color: #ffe2b8 !important; }
+.gbt-main { padding: 0 0 40px !important; }
+.gbt-card, #card-workbench {
+  border: 0 !important;
+  background: #141c2e !important;
+  border-radius: 18px !important;
+}
+h2 {
+  border: 0 !important;
+  padding: 0 0 12px !important;
+  font-size: 22px !important;
+  line-height: 1.25;
+}
+.gbt-statusbar { border: 0 !important; border-top: 0 !important; }
+
+/* 正文不要等宽；只有真代码块保留 */
+.gbt-body, .gbt-body p, .gbt-body span, .gbt-body button, .gbt-body input,
+.gbt-body h1, .gbt-body h2, .gbt-body h3, .gbt-body td, .gbt-body th,
+.gbt-body .gbt-chip, .gbt-body .gbt-dim, .gbt-body .gbt-brand {
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", sans-serif !important;
+}
+.gbt-body .gbt-chip, .gbt-body .gbt-dim, .gbt-body .gbt-badge { font-size: 13px !important; }
+.gbt-body pre, .gbt-body code, .gbt-body .gbt-json {
+  font-family: Consolas, "Cascadia Mono", monospace !important;
+  font-size: 13px !important;
+}
+
+a { color: #ffb454; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: #ffd79a; }
+
+/* 首屏：标题、说明、动作、真实影像 */
+.gbt-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+  padding: clamp(32px, 6vw, 84px) 0 32px;
+}
+.gbt-hero h1 {
+  margin: 0 0 22px;
+  max-width: 12ch;
+  font-size: clamp(44px, 6.6vw, 92px);
+  line-height: .98;
+  letter-spacing: -.045em;
+  color: #f4f7ff;
+}
+.gbt-hero p {
+  margin: 0 0 26px;
+  max-width: 44ch;
+  color: #b8c4d8;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.6;
+}
+.gbt-cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 22px; }
+.gbt-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #ffb454;
+  color: #111827 !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+.gbt-cta-ghost {
+  background: transparent;
+  color: #f4f7ff !important;
+  box-shadow: inset 0 0 0 1px #2a3854;
+}
+.gbt-stats { color: #8fa1bd; font-size: 14px !important; letter-spacing: .02em; }
+.gbt-hero-media { margin: 0; }
+.gbt-hero-media video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: 62vh;
+  object-fit: cover;
+  background: #000;
+  border-radius: 18px;
+}
+.gbt-hero-media figcaption { margin-top: 10px; color: #8fa1bd; font-size: 13px !important; }
+
+.gbt-shots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 0 26px;
+}
+.gbt-shots img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 14;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #141c2e;
+}
+
+.gbt-proof { padding: 24px 0 8px; }
+.gbt-proof h2 { max-width: 18ch; font-size: clamp(28px, 3.2vw, 44px) !important; }
+.gbt-proof > p { max-width: 62ch; color: #b8c4d8; font-size: 17px; }
+.gbt-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+.gbt-proof-grid article {
+  background: #141c2e;
+  border-radius: 16px;
+  padding: 22px;
+}
+.gbt-proof-grid h3 { margin: 0 0 8px; font-size: 18px; color: #ffe2b8; }
+.gbt-proof-grid p { margin: 0; color: #b8c4d8; font-size: 15px; line-height: 1.6; }
+
+/* 载入与滚动：>8 个元素有位移，reduced-motion 时全部停 */
+@keyframes tasteRise {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.gbt-hero, .gbt-hero-media, .gbt-topbar, .gbt-tabs,
+.gbt-tab:nth-child(1), .gbt-tab:nth-child(2), .gbt-tab:nth-child(3),
+.gbt-tab:nth-child(4), .gbt-tab:nth-child(5), .gbt-shots img,
+.gbt-view[data-active="true"] .gbt-card, .gbt-proof-grid article {
+  animation: tasteRise .7s cubic-bezier(.2, .7, .2, 1) both;
+}
+.gbt-tab:nth-child(2) { animation-delay: .06s; }
+.gbt-tab:nth-child(3) { animation-delay: .12s; }
+.gbt-tab:nth-child(4) { animation-delay: .18s; }
+.gbt-shots img:nth-child(1) { animation-delay: .10s; }
+.gbt-shots img:nth-child(2) { animation-delay: .16s; }
+.gbt-shots img:nth-child(3) { animation-delay: .22s; }
+.gbt-shots img:nth-child(4) { animation-delay: .28s; }
+.gbt-cta, .gbt-tab, .gbt-btn, .gbt-actions a {
+  transition: transform .2s ease, background-color .2s ease, color .2s ease;
+}
+.gbt-cta:hover, .gbt-btn:hover, .gbt-tab:hover { transform: translateY(-2px); }
+
+@media (max-width: 760px) {
+  body.gbt-body { padding: 16px 20px 56px !important; }
+  .gbt-hero { grid-template-columns: 1fr; padding-top: 24px; }
+  .gbt-hero-media { order: -1; }
+  .gbt-hero-media video { max-height: 48vh; }
+  .gbt-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gbt-proof-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* 第二轮：标题两行内、边距相等、去影、按钮、移动端 h1 先出现 */
+* { text-shadow: none !important; }
+.gbt-topbar, .gbt-tabs, .gbt-main, .gbt-statusbar { max-width: none !important; }
+.gbt-hero h1 { max-width: 14ch; font-size: clamp(44px, 6.2vw, 88px); }
+.gbt-cta { border: 0 !important; cursor: pointer; font-size: 16px; }
+@media (max-width: 760px) {
+  .gbt-hero { grid-template-columns: 1fr; }
+  .gbt-hero-media { order: 0; }
+  .gbt-hero h1 { font-size: clamp(40px, 12vw, 56px); }
+}
+/* 第三轮：视图不再绝对定位覆盖首屏；低对比度标签提亮 */
+.gbt-main .gbt-view { position: static !important; inset: auto !important; }
+.gbt-main .gbt-view[data-active="true"] { display: block; }
+.gbt-badge, .gbt-statusbar, .gbt-dim, .gbt-engine { color: #aebbd0 !important; }

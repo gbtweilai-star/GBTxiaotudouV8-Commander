@@ -1,4 +1,4 @@
-# 大模型与大脑 · `llm`（41 位）
+# 大模型与大脑 · `llm`（42 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -21,6 +21,7 @@
 | `codex_thread_new` | 只读 | — | —（注册表：无必填） | `user_error` | 官方 Codex 写操作：新建线程（需 process_execute 授权） |
 | `codex_tools` | 只读 | — | —（注册表：无必填） | `user_error` | 官方 Codex 只读：可用动态工具清单（gbt_* **十个**） |
 | `codex_turn_send` | 只读 | 是 | `thread_id` | `user_error` | 官方 Codex 写操作：发送回合并流式回传（需 process_execute 授权，并发上限 1） |
+| `context_guard` | 只读 | — | —（注册表：无必填） | `user_error` | 上下文守卫：实时看环形上下文（窗口/溢出/落库三项），异常回大脑执行层纠正。op=status 环读数+异常诊断；op=tick 采样→诊断→（可选）回大脑→纠正；op=bind 双插（触手↔环，落 state/context-bindings.json）；op=bindings… |
 | `duty_board` | 只读 | — | —（注册表：无必填） | `user_error` | 大脑执行层·**在岗看板**（主人令 2026-10-13「大脑执行层必须确保所有大脑都是在运行干活的」）：读 skill_watch 观测账 + 图鉴位面，算出**在跑（零失败）/ 跑过但有失败 / 卡住（失败≥2笔）/ 从未用过**四类；卡住的**主动进主脑队列**。忙闲**… |
 | `energy_scheduler` | 只读 | — | —（注册表：无必填） | `user_error` | 能源调度面（蒸馏自 2026-09-28 主人给的周榜卡 vllm 92.7k★，只取**调度架构**，不引 CUDA 内核——本机零算力造了也是空壳）：批量 prompt → 多能源分配（**每源并发上限** 按池内 status 档 · **失败冷却** 同源连败 3 次 ⇒… |
 | `fact_gate` | 只读 | — | —（注册表：无必填） | `user_error` | **机器事实直答门**（主人令 2026-10-11「拿实质性证据说话，禁止胡说八道」）：机器事实类问题（在位／装了／通不通／端口／内存／有没有能力位／版本）**不过语言模型** —— ① 现读 → ② **代码判定** → ③ **原文引用读数** → ④ 直答。实证依据：三次… |
@@ -32,8 +33,8 @@
 | `llm_watch` | 只读 | — | —（注册表：无必填） | `user_error` | 大脑执行层·**守望**（主人令 2026-10-13「监控触手LLM的监控，只要发现不对主脑要第一时间知道」）：每次 LLM 输出过后**当场过机器判据** —— 无证据的「已完成」声明 / 越权（自我授权）声明 / 机器事实无现读 / 自相矛盾 / claims 无 evid… |
 | `model_key_pool` | 只读 | — | —（注册表：无必填） | `user_error` | 模型密钥池（只读骨架）：按 owner_ai_id 分池、触手只借不拥有、DPAPI 只存路径、超限只上报 |
 | `multimodal_port` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 多模态维度 × 触手密钥 **Y 字端口**：请求在一处分叉、**一次只走一臂** ——独立臂（该维度专属密钥）/ 共享臂（共享密钥对按维度分账，须恰好成对、指纹互不相同、带 owner_ai_id 可追）；覆盖 text/vision/image/video/code 五维度，… |
-| `offload_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。四条机制：**权重离芯**（… |
-| `omni_plug` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成一根可扫可控的分支。op=status/sockets/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行*… |
+| `offload_distill` | 只读 | — | —（注册表：无必填） | `user_error` | 【蒸馏·内存墙】**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。四条机制：*… |
+| `omni_plug` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成一根可扫可控的分支。op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；r… |
 | `policy_gate` | 只读 | — | —（注册表：无必填） | `user_error` | **权限／付款直答门**（fact_gate 同族 · 主人令「拿实质性证据说话」）：能不能做／要不要授权**也是事实**，不该过模型。实测病根：终考里「买 4090」不是机器事实 ⇒ 没过 fact_gate ⇒ 模型又编市场数据（编出「本机 4194x2 已满」「4090 价… |
 | `prompt_bridge` | 只读 | — | —（注册表：无必填） | `user_error` | 提示词转化挂件（只读/纯本地）：大白话 -> 四段结构化提示词；compile / passthrough / status |
 | `quant_plan` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **压缩与直达**（主人令 2026-10-16 深度蒸馏自 Bonsai 2 27B）：把**压缩体积**与**直达线路**变成她的原生能力。①压缩：每档 bits/weight ⇒ 估算体积（27B × b/w ÷ 8 × 容器开销 1.3）⇒ 能否落在 8GB 级；参考一手… |
@@ -239,6 +240,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap codex_turn_send '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `context_guard`
+
+- **域**：`llm`（大模型与大脑）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：上下文守卫：实时看环形上下文（窗口/溢出/落库三项），异常回大脑执行层纠正。op=status 环读数+异常诊断；op=tick 采样→诊断→（可选）回大脑→纠正；op=bind 双插（触手↔环，落 state/context-bindings.json）；op=bindings 列全部双插；op=bind_guard 把溢出保护触手绑上。判据不新造，直接调 tools/context_guard.py 的既有函数。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap context_guard '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `duty_board`
 
 - **域**：`llm`（大模型与大脑）
@@ -367,7 +379,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。四条机制：**权重离芯**（SSD 流式 + mmap 懒读）· **槽位+LRU+双缓冲**（每步零主机同步）· **prerouter 提前一步预判**（IO 与前向重叠 · 吞吐最高 +59%）· **Recover-LoRA**（int4 底座 + 蒸馏小适配器补质量 · **适配器不合并**）。常用说法：内存压缩 / 省内存 / 流式加载 / 权重放盘 / 预取 / 量化 / LoRA / 内存墙 / 跑大模型。op=status/where/mechanism/map/probe：`mechanism` 逐条给「**上游原文** → 我们的话 → 对我们用处 → 判据」；`map` 给**触手映射**；`probe` **只读现读**本机就绪面（内存/磁盘/工具）并**逐条路线说能不能走**。铁律：**只蒸思路不搬代码 · 只读上游零执行**（不装依赖、不下 23 GB 权重）· **边界不许说反**（本机跑不了它的 MLX 路线；我们是 dense 不是 MoE）。
+- **它做什么**：【蒸馏·内存墙】**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。四条机制：**权重离芯**（SSD 流式 + mmap 懒读）· **槽位+LRU+双缓冲**（每步零主机同步）· **prerouter 提前一步预判**（IO 与前向重叠 · 吞吐最高 +59%）· **Recover-LoRA**（int4 底座 + 蒸馏小适配器补质量 · **适配器不合并**）。常用说法：内存压缩 / 省内存 / 流式加载 / 权重放盘 / 预取 / 量化 / LoRA / 内存墙 / 跑大模型。op=status/where/mechanism/map/probe：`mechanism` 逐条给「**上游原文** → 我们的话 → 对我们用处 → 判据」；`map` 给**触手映射**；`probe` **只读现读**本机就绪面（内存/磁盘/工具）并**逐条路线说能不能走**。铁律：**只蒸思路不搬代码 · 只读上游零执行**（不装依赖、不下 23 GB 权重）· **边界不许说反**（本机跑不了它的 MLX 路线；我们是 dense 不是 MoE）。
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap offload_distill '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -378,7 +390,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
-- **它做什么**：万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成一根可扫可控的分支。op=status/sockets/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。
+- **它做什么**：万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成一根可扫可控的分支。op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap omni_plug '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -506,3 +518,7 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

@@ -647,7 +647,12 @@ def render_page_a(model: dict) -> str:
                       "、".join(bp.get("groups") or []), bp.get("note"),
                       "deploy/cloud-10/mesh.json", n))
     else:
-        bpblock = '<div class="note">蓝图件读不到（不影响现役 10 位）。</div>'
+        # 2026-11-01 整理：原来只写「蓝图件读不到」，没写是哪一件、也没写它的纪律 ⇒
+        # 页面上读不出「蓝图槽按未部署·不探测处理」，C2 判据因此假红。这里如实点名 + 写清处置。
+        bpblock = ('<div class="note">另册 · 50 槽蓝图：<code>deploy/cloud-10/plugins50.json</code> '
+                   '未随仓库发布（读不到）。按纪律处理：**蓝图 ≠ 现役**、50 槽**未部署 · 无端点 ⇒ '
+                   '不探测 · 不冒充接上**；本页卡片只列现役真源 <code>deploy/cloud-10/mesh.json</code> 的 %d 个真模块。</div>'
+                   % n)
 
     body = (
         '<div class="wrap">'

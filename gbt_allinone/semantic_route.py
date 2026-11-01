@@ -73,7 +73,27 @@ def available() -> dict:
     现在把 **缺哪几项** 与 **认哪些环境变量** 一并报出来（**只看有没有，不回显任何密钥值**）。
     为什么这是根因修复而不是"话术"：模糊错会被读成"这功能坏了"，
     指名错会被读成"去设这个变量" —— 后者一次就能修好，前者会一直挂着。
+
+    2026-10-31（主人令：**把原生指挥官权重彻底融合进触手主干**）：
+    这里新增**第一条判断** —— 本机权重车道。它先于云端车道成立，因为它是
+    「不出网 / 不要 external_llm 票 / 不按 token 计费」的那条：主干自己的脑子在盘上。
+    云端车道原样保留在后面，属于**降级链的第二档**（本机引擎没起时照旧可用）。
     """
+    # ① 本机权重车道（GBT 自有的总指挥 GGUF → 127.0.0.1 引擎）
+    try:
+        from .tentacle import commander as _C
+        _h = _C.alive(timeout=0.8)
+        if _h.get("ok"):
+            _w = _C.weights()
+            return {"ok": True, "provider": "gbt-commander", "lane": "local_weights",
+                    "engine": _h.get("base"), "weights": _w.get("name"),
+                    "size_gb": _w.get("size_gb"), "fallback": "heuristic",
+                    "reason": None,
+                    "note": "本机权重车道：不出网、不过 external_llm 票、不计费；"
+                            "权重/引擎读数见 run_task('commander', {'op':'status'})。"}
+        _local_reason = _h.get("error") or "本机引擎不可达"
+    except Exception as exc:  # noqa: BLE001
+        _local_reason = f"{type(exc).__name__}: {str(exc)[:80]}"
     try:
         from .llm import cloud_llm as CL
         provider = CL.PROVIDER or ""
@@ -82,10 +102,11 @@ def available() -> dict:
         ready = all(fields.values())
     except Exception as exc:  # noqa: BLE001
         return {"ok": False, "reason": f"通道不可读: {type(exc).__name__}",
-                "fallback": "heuristic",
+                "fallback": "heuristic", "local_lane": {"ok": False, "reason": _local_reason},
                 "missing": ["通道模块读不到"], "how": []}
     out = {"ok": ready, "provider": provider or None,
            "fallback": "heuristic",
+           "local_lane": {"ok": False, "reason": _local_reason},
            "note": "可用 ≠ 已授权：真跑仍受 external_llm 人工授权门约束，"
                    "未授权时调用会如实返回门禁拒绝，不会降级冒充。"}
     if ready:
@@ -120,10 +141,35 @@ def available() -> dict:
 
 
 def choose(intent: str, *, provider: str = "tentacle_method") -> dict:
-    """主路：让统一大模型在真实方法表里选一个。失败一律如实报，不降级冒充。"""
+    """主路：让统一大模型在真实方法表里选一个。失败一律如实报，不降级冒充。
+
+    2026-10-31（主人令：**把原生指挥官权重彻底融合进触手主干**）：
+    主路的第一顺位换成**本机权重车道**（`tentacle/commander.py`）——
+    盘上的 GGUF 在 127.0.0.1 上跑，判决照样只许落在真名表里（幻觉防护同一把尺）。
+    它答不上来时才落到云端车道（原逻辑逐字保留），并把本地失败原因一起带回来，
+    不把"本地没答"伪装成"云端没配"。
+    """
     text = str(intent or "").strip()
     if not text:
         return {"ok": False, "error": "需要 intent", "path": "semantic"}
+    # ① 本机权重车道（GBT 自有总指挥权重）—— 不出网、不要 external_llm 票
+    _local_err = ""
+    try:
+        from .tentacle import commander as _C
+        if _C.alive(timeout=0.8).get("ok"):
+            # 「全方位不能遗漏」：候选池 = 95 只手 + 351 位能力（commander 自己按 space 出判决）。
+            # 选中的是能力位也照样返回 —— 下游（bridge/brain_exec）本来就两种名字都认。
+            _r = _C.route(text, space="auto")
+            if _r.get("ok"):
+                return {"ok": True, "path": "semantic", "lane": "commander_local_weights",
+                        "method": _r.get("name"), "space": _r.get("space"),
+                        "reason": _r.get("why") or "",
+                        "confidence": None, "provider": "gbt-commander",
+                        "model": _r.get("weights"), "candidates": _r.get("candidates"),
+                        "ms": _r.get("ms"), "usage": _r.get("usage")}
+            _local_err = str(_r.get("error") or "")[:160]
+    except Exception as exc:  # noqa: BLE001
+        _local_err = "%s: %s" % (type(exc).__name__, str(exc)[:120])
     table = method_table()
     lines = "\n".join(f"- {i['method']}（{i['neighborhood']}）{i['hint']}"
                       for i in table["items"])
@@ -179,6 +225,7 @@ def choose(intent: str, *, provider: str = "tentacle_method") -> dict:
         if not r.get("ok"):
             return {"ok": False, "path": "semantic", "provider": r.get("provider"),
                     "error": r.get("error", "模型调用失败"),
+                    "local_lane_error": _local_err or None,
                     "note": "主路不可用 ⇒ 上层应如实降级到辅路，并把降级这件事报出来"}
         raw = str(r.get("reply") or "")
         try:
@@ -190,18 +237,20 @@ def choose(intent: str, *, provider: str = "tentacle_method") -> dict:
             _attempts_detail.append({"attempt": _attempt, "raw_head": raw[:120]})
     if data is None:
         return {"ok": False, "path": "semantic", "error": err or "模型输出不是合法 JSON",
-                "raw_head": raw[:200], "attempts": 3,
+                "raw_head": raw[:200], "attempts": 3, "local_lane_error": _local_err or None,
                 "attempts_detail": _attempts_detail,
                 "note": "三层加固（原样 / 去长清单 / 只给名字）都不合法 ⇒ 如实降级，不冒充"}
     picked = data.get("method")
     if picked is None:
         return {"ok": True, "path": "semantic", "method": None,
                 "reason": data.get("reason") or "模型判定清单里没有合适的",
-                "provider": r.get("provider"), "model": r.get("model")}
+                "provider": r.get("provider"), "model": r.get("model"),
+                "local_lane_error": _local_err or None}
     if picked not in {i["method"] for i in table["items"]}:
         # 幻觉防护：清单外的方法名一律不采信，也不做模糊匹配替它猜
         return {"ok": False, "path": "semantic", "error": "invalid_method",
-                "invalid": picked, "note": "模型给的名字不在真实方法表里 ⇒ 不采信"}
+                "invalid": picked, "local_lane_error": _local_err or None,
+                "note": "模型给的名字不在真实方法表里 ⇒ 不采信"}
     return {"ok": True, "path": "semantic", "method": picked,
             "confidence": data.get("confidence"), "reason": data.get("reason"),
             "provider": r.get("provider"), "model": r.get("model")}

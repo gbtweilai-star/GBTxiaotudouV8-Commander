@@ -301,3 +301,16 @@ index-numbering 4 · first-title 3 · hairline 3 · emoji 2 · mono 2 · glass 1
 
 清单（可回滚）：
 `state/css_version_manifest.json` · `state/emoji_clean_manifest.json` · `brain/cap.js` 备份在 `/tmp/cap.js.bak`
+
+---
+
+
+## 七、原生闸落地（2026-11-01）
+
+- 新增原生位 **`taste_guard`**（creation）：把上面家规钉成可离线数的 18 条静态检查，`op=status/rules/audit/brief`；
+- 只蒸规则，不搬 `library/`、`scripts/`、`assets/`；上游 MIT 保留；
+- 上游 `inspect.mjs` 已接：本机 **Node v26 + Edge**，`deep_audit` 在 1440/768/390 真跑并截图；实测 `holo_pet_w3/index.html` **10 FAIL / 9 WARN**（no-title、few-pictures、blank-gap、edge-text…），exit=1。
+- 契约 `docs/80-taste-guard.md`；测试 `tests/test_taste_guard.py` ALL PASS。
+
+- 修后实测 `holo_pet_w3/index.html`：**PASS · 0 FAIL / 2 WARN · 94 分**（明细 `整理报告/taste-guard-修复.md`）。
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

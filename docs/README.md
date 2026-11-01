@@ -11,9 +11,9 @@
 |---|---|---|
 | **按人话搜** | `python -m gbt_commander search "回滚到上一个版本"` | 只记得想干什么，不记得能力名 |
 | **看某个域** | `python -m gbt_commander catalog --domain pipeline` | 知道大概属于哪个域（30 个域任选） |
-| **一次看全部** | [`能力总表.md`](能力总表.md)（348 项 · 简版说明） | 通读、比对 |
-| **要全文说明** | [`capabilities-full.json`](capabilities-full.json)（348 条 · 每条约 226 字） | 机器读、要完整触发词 |
-| **要人读全文** | [`capabilities/`](capabilities/)（30 份，含「它做什么」段） | 人读、要上下文 |
+| **一次看全部** | [`03-capabilities.md`](03-capabilities.md)（**368 项 · 本表由注册表现生成**） | 通读、比对 |
+| **要全文说明** | [`capabilities-full.json`](capabilities-full.json)（**快照 2026-10-25 · 349 条**；现读请用 `run_task("cap_self", {"op":"verify"})` 或 `caps_registry`） | 机器读、要完整触发词 |
+| **要人读全文** | [`capabilities/`](capabilities/)（30 份，**本轮已按 368 位重生成**） | 人读、要上下文 |
 | **按意图逛** | [`18-native-cloud-catalog.md`](18-native-cloud-catalog.md) | 「我要看/听/说/记事/省内存/稳定输出」 |
 
 **⚠️ 总表的说明列是简版（约 70 字）。触发词（放大 / 洗图 / 高清 / 4K …）在**
@@ -25,7 +25,7 @@
 
 | 文档 | 一句话 |
 |---|---|
-| [`01-model-card.md`](01-model-card.md) | 模型卡：7.6B 中文「总指挥」· 348 位能力 · 一个门 |
+| [`01-model-card.md`](01-model-card.md) | 模型卡：7.6B 中文「总指挥」· **368 位能力（现读）** · 一个门 |
 | [`02-architecture.md`](02-architecture.md) | 架构：为什么它敢叫「总指挥」 |
 | [`18-native-cloud-catalog.md`](18-native-cloud-catalog.md) | **能力总目录（按「我要干什么」查）** ← 最实用 |
 
@@ -35,8 +35,8 @@
 
 | 文档 | 一句话 + 关键词 |
 |---|---|
-| [`03-capabilities.md`](03-capabilities.md) | 能力总表入口 · **348 位 / 30 域** · 两套数口径 |
-| [`能力总表.md`](能力总表.md) | **逐条证据**（348 项）· 绑定 / 载体 / 接线文件 / 实测状态 |
+| [`03-capabilities.md`](03-capabilities.md) | 能力总表入口 · **368 位 / 30 域（注册表现生成）** · 两套数口径 |
+| [`03-capabilities.md`](03-capabilities.md) + [`capabilities/`](capabilities/) | **逐条清单**（368 项 · 本轮重生成）· 域 / 类型 / 需参数 / 常见错误 / 它做什么 |
 | [`07-capability-proof.md`](07-capability-proof.md) | **逐位真调**（341 位那一轮）· 340 ok / 1 needs-input · 零失败 |
 | [`16-capability-audit-341.md`](16-capability-audit-341.md) | 全量核对（341 位）· 红黄清零 · 8 处修复 · 3 个教训 |
 | [`capabilities/`](capabilities/) | 30 个域各一份，含「它做什么 / 怎么调」 |
@@ -75,11 +75,11 @@
 | 文档 | 一句话 + 关键词 |
 |---|---|
 | [`17-phone-a19-runtime.md`](17-phone-a19-runtime.md) | **手机端 A19 全链路** · Q5_0 5.24 GB · 8–11.7 tok/s · 三层接线 · Q4_0 撑不住的逐层爆炸表 |
-| [`身体-设备即本体.md`](身体-设备即本体.md) | 身体 · 设备即本体 |
-| [`身体能力位与多轮.md`](身体能力位与多轮.md) | **七根感官 + 六根动作** · `body_*` 七位 · 多轮上下文 · 界面接线 |
-| [`本体-一体式设计.md`](本体-一体式设计.md) | 模型 + APP 是一件事 |
-| [`APP-自有权重.md`](APP-自有权重.md) | 自有权重按需激活 |
-| [`GPU-车道实测与判决.md`](GPU-车道实测与判决.md) | GPU 车道实测与判决 |
+| `身体-设备即本体.md` （本快照无此文件） | 身体 · 设备即本体 |
+| `身体能力位与多轮.md` （本快照无此文件） | **七根感官 + 六根动作** · `body_*` 七位 · 多轮上下文 · 界面接线 |
+| `本体-一体式设计.md` （本快照无此文件） | 模型 + APP 是一件事 |
+| `APP-自有权重.md` （本快照无此文件） | 自有权重按需激活 |
+| `GPU-车道实测与判决.md` （本快照无此文件） | GPU 车道实测与判决 |
 
 ---
 
@@ -98,7 +98,7 @@
 | 文档 | 一句话 + 关键词 |
 |---|---|
 | [`05-deployment.md`](05-deployment.md) | 部署全链路 |
-| [`权重操作纪律.md`](权重操作纪律.md) | **权重操作纪律**（事故后立）· 禁止事项 |
+| `权重操作纪律.md` （本快照无此文件） | **权重操作纪律**（事故后立）· 禁止事项 |
 | [`WEIGHTS.md`](../WEIGHTS.md) | 四种权重的分片清单 + 一键安装 |
 | [`PROOF-weights.md`](../PROOF-weights.md) | **权重实证** · 12 项排除表 · Q4_0 vs Q8_0 逐层对照 |
 
@@ -110,8 +110,8 @@
 |---|---|
 | [`04-evaluation.md`](04-evaluation.md) | 评测：不看感觉，看读数 |
 | [`06-showcase.md`](06-showcase.md) | 真实回执（未经编辑） |
-| [`架构验收-五柱.md`](架构验收-五柱.md) | 五根柱子：双向绑定 / 名册可取 / 门 / 账 / 复现 |
-| [`验收-10问.md`](验收-10问.md) · [`验收-10问-v2.md`](验收-10问-v2.md) | Q5_0 十问验收（含事故后复验） |
+| `架构验收-五柱.md` （本快照无此文件） | 五根柱子：双向绑定 / 名册可取 / 门 / 账 / 复现 |
+| `验收-10问.md` （本快照无此文件） · `验收-10问-v2.md` （本快照无此文件） | Q5_0 十问验收（含事故后复验） |
 | [`09-mirror-space.md`](09-mirror-space.md) | 镜像空间：先在模拟世界跑绿，再晋升到现实 |
 | [`10-gbt-tianzhen.md`](10-gbt-tianzhen.md) | **GBT天真**：不装 ComfyUI，也跑得动 ComfyUI 的节点契约（27 个原生算子） |
 | [`21-tianzhen-usage.md`](21-tianzhen-usage.md) | **GBT天真 使用手册** · 三种调用方式 · 27 算子契约表 · 本机实跑读数 · 出图流水线 · 两条硬约束 · 踩过的坑 |
@@ -144,5 +144,62 @@
 
 ---
 
+## 十二、主干自有权重（2026-11-01 新增，10 份）
+
+> 这一组回答的是「她到底用谁的脑子、怎么保证不丢」。**条数一律现算，不写死**：
+> 现读 `run_task("cap_self", {"op": "brief"})` 或 `{"op":"verify"}`。
+
+| 文档 | 一句话 |
+|---|---|
+| [`39-commander-trunk.md`](39-commander-trunk.md) | **权重融合进主干**：自有权重 → llama-server → `semantic_route` 第一顺位；降级链三档；实测读数 |
+| [`40-page-binding-audit.md`](40-page-binding-audit.md) | **全仓页级双向绑定**：1706 页 100% 有绑定、反向 354/354、1 个连通分量、任意两页 ≤ 2 跳 |
+| [`41-pulse-core-native.md`](41-pulse-core-native.md) | **四合一原生位**：脉冲 / 量化压缩 2.71× / 按需激活 / 精准直达，`verify` 四判据 |
+| [`42-cap-self.md`](42-cap-self.md) | **能力自知**：三源对账（注册表↔快照↔分派），漂移即红；`has` 三种"没有"分开说 |
+| [`43-omni-open-auto.md`](43-omni-open-auto.md) | **万能插自动打开**：插口是扫出来的（不是固定六类），增量对比拔掉/断线会进声带 |
+| [`44-diagnostic-round.md`](44-diagnostic-round.md) | **按源码推荐跑诊断**：真缺陷 1 个（缺 `store/wf_runs`）；布局类异物属形态非缺陷；D/E/F 源码明令不实现 |
+| [`45-code-graph.md`](45-code-graph.md) | **补齐断链**：`code_graph` 模块此前不存在；顺带挖出 BOM 会让 `ast.parse` 静默失败 |
+| [`46-coverage-sample.md`](46-coverage-sample.md) | **判决层抽样**：56/60 = 93.3%；7 个 miss 全是模型辨别力，不是召回 |
+| [`47-deploy-install-supervisor.md`](47-deploy-install-supervisor.md) | **落地**：一键安装六步幂等 + 引擎守护（kill 后 7 秒自愈）；自启因权限未注册（如实记） |
+| [`48-signature-scope-gap.md`](48-signature-scope-gap.md) | **署名覆盖补漏**：docs/ 69 页从未被检查；新增 `scope=all`，现 100/100 |
+
+---
+
+
 **开发者：自由的风 · 护着：公主土豆**
 **本署名不可删除、不可篡改归属。**
+
+| 51 | [51-twin-caps-experiment.md](51-twin-caps-experiment.md) | 孪生位实验：加了区分词，2/5 命中 —— 结论是尺子本身有歧义 |
+| 52 | [52-human-intent-baseline.md](52-human-intent-baseline.md) | 人写意图基准：召回 100%，命中 1/6 |
+| 53 | [53-lexicon-scoped-routing.md](53-lexicon-scoped-routing.md) | 短意图修复：用人工词表收窄候选，1/6 → 5/5 |
+| 54 | [54-human-bench-final.md](54-human-bench-final.md) | 人写意图 24 条终值：16/24 = 66.7%（召回 100%） |
+| 55 | [55-tonight-ledger.md](55-tonight-ledger.md) | 今晚补齐清单与闭环固化 |
+| 57 | [57-alias-forge.md](57-alias-forge.md) | 别名锻造：新能力位自动获得直达入口 |
+| 58 | [58-pulse-first-route.md](58-pulse-first-route.md) | 脉冲优先路由：主干真的省掉 40s 级调用 |
+| 59 | [59-comfy-parity.md](59-comfy-parity.md) | GBT天真 ↔ 秋叶版一比一：传统面 100%、模型面如实不接 |
+| 60 | [60-comfy-engine.md](60-comfy-engine.md) | GBT天真 执行引擎加固：旁路/循环/失败回滚/未接线明说 |
+| 61 | [61-comfy-harvest.md](61-comfy-harvest.md) | 秋叶版取食器：只取缺的、用得上的，权重一个不下 |
+| 62 | [62-comfy-node-scaffold.md](62-comfy-node-scaffold.md) | 补节点脚手架：三族模板 + 独立 extras 模块 + 判据 |
+| 63 | [63-comfy-ref-rebuild.md](63-comfy-ref-rebuild.md) | 参照重建（127→1000）+ 分类升级 + 批次 A 12 节点 |
+| 64 | [64-native-workflow-import.md](64-native-workflow-import.md) | 原生 ComfyUI 图导入：转换 + 校验 + 未接线原因 |
+| 65 | [65-comfy-import-dir.md](65-comfy-import-dir.md) | 批量导入目录：可跑/要GPU/未知/坏文件四分类 |
+| 66 | [66-comfy-run-snapshots.md](66-comfy-run-snapshots.md) | 可复跑快照：每图留指纹 + replay 验 sha256 |
+| 67 | [67-autonomy-contract.md](67-autonomy-contract.md) | 自主契约：架构给完后除危险能力/转账不许打扰主人 |
+| 68 | [68-blueprint-chain.md](68-blueprint-chain.md) | 蓝图主链：架构→蓝图→过目→思维导图→派遣→落地 |
+| 69 | [69-run-to-landing.md](69-run-to-landing.md) | 跑到落地：中途不停，只有落地/需票/轮尽才停 |
+| 70 | [70-research-on-blocker.md](70-research-on-blocker.md) | 卡点研究环：查资料→落知识→重排任务，不问人 |
+| 71 | [71-stuck-task-protection.md](71-stuck-task-protection.md) | 死循环保护：两轮失败标 stuck 并剔除，不装落地 |
+| 72 | [72-blueprint-templates.md](72-blueprint-templates.md) | 蓝图模板库：落地即沉淀，相似架构 ≥2 关键词才复用 |
+| 73 | [73-one-line-entry.md](73-one-line-entry.md) | 一句话入口：说一句 走完整链，未确认则停在蓝图 |
+| 74 | [74-two-way-sync.md](74-two-way-sync.md) | 一键双向同步：交付树 ↔ live 工作仓（计划/执行/校验三层） |
+| 75 | [75-sync-guard.md](75-sync-guard.md) | 双仓同步巡检位：status/verify/patrol + notify 推送 |
+| 76 | [76-viral-forge.md](76-viral-forge.md) | 爆款拆解·克隆配方：吸收 hypit 设计，词锚配方 + 变体钩子 |
+| 77 | [77-drama-forge.md](77-drama-forge.md) | 短剧产线：剧本→分镜→SAPI 旁白/字幕→竖屏成片，分镜卡/自有图两模式 |
+| 78 | [78-sync-clobber-fix.md](78-sync-clobber-fix.md) | 双向同步回滚修复：newer-wins + 测试自清，防"刚改就被旧副本打回" |
+| 79 | [79-legacy-guard.md](79-legacy-guard.md) | 旧物守卫：六类旧/重复检查，自注册插件 |
+| 80 | [80-taste-guard.md](80-taste-guard.md) | 反-slop 设计闸：蒸馏 taste-skill 18 条 house rules，HTML 静态审计 |
+| 81 | [81-single-source-of-truth.md](81-single-source-of-truth.md) | 唯一真相：旧副本制造歧义，newer-wins + 单一真相 |
+| 86 | [86-repo-cleanup-plan.md](86-repo-cleanup-plan.md) | 原始仓库整理：删 2323 文件/154MB 运行态，补 .gitignore |
+| 87 | [87-repo-cleanup-done.md](87-repo-cleanup-done.md) | 原始仓库整理完成：5108→2708 文件，删 2323 个/154MB |
+| 82 | [82-experience-forge.md](82-experience-forge.md) | 成长闭环：外部验证通过才准固化，存记忆/工具/规则不写权重 |
+| 83 | [83-mirror-stage.md](83-mirror-stage.md) | 镜像工作空间：生产只读→多候选→验证→整页原子替换，失败不进生产 |
+| 84 | [84-remote-controller.md](84-remote-controller.md) | 远程接管授权内核：远端用户点同意 + agent 签名才发 session |

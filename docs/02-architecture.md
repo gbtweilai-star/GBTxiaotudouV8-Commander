@@ -115,3 +115,7 @@ caps_registry（唯一真源）
 - 能力全量：[`03-capabilities.md`](03-capabilities.md)
 - 评测口径：[`04-evaluation.md`](04-evaluation.md)
 - 怎么部署：[`05-deployment.md`](05-deployment.md)
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

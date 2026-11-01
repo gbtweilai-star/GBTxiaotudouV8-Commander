@@ -97,11 +97,28 @@ def _scan_pages():
     return [p for p in pages if p.is_file()]   # 只收真文件（版本快照是同名目录，排除）
 
 
-def audit(restore: bool = False) -> dict:
-    """扫描页面署名完整性。restore=True 时自动补回被删署名。"""
+def _scan_docs() -> list:
+    """仓库 `docs/**/*.md` —— 2026-11-01 实测：77 页只有 8 页带署名，
+    而旧的 `_scan_pages()` 根本不看这里 ⇒ 「每一页都要署名」这条规则在 docs/ 上从未被检查。
+    只给 `scope="all"` 用：**如实量出来，不擅自批量改主人的文档**。"""
+    d = _HOME / "docs"
+    out = []
+    if d.is_dir():
+        out = [x for x in d.rglob("*.md") if x.is_file()]
+    return out
+
+
+def audit(restore: bool = False, scope: str = "framework") -> dict:
+    """扫描页面署名完整性。restore=True 时自动补回被删署名。
+
+    `scope`：`framework`（默认，历史口径）｜`all`（再加 docs/，用于查漏）。
+    """
     t0 = time.time()
     missing, restored, checked = [], [], 0
-    for p in _scan_pages():
+    pages = list(_scan_pages())
+    if str(scope).lower() == "all":
+        pages += [x for x in _scan_docs() if x not in pages]
+    for p in pages:
         try:
             text = p.read_text(encoding="utf-8", errors="replace")
         except Exception:

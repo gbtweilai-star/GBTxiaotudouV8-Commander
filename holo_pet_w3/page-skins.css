@@ -1,0 +1,24 @@
+/* GBT小土豆V8 · 页面共享皮肤层（page-skins.css） —— 重建版（2026-11-01 补齐）
+ * ============================================================================
+ * 为什么有这个文件：全仓 371 处 `<link rel="stylesheet" href="../page-skins.css" />`
+ * （`../../page-skins.css` 同源），判据原文「皮肤覆盖判据要求每页都挂」，
+ * 但该文件从未随仓库发布（全仓 0 文件，上游 main 逐路径实测 404）。
+ *
+ * 重建依据：
+ *   · 各生成页自己已内联完整版式（`capability-audit.py` / `cap-pages.py` 等都带 `_CSS`），
+ *     本文件**不需要**再覆盖任何元素规则；
+ *   · 它承担的是「全站共享的一层」：只冻结语义令牌（与 theme/taste-tokens.css 同一套），
+ *     让没内联令牌的页也能取到 `var(--taste-*, 兜底)`；
+ *   · 因此这里**只写 :root，不写元素选择器** —— 补链接目标，不引入第二套版式。
+ *
+ * 若日后找回原 `page-skins.css`，以原文件为准（本文件可整体替换）。
+ */
+:root{
+ --taste-ground:#0B1120;--taste-surface:#111827;--taste-raised:#1A2535;
+ --taste-border:#1E3A5F;--taste-rule:#162035;--taste-control:#1E3A5F;
+ --taste-text:#E8ECF8;--taste-muted:#9AA4C4;--taste-faint:#6B7280;
+ --taste-accent:#F5B041;--taste-positive:#00E5FF;--taste-negative:#EF4444;
+ --taste-warning:#F5B041;--taste-unknown:#7C4DFF;
+ --taste-radius:10px;--taste-font:Segoe UI, system-ui, sans-serif;
+ --taste-fs-title:22px;--taste-fs-section:16px;--taste-fs-kpi:22px;
+ --taste-fs-body:13px;--taste-fs-small:11.5px}

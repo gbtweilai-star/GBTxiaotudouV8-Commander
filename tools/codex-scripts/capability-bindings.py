@@ -1421,6 +1421,11 @@ def cmd_check(as_json: bool = False) -> int:
     art = build_artifacts()
     rows = run_checks(art)
     live = art.get("ledger") or {}
+    # 2026-11-01 整理：负对照直接写 live["orphans"]（:1450/:1459/:1478），
+    # 而现算台账在「零异常」时**不带 orphans 键** ⇒ --check 必崩（KeyError: 'orphans'）。
+    # 台账是外部输入，判据自己得容缺：缺键就当空表，不许让判据因输入形状而崩。
+    if isinstance(live, dict):
+        live.setdefault("orphans", {})
     live_caps = live.get("caps") or []
     negs = []
 

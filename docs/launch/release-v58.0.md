@@ -55,3 +55,7 @@ python -m unittest discover -s tests -q
 
 ---
 署名：开发者 **自由的风** · Apache-2.0 · 本署名不可删除、不可篡改归属
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

@@ -57,6 +57,103 @@ BENIGN_CAPS = {
         "handler": 'body_open',
         "safe": True,
     },
+    "hand_retarget": {
+        "domain": 'device',
+        "desc": '身体·手语翻译（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：把 21 点手部跟踪'
+                '（Vision Pro/Quest3/摄像头/IMU 手套先转 21 点）映射成目标灵巧手关节角；内置 '
+                'generic_15dof / generic_20dof 模型，也接受自定义 chain/joints/limit 模型；'
+                '几何向量法（**非 IK**）：三点屈曲 + 掌平面外展 + 关节限位 + 中性位标定 + 左右手符号，'
+                '纯计算零依赖。op=status/models/retarget/where。诚实边界：无接触/触觉建模；'
+                '外展/对掌为掌平面近似；高精度需逆运动学求解器（本仓暂无）',
+        "handler": 'hand_retarget',
+        "safe": True,
+    },
+    "hand_bridge": {
+        "domain": 'device',
+        "desc": '身体·手部硬件桥（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：灵巧手 HAL —— '
+                'connect/read_state/move/stop/disconnect；传输 loopback（**仿真真跑**）/ Modbus TCP'
+                '（纯 stdlib 组 MBAP+PDU 真帧）/ 串口 / CAN（缺 pyserial·python-can 时如实 '
+                'needs_dependency）；关节表+限位+回读统一。**真机写必须给 register_map**'
+                '（厂商寄存器表未吸收 ⇒ needs_config，不猜），move 默认 dry_run，真机写需 confirm=true，'
+                'stop 同样要 confirm。op=status/transports/profiles/connect/read_state/move/stop/'
+                'disconnect/where。诚实边界：loopback 是仿真装置，不驱动真手',
+        "handler": 'hand_bridge',
+        "safe": False,
+    },
+
+    "sync_guard": {
+        "domain": 'project',
+        "desc": '双仓同步巡检（2026-11-01）：交付树 ↔ live 工作仓 的 sha1 对账——'
+                'status（只报差异）/ verify（判 ALIGNED：only_live=0 · 非档案 only_delivery=0 · differ=0 · 两边 cap 计数相等）/ '
+                'patrol（verify + 可选写 state/sync_guard.jsonl 台账；notify=true 时 DRIFT 写审计 error、ALIGNED 写 ok，alerts 能读到；DRIFT 时按 env 优先推 webhook/飞书/n8n，未配置则桌面 toast（零依赖））/ where。'
+                'DRIFT 时出 alerts（sync_drift / caps_mismatch）并给修复命令；**只读，不自动 pull/push**，'
+                '修复由 tools/two-way-sync.ps1 执行。交付树路径默认 ~/Desktop/GBT小土豆V8，'
+                '可用 delivery 参数或 GBT_DELIVERY 覆盖',
+        "handler": 'sync_guard',
+        "safe": True,
+    },
+
+    "viral_forge": {
+        "domain": 'creation',
+        "desc": '爆款拆解·克隆配方（2026-11-01 吸收 hypit-ai/hypit 设计，未复制其代码）：'
+                '字幕/逐句稿 → ①爆款拆解（时长/语速/黄金 3 秒钩子/钩子类型/每 5 秒节奏/段落角色/CTA）'
+                '②词锚克隆配方 viral_clone_v1（场景表/变体槽位/N 条模板钩子，可交 edit_pipeline）'
+                '③可选 ffmpeg 视频帧分析（场景切分/镜头时长/每分钟切点/关键帧/亮度饱和度/音量；可导关键帧缩略图+首帧封面到 outputs/viral-forge/；切点自动对齐字幕段落）+ ④pipeline 一条调用串起 analyze→teardown→recipe；⑤inbox/batch 目录投放自动拆解（报告落 outputs/viral-forge/reports/，已拆台账 state/viral_forge_done.json；缺 ffmpeg/ffprobe 如实 needs_dependency；本仓优先找 vendor/ffmpeg/bin 或 GBT_FFMPEG/GBT_FFPROBE）。'
+                '**不是**：不下载/不复制原视频、不自动发布、不调模型生成；"克隆"=结构复刻，'
+                '素材必须自有或已授权（红线写进 recipe.guardrails）。'
+                'op=status/teardown/blueprint/where',
+        "handler": 'viral_forge',
+        "safe": True,
+    },
+    "drama_forge": {
+        "domain": 'creation',
+        "desc": '短剧产线（2026-11-01）：剧本（0s–4s 时间码）→ 分镜（复用 drama 链头）→ '
+                '本地 SAPI 旁白 + 同源 SRT 字幕 → ffmpeg 竖屏 1080×1920 成片（H.264/AAC/软字幕）；'
+                '给 assets_dir 用自有图，没给就渲染**分镜卡 animatic**（明标，不冒充 AI 成片）；'
+                'ffprobe 六条硬指标逐条判。op=status/storyboard/make/verify/where。'
+                '边界：不生成 AI 画面/视频、不下载/不复制/不发布；TTS 离线本地；动作用例见 docs/77',
+        "handler": 'drama_forge',
+        "safe": False,
+    },
+    "taste_guard": {
+        "domain": 'creation',
+        "desc": '反 AI 烂大街设计闸（2026-11-01 蒸馏 Leonxlnx/taste-skill · MIT · 只蒸规则未搬代码）：'
+                '把上游 house rules 钉成可离线数的 18 条：渐变/玻璃/阴影/眉标/等宽/编号/图标卡阵/emoji/'
+                '紫靛助手色/lorem/无 h1/真图不足/字体过多/动效不足；op=status/rules/audit/brief/where。'
+                'FAIL/WARN 分开、分数可复核；诚实标注 not_implemented（Chrome 三宽度 inspector）与 not_checked（留白/边距/构图）。',
+        "handler": 'taste_guard',
+        "safe": True,
+    },
+    "experience_forge": {
+        "domain": 'mind',
+        "desc": '成长闭环（2026-11-01 主人判据：跑通由外部验证器判，固化进记忆/工具/规则而非权重）：'
+                'record 只收**带外部验证证据**的经验（cmd+exit_code=0+evidence），缺验证或非零一律 needs_verify 拒收；'
+                'query 检索「问题→尝试→验证→方案」；promote 升成 rule（验证规则）或 tool（可调用模板）；'
+                'verify 只校验库与证据字段，不重放历史命令。op=status/record/query/show/promote/verify/where。'
+                '边界：不写权重、不训练；存 state/experience_forge/（可后续接 memory_manager 索引）。',
+        "handler": 'experience_forge',
+        "safe": True,
+    },
+    "mirror_stage": {
+        "domain": 'system',
+        "desc": '镜像工作空间（2026-11-01 主人口径：生产永不被试验污染，跑通才整页原子替换）：'
+                'create 把生产目标复制进 state/mirror/stage/<id>/（生产只读）→ write 只写镜像候选（可多候选）→ '
+                'verify 在镜像 work/ 跑外部验证器（cmd+exit_code）→ promote 仅在 verify.exit_code=0 且 confirm=true 时'
+                '做**整文件 os.replace 原子替换**（先备份，支持 rollback）。没验过/失败/越界一律拒。'
+                'op=status/create/list/write/verify/promote/rollback/where。边界：不含远程桌面/隧道/语音（另位）。',
+        "handler": 'mirror_stage',
+        "safe": False,
+    },
+    "remote_controller": {
+        "domain": 'tentacle',
+        "desc": '远程接管授权内核（2026-11-01 主人硬规矩：**必须远端用户点击同意**，请求方不能自批）：'
+                'request 生成一次性 code + agent_secret（只给远端）→ approve 必须 remote_user.confirmed=true 且持 secret 的 HMAC 签名 → '
+                'session 仅在 approved/未撤销时发；revoke 即时失效；audit 全留痕。'
+                '边界：屏幕/输入/语音媒体通道与公网隧道未接（不假装已远控）；是“先同意再接管”的授权层。'
+                'op=status/request/approve/deny/session/revoke/audit/where。',
+        "handler": 'remote_controller',
+        "safe": False,
+    },
     # ── 官方 Codex 能力化（B 档 · 风哥 2026-09-15 批准）──
     # 只读：状态与工具清单；写：线程/回合/中断（由 policy 按 process_execute 作用域守护）
     "codex_status": {
@@ -135,28 +232,28 @@ BENIGN_CAPS = {
     },
     "quant_strategy": {
         "domain": 'finance',
-        "desc": '读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口）',
+        "desc": '【量化·策略信号】读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口）',
         "handler": 'quant_strategy',
         "external": 'quant_tech',
         "safe": True,
     },
     "quant_backtest": {
         "domain": 'finance',
-        "desc": '读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口）',
+        "desc": '【量化·回测接口】读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口）',
         "handler": 'quant_backtest',
         "external": 'quant_tech',
         "safe": True,
     },
     "platform_profile": {
         "domain": 'project',
-        "desc": '读取量化项目结构（真实测绘；外部业务模块 quant_tech，未挂载则如实报缺口）',
+        "desc": '【量化·项目结构】读取量化项目结构（真实测绘；外部业务模块 quant_tech，未挂载则如实报缺口）',
         "handler": 'platform_profile',
         "external": 'quant_tech',
         "safe": True,
     },
     "quant_params": {
         "domain": 'finance',
-        "desc": '读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech）',
+        "desc": '【量化·数值参数】读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech）',
         "handler": 'quant_params',
         "external": 'quant_tech',
         "safe": True,
@@ -239,6 +336,210 @@ BENIGN_CAPS = {
         "desc": ('触手能力总纲（注入大脑上下文）：**条目数运行时现算，不手写**'
                  '（手写数会腐烂——2026-10-13 实测 66/85 两处打架、都没人数过）+ 三通道感官 + 六铁律'),
         "handler": 'tentacle_manifest',
+        "safe": True,
+    },
+    # ── 触手主干 · 原生指挥官（主人令 2026-10-31「把我们的原生无限制指挥官大模型权重
+    #    彻底融合进触手主干」「要做到所有的触手都能通过我们自己的大模型权重」）──
+    # 这一位就是那个「融合口」：权重在 state/weights，引擎在 vendor 的 llama-server，
+    # 判决在 tentacle/commander.py —— 主干路由的第一顺位换成她自己的脑子。
+    # 口径：route/ask/status 是**本地只读**（不出网、不过 external_llm 票、不计费）；
+    #       start/stop 起停本机进程 ⇒ 只收 process_execute 这一道机制门。
+    "commander": {
+        "domain": 'tentacle',
+        "desc": ('触手主干·原生指挥官（**自有大模型权重 → 本机推理 → 主干判决**）：'
+                 'op=status 现读「权重/引擎/模型」三项（缺哪件说哪件，不编）；'
+                 'op=route 给一句意图，在**真名表**里选一个触手方法（不在候选里一律不采信＝幻觉防护）；'
+                 'op=ask 直接问权重一句；op=start/stop 起停本机引擎（幂等，过 process_execute 门）。'
+                 '车道口径：**不出网、不按 token 计费、不要 external_llm 票**；'
+                 '引擎没起时主干照旧降级到云端车道/词表辅路，并把降级如实标出来。'),
+        "handler": 'commander',
+        "safe": False,
+    },
+
+    # ── 四合一原生能力（主人令 2026-10-31「把这套量化的脉冲提速/直达压缩/按需激活的理念
+    #    化为她的原生能力，这样就不会出现遗漏和丢失」）──
+    # 她此前一直"活在文档里"：docs 写了、脚本跑过，但不是能力位 ⇒ 每轮只实现一个切片。
+    # 这一位把四条焊在一起，并自带 verify 判据（真跑四条，任一条不成立当场 FAIL）。
+    "pulse_core": {
+        "domain": 'tentacle',
+        "desc": ('触手四合一原生位：**脉冲提速**（一次拿全身状态）· **量化压缩**（主道 Q5_0，'
+                 'fp16 的 2.7×）· **按需激活**（引擎闲置卸权重、来请求再醒，起停过 process_execute 门）· '
+                 '**精准直达**（召回先兜住**全部能力位 + 全部触手方法**（条数现读，不写死），权重只在这份候选里挑）。'
+                 'op=status 四件套现读；op=verify **真跑四条判据**（防"文档说有、代码没有"）；'
+                 'op=route 一句话走完整条链；op=plan 只出计划；op=wake/stop 起停本机引擎。'),
+        "handler": 'pulse_core',
+        "safe": False,
+    },
+
+    # ── 能力自知（主人 2026-10-31「所有原生能力她有时候连自己都不知道」）──
+    # 病根：她的自知来自三份会漂移的副本（注册表 / data 快照 / docs 手写数字），
+    # 三份不一致时她说的和有的就不是一回事，而且没有任何东西会红。
+    # 这一位把"自知"变成可执行判据：has 三档说清、ask 按意图召回、verify 三源对账。
+    "cap_self": {
+        "domain": 'system',
+        "desc": ('能力自知：**问自己有什么**时只有一个真源（注册表现读）。'
+                 'op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；'
+                 'op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；'
+                 'op=brief 压成能进上下文的 30 域自述；'
+                 'op=verify **三源对账**（注册表 ↔ data 快照 ↔ api 分派 + desc + policy），'
+                 '任何一处漂移当场红并给差集与修法。全只读、零作用域。'),
+        "handler": 'cap_self',
+        "safe": True,
+    },
+
+    # ── 触手覆盖（主人 2026-11-01「所有文件代码都要与她连接，触手要覆盖到所有代码」）──
+    # 把"覆盖所有代码"从文档声明变成**可执行判据**：每个文件 → 认领它的能力位，
+    # 认领不了的单列缺口；同时算"每个能力位有没有自己的文件"。只读源码，不 import。
+    "trunk_cover": {
+        "domain": 'tentacle',
+        "desc": ('触手覆盖：**每个代码文件都要被某根触手认领**。op=status 覆盖率与按 owner 分布；'
+                 'op=scan 重扫落 state/trunk-cover.json；op=verify 判据（兜底率超阈值即红，并列出缺口文件）。'
+                 '认领规则从硬到软：同名文件 → 实现文件映射 → tools 同名 → import 关系 → 兜底 tentacle（单独计数）。'
+                 '同时报"每个能力位有没有自己的文件"——没有的如实列名，不把兜底说成已覆盖。'),
+        "handler": 'trunk_cover',
+        "safe": True,
+    },
+
+    # ── 身体知觉（主人 2026-11-01「有血有肉有器官」「装到机器人上要分得清手脚、受伤要知道哪痛」）──
+    # 三套系统：本体感觉（哪条肢体/机构接没接）· 痛觉（部位/程度/原因/怎么办，追加落盘）· 神经邻域（共享能力位）。
+    "body_sense": {
+        "domain": 'device',
+        "desc": ('身体知觉三合一：op=proprio 本体感觉（分区×左右×机构在位，**没接机械臂就如实报 false**）；'
+                 'op=pain 痛觉（剧痛=身体失联 / 钝痛=部分不可用 / 酸=需票；每条带部位·原因·怎么办，追加落 state/body-pain.jsonl）；'
+                 'op=neighborhood 神经邻域（器官间共享能力位的 Jaccard 邻接）；op=status 三合一现读。'
+                 '只报有证据的痛，没证据不编。'),
+        "handler": 'body_sense',
+        "safe": True,
+    },
+
+    # ── 自主吞食（主人 2026-11-01「她自己自主去识别对自己有用的东西吞噬」）──
+    # 实测：此前从未自主吞过（devour_pipe.jsonl 只有 2 条手动试跑）。
+    # 这一位补上「找食 → 自己判断 → 有用才吞 → 拒的也留痕」这条链；默认只吃**仓内**文本，
+    # 出网吞仍走人工门（数据出网不归自主决策）。
+    "devour_auto": {
+        "domain": 'devour',
+        "desc": ('自主吞食：op=tick 自主跑一轮——扫本地可食源（docs/tools/examples/skills），'
+                 '与**她自己的缺口**（无实现文件的能力位/依赖仓外模块的位）做相关度打分，'
+                 'score≥2 才吞；吞=摘 digest 进 state/devour-digest.md；'
+                 '**拒的也记账**（state/devour-auto.jsonl，理由可读）。'
+                 'op=status 看吃过多少/拒了多少/最后一次；op=loop 跑有限轮（默认 1 轮）。'
+                 '边界：只吃仓内、不出网、不改源码；出网吞仍需人工门。'),
+        "handler": 'devour_auto',
+        "safe": True,
+    },
+
+    # ── 触手推理环（主人 2026-11-01「触手主干联通大脑推理，扫描也能想」）──
+    # 看(真实自检) → 想(本机权重) → 动(只读白名单) → 再想(复核)。不是"哑扫描"。
+    "trunk_reason": {
+        "domain": 'tentacle',
+        "desc": ('触手推理环：op=agent 跑一轮"看→想→动→再想"——先跑真实只读自检，'
+                 '再把现状喂给本机 7.6B 权重判断真风险/误报/下一步，'
+                 '然后按建议**只跑白名单内的只读检查**拿新证据，最后复核初判。'
+                 'op=reflect 单次反思；op=status 看大脑在不在。'
+                 '边界：act 只跑只读能力位，绝不写盘/执行/越权；大脑不在就如实报"没在想"。'),
+        "handler": 'trunk_reason',
+        "safe": True,
+    },
+
+    # ── 上下文守卫（主人 2026-11-01「我设计了无数原生能力，有些压根没部署上去」）──
+    # 源码里 tools/context_guard.py 一直只是脚本、没登记成能力位；本轮正式接上。
+    "context_guard": {
+        "domain": 'llm',
+        "desc": ('上下文守卫：实时看环形上下文（窗口/溢出/落库三项），异常回大脑执行层纠正。'
+                 'op=status 环读数+异常诊断；op=tick 采样→诊断→（可选）回大脑→纠正；'
+                 'op=bind 双插（触手↔环，落 state/context-bindings.json）；op=bindings 列全部双插；'
+                 'op=bind_guard 把溢出保护触手绑上。判据不新造，直接调 tools/context_guard.py 的既有函数。'),
+        "handler": 'context_guard',
+        "safe": True,
+    },
+
+    # ── 2026-11-01 部署反查补登记：这四份**源码早就有 run()**，却一直没能力位 ──
+    # 出处：tools/codex-scripts/audit-deployed.py 的 A 清单（有 def run(、无能力位、无分派）。
+    # 主人原话：「我设计了无数原生能力，有些估计压根你就没给我部署上去过」——这四份就是。
+    "research_intel": {
+        "domain": 'recon',
+        "desc": ('调研 AI 情报部门：三组只读骨架（画禁区 / 找流量 / 定方向）。'
+                 'op=coverage 覆盖读数，op=group 分组。**只读**，不发布、不改生产。'),
+        "handler": 'research_intel',
+        "safe": True,
+    },
+    "hunyuan_video": {
+        "domain": 'video',
+        "desc": ('混元视频 HunyuanVideo 1.5（8.3B）**只读骨架**：op=status 看设计/依赖/显存门槛，'
+                 '不真出视频（真跑要 GPU 与模型权重，缺就如实报）。'),
+        "handler": 'hunyuan_video',
+        "safe": True,
+    },
+
+    # ── 能源核心（主人 2026-11-01「本地算力=能源核心，放进大脑执行层供电」）──
+    "energy_core": {
+        "domain": 'engine',
+        "desc": ('能源核心读数：本机 7.6B 权重是**唯一一块电池**。op=status 在不在/几个取电口/在用几个/'
+                 '最近功率；op=meter 电表（调用数·token·等待时长·功率）。'
+                 '取电统一走 energy_core.think()：排队→占一个口→记账；没电如实报，不假装想过。'),
+        "handler": 'energy_core',
+        "safe": True,
+    },
+
+    # ── 编排账本（主人 2026-11-01「扫哪/改哪/新增什么都要记账，重启看面板一目了然」）──
+    "orchestration": {
+        "domain": 'system',
+        "desc": ('编排账本与面板：六类动作 scan/add/edit/deploy/fix/run 只追加落 '
+                 'state/orchestration-ledger.jsonl。op=record 手记一条；op=panel 重启先看这一屏'
+                 '（本会话动作计数·最近条目·各类扫描最后时间·能力位 vs 快照漂移·自上次看图以来新增）；'
+                 'op=seen 标记已看；op=status 账本概况。闸门对**非 probe** 调用自动记 run。'),
+        "handler": 'orchestration',
+        "safe": True,
+    },
+
+    # ── 自主契约（主人 2026-11-01 严令：「架构给完之后，除终端危险能力和转账，不许打扰用户」）──
+    "autonomy": {
+        "domain": 'tentacle',
+        "desc": ('自主契约：架构声明之后，除 **danger（终端危险能力）** 与 **transfer（转账/花钱）** 外，'
+                 '**禁止打扰主人、禁止要求主人帮助**。op=status 契约状态；op=declare 声明架构已给；'
+                 'op=check {"kind":...} 判定能不能问（只有两个例外放行）；op=guard {"text":...} 把'
+                 '「需要你确认/要不要我/请提供…」这类回头问主人的句子**改写成自主推进**并记账；'
+                 'op=ledger 打扰账本。判据三条：架构已给才生效 / 例外只有 danger+transfer / 打扰必留痕。'),
+        "handler": 'autonomy',
+        "safe": True,
+    },
+
+    # ── 蓝图主链（主人 2026-11-01：「架构→蓝图→用户过目→分析推理→思维导图任务→派遣触手→落地」）──
+    "blueprint": {
+        "domain": 'tentacle',
+        "desc": ('蓝图主链五段：op=make 架构→蓝图（阶段/任务/验收/风险，落 state/blueprints/）；'
+                 'op=approve 主人过目（**唯一允许的交互**，批准即进入自主模式、不再打扰）；'
+                 'op=mindmap 分析推理→任务图+依赖（mermaid 思维导图）；'
+                 'op=dispatch 按依赖拓扑派遣触手执行（**只跑安全能力位**，危险/转账留票）；'
+                 'op=status 进度与是否落地（landed 要求全部任务 ok）。'
+                 '纪律：蓝图不过目不派遣；不装成功，失败如实列。'),
+        "handler": 'blueprint',
+        "safe": True,
+    },
+
+    # ── 旧物守卫（主人 2026-11-01：「项目里不允许旧代码、旧面板、重复的东西」）──
+    "legacy_guard": {
+        "domain": 'tentacle',
+        "desc": ('旧物守卫：查六类旧/重复——state/sync-backup 旧代码快照、过期工作树、旧面板归档、'
+                 '*.bak/.old/.orig、重复文档编号、state/tmp 临时件。op=status 结论；op=scan 逐条列；'
+                 'op=clean 删旧副本类（重复文档只报不删，删哪页要人看内容）。每次清理记编排账本。'),
+        "handler": 'legacy_guard',
+        "safe": True,
+    },
+
+    # ── 万能插·全自动打开（主人令 2026-11-01「以后只要使用她的全部能力必须全部自动打开，
+    #    而不是要我提醒」）──
+    # 六类插座 process/file/api/web/app/ai 在**每次能力调用之前**自动过一遍（廉价探针 + 60s 缓存），
+    # 钩子挂在 api._run_task_core_body 分派前；任何异常都吞掉，绝不弄坏主调用。
+    "omni_open": {
+        "domain": 'tentacle',
+        "desc": ('万能插·全自动打开：用她任何一项能力之前，'
+                 '**六类插座（process/file/api/web/app/ai）自动过一遍**，'
+                 '每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；'
+                 'op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。'
+                 '只做廉价探针，不跑 26s 的全量 discover、不擅自起进程；'
+                 '「没探到」绝不说成「已打开」。'),
+        "handler": 'omni_open',
         "safe": True,
     },
     "sec_surface": {
@@ -510,7 +811,7 @@ BENIGN_CAPS = {
     },
     "devour_scan": {
         "domain": 'devour',
-        "desc": '吞天：能力缺口扫描（域覆盖对照+进化方向）',
+        "desc": '【吞天·缺口扫描】吞天：能力缺口扫描（域覆盖对照+进化方向）',
         "handler": 'devour_scan',
         "safe": True,
     },
@@ -1035,7 +1336,7 @@ BENIGN_CAPS = {
     },
     "quant": {
         "domain": 'finance',
-        "desc": '量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口）',
+        "desc": '【量化·总入口】量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口）',
         "handler": 'quant',
         "external": 'quant_tech',
         "safe": True,
@@ -1524,13 +1825,13 @@ BENIGN_CAPS = {
     },
     "cad_distill": {
         "domain": 'creation',
-        "desc": '**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）的**挂载取法**提炼成我们自己的判据：①挂真内核不另起（addon 装在 FreeCAD 里面 + 只连在跑的那个 RPC server）②脚本即接口（run Python scripts，不把动作硬编码成几百条命令）③改前先读回（inspect documents，同铁律1先看再动）④工程结论必须算（run FEM analyses，同 machine_distill ①）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：改 claude_desktop_config.json + 起 RPC 服务不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 cadgen；本位只蒸取法，**不建平行位**。op=method/source/provenance/where',
+        "desc": '【蒸馏·CAD 件】**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）的**挂载取法**提炼成我们自己的判据：①挂真内核不另起（addon 装在 FreeCAD 里面 + 只连在跑的那个 RPC server）②脚本即接口（run Python scripts，不把动作硬编码成几百条命令）③改前先读回（inspect documents，同铁律1先看再动）④工程结论必须算（run FEM analyses，同 machine_distill ①）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：改 claude_desktop_config.json + 起 RPC 服务不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 cadgen；本位只蒸取法，**不建平行位**。op=method/source/provenance/where',
         "handler": 'cad_distill',
         "safe": True,
     },
     "bi_distill": {
         "domain": 'data',
-        "desc": '**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即建模（先把数据做成可拖拽的字段模型，再谈图）②连接面如实列（「支持 X」= 真连得上；OLTP/OLAP/数仓/文件/API 五类照实登记，连不上如实说）③可分享是产品属性（分析产物必须能交出去，不留在自己盘里）④🔴**许可红线 GPL-3.0：只引用不复制**（复用其实现要先过 GPL）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：离线安装包/install.sh 不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 genoffice/datakit/record_grid；本位只蒸取法，**不建平行位**。op=method/source/provenance/where',
+        "desc": '【蒸馏·BI 件】**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即建模（先把数据做成可拖拽的字段模型，再谈图）②连接面如实列（「支持 X」= 真连得上；OLTP/OLAP/数仓/文件/API 五类照实登记，连不上如实说）③可分享是产品属性（分析产物必须能交出去，不留在自己盘里）④🔴**许可红线 GPL-3.0：只引用不复制**（复用其实现要先过 GPL）。op=source 现读胶囊尺寸+逐文件 sha256 · op=provenance 逐条指回原话（含**未蒸馏**一行：离线安装包/install.sh 不取）。**零作用域**。边界：接入端 ≡ 我们**已有**的 genoffice/datakit/record_grid；本位只蒸取法，**不建平行位**。op=method/source/provenance/where',
         "handler": 'bi_distill',
         "safe": True,
     },
@@ -2166,7 +2467,7 @@ BENIGN_CAPS = {
     },
     "absorb_loop": {
         "domain": 'brain',
-        "desc": '吞天闭环（只读骨架）：蒸馏 DISTILL → 提炼 REFINE → 吸收 ABSORB + 回灌 FED_BACK；四条机械闸（stage_dirty 阶段间不许留垃圾 / loop_not_closed 三阶段必须齐且回灌 / junk_left_silently 垃圾要么清要么登记 / not_resumable 中断必须留续跑点）+ 五条红线（吞完清场/闭环可续/每阶段留痕 source_kind=absorb/不吞未取证来源/垃圾不许静默留）',
+        "desc": '【吞天·闭环】吞天闭环（只读骨架）：蒸馏 DISTILL → 提炼 REFINE → 吸收 ABSORB + 回灌 FED_BACK；四条机械闸（stage_dirty 阶段间不许留垃圾 / loop_not_closed 三阶段必须齐且回灌 / junk_left_silently 垃圾要么清要么登记 / not_resumable 中断必须留续跑点）+ 五条红线（吞完清场/闭环可续/每阶段留痕 source_kind=absorb/不吞未取证来源/垃圾不许静默留）',
         "handler": 'absorb_loop',
         "safe": True,
     },
@@ -2903,7 +3204,7 @@ BENIGN_CAPS = {
     #   且我们是 **7B dense 不是 MoE** ⇒ 它的 prerouter 要**退化成按层顺序预取**，收益远小于 MoE。
     "offload_distill": {
         "domain": 'llm',
-        "desc": ('**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。'
+        "desc": ('【蒸馏·内存墙】**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。'
                  '上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。'
                  '四条机制：**权重离芯**（SSD 流式 + mmap 懒读）· **槽位+LRU+双缓冲**（每步零主机同步）· '
                  '**prerouter 提前一步预判**（IO 与前向重叠 · 吞吐最高 +59%）· **Recover-LoRA**（int4 底座 + '

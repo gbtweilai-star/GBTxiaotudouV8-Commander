@@ -1,126 +1,5546 @@
 {
-  "schema": "intent-lexicon-v1",
-  "note": "意图词表（人工维护，很小）。命中即给强权重，未命中退回按稀有度加权的全文检索。纪律：本文件里点到的每一个能力位名，都必须能在 data/capabilities.json 里查到 —— tests/test_catalog.py 会逐条校验，点错名字当场报红。",
-  "intents": [
-    {
-      "what": "把文档/表格/PPT 做出来或转格式",
-      "say": ["ppt", "幻灯片", "演示文稿", "汇报材料", "word", "docx", "xlsx", "表格", "转格式", "转成", "markdown"],
-      "caps": {"genoffice": 10, "genoffice_bridge": 4}
-    },
-    {
-      "what": "数一数有多少字",
-      "say": ["字数", "多少字", "词数", "统计词"],
-      "caps": {"count_words": 10}
-    },
-    {
-      "what": "查审计账 / 谁调了什么",
-      "say": ["审计", "查账", "谁调了", "调用记录", "留痕"],
-      "caps": {"audit_query": 10, "caps_called_audit": 4}
-    },
-    {
-      "what": "发布到生产 / 上线",
-      "say": ["发布", "上线", "推到生产", "晋升", "部署到生产", "放上线"],
-      "caps": {"one_key_deploy": 10}
-    },
-    {
-      "what": "回滚 / 退版本",
-      "say": ["回滚", "退版本", "上一个版本", "撤回去"],
-      "caps": {"pipeline_rollback": 10, "mirror_rewind": 6}
-    },
-    {
-      "what": "扫描镜像 / 看看有没有脏东西",
-      "say": ["镜像", "脏东西", "残留", "体检", "扫描一下", "清理旧"],
-      "caps": {"mirror_scan": 10, "cross_scan": 5, "file_hygiene": 5}
-    },
-    {
-      "what": "自检 / 现在健康吗",
-      "say": ["自检", "健康", "体检一下", "框架状态", "有没有坏"],
-      "caps": {"selfscan": 10, "health": 8}
-    },
-    {
-      "what": "出图 / 出片",
-      "say": ["出图", "画一张", "生图", "出片", "视频", "剪片", "成片", "渲染"],
-      "caps": {"comfy_cloud": 8, "media_pipeline": 8, "h3_video_gen": 5, "a1art_skill": 4}
-    },
-    {
-      "what": "浏览器打开 / 抓网页",
-      "say": ["打开网页", "抓网页", "浏览器", "截图网页", "搜索一下"],
-      "caps": {"browser": 10}
-    },
-    {
-      "what": "出声 / 念一段 / 听写",
-      "say": ["念一段", "朗读", "出声", "配音", "语音合成", "听写", "转写"],
-      "caps": {"voice": 10, "voice_orchestra": 5}
-    },
-    {
-      "what": "看一眼屏幕 / 识图",
-      "say": ["看一眼", "识图", "摄像头", "屏幕上的", "图里是什么"],
-      "caps": {"vision": 10}
-    },
-    {
-      "what": "扫漏洞 / 攻击面",
-      "say": ["漏洞", "攻击面", "渗透", "红队", "安全扫描"],
-      "caps": {"sec_scan": 10, "pentest": 6, "sec_surface": 5}
-    },
-    {
-      "what": "用云卡 / 云端算力",
-      "say": ["云卡", "云端算力", "免费gpu", "gpu", "反向调用", "算力"],
-      "caps": {"cloud_pc": 8, "comfy_cloud": 6, "cloud_llm": 6, "pod_link": 4}
-    },
-    {
-      "what": "长任务 / 无人值守 / 续跑",
-      "say": ["无人值守", "长任务", "续跑", "跑一晚上", "挂机跑", "定时"],
-      "caps": {"lr_submit": 10, "wf_run": 8, "sched_define": 5}
-    },
-    {
-      "what": "编工作流 / 编排 DAG",
-      "say": ["工作流", "编排", "dag", "串起来跑", "流水线编排"],
-      "caps": {"wf_define": 10, "wf_run": 8}
-    },
-    {
-      "what": "发邮件 / 看邮件",
-      "say": ["邮件", "收件箱", "发信", "回信"],
-      "caps": {"coze_mail": 10}
-    },
-    {
-      "what": "记一笔 / 回忆 / 看时光轴",
-      "say": ["记一笔", "记录下来", "回忆", "以前说过", "时光轴", "日记"],
-      "caps": {"life": 10}
-    },
-    {
-      "what": "Notion / 资料舱",
-      "say": ["notion", "资料舱", "我的笔记库"],
-      "caps": {"notion_bridge": 10}
-    },
-    {
-      "what": "看项目结构 / 这仓长什么样",
-      "say": ["项目结构", "目录树", "这仓", "仓库长什么样"],
-      "caps": {"project_context": 10, "platform_profile": 5}
-    },
-    {
-      "what": "改代码 / 打补丁",
-      "say": ["改代码", "打补丁", "patch", "提交改动", "git"],
-      "caps": {"code_patch": 10, "git_write": 6, "git_read": 4}
-    },
-    {
-      "what": "吞一个仓库 / 自我进化",
-      "say": ["吞一个", "吞天", "进化", "吸收这个仓库"],
-      "caps": {"devour_scan": 10, "absorb_loop": 5}
-    },
-    {
-      "what": "多条触手一起干 / 协作场",
-      "say": ["协作", "一起干", "信息素", "留个痕迹"],
-      "caps": {"stigmergy": 10, "collab_gateway": 6}
-    },
-    {
-      "what": "对外发布作品 / 结算收益",
-      "say": ["发布作品", "推广", "收益", "结算"],
-      "caps": {"auto_publish": 10}
-    },
-    {
-      "what": "登记 / 校验账号表",
-      "say": ["账号表", "登记账号", "校验账号"],
-      "caps": {"account_registry": 10}
-    }
-  ]
+ "schema": "intent-lexicon-v1",
+ "note": "意图词表（人工维护，很小）。命中即给强权重，未命中退回按稀有度加权的全文检索。纪律：本文件里点到的每一个能力位名，都必须能在 data/capabilities.json 里查到 —— tests/test_catalog.py 会逐条校验，点错名字当场报红。",
+ "intents": [
+  {
+   "what": "把文档/表格/PPT 做出来或转格式",
+   "say": [
+    "ppt",
+    "幻灯片",
+    "演示文稿",
+    "汇报材料",
+    "word",
+    "docx",
+    "xlsx",
+    "表格",
+    "转格式",
+    "转成",
+    "markdown"
+   ],
+   "caps": {
+    "genoffice": 10,
+    "genoffice_bridge": 4
+   }
+  },
+  {
+   "what": "数一数有多少字",
+   "say": [
+    "字数",
+    "多少字",
+    "词数",
+    "统计词"
+   ],
+   "caps": {
+    "count_words": 10
+   }
+  },
+  {
+   "what": "查审计账 / 谁调了什么",
+   "say": [
+    "审计",
+    "查账",
+    "谁调了",
+    "调用记录",
+    "留痕"
+   ],
+   "caps": {
+    "audit_query": 10,
+    "caps_called_audit": 4
+   }
+  },
+  {
+   "what": "发布到生产 / 上线",
+   "say": [
+    "发布",
+    "上线",
+    "推到生产",
+    "晋升",
+    "部署到生产",
+    "放上线"
+   ],
+   "caps": {
+    "one_key_deploy": 10
+   }
+  },
+  {
+   "what": "回滚 / 退版本",
+   "say": [
+    "回滚",
+    "退版本",
+    "上一个版本",
+    "撤回去"
+   ],
+   "caps": {
+    "pipeline_rollback": 10,
+    "mirror_rewind": 6
+   }
+  },
+  {
+   "what": "扫描镜像 / 看看有没有脏东西",
+   "say": [
+    "镜像",
+    "脏东西",
+    "残留",
+    "扫描一下",
+    "清理旧"
+   ],
+   "caps": {
+    "mirror_scan": 10,
+    "cross_scan": 5,
+    "file_hygiene": 5
+   }
+  },
+  {
+   "what": "自检 / 现在健康吗",
+   "say": [
+    "自检",
+    "健康",
+    "体检一下",
+    "框架状态",
+    "有没有坏"
+   ],
+   "caps": {
+    "selfscan": 10,
+    "health": 8
+   }
+  },
+  {
+   "what": "出图 / 出片",
+   "say": [
+    "画一张",
+    "生图",
+    "出片",
+    "视频",
+    "剪片",
+    "成片",
+    "渲染"
+   ],
+   "caps": {
+    "comfy_cloud": 8,
+    "media_pipeline": 8,
+    "h3_video_gen": 5,
+    "a1art_skill": 4
+   }
+  },
+  {
+   "what": "浏览器打开 / 抓网页",
+   "say": [
+    "打开网页",
+    "浏览器",
+    "截图网页",
+    "搜索一下"
+   ],
+   "caps": {
+    "browser": 10
+   }
+  },
+  {
+   "what": "出声 / 念一段 / 听写",
+   "say": [
+    "念一段",
+    "朗读",
+    "出声",
+    "语音合成",
+    "听写",
+    "转写"
+   ],
+   "caps": {
+    "voice": 10,
+    "voice_orchestra": 5
+   }
+  },
+  {
+   "what": "看一眼屏幕 / 识图",
+   "say": [
+    "看一眼",
+    "识图",
+    "摄像头",
+    "屏幕上的",
+    "图里是什么"
+   ],
+   "caps": {
+    "vision": 10
+   }
+  },
+  {
+   "what": "扫漏洞 / 攻击面",
+   "say": [
+    "漏洞",
+    "攻击面",
+    "渗透",
+    "红队",
+    "安全扫描"
+   ],
+   "caps": {
+    "sec_scan": 10,
+    "pentest": 6,
+    "sec_surface": 5
+   }
+  },
+  {
+   "what": "用云卡 / 云端算力",
+   "say": [
+    "云卡",
+    "云端算力",
+    "免费gpu",
+    "gpu",
+    "反向调用",
+    "算力"
+   ],
+   "caps": {
+    "cloud_pc": 8,
+    "comfy_cloud": 6,
+    "cloud_llm": 6,
+    "pod_link": 4
+   }
+  },
+  {
+   "what": "长任务 / 无人值守 / 续跑",
+   "say": [
+    "无人值守",
+    "长任务",
+    "续跑",
+    "跑一晚上",
+    "挂机跑",
+    "定时"
+   ],
+   "caps": {
+    "lr_submit": 10,
+    "wf_run": 8,
+    "sched_define": 5
+   }
+  },
+  {
+   "what": "编工作流 / 编排 DAG",
+   "say": [
+    "工作流",
+    "dag",
+    "串起来跑",
+    "流水线编排"
+   ],
+   "caps": {
+    "wf_define": 10,
+    "wf_run": 8
+   }
+  },
+  {
+   "what": "发邮件 / 看邮件",
+   "say": [
+    "邮件",
+    "收件箱",
+    "发信",
+    "回信"
+   ],
+   "caps": {
+    "coze_mail": 10
+   }
+  },
+  {
+   "what": "记一笔 / 回忆 / 看时光轴",
+   "say": [
+    "记录下来",
+    "回忆",
+    "以前说过",
+    "时光轴",
+    "日记"
+   ],
+   "caps": {
+    "life": 10
+   }
+  },
+  {
+   "what": "Notion / 资料舱",
+   "say": [
+    "notion",
+    "资料舱",
+    "我的笔记库"
+   ],
+   "caps": {
+    "notion_bridge": 10
+   }
+  },
+  {
+   "what": "看项目结构 / 这仓长什么样",
+   "say": [
+    "项目结构",
+    "目录树",
+    "这仓",
+    "仓库长什么样"
+   ],
+   "caps": {
+    "project_context": 10,
+    "platform_profile": 5
+   }
+  },
+  {
+   "what": "改代码 / 打补丁",
+   "say": [
+    "改代码",
+    "打补丁",
+    "patch",
+    "提交改动",
+    "git"
+   ],
+   "caps": {
+    "code_patch": 10,
+    "git_write": 6,
+    "git_read": 4
+   }
+  },
+  {
+   "what": "吞一个仓库 / 自我进化",
+   "say": [
+    "吞一个",
+    "吞天",
+    "进化",
+    "吸收这个仓库"
+   ],
+   "caps": {
+    "devour_scan": 10,
+    "absorb_loop": 5
+   }
+  },
+  {
+   "what": "多条触手一起干 / 协作场",
+   "say": [
+    "协作",
+    "一起干",
+    "信息素",
+    "留个痕迹"
+   ],
+   "caps": {
+    "stigmergy": 10,
+    "collab_gateway": 6
+   }
+  },
+  {
+   "what": "对外发布作品 / 结算收益",
+   "say": [
+    "发布作品",
+    "推广",
+    "收益",
+    "结算"
+   ],
+   "caps": {
+    "auto_publish": 10
+   }
+  },
+  {
+   "what": "登记 / 校验账号表",
+   "say": [
+    "账号表",
+    "登记账号",
+    "校验账号"
+   ],
+   "caps": {
+    "account_registry": 10
+   }
+  },
+  {
+   "what": "体检 / 自检 / 有没有毛病",
+   "say": [
+    "体检",
+    "查毛病",
+    "有没有问题",
+    "健康检查"
+   ],
+   "caps": {
+    "selfscan": 10,
+    "ghost_guard": 4
+   }
+  },
+  {
+   "what": "截图 / 抓图 / 看一眼屏幕",
+   "say": [
+    "截图",
+    "抓图",
+    "截个图",
+    "看一眼屏幕",
+    "屏幕什么样"
+   ],
+   "caps": {
+    "body_see": 10
+   }
+  },
+  {
+   "what": "找图 / 找美图",
+   "say": [
+    "找图",
+    "找美图",
+    "配图",
+    "找张图"
+   ],
+   "caps": {
+    "image_scout": 10
+   }
+  },
+  {
+   "what": "出图 / 放大 / 洗图",
+   "say": [
+    "出图",
+    "放大",
+    "洗图",
+    "高清放大",
+    "图片放大"
+   ],
+   "caps": {
+    "comfy_native": 10
+   }
+  },
+  {
+   "what": "数字人 / 口播视频",
+   "say": [
+    "数字人",
+    "口播",
+    "照片说话",
+    "以图生视频"
+   ],
+   "caps": {
+    "digital_human": 10
+   }
+  },
+  {
+   "what": "配音 / 语音合成",
+   "say": [
+    "配音",
+    "语音",
+    "念一遍",
+    "合成语音"
+   ],
+   "caps": {
+    "voice": 10,
+    "hf_voice": 4
+   }
+  },
+  {
+   "what": "记住 / 记忆检索",
+   "say": [
+    "记住",
+    "记忆",
+    "查记忆",
+    "记一下"
+   ],
+   "caps": {
+    "memory_manager": 10,
+    "brain_vault": 4
+   }
+  },
+  {
+   "what": "抓取 / 爬取网页",
+   "say": [
+    "抓取",
+    "爬取",
+    "抓网页",
+    "采集页面"
+   ],
+   "caps": {
+    "scrapling": 10
+   }
+  },
+  {
+   "what": "代码图谱 / 调用链",
+   "say": [
+    "调用链",
+    "谁调用了",
+    "代码图谱",
+    "符号搜索"
+   ],
+   "caps": {
+    "code_graph": 10
+   }
+  },
+  {
+   "what": "权限 / 授权状态",
+   "say": [
+    "授权",
+    "权限",
+    "还有几张票",
+    "门的状态"
+   ],
+   "caps": {
+    "auth_gate_status": 10
+   }
+  },
+  {
+   "what": "记一笔 / 台账",
+   "say": [
+    "记一笔",
+    "记账",
+    "写台账",
+    "留一笔"
+   ],
+   "caps": {
+    "ledger_note": 10
+   }
+  },
+  {
+   "what": "报警 / 异常",
+   "say": [
+    "报警",
+    "异常",
+    "有没有故障",
+    "声带"
+   ],
+   "caps": {
+    "alerts": 10
+   }
+  },
+  {
+   "what": "能源核心 / 还有多少电",
+   "say": [
+    "能源核心",
+    "还有多少电",
+    "电池状态",
+    "电表",
+    "功率"
+   ],
+   "caps": {
+    "energy_core": 10
+   }
+  },
+  {
+   "what": "脉冲 / 直达 / 按需激活",
+   "say": [
+    "脉冲",
+    "直达",
+    "按需激活",
+    "引擎睡着了吗",
+    "唤醒引擎"
+   ],
+   "caps": {
+    "pulse_core": 10
+   }
+  },
+  {
+   "what": "代码覆盖 / 哪个文件归谁",
+   "say": [
+    "代码覆盖",
+    "谁管这个文件",
+    "孤儿文件",
+    "触手覆盖"
+   ],
+   "caps": {
+    "trunk_cover": 10
+   }
+  },
+  {
+   "what": "身体状态 / 哪里痛",
+   "say": [
+    "身体状态",
+    "哪里痛",
+    "器官",
+    "本体感觉",
+    "神经"
+   ],
+   "caps": {
+    "body_sense": 10
+   }
+  },
+  {
+   "what": "动脑想想 / 反思推荐",
+   "say": [
+    "动脑想想",
+    "反思",
+    "推荐下一步",
+    "推理环",
+    "扫描完然后呢"
+   ],
+   "caps": {
+    "trunk_reason": 10
+   }
+  },
+  {
+   "what": "上下文守卫 / 上下文溢出",
+   "say": [
+    "上下文",
+    "上下文溢出",
+    "双插",
+    "记忆窗口"
+   ],
+   "caps": {
+    "context_guard": 10
+   }
+  },
+  {
+   "what": "自主吞食 / 找东西强化自己",
+   "say": [
+    "吞噬",
+    "吞食",
+    "自己找东西吃",
+    "强化自己",
+    "缺口吃什么"
+   ],
+   "caps": {
+    "devour_auto": 10
+   }
+  },
+  {
+   "what": "编排账本 / 面板",
+   "say": [
+    "编排账本",
+    "编排面板",
+    "重启看什么",
+    "记一笔账",
+    "今晚干了啥"
+   ],
+   "caps": {
+    "orchestration": 10
+   }
+  },
+  {
+   "what": "自动别名 · body_map",
+   "say": [
+    "身体·清单"
+   ],
+   "caps": {
+    "body_map": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_see",
+   "say": [
+    "身体·看"
+   ],
+   "caps": {
+    "body_see": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_say",
+   "say": [
+    "身体·说"
+   ],
+   "caps": {
+    "body_say": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_type",
+   "say": [
+    "身体·打字"
+   ],
+   "caps": {
+    "body_type": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_click",
+   "say": [
+    "身体·点",
+    "click"
+   ],
+   "caps": {
+    "body_click": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_volume",
+   "say": [
+    "身体·音量",
+    "volume"
+   ],
+   "caps": {
+    "body_volume": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_open",
+   "say": [
+    "身体·打开"
+   ],
+   "caps": {
+    "body_open": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codex_status",
+   "say": [
+    "官方 Codex 只读状态"
+   ],
+   "caps": {
+    "codex_status": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codex_thread_new",
+   "say": [
+    "thread"
+   ],
+   "caps": {
+    "codex_thread_new": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codex_interrupt",
+   "say": [
+    "interrupt"
+   ],
+   "caps": {
+    "codex_interrupt": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codex_chat",
+   "say": [
+    "官方 Codex 同步对话"
+   ],
+   "caps": {
+    "codex_chat": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codex_models",
+   "say": [
+    "models"
+   ],
+   "caps": {
+    "codex_models": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · desktop_commander",
+   "say": [
+    "桌面指挥官"
+   ],
+   "caps": {
+    "desktop_commander": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · health",
+   "say": [
+    "系统健康信息"
+   ],
+   "caps": {
+    "health": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · echo",
+   "say": [
+    "联调回显位"
+   ],
+   "caps": {
+    "echo": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · count_words",
+   "say": [
+    "数词数",
+    "count",
+    "words"
+   ],
+   "caps": {
+    "count_words": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · audit_query",
+   "say": [
+    "查审计账本",
+    "query"
+   ],
+   "caps": {
+    "audit_query": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · quant_strategy",
+   "say": [
+    "读取真实量化引擎",
+    "strategy"
+   ],
+   "caps": {
+    "quant_strategy": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · quant_backtest",
+   "say": [
+    "读取真实回测 API",
+    "backtest"
+   ],
+   "caps": {
+    "quant_backtest": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · platform_profile",
+   "say": [
+    "读取量化项目结构",
+    "platform"
+   ],
+   "caps": {
+    "platform_profile": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · quant_params",
+   "say": [
+    "params"
+   ],
+   "caps": {
+    "quant_params": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · osint_scan",
+   "say": [
+    "OSINT 扫描",
+    "osint"
+   ],
+   "caps": {
+    "osint_scan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · record_grid",
+   "say": [
+    "行式记录网格",
+    "record"
+   ],
+   "caps": {
+    "record_grid": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · wf_resume",
+   "say": [
+    "resume"
+   ],
+   "caps": {
+    "wf_resume": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · lr_status",
+   "say": [
+    "（占位）自动别名 · lr_status"
+   ],
+   "caps": {
+    "lr_status": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · selfscan",
+   "say": [
+    "selfscan"
+   ],
+   "caps": {
+    "selfscan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · alerts",
+   "say": [
+    "框架声带",
+    "alerts"
+   ],
+   "caps": {
+    "alerts": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle",
+   "say": [
+    "触手/眼睛/双手/手"
+   ],
+   "caps": {
+    "tentacle": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_manifest",
+   "say": [
+    "manifest"
+   ],
+   "caps": {
+    "tentacle_manifest": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · commander",
+   "say": [
+    "触手主干·原生指挥官"
+   ],
+   "caps": {
+    "commander": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pulse_core",
+   "say": [
+    "触手四合一原生位"
+   ],
+   "caps": {
+    "pulse_core": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cap_self",
+   "say": [
+    "能力自知"
+   ],
+   "caps": {
+    "cap_self": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · trunk_cover",
+   "say": [
+    "cover"
+   ],
+   "caps": {
+    "trunk_cover": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · body_sense",
+   "say": [
+    "身体知觉三合一",
+    "sense"
+   ],
+   "caps": {
+    "body_sense": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · devour_auto",
+   "say": [
+    "自主吞食"
+   ],
+   "caps": {
+    "devour_auto": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · trunk_reason",
+   "say": [
+    "触手推理环",
+    "reason"
+   ],
+   "caps": {
+    "trunk_reason": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · context_guard",
+   "say": [
+    "上下文守卫"
+   ],
+   "caps": {
+    "context_guard": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · research_intel",
+   "say": [
+    "调研 AI 情报部门",
+    "research"
+   ],
+   "caps": {
+    "research_intel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · hunyuan_video",
+   "say": [
+    "hunyuan"
+   ],
+   "caps": {
+    "hunyuan_video": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · energy_core",
+   "say": [
+    "能源核心读数"
+   ],
+   "caps": {
+    "energy_core": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · orchestration",
+   "say": [
+    "编排账本与面板"
+   ],
+   "caps": {
+    "orchestration": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · omni_open",
+   "say": [
+    "万能插·全自动打开"
+   ],
+   "caps": {
+    "omni_open": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · sec_defenses",
+   "say": [
+    "defenses"
+   ],
+   "caps": {
+    "sec_defenses": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · sec_llm",
+   "say": [
+    "黑客大脑推理引擎"
+   ],
+   "caps": {
+    "sec_llm": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · truth_scan",
+   "say": [
+    "真实性审计层",
+    "truth"
+   ],
+   "caps": {
+    "truth_scan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · autopilot",
+   "say": [
+    "autopilot"
+   ],
+   "caps": {
+    "autopilot": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · llm_chat",
+   "say": [
+    "操控其他AI"
+   ],
+   "caps": {
+    "llm_chat": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · llm_status",
+   "say": [
+    "LLM网关状态"
+   ],
+   "caps": {
+    "llm_status": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cloud_llm",
+   "say": [
+    "云端大模型通道"
+   ],
+   "caps": {
+    "cloud_llm": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · key_gateway",
+   "say": [
+    "统一密钥网关"
+   ],
+   "caps": {
+    "key_gateway": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · multimodal_port",
+   "say": [
+    "multimodal"
+   ],
+   "caps": {
+    "multimodal_port": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_route",
+   "say": [
+    "大脑执行层·路由维",
+    "route"
+   ],
+   "caps": {
+    "brain_route": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_execute",
+   "say": [
+    "大脑执行层·执行维",
+    "execute"
+   ],
+   "caps": {
+    "brain_execute": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_verify",
+   "say": [
+    "大脑执行层·验证维",
+    "verify"
+   ],
+   "caps": {
+    "brain_verify": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_health",
+   "say": [
+    "大脑执行层·健康维"
+   ],
+   "caps": {
+    "brain_health": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_unify",
+   "say": [
+    "大脑执行层·五维合一",
+    "unify"
+   ],
+   "caps": {
+    "brain_unify": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · root_fix",
+   "say": [
+    "（占位）自动别名 · root_fix"
+   ],
+   "caps": {
+    "root_fix": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · inventory",
+   "say": [
+    "全息盘点",
+    "inventory"
+   ],
+   "caps": {
+    "inventory": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_vault",
+   "say": [
+    "脑库接入"
+   ],
+   "caps": {
+    "brain_vault": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · think_loop",
+   "say": [
+    "think"
+   ],
+   "caps": {
+    "think_loop": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · one_key_deploy",
+   "say": [
+    "一指定江山乾坤换位"
+   ],
+   "caps": {
+    "one_key_deploy": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · deploy_queue",
+   "say": [
+    "AI 接管部署队列",
+    "queue"
+   ],
+   "caps": {
+    "deploy_queue": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_shape",
+   "say": [
+    "shape"
+   ],
+   "caps": {
+    "mirror_shape": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_simulate",
+   "say": [
+    "simulate"
+   ],
+   "caps": {
+    "mirror_simulate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_parity",
+   "say": [
+    "parity"
+   ],
+   "caps": {
+    "mirror_parity": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_rehearse",
+   "say": [
+    "rehearse"
+   ],
+   "caps": {
+    "mirror_rehearse": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_release",
+   "say": [
+    "release"
+   ],
+   "caps": {
+    "mirror_release": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_ascend",
+   "say": [
+    "ascend"
+   ],
+   "caps": {
+    "mirror_ascend": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mirror_rewind",
+   "say": [
+    "rewind"
+   ],
+   "caps": {
+    "mirror_rewind": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · auth_gate_status",
+   "say": [
+    "人工授权门状态"
+   ],
+   "caps": {
+    "auth_gate_status": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · transfer",
+   "say": [
+    "数据传输算子",
+    "transfer"
+   ],
+   "caps": {
+    "transfer": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · wf_cache_clear",
+   "say": [
+    "cache",
+    "clear"
+   ],
+   "caps": {
+    "wf_cache_clear": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · signature_guard",
+   "say": [
+    "signature"
+   ],
+   "caps": {
+    "signature_guard": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · file_hygiene",
+   "say": [
+    "文件卫生层",
+    "hygiene"
+   ],
+   "caps": {
+    "file_hygiene": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · devour_github",
+   "say": [
+    "github"
+   ],
+   "caps": {
+    "devour_github": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_equip",
+   "say": [
+    "触手自配装备与账号",
+    "equip"
+   ],
+   "caps": {
+    "tentacle_equip": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tool_bay",
+   "say": [
+    "装备坞"
+   ],
+   "caps": {
+    "tool_bay": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · remote_confinement",
+   "say": [
+    "执行者隔离",
+    "confinement"
+   ],
+   "caps": {
+    "remote_confinement": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cli_ify",
+   "say": [
+    "软件命令化"
+   ],
+   "caps": {
+    "cli_ify": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_learn",
+   "say": [
+    "触手扫描·采集·学习",
+    "learn"
+   ],
+   "caps": {
+    "tentacle_learn": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · skill_finder",
+   "say": [
+    "技能检索器",
+    "finder"
+   ],
+   "caps": {
+    "skill_finder": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · humanizer",
+   "say": [
+    "去 AI 味改写器",
+    "humanizer"
+   ],
+   "caps": {
+    "humanizer": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · chart_html",
+   "say": [
+    "chart"
+   ],
+   "caps": {
+    "chart_html": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · workflow_forge",
+   "say": [
+    "工作流十式"
+   ],
+   "caps": {
+    "workflow_forge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · forge_mastery",
+   "say": [
+    "mastery"
+   ],
+   "caps": {
+    "forge_mastery": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · showcase_ops",
+   "say": [
+    "作品解剖与展示",
+    "showcase"
+   ],
+   "caps": {
+    "showcase_ops": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · spider_ops",
+   "say": [
+    "自适应抓取编排",
+    "spider"
+   ],
+   "caps": {
+    "spider_ops": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · offense_ops",
+   "say": [
+    "自主渗透编排",
+    "offense"
+   ],
+   "caps": {
+    "offense_ops": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · skill_forge",
+   "say": [
+    "技能蒸馏五式"
+   ],
+   "caps": {
+    "skill_forge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · shot_director",
+   "say": [
+    "镜头导演"
+   ],
+   "caps": {
+    "shot_director": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · book_skill",
+   "say": [
+    "书→技能"
+   ],
+   "caps": {
+    "book_skill": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · music_auto",
+   "say": [
+    "音乐自动化"
+   ],
+   "caps": {
+    "music_auto": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · train_ground",
+   "say": [
+    "回炉训练场",
+    "ground"
+   ],
+   "caps": {
+    "train_ground": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · quant_plan",
+   "say": [
+    "压缩与直达"
+   ],
+   "caps": {
+    "quant_plan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · know_map",
+   "say": [
+    "理解任何事"
+   ],
+   "caps": {
+    "know_map": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · topic_web",
+   "say": [
+    "主题共现网"
+   ],
+   "caps": {
+    "topic_web": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · comfy_forge",
+   "say": [
+    "创作融合台"
+   ],
+   "caps": {
+    "comfy_forge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · scan_cap",
+   "say": [
+    "统一扫描位"
+   ],
+   "caps": {
+    "scan_cap": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · figure_gate",
+   "say": [
+    "figure"
+   ],
+   "caps": {
+    "figure_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · theme_cap",
+   "say": [
+    "theme"
+   ],
+   "caps": {
+    "theme_cap": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · omarchy_bridge",
+   "say": [
+    "Omarchy 桥",
+    "omarchy"
+   ],
+   "caps": {
+    "omarchy_bridge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · delivery_gate",
+   "say": [
+    "交付闸",
+    "delivery"
+   ],
+   "caps": {
+    "delivery_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ux_doctrine",
+   "say": [
+    "交互铁律",
+    "doctrine"
+   ],
+   "caps": {
+    "ux_doctrine": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · welcome",
+   "say": [
+    "启动欢迎语",
+    "welcome"
+   ],
+   "caps": {
+    "welcome": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · god_view",
+   "say": [
+    "上帝视角"
+   ],
+   "caps": {
+    "god_view": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · vision_loop",
+   "say": [
+    "原生四觉闭环"
+   ],
+   "caps": {
+    "vision_loop": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · agency_tentacles",
+   "say": [
+    "职业触手中枢",
+    "agency",
+    "tentacles"
+   ],
+   "caps": {
+    "agency_tentacles": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · media_pipeline",
+   "say": [
+    "AI短视频/电影/音乐流水线"
+   ],
+   "caps": {
+    "media_pipeline": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · edit_pipeline",
+   "say": [
+    "剪辑引擎"
+   ],
+   "caps": {
+    "edit_pipeline": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_pipeline",
+   "say": [
+    "触手自动化流水线"
+   ],
+   "caps": {
+    "tentacle_pipeline": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · long_run_supervisor",
+   "say": [
+    "长程无人值守任务监督",
+    "supervisor"
+   ],
+   "caps": {
+    "long_run_supervisor": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · devour_reflect",
+   "say": [
+    "reflect"
+   ],
+   "caps": {
+    "devour_reflect": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mcp_connect",
+   "say": [
+    "connect"
+   ],
+   "caps": {
+    "mcp_connect": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · coze_mail",
+   "say": [
+    "通信域"
+   ],
+   "caps": {
+    "coze_mail": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · create",
+   "say": [
+    "创作出口",
+    "create"
+   ],
+   "caps": {
+    "create": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · drama",
+   "say": [
+    "drama"
+   ],
+   "caps": {
+    "drama": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_status",
+   "say": [
+    "触手自诊断"
+   ],
+   "caps": {
+    "tentacle_status": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tactics_advise",
+   "say": [
+    "察言观色层",
+    "tactics",
+    "advise"
+   ],
+   "caps": {
+    "tactics_advise": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pipeline_versions",
+   "say": [
+    "versions"
+   ],
+   "caps": {
+    "pipeline_versions": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pipeline_rollback",
+   "say": [
+    "rollback"
+   ],
+   "caps": {
+    "pipeline_rollback": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ghost_guard",
+   "say": [
+    "防复发检测",
+    "ghost"
+   ],
+   "caps": {
+    "ghost_guard": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · svc_inspect",
+   "say": [
+    "服务巡检",
+    "inspect"
+   ],
+   "caps": {
+    "svc_inspect": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · vision",
+   "say": [
+    "视觉/图像识别入口"
+   ],
+   "caps": {
+    "vision": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · vlx_flow",
+   "say": [
+    "流式观察 + 两层记忆"
+   ],
+   "caps": {
+    "vlx_flow": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · prompt_bridge",
+   "say": [
+    "提示词转化挂件",
+    "prompt"
+   ],
+   "caps": {
+    "prompt_bridge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · audio_extract",
+   "say": [
+    "从视频里取出声音",
+    "extract"
+   ],
+   "caps": {
+    "audio_extract": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · audio_mix",
+   "say": [
+    "混音与母带"
+   ],
+   "caps": {
+    "audio_mix": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · media_license",
+   "say": [
+    "license"
+   ],
+   "caps": {
+    "media_license": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · datakit",
+   "say": [
+    "本地数据工具",
+    "datakit"
+   ],
+   "caps": {
+    "datakit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · media_run",
+   "say": [
+    "三方向自动化工作流执行器"
+   ],
+   "caps": {
+    "media_run": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · media_stamp",
+   "say": [
+    "音视频钢印",
+    "stamp"
+   ],
+   "caps": {
+    "media_stamp": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · voice",
+   "say": [
+    "本机语音入口"
+   ],
+   "caps": {
+    "voice": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · voice_orchestra",
+   "say": [
+    "语音技能中枢",
+    "orchestra"
+   ],
+   "caps": {
+    "voice_orchestra": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · browser",
+   "say": [
+    "浏览器自动化入口",
+    "browser"
+   ],
+   "caps": {
+    "browser": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · bluetooth",
+   "say": [
+    "蓝牙设备控制",
+    "bluetooth"
+   ],
+   "caps": {
+    "bluetooth": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · bt_control",
+   "say": [
+    "AI 智能蓝牙操控"
+   ],
+   "caps": {
+    "bt_control": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · quant",
+   "say": [
+    "量化/回测入口"
+   ],
+   "caps": {
+    "quant": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · life",
+   "say": [
+    "生命档案"
+   ],
+   "caps": {
+    "life": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · mind",
+   "say": [
+    "心智引擎"
+   ],
+   "caps": {
+    "mind": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · project_context",
+   "say": [
+    "（占位）自动别名 · project_context"
+   ],
+   "caps": {
+    "project_context": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · topic_watch",
+   "say": [
+    "话题追踪"
+   ],
+   "caps": {
+    "topic_watch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · trend_watch",
+   "say": [
+    "trend"
+   ],
+   "caps": {
+    "trend_watch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · projection_card",
+   "say": [
+    "空间投射只读卡片"
+   ],
+   "caps": {
+    "projection_card": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · trace_store",
+   "say": [
+    "痕迹库只读读数",
+    "trace",
+    "store"
+   ],
+   "caps": {
+    "trace_store": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · wave_probe",
+   "say": [
+    "痕迹触手只读量一次波动"
+   ],
+   "caps": {
+    "wave_probe": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dream_replay",
+   "say": [
+    "做梦技能只读重演",
+    "dream",
+    "replay"
+   ],
+   "caps": {
+    "dream_replay": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · capability_net",
+   "say": [
+    "穿透网七栏只读读数",
+    "capability"
+   ],
+   "caps": {
+    "capability_net": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · director_mood",
+   "say": [
+    "导演 AI 情绪内核"
+   ],
+   "caps": {
+    "director_mood": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · music_publishing",
+   "say": [
+    "publishing"
+   ],
+   "caps": {
+    "music_publishing": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dh_pose",
+   "say": [
+    "数字人动作控制"
+   ],
+   "caps": {
+    "dh_pose": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · anatomy_figures",
+   "say": [
+    "Anatomy 等轴详解图",
+    "anatomy",
+    "figures"
+   ],
+   "caps": {
+    "anatomy_figures": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · rig_audit",
+   "say": [
+    "绑骨体检"
+   ],
+   "caps": {
+    "rig_audit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · rig_fix",
+   "say": [
+    "绑骨修复"
+   ],
+   "caps": {
+    "rig_fix": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · anim_audit",
+   "say": [
+    "动画体检"
+   ],
+   "caps": {
+    "anim_audit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · anim_fix",
+   "say": [
+    "动画手术"
+   ],
+   "caps": {
+    "anim_fix": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dh_asset_gate",
+   "say": [
+    "数字人资产八条闸"
+   ],
+   "caps": {
+    "dh_asset_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_arm",
+   "say": [
+    "触手操控臂"
+   ],
+   "caps": {
+    "tentacle_arm": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · project_drift",
+   "say": [
+    "全项目变化监控",
+    "drift"
+   ],
+   "caps": {
+    "project_drift": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · impact_check",
+   "say": [
+    "影响面检查",
+    "impact",
+    "check"
+   ],
+   "caps": {
+    "impact_check": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · music_intel",
+   "say": [
+    "音乐情报组"
+   ],
+   "caps": {
+    "music_intel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · video_intel",
+   "say": [
+    "短视频情报组"
+   ],
+   "caps": {
+    "video_intel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · film_intel",
+   "say": [
+    "影视情报组"
+   ],
+   "caps": {
+    "film_intel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · account_registry",
+   "say": [
+    "AI 账号登记表只读校验",
+    "account"
+   ],
+   "caps": {
+    "account_registry": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · verification_watch",
+   "say": [
+    "人机验证情报台账",
+    "verification"
+   ],
+   "caps": {
+    "verification_watch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · shared_resources",
+   "say": [
+    "共享资源池",
+    "shared",
+    "resources"
+   ],
+   "caps": {
+    "shared_resources": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brand_outro",
+   "say": [
+    "品牌片尾只读渲染",
+    "brand",
+    "outro"
+   ],
+   "caps": {
+    "brand_outro": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · emotion_projection",
+   "say": [
+    "情感投射只读骨架",
+    "emotion"
+   ],
+   "caps": {
+    "emotion_projection": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · proactive_report",
+   "say": [
+    "主动汇报引擎只读判据层",
+    "proactive",
+    "report"
+   ],
+   "caps": {
+    "proactive_report": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · observer_anchor",
+   "say": [
+    "观察者锚点律只读骨架",
+    "observer"
+   ],
+   "caps": {
+    "observer_anchor": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · persona_kernel",
+   "say": [
+    "性格内核 v4.0",
+    "persona"
+   ],
+   "caps": {
+    "persona_kernel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · hook_registry",
+   "say": [
+    "钩子矩阵只读注册表"
+   ],
+   "caps": {
+    "hook_registry": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · scene_anchor",
+   "say": [
+    "场景锚定只读骨架",
+    "scene"
+   ],
+   "caps": {
+    "scene_anchor": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · code_art",
+   "say": [
+    "代码艺术内核"
+   ],
+   "caps": {
+    "code_art": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · orchestration_kernel",
+   "say": [
+    "编排内核"
+   ],
+   "caps": {
+    "orchestration_kernel": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · render_evolution",
+   "say": [
+    "渲染进化内核",
+    "evolution"
+   ],
+   "caps": {
+    "render_evolution": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · caps_called_audit",
+   "say": [
+    "能力位调用点审计",
+    "called"
+   ],
+   "caps": {
+    "caps_called_audit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_cognition",
+   "say": [
+    "（占位）自动别名 · tentacle_cognition"
+   ],
+   "caps": {
+    "tentacle_cognition": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · coverage_auditor",
+   "say": [
+    "触手覆盖审计",
+    "coverage",
+    "auditor"
+   ],
+   "caps": {
+    "coverage_auditor": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · gods_eye",
+   "say": [
+    "上帝之眼"
+   ],
+   "caps": {
+    "gods_eye": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · obsidian_vault",
+   "say": [
+    "Obsidian 永久记忆层",
+    "obsidian"
+   ],
+   "caps": {
+    "obsidian_vault": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · action_gate",
+   "say": [
+    "先看→动脑→执行 前置闸",
+    "action"
+   ],
+   "caps": {
+    "action_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · growth_hooks",
+   "say": [
+    "短板钩子 + 自主进化钩子",
+    "growth",
+    "hooks"
+   ],
+   "caps": {
+    "growth_hooks": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · devour_fusion",
+   "say": [
+    "吞天 × 原生能力 融合台账",
+    "fusion"
+   ],
+   "caps": {
+    "devour_fusion": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · llm_watch",
+   "say": [
+    "大脑执行层·守望"
+   ],
+   "caps": {
+    "llm_watch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · task_graph",
+   "say": [
+    "大脑执行层·任务图"
+   ],
+   "caps": {
+    "task_graph": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · replan_loop",
+   "say": [
+    "大脑执行层·回流环",
+    "replan"
+   ],
+   "caps": {
+    "replan_loop": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · duty_board",
+   "say": [
+    "大脑执行层·在岗看板",
+    "board"
+   ],
+   "caps": {
+    "duty_board": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · rea_reverse",
+   "say": [
+    "reverse"
+   ],
+   "caps": {
+    "rea_reverse": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · diagram_distill",
+   "say": [
+    "diagram"
+   ],
+   "caps": {
+    "diagram_distill": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · memory_bank",
+   "say": [
+    "记忆银行"
+   ],
+   "caps": {
+    "memory_bank": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · agent_console",
+   "say": [
+    "代理驾驶舱"
+   ],
+   "caps": {
+    "agent_console": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · code_audit",
+   "say": [
+    "代码安全审计"
+   ],
+   "caps": {
+    "code_audit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · agent_rig",
+   "say": [
+    "编码智能体编队"
+   ],
+   "caps": {
+    "agent_rig": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · console_hub",
+   "say": [
+    "工作台中枢"
+   ],
+   "caps": {
+    "console_hub": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · console_pages",
+   "say": [
+    "工作台页面渲染器",
+    "pages"
+   ],
+   "caps": {
+    "console_pages": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · freebuff_term",
+   "say": [
+    "freebuff 终端集成",
+    "freebuff"
+   ],
+   "caps": {
+    "freebuff_term": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · voice_studio",
+   "say": [
+    "VoiceStudio两层面",
+    "studio"
+   ],
+   "caps": {
+    "voice_studio": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · digital_human",
+   "say": [
+    "数字人「以图生视频」",
+    "digital",
+    "human"
+   ],
+   "caps": {
+    "digital_human": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · image_scout",
+   "say": [
+    "美图精准抓取",
+    "image",
+    "scout"
+   ],
+   "caps": {
+    "image_scout": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · install_selfcheck",
+   "say": [
+    "install",
+    "selfcheck"
+   ],
+   "caps": {
+    "install_selfcheck": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · room_space",
+   "say": [
+    "镜像房间空间",
+    "space"
+   ],
+   "caps": {
+    "room_space": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · collab_gateway",
+   "say": [
+    "协作网关",
+    "collab"
+   ],
+   "caps": {
+    "collab_gateway": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · lobehub",
+   "say": [
+    "lobehub"
+   ],
+   "caps": {
+    "lobehub": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · comfyui",
+   "say": [
+    "ComfyUI全控",
+    "comfyui"
+   ],
+   "caps": {
+    "comfyui": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · comfy_native",
+   "say": [
+    "native"
+   ],
+   "caps": {
+    "comfy_native": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ring_context",
+   "say": [
+    "环形自动化上下文"
+   ],
+   "caps": {
+    "ring_context": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · skill_watch",
+   "say": [
+    "技能观察器"
+   ],
+   "caps": {
+    "skill_watch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · vision_grounding",
+   "say": [
+    "视觉/定位通道契约",
+    "grounding"
+   ],
+   "caps": {
+    "vision_grounding": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · repo_publish",
+   "say": [
+    "远端发布面"
+   ],
+   "caps": {
+    "repo_publish": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pulse_direct",
+   "say": [
+    "脉冲直达"
+   ],
+   "caps": {
+    "pulse_direct": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · warm_switch",
+   "say": [
+    "按需常驻开关"
+   ],
+   "caps": {
+    "warm_switch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · page_scan",
+   "say": [
+    "按绑定逐页并发扫"
+   ],
+   "caps": {
+    "page_scan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · fact_gate",
+   "say": [
+    "机器事实直答门"
+   ],
+   "caps": {
+    "fact_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · policy_gate",
+   "say": [
+    "权限／付款直答门"
+   ],
+   "caps": {
+    "policy_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · one_shot",
+   "say": [
+    "一句话 → 全链计划"
+   ],
+   "caps": {
+    "one_shot": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · surface_bind",
+   "say": [
+    "通用「可控制面」绑定器"
+   ],
+   "caps": {
+    "surface_bind": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · memory_manager",
+   "say": [
+    "记忆管理 + 万能精准秒搜"
+   ],
+   "caps": {
+    "memory_manager": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · i2v_agnes",
+   "say": [
+    "图生视频",
+    "agnes"
+   ],
+   "caps": {
+    "i2v_agnes": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · code_graph",
+   "say": [
+    "代码知识图谱"
+   ],
+   "caps": {
+    "code_graph": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · sec_sweeper",
+   "say": [
+    "安全棒",
+    "sweeper"
+   ],
+   "caps": {
+    "sec_sweeper": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · task_manager",
+   "say": [
+    "任务管理器"
+   ],
+   "caps": {
+    "task_manager": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · transformer",
+   "say": [
+    "变压器",
+    "transformer"
+   ],
+   "caps": {
+    "transformer": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · automation_keys",
+   "say": [
+    "自动化配置密钥口",
+    "automation"
+   ],
+   "caps": {
+    "automation_keys": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · model_key_pool",
+   "say": [
+    "模型密钥池",
+    "model"
+   ],
+   "caps": {
+    "model_key_pool": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · meta_cognition",
+   "say": [
+    "元认知循环"
+   ],
+   "caps": {
+    "meta_cognition": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · libtv_skill",
+   "say": [
+    "LibTV 技能"
+   ],
+   "caps": {
+    "libtv_skill": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · a1art_skill",
+   "say": [
+    "a1.art API 技能"
+   ],
+   "caps": {
+    "a1art_skill": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · energy_pool",
+   "say": [
+    "能源池"
+   ],
+   "caps": {
+    "energy_pool": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · scrapling",
+   "say": [
+    "网页抓取",
+    "scrapling"
+   ],
+   "caps": {
+    "scrapling": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · genoffice",
+   "say": [
+    "办公文档"
+   ],
+   "caps": {
+    "genoffice": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · blender",
+   "say": [
+    "三维电影引擎",
+    "blender"
+   ],
+   "caps": {
+    "blender": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · actioncam",
+   "say": [
+    "动作镜头控制系统",
+    "actioncam"
+   ],
+   "caps": {
+    "actioncam": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · look_grade",
+   "say": [
+    "外观库触手",
+    "grade"
+   ],
+   "caps": {
+    "look_grade": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · penetrating_cross_scan",
+   "say": [
+    "穿透式交叉扫描引擎",
+    "penetrating"
+   ],
+   "caps": {
+    "penetrating_cross_scan": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · hook_enforcer",
+   "say": [
+    "enforcer"
+   ],
+   "caps": {
+    "hook_enforcer": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · omission_detector",
+   "say": [
+    "遗漏检测器",
+    "omission",
+    "detector"
+   ],
+   "caps": {
+    "omission_detector": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · zimage_rewash",
+   "say": [
+    "洗图流水线",
+    "zimage",
+    "rewash"
+   ],
+   "caps": {
+    "zimage_rewash": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · n8n_wf",
+   "say": [
+    "n8n 工作流控制"
+   ],
+   "caps": {
+    "n8n_wf": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · filmkit",
+   "say": [
+    "柔性影片产线",
+    "filmkit"
+   ],
+   "caps": {
+    "filmkit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_bind",
+   "say": [
+    "资产↔触手穿透式绑定"
+   ],
+   "caps": {
+    "tentacle_bind": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · asset_index",
+   "say": [
+    "资产索引"
+   ],
+   "caps": {
+    "asset_index": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · control_loop",
+   "say": [
+    "快慢双脑控制回路"
+   ],
+   "caps": {
+    "control_loop": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · local_brain",
+   "say": [
+    "本地原生脑",
+    "local"
+   ],
+   "caps": {
+    "local_brain": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · auto_switch",
+   "say": [
+    "自动化切换引擎"
+   ],
+   "caps": {
+    "auto_switch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · context_vault",
+   "say": [
+    "上下文归档库"
+   ],
+   "caps": {
+    "context_vault": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · feishu_embed",
+   "say": [
+    "飞书镶嵌窗口",
+    "feishu"
+   ],
+   "caps": {
+    "feishu_embed": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dl_forge",
+   "say": [
+    "3D 锻造融合位"
+   ],
+   "caps": {
+    "dl_forge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dh_realism",
+   "say": [
+    "数字人逼真度位",
+    "realism"
+   ],
+   "caps": {
+    "dh_realism": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cloud_plugin",
+   "say": [
+    "云插件"
+   ],
+   "caps": {
+    "cloud_plugin": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · db_plugin",
+   "say": [
+    "数据库插件"
+   ],
+   "caps": {
+    "db_plugin": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · telegram_embed",
+   "say": [
+    "Telegram 镶嵌窗口",
+    "telegram"
+   ],
+   "caps": {
+    "telegram_embed": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · whatsapp_embed",
+   "say": [
+    "WhatsApp 镶嵌窗口",
+    "whatsapp"
+   ],
+   "caps": {
+    "whatsapp_embed": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · libtv_workflow",
+   "say": [
+    "LibTV 节点式工作流"
+   ],
+   "caps": {
+    "libtv_workflow": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · gate_visibility",
+   "say": [
+    "门可见性审计",
+    "visibility"
+   ],
+   "caps": {
+    "gate_visibility": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · dh_brain",
+   "say": [
+    "（占位）自动别名 · dh_brain"
+   ],
+   "caps": {
+    "dh_brain": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · eigenflux",
+   "say": [
+    "AI 朋友圈· 只读能力位",
+    "eigenflux"
+   ],
+   "caps": {
+    "eigenflux": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · h3_video_gen",
+   "say": [
+    "H3mini 视频生成"
+   ],
+   "caps": {
+    "h3_video_gen": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · absorb_loop",
+   "say": [
+    "吞天闭环",
+    "absorb"
+   ],
+   "caps": {
+    "absorb_loop": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cloud_pc",
+   "say": [
+    "云电脑独立窗口"
+   ],
+   "caps": {
+    "cloud_pc": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · awesome_tools_index",
+   "say": [
+    "awesome"
+   ],
+   "caps": {
+    "awesome_tools_index": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · stigmergy",
+   "say": [
+    "协作层的间接通道",
+    "stigmergy"
+   ],
+   "caps": {
+    "stigmergy": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ledger_note",
+   "say": [
+    "台账登记"
+   ],
+   "caps": {
+    "ledger_note": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · code_patch",
+   "say": [
+    "改代码的唯一过门入口"
+   ],
+   "caps": {
+    "code_patch": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · git_read",
+   "say": [
+    "版本库只读面"
+   ],
+   "caps": {
+    "git_read": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · git_write",
+   "say": [
+    "版本库写面",
+    "write"
+   ],
+   "caps": {
+    "git_write": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · brain_council",
+   "say": [
+    "脑会·编队群决策引擎"
+   ],
+   "caps": {
+    "brain_council": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · omni_web",
+   "say": [
+    "万能触手·Web六态"
+   ],
+   "caps": {
+    "omni_web": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · claude_code",
+   "say": [
+    "claude"
+   ],
+   "caps": {
+    "claude_code": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · codebuddy",
+   "say": [
+    "codebuddy"
+   ],
+   "caps": {
+    "codebuddy": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · redteam_recon",
+   "say": [
+    "本机侦察面"
+   ],
+   "caps": {
+    "redteam_recon": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pentest",
+   "say": [
+    "授权渗透验证"
+   ],
+   "caps": {
+    "pentest": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · keylogger",
+   "say": [
+    "本机输入活动记录",
+    "keylogger"
+   ],
+   "caps": {
+    "keylogger": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · screen_sniff",
+   "say": [
+    "本机屏幕采集",
+    "screen",
+    "sniff"
+   ],
+   "caps": {
+    "screen_sniff": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · remote_domain",
+   "say": [
+    "自有设备中继登记",
+    "domain"
+   ],
+   "caps": {
+    "remote_domain": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · device_takeover",
+   "say": [
+    "本机设备接管定位与校验",
+    "device",
+    "takeover"
+   ],
+   "caps": {
+    "device_takeover": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · credential_steal",
+   "say": [
+    "凭据暴露面审计",
+    "credential",
+    "steal"
+   ],
+   "caps": {
+    "credential_steal": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · data_hijack",
+   "say": [
+    "会话/数据完整性检测",
+    "hijack"
+   ],
+   "caps": {
+    "data_hijack": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · social_eng",
+   "say": [
+    "钓鱼识别",
+    "social"
+   ],
+   "caps": {
+    "social_eng": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · paywallbuster",
+   "say": [
+    "内容门检测",
+    "paywallbuster"
+   ],
+   "caps": {
+    "paywallbuster": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · asset_vault_freeze",
+   "say": [
+    "资产单点损失体检"
+   ],
+   "caps": {
+    "asset_vault_freeze": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · onboarding_gate",
+   "say": [
+    "未接线能力上手指引门",
+    "onboarding"
+   ],
+   "caps": {
+    "onboarding_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · agent_control",
+   "say": [
+    "Agent 统一控制面"
+   ],
+   "caps": {
+    "agent_control": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · agent_council",
+   "say": [
+    "多智能体议事会"
+   ],
+   "caps": {
+    "agent_council": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · answer_shaper",
+   "say": [
+    "行动优先输出核",
+    "answer",
+    "shaper"
+   ],
+   "caps": {
+    "answer_shaper": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · belief_forge",
+   "say": [
+    "信念锻造",
+    "belief"
+   ],
+   "caps": {
+    "belief_forge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · case_mine",
+   "say": [
+    "案例挖掘"
+   ],
+   "caps": {
+    "case_mine": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cli_chat",
+   "say": [
+    "外部 CLI 助手对话面板"
+   ],
+   "caps": {
+    "cli_chat": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · command_chain",
+   "say": [
+    "指挥链·总指挥参谋部",
+    "command"
+   ],
+   "caps": {
+    "command_chain": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · creation_camp",
+   "say": [
+    "创造营编排",
+    "creation"
+   ],
+   "caps": {
+    "creation_camp": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · db_probe",
+   "say": [
+    "本地只读查询台"
+   ],
+   "caps": {
+    "db_probe": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · energy_scheduler",
+   "say": [
+    "能源调度面",
+    "scheduler"
+   ],
+   "caps": {
+    "energy_scheduler": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · event_ledger",
+   "say": [
+    "签名事件账",
+    "event"
+   ],
+   "caps": {
+    "event_ledger": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · flow_canvas",
+   "say": [
+    "工作流画布",
+    "canvas"
+   ],
+   "caps": {
+    "flow_canvas": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · freellmapi",
+   "say": [
+    "freellmapi"
+   ],
+   "caps": {
+    "freellmapi": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · handoff",
+   "say": [
+    "跨体接续包",
+    "handoff"
+   ],
+   "caps": {
+    "handoff": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · llm_redteam",
+   "say": [
+    "LLM 红队矩阵"
+   ],
+   "caps": {
+    "llm_redteam": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · notion_bridge",
+   "say": [
+    "Notion 资料舱"
+   ],
+   "caps": {
+    "notion_bridge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · policy_delta",
+   "say": [
+    "策略影响预检",
+    "delta"
+   ],
+   "caps": {
+    "policy_delta": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · slim_profile",
+   "say": [
+    "瘦身画像"
+   ],
+   "caps": {
+    "slim_profile": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · spend_guard",
+   "say": [
+    "花费守卫",
+    "spend"
+   ],
+   "caps": {
+    "spend_guard": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · thebrain_bridge",
+   "say": [
+    "thebrain"
+   ],
+   "caps": {
+    "thebrain_bridge": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · train_recipe",
+   "say": [
+    "训练配方与就绪闸",
+    "recipe"
+   ],
+   "caps": {
+    "train_recipe": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tripo",
+   "say": [
+    "Tripo3D 三维生成",
+    "tripo"
+   ],
+   "caps": {
+    "tripo": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ui_render",
+   "say": [
+    "受控界面渲染"
+   ],
+   "caps": {
+    "ui_render": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · review_gate",
+   "say": [
+    "独立终审位",
+    "review"
+   ],
+   "caps": {
+    "review_gate": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · detail_habit",
+   "say": [
+    "细节化习惯 · 调用侧门口",
+    "detail",
+    "habit"
+   ],
+   "caps": {
+    "detail_habit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · tentacle_scale",
+   "say": [
+    "亿万触手寻址",
+    "scale"
+   ],
+   "caps": {
+    "tentacle_scale": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · express_direct",
+   "say": [
+    "确定性直达",
+    "express"
+   ],
+   "caps": {
+    "express_direct": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · vision_print",
+   "say": [
+    "视觉打印",
+    "print"
+   ],
+   "caps": {
+    "vision_print": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · cadgen",
+   "say": [
+    "本机 CAD 链的口",
+    "cadgen"
+   ],
+   "caps": {
+    "cadgen": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · ui_kit",
+   "say": [
+    "UI 组件库的口"
+   ],
+   "caps": {
+    "ui_kit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · design_atlas",
+   "say": [
+    "设计与审美图鉴的口",
+    "design",
+    "atlas"
+   ],
+   "caps": {
+    "design_atlas": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · art_chain",
+   "say": [
+    "作品链"
+   ],
+   "caps": {
+    "art_chain": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · motion_kit",
+   "say": [
+    "动效引擎的口",
+    "motion"
+   ],
+   "caps": {
+    "motion_kit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · bits_kit",
+   "say": [
+    "动效组件图鉴的口"
+   ],
+   "caps": {
+    "bits_kit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · art_brief",
+   "say": [
+    "作品策划位",
+    "brief"
+   ],
+   "caps": {
+    "art_brief": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · intake_kit",
+   "say": [
+    "外部件接入图鉴"
+   ],
+   "caps": {
+    "intake_kit": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · offload_distill",
+   "say": [
+    "内存墙蒸馏件",
+    "offload"
+   ],
+   "caps": {
+    "offload_distill": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · pod_link",
+   "say": [
+    "（占位）自动别名 · pod_link"
+   ],
+   "caps": {
+    "pod_link": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "自动别名 · comfy_cloud",
+   "say": [
+    "云卡 ComfyUI 触手"
+   ],
+   "caps": {
+    "comfy_cloud": 10
+   },
+   "auto": true,
+   "why": "gen-aliases 从 desc/名字自动生成"
+  },
+  {
+   "what": "部署队列 / 入队",
+   "say": [
+    "部署队列",
+    "入队",
+    "排进部署队列",
+    "deploy queue"
+   ],
+   "caps": {
+    "deploy_queue": 10
+   }
+  },
+  {
+   "what": "镜像晋升 / 跨维晋升",
+   "say": [
+    "镜像晋升",
+    "跨维晋升",
+    "全量写入现实",
+    "全绿才放行"
+   ],
+   "caps": {
+    "mirror_ascend": 10
+   }
+  },
+  {
+   "what": "镜像放行 / 排练后发布",
+   "say": [
+    "镜像放行",
+    "排练全绿",
+    "失败即阻断",
+    "指纹绑定报告"
+   ],
+   "caps": {
+    "mirror_release": 10
+   }
+  },
+  {
+   "what": "镜像回滚 / 时间线回滚",
+   "say": [
+    "镜像回滚",
+    "时间线回滚",
+    "回到过去的时间线",
+    "回滚到历史"
+   ],
+   "caps": {
+    "mirror_rewind": 10
+   }
+  },
+  {
+   "what": "镜像体检 / 维度体检",
+   "say": [
+    "镜像体检",
+    "维度体检",
+    "镜像完整性",
+    "镜像署名"
+   ],
+   "caps": {
+    "mirror_scan": 10
+   }
+  },
+  {
+   "what": "一指定江山 / 一键部署",
+   "say": [
+    "一指定江山",
+    "乾坤换位",
+    "一键换生产",
+    "抓取GitHub本地"
+   ],
+   "caps": {
+    "one_key_deploy": 10
+   }
+  },
+  {
+   "what": "管线状态 / 发布记录",
+   "say": [
+    "管线状态",
+    "发布记录",
+    "发布阻断",
+    "生产留痕"
+   ],
+   "caps": {
+    "pipeline_status": 10
+   }
+  },
+  {
+   "what": "管线提交 / 唯一交付通道",
+   "say": [
+    "管线提交",
+    "唯一交付通道",
+    "门禁审计生产写入",
+    "多维度空间提交"
+   ],
+   "caps": {
+    "pipeline_submit": 10
+   }
+  },
+  {
+   "what": "脑会 / 群决策",
+   "say": [
+    "脑会",
+    "群决策",
+    "委员长裁决",
+    "各脑出提案"
+   ],
+   "caps": {
+    "brain_council": 10
+   }
+  },
+  {
+   "what": "脑库 / Obsidian 记忆库",
+   "say": [
+    "脑库",
+    "Obsidian记忆库",
+    "记忆库读",
+    "从记忆库recall"
+   ],
+   "caps": {
+    "brain_vault": 10
+   }
+  },
+  {
+   "what": "指挥链 / 参谋部",
+   "say": [
+    "指挥链",
+    "参谋部",
+    "总指挥参谋"
+   ],
+   "caps": {
+    "command_chain": 10
+   }
+  },
+  {
+   "what": "导演情绪 / 情绪内核",
+   "say": [
+    "导演情绪",
+    "情绪内核",
+    "导演AI情绪"
+   ],
+   "caps": {
+    "director_mood": 10
+   }
+  },
+  {
+   "what": "文档入库 / 知识库解析",
+   "say": [
+    "文档入库",
+    "知识库解析",
+    "解析入库同步"
+   ],
+   "caps": {
+    "doc_intake": 10
+   }
+  },
+  {
+   "what": "性格内核 / 外温内刚",
+   "say": [
+    "性格内核",
+    "外温表达十律",
+    "内刚四基石"
+   ],
+   "caps": {
+    "persona_kernel": 10
+   }
+  },
+  {
+   "what": "取源 / 自递归改进",
+   "say": [
+    "取源",
+    "未命中即取源",
+    "自递归改进"
+   ],
+   "caps": {
+    "self_intake": 10
+   }
+  },
+  {
+   "what": "知识图谱 / 百科图谱",
+   "say": [
+    "知识图谱",
+    "百科知识图谱",
+    "知识库自维护"
+   ],
+   "caps": {
+    "wiki_graph": 10
+   }
+  },
+  {
+   "what": "定时触发器定义",
+   "say": [
+    "定时触发器定义",
+    "定义调度",
+    "调度工作流间隔"
+   ],
+   "caps": {
+    "sched_define": 10
+   }
+  },
+  {
+   "what": "调度状态 / 上次执行",
+   "say": [
+    "调度状态",
+    "上次执行结果",
+    "定时触发器查"
+   ],
+   "caps": {
+    "sched_status": 10
+   }
+  },
+  {
+   "what": "调度扫描 / 到期执行",
+   "say": [
+    "调度扫描",
+    "到期调度",
+    "扫描到期"
+   ],
+   "caps": {
+    "sched_tick": 10
+   }
+  },
+  {
+   "what": "清空传输缓存",
+   "say": [
+    "清空传输缓存",
+    "清空缓存",
+    "节点结果缓存"
+   ],
+   "caps": {
+    "wf_cache_clear": 10
+   }
+  },
+  {
+   "what": "定义工作流 / DAG 校验",
+   "say": [
+    "定义工作流",
+    "DAG校验环",
+    "工作流定义"
+   ],
+   "caps": {
+    "wf_define": 10
+   }
+  },
+  {
+   "what": "断点续跑",
+   "say": [
+    "断点续跑",
+    "从运行记录续跑",
+    "复用已完成节点"
+   ],
+   "caps": {
+    "wf_resume": 10
+   }
+  },
+  {
+   "what": "执行工作流 / 分层并行",
+   "say": [
+    "执行工作流",
+    "分层并行执行",
+    "跑工作流"
+   ],
+   "caps": {
+    "wf_run": 10
+   }
+  },
+  {
+   "what": "工作流状态 / 运行记录",
+   "say": [
+    "工作流状态",
+    "查运行记录",
+    "工作流名过滤"
+   ],
+   "caps": {
+    "wf_status": 10
+   }
+  },
+  {
+   "what": "身体清单 / 七感官六动作",
+   "say": [
+    "身体清单",
+    "七根感官",
+    "六根动作",
+    "身体现读"
+   ],
+   "caps": {
+    "body_map": 10
+   }
+  },
+  {
+   "what": "身体打开 / 系统默认程序打开",
+   "say": [
+    "身体打开",
+    "系统默认程序打开",
+    "打开文件网址"
+   ],
+   "caps": {
+    "body_open": 10
+   }
+  },
+  {
+   "what": "身体系统 TTS / 念一句",
+   "say": [
+    "身体系统TTS",
+    "身体念一句",
+    "用身体说一句"
+   ],
+   "caps": {
+    "body_say": 10
+   }
+  },
+  {
+   "what": "身体截屏 / 截当前屏幕",
+   "say": [
+    "身体截屏",
+    "截当前屏幕",
+    "身体屏幕落png"
+   ],
+   "caps": {
+    "body_see": 10
+   }
+  },
+  {
+   "what": "身体打字 / 前台键入",
+   "say": [
+    "身体打字",
+    "前台键入",
+    "身体键入文本"
+   ],
+   "caps": {
+    "body_type": 10
+   }
+  },
+  {
+   "what": "身体音量 / 主音量",
+   "say": [
+    "身体音量",
+    "主音量",
+    "读或设音量"
+   ],
+   "caps": {
+    "body_volume": 10
+   }
+  },
+  {
+   "what": "蓝牙操控 / 自然语言蓝牙",
+   "say": [
+    "蓝牙操控",
+    "自然语言蓝牙",
+    "协议匹配写入"
+   ],
+   "caps": {
+    "bt_control": 10
+   }
+  },
+  {
+   "what": "大脑执行层·执行维",
+   "say": [
+    "执行维",
+    "单能力直调",
+    "多能力并行"
+   ],
+   "caps": {
+    "brain_execute": 10
+   }
+  },
+  {
+   "what": "大脑执行层·健康维",
+   "say": [
+    "健康维",
+    "五维自检评分",
+    "执行层自检"
+   ],
+   "caps": {
+    "brain_health": 10
+   }
+  },
+  {
+   "what": "大脑执行层·路由维",
+   "say": [
+    "路由维",
+    "意图到能力动态路由",
+    "语义匹配路由"
+   ],
+   "caps": {
+    "brain_route": 10
+   }
+  },
+  {
+   "what": "大脑执行层·验证维",
+   "say": [
+    "验证维",
+    "触手肉眼验证",
+    "现实视觉指纹"
+   ],
+   "caps": {
+    "brain_verify": 10
+   }
+  },
+  {
+   "what": "在岗看板",
+   "say": [
+    "在岗看板",
+    "值班看板",
+    "谁在岗"
+   ],
+   "caps": {
+    "duty_board": 10
+   }
+  },
+  {
+   "what": "执行层守望",
+   "say": [
+    "执行层守望",
+    "守望环",
+    "监控主脑"
+   ],
+   "caps": {
+    "llm_watch": 10
+   }
+  },
+  {
+   "what": "回流环 / 重排计划",
+   "say": [
+    "回流环",
+    "重排计划",
+    "重新排布主线"
+   ],
+   "caps": {
+    "replan_loop": 10
+   }
+  },
+  {
+   "what": "任务图",
+   "say": [
+    "任务图",
+    "任务依赖图",
+    "任务编队"
+   ],
+   "caps": {
+    "task_graph": 10
+   }
+  },
+  {
+   "what": "官方 Codex·新建线程",
+   "say": [
+    "新建线程",
+    "开个codex线程",
+    "新会话线程"
+   ],
+   "caps": {
+    "codex_thread_new": 10
+   }
+  },
+  {
+   "what": "官方 Codex·发送回合",
+   "say": [
+    "发送回合",
+    "流式回传",
+    "跑完一个回合"
+   ],
+   "caps": {
+    "codex_turn_send": 10
+   }
+  },
+  {
+   "what": "官方 Codex·中断回合",
+   "say": [
+    "中断回合",
+    "打断当前回合",
+    "停下codex"
+   ],
+   "caps": {
+    "codex_interrupt": 10
+   }
+  },
+  {
+   "what": "官方 Codex·模型清单",
+   "say": [
+    "模型清单",
+    "可用模型列表",
+    "codex模型"
+   ],
+   "caps": {
+    "codex_models": 10
+   }
+  },
+  {
+   "what": "官方 Codex·动态工具清单",
+   "say": [
+    "动态工具清单",
+    "可用工具列表",
+    "codex工具"
+   ],
+   "caps": {
+    "codex_tools": 10
+   }
+  },
+  {
+   "what": "官方 Codex·状态",
+   "say": [
+    "codex状态",
+    "官方codex进程",
+    "同步对话状态"
+   ],
+   "caps": {
+    "codex_status": 10
+   }
+  },
+  {
+   "what": "推演环 / 完整心智循环",
+   "say": [
+    "推演环",
+    "心智循环",
+    "自我纠错反思进取"
+   ],
+   "caps": {
+    "think_loop": 10
+   }
+  },
+  {
+   "what": "环形上下文",
+   "say": [
+    "环形上下文",
+    "自动化上下文",
+    "上下文环"
+   ],
+   "caps": {
+    "ring_context": 10
+   }
+  },
+  {
+   "what": "云端大模型通道",
+   "say": [
+    "云端大模型",
+    "云端通道",
+    "发给外部模型"
+   ],
+   "caps": {
+    "cloud_llm": 10
+   }
+  },
+  {
+   "what": "自主编排环",
+   "say": [
+    "自主编排环",
+    "防失控循环",
+    "轮数上限"
+   ],
+   "caps": {
+    "autopilot": 10
+   }
+  },
+  {
+   "what": "多模态维度端口",
+   "say": [
+    "多模态维度",
+    "密钥字端口",
+    "一处请求分叉"
+   ],
+   "caps": {
+    "multimodal_port": 10
+   }
+  },
+  {
+   "what": "万能插 / 插座",
+   "say": [
+    "万能插",
+    "插座",
+    "外部对象接入"
+   ],
+   "caps": {
+    "omni_plug": 10
+   }
+  },
+  {
+   "what": "CAD 蒸馏件",
+   "say": [
+    "CAD蒸馏",
+    "CAD件蒸馏",
+    "freecad蒸馏"
+   ],
+   "caps": {
+    "cad_distill": 10
+   }
+  },
+  {
+   "what": "图表蒸馏件",
+   "say": [
+    "图表蒸馏",
+    "diagram蒸馏",
+    "画图件蒸馏"
+   ],
+   "caps": {
+    "diagram_distill": 10
+   }
+  },
+  {
+   "what": "机械蒸馏件",
+   "say": [
+    "机械蒸馏",
+    "machine蒸馏",
+    "仿真件蒸馏"
+   ],
+   "caps": {
+    "machine_distill": 10
+   }
+  },
+  {
+   "what": "本机 CAD 链",
+   "say": [
+    "本机CAD",
+    "CAD建模链",
+    "CAD生成"
+   ],
+   "caps": {
+    "cadgen": 10
+   }
+  },
+  {
+   "what": "数字人资产闸",
+   "say": [
+    "数字人资产闸",
+    "八条闸",
+    "单网格单蒙皮"
+   ],
+   "caps": {
+    "dh_asset_gate": 10
+   }
+  },
+  {
+   "what": "数字人本体",
+   "say": [
+    "数字人本体",
+    "数字人只读",
+    "数字人能力位"
+   ],
+   "caps": {
+    "dh_brain": 10
+   }
+  },
+  {
+   "what": "数字人动作控制",
+   "say": [
+    "数字人动作",
+    "数字人姿态",
+    "动作控制"
+   ],
+   "caps": {
+    "dh_pose": 10
+   }
+  },
+  {
+   "what": "数字人逼真度",
+   "say": [
+    "数字人逼真度",
+    "逼真度位",
+    "专业流程固化"
+   ],
+   "caps": {
+    "dh_realism": 10
+   }
+  },
+  {
+   "what": "3D 锻造融合",
+   "say": [
+    "3D锻造",
+    "锻造融合",
+    "秋叶节点"
+   ],
+   "caps": {
+    "dl_forge": 10
+   }
+  },
+  {
+   "what": "剧本转分镜",
+   "say": [
+    "剧本转分镜",
+    "拆分镜",
+    "分镜短剧"
+   ],
+   "caps": {
+    "drama": 10
+   }
+  },
+  {
+   "what": "节点即触手 / 生产递归",
+   "say": [
+    "节点即触手",
+    "专业生产自我递归",
+    "锻造精通"
+   ],
+   "caps": {
+    "forge_mastery": 10
+   }
+  },
+  {
+   "what": "光写实仿真成片",
+   "say": [
+    "光写实仿真",
+    "写实仿真成片",
+    "machine film"
+   ],
+   "caps": {
+    "machine_film": 10
+   }
+  },
+  {
+   "what": "OmniArm 机械臂",
+   "say": [
+    "OmniArm",
+    "机械臂",
+    "omni_arm"
+   ],
+   "caps": {
+    "omni_arm": 10
+   }
+  },
+  {
+   "what": "一句话全链",
+   "say": [
+    "一句话全链",
+    "一句话成片",
+    "全链计划"
+   ],
+   "caps": {
+    "one_shot": 10
+   }
+  },
+  {
+   "what": "云卡触手 / 本机 GPU",
+   "say": [
+    "云卡触手",
+    "本机GPU",
+    "传输器官"
+   ],
+   "caps": {
+    "pod_link": 10
+   }
+  },
+  {
+   "what": "蓝队防御验证",
+   "say": [
+    "蓝队防御",
+    "防御是否生效",
+    "防御验证"
+   ],
+   "caps": {
+    "sec_defenses": 10
+   }
+  },
+  {
+   "what": "漏洞扫描",
+   "say": [
+    "漏洞扫描",
+    "扫漏洞",
+    "OWASP扫描"
+   ],
+   "caps": {
+    "sec_scan": 10
+   }
+  },
+  {
+   "what": "装机自检",
+   "say": [
+    "装机自检",
+    "查木马后门",
+    "装机体检"
+   ],
+   "caps": {
+    "install_selfcheck": 10
+   }
+  },
+  {
+   "what": "上手指引门",
+   "say": [
+    "上手指引",
+    "接线配方",
+    "登记了但没实现"
+   ],
+   "caps": {
+    "onboarding_gate": 10
+   }
+  },
+  {
+   "what": "钩子强制器",
+   "say": [
+    "钩子强制器",
+    "交叉钩子",
+    "已钩住未钩住"
+   ],
+   "caps": {
+    "hook_enforcer": 10
+   }
+  },
+  {
+   "what": "渗透蒸馏件",
+   "say": [
+    "渗透蒸馏",
+    "pentest蒸馏",
+    "黑客课程蒸馏"
+   ],
+   "caps": {
+    "pentest_distill": 10
+   }
+  },
+  {
+   "what": "前置闸 / 先看后动",
+   "say": [
+    "前置闸",
+    "先看后动闸",
+    "无脑操作拦截"
+   ],
+   "caps": {
+    "action_gate": 10
+   }
+  },
+  {
+   "what": "Agent 统一控制面",
+   "say": [
+    "Agent控制面",
+    "统一控制面",
+    "agent管控"
+   ],
+   "caps": {
+    "agent_control": 10
+   }
+  },
+  {
+   "what": "技能标签",
+   "say": [
+    "技能标签",
+    "能力标签",
+    "调用许可标签"
+   ],
+   "caps": {
+    "cap_tags": 10
+   }
+  },
+  {
+   "what": "上下文归档",
+   "say": [
+    "上下文归档",
+    "归档检索",
+    "上下文公文包"
+   ],
+   "caps": {
+    "context_vault": 10
+   }
+  },
+  {
+   "what": "覆盖审计",
+   "say": [
+    "覆盖审计",
+    "八短板覆盖",
+    "触手组覆盖率"
+   ],
+   "caps": {
+    "coverage_auditor": 10
+   }
+  },
+  {
+   "what": "细节化习惯",
+   "say": [
+    "细节化习惯",
+    "调用侧门",
+    "细节习惯"
+   ],
+   "caps": {
+    "detail_habit": 10
+   }
+  },
+  {
+   "what": "出图交付门",
+   "say": [
+    "出图交付门",
+    "anatomy门",
+    "出图验收"
+   ],
+   "caps": {
+    "figure_gate": 10
+   }
+  },
+  {
+   "what": "短板钩子 / 自主进化钩子",
+   "say": [
+    "短板钩子",
+    "自主进化钩子",
+    "进化钩子"
+   ],
+   "caps": {
+    "growth_hooks": 10
+   }
+  },
+  {
+   "what": "根治环 / 症状五问",
+   "say": [
+    "根治环",
+    "症状五问",
+    "根治铁律"
+   ],
+   "caps": {
+    "root_fix": 10
+   }
+  },
+  {
+   "what": "署名守卫",
+   "say": [
+    "署名守卫",
+    "检查署名",
+    "署名完整性"
+   ],
+   "caps": {
+    "signature_guard": 10
+   }
+  },
+  {
+   "what": "触手认知",
+   "say": [
+    "触手认知",
+    "触手认知包",
+    "角色边界"
+   ],
+   "caps": {
+    "tentacle_cognition": 10
+   }
+  },
+  {
+   "what": "主题能力位",
+   "say": [
+    "主题能力位",
+    "换主题",
+    "改主题配色"
+   ],
+   "caps": {
+    "theme_cap": 10
+   }
+  },
+  {
+   "what": "总指挥 / 原生指挥官",
+   "say": [
+    "总指挥",
+    "原生指挥官",
+    "本机权重推理"
+   ],
+   "caps": {
+    "commander": 10
+   }
+  },
+  {
+   "what": "桌面蒸馏件",
+   "say": [
+    "桌面蒸馏",
+    "CursorTouch蒸馏",
+    "桌面件蒸馏"
+   ],
+   "caps": {
+    "desktop_distill": 10
+   }
+  },
+  {
+   "what": "MCP 调用",
+   "say": [
+    "MCP调用",
+    "按契约调工具",
+    "调mcp工具"
+   ],
+   "caps": {
+    "mcp_call": 10
+   }
+  },
+  {
+   "what": "MCP 连接",
+   "say": [
+    "MCP连接",
+    "连mcp服务器",
+    "接mcp"
+   ],
+   "caps": {
+    "mcp_connect": 10
+   }
+  },
+  {
+   "what": "MCP 工具清单",
+   "say": [
+    "MCP工具清单",
+    "契约清单",
+    "工具契约列表"
+   ],
+   "caps": {
+    "mcp_tools": 10
+   }
+  },
+  {
+   "what": "万能触手 Web",
+   "say": [
+    "万能触手Web",
+    "读源码结构",
+    "web六态"
+   ],
+   "caps": {
+    "omni_web": 10
+   }
+  },
+  {
+   "what": "触手眼睛双手",
+   "say": [
+    "触手眼睛",
+    "触手双手",
+    "本体原生能力"
+   ],
+   "caps": {
+    "tentacle": 10
+   }
+  },
+  {
+   "what": "触手能力总纲",
+   "say": [
+    "触手能力总纲",
+    "条目数现算",
+    "能力总纲注入"
+   ],
+   "caps": {
+    "tentacle_manifest": 10
+   }
+  },
+  {
+   "what": "H3 视频生成",
+   "say": [
+    "H3视频生成",
+    "H3mini",
+    "四原语视频"
+   ],
+   "caps": {
+    "h3_video_gen": 10
+   }
+  },
+  {
+   "what": "LibTV 技能",
+   "say": [
+    "LibTV技能",
+    "libtv 技能包"
+   ],
+   "caps": {
+    "libtv_skill": 10
+   }
+  },
+  {
+   "what": "LibTV 工作流",
+   "say": [
+    "LibTV工作流",
+    "libtv 节点式",
+    "libtv五动作"
+   ],
+   "caps": {
+    "libtv_workflow": 10
+   }
+  },
+  {
+   "what": "素材许可账",
+   "say": [
+    "素材许可账",
+    "没有许可不许进成品",
+    "许可登记"
+   ],
+   "caps": {
+    "media_license": 10
+   }
+  },
+  {
+   "what": "短视频流水线",
+   "say": [
+    "短视频流水线",
+    "电影音乐流水线",
+    "镜像房间编排"
+   ],
+   "caps": {
+    "media_pipeline": 10
+   }
+  },
+  {
+   "what": "账号登记表",
+   "say": [
+    "账号登记表",
+    "一人一号",
+    "不共用账号"
+   ],
+   "caps": {
+    "account_registry": 10
+   }
+  },
+  {
+   "what": "BI 蒸馏件",
+   "say": [
+    "BI蒸馏",
+    "dataease蒸馏",
+    "BI件蒸馏"
+   ],
+   "caps": {
+    "bi_distill": 10
+   }
+  },
+  {
+   "what": "AI 味改写",
+   "say": [
+    "AI味改写",
+    "去AI味",
+    "人味改写"
+   ],
+   "caps": {
+    "humanizer": 10
+   }
+  },
+  {
+   "what": "外部 CLI 助手",
+   "say": [
+    "外部CLI",
+    "CLI助手",
+    "命令行对话面板"
+   ],
+   "caps": {
+    "cli_chat": 10
+   }
+  },
+  {
+   "what": "飞书镶嵌",
+   "say": [
+    "飞书镶嵌",
+    "飞书面板",
+    "走浏览器触手"
+   ],
+   "caps": {
+    "feishu_embed": 10
+   }
+  },
+  {
+   "what": "吞天融合台账",
+   "say": [
+    "融合台账",
+    "原生能力融合",
+    "吞天融合"
+   ],
+   "caps": {
+    "devour_fusion": 10
+   }
+  },
+  {
+   "what": "吞 GitHub",
+   "say": [
+    "吞GitHub",
+    "吞噬仓库",
+    "啃仓库"
+   ],
+   "caps": {
+    "devour_github": 10
+   }
+  },
+  {
+   "what": "吞天反思",
+   "say": [
+    "吞天反思",
+    "反思回顾",
+    "发现弱能力"
+   ],
+   "caps": {
+    "devour_reflect": 10
+   }
+  },
+  {
+   "what": "视觉识别入口",
+   "say": [
+    "视觉识别",
+    "图像识别入口",
+    "识别图片"
+   ],
+   "caps": {
+    "vision": 10
+   }
+  },
+  {
+   "what": "视觉定位",
+   "say": [
+    "视觉定位",
+    "定位通道",
+    "图上找位置"
+   ],
+   "caps": {
+    "vision_grounding": 10
+   }
+  },
+  {
+   "what": "量化回测入口",
+   "say": [
+    "量化回测入口",
+    "量化入口",
+    "回测入口"
+   ],
+   "caps": {
+    "quant": 10
+   }
+  },
+  {
+   "what": "回测 API",
+   "say": [
+    "回测API",
+    "读回测接口",
+    "回测类函数"
+   ],
+   "caps": {
+    "quant_backtest": 10
+   }
+  },
+  {
+   "what": "长程看板",
+   "say": [
+    "长程任务看板",
+    "长程看板",
+    "任务进度与详情",
+    "读任务图里每个任务"
+   ],
+   "caps": {
+    "lr_status": 10
+   }
+  },
+  {
+   "what": "长程提交",
+   "say": [
+    "长程提交",
+    "非LLM验收",
+    "提交推进"
+   ],
+   "caps": {
+    "lr_submit": 10
+   }
+  },
+  {
+   "what": "UlTARS 桌面",
+   "say": [
+    "UlTARS",
+    "ultars 桌面",
+    "TARS桌面"
+   ],
+   "caps": {
+    "ul_tars_desktop": 10
+   }
+  },
+  {
+   "what": "项目上下文",
+   "say": [
+    "项目上下文",
+    "blueprint蓝图",
+    "项目文档面"
+   ],
+   "caps": {
+    "project_context": 10
+   }
+  },
+  {
+   "what": "n8n 工作流",
+   "say": [
+    "n8n工作流",
+    "自托管n8n",
+    "n8n控制"
+   ],
+   "caps": {
+    "n8n_wf": 10
+   }
+  },
+  {
+   "what": "a1.art 技能",
+   "say": [
+    "a1.art",
+    "a1art技能",
+    "a1art"
+   ],
+   "caps": {
+    "a1art_skill": 10
+   }
+  }
+ ]
 }

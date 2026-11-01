@@ -27,7 +27,7 @@
 
 <meta charset="utf-8" />
 <meta http-equiv="Content-Security-Policy"
- content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
+ content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; media-src 'self'" />
 <title>GBT小土豆V8 · 上帝视角</title>
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB2gAH/8kQ0dQAAAABJRU5ErkJggg==">
 <link rel="stylesheet" href="window.css" />
@@ -36,8 +36,10 @@
 <link rel="stylesheet" href="skin-mission-control.css" />
 <link rel="stylesheet" href="skin-omarchy.css" />
 <link rel="stylesheet" href="page-skins.css" />
+<link rel="stylesheet" href="taste-fix.css" />
 </head>
 <body class="gbt-body">
+<script src="./taste-fix.js"></script>
 <script src="./shell/nav-compact.js"></script>
 
 
@@ -111,6 +113,39 @@
 </nav>
 
 <main class="gbt-main">
+
+<section class="gbt-hero" aria-labelledby="hero-title">
+<div class="gbt-hero-copy">
+<h1 id="hero-title">短剧，自己拍完。</h1>
+<p>不连云端、不租 GPU。剧本、旁白、字幕、竖屏装配全部在本机跑——这一页给你看三条成片和 372 个能力位。</p>
+<div class="gbt-cta-row">
+<button class="gbt-cta" id="hero-open" type="button">打开工作台</button>
+<a class="gbt-cta gbt-cta-ghost" href="../交付成片/顶替新娘/顶替新娘-E01.mp4">看第一集</a>
+</div>
+<p class="gbt-stats">3 集成片 · 372 能力位 · 0 云端调用</p>
+</div>
+<figure class="gbt-hero-media">
+<video src="assets/taste/teaser.mp4" poster="assets/taste/still-01.jpg" autoplay muted loop playsinline></video>
+<figcaption>本机装配的竖屏成片片段</figcaption>
+</figure>
+</section>
+
+<section class="gbt-shots" aria-label="三条成片的画面">
+<img src="assets/taste/still-01.jpg" alt="成片 E01 的画面" />
+<img src="assets/taste/still-02.jpg" alt="成片 E02 的画面" />
+<img src="assets/taste/still-03.jpg" alt="成片 E03 的画面" />
+<img src="assets/taste/still-04.jpg" alt="成片 E01 的另一个画面" />
+</section>
+
+<section class="gbt-proof" aria-labelledby="proof-title">
+<h2 id="proof-title">这一页背后，真的有三条能看的成片。</h2>
+<p>《顶替新娘》三集：每集 61.3 秒、1080×1920、有旁白与字幕；画面来自 CC 授权照片，署名在成片目录的 credits.json。不是分镜卡，不是占位图。</p>
+<div class="gbt-proof-grid">
+<article><h3>E01 · 钩子</h3><p>被顶替的新娘在婚礼上认出了凶手。第一屏就把不公平抛出来。</p></article>
+<article><h3>E02 · 升级</h3><p>她开始查，每一步都有人先她一步；代价第一次落到她身上。</p></article>
+<article><h3>E03 · 悬念</h3><p>真正的她站在门外。下一集才给答案。</p></article>
+</div>
+</section>
 
 <!-- ══ 编程工作台（2026-09-23 第 45 轮加）══
  Owner 目标原话里有「重新设计为一体式多功能专业级编程AI」。
@@ -353,7 +388,7 @@
  它自己的红线写着「任何页只要引了它就'她在场'」—— 而我建完一个页都没引：
  取证时量到"被引用页数 0" ⇒ 建了但没接上 = 死代码。这里补上。 -->
 <script src="avatar-roam.js"></script>
-<script src="../shell/tentacle-boot.js?v=20261030"></script>
+<script src="shell/tentacle-boot.js?v=20261030"></script>
 
 <!-- 触手覆盖（page_tentacle.py 自动注入 · 顺序不能反：先 web 壳再 kit） -->
 

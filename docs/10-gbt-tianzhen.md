@@ -208,3 +208,7 @@ py -3.12 -m gbt_allinone run comfy_native '{"op":"run","workflow":"my_workflow.j
 | `comfy_forge` | 1495 节点的**分族地图**（只读快照） | 想知道"这个用途有哪些节点" |
 
 > 别把四者混成一句"支持 ComfyUI"。**能跑自己的算子**和**能指挥别人的 ComfyUI** 是两种能力。
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

@@ -116,3 +116,7 @@ compute (text, image, video, and a local CPU baseline), with sha256 of every art
 | 348 位是不是凑数？ | 有 `data/capabilities.json` 逐位可查，且 `docs/07` 给了逐位真跑回执；有 1 位仍是 `needs_input`，没算通过。 |
 | 单门执行有什么了不起？ | 它让「授权 + 审计」变成架构保证而不是自觉：绕开 `run_task` 就没有留痕，这在多触手系统里是主要事故源。 |
 | 中文模型对英文用户有什么用？ | 路由口径与审计模型是语言无关的；目录、门、回执都可以复用到英文栈上。 |
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

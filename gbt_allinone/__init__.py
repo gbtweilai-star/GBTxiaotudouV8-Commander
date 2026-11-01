@@ -9,9 +9,3 @@
 from .api import run_task, list_capabilities, DANGEROUS_ENABLED
 from .store import audit, query_log, log_count
 from .soul import SOUL, stamp_result
-
-__all__ = ["run_task", "list_capabilities", "DANGEROUS_ENABLED",
-           "audit", "query_log", "log_count",
-           "SOUL", "stamp_result"]
-__version__ = "8.0.0"
-__release_name__ = "GBT小土豆V8"
