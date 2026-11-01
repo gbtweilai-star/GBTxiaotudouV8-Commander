@@ -908,6 +908,27 @@
       }
     });
   }
+  function refreshSecurityPolicy() {
+    fetch("/api/security/policy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ op: "status" }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var el = $("omni-policy");
+      if (!el) return;
+      if (d && d.attack_mode && d.attack_mode.active) {
+        el.className = "bad";
+        el.textContent = "攻击模式（V8 自我决策）：" + (d.attack_mode.reason || "");
+      } else {
+        el.className = "ok";
+        el.textContent = "策略：黑客全能力需终端确认 · 转账永远需确认"
+          + (d && (d.pending_confirmations || []).length
+            ? " · 待确认 " + d.pending_confirmations.length : "");
+      }
+      document.documentElement.dataset.securityPolicy =
+        (d && d.attack_mode && d.attack_mode.active) ? "attack" : "normal";
+    }).catch(function () {});
+  }
   function wireOmniAll() {
     var attrBtn = $("omni-attr");
     if (attrBtn && !attrBtn.dataset.bound) {
@@ -930,6 +951,12 @@
             "ok:" + d.failed + ":" + Object.keys(cats).length;
         });
       });
+    }
+    refreshSecurityPolicy();
+    var polBtn = $("omni-policy-btn");
+    if (polBtn && !polBtn.dataset.bound) {
+      polBtn.dataset.bound = "1";
+      polBtn.addEventListener("click", refreshSecurityPolicy);
     }
     var btn = $("omni-run");
     if (!btn || btn.dataset.bound) return;

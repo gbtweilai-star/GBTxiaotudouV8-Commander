@@ -105,6 +105,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_dispatch(raw)
         if path == "/api/bounty":
             return self._api_bounty(raw)
+        if path == "/api/security/policy":
+            return self._api_security_policy(raw)
         if path == "/api/omni":
             return self._api_omni(raw)
         if path == "/api/scan":
@@ -383,6 +385,33 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
                           "application/json; charset=utf-8")
 
+    def _api_security_policy(self, raw=b"{}"):
+        """安全策略：status / check / attack-on / attack-off（终端确认只能在 CLI 批准）。"""
+        import json as _json
+        try:
+            d = _json.loads((raw or b"{}").decode("utf-8", "replace") or "{}")
+        except Exception:  # noqa: BLE001
+            d = {}
+        sys.path.insert(0, str(REPO))
+        from gbt_allinone import security_policy as SP
+        op = str(d.get("op") or "status")
+        if op == "status":
+            out = SP.status()
+        elif op == "check":
+            out = SP.check(str(d.get("cap") or ""))
+        elif op == "attack-on":
+            out = SP.enter_attack_mode(str(d.get("reason") or "detected attack"),
+                                       str(d.get("evidence") or ""),
+                                       int(d.get("ttl") or 600))
+        elif op == "attack-off":
+            out = SP.exit_attack_mode(str(d.get("reason") or ""))
+        elif op == "request":
+            out = SP.request_confirm(str(d.get("cap") or ""), str(d.get("reason") or ""))
+        else:
+            out = {"ok": False, "error": "unknown op"}
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
+
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""
         import json as _json
@@ -453,6 +482,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_dispatch(raw)
         if path == "/api/bounty":
             return self._api_bounty(raw)
+        if path == "/api/security/policy":
+            return self._api_security_policy(raw)
         if path == "/api/omni":
             return self._api_omni(raw)
         if path == "/api/chat":

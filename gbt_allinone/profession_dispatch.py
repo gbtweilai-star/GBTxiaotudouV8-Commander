@@ -48,6 +48,27 @@ def dispatch(task: str, dry_run: bool = True, confirm: bool = False, max_caps: i
                                "未确认：需 confirm=True 才执行"})
         return base
 
+    # 🔒 安全策略闸：黑客全能力需主人终端确认；转账永远拦
+    try:
+        from gbt_allinone import security_policy as _sp
+    except Exception:  # noqa: BLE001
+        _sp = None
+    if _sp is not None:
+        allowed, blocked = [], []
+        for c in caps:
+            dec = _sp.check(c)
+            if dec.get("decision") in ("blocked_transfer", "need_terminal_confirm"):
+                blocked.append({"cap": c, "decision": dec.get("decision"),
+                                "reason": dec.get("reason")})
+            else:
+                allowed.append(c)
+        caps = allowed
+        base["blocked_by_policy"] = blocked
+        if not caps:
+            base.update({"ok": False, "executed": False,
+                         "reason": "候选能力位全部被安全策略拦下"})
+            return base
+
     # 真执行：逐条派单，逐条留结果
     from gbt_allinone.api import run_task  # 延迟导入，避免循环
     results = []

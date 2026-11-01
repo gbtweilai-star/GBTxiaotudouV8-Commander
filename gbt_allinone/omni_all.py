@@ -110,6 +110,7 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
     full_open = caps is None
     run_id = run_id or time.strftime("%Y%m%d-%H%M%S")
     results, blocked, blocked_policy = [], [], []
+    blocked_terminal, blocked_transfer = [], []
     t0 = time.time()
 
     def _progress(i: int) -> None:
@@ -133,8 +134,24 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         if not bool(meta.get("safe")) and not ticket:
             blocked.append({"cap": cap, "reason": "需授权位：没票不执行（已打开、被票挡）"})
             continue
+        # 🔒 安全策略闸（主人令 2026-11-02）：
+        #   黑客全能力 → 必须主人终端确认；受攻击 → V8 自我决策；转账 → 永远要确认
+        try:
+            from gbt_allinone import security_policy as _sp
+            dec = _sp.check(cap)
+        except Exception:  # noqa: BLE001
+            dec = {"decision": "allow"}
+        if dec.get("decision") == "blocked_transfer":
+            blocked_transfer.append({"cap": cap, "reason": dec.get("reason")})
+            continue
+        if dec.get("decision") == "need_terminal_confirm":
+            blocked_terminal.append({"cap": cap, "reason": dec.get("reason"),
+                                     "hint": "主人终端执行：python tools/confirm-security.py request %s" % cap})
+            continue
         to = _timeout_for(cap, timeout_per_cap)
         r = _run_one(cap, to)
+        if dec.get("decision") == "attack_self_decision":
+            r["self_decision"] = "GBT小土豆V8（攻击模式）"
         # 授权策略拦截（process_execute/external_llm/deploy_publish/privacy_read）不是失败
         if not r.get("ok") and "需要人工授权" in str(r.get("error") or ""):
             blocked_policy.append({"cap": cap, "reason": r.get("error")})
@@ -164,6 +181,10 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         "executed": len(results), "ok_count": ok_n, "fail_count": len(results) - ok_n,
         "blocked_by_ticket": blocked,
         "blocked_by_policy": blocked_policy,
+        "blocked_by_terminal_confirm": blocked_terminal,
+        "blocked_transfer": blocked_transfer,
+        "blocked_by_terminal_confirm": blocked_terminal,
+        "blocked_transfer": blocked_transfer,
         "results": results,
         "elapsed_ms": elapsed,
         "at": time.strftime("%Y-%m-%dT%H:%M:%S"),

@@ -16228,3 +16228,11 @@
 {"ts": 1793563863.027, "iso": "2026-11-02T03:11:03", "event": "cross_scan_probe", "meta": {"name": "wiki_graph", "s": 0.0}}
 {"ts": 1793563863.077, "iso": "2026-11-02T03:11:03", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
 {"ts": 1793563863.077, "iso": "2026-11-02T03:11:03", "event": "ok", "meta": {"kind": "cross_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793563878.543, "iso": "2026-11-02T03:11:18", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793563878.668, "iso": "2026-11-02T03:11:18", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793564256.831, "iso": "2026-11-02T03:17:36", "event": "call", "meta": {"kind": "body_map", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564258.411, "iso": "2026-11-02T03:17:38", "event": "ok", "meta": {"kind": "body_map", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564258.644, "iso": "2026-11-02T03:17:38", "event": "call", "meta": {"kind": "body_see", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564258.94, "iso": "2026-11-02T03:17:38", "event": "ok", "meta": {"kind": "body_see", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564259.064, "iso": "2026-11-02T03:17:39", "event": "call", "meta": {"kind": "body_say", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793564259.526, "iso": "2026-11-02T03:17:39", "event": "ok", "meta": {"kind": "body_say", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}

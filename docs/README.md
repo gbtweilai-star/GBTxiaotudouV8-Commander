@@ -241,3 +241,4 @@
 | 123 | [123-platform-status-sync.md](123-platform-status-sync.md) | 平台状态只读同步：mock 平台端到端、状态机回填、审计、只读 405 |
 | 124 | [124-omni-all-sync.md](124-omni-all-sync.md) | 万能插全开同步执行：385 位逐个同步、票挡需授权位、进度落盘、API/UI |
 | 125 | [125-alarm-rootcause-fixes.md](125-alarm-rootcause-fixes.md) | 报警必追根因：全开 63 失败归因（policy/超时/kwargs/硬编码路径/缺参/缺件）与修复 |
+| 126 | [126-security-policy-three-rules.md](126-security-policy-three-rules.md) | 最高安全策略：黑客能力终端确认 / 受攻击V8自我决策 / 转账永远确认 |

@@ -7768,3 +7768,6 @@
 {"at": "2026-11-02T03:11:03", "cap": "whatsapp_embed", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
 {"at": "2026-11-02T03:11:03", "cap": "wiki_graph", "ok": true, "ms": 4.333972930908203, "error_class": "", "detail": "", "gate": ""}
 {"at": "2026-11-02T03:11:03", "cap": "cross_scan", "ok": true, "ms": 49266.36743545532, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:17:38", "cap": "body_map", "ok": true, "ms": 1716.015100479126, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:17:38", "cap": "body_see", "ok": true, "ms": 316.93363189697266, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:17:39", "cap": "body_say", "ok": true, "ms": 490.83900451660156, "error_class": "", "detail": "", "gate": ""}
