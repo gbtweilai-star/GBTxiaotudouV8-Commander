@@ -225,3 +225,4 @@
 | 107 | [107-brain-execution-layer.md](107-brain-execution-layer.md) | 大脑执行层：中心脑核 + 七步闭环管道 + 橙色证据节点 + 审计同心环 |
 | 108 | [108-universal-plug-visualization.md](108-universal-plug-visualization.md) | 万能插：数字流动的结 + 8 能力域插口 + 自动插合触手 |
 | 109 | [109-native-autostart-console-service.md](109-native-autostart-console-service.md) | 原生 APP 自启 :8766（Electron/Python 壳/启动器 + 登录自启一键装） |
+| 110 | [110-team-collab-and-mindmap.md](110-team-collab-and-mindmap.md) | 触手协作（8角色×16协作链）+ 思维导图任务指引（6支×18叶） |

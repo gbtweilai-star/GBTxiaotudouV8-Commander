@@ -519,6 +519,24 @@ body.graph-on .grid-overlay { display: block; }
 .plug-wrap:active { cursor: grabbing; }
 .plug-wrap canvas { touch-action: none; }
 #plug3d-canvas { display: block; width: 100%; height: 100%; }
+
+/* ═══ 视图：触手协作 ═══ */
+.console[data-view="team"] { top: 20px; bottom: 20px; background: #04080e; }
+.console[data-view="team"] .view-team { display: flex; flex-direction: column; }
+.view-team { min-height: 0; }
+.team-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; cursor: grab; }
+.team-wrap:active { cursor: grabbing; }
+.team-wrap canvas { touch-action: none; }
+#team3d-canvas { display: block; width: 100%; height: 100%; }
+
+/* ═══ 视图：思维导图任务指引 ═══ */
+.console[data-view="mind"] { top: 20px; bottom: 20px; background: #04070c; }
+.console[data-view="mind"] .view-mind { display: flex; flex-direction: column; }
+.view-mind { min-height: 0; }
+.mind-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; cursor: grab; }
+.mind-wrap:active { cursor: grabbing; }
+.mind-wrap canvas { touch-action: none; }
+#mindmap-canvas { display: block; width: 100%; height: 100%; }
 .space3d-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; }
 #space3d-canvas { display: block; width: 100%; height: 100%; }
 .space3d-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }

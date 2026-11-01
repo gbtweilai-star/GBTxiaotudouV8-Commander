@@ -519,10 +519,31 @@
     return PLUG_P;
   }
 
+  /* ───────── 触手协作 / 思维导图：按需动态 import ───────── */
+  var TEAM_P = null, MIND_P = null;
+  function ensureTeam() {
+    if (TEAM_P) return TEAM_P;
+    TEAM_P = import("./team3d.js").then(function (m) { return m; })
+      .catch(function (e) {
+        document.documentElement.dataset.team3d = "import-err:" + String((e && e.message) || e).slice(0, 80);
+        return null;
+      });
+    return TEAM_P;
+  }
+  function ensureMind() {
+    if (MIND_P) return MIND_P;
+    MIND_P = import("./mindmap3d.js").then(function (m) { return m; })
+      .catch(function (e) {
+        document.documentElement.dataset.mindmap = "import-err:" + String((e && e.message) || e).slice(0, 80);
+        return null;
+      });
+    return MIND_P;
+  }
+
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "dash"];
+    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "dash"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
@@ -534,6 +555,12 @@
     }
     if (name === "plug") {
       ensurePlug().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+    }
+    if (name === "team") {
+      ensureTeam().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+    }
+    if (name === "mind") {
+      ensureMind().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
     }
     if (name === "space") {
       ensure3d().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
