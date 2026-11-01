@@ -294,6 +294,11 @@ class Handler(BaseHTTPRequestHandler):
                                     attachments=[str(x) for x in (d.get("attachments") or [])])
             elif op == "report":
                 out = B.report(str(d.get("finding") or ""))
+            elif op == "platform_sync":
+                from gbt_allinone import platform_sync as PS
+                out = PS.sync(str(d.get("provider") or "mock"),
+                              dry_run=not bool(d.get("confirm")),
+                              program=str(d.get("program") or ""))
             elif op == "bundle":
                 out = B.bundle(str(d.get("finding") or ""))
             elif op == "submit":

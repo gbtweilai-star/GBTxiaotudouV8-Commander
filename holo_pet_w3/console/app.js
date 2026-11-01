@@ -783,6 +783,25 @@
     });
   }
   function wireBounty() {
+    var syncBtn = $("bounty-platform-sync");
+    if (syncBtn && !syncBtn.dataset.bound) {
+      syncBtn.dataset.bound = "1";
+      syncBtn.addEventListener("click", function () {
+        var out = $("bounty-gate-result");
+        if (!window.confirm("只读同步平台状态（mock 平台；不会写平台）？")) return;
+        bountyApi("platform_sync", { provider: "mock", confirm: true }).then(function (d) {
+          if (!out) return;
+          out.className = d.ok ? "ok" : "blocked";
+          out.textContent = d.ok
+            ? ("同步完成：" + d.provider + " · 检查 " + d.checked + " · 回填 " + d.updated
+               + (d.skipped && d.skipped.length ? " · 跳过 " + d.skipped.length : ""))
+            : ("同步失败：" + ((d.errors && d.errors[0] && d.errors[0].error) || d.reason || ""));
+          document.documentElement.dataset.platformSync =
+            "ok:" + d.checked + ":" + d.updated;
+          ensureBounty();
+        });
+      });
+    }
     var impBtn = $("bounty-import");
     if (impBtn && !impBtn.dataset.bound) {
       impBtn.dataset.bound = "1";

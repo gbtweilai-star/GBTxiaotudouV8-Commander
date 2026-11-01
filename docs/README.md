@@ -238,3 +238,4 @@
 | 120 | [120-bounty-report-and-tracker.md](120-bounty-report-and-tracker.md) | 赏金报告升级（CVSS 3.1/CWE/复现/修复/侧车 JSON）+ 提交状态机 |
 | 121 | [121-platform-scope-import.md](121-platform-scope-import.md) | 平台 scope 导入（HackerOne/Bugcrowd 离线归一化，dry-run + 人工确认才落库） |
 | 122 | [122-submit-bundle.md](122-submit-bundle.md) | 可提交包：CVSS 时间/环境分 + 修复 diff + 附件 + manifest + ZIP |
+| 123 | [123-platform-status-sync.md](123-platform-status-sync.md) | 平台状态只读同步：mock 平台端到端、状态机回填、审计、只读 405 |
