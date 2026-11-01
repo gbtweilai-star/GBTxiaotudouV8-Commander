@@ -19,11 +19,13 @@ def run(limb: str, payload: dict | None = None) -> dict:
     if limb not in LIMBS:
         return {"ok": False, "error": "不认识的肢体：%s（可选 %s）" % (limb, ",".join(LIMBS))}
     try:
-        r = subprocess.run([PY, "-X", "utf8", BODY, "--act", limb,
-                            json.dumps(payload or {}, ensure_ascii=False)],
-                           capture_output=True, text=True, encoding="utf-8", errors="replace",
-                           timeout=120, cwd=ROOT)
-        out = (r.stdout or "").strip()
+        from .tentacle.proc_guard import run_capped
+        r = run_capped([PY, "-X", "utf8", BODY, "--act", limb,
+                        json.dumps(payload or {}, ensure_ascii=False)],
+                       timeout=120, max_chars=200_000, cwd=ROOT)
+        out = (r.get("stdout") or "").strip()
+        if r.get("timed_out"):
+            return {"ok": False, "error": "body 子进程超时（已杀进程树）", "detail": r}
         return json.loads(out) if out.startswith("{") else {"ok": False, "error": out[-200:]}
     except Exception as exc:                                     # noqa: BLE001
         return {"ok": False, "error": "%s: %s" % (type(exc).__name__, str(exc)[:160])}
@@ -31,8 +33,12 @@ def run(limb: str, payload: dict | None = None) -> dict:
 
 def body_map() -> dict:
     try:
-        r = subprocess.run([PY, "-X", "utf8", BODY], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=90, cwd=ROOT)
+        from .tentacle.proc_guard import run_capped
+        r0 = run_capped([PY, "-X", "utf8", BODY], timeout=90, max_chars=200_000, cwd=ROOT)
+        class _R:  # 兼容旧字段访问
+            stdout = (r0.get("stdout") or "")
+            stderr = (r0.get("stderr") or "")
+        r = _R()
         return json.loads((r.stdout or "{}"))
     except Exception as exc:                                     # noqa: BLE001
         return {"ok": False, "error": "%s: %s" % (type(exc).__name__, str(exc)[:160])}

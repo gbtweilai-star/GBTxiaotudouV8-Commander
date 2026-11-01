@@ -1,0 +1,35 @@
+{
+  "rec_id": "run.py-44b17521-1793493102",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "run.py",
+      "passed": true,
+      "detail": "967 bytes",
+      "ts": "2026-11-01T07:31:42"
+    },
+    {
+      "dimension": "ownership",
+      "item": "run.py",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:42"
+    },
+    {
+      "dimension": "audit",
+      "item": "run.py",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:qqsq12321/AnyDexRetarget:scaffold",
+      "ts": "2026-11-01T07:31:42"
+    },
+    {
+      "dimension": "policy",
+      "item": "run.py",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:42"
+    }
+  ],
+  "blocked_by": []
+}

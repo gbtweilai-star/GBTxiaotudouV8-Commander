@@ -1,0 +1,105 @@
+{
+  "rec_id": "run.py-0402ff5d-1793493117",
+  "name": "run.py",
+  "sha256": "0402ff5dc5818cde37ee5b428a699601dfa82d467f32d153c9f8781987e19ed8",
+  "size": 979,
+  "submitted_at": "2026-11-01T07:31:57",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:Juxi-Technology/AmazingHand:scaffold"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\run.py-0402ff5d-1793493117.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "979 bytes",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Juxi-Technology/AmazingHand:scaffold",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:57"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "run.py-0402ff5d-1793493117",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "979 bytes",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Juxi-Technology/AmazingHand:scaffold",
+        "ts": "2026-11-01T07:31:57"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:57"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\run.py",
+    "version": 2,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "run.py-0402ff5d-1793493117",
+        "sha256": "0402ff5dc5818cde37ee5b428a699601dfa82d467f32d153c9f8781987e19ed8",
+        "published_at": "2026-11-01T07:31:57",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:Juxi-Technology/AmazingHand:scaffold",
+        "version": 2,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}

@@ -565,6 +565,36 @@ def _run_benign(kind, payload, policy_decision=None):
         from .tentacle import legacy_guard as _LG
         p = dict(payload or {})
         return _LG.run(str(p.pop("op", "status")), **p)
+
+    # 技能库（2026-11-01 吞噬强化）：方法论 skill 的取用口
+    if kind == "skills_hub":
+        from .tentacle import skills_hub as _SH
+        p = dict(payload or {})
+        return _SH.run(str(p.pop("op", "list")), **p)
+
+    # 唯一执行路径（v5 纪律）：七步链不可跳步
+    if kind == "chain_kernel":
+        from .tentacle import chain_kernel as _CK
+        p = dict(payload or {})
+        return _CK.run_op(str(p.pop("op", "status")), **p)
+
+    # 病因定位（蒸馏自 v5）：假设→取证→落案卷
+    if kind == "root_cause":
+        from .tentacle import root_cause as _RC
+        p = dict(payload or {})
+        return _RC.run(str(p.pop("op", "status")), **p)
+
+    # 执行防线（蒸馏自 v5）：审账本抓"自己骗自己"
+    if kind == "execution_guard":
+        from .tentacle import execution_guard as _EG
+        p = dict(payload or {})
+        return _EG.run(str(p.pop("op", "status")), **p)
+
+    # 能力包（蒸馏自 v5 capability_protocol）：外挂发现，执行过门
+    if kind == "cap_pack":
+        from .tentacle import cap_pack as _CP
+        p = dict(payload or {})
+        return _CP.run_op(str(p.pop("op", "status")), **p)
     # 万能插·全自动打开（2026-11-01）：六类插座现状与一次性重算
     if kind == "omni_open":
         from .tentacle import omni_open as _OO
@@ -1948,6 +1978,35 @@ def _run_benign(kind, payload, policy_decision=None):
         if not server or not tool:
             raise ValueError("需要 server 与 tool（参数放 arguments）")
         return MB.call(server, tool, p.get("arguments"))
+
+    # MCP 配置注册表（蒸馏自 v5 .omp/mcp.json 的 mcpServers 清单）：
+    #   登记（写 state/mcp-servers.json，过 filesystem_write 门）、列出、体检（过 process_execute 门）。
+    if kind == "mcp_register":
+        from .tentacle import mcp_bridge as MB
+        p = payload or {}
+        path = p.get("path") or p.get("config")
+        if not path:
+            return {"ok": False, "error": "user_error: 需要 path（如 .omp/mcp.json 或任意 mcpServers 配置）"}
+        return MB.register(path, merge=bool(p.get("merge", True)))
+    if kind == "mcp_servers":
+        from .tentacle import mcp_bridge as MB
+        return MB.servers()
+    if kind == "mcp_unregister":
+        from .tentacle import mcp_bridge as MB
+        name = str((payload or {}).get("server") or (payload or {}).get("name") or "").strip()
+        if not name:
+            return {"ok": False, "error": "user_error: 需要 server 名"}
+        return MB.unregister(name)
+    if kind == "mcp_health":
+        from .tentacle import mcp_bridge as MB
+        p = payload or {}
+        return MB.health(timeout=float(p.get("timeout") or 15))
+
+    # 双脑确认（蒸馏自 v5 dual_brain_gate）：危险动作前两道独立裁决
+    if kind == "dual_gate":
+        from .tentacle import dual_gate as _DG
+        p = dict(payload or {})
+        return _DG.run(str(p.pop("op", "status")), **p)
 
     # 桌面指挥官触手（V8：终端+文件系统 MCP——本地 stdio / remote 设备双形态）
     if kind == "desktop_commander":

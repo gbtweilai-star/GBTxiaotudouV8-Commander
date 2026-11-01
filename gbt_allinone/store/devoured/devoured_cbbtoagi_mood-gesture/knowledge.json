@@ -1,0 +1,38 @@
+{
+  "_stamp": "⛔ 开发者：自由的风 · 永久钢印 · 禁止删除",
+  "name": "devoured_cbbtoagi_mood-gesture",
+  "version": "1.0.0",
+  "description": "吞噬知识胶囊: cbbtoagi/Mood-Gesture — 情指传暖 Mood-Gesture — 基于单只开源灵巧手的人脸情绪感知与虚实双轨情感陪伴系统：Face emotion → LLM blessing → de",
+  "language": "python",
+  "risk_level": "safe",
+  "auto_exec": false,
+  "category": "吞噬吸收",
+  "tier": "knowledge",
+  "entry": {
+    "program": "python",
+    "args": [
+      "run.py"
+    ]
+  },
+  "actions": {
+    "knowledge": {
+      "description": "读取本胶囊吞噬吸收的知识"
+    },
+    "run": {
+      "description": "同 knowledge — 读取吞噬知识"
+    },
+    "status": {
+      "description": "胶囊状态"
+    }
+  },
+  "triggers": {
+    "keywords": [
+      "cbbtoagi",
+      "mood-gesture"
+    ],
+    "intent": "devoured_cbbtoagi_mood-gesture"
+  },
+  "domains": [
+    "AI域"
+  ]
+}

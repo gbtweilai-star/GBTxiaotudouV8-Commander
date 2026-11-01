@@ -1,0 +1,35 @@
+{
+  "rec_id": "knowledge.json-b591d43d-1793493110",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "934 bytes",
+      "ts": "2026-11-01T07:31:50"
+    },
+    {
+      "dimension": "ownership",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:50"
+    },
+    {
+      "dimension": "audit",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:yuzhench/inspire-hand-rh56-py:scaffold",
+      "ts": "2026-11-01T07:31:50"
+    },
+    {
+      "dimension": "policy",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:50"
+    }
+  ],
+  "blocked_by": []
+}

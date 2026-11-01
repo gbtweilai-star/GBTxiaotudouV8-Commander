@@ -40,6 +40,69 @@ LOCK = ROOT / "state" / "core.lock"
 WAIT_DEFAULT = 240.0        # 排队最长等这么久（一块电池喂一次要 15–40s）
 STALE_S = 600.0             # 锁文件超过这么久 = 上一个持锁者崩了
 
+# ── 熔断器（蒸馏自 GBT-Framework v5 的 circuit_breaker，只取"状态机"这一个点）──
+# 为什么我们需要：引擎挂掉时，每次 think() 都要等 300s 超时才发现 —— 40 个触手就是 40 次白等。
+# 熔断后直接秒回 circuit_open，冷却后再放一个探测请求（HALF_OPEN），成功才恢复供电。
+BREAKER = ROOT / "state" / "energy-breaker.json"
+BREAK_THRESHOLD = 3         # 窗口内失败几次就跳闸
+BREAK_WINDOW_S = 60.0       # 统计窗口
+BREAK_OPEN_S = 30.0         # 跳闸后冷却多久再放探测
+
+
+def _breaker_load() -> dict:
+    try:
+        return json.loads(BREAKER.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {"failures": [], "state": "closed", "opened_at": 0.0, "trips": 0}
+
+
+def _breaker_save(b: dict) -> None:
+    try:
+        BREAKER.parent.mkdir(parents=True, exist_ok=True)
+        BREAKER.write_text(json.dumps(b, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def breaker_state() -> dict:
+    """当前熔断状态（给 status 用）：closed / open / half_open。"""
+    b = _breaker_load()
+    now = time.time()
+    if b.get("state") == "open" and now - float(b.get("opened_at") or 0) >= BREAK_OPEN_S:
+        b["state"] = "half_open"
+        _breaker_save(b)
+    return b
+
+
+def breaker_allow() -> tuple:
+    """能不能发这一次请求：(allow, 原因)。open 且未到冷却 ⇒ 直接拒。"""
+    st = breaker_state()
+    state = st.get("state") or "closed"
+    if state == "open":
+        left = max(0.0, BREAK_OPEN_S - (time.time() - float(st.get("opened_at") or 0)))
+        return False, "circuit_open（冷却剩 %.0fs；连续失败 %d 次）" % (left, len(st.get("failures") or []))
+    return True, state
+
+
+def breaker_record(ok: bool) -> dict:
+    """结果记账：成功即闭合；窗口内失败够了就跳闸。"""
+    b = _breaker_load()
+    now = time.time()
+    if ok:
+        b.update({"state": "closed", "failures": [], "opened_at": 0.0})
+        _breaker_save(b)
+        return b
+    fails = [t for t in (b.get("failures") or []) if now - float(t) <= BREAK_WINDOW_S]
+    fails.append(now)
+    b["failures"] = fails
+    if len(fails) >= BREAK_THRESHOLD:
+        b["state"] = "open"
+        b["opened_at"] = now
+        b["trips"] = int(b.get("trips") or 0) + 1
+    _breaker_save(b)
+    return b
+
+
 
 def _engine() -> dict:
     """电池在不在 + 输出功率（tok/s 用最近 20 次取电估）。"""
@@ -124,7 +187,13 @@ def think(messages: list, *, temperature: float = 0.0, max_tokens: int = 220,
     这是主人 2026-11-01 说的「无限制上下文」：**不是把 ctx 调大，是模型只看一屏、全量可查**。
     """
     t0 = time.time()
+    allowed, why = breaker_allow()
+    if not allowed:
+        return {"ok": False, "error": why, "breaker": breaker_state(),
+                "waited_ms": 0, "ms": int((time.time() - t0) * 1000),
+                "note": "熔断中：引擎连续失败，先不白等；冷却后自动放探测"}
     if not _engine().get("alive"):
+        breaker_record(False)
         return {"ok": False, "error": "没电：本机引擎不在", "waited_ms": 0, "context": context and {"name": context},
                 "ms": int((time.time() - t0) * 1000)}
     from .tentacle import commander as C
@@ -166,6 +235,10 @@ def think(messages: list, *, temperature: float = 0.0, max_tokens: int = 220,
            "completion_tokens": usage.get("completion_tokens"),
            "port": port, "waited_ms": waited_ms, "used_ms": used_ms,
            "ms": int((time.time() - t0) * 1000)}
+    try:
+        breaker_record(bool(r.get("ok")))
+    except Exception:  # noqa: BLE001
+        pass
     _log(rec)
     if rc is not None and r.get("ok"):
         try:
@@ -226,9 +299,26 @@ def status(wait: float = 0.0) -> dict:
     return {"ok": bool(eng.get("alive")), "core": eng, "ports": _slots(),
             "in_use": sum(1 for i in range(_slots()) if LOCK.with_name("core.%d.lock" % i).exists()),
             "busy": busy, "queue": q,
+            "breaker": breaker_state(),
             "recent": {"calls": m["calls"], "avg_ms": m["avg_ms"],
                        "power_tok_s": m["power_tok_s"], "waited_s_total": m["waited_s_total"]},
             "note": "本机权重是唯一电池；所有推理都从 energy_core.think() 取电"}
+
+
+def breaker_reset() -> dict:
+    """手动复位熔断器（排障后跑一次）。"""
+    b = {"failures": [], "state": "closed", "opened_at": 0.0, "trips": 0}
+    _breaker_save(b)
+    return {"ok": True, "breaker": b}
+
+
+def breaker_trip(reason: str = "manual") -> dict:
+    """手动跳闸（测试/演练用）。"""
+    b = breaker_record(False)
+    b.update({"state": "open", "opened_at": time.time(),
+              "trips": int(b.get("trips") or 0) + 1})
+    _breaker_save(b)
+    return {"ok": True, "breaker": b, "reason": reason}
 
 
 def run(op: str = "status", **kw) -> dict:
@@ -237,4 +327,13 @@ def run(op: str = "status", **kw) -> dict:
         return status()
     if op == "meter":
         return meter(limit=int(kw.get("limit") or 200))
-    return {"ok": False, "error": "energy_core 只供 think/status/meter（op=%s）" % op}
+    if op == "breaker":
+        sub = str(kw.get("do") or "status").lower()
+        if sub == "status":
+            return {"ok": True, "breaker": breaker_state()}
+        if sub == "reset":
+            return breaker_reset()
+        if sub == "trip":
+            return breaker_trip(str(kw.get("reason") or "manual"))
+        return {"ok": False, "error": "breaker 不认 do=%s（status/reset/trip）" % sub}
+    return {"ok": False, "error": "energy_core 只供 think/status/meter/breaker（op=%s）" % op}

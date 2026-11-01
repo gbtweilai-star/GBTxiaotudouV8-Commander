@@ -1,0 +1,19 @@
+{
+  "gbt_stamp": {
+    "framework": "GBT小土豆",
+    "version": "8.0.0",
+    "mark": "GBT",
+    "developer": "自由的风",
+    "ownership": "independent-personal",
+    "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+  },
+  "publish": {
+    "rec_id": "knowledge.json-d0808b72-1793499590",
+    "sha256": "d0808b72432b50ce812f4a0c86bffceb11cda991249dd42f24e727f271fb7a39",
+    "published_at": "2026-11-01T09:19:50",
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:hypit-ai/hypit:scaffold",
+    "version": 2,
+    "refined_rounds": 0
+  }
+}

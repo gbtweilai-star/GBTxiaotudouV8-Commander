@@ -1,0 +1,22 @@
+{
+  "双仓同步巡检": {
+    "workflow": "双仓同步巡检",
+    "every_seconds": 21600,
+    "enabled": true,
+    "defined_at": "2026-11-01T08:43:15",
+    "last_run_ts": 1793519004.1324754,
+    "last_status": "ok",
+    "last_run_at": "2026-11-01T14:43:33",
+    "last_run_id": "双仓同步巡检-1793519013049"
+  },
+  "爆款拆解流水线": {
+    "workflow": "爆款拆解流水线",
+    "every_seconds": 86400,
+    "enabled": true,
+    "defined_at": "2026-11-01T09:44:03",
+    "last_run_ts": 1793501043.538778,
+    "last_status": "ok",
+    "last_run_at": "2026-11-01T09:44:04",
+    "last_run_id": "爆款拆解流水线-1793501044285"
+  }
+}

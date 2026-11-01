@@ -1,0 +1,4769 @@
+{
+ "source": "https://github.com/paysssk-creator/GBT-Framework",
+ "note": "GBT小土豆 v5.0 全量家底（10脑·19邻域·196cap·987handler）——逐文件归档，供 V8 按需吸收",
+ "total_files": 897,
+ "by_top": {
+  ".env.example": 1,
+  ".github": 3,
+  ".gitignore": 1,
+  ".ompignore": 1,
+  ".pre-commit-config.yaml": 1,
+  "AGENTS.md": 1,
+  "ARCHITECTURE.md": 1,
+  "brain": 63,
+  "capability.schema.json": 1,
+  "caps": 606,
+  "CHANGELOG.md": 1,
+  "cli": 1,
+  "CONSTITUTION.md": 1,
+  "deploy": 16,
+  "deploy.bat": 1,
+  "DEPLOY.md": 1,
+  "docker-compose.yml": 1,
+  "docs": 1,
+  "fix_ocr.bat": 1,
+  "gates.md": 1,
+  "gbt.bat": 1,
+  "gbt.py": 1,
+  "gbt_tui.py": 1,
+  "GBTdaemon.bat": 1,
+  "GBTxiaotudouV5.bat": 1,
+  "HOST_BODY.md": 1,
+  "integrations": 12,
+  "manifest.json": 1,
+  "nginx.conf": 1,
+  "pipeline.md": 1,
+  "pyproject.toml": 1,
+  "qa_check.py": 1,
+  "quad_brain.md": 1,
+  "README-BRAIN-RUNTIME.md": 1,
+  "README.md": 1,
+  "requirements.lock": 1,
+  "requirements.txt": 1,
+  "service-worker.js": 1,
+  "STAMP.md": 1,
+  "tests": 3,
+  "tmp_run.bat": 1,
+  "tools": 4,
+  "UNIFIED_PATH.md": 1,
+  "V5.bat": 1,
+  "verify_all_caps.py": 1,
+  "web": 152
+ },
+ "docs": [
+  {
+   "path": "AGENTS.md",
+   "chars": 2935,
+   "title": "GBT小土豆 · 智能大脑 v5.0"
+  },
+  {
+   "path": "ARCHITECTURE.md",
+   "chars": 733,
+   "title": "GBTxiaotudouV5 架构边界"
+  },
+  {
+   "path": "caps/agent_reach/absorbed_knowledge.md",
+   "chars": 318,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/ai_vision/absorbed_knowledge.md",
+   "chars": 165,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/blockchain_analyzer/absorbed_knowledge.md",
+   "chars": 330,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/code_scanner/absorbed_knowledge.md",
+   "chars": 171,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/crypto_harvester/absorbed_knowledge.md",
+   "chars": 171,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/desktop_master/absorbed_knowledge.md",
+   "chars": 351,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/multi_llm/absorbed_knowledge.md",
+   "chars": 189,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/programming/absorbed_knowledge.md",
+   "chars": 189,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/security_scan/absorbed_knowledge.md",
+   "chars": 345,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "caps/skill_library/absorbed_knowledge.md",
+   "chars": 183,
+   "title": "2026-07-25 04:37:53 — 吞噬注入"
+  },
+  {
+   "path": "CHANGELOG.md",
+   "chars": 2766,
+   "title": "GBTxiaotudouV5 · 全量修复记录"
+  },
+  {
+   "path": "CONSTITUTION.md",
+   "chars": 12017,
+   "title": "GBT小土豆 · 智能大脑宪法 v5.0"
+  },
+  {
+   "path": "DEPLOY.md",
+   "chars": 760,
+   "title": "8号当铺 部署标准流程 (SOP)"
+  },
+  {
+   "path": "docs/caps_api.md",
+   "chars": 78434,
+   "title": "Caps API 文档"
+  },
+  {
+   "path": "gates.md",
+   "chars": 1508,
+   "title": "⛔ 门禁系统 · 准入/准出条件"
+  },
+  {
+   "path": "HOST_BODY.md",
+   "chars": 150,
+   "title": "GBT 桌面操控"
+  },
+  {
+   "path": "pipeline.md",
+   "chars": 4693,
+   "title": "⛔ 统一调度层 · 唯一执行通道 · 不可跳步"
+  },
+  {
+   "path": "quad_brain.md",
+   "chars": 2798,
+   "title": "四脑渐进循环引擎"
+  },
+  {
+   "path": "README-BRAIN-RUNTIME.md",
+   "chars": 5724,
+   "title": "🧠 GBT Brain Runtime v5.3.0"
+  },
+  {
+   "path": "README.md",
+   "chars": 5080,
+   "title": "GBT小土豆 · 智能大脑 v5.0"
+  },
+  {
+   "path": "STAMP.md",
+   "chars": 167,
+   "title": "⛔ 永久钢印 · 禁止删除"
+  },
+  {
+   "path": "UNIFIED_PATH.md",
+   "chars": 2550,
+   "title": "⛔ 不可修改 · 不可删除 · 不可绕过"
+  },
+  {
+   "path": "web/docs/caps_api.md",
+   "chars": 47554,
+   "title": "Caps API 文档"
+  },
+  {
+   "path": "web/docs/GBT-3D-DESIGN.md",
+   "chars": 3577,
+   "title": "GBT 3D v2 部署规范 — AI 必读"
+  },
+  {
+   "path": "web/docs/remote-control-playbook.md",
+   "chars": 14924,
+   "title": "⚡ 远程操控 · 战术手册"
+  },
+  {
+   "path": "web/docs/sunpay-recovery-plan.md",
+   "chars": 2324,
+   "title": "SunPay Global · 证据与追回行动包"
+  },
+  {
+   "path": "web/docs/V5-3D-AI-PROTOCOL.md",
+   "chars": 23794,
+   "title": "V0-V4 史前探索：声明式引擎的诞生之路"
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack/README.md",
+   "chars": 859,
+   "title": "GBT小土豆 · OMP原生控制包 v5.0"
+  },
+  {
+   "path": "web/downloads/gbt-stock-scalper/README.md",
+   "chars": 724,
+   "title": "GBT A股AI快进快出操盘系统 v1.0"
+  },
+  {
+   "path": "web/sdk/python/README.md",
+   "chars": 1664,
+   "title": "GBT Python SDK"
+  }
+ ],
+ "caps": [
+  {
+   "name": "_2captcha",
+   "lines": 1120,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "abliterator",
+   "lines": 533,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "agency",
+   "lines": 311,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "agent_reach",
+   "lines": 302,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "ai_drama",
+   "lines": 454,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "ai_service",
+   "lines": 363,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "ai_vision",
+   "lines": 166,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "anti_track",
+   "lines": 762,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "api_tester",
+   "lines": 60,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "audio_capture",
+   "lines": 72,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "auter",
+   "lines": 683,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "auto_fix",
+   "lines": 73,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "auto_pipeline",
+   "lines": 227,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "auto_register",
+   "lines": 89,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "auto_resolver",
+   "lines": 713,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "autonomous_loop",
+   "lines": 271,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "blockchain_analyzer",
+   "lines": 66,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "bounty_hunter",
+   "lines": 129,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "brain_nexus",
+   "lines": 37,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "browser_automation",
+   "lines": 413,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "browser_fingerprint",
+   "lines": 129,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "calendar_sync",
+   "lines": 282,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cap_docs",
+   "lines": 358,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "captcha_solver",
+   "lines": 123,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cicd",
+   "lines": 686,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "circuit_breaker",
+   "lines": 186,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "clipboard_monitor",
+   "lines": 54,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cloud_brain",
+   "lines": 281,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cloud_browser",
+   "lines": 67,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cloud_llm",
+   "lines": 707,
+   "in_v8_same_name": true
+  },
+  {
+   "name": "code_exec",
+   "lines": 26,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "code_scanner",
+   "lines": 402,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "codebase_memory",
+   "lines": 626,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "coder",
+   "lines": 759,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cognition",
+   "lines": 133,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "collab_dispatch",
+   "lines": 563,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "command_injector",
+   "lines": 151,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "compliance_checker",
+   "lines": 85,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "computer_use",
+   "lines": 240,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "content_publisher",
+   "lines": 145,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "context7_mcp",
+   "lines": 71,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "context_brain",
+   "lines": 255,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "context_gate",
+   "lines": 472,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "cradle_task",
+   "lines": 47,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "crypto_harvester",
+   "lines": 186,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "daemon_launcher",
+   "lines": 214,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "darknet_scanner",
+   "lines": 36,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "data_engine",
+   "lines": 410,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "data_hijack",
+   "lines": 124,
+   "in_v8_same_name": true
+  },
+  {
+   "name": "data_transfer",
+   "lines": 118,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "database",
+   "lines": 87,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dater",
+   "lines": 267,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "deep_reasoner",
+   "lines": 48,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "deep_scrape",
+   "lines": 230,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "deepfake_detector",
+   "lines": 39,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "design_brain",
+   "lines": 718,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "desktop_master",
+   "lines": 236,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "desktop_type",
+   "lines": 36,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_cpu",
+   "lines": 35,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_disk",
+   "lines": 43,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_gpu",
+   "lines": 36,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_network",
+   "lines": 52,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_os",
+   "lines": 54,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_ports",
+   "lines": 51,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_processes",
+   "lines": 62,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dev_ram",
+   "lines": 37,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "device_takeover",
+   "lines": 405,
+   "in_v8_same_name": true
+  },
+  {
+   "name": "devourer",
+   "lines": 930,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dimensional_shift",
+   "lines": 47,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dir_buster",
+   "lines": 130,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "dns_tunneler",
+   "lines": 54,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "docer",
+   "lines": 439,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "docker",
+   "lines": 121,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "email_engine",
+   "lines": 220,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "encryption_engine",
+   "lines": 73,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "entanglement_bridge",
+   "lines": 55,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "event_bus",
+   "lines": 170,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "file_operation",
+   "lines": 93,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "fingerprint_browser",
+   "lines": 112,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "fingerprint_engine",
+   "lines": 467,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "firecrawl_mcp",
+   "lines": 97,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "forensic_collector",
+   "lines": 90,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "fund_pool",
+   "lines": 451,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "gbt_brain",
+   "lines": 610,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "gbt_browser",
+   "lines": 429,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "gbt_gigs",
+   "lines": 149,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "gbt_writer",
+   "lines": 90,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "gener",
+   "lines": 322,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "git_ops",
+   "lines": 123,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "github_oauth",
+   "lines": 286,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "headroom",
+   "lines": 156,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "health_dashboard",
+   "lines": 376,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "human_task",
+   "lines": 241,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "identity_forge",
+   "lines": 37,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "image_analysis",
+   "lines": 306,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "imager",
+   "lines": 409,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "input_sanitizer",
+   "lines": 420,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "jwt_tester",
+   "lines": 162,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "keylogger",
+   "lines": 75,
+   "in_v8_same_name": true
+  },
+  {
+   "name": "local_eye",
+   "lines": 160,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "location_tracker",
+   "lines": 25,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "log_analyzer",
+   "lines": 175,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "mcp_bridge",
+   "lines": 269,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "memory_dumper",
+   "lines": 76,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "metrics_exporter",
+   "lines": 380,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "migration",
+   "lines": 287,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "mind_visual",
+   "lines": 232,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "miniapp",
+   "lines": 130,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "mirror_fusion",
+   "lines": 79,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "multi_llm",
+   "lines": 100,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "n8n_attack_chain",
+   "lines": 371,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "n8n_automation",
+   "lines": 221,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "nanobrowser",
+   "lines": 560,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "native_vision",
+   "lines": 571,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "net_sniffer",
+   "lines": 196,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "netter",
+   "lines": 551,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "nexus_monitor",
+   "lines": 753,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "omni_eye",
+   "lines": 170,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "oneclick_deploy",
+   "lines": 301,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "osint_aggregator",
+   "lines": 53,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "osint_master",
+   "lines": 527,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "packet_crafter",
+   "lines": 42,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "pentest_kali",
+   "lines": 228,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "phishing_engine",
+   "lines": 101,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "plugin_loader",
+   "lines": 152,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "ponytail",
+   "lines": 35,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "port_scanner",
+   "lines": 198,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "precision_scrape",
+   "lines": 56,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "process_injector",
+   "lines": 70,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "programming",
+   "lines": 350,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "project_registry",
+   "lines": 93,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "project_state",
+   "lines": 389,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "proxy_network",
+   "lines": 44,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "quantum_optimizer",
+   "lines": 45,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "quantum_reasoner",
+   "lines": 123,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "rag_knowledge",
+   "lines": 90,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "remote_agent",
+   "lines": 202,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "remote_control",
+   "lines": 1155,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "remote_deploy",
+   "lines": 281,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "report_generator",
+   "lines": 73,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "reverse_scrape",
+   "lines": 121,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "root_cause_debugger",
+   "lines": 1149,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "screen_ocr",
+   "lines": 125,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "screenpipe_monitor",
+   "lines": 145,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "screenshot",
+   "lines": 148,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "secer",
+   "lines": 456,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "security_scan",
+   "lines": 351,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "self_diagnostic",
+   "lines": 413,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "self_evolve",
+   "lines": 602,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "simulation_env",
+   "lines": 50,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "skill_library",
+   "lines": 807,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "skillspector",
+   "lines": 334,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "slack_bot",
+   "lines": 140,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "smart_scheduler",
+   "lines": 593,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "social_engineer",
+   "lines": 92,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "sqli_tester",
+   "lines": 201,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "state_space",
+   "lines": 675,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "steganography",
+   "lines": 59,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "stock_browser_trader",
+   "lines": 1439,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "stock_scalper",
+   "lines": 481,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "stock_trader",
+   "lines": 330,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "stress_test",
+   "lines": 101,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "strix",
+   "lines": 450,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "sub_agent_mgr",
+   "lines": 895,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "subdomain_enum",
+   "lines": 166,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "superposition_planner",
+   "lines": 68,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "sys_control",
+   "lines": 46,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "system_backup",
+   "lines": 333,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "task_mind",
+   "lines": 664,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "telegram",
+   "lines": 68,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "tentacle_transmission",
+   "lines": 197,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "tg_client",
+   "lines": 114,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "threat_hunter",
+   "lines": 84,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "tool_adapter",
+   "lines": 523,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "toolbox",
+   "lines": 297,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "tp_connect",
+   "lines": 211,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "tracer",
+   "lines": 205,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "translator",
+   "lines": 147,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "trending_scanner",
+   "lines": 160,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "verter",
+   "lines": 813,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "video_edit",
+   "lines": 360,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "video_gen",
+   "lines": 147,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "voice_clone",
+   "lines": 66,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "voice_speak",
+   "lines": 198,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "waf_bypass",
+   "lines": 181,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "waveform_collapse",
+   "lines": 44,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "web_api",
+   "lines": 618,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "web_deploy_3d",
+   "lines": 66,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "web_search",
+   "lines": 126,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "wifi_scanner",
+   "lines": 57,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "win_control",
+   "lines": 38,
+   "in_v8_same_name": false
+  },
+  {
+   "name": "xss_tester",
+   "lines": 159,
+   "in_v8_same_name": false
+  }
+ ],
+ "caps_total": 192,
+ "caps_same_name_in_v8": 4,
+ "files": [
+  {
+   "path": ".env.example",
+   "bytes": 4665
+  },
+  {
+   "path": ".github/workflows/ci.yml",
+   "bytes": 3012
+  },
+  {
+   "path": ".github/workflows/deploy.yml",
+   "bytes": 999
+  },
+  {
+   "path": ".github/workflows/pages-deploy.yml",
+   "bytes": 563
+  },
+  {
+   "path": ".gitignore",
+   "bytes": 478
+  },
+  {
+   "path": ".ompignore",
+   "bytes": 349
+  },
+  {
+   "path": ".pre-commit-config.yaml",
+   "bytes": 594
+  },
+  {
+   "path": "AGENTS.md",
+   "bytes": 4505
+  },
+  {
+   "path": "ARCHITECTURE.md",
+   "bytes": 1123
+  },
+  {
+   "path": "brain/__init__.py",
+   "bytes": 2841
+  },
+  {
+   "path": "brain/_audit_routes.py",
+   "bytes": 1673
+  },
+  {
+   "path": "brain/_audit_scanall.py",
+   "bytes": 971
+  },
+  {
+   "path": "brain/_audit_topology.py",
+   "bytes": 7825
+  },
+  {
+   "path": "brain/_compile_check.py",
+   "bytes": 443
+  },
+  {
+   "path": "brain/_import_test.py",
+   "bytes": 2468
+  },
+  {
+   "path": "brain/_run_test.py",
+   "bytes": 305
+  },
+  {
+   "path": "brain/_test_enc.py",
+   "bytes": 306
+  },
+  {
+   "path": "brain/_test_runner.py",
+   "bytes": 439
+  },
+  {
+   "path": "brain/action_tentacle.py",
+   "bytes": 8769
+  },
+  {
+   "path": "brain/ai_gateway.py",
+   "bytes": 10261
+  },
+  {
+   "path": "brain/audit_trail.py",
+   "bytes": 7234
+  },
+  {
+   "path": "brain/autonomous_boot.py",
+   "bytes": 17498
+  },
+  {
+   "path": "brain/boot.py",
+   "bytes": 10194
+  },
+  {
+   "path": "brain/brain_council.py",
+   "bytes": 13458
+  },
+  {
+   "path": "brain/cap_scaffold.py",
+   "bytes": 5631
+  },
+  {
+   "path": "brain/capability_manifest.py",
+   "bytes": 14168
+  },
+  {
+   "path": "brain/capability_protocol.py",
+   "bytes": 3348
+  },
+  {
+   "path": "brain/chain_kernel.py",
+   "bytes": 15726
+  },
+  {
+   "path": "brain/chain_monitor.py",
+   "bytes": 8739
+  },
+  {
+   "path": "brain/cognition.py",
+   "bytes": 10296
+  },
+  {
+   "path": "brain/cross_validation.py",
+   "bytes": 18877
+  },
+  {
+   "path": "brain/deep_reasoner.py",
+   "bytes": 16875
+  },
+  {
+   "path": "brain/deploy_audit.py",
+   "bytes": 7893
+  },
+  {
+   "path": "brain/devour_tentacle.py",
+   "bytes": 10519
+  },
+  {
+   "path": "brain/event_wiring.py",
+   "bytes": 6727
+  },
+  {
+   "path": "brain/evidence_tentacle.py",
+   "bytes": 10336
+  },
+  {
+   "path": "brain/executor.py",
+   "bytes": 18520
+  },
+  {
+   "path": "brain/full_audit.py",
+   "bytes": 3601
+  },
+  {
+   "path": "brain/gate_check.py",
+   "bytes": 5034
+  },
+  {
+   "path": "brain/gbt_deploy.py",
+   "bytes": 5149
+  },
+  {
+   "path": "brain/guard.py",
+   "bytes": 10203
+  },
+  {
+   "path": "brain/heartbeat.py",
+   "bytes": 7312
+  },
+  {
+   "path": "brain/host_body.py",
+   "bytes": 46824
+  },
+  {
+   "path": "brain/immutable_chain.py",
+   "bytes": 11883
+  },
+  {
+   "path": "brain/intent_broker.py",
+   "bytes": 8955
+  },
+  {
+   "path": "brain/layer_guard.py",
+   "bytes": 6815
+  },
+  {
+   "path": "brain/layer_wiring.py",
+   "bytes": 5841
+  },
+  {
+   "path": "brain/logging_pipeline.py",
+   "bytes": 5875
+  },
+  {
+   "path": "brain/mind_map.py",
+   "bytes": 1466
+  },
+  {
+   "path": "brain/mirror_fusion.py",
+   "bytes": 20355
+  },
+  {
+   "path": "brain/navigation_tentacle.py",
+   "bytes": 19365
+  },
+  {
+   "path": "brain/neighborhood_vision.py",
+   "bytes": 9620
+  },
+  {
+   "path": "brain/neural_proprioception.py",
+   "bytes": 13794
+  },
+  {
+   "path": "brain/neural_tentacle.py",
+   "bytes": 14866
+  },
+  {
+   "path": "brain/nexus.py",
+   "bytes": 64906
+  },
+  {
+   "path": "brain/orchestrator.py",
+   "bytes": 9142
+  },
+  {
+   "path": "brain/penetration_scan.py",
+   "bytes": 23093
+  },
+  {
+   "path": "brain/platform.py",
+   "bytes": 5261
+  },
+  {
+   "path": "brain/prompt_audit.py",
+   "bytes": 8329
+  },
+  {
+   "path": "brain/reasoning_brain.py",
+   "bytes": 24257
+  },
+  {
+   "path": "brain/remote_body.py",
+   "bytes": 9870
+  },
+  {
+   "path": "brain/repair_watchdog.py",
+   "bytes": 13238
+  },
+  {
+   "path": "brain/self_evolve.py",
+   "bytes": 10048
+  },
+  {
+   "path": "brain/session_resume.py",
+   "bytes": 6813
+  },
+  {
+   "path": "brain/step_tracker.py",
+   "bytes": 8985
+  },
+  {
+   "path": "brain/step_tracker_test.py",
+   "bytes": 0
+  },
+  {
+   "path": "brain/verify.py",
+   "bytes": 3810
+  },
+  {
+   "path": "brain/vision_dispatch.py",
+   "bytes": 12323
+  },
+  {
+   "path": "brain/vision_tentacle.py",
+   "bytes": 20864
+  },
+  {
+   "path": "brain/visual_cortex.py",
+   "bytes": 20208
+  },
+  {
+   "path": "brain/visual_memory.py",
+   "bytes": 10006
+  },
+  {
+   "path": "brain/workflow_engine.py",
+   "bytes": 13329
+  },
+  {
+   "path": "capability.schema.json",
+   "bytes": 2593
+  },
+  {
+   "path": "caps/_2captcha/__init__.py",
+   "bytes": 738
+  },
+  {
+   "path": "caps/_2captcha/capability.json",
+   "bytes": 945
+  },
+  {
+   "path": "caps/_2captcha/client.py",
+   "bytes": 44582
+  },
+  {
+   "path": "caps/_2captcha/run.py",
+   "bytes": 1869
+  },
+  {
+   "path": "caps/_shared.py",
+   "bytes": 1876
+  },
+  {
+   "path": "caps/abliterator/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/abliterator/capability.json",
+   "bytes": 613
+  },
+  {
+   "path": "caps/abliterator/run.py",
+   "bytes": 21765
+  },
+  {
+   "path": "caps/agency/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/agency/capability.json",
+   "bytes": 1719
+  },
+  {
+   "path": "caps/agency/run.py",
+   "bytes": 14001
+  },
+  {
+   "path": "caps/agent_reach/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/agent_reach/absorbed_knowledge.md",
+   "bytes": 522
+  },
+  {
+   "path": "caps/agent_reach/capability.json",
+   "bytes": 698
+  },
+  {
+   "path": "caps/agent_reach/run.py",
+   "bytes": 11937
+  },
+  {
+   "path": "caps/ai_drama/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/ai_drama/capability.json",
+   "bytes": 1920
+  },
+  {
+   "path": "caps/ai_drama/run.py",
+   "bytes": 16892
+  },
+  {
+   "path": "caps/ai_service/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/ai_service/capability.json",
+   "bytes": 878
+  },
+  {
+   "path": "caps/ai_service/run.py",
+   "bytes": 17023
+  },
+  {
+   "path": "caps/ai_vision/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/ai_vision/absorbed_knowledge.md",
+   "bytes": 267
+  },
+  {
+   "path": "caps/ai_vision/capability.json",
+   "bytes": 1377
+  },
+  {
+   "path": "caps/ai_vision/run.py",
+   "bytes": 6723
+  },
+  {
+   "path": "caps/anti_track/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/anti_track/capability.json",
+   "bytes": 1581
+  },
+  {
+   "path": "caps/anti_track/run.py",
+   "bytes": 30107
+  },
+  {
+   "path": "caps/api_tester/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/api_tester/capability.json",
+   "bytes": 362
+  },
+  {
+   "path": "caps/api_tester/run.py",
+   "bytes": 3111
+  },
+  {
+   "path": "caps/audio_capture/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/audio_capture/capability.json",
+   "bytes": 418
+  },
+  {
+   "path": "caps/audio_capture/run.py",
+   "bytes": 3279
+  },
+  {
+   "path": "caps/auter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/auter/capability.json",
+   "bytes": 1547
+  },
+  {
+   "path": "caps/auter/run.py",
+   "bytes": 25137
+  },
+  {
+   "path": "caps/auto_fix/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/auto_fix/capability.json",
+   "bytes": 883
+  },
+  {
+   "path": "caps/auto_fix/run.py",
+   "bytes": 2331
+  },
+  {
+   "path": "caps/auto_pipeline/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/auto_pipeline/capability.json",
+   "bytes": 627
+  },
+  {
+   "path": "caps/auto_pipeline/run.py",
+   "bytes": 7949
+  },
+  {
+   "path": "caps/auto_register/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/auto_register/capability.json",
+   "bytes": 458
+  },
+  {
+   "path": "caps/auto_register/run.py",
+   "bytes": 3543
+  },
+  {
+   "path": "caps/auto_resolver/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/auto_resolver/capability.json",
+   "bytes": 2287
+  },
+  {
+   "path": "caps/auto_resolver/run.py",
+   "bytes": 29006
+  },
+  {
+   "path": "caps/autonomous_loop/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/autonomous_loop/capability.json",
+   "bytes": 1180
+  },
+  {
+   "path": "caps/autonomous_loop/run.py",
+   "bytes": 9209
+  },
+  {
+   "path": "caps/blockchain_analyzer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/blockchain_analyzer/absorbed_knowledge.md",
+   "bytes": 540
+  },
+  {
+   "path": "caps/blockchain_analyzer/capability.json",
+   "bytes": 564
+  },
+  {
+   "path": "caps/blockchain_analyzer/run.py",
+   "bytes": 3245
+  },
+  {
+   "path": "caps/bounty_hunter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/bounty_hunter/capability.json",
+   "bytes": 445
+  },
+  {
+   "path": "caps/bounty_hunter/run.py",
+   "bytes": 4652
+  },
+  {
+   "path": "caps/brain_nexus/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/brain_nexus/capability.json",
+   "bytes": 2040
+  },
+  {
+   "path": "caps/brain_nexus/run.py",
+   "bytes": 1580
+  },
+  {
+   "path": "caps/browser_automation/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/browser_automation/browser-mastery.js",
+   "bytes": 18908
+  },
+  {
+   "path": "caps/browser_automation/capability.json",
+   "bytes": 2101
+  },
+  {
+   "path": "caps/browser_automation/recipes/index.js",
+   "bytes": 283
+  },
+  {
+   "path": "caps/browser_automation/recipes/login.js",
+   "bytes": 2300
+  },
+  {
+   "path": "caps/browser_automation/recipes/monitor.js",
+   "bytes": 1677
+  },
+  {
+   "path": "caps/browser_automation/recipes/scrape.js",
+   "bytes": 2965
+  },
+  {
+   "path": "caps/browser_automation/run.py",
+   "bytes": 16405
+  },
+  {
+   "path": "caps/browser_fingerprint/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/browser_fingerprint/capability.json",
+   "bytes": 2741
+  },
+  {
+   "path": "caps/browser_fingerprint/run.py",
+   "bytes": 4226
+  },
+  {
+   "path": "caps/calendar_sync/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/calendar_sync/capability.json",
+   "bytes": 1461
+  },
+  {
+   "path": "caps/calendar_sync/run.py",
+   "bytes": 13018
+  },
+  {
+   "path": "caps/cap_docs/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cap_docs/capability.json",
+   "bytes": 736
+  },
+  {
+   "path": "caps/cap_docs/run.py",
+   "bytes": 11383
+  },
+  {
+   "path": "caps/captcha_solver/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/captcha_solver/capability.json",
+   "bytes": 1185
+  },
+  {
+   "path": "caps/captcha_solver/run.py",
+   "bytes": 5610
+  },
+  {
+   "path": "caps/cicd/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cicd/capability.json",
+   "bytes": 1385
+  },
+  {
+   "path": "caps/cicd/run.py",
+   "bytes": 30408
+  },
+  {
+   "path": "caps/circuit_breaker/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/circuit_breaker/capability.json",
+   "bytes": 1181
+  },
+  {
+   "path": "caps/circuit_breaker/run.py",
+   "bytes": 6527
+  },
+  {
+   "path": "caps/clipboard_monitor/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/clipboard_monitor/capability.json",
+   "bytes": 484
+  },
+  {
+   "path": "caps/clipboard_monitor/run.py",
+   "bytes": 2219
+  },
+  {
+   "path": "caps/cloud_brain/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cloud_brain/capability.json",
+   "bytes": 2396
+  },
+  {
+   "path": "caps/cloud_brain/run.py",
+   "bytes": 11534
+  },
+  {
+   "path": "caps/cloud_browser/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cloud_browser/capability.json",
+   "bytes": 1946
+  },
+  {
+   "path": "caps/cloud_browser/run.py",
+   "bytes": 2454
+  },
+  {
+   "path": "caps/cloud_llm/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cloud_llm/capability.json",
+   "bytes": 1619
+  },
+  {
+   "path": "caps/cloud_llm/run.py",
+   "bytes": 33534
+  },
+  {
+   "path": "caps/code_exec/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/code_exec/capability.json",
+   "bytes": 769
+  },
+  {
+   "path": "caps/code_exec/run.py",
+   "bytes": 1035
+  },
+  {
+   "path": "caps/code_scanner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/code_scanner/absorbed_knowledge.md",
+   "bytes": 279
+  },
+  {
+   "path": "caps/code_scanner/capability.json",
+   "bytes": 773
+  },
+  {
+   "path": "caps/code_scanner/run.py",
+   "bytes": 17820
+  },
+  {
+   "path": "caps/codebase_memory/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/codebase_memory/capability.json",
+   "bytes": 3761
+  },
+  {
+   "path": "caps/codebase_memory/run.py",
+   "bytes": 25368
+  },
+  {
+   "path": "caps/coder/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/coder/capability.json",
+   "bytes": 1173
+  },
+  {
+   "path": "caps/coder/run.py",
+   "bytes": 31287
+  },
+  {
+   "path": "caps/cognition/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cognition/capability.json",
+   "bytes": 669
+  },
+  {
+   "path": "caps/cognition/run.py",
+   "bytes": 4946
+  },
+  {
+   "path": "caps/collab_dispatch/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/collab_dispatch/capability.json",
+   "bytes": 1373
+  },
+  {
+   "path": "caps/collab_dispatch/run.py",
+   "bytes": 22460
+  },
+  {
+   "path": "caps/command_injector/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/command_injector/capability.json",
+   "bytes": 449
+  },
+  {
+   "path": "caps/command_injector/run.py",
+   "bytes": 5312
+  },
+  {
+   "path": "caps/compliance_checker/capability.json",
+   "bytes": 894
+  },
+  {
+   "path": "caps/compliance_checker/run.py",
+   "bytes": 3438
+  },
+  {
+   "path": "caps/computer_use/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/computer_use/capability.json",
+   "bytes": 1189
+  },
+  {
+   "path": "caps/computer_use/run.py",
+   "bytes": 8426
+  },
+  {
+   "path": "caps/content_publisher/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/content_publisher/capability.json",
+   "bytes": 688
+  },
+  {
+   "path": "caps/content_publisher/run.py",
+   "bytes": 7263
+  },
+  {
+   "path": "caps/context7_mcp/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/context7_mcp/capability.json",
+   "bytes": 945
+  },
+  {
+   "path": "caps/context7_mcp/run.py",
+   "bytes": 2158
+  },
+  {
+   "path": "caps/context_brain/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/context_brain/capability.json",
+   "bytes": 1556
+  },
+  {
+   "path": "caps/context_brain/run.py",
+   "bytes": 11994
+  },
+  {
+   "path": "caps/context_gate/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/context_gate/capability.json",
+   "bytes": 1836
+  },
+  {
+   "path": "caps/context_gate/run.py",
+   "bytes": 19149
+  },
+  {
+   "path": "caps/cradle_task/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/cradle_task/capability.json",
+   "bytes": 489
+  },
+  {
+   "path": "caps/cradle_task/run.py",
+   "bytes": 1781
+  },
+  {
+   "path": "caps/crypto_harvester/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/crypto_harvester/absorbed_knowledge.md",
+   "bytes": 249
+  },
+  {
+   "path": "caps/crypto_harvester/capability.json",
+   "bytes": 884
+  },
+  {
+   "path": "caps/crypto_harvester/run.py",
+   "bytes": 9412
+  },
+  {
+   "path": "caps/daemon_launcher/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/daemon_launcher/capability.json",
+   "bytes": 1420
+  },
+  {
+   "path": "caps/daemon_launcher/run.py",
+   "bytes": 7124
+  },
+  {
+   "path": "caps/darknet_scanner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/darknet_scanner/capability.json",
+   "bytes": 359
+  },
+  {
+   "path": "caps/darknet_scanner/run.py",
+   "bytes": 1533
+  },
+  {
+   "path": "caps/data_engine/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/data_engine/capability.json",
+   "bytes": 1917
+  },
+  {
+   "path": "caps/data_engine/run.py",
+   "bytes": 17125
+  },
+  {
+   "path": "caps/data_hijack/capability.json",
+   "bytes": 1491
+  },
+  {
+   "path": "caps/data_hijack/run.py",
+   "bytes": 5427
+  },
+  {
+   "path": "caps/data_transfer/capability.json",
+   "bytes": 1490
+  },
+  {
+   "path": "caps/data_transfer/run.py",
+   "bytes": 4707
+  },
+  {
+   "path": "caps/database/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/database/capability.json",
+   "bytes": 1210
+  },
+  {
+   "path": "caps/database/run.py",
+   "bytes": 3347
+  },
+  {
+   "path": "caps/dater/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dater/capability.json",
+   "bytes": 1475
+  },
+  {
+   "path": "caps/dater/run.py",
+   "bytes": 10461
+  },
+  {
+   "path": "caps/deep_reasoner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/deep_reasoner/capability.json",
+   "bytes": 965
+  },
+  {
+   "path": "caps/deep_reasoner/run.py",
+   "bytes": 2042
+  },
+  {
+   "path": "caps/deep_scrape/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/deep_scrape/capability.json",
+   "bytes": 1625
+  },
+  {
+   "path": "caps/deep_scrape/run.py",
+   "bytes": 9871
+  },
+  {
+   "path": "caps/deepfake_detector/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/deepfake_detector/capability.json",
+   "bytes": 515
+  },
+  {
+   "path": "caps/deepfake_detector/run.py",
+   "bytes": 1685
+  },
+  {
+   "path": "caps/design_brain/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/design_brain/capability.json",
+   "bytes": 1795
+  },
+  {
+   "path": "caps/design_brain/run.py",
+   "bytes": 33261
+  },
+  {
+   "path": "caps/desktop_master/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/desktop_master/absorbed_knowledge.md",
+   "bytes": 525
+  },
+  {
+   "path": "caps/desktop_master/capability.json",
+   "bytes": 586
+  },
+  {
+   "path": "caps/desktop_master/run.py",
+   "bytes": 10283
+  },
+  {
+   "path": "caps/desktop_type/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/desktop_type/capability.json",
+   "bytes": 419
+  },
+  {
+   "path": "caps/desktop_type/run.py",
+   "bytes": 1355
+  },
+  {
+   "path": "caps/dev_cpu/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_cpu/capability.json",
+   "bytes": 368
+  },
+  {
+   "path": "caps/dev_cpu/run.py",
+   "bytes": 1336
+  },
+  {
+   "path": "caps/dev_disk/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_disk/capability.json",
+   "bytes": 375
+  },
+  {
+   "path": "caps/dev_disk/run.py",
+   "bytes": 1610
+  },
+  {
+   "path": "caps/dev_gpu/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_gpu/capability.json",
+   "bytes": 369
+  },
+  {
+   "path": "caps/dev_gpu/run.py",
+   "bytes": 1594
+  },
+  {
+   "path": "caps/dev_network/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_network/capability.json",
+   "bytes": 442
+  },
+  {
+   "path": "caps/dev_network/run.py",
+   "bytes": 1916
+  },
+  {
+   "path": "caps/dev_os/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_os/capability.json",
+   "bytes": 493
+  },
+  {
+   "path": "caps/dev_os/run.py",
+   "bytes": 2172
+  },
+  {
+   "path": "caps/dev_ports/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_ports/capability.json",
+   "bytes": 432
+  },
+  {
+   "path": "caps/dev_ports/run.py",
+   "bytes": 1958
+  },
+  {
+   "path": "caps/dev_processes/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_processes/capability.json",
+   "bytes": 431
+  },
+  {
+   "path": "caps/dev_processes/run.py",
+   "bytes": 2220
+  },
+  {
+   "path": "caps/dev_ram/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dev_ram/capability.json",
+   "bytes": 374
+  },
+  {
+   "path": "caps/dev_ram/run.py",
+   "bytes": 1413
+  },
+  {
+   "path": "caps/device_takeover/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/device_takeover/capability.json",
+   "bytes": 1253
+  },
+  {
+   "path": "caps/device_takeover/run.py",
+   "bytes": 15412
+  },
+  {
+   "path": "caps/devourer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/devourer/capability.json",
+   "bytes": 1282
+  },
+  {
+   "path": "caps/devourer/run.py",
+   "bytes": 45908
+  },
+  {
+   "path": "caps/dimensional_shift/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dimensional_shift/capability.json",
+   "bytes": 365
+  },
+  {
+   "path": "caps/dimensional_shift/run.py",
+   "bytes": 1885
+  },
+  {
+   "path": "caps/dir_buster/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dir_buster/capability.json",
+   "bytes": 422
+  },
+  {
+   "path": "caps/dir_buster/run.py",
+   "bytes": 4821
+  },
+  {
+   "path": "caps/dns_tunneler/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/dns_tunneler/capability.json",
+   "bytes": 423
+  },
+  {
+   "path": "caps/dns_tunneler/run.py",
+   "bytes": 2324
+  },
+  {
+   "path": "caps/docer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/docer/capability.json",
+   "bytes": 1480
+  },
+  {
+   "path": "caps/docer/run.py",
+   "bytes": 15923
+  },
+  {
+   "path": "caps/docker/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/docker/capability.json",
+   "bytes": 1083
+  },
+  {
+   "path": "caps/docker/run.py",
+   "bytes": 5463
+  },
+  {
+   "path": "caps/email_engine/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/email_engine/capability.json",
+   "bytes": 823
+  },
+  {
+   "path": "caps/email_engine/run.py",
+   "bytes": 8983
+  },
+  {
+   "path": "caps/encryption_engine/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/encryption_engine/capability.json",
+   "bytes": 636
+  },
+  {
+   "path": "caps/encryption_engine/run.py",
+   "bytes": 3569
+  },
+  {
+   "path": "caps/entanglement_bridge/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/entanglement_bridge/capability.json",
+   "bytes": 366
+  },
+  {
+   "path": "caps/entanglement_bridge/run.py",
+   "bytes": 2066
+  },
+  {
+   "path": "caps/event_bus/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/event_bus/capability.json",
+   "bytes": 750
+  },
+  {
+   "path": "caps/event_bus/run.py",
+   "bytes": 5847
+  },
+  {
+   "path": "caps/file_operation/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/file_operation/capability.json",
+   "bytes": 635
+  },
+  {
+   "path": "caps/file_operation/run.py",
+   "bytes": 4127
+  },
+  {
+   "path": "caps/fingerprint_browser/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/fingerprint_browser/capability.json",
+   "bytes": 646
+  },
+  {
+   "path": "caps/fingerprint_browser/run.py",
+   "bytes": 4766
+  },
+  {
+   "path": "caps/fingerprint_engine/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/fingerprint_engine/capability.json",
+   "bytes": 1540
+  },
+  {
+   "path": "caps/fingerprint_engine/run.py",
+   "bytes": 19480
+  },
+  {
+   "path": "caps/firecrawl_mcp/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/firecrawl_mcp/capability.json",
+   "bytes": 1126
+  },
+  {
+   "path": "caps/firecrawl_mcp/run.py",
+   "bytes": 2646
+  },
+  {
+   "path": "caps/forensic_collector/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/forensic_collector/capability.json",
+   "bytes": 511
+  },
+  {
+   "path": "caps/forensic_collector/run.py",
+   "bytes": 4327
+  },
+  {
+   "path": "caps/fund_pool/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/fund_pool/capability.json",
+   "bytes": 1319
+  },
+  {
+   "path": "caps/fund_pool/run.py",
+   "bytes": 16138
+  },
+  {
+   "path": "caps/gbt_brain/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/gbt_brain/capability.json",
+   "bytes": 2665
+  },
+  {
+   "path": "caps/gbt_brain/run.py",
+   "bytes": 24849
+  },
+  {
+   "path": "caps/gbt_browser/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/gbt_browser/capability.json",
+   "bytes": 1541
+  },
+  {
+   "path": "caps/gbt_browser/run.py",
+   "bytes": 18603
+  },
+  {
+   "path": "caps/gbt_gigs/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/gbt_gigs/capability.json",
+   "bytes": 476
+  },
+  {
+   "path": "caps/gbt_gigs/run.py",
+   "bytes": 5882
+  },
+  {
+   "path": "caps/gbt_writer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/gbt_writer/capability.json",
+   "bytes": 1103
+  },
+  {
+   "path": "caps/gbt_writer/run.py",
+   "bytes": 3211
+  },
+  {
+   "path": "caps/gener/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/gener/capability.json",
+   "bytes": 1417
+  },
+  {
+   "path": "caps/gener/run.py",
+   "bytes": 13547
+  },
+  {
+   "path": "caps/git_ops/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/git_ops/capability.json",
+   "bytes": 2024
+  },
+  {
+   "path": "caps/git_ops/run.py",
+   "bytes": 4414
+  },
+  {
+   "path": "caps/github_oauth/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/github_oauth/capability.json",
+   "bytes": 1223
+  },
+  {
+   "path": "caps/github_oauth/run.py",
+   "bytes": 11513
+  },
+  {
+   "path": "caps/headroom/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/headroom/capability.json",
+   "bytes": 1455
+  },
+  {
+   "path": "caps/headroom/run.py",
+   "bytes": 5699
+  },
+  {
+   "path": "caps/health_dashboard/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/health_dashboard/capability.json",
+   "bytes": 1570
+  },
+  {
+   "path": "caps/health_dashboard/run.py",
+   "bytes": 13031
+  },
+  {
+   "path": "caps/human_task/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/human_task/capability.json",
+   "bytes": 1192
+  },
+  {
+   "path": "caps/human_task/run.py",
+   "bytes": 10655
+  },
+  {
+   "path": "caps/identity_forge/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/identity_forge/capability.json",
+   "bytes": 364
+  },
+  {
+   "path": "caps/identity_forge/run.py",
+   "bytes": 2340
+  },
+  {
+   "path": "caps/image_analysis/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/image_analysis/capability.json",
+   "bytes": 1713
+  },
+  {
+   "path": "caps/image_analysis/run.py",
+   "bytes": 10874
+  },
+  {
+   "path": "caps/imager/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/imager/capability.json",
+   "bytes": 1572
+  },
+  {
+   "path": "caps/imager/run.py",
+   "bytes": 12464
+  },
+  {
+   "path": "caps/input_sanitizer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/input_sanitizer/capability.json",
+   "bytes": 1113
+  },
+  {
+   "path": "caps/input_sanitizer/run.py",
+   "bytes": 17330
+  },
+  {
+   "path": "caps/jwt_tester/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/jwt_tester/capability.json",
+   "bytes": 430
+  },
+  {
+   "path": "caps/jwt_tester/run.py",
+   "bytes": 5903
+  },
+  {
+   "path": "caps/keylogger/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/keylogger/capability.json",
+   "bytes": 476
+  },
+  {
+   "path": "caps/keylogger/run.py",
+   "bytes": 2938
+  },
+  {
+   "path": "caps/local_eye/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/local_eye/capability.json",
+   "bytes": 458
+  },
+  {
+   "path": "caps/local_eye/run.py",
+   "bytes": 5517
+  },
+  {
+   "path": "caps/location_tracker/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/location_tracker/capability.json",
+   "bytes": 506
+  },
+  {
+   "path": "caps/location_tracker/run.py",
+   "bytes": 1321
+  },
+  {
+   "path": "caps/log_analyzer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/log_analyzer/capability.json",
+   "bytes": 686
+  },
+  {
+   "path": "caps/log_analyzer/run.py",
+   "bytes": 7849
+  },
+  {
+   "path": "caps/mcp_bridge/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/mcp_bridge/capability.json",
+   "bytes": 1150
+  },
+  {
+   "path": "caps/mcp_bridge/run.py",
+   "bytes": 8497
+  },
+  {
+   "path": "caps/memory_dumper/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/memory_dumper/capability.json",
+   "bytes": 369
+  },
+  {
+   "path": "caps/memory_dumper/run.py",
+   "bytes": 3529
+  },
+  {
+   "path": "caps/metrics_exporter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/metrics_exporter/capability.json",
+   "bytes": 686
+  },
+  {
+   "path": "caps/metrics_exporter/run.py",
+   "bytes": 13654
+  },
+  {
+   "path": "caps/migration/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/migration/capability.json",
+   "bytes": 902
+  },
+  {
+   "path": "caps/migration/run.py",
+   "bytes": 10536
+  },
+  {
+   "path": "caps/mind_visual/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/mind_visual/capability.json",
+   "bytes": 1564
+  },
+  {
+   "path": "caps/mind_visual/run.py",
+   "bytes": 10113
+  },
+  {
+   "path": "caps/miniapp/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/miniapp/capability.json",
+   "bytes": 996
+  },
+  {
+   "path": "caps/miniapp/run.py",
+   "bytes": 4861
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/app.js",
+   "bytes": 868
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/app.json",
+   "bytes": 1182
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/app.wxss",
+   "bytes": 2155
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/cart/cart.json",
+   "bytes": 69
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/goods/goods.js",
+   "bytes": 2203
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/goods/goods.json",
+   "bytes": 72
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/goods/goods.wxml",
+   "bytes": 1936
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/goods/goods.wxss",
+   "bytes": 2713
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/index/index.js",
+   "bytes": 2780
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/index/index.json",
+   "bytes": 76
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/index/index.wxml",
+   "bytes": 2309
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/pages/index/index.wxss",
+   "bytes": 2612
+  },
+  {
+   "path": "caps/miniapp/templates/ecommerce/template.json",
+   "bytes": 1013
+  },
+  {
+   "path": "caps/mirror_fusion/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/mirror_fusion/capability.json",
+   "bytes": 453
+  },
+  {
+   "path": "caps/mirror_fusion/run.py",
+   "bytes": 3523
+  },
+  {
+   "path": "caps/multi_llm/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/multi_llm/absorbed_knowledge.md",
+   "bytes": 279
+  },
+  {
+   "path": "caps/multi_llm/capability.json",
+   "bytes": 1167
+  },
+  {
+   "path": "caps/multi_llm/run.py",
+   "bytes": 4800
+  },
+  {
+   "path": "caps/n8n_attack_chain/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/n8n_attack_chain/capability.json",
+   "bytes": 751
+  },
+  {
+   "path": "caps/n8n_attack_chain/run.py",
+   "bytes": 16421
+  },
+  {
+   "path": "caps/n8n_automation/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/n8n_automation/capability.json",
+   "bytes": 1210
+  },
+  {
+   "path": "caps/n8n_automation/run.py",
+   "bytes": 12173
+  },
+  {
+   "path": "caps/nanobrowser/__init__.py",
+   "bytes": 121
+  },
+  {
+   "path": "caps/nanobrowser/capability.json",
+   "bytes": 2137
+  },
+  {
+   "path": "caps/nanobrowser/run.py",
+   "bytes": 21398
+  },
+  {
+   "path": "caps/native_vision/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/native_vision/capability.json",
+   "bytes": 3845
+  },
+  {
+   "path": "caps/native_vision/run.py",
+   "bytes": 17719
+  },
+  {
+   "path": "caps/net_sniffer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/net_sniffer/capability.json",
+   "bytes": 485
+  },
+  {
+   "path": "caps/net_sniffer/run.py",
+   "bytes": 6627
+  },
+  {
+   "path": "caps/netter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/netter/capability.json",
+   "bytes": 1242
+  },
+  {
+   "path": "caps/netter/run.py",
+   "bytes": 20620
+  },
+  {
+   "path": "caps/nexus_monitor/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/nexus_monitor/capability.json",
+   "bytes": 1272
+  },
+  {
+   "path": "caps/nexus_monitor/enhanced_watch.py",
+   "bytes": 11984
+  },
+  {
+   "path": "caps/nexus_monitor/run.py",
+   "bytes": 15515
+  },
+  {
+   "path": "caps/omni_eye/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/omni_eye/capability.json",
+   "bytes": 495
+  },
+  {
+   "path": "caps/omni_eye/run.py",
+   "bytes": 5533
+  },
+  {
+   "path": "caps/oneclick_deploy/capability.json",
+   "bytes": 768
+  },
+  {
+   "path": "caps/oneclick_deploy/run.py",
+   "bytes": 12557
+  },
+  {
+   "path": "caps/osint_aggregator/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/osint_aggregator/capability.json",
+   "bytes": 524
+  },
+  {
+   "path": "caps/osint_aggregator/run.py",
+   "bytes": 2524
+  },
+  {
+   "path": "caps/osint_master/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/osint_master/capability.json",
+   "bytes": 1143
+  },
+  {
+   "path": "caps/osint_master/run.py",
+   "bytes": 25252
+  },
+  {
+   "path": "caps/packet_crafter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/packet_crafter/capability.json",
+   "bytes": 523
+  },
+  {
+   "path": "caps/packet_crafter/run.py",
+   "bytes": 2272
+  },
+  {
+   "path": "caps/pentest_kali/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/pentest_kali/capability.json",
+   "bytes": 1544
+  },
+  {
+   "path": "caps/pentest_kali/run.py",
+   "bytes": 10087
+  },
+  {
+   "path": "caps/phishing_engine/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/phishing_engine/capability.json",
+   "bytes": 621
+  },
+  {
+   "path": "caps/phishing_engine/run.py",
+   "bytes": 5533
+  },
+  {
+   "path": "caps/plugin_loader/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/plugin_loader/capability.json",
+   "bytes": 752
+  },
+  {
+   "path": "caps/plugin_loader/run.py",
+   "bytes": 5323
+  },
+  {
+   "path": "caps/ponytail/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/ponytail/capability.json",
+   "bytes": 586
+  },
+  {
+   "path": "caps/ponytail/run.py",
+   "bytes": 1551
+  },
+  {
+   "path": "caps/port_scanner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/port_scanner/capability.json",
+   "bytes": 477
+  },
+  {
+   "path": "caps/port_scanner/run.py",
+   "bytes": 7791
+  },
+  {
+   "path": "caps/precision_scrape/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/precision_scrape/capability.json",
+   "bytes": 745
+  },
+  {
+   "path": "caps/precision_scrape/run.py",
+   "bytes": 2337
+  },
+  {
+   "path": "caps/process_injector/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/process_injector/capability.json",
+   "bytes": 424
+  },
+  {
+   "path": "caps/process_injector/run.py",
+   "bytes": 3170
+  },
+  {
+   "path": "caps/programming/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/programming/absorbed_knowledge.md",
+   "bytes": 303
+  },
+  {
+   "path": "caps/programming/capability.json",
+   "bytes": 4325
+  },
+  {
+   "path": "caps/programming/run.py",
+   "bytes": 16160
+  },
+  {
+   "path": "caps/project_registry/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/project_registry/capability.json",
+   "bytes": 932
+  },
+  {
+   "path": "caps/project_registry/run.py",
+   "bytes": 6011
+  },
+  {
+   "path": "caps/project_state/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/project_state/capability.json",
+   "bytes": 2285
+  },
+  {
+   "path": "caps/project_state/run.py",
+   "bytes": 17109
+  },
+  {
+   "path": "caps/proxy_network/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/proxy_network/capability.json",
+   "bytes": 1573
+  },
+  {
+   "path": "caps/proxy_network/run.py",
+   "bytes": 1520
+  },
+  {
+   "path": "caps/quantum_optimizer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/quantum_optimizer/capability.json",
+   "bytes": 362
+  },
+  {
+   "path": "caps/quantum_optimizer/run.py",
+   "bytes": 1877
+  },
+  {
+   "path": "caps/quantum_reasoner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/quantum_reasoner/capability.json",
+   "bytes": 437
+  },
+  {
+   "path": "caps/quantum_reasoner/run.py",
+   "bytes": 5511
+  },
+  {
+   "path": "caps/rag_knowledge/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/rag_knowledge/capability.json",
+   "bytes": 1192
+  },
+  {
+   "path": "caps/rag_knowledge/run.py",
+   "bytes": 3669
+  },
+  {
+   "path": "caps/remote_agent/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/remote_agent/capability.json",
+   "bytes": 1372
+  },
+  {
+   "path": "caps/remote_agent/run.py",
+   "bytes": 7575
+  },
+  {
+   "path": "caps/remote_control/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/remote_control/agent.py",
+   "bytes": 18405
+  },
+  {
+   "path": "caps/remote_control/capability.json",
+   "bytes": 1352
+  },
+  {
+   "path": "caps/remote_control/connect.py",
+   "bytes": 6234
+  },
+  {
+   "path": "caps/remote_control/desktop_master.py",
+   "bytes": 9523
+  },
+  {
+   "path": "caps/remote_control/phone_home.py",
+   "bytes": 5085
+  },
+  {
+   "path": "caps/remote_control/quick_test.py",
+   "bytes": 2485
+  },
+  {
+   "path": "caps/remote_control/run.py",
+   "bytes": 2008
+  },
+  {
+   "path": "caps/remote_deploy/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/remote_deploy/capability.json",
+   "bytes": 2005
+  },
+  {
+   "path": "caps/remote_deploy/run.py",
+   "bytes": 12025
+  },
+  {
+   "path": "caps/report_generator/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/report_generator/capability.json",
+   "bytes": 552
+  },
+  {
+   "path": "caps/report_generator/run.py",
+   "bytes": 2862
+  },
+  {
+   "path": "caps/reverse_scrape/capability.json",
+   "bytes": 1324
+  },
+  {
+   "path": "caps/reverse_scrape/run.py",
+   "bytes": 5532
+  },
+  {
+   "path": "caps/root_cause_debugger/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/root_cause_debugger/capability.json",
+   "bytes": 1469
+  },
+  {
+   "path": "caps/root_cause_debugger/run.py",
+   "bytes": 43710
+  },
+  {
+   "path": "caps/screen_ocr/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/screen_ocr/capability.json",
+   "bytes": 469
+  },
+  {
+   "path": "caps/screen_ocr/run.py",
+   "bytes": 3817
+  },
+  {
+   "path": "caps/screenpipe_monitor/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/screenpipe_monitor/capability.json",
+   "bytes": 503
+  },
+  {
+   "path": "caps/screenpipe_monitor/run.py",
+   "bytes": 4773
+  },
+  {
+   "path": "caps/screenshot/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/screenshot/capability.json",
+   "bytes": 454
+  },
+  {
+   "path": "caps/screenshot/run.py",
+   "bytes": 4383
+  },
+  {
+   "path": "caps/secer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/secer/capability.json",
+   "bytes": 1502
+  },
+  {
+   "path": "caps/secer/run.py",
+   "bytes": 17276
+  },
+  {
+   "path": "caps/security_scan/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/security_scan/absorbed_knowledge.md",
+   "bytes": 573
+  },
+  {
+   "path": "caps/security_scan/capability.json",
+   "bytes": 724
+  },
+  {
+   "path": "caps/security_scan/run.py",
+   "bytes": 14846
+  },
+  {
+   "path": "caps/self_diagnostic/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/self_diagnostic/capability.json",
+   "bytes": 1063
+  },
+  {
+   "path": "caps/self_diagnostic/run.py",
+   "bytes": 14950
+  },
+  {
+   "path": "caps/self_evolve/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/self_evolve/capability.json",
+   "bytes": 2354
+  },
+  {
+   "path": "caps/self_evolve/run.py",
+   "bytes": 25108
+  },
+  {
+   "path": "caps/simulation_env/capability.json",
+   "bytes": 766
+  },
+  {
+   "path": "caps/simulation_env/run.py",
+   "bytes": 1937
+  },
+  {
+   "path": "caps/skill_library/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/skill_library/absorbed_knowledge.md",
+   "bytes": 285
+  },
+  {
+   "path": "caps/skill_library/capability.json",
+   "bytes": 1299
+  },
+  {
+   "path": "caps/skill_library/run.py",
+   "bytes": 32696
+  },
+  {
+   "path": "caps/skillspector/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/skillspector/capability.json",
+   "bytes": 1251
+  },
+  {
+   "path": "caps/skillspector/run.py",
+   "bytes": 13704
+  },
+  {
+   "path": "caps/slack_bot/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/slack_bot/capability.json",
+   "bytes": 999
+  },
+  {
+   "path": "caps/slack_bot/run.py",
+   "bytes": 5827
+  },
+  {
+   "path": "caps/smart_scheduler/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/smart_scheduler/capability.json",
+   "bytes": 1060
+  },
+  {
+   "path": "caps/smart_scheduler/run.py",
+   "bytes": 23865
+  },
+  {
+   "path": "caps/social_engineer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/social_engineer/capability.json",
+   "bytes": 564
+  },
+  {
+   "path": "caps/social_engineer/run.py",
+   "bytes": 4170
+  },
+  {
+   "path": "caps/sqli_tester/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/sqli_tester/capability.json",
+   "bytes": 531
+  },
+  {
+   "path": "caps/sqli_tester/run.py",
+   "bytes": 7698
+  },
+  {
+   "path": "caps/state_space/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/state_space/capability.json",
+   "bytes": 1122
+  },
+  {
+   "path": "caps/state_space/run.py",
+   "bytes": 27943
+  },
+  {
+   "path": "caps/steganography/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/steganography/capability.json",
+   "bytes": 527
+  },
+  {
+   "path": "caps/steganography/run.py",
+   "bytes": 2655
+  },
+  {
+   "path": "caps/stock_browser_trader/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/stock_browser_trader/capability.json",
+   "bytes": 1867
+  },
+  {
+   "path": "caps/stock_browser_trader/deploy.bat",
+   "bytes": 1934
+  },
+  {
+   "path": "caps/stock_browser_trader/knowledge.json",
+   "bytes": 9771
+  },
+  {
+   "path": "caps/stock_browser_trader/run.py",
+   "bytes": 56412
+  },
+  {
+   "path": "caps/stock_scalper/__init__.py",
+   "bytes": 113
+  },
+  {
+   "path": "caps/stock_scalper/capability.json",
+   "bytes": 1598
+  },
+  {
+   "path": "caps/stock_scalper/run.py",
+   "bytes": 17181
+  },
+  {
+   "path": "caps/stock_trader/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/stock_trader/capability.json",
+   "bytes": 752
+  },
+  {
+   "path": "caps/stock_trader/run.py",
+   "bytes": 11355
+  },
+  {
+   "path": "caps/stress_test/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/stress_test/capability.json",
+   "bytes": 435
+  },
+  {
+   "path": "caps/stress_test/run.py",
+   "bytes": 3828
+  },
+  {
+   "path": "caps/strix/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/strix/capability.json",
+   "bytes": 509
+  },
+  {
+   "path": "caps/strix/run.py",
+   "bytes": 17643
+  },
+  {
+   "path": "caps/sub_agent_mgr/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/sub_agent_mgr/capability.json",
+   "bytes": 2321
+  },
+  {
+   "path": "caps/sub_agent_mgr/run.py",
+   "bytes": 40920
+  },
+  {
+   "path": "caps/subdomain_enum/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/subdomain_enum/capability.json",
+   "bytes": 430
+  },
+  {
+   "path": "caps/subdomain_enum/run.py",
+   "bytes": 6901
+  },
+  {
+   "path": "caps/superposition_planner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/superposition_planner/capability.json",
+   "bytes": 361
+  },
+  {
+   "path": "caps/superposition_planner/run.py",
+   "bytes": 3327
+  },
+  {
+   "path": "caps/sys_control/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/sys_control/capability.json",
+   "bytes": 587
+  },
+  {
+   "path": "caps/sys_control/run.py",
+   "bytes": 2002
+  },
+  {
+   "path": "caps/system_backup/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/system_backup/capability.json",
+   "bytes": 1314
+  },
+  {
+   "path": "caps/system_backup/run.py",
+   "bytes": 12414
+  },
+  {
+   "path": "caps/task_mind/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/task_mind/capability.json",
+   "bytes": 2251
+  },
+  {
+   "path": "caps/task_mind/run.py",
+   "bytes": 30988
+  },
+  {
+   "path": "caps/telegram/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/telegram/capability.json",
+   "bytes": 469
+  },
+  {
+   "path": "caps/telegram/run.py",
+   "bytes": 3134
+  },
+  {
+   "path": "caps/tentacle_transmission/capability.json",
+   "bytes": 1890
+  },
+  {
+   "path": "caps/tentacle_transmission/run.py",
+   "bytes": 7598
+  },
+  {
+   "path": "caps/tg_client/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/tg_client/capability.json",
+   "bytes": 547
+  },
+  {
+   "path": "caps/tg_client/run.py",
+   "bytes": 4360
+  },
+  {
+   "path": "caps/threat_hunter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/threat_hunter/capability.json",
+   "bytes": 493
+  },
+  {
+   "path": "caps/threat_hunter/run.py",
+   "bytes": 4390
+  },
+  {
+   "path": "caps/tool_adapter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/tool_adapter/capability.json",
+   "bytes": 1058
+  },
+  {
+   "path": "caps/tool_adapter/run.py",
+   "bytes": 20556
+  },
+  {
+   "path": "caps/toolbox/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/toolbox/capability.json",
+   "bytes": 1847
+  },
+  {
+   "path": "caps/toolbox/run.py",
+   "bytes": 11136
+  },
+  {
+   "path": "caps/tp_connect/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/tp_connect/capability.json",
+   "bytes": 725
+  },
+  {
+   "path": "caps/tp_connect/run.py",
+   "bytes": 9289
+  },
+  {
+   "path": "caps/tracer/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/tracer/capability.json",
+   "bytes": 668
+  },
+  {
+   "path": "caps/tracer/run.py",
+   "bytes": 6232
+  },
+  {
+   "path": "caps/translator/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/translator/capability.json",
+   "bytes": 1142
+  },
+  {
+   "path": "caps/translator/run.py",
+   "bytes": 7489
+  },
+  {
+   "path": "caps/trending_scanner/capability.json",
+   "bytes": 777
+  },
+  {
+   "path": "caps/trending_scanner/run.py",
+   "bytes": 5851
+  },
+  {
+   "path": "caps/verter/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/verter/capability.json",
+   "bytes": 1616
+  },
+  {
+   "path": "caps/verter/run.py",
+   "bytes": 27879
+  },
+  {
+   "path": "caps/video_edit/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/video_edit/capability.json",
+   "bytes": 568
+  },
+  {
+   "path": "caps/video_edit/run.py",
+   "bytes": 14695
+  },
+  {
+   "path": "caps/video_gen/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/video_gen/capability.json",
+   "bytes": 514
+  },
+  {
+   "path": "caps/video_gen/run.py",
+   "bytes": 6152
+  },
+  {
+   "path": "caps/voice_clone/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/voice_clone/capability.json",
+   "bytes": 572
+  },
+  {
+   "path": "caps/voice_clone/run.py",
+   "bytes": 2672
+  },
+  {
+   "path": "caps/voice_speak/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/voice_speak/capability.json",
+   "bytes": 907
+  },
+  {
+   "path": "caps/voice_speak/run.py",
+   "bytes": 6747
+  },
+  {
+   "path": "caps/waf_bypass/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/waf_bypass/capability.json",
+   "bytes": 509
+  },
+  {
+   "path": "caps/waf_bypass/run.py",
+   "bytes": 6660
+  },
+  {
+   "path": "caps/waveform_collapse/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/waveform_collapse/capability.json",
+   "bytes": 368
+  },
+  {
+   "path": "caps/waveform_collapse/run.py",
+   "bytes": 1890
+  },
+  {
+   "path": "caps/web_api/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/web_api/capability.json",
+   "bytes": 778
+  },
+  {
+   "path": "caps/web_api/run.py",
+   "bytes": 27953
+  },
+  {
+   "path": "caps/web_deploy_3d/__init__.py",
+   "bytes": 1936
+  },
+  {
+   "path": "caps/web_deploy_3d/capability.json",
+   "bytes": 527
+  },
+  {
+   "path": "caps/web_deploy_3d/run.py",
+   "bytes": 256
+  },
+  {
+   "path": "caps/web_search/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/web_search/capability.json",
+   "bytes": 742
+  },
+  {
+   "path": "caps/web_search/run.py",
+   "bytes": 4953
+  },
+  {
+   "path": "caps/wifi_scanner/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/wifi_scanner/capability.json",
+   "bytes": 362
+  },
+  {
+   "path": "caps/wifi_scanner/run.py",
+   "bytes": 2859
+  },
+  {
+   "path": "caps/win_control/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/win_control/capability.json",
+   "bytes": 490
+  },
+  {
+   "path": "caps/win_control/run.py",
+   "bytes": 1745
+  },
+  {
+   "path": "caps/xss_tester/__init__.py",
+   "bytes": 17
+  },
+  {
+   "path": "caps/xss_tester/capability.json",
+   "bytes": 501
+  },
+  {
+   "path": "caps/xss_tester/run.py",
+   "bytes": 6102
+  },
+  {
+   "path": "CHANGELOG.md",
+   "bytes": 3456
+  },
+  {
+   "path": "cli/gbt_tui.py",
+   "bytes": 10017
+  },
+  {
+   "path": "CONSTITUTION.md",
+   "bytes": 22958
+  },
+  {
+   "path": "deploy/.dockerignore",
+   "bytes": 596
+  },
+  {
+   "path": "deploy/_deploy_pack.py",
+   "bytes": 243195
+  },
+  {
+   "path": "deploy/deploy-agent.bat",
+   "bytes": 967
+  },
+  {
+   "path": "deploy/deploy-agent.sh",
+   "bytes": 996
+  },
+  {
+   "path": "deploy/deploy.ps1",
+   "bytes": 8608
+  },
+  {
+   "path": "deploy/deploy.sh",
+   "bytes": 7480
+  },
+  {
+   "path": "deploy/deploy_me.py",
+   "bytes": 7379
+  },
+  {
+   "path": "deploy/docker-compose.yml",
+   "bytes": 707
+  },
+  {
+   "path": "deploy/Dockerfile",
+   "bytes": 704
+  },
+  {
+   "path": "deploy/gbt_deploy.py",
+   "bytes": 6266
+  },
+  {
+   "path": "deploy/oneclick_deploy/capability.json",
+   "bytes": 483
+  },
+  {
+   "path": "deploy/oneclick_deploy/run.py",
+   "bytes": 11928
+  },
+  {
+   "path": "deploy/trending_scanner/capability.json",
+   "bytes": 495
+  },
+  {
+   "path": "deploy/trending_scanner/run.py",
+   "bytes": 5851
+  },
+  {
+   "path": "deploy/tunnel/config.yml",
+   "bytes": 1141
+  },
+  {
+   "path": "deploy/tunnel/setup_permanent_tunnel.py",
+   "bytes": 8574
+  },
+  {
+   "path": "deploy.bat",
+   "bytes": 6297
+  },
+  {
+   "path": "DEPLOY.md",
+   "bytes": 1180
+  },
+  {
+   "path": "docker-compose.yml",
+   "bytes": 416
+  },
+  {
+   "path": "docs/caps_api.md",
+   "bytes": 105094
+  },
+  {
+   "path": "fix_ocr.bat",
+   "bytes": 1274
+  },
+  {
+   "path": "gates.md",
+   "bytes": 2811
+  },
+  {
+   "path": "gbt.bat",
+   "bytes": 386
+  },
+  {
+   "path": "gbt.py",
+   "bytes": 8230
+  },
+  {
+   "path": "gbt_tui.py",
+   "bytes": 10833
+  },
+  {
+   "path": "GBTdaemon.bat",
+   "bytes": 2517
+  },
+  {
+   "path": "GBTxiaotudouV5.bat",
+   "bytes": 99
+  },
+  {
+   "path": "HOST_BODY.md",
+   "bytes": 234
+  },
+  {
+   "path": "integrations/cloudflare/cf_setup.py",
+   "bytes": 9525
+  },
+  {
+   "path": "integrations/relay/cmd_server.py",
+   "bytes": 1603
+  },
+  {
+   "path": "integrations/relay/gbt_agent.ps1",
+   "bytes": 550
+  },
+  {
+   "path": "integrations/relay/gbt_direct.py",
+   "bytes": 8790
+  },
+  {
+   "path": "integrations/relay/gbt_http_relay.py",
+   "bytes": 9039
+  },
+  {
+   "path": "integrations/relay/gbt_server_light.py",
+   "bytes": 3535
+  },
+  {
+   "path": "integrations/relay/relay_agent.py",
+   "bytes": 5110
+  },
+  {
+   "path": "integrations/relay/rserver.py",
+   "bytes": 1877
+  },
+  {
+   "path": "integrations/telegram/tg_bridge.py",
+   "bytes": 2578
+  },
+  {
+   "path": "integrations/trading/gbt_browser_trader.py",
+   "bytes": 17807
+  },
+  {
+   "path": "integrations/trading/gbt_stock.ps1",
+   "bytes": 3181
+  },
+  {
+   "path": "integrations/trading/gbt_trade_engine.py",
+   "bytes": 17543
+  },
+  {
+   "path": "manifest.json",
+   "bytes": 417
+  },
+  {
+   "path": "nginx.conf",
+   "bytes": 1162
+  },
+  {
+   "path": "pipeline.md",
+   "bytes": 8941
+  },
+  {
+   "path": "pyproject.toml",
+   "bytes": 2187
+  },
+  {
+   "path": "qa_check.py",
+   "bytes": 5828
+  },
+  {
+   "path": "quad_brain.md",
+   "bytes": 5150
+  },
+  {
+   "path": "README-BRAIN-RUNTIME.md",
+   "bytes": 8822
+  },
+  {
+   "path": "README.md",
+   "bytes": 8111
+  },
+  {
+   "path": "requirements.lock",
+   "bytes": 12989
+  },
+  {
+   "path": "requirements.txt",
+   "bytes": 3156
+  },
+  {
+   "path": "service-worker.js",
+   "bytes": 918
+  },
+  {
+   "path": "STAMP.md",
+   "bytes": 341
+  },
+  {
+   "path": "tests/__init__.py",
+   "bytes": 87
+  },
+  {
+   "path": "tests/test_caps.py",
+   "bytes": 4967
+  },
+  {
+   "path": "tests/test_hands_comprehensive.py",
+   "bytes": 166
+  },
+  {
+   "path": "tmp_run.bat",
+   "bytes": 64
+  },
+  {
+   "path": "tools/check.py",
+   "bytes": 847
+  },
+  {
+   "path": "tools/fix_chat.py",
+   "bytes": 2749
+  },
+  {
+   "path": "tools/test_native_vision.py",
+   "bytes": 1909
+  },
+  {
+   "path": "tools/test_no_checkapi.js",
+   "bytes": 9249
+  },
+  {
+   "path": "UNIFIED_PATH.md",
+   "bytes": 4477
+  },
+  {
+   "path": "V5.bat",
+   "bytes": 132
+  },
+  {
+   "path": "verify_all_caps.py",
+   "bytes": 12953
+  },
+  {
+   "path": "web/.pagesignore",
+   "bytes": 106
+  },
+  {
+   "path": "web/.well-known/security.txt",
+   "bytes": 265
+  },
+  {
+   "path": "web/404.html",
+   "bytes": 11899
+  },
+  {
+   "path": "web/_headers",
+   "bytes": 642
+  },
+  {
+   "path": "web/admin/funds.html",
+   "bytes": 37481
+  },
+  {
+   "path": "web/admin/health.html",
+   "bytes": 32415
+  },
+  {
+   "path": "web/admin/users.html",
+   "bytes": 33862
+  },
+  {
+   "path": "web/ads.html",
+   "bytes": 63799
+  },
+  {
+   "path": "web/api/health.py",
+   "bytes": 2526
+  },
+  {
+   "path": "web/api/oauth.py",
+   "bytes": 1786
+  },
+  {
+   "path": "web/api-gateway/eye-workflow.js",
+   "bytes": 4878
+  },
+  {
+   "path": "web/api-gateway/index.js",
+   "bytes": 6465
+  },
+  {
+   "path": "web/api-gateway/tail-worker.js",
+   "bytes": 2084
+  },
+  {
+   "path": "web/api-gateway/wrangler.toml",
+   "bytes": 1508
+  },
+  {
+   "path": "web/assets/gbt-3d-react.js",
+   "bytes": 13304
+  },
+  {
+   "path": "web/assets/gbt-3d.js",
+   "bytes": 109208
+  },
+  {
+   "path": "web/assets/gbt-animations.css",
+   "bytes": 7111
+  },
+  {
+   "path": "web/assets/hero_bg.jpg",
+   "bytes": 14787
+  },
+  {
+   "path": "web/assets/logos/ach.svg",
+   "bytes": 268
+  },
+  {
+   "path": "web/assets/logos/bitcoin.svg",
+   "bytes": 2069
+  },
+  {
+   "path": "web/assets/logos/ethereum.svg",
+   "bytes": 1345
+  },
+  {
+   "path": "web/assets/logos/lightning.svg",
+   "bytes": 240
+  },
+  {
+   "path": "web/assets/logos/mastercard.svg",
+   "bytes": 1282
+  },
+  {
+   "path": "web/assets/logos/paypal.svg",
+   "bytes": 363
+  },
+  {
+   "path": "web/assets/logos/solana.svg",
+   "bytes": 1785
+  },
+  {
+   "path": "web/assets/logos/tether.svg",
+   "bytes": 874
+  },
+  {
+   "path": "web/assets/logos/usdc.svg",
+   "bytes": 1696
+  },
+  {
+   "path": "web/assets/logos/venmo.svg",
+   "bytes": 237
+  },
+  {
+   "path": "web/assets/logos/visa.svg",
+   "bytes": 1389
+  },
+  {
+   "path": "web/assets/logos/wire.svg",
+   "bytes": 235
+  },
+  {
+   "path": "web/assets/visa.svg",
+   "bytes": 274
+  },
+  {
+   "path": "web/avatar.svg",
+   "bytes": 2008
+  },
+  {
+   "path": "web/bank-open.html",
+   "bytes": 15570
+  },
+  {
+   "path": "web/capabilities.html",
+   "bytes": 4492
+  },
+  {
+   "path": "web/chat.html",
+   "bytes": 16877
+  },
+  {
+   "path": "web/cloud_brain.json",
+   "bytes": 155
+  },
+  {
+   "path": "web/dashboard.html",
+   "bytes": 7720
+  },
+  {
+   "path": "web/deploy.html",
+   "bytes": 55015
+  },
+  {
+   "path": "web/design-system.html",
+   "bytes": 19853
+  },
+  {
+   "path": "web/design-v2.html",
+   "bytes": 2524
+  },
+  {
+   "path": "web/design-v3.html",
+   "bytes": 2524
+  },
+  {
+   "path": "web/design-v4.html",
+   "bytes": 2524
+  },
+  {
+   "path": "web/design-v5.html",
+   "bytes": 12291
+  },
+  {
+   "path": "web/docs/caps_api.html",
+   "bytes": 139155
+  },
+  {
+   "path": "web/docs/caps_api.md",
+   "bytes": 65660
+  },
+  {
+   "path": "web/docs/faq.html",
+   "bytes": 4102
+  },
+  {
+   "path": "web/docs/GBT-3D-DESIGN.md",
+   "bytes": 4499
+  },
+  {
+   "path": "web/docs/index.html",
+   "bytes": 4663
+  },
+  {
+   "path": "web/docs/pricing.html",
+   "bytes": 3390
+  },
+  {
+   "path": "web/docs/quickstart.html",
+   "bytes": 4362
+  },
+  {
+   "path": "web/docs/remote-control-playbook.md",
+   "bytes": 19074
+  },
+  {
+   "path": "web/docs/sunpay-recovery-plan.md",
+   "bytes": 3856
+  },
+  {
+   "path": "web/docs/V5-3D-AI-PROTOCOL.md",
+   "bytes": 29409
+  },
+  {
+   "path": "web/doubao_cards.html",
+   "bytes": 81
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/build.bat",
+   "bytes": 1145
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/electron/main.js",
+   "bytes": 4793
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/electron/preload.js",
+   "bytes": 1070
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/install.bat",
+   "bytes": 1293
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/package-lock.json",
+   "bytes": 159127
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/package.json",
+   "bytes": 1113
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/server/bridge.py",
+   "bytes": 7163
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/src/gbt-3d.js",
+   "bytes": 109208
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/src/index.html",
+   "bytes": 13335
+  },
+  {
+   "path": "web/downloads/gbt-nano-browser-pro/src/knowledge.js",
+   "bytes": 4027
+  },
+  {
+   "path": "web/downloads/GBT-Nano-Browser-Pro-v1.0.zip",
+   "bytes": 16297
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack/install.bat",
+   "bytes": 4932
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack/install.sh",
+   "bytes": 4588
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack/README.md",
+   "bytes": 1154
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack/START-HERE.bat",
+   "bytes": 494
+  },
+  {
+   "path": "web/downloads/gbt-omp-control-pack.zip",
+   "bytes": 4881
+  },
+  {
+   "path": "web/downloads/gbt-stock-scalper/main.py",
+   "bytes": 10213
+  },
+  {
+   "path": "web/downloads/gbt-stock-scalper/README.md",
+   "bytes": 1138
+  },
+  {
+   "path": "web/downloads/gbt-stock-scalper.zip",
+   "bytes": 4486
+  },
+  {
+   "path": "web/downloads.html",
+   "bytes": 8626
+  },
+  {
+   "path": "web/eula.html",
+   "bytes": 37786
+  },
+  {
+   "path": "web/fix_browser.py",
+   "bytes": 409
+  },
+  {
+   "path": "web/functions/api/[[path]].js",
+   "bytes": 3914
+  },
+  {
+   "path": "web/gallery.html",
+   "bytes": 16433
+  },
+  {
+   "path": "web/gbt-3d.js",
+   "bytes": 109208
+  },
+  {
+   "path": "web/gbt-analytics.js",
+   "bytes": 7876
+  },
+  {
+   "path": "web/gbt-animations.css",
+   "bytes": 7111
+  },
+  {
+   "path": "web/gbt-studio/favicon.png",
+   "bytes": 52848
+  },
+  {
+   "path": "web/gbt-studio/GBT-Studio.bat",
+   "bytes": 2638
+  },
+  {
+   "path": "web/gbt-studio/index.html",
+   "bytes": 26584
+  },
+  {
+   "path": "web/gbt-studio/install.bat",
+   "bytes": 1761
+  },
+  {
+   "path": "web/gbt-studio/launcher.py",
+   "bytes": 2114
+  },
+  {
+   "path": "web/gbt-studio/logo.png",
+   "bytes": 52848
+  },
+  {
+   "path": "web/gbt-studio/manifest.json",
+   "bytes": 702
+  },
+  {
+   "path": "web/gbt-studio/sw.js",
+   "bytes": 232
+  },
+  {
+   "path": "web/gbt-telemetry-worker/index.js",
+   "bytes": 1084
+  },
+  {
+   "path": "web/gbt_source.zip",
+   "bytes": 11011808
+  },
+  {
+   "path": "web/help.html",
+   "bytes": 74513
+  },
+  {
+   "path": "web/index-new-spline.html",
+   "bytes": 12587
+  },
+  {
+   "path": "web/index-new.html",
+   "bytes": 10181
+  },
+  {
+   "path": "web/index.html",
+   "bytes": 16682
+  },
+  {
+   "path": "web/kline-panel.html",
+   "bytes": 23238
+  },
+  {
+   "path": "web/leaderboard.html",
+   "bytes": 56598
+  },
+  {
+   "path": "web/logo.svg",
+   "bytes": 3875
+  },
+  {
+   "path": "web/menu-handler.js",
+   "bytes": 10884
+  },
+  {
+   "path": "web/nav-footer.js",
+   "bytes": 40852
+  },
+  {
+   "path": "web/neighborhood-vision.html",
+   "bytes": 9253
+  },
+  {
+   "path": "web/oauth-callback.html",
+   "bytes": 30573
+  },
+  {
+   "path": "web/onboard.html",
+   "bytes": 72689
+  },
+  {
+   "path": "web/onramp.html",
+   "bytes": 19242
+  },
+  {
+   "path": "web/orbitx-clone/index.html",
+   "bytes": 591842
+  },
+  {
+   "path": "web/package-lock.json",
+   "bytes": 1319
+  },
+  {
+   "path": "web/package.json",
+   "bytes": 66
+  },
+  {
+   "path": "web/portfolio/assets/index-BiW5MXbI.css",
+   "bytes": 7073
+  },
+  {
+   "path": "web/portfolio/assets/index-NcwaTHYl.js",
+   "bytes": 385673
+  },
+  {
+   "path": "web/portfolio/humans.txt",
+   "bytes": 361
+  },
+  {
+   "path": "web/portfolio/index.html",
+   "bytes": 33752
+  },
+  {
+   "path": "web/portfolio/llms.txt",
+   "bytes": 3912
+  },
+  {
+   "path": "web/portfolio/logo.png",
+   "bytes": 415815
+  },
+  {
+   "path": "web/portfolio/manifest.json",
+   "bytes": 527
+  },
+  {
+   "path": "web/portfolio/robots.txt",
+   "bytes": 1041
+  },
+  {
+   "path": "web/portfolio/sitemap.xml",
+   "bytes": 1328
+  },
+  {
+   "path": "web/pricing.html",
+   "bytes": 69785
+  },
+  {
+   "path": "web/privacy.html",
+   "bytes": 38896
+  },
+  {
+   "path": "web/pro-polish.css",
+   "bytes": 7361
+  },
+  {
+   "path": "web/refund.html",
+   "bytes": 35674
+  },
+  {
+   "path": "web/sdk/gbt-ai.js",
+   "bytes": 29564
+  },
+  {
+   "path": "web/sdk/gbt-checkout.js",
+   "bytes": 57309
+  },
+  {
+   "path": "web/sdk/gbt-collapse.js",
+   "bytes": 8006
+  },
+  {
+   "path": "web/sdk/gbt-logos.js",
+   "bytes": 11240
+  },
+  {
+   "path": "web/sdk/gbt-payout.js",
+   "bytes": 30587
+  },
+  {
+   "path": "web/sdk/gbt-sdk.d.ts",
+   "bytes": 4469
+  },
+  {
+   "path": "web/sdk/gbt-sdk.js",
+   "bytes": 23123
+  },
+  {
+   "path": "web/sdk/gbt-ticker.js",
+   "bytes": 11375
+  },
+  {
+   "path": "web/sdk/gbt-voice.js",
+   "bytes": 7812
+  },
+  {
+   "path": "web/sdk/gbt-wallet-bridge.js",
+   "bytes": 6739
+  },
+  {
+   "path": "web/sdk/gbt-wallet.js",
+   "bytes": 38250
+  },
+  {
+   "path": "web/sdk/package.json",
+   "bytes": 755
+  },
+  {
+   "path": "web/sdk/python/gbt_sdk/__init__.py",
+   "bytes": 15138
+  },
+  {
+   "path": "web/sdk/python/README.md",
+   "bytes": 1664
+  },
+  {
+   "path": "web/sdk/python/setup.py",
+   "bytes": 1146
+  },
+  {
+   "path": "web/server15888.py",
+   "bytes": 407
+  },
+  {
+   "path": "web/settings.html",
+   "bytes": 72793
+  },
+  {
+   "path": "web/shopify.html",
+   "bytes": 51747
+  },
+  {
+   "path": "web/showcase-standalone.html",
+   "bytes": 11491
+  },
+  {
+   "path": "web/showcase.html",
+   "bytes": 12587
+  },
+  {
+   "path": "web/sitemap.xml",
+   "bytes": 2448
+  },
+  {
+   "path": "web/stack.html",
+   "bytes": 71113
+  },
+  {
+   "path": "web/status.html",
+   "bytes": 34233
+  },
+  {
+   "path": "web/styles.css",
+   "bytes": 54068
+  },
+  {
+   "path": "web/tech-theme.css",
+   "bytes": 16071
+  },
+  {
+   "path": "web/terms.html",
+   "bytes": 41183
+  },
+  {
+   "path": "web/test3d.html",
+   "bytes": 1223
+  },
+  {
+   "path": "web/toolbox.html",
+   "bytes": 57289
+  },
+  {
+   "path": "web/update.html",
+   "bytes": 29786
+  },
+  {
+   "path": "web/v17-showcase.html",
+   "bytes": 9086
+  },
+  {
+   "path": "web/wallet.html",
+   "bytes": 50101
+  },
+  {
+   "path": "web/welcome.html",
+   "bytes": 5008
+  }
+ ]
+}

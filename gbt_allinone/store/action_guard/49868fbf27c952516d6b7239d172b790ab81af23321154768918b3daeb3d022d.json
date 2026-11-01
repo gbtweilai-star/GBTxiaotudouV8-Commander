@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "wf_define",
+  "fingerprint": "49868fbf27c952516d6b7239d172b790ab81af23321154768918b3daeb3d022d",
+  "pid": 13996,
+  "started_at": 1793475886.919391,
+  "started_iso": "2026-11-01T02:44:46",
+  "finished_at": 1793475887.4574957,
+  "finished_iso": "2026-11-01T02:44:47",
+  "detail": {
+    "error": "需要 name 与非空 nodes 列表"
+  }
+}

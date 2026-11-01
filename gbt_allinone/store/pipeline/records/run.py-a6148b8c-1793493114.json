@@ -1,0 +1,105 @@
+{
+  "rec_id": "run.py-a6148b8c-1793493114",
+  "name": "run.py",
+  "sha256": "a6148b8c74cf3d18d94ffe44af0d24cc2d67ebea94cc9a9433f0c0850a4bf335",
+  "size": 971,
+  "submitted_at": "2026-11-01T07:31:54",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:tesollodelto/tesollo_ros2:scaffold"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\run.py-a6148b8c-1793493114.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "971 bytes",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:tesollodelto/tesollo_ros2:scaffold",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:54"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "run.py-a6148b8c-1793493114",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "971 bytes",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:tesollodelto/tesollo_ros2:scaffold",
+        "ts": "2026-11-01T07:31:54"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:54"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\run.py",
+    "version": 2,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "run.py-a6148b8c-1793493114",
+        "sha256": "a6148b8c74cf3d18d94ffe44af0d24cc2d67ebea94cc9a9433f0c0850a4bf335",
+        "published_at": "2026-11-01T07:31:54",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:tesollodelto/tesollo_ros2:scaffold",
+        "version": 2,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}

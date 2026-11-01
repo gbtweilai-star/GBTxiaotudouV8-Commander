@@ -207,3 +207,21 @@
 | 89 | [89-history-rewrite.md](89-history-rewrite.md) | 方案A：历史重写（362→351 提交，193.1→177.2MB，HEAD 不变） |
 | 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：30 域 375 位（从注册表实时生成） |
 | 91 | [91-visual-pages.md](91-visual-pages.md) | 所有可视化页面：28 面板 + 落地页 + 图集 |
+| 92 | [92-absorb-superpowers.md](92-absorb-superpowers.md) | 吞噬 superpowers-zh：20 个方法论 skill → skills_hub（第 376 位） |
+| 93 | [93-gbtv5-full-review.md](93-gbtv5-full-review.md) | GBT-Framework v5 全量核对（897 文件/192 cap）+ chain_kernel 七步纪律 |
+| 94 | [94-distill-not-dump.md](94-distill-not-dump.md) | 蒸馏不搬运：熔断加强 energy_core + root_cause + 拒收清单 |
+| 95 | [95-cap-pack.md](95-cap-pack.md) | 能力包 cap_pack：清单发现+动态装载（第380位） |
+| 96 | [96-mcp-and-dual-gate.md](96-mcp-and-dual-gate.md) | MCP 注册表闭环 + 双脑确认（接进 chain_kernel 派工） |
+| 97 | [97-commander-engine-online.md](97-commander-engine-online.md) | 本机指挥官模型接入：引擎起、框架用、P0 假绿修掉 |
+| 98 | [98-cap-count-truth.md](98-cap-count-truth.md) | 能力位到底几位：341/348/368/375/385 来龙去脉 + 计数守卫 |
+| 99 | [99-agent-skills-spec.md](99-agent-skills-spec.md) | 吞噬 Agent Skills 规范：校验/打包/安装/渐进读取 |
+| 100 | [100-gsap-skill.md](100-gsap-skill.md) | 实战：把 GSAP 8 个技能蒸馏成 1 个（validate/pack/match 闭环） |
+| 101 | [101-panel-anim.md](101-panel-anim.md) | 面板动效真落地：GSAP 接三页 + 截图对比（5.75%/15.81% 像素变化） |
+| 102 | [102-cognitive-console.md](102-cognitive-console.md) | 认知界面：拆 28 面板 + 照白龙马 1:1 三栏 + 土豆 Logo + 无限上下文 |
+| 103 | [103-console-views-3d.md](103-console-views-3d.md) | 控制台四视图：功能表 385 / 技能栏 23 / 仪表盘 / 3D 触手星图（15,400 根） |
+| 104 | [104-bloom-and-live-tentacles.md](104-bloom-and-live-tentacles.md) | 3D Bloom 辉光 + 按真实审计点亮触手（ok:385+30+15400+4） |
+| 105 | [105-live-tentacles-sse.md](105-live-tentacles-sse.md) | 实时触手：SSE 推审计事件，3D 当场点亮（实测 inventory 事件） |
+| 106 | [106-mouse-rotate-and-avatar.md](106-mouse-rotate-and-avatar.md) | 鼠标转动（自检 ok:14.491）+ 中心她的头像 + 修 /icons 404 |
+| 107 | [107-brain-execution-layer.md](107-brain-execution-layer.md) | 大脑执行层：中心脑核 + 七步闭环管道 + 橙色证据节点 + 审计同心环 |
+| 108 | [108-universal-plug-visualization.md](108-universal-plug-visualization.md) | 万能插：数字流动的结 + 8 能力域插口 + 自动插合触手 |
+| 109 | [109-native-autostart-console-service.md](109-native-autostart-console-service.md) | 原生 APP 自启 :8766（Electron/Python 壳/启动器 + 登录自启一键装） |

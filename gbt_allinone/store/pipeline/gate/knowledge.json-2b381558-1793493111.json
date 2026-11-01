@@ -1,0 +1,35 @@
+{
+  "rec_id": "knowledge.json-2b381558-1793493111",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "896 bytes",
+      "ts": "2026-11-01T07:31:51"
+    },
+    {
+      "dimension": "ownership",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:51"
+    },
+    {
+      "dimension": "audit",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Roboparty/rp_dexhand:scaffold",
+      "ts": "2026-11-01T07:31:51"
+    },
+    {
+      "dimension": "policy",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:51"
+    }
+  ],
+  "blocked_by": []
+}

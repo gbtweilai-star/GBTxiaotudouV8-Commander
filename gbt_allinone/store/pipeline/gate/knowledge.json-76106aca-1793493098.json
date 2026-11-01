@@ -1,0 +1,35 @@
+{
+  "rec_id": "knowledge.json-76106aca-1793493098",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "877 bytes",
+      "ts": "2026-11-01T07:31:38"
+    },
+    {
+      "dimension": "ownership",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:38"
+    },
+    {
+      "dimension": "audit",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:hsp-iit/PCHands:scaffold",
+      "ts": "2026-11-01T07:31:38"
+    },
+    {
+      "dimension": "policy",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:38"
+    }
+  ],
+  "blocked_by": []
+}

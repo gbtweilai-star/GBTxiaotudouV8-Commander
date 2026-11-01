@@ -1,0 +1,38 @@
+{
+  "_stamp": "⛔ 开发者：自由的风 · 永久钢印 · 禁止删除",
+  "name": "devoured_qqsq12321_anydexretarget",
+  "version": "1.0.0",
+  "description": "吞噬知识胶囊: qqsq12321/AnyDexRetarget — High-precision hand pose retargeting for multiple dexterous hands. Supports Visi",
+  "language": "python",
+  "risk_level": "safe",
+  "auto_exec": false,
+  "category": "吞噬吸收",
+  "tier": "knowledge",
+  "entry": {
+    "program": "python",
+    "args": [
+      "run.py"
+    ]
+  },
+  "actions": {
+    "knowledge": {
+      "description": "读取本胶囊吞噬吸收的知识"
+    },
+    "run": {
+      "description": "同 knowledge — 读取吞噬知识"
+    },
+    "status": {
+      "description": "胶囊状态"
+    }
+  },
+  "triggers": {
+    "keywords": [
+      "qqsq12321",
+      "anydexretarget"
+    ],
+    "intent": "devoured_qqsq12321_anydexretarget"
+  },
+  "domains": [
+    "AI域"
+  ]
+}

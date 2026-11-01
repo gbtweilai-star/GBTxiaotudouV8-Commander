@@ -256,6 +256,10 @@ def run(op: str = "status", **kw) -> dict:
         return has(str(kw.get("name") or kw.get("cap") or ""))
     if op == "ask":
         return ask(str(kw.get("intent") or kw.get("text") or ""), k=int(kw.get("k") or 12))
+    if op == "docs":
+        # 文档里的"当前能力位数"必须等于注册表现读（主人 2026-11-01 发火点）
+        from . import doc_counts as DC
+        return DC.check(apply=bool(kw.get("apply")))
     if op == "verify":
         return verify()
     return {"ok": False, "error": "cap_self 不认 op=%s（status/list/brief/has/ask/verify）" % op}

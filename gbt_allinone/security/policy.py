@@ -311,6 +311,12 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             add("filesystem_write")
     if kind == "mcp_connect":
         add("process_execute")
+    elif kind == "mcp_health":
+        # 体检会真起子进程（连一次、列一次工具）⇒ 与 mcp_connect 同一道门
+        add("process_execute")
+    elif kind in ("mcp_register", "mcp_unregister"):
+        # 写 state/mcp-servers.json ⇒ 机制层写门（不是通道件）
+        add("filesystem_write")
     elif kind == "mcp_call":
         add("process_execute")
     elif kind == "desktop_commander":

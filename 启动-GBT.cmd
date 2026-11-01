@@ -18,23 +18,47 @@ goto br_done
 echo [1/3] bridge :8791 already up (weights stay cold until first message)
 :br_done
 
-echo [2/3] doctor ...
+echo [2/4] ensuring cognitive console :8766 ...
+call :probe2 8766
+if "%UP2%"=="1" goto cs_up
+start "" /min "pyembed\python.exe" -X utf8 "tools\console-server.py" --port 8766
+call :wait2 8766 20
+:cs_up
+if "%UP2%"=="1" echo   cognitive console ready: http://127.0.0.1:8766/console/index.html
+if "%UP2%"=="0" echo   cognitive console not ready (shell still starts)
+
+echo [3/4] doctor ...
 "C:\Python312\python.exe" "tools\model-bridge\doctor.py"
 echo.
 
 if "%~1"=="--no-shell" goto no_shell
-echo [3/3] starting desktop shell ...
+echo [4/4] starting desktop shell ...
 pushd holo_pet_w3
 start "" ".\node_modules\.bin\electron.cmd" .
 popd
 goto end
 :no_shell
-echo [3/3] shell skipped (--no-shell)
+echo [4/4] shell skipped (--no-shell)
 :end
 echo.
 echo done. weights load on the FIRST chat message, then idle-exit after 900s.
 echo override idle window: set GBT_SELFHOST_IDLE=1800
 exit /b 0
+
+:probe2
+set UP2=0
+for /f %%c in ('curl -s -o nul -w "%%{http_code}" http://127.0.0.1:%~1/api/state --max-time 3 2^>nul') do if "%%c"=="200" set UP2=1
+exit /b 0
+
+:wait2
+set /a _n2=0
+:waitloop2
+call :probe2 %~1
+if "%UP2%"=="1" exit /b 0
+set /a _n2+=1
+if %_n2% geq %~2 exit /b 1
+timeout /t 2 >nul
+goto waitloop2
 
 :probe
 set UP=0

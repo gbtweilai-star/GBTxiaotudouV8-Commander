@@ -1,0 +1,16 @@
+{
+ "name": "example-hello",
+ "version": "1.0.0",
+ "description": "示例能力包：只登记不执行（auto_exec=false），演示 cap_pack 的发现与安全默认",
+ "language": "python",
+ "entry": {
+  "program": "python",
+  "args": [
+   "hello.py"
+  ]
+ },
+ "actions": [
+  "greet"
+ ],
+ "auto_exec": false
+}

@@ -1,4 +1,4 @@
-# 90 · 她能干嘛：30 域 375 位能力（现读版）
+# 90 · 她能干嘛：30 域 385 位能力（现读版）
 
 > 本文由 `gbt_allinone/caps_registry.py` **实时生成**（不是手写宣传语）。
 > 想知道某一位到底能干什么，看命令 `gbt.run_task('<名字>', {'op':'status'})`。
@@ -17,10 +17,10 @@ gbt.run_task("cap_self", {"op": "brief"})   # 她现读的自述：我能干什�
 | 域 | 能力数 | 代表能力 | 一句话 |
 |---|---|---:|---|
 | **创作（视频/图像/音乐/剧本）** | 57 | `viral_forge`, `drama_forge`, `taste_guard`, `forge_mastery` | 爆款拆解·克隆配方 |
-| **系统（自检/编排/修复）** | 54 | `mirror_stage`, `health`, `selfscan`, `alerts` | 镜像工作空间（2026-11-01 主人口径 |
+| **系统（自检/编排/修复）** | 56 | `mirror_stage`, `health`, `selfscan`, `alerts` | 镜像工作空间（2026-11-01 主人口径 |
 | **大模型（本机/云端/上下文）** | 42 | `codex_status`, `codex_tools`, `codex_thread_new`, `codex_turn_send` | 官方 Codex 只读状态 |
-| **安全（测绘/扫描/防御）** | 29 | `sec_surface`, `sec_scan`, `sec_chain`, `sec_defenses` | 黑客大脑 |
-| **触手（总指挥/脉冲/覆盖）** | 27 | `remote_controller`, `desktop_commander`, `tentacle`, `tentacle_manifest` | 远程接管授权内核（2026-11-01 主人硬规矩 |
+| **触手（总指挥/脉冲/覆盖）** | 30 | `remote_controller`, `desktop_commander`, `tentacle`, `tentacle_manifest` | 远程接管授权内核（2026-11-01 主人硬规矩 |
+| **安全（测绘/扫描/防御）** | 30 | `dual_gate`, `sec_surface`, `sec_scan`, `sec_chain` | 双脑确认 |
 | **心智（记忆/人格/情绪）** | 21 | `experience_forge`, `brain_vault`, `self_intake`, `mind` | 成长闭环（2026-11-01 主人判据 |
 | **情报（OSINT/研究/学习）** | 18 | `osint_scan`, `research_intel`, `tentacle_learn`, `spider_ops` | OSINT 扫描（DNS/WHOIS/子域名/端口/指纹/邮箱/IP归属/社交 |
 | **管线（镜像/部署/回滚）** | 18 | `one_key_deploy`, `deploy_queue`, `mirror_shape`, `mirror_scan` | 一指定江山乾坤换位 |
@@ -28,8 +28,8 @@ gbt.run_task("cap_self", {"op": "brief"})   # 她现读的自述：我能干什�
 | **身体（看/说/按/敲）** | 12 | `body_map`, `body_see`, `body_say`, `body_type` | 身体·清单 |
 | **数据（审计/图表/检索）** | 12 | `echo`, `count_words`, `audit_query`, `record_grid` | 联调回显位 |
 | **引擎（DAG/能源/缓存）** | 11 | `wf_define`, `wf_run`, `wf_status`, `wf_resume` | 万能插执行引擎 |
+| **集成（飞书/TG/WA/Notion）** | 11 | `mcp_register`, `mcp_servers`, `mcp_unregister`, `mcp_health` | MCP 注册 |
 | **工具（投影卡/仓库/补丁）** | 9 | `projection_card`, `capability_net`, `freebuff_term`, `repo_publish` | 空间投射只读卡片 |
-| **集成（飞书/TG/WA/Notion）** | 7 | `cli_ify`, `feishu_embed`, `telegram_embed`, `whatsapp_embed` | **软件命令化** |
 | **吞噬（GitHub→知识→进化）** | 6 | `devour_auto`, `devour_scan`, `devour_github`, `devour_reflect` | 自主吞食 |
 | **视觉（流/差异/打印）** | 5 | `vision_loop`, `vision`, `vlx_flow`, `vision_grounding` | **原生四觉闭环**（主人令 2026-10-09 |
 | **金融（量化策略/回测）** | 4 | `quant_strategy`, `quant_backtest`, `quant_params`, `quant` | 【量化·策略信号】读取真实量化引擎 |
@@ -139,7 +139,7 @@ print(r.get('gbt_result', {}).get('result'))
 ## 五、怎么自己核
 
 ```bash
-python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 375
+python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 385
 python -m gbt_allinone list                                                                          # 逐位列出
 ```
 

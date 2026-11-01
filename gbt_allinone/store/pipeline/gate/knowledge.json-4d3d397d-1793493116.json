@@ -1,0 +1,35 @@
+{
+  "rec_id": "knowledge.json-4d3d397d-1793493116",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "932 bytes",
+      "ts": "2026-11-01T07:31:56"
+    },
+    {
+      "dimension": "ownership",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:56"
+    },
+    {
+      "dimension": "audit",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Blue-Hill-Tech/artly-dex-hand:scaffold",
+      "ts": "2026-11-01T07:31:56"
+    },
+    {
+      "dimension": "policy",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:56"
+    }
+  ],
+  "blocked_by": []
+}

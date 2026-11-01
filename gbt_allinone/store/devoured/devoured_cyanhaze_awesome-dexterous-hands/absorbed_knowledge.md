@@ -1,0 +1,117 @@
+# CyanHaze/Awesome-Dexterous-Hands 吞噬记录 — devour_tentacle
+> 吞噬日期: 2026-11-01T07:30:44 | 来源: https://github.com/CyanHaze/Awesome-Dexterous-Hands
+> Stars: 50 | 语言: None | 许可: CC-BY-4.0
+
+## 项目概览
+- 描述: A curated list of papers, datasets, simulators, hardware platforms, and open-source resources for dexterous robot hands and hand-object manipulation.
+- 主题: awesome-list, dexterous-grasping, dexterous-hand, dexterous-hands, dexterous-manipulation, dexterous-robotic-hand, hand-object-interaction, hand-object-reconstruction, retargeting, robot-hand
+- 分支: main | 最近推送: 2026-10-27
+
+## README 摘要
+<div align="center">
+
+# Awesome Dexterous Hands
+
+[![GitHub stars](https://img.shields.io/github/stars/CyanHaze/Awesome-Dexterous-Hands?style=social)](https://github.com/CyanHaze/Awesome-Dexterous-Hands/stargazers)
+[![License: CC BY 4.0](https://img.shields.io/badge/license-CC--BY--4.0-lightgrey.svg)](./LICENSE)
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](./CONTRIBUTING.md)
+
+A curated list of papers, datasets, simulators, hardware platforms, and open-source resources for **dexterous robot hands**.
+
+This repository focuses on concrete hand-object manipulation scenarios: reconstructing human hand-object interaction, retargeting or teleoperating it to robot hands, using tactile sensing for contact-rich execution, and evaluating dexterous manipulation on real tasks.
+
+</div>
+
+<p align="center">
+  <img src="assets/cover.png" alt="# Awesome Dexterous Hands" width="100%" style="border-radius: 15px; box-shadow: 0 4px 24px rgba(0,0,0,.1); margin: 5px 0;">
+</p>
+
+---
+
+## News & Updates
+
+- [2026.10] Added sixteen recent resources spanning physics-based retargeting, human-video pipelines, portable demonstration collection, generalist dexterous policies, visual-tactile data, and manipulation benchmarks.
+- [2026.09] Added twenty recent resources spanning human-to-robot pipelines, force-aware retargeting, teleoperation, dexterous policy learning, HOI reconstruction, grasp synthesis, hardware, datasets, and benchmarks.
+- [2026.08] Expanded the July 2026 collection across retargeting, tactile manipulation, learning, hardware, and benchmarks, added verified official links, and pruned older peripheral entries.
+- [2026.06] Repository scaffold launched with the first taxonomy for retargeting, HOI reconstruction, tactile dexterous hands, teleoperation, hardware, datasets, and tasks.
+- [Ongoing] Paper and resource contributions are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+---
+
+## Scope
+
+This repo is **robot-hand first**. It is not a general tactile-sensing list, not a general hand-pose list, and not a general robot-manipulation list.
+
+Included:
+
+- Dexterous robot hands, anthropomorphic hands, multi-finger hands, and hand-arm systems.
+- Human-to-robot hand retargeting, especially object-aware, contact-preserving, and cross-embodiment methods.
+- Dexterous teleoperation and data collection systems.
+- HOI reconstruction when it helps recover hand-object pose, contact, motion, or demonstrations for robot hands.
+- Tactile sensing when it is attached to robot hands or used for dexterous manipulation.
+- Datasets, simulators, benchmarks, and open-source tools for dexterous hand-object manipulation.
+
+Excluded by default:
+
+- Pure human hand pose estimation without object interaction.
+- Pure HOI action recognition without 3D geometry, contact, or robot relevance.
+- Pure tactile sensor material papers without a robot-hand or manipulation connection.
+- General parallel-gripper manipulation, unless it introduces a resource directly useful for dexterous hands.
+- General VLA / embodied-AI papers without a dexterous-hand component.
+
+---
+
+## Taxonomy Rationale
+
+The repository is organized around a practical pipeline:
+
+| Stage | Main section | Core question |
+|---|---|---|
+| Human interaction capture | HOI Reconstruction | What did the human hand and object do? |
+| Embodiment transfer and data collection | Retargeting and Teleoperation | How can this interaction become executable on a robot hand? |
+| Contact sensing | Tactile Dexterous Hands | What does the robot hand feel during execution? |
+| Policy learning and control | Learning and Control for Dexterous Hands | How can dexterous skills become robust policies? |
+| Execution | Dexterous Manipulation Tasks | Which task is being solved? |
+| Platform | Robot Hands and Hardware | Which hand makes the behavior possible? |
+| Evaluation | Datasets, Benchmarks, and Simulators | How do we compare progress? |
+
+The intended center of gravity is **retargeting and dexterous robot-hand execution**. HOI reconstruction and tactile sensing are treated as supporting pillars, not separate unrelated lists.
+
+---
+
+## Categories
+
+<ul style="list-style: none; padding: 0;">
+<li style="margin-left: 0;"><a href="#surveys-and-roadmaps">Surveys and Roadmaps</a></li>
+<li style="margin-left: 0;"><a href="#retargeting-and-teleoperation">Retargeting and Teleoperation</a></li>
+<li style="margin-left: 0;"><a href="#hoi-reconstruction-for-dexterous-manipulation">HOI Reconstruction for Dexterous Manipulation</a></li>
+<li style="margin-left: 0;"><a href="#tactile-dexterous-hands">Tactile Dexterous Hands</a></li>
+<li style="margin-left: 0;"><a href="#learning-and-control-for-dexterous-hands">Learning and Control for Dexterous Hands</a></li>
+<li style="margin-left: 0;"><a href="#dexterous-manipulation-tasks">Dexterous Manipulation Tasks</a></li>
+<li style="margin-left: 0;"><a href="#robot-hands-and-hardware-platforms">Robot Hands and Hardware Platforms</a></li>
+<li style="margin-left: 0;"><a href="#datasets-benchmarks-and-simulators">Datasets, Benchmarks, and Simulators</a></li>
+<li style="margin-left: 0;"><a href="#open-source-tools-and-tutorials">Open-Source Tools and Tutorials</a></li>
+<li style="margin-left: 0;"><a href="#citation">Citation</a></li>
+</ul>
+
+> **Legend**<br>
+> ⭐️ Must Read / recommended starting point<br>
+> ![arXiv](https://img.shields.io/badge/arXiv-Preprint-b31b1b.svg) Preprint<br>
+> ![Paper](https://img.shields.io/badge/Paper-Publisher-purple) Published paper<br>
+> ![Project](https://img.shields.io/badge/Project-Page-green) Project page<br>
+> ![GitHub](https://img.shields.io/badge/GitHub-Code-blue) Official or high-quality implementation<br>
+> ![Dataset](https://img.shields.io/badge/Dataset-Download-yellow) Dataset<br>
+> ![Benchmark](https://img.shields.io/badge/Benchmark-Evaluation-orange) Benchmark<br>
+> **Last Updated:** 2026-10-27
+
+---
+
+# Dexterous Hand Resources
+
+## Surveys and Roadmaps
+
+High-
+
+## 对 GBT 的启示
+- 可吸收点: 结合仓库定位与 README 技术栈, 提炼可注入 GBT cap 的知识

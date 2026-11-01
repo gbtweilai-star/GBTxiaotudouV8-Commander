@@ -312,6 +312,12 @@ def run_gui():
 
 
 def main():
+    # 认知界面服务自启（主人令 2026-11-01）：起不来只打日志、不拖垮桌面壳
+    try:
+        from .console_service import ensure_server
+        ensure_server()
+    except Exception as _e:  # noqa: BLE001
+        print("[console] 自启失败（不牵连桌面壳）：%s" % str(_e)[:160])
     return run_gui()
 
 

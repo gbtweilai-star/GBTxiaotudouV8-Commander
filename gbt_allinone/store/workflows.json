@@ -1,0 +1,47 @@
+{
+  "双仓同步巡检": {
+    "name": "双仓同步巡检",
+    "nodes": [
+      {
+        "id": "guard",
+        "kind": "sync_guard",
+        "params": {
+          "op": "patrol",
+          "record": true,
+          "notify": true
+        }
+      },
+      {
+        "id": "voice",
+        "kind": "alerts",
+        "params": {},
+        "depends_on": [
+          "guard"
+        ]
+      }
+    ],
+    "defined_at": "2026-11-01T08:26:25"
+  },
+  "爆款拆解流水线": {
+    "name": "爆款拆解流水线",
+    "nodes": [
+      {
+        "id": "inbox",
+        "kind": "viral_forge",
+        "params": {
+          "op": "inbox",
+          "variants": 3
+        }
+      },
+      {
+        "id": "voice",
+        "kind": "alerts",
+        "params": {},
+        "depends_on": [
+          "inbox"
+        ]
+      }
+    ],
+    "defined_at": "2026-11-01T09:54:43"
+  }
+}

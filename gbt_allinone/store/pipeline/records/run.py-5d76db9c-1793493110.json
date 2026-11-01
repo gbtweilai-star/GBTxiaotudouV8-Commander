@@ -1,0 +1,105 @@
+{
+  "rec_id": "run.py-5d76db9c-1793493110",
+  "name": "run.py",
+  "sha256": "5d76db9cdf797fa381f900d7099a839e6887e60e536c7f4b89538588d9e1dc39",
+  "size": 987,
+  "submitted_at": "2026-11-01T07:31:50",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:yuzhench/inspire-hand-rh56-py:scaffold"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\run.py-5d76db9c-1793493110.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "987 bytes",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:yuzhench/inspire-hand-rh56-py:scaffold",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:50"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "run.py-5d76db9c-1793493110",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "987 bytes",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:yuzhench/inspire-hand-rh56-py:scaffold",
+        "ts": "2026-11-01T07:31:50"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:50"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\run.py",
+    "version": 2,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "run.py-5d76db9c-1793493110",
+        "sha256": "5d76db9cdf797fa381f900d7099a839e6887e60e536c7f4b89538588d9e1dc39",
+        "published_at": "2026-11-01T07:31:50",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:yuzhench/inspire-hand-rh56-py:scaffold",
+        "version": 2,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}

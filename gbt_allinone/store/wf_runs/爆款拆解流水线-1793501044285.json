@@ -1,0 +1,523 @@
+{
+  "record": {
+    "run_id": "爆款拆解流水线-1793501044285",
+    "workflow": "爆款拆解流水线",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "analyze": "ok",
+      "forge": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 0.746,
+    "finished_at": "2026-11-01T09:44:04"
+  },
+  "results": {
+    "analyze": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "viral_forge",
+        "result": {
+          "ok": true,
+          "source": "ffprobe/ffmpeg",
+          "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\.scratch\\lead\\test-viral.mp4",
+          "probe": {
+            "duration_s": 6.0,
+            "width": 320,
+            "height": 240,
+            "fps": 15.0,
+            "video_codec": "h264",
+            "audio_codec": null,
+            "bitrate": "5677",
+            "size": "4258"
+          },
+          "visual": {
+            "scene_threshold": 0.35,
+            "cuts": [
+              2.0,
+              4.0
+            ],
+            "shot_stats": {
+              "cuts": 2,
+              "shots": 3,
+              "first_shot_s": 2.0,
+              "avg_shot_s": 2.0,
+              "cuts_per_min": 20.0
+            },
+            "keyframes_s": [
+              0.0,
+              2.0
+            ],
+            "color": {
+              "yavg": {
+                "n": 90,
+                "mean": 67.67,
+                "min": 41.0,
+                "max": 81.0,
+                "first3s_mean": 81.0
+              },
+              "satavg": {
+                "n": 90,
+                "mean": 96.67,
+                "min": 59.0,
+                "max": 118.0
+              }
+            },
+            "loudness": {}
+          },
+          "honesty": "只读分析，不写文件、不复制内容"
+        }
+      }
+    },
+    "forge": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "viral_forge",
+        "result": {
+          "ok": true,
+          "op": "pipeline",
+          "analysis": {
+            "ok": true,
+            "source": "ffprobe/ffmpeg",
+            "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\.scratch\\lead\\test-viral.mp4",
+            "probe": {
+              "duration_s": 6.0,
+              "width": 320,
+              "height": 240,
+              "fps": 15.0,
+              "video_codec": "h264",
+              "audio_codec": null,
+              "bitrate": "5677",
+              "size": "4258"
+            },
+            "visual": {
+              "scene_threshold": 0.35,
+              "cuts": [
+                2.0,
+                4.0
+              ],
+              "shot_stats": {
+                "cuts": 2,
+                "shots": 3,
+                "first_shot_s": 2.0,
+                "avg_shot_s": 2.0,
+                "cuts_per_min": 20.0
+              },
+              "keyframes_s": [
+                0.0,
+                2.0
+              ],
+              "color": {
+                "yavg": {
+                  "n": 90,
+                  "mean": 67.67,
+                  "min": 41.0,
+                  "max": 81.0,
+                  "first3s_mean": 81.0
+                },
+                "satavg": {
+                  "n": 90,
+                  "mean": 96.67,
+                  "min": 59.0,
+                  "max": 118.0
+                }
+              },
+              "loudness": {}
+            },
+            "honesty": "只读分析，不写文件、不复制内容"
+          },
+          "forge": {
+            "ok": true,
+            "cap": "viral_forge",
+            "reading": {
+              "duration_s": 6.0,
+              "cue_count": 5,
+              "words": 20,
+              "wpm": 200.0,
+              "hook": "三秒看懂这个 视频 第二个镜头",
+              "hook_type": "statement",
+              "pacing_every_5s": [
+                {
+                  "at": 0.0,
+                  "words": 17,
+                  "wpm": 204.0
+                },
+                {
+                  "at": 5.0,
+                  "words": 3,
+                  "wpm": 36.0
+                }
+              ],
+              "segments": [
+                {
+                  "role": "hook",
+                  "start": 0.0,
+                  "end": 3.0,
+                  "caption": "三秒看懂这个 视频 第二个镜头",
+                  "word_count": 13
+                },
+                {
+                  "role": "twist",
+                  "start": 2.1,
+                  "end": 3.9,
+                  "caption": "视频 第二个镜头",
+                  "word_count": 7
+                },
+                {
+                  "role": "payoff",
+                  "start": 3.9,
+                  "end": 5.28,
+                  "caption": "第二个镜头 换个颜色 关注我",
+                  "word_count": 12
+                },
+                {
+                  "role": "cta",
+                  "start": 5.28,
+                  "end": 6.0,
+                  "caption": "关注我",
+                  "word_count": 3
+                }
+              ],
+              "cta": "关注我",
+              "brief": {},
+              "visual": {
+                "scene_threshold": 0.35,
+                "cuts": [
+                  2.0,
+                  4.0
+                ],
+                "shot_stats": {
+                  "cuts": 2,
+                  "shots": 3,
+                  "first_shot_s": 2.0,
+                  "avg_shot_s": 2.0,
+                  "cuts_per_min": 20.0
+                },
+                "keyframes_s": [
+                  0.0,
+                  2.0
+                ],
+                "color": {
+                  "yavg": {
+                    "n": 90,
+                    "mean": 67.67,
+                    "min": 41.0,
+                    "max": 81.0,
+                    "first3s_mean": 81.0
+                  },
+                  "satavg": {
+                    "n": 90,
+                    "mean": 96.67,
+                    "min": 59.0,
+                    "max": 118.0
+                  }
+                },
+                "loudness": {}
+              },
+              "video_probe": {
+                "duration_s": 6.0,
+                "width": 320,
+                "height": 240,
+                "fps": 15.0,
+                "video_codec": "h264",
+                "audio_codec": null,
+                "bitrate": "5677",
+                "size": "4258"
+              },
+              "shots": [
+                {
+                  "shot": 1,
+                  "start": 0.0,
+                  "end": 2.0,
+                  "caption": "三秒看懂这个",
+                  "words": 6
+                },
+                {
+                  "shot": 2,
+                  "start": 2.0,
+                  "end": 4.0,
+                  "caption": "视频 第二个镜头",
+                  "words": 7
+                },
+                {
+                  "shot": 3,
+                  "start": 4.0,
+                  "end": 6.0,
+                  "caption": "换个颜色 关注我",
+                  "words": 7
+                }
+              ],
+              "alignment": {
+                "aligned": true,
+                "cuts": 2
+              },
+              "mode": "video+subtitles"
+            },
+            "video_probe": {
+              "ok": true,
+              "source": "ffprobe/ffmpeg",
+              "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\.scratch\\lead\\test-viral.mp4",
+              "probe": {
+                "duration_s": 6.0,
+                "width": 320,
+                "height": 240,
+                "fps": 15.0,
+                "video_codec": "h264",
+                "audio_codec": null,
+                "bitrate": "5677",
+                "size": "4258"
+              },
+              "visual": {
+                "scene_threshold": 0.35,
+                "cuts": [
+                  2.0,
+                  4.0
+                ],
+                "shot_stats": {
+                  "cuts": 2,
+                  "shots": 3,
+                  "first_shot_s": 2.0,
+                  "avg_shot_s": 2.0,
+                  "cuts_per_min": 20.0
+                },
+                "keyframes_s": [
+                  0.0,
+                  2.0
+                ],
+                "color": {
+                  "yavg": {
+                    "n": 90,
+                    "mean": 67.67,
+                    "min": 41.0,
+                    "max": 81.0,
+                    "first3s_mean": 81.0
+                  },
+                  "satavg": {
+                    "n": 90,
+                    "mean": 96.67,
+                    "min": 59.0,
+                    "max": 118.0
+                  }
+                },
+                "loudness": {}
+              },
+              "honesty": "只读分析，不写文件、不复制内容"
+            },
+            "honesty": "只做结构/画面分析；不下载/不复制原视频；变体钩子是模板，不是模型生成",
+            "recipe": {
+              "format": "viral_clone_v1",
+              "anchor": "word",
+              "source": "user_supplied_subtitles",
+              "duration_s": 6.0,
+              "segments": [
+                {
+                  "role": "hook",
+                  "start": 0.0,
+                  "end": 3.0,
+                  "caption": "三秒看懂这个 视频 第二个镜头",
+                  "broll": "无",
+                  "slots": [
+                    "host",
+                    "product"
+                  ]
+                },
+                {
+                  "role": "twist",
+                  "start": 2.1,
+                  "end": 3.9,
+                  "caption": "视频 第二个镜头",
+                  "broll": "待选（自有/已授权素材）",
+                  "slots": [
+                    "broll"
+                  ]
+                },
+                {
+                  "role": "payoff",
+                  "start": 3.9,
+                  "end": 5.28,
+                  "caption": "第二个镜头 换个颜色 关注我",
+                  "broll": "待选（自有/已授权素材）",
+                  "slots": [
+                    "host",
+                    "product"
+                  ]
+                },
+                {
+                  "role": "cta",
+                  "start": 5.28,
+                  "end": 6.0,
+                  "caption": "关注我",
+                  "broll": "无",
+                  "slots": [
+                    "host",
+                    "product"
+                  ]
+                }
+              ],
+              "shots": [
+                {
+                  "shot": 1,
+                  "start": 0.0,
+                  "end": 2.0,
+                  "caption": "三秒看懂这个",
+                  "words": 6
+                },
+                {
+                  "shot": 2,
+                  "start": 2.0,
+                  "end": 4.0,
+                  "caption": "视频 第二个镜头",
+                  "words": 7
+                },
+                {
+                  "shot": 3,
+                  "start": 4.0,
+                  "end": 6.0,
+                  "caption": "换个颜色 关注我",
+                  "words": 7
+                }
+              ],
+              "variant_slots": [
+                "host",
+                "product",
+                "language",
+                "hook_angle",
+                "broll",
+                "cta"
+              ],
+              "variants": [
+                {
+                  "angle": "反常识",
+                  "hook": "POV：你 以为 它很普通，结果 结果完全反过来"
+                },
+                {
+                  "angle": "数字冲击",
+                  "hook": "先别划走——预算有限 的人，这条 30 秒讲清楚 把关键说清楚"
+                }
+              ],
+              "visual": {
+                "scene_threshold": 0.35,
+                "cuts": [
+                  2.0,
+                  4.0
+                ],
+                "shot_stats": {
+                  "cuts": 2,
+                  "shots": 3,
+                  "first_shot_s": 2.0,
+                  "avg_shot_s": 2.0,
+                  "cuts_per_min": 20.0
+                },
+                "keyframes_s": [
+                  0.0,
+                  2.0
+                ],
+                "color": {
+                  "yavg": {
+                    "n": 90,
+                    "mean": 67.67,
+                    "min": 41.0,
+                    "max": 81.0,
+                    "first3s_mean": 81.0
+                  },
+                  "satavg": {
+                    "n": 90,
+                    "mean": 96.67,
+                    "min": 59.0,
+                    "max": 118.0
+                  }
+                },
+                "loudness": {}
+              },
+              "guardrails": [
+                "只用自有或已授权素材",
+                "不复制原视频画面/音频",
+                "不自动发布",
+                "模型调用需主人授权",
+                "结构复刻 ≠ 内容抄袭"
+              ],
+              "edit_chain_hint": "可交 edit_pipeline：scenes → 轨道/片段；caption → 字幕；broll → 素材槽"
+            },
+            "thumbs": {
+              "ok": true,
+              "dir": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral_mp4",
+              "files": [
+                {
+                  "t": 0.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral_mp4\\cover.jpg",
+                  "bytes": 1258
+                },
+                {
+                  "t": 2.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral_mp4\\frame-01-2_0.jpg",
+                  "bytes": 1258
+                },
+                {
+                  "t": 4.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral_mp4\\frame-02-4_0.jpg",
+                  "bytes": 1257
+                }
+              ]
+            }
+          },
+          "chain": [
+            "analyze",
+            "teardown",
+            "recipe"
+          ],
+          "honesty": "一条调用串起三段落；视频分析重复跑一次是为了让每段都能单独用"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内确实什么都没有",
+          "any_signal": false,
+          "needs_a_look": false,
+          "anomalies": 0,
+          "sockets": {
+            "alert": false,
+            "counts": {
+              "added": 0,
+              "removed": 0,
+              "flipped": 0
+            },
+            "removed": [],
+            "flipped": [],
+            "at": "2026-11-01T09:43:01",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "note": "窗口期内无异常事件"
+        }
+      }
+    }
+  }
+}

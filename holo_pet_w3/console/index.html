@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-app="gbt-console">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>GBT小土豆V8 · 认知界面</title>
+<!-- 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属 -->
+<!-- 布局/视觉：1:1 照 BaiLongma Brain UI（MIT © xiaoyuanda666-ship-it）的三栏认知界面：
+     app-titlebar / app-viewport / #panel-l1 / .console#chat-area / #panel-l2；
+     设计令牌（--bg0/--panel/--line-strong/--warm/--cool/--side-panel-width …）与命名同源。
+     内容、数据、头像全部换成我们自己的。数据源：state/console-data.js（tools/gen-console-data.py 现读生成）。 -->
+<link rel="icon" href="../../icons/avatar-96.png" />
+<link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png" />
+<link rel="stylesheet" href="./app.css" />
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/three.module.js","three/addons/":"../../assets/vendor/three/"}}</script>
+</head>
+<body data-theme="midnight">
+
+<header class="app-titlebar" aria-label="窗口拖拽区"></header>
+
+<main class="app-viewport">
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <svg id="graph" aria-label="能力域图谱"></svg>
+
+  <!-- 左栏：身份 + 消息处理器流 -->
+  <aside id="panel-l1" class="panel">
+    <header class="panel-identity">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-copy">
+        <div class="eyebrow">认知界面</div>
+        <div class="brand-title" id="agent-brand-name">GBT小土豆V8</div>
+      </div>
+      <button class="icon-btn" id="voice-btn" title="语音" type="button">🎤</button>
+      <button class="icon-btn" id="settings-btn" title="设置" type="button">⚙</button>
+    </header>
+
+    <div class="stream-meta">
+      <div>
+        <div class="stream-title-text">用户消息处理器</div>
+        <div class="stream-subtitle">能力 · 守卫 · 技能</div>
+      </div>
+      <span class="pill" id="pill-l1">快照</span>
+    </div>
+
+    <div class="ai-activity" id="ai-activity" data-state="idle">
+      <span class="ai-activity-dot" id="ai-activity-dot"></span>
+      <span class="ai-activity-label" id="ai-activity-label">空闲</span>
+      <span class="ai-activity-detail" id="ai-activity-detail"></span>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="stream" tabindex="0" aria-label="能力与事件流">
+      <div class="stream-inner" id="si-l1"></div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="reset-view" id="reset-view-btn" type="button">重置节点图</button>
+      <button class="reset-view" id="refresh-btn" type="button">重读数据</button>
+    </div>
+
+    <div class="sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</div>
+  </aside>
+
+  <!-- 右栏：心跳 / 行动日志 / 思考与工具（各模块自带卡面，rail 透明——同原设计） -->
+  <aside id="panel-l2" class="panel">
+    <div class="l2-dashboard">
+      <section class="l2-module heartbeat-monitor" aria-labelledby="hb-title">
+        <header class="panel-stats heartbeat-stats" id="panel-stats">
+          <div class="stat"><span class="stat-label">状态</span><div class="stat-value live" id="conn-state"><span class="live-dot"></span>本机</div></div>
+          <div class="stat"><span class="stat-label">能力</span><div class="stat-value" id="stat-caps">—</div></div>
+          <div class="stat"><span class="stat-label">技能</span><div class="stat-value" id="stat-skills">—</div></div>
+          <div class="stat"><span class="stat-label">守卫</span><div class="stat-value" id="stat-guards">—</div></div>
+          <div class="stat"><span class="stat-label">tok/s</span><div class="stat-value" id="stat-toks">—</div></div>
+          <div class="stat"><span class="stat-label">账本</span><div class="stat-value" id="stat-ledger">—</div></div>
+        </header>
+        <div class="l2-module-head">
+          <div>
+            <div class="l2-module-kicker">HEARTBEAT</div>
+            <h2 class="l2-module-title" id="hb-title">意识心跳</h2>
+          </div>
+          <span class="heartbeat-state" id="hb-state" data-state="waiting"><span class="heartbeat-state-dot"></span><span id="hb-state-label">等待读数</span></span>
+        </div>
+        <div class="heartbeat-chart" id="heartbeat-chart" role="img" aria-label="意识心跳实时波形">
+          <svg viewBox="0 0 320 72" preserveAspectRatio="none" aria-hidden="true">
+            <path class="heartbeat-gridline" d="M0 36 H320"></path>
+            <path class="heartbeat-wave" id="hb-wave" d=""></path>
+          </svg>
+          <span class="heartbeat-sweep" aria-hidden="true"></span>
+        </div>
+        <div class="heartbeat-facts">
+          <span><b id="hb-count">0</b> 次读数</span>
+          <span id="hb-last">等待首次刷新</span>
+        </div>
+      </section>
+
+      <section class="l2-module action-log-module" aria-labelledby="al-title">
+        <div class="action-log-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">ACTION LOG</div>
+              <h2 class="l2-module-title" id="al-title">行动日志</h2>
+            </div>
+          </div>
+          <div class="action-log-feed" tabindex="0" aria-label="行动日志">
+            <div class="action-log" id="action-log">
+              <div class="action-log-empty" id="action-log-empty">Agent 最近执行的动作会显示在这里</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="l2-module cognition-module" aria-labelledby="cg-title">
+        <div class="cognition-surface" id="cognition-surface">
+          <div class="l2-module-head compact cognition-head">
+            <div>
+              <div class="l2-module-kicker">LIVE COGNITION</div>
+              <h2 class="l2-module-title" id="cg-title">思考与工具</h2>
+            </div>
+            <div class="cognition-state-group">
+              <span class="cognition-state" id="cog-state" data-state="idle">待命</span>
+            </div>
+          </div>
+          <div class="stream cognition-stream" tabindex="0" aria-label="思考与工具">
+            <div class="stream-inner" id="si-l2"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <!-- 中栏：对话 -->
+  <section class="console" id="chat-area" data-view="chat">
+    <nav class="view-tabs" aria-label="视图切换">
+      <button class="view-tab is-active" data-view="chat" type="button">对话</button>
+      <button class="view-tab" data-view="caps" type="button">功能表 <b id="tab-caps-n">385</b></button>
+      <button class="view-tab" data-view="skills" type="button">技能栏 <b id="tab-skills-n">23</b></button>
+      <button class="view-tab" data-view="space" type="button">3D 星图</button>
+      <button class="view-tab" data-view="brain" type="button">大脑执行层</button>
+      <button class="view-tab" data-view="plug" type="button">万能插</button>
+      <button class="view-tab" data-view="dash" type="button">仪表盘</button>
+    </nav>
+
+    <!-- 视图 1：对话（底部座席，DSH 样式输入卡） -->
+    <div class="view view-chat">
+      <div class="chat-history" id="chat-history">
+        <div class="chat-messages" id="chat-messages"></div>
+      </div>
+      <form class="chat-composer" id="chat-composer" autocomplete="off">
+        <div class="dsh-composer">
+          <textarea id="chat-input" rows="1" placeholder="对她说点什么…"></textarea>
+          <div class="composer-toolbar">
+            <div class="composer-left">
+              <button class="tool-btn" type="button" title="附件（占位）">+</button>
+              <span class="model-chip" id="model-chip">本机指挥官 · 无限上下文</span>
+            </div>
+            <div class="composer-right">
+              <button class="send-btn" type="submit" title="发送（Enter）">↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="composer-hint" id="composer-hint">Enter 发送 · Shift+Enter 换行 · 直开 file:// 为快照</div>
+      </form>
+    </div>
+
+    <!-- 视图 2：功能表（385 位，可搜可筛） -->
+    <div class="view view-caps">
+      <div class="view-head">
+        <div class="view-title">功能表 <span class="view-sub" id="caps-sub">385 位 · 30 域</span></div>
+        <div class="view-tools">
+          <input class="view-search" id="cap-search" placeholder="搜能力位 / 描述…" />
+          <select class="view-select" id="cap-domain"><option value="">全部域</option></select>
+        </div>
+      </div>
+      <div class="cap-table-wrap">
+        <table class="cap-table">
+          <thead><tr><th>能力位</th><th>域</th><th>门</th><th>说明</th></tr></thead>
+          <tbody id="cap-rows"></tbody>
+        </table>
+        <div class="view-empty" id="cap-empty" hidden>没有匹配的能力位</div>
+      </div>
+    </div>
+
+    <!-- 视图 3：技能栏（23 个，可搜） -->
+    <div class="view view-skills">
+      <div class="view-head">
+        <div class="view-title">技能栏 <span class="view-sub" id="skills-sub">23 个 · 全部合规</span></div>
+        <div class="view-tools">
+          <input class="view-search" id="skill-search" placeholder="搜技能…" />
+        </div>
+      </div>
+      <div class="skill-grid" id="skill-grid"></div>
+      <div class="view-empty" id="skill-empty" hidden>没有匹配的技能</div>
+    </div>
+
+    <!-- 视图 5：3D 能力星图（Three.js / WebGL） -->
+    <div class="view view-space">
+      <div class="space3d-wrap">
+        <canvas id="space3d-canvas"></canvas>
+        <div class="space3d-labels" id="space3d-labels"></div>
+        <div class="space3d-fallback" id="space3d-fallback" hidden></div>
+        <div class="space3d-hud">
+          <span class="space3d-title">能力星图 · 30 域 385 位</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 中间是她（也在自转） · 节点大小=能力数</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 6：大脑执行层（七步执行路径 × 审计闭环） -->
+    <div class="view view-brain">
+      <div class="brain-wrap">
+        <canvas id="brain3d-canvas"></canvas>
+        <div class="space3d-hud">
+          <span class="space3d-title">大脑执行层 · 七步路径 × 审计闭环</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 臂=执行步骤 · 橙点=证据落点 · 线圈=留痕闭环</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 7：万能插（数字流动的结 × 万能插口阵列） -->
+    <div class="view view-plug">
+      <div class="plug-wrap">
+        <canvas id="plug3d-canvas"></canvas>
+        <div class="space3d-hud">
+          <span class="space3d-title">万能插 · 数字流动的结 × 万能插口</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 结=触手本体 · 数字=流动数据 · 8 插口=能力域</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 4：仪表盘（可视化：域分布 / 门占比 / 守卫 / 电表 / 流水） -->
+    <div class="view view-dash">
+      <div class="dash-grid">
+        <section class="dash-card">
+          <div class="view-title">能力域分布 <span class="view-sub">30 域</span></div>
+          <div class="dash-bars" id="dash-bars"></div>
+        </section>
+        <section class="dash-card">
+          <div class="view-title">门占比 <span class="view-sub" id="dash-gate-sub"></span></div>
+          <div class="dash-donut-wrap">
+            <div class="dash-donut" id="dash-donut"></div>
+            <div class="dash-legend" id="dash-gate-legend"></div>
+          </div>
+        </section>
+        <section class="dash-card">
+          <div class="view-title">守卫 / 引擎</div>
+          <div class="dash-kv" id="dash-kv"></div>
+        </section>
+        <section class="dash-card">
+          <div class="view-title">编排流水 <span class="view-sub" id="dash-flow-sub"></span></div>
+          <div class="dash-flow" id="dash-flow"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* 3D 视图的诚实标记：模块加载失败 / WebGL 不可用时写进 <html data-space3d>，不假装有 3D */
+window.addEventListener("error", function (e) {
+  document.documentElement.dataset.space3d = "error:" + String(e.message || "script").slice(0, 80);
+});
+</script>
+<script src="../../state/console-data.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

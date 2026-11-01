@@ -1,0 +1,99 @@
+{
+  "record": {
+    "run_id": "爆款拆解流水线-1793501683847",
+    "workflow": "爆款拆解流水线",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "inbox": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 0.4,
+    "finished_at": "2026-11-01T09:54:43"
+  },
+  "results": {
+    "inbox": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "viral_forge",
+        "result": {
+          "ok": true,
+          "status": "processed",
+          "inbox": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\inbox",
+          "count": 1,
+          "results": [
+            {
+              "file": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\inbox\\test-viral2.mp4",
+              "ok": true,
+              "report": {
+                "md": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\reports\\test-viral2.md",
+                "json": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\reports\\test-viral2.json"
+              },
+              "thumbs": [
+                {
+                  "t": 0.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral2_mp4\\cover.jpg",
+                  "bytes": 1258
+                },
+                {
+                  "t": 2.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral2_mp4\\frame-01-2_0.jpg",
+                  "bytes": 1258
+                },
+                {
+                  "t": 4.0,
+                  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\test-viral2_mp4\\frame-02-4_0.jpg",
+                  "bytes": 1257
+                }
+              ]
+            }
+          ],
+          "done_ledger": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\state\\viral_forge_done.json",
+          "honesty": "只拆结构与画面；不复制原视频；报告落 outputs/viral-forge/reports/"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内确实什么都没有",
+          "any_signal": false,
+          "needs_a_look": false,
+          "anomalies": 0,
+          "sockets": {
+            "alert": false,
+            "counts": {
+              "added": 0,
+              "removed": 0,
+              "flipped": 0
+            },
+            "removed": [],
+            "flipped": [],
+            "at": "2026-11-01T09:43:01",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "note": "窗口期内无异常事件"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "sched_define",
+  "fingerprint": "9d638b245c877e9900a3f7ec4e0c8cfced7e7126f4cb7358eb182bb5763c1bf3",
+  "pid": 7308,
+  "started_at": 1793496385.3756301,
+  "started_iso": "2026-11-01T08:26:25",
+  "finished_at": 1793496385.392843,
+  "finished_iso": "2026-11-01T08:26:25",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

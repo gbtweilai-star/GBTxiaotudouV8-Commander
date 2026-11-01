@@ -171,3 +171,143 @@ def call(server_key, tool, arguments=None):
 def status():
     return {"servers": {k: {"alive": b.proc and b.proc.poll() is None}
                         for k, b in _SESSIONS.items()}}
+
+
+# ═══ 配置注册表（蒸馏自 v5 .omp/mcp.json 的标准 mcpServers 清单） ═══
+# 为什么需要：v5 用一份 mcp.json（command/args/cwd/env）声明服务器，工具据此起进程。
+# 我们原来只能每次手写 command 数组 ⇒ 服务器清单不可复用、不可体检。
+# 现在：把标准 mcpServers 配置读进 state/mcp-servers.json，可列、可体检、可按名连接。
+CONFIG = _BASE.parent.parent / "state" / "mcp-servers.json"
+
+
+def _norm_server(name: str, spec: dict) -> dict:
+    """把 {command, args, cwd, env} 归一成 {name, command:[...], cwd, env}。"""
+    cmd = spec.get("command")
+    if isinstance(cmd, str):
+        argv = [cmd]
+    elif isinstance(cmd, (list, tuple)):
+        argv = [str(c) for c in cmd]
+    else:
+        raise ValueError("server %s 缺 command" % name)
+    argv += [str(a) for a in (spec.get("args") or [])]
+    return {"name": str(name), "command": argv,
+            "cwd": str(spec.get("cwd") or ""),
+            "env": dict(spec.get("env") or {}),
+            "description": str(spec.get("description") or "")}
+
+
+def load_config(path: str | Path) -> dict:
+    """读标准 MCP 配置：{"mcpServers": {...}} 或 {"servers": {...}}。"""
+    p = Path(path)
+    if not p.is_file():
+        return {"ok": False, "error": "user_error: 配置文件不存在：%s" % p}
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": "配置文件不是合法 JSON：%s" % e}
+    raw = d.get("mcpServers") or d.get("servers") or {}
+    if not isinstance(raw, dict):
+        return {"ok": False, "error": "配置里 mcpServers 不是对象"}
+    servers, errors = {}, []
+    for name, spec in raw.items():
+        try:
+            servers[name] = _norm_server(name, spec or {})
+        except Exception as e:  # noqa: BLE001
+            errors.append({"server": name, "why": str(e)[:120]})
+    return {"ok": True, "servers": servers, "errors": errors, "source": str(p)}
+
+
+def _load_registry() -> dict:
+    try:
+        return json.loads(CONFIG.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _save_registry(d: dict) -> None:
+    CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    CONFIG.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def register(path: str | Path = "", merge: bool = True) -> dict:
+    """把配置文件里的服务器登记进 registry（默认合并，不覆盖同名的旧项）。"""
+    r = load_config(path)
+    if not r.get("ok"):
+        return r
+    reg = _load_registry() if merge else {}
+    added = []
+    for name, spec in r["servers"].items():
+        if name not in reg:
+            reg[name] = spec
+            added.append(name)
+    _save_registry(reg)
+    return {"ok": True, "registered": added, "total": len(reg),
+            "errors": r.get("errors") or [], "source": r.get("source")}
+
+
+def servers() -> dict:
+    reg = _load_registry()
+    return {"ok": True, "count": len(reg),
+            "servers": [{"name": k, "command": v.get("command"),
+                         "cwd": v.get("cwd"), "description": v.get("description")}
+                        for k, v in reg.items()]}
+
+
+def unregister(name: str) -> dict:
+    reg = _load_registry()
+    if name not in reg:
+        return {"ok": False, "error": "user_error: 没登记这个服务器：%s" % name}
+    reg.pop(name, None)
+    _save_registry(reg)
+    return {"ok": True, "removed": name, "total": len(reg)}
+
+
+def connect_registered(name: str, timeout: float = 20.0) -> dict:
+    """按登记的命令连一台服务器（返回工具清单 = 一次闭环）。"""
+    reg = _load_registry()
+    spec = reg.get(name)
+    if not spec:
+        return {"ok": False, "error": "user_error: 没登记这个服务器：%s" % name}
+    r = connect(name, list(spec.get("command") or []))
+    if not r.get("ok"):
+        return r
+    t = list_tools(name)
+    return {"ok": bool(t.get("ok")), "server": name,
+            "tools": t.get("tools") or [], "count": t.get("count") or 0,
+            "error": t.get("error")}
+
+
+def health(timeout: float = 15.0) -> dict:
+    """体检：登记的每个服务器都真连一次、列一次工具、然后断开。"""
+    reg = _load_registry()
+    rows = []
+    for name, spec in reg.items():
+        t0 = time.time()
+        try:
+            r = connect(name, list(spec.get("command") or []))
+            if not r.get("ok"):
+                rows.append({"server": name, "up": False, "error": r.get("error"),
+                             "ms": int((time.time() - t0) * 1000)})
+                continue
+            t = list_tools(name)
+            _stop(name)
+            rows.append({"server": name, "up": bool(t.get("ok")),
+                         "tools": t.get("count") or 0,
+                         "error": t.get("error"),
+                         "ms": int((time.time() - t0) * 1000)})
+        except Exception as e:  # noqa: BLE001
+            rows.append({"server": name, "up": False,
+                         "error": "%s: %s" % (type(e).__name__, str(e)[:100])})
+    up = sum(1 for r in rows if r.get("up"))
+    return {"ok": True, "checked": len(rows), "up": up, "down": len(rows) - up,
+            "servers": rows,
+            "note": "体检会真起子进程；每个服务器连一次、列一次工具、断开"}
+
+
+def _stop(name: str) -> None:
+    b = _SESSIONS.get(name)
+    if b:
+        try:
+            b.stop()
+        finally:
+            _SESSIONS.pop(name, None)

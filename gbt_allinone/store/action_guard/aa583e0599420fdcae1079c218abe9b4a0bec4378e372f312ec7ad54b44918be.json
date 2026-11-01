@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "wf_run",
+  "fingerprint": "aa583e0599420fdcae1079c218abe9b4a0bec4378e372f312ec7ad54b44918be",
+  "pid": 6864,
+  "started_at": 1793501683.4383852,
+  "started_iso": "2026-11-01T09:54:43",
+  "finished_at": 1793501683.8541236,
+  "finished_iso": "2026-11-01T09:54:43",
+  "detail": {
+    "ok": true,
+    "result_status": "ok"
+  }
+}

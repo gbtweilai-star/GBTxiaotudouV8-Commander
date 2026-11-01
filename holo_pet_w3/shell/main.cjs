@@ -22,6 +22,8 @@ const http = require("http");
 const zlib = require("zlib");
 const crypto = require("crypto");
 const { execFile, spawn } = require("child_process");
+/* 认知界面服务自启（主人令 2026-11-01）：壳启动时确保 :8766，失败不牵连启动 */
+const consoleService = require("./console-service.cjs");
 const layout = require("./layout.cjs");
 const features = require("./features.cjs");
 const chrome = require("./chrome.cjs");
@@ -2648,6 +2650,16 @@ if (WIRE_ONLY) {
        否则数字人壳没有可加载的页面，主人看到的是一片「未连接/未配置」。
        （真因见 ensurePanelBridge 处的说明：桥没人拉，而 windows.json 假定有人在拉。）
        失败只打日志、不牵连启动（与 R-H295 同向：展示面不许拖垮数据面）。 */
+    try {
+      const cs = await consoleService.ensureConsoleServer();
+      if (cs.ok !== true) {
+        console.error("[w3] 认知界面服务未就绪（不牵连壳启动）:", cs.reason);
+      } else if (cs.already !== true) {
+        console.log("[w3] 认知界面服务已自启 :8766（等了 " + cs.waited_ms + " ms）");
+      }
+    } catch (err) {
+      console.error("[w3] 认知界面自启异常（不牵连壳启动）:", err);
+    }
     try {
       const br = await ensurePanelBridge();
       if (br.ok !== true) {

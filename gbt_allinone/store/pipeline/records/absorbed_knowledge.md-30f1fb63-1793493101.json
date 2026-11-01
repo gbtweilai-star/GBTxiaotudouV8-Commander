@@ -1,0 +1,105 @@
+{
+  "rec_id": "absorbed_knowledge.md-30f1fb63-1793493101",
+  "name": "absorbed_knowledge.md",
+  "sha256": "30f1fb63808ab43919c5771481ee69130c9ed224804c0c97b1cfd7ebd1a86a83",
+  "size": 580,
+  "submitted_at": "2026-11-01T07:31:41",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:Dengfeng-Yan/Dexterous-Soft-Hand"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\absorbed_knowledge.md-30f1fb63-1793493101.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "580 bytes",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "ownership",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "audit",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Dengfeng-Yan/Dexterous-Soft-Hand",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "policy",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:41"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "absorbed_knowledge.md-30f1fb63-1793493101",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "580 bytes",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "ownership",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "audit",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Dengfeng-Yan/Dexterous-Soft-Hand",
+        "ts": "2026-11-01T07:31:41"
+      },
+      {
+        "dimension": "policy",
+        "item": "absorbed_knowledge.md",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:41"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\absorbed_knowledge.md",
+    "version": 2,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "absorbed_knowledge.md-30f1fb63-1793493101",
+        "sha256": "30f1fb63808ab43919c5771481ee69130c9ed224804c0c97b1cfd7ebd1a86a83",
+        "published_at": "2026-11-01T07:31:41",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:Dengfeng-Yan/Dexterous-Soft-Hand",
+        "version": 2,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}

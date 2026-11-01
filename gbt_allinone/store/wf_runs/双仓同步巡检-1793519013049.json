@@ -1,0 +1,166 @@
+{
+  "record": {
+    "run_id": "双仓同步巡检-1793519013049",
+    "workflow": "双仓同步巡检",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "guard": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 8.917,
+    "finished_at": "2026-11-01T14:43:33"
+  },
+  "results": {
+    "guard": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "sync_guard",
+        "result": {
+          "ok": true,
+          "op": "patrol",
+          "aligned": false,
+          "verdict": "DRIFT",
+          "alerts": [
+            {
+              "level": "warn",
+              "code": "sync_drift",
+              "message": "双仓源码面漂移：only_live=49 only_delivery=0 differ=7",
+              "fix": "tools\\two-way-sync.ps1 pull -Apply  # 或 push -Apply -Refresh"
+            },
+            {
+              "level": "error",
+              "code": "caps_mismatch",
+              "message": "能力位计数不一致：live=378 delivery=375",
+              "fix": "先 align 源码，再跑 refresh 链"
+            }
+          ],
+          "reading": {
+            "verdict": "DRIFT",
+            "live_caps": 378,
+            "delivery_caps": 375,
+            "live_files": 2776,
+            "delivery_files": 2741,
+            "only_live_n": 49,
+            "only_delivery_n": 0,
+            "differ_n": 7,
+            "only_live": [
+              ".github/ISSUE_TEMPLATE/bug_report.yml",
+              ".github/ISSUE_TEMPLATE/feature_request.yml",
+              ".github/workflows/ci.yml",
+              "CODE_OF_CONDUCT.md",
+              "assets/panels/blueprint.webp",
+              "assets/panels/body.webp",
+              "assets/panels/capabilities.webp",
+              "assets/panels/eye.webp",
+              "assets/panels/health-ledger.webp",
+              "assets/panels/model-chat.webp",
+              "assets/panels/panel.webp",
+              "assets/panels/welcome.webp",
+              "data/absorbed-v5.json",
+              "docs/89-history-rewrite.md",
+              "docs/90-what-she-can-do.md",
+              "docs/91-visual-pages.md",
+              "docs/92-absorb-superpowers.md",
+              "docs/93-gbtv5-full-review.md",
+              "docs/94-distill-not-dump.md",
+              "gbt_allinone/tentacle/chain_kernel.py"
+            ],
+            "only_delivery": [],
+            "differ": [
+              "CHANGELOG.md",
+              "README.md",
+              "data/capabilities.json",
+              "docs/README.md",
+              "gbt_allinone/api.py",
+              "gbt_allinone/caps_registry.py",
+              "gbt_allinone/energy_core.py"
+            ],
+            "quiet_age_s": 106.1
+          },
+          "delivery": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
+          "live": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main",
+          "fix": "tools\\two-way-sync.ps1 status / pull -Apply / push -Apply -Refresh / verify",
+          "record": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\state\\sync_guard.jsonl",
+          "notified": "notified_error",
+          "pushed": "toast_ok"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内没有**现行故障**（runtime_faults=0）；但异常事件数不为 0 ⇒ 仍需人逐条看一眼",
+          "any_signal": true,
+          "needs_a_look": true,
+          "needs_a_look_means": "真故障(runtime/guard) 或 在册能力位异常 ⇒ True；只有不在册名字上的测试足迹 ⇒ False",
+          "sockets": {
+            "alert": true,
+            "counts": {
+              "added": 0,
+              "removed": 1,
+              "flipped": 0
+            },
+            "removed": [
+              {
+                "surface": "监听端口",
+                "kind": "port",
+                "plug_kind": "api",
+                "target": "127.0.0.1:8792",
+                "ok": true,
+                "reason": ""
+              }
+            ],
+            "flipped": [],
+            "at": "2026-11-01T14:33:20",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "registered_anomalies": 1,
+          "unregistered_footprints": [],
+          "anomalies": 2,
+          "runtime_faults": 0,
+          "by_signal": {
+            "runtime": 0,
+            "guard": 0,
+            "trace": 0,
+            "legacy": 0,
+            "recovered": 2
+          },
+          "by_event": {
+            "error": 2
+          },
+          "top_offenders": [
+            {
+              "capability": "sync_guard",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 0,
+              "total": 2
+            }
+          ],
+          "note": "runtime=要追的病；guard=护栏正常工作；trace=测试足迹；legacy=历史缺席；recovered=历史掉线已恢复。⚠️ **别只看 quiet**：anomalies 不为 0 就得逐条看，否则那几条会一直挂着没人碰。"
+        }
+      }
+    }
+  }
+}

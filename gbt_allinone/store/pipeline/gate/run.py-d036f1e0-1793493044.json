@@ -1,0 +1,35 @@
+{
+  "rec_id": "run.py-d036f1e0-1793493044",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "run.py",
+      "passed": true,
+      "detail": "999 bytes",
+      "ts": "2026-11-01T07:30:44"
+    },
+    {
+      "dimension": "ownership",
+      "item": "run.py",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:30:44"
+    },
+    {
+      "dimension": "audit",
+      "item": "run.py",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:CyanHaze/Awesome-Dexterous-Hands:scaffold",
+      "ts": "2026-11-01T07:30:44"
+    },
+    {
+      "dimension": "policy",
+      "item": "run.py",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:30:44"
+    }
+  ],
+  "blocked_by": []
+}

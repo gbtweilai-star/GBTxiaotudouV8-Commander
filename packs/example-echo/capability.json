@@ -1,0 +1,17 @@
+{
+ "name": "example-echo",
+ "version": "1.0.0",
+ "description": "示例能力包：可执行（auto_exec=true），但仍需 process_execute 票才真跑",
+ "language": "python",
+ "entry": {
+  "program": "python",
+  "args": [
+   "echo.py"
+  ]
+ },
+ "actions": [
+  "say"
+ ],
+ "auto_exec": true,
+ "timeout_s": 15
+}

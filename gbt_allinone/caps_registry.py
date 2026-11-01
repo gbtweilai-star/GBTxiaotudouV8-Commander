@@ -527,6 +527,114 @@ BENIGN_CAPS = {
         "safe": True,
     },
 
+    # ── 技能库（主人 2026-11-01「吞噬强化自己」：吸收 superpowers-zh 的 20 个方法论 skill）──
+    "skills_hub": {
+        "domain": 'tentacle',
+        "desc": ('技能库：能力位是**手**（真跑留痕），skill 是**做法**（先想清楚再动手）。'
+                 'op=list 列全部（name/来源/一行描述）；op=get {"name":...} 取全文；'
+                 'op=match {"query":...} 按任务文本匹配最相关 skill；op=verify 体检（数量/重名）。'
+                 '现有 20 个（吸收自 paysssk-creator/superpowers-zh，MIT，上游 obra/superpowers）：'
+                 'brainstorming / writing-plans / executing-plans / test-driven-development / '
+                 'systematic-debugging / verification-before-completion / requesting-code-review / '
+                 'receiving-code-review / dispatching-parallel-agents / subagent-driven-development / '
+                 'using-git-worktrees / finishing-a-development-branch / mcp-builder / workflow-runner / '
+                 'writing-skills / using-superpowers / chinese-code-review / chinese-commit-conventions / '
+                 'chinese-documentation / chinese-git-workflow。'),
+        "handler": 'skills_hub',
+        "safe": True,
+    },
+
+    # ── 唯一执行路径（吸自 GBT-Framework v5 的 UNIFIED_PATH/pipeline/gates）──
+    "chain_kernel": {
+        "domain": 'tentacle',
+        "desc": ('唯一执行路径：Step -1→5 七步链，**不可跳步**、每步有准入/准出、每步必须产出证据。'
+                 'op=run {"goal":"...","approve":false} 跑链（approve=true 才真派工，默认只读面）；'
+                 'op=status 七步与门禁；op=gate {"step":1} 看单步条件。'
+                 '某步没证据 ⇒ 整链 fail-closed 并返回 stopped_at（不往下糊）。'
+                 '来源：GBT-Framework v5 的 CONSTITUTION/UNIFIED_PATH/pipeline/gates 纪律。'),
+        "handler": 'chain_kernel',
+        "safe": True,
+    },
+
+    # ── 病因定位（蒸馏自 v5 root_cause_debugger，只留方法）──
+    "root_cause": {
+        "domain": 'system',
+        "desc": ('病因定位：把症状映射成**我们自己的**可验证假设（能力位三数不一致 / 自检不干净 / '
+                 '署名缺失 / 根目录异物 / 旧物 / 静默造假 / 最近失败），每条假设必须挂真调用读数，'
+                 '取不到标 unknown **不猜**；一条不成立就如实说 inconclusive。op=diagnose {"symptom":...}；'
+                 'op=status 案件列表；op=case {"id":...} 看案卷（state/cases/<id>.json）。'),
+        "handler": 'root_cause',
+        "safe": True,
+    },
+
+    # ── 执行防线（蒸馏自 v5 execution_guard 的"防自己劣根性"检测器）──
+    "execution_guard": {
+        "domain": 'system',
+        "desc": ('执行防线：审编排账本，专抓四类"自己骗自己"——① 写动作完成却没带 evidence；'
+                 '② 连续 ≥3 个写动作中间没有验证；③ 结果带 折叠/截断 标记却声称完成；'
+                 '④ 同一目标连续两次写且中间无验证。op=audit {"limit":200} 出违规清单；'
+                 'op=tail 看最近；op=status 一句话结论。只审账本能证实的，不脑补动机。'),
+        "handler": 'execution_guard',
+        "safe": True,
+    },
+
+    # ── 能力包（蒸馏自 v5 capability_protocol 的清单发现；执行仍过 process_execute 门）──
+    "cap_pack": {
+        "domain": 'tentacle',
+        "desc": ('能力包：丢一个含 capability.json 的目录 = 多一个能力（与框架代码解耦）。'
+                 'op=discover 扫包（packs/、state/packs/、$GBT_CAP_PACKS）；op=info {"name":...}；'
+                 'op=status 几个包/几个可执行；op=run {"name","action","params"?} 执行。'
+                 '**安全默认**：auto_exec 默认 false（只登记不执行）；要真跑必须 auto_exec:true '
+                 '且主人发 process_execute 票（与 body_open 同一道门）；子进程走 proc_guard'
+                 '（超时杀整棵树/输出封顶/环境净化）。'),
+        "handler": 'cap_pack',
+        "safe": True,
+    },
+
+    # ── MCP 配置注册表（蒸馏自 v5 .omp/mcp.json 的 mcpServers 清单）──
+    "mcp_register": {
+        "domain": 'integration',
+        "desc": ('MCP 注册：把标准 mcpServers 配置（mcp.json：command/args/cwd/env）读进 state/mcp-servers.json，op=path 指定配置文件；默认 merge 不覆盖同名。写盘过 filesystem_write 门。'),
+        "handler": 'mcp_register',
+        "safe": True,
+    },
+
+    # ── 双脑确认（蒸馏自 v5 dual_brain_gate 的"两脑都点头才执行"）──
+    "dual_gate": {
+        "domain": 'security',
+        "desc": ('双脑确认：危险动作之前，推理脑（作用域该不该要票 / 金额上限 / 收款人必填 / '
+                 'force 与 dry_run 互斥）+ 编程脑（能力位存在 / 必填参数齐 / 落点路径存在）'
+                 '各自出一份裁决，**两脑都点头才执行**，任一否决即 rejected。'
+                 'op=check {"kind":..., "payload":{...}}；op=status 规则清单。'
+                 '双脑只判"该不该/干不干得成"，发票仍然只有主人能发。'),
+        "handler": 'dual_gate',
+        "safe": True,
+    },
+
+    # ── MCP 配置注册表（蒸馏自 v5 .omp/mcp.json 的 mcpServers 清单）──
+    "mcp_servers": {
+        "domain": 'integration',
+        "desc": ('MCP 服务器清单：列出已登记的服务器（名称/命令/工作目录/说明）；只读。'),
+        "handler": 'mcp_servers',
+        "safe": True,
+    },
+
+    # ── MCP 配置注册表（蒸馏自 v5 .omp/mcp.json 的 mcpServers 清单）──
+    "mcp_unregister": {
+        "domain": 'integration',
+        "desc": ('MCP 注销：从 state/mcp-servers.json 移除一台（op=server）；写盘过 filesystem_write 门。'),
+        "handler": 'mcp_unregister',
+        "safe": True,
+    },
+
+    # ── MCP 配置注册表（蒸馏自 v5 .omp/mcp.json 的 mcpServers 清单）──
+    "mcp_health": {
+        "domain": 'integration',
+        "desc": ('MCP 体检：对每台登记服务器真连一次、列一次工具、断开，返回 up/down/tools/耗时。会起子进程，过 process_execute 门；连不上如实报 down（不伪造 up）。'),
+        "handler": 'mcp_health',
+        "safe": True,
+    },
+
     # ── 万能插·全自动打开（主人令 2026-11-01「以后只要使用她的全部能力必须全部自动打开，
     #    而不是要我提醒」）──
     # 六类插座 process/file/api/web/app/ai 在**每次能力调用之前**自动过一遍（廉价探针 + 60s 缓存），

@@ -1,0 +1,35 @@
+{
+  "rec_id": "knowledge.json-f2fc0536-1793493119",
+  "passed": true,
+  "tokens": [
+    {
+      "dimension": "integrity",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "970 bytes",
+      "ts": "2026-11-01T07:31:59"
+    },
+    {
+      "dimension": "ownership",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "GBT 钢印可用",
+      "ts": "2026-11-01T07:31:59"
+    },
+    {
+      "dimension": "audit",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:cbbtoagi/Mood-Gesture:scaffold",
+      "ts": "2026-11-01T07:31:59"
+    },
+    {
+      "dimension": "policy",
+      "item": "knowledge.json",
+      "passed": true,
+      "detail": "无高风险标签",
+      "ts": "2026-11-01T07:31:59"
+    }
+  ],
+  "blocked_by": []
+}

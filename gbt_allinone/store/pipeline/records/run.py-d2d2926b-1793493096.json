@@ -1,0 +1,105 @@
+{
+  "rec_id": "run.py-d2d2926b-1793493096",
+  "name": "run.py",
+  "sha256": "d2d2926b31c103d9841ce0bbf2093b9e5388f46d670e912639d4f07b99ba0997",
+  "size": 947,
+  "submitted_at": "2026-11-01T07:31:36",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:Janebek/AdaDexTrack:scaffold"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\run.py-d2d2926b-1793493096.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "947 bytes",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Janebek/AdaDexTrack:scaffold",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:36"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "run.py-d2d2926b-1793493096",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "run.py",
+        "passed": true,
+        "detail": "947 bytes",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "ownership",
+        "item": "run.py",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "audit",
+        "item": "run.py",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:Janebek/AdaDexTrack:scaffold",
+        "ts": "2026-11-01T07:31:36"
+      },
+      {
+        "dimension": "policy",
+        "item": "run.py",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:36"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\run.py",
+    "version": 2,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "run.py-d2d2926b-1793493096",
+        "sha256": "d2d2926b31c103d9841ce0bbf2093b9e5388f46d670e912639d4f07b99ba0997",
+        "published_at": "2026-11-01T07:31:37",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:Janebek/AdaDexTrack:scaffold",
+        "version": 2,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}

@@ -1,0 +1,88 @@
+{
+  "record": {
+    "run_id": "双仓同步巡检-1793495932760",
+    "workflow": "双仓同步巡检",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "guard": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 1.57,
+    "finished_at": "2026-11-01T08:18:52"
+  },
+  "results": {
+    "guard": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "sync_guard",
+        "result": {
+          "ok": true,
+          "op": "verify",
+          "aligned": true,
+          "verdict": "ALIGNED",
+          "alerts": [],
+          "reading": {
+            "verdict": "ALIGNED",
+            "live_caps": 368,
+            "delivery_caps": 368,
+            "live_files": 2646,
+            "delivery_files": 2656,
+            "only_live_n": 0,
+            "only_delivery_n": 0,
+            "differ_n": 0,
+            "only_live": [],
+            "only_delivery": [],
+            "differ": [],
+            "quiet_age_s": 23.8
+          },
+          "delivery": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
+          "live": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main",
+          "fix": "tools\\two-way-sync.ps1 status / pull -Apply / push -Apply -Refresh / verify"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内确实什么都没有",
+          "any_signal": false,
+          "needs_a_look": false,
+          "anomalies": 0,
+          "sockets": {
+            "alert": false,
+            "counts": {
+              "added": 0,
+              "removed": 0,
+              "flipped": 0
+            },
+            "removed": [],
+            "flipped": [],
+            "at": "2026-11-01T08:18:35",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "note": "窗口期内无异常事件"
+        }
+      }
+    }
+  }
+}

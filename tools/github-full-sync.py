@@ -57,25 +57,57 @@ C:*/
 """
 
 
-def _req(url, token=None, method="GET", body=None, raw=False):
+def _req(url, token=None, method="GET", body=None, raw=False, _tries=8):
+    """GitHub API 请求 + 限流退避。
+
+    2026-11-01 实测教训：并发 8 上传 1233 个 blob 时撞上 **secondary rate limit**
+    （HTTP 403「You have exceeded a secondary rate limit」）—— 原来 _req 直接
+    SystemExit，整次同步白跑。现在：403/429/5xx 按 Retry-After 或指数退避重试，
+    网络错误也重试；重试耗尽才报错退出。并发同时降到 2（见 apply）。
+    """
+    import time as _time
     data = json.dumps(body).encode() if body is not None else None
-    r = urllib.request.Request(url, data=data, method=method)
-    r.add_header("User-Agent", "dsh-sync")
-    r.add_header("Accept", "application/vnd.github+json")
-    if token:
+    last = ""
+    for attempt in range(_tries):
+        r = urllib.request.Request(url, data=data, method=method)
+        r.add_header("User-Agent", "dsh-sync")
+        r.add_header("Accept", "application/vnd.github+json")
+        if token:
+            try:
+                token.encode("ascii")
+            except UnicodeEncodeError:
+                raise SystemExit("token 含非 ASCII 字符（占位符没换？）请用 --prompt 重新输入")
+            r.add_header("Authorization", "Bearer " + token)
+        if data:
+            r.add_header("Content-Type", "application/json")
         try:
-            token.encode("ascii")
-        except UnicodeEncodeError:
-            raise SystemExit("token 含非 ASCII 字符（占位符没换？）请用 --prompt 重新输入")
-        r.add_header("Authorization", "Bearer " + token)
-    if data:
-        r.add_header("Content-Type", "application/json")
-    try:
-        with urllib.request.urlopen(r, timeout=120) as x:
-            b = x.read()
-    except urllib.error.HTTPError as e:
-        raise SystemExit("HTTP %s %s: %s" % (e.code, url.split('/')[-1], e.read()[:200]))
-    return b.decode("utf-8", "replace") if raw else (json.loads(b) if b.strip() else {})
+            with urllib.request.urlopen(r, timeout=120) as x:
+                b = x.read()
+            return b.decode("utf-8", "replace") if raw else (json.loads(b) if b.strip() else {})
+        except urllib.error.HTTPError as e:
+            code = e.code
+            body = e.read()[:300]
+            last = "HTTP %s %s: %s" % (code, url.split('/')[-1], body)
+            retryable = code in (403, 429, 500, 502, 503, 504)
+            if not retryable or attempt == _tries - 1:
+                raise SystemExit(last)
+            wait = 0.0
+            try:
+                wait = float(e.headers.get("Retry-After") or 0)
+            except Exception:
+                wait = 0.0
+            if not wait:
+                wait = min(90.0, 5.0 * (2 ** attempt))
+            print("  …限流/服务端 %s，等 %.0fs 后重试（第 %d/%d 次）" % (code, wait, attempt + 1, _tries))
+            _time.sleep(wait)
+            continue
+        except Exception as e:  # noqa: BLE001
+            last = "网络错误 %s" % str(e)[:160]
+            if attempt == _tries - 1:
+                raise SystemExit(last)
+            _time.sleep(min(60.0, 3.0 * (2 ** attempt)))
+            continue
+    raise SystemExit(last)
 
 
 def blob_sha(path: pathlib.Path) -> str:
@@ -142,8 +174,8 @@ def create_blob(path: pathlib.Path, token: str) -> str:
 def apply(p, token):
     entries = []
     jobs = [p["local"][rel] for rel in p["upload"]]
-    print("上传 blob：%d 个（并发 8）…" % len(jobs))
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+    print("上传 blob：%d 个（并发 2，带限流退避）…" % len(jobs))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:
         futs = {ex.submit(create_blob, pth, token): rel
                 for pth, rel in zip(jobs, p["upload"])}
         done = 0
@@ -156,16 +188,27 @@ def apply(p, token):
                 print("  …%d" % done)
     for rel in p["delete"]:
         entries.append({"path": rel, "mode": "100644", "type": "blob", "sha": None})
-    print("建树：%d 条变更 …" % len(entries))
-    tree = _req("%s/repos/%s/git/trees" % (API, REPO), token, "POST",
-                {"base_tree": p["tree"], "tree": entries})
+    print("建树：%d 条变更（分块增量建，避免单次请求过大 422）…" % len(entries))
+    # 🔴 2026-11-01 实测：1713 条变更一次性 POST /git/trees 被 GitHub 判
+    #    HTTP 422「request timed out ... input was too large」（官方建议分块）。
+    #    改法：按 base_tree 链式分块，每块 250 条，逐块 POST 拿新 tree sha 作为下一块的 base。
+    CHUNK = 250
+    tree_sha = p["tree"]
+    for i in range(0, len(entries), CHUNK):
+        chunk = entries[i:i + CHUNK]
+        out = _req("%s/repos/%s/git/trees" % (API, REPO), token, "POST",
+                   {"base_tree": tree_sha, "tree": chunk})
+        tree_sha = out["sha"]
+        print("  块 %d/%d：%d 条 → tree %s" % (i // CHUNK + 1,
+                                              (len(entries) + CHUNK - 1) // CHUNK,
+                                              len(chunk), tree_sha[:10]))
     commit = _req("%s/repos/%s/git/commits" % (API, REPO), token, "POST",
                   {"message": ("chore(repo): 全面清扫——以本地真身为唯一真相（上传 %d / 删旧 %d）"
                                % (len(p["upload"]), len(p["delete"]))),
-                   "tree": tree["sha"], "parents": [p["head"]]})
+                   "tree": tree_sha, "parents": [p["head"]]})
     upd = _req("%s/repos/%s/git/refs/heads/%s" % (API, REPO, BRANCH), token, "PATCH",
                {"sha": commit["sha"], "force": False})
-    return {"commit": commit["sha"], "tree": tree["sha"], "ref": upd.get("object", {}).get("sha"),
+    return {"commit": commit["sha"], "tree": tree_sha, "ref": upd.get("object", {}).get("sha"),
             "uploaded": len(p["upload"]), "deleted": len(p["delete"])}
 
 

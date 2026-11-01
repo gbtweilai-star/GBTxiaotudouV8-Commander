@@ -1,0 +1,105 @@
+{
+  "rec_id": "knowledge.json-e3273e37-1793493090",
+  "name": "knowledge.json",
+  "sha256": "e3273e370d521ebbe849b27b91872bbed25828b9ebe19b9666910dffb6e92dca",
+  "size": 972,
+  "submitted_at": "2026-11-01T07:31:30",
+  "meta": {
+    "actor": "devour_tentacle",
+    "purpose": "吞噬产物: devour_github_repo:yanming03/awesome-humanoid-manipulation:scaffold"
+  },
+  "stage1_mirror": {
+    "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\mirror\\knowledge.json-e3273e37-1793493090.bin",
+    "dimensions": [
+      {
+        "dimension": "integrity",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "972 bytes",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "ownership",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "audit",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:yanming03/awesome-humanoid-manipulation:scaffold",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "policy",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:30"
+      }
+    ],
+    "refine_lineage": []
+  },
+  "stage2_gate": {
+    "rec_id": "knowledge.json-e3273e37-1793493090",
+    "passed": true,
+    "tokens": [
+      {
+        "dimension": "integrity",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "972 bytes",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "ownership",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "GBT 钢印可用",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "audit",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "actor=devour_tentacle, purpose=吞噬产物: devour_github_repo:yanming03/awesome-humanoid-manipulation:scaffold",
+        "ts": "2026-11-01T07:31:30"
+      },
+      {
+        "dimension": "policy",
+        "item": "knowledge.json",
+        "passed": true,
+        "detail": "无高风险标签",
+        "ts": "2026-11-01T07:31:30"
+      }
+    ],
+    "blocked_by": []
+  },
+  "stage3_publish": {
+    "status": "published",
+    "production": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\pipeline\\production\\knowledge.json",
+    "version": 1,
+    "passport": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "publish": {
+        "rec_id": "knowledge.json-e3273e37-1793493090",
+        "sha256": "e3273e370d521ebbe849b27b91872bbed25828b9ebe19b9666910dffb6e92dca",
+        "published_at": "2026-11-01T07:31:30",
+        "actor": "devour_tentacle",
+        "purpose": "吞噬产物: devour_github_repo:yanming03/awesome-humanoid-manipulation:scaffold",
+        "version": 1,
+        "refined_rounds": 0
+      }
+    }
+  },
+  "status": "published"
+}
