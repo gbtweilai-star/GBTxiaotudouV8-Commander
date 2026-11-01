@@ -1,138 +1,193 @@
 <p align="center">
   <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander">
-    <img src="assets/brand/repo-banner.png" alt="GBT小土豆V8 · 独立数字人框架" width="100%">
+    <img src="assets/social-preview.png" alt="GBT小土豆V8 · 独立数字人框架" width="100%">
   </a>
 </p>
 
+<h1 align="center">GBT小土豆V8 · 独立数字人框架</h1>
+
 <p align="center">
-  <img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5_3.10-7C4DFF">
-  <img alt="核心依赖" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
-  <img alt="能力位" src="https://img.shields.io/badge/Caps-375-F5B041">
-  <img alt="测试" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
-  <img alt="语言" src="https://img.shields.io/badge/Lang-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-9AA4C4">
+  <b>统一入口 <code>run_task</code> · 全行为落审计 · 能力位现读可核 · 触手层可插拔</b>
 </p>
 
 <p align="center">
-  <b>独立数字人框架</b>：统一入口 <code>run_task</code> · 全行为落审计账 · 能力位现读可核<br>
-  <sub>开发者：自由的风 · 本署名不可删除、不可篡改归属</sub>
+  <img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5_3.10-3776AB?logo=python&logoColor=white">
+  <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
+  <img alt="Caps" src="https://img.shields.io/badge/Capabilities-375-F5B041">
+  <img alt="Tests" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
+  <img alt="Docs" src="https://img.shields.io/badge/Docs-93_pages-00E5FF">
+  <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
+  <img alt="Status" src="https://img.shields.io/badge/Status-active-7C4DFF">
 </p>
 
 <p align="center">
-  <a href="#快速开始">快速开始</a> ·
-  <a href="#现读数字">现读数字</a> ·
-  <a href="#结构">结构</a> ·
-  <a href="#审计与授权">审计与授权</a> ·
-  <a href="#测试">测试</a> ·
-  <a href="docs/">文档</a> ·
-  <a href="#署名">署名</a>
+  <a href="#-快速开始">快速开始</a> ·
+  <a href="#-它是什么">它是什么</a> ·
+  <a href="#-架构">架构</a> ·
+  <a href="#-能力面">能力面</a> ·
+  <a href="#-实测读数">实测读数</a> ·
+  <a href="#-文档">文档</a> ·
+  <a href="#-参与">参与</a>
+</p>
+
+<p align="center">
+  <sub><b>开发者：自由的风</b> · 本署名不可删除、不可篡改归属</sub>
 </p>
 
 ---
 
-V8.0.0 · 独立私人框架，与任何企业公司无关。Python ≥ 3.10 · 核心仅标准库。
+## 🥔 它是什么
 
-## 现读数字（以本仓代码为准，不写死宣传语）
+一个**本地优先的独立数字人框架**：大脑（大模型）+ 触手（操作系统能力）+ 审计账（每次调用可追），
+所有能力通过**唯一入口** `run_task(kind, payload)` 调度，写盘 / 花钱 / 出网一律过授权门。
 
-| 项 | 现读 | 怎么自己核 |
+- **不是聊天壳**：375 个能力位落在 30 个域，本机真跑、真留痕。
+- **不是玩具**：每次调用落 `audit.jsonl`（call / ok / error / denied），可查、可计数。
+- **不依赖云**：核心只用标准库；大模型可换本机 GGUF，也可以接任意 OpenAI 兼容端点。
+- **可自检**：`selfscan` 五维扫描、`trunk_cover` 代码全覆盖、`legacy_guard` 旧物六类扫描。
+
+<p align="center">
+  <img src="assets/demo.gif" alt="30 秒 demo（真跑回放）" width="720">
+  <br>
+  <sub>30 秒 demo：真跑回放，不是录屏剪的</sub>
+</p>
+
+## 🚀 快速开始
+
+```bash
+git clone https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander.git
+cd GBTxiaotudouV8-Commander
+```
+
+```python
+import sys; sys.path.insert(0, ".")
+import gbt_allinone as gbt
+
+print(len(gbt.list_capabilities()))                 # 375
+print(gbt.run_task("health"))                       # 环境自检
+print(gbt.run_task("cap_self", {"op": "brief"}))    # 她自己的自述（现读）
+print(gbt.run_task("selfscan"))                     # 五维自检
+```
+
+Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd holo_pet_w3 && npx --no-install electron shell/main.cjs`。
+
+## 🏛 架构
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="架构：大脑 → 唯一门 → 能力位 → 触手 → 审计" width="820">
+</p>
+
+```
+run_task(kind, payload)
+   │
+   ├─ 授权门 security/policy.py（15 个作用域：付款/隐私/生产写入/远控/发声/出网…）
+   ├─ 能力位 caps_registry.py（375 个，30 域）
+   ├─ 触手层 tentacle/（识别 / 执行 / 自检 / 编排 / 蓝图 / 脉冲直达）
+   └─ 审计 store/audit.jsonl（call / ok / error / denied 全程落盘）
+```
+
+## 🧠 她能干嘛（30 域 · 375 位）
+
+**给她一句话，她自己选能力位、过授权门、真跑、留审计、出结果。**
+
+| 域 | 数量 | 代表能力 |
+|---|---:|---|
+| 创作（视频/图像/音乐/剧本） | 57 | iral_forge drama_forge shot_director |
+| 系统（自检/编排/修复） | 54 | selfscan orchestration 
+oot_fix |
+| 大模型（本机/云端/上下文） | 42 | codex_* context_guard energy_core |
+| 安全（测绘/扫描/防御） | 29 | sec_surface sec_scan sec_defenses |
+| 触手（总指挥/脉冲/覆盖） | 27 | 	entacle pulse_core 	runk_cover |
+| 心智（记忆/人格/情绪） | 21 | experience_forge rain_vault persona_kernel |
+| 情报（OSINT/研究/学习） | 18 | osint_scan 
+esearch_intel 	opic_web |
+| 管线（镜像/部署/回滚） | 18 | one_key_deploy mirror_* deploy_queue |
+| 视频（生成/剪辑/混音） | 16 | hunyuan_video media_pipeline udio_mix |
+| 身体（看/说/按/敲） | 12 | ody_see ody_click ody_type |
+
+完整 30 域 + 10 个可抄用法 + 边界说明：[**docs/90-what-she-can-do.md**](docs/90-what-she-can-do.md)
+
+> 边界：危险动作（转账/隐私/生产写入/远控/外发）一律要主人发授权；缺钥/缺依赖**如实报**，不装成功。
+
+## 🖥 可视化页面（28 个面板，一屏一问）
+
+她的界面不是大杂烩：**28 个独立静态页面，每个只回答一个问题**，全部只读现算、离线可看。
+
+| 类 | 面板 |
+|---|---|
+| 状态体检 | `health-ledger` `capabilities` `capability-bar` `model-align` `cloud-status` `plugins-mesh` `energy` `logbook` |
+| 执行调度 | `exec-deck` `activity` `ai-board` `blueprint` `code-deck` `h1` `projection` |
+| 身体感知 | `body` `eye` `voice-theater` `digital-human` `kaleido` |
+| 云与社交 | `cloud-plugins` `cloud-auth` `eigenflux` `db-fleet` `model-chat` `panel` `welcome` |
+
+<p align="center">
+  <img src="assets/panels/capabilities.webp" width="49%" alt="能力统计面板">
+  <img src="assets/panels/panel.webp" width="49%" alt="控制面板">
+</p>
+<p align="center">
+  <img src="assets/panels/body.webp" width="49%" alt="身体/器官面板">
+  <img src="assets/panels/blueprint.webp" width="49%" alt="项目蓝图面板">
+</p>
+
+打开：双击 `holo_pet_w3/panel/index.html`，或 `cd holo_pet_w3 && npx --no-install electron shell/main.cjs`。
+全部页面清单与每页用途：[**docs/91-visual-pages.md**](docs/91-visual-pages.md)
+
+## 🧩 能力面
+
+| 域 | 代表能力 | 一句话 |
 |---|---|---|
-| 能力位 | **375** | `gbt.run_task('cap_self', {'op':'verify'})` |
-| 测试 | **27 套** | `tests/test_*.py` |
-| 工具脚本 | **948** 个 `.py` | `tools/**/*.py` |
-| 文档 | **93 页** | `docs/*.md`（索引 `docs/README.md`） |
-| 代码覆盖 | 每一处都归到某根触手 | `gbt.run_task('trunk_cover', {'op':'status'})` |
-| 旧物/重复 | 六类扫描 | `gbt.run_task('legacy_guard', {'op':'status'})` |
+| 大脑 | `commander` · `energy_core` · `trunk_reason` | 本机 GGUF 总指挥 + 能源核心（取电口池）+ 触手推理环 |
+| 执行 | `tentacle` · `omni_*` · `body_*` | 看屏 / 点按 / 键入 / 窗口 / 进程 / 剪贴板（万能插即插即用） |
+| 自检 | `selfscan` · `trunk_cover` · `legacy_guard` | 路由对账 / 代码全覆盖 / 旧物六类 |
+| 编排 | `orchestration` · `blueprint` · `wf_*` | 编排账本 / 架构→蓝图→派遣→落地 / DAG 工作流 |
+| 图像 | `comfy_native` | 118 个纯 CPU 算子（音频/图像/文本），契约面覆盖 10.1% |
+| 安全 | `signature_guard` · `sec_*` | 署名守卫 / 攻击面测绘 / 漏洞扫描 / 防御验证 |
 
-> 数字只认跑出来的读数：改一次代码就重新读一次，不写"大概/约"。
+完整清单：`gbt.run_task("caps_list")`，或看 [docs/capabilities](docs/capabilities/)。
 
-## 为人处世三律
+## 📊 实测读数
 
-1. **听从指令** — 用户指令第一，不揣测、不代答、不擅自扩大或缩小任务范围。
-2. **给意见** — 完成后主动给出专业判断：风险在哪、更好的做法是什么、下一步建议什么。
-3. **一起想办法** — 遇到阻塞不甩锅、不空手而归，带着方案回来让用户挑。
+> 只写跑出来的数字，改一次代码重新读一次。
 
-拒绝的永远只是**具体行为的风险**，不是这个人：说清楚为什么不行，再给出怎样才行。
+| 指标 | 读数 | 复核命令 |
+|---|---|---|
+| 能力位 | **375** | `cap_self verify` |
+| 审计条数 | 现读 | `gbt.log_count()` |
+| 自检 | clean | `selfscan` |
+| 代码覆盖 | orphan = 0 | `trunk_cover status` |
+| 脉冲直达 | ≈90% 请求 0 token 命中（≈4ms） | `pulse_core verify` |
+| 图像算子 | 118 个（纯 CPU） | `comfy_native status` |
 
-## 自主铁律（2026-11-01 主人令）
+<table>
+<tr>
+  <td><img src="assets/fig-caps.png" alt="能力面"></td>
+  <td><img src="assets/fig-concurrency.png" alt="并发实测"></td>
+</tr>
+<tr>
+  <td><img src="assets/fig-eval.png" alt="评测"></td>
+  <td><img src="assets/fig-dispatch-ok.png" alt="真跑回执"></td>
+</tr>
+</table>
 
-- **架构给完之后**：除 `danger`（终端危险能力）与 `transfer`（转账）外，**禁止打扰主人、禁止要求主人帮助**；不确定就自主决策并如实标注。
-- **唯一真相**：只看 live 仓**当前文件**与编排账本；**旧备份 / 归档 / 旧工作树一律不读**（去旧目录找答案 = 绕弯根源）。
-- **不留旧物**：旧代码、旧面板、重复物一律清掉（`legacy_guard` 查六类：旧代码快照 / 过期工作树 / 旧面板归档 / `*.bak` / 重复文档编号 / 临时件）。
+## 📚 文档
 
-## GBT 钢印
+索引：[docs/README.md](docs/README.md)（93 页，按编号）
 
-框架产出的结果默认携带 `gbt_stamp`（框架名 / 版本 / GBT 标记 / 独立归属声明）。
-钢印不可伪造归属、不可移除出处；`run_task(kind, payload, stamp=False)` 可显式关闭。
-所有钢印产物与任何企业公司无关。
+- [模型卡](docs/01-model-card.md) · [架构](docs/02-architecture.md) · [能力面](docs/03-capabilities.md)
+- [部署](docs/05-deployment.md) · [并发实测](docs/08-concurrency.md) · [安全与控制](docs/14-security-and-control.md)
+- [蓝图主链](docs/68-blueprint-chain.md) · [跑到落地](docs/69-run-to-landing.md) · [旧物守卫](docs/79-legacy-guard.md) · [仓库整理](docs/87-repo-cleanup-done.md)
 
-## 结构（真实存在，现读）
+## 🤝 参与
 
-```
-GBTxiaotudouV8-Commander/
-├── gbt_allinone/        # 框架核心
-│   ├── api.py           # 统一入口 run_task（全行为落审计 + 默认钢印）
-│   ├── caps_registry.py # 能力位注册表（375）
-│   ├── soul.py          # 理念 + 钢印
-│   ├── store.py         # JSONL 审计后台
-│   ├── tentacle/        # 触手层（识别 / 执行 / 自检 / 编排 / 蓝图）
-│   └── security/        # 授权门（policy.py 作用域）
-├── tools/               # 948 个工具（含 model-bridge / codex-scripts）
-├── tests/               # 27 套判据
-├── docs/                # 93 页文档（docs/README.md 是索引）
-├── data/                # 能力表 / 意图词表等只读数据
-├── holo_pet_w3/         # 桌面壳（现役：Electron + 127.0.0.1:8765 面板）
-├── holo_pet/            # 桌面壳资源（旧版）
-├── arms/  skills/  examples/  icons/  ios/  mobile/  gbt_commander/
-├── demo.py              # 30 秒 demo
-├── install.ps1          # 安装
-└── 启动-GBT.cmd         # Windows 启动器
-```
+- 提 Bug / 需求：[Issues](https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/issues)
+- 贡献流程：[CONTRIBUTING.md](CONTRIBUTING.md) · PR 模板见 [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md)
+- 安全披露：[SECURITY.md](SECURITY.md)
+- 行为准则：[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- 引用：[CITATION.cff](CITATION.cff)
 
-## 快速开始
+## 🪪 许可与署名
 
-```bash
-# 列出能力位 + 审计条数
-python -c "import sys;sys.path.insert(0,'.');from gbt_allinone.cli import main;main(['list'])"
-
-# 调一个只读能力位（全程落审计，结果带钢印）
-python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as gbt, json;print(json.dumps(gbt.run_task('cap_self',{'op':'brief'}),ensure_ascii=False)[:400])"
-
-# 桌面壳（现役）
-cd holo_pet_w3 && npx --no-install electron shell/main.cjs
-```
-
-依赖：`pip install -r requirements.txt`（桌面壳需 customtkinter / tkinter）。
-
-## 审计与授权
-
-- `gbt_allinone/store/audit.jsonl`：call / ok / error / denied 全程落盘；`gbt.query_log()`、`gbt.log_count()` 查询。
-- 授权只能主人在终端发放：`python -m gbt_allinone auth grant --scope <作用域> --ttl <秒>`；
-  **AI 永远无权给自己发授权**，缺哪个就如实报哪个。
-- 只读类不需要授权；没有"按名禁用"的能力（`DISABLED_CAPS = 0`）。
-- 门是主人的开关，不是技术限制：门开着，技术全在。
-
-## 触手与万能插（现读）
-
-- `tentacle`：统一调用触手能力（`see` / `read_text` / `click` / `type` / `list_windows` / `process_list` / `clipboard` / `chain` / `monitor` …）+ 六铁律（先看再动 / 动后等稳定 / 找不到就滚 / 遇弹窗必关 / 每步亲眼验证 / 不确定就对比前后截图）。
-- `omni_*`（万能插）：插座动态发现、能力位即插即用；`omni_open` 自动识别插口，不写死。
-- 速度：脉冲·直达——常见意图 0 token 直接命中（实测十次请求约九次直达，≈4ms）。
-
-## 测试
-
-```bash
-python tests/test_autonomy.py          # 自主契约（不打扰主人）
-python tests/test_blueprint.py         # 架构→蓝图→过目→思维导图→派遣→落地
-python tests/test_comfy_engine.py      # 天真图像引擎判据
-python tests/test_legacy_guard.py      # 旧物六类扫描
-```
-
-## 文档
-
-索引：`docs/README.md`（按编号排列）。近期关键：
-- `docs/87-repo-cleanup-done.md` — 本仓 GitHub 整理记录（5108 → 2708 文件）
-- `docs/81-single-source-of-truth.md` — 唯一真相与旧物禁令
-- `docs/69-run-to-landing.md` · `docs/70-research-on-blocker.md` · `docs/71-stuck-task-protection.md` · `docs/72-blueprint-templates.md`
-
-## 署名
-
+Apache-2.0（见 [LICENSE](LICENSE) 与 [NOTICE](NOTICE)）。
 **开发者：自由的风** —— 框架每一页（文档 / 网页 / 产物）自动携带署名，禁止删除、禁止篡改归属。
-`signature_guard` 能力：扫描页面署名完整性，缺失即报，`restore=true` 自动补回。
+
+<p align="center"><sub>GBT小土豆V8 · 独立私人框架 · 与任何企业公司无关</sub></p>

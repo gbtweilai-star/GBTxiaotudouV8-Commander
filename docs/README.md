@@ -203,3 +203,7 @@
 | 82 | [82-experience-forge.md](82-experience-forge.md) | 成长闭环：外部验证通过才准固化，存记忆/工具/规则不写权重 |
 | 83 | [83-mirror-stage.md](83-mirror-stage.md) | 镜像工作空间：生产只读→多候选→验证→整页原子替换，失败不进生产 |
 | 84 | [84-remote-controller.md](84-remote-controller.md) | 远程接管授权内核：远端用户点同意 + agent 签名才发 session |
+| 85 | [85-local-only-audit.md](85-local-only-audit.md) | 本地算力审计：云 TTS/云取图点名，本地优先 fail-closed |
+| 89 | [89-history-rewrite.md](89-history-rewrite.md) | 方案A：历史重写（362→351 提交，193.1→177.2MB，HEAD 不变） |
+| 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：30 域 375 位（从注册表实时生成） |
+| 91 | [91-visual-pages.md](91-visual-pages.md) | 所有可视化页面：28 面板 + 落地页 + 图集 |

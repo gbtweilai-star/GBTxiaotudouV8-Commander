@@ -16,9 +16,10 @@ param(
     [double]$MaxDur = 180,
     [switch]$Gen,
     [string]$StockQueriesFile = "",
-    [string]$Voice = "zh-TW-HsiaoChenNeural",
+    [string]$Voice = "local",
     [string]$Rate = "",
     [string]$Pitch = "",
+    [switch]$CloudTts,
     [string]$Repo = ''
 )
 
@@ -43,15 +44,31 @@ Write-Output '== 1/3 剧本 → 分镜 =='
 if ($LASTEXITCODE -ne 0) { throw 'drama-prep 失败（检查剧本时间码格式 0s – 4s）' }
 $prep = Get-Content -LiteralPath $prepJson -Raw -Encoding utf8 | ConvertFrom-Json
 
-Write-Output '== 2/3 台湾腔女声（Edge TTS zh-TW-HsiaoChenNeural） =='
+Write-Output '== 2/3 旁白（本地优先；Edge 需 -CloudTts 显式开） =='
 $edge = Join-Path $Repo 'tools\codex-scripts\edge-tts.py'
-foreach ($sh in $prep.shots) {
-    $txt = [IO.File]::ReadAllText($sh.txt, [Text.Encoding]::UTF8)
-    if (-not $txt) { continue }
-    $mp3 = Join-Path $ttsDir ("shot-{0:D2}.mp3" -f [int]$sh.idx)
-    $edgeArgs = @('--text-file', $sh.txt, '--out', $mp3, '--voice', $Voice); if ($Rate) { $edgeArgs += @('--rate', $Rate) }; if ($Pitch) { $edgeArgs += @('--pitch', $Pitch) }; & $py -B -X utf8 $edge @edgeArgs
-    if ($LASTEXITCODE -ne 0) { throw ("镜 {0} 台湾腔配音失败；不降级成普通话以免变味" -f $sh.idx) }
-    Write-Output ("  镜 {0}: {1}（{2}）" -f $sh.idx, (Split-Path $mp3 -Leaf), $Voice)
+if ($CloudTts -and $Voice -match '^zh-TW-') {
+    foreach ($sh in $prep.shots) {
+        $txt = [IO.File]::ReadAllText($sh.txt, [Text.Encoding]::UTF8)
+        if (-not $txt) { continue }
+        $mp3 = Join-Path $ttsDir ("shot-{0:D2}.mp3" -f [int]$sh.idx)
+        $edgeArgs = @('--text-file', $sh.txt, '--out', $mp3, '--voice', $Voice)
+        if ($Rate) { $edgeArgs += @('--rate', $Rate) }
+        if ($Pitch) { $edgeArgs += @('--pitch', $Pitch) }
+        & $py -B -X utf8 $edge @edgeArgs
+        if ($LASTEXITCODE -ne 0) { throw ("镜 {0} Edge 配音失败" -f $sh.idx) }
+        Write-Output ("  镜 {0}: {1}（{2}）" -f $sh.idx, (Split-Path $mp3 -Leaf), $Voice)
+    }
+} else {
+    Add-Type -AssemblyName System.Speech
+    foreach ($sh in $prep.shots) {
+        $txt = [IO.File]::ReadAllText($sh.txt, [Text.Encoding]::UTF8)
+        if (-not $txt) { continue }
+        $wav = Join-Path $ttsDir ("shot-{0:D2}.wav" -f [int]$sh.idx)
+        $ps = "Add-Type -AssemblyName System.Speech;`$s=New-Object System.Speech.Synthesis.SpeechSynthesizer;`$vs=`$s.GetInstalledVoices()|ForEach-Object{`$_.VoiceInfo};`$pick=`$vs|Where-Object{`$_.Culture.Name -eq 'zh-TW' -and `$_.Gender -eq 'Female'}|Select-Object -First 1;if(-not `$pick){`$pick=`$vs|Where-Object{`$_.Culture.Name -like 'zh-*'}|Select-Object -First 1};if(`$pick){`$s.SelectVoice(`$pick.Name)};`$s.SetOutputToWaveFile('$wav');`$s.Speak([IO.File]::ReadAllText('$($sh.txt)'));`$name=`$s.Voice.Name;`$s.Dispose();Write-Output `$name"
+        $used = & powershell -NoProfile -Command $ps 2>&1 | Select-Object -Last 1
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $wav)) { throw ("镜 {0} 本地配音失败" -f $sh.idx) }
+        Write-Output ("  镜 {0}: {1}（本地 {2}）" -f $sh.idx, (Split-Path $wav -Leaf), $used)
+    }
 }
 
 Write-Output '== 3/3 装配（ffmpeg + 字幕） =='

@@ -50,7 +50,7 @@ STATUS = {
     "input": ["script(带 0s–4s 时间码)", "assets_dir(可选自有图)", "gen + GBT_T2I_CMD(可选文生图命令)", "name/voice"],
     "outputs": ["storyboard.json", "cards/*.png", "audio/*.wav", "episode.srt", "episode.mp4", "report.json/md"],
     "not_implemented": ["AI 生成画面/视频", "AI 换脸/换声", "自动发布"],
-    "guardrails": ["只用自有/授权素材", "不复制原片", "不自动发布", "TTS 台湾腔 Edge（联网；本地离线可切 SAPI）"],
+    "guardrails": ["只用自有/授权素材", "不复制原片", "不自动发布", "TTS 本地优先（SAPI；Edge 需显式 -CloudTts）"],
 }
 
 
@@ -109,7 +109,12 @@ def _sapi_tts(text: str, wav: Path) -> dict:
         return {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:120])}
     ps = ("Add-Type -AssemblyName System.Speech;"
           "$s=New-Object System.Speech.Synthesis.SpeechSynthesizer;"
-          "$s.SetOutputToWaveFile('%s');$s.Speak([IO.File]::ReadAllText('%s'));$s.Dispose()"
+          "$vs=$s.GetInstalledVoices()|ForEach-Object{$_.VoiceInfo};"
+          "$pick=$vs|Where-Object{$_.Culture.Name -eq 'zh-TW' -and $_.Gender -eq 'Female'}|Select-Object -First 1;"
+          "if(-not $pick){$pick=$vs|Where-Object{$_.Culture.Name -like 'zh-*'}|Select-Object -First 1};"
+          "if($pick){$s.SelectVoice($pick.Name)};"
+          "$s.SetOutputToWaveFile('%s');$s.Speak([IO.File]::ReadAllText('%s'));"
+          "$name=$s.Voice.Name;$s.Dispose();Write-Output $name"
           % (str(tmpwav), str(txt)))
     try:
         code, out, err = _run(["powershell", "-NoProfile", "-Command", ps], timeout=120)
@@ -117,13 +122,15 @@ def _sapi_tts(text: str, wav: Path) -> dict:
             import shutil as _sh
             _sh.copy2(tmpwav, wav)
             dur = _probe(wav)
-            return {"ok": True, "wav": str(wav), "dur": dur.get("duration_s") or 0}
+            actual = (out or "").strip().splitlines()[-1] if (out or "").strip() else ""
+            return {"ok": True, "wav": str(wav), "dur": dur.get("duration_s") or 0,
+                    "voice": actual or "System.Speech 默认", "provider": "sapi"}
         return {"ok": False, "error": (err or out)[-200:] or "SAPI 输出为空"}
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:120])}
 
 
-VOICE_DEFAULT = "zh-TW-HsiaoChenNeural"
+VOICE_DEFAULT = "local"
 VOICE_RATE = ""
 VOICE_PITCH = ""
 
@@ -162,24 +169,27 @@ def _edge_tts(text: str, out: Path, voice: str, rate: str = "", pitch: str = "")
 
 
 def _tts(text: str, wav: Path, payload=None) -> dict:
+    import os
     payload = payload or {}
     voice = str(payload.get("voice") or _voice_default())
-    if voice.lower() in ("sapi", "microsoft huihui desktop"):
+    allow_cloud = bool(payload.get("allow_cloud_tts")) or os.environ.get("GBT_ALLOW_CLOUD_TTS") == "1"
+    if voice.lower() in ("local", "sapi", "auto"):
         s = _sapi_tts(text, wav)
-        s["voice"] = "Microsoft Huihui Desktop"
         s["provider"] = "sapi"
+        s.setdefault("voice", "local")
         return s
-    edge = _edge_tts(text, wav.with_suffix(".mp3"), voice)
-    if edge.get("ok"):
-        return edge
-    # 台湾腔不可用就如实降级，并写清 fallback_from；不假装还是台湾腔
+    if voice.startswith("zh-TW-"):
+        if not allow_cloud:
+            return {"ok": False, "status": "needs_local_voice",
+                    "error": "本地没有 zh-TW 声线，且本地优先不允许联网 Edge；装 zh-TW 语言包或显式 allow_cloud_tts=true",
+                    "voice": voice}
+        rate, pitch = _voice_tone()
+        return _edge_tts(text, wav.with_suffix(".mp3"), voice,
+                         rate=str(payload.get("rate") or rate), pitch=str(payload.get("pitch") or pitch))
     s = _sapi_tts(text, wav)
-    s["fallback_from"] = voice
-    s["fallback_error"] = edge.get("error")
-    s["voice"] = "Microsoft Huihui Desktop（普通话 fallback）"
     s["provider"] = "sapi"
+    s.setdefault("voice", voice)
     return s
-
 
 def _wrap(text: str, width_chars: int = 18) -> list:
     text = " ".join(str(text or "").split())

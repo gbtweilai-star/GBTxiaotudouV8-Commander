@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: 冒烟（${{ matrix.os }} / py${{ matrix.python }}）
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: 语法编译（全仓）
+        run: python -m compileall -q gbt_allinone tools
+
+      - name: 导入与能力面冒烟
+        shell: bash
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, ".")
+          import gbt_allinone as gbt
+          caps = gbt.list_capabilities()
+          n = len(caps)
+          print("capabilities:", n)
+          assert n >= 300, "能力位数量异常：%s" % n
+          r = gbt.run_task("health")
+          print("health ok:", bool(r.get("ok")))
+          assert r.get("ok") is not False
+          PY
+
+      - name: 判据（跨平台子集）
+        shell: bash
+        run: |
+          set -e
+          python tests/test_legacy_guard.py
+          python tests/test_autonomy.py

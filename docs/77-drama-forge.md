@@ -72,7 +72,7 @@ powershell ... -File tools\drama-build.ps1 -ScriptFile E01.txt -Name 剧名-E01 
 ## 三·九、台湾腔女声（2026-11-01 修）
 
 - 本机 SAPI 实测只有 `Microsoft Huihui Desktop`（zh-CN 女声），**没有 zh-TW 女声** ⇒ 之前默认念出来是普通话，所以“变味”。
-- 现默认：**`zh-TW-HsiaoChenNeural`**（Edge TTS，台湾腔女声）默认 **自然台湾腔（rate/pitch 不加工，主人 2026-11-01 选 1）**；配置 `state/voice.json`，或 `-Voice zh-TW-HsiaoYuNeural` 切换；helper `tools/codex-scripts/edge-tts.py`。
+- 现默认：**`zh-TW-HsiaoChenNeural`**（Edge TTS，台湾腔女声）**本地优先**：默认 `Voice=local`（SAPI；本机现只有 zh-CN Huihui）；`-CloudTts` 才显式用 Edge zh-TW。三集当前成片是 **Edge 云配音历史版**，不是本地配音；要本地台湾腔先装 zh-TW 语言包（见 docs/85）。
 - 实测重装 E01：5 镜全部 `zh-TW-HsiaoChenNeural`，成片 **61.07s / 1080×1920 / 有音轨 / 有字幕**。
 - 候选试听：`交付成片/顶替新娘/试听-HsiaoChen-自然.mp3`、`试听-HsiaoChen-泼辣.mp3`、`试听-HsiaoYu-泼辣.mp3`、`试听-Google-zhTW.mp3`（同一句，挑最对味的再锁默认）。
 - 边界：Edge TTS **需联网**；要完全本地台湾腔，需装 zh-TW 语言包（管理员）后切 SAPI/OneCore；没装就明确写联网，不假装本地。

@@ -355,3 +355,7 @@
 - **旧覆盖新根治（2026-11-01）**：查出外部同步用 -Force 绕过了 newer-wins（所以新改动被旧副本打回）。改：-Force 只表示允许并发推送，**不再**能覆盖更新的一侧；要覆盖须显式 -ForceOverwrite。同时补 state/obsolete-files.json 淘汰清单（删掉的文件不会被 push 复活）、legacy_guard op=authority（唯一真相=live 当前文件+账本）、记忆条三条禁令（不留旧/唯一真相/不打扰）。
 - **原始仓库整理（docs/82）**：GitHub 仓被运行态撑到 ~200MB（5108 文件，state/ 1876 个、dist/ 40.6MB、vendor/ 二进制，还有一个以 Windows 绝对路径命名的目录）。新增 	ools/github-repo-clean.py：只删运行态/产物（2323 文件 / 154MB）+ 重写 .gitignore，用 Git Data API 建一次 commit（本机无 git）。源文件与文档一律不动。
 - **原始仓库整理完成（docs/83）**：用 Git Data API 一次 commit（19d2b06）把 GitHub 仓 HEAD 从 **5108 → 2708 文件**（删 2323 个 / 154.1MB：state/ 1876、dist/ 40.6MB、runtime/logs/vaults/vendor、C:\Users\ADMIN\Desktop\GBT小土豆V8 目录、>2MB 大二进制），并追加 .gitignore 阻断块；源码与 docs/ 未动。历史体积仍 ~200MB（需 filter-repo 才能缩）。
+- **GitHub 全量清扫（docs/88）**：以本地真身为唯一真相，用便携 git 一次推送（fc8742c + 3851410）：旧内容 470 → 0，缺件 1503 → 0，旧件 3 → 0，产物目录 交付成片/ 移出并加 .gitignore；README 换新版（Caps 375）。
+- **方案A 历史重写（docs/89）**：便携 git+filter-repo 从 362 个提交历史里剔除 state/store/dist/runtime/logs/vaults/vendor/outputs/交付成片/C:\ 目录 → 351 提交、.git 193.1→177.2MB、HEAD 2752 文件不变；强推后远程 HEAD=d57a406。GitHub 体积是异步统计，旧对象待其 GC 释放。
+- **仓库装修（README/CI/模板/能力介绍）**：README 换专业版（社交预览图/徽章/TOC/架构 SVG/demo GIF/图集/实测读数表）；新增 CI（ubuntu+windows × py3.10/3.12）、Issue 表单、PR 模板、行为准则；新增 docs/90 能力介绍（30 域 375 位，从注册表实时生成）。
+- **可视化页面总览（docs/91）**：28 个静态面板逐一说明（一屏一问）+ 落地页/启动页/控制台 + docs/gallery 图集 + 三种打开方式；README 增「可视化页面」区块。

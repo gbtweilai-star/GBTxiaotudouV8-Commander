@@ -1,0 +1,30 @@
+name: ✨ 功能建议
+description: 提出一个新能力 / 新用法
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 想解决什么
+      description: 你现在的痛点是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望的方案
+      description: 新的能力位名 / 调用方式 / 期望输出
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 你考虑过的替代方案
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 自查
+      options:
+        - label: 我先查过 `docs/README.md`，没有重复的能力
+          required: true
