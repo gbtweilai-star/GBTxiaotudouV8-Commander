@@ -104,7 +104,7 @@ def main() -> int:
     if FAILS:
         print("FAILED %d: %s" % (len(FAILS), FAILS))
         return 1
-    print("ALL OK —— 受攻击取证/极限并发/合法反制/拒绝黑客反击 全过")
+    print("ALL OK —— 受攻击取证/极限并发/合法反制 全过")
     return 0
 
 

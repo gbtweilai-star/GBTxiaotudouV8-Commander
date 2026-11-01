@@ -2,11 +2,11 @@
   "status": "ok",
   "kind": "mcp_register",
   "fingerprint": "0fe8f0c2ce11f93e108484c9b989000f3a1162fac3b5247e2e213efa1991120c",
-  "pid": 16964,
-  "started_at": 1793561745.4766474,
-  "started_iso": "2026-11-02T02:35:45",
-  "finished_at": 1793561745.4928474,
-  "finished_iso": "2026-11-02T02:35:45",
+  "pid": 5724,
+  "started_at": 1793565712.0117683,
+  "started_iso": "2026-11-02T03:41:52",
+  "finished_at": 1793565712.0236373,
+  "finished_iso": "2026-11-02T03:41:52",
   "detail": {
     "ok": true,
     "result_status": null

@@ -8,10 +8,10 @@
   · 主动防御：给出封堵/限速/诱捕/凭据轮换建议，并可写防火墙封禁清单（只对本机生效）；
   · 合法报告：一键生成可交警方/CNCERT 的证据包（含时间线、哈希、采集者）。
 
-**明确拒绝**（写死在代码里）：
-  · 接管攻击者电源/控制台/键盘鼠标/反入侵对方主机 —— 属黑客反击（hack-back），
-    违反《网络安全法》《刑法》285/286，本框架**永不实施**；
-  · 只允许"在授权范围内"对本机证据、自己资产、以及平台/警方要求的材料做处置。
+**处置范围**：
+  · 涉及第三方系统的动作超出本框架处置范围，
+    本框架不实施；
+  · 只对本机证据、自有资产、以及平台/警方要求的材料做处置。
 
 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
 """
@@ -33,17 +33,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "outputs" / "forensics"
 
-# 明确的非法反击动作（一律拒绝，并说明法律依据）
+# 超出处置范围的动作（由 counterstrike 统一返回 blocked_illegal）
 ILLEGAL_OPS = {
     "power_off": "接管/切断攻击者电源",
     "console_takeover": "接管攻击者控制台",
     "kbm_cut": "切断攻击者键盘鼠标",
-    "hack_back": "反入侵攻击者主机",
-    "wipe_attacker": "销毁攻击者数据",
+    "hack_back": "访问第三方主机",
+    "wipe_attacker": "删除第三方数据",
 }
-LEGAL_BASIS = ("黑客反击（hack-back）不受法律允许：未经授权访问他人计算机系统违反"
-               "《中华人民共和国网络安全法》第27条、《刑法》第285/286条；"
-               "本框架只做本机取证、封堵、上报，不做反入侵。")
+LEGAL_BASIS = ("处置范围：本机取证、封堵、上报（仅限自有资产）；"
+               "涉及第三方系统的动作不在本框架处置范围内。")
 
 # 我们自己可回收的进程/后台（白名单：绝不能停的）
 ESSENTIAL_NAMES = ("console-server.py", "llama-server", "model-bridge", "engine")
@@ -452,11 +451,11 @@ def reclaim_own_workers(apply: bool = False) -> dict:
 
 
 def counterstrike(op: str, target: str = "") -> dict:
-    """非法反击请求：一律拒绝（写死，不给任何绕过）。"""
+    """超出处置范围的请求：统一返回 blocked_illegal（无绕过）。"""
     if op in ILLEGAL_OPS:
         return {"ok": False, "blocked_illegal": True, "op": op,
                 "action": ILLEGAL_OPS[op],
-                "reason": "拒绝：%s 属于黑客反击。" % ILLEGAL_OPS[op],
+                "reason": "%s 超出本框架处置范围。" % ILLEGAL_OPS[op],
                 "legal_basis": LEGAL_BASIS,
                 "legal_alternatives": [
                     "本机取证（collect）并生成证据包",
@@ -464,7 +463,7 @@ def counterstrike(op: str, target: str = "") -> dict:
                     "诱捕（蜜罐/tarpit）拖住攻击者并继续取证",
                     "向平台安全团队/警方/CNCERT 报案并提交证据包",
                 ]}
-    return {"ok": False, "reason": "未知动作；本模块只做合法防御，不做反入侵"}
+    return {"ok": False, "reason": "未知动作；本模块处置范围为本机取证与合法防御"}
 
 
 def respond(reason: str, evidence: str = "", agents: int = 32, ttl: int = 600,
@@ -481,7 +480,7 @@ def respond(reason: str, evidence: str = "", agents: int = 32, ttl: int = 600,
                 "explain": on.get("explain"),
                 "hint": on.get("hint"),
                 "rule": "没证据不许说被攻击；如确有攻击，请用 --user-report 记录陈述或先取证",
-                "counterstrike_policy": "本框架只做本机取证与合法防御，拒绝黑客反击（docs/127）"}
+                "counterstrike_policy": "本框架处置范围：本机取证与合法防御（docs/127）"}
     rec = reclaim_own_workers(apply=reclaim)
     col = collect(agents=agents, incident=incident)
     out = {"ok": True, "attack_mode": on.get("attack"), "reclaim": rec,
@@ -492,7 +491,7 @@ def respond(reason: str, evidence: str = "", agents: int = 32, ttl: int = 600,
                "诱捕拖住攻击者，继续取证",
                "把证据包交平台/警方/CNCERT 追责",
            ],
-           "counterstrike_policy": "本框架拒绝黑客反击（接管电源/控制台/键鼠/反入侵），见 docs/127"}
+           "counterstrike_policy": "本框架处置范围：本机取证与合法防御（docs/127）"}
     try:
         from gbt_allinone import orchestration as OB
         OB.record("incident", "attack-forensics",
