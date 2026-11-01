@@ -303,6 +303,13 @@ class Handler(BaseHTTPRequestHandler):
             elif op == "cvss":
                 from gbt_allinone import bounty_core as BC
                 out = BC.cvss3(str(d.get("vector") or ""))
+            elif op == "scope_import":
+                from gbt_allinone import scope_import as SI
+                loaded = SI.load_sample(str(d.get("file") or ""))
+                if not loaded.get("ok"):
+                    out = loaded
+                else:
+                    out = SI.import_doc(loaded["doc"], confirm=bool(d.get("confirm")))
             elif op == "payout":
                 out = B.payout(str(d.get("program") or ""), str(d.get("finding") or ""),
                                float(d.get("amount") or 0), str(d.get("currency") or "USD"),

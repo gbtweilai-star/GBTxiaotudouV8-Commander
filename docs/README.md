@@ -236,3 +236,4 @@
 | 118 | [118-bounty-direction.md](118-bounty-direction.md) | 方向转向：安全研究/赏金工作台（授权闸/scope闸/报告/赔付账本 #bounty） |
 | 119 | [119-own-lab-end-to-end.md](119-own-lab-end-to-end.md) | 自训靶场 + 端到端：6 类漏洞真跑 → 录单 → 报告(sha256) → 账本 |
 | 120 | [120-bounty-report-and-tracker.md](120-bounty-report-and-tracker.md) | 赏金报告升级（CVSS 3.1/CWE/复现/修复/侧车 JSON）+ 提交状态机 |
+| 121 | [121-platform-scope-import.md](121-platform-scope-import.md) | 平台 scope 导入（HackerOne/Bugcrowd 离线归一化，dry-run + 人工确认才落库） |

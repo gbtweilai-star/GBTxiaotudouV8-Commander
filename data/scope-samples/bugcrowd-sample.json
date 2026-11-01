@@ -1,0 +1,18 @@
+{
+ "program": {
+  "name": "Bugcrowd 示例（虚构）",
+  "handle": "bugcrowd-sample",
+  "url": "https://bugcrowd.com/bugcrowd-sample"
+ },
+ "targets": {
+  "in_scope": [
+   {"name": "主站", "category": "website", "uri": "https://shop.example.net"},
+   {"name": "API", "category": "api", "uri": "api.example.net"},
+   {"name": "网段", "category": "network", "uri": "198.51.100.0/24"}
+  ],
+  "out_of_scope": [
+   {"name": "支付回调", "category": "website", "uri": "pay.example.net"},
+   "status.example.net"
+  ]
+ }
+}

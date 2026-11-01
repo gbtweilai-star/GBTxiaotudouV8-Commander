@@ -1,0 +1,16 @@
+{
+ "platform": "hackerone",
+ "program": {
+  "name": "Acme VDP（示例·虚构）",
+  "handle": "acme-vdp-sample",
+  "url": "https://hackerone.com/acme-vdp-sample",
+  "rules": "仅测试 web 资产；禁止 DoS；禁止社工；发现后 90 天披露"
+ },
+ "scopes": [
+  {"asset_identifier": "https://www.example.com", "asset_type": "URL", "eligible_for_bounty": true},
+  {"asset_identifier": "*.api.example.com", "asset_type": "WILDCARD", "eligible_for_bounty": true},
+  {"asset_identifier": "203.0.113.10", "asset_type": "IP_ADDRESS", "eligible_for_bounty": true},
+  {"asset_identifier": "intranet.example.com", "asset_type": "DOMAIN", "eligible_for_bounty": false}
+ ],
+ "out_of_scope": ["mail.example.com", "*.internal.example.com"]
+}

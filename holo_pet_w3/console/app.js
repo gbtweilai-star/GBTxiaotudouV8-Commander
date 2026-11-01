@@ -767,6 +767,36 @@
     });
   }
   function wireBounty() {
+    var impBtn = $("bounty-import");
+    if (impBtn && !impBtn.dataset.bound) {
+      impBtn.dataset.bound = "1";
+      impBtn.addEventListener("click", function () {
+        var out = $("bounty-gate-result");
+        bountyApi("scope_import", {
+          file: "data/scope-samples/hackerone-sample.json", confirm: false,
+        }).then(function (d) {
+          if (!out) return;
+          out.className = d.ok ? "ok" : "blocked";
+          out.textContent = d.ok
+            ? ("预览：" + d.name + " · scope " + (d.scope || []).join(" / ")
+               + (d.out_of_scope || []).length + " 个 out —— 确认后才落库")
+            : ("导入失败：" + (d.reason || ""));
+          if (!d.ok) return;
+          if (!window.confirm("确认把示例 scope 落库为授权项目？（示例为虚构，仅演示）")) return;
+          bountyApi("scope_import", {
+            file: "data/scope-samples/hackerone-sample.json", confirm: true,
+          }).then(function (r2) {
+            var el = $("bounty-gate-result");
+            if (el) {
+              el.className = r2.created ? "ok" : "blocked";
+              el.textContent = r2.created ? ("已导入项目：" + (r2.program || {}).id)
+                : ("落库失败：" + (r2.reason || ""));
+            }
+            ensureBounty();
+          });
+        });
+      });
+    }
     var checkBtn = $("bounty-check");
     var demoBtn = $("bounty-add-demo");
     if (!checkBtn) return;
