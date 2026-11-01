@@ -245,3 +245,4 @@
 | 127 | [127-attack-evidence-only.md](127-attack-evidence-only.md) | 受攻击只采集证据：极限并发取证/资源回收/证据包 |
 | 128 | [128-attack-evidence-admission.md](128-attack-evidence-admission.md) | 受攻击举证：没证据不许说被攻击；强证据/主人陈述/交代话术 |
 | 129 | [129-full-forensics-chain.md](129-full-forensics-chain.md) | 全量采集 16 采集器 + sha256 哈希链 + 时间线 + 内存预算 |
+| 130 | [130-engine-gpu-vulkan.md](130-engine-gpu-vulkan.md) | 引擎直连 GPU：补齐 Vulkan 后端、探测/加载/切换、CPU vs GPU 实测 |
