@@ -93,7 +93,7 @@ def _connect_ro(db: str):
     return con, p
 
 
-def sources() -> dict:
+def sources(**_kwargs) -> dict:
     """现读可查的本地源（只读列举）：store/state 下的 *.db/*.jsonl。"""
     roots = [_store_root(), ROOT / "state", ROOT / "gbt_allinone" / "store"]
     seen, dbs, jsonls = set(), [], []

@@ -140,7 +140,7 @@ def consolidate(claim: str = "") -> dict:
             "_口径": "历史只追加（不覆盖）；置信度=证据加权；move ∈ strengthen/weaken/extend"}
 
 
-def beliefs(min_conf: float = 0.0) -> dict:
+def beliefs(min_conf: float = 0.0, **_kwargs) -> dict:
     """现读信念（每条取最新一版；`history` 在盘上保留）。"""
     rows = {}
     for b in _read_jsonl(_store_dir() / "beliefs.jsonl"):

@@ -909,6 +909,28 @@
     });
   }
   function wireOmniAll() {
+    var attrBtn = $("omni-attr");
+    if (attrBtn && !attrBtn.dataset.bound) {
+      attrBtn.dataset.bound = "1";
+      attrBtn.addEventListener("click", function () {
+        omniApi({ op: "attribution" }).then(function (d) {
+          var el = $("omni-status");
+          if (!el) return;
+          if (!d || d.ok !== true) {
+            el.className = "bad";
+            el.textContent = "归因失败：" + ((d && (d.reason || d.error)) || "");
+            return;
+          }
+          var cats = d.categories || {};
+          var parts = Object.keys(cats).map(function (k) { return k + " " + cats[k]; });
+          el.className = d.failed ? "bad" : "ok";
+          el.textContent = "失败 " + d.failed + " · " + (parts.join("／") || "无") + " · 报告 "
+            + (d.report || "").split("\\").pop();
+          document.documentElement.dataset.omniAttr =
+            "ok:" + d.failed + ":" + Object.keys(cats).length;
+        });
+      });
+    }
     var btn = $("omni-run");
     if (!btn || btn.dataset.bound) return;
     btn.dataset.bound = "1";

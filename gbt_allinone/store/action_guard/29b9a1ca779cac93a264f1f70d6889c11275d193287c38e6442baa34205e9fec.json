@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "lr_submit",
+  "fingerprint": "29b9a1ca779cac93a264f1f70d6889c11275d193287c38e6442baa34205e9fec",
+  "pid": 13096,
+  "started_at": 1793563618.7531993,
+  "started_iso": "2026-11-02T03:06:58",
+  "finished_at": 1793563618.7697783,
+  "finished_iso": "2026-11-02T03:06:58",
+  "detail": {
+    "error": "需要 description"
+  }
+}

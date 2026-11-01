@@ -18,13 +18,15 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
-_FG = ROOT / "tools" / "filmgrade.py"
+ROOT = Path(__file__).resolve().parents[2]  # 仓库根（不再写死 ADMIN 桌面）
+_FG = ROOT / "tools" / "filmgrade.py"  # 外部调色工具（没装 = 环境缺件）
 READ_OPS = ("list", "pick", "qc")
 WRITE_OPS = ("preview",)
 
 
 def _fg():
+    if not _FG.is_file():
+        raise RuntimeError("缺少 filmgrade.py（外部调色工具未安装）：%s" % _FG)
     spec = importlib.util.spec_from_file_location("filmgrade", _FG)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)

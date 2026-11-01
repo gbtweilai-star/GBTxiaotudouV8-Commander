@@ -609,7 +609,7 @@ def get_plan(name: str = "default") -> dict:
     name = _canonical_name(name)
     record = load_json(_plan_path(name), None)
     if not isinstance(record, dict) or not isinstance(record.get("plan"), dict):
-        raise RehearsalError(f"排练计划不存在: {name}")
+        raise RehearsalError(f"缺少 plan：排练计划不存在: {name}")
     normalized = _normalize_plan(record["plan"])
     plan_sha = _json_sha(normalized)
     return {

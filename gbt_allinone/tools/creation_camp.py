@@ -155,7 +155,7 @@ def where(**_kw) -> dict:
             ]}
 
 
-def sources() -> dict:
+def sources(**_kwargs) -> dict:
     return {"ok": True, "op": "sources", "sources": SOURCES}
 
 

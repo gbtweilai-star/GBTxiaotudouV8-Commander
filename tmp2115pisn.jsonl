@@ -1,0 +1,8 @@
+{"run_id": "T1", "cap": "hand_bridge", "ok": false, "ms": 0, "error": "需授权位：没票不执行"}
+{"run_id": "T1", "cap": "slow_cap", "ok": false, "ms": 12000, "error": "超时 12s（已 kill）"}
+{"run_id": "T1", "cap": "llm_chat", "ok": false, "ms": 50, "error": "ModuleNotFoundError: No module named 'openai'"}
+{"run_id": "T1", "cap": "media_run", "ok": false, "ms": 60, "error": "FileNotFoundError: No such file or directory: 'ffmpeg.exe'"}
+{"run_id": "T1", "cap": "filesystem_write", "ok": false, "ms": 40, "error": "PermissionError: [WinError 5] 拒绝访问"}
+{"run_id": "T1", "cap": "recon_arxiv", "ok": false, "ms": 300, "error": "URLError: Connection timed out"}
+{"run_id": "T1", "cap": "selfscan", "ok": false, "ms": 80, "error": "AssertionError: unexpected state"}
+{"run_id": "T1", "cap": "inventory", "ok": true, "ms": 90}

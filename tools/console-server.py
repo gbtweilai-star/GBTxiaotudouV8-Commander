@@ -351,7 +351,13 @@ class Handler(BaseHTTPRequestHandler):
             d = {}
         sys.path.insert(0, str(REPO))
         from gbt_allinone import omni_all
-        if str(d.get("op") or "") == "status" or not d.get("confirm"):
+        op = str(d.get("op") or "")
+        if op == "attribution":
+            from gbt_allinone import omni_attr
+            out = omni_attr.attribute(str(d.get("run_id") or ""))
+            return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        if op == "status" or not d.get("confirm"):
             out = omni_all.status()
             out["notice"] = ("状态查询；真全开执行需要 confirm=true"
                              if not d.get("confirm") else "已确认")

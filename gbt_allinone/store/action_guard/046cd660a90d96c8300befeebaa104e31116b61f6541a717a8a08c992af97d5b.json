@@ -2,11 +2,11 @@
   "status": "user_error",
   "kind": "sched_define",
   "fingerprint": "046cd660a90d96c8300befeebaa104e31116b61f6541a717a8a08c992af97d5b",
-  "pid": 9476,
-  "started_at": 1793560632.381589,
-  "started_iso": "2026-11-02T02:17:12",
-  "finished_at": 1793560632.4012928,
-  "finished_iso": "2026-11-02T02:17:12",
+  "pid": 6240,
+  "started_at": 1793561943.3331246,
+  "started_iso": "2026-11-02T02:39:03",
+  "finished_at": 1793561943.349919,
+  "finished_iso": "2026-11-02T02:39:03",
   "detail": {
     "error": "需要 name"
   }

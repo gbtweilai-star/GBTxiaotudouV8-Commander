@@ -249,7 +249,7 @@ def tick(task_id: str, *, now: str = "") -> dict:
             "owner_action_required": state.get("owner_action_required", False)}
 
 
-def status(task_id: str = "") -> dict:
+def status(task_id: str = "", **_kwargs) -> dict:
     if task_id:
         return {"ok": True, "readonly": True, "task": _read(task_id)}
     tasks = []

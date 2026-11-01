@@ -2,11 +2,11 @@
   "status": "user_error",
   "kind": "wf_define",
   "fingerprint": "49868fbf27c952516d6b7239d172b790ab81af23321154768918b3daeb3d022d",
-  "pid": 20068,
-  "started_at": 1793560708.0709336,
-  "started_iso": "2026-11-02T02:18:28",
-  "finished_at": 1793560708.0958319,
-  "finished_iso": "2026-11-02T02:18:28",
+  "pid": 12904,
+  "started_at": 1793563517.630229,
+  "started_iso": "2026-11-02T03:05:17",
+  "finished_at": 1793563517.6388838,
+  "finished_iso": "2026-11-02T03:05:17",
   "detail": {
     "error": "需要 name 与非空 nodes 列表"
   }

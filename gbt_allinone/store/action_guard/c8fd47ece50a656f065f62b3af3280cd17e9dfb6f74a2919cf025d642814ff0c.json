@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "mirror_parity",
+  "fingerprint": "c8fd47ece50a656f065f62b3af3280cd17e9dfb6f74a2919cf025d642814ff0c",
+  "pid": 15412,
+  "started_at": 1793563298.9855108,
+  "started_iso": "2026-11-02T03:01:38",
+  "finished_at": 1793563299.0020268,
+  "finished_iso": "2026-11-02T03:01:39",
+  "detail": {
+    "error": "缺少 plan：排练计划不存在: default"
+  }
+}

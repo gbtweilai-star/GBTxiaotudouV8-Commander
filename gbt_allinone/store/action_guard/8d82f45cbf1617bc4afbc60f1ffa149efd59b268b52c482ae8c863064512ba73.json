@@ -2,11 +2,11 @@
   "status": "ok",
   "kind": "pipeline_submit",
   "fingerprint": "8d82f45cbf1617bc4afbc60f1ffa149efd59b268b52c482ae8c863064512ba73",
-  "pid": 13820,
-  "started_at": 1793560584.591866,
-  "started_iso": "2026-11-02T02:16:24",
-  "finished_at": 1793560584.6037495,
-  "finished_iso": "2026-11-02T02:16:24",
+  "pid": 6320,
+  "started_at": 1793563501.2490916,
+  "started_iso": "2026-11-02T03:05:01",
+  "finished_at": 1793563501.2574837,
+  "finished_iso": "2026-11-02T03:05:01",
   "detail": {
     "ok": true,
     "result_status": "blocked"

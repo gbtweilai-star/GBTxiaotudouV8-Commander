@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "sched_tick",
+  "fingerprint": "456e51bb3c5ee0684a78cdda9290cbe1cb9e5085869ee47b452d9da5179ef796",
+  "pid": 19204,
+  "started_at": 1793562598.675409,
+  "started_iso": "2026-11-02T02:49:58",
+  "finished_at": 1793562598.6921175,
+  "finished_iso": "2026-11-02T02:49:58",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

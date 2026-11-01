@@ -1,0 +1,13 @@
+{
+  "status": "user_error",
+  "kind": "sched_define",
+  "fingerprint": "b6ef9d044c8bd9355152cf1db1263868a53f7d48682833d0a411251d35517e91",
+  "pid": 2524,
+  "started_at": 1793563617.8527734,
+  "started_iso": "2026-11-02T03:06:57",
+  "finished_at": 1793563617.8527734,
+  "finished_iso": "2026-11-02T03:06:57",
+  "detail": {
+    "error": "需要 name"
+  }
+}

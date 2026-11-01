@@ -225,7 +225,7 @@ def fetch(url: str, source_key: str = "starterstory", keyword: str = "") -> dict
             "via": "run_task('tentacle', web_read)（唯一门）"}
 
 
-def sources() -> dict:
+def sources(**_kwargs) -> dict:
     return {"ok": True, "op": "sources", "sources": SOURCES,
             "_口径": "只读公开页；取数一律经唯一门（触手 web_read）；本件自己不发 HTTP"}
 

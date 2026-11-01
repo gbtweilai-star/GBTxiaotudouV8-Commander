@@ -6328,3 +6328,1178 @@
 {"at": "2026-11-02T02:35:48", "cap": "body_map", "ok": true, "ms": 2104.3691635131836, "error_class": "", "detail": "", "gate": ""}
 {"at": "2026-11-02T02:35:48", "cap": "body_see", "ok": true, "ms": 300.2347946166992, "error_class": "", "detail": "", "gate": ""}
 {"at": "2026-11-02T02:35:48", "cap": "body_say", "ok": true, "ms": 110.7180118560791, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:37:59", "cap": "body_map", "ok": true, "ms": 2083.5623741149902, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:37:59", "cap": "body_see", "ok": true, "ms": 283.5071086883545, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:00", "cap": "body_say", "ok": true, "ms": 118.67237091064453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:00", "cap": "body_type", "ok": true, "ms": 148.43416213989258, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:00", "cap": "body_click", "ok": true, "ms": 308.9010715484619, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:00", "cap": "body_volume", "ok": true, "ms": 110.61525344848633, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:01", "cap": "body_open", "ok": false, "ms": 48.16699028015137, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:38:01", "cap": "hand_retarget", "ok": true, "ms": 52.25062370300293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:03", "cap": "sync_guard", "ok": true, "ms": 1722.6650714874268, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:03", "cap": "viral_forge", "ok": true, "ms": 70.49179077148438, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:03", "cap": "taste_guard", "ok": true, "ms": 96.25959396362305, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:03", "cap": "experience_forge", "ok": true, "ms": 66.68496131896973, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:03", "cap": "codex_status", "ok": true, "ms": 369.89688873291016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:04", "cap": "codex_tools", "ok": true, "ms": 81.43329620361328, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:04", "cap": "codex_thread_new", "ok": false, "ms": 49.53289031982422, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:38:04", "cap": "codex_turn_send", "ok": false, "ms": 50.18877983093262, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:38:04", "cap": "codex_interrupt", "ok": false, "ms": 103.58119010925293, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:38:04", "cap": "codex_chat", "ok": false, "ms": 68.59445571899414, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:38:04", "cap": "codex_models", "ok": false, "ms": 65.18840789794922, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:38:05", "cap": "desktop_commander", "ok": true, "ms": 72.39389419555664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:05", "cap": "health", "ok": true, "ms": 142.5318717956543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:05", "cap": "echo", "ok": true, "ms": 100.0669002532959, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:05", "cap": "count_words", "ok": true, "ms": 66.61653518676758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:05", "cap": "audit_query", "ok": true, "ms": 67.9788589477539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "quant_strategy", "ok": true, "ms": 68.32742691040039, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "quant_backtest", "ok": true, "ms": 62.20841407775879, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "platform_profile", "ok": true, "ms": 67.08335876464844, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "quant_params", "ok": true, "ms": 62.668800354003906, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "osint_scan", "ok": false, "ms": 68.3748722076416, "error_class": "error", "detail": "缺少 target（要扫的域名或 IP）。例：{\"target\": \"example.com\"}", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "record_grid", "ok": false, "ms": 61.206817626953125, "error_class": "error", "detail": "需要 text（内联文本）或 path（框架内相对路径）", "gate": ""}
+{"at": "2026-11-02T02:38:06", "cap": "wf_define", "ok": false, "ms": 66.45560264587402, "error_class": "error", "detail": "需要 name 与非空 nodes 列表", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "wf_run", "ok": false, "ms": 71.05374336242676, "error_class": "error", "detail": "工作流不存在: （先 wf_define）", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "wf_status", "ok": true, "ms": 83.37640762329102, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "wf_resume", "ok": false, "ms": 66.3764476776123, "error_class": "error", "detail": "运行记录不存在: ", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "lr_submit", "ok": false, "ms": 71.51055335998535, "error_class": "error", "detail": "需要 description", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "lr_tick", "ok": true, "ms": 79.132080078125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:07", "cap": "lr_status", "ok": true, "ms": 67.49677658081055, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:08", "cap": "selfscan", "ok": true, "ms": 118.12758445739746, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:08", "cap": "alerts", "ok": true, "ms": 64.79978561401367, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:08", "cap": "tentacle", "ok": false, "ms": 99.17569160461426, "error_class": "error", "detail": "缺少 action：给触手能力名（tentacle_manifest）、给 intent 走自动路由、或 op=caps 看全部能力", "gate": ""}
+{"at": "2026-11-02T02:38:08", "cap": "tentacle_manifest", "ok": true, "ms": 110.07928848266602, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:08", "cap": "cap_self", "ok": true, "ms": 67.3058032989502, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "trunk_cover", "ok": true, "ms": 57.69538879394531, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "body_sense", "ok": true, "ms": 109.62486267089844, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "devour_auto", "ok": true, "ms": 65.63687324523926, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "trunk_reason", "ok": true, "ms": 90.19017219543457, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "context_guard", "ok": true, "ms": 66.47729873657227, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:09", "cap": "research_intel", "ok": true, "ms": 66.37263298034668, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:10", "cap": "hunyuan_video", "ok": true, "ms": 65.0625228881836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:10", "cap": "energy_core", "ok": true, "ms": 110.27383804321289, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:10", "cap": "orchestration", "ok": true, "ms": 92.98825263977051, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:10", "cap": "autonomy", "ok": true, "ms": 61.15365028381348, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:10", "cap": "blueprint", "ok": true, "ms": 70.5118179321289, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:11", "cap": "legacy_guard", "ok": true, "ms": 200.32048225402832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:11", "cap": "skills_hub", "ok": true, "ms": 74.9659538269043, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:11", "cap": "chain_kernel", "ok": true, "ms": 62.5607967376709, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:11", "cap": "root_cause", "ok": true, "ms": 66.95866584777832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:11", "cap": "execution_guard", "ok": true, "ms": 85.43992042541504, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "cap_pack", "ok": true, "ms": 68.01080703735352, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "mcp_register", "ok": true, "ms": 72.62420654296875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "dual_gate", "ok": true, "ms": 63.547372817993164, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "mcp_servers", "ok": true, "ms": 69.56839561462402, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "mcp_unregister", "ok": true, "ms": 72.9827880859375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:12", "cap": "mcp_health", "ok": false, "ms": 49.88598823547363, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:38:13", "cap": "omni_open", "ok": true, "ms": 72.62158393859863, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:13", "cap": "sec_surface", "ok": true, "ms": 710.2773189544678, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:38", "cap": "keylogger", "ok": false, "ms": 14.892101287841797, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:38:38", "cap": "osint_scan", "ok": false, "ms": 4.5013427734375, "error_class": "gate_denied", "detail": "需要人工授权（osint_private）：OSINT 扫描自有内网/保留地址（一次性授权）", "gate": "osint_private"}
+{"at": "2026-11-02T02:38:38", "cap": "pipeline_submit", "ok": true, "ms": 13.985872268676758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:38", "cap": "sec_defenses", "ok": true, "ms": 177.74176597595215, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:38", "cap": "sec_llm", "ok": false, "ms": 57.463884353637695, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:38:38", "cap": "truth_scan", "ok": true, "ms": 58.374881744384766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:38", "cap": "autopilot", "ok": false, "ms": 54.66628074645996, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:38:38", "cap": "llm_chat", "ok": false, "ms": 46.0512638092041, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:38:39", "cap": "llm_status", "ok": true, "ms": 509.0320110321045, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:39", "cap": "cloud_llm", "ok": true, "ms": 74.92589950561523, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:39", "cap": "brain_route", "ok": false, "ms": 62.80684471130371, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T02:38:39", "cap": "brain_execute", "ok": false, "ms": 60.20545959472656, "error_class": "error", "detail": "缺少 kind 或 parallel", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "brain_verify", "ok": true, "ms": 229.36224937438965, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "selfscan", "ok": true, "ms": 56.61320686340332, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "wf_status", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "tentacle_status", "ok": true, "ms": 60.471296310424805, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "brain_health", "ok": true, "ms": 175.55761337280273, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "brain_unify", "ok": false, "ms": 60.9591007232666, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T02:38:40", "cap": "root_fix", "ok": true, "ms": 75.13189315795898, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:52", "cap": "inventory", "ok": true, "ms": 82.96751976013184, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:53", "cap": "brain_vault", "ok": true, "ms": 66.65635108947754, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:53", "cap": "think_loop", "ok": false, "ms": 49.954891204833984, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:38:53", "cap": "one_key_deploy", "ok": false, "ms": 65.42730331420898, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T02:38:53", "cap": "deploy_queue", "ok": true, "ms": 66.6496753692627, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:53", "cap": "mirror_shape", "ok": true, "ms": 59.20910835266113, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:53", "cap": "mirror_scan", "ok": true, "ms": 63.34686279296875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:53", "cap": "mirror_plan", "ok": false, "ms": 62.67070770263672, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_simulate", "ok": false, "ms": 70.40882110595703, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_parity", "ok": false, "ms": 79.25152778625488, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_rehearse", "ok": false, "ms": 48.16031455993652, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_release", "ok": false, "ms": 41.40973091125488, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_ascend", "ok": false, "ms": 56.70881271362305, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:38:54", "cap": "mirror_status", "ok": true, "ms": 82.48615264892578, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:55", "cap": "mirror_rewind", "ok": false, "ms": 52.56199836730957, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:38:55", "cap": "auth_gate_status", "ok": true, "ms": 67.75808334350586, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:55", "cap": "transfer", "ok": true, "ms": 66.52021408081055, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:55", "cap": "wf_cache_clear", "ok": true, "ms": 59.20982360839844, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:55", "cap": "signature_guard", "ok": true, "ms": 105.70740699768066, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:58", "cap": "file_hygiene", "ok": true, "ms": 2646.733283996582, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:58", "cap": "devour_scan", "ok": true, "ms": 50.19187927246094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:58", "cap": "devour_github", "ok": false, "ms": 49.83091354370117, "error_class": "error", "detail": "缺少 repo：请给出 GitHub 仓库 URL（如 https://github.com/owner/repo）", "gate": ""}
+{"at": "2026-11-02T02:38:58", "cap": "comfy_forge", "ok": true, "ms": 66.82443618774414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "ux_doctrine", "ok": true, "ms": 60.910701751708984, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "welcome", "ok": true, "ms": 66.73645973205566, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "god_view", "ok": true, "ms": 61.615943908691406, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "agency_tentacles", "ok": true, "ms": 67.3520565032959, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "media_pipeline", "ok": true, "ms": 66.96414947509766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:38:59", "cap": "tentacle_pipeline", "ok": true, "ms": 62.62063980102539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:00", "cap": "long_run_supervisor", "ok": true, "ms": 62.70718574523926, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:00", "cap": "devour_reflect", "ok": true, "ms": 75.54435729980469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:00", "cap": "devour_pulse", "ok": false, "ms": 57.27505683898926, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:39:00", "cap": "mcp_connect", "ok": false, "ms": 52.50740051269531, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:39:00", "cap": "mcp_tools", "ok": true, "ms": 65.97685813903809, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:00", "cap": "mcp_call", "ok": false, "ms": 52.42323875427246, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:39:00", "cap": "coze_mail", "ok": true, "ms": 63.24577331542969, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:01", "cap": "create", "ok": true, "ms": 56.97917938232422, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:01", "cap": "drama", "ok": true, "ms": 66.6801929473877, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:01", "cap": "tentacle_status", "ok": true, "ms": 117.4156665802002, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:01", "cap": "tactics_advise", "ok": true, "ms": 65.33288955688477, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:01", "cap": "pipeline_submit", "ok": false, "ms": 65.94395637512207, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:39:01", "cap": "pipeline_versions", "ok": false, "ms": 64.3763542175293, "error_class": "error", "detail": "缺少 name：请给出产物名", "gate": ""}
+{"at": "2026-11-02T02:39:02", "cap": "pipeline_rollback", "ok": false, "ms": 53.592681884765625, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:39:02", "cap": "pipeline_status", "ok": true, "ms": 65.90771675109863, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:03", "cap": "ghost_guard", "ok": true, "ms": 801.7086982727051, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:03", "cap": "sched_define", "ok": false, "ms": 102.85782814025879, "error_class": "error", "detail": "需要 name", "gate": ""}
+{"at": "2026-11-02T02:39:03", "cap": "sched_tick", "ok": true, "ms": 103.33442687988281, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:03", "cap": "sched_status", "ok": true, "ms": 94.23518180847168, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:04", "cap": "svc_inspect", "ok": true, "ms": 700.822114944458, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:04", "cap": "vision", "ok": true, "ms": 133.38828086853027, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:05", "cap": "vlx_flow", "ok": true, "ms": 82.88836479187012, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:05", "cap": "prompt_bridge", "ok": true, "ms": 87.88371086120605, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:05", "cap": "datakit", "ok": true, "ms": 82.7326774597168, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:05", "cap": "voice", "ok": false, "ms": 101.08137130737305, "error_class": "error", "detail": "缺少 text：要合成的文本", "gate": ""}
+{"at": "2026-11-02T02:39:06", "cap": "voice_orchestra", "ok": true, "ms": 687.6606941223145, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:06", "cap": "browser", "ok": false, "ms": 81.04610443115234, "error_class": "error", "detail": "缺少 url", "gate": ""}
+{"at": "2026-11-02T02:39:06", "cap": "bluetooth", "ok": true, "ms": 95.84760665893555, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:07", "cap": "bt_control", "ok": true, "ms": 87.42284774780273, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:07", "cap": "quant", "ok": true, "ms": 79.84781265258789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:07", "cap": "life", "ok": true, "ms": 82.96942710876465, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:07", "cap": "mind", "ok": true, "ms": 77.74066925048828, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:07", "cap": "project_context", "ok": true, "ms": 82.9010009765625, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:08", "cap": "topic_watch", "ok": false, "ms": 86.29155158996582, "error_class": "error", "detail": "缺少 need：请给一句需求（如「帮我盯着 AI 行业动态」）", "gate": ""}
+{"at": "2026-11-02T02:39:08", "cap": "trend_watch", "ok": true, "ms": 83.37569236755371, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:08", "cap": "projection_card", "ok": true, "ms": 83.38093757629395, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:08", "cap": "trace_store", "ok": true, "ms": 123.33393096923828, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:09", "cap": "wave_probe", "ok": true, "ms": 142.26245880126953, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:09", "cap": "dream_replay", "ok": true, "ms": 83.36067199707031, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:09", "cap": "capability_net", "ok": true, "ms": 107.15556144714355, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:09", "cap": "director_mood", "ok": true, "ms": 94.65599060058594, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:09", "cap": "music_publishing", "ok": true, "ms": 129.75811958312988, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:10", "cap": "anim_audit", "ok": true, "ms": 81.5885066986084, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:10", "cap": "dh_asset_gate", "ok": true, "ms": 83.02688598632812, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:10", "cap": "tentacle_arm", "ok": true, "ms": 84.35845375061035, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:10", "cap": "project_drift", "ok": true, "ms": 117.20490455627441, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:11", "cap": "impact_check", "ok": true, "ms": 70.88494300842285, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:11", "cap": "music_intel", "ok": true, "ms": 83.00399780273438, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:11", "cap": "video_intel", "ok": true, "ms": 66.73145294189453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:11", "cap": "film_intel", "ok": true, "ms": 81.2370777130127, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:11", "cap": "account_registry", "ok": true, "ms": 77.25739479064941, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:12", "cap": "verification_watch", "ok": true, "ms": 79.81491088867188, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:12", "cap": "shared_resources", "ok": true, "ms": 80.70111274719238, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:12", "cap": "brand_outro", "ok": true, "ms": 82.99016952514648, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:12", "cap": "emotion_projection", "ok": true, "ms": 76.16758346557617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:12", "cap": "proactive_report", "ok": true, "ms": 76.46679878234863, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:13", "cap": "observer_anchor", "ok": true, "ms": 75.39892196655273, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:13", "cap": "persona_kernel", "ok": true, "ms": 84.92279052734375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:13", "cap": "hook_registry", "ok": true, "ms": 67.01874732971191, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:13", "cap": "scene_anchor", "ok": true, "ms": 66.79511070251465, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:13", "cap": "code_art", "ok": true, "ms": 83.26864242553711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:14", "cap": "orchestration_kernel", "ok": true, "ms": 151.93676948547363, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:14", "cap": "render_evolution", "ok": true, "ms": 83.53066444396973, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:16", "cap": "caps_called_audit", "ok": true, "ms": 1654.886245727539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:16", "cap": "tentacle_cognition", "ok": true, "ms": 59.44967269897461, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:16", "cap": "coverage_auditor", "ok": true, "ms": 67.02184677124023, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:16", "cap": "console_hub", "ok": true, "ms": 16.924381256103516, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "gods_eye", "ok": true, "ms": 1502.2425651550293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "obsidian_vault", "ok": true, "ms": 60.58788299560547, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "cap_tags", "ok": true, "ms": 113.5098934173584, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "action_gate", "ok": true, "ms": 58.99477005004883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "growth_hooks", "ok": true, "ms": 66.79010391235352, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "devour_fusion", "ok": true, "ms": 63.261985778808594, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:18", "cap": "wiki_graph", "ok": true, "ms": 67.03758239746094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "doc_intake", "ok": true, "ms": 66.91932678222656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "llm_watch", "ok": true, "ms": 66.36261940002441, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "task_graph", "ok": true, "ms": 72.55983352661133, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "replan_loop", "ok": true, "ms": 57.6014518737793, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "duty_board", "ok": true, "ms": 84.19132232666016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:19", "cap": "rea_reverse", "ok": true, "ms": 67.02327728271484, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "recon_distill", "ok": true, "ms": 78.49788665771484, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "desktop_distill", "ok": true, "ms": 69.83685493469238, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "pentest_distill", "ok": true, "ms": 82.32927322387695, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "diagram_distill", "ok": true, "ms": 67.61717796325684, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "machine_distill", "ok": true, "ms": 73.36306571960449, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:20", "cap": "cad_distill", "ok": true, "ms": 71.14481925964355, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "bi_distill", "ok": true, "ms": 71.16389274597168, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "memory_bank", "ok": true, "ms": 67.67034530639648, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "agent_console", "ok": true, "ms": 71.67816162109375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "code_audit", "ok": true, "ms": 78.41849327087402, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "agent_rig", "ok": true, "ms": 66.5428638458252, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:21", "cap": "console_hub", "ok": true, "ms": 72.64471054077148, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:22", "cap": "console_pages", "ok": true, "ms": 211.17591857910156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:22", "cap": "freebuff_term", "ok": true, "ms": 87.83698081970215, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:22", "cap": "hf_voice", "ok": true, "ms": 78.40490341186523, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:24", "cap": "voice_studio", "ok": true, "ms": 2146.550178527832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:25", "cap": "digital_human", "ok": true, "ms": 65.48380851745605, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:37", "cap": "install_selfcheck", "ok": true, "ms": 99.7915267944336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:37", "cap": "lobehub", "ok": true, "ms": 58.606624603271484, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:39", "cap": "comfyui", "ok": true, "ms": 2109.088659286499, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:39", "cap": "comfy_native", "ok": true, "ms": 99.94864463806152, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:40", "cap": "ring_context", "ok": true, "ms": 67.25382804870605, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:40", "cap": "skill_watch", "ok": true, "ms": 80.13653755187988, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:40", "cap": "vision_grounding", "ok": true, "ms": 50.11773109436035, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:44", "cap": "tentacle_comfy_bridge", "ok": true, "ms": 4158.486843109131, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:44", "cap": "repo_publish", "ok": true, "ms": 68.34578514099121, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:44", "cap": "pulse_direct", "ok": true, "ms": 78.3989429473877, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:45", "cap": "warm_switch", "ok": true, "ms": 571.1612701416016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:48", "cap": "console_hub", "ok": true, "ms": 2259.8021030426025, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:57", "cap": "fact_gate", "ok": true, "ms": 66.7569637298584, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:57", "cap": "policy_gate", "ok": true, "ms": 49.89886283874512, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "one_shot", "ok": true, "ms": 66.59293174743652, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "surface_bind", "ok": true, "ms": 67.43621826171875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "memory_manager", "ok": true, "ms": 83.74452590942383, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "i2v_agnes", "ok": false, "ms": 66.94674491882324, "error_class": "error", "detail": "[WinError 2] 系统找不到指定的文件。", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "code_graph", "ok": true, "ms": 65.26350975036621, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "sec_sweeper", "ok": true, "ms": 66.75505638122559, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:58", "cap": "task_manager", "ok": true, "ms": 62.609195709228516, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "transformer", "ok": true, "ms": 66.34521484375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "automation_keys", "ok": true, "ms": 63.00663948059082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "model_key_pool", "ok": true, "ms": 66.71404838562012, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "meta_cognition", "ok": true, "ms": 132.82370567321777, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "libtv_skill", "ok": true, "ms": 66.56837463378906, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:39:59", "cap": "a1art_skill", "ok": true, "ms": 66.4529800415039, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:00", "cap": "energy_pool", "ok": true, "ms": 66.5748119354248, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:00", "cap": "scrapling", "ok": true, "ms": 49.86858367919922, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:00", "cap": "penetrating_cross_scan", "ok": true, "ms": 66.4663314819336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:00", "cap": "hook_enforcer", "ok": true, "ms": 130.16104698181152, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:00", "cap": "omission_detector", "ok": true, "ms": 49.70240592956543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "tentacle_bind", "ok": true, "ms": 99.80559349060059, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "asset_index", "ok": true, "ms": 66.680908203125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "control_loop", "ok": false, "ms": 66.6966438293457, "error_class": "error", "detail": "[WinError 5] 拒绝访问。: 'C:\\\\Users\\\\ADMIN'", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "local_brain", "ok": true, "ms": 66.46585464477539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "auto_switch", "ok": true, "ms": 66.57195091247559, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "context_vault", "ok": true, "ms": 66.5431022644043, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:01", "cap": "feishu_embed", "ok": true, "ms": 49.89194869995117, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "dl_forge", "ok": true, "ms": 66.5891170501709, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "dh_realism", "ok": true, "ms": 66.55669212341309, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "cloud_plugin", "ok": true, "ms": 66.67017936706543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "db_plugin", "ok": true, "ms": 66.19834899902344, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "telegram_embed", "ok": true, "ms": 50.03166198730469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "whatsapp_embed", "ok": true, "ms": 66.70260429382324, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:02", "cap": "libtv_workflow", "ok": true, "ms": 50.08363723754883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "gate_visibility", "ok": true, "ms": 66.9260025024414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "dh_brain", "ok": true, "ms": 50.8427619934082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "eigenflux", "ok": true, "ms": 66.47515296936035, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "h3_video_gen", "ok": true, "ms": 66.67137145996094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "absorb_loop", "ok": true, "ms": 67.15035438537598, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:03", "cap": "cloud_pc", "ok": true, "ms": 49.80874061584473, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "auto_publish", "ok": true, "ms": 66.89095497131348, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "awesome_tools_index", "ok": true, "ms": 66.65420532226562, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "stigmergy", "ok": true, "ms": 66.73932075500488, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "ledger_note", "ok": true, "ms": 66.57910346984863, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "git_read", "ok": false, "ms": 66.46013259887695, "error_class": "error", "detail": "本机找不到 git", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "brain_council", "ok": true, "ms": 66.7722225189209, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:04", "cap": "social_eng", "ok": true, "ms": 66.20907783508301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:05", "cap": "paywallbuster", "ok": true, "ms": 68.67313385009766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "asset_vault_freeze", "ok": true, "ms": 850.2340316772461, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "onboarding_gate", "ok": true, "ms": 66.61033630371094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "security_status", "ok": false, "ms": 16.425371170043945, "error_class": "error", "detail": "unknown capability（没有这个能力位名）。你是不是要：sched_status / lr_status", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "agent_control", "ok": true, "ms": 66.33639335632324, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "agent_council", "ok": true, "ms": 72.30877876281738, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "answer_shaper", "ok": true, "ms": 66.81942939758301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "belief_forge", "ok": true, "ms": 66.82419776916504, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:06", "cap": "case_mine", "ok": true, "ms": 66.67208671569824, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:07", "cap": "command_chain", "ok": true, "ms": 66.62631034851074, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:07", "cap": "creation_camp", "ok": true, "ms": 66.86830520629883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:07", "cap": "db_probe", "ok": true, "ms": 200.0100612640381, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:07", "cap": "energy_scheduler", "ok": true, "ms": 83.32967758178711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:07", "cap": "event_ledger", "ok": true, "ms": 117.03705787658691, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:08", "cap": "flow_canvas", "ok": true, "ms": 66.86210632324219, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:12", "cap": "freellmapi", "ok": true, "ms": 4167.073488235474, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:12", "cap": "handoff", "ok": true, "ms": 55.773258209228516, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:12", "cap": "llm_redteam", "ok": true, "ms": 51.78213119506836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:12", "cap": "policy_delta", "ok": true, "ms": 66.65372848510742, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "slim_profile", "ok": true, "ms": 54.61430549621582, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "spend_guard", "ok": true, "ms": 65.58513641357422, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "train_recipe", "ok": true, "ms": 56.028127670288086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "ui_render", "ok": true, "ms": 60.034990310668945, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "review_gate", "ok": true, "ms": 64.07904624938965, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "detail_habit", "ok": true, "ms": 67.17753410339355, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:13", "cap": "tentacle_scale", "ok": true, "ms": 52.701473236083984, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:14", "cap": "express_direct", "ok": true, "ms": 48.21610450744629, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:14", "cap": "vision_print", "ok": true, "ms": 501.19495391845703, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:14", "cap": "ui_kit", "ok": true, "ms": 66.72358512878418, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:14", "cap": "design_atlas", "ok": true, "ms": 59.77201461791992, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:15", "cap": "motion_kit", "ok": true, "ms": 90.70277214050293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:15", "cap": "bits_kit", "ok": true, "ms": 66.7567253112793, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:15", "cap": "intake_kit", "ok": true, "ms": 67.36063957214355, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:40:15", "cap": "offload_distill", "ok": true, "ms": 95.91412544250488, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:43:23", "cap": "sync_guard", "ok": true, "ms": 9081.421613693237, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:43:23", "cap": "sched_tick", "ok": true, "ms": 32.279014587402344, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:20", "cap": "body_map", "ok": true, "ms": 2113.375663757324, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:21", "cap": "body_see", "ok": true, "ms": 290.9238338470459, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:21", "cap": "body_say", "ok": true, "ms": 516.2291526794434, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:22", "cap": "body_type", "ok": true, "ms": 332.7782154083252, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:22", "cap": "body_click", "ok": true, "ms": 293.80154609680176, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:22", "cap": "body_volume", "ok": true, "ms": 119.12870407104492, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:22", "cap": "body_open", "ok": false, "ms": 56.47897720336914, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:47:23", "cap": "hand_retarget", "ok": true, "ms": 66.6043758392334, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:23", "cap": "hand_bridge", "ok": true, "ms": 66.9410228729248, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:24", "cap": "sync_guard", "ok": true, "ms": 1666.6975021362305, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "viral_forge", "ok": true, "ms": 66.6208267211914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "drama_forge", "ok": true, "ms": 68.83502006530762, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "taste_guard", "ok": true, "ms": 90.65723419189453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "experience_forge", "ok": true, "ms": 73.13179969787598, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "mirror_stage", "ok": true, "ms": 71.85626029968262, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:25", "cap": "remote_controller", "ok": true, "ms": 66.73789024353027, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:26", "cap": "codex_status", "ok": true, "ms": 388.23413848876953, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:26", "cap": "codex_tools", "ok": true, "ms": 66.73717498779297, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:26", "cap": "codex_thread_new", "ok": false, "ms": 62.27993965148926, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:47:26", "cap": "codex_turn_send", "ok": false, "ms": 47.68085479736328, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:47:26", "cap": "codex_interrupt", "ok": false, "ms": 49.97062683105469, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:47:27", "cap": "codex_chat", "ok": false, "ms": 50.19855499267578, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:47:27", "cap": "codex_models", "ok": false, "ms": 49.643754959106445, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:47:27", "cap": "desktop_commander", "ok": true, "ms": 66.45846366882324, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:27", "cap": "health", "ok": true, "ms": 116.54281616210938, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:27", "cap": "echo", "ok": true, "ms": 51.82957649230957, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:27", "cap": "count_words", "ok": true, "ms": 68.73083114624023, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "audit_query", "ok": true, "ms": 68.33744049072266, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "quant_strategy", "ok": true, "ms": 69.76747512817383, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "quant_backtest", "ok": true, "ms": 66.17927551269531, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "platform_profile", "ok": true, "ms": 66.82109832763672, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "quant_params", "ok": true, "ms": 66.89763069152832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:28", "cap": "osint_scan", "ok": false, "ms": 71.70891761779785, "error_class": "error", "detail": "缺少 target（要扫的域名或 IP）。例：{\"target\": \"example.com\"}", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "record_grid", "ok": true, "ms": 67.78693199157715, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "wf_define", "ok": false, "ms": 81.77971839904785, "error_class": "error", "detail": "需要 name 与非空 nodes 列表", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "wf_run", "ok": false, "ms": 82.06820487976074, "error_class": "error", "detail": "工作流不存在: （先 wf_define）", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "wf_status", "ok": true, "ms": 73.3487606048584, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "wf_resume", "ok": false, "ms": 83.41646194458008, "error_class": "error", "detail": "运行记录不存在: ", "gate": ""}
+{"at": "2026-11-02T02:47:29", "cap": "lr_submit", "ok": false, "ms": 80.5807113647461, "error_class": "error", "detail": "需要 description", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "lr_tick", "ok": true, "ms": 96.26603126525879, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "lr_status", "ok": true, "ms": 51.844120025634766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "selfscan", "ok": true, "ms": 120.18656730651855, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "alerts", "ok": true, "ms": 66.63966178894043, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "tentacle", "ok": false, "ms": 66.4358139038086, "error_class": "error", "detail": "缺少 action：给触手能力名（tentacle_manifest）、给 intent 走自动路由、或 op=caps 看全部能力", "gate": ""}
+{"at": "2026-11-02T02:47:30", "cap": "tentacle_manifest", "ok": true, "ms": 85.44802665710449, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:31", "cap": "commander", "ok": true, "ms": 83.72783660888672, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:31", "cap": "pulse_core", "ok": true, "ms": 135.5147361755371, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:31", "cap": "cap_self", "ok": true, "ms": 65.98711013793945, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:35", "cap": "trunk_cover", "ok": true, "ms": 4434.179306030273, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:36", "cap": "body_sense", "ok": true, "ms": 99.4410514831543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:36", "cap": "devour_auto", "ok": true, "ms": 70.57428359985352, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:36", "cap": "trunk_reason", "ok": true, "ms": 71.65408134460449, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:36", "cap": "context_guard", "ok": true, "ms": 79.74720001220703, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:36", "cap": "research_intel", "ok": true, "ms": 64.4991397857666, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:37", "cap": "hunyuan_video", "ok": true, "ms": 66.73955917358398, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:37", "cap": "energy_core", "ok": true, "ms": 119.74644660949707, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:37", "cap": "orchestration", "ok": true, "ms": 90.89183807373047, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:37", "cap": "autonomy", "ok": true, "ms": 50.431013107299805, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:37", "cap": "blueprint", "ok": true, "ms": 66.63036346435547, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "legacy_guard", "ok": true, "ms": 216.28594398498535, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "skills_hub", "ok": true, "ms": 83.25815200805664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "chain_kernel", "ok": true, "ms": 71.06876373291016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "root_cause", "ok": true, "ms": 96.4658260345459, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "execution_guard", "ok": true, "ms": 95.5204963684082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:38", "cap": "cap_pack", "ok": true, "ms": 66.44701957702637, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:39", "cap": "mcp_register", "ok": true, "ms": 86.4858627319336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:39", "cap": "dual_gate", "ok": true, "ms": 71.12264633178711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:39", "cap": "mcp_servers", "ok": true, "ms": 64.8491382598877, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:39", "cap": "mcp_unregister", "ok": true, "ms": 73.26650619506836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:39", "cap": "mcp_health", "ok": false, "ms": 42.75345802307129, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:47:39", "cap": "omni_open", "ok": true, "ms": 66.5426254272461, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:47:40", "cap": "sec_surface", "ok": true, "ms": 716.545581817627, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:52", "cap": "keylogger", "ok": false, "ms": 31.447649002075195, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:48:52", "cap": "osint_scan", "ok": false, "ms": 6.002664566040039, "error_class": "gate_denied", "detail": "需要人工授权（osint_private）：OSINT 扫描自有内网/保留地址（一次性授权）", "gate": "osint_private"}
+{"at": "2026-11-02T02:48:52", "cap": "pipeline_submit", "ok": true, "ms": 19.89579200744629, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:52", "cap": "sec_defenses", "ok": true, "ms": 141.40987396240234, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:53", "cap": "sec_llm", "ok": false, "ms": 49.78179931640625, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:48:53", "cap": "truth_scan", "ok": true, "ms": 67.53158569335938, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:53", "cap": "autopilot", "ok": false, "ms": 51.178693771362305, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:48:53", "cap": "llm_chat", "ok": false, "ms": 72.62873649597168, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:48:54", "cap": "llm_status", "ok": true, "ms": 500.2007484436035, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:54", "cap": "cloud_llm", "ok": true, "ms": 83.4653377532959, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:54", "cap": "key_gateway", "ok": true, "ms": 74.4168758392334, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:54", "cap": "multimodal_port", "ok": true, "ms": 72.69620895385742, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:54", "cap": "genoffice_bridge", "ok": true, "ms": 84.03992652893066, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "brain_route", "ok": false, "ms": 64.88490104675293, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "brain_execute", "ok": false, "ms": 66.20335578918457, "error_class": "error", "detail": "缺少 kind 或 parallel", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "brain_verify", "ok": true, "ms": 273.98681640625, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "selfscan", "ok": true, "ms": 67.55781173706055, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "wf_status", "ok": true, "ms": 12.553215026855469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "tentacle_status", "ok": true, "ms": 82.90958404541016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:55", "cap": "brain_health", "ok": true, "ms": 220.76916694641113, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:48:56", "cap": "brain_unify", "ok": false, "ms": 68.5126781463623, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T02:48:56", "cap": "root_fix", "ok": true, "ms": 80.23548126220703, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "a1art_skill", "ok": true, "ms": 16.061067581176758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "absorb_loop", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "account_registry", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "action_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "agency_tentacles", "ok": true, "ms": 16.611099243164062, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "agent_console", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "security_status", "ok": false, "ms": 16.4334774017334, "error_class": "error", "detail": "unknown capability（没有这个能力位名）。你是不是要：sched_status / lr_status", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "agent_control", "ok": true, "ms": 16.4334774017334, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "agent_council", "ok": true, "ms": 16.77083969116211, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:22", "cap": "agent_rig", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "alerts", "ok": true, "ms": 33.405303955078125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "anim_audit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "answer_shaper", "ok": true, "ms": 16.90983772277832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "asset_index", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "audit_query", "ok": true, "ms": 1.093149185180664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "auth_gate_status", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "auto_publish", "ok": true, "ms": 16.382932662963867, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "auto_switch", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "automation_keys", "ok": true, "ms": 14.823675155639648, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "autonomy", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "awesome_tools_index", "ok": true, "ms": 16.9675350189209, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "belief_forge", "ok": false, "ms": 0.0, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "bi_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "bits_kit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "blueprint", "ok": true, "ms": 16.541004180908203, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "bluetooth", "ok": true, "ms": 51.100730895996094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:23", "cap": "body_click", "ok": true, "ms": 252.11453437805176, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_map", "ok": true, "ms": 1916.4793491363525, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_open", "ok": false, "ms": 16.609668731689453, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:25", "cap": "body_say", "ok": true, "ms": 66.7119026184082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_see", "ok": true, "ms": 233.22606086730957, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_sense", "ok": true, "ms": 50.168752670288086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_type", "ok": true, "ms": 100.30221939086914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "body_volume", "ok": true, "ms": 50.00495910644531, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brain_council", "ok": true, "ms": 4.351139068603516, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brain_execute", "ok": false, "ms": 0.0, "error_class": "error", "detail": "缺少 kind 或 parallel", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brain_route", "ok": false, "ms": 0.0, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brain_unify", "ok": false, "ms": 1.5895366668701172, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brain_vault", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:25", "cap": "brand_outro", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "browser", "ok": false, "ms": 17.663002014160156, "error_class": "error", "detail": "缺少 url", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "bt_control", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cad_distill", "ok": true, "ms": 14.7857666015625, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cap_pack", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cap_self", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cap_tags", "ok": true, "ms": 83.0388069152832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "capability_net", "ok": true, "ms": 16.746044158935547, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "case_mine", "ok": false, "ms": 16.569137573242188, "error_class": "error", "detail": "sources() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "chain_kernel", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cloud_llm", "ok": true, "ms": 12.758016586303711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cloud_pc", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "cloud_plugin", "ok": true, "ms": 16.405820846557617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "code_art", "ok": true, "ms": 15.896320343017578, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "code_audit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "code_graph", "ok": true, "ms": 16.752243041992188, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:26", "cap": "codex_chat", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:49:26", "cap": "codex_interrupt", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:26", "cap": "codex_models", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:49:27", "cap": "codex_status", "ok": true, "ms": 782.6652526855469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:27", "cap": "codex_thread_new", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:27", "cap": "codex_tools", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:27", "cap": "codex_turn_send", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T02:49:27", "cap": "comfy_forge", "ok": true, "ms": 16.476869583129883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "comfyui", "ok": true, "ms": 2067.5909519195557, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "command_chain", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "console_hub", "ok": true, "ms": 15.993118286132812, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "context_guard", "ok": true, "ms": 15.49983024597168, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "context_vault", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "control_loop", "ok": false, "ms": 16.46113395690918, "error_class": "error", "detail": "[WinError 5] 拒绝访问。: 'C:\\\\Users\\\\ADMIN'", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "count_words", "ok": true, "ms": 16.744613647460938, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "coverage_auditor", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "coze_mail", "ok": true, "ms": 16.713857650756836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "create", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "creation_camp", "ok": false, "ms": 0.0, "error_class": "error", "detail": "sources() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "datakit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "db_plugin", "ok": true, "ms": 16.759634017944336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "design_atlas", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "desktop_commander", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "desktop_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "detail_habit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "devour_auto", "ok": true, "ms": 16.803264617919922, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "devour_fusion", "ok": true, "ms": 16.741037368774414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "devour_scan", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dh_asset_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dh_brain", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dh_realism", "ok": true, "ms": 16.646623611450195, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "diagram_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "digital_human", "ok": true, "ms": 16.639232635498047, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "director_mood", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dl_forge", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "doc_intake", "ok": true, "ms": 16.15762710571289, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "drama", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dream_replay", "ok": true, "ms": 15.644311904907227, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "dual_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "duty_board", "ok": true, "ms": 50.0640869140625, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "echo", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "eigenflux", "ok": true, "ms": 16.75248146057129, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "emotion_projection", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "energy_core", "ok": true, "ms": 17.080307006835938, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "energy_pool", "ok": true, "ms": 16.32380485534668, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "energy_scheduler", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "event_ledger", "ok": true, "ms": 16.56937599182129, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "execution_guard", "ok": true, "ms": 49.95131492614746, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "experience_forge", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "express_direct", "ok": true, "ms": 16.5712833404541, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "fact_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "feishu_embed", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "film_intel", "ok": true, "ms": 16.742229461669922, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "flow_canvas", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:29", "cap": "freebuff_term", "ok": true, "ms": 16.54648780822754, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:32", "cap": "inventory", "ok": true, "ms": 83.20474624633789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:32", "cap": "brain_vault", "ok": true, "ms": 66.82419776916504, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:32", "cap": "think_loop", "ok": false, "ms": 49.936771392822266, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:49:33", "cap": "one_key_deploy", "ok": false, "ms": 50.199270248413086, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T02:49:33", "cap": "deploy_queue", "ok": true, "ms": 65.91463088989258, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:33", "cap": "mirror_shape", "ok": true, "ms": 50.344228744506836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:33", "cap": "mirror_scan", "ok": true, "ms": 65.77658653259277, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:33", "cap": "mirror_plan", "ok": false, "ms": 66.7879581451416, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:49:33", "cap": "mirror_simulate", "ok": false, "ms": 83.26387405395508, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:49:33", "cap": "mirror_parity", "ok": false, "ms": 83.55140686035156, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T02:49:34", "cap": "mirror_rehearse", "ok": false, "ms": 49.959659576416016, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:34", "cap": "mirror_release", "ok": false, "ms": 66.39742851257324, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T02:49:34", "cap": "mirror_ascend", "ok": false, "ms": 50.07004737854004, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:49:34", "cap": "mirror_status", "ok": true, "ms": 66.7276382446289, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:34", "cap": "mirror_rewind", "ok": false, "ms": 66.80440902709961, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:49:34", "cap": "auth_gate_status", "ok": true, "ms": 66.64633750915527, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:34", "cap": "transfer", "ok": true, "ms": 68.31765174865723, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:35", "cap": "wf_cache_clear", "ok": true, "ms": 66.44201278686523, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:35", "cap": "signature_guard", "ok": true, "ms": 116.52731895446777, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "file_hygiene", "ok": true, "ms": 2683.2940578460693, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "devour_scan", "ok": true, "ms": 56.86545372009277, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "devour_github", "ok": false, "ms": 66.80631637573242, "error_class": "error", "detail": "缺少 repo：请给出 GitHub 仓库 URL（如 https://github.com/owner/repo）", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "tentacle_equip", "ok": true, "ms": 77.4993896484375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "tool_bay", "ok": true, "ms": 105.93056678771973, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:38", "cap": "remote_confinement", "ok": false, "ms": 66.99681282043457, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:39", "cap": "cli_ify", "ok": true, "ms": 83.37211608886719, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:39", "cap": "tentacle_learn", "ok": true, "ms": 66.76459312438965, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:39", "cap": "skill_finder", "ok": true, "ms": 66.35832786560059, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:39", "cap": "humanizer", "ok": true, "ms": 82.31544494628906, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:39", "cap": "chart_html", "ok": true, "ms": 66.74361228942871, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "workflow_forge", "ok": true, "ms": 67.71087646484375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "forge_mastery", "ok": true, "ms": 66.67184829711914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "showcase_ops", "ok": true, "ms": 66.96057319641113, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "spider_ops", "ok": true, "ms": 66.57528877258301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "offense_ops", "ok": true, "ms": 67.6107406616211, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:40", "cap": "skill_forge", "ok": true, "ms": 67.6429271697998, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "shot_director", "ok": true, "ms": 67.03519821166992, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "book_skill", "ok": true, "ms": 66.51949882507324, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "music_auto", "ok": true, "ms": 83.34946632385254, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "train_ground", "ok": true, "ms": 69.29278373718262, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "quant_plan", "ok": true, "ms": 66.64872169494629, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:41", "cap": "know_map", "ok": true, "ms": 66.63823127746582, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:42", "cap": "topic_web", "ok": true, "ms": 66.57862663269043, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:42", "cap": "self_intake", "ok": true, "ms": 83.2357406616211, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:42", "cap": "comfy_forge", "ok": true, "ms": 61.72323226928711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:53", "cap": "scan_cap", "ok": true, "ms": 10632.321119308472, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:53", "cap": "figure_gate", "ok": true, "ms": 66.66398048400879, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:53", "cap": "theme_cap", "ok": true, "ms": 66.8649673461914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:53", "cap": "omarchy_bridge", "ok": false, "ms": 50.38595199584961, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:53", "cap": "delivery_gate", "ok": true, "ms": 66.53428077697754, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:53", "cap": "ux_doctrine", "ok": true, "ms": 49.98612403869629, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "welcome", "ok": true, "ms": 50.00448226928711, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "god_view", "ok": true, "ms": 66.5886402130127, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "vision_loop", "ok": true, "ms": 66.63799285888672, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "agency_tentacles", "ok": true, "ms": 66.56384468078613, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "media_pipeline", "ok": true, "ms": 86.51995658874512, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:54", "cap": "edit_pipeline", "ok": true, "ms": 66.7269229888916, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:55", "cap": "tentacle_pipeline", "ok": true, "ms": 68.76730918884277, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:55", "cap": "long_run_supervisor", "ok": false, "ms": 66.76721572875977, "error_class": "error", "detail": "status() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:49:55", "cap": "devour_reflect", "ok": true, "ms": 83.19473266601562, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:55", "cap": "devour_pulse", "ok": false, "ms": 47.49560356140137, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T02:49:55", "cap": "mcp_connect", "ok": false, "ms": 52.92344093322754, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:55", "cap": "mcp_tools", "ok": true, "ms": 67.04258918762207, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:55", "cap": "mcp_call", "ok": false, "ms": 49.91555213928223, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T02:49:56", "cap": "coze_mail", "ok": true, "ms": 66.73097610473633, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:56", "cap": "create", "ok": true, "ms": 66.99728965759277, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:56", "cap": "drama", "ok": true, "ms": 66.77913665771484, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:56", "cap": "tentacle_status", "ok": true, "ms": 116.44887924194336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:56", "cap": "tactics_advise", "ok": true, "ms": 50.10390281677246, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:56", "cap": "pipeline_submit", "ok": false, "ms": 66.74909591674805, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:49:57", "cap": "pipeline_versions", "ok": false, "ms": 66.36500358581543, "error_class": "error", "detail": "缺少 name：请给出产物名", "gate": ""}
+{"at": "2026-11-02T02:49:57", "cap": "pipeline_rollback", "ok": false, "ms": 66.58506393432617, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T02:49:57", "cap": "pipeline_status", "ok": true, "ms": 66.80727005004883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:58", "cap": "ghost_guard", "ok": true, "ms": 866.3492202758789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:58", "cap": "sched_define", "ok": false, "ms": 83.24527740478516, "error_class": "error", "detail": "需要 name", "gate": ""}
+{"at": "2026-11-02T02:49:58", "cap": "sched_tick", "ok": true, "ms": 83.3578109741211, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:58", "cap": "sched_status", "ok": true, "ms": 66.6961669921875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:59", "cap": "svc_inspect", "ok": true, "ms": 683.0539703369141, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:49:59", "cap": "vision", "ok": true, "ms": 116.74380302429199, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "vlx_flow", "ok": true, "ms": 66.5276050567627, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "prompt_bridge", "ok": true, "ms": 50.549983978271484, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "audio_extract", "ok": true, "ms": 51.59306526184082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "audio_mix", "ok": true, "ms": 67.02113151550293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "media_license", "ok": true, "ms": 82.45730400085449, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:00", "cap": "datakit", "ok": true, "ms": 83.34851264953613, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:01", "cap": "media_run", "ok": true, "ms": 66.66207313537598, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:01", "cap": "omni_plug", "ok": true, "ms": 83.11772346496582, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:01", "cap": "media_stamp", "ok": true, "ms": 83.24050903320312, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:01", "cap": "media_publish", "ok": true, "ms": 83.30535888671875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:02", "cap": "voice", "ok": true, "ms": 482.9587936401367, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "voice_orchestra", "ok": true, "ms": 684.5724582672119, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "browser", "ok": false, "ms": 66.4217472076416, "error_class": "error", "detail": "缺少 url", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "bluetooth", "ok": true, "ms": 83.46748352050781, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "bt_control", "ok": true, "ms": 83.65941047668457, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "quant", "ok": true, "ms": 66.7886734008789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:03", "cap": "life", "ok": true, "ms": 66.56241416931152, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "mind", "ok": true, "ms": 83.57357978820801, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "project_context", "ok": true, "ms": 83.13298225402832, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "topic_watch", "ok": false, "ms": 83.1146240234375, "error_class": "error", "detail": "缺少 need：请给一句需求（如「帮我盯着 AI 行业动态」）", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "trend_watch", "ok": true, "ms": 83.30297470092773, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "projection_card", "ok": true, "ms": 82.97610282897949, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:04", "cap": "trace_store", "ok": true, "ms": 99.78795051574707, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:05", "cap": "wave_probe", "ok": true, "ms": 148.74529838562012, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:05", "cap": "dream_replay", "ok": true, "ms": 81.4511775970459, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:05", "cap": "capability_net", "ok": true, "ms": 83.23073387145996, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:05", "cap": "director_mood", "ok": true, "ms": 105.56149482727051, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:06", "cap": "music_publishing", "ok": true, "ms": 90.97099304199219, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:06", "cap": "dh_pose", "ok": true, "ms": 93.16325187683105, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:06", "cap": "anatomy_figures", "ok": true, "ms": 68.30382347106934, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:06", "cap": "machine_film", "ok": true, "ms": 71.66790962219238, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:06", "cap": "rig_audit", "ok": true, "ms": 68.9842700958252, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "rig_fix", "ok": true, "ms": 69.71287727355957, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "anim_audit", "ok": true, "ms": 69.75173950195312, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "anim_fix", "ok": true, "ms": 73.29893112182617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "dh_asset_gate", "ok": true, "ms": 71.13504409790039, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "omni_arm", "ok": true, "ms": 68.35770606994629, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:07", "cap": "tentacle_arm", "ok": true, "ms": 68.79639625549316, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "project_drift", "ok": true, "ms": 67.63267517089844, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "impact_check", "ok": true, "ms": 65.43421745300293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "music_intel", "ok": true, "ms": 67.2147274017334, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "video_intel", "ok": true, "ms": 66.64896011352539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "film_intel", "ok": true, "ms": 60.93263626098633, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:08", "cap": "account_registry", "ok": true, "ms": 61.339378356933594, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "verification_watch", "ok": true, "ms": 61.341285705566406, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "shared_resources", "ok": true, "ms": 65.92559814453125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "brand_outro", "ok": true, "ms": 75.25992393493652, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "emotion_projection", "ok": true, "ms": 68.8934326171875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "proactive_report", "ok": true, "ms": 68.42327117919922, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:09", "cap": "observer_anchor", "ok": true, "ms": 68.5117244720459, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "persona_kernel", "ok": true, "ms": 72.76535034179688, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "hook_registry", "ok": true, "ms": 72.74556159973145, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "scene_anchor", "ok": true, "ms": 73.3957290649414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "code_art", "ok": true, "ms": 66.74671173095703, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "orchestration_kernel", "ok": true, "ms": 98.41585159301758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:10", "cap": "render_evolution", "ok": true, "ms": 74.50056076049805, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:12", "cap": "caps_called_audit", "ok": true, "ms": 1483.6690425872803, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:12", "cap": "tentacle_cognition", "ok": true, "ms": 66.67304039001465, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:12", "cap": "coverage_auditor", "ok": true, "ms": 83.18781852722168, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:13", "cap": "console_hub", "ok": true, "ms": 3.6313533782958984, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:14", "cap": "gods_eye", "ok": true, "ms": 1502.2027492523193, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:14", "cap": "obsidian_vault", "ok": true, "ms": 70.2970027923584, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:14", "cap": "cap_tags", "ok": true, "ms": 94.11478042602539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:14", "cap": "action_gate", "ok": true, "ms": 56.173086166381836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "growth_hooks", "ok": true, "ms": 49.51167106628418, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "devour_fusion", "ok": true, "ms": 63.25864791870117, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "wiki_graph", "ok": true, "ms": 62.79587745666504, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "doc_intake", "ok": true, "ms": 73.67944717407227, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "llm_watch", "ok": true, "ms": 62.73794174194336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "task_graph", "ok": true, "ms": 44.072628021240234, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:15", "cap": "replan_loop", "ok": true, "ms": 59.88025665283203, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "duty_board", "ok": true, "ms": 79.79989051818848, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "rea_reverse", "ok": true, "ms": 52.5968074798584, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "recon_distill", "ok": true, "ms": 60.75716018676758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "desktop_distill", "ok": true, "ms": 53.342342376708984, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "pentest_distill", "ok": true, "ms": 55.3739070892334, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "diagram_distill", "ok": true, "ms": 48.13265800476074, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:16", "cap": "machine_distill", "ok": true, "ms": 57.033538818359375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "cad_distill", "ok": true, "ms": 63.721656799316406, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "bi_distill", "ok": true, "ms": 54.88920211791992, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "memory_bank", "ok": true, "ms": 45.60422897338867, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "agent_console", "ok": true, "ms": 62.76059150695801, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "code_audit", "ok": true, "ms": 58.10809135437012, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "agent_rig", "ok": true, "ms": 67.00563430786133, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:17", "cap": "console_hub", "ok": true, "ms": 42.91415214538574, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:18", "cap": "console_pages", "ok": true, "ms": 168.6544418334961, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:18", "cap": "freebuff_term", "ok": true, "ms": 68.60470771789551, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:18", "cap": "hf_voice", "ok": true, "ms": 90.5923843383789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:20", "cap": "voice_studio", "ok": true, "ms": 2207.188367843628, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:21", "cap": "digital_human", "ok": true, "ms": 69.89622116088867, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:33", "cap": "image_scout", "ok": true, "ms": 12216.392040252686, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:33", "cap": "install_selfcheck", "ok": true, "ms": 166.61334037780762, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:33", "cap": "room_space", "ok": true, "ms": 88.97137641906738, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:34", "cap": "collab_gateway", "ok": true, "ms": 82.68857002258301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:34", "cap": "lobehub", "ok": true, "ms": 83.8010311126709, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:36", "cap": "comfyui", "ok": true, "ms": 2287.6620292663574, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:36", "cap": "comfy_native", "ok": true, "ms": 123.95071983337402, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:37", "cap": "ring_context", "ok": true, "ms": 82.74602890014648, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:37", "cap": "skill_watch", "ok": true, "ms": 99.55620765686035, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:37", "cap": "vision_grounding", "ok": true, "ms": 50.72736740112305, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:41", "cap": "tentacle_comfy_bridge", "ok": true, "ms": 4170.753240585327, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:42", "cap": "repo_publish", "ok": true, "ms": 89.45631980895996, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:42", "cap": "pulse_direct", "ok": true, "ms": 75.04916191101074, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:42", "cap": "warm_switch", "ok": true, "ms": 467.0560359954834, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:45", "cap": "console_hub", "ok": true, "ms": 2280.6966304779053, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:50:58", "cap": "console_hub", "ok": true, "ms": 3750.338077545166, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:06", "cap": "selfscan", "ok": true, "ms": 11266.523838043213, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:06", "cap": "wf_status", "ok": true, "ms": 500.17571449279785, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:11", "cap": "tentacle_status", "ok": true, "ms": 4377.485990524292, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:18", "cap": "fact_gate", "ok": true, "ms": 51.53489112854004, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "policy_gate", "ok": true, "ms": 60.533761978149414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "one_shot", "ok": true, "ms": 61.52772903442383, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "surface_bind", "ok": true, "ms": 61.28883361816406, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "memory_manager", "ok": true, "ms": 72.72458076477051, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "i2v_agnes", "ok": false, "ms": 65.28711318969727, "error_class": "error", "detail": "[WinError 2] 系统找不到指定的文件。", "gate": ""}
+{"at": "2026-11-02T02:51:19", "cap": "code_graph", "ok": true, "ms": 68.07112693786621, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "sec_sweeper", "ok": true, "ms": 63.077688217163086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "task_manager", "ok": true, "ms": 61.19418144226074, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "transformer", "ok": true, "ms": 66.70594215393066, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "automation_keys", "ok": true, "ms": 49.387454986572266, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "model_key_pool", "ok": true, "ms": 80.77287673950195, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "meta_cognition", "ok": true, "ms": 64.09597396850586, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:20", "cap": "libtv_skill", "ok": true, "ms": 49.48544502258301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "a1art_skill", "ok": true, "ms": 51.31220817565918, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "energy_pool", "ok": true, "ms": 74.5706558227539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "scrapling", "ok": true, "ms": 58.01582336425781, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "genoffice", "ok": true, "ms": 55.779457092285156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "blender", "ok": true, "ms": 62.758445739746094, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "gs_h3", "ok": true, "ms": 63.405752182006836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:21", "cap": "actioncam", "ok": true, "ms": 63.72570991516113, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:22", "cap": "look_grade", "ok": false, "ms": 59.432029724121094, "error_class": "error", "detail": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\ADMIN\\\\Desktop\\\\GBT小土豆V8\\\\tools\\\\filmgrade.py'", "gate": ""}
+{"at": "2026-11-02T02:51:22", "cap": "penetrating_cross_scan", "ok": true, "ms": 68.15671920776367, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:22", "cap": "hook_enforcer", "ok": true, "ms": 66.00046157836914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:22", "cap": "omission_detector", "ok": true, "ms": 61.89465522766113, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:22", "cap": "zimage_rewash", "ok": true, "ms": 63.405752182006836, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:26", "cap": "n8n_wf", "ok": true, "ms": 4200.659513473511, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "filmkit", "ok": true, "ms": 57.90996551513672, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "tentacle_bind", "ok": true, "ms": 86.36331558227539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "asset_index", "ok": true, "ms": 62.41273880004883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "control_loop", "ok": false, "ms": 64.90612030029297, "error_class": "error", "detail": "[WinError 5] 拒绝访问。: 'C:\\\\Users\\\\ADMIN'", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "local_brain", "ok": true, "ms": 59.424638748168945, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "auto_switch", "ok": true, "ms": 57.805776596069336, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:27", "cap": "context_vault", "ok": true, "ms": 58.072805404663086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "feishu_embed", "ok": true, "ms": 56.92243576049805, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "dl_forge", "ok": true, "ms": 55.67598342895508, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "dh_realism", "ok": true, "ms": 55.26375770568848, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "cloud_plugin", "ok": true, "ms": 69.81563568115234, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "db_plugin", "ok": true, "ms": 60.93883514404297, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "telegram_embed", "ok": true, "ms": 61.10811233520508, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:28", "cap": "whatsapp_embed", "ok": true, "ms": 58.7313175201416, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "libtv_workflow", "ok": true, "ms": 61.57708168029785, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "gate_visibility", "ok": true, "ms": 71.868896484375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "dh_brain", "ok": true, "ms": 77.40545272827148, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "eigenflux", "ok": true, "ms": 56.95462226867676, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "h3_video_gen", "ok": true, "ms": 72.51214981079102, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:29", "cap": "absorb_loop", "ok": true, "ms": 67.03734397888184, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "cloud_pc", "ok": true, "ms": 61.08808517456055, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "auto_publish", "ok": true, "ms": 60.1201057434082, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "awesome_tools_index", "ok": true, "ms": 69.55099105834961, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "stigmergy", "ok": true, "ms": 61.856746673583984, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "ledger_note", "ok": true, "ms": 48.25401306152344, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:30", "cap": "code_patch", "ok": false, "ms": 59.461355209350586, "error_class": "error", "detail": "find 不能为空（空白替换只会误伤）", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "git_read", "ok": false, "ms": 62.05868721008301, "error_class": "error", "detail": "本机找不到 git", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "git_write", "ok": false, "ms": 76.03812217712402, "error_class": "error", "detail": "git_write 不认 op=（只认 stage/add/commit）", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "brain_council", "ok": true, "ms": 56.923866271972656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "omni_web", "ok": false, "ms": 58.714866638183594, "error_class": "gate_denied", "detail": "需要人工授权（data_export）：把数据发送到外部服务或持久化到框架外", "gate": "data_export"}
+{"at": "2026-11-02T02:51:31", "cap": "ul_tars_desktop", "ok": true, "ms": 66.50280952453613, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "claude_code", "ok": true, "ms": 62.249183654785156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:31", "cap": "codebuddy", "ok": true, "ms": 63.83085250854492, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:32", "cap": "redteam_recon", "ok": false, "ms": 57.52372741699219, "error_class": "error", "detail": "No module named 'psutil'", "gate": ""}
+{"at": "2026-11-02T02:51:32", "cap": "pentest", "ok": true, "ms": 55.43255805969238, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:32", "cap": "keylogger", "ok": false, "ms": 56.28657341003418, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:51:32", "cap": "screen_sniff", "ok": false, "ms": 45.60208320617676, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:51:32", "cap": "remote_domain", "ok": true, "ms": 76.83587074279785, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:34", "cap": "device_takeover", "ok": true, "ms": 1531.5172672271729, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:34", "cap": "credential_steal", "ok": false, "ms": 63.55690956115723, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:51:34", "cap": "data_hijack", "ok": false, "ms": 63.6143684387207, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T02:51:34", "cap": "social_eng", "ok": true, "ms": 64.30816650390625, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:34", "cap": "paywallbuster", "ok": true, "ms": 62.79730796813965, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:35", "cap": "asset_vault_freeze", "ok": true, "ms": 668.5194969177246, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:35", "cap": "onboarding_gate", "ok": true, "ms": 55.474281311035156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:35", "cap": "security_status", "ok": false, "ms": 16.138076782226562, "error_class": "error", "detail": "unknown capability（没有这个能力位名）。你是不是要：sched_status / lr_status", "gate": ""}
+{"at": "2026-11-02T02:51:35", "cap": "agent_control", "ok": true, "ms": 59.48138236999512, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:35", "cap": "agent_council", "ok": true, "ms": 47.55973815917969, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "answer_shaper", "ok": true, "ms": 54.13031578063965, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "belief_forge", "ok": false, "ms": 61.681509017944336, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "case_mine", "ok": false, "ms": 53.64179611206055, "error_class": "error", "detail": "sources() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "cli_chat", "ok": true, "ms": 71.0301399230957, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "command_chain", "ok": true, "ms": 56.307077407836914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "creation_camp", "ok": false, "ms": 61.85293197631836, "error_class": "error", "detail": "sources() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:51:36", "cap": "db_probe", "ok": false, "ms": 62.15524673461914, "error_class": "error", "detail": "sources() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:51:37", "cap": "energy_scheduler", "ok": true, "ms": 75.63519477844238, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:37", "cap": "event_ledger", "ok": true, "ms": 57.73806571960449, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:37", "cap": "flow_canvas", "ok": true, "ms": 80.67750930786133, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:41", "cap": "freellmapi", "ok": true, "ms": 4185.329437255859, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:41", "cap": "handoff", "ok": true, "ms": 66.86782836914062, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:42", "cap": "llm_redteam", "ok": true, "ms": 76.68018341064453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:42", "cap": "notion_bridge", "ok": true, "ms": 74.97191429138184, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:42", "cap": "policy_delta", "ok": false, "ms": 125.0753402709961, "error_class": "error", "detail": "tables() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T02:51:42", "cap": "slim_profile", "ok": true, "ms": 83.88853073120117, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:42", "cap": "spend_guard", "ok": true, "ms": 82.97562599182129, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:45", "cap": "thebrain_bridge", "ok": true, "ms": 2224.7254848480225, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:45", "cap": "train_recipe", "ok": true, "ms": 76.03979110717773, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:45", "cap": "tripo", "ok": true, "ms": 84.98859405517578, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:45", "cap": "ui_render", "ok": true, "ms": 65.43183326721191, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:45", "cap": "review_gate", "ok": true, "ms": 68.57633590698242, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:46", "cap": "detail_habit", "ok": true, "ms": 69.04315948486328, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:46", "cap": "tentacle_scale", "ok": true, "ms": 68.84241104125977, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:46", "cap": "express_direct", "ok": true, "ms": 74.35894012451172, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:47", "cap": "vision_print", "ok": true, "ms": 517.725944519043, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:47", "cap": "cadgen", "ok": true, "ms": 82.38339424133301, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:47", "cap": "ui_kit", "ok": true, "ms": 75.31523704528809, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:47", "cap": "design_atlas", "ok": true, "ms": 62.737464904785156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:47", "cap": "art_chain", "ok": true, "ms": 74.14031028747559, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "motion_kit", "ok": true, "ms": 74.02873039245605, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "bits_kit", "ok": true, "ms": 66.25056266784668, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "ui_kit", "ok": true, "ms": 5.382776260375977, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "bits_kit", "ok": true, "ms": 10.960578918457031, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "motion_kit", "ok": true, "ms": 8.856058120727539, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "design_atlas", "ok": true, "ms": 4.35328483581543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "art_chain", "ok": true, "ms": 7.68280029296875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "art_brief", "ok": true, "ms": 103.78122329711914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "intake_kit", "ok": true, "ms": 70.93930244445801, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:48", "cap": "offload_distill", "ok": true, "ms": 141.90435409545898, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:49", "cap": "pod_link", "ok": true, "ms": 67.53277778625488, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T02:51:49", "cap": "comfy_cloud", "ok": false, "ms": 62.4847412109375, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:00:50", "cap": "creation_camp", "ok": true, "ms": 198.14777374267578, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "db_probe", "ok": true, "ms": 118.89195442199707, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "case_mine", "ok": true, "ms": 13.738155364990234, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "look_grade", "ok": false, "ms": 0.0, "error_class": "error", "detail": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\Lenovo E14 Gen 5\\\\Documents\\\\deepseek-harness\\\\default-workspace\\\\GBTxiaotudouV8-Commander\\\\GBTxiaotudouV8-Commander-main\\\\tools\\\\filmgrade.py'", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "control_loop", "ok": true, "ms": 16.136646270751953, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "mirror_parity", "ok": false, "ms": 17.959117889404297, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "mirror_plan", "ok": false, "ms": 16.718387603759766, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:00:51", "cap": "mirror_simulate", "ok": false, "ms": 15.718936920166016, "error_class": "error", "detail": "排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "creation_camp", "ok": true, "ms": 83.29558372497559, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "db_probe", "ok": true, "ms": 133.33702087402344, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "case_mine", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "look_grade", "ok": false, "ms": 16.505002975463867, "error_class": "error", "detail": "'dict' object has no attribute 'looks_list'", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "control_loop", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "mirror_parity", "ok": false, "ms": 50.1248836517334, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "mirror_plan", "ok": false, "ms": 0.0, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:03", "cap": "mirror_simulate", "ok": false, "ms": 16.748905181884766, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "git_read", "ok": false, "ms": 66.62845611572266, "error_class": "error", "detail": "本机找不到 git", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "i2v_agnes", "ok": false, "ms": 66.07651710510254, "error_class": "error", "detail": "[WinError 2] 系统找不到指定的文件。", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "browser", "ok": false, "ms": 85.4501724243164, "error_class": "error", "detail": "缺少 url", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "devour_github", "ok": false, "ms": 65.80018997192383, "error_class": "error", "detail": "缺少 repo：请给出 GitHub 仓库 URL（如 https://github.com/owner/repo）", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "brain_execute", "ok": false, "ms": 50.0636100769043, "error_class": "error", "detail": "缺少 kind 或 parallel", "gate": ""}
+{"at": "2026-11-02T03:01:34", "cap": "pipeline_versions", "ok": false, "ms": 65.36674499511719, "error_class": "error", "detail": "缺少 name：请给出产物名", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "osint_scan", "ok": false, "ms": 69.79966163635254, "error_class": "error", "detail": "缺少 target（要扫的域名或 IP）。例：{\"target\": \"example.com\"}", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "topic_watch", "ok": false, "ms": 66.96557998657227, "error_class": "error", "detail": "缺少 need：请给一句需求（如「帮我盯着 AI 行业动态」）", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "tentacle", "ok": false, "ms": 64.2557144165039, "error_class": "error", "detail": "缺少 action：给触手能力名（tentacle_manifest）、给 intent 走自动路由、或 op=caps 看全部能力", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "control_loop", "ok": true, "ms": 66.4370059967041, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "creation_camp", "ok": true, "ms": 65.44613838195801, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:35", "cap": "db_probe", "ok": true, "ms": 200.06036758422852, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:36", "cap": "body_open", "ok": false, "ms": 50.220489501953125, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:36", "cap": "devour_pulse", "ok": false, "ms": 53.087472915649414, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:36", "cap": "sched_define", "ok": false, "ms": 66.65754318237305, "error_class": "error", "detail": "需要 name", "gate": ""}
+{"at": "2026-11-02T03:01:36", "cap": "wf_define", "ok": false, "ms": 66.50257110595703, "error_class": "error", "detail": "需要 name 与非空 nodes 列表", "gate": ""}
+{"at": "2026-11-02T03:01:36", "cap": "wf_resume", "ok": false, "ms": 68.36628913879395, "error_class": "error", "detail": "运行记录不存在: ", "gate": ""}
+{"at": "2026-11-02T03:01:36", "cap": "wf_run", "ok": false, "ms": 83.43744277954102, "error_class": "error", "detail": "工作流不存在: （先 wf_define）", "gate": ""}
+{"at": "2026-11-02T03:01:36", "cap": "mcp_health", "ok": false, "ms": 49.90077018737793, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:37", "cap": "autopilot", "ok": false, "ms": 55.202484130859375, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:37", "cap": "brain_route", "ok": false, "ms": 66.45059585571289, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T03:01:37", "cap": "brain_unify", "ok": false, "ms": 65.61684608459473, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T03:01:37", "cap": "codex_chat", "ok": false, "ms": 50.03237724304199, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T03:01:37", "cap": "codex_interrupt", "ok": false, "ms": 46.62919044494629, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:37", "cap": "codex_models", "ok": false, "ms": 49.93319511413574, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:37", "cap": "codex_thread_new", "ok": false, "ms": 43.2286262512207, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:38", "cap": "codex_turn_send", "ok": false, "ms": 65.50312042236328, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T03:01:38", "cap": "llm_chat", "ok": false, "ms": 49.971580505371094, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:38", "cap": "think_loop", "ok": false, "ms": 50.23002624511719, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:38", "cap": "lr_submit", "ok": false, "ms": 66.87283515930176, "error_class": "error", "detail": "需要 description", "gate": ""}
+{"at": "2026-11-02T03:01:38", "cap": "belief_forge", "ok": false, "ms": 66.81156158447266, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:01:38", "cap": "mirror_ascend", "ok": false, "ms": 47.73974418640137, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_parity", "ok": false, "ms": 87.39733695983887, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_plan", "ok": false, "ms": 83.40668678283691, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_rehearse", "ok": false, "ms": 60.622453689575195, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_release", "ok": false, "ms": 47.72663116455078, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_rewind", "ok": false, "ms": 47.48415946960449, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:01:39", "cap": "mirror_simulate", "ok": false, "ms": 86.67206764221191, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:01:39", "cap": "one_key_deploy", "ok": false, "ms": 65.42325019836426, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T03:01:40", "cap": "pipeline_rollback", "ok": false, "ms": 52.260637283325195, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:01:40", "cap": "pipeline_submit", "ok": false, "ms": 49.89004135131836, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:01:40", "cap": "case_mine", "ok": true, "ms": 59.32116508483887, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:01:40", "cap": "policy_delta", "ok": false, "ms": 67.28410720825195, "error_class": "error", "detail": "tables() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:01:40", "cap": "sec_llm", "ok": false, "ms": 49.880266189575195, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:01:40", "cap": "long_run_supervisor", "ok": false, "ms": 63.121795654296875, "error_class": "error", "detail": "status() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:01:40", "cap": "mcp_call", "ok": false, "ms": 54.6724796295166, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:01:41", "cap": "mcp_connect", "ok": false, "ms": 50.162553787231445, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:03:01", "cap": "sec_chain", "ok": true, "ms": 80197.98183441162, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:18", "cap": "sec_scan", "ok": true, "ms": 76750.96106529236, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "a1art_skill", "ok": true, "ms": 16.85810089111328, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "absorb_loop", "ok": true, "ms": 16.730785369873047, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "account_registry", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "action_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "agency_tentacles", "ok": true, "ms": 1.06048583984375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "agent_console", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "security_status", "ok": false, "ms": 0.0, "error_class": "error", "detail": "unknown capability（没有这个能力位名）。你是不是要：sched_status / lr_status", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "agent_control", "ok": true, "ms": 16.688823699951172, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "agent_council", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "agent_rig", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "alerts", "ok": true, "ms": 16.121864318847656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "anim_audit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "answer_shaper", "ok": true, "ms": 18.00537109375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "asset_index", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "audit_query", "ok": true, "ms": 1.0638236999511719, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "auth_gate_status", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "auto_publish", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "auto_switch", "ok": true, "ms": 1.4374256134033203, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "automation_keys", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:33", "cap": "autonomy", "ok": true, "ms": 16.492128372192383, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "awesome_tools_index", "ok": true, "ms": 17.2574520111084, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "belief_forge", "ok": false, "ms": 0.0, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "bi_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "bits_kit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "blueprint", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "bluetooth", "ok": true, "ms": 33.80084037780762, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:34", "cap": "body_click", "ok": true, "ms": 250.86021423339844, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:36", "cap": "body_map", "ok": true, "ms": 1932.9519271850586, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:36", "cap": "body_open", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:04:36", "cap": "body_say", "ok": true, "ms": 67.4736499786377, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:36", "cap": "body_see", "ok": true, "ms": 256.85787200927734, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:36", "cap": "body_sense", "ok": true, "ms": 151.52835845947266, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:36", "cap": "body_type", "ok": true, "ms": 147.54772186279297, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "body_volume", "ok": true, "ms": 49.881935119628906, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brain_council", "ok": true, "ms": 7.906198501586914, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brain_execute", "ok": false, "ms": 8.735418319702148, "error_class": "error", "detail": "缺少 kind 或 parallel", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brain_route", "ok": false, "ms": 15.768051147460938, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brain_unify", "ok": false, "ms": 0.0, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brain_vault", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "brand_outro", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "browser", "ok": false, "ms": 14.783382415771484, "error_class": "error", "detail": "缺少 url", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "bt_control", "ok": true, "ms": 17.55547523498535, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cad_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cap_pack", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cap_self", "ok": true, "ms": 9.780645370483398, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cap_tags", "ok": true, "ms": 116.3949966430664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "capability_net", "ok": true, "ms": 32.92655944824219, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "case_mine", "ok": true, "ms": 15.482902526855469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "chain_kernel", "ok": true, "ms": 7.766008377075195, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cloud_llm", "ok": true, "ms": 8.514404296875, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cloud_pc", "ok": true, "ms": 17.510652542114258, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "cloud_plugin", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "code_art", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "code_audit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "code_graph", "ok": true, "ms": 16.98160171508789, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:37", "cap": "codex_chat", "ok": false, "ms": 16.09063148498535, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T03:04:37", "cap": "codex_interrupt", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:04:37", "cap": "codex_models", "ok": false, "ms": 15.772104263305664, "error_class": "gate_denied", "detail": "需要人工授权（external_llm）：把当前任务数据发送到外部大模型服务", "gate": "external_llm"}
+{"at": "2026-11-02T03:04:38", "cap": "codex_status", "ok": true, "ms": 1317.2144889831543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:38", "cap": "codex_thread_new", "ok": false, "ms": 16.93582534790039, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:04:38", "cap": "codex_tools", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:38", "cap": "codex_turn_send", "ok": false, "ms": 15.659570693969727, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute,external_llm"}
+{"at": "2026-11-02T03:04:38", "cap": "comfy_forge", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "comfyui", "ok": true, "ms": 2066.8861865997314, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "command_chain", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "console_hub", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "context_guard", "ok": true, "ms": 16.03865623474121, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "context_vault", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "control_loop", "ok": true, "ms": 1.0724067687988281, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "count_words", "ok": true, "ms": 16.7999267578125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "coverage_auditor", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "coze_mail", "ok": true, "ms": 16.667842864990234, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "create", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "creation_camp", "ok": true, "ms": 15.574455261230469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "datakit", "ok": true, "ms": 9.984254837036133, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:40", "cap": "db_plugin", "ok": true, "ms": 16.142606735229492, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "design_atlas", "ok": true, "ms": 9.589672088623047, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "desktop_commander", "ok": true, "ms": 13.323068618774414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "desktop_distill", "ok": true, "ms": 15.904426574707031, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "detail_habit", "ok": true, "ms": 9.57345962524414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "devour_auto", "ok": true, "ms": 20.760297775268555, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "devour_fusion", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "devour_scan", "ok": true, "ms": 8.074522018432617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dh_asset_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dh_brain", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dh_realism", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "diagram_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "digital_human", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "director_mood", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dl_forge", "ok": true, "ms": 14.926671981811523, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "doc_intake", "ok": true, "ms": 15.490055084228516, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "drama", "ok": true, "ms": 7.690906524658203, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dream_replay", "ok": true, "ms": 2.5429725646972656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "dual_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "duty_board", "ok": true, "ms": 50.33135414123535, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "echo", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "eigenflux", "ok": true, "ms": 2.1059513092041016, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "emotion_projection", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "energy_core", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "energy_pool", "ok": true, "ms": 1.1620521545410156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "energy_scheduler", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "event_ledger", "ok": true, "ms": 17.50469207763672, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "execution_guard", "ok": true, "ms": 66.79558753967285, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "experience_forge", "ok": true, "ms": 15.932798385620117, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "express_direct", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "fact_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "feishu_embed", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "film_intel", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "flow_canvas", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:41", "cap": "freebuff_term", "ok": true, "ms": 16.458511352539062, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:45", "cap": "freellmapi", "ok": true, "ms": 4066.480875015259, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:45", "cap": "gate_visibility", "ok": true, "ms": 12.932777404785156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:45", "cap": "git_read", "ok": false, "ms": 0.0, "error_class": "error", "detail": "本机找不到 git", "gate": ""}
+{"at": "2026-11-02T03:04:45", "cap": "god_view", "ok": true, "ms": 17.069339752197266, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:45", "cap": "console_hub", "ok": true, "ms": 16.70670509338379, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "gods_eye", "ok": true, "ms": 1449.4001865386963, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "growth_hooks", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "h3_video_gen", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "hand_retarget", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "handoff", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "health", "ok": true, "ms": 133.93855094909668, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "hf_voice", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "hook_enforcer", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "hook_registry", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "hunyuan_video", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:47", "cap": "i2v_agnes", "ok": false, "ms": 0.8058547973632812, "error_class": "error", "detail": "[WinError 2] 系统找不到指定的文件。", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "image_scout", "ok": true, "ms": 12164.854288101196, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "impact_check", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "install_selfcheck", "ok": true, "ms": 16.36195182800293, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "intake_kit", "ok": true, "ms": 16.959667205810547, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "inventory", "ok": true, "ms": 150.8188247680664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:04:59", "cap": "ledger_note", "ok": true, "ms": 43.65253448486328, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "legacy_guard", "ok": true, "ms": 399.19471740722656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "libtv_skill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "life", "ok": true, "ms": 1.2733936309814453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "llm_redteam", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "llm_status", "ok": true, "ms": 433.38918685913086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "llm_watch", "ok": true, "ms": 16.527891159057617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "lobehub", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "local_brain", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "long_run_supervisor", "ok": false, "ms": 0.0, "error_class": "error", "detail": "status() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "lr_status", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "machine_distill", "ok": true, "ms": 4.086494445800781, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_call", "ok": false, "ms": 9.557723999023438, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_connect", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_health", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_register", "ok": true, "ms": 16.657590866088867, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_servers", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_tools", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mcp_unregister", "ok": true, "ms": 16.576766967773438, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "media_pipeline", "ok": true, "ms": 16.670703887939453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "memory_bank", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "memory_manager", "ok": true, "ms": 32.75012969970703, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "meta_cognition", "ok": true, "ms": 2.936124801635742, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mind", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_ascend", "ok": false, "ms": 10.814666748046875, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_parity", "ok": false, "ms": 33.605098724365234, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_plan", "ok": false, "ms": 0.0, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_rehearse", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（process_execute）：启动进程、执行命令或连接 MCP/终端服务器", "gate": "process_execute"}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_release", "ok": false, "ms": 1.1169910430908203, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish,process_execute"}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_rewind", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_scan", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_simulate", "ok": false, "ms": 16.90983772277832, "error_class": "error", "detail": "缺少 plan：排练计划不存在: default", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "mirror_status", "ok": true, "ms": 1.789093017578125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "model_key_pool", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "motion_kit", "ok": true, "ms": 13.77248764038086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "music_intel", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "music_publishing", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "observer_anchor", "ok": true, "ms": 3.1180381774902344, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "obsidian_vault", "ok": true, "ms": 4.015922546386719, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "offload_distill", "ok": true, "ms": 6.93058967590332, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "omission_detector", "ok": true, "ms": 1.0113716125488281, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "omni_open", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "onboarding_gate", "ok": true, "ms": 9.094476699829102, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "one_shot", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "orchestration", "ok": true, "ms": 59.07726287841797, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:00", "cap": "orchestration_kernel", "ok": true, "ms": 3.5653114318847656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "paywallbuster", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "penetrating_cross_scan", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "pentest_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "persona_kernel", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "pipeline_rollback", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（deploy_publish）：部署、晋升、回滚或写入生产交付区", "gate": "deploy_publish"}
+{"at": "2026-11-02T03:05:01", "cap": "pipeline_status", "ok": true, "ms": 16.962528228759766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "pipeline_versions", "ok": false, "ms": 0.0, "error_class": "error", "detail": "缺少 name：请给出产物名", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "platform_profile", "ok": true, "ms": 16.36815071105957, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "policy_delta", "ok": false, "ms": 0.0, "error_class": "error", "detail": "tables() got an unexpected keyword argument '_probe'", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "policy_gate", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "proactive_report", "ok": true, "ms": 15.611886978149414, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "project_context", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "project_drift", "ok": true, "ms": 16.718149185180664, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "projection_card", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "prompt_bridge", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "pulse_direct", "ok": true, "ms": 25.133848190307617, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "quant", "ok": true, "ms": 8.077144622802734, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "quant_backtest", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "quant_params", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "quant_strategy", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "rea_reverse", "ok": true, "ms": 1.18255615234375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "recon_distill", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "record_grid", "ok": false, "ms": 0.0, "error_class": "error", "detail": "需要 text（内联文本）或 path（框架内相对路径）", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "render_evolution", "ok": true, "ms": 16.47663116455078, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "replan_loop", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "repo_publish", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "research_intel", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "review_gate", "ok": true, "ms": 4.023075103759766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "ring_context", "ok": true, "ms": 1.0035037994384766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "root_cause", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "scene_anchor", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "sched_status", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "scrapling", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "keylogger", "ok": false, "ms": 0.0, "error_class": "gate_denied", "detail": "需要人工授权（privacy_read）：读取屏幕、摄像头、麦克风或隐私载体", "gate": "privacy_read"}
+{"at": "2026-11-02T03:05:01", "cap": "osint_scan", "ok": false, "ms": 22.136211395263672, "error_class": "gate_denied", "detail": "需要人工授权（osint_private）：OSINT 扫描自有内网/保留地址（一次性授权）", "gate": "osint_private"}
+{"at": "2026-11-02T03:05:01", "cap": "pipeline_submit", "ok": true, "ms": 27.98771858215332, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "sec_defenses", "ok": true, "ms": 67.1846866607666, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "sec_sweeper", "ok": true, "ms": 17.412185668945312, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "selfscan", "ok": true, "ms": 59.125661849975586, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "shared_resources", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "signature_guard", "ok": true, "ms": 94.573974609375, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "skill_watch", "ok": true, "ms": 50.879716873168945, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "skills_hub", "ok": true, "ms": 30.086994171142578, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "slim_profile", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "social_eng", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "spend_guard", "ok": true, "ms": 16.777992248535156, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "stigmergy", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:01", "cap": "surface_bind", "ok": true, "ms": 15.876531600952148, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:02", "cap": "svc_inspect", "ok": true, "ms": 616.0893440246582, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "sync_guard", "ok": true, "ms": 4281.682014465332, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tactics_advise", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "task_graph", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "taste_guard", "ok": true, "ms": 49.51930046081543, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "telegram_embed", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle", "ok": false, "ms": 3.146648406982422, "error_class": "error", "detail": "缺少 action：给触手能力名（tentacle_manifest）、给 intent 走自动路由、或 op=caps 看全部能力", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_arm", "ok": true, "ms": 15.900373458862305, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_bind", "ok": true, "ms": 108.17503929138184, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_cognition", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_manifest", "ok": true, "ms": 17.388105392456055, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_pipeline", "ok": true, "ms": 1.5070438385009766, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "tentacle_scale", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "topic_watch", "ok": false, "ms": 27.678728103637695, "error_class": "error", "detail": "缺少 need：请给一句需求（如「帮我盯着 AI 行业动态」）", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "trace_store", "ok": true, "ms": 5.534172058105469, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "transfer", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "transformer", "ok": true, "ms": 9.171724319458008, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:06", "cap": "trend_watch", "ok": true, "ms": 2.022981643676758, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "trunk_cover", "ok": true, "ms": 6966.980934143066, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "trunk_reason", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "truth_scan", "ok": true, "ms": 16.600847244262695, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "ui_kit", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "ui_render", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "ux_doctrine", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "verification_watch", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "video_intel", "ok": true, "ms": 0.47779083251953125, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:13", "cap": "viral_forge", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "vision", "ok": true, "ms": 156.6169261932373, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "vision_grounding", "ok": true, "ms": 3.6568641662597656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "vision_print", "ok": true, "ms": 9.804248809814453, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "vlx_flow", "ok": true, "ms": 22.240877151489258, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "voice", "ok": false, "ms": 70.08886337280273, "error_class": "error", "detail": "缺少 text：要合成的文本", "gate": ""}
+{"at": "2026-11-02T03:05:14", "cap": "voice_orchestra", "ok": true, "ms": 620.1989650726318, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:16", "cap": "voice_studio", "ok": true, "ms": 2050.339698791504, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "warm_switch", "ok": true, "ms": 366.7271137237549, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "welcome", "ok": true, "ms": 2.103090286254883, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "wf_status", "ok": true, "ms": 14.01209831237793, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "whatsapp_embed", "ok": true, "ms": 9.843587875366211, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "wiki_graph", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:17", "cap": "cross_scan", "ok": true, "ms": 58946.89679145813, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:20", "cap": "console_hub", "ok": true, "ms": 2873.009443283081, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:34", "cap": "selfscan", "ok": true, "ms": 17168.097257614136, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:35", "cap": "wf_status", "ok": true, "ms": 466.6788578033447, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:05:39", "cap": "tentacle_status", "ok": true, "ms": 4165.087699890137, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:06:36", "cap": "page_scan", "ok": true, "ms": 78695.33777236938, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "belief_forge", "ok": false, "ms": 66.54167175292969, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "policy_delta", "ok": true, "ms": 51.064491271972656, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "long_run_supervisor", "ok": false, "ms": 66.74957275390625, "error_class": "error", "detail": "status() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "sched_define", "ok": false, "ms": 79.96940612792969, "error_class": "error", "detail": "需要 name", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "wf_define", "ok": false, "ms": 82.97133445739746, "error_class": "error", "detail": "需要 name 与非空 nodes 列表", "gate": ""}
+{"at": "2026-11-02T03:06:47", "cap": "wf_resume", "ok": false, "ms": 66.21503829956055, "error_class": "error", "detail": "运行记录不存在: ", "gate": ""}
+{"at": "2026-11-02T03:06:48", "cap": "wf_run", "ok": false, "ms": 83.24217796325684, "error_class": "error", "detail": "工作流不存在: （先 wf_define）", "gate": ""}
+{"at": "2026-11-02T03:06:48", "cap": "brain_route", "ok": false, "ms": 116.98150634765625, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T03:06:48", "cap": "brain_unify", "ok": false, "ms": 53.513288497924805, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T03:06:48", "cap": "lr_submit", "ok": false, "ms": 64.42594528198242, "error_class": "error", "detail": "需要 description", "gate": ""}
+{"at": "2026-11-02T03:06:57", "cap": "belief_forge", "ok": false, "ms": 66.35665893554688, "error_class": "error", "detail": "beliefs() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:06:57", "cap": "long_run_supervisor", "ok": false, "ms": 68.74227523803711, "error_class": "error", "detail": "status() got an unexpected keyword argument 'text'", "gate": ""}
+{"at": "2026-11-02T03:06:57", "cap": "sched_define", "ok": false, "ms": 66.5731430053711, "error_class": "error", "detail": "需要 name", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "wf_define", "ok": false, "ms": 66.99895858764648, "error_class": "error", "detail": "需要 name 与非空 nodes 列表", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "wf_resume", "ok": false, "ms": 66.15972518920898, "error_class": "error", "detail": "运行记录不存在: ", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "wf_run", "ok": false, "ms": 83.3275318145752, "error_class": "error", "detail": "工作流不存在: （先 wf_define）", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "brain_route", "ok": false, "ms": 51.32699012756348, "error_class": "error", "detail": "需要 intent：任务意图描述", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "brain_unify", "ok": false, "ms": 66.85781478881836, "error_class": "error", "detail": "需要 goal（意图）或 kind（指定能力）", "gate": ""}
+{"at": "2026-11-02T03:06:58", "cap": "lr_submit", "ok": false, "ms": 66.90430641174316, "error_class": "error", "detail": "需要 description", "gate": ""}
+{"at": "2026-11-02T03:07:06", "cap": "belief_forge", "ok": true, "ms": 64.5136833190918, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:07:06", "cap": "long_run_supervisor", "ok": true, "ms": 5.796194076538086, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:07:06", "cap": "policy_delta", "ok": true, "ms": 0.0, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:07:25", "cap": "body_map", "ok": true, "ms": 1987.443208694458, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:07:25", "cap": "body_see", "ok": true, "ms": 267.83037185668945, "error_class": "", "detail": "", "gate": ""}
+{"at": "2026-11-02T03:07:26", "cap": "body_say", "ok": true, "ms": 507.83753395080566, "error_class": "", "detail": "", "gate": ""}

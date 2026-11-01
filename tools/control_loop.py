@@ -44,7 +44,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[1]  # 仓库根（不再写死 ADMIN 桌面）
 TRACE = ROOT / "state" / "control_loop.jsonl"
 
 # 动作空间（枚举，照移植；**枚举之外的动作不存在** —— 这是安全的第一层）

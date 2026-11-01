@@ -240,3 +240,4 @@
 | 122 | [122-submit-bundle.md](122-submit-bundle.md) | 可提交包：CVSS 时间/环境分 + 修复 diff + 附件 + manifest + ZIP |
 | 123 | [123-platform-status-sync.md](123-platform-status-sync.md) | 平台状态只读同步：mock 平台端到端、状态机回填、审计、只读 405 |
 | 124 | [124-omni-all-sync.md](124-omni-all-sync.md) | 万能插全开同步执行：385 位逐个同步、票挡需授权位、进度落盘、API/UI |
+| 125 | [125-alarm-rootcause-fixes.md](125-alarm-rootcause-fixes.md) | 报警必追根因：全开 63 失败归因（policy/超时/kwargs/硬编码路径/缺参/缺件）与修复 |

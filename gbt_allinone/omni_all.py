@@ -23,12 +23,27 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = str(ROOT / "pyembed" / "python.exe") if (ROOT / "pyembed" / "python.exe").is_file() else sys.executable
 STATE = ROOT / "state" / "omni-plug.json"
 LOG = ROOT / "state" / "omni-plug.jsonl"
+RESULTS = ROOT / "state" / "omni-results.jsonl"
 
 
 def cap_table() -> dict:
     sys.path.insert(0, str(ROOT))
     from gbt_allinone.caps_registry import BENIGN_CAPS
     return BENIGN_CAPS
+
+
+HEAVY_DOMAINS = {"video", "creation", "llm", "recon", "devour", "image_video", "voice"}
+HEAVY_CAPS = {"sec_chain", "sec_scan", "cross_scan", "page_scan"}
+SMOKE = {"text": "GBT全开自检"}
+
+
+def _timeout_for(cap: str, base: float) -> float:
+    if cap in HEAVY_CAPS:
+        return max(base, 90.0)
+    meta = (cap_table().get(cap) or {})
+    if str(meta.get("domain") or "") in HEAVY_DOMAINS:
+        return max(base, 60.0)
+    return base
 
 
 def _run_one(cap: str, timeout: float) -> dict:
@@ -42,8 +57,9 @@ def _run_one(cap: str, timeout: float) -> dict:
     code = (
         "import sys,json;sys.path.insert(0,%r);"
         "import gbt_allinone as g;"
-        "r=g.run_task(%r);"
-        "print(json.dumps({'ok':bool(r.get('ok'))},ensure_ascii=False))"
+        "r=g.run_task(%r, {'text': 'GBT全开自检'});"
+        "err = r.get('error') or (r.get('gbt_result') or {}).get('error') or '';"
+        "print(json.dumps({'ok':bool(r.get('ok')), 'error': str(err)[:300]},ensure_ascii=False))"
         % (str(ROOT), cap)
     )
     t0 = time.time()
@@ -71,8 +87,10 @@ def _run_one(cap: str, timeout: float) -> dict:
             d = json.loads((p.stdout or "").strip().splitlines()[-1])
         except Exception:  # noqa: BLE001
             return {"cap": cap, "ok": False, "ms": ms,
-                    "error": "子进程输出不是 JSON"}
+                    "error": "子进程输出不是 JSON：" + (p.stdout or "")[-120:]}
         out = {"cap": cap, "ok": bool(d.get("ok")), "ms": ms}
+        if not out["ok"]:
+            out["error"] = str(d.get("error") or "")[:300] or "ok=false（无 error 字段）"
         if cleaned:
             out["cleaned_artifacts"] = cleaned
         return out
@@ -91,7 +109,7 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
     target = list(caps) if caps else all_caps
     full_open = caps is None
     run_id = run_id or time.strftime("%Y%m%d-%H%M%S")
-    results, blocked = [], []
+    results, blocked, blocked_policy = [], [], []
     t0 = time.time()
 
     def _progress(i: int) -> None:
@@ -114,8 +132,26 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         meta = table.get(cap) or {}
         if not bool(meta.get("safe")) and not ticket:
             blocked.append({"cap": cap, "reason": "需授权位：没票不执行（已打开、被票挡）"})
-        else:
-            results.append(_run_one(cap, timeout_per_cap))
+            continue
+        to = _timeout_for(cap, timeout_per_cap)
+        r = _run_one(cap, to)
+        # 授权策略拦截（process_execute/external_llm/deploy_publish/privacy_read）不是失败
+        if not r.get("ok") and "需要人工授权" in str(r.get("error") or ""):
+            blocked_policy.append({"cap": cap, "reason": r.get("error")})
+            continue
+        if not r.get("ok") and "超时" in str(r.get("error") or ""):
+            # 重型位超时：放宽到 2 倍再试一次（仍失败才算失败）
+            r2 = _run_one(cap, to * 2)
+            if r2.get("ok"):
+                r = r2
+                r["retried"] = True
+        results.append(r)
+        try:
+            with RESULTS.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps({"run_id": run_id, "cap": cap, **r},
+                                    ensure_ascii=False) + "\n")
+        except Exception:  # noqa: BLE001
+            pass
         if i % 5 == 0 or i == len(target):
             _progress(i)
     elapsed = int((time.time() - t0) * 1000)
@@ -127,6 +163,7 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         "full_open": full_open,
         "executed": len(results), "ok_count": ok_n, "fail_count": len(results) - ok_n,
         "blocked_by_ticket": blocked,
+        "blocked_by_policy": blocked_policy,
         "results": results,
         "elapsed_ms": elapsed,
         "at": time.strftime("%Y-%m-%dT%H:%M:%S"),

@@ -55,7 +55,7 @@ def _tables() -> dict:
     return out
 
 
-def tables() -> dict:
+def tables(**_kwargs) -> dict:
     t = _tables()
     a = set(t.get("门（policy）·只读免卡动作") or [])
     b = set(t.get("预检（preflight）·只读免卡动作") or [])
