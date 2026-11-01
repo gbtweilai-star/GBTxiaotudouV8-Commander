@@ -99,6 +99,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):  # noqa: N802
         path = urllib.parse.urlparse(self.path).path
+        if path == "/api/scan":
+            from urllib.parse import parse_qs as _pq
+            from urllib.parse import urlparse as _urlparse
+            q = _pq(_urlparse(self.path).query)
+            target = (q.get("target") or ["bindings"])[0]
+            return self._api_scan(target)
         if path == "/api/events":
             return self._sse()
         if path == "/api/data":
@@ -148,6 +154,59 @@ class Handler(BaseHTTPRequestHandler):
                  ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml",
                  ".woff2": "font/woff2"}.get(f.suffix.lower(), "application/octet-stream")
         return self._send(200, f.read_bytes(), ctype)
+
+    # 允许现场重扫的目标（白名单；tree: 只允许仓库内已声明目录，防穿越）
+    SCAN_DIRS = {"gbt_allinone", "holo_pet_w3", "tools", "docs", "tests", "skills", "arms",
+                 "runtime", "assets", "data"}
+
+    def _scan_target_ok(self, target):
+        target = str(target or "").strip()
+        if target in ("bindings", "registry"):
+            return target
+        if target.startswith("tree:"):
+            rel = target[5:].strip().strip("/\\")
+            if not rel or ".." in rel.split("/"):
+                return None
+            head = rel.split("/")[0]
+            if head not in self.SCAN_DIRS:
+                return None
+            return "tree:" + rel
+        return None
+
+    def _api_scan(self, target):
+        """现场真跑 penetrating_cross_scan，返回该目标的结果（含 unit_details）。"""
+        import json as _json
+        import subprocess as _sub
+        ok_target = self._scan_target_ok(target)
+        if not ok_target:
+            return self._send(400, _json.dumps(
+                {"ok": False, "error": "target 不在白名单（bindings|registry|tree:<dir>）"},
+                ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
+        t0 = time.time()
+        try:
+            r = _sub.run([sys.executable, "-X", "utf8",
+                          str(REPO / "tools" / "penetrating_cross_scan.py"),
+                          "scan", ok_target],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace",
+                         cwd=str(REPO), timeout=600)
+            d = _json.loads(r.stdout)
+        except Exception as e:  # noqa: BLE001
+            return self._send(500, _json.dumps(
+                {"ok": False, "target": ok_target, "error": str(e)[:200]}, ensure_ascii=False
+            ).encode("utf-8"), "application/json; charset=utf-8")
+        out = {
+            "ok": bool(d.get("ok")), "target": ok_target, "units": d.get("units"),
+            "hooked": d.get("hooked"), "coverage": d.get("coverage"),
+            "agree": d.get("agree"), "arbitrated": d.get("arbitrated"),
+            "missing": d.get("missing") or [], "mode": d.get("mode"),
+            "coverage": d.get("coverage"), "full_coverage": d.get("full_coverage"),
+            "dead_spots": d.get("dead_spots") or [],
+            "dead_spot_count": d.get("dead_spot_count", len(d.get("missing") or [])),
+            "unit_details": (d.get("unit_details") or [])[:4000],
+            "ms": int((time.time() - t0) * 1000),
+        }
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
 
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""

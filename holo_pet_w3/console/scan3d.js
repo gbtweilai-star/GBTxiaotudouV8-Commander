@@ -37,6 +37,8 @@ let hud = {};
 let stats = { swept: 0, doubts: 0, reflections: 0, penetrations: 0 };
 let total = 0, doubtN = 0, greenN = 0, amberN = 0, redN = 0;
 let targetName = "";
+let coverage = null;            // 真实覆盖率（服务端/扫描器原样）
+let deadSpots = [];             // 未钩住的死角（如实在 UI 报红）
 let scans = [];
 
 function labelSprite(text, color, scale, size) {
@@ -198,8 +200,17 @@ function buildScan(scan) {
     });
   }
   updateHud();
+  coverage = (typeof scan.coverage === "number") ? scan.coverage : null;
+  deadSpots = scan.dead_spots || scan.missing || [];
   document.documentElement.dataset.scan3d =
     "ok:" + targetName + ":" + total + "单元+" + doubtN + "疑点";
+  document.documentElement.dataset.scan3dCoverage =
+    (coverage === null ? "unknown" : String(Math.round(coverage * 1000) / 10));
+  document.documentElement.dataset.scan3dDead = String(deadSpots.length);
+  const covEl = document.getElementById("scan-coverage");
+  if (covEl) covEl.textContent = (coverage === null ? "—" : (Math.round(coverage * 1000) / 10 + "%"));
+  const deadEl = document.getElementById("scan-dead");
+  if (deadEl) deadEl.textContent = String(deadSpots.length);
 }
 
 function updateHud() {
@@ -279,11 +290,62 @@ function stepScan(dt) {
     colAttr.setXYZ(i, n.base.r * k, n.base.g * k, n.base.b * k);
   }
   colAttr.needsUpdate = true;
+  // 漏扫计数：每帧都算（无死角口径要能随时查，不等一轮结束）
+  const missedNow = nodes.filter(function (n) { return !n.lit; }).length;
+  document.documentElement.dataset.scan3dMissed = String(missedNow);
   if (stats.swept >= total) {
-    if (hud.state) hud.state.textContent = "本轮扫完 · " + (doubtN ? "疑点已全部穿透" : "全绿·无遗漏");
+    const missed = missedNow;
+    const full = (coverage === null || coverage >= 1) && deadSpots.length === 0 && missed === 0;
+    document.documentElement.dataset.scan3dMissed = String(missed);
+    if (hud.state) {
+      hud.state.textContent = full
+        ? ("无死角 · " + total + "/" + total + " · " + (doubtN ? "疑点已全部穿透" : "全绿"))
+        : ("仍有死角 " + (deadSpots.length + missed) + " 个（如实报，不折叠）");
+    }
     sensePulse("mouth", 1500);
   }
   updateHud();
+}
+
+/* 现场重扫：真的跑 /api/scan（服务端白名单）；覆盖率<1 自动补扫（最多 3 轮），仍死角就如实红 */
+async function rescan(target) {
+  const btn = document.getElementById("scan-rescan");
+  const st = document.getElementById("scan-state");
+  const old = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "重扫中…"; }
+  if (st) st.textContent = "现场重扫 " + target + " …";
+  const t0 = performance.now();
+  try {
+    let attempts = 0;
+    let cur = null;
+    while (attempts < 3) {
+      attempts += 1;
+      const r = await fetch("/api/scan?target=" + encodeURIComponent(target));
+      const d = await r.json();
+      if (!d || (d.ok !== true && !d.units)) throw new Error((d && d.error) || "接口返回失败");
+      cur = d;
+      const k = scans.findIndex(function (x) { return x.target === d.target; });
+      if (k >= 0) scans[k] = d; else scans.push(d);
+      buildScan(scans.find(function (x) { return x.target === d.target; }) || d);
+      const cov = (typeof d.coverage === "number") ? d.coverage : 1;
+      if (cov >= 1) break;
+      if (st) st.textContent = "发现死角，补扫第 " + (attempts + 1) + " 轮…";
+    }
+    const took = Math.round(performance.now() - t0);
+    const cov = cur && typeof cur.coverage === "number" ? cur.coverage : null;
+    document.documentElement.dataset.scan3dRescan =
+      "ok:" + (cur ? cur.target : target) + ":" + ((cur && cur.unit_details) || []).length
+      + "单元:" + took + "ms:补扫" + attempts + "轮:覆盖" + (cov === null ? "?" : cov);
+    if (st) st.textContent = "重扫完成 · " + (cur ? cur.target : target) + " · "
+      + ((cur && cur.unit_details) || []).length + " 单元 · " + took + " ms · 覆盖 "
+      + (cov === null ? "?" : Math.round(cov * 1000) / 10 + "%");
+  } catch (e) {
+    document.documentElement.dataset.scan3dRescan =
+      "error:" + String((e && e.message) || e).slice(0, 120);
+    if (st) st.textContent = "重扫失败：" + String((e && e.message) || e).slice(0, 60);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = old || "现场重扫"; }
+  }
 }
 
 function init() {
@@ -380,6 +442,11 @@ function init() {
     const want = new URLSearchParams(location.search).get("target");
     const pick = (want && scans.find(function (x) { return x.target === want; })) || scans[0];
     buildScan(pick);
+    const rb = document.getElementById("scan-rescan");
+    if (rb) rb.addEventListener("click", function () { rescan(targetName); });
+    if (new URLSearchParams(location.search).get("rescan") === "1") {
+      setTimeout(function () { rescan(targetName); }, 600);
+    }
     resize();
     inited = true;
     draw();
@@ -448,6 +515,7 @@ window.__scan3d = {
   get stats() { return { swept: stats.swept, doubts: stats.doubts, reflections: stats.reflections,
                          penetrations: stats.penetrations, total: total }; },
   get target() { return targetName; },
+  rescan: rescan,
   switchTo: function (t) {
     const sc = scans.find(function (x) { return x.target === t; });
     if (sc) buildScan(sc);

@@ -37,6 +37,9 @@ def run_one(target: str) -> dict:
     return {
         "ok": bool(d.get("ok")), "target": target, "units": d.get("units"),
         "hooked": d.get("hooked"), "coverage": d.get("coverage"),
+        "full_coverage": d.get("full_coverage"),
+        "dead_spots": d.get("dead_spots") or [],
+        "dead_spot_count": d.get("dead_spot_count", len(d.get("missing") or [])),
         "agree": d.get("agree"), "arbitrated": d.get("arbitrated"),
         "missing": d.get("missing") or [], "mode": d.get("mode"),
         "unit_details": d.get("unit_details") or [], "ms": took,

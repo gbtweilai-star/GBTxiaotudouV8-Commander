@@ -50,7 +50,7 @@ ROOT = Path(__import__("os").environ.get("GBT_ROOT")
             or Path(__file__).resolve().parents[1])
 TRACE = ROOT / "state" / "cross_scan_trace.jsonl"
 MAX_WORKERS = 8
-RESCAN_ROUNDS = 2          # 遗漏补扫最多两轮，仍钩不住就如实报
+RESCAN_ROUNDS = 3          # 遗漏补扫最多三轮（无死角口径：补到钩住为止；仍钩不住如实报红）
 CROSS_READERS = 2          # 每单元至少两路；不一致再请第三路仲裁
 
 # ── 步骤锁（红线 2）────────────────────────────────────────────────────
@@ -351,11 +351,15 @@ def _report(target: str, units: list, verdicts: dict, missing: list, mode: str) 
             "units": len(units), "hooked": len(units) - len(missing),
             "coverage": cov, "agree": agree, "arbitrated": arb,
             "missing": missing[:30],
+            "dead_spots": missing[:30],
+            "dead_spot_count": len(missing),
+            "full_coverage": cov >= 1.0,
             "unit_details": details,
             "unit_details_truncated": len(units) > 4000,
             "red_lines": ["钩子未触发=失败", "步骤锁生效", "交叉验证≥2路", "遗漏必须补扫", "全程留痕"],
             "trace": str(TRACE), "source_kind": "cross_scan",
-            "口径": "覆盖率=已钩住/总数；missing 非空 ⇒ 不许念成通过"}
+            "口径": "覆盖率=已钩住/总数；missing/dead_spots 非空 ⇒ 不许念成通过；"
+                    "full_coverage=false ⇒ 不算无死角"}
 
 
 def status() -> dict:
