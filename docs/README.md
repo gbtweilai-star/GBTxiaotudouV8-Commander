@@ -226,3 +226,4 @@
 | 108 | [108-universal-plug-visualization.md](108-universal-plug-visualization.md) | 万能插：数字流动的结 + 8 能力域插口 + 自动插合触手 |
 | 109 | [109-native-autostart-console-service.md](109-native-autostart-console-service.md) | 原生 APP 自启 :8766（Electron/Python 壳/启动器 + 登录自启一键装） |
 | 110 | [110-team-collab-and-mindmap.md](110-team-collab-and-mindmap.md) | 触手协作（8角色×16协作链）+ 思维导图任务指引（6支×18叶） |
+| 111 | [111-team-pulse-effect.md](111-team-pulse-effect.md) | 触手协作脉冲特效：冲击波环/拖尾/核心闪光 + 真实事件映射 |
