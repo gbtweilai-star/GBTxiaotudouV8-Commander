@@ -162,10 +162,170 @@ def _c_policy(base: Path) -> dict:
     return {"kind": "policy", "files": ["policy-state.json"], "note": "当前安全策略/攻击模式状态"}
 
 
+
+
+def _ps(cmd: str, timeout: int = 30) -> object:
+    out = subprocess.run(["powershell", "-NoProfile", "-Command", cmd],
+                         capture_output=True, text=True, timeout=timeout)
+    return json.loads(out.stdout or "[]")
+
+
+def _c_eventlog(base: Path) -> dict:
+    """安全/系统事件最近 200 条（需权限；无权限如实标注）。"""
+    try:
+        rows = _ps("Get-WinEvent -LogName Security -MaxEvents 200 -ErrorAction Stop | "
+                   "Select-Object TimeCreated,Id,ProviderName,Message | "
+                   "ConvertTo-Json -Compress", timeout=60)
+        (base / "eventlog-security.json").write_text(
+            json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
+        return {"kind": "eventlog", "files": ["eventlog-security.json"],
+                "count": len(rows) if isinstance(rows, list) else 1,
+                "note": "Windows 安全事件（登录/失败/权限）"}
+    except Exception as e:  # noqa: BLE001
+        (base / "eventlog-unavailable.json").write_text(
+            json.dumps({"reason": "需要管理员权限或事件日志不可读：%s" % str(e)[:160]},
+                       ensure_ascii=False, indent=1), encoding="utf-8")
+        return {"kind": "eventlog", "files": ["eventlog-unavailable.json"],
+                "available": False, "note": "安全事件日志不可读（如实标注，不伪造）"}
+
+
+def _c_services(base: Path) -> dict:
+    rows = _ps("Get-Service | Select-Object Name,DisplayName,Status,StartType | "
+               "ConvertTo-Json -Compress")
+    (base / "services.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                       encoding="utf-8")
+    return {"kind": "services", "files": ["services.json"], "note": "服务运行状态（可疑服务）"}
+
+
+def _c_tasks(base: Path) -> dict:
+    rows = _ps("Get-ScheduledTask | Select-Object TaskName,TaskPath,State | "
+               "ConvertTo-Json -Compress")
+    (base / "scheduled-tasks.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                               encoding="utf-8")
+    return {"kind": "scheduled-tasks", "files": ["scheduled-tasks.json"],
+            "note": "计划任务（持久化点）"}
+
+
+def _c_startup(base: Path) -> dict:
+    rows = _ps("Get-CimInstance Win32_StartupCommand | Select-Object Name,Command,Location,User | "
+               "ConvertTo-Json -Compress")
+    (base / "startup.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                      encoding="utf-8")
+    return {"kind": "startup", "files": ["startup.json"], "note": "开机自启（持久化点）"}
+
+
+def _c_users(base: Path) -> dict:
+    rows = _ps("Get-LocalUser | Select-Object Name,Enabled,LastLogon,Description | "
+               "ConvertTo-Json -Compress")
+    (base / "users.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                     encoding="utf-8")
+    return {"kind": "users", "files": ["users.json"], "note": "本地账户（异常账户）"}
+
+
+def _c_netconfig(base: Path) -> dict:
+    rows = _ps("Get-NetIPConfiguration | ConvertTo-Json -Compress")
+    arp = _ps("Get-NetNeighbor -ErrorAction SilentlyContinue | Select-Object IPAddress,"
+              "LinkLayerAddress,State | ConvertTo-Json -Compress")
+    dns = _ps("Get-DnsClientCache | Select-Object Entry,Data,TimeToLive | "
+              "ConvertTo-Json -Compress")
+    (base / "netconfig.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                         encoding="utf-8")
+    (base / "arp.json").write_text(json.dumps(arp, ensure_ascii=False, indent=1),
+                                   encoding="utf-8")
+    (base / "dns-cache.json").write_text(json.dumps(dns, ensure_ascii=False, indent=1),
+                                         encoding="utf-8")
+    return {"kind": "network", "files": ["netconfig.json", "arp.json", "dns-cache.json"],
+            "note": "网卡/ARP/DNS 缓存（横向移动痕迹）"}
+
+
+def _c_firewall(base: Path) -> dict:
+    rows = _ps("Get-NetFirewallProfile | Select-Object Name,Enabled,DefaultInboundAction,"
+               "DefaultOutboundAction | ConvertTo-Json -Compress")
+    rules = _ps("Get-NetFirewallRule -ErrorAction SilentlyContinue | Where-Object Enabled -eq True | "
+                "Select-Object DisplayName,Direction,Action,Profile | ConvertTo-Json -Compress")
+    (base / "firewall-profiles.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                                 encoding="utf-8")
+    (base / "firewall-rules.json").write_text(json.dumps(rules, ensure_ascii=False, indent=1),
+                                              encoding="utf-8")
+    return {"kind": "firewall", "files": ["firewall-profiles.json", "firewall-rules.json"],
+            "note": "防火墙状态（封堵依据/被改痕迹）"}
+
+
+def _c_software(base: Path) -> dict:
+    rows = _ps("Get-ItemProperty 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' | "
+               "Where-Object DisplayName | Select-Object DisplayName,DisplayVersion,InstallDate,Publisher | "
+               "ConvertTo-Json -Compress")
+    (base / "installed-software.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1),
+                                                  encoding="utf-8")
+    return {"kind": "software", "files": ["installed-software.json"],
+            "note": "已安装软件（可疑软件/后门）"}
+
+
+def _c_memory(base: Path) -> dict:
+    """内存转储：需要 procdump/管理员；没有则如实标 unavailable（绝不伪造）。"""
+    procdump = shutil.which("procdump") or shutil.which("procdump64")
+    if not procdump:
+        (base / "memory-unavailable.json").write_text(json.dumps(
+            {"reason": "未安装 procdump/内存转储工具，且默认无管理员权限；不伪造内存证据"},
+            ensure_ascii=False, indent=1), encoding="utf-8")
+        return {"kind": "memory", "files": ["memory-unavailable.json"], "available": False,
+                "note": "内存证据不可用（如实标注）"}
+    try:
+        out = base / "memory.dmp"
+        subprocess.run([procdump, "-accepteula", "-ma", "-o", str(out), str(os.getpid())],
+                       capture_output=True, timeout=120)
+        if out.is_file():
+            return {"kind": "memory", "files": ["memory.dmp"], "note": "内存转储"}
+    except Exception:  # noqa: BLE001
+        pass
+    (base / "memory-unavailable.json").write_text(json.dumps(
+        {"reason": "procdump 存在但转储失败（权限/路径）；如实标注"},
+        ensure_ascii=False, indent=1), encoding="utf-8")
+    return {"kind": "memory", "files": ["memory-unavailable.json"], "available": False,
+            "note": "内存证据不可用（如实标注）"}
+
+
+def _c_timeline(base: Path) -> dict:
+    """把审计/策略/账本事件合成时间线（给警方看的顺序）。"""
+    events = []
+    for rel, tag in (("gbt_allinone/store/audit.jsonl", "audit"),
+                     ("state/security-policy-audit.jsonl", "policy"),
+                     ("state/orchestration-ledger.jsonl", "ledger"),
+                     ("state/attack-evidence.jsonl", "evidence")):
+        p = ROOT / rel
+        if not p.is_file():
+            continue
+        for ln in p.read_text(encoding="utf-8", errors="replace").splitlines()[-300:]:
+            if not ln.strip():
+                continue
+            try:
+                d = json.loads(ln)
+            except Exception:
+                continue
+            t = str(d.get("at") or d.get("iso") or "")
+            events.append({"at": t, "source": tag, "event": str(d.get("event") or d.get("type") or ""),
+                           "summary": str(d)[:300]})
+    events.sort(key=lambda x: x.get("at") or "")
+    (base / "timeline.json").write_text(json.dumps(events, ensure_ascii=False, indent=1),
+                                        encoding="utf-8")
+    lines = ["# 攻击事件时间线（自动合成）", ""]
+    for e in events[-200:]:
+        lines.append("- %s [%s] %s — %s" % (e.get("at"), e.get("source"),
+                                            e.get("event"), e.get("summary")[:160]))
+    (base / "timeline.md").write_text(chr(10).join(lines) + chr(10), encoding="utf-8")
+    return {"kind": "timeline", "files": ["timeline.json", "timeline.md"],
+            "count": len(events), "note": "合成事件时间线（按时间排序）"}
+
+
 COLLECTORS = [
     ("system", _c_system), ("processes", _c_processes), ("connections", _c_connections),
-    ("audit", _c_audit), ("recent-files", _c_recent_files), ("policy", _c_policy),
+    ("eventlog", _c_eventlog), ("services", _c_services), ("scheduled-tasks", _c_tasks),
+    ("startup", _c_startup), ("users", _c_users), ("network", _c_netconfig),
+    ("firewall", _c_firewall), ("software", _c_software), ("memory", _c_memory),
+    ("audit", _c_audit), ("recent-files", _c_recent_files), ("timeline", _c_timeline),
+    ("policy", _c_policy),
 ]
+
 
 
 def collect(agents: int = 32, incident: str = "") -> dict:
@@ -186,11 +346,20 @@ def collect(agents: int = 32, incident: str = "") -> dict:
                 r = {"kind": name, "error": str(e)[:200], "files": []}
             results.append(r)
     files = sorted([p for p in base.iterdir() if p.is_file()])
+    # 哈希链：prev_chain = sha256(prev_chain + file_sha256)，任何人改一个文件链就断
+    chain, prev = [], "GENESIS"
+    for p in files:
+        fh = _sha256(p)
+        link = hashlib.sha256((prev + fh).encode()).hexdigest()
+        chain.append({"name": p.name, "sha256": fh, "prev": prev, "chain": link,
+                      "bytes": p.stat().st_size, "at": _now()})
+        prev = link
     manifest = {
         "incident": iid, "at": _now(), "agents": agents,
         "collectors": results, "elapsed_ms": int((time.time() - t0) * 1000),
         "files": [{"name": p.name, "sha256": _sha256(p), "bytes": p.stat().st_size}
                   for p in files],
+        "hash_chain": chain, "chain_root": prev,
         "chain_of_custody": {
             "collector": "GBT小土豆V8（本机只读采集）",
             "owner": os.environ.get("USERNAME"),
@@ -199,6 +368,21 @@ def collect(agents: int = 32, incident: str = "") -> dict:
     mf = base / "manifest.json"
     mf.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
     files.append(mf)
+    # 证据索引（交警方/CNCERT 的目录）
+    idx = ["# 证据索引 %s" % iid, "",
+           "- 采集时间: %s" % _now(),
+           "- 机器: %s" % socket.gethostname(),
+           "- 采集器: %d 个（极限并发 agents=%d，耗时 %dms）" % (len(results), agents, manifest["elapsed_ms"]),
+           "- 哈希链根: `%s`" % prev, "",
+           "## 文件清单（sha256）"]
+    for f in manifest["files"]:
+        idx.append("- `%s` — `%s` (%d bytes)" % (f["name"], f["sha256"], f["bytes"]))
+    idx += ["", "## 法律声明", "",
+            "本证据包由 GBT小土豆V8 在本机只读采集；哈希链可校验是否被改；",
+            "提交警方/CNCERT 前请勿修改本目录内容，否则 chain_root 失效。", ""]
+    idxp = base / "evidence-index.md"
+    idxp.write_text("\n".join(idx), encoding="utf-8")
+    files.append(idxp)
     zpath = OUT / ("%s-evidence.zip" % iid)
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         for f in files:
@@ -210,8 +394,19 @@ def collect(agents: int = 32, incident: str = "") -> dict:
             "zip_sha256": _sha256(zpath), "zip_bytes": zpath.stat().st_size}
 
 
+def _free_mb() -> int:
+    try:
+        out = subprocess.run(["powershell", "-NoProfile", "-Command",
+                              "(Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory"],
+                             capture_output=True, text=True, timeout=20)
+        return int((out.stdout or "0").strip() or 0) // 1024
+    except Exception:  # noqa: BLE001
+        return 0
+
+
 def reclaim_own_workers(apply: bool = False) -> dict:
     """极限并发：回收**我们自己**的非必需进程（不碰系统/用户进程）。"""
+    before = _free_mb()
     rows = []
     try:
         out = subprocess.run(["powershell", "-NoProfile", "-Command",
@@ -248,9 +443,12 @@ def reclaim_own_workers(apply: bool = False) -> dict:
                 stopped.append(c["pid"])
             except Exception:
                 pass
+    after = _free_mb()
     return {"ok": True, "reclaimed_candidates": candidates, "stopped": stopped,
             "kept_essential": kept, "apply": bool(apply),
-            "notice": "只回收本框架自己的非必需进程；系统/用户进程一律不碰"}
+            "free_mb_before": before, "free_mb_after": after,
+            "freed_mb": max(0, after - before),
+            "notice": "只回收本框架自己的非必需进程；系统/用户进程一律不碰（要关需主人确认）"}
 
 
 def counterstrike(op: str, target: str = "") -> dict:

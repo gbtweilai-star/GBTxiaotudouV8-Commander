@@ -50,14 +50,21 @@ def main() -> int:
     man = json.loads(mf.read_text(encoding="utf-8")) if mf.is_file() else {}
     check("manifest 文件 sha256", len(man.get("files") or []) >= 5,
           len(man.get("files") or []))
-    check("采集器 >=6", len(man.get("collectors") or []) >= 6, man.get("collectors"))
+    check("采集器 >=16", len(man.get("collectors") or []) >= 16, man.get("collectors"))
     check("有进程/连接证据", (base / "processes.json").is_file()
           and (base / "connections.json").is_file())
+    check("哈希链根", len(man.get("chain_root") or "") == 64, (man.get("chain_root") or "")[:12])
+    check("哈希链完整", len(man.get("hash_chain") or []) >= 20,
+          len(man.get("hash_chain") or []))
+    check("证据索引", (base / "evidence-index.md").is_file())
+    check("时间线", (base / "timeline.md").is_file() and (base / "timeline.json").is_file())
 
     print("[2] 资源回收只碰自己")
     rec = AF.reclaim_own_workers(apply=False)
     check("reclaim ok", rec.get("ok") is True, rec.get("reason"))
     check("保留关键进程计数", "kept_essential" in rec, rec)
+    check("内存预算有读数", isinstance(rec.get("free_mb_before"), int)
+          and rec.get("free_mb_before", 0) > 0, rec.get("free_mb_before"))
     for cand in rec.get("reclaimed_candidates") or []:
         cmd = str(cand.get("cmd") or "")
         check("候选只来自本框架",
