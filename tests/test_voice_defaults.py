@@ -1,5 +1,5 @@
 # gbt-capability: drama_forge
-"""女声固化判据：默认必须是 HsiaoChen 自然台湾腔，代码/脚本/成片三处一致。"""
+"""女声固化判据（2026-11-01 改：本地优先）：默认 local（不联网 Edge），rate/pitch 不加工；代码/脚本/配置三处一致。"""
 from __future__ import annotations
 
 import json
@@ -17,13 +17,13 @@ def check(name, cond, detail=""):
 
 
 def main() -> int:
-    print("[1] 代码默认：HsiaoChen 自然，rate/pitch 不加工")
+    print("[1] 代码默认：local 本地优先，rate/pitch 不加工")
     mod = (ROOT / "gbt_allinone" / "tentacle" / "drama_forge.py").read_text(encoding="utf-8", errors="replace")
-    check("VOICE_DEFAULT", 'VOICE_DEFAULT = "zh-TW-HsiaoChenNeural"' in mod)
+    check("VOICE_DEFAULT", 'VOICE_DEFAULT = "local"' in mod)
     check("VOICE_RATE 空", 'VOICE_RATE = ""' in mod)
     check("VOICE_PITCH 空", 'VOICE_PITCH = ""' in mod)
     ps = (ROOT / "tools" / "drama-build.ps1").read_text(encoding="utf-8", errors="replace")
-    check("build Voice 默认", '[string]$Voice = "zh-TW-HsiaoChenNeural"' in ps)
+    check("build Voice 默认", '[string]$Voice = "local"' in ps)
     check("build Rate 空", '[string]$Rate = "",' in ps)
     check("build Pitch 空", '[string]$Pitch = "",' in ps)
 
@@ -31,8 +31,8 @@ def main() -> int:
     cfg_p = ROOT / "state" / "voice.json"
     if cfg_p.is_file():
         cfg = json.loads(cfg_p.read_text(encoding="utf-8-sig"))
-        check("配置 default", cfg.get("default") == "zh-TW-HsiaoChenNeural", cfg)
-        check("配置 natural", cfg.get("style") == "taiwan_natural", cfg)
+        check("配置 default", cfg.get("default") == "local", cfg)
+        check("配置 natural", cfg.get("style") in ("local_pending_zh_tw", "taiwan_natural"), cfg)
         check("配置 rate 空", not cfg.get("rate"), cfg)
         check("配置 pitch 空", not cfg.get("pitch"), cfg)
 

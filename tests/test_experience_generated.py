@@ -34,7 +34,7 @@ def main():
     # rule: 默认女声锁死：HsiaoChen 自然台湾腔，不加工
     p = ROOT / 'gbt_allinone/tentacle/drama_forge.py'
     check('存在 gbt_allinone/tentacle/drama_forge.py', p.is_file(), str(p))
-    check('包含 VOICE_DEFAULT = "zh-TW-HsiaoChenNeural"', 'VOICE_DEFAULT = "zh-TW-HsiaoChenNeural"' in p.read_text(encoding='utf-8', errors='replace'))
+    check('包含 VOICE_DEFAULT = "local"', 'VOICE_DEFAULT = "local"' in p.read_text(encoding='utf-8', errors='replace'))
     p = ROOT / 'gbt_allinone/tentacle/drama_forge.py'
     check('存在 gbt_allinone/tentacle/drama_forge.py', p.is_file(), str(p))
     check('包含 VOICE_RATE = ""', 'VOICE_RATE = ""' in p.read_text(encoding='utf-8', errors='replace'))
@@ -43,7 +43,7 @@ def main():
     check('包含 VOICE_PITCH = ""', 'VOICE_PITCH = ""' in p.read_text(encoding='utf-8', errors='replace'))
     p = ROOT / 'tools/drama-build.ps1'
     check('存在 tools/drama-build.ps1', p.is_file(), str(p))
-    check('包含 [string]$Voice = "zh-TW-HsiaoChenNeural"', '[string]$Voice = "zh-TW-HsiaoChenNeural"' in p.read_text(encoding='utf-8', errors='replace'))
+    check('包含 [string]$Voice = "local"', '[string]$Voice = "local"' in p.read_text(encoding='utf-8', errors='replace'))
     p = ROOT / 'tools/drama-build.ps1'
     check('存在 tools/drama-build.ps1', p.is_file(), str(p))
     check('包含 [string]$Rate = "",', '[string]$Rate = "",' in p.read_text(encoding='utf-8', errors='replace'))

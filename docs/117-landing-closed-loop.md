@@ -53,7 +53,19 @@ API：POST /api/dispatch {"task":"扫描安全疑点做无死角","confirm":true
 | GitHub 私有仓全量同步 | ✅ | private=True，HEAD 见最后一次推送 |
 | 全量测试 + 五维守卫 | ✅ | `tests/`（console/console_service/doc_counts/skills/chain/guards…） |
 
-## 五、边界（如实）
+## 五、落地时清零的历史失败（3 个）
+
+全量测试 30 个文件，落地时清掉 3 个历史失败：
+
+| 失败 | 根因 | 修法 |
+|---|---|---|
+| `test_experience_rules` / `test_experience_generated`（h1/imgs） | 拆 28 面板时把 `holo_pet_w3/index.html` 改成跳转壳，丢了首屏 h1 与真图 | 重建**落地首页**（h1 + 4 张真实界面截图 + 入口 + 签名），规则满足 |
+| 同上（VOICE_DEFAULT 断言） | 2026-11-01 女声口径改成**本地优先 local**，rules.json 还写着旧的 Edge 女声 | rules.json 口径改 local 并**重新生成**测试（不手改生成文件） |
+| `test_voice_defaults` | 同上（代码/脚本/配置已 local，测试还断言旧值） | 测试口径改 local（含 `local_pending_zh_tw`），docstring 注明决定日期 |
+
+复跑：三个全 PASS；全量 30 个测试文件全绿。
+
+## 六、边界（如实）
 
 - 派单只跑 safe 候选；危险能力（终端危险操作、转账拿票）仍需人；
 - 路由是关键词打分，不接语义模型；新任务类型要补关键词；
