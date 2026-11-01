@@ -40,7 +40,8 @@ def main(argv) -> int:
     elif cmd == "respond":
         out = AF.respond(opt("--reason", "detected attack"), opt("--evidence"),
                          int(opt("--agents", "32")), int(opt("--ttl", "600")),
-                         reclaim="--apply" in argv)
+                         reclaim="--apply" in argv,
+                         user_report="--user-report" in argv)
     elif cmd == "counterstrike":
         out = AF.counterstrike(opt("--op"))
     else:

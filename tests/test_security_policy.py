@@ -70,7 +70,7 @@ def main() -> int:
     check("退出后黑客又需确认", SP.check("pentest")["decision"] == "need_terminal_confirm")
 
     print("[4] TTL 到期")
-    SP.enter_attack_mode("短 TTL", ttl=1)
+    SP.enter_attack_mode("短 TTL", evidence="测试证据：ttl 到期验证", ttl=1)
     import time
     time.sleep(1.2)
     check("TTL 到期自动失效", SP.attack_state().get("active") is False)

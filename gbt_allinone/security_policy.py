@@ -99,13 +99,36 @@ def attack_state() -> dict:
     return {"active": False, "last": atk or None}
 
 
-def enter_attack_mode(reason: str, evidence: str = "", ttl: int = ATTACK_TTL) -> dict:
-    """受攻击时进入极限并发模式：之后的黑客动作由 V8 自我决策。"""
+def enter_attack_mode(reason: str, evidence: str = "", ttl: int = ATTACK_TTL,
+                      user_report: bool = False) -> dict:
+    """受攻击时进入极限并发模式：**必须先举证**（没证据不许说被攻击）。"""
     d = _load()
+    # —— 举证门槛 ——
+    try:
+        from gbt_allinone import attack_evidence as AE
+        if evidence:
+            AE.add_evidence("user_report" if user_report else "intrusion_alert",
+                            "master/terminal", evidence, strong=not user_report)
+        for x in AE.detect_signals():
+            AE.add_evidence(x["kind"], x.get("source", "detect"), x.get("detail", ""),
+                            strong=(x["kind"] in AE.STRONG_KINDS))
+        adm = AE.admission()
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "reason": "举证组件不可用：%s" % str(e)[:120]}
+    if not adm.get("admitted"):
+        _audit("attack_refused", reason="no evidence", reason_text=reason[:200])
+        return {"ok": False, "not_admitted": True,
+                "reason": adm.get("reason"),
+                "explain": adm.get("explain"),
+                "hint": adm.get("hint"),
+                "rule": "没证据不许说被攻击；攻击模式必须有证据门槛"}
     until = _now() + int(ttl)
     d["attack"] = {"active": True, "reason": reason or "detected attack",
                    "evidence": str(evidence)[:500], "since": _iso(), "until": until,
-                   "ttl": int(ttl), "decider": "GBT小土豆V8"}
+                   "ttl": int(ttl), "decider": "GBT小土豆V8",
+                   "evidence_level": adm.get("level"),
+                   "evidence_count": adm.get("count", 0),
+                   "evidence_ids": [x.get("sha256") for x in (adm.get("evidence") or [])]}
     _save(d)
     _audit("attack_on", reason=d["attack"]["reason"], ttl=int(ttl),
            evidence=str(evidence)[:300], decider="GBT小土豆V8")

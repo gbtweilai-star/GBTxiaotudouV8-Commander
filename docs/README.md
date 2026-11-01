@@ -243,3 +243,4 @@
 | 125 | [125-alarm-rootcause-fixes.md](125-alarm-rootcause-fixes.md) | 报警必追根因：全开 63 失败归因（policy/超时/kwargs/硬编码路径/缺参/缺件）与修复 |
 | 126 | [126-security-policy-three-rules.md](126-security-policy-three-rules.md) | 最高安全策略：黑客能力终端确认 / 受攻击V8自我决策 / 转账永远确认 |
 | 127 | [127-attack-evidence-only.md](127-attack-evidence-only.md) | 受攻击只采集证据：极限并发取证/资源回收/证据包；明确拒绝黑客反击 |
+| 128 | [128-attack-evidence-admission.md](128-attack-evidence-admission.md) | 受攻击举证：没证据不许说被攻击；强证据/主人陈述/交代话术 |

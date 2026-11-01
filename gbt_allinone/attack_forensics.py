@@ -270,11 +270,20 @@ def counterstrike(op: str, target: str = "") -> dict:
 
 
 def respond(reason: str, evidence: str = "", agents: int = 32, ttl: int = 600,
-            reclaim: bool = True, incident: str = "") -> dict:
-    """受攻击响应：进攻击模式（V8 自我决策）→ 回收资源 → 极限并发取证 → 证据包。"""
+            reclaim: bool = True, incident: str = "", user_report: bool = False) -> dict:
+    """受攻击响应：**先举证** → 进攻击模式（V8 自我决策）→ 回收资源 → 极限并发取证 → 证据包。
+    没证据：明确返回"未发现被攻击证据"，不进入攻击模式。"""
     sys.path.insert(0, str(ROOT))
     from gbt_allinone import security_policy as SP
-    on = SP.enter_attack_mode(reason or "detected attack", evidence, ttl)
+    on = SP.enter_attack_mode(reason or "detected attack", evidence, ttl,
+                              user_report=user_report)
+    if not on.get("ok") and on.get("not_admitted"):
+        return {"ok": False, "not_admitted": True,
+                "conclusion": "未发现被攻击证据",
+                "explain": on.get("explain"),
+                "hint": on.get("hint"),
+                "rule": "没证据不许说被攻击；如确有攻击，请用 --user-report 记录陈述或先取证",
+                "counterstrike_policy": "本框架只做本机取证与合法防御，拒绝黑客反击（docs/127）"}
     rec = reclaim_own_workers(apply=reclaim)
     col = collect(agents=agents, incident=incident)
     out = {"ok": True, "attack_mode": on.get("attack"), "reclaim": rec,
