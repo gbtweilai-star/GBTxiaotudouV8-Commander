@@ -154,6 +154,17 @@ def main() -> int:
     check("职业全覆盖能力位", _cov.get("caps_covered") == _cov.get("caps_total") == 385, str(_cov))
     check("职业无孤儿", _cov.get("orphans") == [], str((_cov.get("orphans") or [])[:6]))
     check("职业覆盖全部域", _cov.get("domains_covered") == _cov.get("domains_total"), str(_cov))
+    check("职业路由模块存在", (ROOT / "gbt_allinone" / "profession_router.py").is_file())
+    sys.path.insert(0, str(ROOT))
+    from gbt_allinone.profession_router import plan as _plan
+    _cases = {"剪一条30秒短视频": "短视频编导", "给这段歌词编曲混音": "音乐制作",
+              "修一个 bug 并跑测试": "编程工程师", "做一个数字人口播直播": "数字人 / 直播"};
+    _bad = [k for k, v in _cases.items() if _plan(k).get("profession") != v]
+    check("职业路由 4 例命中", not _bad, str(_bad))
+    _srv2 = (ROOT / "tools" / "console-server.py").read_text(encoding="utf-8")
+    check("路由接口在服务端", "/api/route" in _srv2 and "_api_route" in _srv2)
+    _appj2 = (con / "app.js").read_text(encoding="utf-8")
+    check("路由条在页面", 'id="route-input"' in html and "wireProfRoute" in _appj2)
     check("有短视频/音乐/电影职业", {"短视频编导", "音乐制作", "影视 / 电影"} <= _titles,
           str(sorted(_titles))[:120])
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))

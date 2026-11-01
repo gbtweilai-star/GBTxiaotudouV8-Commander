@@ -99,6 +99,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):  # noqa: N802
         path = urllib.parse.urlparse(self.path).path
+        if path == "/api/route":
+            return self._api_route(raw)
         if path == "/api/scan":
             from urllib.parse import parse_qs as _pq
             from urllib.parse import urlparse as _urlparse
@@ -208,6 +210,32 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
                           "application/json; charset=utf-8")
 
+    def _api_route(self, raw=b"{}"):
+        """职业路由：任务 → 职业 → 候选能力位（只读，不派单）。
+
+        do_POST 已经把 body 读进 raw（读两次会拿到空），所以这里收参数不再读流。
+        """
+        import json as _json
+        try:
+            body = (raw or b"{}").decode("utf-8", "replace")
+            d = _json.loads(body or "{}")
+        except Exception:  # noqa: BLE001
+            d = {}
+        task = str(d.get("task") or "").strip()
+        if not task:
+            return self._send(400, b'{"ok":false,"error":"task empty"}',
+                              "application/json; charset=utf-8")
+        try:
+            sys.path.insert(0, str(REPO))
+            from gbt_allinone.profession_router import plan as _plan
+            out = _plan(task[:500])
+        except Exception as e:  # noqa: BLE001
+            return self._send(500, _json.dumps({"ok": False, "error": str(e)[:200]},
+                                               ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
+
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""
         import json as _json
@@ -272,6 +300,8 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(raw or b"{}")
         except Exception:  # noqa: BLE001
             return self._json({"ok": False, "error": "bad json"}, 400)
+        if path == "/api/route":
+            return self._api_route(raw)
         if path == "/api/chat":
             text = str(body.get("text") or "").strip()
             if not text:

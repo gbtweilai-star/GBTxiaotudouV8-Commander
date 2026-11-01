@@ -311,6 +311,7 @@
     renderCaps(d);
     renderSkills(d);
     renderProfessions(d);
+    wireProfRoute();
     renderDash(d);
     var cs = $("caps-sub"), ss = $("skills-sub");
     if (cs) cs.textContent = (d.caps && d.caps.total) + " 位 · " + ((d.domains && d.domains.length) || 0) + " 域";
@@ -547,6 +548,51 @@
       });
       card.appendChild(caps);
       wrap.appendChild(card);
+    });
+  }
+
+  /* ───────── 职业路由（只读规划：任务 → 职业 → 候选能力位） ───────── */
+  function wireProfRoute() {
+    var btn = $("route-btn"), inp = $("route-input");
+    if (!btn || !inp) return;
+    function run() {
+      var task = (inp.value || "").trim();
+      if (!task) return;
+      var res = $("route-result");
+      if (res) res.textContent = "路由中…";
+      fetch("/api/route", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task: task }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d || d.ok !== true) {
+          if (res) res.textContent = "没命中职业（走协同/指挥人工定）：" + ((d && d.error) || "");
+          document.documentElement.dataset.route = "miss";
+          return;
+        }
+        var safe = (d.safe_candidates || []).slice(0, 6).join(" · ");
+        var gated = (d.gated_candidates || []).length;
+        if (res) {
+          res.innerHTML = "";
+          var b = document.createElement("b");
+          b.textContent = d.profession + " ";
+          res.appendChild(b);
+          res.appendChild(document.createTextNode(
+            "（命中：" + (d.matched || []).join("、") + "）→ 候选能力位：" + safe
+            + (gated ? "（另有 " + gated + " 个需授权位，要票）" : "")
+            + " · 工具：" + (d.tools || []).join("/")
+            + " · KPI：" + d.kpi));
+        }
+        document.documentElement.dataset.route = "ok:" + d.id + ":" + (d.safe_candidates || []).length;
+        document.documentElement.dataset.routeProf = d.profession || "";
+      }).catch(function (e) {
+        if (res) res.textContent = "路由失败：" + ((e && e.message) || e);
+        document.documentElement.dataset.route = "error";
+      });
+    }
+    btn.addEventListener("click", run);
+    inp.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); run(); }
     });
   }
 

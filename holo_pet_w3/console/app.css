@@ -636,3 +636,17 @@ body.graph-on .grid-overlay { display: block; }
   font: 500 8.5px/1 var(--mono); color: #9fb8d8; border: 1px solid var(--line);
   border-radius: 999px; padding: 3px 6px;
 }
+
+.prof-route { display: flex; gap: 8px; align-items: center; margin: 0 0 12px; flex-wrap: wrap; }
+.prof-route input {
+  flex: 1 1 320px; padding: 8px 10px; border-radius: 10px; color: var(--text);
+  background: rgba(10, 16, 26, .85); border: 1px solid var(--line);
+  font: 400 11px/1.4 var(--mono);
+}
+.prof-route input:focus { outline: none; border-color: rgba(255, 159, 28, .55); }
+.prof-route button {
+  padding: 8px 14px; border-radius: 10px; cursor: pointer; background: var(--warm);
+  border: 1px solid var(--warm); color: #151517; font: 600 11px/1 var(--mono);
+}
+.prof-route-result { font: 400 9.5px/1.55 var(--mono); color: var(--dim); flex: 1 1 100%; }
+.prof-route-result b { color: var(--warm); font-weight: 600; }
