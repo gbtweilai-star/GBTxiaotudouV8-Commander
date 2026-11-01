@@ -151,7 +151,7 @@ def main() -> int:
     check("编程是首席", any(p.get("chief") and p.get("title") == "编程工程师" for p in _profs))
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))
     _appj = (con / "app.js").read_text(encoding="utf-8")
-    check("职业有渲染函数", "renderProfessions" in _appj and "data-prof" in _appj)
+    check("职业有渲染函数", "renderProfessions" in _appj and "dataset.prof" in _appj)
     check("有拖动自检", "selfTestDrag" in sj and "space3dDrag" in sj)
     check("中心有她的头像", "avatarBall" in sj and "space3dAvatar" in sj)
     css3 = (con / "app.css").read_text(encoding="utf-8")
