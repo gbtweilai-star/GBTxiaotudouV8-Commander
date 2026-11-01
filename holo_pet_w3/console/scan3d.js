@@ -30,7 +30,7 @@ let renderer, scene, camera, controls, composer, bloom;
 let inited = false, running = false, raf = 0;
 let group = null;
 let nodes = [], nodePoints = null;
-let sweepPlane = null, sweepY = 9;
+let sweepPlane = null, sweepY = 10.6;
 let sweepDir = -1, speed = 2.6, slowUntil = 0;
 let rings = [], depthBeams = [], senseOrbs = {};
 let hud = {};
@@ -116,7 +116,7 @@ function clearGroup() {
   rings.forEach(function (r) { r.sprite.material.dispose(); });
   rings = [];
   stats = { swept: 0, doubts: 0, reflections: 0, penetrations: 0 };
-  sweepDir = -1; sweepY = 9.4;
+  sweepDir = -1; sweepY = 10.6;
 }
 
 function buildScan(scan) {
@@ -265,9 +265,9 @@ function stepScan(dt) {
   if (!sweepPlane) return;
   const slowing = performance.now() < slowUntil;
   sweepY += sweepDir * (slowing ? speed * 0.25 : speed) * dt;
-  if (sweepY < -9.4 || sweepY > 9.4) {
+  if (sweepY < -10.6 || sweepY > 10.6) {
     sweepDir *= -1;
-    sweepY = sweepDir > 0 ? -9.4 : 9.4;
+    sweepY = sweepDir > 0 ? -10.6 : 10.6;
     stats.swept = 0;
     if (hud.state) hud.state.textContent = "扫描中";
     sensePulse("eye", 1200);
@@ -290,11 +290,11 @@ function stepScan(dt) {
     colAttr.setXYZ(i, n.base.r * k, n.base.g * k, n.base.b * k);
   }
   colAttr.needsUpdate = true;
-  // 漏扫计数：每帧都算（无死角口径要能随时查，不等一轮结束）
-  const missedNow = nodes.filter(function (n) { return !n.lit; }).length;
-  document.documentElement.dataset.scan3dMissed = String(missedNow);
+  // 扫描中：未扫数（remaining）；整轮结束才算漏扫（missed，正常必须为 0）
+  const remainingNow = nodes.filter(function (n) { return !n.lit; }).length;
+  document.documentElement.dataset.scan3dRemaining = String(remainingNow);
   if (stats.swept >= total) {
-    const missed = missedNow;
+    const missed = remainingNow;
     const full = (coverage === null || coverage >= 1) && deadSpots.length === 0 && missed === 0;
     document.documentElement.dataset.scan3dMissed = String(missed);
     if (hud.state) {
@@ -478,6 +478,7 @@ function loop() {
   raf = requestAnimationFrame(loop);
   const now = performance.now();
   const dt = Math.min(0.05, (now - last) / 1000);
+  if (new URLSearchParams(location.search).get("fast") === "1") speed = 60;
   last = now;
   stepScan(dt);
   for (let i = rings.length - 1; i >= 0; i--) {
