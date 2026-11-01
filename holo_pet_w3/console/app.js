@@ -484,8 +484,17 @@
     document.documentElement.dataset.prof =
       "ok:" + items.length + "职业" + (items.some(function (p) { return p.chief; }) ? "+编程首席" : "");
     var titleEl = $("prof-title");
+    var cov = box && box.coverage;
     if (titleEl) {
-      titleEl.textContent = "触手职业 · " + items.length + " 种职业（编程工程师为首席）";
+      titleEl.textContent = "触手职业 · " + items.length + " 种职业（编程工程师为首席）"
+        + (cov ? " · 覆盖 " + cov.caps_covered + "/" + cov.caps_total + " 能力位" : "");
+    }
+    var subEl = $("prof-sub");
+    if (subEl && cov) {
+      subEl.textContent = "域覆盖 " + cov.domains_covered + "/" + cov.domains_total
+        + " · 孤儿能力位 " + (cov.orphans || []).length
+        + (cov.flex_caps ? (" · 机动补位 " + cov.flex_caps) : " · 无补位（全部显式归属）")
+        + " · 一个能力位可属多职业";
     }
     if (!wrap) return;
     wrap.innerHTML = "";

@@ -176,6 +176,31 @@ PROFESSIONS = [
         "kpi": "60fps · 可交互 · 可导出",
     },
     {
+        "id": "integration", "title": "集成 / 连接", "chief": False,
+        "headline": "MCP、IM、第三方桥；把外面的东西接进来",
+        "domains": ["integration", "comms", "social"],
+        "patterns": ["mcp_", "notion", "feishu", "telegram", "whatsapp", "bridge",
+                     "webhook", "oauth"],
+        "tools": ["MCP 注册/发现", "IM 桥", "Webhook"],
+        "kpi": "接通可验证 · 权限最小化",
+    },
+    {
+        "id": "cli", "title": "命令行 / 入口", "chief": False,
+        "headline": "终端入口、CLI 包装、对话式操作",
+        "domains": ["tools"],
+        "patterns": ["cli_", "term", "shell", "cmd"],
+        "tools": ["CLI 包装", "终端交互", "对话入口"],
+        "kpi": "一条命令能跑 · 输出可读",
+    },
+    {
+        "id": "life", "title": "生活 / 陪伴", "chief": False,
+        "headline": "生活域：提醒、习惯、陪伴（不越界到危险/转账）",
+        "domains": ["life"],
+        "patterns": ["life", "remind", "habit", "companion"],
+        "tools": ["提醒", "习惯记录", "陪伴对话"],
+        "kpi": "不打扰 · 不越界",
+    },
+    {
         "id": "orchestrator", "title": "协同 / 指挥", "chief": False,
         "headline": "派单、交接、回喂、留痕",
         "domains": ["tentacle", "collab", "brain", "longrun"],
@@ -201,14 +226,37 @@ def pick_caps(patterns, domains):
 
 def main() -> int:
     profs = []
+    assigned = set()
     for d in PROFESSIONS:
         caps = pick_caps(d["patterns"], d["domains"])
+        assigned.update(caps)
         profs.append({
             "id": d["id"], "title": d["title"], "chief": bool(d.get("chief")),
             "headline": d["headline"], "domains": d["domains"],
             "caps": caps, "cap_count": len(caps),
             "tools": d["tools"], "kpi": d["kpi"],
         })
+
+    # 🔴 全方位口径（主人令 2026-11-01）：每个能力位都必须有职业，不许孤儿。
+    #    先按显式职业归属；剩下的进「通用 / 机动（补位）」并在覆盖审计里如实标出。
+    all_caps = set(BENIGN_CAPS)
+    orphans = sorted(all_caps - assigned)
+    if orphans:
+        profs.append({
+            "id": "flex", "title": "通用 / 机动（补位）", "chief": False,
+            "headline": "未明确归属的能力位在这里，不隐藏；补位也要有职业",
+            "domains": sorted({(BENIGN_CAPS[c] or {}).get("domain", "?") for c in orphans}),
+            "caps": orphans, "cap_count": len(orphans),
+            "tools": ["按需派单"], "kpi": "尽快落进明确职业",
+        })
+
+    doms = {}
+    for c in all_caps:
+        doms.setdefault((BENIGN_CAPS[c] or {}).get("domain", "?"), []).append(c)
+    covered = set()
+    for p in profs:
+        covered.update(p["caps"])
+    covered_domains = {d for d, cs in doms.items() if set(cs) & covered}
     total = sum(p["cap_count"] for p in profs)
     data = {
         "ok": True,
@@ -216,7 +264,18 @@ def main() -> int:
         "total_caps": len(BENIGN_CAPS),
         "professions": profs,
         "sum_cap_count": total,
-        "note": "一个能力位可属多职业（协同类会跨域），所以 sum 会大于 385；这是职业视角不是分区。",
+        "coverage": {
+            "caps_total": len(all_caps),
+            "caps_covered": len(all_caps & covered),
+            "orphans": orphans,
+            "domains_total": len(doms),
+            "domains_covered": len(covered_domains),
+            "uncovered_domains": sorted(set(doms) - covered_domains),
+            "flex_caps": [p["cap_count"] for p in profs if p["id"] == "flex"] and
+                          [p["cap_count"] for p in profs if p["id"] == "flex"][0] or 0,
+        },
+        "note": "一个能力位可属多职业（跨域协作），所以 sum 会大于 385；这是职业视角不是分区。"
+                "coverage.orphans 必须为空：有孤儿就补位进 flex 或在 PROFESSIONS 里显式归属。",
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")

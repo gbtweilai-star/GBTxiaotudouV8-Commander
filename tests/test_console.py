@@ -147,9 +147,13 @@ def main() -> int:
     import json as _json2
     _pj = _json2.loads((ROOT / "data" / "professions.json").read_text(encoding="utf-8"))
     _profs = _pj.get("professions") or []
-    check("18 种职业", len(_profs) >= 18, str(len(_profs)))
+    check("21 种职业", len(_profs) >= 21, str(len(_profs)))
     check("编程是首席", any(p.get("chief") and p.get("title") == "编程工程师" for p in _profs))
     _titles = {p.get("title") for p in _profs}
+    _cov = _pj.get("coverage") or {}
+    check("职业全覆盖能力位", _cov.get("caps_covered") == _cov.get("caps_total") == 385, str(_cov))
+    check("职业无孤儿", _cov.get("orphans") == [], str((_cov.get("orphans") or [])[:6]))
+    check("职业覆盖全部域", _cov.get("domains_covered") == _cov.get("domains_total"), str(_cov))
     check("有短视频/音乐/电影职业", {"短视频编导", "音乐制作", "影视 / 电影"} <= _titles,
           str(sorted(_titles))[:120])
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))

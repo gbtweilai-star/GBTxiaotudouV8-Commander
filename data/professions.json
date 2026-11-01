@@ -1262,6 +1262,97 @@
    "kpi": "60fps · 可交互 · 可导出"
   },
   {
+   "id": "integration",
+   "title": "集成 / 连接",
+   "chief": false,
+   "headline": "MCP、IM、第三方桥；把外面的东西接进来",
+   "domains": [
+    "integration",
+    "comms",
+    "social"
+   ],
+   "caps": [
+    "auto_publish",
+    "cli_chat",
+    "cli_ify",
+    "coze_mail",
+    "eigenflux",
+    "feishu_embed",
+    "genoffice_bridge",
+    "hand_bridge",
+    "mcp_call",
+    "mcp_connect",
+    "mcp_health",
+    "mcp_register",
+    "mcp_servers",
+    "mcp_tools",
+    "mcp_unregister",
+    "notion_bridge",
+    "omarchy_bridge",
+    "prompt_bridge",
+    "telegram_embed",
+    "tentacle_comfy_bridge",
+    "thebrain_bridge",
+    "whatsapp_embed"
+   ],
+   "cap_count": 22,
+   "tools": [
+    "MCP 注册/发现",
+    "IM 桥",
+    "Webhook"
+   ],
+   "kpi": "接通可验证 · 权限最小化"
+  },
+  {
+   "id": "cli",
+   "title": "命令行 / 入口",
+   "chief": false,
+   "headline": "终端入口、CLI 包装、对话式操作",
+   "domains": [
+    "tools"
+   ],
+   "caps": [
+    "awesome_tools_index",
+    "capability_net",
+    "cli_chat",
+    "cli_ify",
+    "code_patch",
+    "freebuff_term",
+    "git_read",
+    "git_write",
+    "projection_card",
+    "pulse_direct",
+    "repo_publish"
+   ],
+   "cap_count": 11,
+   "tools": [
+    "CLI 包装",
+    "终端交互",
+    "对话入口"
+   ],
+   "kpi": "一条命令能跑 · 输出可读"
+  },
+  {
+   "id": "life",
+   "title": "生活 / 陪伴",
+   "chief": false,
+   "headline": "生活域：提醒、习惯、陪伴（不越界到危险/转账）",
+   "domains": [
+    "life"
+   ],
+   "caps": [
+    "detail_habit",
+    "life"
+   ],
+   "cap_count": 2,
+   "tools": [
+    "提醒",
+    "习惯记录",
+    "陪伴对话"
+   ],
+   "kpi": "不打扰 · 不越界"
+  },
+  {
    "id": "orchestrator",
    "title": "协同 / 指挥",
    "chief": false,
@@ -1339,6 +1430,15 @@
    "kpi": "每次派单都有账"
   }
  ],
- "sum_cap_count": 971,
- "note": "一个能力位可属多职业（协同类会跨域），所以 sum 会大于 385；这是职业视角不是分区。"
+ "sum_cap_count": 1006,
+ "coverage": {
+  "caps_total": 385,
+  "caps_covered": 385,
+  "orphans": [],
+  "domains_total": 30,
+  "domains_covered": 30,
+  "uncovered_domains": [],
+  "flex_caps": 0
+ },
+ "note": "一个能力位可属多职业（跨域协作），所以 sum 会大于 385；这是职业视角不是分区。coverage.orphans 必须为空：有孤儿就补位进 flex 或在 PROFESSIONS 里显式归属。"
 }
