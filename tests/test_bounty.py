@@ -81,6 +81,26 @@ def main() -> int:
     check("报告含授权依据", "selftest · 自有靶场授权" in txt)
     check("报告签名", "本署名不可删除" in txt)
 
+    print("[4b] 报告升级：CVSS 3.1 / CWE / 复现命令 / 状态机")
+    from gbt_allinone import bounty_core as core
+    for vec, want in (("AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H", 9.8),
+                      ("AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H", 8.8),
+                      ("AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N", 6.1),
+                      ("AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:N", 0.0)):
+        got = core.cvss3("CVSS:3.1/" + vec)
+        check("CVSS " + vec[:18], got.get("base_score") == want, (got.get("base_score"), want))
+    check("CWE-79 映射", core.cwe_info("CWE-79").get("name") == "跨站脚本（XSS）")
+    md = pathlib.Path(rep["report"]).read_text(encoding="utf-8")
+    for sec in ("CVSS", "CWE", "复现命令", "修复建议", "sha256", "提交建议"):
+        check("报告含 " + sec, sec in md)
+    check("报告侧车 JSON", pathlib.Path(rep.get("json", "")).is_file())
+    bad = B.set_status(fid, "paid")
+    check("draft→paid 非法", bad.get("ok") is False, bad.get("reason"))
+    check("提交 → submitted", B.submit(fid, "HackerOne").get("to") == "submitted")
+    check("→ triaged", B.set_status(fid, "triaged").get("to") == "triaged")
+    check("→ paid", B.set_status(fid, "paid").get("to") == "paid")
+    check("summary 有状态计数", "paid" in (B.summary().get("by_status") or {}))
+
     print("[5] 赔付只记账")
     po = B.payout(pid, fid, 0, "USD", note="selftest")
     check("payout ok", po.get("ok") is True)

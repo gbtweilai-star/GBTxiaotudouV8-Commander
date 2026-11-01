@@ -668,6 +668,10 @@
     kpi("critical", by.critical || 0);
     kpi("high", by.high || 0);
     kpi("medium", by.medium || 0);
+    var st = d.by_status || {};
+    Object.keys(st).forEach(function (k) { kpi("状态 " + k, st[k]); });
+    var avg = d.avg_cvss;
+    if (avg != null) kpi("平均 CVSS", avg);
     var pay = d.payout_total || {};
     var keys = Object.keys(pay);
     if (!keys.length) kpi("赔付账本", "0");
@@ -705,7 +709,9 @@
         sev.textContent = "[" + (f.severity || "info").toUpperCase() + "] ";
         card.appendChild(sev);
         card.appendChild(document.createTextNode(
-          f.target + " · " + (f.cwe || "-") + " · " + (f.cvss || "-")
+          f.target + " · " + (f.cwe || "-") + "/" + (f.cwe_name || "未收录")
+          + " · CVSS " + (f.cvss_score != null ? f.cvss_score : (f.cvss || "-"))
+          + " · 状态 " + (f.status || "draft")
           + " · 证据 " + ((f.evidence || []).length) + " 个"));
         var btn = document.createElement("button");
         btn.type = "button";
@@ -723,6 +729,26 @@
           });
         });
         card.appendChild(btn);
+        var subBtn = document.createElement("button");
+        subBtn.type = "button";
+        subBtn.className = "scan-target";
+        subBtn.textContent = "提交";
+        subBtn.style.marginLeft = "6px";
+        subBtn.addEventListener("click", function () {
+          var platform = window.prompt("提交到哪个平台？（如 HackerOne / Bugcrowd / 自建）", "自建");
+          if (platform === null) return;
+          bountyApi("submit", { finding: f.id, platform: platform, note: "UI 提交" })
+            .then(function (r) {
+              var el = $("bounty-gate-result");
+              if (el) {
+                el.className = r.ok ? "ok" : "blocked";
+                el.textContent = r.ok ? ("已提交：" + f.id + "（" + platform + "）")
+                  : ("提交被拒：" + (r.reason || ""));
+              }
+              ensureBounty();
+            });
+        });
+        card.appendChild(subBtn);
         box.appendChild(card);
       });
     }

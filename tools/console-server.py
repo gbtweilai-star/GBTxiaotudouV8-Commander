@@ -292,6 +292,17 @@ class Handler(BaseHTTPRequestHandler):
                                     evidence=[str(x) for x in (d.get("evidence") or [])])
             elif op == "report":
                 out = B.report(str(d.get("finding") or ""))
+            elif op == "submit":
+                out = B.submit(str(d.get("finding") or ""),
+                               platform=str(d.get("platform") or ""),
+                               url=str(d.get("url") or ""),
+                               note=str(d.get("note") or ""))
+            elif op == "set_status":
+                out = B.set_status(str(d.get("finding") or ""),
+                                   str(d.get("to") or ""), str(d.get("note") or ""))
+            elif op == "cvss":
+                from gbt_allinone import bounty_core as BC
+                out = BC.cvss3(str(d.get("vector") or ""))
             elif op == "payout":
                 out = B.payout(str(d.get("program") or ""), str(d.get("finding") or ""),
                                float(d.get("amount") or 0), str(d.get("currency") or "USD"),
