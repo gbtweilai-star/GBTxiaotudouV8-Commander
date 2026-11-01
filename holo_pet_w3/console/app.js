@@ -874,6 +874,63 @@
     }
   }
 
+  /* ───────── 万能插：全开同步执行（385 位，需确认；轮询进度） ───────── */
+  function omniApi(body) {
+    return fetch("/api/omni", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (r) { return r.json(); });
+  }
+  function renderOmniStatus(d) {
+    var el = $("omni-status");
+    if (!el) return;
+    if (!d || d.ok === false) {
+      el.className = "bad";
+      el.textContent = (d && (d.reason || d.error)) || "无记录";
+      document.documentElement.dataset.omni = "none";
+      return;
+    }
+    el.className = d.fail_count ? "bad" : "ok";
+    el.textContent = "全开 " + d.caps_opened + "/" + d.caps_total
+      + " · ok " + d.ok_count + " · fail " + d.fail_count
+      + " · 票挡 " + ((d.blocked_by_ticket || []).length)
+      + " · " + (d.elapsed_ms || 0) + "ms";
+    document.documentElement.dataset.omni =
+      "ok:" + d.caps_opened + ":" + d.ok_count + ":" + d.fail_count;
+  }
+  function pollOmni(tries) {
+    if (tries <= 0) return;
+    omniApi({ op: "status" }).then(function (d) {
+      renderOmniStatus(d);
+      if (d && d.mode === "sync-all" && d.executed < d.caps_opened) {
+        setTimeout(function () { pollOmni(tries - 1); }, 2000);
+      }
+    });
+  }
+  function wireOmniAll() {
+    var btn = $("omni-run");
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    omniApi({ op: "status" }).then(renderOmniStatus).catch(function () {});
+    btn.addEventListener("click", function () {
+      if (!window.confirm("全开同步执行会逐个跑全部 385 个能力位（需授权位没票会被挡），确定？")) return;
+      btn.disabled = true;
+      omniApi({ confirm: true, timeout: 12 }).then(function (d) {
+        var el = $("omni-status");
+        if (el) {
+          el.className = "ok";
+          el.textContent = d.started ? ("已启动 run " + d.run_id + " · 同步执行中…")
+            : ("启动失败：" + (d.error || ""));
+        }
+        pollOmni(150);
+      }).catch(function (e) {
+        var el = $("omni-status");
+        if (el) { el.className = "bad"; el.textContent = "启动失败：" + ((e && e.message) || e); }
+      }).then(function () { btn.disabled = false; });
+    });
+  }
+
   /* ───────── 3D 视图按需加载（动态 import，file:// 下会失败→走兜底提示） ───────── */
   var SPACE_P = null;
   function ensure3d() {
@@ -966,6 +1023,7 @@
     }
     if (name === "plug") {
       ensurePlug().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+      wireOmniAll();
     }
     if (name === "team") {
       ensureTeam().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });

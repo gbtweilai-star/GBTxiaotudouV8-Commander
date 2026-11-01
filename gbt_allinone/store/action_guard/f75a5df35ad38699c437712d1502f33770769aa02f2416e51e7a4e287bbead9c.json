@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "lr_tick",
+  "fingerprint": "f75a5df35ad38699c437712d1502f33770769aa02f2416e51e7a4e287bbead9c",
+  "pid": 16972,
+  "started_at": 1793560554.246928,
+  "started_iso": "2026-11-02T02:15:54",
+  "finished_at": 1793560554.257744,
+  "finished_iso": "2026-11-02T02:15:54",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

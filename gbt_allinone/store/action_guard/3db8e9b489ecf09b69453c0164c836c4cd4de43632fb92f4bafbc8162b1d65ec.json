@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "wf_cache_clear",
+  "fingerprint": "3db8e9b489ecf09b69453c0164c836c4cd4de43632fb92f4bafbc8162b1d65ec",
+  "pid": 20432,
+  "started_at": 1793560604.4622734,
+  "started_iso": "2026-11-02T02:16:44",
+  "finished_at": 1793560604.4788275,
+  "finished_iso": "2026-11-02T02:16:44",
+  "detail": {
+    "ok": true,
+    "result_status": null
+  }
+}

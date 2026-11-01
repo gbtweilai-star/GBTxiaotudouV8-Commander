@@ -105,6 +105,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_dispatch(raw)
         if path == "/api/bounty":
             return self._api_bounty(raw)
+        if path == "/api/omni":
+            return self._api_omni(raw)
         if path == "/api/scan":
             from urllib.parse import parse_qs as _pq
             from urllib.parse import urlparse as _urlparse
@@ -340,6 +342,41 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
                           "application/json; charset=utf-8")
 
+    def _api_omni(self, raw=b"{}"):
+        """万能插全开同步执行：confirm 才起后台全开；否则只读状态。"""
+        import json as _json
+        try:
+            d = _json.loads((raw or b"{}").decode("utf-8", "replace") or "{}")
+        except Exception:  # noqa: BLE001
+            d = {}
+        sys.path.insert(0, str(REPO))
+        from gbt_allinone import omni_all
+        if str(d.get("op") or "") == "status" or not d.get("confirm"):
+            out = omni_all.status()
+            out["notice"] = ("状态查询；真全开执行需要 confirm=true"
+                             if not d.get("confirm") else "已确认")
+            return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        # 真执行：后台起一个进程（同步逐个执行，不阻塞 HTTP）
+        run_id = time.strftime("%Y%m%d-%H%M%S")
+        cmd = [sys.executable, "-X", "utf8", str(REPO / "tools" / "omni-run.py"),
+               "--run-id", run_id, "--timeout", str(float(d.get("timeout") or 12))]
+        if d.get("ticket"):
+            cmd += ["--ticket", str(d.get("ticket"))]
+        try:
+            import subprocess as _sub
+            proc = _sub.Popen(cmd, cwd=str(REPO), stdout=_sub.DEVNULL,
+                              stderr=_sub.DEVNULL,
+                              creationflags=getattr(_sub, "CREATE_NO_WINDOW", 0))
+        except Exception as e:  # noqa: BLE001
+            return self._send(500, _json.dumps({"ok": False, "error": str(e)[:200]},
+                                               ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        out = {"ok": True, "started": True, "run_id": run_id, "pid": proc.pid,
+               "mode": "sync-all", "note": "全开 385 位同步执行已启动；用 op=status 查进度"}
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
+
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""
         import json as _json
@@ -410,6 +447,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_dispatch(raw)
         if path == "/api/bounty":
             return self._api_bounty(raw)
+        if path == "/api/omni":
+            return self._api_omni(raw)
         if path == "/api/chat":
             text = str(body.get("text") or "").strip()
             if not text:

@@ -684,3 +684,12 @@ body.graph-on .grid-overlay { display: block; }
 .bounty-finding .sev-critical, .bounty-finding .sev-high { color: #ff5f6d; }
 .bounty-finding .sev-medium { color: var(--warm); }
 .bounty-finding .sev-low, .bounty-finding .sev-info { color: var(--ok); }
+
+.omni-actions { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.omni-actions button {
+  padding: 7px 12px; border-radius: 9px; cursor: pointer; background: var(--warm);
+  border: 1px solid var(--warm); color: #151517; font: 600 10px/1 var(--mono);
+}
+.omni-actions b { color: var(--dim); font: 500 9.5px/1.4 var(--mono); }
+.omni-actions b.ok { color: var(--ok); }
+.omni-actions b.bad { color: #ff5f6d; }

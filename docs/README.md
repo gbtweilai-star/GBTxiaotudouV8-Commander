@@ -239,3 +239,4 @@
 | 121 | [121-platform-scope-import.md](121-platform-scope-import.md) | 平台 scope 导入（HackerOne/Bugcrowd 离线归一化，dry-run + 人工确认才落库） |
 | 122 | [122-submit-bundle.md](122-submit-bundle.md) | 可提交包：CVSS 时间/环境分 + 修复 diff + 附件 + manifest + ZIP |
 | 123 | [123-platform-status-sync.md](123-platform-status-sync.md) | 平台状态只读同步：mock 平台端到端、状态机回填、审计、只读 405 |
+| 124 | [124-omni-all-sync.md](124-omni-all-sync.md) | 万能插全开同步执行：385 位逐个同步、票挡需授权位、进度落盘、API/UI |

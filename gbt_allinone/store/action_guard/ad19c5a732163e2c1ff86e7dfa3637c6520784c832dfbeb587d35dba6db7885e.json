@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "kind": "mcp_unregister",
+  "fingerprint": "ad19c5a732163e2c1ff86e7dfa3637c6520784c832dfbeb587d35dba6db7885e",
+  "pid": 2968,
+  "started_at": 1793560559.1573114,
+  "started_iso": "2026-11-02T02:15:59",
+  "finished_at": 1793560559.1740658,
+  "finished_iso": "2026-11-02T02:15:59",
+  "detail": {
+    "ok": false,
+    "result_status": null
+  }
+}
