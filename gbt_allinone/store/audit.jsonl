@@ -15927,3 +15927,304 @@
 {"ts": 1793563692.0, "iso": "2026-11-02T03:08:11", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
 {"ts": 1793563697.366, "iso": "2026-11-02T03:08:17", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 2}}
 {"ts": 1793563727.72, "iso": "2026-11-02T03:08:47", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793563739.024, "iso": "2026-11-02T03:08:59", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793563739.081, "iso": "2026-11-02T03:08:59", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793563813.826, "iso": "2026-11-02T03:10:13", "event": "call", "meta": {"kind": "cross_scan", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793563813.911, "iso": "2026-11-02T03:10:13", "event": "cross_scan_dim", "meta": {"dim": "A+B", "s": 0.0}}
+{"ts": 1793563826.926, "iso": "2026-11-02T03:10:26", "event": "cross_scan_dim", "meta": {"dim": "G", "s": 13.0}}
+{"ts": 1793563826.942, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "a1art_skill", "s": 0.0}}
+{"ts": 1793563826.942, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "absorb_loop", "s": 0.0}}
+{"ts": 1793563826.961, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "account_registry", "s": 0.0}}
+{"ts": 1793563826.961, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "action_gate", "s": 0.0}}
+{"ts": 1793563826.976, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "agency_tentacles", "s": 0.0}}
+{"ts": 1793563826.977, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "agent_console", "s": 0.0}}
+{"ts": 1793563826.977, "iso": "2026-11-02T03:10:26", "event": "call", "meta": {"kind": "security_status", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563826.994, "iso": "2026-11-02T03:10:26", "event": "user_error", "meta": {"kind": "security_status", "reason": "unknown capability", "reason_code": "unknown_capability", "error_class": "user_error", "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563826.994, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "agent_control", "s": 0.0}}
+{"ts": 1793563826.994, "iso": "2026-11-02T03:10:26", "event": "cross_scan_probe", "meta": {"name": "agent_council", "s": 0.0}}
+{"ts": 1793563827.011, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "agent_rig", "s": 0.0}}
+{"ts": 1793563827.011, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "alerts", "s": 0.0}}
+{"ts": 1793563827.027, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "anim_audit", "s": 0.0}}
+{"ts": 1793563827.03, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "answer_shaper", "s": 0.0}}
+{"ts": 1793563827.03, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "asset_index", "s": 0.0}}
+{"ts": 1793563827.042, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "audit_query", "s": 0.0}}
+{"ts": 1793563827.042, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "auth_gate_status", "s": 0.0}}
+{"ts": 1793563827.058, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "auto_publish", "s": 0.0}}
+{"ts": 1793563827.061, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "auto_switch", "s": 0.0}}
+{"ts": 1793563827.061, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "automation_keys", "s": 0.0}}
+{"ts": 1793563827.077, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "autonomy", "s": 0.0}}
+{"ts": 1793563827.13, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "awesome_tools_index", "s": 0.1}}
+{"ts": 1793563827.144, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "belief_forge", "s": 0.0}}
+{"ts": 1793563827.161, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "bi_distill", "s": 0.0}}
+{"ts": 1793563827.161, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "bits_kit", "s": 0.0}}
+{"ts": 1793563827.179, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "blueprint", "s": 0.0}}
+{"ts": 1793563827.23, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "bluetooth", "s": 0.0}}
+{"ts": 1793563827.489, "iso": "2026-11-02T03:10:27", "event": "cross_scan_probe", "meta": {"name": "body_click", "s": 0.3}}
+{"ts": 1793563829.11, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_map", "s": 1.6}}
+{"ts": 1793563829.126, "iso": "2026-11-02T03:10:29", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "body_open:body_open", "kind": "body_open", "missing": ["process_execute"]}}
+{"ts": 1793563829.135, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_open", "s": 0.0}}
+{"ts": 1793563829.207, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_say", "s": 0.1}}
+{"ts": 1793563829.391, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_see", "s": 0.2}}
+{"ts": 1793563829.427, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_sense", "s": 0.0}}
+{"ts": 1793563829.541, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_type", "s": 0.1}}
+{"ts": 1793563829.609, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "body_volume", "s": 0.1}}
+{"ts": 1793563829.611, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brain_council", "s": 0.0}}
+{"ts": 1793563829.631, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brain_execute", "s": 0.0}}
+{"ts": 1793563829.638, "iso": "2026-11-02T03:10:29", "event": "brain_enter", "meta": {"dim": "route"}}
+{"ts": 1793563829.644, "iso": "2026-11-02T03:10:29", "event": "brain_exit", "meta": {"dim": "route", "ok": false, "ms": 4, "error": "BrainExecError: 需要 intent：任务意图描述"}}
+{"ts": 1793563829.644, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brain_route", "s": 0.0}}
+{"ts": 1793563829.644, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brain_unify", "s": 0.0}}
+{"ts": 1793563829.66, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brain_vault", "s": 0.0}}
+{"ts": 1793563829.677, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "brand_outro", "s": 0.0}}
+{"ts": 1793563829.709, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "browser", "s": 0.0}}
+{"ts": 1793563829.709, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "bt_control", "s": 0.0}}
+{"ts": 1793563829.727, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cad_distill", "s": 0.0}}
+{"ts": 1793563829.744, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cap_pack", "s": 0.0}}
+{"ts": 1793563829.744, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cap_self", "s": 0.0}}
+{"ts": 1793563829.827, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cap_tags", "s": 0.1}}
+{"ts": 1793563829.844, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "capability_net", "s": 0.0}}
+{"ts": 1793563829.86, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "case_mine", "s": 0.0}}
+{"ts": 1793563829.86, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "chain_kernel", "s": 0.0}}
+{"ts": 1793563829.876, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cloud_llm", "s": 0.0}}
+{"ts": 1793563829.876, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cloud_pc", "s": 0.0}}
+{"ts": 1793563829.876, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "cloud_plugin", "s": 0.0}}
+{"ts": 1793563829.892, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "code_art", "s": 0.0}}
+{"ts": 1793563829.908, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "code_audit", "s": 0.0}}
+{"ts": 1793563829.924, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "code_graph", "s": 0.0}}
+{"ts": 1793563829.924, "iso": "2026-11-02T03:10:29", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "codex_chat:codex_chat", "kind": "codex_chat", "missing": ["process_execute", "external_llm"]}}
+{"ts": 1793563829.924, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "codex_chat", "s": 0.0}}
+{"ts": 1793563829.924, "iso": "2026-11-02T03:10:29", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "codex_interrupt:codex_interrupt", "kind": "codex_interrupt", "missing": ["process_execute"]}}
+{"ts": 1793563829.937, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "codex_interrupt", "s": 0.0}}
+{"ts": 1793563829.939, "iso": "2026-11-02T03:10:29", "event": "auth_denied", "meta": {"scope": "external_llm", "detail": "codex_models:codex_models", "kind": "codex_models", "missing": ["external_llm"]}}
+{"ts": 1793563829.939, "iso": "2026-11-02T03:10:29", "event": "cross_scan_probe", "meta": {"name": "codex_models", "s": 0.0}}
+{"ts": 1793563830.943, "iso": "2026-11-02T03:10:30", "event": "cross_scan_probe", "meta": {"name": "codex_status", "s": 1.0}}
+{"ts": 1793563830.959, "iso": "2026-11-02T03:10:30", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "codex_thread_new:codex_thread_new", "kind": "codex_thread_new", "missing": ["process_execute"]}}
+{"ts": 1793563830.959, "iso": "2026-11-02T03:10:30", "event": "cross_scan_probe", "meta": {"name": "codex_thread_new", "s": 0.0}}
+{"ts": 1793563830.959, "iso": "2026-11-02T03:10:30", "event": "cross_scan_probe", "meta": {"name": "codex_tools", "s": 0.0}}
+{"ts": 1793563830.975, "iso": "2026-11-02T03:10:30", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "codex_turn_send:codex_turn_send", "kind": "codex_turn_send", "missing": ["process_execute", "external_llm"]}}
+{"ts": 1793563830.975, "iso": "2026-11-02T03:10:30", "event": "cross_scan_probe", "meta": {"name": "codex_turn_send", "s": 0.0}}
+{"ts": 1793563830.975, "iso": "2026-11-02T03:10:30", "event": "cross_scan_probe", "meta": {"name": "comfy_forge", "s": 0.0}}
+{"ts": 1793563833.042, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "comfyui", "s": 2.0}}
+{"ts": 1793563833.05, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "command_chain", "s": 0.0}}
+{"ts": 1793563833.058, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "console_hub", "s": 0.0}}
+{"ts": 1793563833.058, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "context_guard", "s": 0.0}}
+{"ts": 1793563833.074, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "context_vault", "s": 0.0}}
+{"ts": 1793563833.1, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "control_loop", "s": 0.0}}
+{"ts": 1793563833.107, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "count_words", "s": 0.0}}
+{"ts": 1793563833.109, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "coverage_auditor", "s": 0.0}}
+{"ts": 1793563833.127, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "coze_mail", "s": 0.0}}
+{"ts": 1793563833.127, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "create", "s": 0.0}}
+{"ts": 1793563833.127, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "creation_camp", "s": 0.0}}
+{"ts": 1793563833.144, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "datakit", "s": 0.0}}
+{"ts": 1793563833.145, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "db_plugin", "s": 0.0}}
+{"ts": 1793563833.145, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "design_atlas", "s": 0.0}}
+{"ts": 1793563833.159, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "desktop_commander", "s": 0.0}}
+{"ts": 1793563833.175, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "desktop_distill", "s": 0.0}}
+{"ts": 1793563833.175, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "detail_habit", "s": 0.0}}
+{"ts": 1793563833.191, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "devour_auto", "s": 0.0}}
+{"ts": 1793563833.207, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "devour_fusion", "s": 0.0}}
+{"ts": 1793563833.223, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "devour_scan", "s": 0.0}}
+{"ts": 1793563833.223, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dh_asset_gate", "s": 0.0}}
+{"ts": 1793563833.223, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dh_brain", "s": 0.0}}
+{"ts": 1793563833.239, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dh_realism", "s": 0.0}}
+{"ts": 1793563833.246, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "diagram_distill", "s": 0.0}}
+{"ts": 1793563833.255, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "digital_human", "s": 0.0}}
+{"ts": 1793563833.255, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "director_mood", "s": 0.0}}
+{"ts": 1793563833.255, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dl_forge", "s": 0.0}}
+{"ts": 1793563833.271, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "doc_intake", "s": 0.0}}
+{"ts": 1793563833.271, "iso": "2026-11-02T03:10:33", "event": "module_action", "meta": {"module": "drama", "role": "剧本理解引擎", "phase": "接口1 剧本→分镜", "action": "status", "ok": true, "output": null}}
+{"ts": 1793563833.271, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "drama", "s": 0.0}}
+{"ts": 1793563833.286, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dream_replay", "s": 0.0}}
+{"ts": 1793563833.286, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "dual_gate", "s": 0.0}}
+{"ts": 1793563833.35, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "duty_board", "s": 0.1}}
+{"ts": 1793563833.35, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "echo", "s": 0.0}}
+{"ts": 1793563833.35, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "eigenflux", "s": 0.0}}
+{"ts": 1793563833.366, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "emotion_projection", "s": 0.0}}
+{"ts": 1793563833.413, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "energy_core", "s": 0.0}}
+{"ts": 1793563833.413, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "energy_pool", "s": 0.0}}
+{"ts": 1793563833.429, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "energy_scheduler", "s": 0.0}}
+{"ts": 1793563833.429, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "event_ledger", "s": 0.0}}
+{"ts": 1793563833.477, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "execution_guard", "s": 0.0}}
+{"ts": 1793563833.477, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "experience_forge", "s": 0.0}}
+{"ts": 1793563833.493, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "express_direct", "s": 0.0}}
+{"ts": 1793563833.493, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "fact_gate", "s": 0.0}}
+{"ts": 1793563833.493, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "feishu_embed", "s": 0.0}}
+{"ts": 1793563833.51, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "film_intel", "s": 0.0}}
+{"ts": 1793563833.51, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "flow_canvas", "s": 0.0}}
+{"ts": 1793563833.527, "iso": "2026-11-02T03:10:33", "event": "cross_scan_probe", "meta": {"name": "freebuff_term", "s": 0.0}}
+{"ts": 1793563837.592, "iso": "2026-11-02T03:10:37", "event": "cross_scan_probe", "meta": {"name": "freellmapi", "s": 4.1}}
+{"ts": 1793563837.592, "iso": "2026-11-02T03:10:37", "event": "cross_scan_probe", "meta": {"name": "gate_visibility", "s": 0.0}}
+{"ts": 1793563837.61, "iso": "2026-11-02T03:10:37", "event": "cross_scan_probe", "meta": {"name": "git_read", "s": 0.0}}
+{"ts": 1793563837.626, "iso": "2026-11-02T03:10:37", "event": "cross_scan_probe", "meta": {"name": "god_view", "s": 0.0}}
+{"ts": 1793563837.626, "iso": "2026-11-02T03:10:37", "event": "call", "meta": {"kind": "console_hub", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563837.626, "iso": "2026-11-02T03:10:37", "event": "ok", "meta": {"kind": "console_hub", "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563839.078, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "gods_eye", "s": 1.4}}
+{"ts": 1793563839.078, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "growth_hooks", "s": 0.0}}
+{"ts": 1793563839.095, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "h3_video_gen", "s": 0.0}}
+{"ts": 1793563839.095, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "hand_retarget", "s": 0.0}}
+{"ts": 1793563839.112, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "handoff", "s": 0.0}}
+{"ts": 1793563839.278, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "health", "s": 0.2}}
+{"ts": 1793563839.278, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "hf_voice", "s": 0.0}}
+{"ts": 1793563839.312, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "hook_enforcer", "s": 0.0}}
+{"ts": 1793563839.329, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "hook_registry", "s": 0.0}}
+{"ts": 1793563839.329, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "hunyuan_video", "s": 0.0}}
+{"ts": 1793563839.345, "iso": "2026-11-02T03:10:39", "event": "cross_scan_probe", "meta": {"name": "i2v_agnes", "s": 0.0}}
+{"ts": 1793563851.5, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "image_scout", "s": 12.1}}
+{"ts": 1793563851.577, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "impact_check", "s": 0.0}}
+{"ts": 1793563851.579, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "install_selfcheck", "s": 0.0}}
+{"ts": 1793563851.594, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "intake_kit", "s": 0.0}}
+{"ts": 1793563851.66, "iso": "2026-11-02T03:10:51", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793563851.678, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "inventory", "s": 0.1}}
+{"ts": 1793563851.694, "iso": "2026-11-02T03:10:51", "event": "cross_scan_probe", "meta": {"name": "ledger_note", "s": 0.0}}
+{"ts": 1793563852.111, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "legacy_guard", "s": 0.4}}
+{"ts": 1793563852.127, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "libtv_skill", "s": 0.0}}
+{"ts": 1793563852.127, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "life", "s": 0.0}}
+{"ts": 1793563852.127, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "llm_redteam", "s": 0.0}}
+{"ts": 1793563852.56, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "llm_status", "s": 0.4}}
+{"ts": 1793563852.582, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "llm_watch", "s": 0.0}}
+{"ts": 1793563852.595, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "lobehub", "s": 0.0}}
+{"ts": 1793563852.595, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "local_brain", "s": 0.0}}
+{"ts": 1793563852.611, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "long_run_supervisor", "s": 0.0}}
+{"ts": 1793563852.611, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "lr_status", "s": 0.0}}
+{"ts": 1793563852.611, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "machine_distill", "s": 0.0}}
+{"ts": 1793563852.626, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "mcp_call:mcp_call", "kind": "mcp_call", "missing": ["process_execute"]}}
+{"ts": 1793563852.627, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_call", "s": 0.0}}
+{"ts": 1793563852.627, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "mcp_connect:mcp_connect", "kind": "mcp_connect", "missing": ["process_execute"]}}
+{"ts": 1793563852.627, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_connect", "s": 0.0}}
+{"ts": 1793563852.627, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "mcp_health:mcp_health", "kind": "mcp_health", "missing": ["process_execute"]}}
+{"ts": 1793563852.644, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_health", "s": 0.0}}
+{"ts": 1793563852.663, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_register", "s": 0.0}}
+{"ts": 1793563852.67, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_servers", "s": 0.0}}
+{"ts": 1793563852.677, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_tools", "s": 0.0}}
+{"ts": 1793563852.695, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mcp_unregister", "s": 0.0}}
+{"ts": 1793563852.704, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "media_pipeline", "s": 0.0}}
+{"ts": 1793563852.712, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "memory_bank", "s": 0.0}}
+{"ts": 1793563852.727, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "memory_manager", "s": 0.0}}
+{"ts": 1793563852.744, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "meta_cognition", "s": 0.0}}
+{"ts": 1793563852.761, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mind", "s": 0.0}}
+{"ts": 1793563852.777, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "deploy_publish", "detail": "mirror_ascend:mirror_ascend", "kind": "mirror_ascend", "missing": ["deploy_publish"]}}
+{"ts": 1793563852.777, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_ascend", "s": 0.0}}
+{"ts": 1793563852.843, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_parity", "s": 0.1}}
+{"ts": 1793563852.844, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_plan", "s": 0.0}}
+{"ts": 1793563852.861, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "mirror_rehearse:mirror_rehearse", "kind": "mirror_rehearse", "missing": ["process_execute"]}}
+{"ts": 1793563852.863, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_rehearse", "s": 0.0}}
+{"ts": 1793563852.863, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "deploy_publish", "detail": "mirror_release:mirror_release", "kind": "mirror_release", "missing": ["deploy_publish", "process_execute"]}}
+{"ts": 1793563852.876, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_release", "s": 0.0}}
+{"ts": 1793563852.877, "iso": "2026-11-02T03:10:52", "event": "auth_denied", "meta": {"scope": "deploy_publish", "detail": "mirror_rewind:mirror_rewind", "kind": "mirror_rewind", "missing": ["deploy_publish"]}}
+{"ts": 1793563852.877, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_rewind", "s": 0.0}}
+{"ts": 1793563852.877, "iso": "2026-11-02T03:10:52", "event": "deploy_validate", "meta": {"passed": 3, "total": 5, "files": 0}}
+{"ts": 1793563852.896, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_scan", "s": 0.0}}
+{"ts": 1793563852.913, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_simulate", "s": 0.0}}
+{"ts": 1793563852.913, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "mirror_status", "s": 0.0}}
+{"ts": 1793563852.927, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "model_key_pool", "s": 0.0}}
+{"ts": 1793563852.927, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "motion_kit", "s": 0.0}}
+{"ts": 1793563852.944, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "music_intel", "s": 0.0}}
+{"ts": 1793563852.953, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "music_publishing", "s": 0.0}}
+{"ts": 1793563852.959, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "observer_anchor", "s": 0.0}}
+{"ts": 1793563852.96, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "obsidian_vault", "s": 0.0}}
+{"ts": 1793563852.995, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "offload_distill", "s": 0.0}}
+{"ts": 1793563852.995, "iso": "2026-11-02T03:10:52", "event": "cross_scan_probe", "meta": {"name": "omission_detector", "s": 0.0}}
+{"ts": 1793563853.01, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "omni_open", "s": 0.0}}
+{"ts": 1793563853.01, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "onboarding_gate", "s": 0.0}}
+{"ts": 1793563853.01, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "one_shot", "s": 0.0}}
+{"ts": 1793563853.066, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "orchestration", "s": 0.0}}
+{"ts": 1793563853.077, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "orchestration_kernel", "s": 0.0}}
+{"ts": 1793563853.077, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "paywallbuster", "s": 0.0}}
+{"ts": 1793563853.096, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "penetrating_cross_scan", "s": 0.0}}
+{"ts": 1793563853.11, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "pentest_distill", "s": 0.0}}
+{"ts": 1793563853.11, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "persona_kernel", "s": 0.0}}
+{"ts": 1793563853.126, "iso": "2026-11-02T03:10:53", "event": "auth_denied", "meta": {"scope": "deploy_publish", "detail": "pipeline_rollback:pipeline_rollback", "kind": "pipeline_rollback", "missing": ["deploy_publish"]}}
+{"ts": 1793563853.127, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "pipeline_rollback", "s": 0.0}}
+{"ts": 1793563853.144, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "pipeline_status", "s": 0.0}}
+{"ts": 1793563853.144, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "pipeline_versions", "s": 0.0}}
+{"ts": 1793563853.161, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "platform_profile", "s": 0.0}}
+{"ts": 1793563853.176, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "policy_delta", "s": 0.0}}
+{"ts": 1793563853.177, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "policy_gate", "s": 0.0}}
+{"ts": 1793563853.194, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "proactive_report", "s": 0.0}}
+{"ts": 1793563853.21, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "project_context", "s": 0.0}}
+{"ts": 1793563853.221, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "project_drift", "s": 0.0}}
+{"ts": 1793563853.229, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "projection_card", "s": 0.0}}
+{"ts": 1793563853.23, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "prompt_bridge", "s": 0.0}}
+{"ts": 1793563853.26, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "pulse_direct", "s": 0.0}}
+{"ts": 1793563853.277, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "quant", "s": 0.0}}
+{"ts": 1793563853.279, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "quant_backtest", "s": 0.0}}
+{"ts": 1793563853.279, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "quant_params", "s": 0.0}}
+{"ts": 1793563853.296, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "quant_strategy", "s": 0.0}}
+{"ts": 1793563853.296, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "rea_reverse", "s": 0.0}}
+{"ts": 1793563853.311, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "recon_distill", "s": 0.0}}
+{"ts": 1793563853.311, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "record_grid", "s": 0.0}}
+{"ts": 1793563853.327, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "render_evolution", "s": 0.0}}
+{"ts": 1793563853.327, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "replan_loop", "s": 0.0}}
+{"ts": 1793563853.344, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "repo_publish", "s": 0.0}}
+{"ts": 1793563853.344, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "research_intel", "s": 0.0}}
+{"ts": 1793563853.36, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "review_gate", "s": 0.0}}
+{"ts": 1793563853.36, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "ring_context", "s": 0.0}}
+{"ts": 1793563853.377, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "root_cause", "s": 0.0}}
+{"ts": 1793563853.397, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "scene_anchor", "s": 0.0}}
+{"ts": 1793563853.397, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "sched_status", "s": 0.0}}
+{"ts": 1793563853.411, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "scrapling", "s": 0.0}}
+{"ts": 1793563853.411, "iso": "2026-11-02T03:10:53", "event": "call", "meta": {"kind": "keylogger", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.411, "iso": "2026-11-02T03:10:53", "event": "auth_denied", "meta": {"scope": "privacy_read", "detail": "keylogger:keylogger", "kind": "keylogger", "missing": ["privacy_read"]}}
+{"ts": 1793563853.427, "iso": "2026-11-02T03:10:53", "event": "denied", "meta": {"kind": "keylogger", "reason": "authorization required", "scopes": ["privacy_read"], "missing": ["privacy_read"], "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.428, "iso": "2026-11-02T03:10:53", "event": "call", "meta": {"kind": "osint_scan", "payload_keys": ["target"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.428, "iso": "2026-11-02T03:10:53", "event": "auth_denied", "meta": {"scope": "osint_private", "detail": "osint_scan:osint_scan", "kind": "osint_scan", "missing": ["osint_private"]}}
+{"ts": 1793563853.428, "iso": "2026-11-02T03:10:53", "event": "denied", "meta": {"kind": "osint_scan", "reason": "authorization required", "scopes": ["osint_private"], "missing": ["osint_private"], "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.428, "iso": "2026-11-02T03:10:53", "event": "call", "meta": {"kind": "pipeline_submit", "payload_keys": ["name", "content", "meta"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.445, "iso": "2026-11-02T03:10:53", "event": "preflight_checked", "meta": {"kind": "pipeline_submit", "fingerprint": "8d82f45cbf1617bc4afbc60f1ffa149efd59b268b52c482ae8c863064512ba73", "status": "acquired", "side_effect": true, "observation": {"checked": false, "matched": false, "reason": "no_reality_probe"}, "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.445, "iso": "2026-11-02T03:10:53", "event": "pipeline_blocked", "meta": {"rec_id": "_def_probe.txt-2d711642-1793563853", "name": "_def_probe.txt", "sha256": "2d711642b726", "refined": 0, "probe": true}}
+{"ts": 1793563853.461, "iso": "2026-11-02T03:10:53", "event": "ok", "meta": {"kind": "pipeline_submit", "synced": true, "synced_via": "ctx", "synced_entry": "outer"}}
+{"ts": 1793563853.495, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "sec_defenses", "s": 0.1}}
+{"ts": 1793563853.497, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "sec_sweeper", "s": 0.0}}
+{"ts": 1793563853.561, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "selfscan", "s": 0.1}}
+{"ts": 1793563853.561, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "shared_resources", "s": 0.0}}
+{"ts": 1793563853.66, "iso": "2026-11-02T03:10:53", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793563853.66, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "signature_guard", "s": 0.1}}
+{"ts": 1793563853.744, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "skill_watch", "s": 0.1}}
+{"ts": 1793563853.76, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "skills_hub", "s": 0.0}}
+{"ts": 1793563853.778, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "slim_profile", "s": 0.0}}
+{"ts": 1793563853.778, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "social_eng", "s": 0.0}}
+{"ts": 1793563853.798, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "spend_guard", "s": 0.0}}
+{"ts": 1793563853.811, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "stigmergy", "s": 0.0}}
+{"ts": 1793563853.811, "iso": "2026-11-02T03:10:53", "event": "cross_scan_probe", "meta": {"name": "surface_bind", "s": 0.0}}
+{"ts": 1793563854.447, "iso": "2026-11-02T03:10:54", "event": "svc_down", "meta": {"services": ["payment_gateway", "blockchain_bridge", "social_trading_v2", "monitor_service", "backtest_api_v2", "cis_harvesting_v2", "quant_api", "cis_v42_trader", "crypto_gateway", "gbt_wallet_api", "gbt_cap_bridge", "hcl_control", "gate_daemon"]}}
+{"ts": 1793563854.447, "iso": "2026-11-02T03:10:54", "event": "cross_scan_probe", "meta": {"name": "svc_inspect", "s": 0.6}}
+{"ts": 1793563859.212, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "sync_guard", "s": 4.8}}
+{"ts": 1793563859.227, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tactics_advise", "s": 0.0}}
+{"ts": 1793563859.238, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "task_graph", "s": 0.0}}
+{"ts": 1793563859.294, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "taste_guard", "s": 0.0}}
+{"ts": 1793563859.294, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "telegram_embed", "s": 0.0}}
+{"ts": 1793563859.312, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle", "s": 0.0}}
+{"ts": 1793563859.327, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_arm", "s": 0.0}}
+{"ts": 1793563859.443, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_bind", "s": 0.1}}
+{"ts": 1793563859.443, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_cognition", "s": 0.0}}
+{"ts": 1793563859.46, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_manifest", "s": 0.0}}
+{"ts": 1793563859.46, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_pipeline", "s": 0.0}}
+{"ts": 1793563859.46, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "tentacle_scale", "s": 0.0}}
+{"ts": 1793563859.477, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "topic_watch", "s": 0.0}}
+{"ts": 1793563859.484, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "trace_store", "s": 0.0}}
+{"ts": 1793563859.484, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "transfer", "s": 0.0}}
+{"ts": 1793563859.494, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "transformer", "s": 0.0}}
+{"ts": 1793563859.496, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "trend_watch", "s": 0.0}}
+{"ts": 1793563859.509, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "trunk_cover", "s": 0.0}}
+{"ts": 1793563859.528, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "trunk_reason", "s": 0.0}}
+{"ts": 1793563859.536, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "truth_scan", "s": 0.0}}
+{"ts": 1793563859.543, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "ui_kit", "s": 0.0}}
+{"ts": 1793563859.558, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "ui_render", "s": 0.0}}
+{"ts": 1793563859.561, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "ux_doctrine", "s": 0.0}}
+{"ts": 1793563859.561, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "verification_watch", "s": 0.0}}
+{"ts": 1793563859.577, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "video_intel", "s": 0.0}}
+{"ts": 1793563859.577, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "viral_forge", "s": 0.0}}
+{"ts": 1793563859.727, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "vision", "s": 0.2}}
+{"ts": 1793563859.744, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "vision_grounding", "s": 0.0}}
+{"ts": 1793563859.76, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "vision_print", "s": 0.0}}
+{"ts": 1793563859.76, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "vlx_flow", "s": 0.0}}
+{"ts": 1793563859.796, "iso": "2026-11-02T03:10:59", "event": "cross_scan_probe", "meta": {"name": "voice", "s": 0.0}}
+{"ts": 1793563860.428, "iso": "2026-11-02T03:11:00", "event": "cross_scan_probe", "meta": {"name": "voice_orchestra", "s": 0.6}}
+{"ts": 1793563862.495, "iso": "2026-11-02T03:11:02", "event": "cross_scan_probe", "meta": {"name": "voice_studio", "s": 2.1}}
+{"ts": 1793563862.978, "iso": "2026-11-02T03:11:02", "event": "cross_scan_probe", "meta": {"name": "warm_switch", "s": 0.5}}
+{"ts": 1793563862.994, "iso": "2026-11-02T03:11:02", "event": "cross_scan_probe", "meta": {"name": "welcome", "s": 0.0}}
+{"ts": 1793563863.011, "iso": "2026-11-02T03:11:03", "event": "cross_scan_probe", "meta": {"name": "wf_status", "s": 0.0}}
+{"ts": 1793563863.011, "iso": "2026-11-02T03:11:03", "event": "cross_scan_probe", "meta": {"name": "whatsapp_embed", "s": 0.0}}
+{"ts": 1793563863.027, "iso": "2026-11-02T03:11:03", "event": "cross_scan_probe", "meta": {"name": "wiki_graph", "s": 0.0}}
+{"ts": 1793563863.077, "iso": "2026-11-02T03:11:03", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793563863.077, "iso": "2026-11-02T03:11:03", "event": "ok", "meta": {"kind": "cross_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}

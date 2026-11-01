@@ -290,7 +290,6 @@ def _x_run_isolated(kinds=_X_SCANNER_KINDS, timeout_s: int = 240, store_dir=None
     import shutil as _shutil
     import sys as _sys
     import tempfile as _tempfile
-from pathlib import Path
     from subprocess import TimeoutExpired as _TimeoutExpired
 
     from .tools.native_rc import run_native

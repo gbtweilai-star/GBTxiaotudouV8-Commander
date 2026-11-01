@@ -8,3 +8,4 @@
 {"ts": 1793562569.21, "iso": "2026-11-02T02:49:29", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
 {"ts": 1793562596.059, "iso": "2026-11-02T02:49:56", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
 {"ts": 1793563480.925, "iso": "2026-11-02T03:04:40", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
+{"ts": 1793563833.121, "iso": "2026-11-02T03:10:33", "event": "coze_mail_status_change", "meta": {"op": "status", "connected": false, "reason": "transport_unavailable"}}
