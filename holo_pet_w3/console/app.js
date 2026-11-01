@@ -483,6 +483,10 @@
     var items = (box && box.professions) || [];
     document.documentElement.dataset.prof =
       "ok:" + items.length + "职业" + (items.some(function (p) { return p.chief; }) ? "+编程首席" : "");
+    var titleEl = $("prof-title");
+    if (titleEl) {
+      titleEl.textContent = "触手职业 · " + items.length + " 种职业（编程工程师为首席）";
+    }
     if (!wrap) return;
     wrap.innerHTML = "";
     items.forEach(function (p) {

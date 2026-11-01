@@ -147,8 +147,11 @@ def main() -> int:
     import json as _json2
     _pj = _json2.loads((ROOT / "data" / "professions.json").read_text(encoding="utf-8"))
     _profs = _pj.get("professions") or []
-    check("12 种职业", len(_profs) >= 12, str(len(_profs)))
+    check("18 种职业", len(_profs) >= 18, str(len(_profs)))
     check("编程是首席", any(p.get("chief") and p.get("title") == "编程工程师" for p in _profs))
+    _titles = {p.get("title") for p in _profs}
+    check("有短视频/音乐/电影职业", {"短视频编导", "音乐制作", "影视 / 电影"} <= _titles,
+          str(sorted(_titles))[:120])
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))
     _appj = (con / "app.js").read_text(encoding="utf-8")
     check("职业有渲染函数", "renderProfessions" in _appj and "dataset.prof" in _appj)
