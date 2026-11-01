@@ -32,7 +32,7 @@ def main() -> int:
     if cfg_p.is_file():
         cfg = json.loads(cfg_p.read_text(encoding="utf-8-sig"))
         check("配置 default", cfg.get("default") == "local", cfg)
-        check("配置 natural", cfg.get("style") in ("local_pending_zh_tw", "taiwan_natural"), cfg)
+        check("配置 natural", cfg.get("style") in ("local_pending_zh_tw", "local_zh_tw", "taiwan_natural"), cfg)
         check("配置 rate 空", not cfg.get("rate"), cfg)
         check("配置 pitch 空", not cfg.get("pitch"), cfg)
 
