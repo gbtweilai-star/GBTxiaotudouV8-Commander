@@ -70,7 +70,7 @@ def _run_one(cap: str, timeout: float) -> dict:
         ms = int((time.time() - t0) * 1000)
         # 防御：某些能力位会把 cross_scan 临时产物写进 CWD（仓根）→ 跑完立刻清
         cleaned = 0
-        for junk in list(ROOT.glob("gbt_cross_scan*")):
+        for junk in list(ROOT.glob("gbt_cross_scan*")) + list(ROOT.glob("tmp*.jsonl")):
             try:
                 if junk.is_dir():
                     import shutil as _sh

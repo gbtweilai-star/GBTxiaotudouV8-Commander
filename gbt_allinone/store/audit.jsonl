@@ -15923,3 +15923,7 @@
 {"ts": 1793563645.825, "iso": "2026-11-02T03:07:25", "event": "ok", "meta": {"kind": "body_see", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
 {"ts": 1793563645.919, "iso": "2026-11-02T03:07:25", "event": "call", "meta": {"kind": "body_say", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
 {"ts": 1793563646.412, "iso": "2026-11-02T03:07:26", "event": "ok", "meta": {"kind": "body_say", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793563691.866, "iso": "2026-11-02T03:08:11", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 2}}
+{"ts": 1793563692.0, "iso": "2026-11-02T03:08:11", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793563697.366, "iso": "2026-11-02T03:08:17", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 2}}
+{"ts": 1793563727.72, "iso": "2026-11-02T03:08:47", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}

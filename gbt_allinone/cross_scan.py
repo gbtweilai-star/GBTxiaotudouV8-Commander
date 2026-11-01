@@ -290,6 +290,7 @@ def _x_run_isolated(kinds=_X_SCANNER_KINDS, timeout_s: int = 240, store_dir=None
     import shutil as _shutil
     import sys as _sys
     import tempfile as _tempfile
+from pathlib import Path
     from subprocess import TimeoutExpired as _TimeoutExpired
 
     from .tools.native_rc import run_native
@@ -301,7 +302,10 @@ def _x_run_isolated(kinds=_X_SCANNER_KINDS, timeout_s: int = 240, store_dir=None
     out = {"verdicts": {}, "selfscan_sections": {}, "gate_error": None,
            "gate_detail": "", "iso": str(iso), "child_rc": None}
     src = _X_CHILD_SRC if child_src is None else str(child_src)
-    fd, out_name = _tempfile.mkstemp(prefix="gbt_cross_scan_out_", suffix=".json")
+    _tmpdir = Path(__file__).resolve().parent.parent / "state" / "tmp"
+    _tmpdir.mkdir(parents=True, exist_ok=True)
+    fd, out_name = _tempfile.mkstemp(prefix="gbt_cross_scan_out_", suffix=".json",
+                                     dir=str(_tmpdir))
     _os.close(fd)
     out_file = Path(out_name)
     try:
