@@ -312,6 +312,7 @@
     renderSkills(d);
     renderProfessions(d);
     wireProfRoute();
+    wireProfDispatch();
     renderDash(d);
     var cs = $("caps-sub"), ss = $("skills-sub");
     if (cs) cs.textContent = (d.caps && d.caps.total) + " 位 · " + ((d.domains && d.domains.length) || 0) + " 域";
@@ -593,6 +594,48 @@
     btn.addEventListener("click", run);
     inp.addEventListener("keydown", function (e) {
       if (e.key === "Enter") { e.preventDefault(); run(); }
+    });
+  }
+
+  /* ───────── 职业派单（只跑 safe 候选；真执行写账本） ───────── */
+  function wireProfDispatch() {
+    var btn = $("dispatch-btn"), inp = $("route-input");
+    if (!btn || !inp) return;
+    btn.addEventListener("click", function () {
+      var task = (inp.value || "").trim();
+      var out = $("dispatch-result");
+      if (!task) { if (out) out.textContent = "先输入任务"; return; }
+      if (!window.confirm("真派单会执行 safe 能力位并写账本，确定？")) { return; }
+      if (out) out.textContent = "派单中…";
+      btn.disabled = true;
+      fetch("/api/dispatch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task: task, confirm: true, max_caps: 3 }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!out) return;
+        out.innerHTML = "";
+        var b = document.createElement("b");
+        b.textContent = (d.profession || "?") + " ";
+        out.appendChild(b);
+        if (!d.executed) {
+          out.appendChild(document.createTextNode("· 计划：" + (d.caps_planned || []).join(" · ")
+            + "（未执行：" + (d.reason || "") + "）"));
+          document.documentElement.dataset.dispatch = "plan:" + d.profession_id;
+          return;
+        }
+        var lines = (d.results || []).map(function (x) {
+          return x.cap + (x.ok ? " ✓" : " ✗") + " (" + x.ms + "ms)";
+        });
+        out.appendChild(document.createTextNode(
+          "· 执行 " + (d.ok_count || 0) + "/" + (d.results || []).length
+          + " · " + lines.join(" · ") + " · " + (d.ledger || "")));
+        document.documentElement.dataset.dispatch =
+          "ok:" + d.profession_id + ":" + (d.ok_count || 0) + "/" + (d.results || []).length;
+      }).catch(function (e) {
+        if (out) out.textContent = "派单失败：" + ((e && e.message) || e);
+        document.documentElement.dataset.dispatch = "error";
+      }).then(function () { btn.disabled = false; });
     });
   }
 

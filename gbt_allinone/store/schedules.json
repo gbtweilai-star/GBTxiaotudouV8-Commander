@@ -4,10 +4,10 @@
     "every_seconds": 21600,
     "enabled": true,
     "defined_at": "2026-11-01T08:43:15",
-    "last_run_ts": 1793519004.1324754,
+    "last_run_ts": 1793554755.7868812,
     "last_status": "ok",
-    "last_run_at": "2026-11-01T14:43:33",
-    "last_run_id": "双仓同步巡检-1793519013049"
+    "last_run_at": "2026-11-02T00:39:24",
+    "last_run_id": "双仓同步巡检-1793554764246"
   },
   "爆款拆解流水线": {
     "workflow": "爆款拆解流水线",

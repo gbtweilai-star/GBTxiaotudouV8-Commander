@@ -101,6 +101,8 @@ class Handler(BaseHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path
         if path == "/api/route":
             return self._api_route(raw)
+        if path == "/api/dispatch":
+            return self._api_dispatch(raw)
         if path == "/api/scan":
             from urllib.parse import parse_qs as _pq
             from urllib.parse import urlparse as _urlparse
@@ -236,6 +238,30 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
                           "application/json; charset=utf-8")
 
+    def _api_dispatch(self, raw=b"{}"):
+        """职业派单：默认 dry_run；confirm=true 才真跑 safe 能力位。"""
+        import json as _json
+        try:
+            d = _json.loads((raw or b"{}").decode("utf-8", "replace") or "{}")
+        except Exception:  # noqa: BLE001
+            d = {}
+        task = str(d.get("task") or "").strip()
+        if not task:
+            return self._send(400, b'{"ok":false,"error":"task empty"}',
+                              "application/json; charset=utf-8")
+        try:
+            sys.path.insert(0, str(REPO))
+            from gbt_allinone.profession_dispatch import dispatch as _dispatch
+            out = _dispatch(task[:500], dry_run=not bool(d.get("confirm")),
+                            confirm=bool(d.get("confirm")),
+                            max_caps=int(d.get("max_caps") or 3))
+        except Exception as e:  # noqa: BLE001
+            return self._send(500, _json.dumps({"ok": False, "error": str(e)[:200]},
+                                               ensure_ascii=False).encode("utf-8"),
+                              "application/json; charset=utf-8")
+        return self._send(200, _json.dumps(out, ensure_ascii=False).encode("utf-8"),
+                          "application/json; charset=utf-8")
+
     def _sse(self):
         """SSE：把 audit.jsonl 的新事件按行推给前端（3D 触手实时点亮用）。"""
         import json as _json
@@ -302,6 +328,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"ok": False, "error": "bad json"}, 400)
         if path == "/api/route":
             return self._api_route(raw)
+        if path == "/api/dispatch":
+            return self._api_dispatch(raw)
         if path == "/api/chat":
             text = str(body.get("text") or "").strip()
             if not text:

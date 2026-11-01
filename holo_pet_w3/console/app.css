@@ -650,3 +650,7 @@ body.graph-on .grid-overlay { display: block; }
 }
 .prof-route-result { font: 400 9.5px/1.55 var(--mono); color: var(--dim); flex: 1 1 100%; }
 .prof-route-result b { color: var(--warm); font-weight: 600; }
+
+.prof-route #dispatch-btn { background: rgba(20, 28, 40, .9); border-color: var(--line); color: var(--text2); }
+.prof-route #dispatch-btn:hover { border-color: rgba(255, 159, 28, .5); color: var(--warm); }
+#dispatch-result { color: var(--text2); }

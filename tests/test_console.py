@@ -165,6 +165,14 @@ def main() -> int:
     check("路由接口在服务端", "/api/route" in _srv2 and "_api_route" in _srv2)
     _appj2 = (con / "app.js").read_text(encoding="utf-8")
     check("路由条在页面", 'id="route-input"' in html and "wireProfRoute" in _appj2)
+    check("派单模块存在", (ROOT / "gbt_allinone" / "profession_dispatch.py").is_file())
+    from gbt_allinone.profession_dispatch import dispatch as _dispatch
+    _dp = _dispatch("剪一条30秒短视频", dry_run=True)
+    check("派单 dry-run 出计划", _dp.get("ok") and not _dp.get("executed")
+          and bool(_dp.get("caps_planned")), str(_dp.get("profession")))
+    _srv3 = (ROOT / "tools" / "console-server.py").read_text(encoding="utf-8")
+    check("派单接口在服务端", "/api/dispatch" in _srv3 and "_api_dispatch" in _srv3)
+    check("派单按钮在页面", 'id="dispatch-btn"' in html and "wireProfDispatch" in _appj2)
     check("有短视频/音乐/电影职业", {"短视频编导", "音乐制作", "影视 / 电影"} <= _titles,
           str(sorted(_titles))[:120])
     check("职业接能力位", all(p.get("cap_count", 0) > 0 for p in _profs))

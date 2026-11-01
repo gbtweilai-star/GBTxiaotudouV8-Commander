@@ -10474,3 +10474,230 @@
 {"ts": 1793532882.01, "iso": "2026-11-01T18:34:42", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
 {"ts": 1793532976.507, "iso": "2026-11-01T18:36:16", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
 {"ts": 1793532976.573, "iso": "2026-11-01T18:36:16", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793533009.826, "iso": "2026-11-01T18:36:49", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793533009.888, "iso": "2026-11-01T18:36:49", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793554744.143, "iso": "2026-11-02T00:39:04", "event": "call", "meta": {"kind": "sync_guard", "payload_keys": ["op", "record", "notify"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793554747.803, "iso": "2026-11-02T00:39:07", "event": "error", "meta": {"kind": "sync_guard", "reason": "sync_drift only_live=595 only_delivery=442 differ=30", "live_caps": 385, "delivery_caps": 375}}
+{"ts": 1793554755.417, "iso": "2026-11-02T00:39:15", "event": "ok", "meta": {"kind": "sync_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793554755.777, "iso": "2026-11-02T00:39:15", "event": "call", "meta": {"kind": "sched_tick", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793554755.787, "iso": "2026-11-02T00:39:15", "event": "preflight_checked", "meta": {"kind": "sched_tick", "fingerprint": "d3690ee207ba6208d3a0be6188b4b13268d31fba562a1a50559f418af3744c75", "status": "acquired", "side_effect": true, "observation": {"checked": false, "matched": false, "reason": "no_reality_probe"}, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793554755.79, "iso": "2026-11-02T00:39:15", "event": "call", "meta": {"kind": "sync_guard", "payload_keys": ["op", "record", "notify"], "coding_discipline": false, "synced": true, "synced_via": "env", "synced_entry": "outer"}}
+{"ts": 1793554756.949, "iso": "2026-11-02T00:39:16", "event": "error", "meta": {"kind": "sync_guard", "reason": "sync_drift only_live=595 only_delivery=442 differ=30", "live_caps": 385, "delivery_caps": 375}}
+{"ts": 1793554764.23, "iso": "2026-11-02T00:39:24", "event": "ok", "meta": {"kind": "sync_guard", "synced": true, "synced_via": "env", "synced_entry": "outer"}}
+{"ts": 1793554764.23, "iso": "2026-11-02T00:39:24", "event": "call", "meta": {"kind": "alerts", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "env", "synced_entry": "outer"}}
+{"ts": 1793554764.246, "iso": "2026-11-02T00:39:24", "event": "ok", "meta": {"kind": "alerts", "synced": true, "synced_via": "env", "synced_entry": "outer"}}
+{"ts": 1793554764.246, "iso": "2026-11-02T00:39:24", "event": "sched_tick", "meta": {"ran": 1}}
+{"ts": 1793554764.262, "iso": "2026-11-02T00:39:24", "event": "ok", "meta": {"kind": "sched_tick", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555609.532, "iso": "2026-11-02T00:53:29", "event": "call", "meta": {"kind": "asset_vault_freeze", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555610.266, "iso": "2026-11-02T00:53:30", "event": "ok", "meta": {"kind": "asset_vault_freeze", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555632.107, "iso": "2026-11-02T00:53:52", "event": "call", "meta": {"kind": "asset_vault_freeze", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555632.814, "iso": "2026-11-02T00:53:52", "event": "ok", "meta": {"kind": "asset_vault_freeze", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555633.48, "iso": "2026-11-02T00:53:53", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555633.518, "iso": "2026-11-02T00:53:53", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555633.875, "iso": "2026-11-02T00:53:53", "event": "call", "meta": {"kind": "asset_vault_freeze", "payload_keys": ["text"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555634.603, "iso": "2026-11-02T00:53:54", "event": "ok", "meta": {"kind": "asset_vault_freeze", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555679.296, "iso": "2026-11-02T00:54:39", "event": "call", "meta": {"kind": "selfscan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555679.396, "iso": "2026-11-02T00:54:39", "event": "ok", "meta": {"kind": "selfscan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555679.462, "iso": "2026-11-02T00:54:39", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555679.48, "iso": "2026-11-02T00:54:39", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555679.48, "iso": "2026-11-02T00:54:39", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555683.979, "iso": "2026-11-02T00:54:43", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555683.996, "iso": "2026-11-02T00:54:43", "event": "call", "meta": {"kind": "inventory", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.063, "iso": "2026-11-02T00:54:44", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555684.063, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "inventory", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.063, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.096, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.096, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.246, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.246, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "comfy_native", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.263, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "comfy_native", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.279, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "body_sense", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.313, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "body_sense", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.313, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["scope"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.446, "iso": "2026-11-02T00:54:44", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555684.446, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "signature_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.446, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.446, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "truth_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.463, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.479, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.479, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.496, "iso": "2026-11-02T00:54:44", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555684.513, "iso": "2026-11-02T00:54:44", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555691.019, "iso": "2026-11-02T00:54:51", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555691.028, "iso": "2026-11-02T00:54:51", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.213, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.229, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "autonomy", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.229, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "autonomy", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.245, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.296, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.312, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "selfscan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.412, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "selfscan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.412, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.445, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.445, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.462, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.462, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "inventory", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.496, "iso": "2026-11-02T00:55:11", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555711.496, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "inventory", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.496, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.528, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.528, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.545, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.561, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "comfy_native", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.561, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "comfy_native", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.561, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "body_sense", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.612, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "body_sense", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.612, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["scope"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.778, "iso": "2026-11-02T00:55:11", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555711.778, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "signature_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.794, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.797, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "truth_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.799, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.828, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.828, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.844, "iso": "2026-11-02T00:55:11", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555711.844, "iso": "2026-11-02T00:55:11", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555718.711, "iso": "2026-11-02T00:55:18", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555718.78, "iso": "2026-11-02T00:55:18", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.81, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.81, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "context_guard", "payload_keys": ["op", "name"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.827, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "context_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.827, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op", "limit", "web"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.859, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.86, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.877, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.877, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op", "intent"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.911, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.911, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "autonomy", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.911, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "autonomy", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.927, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.944, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.96, "iso": "2026-11-02T00:55:38", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555738.96, "iso": "2026-11-02T00:55:38", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555841.724, "iso": "2026-11-02T00:57:21", "event": "call", "meta": {"kind": "selfscan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555841.856, "iso": "2026-11-02T00:57:21", "event": "ok", "meta": {"kind": "selfscan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555841.947, "iso": "2026-11-02T00:57:21", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555841.995, "iso": "2026-11-02T00:57:21", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555841.995, "iso": "2026-11-02T00:57:21", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.015, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.015, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "inventory", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.074, "iso": "2026-11-02T00:57:22", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555842.093, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "inventory", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.1, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.172, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.188, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.22, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.22, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "comfy_native", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.236, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "comfy_native", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.236, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "body_sense", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.284, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "body_sense", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.284, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["scope"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.428, "iso": "2026-11-02T00:57:22", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555842.428, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "signature_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.428, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.445, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "truth_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.448, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.47, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.474, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.476, "iso": "2026-11-02T00:57:22", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555842.487, "iso": "2026-11-02T00:57:22", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555850.439, "iso": "2026-11-02T00:57:30", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555850.455, "iso": "2026-11-02T00:57:30", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.568, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.583, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "context_guard", "payload_keys": ["op", "name"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.607, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "context_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.615, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op", "limit", "web"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.64, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.64, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.672, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.688, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op", "intent"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.688, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.704, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "autonomy", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.704, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "autonomy", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.704, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.751, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.751, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.767, "iso": "2026-11-02T00:57:50", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555870.767, "iso": "2026-11-02T00:57:50", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555876.263, "iso": "2026-11-02T00:57:56", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555876.263, "iso": "2026-11-02T00:57:56", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.394, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.41, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "context_guard", "payload_keys": ["op", "name"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.426, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "context_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.426, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op", "limit", "web"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.457, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.457, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.489, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.509, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op", "intent"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.52, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.527, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "autonomy", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.529, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "autonomy", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.538, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.575, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.581, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.591, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.606, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "selfscan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.685, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "selfscan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.685, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.717, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.717, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.717, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.732, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "inventory", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.748, "iso": "2026-11-02T00:58:16", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555896.748, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "inventory", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.764, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.796, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.796, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.818, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.82, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "comfy_native", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.829, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "comfy_native", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.832, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "body_sense", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.859, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "body_sense", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.864, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "signature_guard", "payload_keys": ["scope"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.937, "iso": "2026-11-02T00:58:16", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555896.937, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "signature_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.937, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "truth_scan", "payload_keys": [], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.937, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "truth_scan", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.937, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.973, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.977, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "cap_self", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.986, "iso": "2026-11-02T00:58:16", "event": "ok", "meta": {"kind": "cap_self", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555896.986, "iso": "2026-11-02T00:58:16", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555902.35, "iso": "2026-11-02T00:58:22", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555902.389, "iso": "2026-11-02T00:58:22", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.558, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.576, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "context_guard", "payload_keys": ["op", "name"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.589, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "context_guard", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.606, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op", "limit", "web"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.656, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.674, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.709, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.722, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op", "intent"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.742, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.755, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "autonomy", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.755, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "autonomy", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.772, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "orchestration", "payload_keys": ["op", "limit"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.857, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "orchestration", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.857, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "devour_auto", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.892, "iso": "2026-11-02T00:58:42", "event": "ok", "meta": {"kind": "devour_auto", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555922.892, "iso": "2026-11-02T00:58:42", "event": "call", "meta": {"kind": "trunk_cover", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555932.355, "iso": "2026-11-02T00:58:52", "event": "ok", "meta": {"kind": "trunk_cover", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555932.371, "iso": "2026-11-02T00:58:52", "event": "call", "meta": {"kind": "omni_open", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.494, "iso": "2026-11-02T00:59:12", "event": "ok", "meta": {"kind": "omni_open", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.511, "iso": "2026-11-02T00:59:12", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.542, "iso": "2026-11-02T00:59:12", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.542, "iso": "2026-11-02T00:59:12", "event": "call", "meta": {"kind": "pulse_core", "payload_keys": ["op", "intent"], "coding_discipline": false, "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.558, "iso": "2026-11-02T00:59:12", "event": "ok", "meta": {"kind": "pulse_core", "synced": true, "synced_via": "ctx", "synced_entry": "auto"}}
+{"ts": 1793555952.735, "iso": "2026-11-02T00:59:12", "event": "auth_denied", "meta": {"scope": "process_execute", "detail": "cap_pack:run", "kind": "run", "missing": ["process_execute"]}}
+{"ts": 1793555953.744, "iso": "2026-11-02T00:59:13", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555953.927, "iso": "2026-11-02T00:59:13", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555953.941, "iso": "2026-11-02T00:59:13", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555961.482, "iso": "2026-11-02T00:59:21", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555961.509, "iso": "2026-11-02T00:59:21", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555963.932, "iso": "2026-11-02T00:59:23", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555963.978, "iso": "2026-11-02T00:59:23", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555966.431, "iso": "2026-11-02T00:59:26", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
+{"ts": 1793555966.537, "iso": "2026-11-02T00:59:26", "event": "inventory", "meta": {"verdict": "foreign_found", "foreign": 33}}
+{"ts": 1793555969.117, "iso": "2026-11-02T00:59:29", "event": "mcp_call", "meta": {"server": "gbt-demo", "tool": "echo"}}
+{"ts": 1793555973.031, "iso": "2026-11-02T00:59:33", "event": "signature_guard", "meta": {"verdict": "clean", "missing": 0, "restored": 0}}
+{"ts": 1793555973.058, "iso": "2026-11-02T00:59:33", "event": "inventory", "meta": {"verdict": "clean", "foreign": 0}}
