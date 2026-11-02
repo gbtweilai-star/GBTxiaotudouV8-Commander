@@ -538,6 +538,61 @@ body.graph-on .grid-overlay { display: block; }
 .mind-wrap canvas { touch-action: none; }
 #mindmap-canvas { display: block; width: 100%; height: 100%; }
 
+/* 思维导图 · 任务指引：输入 + 面板（2026-11-02 重做） */
+/* 思维导图 · 任务指引：命令条 + 真实进度 + 详情（扁平、单一强调色） */
+.mind-command {
+  position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 3;
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: #0a1420; border: 1px solid #1d3247; border-radius: 10px;
+}
+#mind-task {
+  flex: 1 1 auto; min-width: 160px; height: 34px; padding: 0 10px; outline: none;
+  border: 1px solid #243d55; border-radius: 6px; background: #0c1826;
+  color: #e8f1fb; font: 400 12.5px/1 var(--mono);
+}
+#mind-task:focus { border-color: #ffb02e; }
+#mind-run, #mind-next, #mind-blocker {
+  height: 34px; padding: 0 12px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+  border: 1px solid #243d55; background: transparent; color: #c6d6e8;
+  font: 500 12px/1 var(--mono);
+}
+#mind-run { border-color: #ffb02e; color: #ffb02e; }
+#mind-run:hover, #mind-next:hover, #mind-blocker:hover { background: #12212f; }
+#mind-next:disabled, #mind-blocker:disabled { opacity: .45; cursor: default; }
+.mind-model {
+  display: flex; align-items: center; gap: 5px; color: #7e93ab;
+  font: 400 11px/1 var(--mono); white-space: nowrap;
+}
+.mind-meter { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+#mind-progress {
+  font: 600 15px/1 var(--mono); color: #e8f1fb; font-variant-numeric: tabular-nums;
+  min-width: 52px; text-align: right;
+}
+.mind-seg { display: flex; gap: 3px; }
+.mind-seg i {
+  display: block; width: 14px; height: 8px; border-radius: 2px;
+  background: #1b2c3f; border: 1px solid #24384d;
+}
+.mind-seg i.is-done { background: #ffb02e; border-color: #ffb02e; }
+.mind-seg i.is-active { background: transparent; border-color: #ffb02e; box-shadow: inset 0 0 0 1px #ffb02e; }
+.mind-seg i.is-blocked { background: #d2453f; border-color: #d2453f; }
+.mind-state {
+  color: #7e93ab; font: 400 11px/1.35 var(--mono); max-width: 300px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mind-detail {
+  position: absolute; right: 16px; top: 64px; width: 300px; max-height: 58vh; overflow: auto;
+  display: none; padding: 14px 16px; z-index: 3; border-radius: 10px;
+  background: #0a1420; border: 1px solid #1d3247;
+}
+.mind-detail.is-on { display: block; }
+#mind-detail h3 { margin: 0 0 2px; color: #e8f1fb; font: 600 13px/1.4 var(--sans, system-ui); }
+#mind-detail .idx { color: #7e93ab; font: 400 11px/1.4 var(--mono); margin-bottom: 10px; }
+#mind-detail .row { display: grid; grid-template-columns: 56px 1fr; gap: 2px 10px; padding: 7px 0; border-top: 1px solid #162838; }
+#mind-detail .row:first-of-type { border-top: 0; }
+#mind-detail .row span { color: #7e93ab; font: 400 11px/1.5 var(--mono); }
+#mind-detail .row p { margin: 0; color: #cfdeee; font: 400 12px/1.55 var(--sans, system-ui); }
+
 /* ═══ 视图：穿透式交叉扫描 ═══ */
 .console[data-view="scan"] { top: 20px; bottom: 20px; background: #05070c; }
 .console[data-view="scan"] .view-scan { display: flex; flex-direction: column; }
@@ -684,12 +739,3 @@ body.graph-on .grid-overlay { display: block; }
 .bounty-finding .sev-critical, .bounty-finding .sev-high { color: #ff5f6d; }
 .bounty-finding .sev-medium { color: var(--warm); }
 .bounty-finding .sev-low, .bounty-finding .sev-info { color: var(--ok); }
-
-.omni-actions { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
-.omni-actions button {
-  padding: 7px 12px; border-radius: 9px; cursor: pointer; background: var(--warm);
-  border: 1px solid var(--warm); color: #151517; font: 600 10px/1 var(--mono);
-}
-.omni-actions b { color: var(--dim); font: 500 9.5px/1.4 var(--mono); }
-.omni-actions b.ok { color: var(--ok); }
-.omni-actions b.bad { color: #ff5f6d; }

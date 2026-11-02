@@ -13,6 +13,7 @@
 <link rel="icon" href="../../icons/avatar-96.png" />
 <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png" />
 <link rel="stylesheet" href="./app.css" />
+<link rel="stylesheet" href="./skin-cube.css" />
 <script type="importmap">{"imports":{"three":"../../assets/vendor/three/three.module.js","three/addons/":"../../assets/vendor/three/"}}</script>
 </head>
 <body data-theme="midnight">
@@ -58,6 +59,8 @@
     <div class="panel-actions">
       <button class="reset-view" id="reset-view-btn" type="button">重置节点图</button>
       <button class="reset-view" id="refresh-btn" type="button">重读数据</button>
+      <a class="reset-view" href="/blueprint3d/" target="_blank" rel="noopener">成品预览</a>
+      <a class="reset-view" href="/tentacle3d/" target="_blank" rel="noopener">触手绑定</a>
     </div>
 
     <div class="sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</div>
@@ -145,6 +148,8 @@
       <button class="view-tab" data-view="prof" type="button">职业</button>
       <button class="view-tab" data-view="bounty" type="button">赏金</button>
       <button class="view-tab" data-view="dash" type="button">仪表盘</button>
+      <button class="view-tab" data-view="moments" type="button">AI 朋友圈</button>
+      <button class="view-tab" data-view="dh" type="button">数字人</button>
     </nav>
 
     <!-- 视图 1：对话（底部座席，DSH 样式输入卡） -->
@@ -230,14 +235,21 @@
         <div class="space3d-hud">
           <span class="space3d-title">万能插 · 数字流动的结 × 万能插口</span>
           <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 结=触手本体 · 数字=流动数据 · 8 插口=能力域</span>
-          <span class="omni-actions">
-            <button id="omni-run" type="button">全开同步执行（385 位）</button>
-            <button id="omni-attr" type="button">失败归因</button>
-            <b id="omni-status">未执行</b>
-            <button id="omni-policy-btn" type="button">策略状态</button>
-            <b id="omni-policy">策略加载中…</b>
-          </span>
         </div>
+        <button class="omni-mon-toggle" id="om-toggle" type="button">▸ 多域监控</button>
+        <aside class="omni-mon collapsed" id="omni-mon">
+          <header class="om-head">
+            <div>
+              <b>多域监控</b>
+              <span id="om-sub">采样中…</span>
+            </div>
+            <button id="om-selftest" type="button">全开自检</button>
+            <button id="om-collapse" type="button" title="收起">收起</button>
+          </header>
+          <div class="om-grid" id="om-grid"></div>
+          <div class="om-recent-head">最近变化 · 细微级</div>
+          <div class="om-recent" id="om-recent"></div>
+        </aside>
       </div>
     </div>
 
@@ -247,7 +259,7 @@
         <canvas id="team3d-canvas"></canvas>
         <div class="space3d-hud">
           <span class="space3d-title">触手协作 · 共享任务 × 8 协作角色</span>
-          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 弧线=协作链 · 流动光点=协作消息 · 底座环=共享账本</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 亮点=协作角色/能力位 · 细线=协作链（呼吸式淡入淡出）· 金光点=协作消息</span>
         </div>
       </div>
     </div>
@@ -257,9 +269,22 @@
       <div class="mind-wrap">
         <canvas id="mindmap-canvas"></canvas>
         <div class="space3d-hud">
-          <span class="space3d-title">思维导图 · 任务指引（框架真在用的流程）</span>
-          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 6 分支（理解/计划/执行/验证/留痕/交付）× 每支 3 条具体动作</span>
+          <span class="space3d-title">思维导图 · 任务指引（意图 → 精细步骤 → 卡点回路）</span>
+          <span class="space3d-hint">输入任务生成步骤 · 点步骤看做法/判定/卡点 · 卡点→回大脑执行层查资料/论文→吸收→重生成 · 拖动旋转</span>
         </div>
+        <div class="mind-command">
+          <input id="mind-task" type="text" placeholder="要做什么？例如：帮我注册一个邮箱" />
+          <button id="mind-run" type="button">生成指引</button>
+          <button id="mind-next" type="button">推进</button>
+          <button id="mind-blocker" type="button">标卡点</button>
+          <label class="mind-model"><input id="mind-model" type="checkbox" /> 模型生成</label>
+          <div class="mind-meter">
+            <b id="mind-progress">0 / 0</b>
+            <div id="mind-seg" class="mind-seg" aria-hidden="true"></div>
+          </div>
+          <span id="mind-state" class="mind-state">待命</span>
+        </div>
+        <aside id="mind-detail" class="mind-detail" aria-live="polite"></aside>
       </div>
     </div>
 
@@ -324,8 +349,6 @@
         <input id="bounty-target" type="text" placeholder="目标域名或 IP（例：example.com）" />
         <button id="bounty-check" type="button">范围检查</button>
         <button id="bounty-add-demo" type="button">录入示例发现</button>
-        <button id="bounty-import" type="button">导入示例 scope</button>
-        <button id="bounty-platform-sync" type="button">同步平台状态</button>
         <span id="bounty-gate-result"></span>
       </div>
       <div class="bounty-list" id="bounty-findings"></div>
@@ -355,6 +378,27 @@
         </section>
       </div>
     </div>
+
+    <!-- 视图 5：AI 朋友圈（动态流 / 发布 / 点赞） -->
+    <div class="view view-moments">
+      <div class="moments-head">
+        <div>
+          <span class="view-title">AI 朋友圈</span>
+          <span class="view-sub" id="moments-sub">她的日常 · 数据落 state/moments.json</span>
+        </div>
+        <button id="moments-refresh" class="moments-btn" type="button">刷新</button>
+      </div>
+      <div class="moments-feed" id="moments-feed"></div>
+      <form class="moments-form" id="moments-form" autocomplete="off">
+        <textarea id="moments-input" rows="1" placeholder="以主人身份发一条…"></textarea>
+        <button type="submit" class="moments-btn primary">发布</button>
+      </form>
+    </div>
+
+    <!-- 视图 6：数字人（语音剧场 3D，懒加载） -->
+    <div class="view view-dh">
+      <iframe id="dh-frame" data-src="/dh-live/" title="数字人 · 语音剧场"></iframe>
+    </div>
   </section>
 
 </main>
@@ -365,7 +409,106 @@ window.addEventListener("error", function (e) {
   document.documentElement.dataset.space3d = "error:" + String(e.message || "script").slice(0, 80);
 });
 </script>
+
+<!-- 设置：模型 / 外观 / 行为 / 数据 / 高级 -->
+<div id="set-modal" class="sm" hidden aria-hidden="true">
+  <div class="sm-card" role="dialog" aria-modal="true" aria-labelledby="sm-title">
+    <header class="sm-head">
+      <div><h2 id="sm-title">设置</h2><p>模型 · 外观 · 行为 · 数据 · 高级</p></div>
+      <button class="sm-x" id="sm-close" type="button" aria-label="关闭">×</button>
+    </header>
+    <div class="sm-main">
+      <nav class="sm-tabs" id="sm-tabs">
+        <button data-tab="model" class="on" type="button">模型</button>
+        <button data-tab="appearance" type="button">外观</button>
+        <button data-tab="behavior" type="button">行为</button>
+        <button data-tab="data" type="button">数据</button>
+        <button data-tab="advanced" type="button">高级</button>
+      </nav>
+      <div class="sm-panes" id="sm-panes">
+        <section data-pane="model">
+          <label class="sm-row"><span>提供方</span>
+            <select id="set-provider"><option value="openai-compatible">OpenAI 兼容（/v1/chat/completions）</option></select>
+          </label>
+          <label class="sm-row"><span>Base URL</span>
+            <input id="set-base-url" placeholder="http://127.0.0.1:8080/v1" autocomplete="off" />
+          </label>
+          <label class="sm-row"><span>API Key</span>
+            <input id="set-api-key" type="password" placeholder="sk-…（本地模型可留空）" autocomplete="off" />
+          </label>
+          <label class="sm-row"><span>模型名</span>
+            <input id="set-model-name" placeholder="例如 qwen2.5-32b / claude-sonnet-4-5 / gpt-4.1" autocomplete="off" />
+          </label>
+          <div class="sm-grid3">
+            <label class="sm-row"><span>temperature</span><input id="set-temp" type="number" step="0.1" min="0" max="2" /></label>
+            <label class="sm-row"><span>max_tokens</span><input id="set-max" type="number" min="1" max="200000" /></label>
+            <label class="sm-row"><span>timeout(s)</span><input id="set-timeout" type="number" min="5" max="600" /></label>
+          </div>
+          <label class="sm-row sm-col"><span>系统提示词</span><textarea id="set-sys" rows="3" placeholder="可选；例如：你是 GBT小土豆V8，回答简洁"></textarea></label>
+          <div class="sm-actions">
+            <button id="set-test" type="button" class="sm-btn">测试连接</button>
+            <span id="set-test-state" class="sm-state"></span>
+          </div>
+          <p class="sm-hint">支持任何 OpenAI 兼容服务：llama.cpp / Ollama / vLLM / LM Studio / Claude 代理 / OpenAI。保存后网页对话立刻走你的模型。</p>
+        </section>
+        <section data-pane="appearance" hidden>
+          <label class="sm-row"><span>主题</span>
+            <select id="set-theme"><option value="dark">深色（默认）</option><option value="system">跟随系统</option></select>
+          </label>
+          <label class="sm-row"><span>字号缩放</span>
+            <select id="set-font"><option value="0.92">紧凑 92%</option><option value="1">标准 100%</option><option value="1.08">舒适 108%</option><option value="1.16">大号 116%</option></select>
+          </label>
+          <label class="sm-row"><span>信息密度</span>
+            <select id="set-density"><option value="comfortable">舒适</option><option value="compact">紧凑</option></select>
+          </label>
+          <label class="sm-check"><input id="set-motion" type="checkbox" /><span>减少动画（关闭进入动效）</span></label>
+        </section>
+        <section data-pane="behavior" hidden>
+          <label class="sm-row"><span>界面语言</span>
+            <select id="set-lang"><option value="zh-CN">简体中文</option><option value="en-US">English</option></select>
+          </label>
+          <label class="sm-check"><input id="set-enter" type="checkbox" /><span>Enter 发送 · Shift+Enter 换行</span></label>
+          <label class="sm-check"><input id="set-notify" type="checkbox" /><span>任务完成时发系统通知</span></label>
+          <label class="sm-check"><input id="set-sound" type="checkbox" /><span>完成提示音</span></label>
+          <label class="sm-check"><input id="set-autostart" type="checkbox" /><span>开机自启（由安装脚本写入；打包版用 安装自启.bat）</span></label>
+        </section>
+        <section data-pane="data" hidden>
+          <label class="sm-row"><span>数据目录</span><input id="set-datadir" readonly /></label>
+          <label class="sm-check"><input id="set-memory" type="checkbox" /><span>启用记忆链（/api/memory）</span></label>
+          <label class="sm-check"><input id="set-backup" type="checkbox" /><span>自动备份状态与记忆</span></label>
+          <label class="sm-row"><span>备份目录</span><input id="set-backupdir" placeholder="例如 D:\GBT备份" /></label>
+          <div class="sm-actions">
+            <button id="set-export" type="button" class="sm-btn">导出设置</button>
+            <button id="set-import" type="button" class="sm-btn">导入设置</button>
+            <button id="set-export-mem" type="button" class="sm-btn">导出记忆索引</button>
+            <input id="set-import-file" type="file" accept="application/json" hidden />
+          </div>
+          <p class="sm-hint">导出文件可带到另一台机器；记忆索引导出为 JSON（只读快照，不回写）。</p>
+        </section>
+        <section data-pane="advanced" hidden>
+          <label class="sm-row"><span>网络代理</span><input id="set-proxy" placeholder="http://127.0.0.1:7890（留空不走代理）" /></label>
+          <label class="sm-row"><span>失败重试</span><input id="set-retries" type="number" min="0" max="5" /></label>
+          <label class="sm-row"><span>上下文模式</span>
+            <select id="set-ctx"><option value="ring">ring（有界窗口 + 全量落库）</option><option value="full">full（尽量带全量）</option></select>
+          </label>
+          <label class="sm-row"><span>窗口字符数</span><input id="set-window" type="number" min="1000" max="200000" /></label>
+          <p class="sm-hint">当前版本用 ring 上下文；代理与重试写入配置，网关层接入后生效。</p>
+        </section>
+      </div>
+    </div>
+    <footer class="sm-foot">
+      <span id="sm-saved"></span>
+      <button id="sm-save" class="sm-btn primary" type="button">保存设置</button>
+    </footer>
+  </div>
+</div>
+
 <script src="../../state/console-data.js"></script>
+<script src="./skin-cube.js"></script>
+<script src="../../assets/gsap.min.js"></script>
 <script src="./app.js"></script>
+<script src="./settings.js"></script>
+<script src="./moments.js"></script>
+<script src="./omni-monitor.js"></script>
 </body>
 </html>

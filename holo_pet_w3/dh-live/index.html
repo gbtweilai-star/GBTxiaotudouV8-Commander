@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GBT小土豆V8 · 数字人</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #07080a; overflow: hidden;
+    font-family: "Söhne", "Inter", "Microsoft YaHei", system-ui, sans-serif; }
+  #stage { position: fixed; inset: 0; }
+  canvas { display: block; width: 100%; height: 100%; }
+  .brand { position: fixed; left: 26px; top: 22px; color: rgba(236,236,235,.75);
+    font-size: 12px; letter-spacing: .22em; text-transform: uppercase; pointer-events: none; }
+  .brand b { display: block; font-size: 15px; letter-spacing: .04em; font-weight: 600;
+    color: #ececeb; margin-top: 3px; }
+  .hint { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%);
+    color: rgba(236,236,235,.45); font-size: 11.5px; letter-spacing: .03em;
+    pointer-events: none; transition: opacity .5s; }
+  .caption { position: fixed; left: 50%; bottom: 44px; transform: translateX(-50%);
+    max-width: min(760px, 86vw); text-align: center; color: #ececeb;
+    font-size: 14px; line-height: 1.6; text-shadow: 0 2px 18px rgba(0,0,0,.8);
+    opacity: 0; transition: opacity .35s; pointer-events: none; }
+  .caption.show { opacity: 1; }
+  .mic { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: rgba(236,236,235,.7); font-size: 17px; cursor: pointer;
+    backdrop-filter: blur(10px); transition: .25s; }
+  .mic:hover { background: rgba(255,255,255,.1); }
+  .mic.listening { color: #fff; border-color: rgba(255,255,255,.4);
+    box-shadow: 0 0 0 0 rgba(255,255,255,.25); animation: pulse 1.8s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,255,255,.20); }
+    70% { box-shadow: 0 0 0 18px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+  .state { position: fixed; right: 26px; top: 24px; color: rgba(236,236,235,.4);
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+  .vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(0,0,0,.55) 100%); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="vignette"></div>
+<div class="brand">GBT小土豆V8<b>数字人</b></div>
+<div class="state" id="state">待机</div>
+<div class="hint" id="hint">按住空格键说话，松开即发送</div>
+<div class="caption" id="caption"></div>
+<script src="../brain/vendor/three.global.js"></script>
+<script src="../brain/vendor/GLTFLoader.global.js"></script>
+<script src="./dh-live.js"></script>
+</body>
+</html>

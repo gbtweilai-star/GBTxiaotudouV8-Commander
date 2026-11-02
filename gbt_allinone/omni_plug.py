@@ -33,11 +33,32 @@ import re
 import subprocess
 import sys
 import time
+from pathlib import Path as _P
+
+# 便携 Python 自带 CA 不全 ⇒ https 插座会 CERTIFICATE_VERIFY_FAILED。
+# 有 certifi 就设为默认 CA（没有就保持系统默认，不假装）。
+try:
+    import certifi as _certifi_mod
+    os.environ.setdefault("SSL_CERT_FILE", _certifi_mod.where())
+except Exception:  # noqa: BLE001
+    pass
 from dataclasses import dataclass, field
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-SOCKET_KINDS = ("process", "file", "api", "web", "app", "ai")
+SOCKET_KINDS = ("process", "file", "api", "web", "app", "ai", "dh")
+# 数字人执行器插座：细节操控（骨骼/绑定/Blender 动作）走这里；
+# 由 gbt_allinone/dh_omni_loop.py 在启动时 register_actuator("dh:rig", ...)。
+ACTUATORS: dict = {}
+
+
+def register_actuator(name: str, fn) -> None:
+    """把一个进程内执行器插成「万能插」的插座（kind=dh）。"""
+    ACTUATORS[str(name)] = fn
+
+
+def get_actuator(name: str):
+    return ACTUATORS.get(str(name))
 SOCKET_ENERGY = {
     "process": "本机 CPU + 她的调度",
     "file": "本机 IO",
@@ -45,6 +66,7 @@ SOCKET_ENERGY = {
     "web": "她的眼+手（走触手，需 desktop_control）",
     "app": "她的眼+手：插任意 APP 并操控（list_windows→see_window→click/type/hotkey…，需 desktop_control+privacy_read）",
     "ai": "她的 AI 能量池：钥匙槽（key_env/金库/环境，永不回显）+ 任意 **OpenAI 兼容**端点；插上即输能并操控（chat/tools）",
+    "dh": "数字人骨架执行器：把触手骨位表算出的目标角度推进 3D rig（进程内，实时闭环）",
 }
 WRITE_ROOTS = ("projects", "outputs", ".scratch")
 
@@ -103,13 +125,22 @@ class Pulse:
                         socket.state = "failed"
                         socket.detail = "窗口没命中（当前 %d 个窗口）%s" % (
                             len(wins), ("：" + err) if err else "")
+            elif socket.kind == "dh":
+                fn = ACTUATORS.get(str(socket.target))
+                if fn is None:
+                    socket.state = "failed"
+                    socket.detail = "没有注册执行器 %s（先跑 dh_omni_loop.register）" % socket.target
+                else:
+                    socket.state = "plugged"
+                    socket.detail = "执行器就绪：%s" % socket.target
             elif socket.kind == "ai":
                 # 2026-10-17 主人令「万能插只要插到其他 AI 都可直接输送能源操控她」：
                 #   AI 插座只认 **https** 端点（OpenAI 兼容）；钥匙槽在 options.key_env，缺就自动探常见槽位。
                 t = str(socket.target or "").strip()
-                if not t.startswith("https://"):
+                _local_ai = t.startswith(("http://127.0.0.1", "http://localhost")) or t.lower() in ("local", "weights", "selfhost", "our", "ours", "")
+                if not t.startswith("https://") and not _local_ai:
                     socket.state = "failed"
-                    socket.detail = "AI 插座只认 https 端点（给的是 %s）" % (t[:60] or "空")
+                    socket.detail = "AI 插座只认 https（云端）或本机回环端点（给的是 %s）" % (t[:60] or "空")
                 else:
                     host = (t.split("/")[2] if "//" in t else t)[:60]
                     socket.state = "plugged"
@@ -714,20 +745,52 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
     if sock.kind == "ai" and str(target or "").strip().lower() in (
             "", "our", "ours", "weights", "selfhost", "local"):
         import importlib.util as _iu6
-        _sp6 = _iu6.spec_from_file_location(
-            "_w_plug3", str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
-        _m6 = _iu6.module_from_spec(_sp6)
-        _sp6.loader.exec_module(_m6)                              # type: ignore[union-attr]
+        # 端口路径用 pathlib，Windows 反斜杠下 replace("gbt_allinone/omni_plug.py") 永远失败 ⇒
+        # 会把 omni_plug.py 自己再当 weights 模块执行（实测 AttributeError: NoneType.__dict__）。
+        _wpath = _P(__file__).resolve().parent.parent / "tools" / "weights.py"
         _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
-        _r = _m6.chat(_txt, int((a or {}).get("max_tokens") or 128))
-        return {"ok": bool(_r.get("ok")), "socket": "ai", "engine": _r.get("lane"),
-                "weights_ours": bool(_r.get("weights_ours")),
-                "text": _r.get("text") or "",
-                "error": _r.get("error") or _r.get("err")}
+        if _wpath.is_file():
+            _sp6 = _iu6.spec_from_file_location("_w_plug3", str(_wpath))
+            _m6 = _iu6.module_from_spec(_sp6)
+            _sp6.loader.exec_module(_m6)                          # type: ignore[union-attr]
+            _r = _m6.chat(_txt, int((a or {}).get("max_tokens") or 128))
+            if _r.get("ok"):
+                return {"ok": True, "socket": "ai", "engine": _r.get("lane"),
+                        "weights_ours": bool(_r.get("weights_ours")),
+                        "text": _r.get("text") or "",
+                        "error": _r.get("error") or _r.get("err")}
+            _w_err = str(_r.get("error") or _r.get("err") or "weights 不可用")[:120]
+        else:
+            _w_err = "tools/weights.py 不在盘上"
+        # weights 不在岗时退回本机 energy_core（仍然是“自己的模型”，不编）
+        try:
+            from . import energy_core as _E
+            _r = _E.think([{"role": "user", "content": _txt}], temperature=0.0,
+                          max_tokens=int((a or {}).get("max_tokens") or 64))
+            if _r.get("ok"):
+                return {"ok": True, "socket": "ai", "engine": "energy_core",
+                        "text": _r.get("text") or "", "note": "weights: " + _w_err}
+            return {"ok": False, "socket": "ai", "engine": "energy_core",
+                    "error": ("%s | weights: %s" % (_r.get("error"), _w_err))[:200]}
+        except Exception as exc:  # noqa: BLE001
+            return {"ok": False, "socket": "ai",
+                    "error": "%s: %s | weights: %s" % (type(exc).__name__, str(exc)[:120], _w_err)}
 
     Pulse(ledger=ledger).plug(sock)
     res = {"ok": False, "socket": sock.kind, "target": target, "action": action,
            "energy": SOCKET_ENERGY.get(sock.kind, "未知"), "plug": sock.state}
+    if sock.kind == "dh":
+        fn = ACTUATORS.get(str(target))
+        if fn is None:
+            res.update({"reason": "执行器未注册：%s" % target})
+            return res
+        try:
+            out = fn(a) or {}
+            res.update({"ok": bool(out.get("ok", True)), "executor": target})
+            res.update({k: out[k] for k in out if k not in ("ok",)})
+        except Exception as exc:  # noqa: BLE001
+            res.update({"ok": False, "error": "%s: %s" % (type(exc).__name__, exc)})
+        return res
     if sock.state != "plugged":
         res["reason"] = "先 plug 成功再驱动：%s" % sock.detail
         return res

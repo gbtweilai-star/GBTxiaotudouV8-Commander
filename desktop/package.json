@@ -1,0 +1,13 @@
+{
+  "name": "gbt-xiaotudou-v8",
+  "version": "1.0.0",
+  "private": true,
+  "main": "main.js",
+  "description": "GBT小土豆V8 desktop shell",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^45.2.1"
+  }
+}

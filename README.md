@@ -183,3 +183,11 @@ Apache-2.0（见 [LICENSE](LICENSE) 与 [NOTICE](NOTICE)）。
 **开发者：自由的风** —— 框架每一页（文档 / 网页 / 产物）自动携带署名，禁止删除、禁止篡改归属。
 
 <p align="center"><sub>GBT小土豆V8 · 独立私人框架 · 与任何企业公司无关</sub></p>
+
+## 📸 界面截图（APP 每一页）
+
+14 个主页面 + 5 个设置页实拍，全部在 [docs/136-app-screens.md](docs/136-app-screens.md)。
+
+![万能插 · 多域监控](docs/app-screens/06-万能插.png)
+
+![数字人](docs/app-screens/14-数字人.png)
