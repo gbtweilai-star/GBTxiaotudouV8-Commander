@@ -71,6 +71,14 @@ def _audit(event: str, **kw) -> None:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
+def _danger_caps() -> set:
+    try:
+        from gbt_allinone.caps_registry import BENIGN_CAPS
+        return {k for k, v in BENIGN_CAPS.items() if not (v or {}).get("safe")}
+    except Exception:  # noqa: BLE001
+        return set()
+
+
 def classify(cap: str) -> str:
     """normal / hacker / transfer。"""
     c = str(cap or "").lower()
@@ -88,6 +96,8 @@ def classify(cap: str) -> str:
             return "hacker"
     except Exception:  # noqa: BLE001
         pass
+    if cap in _danger_caps():
+        return "danger"
     return "normal"
 
 
@@ -207,6 +217,13 @@ def check(cap: str) -> dict:
     if kind == "transfer":
         return {"cap": cap, "kind": "transfer", "decision": "blocked_transfer",
                 "reason": "转账必须主人终端确认——任何模式（含受攻击）都不例外"}
+    if kind == "danger":
+        tok = _consume(cap)
+        if tok:
+            return {"cap": cap, "kind": "danger", "decision": "allow",
+                    "reason": "主人已终端确认（危险能力一次性放行）", "token": tok}
+        return {"cap": cap, "kind": "danger", "decision": "need_terminal_confirm",
+                "reason": "危险能力：必须主人终端 YES 才放行（python tools/confirm-security.py request %s）" % cap}
     if kind == "hacker":
         if atk.get("active"):
             _audit("allow_attack", cap=cap, reason=atk.get("reason"),

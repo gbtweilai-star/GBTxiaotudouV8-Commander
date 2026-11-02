@@ -1,4 +1,4 @@
-"""GBT小土豆V8 · 统一接口：run_task / list_capabilities。路由到良性能力，禁用危险能力。
+﻿"""GBT小土豆V8 · 统一接口：run_task / list_capabilities。路由到良性能力，禁用危险能力。
 V8 行为准则（见 soul.py）：
 - 每次调用先落审计（call/ok/error/denied 全程可追踪）；
 - 执行结果默认携带 GBT 钢印（声明独立私人框架出处）；
@@ -158,6 +158,9 @@ def _run_benign(kind, payload, policy_decision=None):
     if kind in ("body_see", "body_say", "body_type", "body_click", "body_volume", "body_open"):
         from . import body_bridge
         return body_bridge.run(kind[5:], payload or {})
+    if kind == "body_realtime":
+        from .tentacle import body_realtime as _br
+        return _br.run(str((payload or {}).get("op", "status")), payload or {})
     if kind == "body_map":
         from . import body_bridge
         return body_bridge.body_map()
@@ -1073,6 +1076,12 @@ def _run_benign(kind, payload, policy_decision=None):
         from .tools import omni_arm as _oa
         p = payload or {}
         return _oa.run_op(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "hand_realtime":
+        from .tentacle import hand_realtime as _hr
+        return _hr.run(str((payload or {}).get("op", "status")), payload or {})
+    if kind == "hand_vision":
+        from .tentacle import hand_vision as _hv
+        return _hv.run(str((payload or {}).get("op", "status")), payload or {})
     if kind == "hand_retarget":
         # 手部姿态重定向（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：21 点 → 关节角。
         # 纯计算、零依赖；不是 IK，接触/触觉未建模（模块头写死边界）。
@@ -3330,3 +3339,8 @@ def run_task(kind, payload=None, stamp=True, safe=False, probe=False):
         except Exception:
             pass
     return _r
+
+
+
+
+

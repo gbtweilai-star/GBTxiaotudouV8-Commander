@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GBT小土豆V8 · 她的控制台</title>
+<style>
+:root{--bg:#0a0e16;--fg:#d8ecff;--dim:#7f8ea8;--acc:#00e5ff;--warn:#ffc46b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.7 -apple-system,system-ui,sans-serif;
+     display:flex;flex-direction:column;height:100vh}
+header{padding:12px 14px;border-bottom:1px solid #16203180;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#who{font-weight:600;color:var(--acc)}
+#st{font-size:12px;color:var(--dim)}
+main{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:86%;padding:10px 13px;border-radius:14px;white-space:pre-wrap;word-break:break-word}
+.me{align-self:flex-end;background:#123048;border:1px solid #1d4a66}
+.ai{align-self:flex-start;background:#101a28;border:1px solid #1b2a3d}
+.meta{font-size:11px;color:var(--dim);margin-top:4px}
+.tool{align-self:flex-start;font:12px/1.5 ui-monospace,monospace;color:var(--warn);
+      background:#1a1508;border:1px solid #3a2d10;padding:6px 10px;border-radius:10px;max-width:92%}
+footer{padding:10px;border-top:1px solid #16203180;display:flex;gap:8px}
+input{flex:1;background:#0f1724;border:1px solid #1d2b3f;color:var(--fg);border-radius:12px;padding:11px 13px;font-size:15px}
+button{background:var(--acc);color:#04121a;border:0;border-radius:12px;padding:0 18px;font-weight:700}
+button:disabled{opacity:.45}
+#bubble{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);max-width:78vw;padding:10px 14px;
+        border-radius:14px;background:#0f1b2aee;border:1px solid #00e5ff55;font-size:13px;opacity:0;transition:.25s;z-index:9}
+</style>
+</head>
+<body>
+<header>
+  <span id="who">GBT小土豆V8</span>
+  <span id="st">载入中…</span>
+</header>
+<main id="log"></main>
+<footer>
+  <input id="q" placeholder="跟她说点什么…（Enter 发送）" autocomplete="off">
+  <button id="send">发送</button>
+</footer>
+<div id="bubble"></div>
+
+<script type="module">
+const BR = "http://127.0.0.1:8791";
+const log = document.getElementById("log");
+const st = document.getElementById("st");
+const q = document.getElementById("q");
+const btn = document.getElementById("send");
+const bubble = document.getElementById("bubble");
+
+const add = (cls, text, meta) => {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.textContent = text;
+  if (meta) { const m = document.createElement("div"); m.className = "meta"; m.textContent = meta; d.appendChild(m); }
+  log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+};
+const say = (t) => { bubble.textContent = t; bubble.style.opacity = "1"; clearTimeout(bubble._t); bubble._t = setTimeout(() => bubble.style.opacity = "0", 12000); };
+
+let llm = null;
+try {
+  const mod = await import("./local-llm.js");
+  llm = await mod.createLocalLLM({ backend: "auto", modelUrl: "models/tiny.gguf" });
+  st.textContent = "自有权重 · " + llm.backend + " · 触手已接";
+} catch (e) {
+  st.textContent = "引擎载入失败：" + (e && e.message || e);
+}
+
+// 触手：页面 → 桥 /_cap → run_task（唯一门）
+async function cap(name, payload) {
+  try {
+    const r = await fetch(BR + "/_cap", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cap: name, payload: payload || {} }) });
+    return await r.json();
+  } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
+}
+window.herCap = cap;
+
+// 主动性：有话说就冒泡（不刷屏）
+async function pullProactive() {
+  try {
+    await fetch(BR + "/_proactive/heartbeat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ surface: "console" }) });
+    await fetch(BR + "/_proactive/tick", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    const r = await fetch(BR + "/_proactive/pull", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ limit: 1 }) });
+    const d = await r.json();
+    const it = (d.items || [])[0];
+    if (it) say("🧠 " + it.text);
+  } catch (e) {}
+}
+setInterval(pullProactive, 45000); setTimeout(pullProactive, 4000);
+
+// 让模型能"叫触手"：先让它判断要不要调，再执行
+const TOOLS = ["health", "asset_index", "duty_patrol", "mirror_plan", "brain_vault"];
+async function reply(text) {
+  if (!llm) { add("ai", "引擎还没就绪"); return; }
+  // 极简意图路由：问"健康/服务" → 真调 health，把结果喂给模型
+  let toolNote = "";
+  if (/健康|服务|状态|health/i.test(text)) {
+    const r0 = await cap("health", {});
+    const r = r0;
+    const res = (r && (r.result || r)) || {};
+    toolNote = "工具 health 返回：" + JSON.stringify(res).slice(0, 200);
+    add("tool", "⚙ 调用触手 health → " + (r.ok ? "ok" : "fail") + " " + JSON.stringify(res).slice(0, 80));
+  }
+  // 🔴 2026-10-31 修：135M 模型嚼不动 JSON（实测输出乱码）。
+  //   工具结果的**结论**由代码直说（确定、可信），模型只负责"人的语气"那一层。
+  if (toolNote) {
+    let plain = "";
+    try {
+      const j = (r0 && (r0.result || r0)) || {};
+      plain = "服务面正常：python " + (j.python || "?") + " · " + (j.platform || "").slice(0, 28);
+    } catch (e) { plain = "服务面已查（结果见上）"; }
+    add("ai", plain, "工具结果 · 未经模型改写");
+    return;
+  }
+  const prompt = text;
+  const t0 = performance.now();
+  try {
+    const out = await llm.chat(prompt, 96);
+    add("ai", out.text, (llm.backend + " · " + (out.tokens || "?") + " token · " + (out.tokPerSec || "?") + " tok/s"));
+  } catch (e) {
+    add("ai", "算不动：" + (e && e.message || e));
+  }
+}
+
+async function send() {
+  const t = (q.value || "").trim();
+  if (!t) return;
+  q.value = ""; btn.disabled = true;
+  add("me", t);
+  const thinking = add("ai", "…");
+  await reply(t);
+  thinking.remove();
+  btn.disabled = false; q.focus();
+}
+btn.onclick = send;
+q.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+
+add("ai", "我在这儿。有事直接说，我会自己看一眼再回答。", "自有权重启动中…");
+</script>
+</body>
+</html>

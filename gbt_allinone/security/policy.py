@@ -1,4 +1,4 @@
-# gbt-capability: dynamic-import
+﻿# gbt-capability: dynamic-import
 """能力风险策略：保留全部能力，给高风险动作增加主人会话与一次性授权边界。
 
 策略原则：
@@ -1133,7 +1133,7 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     # 仍要票：process_execute / remote_device / privacy_read（看别人隐私）/
     # osint_private / deploy_* / owner_control / external_llm / data_export。
     _OWN_SENSES = {"vision", "vision_grounding", "vision_snapshot", "vision_diff",
-                   "body_see", "body_say", "body_volume", "body_click", "body_type",
+                   "body_see", "body_say", "body_volume", "body_click", "body_type", "body_realtime",
                    "tentacle", "tentacle_manifest", "voice", "hf_voice", "digital_human",
                    "audio_extract", "voice_studio"}
     if kind in _OWN_SENSES:
@@ -1231,3 +1231,4 @@ def describe() -> dict:
 def safe_url_parts(url: str) -> dict:
     parsed = urllib.parse.urlsplit(url)
     return {"scheme": parsed.scheme, "host": parsed.hostname, "port": parsed.port}
+

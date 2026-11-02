@@ -1,4 +1,4 @@
-# gbt-capability: coding
+﻿# gbt-capability: coding
 """GBT小土豆V8 · 内生编程纪律（Codex-style engineering discipline）。
 
 这是运行时的默认真序，不是需要主人每次提醒的提示词。凡任务被识别为编程/修复/
@@ -241,7 +241,14 @@ def augment_system(system: str = "", context=None) -> str:
 
 def prepare_payload(kind: str, payload: dict | None) -> dict:
     """在编程任务载荷中附带内生契约；原字段全部保留。"""
-    data = dict(payload or {})
+    if payload is None:
+        data = {}
+    elif isinstance(payload, dict):
+        data = dict(payload)
+    elif isinstance(payload, str):
+        data = {"text": payload}
+    else:
+        data = {"payload": payload}
     context = {
         "kind": kind,
         **{k: data.get(k) for k in (
@@ -277,3 +284,4 @@ def status() -> dict:
         "verification_order": list(VERIFICATION_ORDER),
         "note": "编程任务经统一入口与 LLM 桥自动装载；其它任务不额外注入。",
     }
+

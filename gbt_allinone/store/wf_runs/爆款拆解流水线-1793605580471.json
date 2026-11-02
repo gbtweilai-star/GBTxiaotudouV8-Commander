@@ -1,0 +1,147 @@
+{
+  "record": {
+    "run_id": "爆款拆解流水线-1793605580471",
+    "workflow": "爆款拆解流水线",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "inbox": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 0.331,
+    "finished_at": "2026-11-02T14:46:20"
+  },
+  "results": {
+    "inbox": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "viral_forge",
+        "result": {
+          "ok": true,
+          "status": "all_done",
+          "inbox": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\outputs\\viral-forge\\inbox",
+          "count": 2,
+          "note": "目录里的视频都拆过了；要重拆就删 state/viral_forge_done.json 里对应项或加 --force"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内没有**现行故障**（runtime_faults=0）；但异常事件数不为 0 ⇒ 仍需人逐条看一眼",
+          "any_signal": true,
+          "needs_a_look": true,
+          "needs_a_look_means": "真故障(runtime/guard) 或 在册能力位异常 ⇒ True；只有不在册名字上的测试足迹 ⇒ False",
+          "sockets": {
+            "alert": true,
+            "counts": {
+              "added": 0,
+              "removed": 1,
+              "flipped": 0
+            },
+            "removed": [
+              {
+                "surface": "监听端口",
+                "kind": "port",
+                "plug_kind": "api",
+                "target": "127.0.0.1:8188",
+                "ok": true,
+                "reason": ""
+              }
+            ],
+            "flipped": [],
+            "at": "2026-11-02T14:43:42",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "registered_anomalies": 1,
+          "unregistered_footprints": [
+            "_def_probe.txt",
+            "backtest_api_v2",
+            "blockchain_bridge",
+            "cis_harvesting_v2",
+            "cis_v42_trader",
+            "crypto_gateway",
+            "gate_daemon",
+            "gbt_cap_bridge"
+          ],
+          "anomalies": 6,
+          "runtime_faults": 0,
+          "by_signal": {
+            "runtime": 0,
+            "guard": 0,
+            "trace": 1,
+            "legacy": 1,
+            "recovered": 4
+          },
+          "by_event": {
+            "pipeline_blocked": 1,
+            "svc_down": 1,
+            "error": 4
+          },
+          "top_offenders": [
+            {
+              "capability": "_def_probe.txt",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 1,
+              "legacy": 0,
+              "total": 1
+            },
+            {
+              "capability": "payment_gateway",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "blockchain_bridge",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "social_trading_v2",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "monitor_service",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            }
+          ],
+          "note": "runtime=要追的病；guard=护栏正常工作；trace=测试足迹；legacy=历史缺席；recovered=历史掉线已恢复。⚠️ **别只看 quiet**：anomalies 不为 0 就得逐条看，否则那几条会一直挂着没人碰。"
+        }
+      }
+    }
+  }
+}

@@ -282,12 +282,9 @@
       drawGraph((MODE.data && MODE.data.domains) || []);
     });
     $("voice-btn").addEventListener("click", function () {
-      var t = document.querySelector('.view-tab[data-view="dh"]');
-      if (t) { t.click(); return; }
-      try { window.open("/dh-live/", "_blank"); } catch (e) {}
+      addBot("语音入口在壳的 connect 页（ASR/TTS 未在这页接）。", "占位");
     });
     $("settings-btn").addEventListener("click", function () {
-      if (window.__openSettings) { window.__openSettings(); return; }
       addBot("设置：模型/语音/社交在壳的 connect 页；本页只读状态。", "占位");
     });
     var tb = $("titlebar-time");
@@ -671,6 +668,10 @@
     kpi("critical", by.critical || 0);
     kpi("high", by.high || 0);
     kpi("medium", by.medium || 0);
+    var st = d.by_status || {};
+    Object.keys(st).forEach(function (k) { kpi("状态 " + k, st[k]); });
+    var avg = d.avg_cvss;
+    if (avg != null) kpi("平均 CVSS", avg);
     var pay = d.payout_total || {};
     var keys = Object.keys(pay);
     if (!keys.length) kpi("赔付账本", "0");
@@ -708,7 +709,9 @@
         sev.textContent = "[" + (f.severity || "info").toUpperCase() + "] ";
         card.appendChild(sev);
         card.appendChild(document.createTextNode(
-          f.target + " · " + (f.cwe || "-") + " · " + (f.cvss || "-")
+          f.target + " · " + (f.cwe || "-") + "/" + (f.cwe_name || "未收录")
+          + " · CVSS " + (f.cvss_score != null ? f.cvss_score : (f.cvss || "-"))
+          + " · 状态 " + (f.status || "draft")
           + " · 证据 " + ((f.evidence || []).length) + " 个"));
         var btn = document.createElement("button");
         btn.type = "button";
@@ -726,6 +729,42 @@
           });
         });
         card.appendChild(btn);
+        var subBtn = document.createElement("button");
+        subBtn.type = "button";
+        subBtn.className = "scan-target";
+        subBtn.textContent = "提交";
+        subBtn.style.marginLeft = "6px";
+        subBtn.addEventListener("click", function () {
+          var platform = window.prompt("提交到哪个平台？（如 HackerOne / Bugcrowd / 自建）", "自建");
+          if (platform === null) return;
+          bountyApi("submit", { finding: f.id, platform: platform, note: "UI 提交" })
+            .then(function (r) {
+              var el = $("bounty-gate-result");
+              if (el) {
+                el.className = r.ok ? "ok" : "blocked";
+                el.textContent = r.ok ? ("已提交：" + f.id + "（" + platform + "）")
+                  : ("提交被拒：" + (r.reason || ""));
+              }
+              ensureBounty();
+            });
+        });
+        card.appendChild(subBtn);
+        var bdBtn = document.createElement("button");
+        bdBtn.type = "button";
+        bdBtn.className = "scan-target";
+        bdBtn.textContent = "生成提交包";
+        bdBtn.style.marginLeft = "6px";
+        bdBtn.addEventListener("click", function () {
+          bountyApi("bundle", { finding: f.id }).then(function (r) {
+            var el = $("bounty-gate-result");
+            if (el) {
+              el.className = r.ok ? "ok" : "blocked";
+              el.textContent = r.ok ? ("提交包：" + r.zip + " · " + r.files + " 个文件 · sha256 "
+                + (r.zip_sha256 || "").slice(0, 12)) : ("打包失败：" + (r.reason || ""));
+            }
+          });
+        });
+        card.appendChild(bdBtn);
         box.appendChild(card);
       });
     }
@@ -744,6 +783,55 @@
     });
   }
   function wireBounty() {
+    var syncBtn = $("bounty-platform-sync");
+    if (syncBtn && !syncBtn.dataset.bound) {
+      syncBtn.dataset.bound = "1";
+      syncBtn.addEventListener("click", function () {
+        var out = $("bounty-gate-result");
+        if (!window.confirm("只读同步平台状态（mock 平台；不会写平台）？")) return;
+        bountyApi("platform_sync", { provider: "mock", confirm: true }).then(function (d) {
+          if (!out) return;
+          out.className = d.ok ? "ok" : "blocked";
+          out.textContent = d.ok
+            ? ("同步完成：" + d.provider + " · 检查 " + d.checked + " · 回填 " + d.updated
+               + (d.skipped && d.skipped.length ? " · 跳过 " + d.skipped.length : ""))
+            : ("同步失败：" + ((d.errors && d.errors[0] && d.errors[0].error) || d.reason || ""));
+          document.documentElement.dataset.platformSync =
+            "ok:" + d.checked + ":" + d.updated;
+          ensureBounty();
+        });
+      });
+    }
+    var impBtn = $("bounty-import");
+    if (impBtn && !impBtn.dataset.bound) {
+      impBtn.dataset.bound = "1";
+      impBtn.addEventListener("click", function () {
+        var out = $("bounty-gate-result");
+        bountyApi("scope_import", {
+          file: "data/scope-samples/hackerone-sample.json", confirm: false,
+        }).then(function (d) {
+          if (!out) return;
+          out.className = d.ok ? "ok" : "blocked";
+          out.textContent = d.ok
+            ? ("预览：" + d.name + " · scope " + (d.scope || []).join(" / ")
+               + (d.out_of_scope || []).length + " 个 out —— 确认后才落库")
+            : ("导入失败：" + (d.reason || ""));
+          if (!d.ok) return;
+          if (!window.confirm("确认把示例 scope 落库为授权项目？（示例为虚构，仅演示）")) return;
+          bountyApi("scope_import", {
+            file: "data/scope-samples/hackerone-sample.json", confirm: true,
+          }).then(function (r2) {
+            var el = $("bounty-gate-result");
+            if (el) {
+              el.className = r2.created ? "ok" : "blocked";
+              el.textContent = r2.created ? ("已导入项目：" + (r2.program || {}).id)
+                : ("落库失败：" + (r2.reason || ""));
+            }
+            ensureBounty();
+          });
+        });
+      });
+    }
     var checkBtn = $("bounty-check");
     var demoBtn = $("bounty-add-demo");
     if (!checkBtn) return;
@@ -784,6 +872,112 @@
         });
       });
     }
+  }
+
+  /* ───────── 万能插：全开同步执行（385 位，需确认；轮询进度） ───────── */
+  function omniApi(body) {
+    return fetch("/api/omni", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (r) { return r.json(); });
+  }
+  function renderOmniStatus(d) {
+    var el = $("omni-status");
+    if (!el) return;
+    if (!d || d.ok === false) {
+      el.className = "bad";
+      el.textContent = (d && (d.reason || d.error)) || "无记录";
+      document.documentElement.dataset.omni = "none";
+      return;
+    }
+    el.className = d.fail_count ? "bad" : "ok";
+    el.textContent = "全开 " + d.caps_opened + "/" + d.caps_total
+      + " · ok " + d.ok_count + " · fail " + d.fail_count
+      + " · 票挡 " + ((d.blocked_by_ticket || []).length)
+      + " · " + (d.elapsed_ms || 0) + "ms";
+    document.documentElement.dataset.omni =
+      "ok:" + d.caps_opened + ":" + d.ok_count + ":" + d.fail_count;
+  }
+  function pollOmni(tries) {
+    if (tries <= 0) return;
+    omniApi({ op: "status" }).then(function (d) {
+      renderOmniStatus(d);
+      if (d && d.mode === "sync-all" && d.executed < d.caps_opened) {
+        setTimeout(function () { pollOmni(tries - 1); }, 2000);
+      }
+    });
+  }
+  function refreshSecurityPolicy() {
+    fetch("/api/security/policy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ op: "status" }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var el = $("omni-policy");
+      if (!el) return;
+      if (d && d.attack_mode && d.attack_mode.active) {
+        el.className = "bad";
+        el.textContent = "攻击模式（V8 自我决策）：" + (d.attack_mode.reason || "");
+      } else {
+        el.className = "ok";
+        el.textContent = "策略：黑客全能力需终端确认 · 转账永远需确认"
+          + (d && (d.pending_confirmations || []).length
+            ? " · 待确认 " + d.pending_confirmations.length : "");
+      }
+      document.documentElement.dataset.securityPolicy =
+        (d && d.attack_mode && d.attack_mode.active) ? "attack" : "normal";
+    }).catch(function () {});
+  }
+  function wireOmniAll() {
+    var attrBtn = $("omni-attr");
+    if (attrBtn && !attrBtn.dataset.bound) {
+      attrBtn.dataset.bound = "1";
+      attrBtn.addEventListener("click", function () {
+        omniApi({ op: "attribution" }).then(function (d) {
+          var el = $("omni-status");
+          if (!el) return;
+          if (!d || d.ok !== true) {
+            el.className = "bad";
+            el.textContent = "归因失败：" + ((d && (d.reason || d.error)) || "");
+            return;
+          }
+          var cats = d.categories || {};
+          var parts = Object.keys(cats).map(function (k) { return k + " " + cats[k]; });
+          el.className = d.failed ? "bad" : "ok";
+          el.textContent = "失败 " + d.failed + " · " + (parts.join("／") || "无") + " · 报告 "
+            + (d.report || "").split("\\").pop();
+          document.documentElement.dataset.omniAttr =
+            "ok:" + d.failed + ":" + Object.keys(cats).length;
+        });
+      });
+    }
+    refreshSecurityPolicy();
+    var polBtn = $("omni-policy-btn");
+    if (polBtn && !polBtn.dataset.bound) {
+      polBtn.dataset.bound = "1";
+      polBtn.addEventListener("click", refreshSecurityPolicy);
+    }
+    var btn = $("omni-run");
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = "1";
+    omniApi({ op: "status" }).then(renderOmniStatus).catch(function () {});
+    btn.addEventListener("click", function () {
+      if (!window.confirm("全开同步执行会逐个跑全部 385 个能力位（需授权位没票会被挡），确定？")) return;
+      btn.disabled = true;
+      omniApi({ confirm: true, timeout: 12 }).then(function (d) {
+        var el = $("omni-status");
+        if (el) {
+          el.className = "ok";
+          el.textContent = d.started ? ("已启动 run " + d.run_id + " · 同步执行中…")
+            : ("启动失败：" + (d.error || ""));
+        }
+        pollOmni(150);
+      }).catch(function (e) {
+        var el = $("omni-status");
+        if (el) { el.className = "bad"; el.textContent = "启动失败：" + ((e && e.message) || e); }
+      }).then(function () { btn.disabled = false; });
+    });
   }
 
   /* ───────── 3D 视图按需加载（动态 import，file:// 下会失败→走兜底提示） ───────── */
@@ -866,7 +1060,7 @@
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "bounty", "dash", "moments", "dh"];
+    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "bounty", "dash"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
@@ -878,6 +1072,7 @@
     }
     if (name === "plug") {
       ensurePlug().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+      wireOmniAll();
     }
     if (name === "team") {
       ensureTeam().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });

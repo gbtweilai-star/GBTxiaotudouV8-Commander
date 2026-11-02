@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>本机推理 · GGUF 前向 + 生成</title>
+<style>
+  body{margin:0;padding:16px;background:#0b0f16;color:#c9d4e2;
+       font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1{font-size:15px;color:#7dd3fc;margin:0 0 10px}
+  pre{white-space:pre-wrap;word-break:break-word;background:#111827;padding:12px;border-radius:8px}
+  .ok{color:#34d399}.bad{color:#ff8a8a}.dim{color:#64748b}
+</style>
+</head>
+<body>
+<h1>本机推理（浏览器内 · 零依赖 · 自己算）</h1>
+<pre id="o">载入模型…</pre>
+<script type="module">
+import { GGUFModel, rmsnorm, matvec, rope, softmax } from "./gguf-llm.js";
+
+const L = [];
+const out = document.getElementById("o");
+const say = (s) => { L.push(s); out.innerHTML = L.join("\n"); };
+
+let M = null, KVK = [], KVK2 = [], embCache = null;
+
+function silu(x){ return x / (1 + Math.exp(-x)); }
+
+/* 前向一次：tokens → 最后一位的 logits */
+let KVC = [];
+function resetKV(){ KVC = []; }
+function forward(ids, opts){
+  const nE = M.nEmbd, nH = M.nHead, nKV = M.nKV, hd = M.headDim, nFF = M.nFF;
+  const T = M.tensor.bind(M);
+
+  /* 词嵌入（tied：logits 也用它） */
+  if (!embCache) {
+    embCache = T("token_embd.weight");        /* [576, 49152] ⇒ 49152 行 × 576 */
+  }
+  const seq = ids.length;
+  /* 🔴 2026-10-30 性能修：原来每次 forward 都新建 cache ⇒ 每生成一个 token 都把整段提示重算
+     一遍（O(n²)，实测 1.39 tok/s）。改成**持久 KV + 增量解码**：只算 from 之后的 token。 */
+  const cache = KVC;
+  const start = (opts && opts.from) || 0;
+
+  let logits = null;
+  for (let pos=start; pos<seq; pos++){
+    let x = embCache.subarray(ids[pos]*nE, ids[pos]*nE + nE).slice();
+
+    for (let l=0; l<M.nLayer; l++){
+      const pre = "blk."+l+".";
+      if (!cache[l]) cache[l] = {k: [], v: []};
+
+      /* ── 注意力 ── */
+      let h = rmsnorm(x, T(pre+"attn_norm.weight"), M.eps);
+      let q = matvec(T(pre+"attn_q.weight"), h, nE, nE);
+      let k = matvec(T(pre+"attn_k.weight"), h, nE, nKV*hd);
+      let v = matvec(T(pre+"attn_v.weight"), h, nE, nKV*hd);
+      rope(q, nH, hd, pos, M.ropeTheta);
+      rope(k, nKV, hd, pos, M.ropeTheta);
+      cache[l].k.push(k); cache[l].v.push(v);
+
+      const ctx = new Float32Array(nE);
+      const scale = 1 / Math.sqrt(hd);
+      for (let hh=0; hh<nH; hh++){
+        const kvh = Math.floor(hh * nKV / nH);      /* GQA 映射 */
+        const scores = new Float32Array(pos+1);
+        for (let t=0; t<=pos; t++){
+          const kk = cache[l].k[t];
+          let s = 0;
+          for (let d=0; d<hd; d++) s += q[hh*hd+d] * kk[kvh*hd+d];
+          scores[t] = s * scale;
+        }
+        const p = softmax(scores);
+        for (let d=0; d<hd; d++){
+          let acc = 0;
+          for (let t=0; t<=pos; t++) acc += p[t] * cache[l].v[t][kvh*hd+d];
+          ctx[hh*hd+d] = acc;
+        }
+      }
+      const ao = matvec(T(pre+"attn_output.weight"), ctx, nE, nE);
+      for (let i=0;i<nE;i++) x[i] += ao[i];
+
+      /* ── FFN（SwiGLU）── */
+      const h2 = rmsnorm(x, T(pre+"ffn_norm.weight"), M.eps);
+      const g = matvec(T(pre+"ffn_gate.weight"), h2, nE, nFF);
+      const u = matvec(T(pre+"ffn_up.weight"),   h2, nE, nFF);
+      const act = new Float32Array(nFF);
+      for (let i=0;i<nFF;i++) act[i] = silu(g[i]) * u[i];
+      const dn = matvec(T(pre+"ffn_down.weight"), act, nFF, nE);
+      for (let i=0;i<nE;i++) x[i] += dn[i];
+    }
+
+    if (pos === seq-1){
+      const xf = rmsnorm(x, T("output_norm.weight"), M.eps);
+      const V = M.tokens.length;
+      logits = new Float32Array(V);
+      for (let t=0; t<V; t++){
+        const row = embCache.subarray(t*nE, t*nE+nE);
+        let s = 0;
+        for (let i=0;i<nE;i++) s += row[i]*xf[i];
+        logits[t] = s;
+      }
+    }
+  }
+  return logits;
+}
+
+function argmax(a){ let b=0; for (let i=1;i<a.length;i++) if (a[i]>a[b]) b=i; return b; }
+
+function decode(ids){
+  return ids.map(i => (M.tokens[i]||"").replace(/Ġ/g," ").replace(/Ċ/g,"\n")).join("");
+}
+
+/* 真 BPE（2026-10-30 换掉原来的正则匹配版）：
+   ① 先切出特殊 token（<|endoftext|>=0 / <|im_start|>=1 / <|im_end|>=2）直接给 id；
+   ② 其余按 GPT2 预分词切段，段内做 merges 贪心合并。
+   原来的正则版把 "<|im_start|>" 拆成字节 ⇒ 41 个垃圾 token，模型当然答不对。 */
+let RANK = null, T2I = null;
+function ensureTok(){
+  if (RANK) return;
+  RANK = new Map();
+  (M.kv["tokenizer.ggml.merges"] || []).forEach((m, idx) => {
+    const pp = String(m).split(" ");
+    if (pp.length === 2) RANK.set(pp[0] + "\u0000" + pp[1], idx);
+  });
+  T2I = new Map();
+  M.tokens.forEach((t, idx) => { if (!T2I.has(t)) T2I.set(t, idx); });
+}
+function bpePiece(piece){
+  ensureTok();
+  let seq = Array.from(piece).map(ch => {
+    const t = ch === " " ? "Ġ" : (ch === "\n" ? "Ċ" : (ch === "\t" ? "ĉ" : ch));
+    return T2I.has(t) ? t : null;
+  });
+  if (seq.some(x => x === null)) return [];
+  let merged = true;
+  while (merged && seq.length > 1){
+    merged = false;
+    let bestRank = Infinity, bestAt = -1;
+    for (let k = 0; k < seq.length - 1; k++){
+      const rk = RANK.get(seq[k] + "\u0000" + seq[k + 1]);
+      if (rk !== undefined && rk < bestRank){ bestRank = rk; bestAt = k; }
+    }
+    if (bestAt >= 0){ seq.splice(bestAt, 2, seq[bestAt] + seq[bestAt + 1]); merged = true; }
+  }
+  return seq.map(t => T2I.get(t)).filter(x => x !== undefined);
+}
+function encodeSimple(text){
+  ensureTok();
+  const SPECIALS = { "<|endoftext|>": 0, "<|im_start|>": 1, "<|im_end|>": 2 };
+  const ids = [];
+  const re = /(<\|endoftext\|>|<\|im_start\|>|<\|im_end\|>)/;
+  for (const seg of text.split(re)){
+    if (!seg) continue;
+    if (SPECIALS[seg] !== undefined){ ids.push(SPECIALS[seg]); continue; }
+    const pieces = seg.match(/\s?[A-Za-z]+|\s?[0-9]+|\s?[^\sA-Za-z0-9]+|\s+/g) || [];
+    for (const pc of pieces) ids.push(...bpePiece(pc));
+  }
+  return ids;
+}
+
+(async function(){
+  try{
+    const t0 = performance.now();
+    const resp = await fetch("models/tiny.gguf");
+    const buf = await resp.arrayBuffer();
+    M = new GGUFModel(buf);
+    say(`<span class='ok'>✅ 模型就绪</span>`);
+    say(`  ${M.arch} · ${M.nLayer} 层 · emb ${M.nEmbd} · 头 ${M.nHead}/${M.nKV} · ff ${M.nFF} · head_dim ${M.headDim}`);
+    say(`  rope θ=${M.ropeTheta} · eps=${M.eps} · 词表 ${M.tokens.length} · 载入 ${(performance.now()-t0|0)} ms`);
+    say("");
+
+    /* SmolLM2-135M-Instruct 是对话模型：裸续写不在分布内，
+       必须用它自己的 chat 模板（元数据 tokenizer.chat_template 同形状）。 */
+    /* 2026-10-30：Q6_K 修好后，裸续写就能出正确答案（numpy 参考 top-1 = ' Paris'）。
+       这里也用这条提示，便于两边直接对。 */
+    const prompt = "The capital of France is";
+    const ids = encodeSimple(prompt);
+    say(`  提示 ${JSON.stringify(prompt)} → ${ids.length} tokens ${JSON.stringify(ids)}`);
+    say("  首次前向（会把权重反量化进缓存，慢）…");
+
+    let gen = ids.slice();
+    resetKV();
+    const tF = performance.now();
+    const lg = forward(gen, {from: 0});
+    const tFirst = performance.now() - tF;
+    let nxt = argmax(lg);
+    say(`  首 token 前向 ${(tFirst/1000).toFixed(1)} s · top-1 = ${JSON.stringify((M.tokens[nxt]||"").replace(/Ġ/g," "))}`);
+    gen.push(nxt);
+
+    const N = 8;
+    const tG = performance.now();
+    for (let i=1;i<N;i++){
+      /* 增量：只算刚追加的那一位（KV 里已有前缀） */
+      const l2 = forward(gen, {from: gen.length - 1});
+      nxt = argmax(l2);
+      gen.push(nxt);
+    }
+    const tAll = (performance.now()-tG)/1000;
+    say("");
+    say(`<span class='ok'>生成 ${N} token · ${tAll.toFixed(1)} s · ${(N/tAll).toFixed(2)} tok/s</span>`);
+    say(`  文本：${JSON.stringify(decode(gen))}`);
+    window.__infer = {
+      ok:true, prompt, promptIds:ids.length,
+      firstMs: tFirst|0, genTokens:N, genS:+tAll.toFixed(2),
+      tokPerSec: +(N/tAll).toFixed(2),
+      text: decode(gen)
+    };
+
+    /* ── 对外 API：让她的页面（和触手）能直接调本机推理 ───────────────
+       2026-10-30：这条路的意义就是"不求 App 开端口也能用整机算力"，
+       所以必须有个稳定入口，而不是只有一个人看的 demo 页。 */
+    window.GBT_LOCAL_LLM = {
+      get ready(){ return !!M; },
+      model(){ return { arch:M.arch, layers:M.nLayer, emb:M.nEmbd, heads:M.nHead,
+                        kvHeads:M.nKV, headDim:M.headDim, vocab:M.tokens.length }; },
+      /* 她说一句话：走它自己的 chat 模板，遇到 eos 就停 */
+      chat(userText, maxTokens, opts){
+        const N2 = Math.max(1, Math.min(64, maxTokens || 24));
+        /* 贪心解码会复读（实测 "…\n\nThe capital of France"）⇒ 加**重复惩罚**：
+           最近 16 个 token 里出现过的，logit 按正负各扣/加 penalty，避免原地打转。 */
+        const pen = (opts && opts.repetitionPenalty) || 1.25;
+        const repeat = (lg2, ids) => {
+          const seen = new Set(ids.slice(-16));
+          for (const t of seen){
+            if (lg2[t] > 0) lg2[t] /= pen; else lg2[t] *= pen;
+          }
+          return lg2;
+        };
+        const p = "<|im_start|>user\n" + String(userText) + "<|im_end|>\n<|im_start|>assistant\n";
+        const pids = encodeSimple(p);
+        resetKV();
+        let lg = forward(pids, {from:0});
+        let g = pids.slice();
+        let nxt = argmax(repeat(lg, g));
+        const t0 = performance.now();
+        for (let i=0;i<N2;i++){
+          g.push(nxt);
+          if (nxt === 2) break;                 /* <|im_end|> */
+          lg = forward(g, {from: g.length-1});
+          nxt = argmax(repeat(lg, g));
+        }
+        const dt = (performance.now()-t0)/1000;
+        const outIds = g.slice(pids.length).filter(x => x !== 2);
+        return { ok:true, text: decode(outIds).trim(), ids: outIds,
+                 tokens: outIds.length, seconds: +dt.toFixed(2),
+                 tokPerSec: dt > 0 ? +(outIds.length/dt).toFixed(2) : null };
+      },
+      /* 裸续写（给对照/测试用） */
+      generate(promptText, maxTokens){ return this.chat(promptText, maxTokens); }
+    };
+
+    /* ── 交付自检：不达标就是这个页面自己红 ───────────────────────── */
+    (function selfCheck(){
+      const need = { minTokPerSec: 5, maxFirstMs: 3000 };
+      const rows = [];
+      rows.push(['模型 30 层 / 词表 49152', M.nLayer === 30 && M.tokens.length === 49152]);
+      rows.push(['top-1 是 Paris（Q6_K 修复的硬判据）', /Paris/.test(decode([argmax(forward(gen.slice(0,5), {from:0}))]))]);
+      rows.push([`速度 ≥ ${need.minTokPerSec} tok/s（实测 ${(N/tAll).toFixed(2)}）`, (N/tAll) >= need.minTokPerSec]);
+      rows.push([`首 token ≤ ${need.maxFirstMs} ms（实测 ${tFirst|0}）`, (tFirst|0) <= need.maxFirstMs]);
+      const bad = rows.filter(r => !r[1]).length;
+      say("");
+      for (const [t, ok2] of rows) say(ok2 ? `<span class='ok'>✅ ${t}</span>` : `<span class='bad'>🔴 ${t}</span>`);
+      say(bad === 0 ? `<span class='ok'>交付自检通过（${rows.length}/${rows.length}）</span>`
+                    : `<span class='bad'>交付自检不通过：${bad} 项红了</span>`);
+      window.__inferSelfCheck = { ok: bad === 0, rows };
+    })();
+  }catch(e){
+    say(`<span class='bad'>🔴 ${String(e&&e.message||e)}</span>`);
+    if (e && e.stack) say(`<span class='dim'>${String(e.stack).split("\n").slice(0,4).join("\n")}</span>`);
+    window.__infer = {ok:false, error:String(e&&e.message||e)};
+  }
+})();
+</script>
+</body></html>

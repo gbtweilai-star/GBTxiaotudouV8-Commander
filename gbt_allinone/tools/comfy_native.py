@@ -872,26 +872,62 @@ def _op_coverage(payload: dict) -> dict:
     missing = sorted(set(con) - set(NODES))
     # 分类：模型面 / 云端 / 传统可补 / 未知
     def _cat(name: str) -> str:
-        low = str(name).lower()
-        if any(h in low for h in ("sampler", "checkpoint", "loader", "clip", "vae", "lora",
-                                  "latent", "conditioning", "controlnet", "unet", "model",
-                                  "merge", "gligen", "diffusion")):
-            return "model"
-        if any(h in name for h in ("API", "Gemini", "OpenAI", "Flux", "Runway", "Kling")):
+        # 与 tools/comfy-harvest.py 同口径：模型面 > 云端 > 3D/unknown > 传统
+        _MODEL = ("sampler", "checkpoint", "loader", "clip", "vae", "lora", "latent",
+                  "conditioning", "controlnet", "unet", "model", "attention", "gligen",
+                  "hypernetwork", "diffusion", "inpaint", "upscale_model", "freeu",
+                  "style_model", "guider", "sigmas", "noise", "merge", "sampling",
+                  "video", "3d", "glb", "splat", "pointcloud", "temporal", "keyframe",
+                  "wan", "ltxv", "hunyuan", "dancer", "humo", "sound", "encode", "training",
+                  "mediapipe", "hidream", "hitpaw", "hyper", "sdr", "hdr", "timbre", "moss",
+                  "sam3", "scail", "sheet", "rope", "sfx", "music", "mp3", "opus", "webm",
+                  "textgenerate", "record", "imagetosvg")
+        _CLOUD = ("API", "Gemini", "OpenAI", "Sora", "Flux", "Ideogram", "Runway",
+                  "Luma", "Pika", "Kling", "Recraft", "Veo", "BFL", "Midjourney")
+        _GEOM = ("Mesh", "Voxel", "Texture", "Bone", "Rig", "Skeleton", "Animate3D", "UV")
+        _VENDORS = ("Bria", "ByteDance", "ElevenLabs", "FishAudio", "Fish", "Grok", "Kling",
+                    "Luma", "Minimax", "Ideogram", "Recraft", "Veo", "Sora", "Pika", "Runway",
+                    "Mage", "Flux", "ComfyCloud", "OpenAI", "Gemini", "HappyHorse", "Beeble",
+                    "Tripo", "Meshy", "Rodin", "StabilityStable", "Stability", "Kandinsky",
+                    "WanImage", "WanVideo", "QwenImage", "Qwen", "MiniMax", "Suno", "Udio",
+                    "Krea", "Topaz", "BFL", "PiAPI", "GrokImage", "GrokVideo")
+        _TRAD = ("Image", "Mask", "Text", "Color", "Blur", "Crop", "Scale", "Pad",
+                 "Invert", "Batch", "Empty", "Solid", "Levels", "Gamma", "Quantize",
+                 "Posterize", "Contrast", "Brightness", "Saturation", "Sharpen", "Rotate",
+                 "Transpose", "Composite", "Blend", "Stitch", "Preview", "Save", "Load",
+                 "Adjust", "Center", "Convert", "Resize", "Tile", "Flip", "RGB", "HSV", "Audio")
+        if name.endswith("Node") and not name.startswith(("Image", "Mask", "Batch", "Empty")):
             return "cloud"
-        if any(h in name for h in ("Image", "Mask", "Text", "Color", "Blur", "Crop", "Scale",
-                                   "Pad", "Batch", "Empty", "Solid", "Preview", "Load", "Save")):
+        if any(name.startswith(x) or ("Api" in name) for x in _VENDORS):
+            return "cloud"
+        if any(x in name for x in _GEOM):
+            return "unknown"
+        low = str(name).lower()
+        if any(h.lower() in low for h in _MODEL):
+            return "model"
+        if any(h in name for h in _CLOUD):
+            return "cloud"
+        if any(h in name for h in _TRAD):
             return "traditional"
         return "unknown"
     by_cat = {"traditional": [], "model": [], "cloud": [], "unknown": []}
     for nm in missing:
         by_cat[_cat(nm)].append(nm)
+    cloud_set = set(by_cat["cloud"])
+    local_total = max(0, total - len(cloud_set))
+    local_native = [n for n in native if n not in cloud_set]
+    local_coverage = round(len(local_native) / local_total, 4) if local_total else 0.0
     return {"ok": True, "op": "coverage", "contract_total": total,
             "native_total": len(native), "missing_total": len(missing),
             "coverage": round(len(native) / total, 4) if total else 0.0,
+            "local_total": local_total,
+            "local_native": len(local_native),
+            "local_coverage": local_coverage,
+            "cloud_total": len(cloud_set),
+            "cloud_policy": "excluded_not_local_target",
             "missing_by_cat": {k: {"count": len(v), "sample": v[:15]} for k, v in by_cat.items()},
             "traditional_missing": by_cat["traditional"],
-            "note": "traditional 面可纯 CPU 补；model 面无 CUDA 不接；cloud 面无 key 不接"}
+            "note": "云端节点是上游目录里的远端 API，不属于本地目标；本地分母已扣除 cloud；model 面无 CUDA 不接；traditional 面可纯 CPU 补"}
 
 
 def _op_contract() -> dict:

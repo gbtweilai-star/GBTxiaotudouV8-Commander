@@ -1,4 +1,4 @@
-# gbt-capability: hand_retarget
+﻿# gbt-capability: hand_retarget
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """hand_retarget — 手部姿态重定向（原生位 · 2026-11-01 蒸馏自 dexterous-hand 知识胶囊）。
 
@@ -88,11 +88,11 @@ MODELS = {
 STATUS = {
     "cap": "hand_retarget",
     "tier": "native",
-    "ops": ["status", "models", "retarget", "where"],
+    "ops": ["status", "models", "retarget", "ik", "ik_global", "where"],
     "inputs": ["landmarks(21x3)", "joints(dict)"],
     "models": sorted(MODELS),
     "dof": {"generic_15dof": 15, "generic_20dof": 20},
-    "not_implemented": ["逆运动学求解", "接触/触觉估计", "厂商寄存器协议（见 hand_bridge）"],
+    "not_implemented": ["全手 21-DoF 全局 IK（当前每指平面 3-link）", "接触/触觉估计", "厂商寄存器协议（见 hand_bridge）"],
 }
 
 
@@ -322,5 +322,31 @@ def run(op="status", **kw):
                 "checks": {"input": "landmarks" if kw.get("landmarks") else "joints",
                            "landmarks": len(kw["landmarks"]) if kw.get("landmarks") else None},
                 "honesty": "几何向量法（非 IK）；外展/对掌为近似；无接触/触觉建模"}
+    if op in ("ik", "ik_global"):
+        model = _model_or_none(kw.get("model"))
+        if model is None:
+            return {"ok": False, "op": op, "status": "needs_input",
+                    "error": "未知 model（可用：%s，或传 dict）" % ", ".join(MODELS)}
+        hand = str(kw.get("hand") or "right").lower()
+        if hand not in ("right", "left"):
+            return {"ok": False, "op": op, "status": "needs_input", "error": "hand 只认 right/left"}
+        if not kw.get("landmarks"):
+            return {"ok": False, "op": op, "status": "needs_input",
+                    "error": "ik 需要 landmarks（21×[x,y,z]）"}
+        from . import hand_ik
+        smooth = float(kw.get("smooth") or (0.15 if op == "ik_global" else 0.0))
+        r = hand_ik.solve(kw["landmarks"], model, hand, prev=kw.get("prev"), smooth=smooth)
+        if not r.get("ok"):
+            return {"ok": False, "op": op, "status": "user_error", "error": r.get("error"),
+                    "warnings": r.get("warnings")}
+        unit = str(kw.get("unit") or "rad")
+        return {"ok": True, "op": op, "cap": "hand_retarget", "model": model.get("name"),
+                "hand": hand, "unit": unit, "joints": _as_unit(r["joints"], unit),
+                "joint_count": len(r["joints"]), "ik": r.get("ik"),
+                "warnings": r.get("warnings") or [], "smooth": smooth,
+                "checks": {"input": "landmarks", "landmarks": len(kw["landmarks"]),
+                           "solver": "planar-box-constrained-ik"},
+                "honesty": "每指平面 3-link IK，非全手 21-DoF 全局 IK；无接触/触觉建模"}
     return {"ok": False, "op": op, "status": "unknown_op",
             "error": "未知 op：%s" % op, "available": STATUS["ops"], "fail_closed": True}
+

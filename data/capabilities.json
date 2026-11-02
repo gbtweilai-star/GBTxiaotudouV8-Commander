@@ -1,5 +1,5 @@
 {
- "count": 385,
+ "count": 388,
  "at": "2026-11-01T15:07:43",
  "capabilities": [
   {
@@ -3540,6 +3540,33 @@
    "desc": "洗图流水线（看图→反推提示词→重绘→放大）：**放大环已可用**（ffmpeg lanczos+unsharp，零依赖）；反推环**已接线**（2026-10-15 起 zimage_rewash_cap 走 vision 通道；2026-10-16 增形式化反推件 tools/codex-scripts/img-reverse.py）；**语义反推**仍待外部理解通道（teamorouter 401 / 本地 8111 未监听）——缺什么就写什么；重绘环**未接线**（未装 ComfyUI；pollinations img2img 需公网可达图 URL）；含降噪强度口径表 0.15→0.85 四档。⚠️ **2026-10-13 收敛（主人令「每一个调节都要触手可控」）**：本位是**历史腿**，主腿 = `comfy_native.upscale_4k`（PIL LANCZOS + USM；`vision_print.polish` 的清晰度腿走它）。收敛**分两类做、不搞假统一**：① **几何旋钮真统一** —— `scale`（新名，倍数）＝旧名 `factor`，且都接受 `size`（目标绝对宽，按源图宽换算成倍数走同一条路）；两个名字同时给且不等 ⇒ **fail-closed**。② **锐化旋钮不统一、且显式拒** —— 本位只有 `unsharp`（**ffmpeg unsharp 滤镜的 amount**），主腿是 `sharpen`（**PIL USM 的 percent 比例**），**两个算法两个量纲**；把 `sharpen` 传给本位 ⇒ **当场 fail-closed 并指路主腿**（改名冒充＝假统一，更害人）。参数判在**过门之前**（参数错不消耗授权）。",
    "safe": false,
    "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "body_realtime",
+   "domain": "device",
+   "desc": "身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。",
+   "safe": true,
+   "readonly": false,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "hand_realtime",
+   "domain": "device",
+   "desc": "手·眼手脑同拍（灵巧手 loopback）：21 点流 → hand_retarget → hand_bridge.move → read_state，同一 tick 闭环；op=status/loop（hz/seconds）。loopback 是仿真，不驱动真手。",
+   "safe": true,
+   "readonly": false,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "hand_vision",
+   "domain": "device",
+   "desc": "手·眼睛：本地 MediaPipe Hands 从摄像头/图片/视频取 21 点（x,y,z+左右手）；op=status/image/camera。摄像头不可用如实 needs_camera，不伪造；输出归一化坐标，接真手前需标定。",
+   "safe": true,
+   "readonly": false,
    "scopes_static": [],
    "risk": "low"
   }

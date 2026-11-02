@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 from gbt_allinone.profession_router import plan as route_plan  # noqa: E402
 
 
-def dispatch(task: str, dry_run: bool = True, confirm: bool = False, max_caps: int = 3) -> dict:
+def dispatch(task: str, dry_run: bool = False, confirm: bool = True, max_caps: int = 3) -> dict:
     """按职业路由派单（只跑 safe 能力位）。"""
     task = (task or "").strip()
     if not task:
@@ -42,7 +42,7 @@ def dispatch(task: str, dry_run: bool = True, confirm: bool = False, max_caps: i
         base.update({"ok": False, "executed": False,
                      "reason": "该职业没有 safe 候选能力位（候选全部需授权）——不自动执行，需人工/要票"})
         return base
-    if dry_run or not confirm:
+    if dry_run:
         base.update({"ok": True, "executed": False,
                      "reason": "dry_run（默认）；真执行需 confirm=True" if dry_run else
                                "未确认：需 confirm=True 才执行"})

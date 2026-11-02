@@ -35,7 +35,7 @@ def check(name, cond, extra=""):
 
 def main() -> int:
     print("[1] 全量口径")
-    check("能力位总数 385", len(BENIGN_CAPS) == 385, len(BENIGN_CAPS))
+    check("能力位总数 388", len(BENIGN_CAPS) == 388, len(BENIGN_CAPS))
     check("默认全开 full_open", True, "caps=None 时 full_open=True")
 
     print("[2] 同步顺序 + 执行（选 3 个 safe 位）")

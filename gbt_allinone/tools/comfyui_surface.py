@@ -1,4 +1,4 @@
-# gbt-capability: comfyui
+﻿# gbt-capability: comfyui
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """ComfyUI（秋叶整合版）可控制面 · **一个不漏的双向绑定**（主人令 2026-09-27）。
 
@@ -304,12 +304,105 @@ def verify(**_kw) -> dict:
             "_口径": "阈值来自实测（966）；节点消失=断连，要解释或补"}
 
 
+
+
+def t2i(prompt: str = "", negative: str = "", ckpt: str = "Realistic_Vision_V5.1_fp16-no-ema.safetensors",
+        width: int = 512, height: int = 896, steps: int = 8, cfg: float = 7.0, seed: int = 42,
+        sampler: str = "dpmpp_2m", scheduler: str = "karras", timeout: int = 1800, **_kw) -> dict:
+    """Local ComfyUI text-to-image preset; server must be 127.0.0.1:8188.
+
+    Returns prompt_id + generated image refs from /history. CPU is slow: 8 steps 512x896 ~4min.
+    """
+    if not prompt.strip():
+        return {"ok": False, "op": "t2i", "error": "prompt 不能为空", "fail_closed": True}
+    wf = {
+        "1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": ckpt}},
+        "2": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["1", 1]}},
+        "3": {"class_type": "CLIPTextEncode", "inputs": {"text": negative, "clip": ["1", 1]}},
+        "4": {"class_type": "EmptyLatentImage", "inputs": {"width": int(width), "height": int(height), "batch_size": 1}},
+        "5": {"class_type": "KSampler", "inputs": {"seed": int(seed), "steps": int(steps), "cfg": float(cfg),
+               "sampler_name": sampler, "scheduler": scheduler, "denoise": 1,
+               "model": ["1", 0], "positive": ["2", 0], "negative": ["3", 0], "latent_image": ["4", 0]}},
+        "6": {"class_type": "VAEDecode", "inputs": {"samples": ["5", 0], "vae": ["1", 2]}},
+        "7": {"class_type": "SaveImage", "inputs": {"filename_prefix": "gbt_t2i", "images": ["6", 0]}},
+    }
+    r = submit(workflow=wf)
+    if not r.get("ok"):
+        return {"ok": False, "op": "t2i", "error": r.get("error"), "submit": r, "ckpt": ckpt}
+    pid = r.get("prompt_id")
+    if not pid:
+        return {"ok": False, "op": "t2i", "error": "ComfyUI 没有返回 prompt_id", "submit": r, "ckpt": ckpt}
+    import time
+    deadline = time.time() + int(timeout)
+    while time.time() < deadline:
+        h = _http("/history/" + pid, timeout=30)
+        data = h.get("data") or {}
+        row = data.get(pid) if isinstance(data, dict) else None
+        if row:
+            outs = row.get("outputs") or {}
+            imgs = []
+            for node in outs.values():
+                for im in (node.get("images") or []):
+                    imgs.append({"filename": im.get("filename"), "subfolder": im.get("subfolder", ""),
+                                 "type": im.get("type", "output")})
+            return {"ok": bool(imgs), "op": "t2i", "prompt_id": pid, "images": imgs,
+                    "ckpt": ckpt, "steps": int(steps), "size": [int(width), int(height)],
+                    "note": "CPU 本地出图；图在 ComfyUI/output/，可 /view 取回"}
+        time.sleep(2)
+    return {"ok": False, "op": "t2i", "prompt_id": pid, "error": "等待 ComfyUI 超时（队列仍在跑）", "ckpt": ckpt}
+
+
+
+
+def _wait_images(pid: str, timeout: int = 1800) -> dict:
+    import time
+    deadline = time.time() + int(timeout)
+    while time.time() < deadline:
+        h = _http("/history/" + pid, timeout=30)
+        data = h.get("data") or {}
+        row = data.get(pid) if isinstance(data, dict) else None
+        if row:
+            imgs = []
+            for node in (row.get("outputs") or {}).values():
+                for im in (node.get("images") or []):
+                    imgs.append({"filename": im.get("filename"), "subfolder": im.get("subfolder", ""),
+                                 "type": im.get("type", "output")})
+            return {"ok": bool(imgs), "images": imgs}
+        time.sleep(2)
+    return {"ok": False, "error": "等待 ComfyUI 超时（队列仍在跑）"}
+
+
+def upscale(image: str = "", model: str = "RealESRGAN_x4plus.pth", timeout: int = 900, **_kw) -> dict:
+    """Local Real-ESRGAN upscale. image = local path; uploads to ComfyUI/input first."""
+    import os, shutil, requests
+    if not image or not os.path.isfile(image):
+        return {"ok": False, "op": "upscale", "error": "image 不存在: %s" % image, "fail_closed": True}
+    name = os.path.basename(image)
+    inp = os.path.join(os.path.dirname(_ROOT), "vendor", "ComfyUI", "input")
+    os.makedirs(inp, exist_ok=True)
+    shutil.copy2(image, os.path.join(inp, name))
+    wf = {
+        "1": {"class_type": "LoadImage", "inputs": {"image": name}},
+        "2": {"class_type": "UpscaleModelLoader", "inputs": {"model_name": model}},
+        "3": {"class_type": "ImageUpscaleWithModel", "inputs": {"upscale_model": ["2", 0], "image": ["1", 0]}},
+        "4": {"class_type": "SaveImage", "inputs": {"filename_prefix": "gbt_up", "images": ["3", 0]}},
+    }
+    r = submit(workflow=wf)
+    if not r.get("ok"):
+        return {"ok": False, "op": "upscale", "error": r.get("error"), "submit": r}
+    pid = r.get("prompt_id")
+    out = _wait_images(pid, timeout)
+    return {"ok": bool(out.get("ok")), "op": "upscale", "prompt_id": pid, "images": out.get("images") or [],
+            "model": model, "source": name, "error": out.get("error")}
+
+
 def run_op(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
-    for name, fn in (("status", status), ("nodes", nodes), ("models", models), ("submit", submit),
+    for name, fn in (("status", status), ("nodes", nodes), ("models", models), ("submit", submit), ("t2i", t2i), ("upscale", upscale),
                      ("queue", queue), ("history", history), ("free", free),
                      ("interrupt", interrupt), ("surface", surface), ("verify", verify)):
         if op == name:
             return fn(**params)
     return {"ok": False, "fail_closed": True,
-            "error": f"未知 op:{op}（status/nodes/models/submit/queue/history/free/interrupt/surface/verify）"}
+            "error": f"未知 op:{op}（status/nodes/models/submit/t2i/upscale/queue/history/free/interrupt/surface/verify）"}
+

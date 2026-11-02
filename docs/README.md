@@ -1,4 +1,4 @@
-# 文档总索引
+﻿# 文档总索引
 
 > **想找能力？** 先看下面这一节，别从 30 份文档里翻。
 > 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
@@ -235,14 +235,97 @@
 | 117 | [117-landing-closed-loop.md](117-landing-closed-loop.md) | 落地闭环：路由→派单→账本 + 全景清单（11 视图/385 位/21 职业/无死角/自启） |
 | 118 | [118-bounty-direction.md](118-bounty-direction.md) | 方向转向：安全研究/赏金工作台（授权闸/scope闸/报告/赔付账本 #bounty） |
 | 119 | [119-own-lab-end-to-end.md](119-own-lab-end-to-end.md) | 自训靶场 + 端到端：6 类漏洞真跑 → 录单 → 报告(sha256) → 账本 |
-| 120 | [120-bounty-report-and-tracker.md](120-bounty-report-and-tracker.md) | 赏金报告升级（CVSS 3.1/CWE/复现/修复/侧车 JSON）+ 提交状态机 |
-| 121 | [121-platform-scope-import.md](121-platform-scope-import.md) | 平台 scope 导入（HackerOne/Bugcrowd 离线归一化，dry-run + 人工确认才落库） |
-| 122 | [122-submit-bundle.md](122-submit-bundle.md) | 可提交包：CVSS 时间/环境分 + 修复 diff + 附件 + manifest + ZIP |
-| 123 | [123-platform-status-sync.md](123-platform-status-sync.md) | 平台状态只读同步：mock 平台端到端、状态机回填、审计、只读 405 |
-| 124 | [124-omni-all-sync.md](124-omni-all-sync.md) | 万能插全开同步执行：385 位逐个同步、票挡需授权位、进度落盘、API/UI |
-| 125 | [125-alarm-rootcause-fixes.md](125-alarm-rootcause-fixes.md) | 报警必追根因：全开 63 失败归因（policy/超时/kwargs/硬编码路径/缺参/缺件）与修复 |
-| 126 | [126-security-policy-three-rules.md](126-security-policy-three-rules.md) | 最高安全策略：黑客能力终端确认 / 受攻击V8自我决策 / 转账永远确认 |
-| 127 | [127-attack-evidence-only.md](127-attack-evidence-only.md) | 受攻击只采集证据：极限并发取证/资源回收/证据包 |
-| 128 | [128-attack-evidence-admission.md](128-attack-evidence-admission.md) | 受攻击举证：没证据不许说被攻击；强证据/主人陈述/交代话术 |
-| 129 | [129-full-forensics-chain.md](129-full-forensics-chain.md) | 全量采集 16 采集器 + sha256 哈希链 + 时间线 + 内存预算 |
-| 130 | [130-engine-gpu-vulkan.md](130-engine-gpu-vulkan.md) | 引擎直连 GPU：补齐 Vulkan 后端、探测/加载/切换、CPU vs GPU 实测 |
+| 86 | [86-comfyui-local.md](86-comfyui-local.md) | ComfyUI 本地运行时落地：8188 CPU + Realistic Vision + GBT `comfyui.t2i` |
+| 87 | [87-pro-film-pipeline.md](87-pro-film-pipeline.md) | 专业成片步骤：项目制设计、镜头/声音/色彩/QC |
+| 88 | [88-realtime-eye-hand.md](88-realtime-eye-hand.md) | 眼手脑同拍：采集线程+闭环微步，实测 18fps 感知 / 3.2fps 负载下 |
+| 89 | [89-hand-realtime.md](89-hand-realtime.md) | 眼手脑同拍 · 灵巧手 loopback：60 tick/58Hz/0.31ms 跑通 |
+| 90 | [90-hand-ik.md](90-hand-ik.md) | 手指数值 IK：每指平面 3-link、限位、残差、同拍 58Hz |
+| 91 | [91-hand-global-ik.md](91-hand-global-ik.md) | 全手 IK 关节向量 + 限位 + 时序平滑（非真 21-DoF QP） |
+| 92 | [92-hand-vision.md](92-hand-vision.md) | 手部视觉入口：MediaPipe 本地；摄像头需隐私/后端，图片/视频可用 |
+| 93 | [93-hand-image-chain.md](93-hand-image-chain.md) | 图片→MediaPipe 21 点→IK→loopback 手：已跑通 |
+| 94 | [94-hand-force-contact.md](94-hand-force-contact.md) | 力/接触/柔顺接口：loopback 仿真；真机 fail-closed |
+| 95 | [95-hand-force-loop.md](95-hand-force-loop.md) | 力限幅+导纳同拍：60 tick/58Hz/力峰值=limit |
+| 96 | [96-hand-video-chain.md](96-hand-video-chain.md) | 手部视频→21点→IK→loopback：30/30 帧跑通 |
+| 97 | [97-hand-video-smoothing.md](97-hand-video-smoothing.md) | 视频视觉链：抖动度量 + EMA 平滑 |
+| 98 | [98-hand-video-timing.md](98-hand-video-timing.md) | 视频时序：时间戳/丢帧/处理延迟，实测 176.95ms mean |
+| 99 | [99-hand-roi-experiment.md](99-hand-roi-experiment.md) | ROI/降分辨率实测：未达实时，瓶颈在推理不是分辨率 |
+| 100 | [100-hand-pipeline-verdict.md](100-hand-pipeline-verdict.md) | 常驻 worker+三线程：仍 1.44fps，判本机 CPU 不适合实时手势 |
+| 101 | [101-hand-onnx-realtime.md](101-hand-onnx-realtime.md) | 换本地 ONNX：23.69fps / frame p95 91.7ms，达到实时判据 |
+| 102 | [102-hand-onnx-threaded.md](102-hand-onnx-threaded.md) | ONNX 三线程：26fps 但 e2e p95 255ms；串行仍是实时最佳 |
+| 103 | [103-hand-latest-frame.md](103-hand-latest-frame.md) | latest-frame：延迟降但 coverage 0.1，判不达标 |
+| 104 | [104-hand-adaptive-queue.md](104-hand-adaptive-queue.md) | 自适应队列：30帧短片冷启动拖累，coverage 0.3；串行仍最佳 |
+| 105 | [105-hand-longrun-degradation.md](105-hand-longrun-degradation.md) | 长视频稳态：150帧崩到0.22fps，短片段23fps不能外推 |
+| 106 | [106-hand-longrun-profile.md](106-hand-longrun-profile.md) | 60帧稳态25.3fps/p95 37.5ms；150帧仍异常，需chunk回收 |
+| 108 | [108-hand-process-recycle.md](108-hand-process-recycle.md) | 真进程回收：150帧21fps/p95 39ms，长跑稳定 |
+| 109 | [109-hand-chunked-chain.md](109-hand-chunked-chain.md) | 长视频闭环：进程回收+IK/HAL，150帧28fps |
+| 110 | [110-hand-chunked-force.md](110-hand-chunked-force.md) | 长视频链+力限幅：150帧40fps，力峰值=limit |
+| 111 | [111-hand-adaptive-force.md](111-hand-adaptive-force.md) | 自适应刚度+接触事件：力峰值=limit；fps 14.8 |
+| 112 | [112-hand-compliance-optimized.md](112-hand-compliance-optimized.md) | compliance降频+防抖：42.3fps，力峰值=limit |
+| 113 | [113-hand-dense-compliance.md](113-hand-dense-compliance.md) | 接触后密调/稳态降频：40.36fps，compliance_calls=8 |
+| 114 | [114-hand-force-feedforward.md](114-hand-force-feedforward.md) | 力变化率前馈：已实现；静态接触 ff_hits=0 不吹 |
+| 115 | [115-hand-feedforward-dynamic.md](115-hand-feedforward-dynamic.md) | 动态外力：pre-clamp保底；裸奔峰值20.5，前馈不能替代 |
+| 116 | [116-hand-feedforward-unsafe.md](116-hand-feedforward-unsafe.md) | 位置前馈在动态外力下峰值6.68：前馈不能替代pre-clamp |
+| 117 | [117-hand-safety-guard.md](117-hand-safety-guard.md) | 安全闸：force_limit>0 时禁止 pre_clamp=false 裸奔 |
+| 118 | [118-hand-safety-api-fix.md](118-hand-safety-api-fix.md) | API 安全闸：裸奔配置结构化拒绝，不再 payload 崩溃 |
+| 119 | [119-camera-winrt.md](119-camera-winrt.md) | 摄像头突破：WinRT能抓帧；Python子进程不行，需PowerShell帧桥 |
+| 120 | [120-camera-bridge-chain.md](120-camera-bridge-chain.md) | WinRT帧桥→ONNX：真实相机帧可读；手图帧3/3/35fps |
+| 121 | [121-camera-winrt-video.md](121-camera-winrt-video.md) | WinRT连续录像：3s/720p/46帧，ONNX 29.32fps；手未入镜 |
+| 122 | [122-camera-chunks-real.md](122-camera-chunks-real.md) | WinRT连续chunk：真实相机33帧/5 detected/5 moved；coverage不足 |
+| 123 | [123-hand-regression-matrix.md](123-hand-regression-matrix.md) | 手部回归 15/15 PASS；修 flaky 平滑断言 |
+| 124 | [124-mediaframe-reader-fail.md](124-mediaframe-reader-fail.md) | MediaFrameReader初始化失败；连续相机仍用1s chunk |
+| 125 | [125-framesources-null.md](125-framesources-null.md) | FrameSources枚举为null；MediaFrameReader仍未通 |
+| 126 | [126-fast-camera-chunks.md](126-fast-camera-chunks.md) | 0.3s chunk相机：12帧/32fps处理；仍无手 detected=0 |
+| 127 | [127-csharp-windowsdk-missing.md](127-csharp-windowsdk-missing.md) | C#/WinRT helper编译失败：缺Windows SDK UnionMetadata |
+| 128 | [128-delivery-cleanup.md](128-delivery-cleanup.md) | 交付树清理：25.7k/7.6GB→3.3k/245MB；剩engine/llama锁定 |
+| 129 | [129-desktop-hand-package.md](129-desktop-hand-package.md) | 桌面版打包手部ONNX：API onnx_image 21点/20关节/moved |
+| 130 | [130-desktop-hand-chunked-api.md](130-desktop-hand-chunked-api.md) | 桌面API onnx_chunked：30帧/27.82fps/moved30 |
+| 131 | [131-desktop-camera-chunks-api.md](131-desktop-camera-chunks-api.md) | 桌面API camera_chunks：300帧/moved300/11.47fps |
+| 132 | [132-desktop-hand-ui.md](132-desktop-hand-ui.md) | 桌面UI注入手部按钮：图片/长视频走API |
+| 133 | [133-desktop-native-picker.md](133-desktop-native-picker.md) | 桌面UI：原生文件选择+结果面板；API 200 |
+| 134 | [134-desktop-camera-dir-ui.md](134-desktop-camera-dir-ui.md) | 桌面UI：相机chunk目录选择+可关闭结果面板 |
+| 135 | [135-desktop-camera-watch.md](135-desktop-camera-watch.md) | camera_watch目录监视：150帧/45.29fps/moved150 |
+| 136 | [136-desktop-watch-ui.md](136-desktop-watch-ui.md) | 桌面UI第4按钮：监视相机目录→camera_watch |
+| 137 | [137-desktop-record-ui.md](137-desktop-record-ui.md) | 桌面UI录相机5s+自动camera_watch；接线已验证，点击未测 |
+| 138 | [138-desktop-record-verified.md](138-desktop-record-verified.md) | UI录相机5s端到端：5 chunk，record ok；无手 detected=0 |
+| 139 | [139-hand-buttons-sidebar.md](139-hand-buttons-sidebar.md) | 手部按钮移入左栏，居中模态结果 |
+| 140 | [140-tianzhen-addnoise-and-ui-confirm.md](140-tianzhen-addnoise-and-ui-confirm.md) | 手部UI无孤儿确认；天真补ImageAddNoise，119节点/覆盖10.2% |
+| 141 | [141-tianzhen-purecpu-batch2.md](141-tianzhen-purecpu-batch2.md) | 天真第二批20个纯CPU节点：139节点/覆盖122=12.2% |
+| 142 | [142-tianzhen-purecpu-batch3.md](142-tianzhen-purecpu-batch3.md) | 天真第三批9节点：148节点/覆盖131=13.1% |
+| 143 | [143-tianzhen-purecpu-tests.md](143-tianzhen-purecpu-tests.md) | 天真纯CPU节点真调用测试 ALL PASS（非只注册） |
+| 144 | [144-tianzhen-purecpu-batch4.md](144-tianzhen-purecpu-batch4.md) | 天真第四批9节点：157节点/覆盖140=14.0% |
+| 145 | [145-tianzhen-purecpu-batch5.md](145-tianzhen-purecpu-batch5.md) | 天真第五批7节点：164节点/覆盖147=14.7% |
+| 146 | [146-tianzhen-canny.md](146-tianzhen-canny.md) | 天真Canny边缘：165节点/覆盖148=14.8% |
+| 147 | [147-tianzhen-workflow-integration.md](147-tianzhen-workflow-integration.md) | 天真纯CPU节点走完整workflow：5节点/68×68/gate pass |
+| 148 | [148-desktop-tianzhen-api.md](148-desktop-tianzhen-api.md) | 桌面版接天真只读API：status/coverage 200，PIL13/165节点 |
+| 149 | [149-desktop-tianzhen-run.md](149-desktop-tianzhen-run.md) | 桌面天真API可跑workflow：5节点/200/sha一致 |
+| 150 | [150-tianzhen-coverage-fix.md](150-tianzhen-coverage-fix.md) | coverage口径对齐：traditional 0，不再虚报177 |
+| 151 | [151-desktop-tianzhen-ui.md](151-desktop-tianzhen-ui.md) | 桌面天真UI：状态/覆盖按钮，CDP实测可用 |
+| 152 | [152-capability-router.md](152-capability-router.md) | capability_router：看屏幕/开网页/读写文件/看图四类接进 /api/chat，自动调用万能插（56项验收 ALL OK，含两轮独立验收回归） |
+| 153 | [153-tianzhen-api-negative.md](153-tianzhen-api-negative.md) | 天真API负例：未知节点fail-closed，非白名单400 |
+| 154 | [154-tianzhen-boundary-audit.md](154-tianzhen-boundary-audit.md) | 天真边界审计：unknown85全模型/3D，无纯CPU可补 |
+| 155 | [155-living-world-devour.md](155-living-world-devour.md) | 吞噬 AEON/WorldX/Temporal God：逐仓拔缺失 + world_forge 世界内核（46项验收 ALL OK） |
+| 156 | [156-shannon-devour.md](156-shannon-devour.md) | 吞噬 Shannon：把「No exploit, no report」蒸成授权渗透流水线（64项验收 ALL OK） |
+| 157 | [157-p1-registration-app.md](157-p1-registration-app.md) | world_forge/pentest_flow 注册能力位 + P1（世界规格/存档/3D、源码攻击面/五类代理）+ APP 真机接线（76项验收 ALL OK） |
+| 155 | [155-comfyui-local-objectinfo.md](155-comfyui-local-objectinfo.md) | 本地ComfyUI真快照1033节点；补SaveImageWebsocket，traditional0 |
+| 156 | [156-local-only-coverage.md](156-local-only-coverage.md) | 本地口径：cloud 368 不计入，本地覆盖146/665=21.95% |
+| 157 | [157-native-sdturbo.md](157-native-sdturbo.md) | 删ComfyUI后本地SD-Turbo原生出图：256/24.24s/121KB |
+| 158 | [158-desktop-native-t2i-512.md](158-desktop-native-t2i-512.md) | 桌面API接SD-Turbo：256/512，缓存load4.68s，512生成27.13s |
+| 159 | [159-native-shortfilm-nightlight.md](159-native-shortfilm-nightlight.md) |
+| 160 | [160-bailongma-voice-intercom.md](160-bailongma-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
+| 161 | [161-bailongma-gap-matrix.md](161-bailongma-gap-matrix.md) | BaiLongma → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
+| 162 | [162-native-browser-embed.md](162-native-browser-embed.md) | 我们自己的原生浏览器：Electron WebContentsView 宿主（标签/地址栏/下载/权限/边界）+ 契约与真机读数 |
+| 163 | [163-ui-card-acui.md](163-ui-card-acui.md) | ACUI 卡片协议 ui_card：schema/白名单/纯文本/TTL/动作只回事件 + 能力位/统一门/console 卡片栈（P0 完成） |
+| 164 | [164-voice-settings.md](164-voice-settings.md) | 语音设置页：TTS 音色/语速/音高/音量 + ASR 后端 auto/whisper/windows + 自动朗读（能力位/统一门/数字人弹窗） |
+| 166 | [166-body-control.md](166-body-control.md) | body_control（身体控制/触手/全息投影）：如实 not_supported，缺感觉/执行器报缺，动作 executed=false |
+| 167 | [167-context-inject.md](167-context-inject.md) | 上下文注入 context_inject：过期/去重/相关度/来源配额/字符预算 + 能力位/统一门/右栏预览 |
+| 168 | [168-thought-stream.md](168-thought-stream.md) | 思考流/行动流：真实编排账归一化五类（thought/action/result/guard/system）+ 能力位/统一门/console 视图 |
+| 169 | [169-api-slot.md](169-api-slot.md) | 动态 API 槽：https-only/拒私网/密钥只存 env 引用名/参数白名单；只登记定义，call 永远 not_supported |
+| 170 | [170-reminder.md](170-reminder.md) | 提醒能力位：创建/列出/取消/到点查询；写面过 filesystem_write 门；不做网络通知 |
+| 171 | [171-resource-snapshot.md](171-resource-snapshot.md) | 本机资源快照：ctypes+shutil 只读 CPU/内存/磁盘/uptime；能力位/统一门/右栏面板 |
+| 172 | [172-media-stage.md](172-media-stage.md) | 媒体舞台/音乐库/历史：既有产物索引/分类/Range 文件服务；console 视图；APP 打包副本 |
+| 173 | [173-turn-trace.md](173-turn-trace.md) | 轮次追踪 Turn Trace：session+间隔归并步骤/结果/证据/耗时；不伪造输入；能力位/统一门/console 视图 |
+| 174 | [174-pairing-cert.md](174-pairing-cert.md) | 局域网配对/证书安全原语：一次性码/设备白名单/证书指纹；无监听、无签发 |
+| 175 | [175-lan-pairing.md](175-lan-pairing.md) | 局域网配对监听/自签证书：只绑私有 LAN/回环 + TLS + 一次性码→Bearer；无远程命令；证书放 state/ |
+| 165 | [165-focus-stack-memory-audit.md](165-focus-stack-memory-audit.md) | 焦点栈 + 记忆审计：上限12/提分/排序/pop + 只读审计（重复/缺时/secret_like）；能力位/统一门/右栏面板 |
+| 160 | [160-weight-fusion-rv-tiny.md](160-weight-fusion-rv-tiny.md) | 公共权重真融合：RV5.1×Tiny-SD，共同148键，出图正常 |
+

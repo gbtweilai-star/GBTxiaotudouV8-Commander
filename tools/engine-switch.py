@@ -27,6 +27,10 @@ ACTIVE = STATE_W / "ACTIVE.json"
 CONF = ROOT / "state" / "engine-backend.json"
 PORT = 8792
 
+MODEL_CHOICES = {
+    "q5": STATE_W / "gbt-v8-v82-q5_0.gguf",
+    "q4": STATE_W / "gbt-v8-v82-q4_k_m.gguf",   # 低内存档（量化压缩后）
+}
 BACKENDS = {
     "cpu": {"exe": ROOT / "vendor" / "llama-server.exe", "ngl": 0, "threads": 12},
     "vulkan": {"exe": ROOT / "vendor" / "vulkan-b12032" / "llama-server.exe",
@@ -93,26 +97,28 @@ def status() -> dict:
             "models": _models(PORT), "backends": {k: str(v["exe"]) for k, v in BACKENDS.items()}}
 
 
-def switch(backend: str) -> dict:
+def switch(backend: str, model_key: str = "q5", sleep_idle: int = 30) -> dict:
     if backend not in BACKENDS:
         return {"ok": False, "reason": "未知后端：%s（可选 %s）" % (backend, list(BACKENDS))}
     spec = BACKENDS[backend]
     if not Path(spec["exe"]).is_file():
         return {"ok": False, "reason": "后端二进制不存在：%s" % spec["exe"],
                 "hint": "vulkan 需先下载 vendors/vulkan-b12032（见 docs/130）"}
-    model = _active_model()
+    model = MODEL_CHOICES.get(model_key) or _active_model()
     if not model.is_file():
         return {"ok": False, "reason": "ACTIVE 模型不存在：%s" % model}
     stopped = _stop(PORT)
     time.sleep(1.5)
     cmd = [str(spec["exe"]), "-m", str(model), "--host", "127.0.0.1",
            "--port", str(PORT), "-c", "2048", "-t", str(spec["threads"]),
-           "-ngl", str(spec["ngl"]), "--no-webui", "--sleep-idle-seconds", "600"]
+           "-ngl", str(spec["ngl"]), "--no-webui",
+           "--sleep-idle-seconds", str(int(sleep_idle))]
     proc = subprocess.Popen(cmd, cwd=str(ROOT), stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL,
                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     ok = _health(PORT)
     rec = {"backend": backend, "pid": proc.pid, "model": model.name,
+           "sleep_idle": int(sleep_idle), "lane": "on-demand" if sleep_idle <= 60 else "always-on",
            "ngl": spec["ngl"], "threads": spec["threads"], "port": PORT,
            "at": time.strftime("%Y-%m-%dT%H:%M:%S"), "healthy": ok,
            "models": _models(PORT)}
@@ -123,8 +129,10 @@ def switch(backend: str) -> dict:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", choices=list(BACKENDS), default="")
+    ap.add_argument("--model", choices=list(MODEL_CHOICES), default="q5")
+    ap.add_argument("--sleep-idle", type=int, default=30)
     ap.add_argument("--status", action="store_true")
     a = ap.parse_args()
-    out = status() if (a.status or not a.backend) else switch(a.backend)
+    out = status() if (a.status or not a.backend) else switch(a.backend, a.model, a.sleep_idle)
     print(json.dumps(out, ensure_ascii=False, indent=2))
     sys.exit(0 if out.get("ok") else 1)

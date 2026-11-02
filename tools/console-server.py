@@ -63,6 +63,10 @@ _engine_autostart()
 DATA_LOCK = threading.Lock()
 DATA_CACHE = {"at": 0.0, "data": None}
 CONTEXT_NAME = "console-web"
+GBT_PERSONA = ("你是 GBT小土豆V8（小土豆），不是普通聊天模型。你运行在本机桌面版，拥有 385 项能力域、触手执行器、"
+               "万能插（process/file/api/web/app/ai/dh）、数字人、AI 朋友圈、主动智能体等真实能力。"
+               "严禁回答“我只是语言模型/我不能做任何事”。被问能力时按实际能力回答；被要求做事时说明由哪个执行器/入口执行，"
+               "不要否认自己的能力。")
 
 
 def _build_data() -> dict:
@@ -277,6 +281,8 @@ def _openai_chat(text: str, m: dict) -> dict:
     msgs = []
     if m.get("system_prompt"):
         msgs.append({"role": "system", "content": str(m["system_prompt"])})
+    else:
+        msgs.insert(0, {"role": "system", "content": GBT_PERSONA})
     msgs.append({"role": "user", "content": str(text)})
     payload = {
         "model": str(m["name"]),
@@ -305,17 +311,50 @@ def _openai_chat(text: str, m: dict) -> dict:
             "provider": m.get("provider") or "openai-compatible"}
 
 
-def _chat(text: str, context: str = CONTEXT_NAME) -> dict:
-    """无限上下文 + 稳定输出：temperature=0，context 走 ring_context。"""
+def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True) -> dict:
+    """无限上下文 + 稳定输出：temperature=0，context 走 ring_context。
+
+    2026-11-02 主人令：先过 `capability_router` ——「看屏幕 / 开网页 / 读写文件 / 看图」四类
+    命中就**自动调用万能插**真执行（回执里带 call=omni_plug + capability），
+    四类之外（或只是提问）照旧走对话模型，行为与接进前一致。
+    开关：body 里 `capability:false` 或环境变量 `GBT_CAPABILITY_ROUTER=0`。
+    """
     t0 = time.time()
+    if use_capabilities and os.environ.get("GBT_CAPABILITY_ROUTER", "1") != "0":
+        try:
+            from gbt_allinone import capability_router as _CR
+            cap = _CR.run(text, context=context)
+            if cap.get("handled"):
+                cap.setdefault("context", {"mode": "capability-router", "name": context})
+                cap["elapsed_ms"] = int((time.time() - t0) * 1000)
+                return cap
+        except Exception as _cap_err:  # noqa: BLE001
+            # 路由自己坏了绝不许挡正常对话：降级走模型，但**必须在 stderr 留痕**（不许静默）。
+            try:
+                print("[capability_router] 降级：%s: %s" % (type(_cap_err).__name__,
+                                                          str(_cap_err)[:200]), file=sys.stderr)
+            except Exception:  # noqa: BLE001
+                pass
     m = _settings_load().get("model") or {}
-    if m.get("base_url") and m.get("name"):
-        r = _openai_chat(text, m)
+    prompt_text = GBT_PERSONA + "\n\n用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
+    # 2026-11-02 主人令：Agnes 只做“反向调用云端算力”，不是聊天模型；
+    # 聊天永远先用我们自己的本机权重。除非显式 GBT_ALLOW_EXTERNAL_MODEL=1，否则不允许外部模型接聊天。
+    if m.get("base_url") and m.get("name") and os.environ.get("GBT_ALLOW_EXTERNAL_MODEL") == "1":
+        r = _openai_chat(prompt_text, m)
         r.setdefault("context", {"mode": "user-model", "name": context})
         r["elapsed_ms"] = int((time.time() - t0) * 1000)
         return r
+    try:
+        from gbt_allinone import omni_plug as _OP
+        _or = _OP.plug_and_run("engine", kind="ai", args={"prompt": prompt_text, "max_tokens": 512}, timeout=300)
+        if _or.get("ok") and _or.get("text"):
+            return {"ok": True, "text": _or.get("text"), "via": "omni_plug:ai:engine",
+                    "ms": int((time.time() - t0) * 1000), "context": {"mode": "omni-ai-engine", "name": context}}
+    except Exception:  # noqa: BLE001
+        pass
     from gbt_allinone import energy_core as E
-    r = E.think([{"role": "user", "content": str(text)}], temperature=0.0,
+    r = E.think([{"role": "system", "content": GBT_PERSONA},
+                 {"role": "user", "content": prompt_text}], temperature=0.0,
                 max_tokens=512, timeout=300, context=context, label="console-web")
     out = {"ok": bool(r.get("ok")), "text": r.get("text"),
            "error": r.get("error"), "ms": r.get("ms"),
@@ -738,6 +777,19 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/tianzhen":
+            try:
+                from gbt_allinone.tools import comfy_native as CN
+                q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                op = (q.get("op") or ["status"])[0]
+                allowed = ("status", "nodes", "coverage", "harvest", "contract", "gate", "runs")
+                if op not in allowed:
+                    return self._json({"ok": False, "op": op,
+                                       "error": "user_error: /api/tianzhen 只读；允许 %s" % (allowed,)}, 400)
+                return self._json(CN.run({"op": op}))
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/dh/hand":
             try:
                 from gbt_allinone.tentacle import hand_bridge as HB
@@ -770,7 +822,28 @@ class Handler(BaseHTTPRequestHandler):
                                    % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/moments":
             try:
-                return self._json(_moments_state())
+                from gbt_allinone import moments_hub as MH
+                from gbt_allinone import moments_accounts as MA
+                acc = MA.resolve(self.headers.get("X-Moments-Account"))
+                if not acc:
+                    return self._json(MA.auth_state())
+                MH.STATE = MA.data_path(acc["id"])
+                d = MH.state()
+                d["current"] = MA.public(acc)
+                d["needs_auth"] = False
+                return self._json(d)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/proactive":
+            try:
+                from gbt_allinone import proactive as _PA
+                from urllib.parse import parse_qs as _pq
+                q = _pq(urllib.parse.urlparse(self.path).query)
+                op = (q.get("op") or ["status"])[0]
+                if str(op) == "tickets":
+                    return self._json(_PA.status())
+                return self._json(_PA.status())
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
@@ -1264,6 +1337,17 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_bounty(raw)
         if path == "/api/memory":
             return self._api_memory_post(body)
+        if path == "/api/tianzhen":
+            try:
+                from gbt_allinone.tools import comfy_native as CN
+                op = str(body.get("op") or "status")
+                if op not in ("run", "validate", "gate", "import", "import_dir"):
+                    return self._json({"ok": False, "op": op,
+                                       "error": "user_error: /api/tianzhen POST 只允许 run/validate/gate/import"}, 400)
+                return self._json(CN.run(dict(body)))
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/blueprint":
             return self._api_blueprint_post(body)
         if path == "/api/dh/action":
@@ -1289,28 +1373,37 @@ class Handler(BaseHTTPRequestHandler):
                                    % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/moments":
             try:
-                op = str(body.get("op") or "post").lower()
-                posts = _moments_load()
-                if op == "post":
-                    text = str(body.get("text") or "").strip()
-                    if not text:
-                        return self._json({"ok": False, "error": "user_error: 需要 text"}, 400)
-                    posts.append({"id": "m-%d" % int(time.time() * 1000),
-                                  "author": "主人", "kind": "user",
-                                  "text": text[:2000],
-                                  "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                  "likes": 0, "tags": []})
-                    _moments_save(posts)
-                    return self._json(_moments_state())
-                if op == "like":
-                    pid = str(body.get("id") or "")
-                    for p in posts:
-                        if str(p.get("id")) == pid:
-                            p["likes"] = int(p.get("likes") or 0) + 1
-                            _moments_save(posts)
-                            return self._json(_moments_state())
-                    return self._json({"ok": False, "error": "not found: %s" % pid}, 404)
-                return self._json({"ok": False, "error": "unknown op"}, 400)
+                from gbt_allinone import moments_hub as MH
+                from gbt_allinone import moments_accounts as MA
+                op0 = str(body.get("op") or "post").lower()
+                if op0 in ("register", "login", "logout", "accounts"):
+                    return self._json(MA.handle(op0, body))
+                acc = MA.resolve(self.headers.get("X-Moments-Account"))
+                if not acc:
+                    return self._json(MA.auth_state())
+                MH.STATE = MA.data_path(acc["id"])
+                d = MH.op(body)
+                d["current"] = MA.public(acc)
+                d["needs_auth"] = False
+                return self._json(d)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/proactive":
+            try:
+                from gbt_allinone import proactive as _PA
+                op = str(body.get("op") or "status").lower()
+                if op == "start":
+                    return self._json(_PA.start())
+                if op == "stop":
+                    return self._json(_PA.stop())
+                if op == "submit":
+                    return self._json(_PA.submit(body))
+                if op == "blueprint":
+                    return self._json(_PA.submit_blueprint(int(body.get("limit") or 5)))
+                if op == "tickets":
+                    return self._json(_PA.status())
+                return self._json(_PA.status())
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
@@ -1340,7 +1433,8 @@ class Handler(BaseHTTPRequestHandler):
             if not text:
                 return self._json({"ok": False, "error": "user_error: 需要 text"}, 400)
             try:
-                return self._json(_chat(text, str(body.get("context") or CONTEXT_NAME)))
+                return self._json(_chat(text, str(body.get("context") or CONTEXT_NAME),
+                                        use_capabilities=body.get("capability") is not False))
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:160])}, 500)
         return self._json({"ok": False, "error": "not found"}, 404)
@@ -1356,7 +1450,7 @@ def main() -> int:
         allow_reuse_address = sys.platform != "win32"
 
     srv = _Server(("127.0.0.1", a.port), Handler)
-    print("认知界面: http://127.0.0.1:%d/  （/api/data · /api/chat · /api/memory）" % a.port)
+    print("认知界面: http://127.0.0.1:%d/  （/api/data · /api/chat（含 capability_router 四类）· /api/memory）" % a.port)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

@@ -1,4 +1,4 @@
-# gbt-capability: hand_bridge
+﻿# gbt-capability: hand_bridge
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """hand_bridge — 灵巧手硬件桥（原生位 · 2026-11-01 蒸馏自 dexterous-hand 知识胶囊）。
 
@@ -71,7 +71,7 @@ TRANSPORTS = {
 STATUS = {
     "cap": "hand_bridge", "tier": "native",
     "ops": ["status", "transports", "profiles", "connect", "read_state",
-            "move", "stop", "disconnect", "where"],
+            "move", "stop", "disconnect", "contact", "read_force", "compliance", "where"],
     "transports": TRANSPORTS,
     "profiles": sorted(PROFILES),
     "safety": {"move_default_dry_run": True, "limits_clamped": True,
@@ -149,13 +149,36 @@ class _Loopback:
     def __init__(self, profile):
         self.profile = profile
         self.state = {j["name"]: 0.0 for j in profile.get("joints") or []}
+        self.force = {j["name"]: 0.0 for j in profile.get("joints") or []}
+        self.stiffness = 1.0
+        self.damping = 0.05
 
     def write(self, targets):
         self.state.update(targets)
         return {"ok": True, "written": dict(targets)}
 
     def read(self):
-        return {"ok": True, "joints": dict(self.state), "simulated": True}
+        return {"ok": True, "joints": dict(self.state), "simulated": True,
+                "force": dict(self.force), "stiffness": self.stiffness}
+
+    def contact(self, joint, external, stiffness=None, damping=None):
+        """虚拟接触：力 = k*(关节位置 - 外部位置)；仅仿真。"""
+        if joint not in self.state:
+            return {"ok": False, "status": "user_error", "error": "未知关节 %s" % joint}
+        k = float(self.stiffness if stiffness is None else stiffness)
+        d = float(self.damping if damping is None else damping)
+        f = k * (float(self.state[joint]) - float(external))
+        self.force[joint] = round(f, 6)
+        return {"ok": True, "simulated": True, "joint": joint, "force": round(f, 6),
+                "stiffness": k, "damping": d, "external": float(external),
+                "contact": abs(f) > 1e-6}
+
+    def set_compliance(self, stiffness=None, damping=None):
+        if stiffness is not None:
+            self.stiffness = max(0.0, float(stiffness))
+        if damping is not None:
+            self.damping = max(0.0, float(damping))
+        return {"ok": True, "simulated": True, "stiffness": self.stiffness, "damping": self.damping}
 
 
 class _ModbusTcp:
@@ -314,6 +337,25 @@ def run(op="status", **kw):
                 "error": "会话不存在（先 connect）：%r" % sid,
                 "sessions": list(_SESSIONS)}
     dev = sess["dev"]
+    if op == "contact":
+        if sess["transport"] != "loopback":
+            return {"ok": False, "op": op, "status": "needs_hardware",
+                    "error": "真机接触/力反馈需要传感器；本件不伪造力",
+                    "session": sid, "transport": sess["transport"]}
+        return {**dev.contact(str(kw.get("joint")), kw.get("external", 0.0),
+                              kw.get("stiffness"), kw.get("damping")), "op": op, "session": sid}
+    if op == "read_force":
+        if sess["transport"] != "loopback":
+            return {"ok": False, "op": op, "status": "needs_hardware",
+                    "error": "真机力反馈需要传感器；本件不伪造力", "session": sid}
+        return {"ok": True, "op": op, "session": sid, "simulated": True,
+                "force": dict(dev.force), "stiffness": dev.stiffness}
+    if op == "compliance":
+        if sess["transport"] != "loopback":
+            return {"ok": False, "op": op, "status": "needs_hardware",
+                    "error": "真机柔顺控制需要厂商接口；本件不伪造", "session": sid}
+        return {**dev.set_compliance(kw.get("stiffness"), kw.get("damping")),
+                "op": op, "session": sid}
     if op == "read_state":
         if sess["transport"] == "loopback":
             res = dev.read()
@@ -380,3 +422,4 @@ def run(op="status", **kw):
         return {"ok": True, "op": op, "session": sid, "disconnected": True}
     return {"ok": False, "op": op, "status": "unknown_op",
             "error": "未知 op：%s" % op, "available": STATUS["ops"], "fail_closed": True}
+

@@ -360,9 +360,7 @@ def asr(audio=None):
 
 
 def _ps_exe():
-    # System.Speech 在 Windows PowerShell 5.1 里是内置 .NET Framework 组件；
-    # PowerShell 7（pwsh）默认不带它 ⇒ 离线识别会 exit=1。这里优先 powershell.exe。
-    for n in ("powershell", "pwsh"):
+    for n in ("pwsh", "powershell"):
         p = shutil.which(n)
         if p:
             return p
@@ -540,7 +538,8 @@ def _record_wav(seconds, to, device=None):
         try:
             dev_arg = str(int(device))
         except Exception:  # noqa: BLE001
-            dev_arg = str(device)   # 也接受设备名片段（如 "Microphone Array"）
+            return {"ok": False, "status": "bad_device",
+                    "error": "device 必须是整数索引（现读拿到的是 %r）" % (device,)}
     for py in cands:
         cmd = [py, str(rec), "--seconds", str(float(seconds)), "--out", str(out), "--json"]
         if dev_arg is not None:

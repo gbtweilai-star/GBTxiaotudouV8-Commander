@@ -1338,3 +1338,792 @@ NODES.update({
     "SaveAudioAdvanced": {"fn": _n_SaveAudioAdvanced, "in": ["audio", "out"], "out": ["AUDIO"],
                           "writes": True, "desc": "音频落盘（只接 wav；MP3/Opus 如实不接）"},
 })
+
+
+# ── 2026-11-02 · 秋叶取食清单唯一 remaining useful：ImageAddNoise ──
+def _n_ImageAddNoise(inputs: dict, ctx: dict) -> dict:
+    """ComfyUI 同名：给图像加高斯噪声（seed 可复现，strength 0~1）。"""
+    import numpy as np
+    from PIL import Image
+
+    src = inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: 要 image"}
+    strength = float(inputs.get("strength") if inputs.get("strength") is not None else 0.1)
+    strength = max(0.0, min(1.0, strength))
+    seed = int(inputs.get("seed") or 0)
+    img = Image.open(str(src)).convert("RGBA")
+    arr = np.asarray(img).astype(np.float32)
+    rng = np.random.default_rng(seed)
+    noise = rng.normal(0.0, 255.0 * strength, arr[:, :, :3].shape)
+    arr[:, :, :3] = np.clip(arr[:, :, :3] + noise, 0, 255)
+    out_img = Image.fromarray(arr.astype(np.uint8), "RGBA")
+    out = _save(out_img, inputs, "addnoise")
+    return {"ok": True, "out": out, "seed": seed, "strength": strength,
+            "width": out_img.width, "height": out_img.height}
+
+
+NODES["ImageAddNoise"] = {
+    "fn": _n_ImageAddNoise,
+    "in": ["image", "out", "seed?", "strength?"],
+    "out": ["IMAGE"],
+    "writes": True,
+    "desc": "图像加高斯噪声（ComfyUI 同名；seed 可复现）",
+}
+
+
+# ── 2026-11-02 · 天真第二批：核心面纯 CPU 结构/字符串节点（20 个）──
+# 这些节点不产图、不碰模型/云端，只用 Python 类型与字符串；可安全接秋叶图的值传递。
+def _n_PrimitiveString(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("value") or "")}
+
+
+def _n_PrimitiveStringMultiline(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("value") or "")}
+
+
+def _n_PrimitiveInt(inputs, ctx):
+    try:
+        return {"ok": True, "value": int(inputs.get("value") or 0)}
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "user_error: PrimitiveInt 要整数"}
+
+
+def _n_PrimitiveFloat(inputs, ctx):
+    try:
+        return {"ok": True, "value": float(inputs.get("value") or 0.0)}
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "user_error: PrimitiveFloat 要数字"}
+
+
+def _n_PrimitiveBoolean(inputs, ctx):
+    v = inputs.get("value")
+    if isinstance(v, str):
+        v = v.strip().lower() in ("1", "true", "yes", "on")
+    return {"ok": True, "value": bool(v)}
+
+
+def _n_PrimitiveBoundingBox(inputs, ctx):
+    return {"ok": True, "value": inputs.get("value") or [0, 0, 0, 0]}
+
+
+def _n_InvertBooleanNode(inputs, ctx):
+    v = inputs.get("value", inputs.get("boolean"))
+    if isinstance(v, str):
+        v = v.strip().lower() in ("1", "true", "yes", "on")
+    return {"ok": True, "value": not bool(v)}
+
+
+def _n_StringCompare(inputs, ctx):
+    a = str(inputs.get("a", inputs.get("string_a", "")))
+    b = str(inputs.get("b", inputs.get("string_b", "")))
+    op = str(inputs.get("op") or "eq").lower()
+    return {"ok": True, "value": (a == b) if op in ("eq", "==", "equal") else (a != b)}
+
+
+def _n_StringConcatenate(inputs, ctx):
+    a = str(inputs.get("a", inputs.get("string_a", "")))
+    b = str(inputs.get("b", inputs.get("string_b", "")))
+    sep = str(inputs.get("separator") or "")
+    return {"ok": True, "value": a + sep + b}
+
+
+def _n_StringContains(inputs, ctx):
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    sub = str(inputs.get("substring") or inputs.get("find") or "")
+    return {"ok": True, "value": sub in s}
+
+
+def _n_StringLength(inputs, ctx):
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    return {"ok": True, "value": len(s)}
+
+
+def _n_StringReplace(inputs, ctx):
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    find = str(inputs.get("find") or inputs.get("old") or "")
+    repl = str(inputs.get("replace") or inputs.get("new") or "")
+    return {"ok": True, "value": s.replace(find, repl) if find else s}
+
+
+def _n_StringSubstring(inputs, ctx):
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    start = int(inputs.get("start") or 0)
+    length = inputs.get("length")
+    return {"ok": True, "value": s[start:start + int(length)] if length is not None else s[start:]}
+
+
+def _n_StringTrim(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("string") or inputs.get("text") or "").strip()}
+
+
+def _n_JsonExtractString(inputs, ctx):
+    import json as _json
+    raw = inputs.get("json") if inputs.get("json") is not None else inputs.get("value")
+    try:
+        data = _json.loads(raw) if isinstance(raw, str) else raw
+    except Exception:  # noqa: BLE001
+        return {"ok": False, "error": "user_error: JsonExtractString 的 json 不合法"}
+    key = str(inputs.get("key") or inputs.get("path") or "")
+    cur = data
+    for part in [p for p in key.replace("/", ".").split(".") if p]:
+        if isinstance(cur, dict):
+            cur = cur.get(part)
+        elif isinstance(cur, list):
+            cur = cur[int(part)] if part.isdigit() and int(part) < len(cur) else None
+        else:
+            cur = None
+    return {"ok": True, "value": "" if cur is None else str(cur)}
+
+
+def _n_KSamplerSelect(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("sampler_name") or inputs.get("value") or "euler")}
+
+
+def _n_ResolutionSelector(inputs, ctx):
+    return {"ok": True, "width": int(inputs.get("width") or 1024),
+            "height": int(inputs.get("height") or 1024),
+            "value": [int(inputs.get("width") or 1024), int(inputs.get("height") or 1024)]}
+
+
+def _n_ComfySwitchNode(inputs, ctx):
+    return {"ok": True, "value": inputs.get("on_true") if inputs.get("condition") else inputs.get("on_false")}
+
+
+def _n_ComfySoftSwitchNode(inputs, ctx):
+    return _n_ComfySwitchNode(inputs, ctx)
+
+
+def _n_ConvertStringToComboNode(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("value") or inputs.get("string") or "")}
+
+
+NODES.update({
+    "PrimitiveString": {"fn": _n_PrimitiveString, "in": ["value?"], "out": ["STRING"],
+                        "writes": False, "desc": "字符串常量"},
+    "PrimitiveStringMultiline": {"fn": _n_PrimitiveStringMultiline, "in": ["value?"], "out": ["STRING"],
+                                 "writes": False, "desc": "多行字符串常量"},
+    "PrimitiveInt": {"fn": _n_PrimitiveInt, "in": ["value?"], "out": ["INT"],
+                     "writes": False, "desc": "整数常量"},
+    "PrimitiveFloat": {"fn": _n_PrimitiveFloat, "in": ["value?"], "out": ["FLOAT"],
+                       "writes": False, "desc": "浮点常量"},
+    "PrimitiveBoolean": {"fn": _n_PrimitiveBoolean, "in": ["value?"], "out": ["BOOLEAN"],
+                         "writes": False, "desc": "布尔常量"},
+    "PrimitiveBoundingBox": {"fn": _n_PrimitiveBoundingBox, "in": ["value?"], "out": ["BBOX"],
+                             "writes": False, "desc": "包围盒常量"},
+    "InvertBooleanNode": {"fn": _n_InvertBooleanNode, "in": ["value?"], "out": ["BOOLEAN"],
+                          "writes": False, "desc": "布尔取反"},
+    "StringCompare": {"fn": _n_StringCompare, "in": ["a?", "b?", "op?"], "out": ["BOOLEAN"],
+                      "writes": False, "desc": "字符串比较"},
+    "StringConcatenate": {"fn": _n_StringConcatenate, "in": ["a?", "b?", "separator?"], "out": ["STRING"],
+                          "writes": False, "desc": "字符串拼接"},
+    "StringContains": {"fn": _n_StringContains, "in": ["string?", "substring?"], "out": ["BOOLEAN"],
+                       "writes": False, "desc": "字符串包含"},
+    "StringLength": {"fn": _n_StringLength, "in": ["string?"], "out": ["INT"],
+                     "writes": False, "desc": "字符串长度"},
+    "StringReplace": {"fn": _n_StringReplace, "in": ["string?", "find?", "replace?"], "out": ["STRING"],
+                      "writes": False, "desc": "字符串替换"},
+    "StringSubstring": {"fn": _n_StringSubstring, "in": ["string?", "start?", "length?"], "out": ["STRING"],
+                        "writes": False, "desc": "字符串截取"},
+    "StringTrim": {"fn": _n_StringTrim, "in": ["string?"], "out": ["STRING"],
+                   "writes": False, "desc": "字符串去空白"},
+    "JsonExtractString": {"fn": _n_JsonExtractString, "in": ["json?", "key?"], "out": ["STRING"],
+                          "writes": False, "desc": "JSON 取字符串"},
+    "KSamplerSelect": {"fn": _n_KSamplerSelect, "in": ["sampler_name?"], "out": ["STRING"],
+                       "writes": False, "desc": "采样器名选择（不跑采样）"},
+    "ResolutionSelector": {"fn": _n_ResolutionSelector, "in": ["width?", "height?"], "out": ["INT", "INT"],
+                           "writes": False, "desc": "分辨率选择"},
+    "ComfySwitchNode": {"fn": _n_ComfySwitchNode, "in": ["condition?", "on_true?", "on_false?"], "out": ["VALUE"],
+                        "writes": False, "desc": "条件开关"},
+    "ComfySoftSwitchNode": {"fn": _n_ComfySoftSwitchNode, "in": ["condition?", "on_true?", "on_false?"], "out": ["VALUE"],
+                            "writes": False, "desc": "软条件开关"},
+    "ConvertStringToComboNode": {"fn": _n_ConvertStringToComboNode, "in": ["value?"], "out": ["STRING"],
+                                 "writes": False, "desc": "字符串转选择值"},
+})
+
+
+# ── 2026-11-02 · 天真第三批：字符串/设备选择/列表/图像边缘结构节点（9 个）──
+def _n_StringFormat(inputs, ctx):
+    tmpl = str(inputs.get("format") if inputs.get("format") is not None else inputs.get("template") or "")
+    vals = inputs.get("values")
+    try:
+        if isinstance(vals, dict):
+            return {"ok": True, "value": tmpl.format(**vals)}
+        if isinstance(vals, (list, tuple)):
+            return {"ok": True, "value": tmpl.format(*vals)}
+        return {"ok": True, "value": tmpl.format(vals if vals is not None else "")}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": "user_error: StringFormat 失败 %s" % str(e)[:120]}
+
+
+def _n_SelectDevice(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("device") or inputs.get("value") or "default")}
+
+
+def _n_MergeLists(inputs, ctx):
+    out = []
+    for k in ("list1", "list2", "lists", "images", "texts", "value"):
+        v = inputs.get(k)
+        if isinstance(v, list):
+            out.extend(v)
+        elif v is not None:
+            out.append(v)
+    return {"ok": True, "value": out, "count": len(out)}
+
+
+def _n_PadImageNode(inputs, ctx):
+    from PIL import ImageOps
+    img, err = _rgba(inputs) if "_rgba" in globals() else (None, None)
+    if img is None:
+        from PIL import Image
+        src = inputs.get("image") or inputs.get("path")
+        if not src:
+            return {"ok": False, "error": "user_error: 要 image"}
+        img = Image.open(str(src)).convert("RGBA")
+    l = int(inputs.get("left") or inputs.get("pad_left") or 0)
+    t = int(inputs.get("top") or inputs.get("pad_top") or 0)
+    r = int(inputs.get("right") or inputs.get("pad_right") or 0)
+    b = int(inputs.get("bottom") or inputs.get("pad_bottom") or 0)
+    color = inputs.get("color") or (0, 0, 0, 0)
+    if isinstance(color, str):
+        color = tuple(int(x) for x in color.replace("#", "").strip()) if color.startswith("#") else (0, 0, 0, 0)
+    if len(color) == 3:
+        color = (*color, 255)
+    out_img = ImageOps.expand(img, border=(l, t, r, b), fill=tuple(color))
+    out = _save(out_img, inputs, "padimage")
+    return {"ok": True, "out": out, "width": out_img.width, "height": out_img.height}
+
+
+def _n_ResizeImageMaskNode(inputs, ctx):
+    from PIL import Image
+    src = inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: 要 image"}
+    img = Image.open(str(src)).convert("RGBA")
+    w = int(inputs.get("width") or img.width)
+    h = int(inputs.get("height") or img.height)
+    method = str(inputs.get("method") or "lanczos").lower()
+    m = {"nearest": Image.NEAREST, "bilinear": Image.BILINEAR, "bicubic": Image.BICUBIC,
+         "area": Image.BOX, "lanczos": Image.LANCZOS}.get(method, Image.LANCZOS)
+    out_img = img.resize((max(1, w), max(1, h)), m)
+    out = _save(out_img, inputs, "resizeimagemask")
+    return {"ok": True, "out": out, "width": out_img.width, "height": out_img.height}
+
+
+def _n_ComfyMathExpression(inputs, ctx):
+    import ast
+    import operator
+    expr = str(inputs.get("expression") or inputs.get("value") or "").strip()
+    if not expr:
+        return {"ok": True, "value": 0}
+    ops = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+           ast.Div: operator.truediv, ast.FloorDiv: operator.floordiv,
+           ast.Mod: operator.mod, ast.Pow: operator.pow, ast.USub: operator.neg,
+           ast.UAdd: operator.pos}
+    def ev(node):
+        if isinstance(node, ast.Expression):
+            return ev(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return node.value
+        if isinstance(node, ast.BinOp) and type(node.op) in ops:
+            return ops[type(node.op)](ev(node.left), ev(node.right))
+        if isinstance(node, ast.UnaryOp) and type(node.op) in ops:
+            return ops[type(node.op)](ev(node.operand))
+        raise ValueError("unsupported expression")
+    try:
+        return {"ok": True, "value": ev(ast.parse(expr, mode="eval"))}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": "user_error: ComfyMathExpression 不支持 %s" % str(e)[:120]}
+
+
+NODES.update({
+    "StringFormat": {"fn": _n_StringFormat, "in": ["format?", "values?"], "out": ["STRING"],
+                     "writes": False, "desc": "字符串格式化（Python format）"},
+    "SelectCLIPDevice": {"fn": _n_SelectDevice, "in": ["device?"], "out": ["STRING"],
+                         "writes": False, "desc": "CLIP 设备选择（值透传）"},
+    "SelectModelDevice": {"fn": _n_SelectDevice, "in": ["device?"], "out": ["STRING"],
+                          "writes": False, "desc": "模型设备选择（值透传）"},
+    "SelectVAEDevice": {"fn": _n_SelectDevice, "in": ["device?"], "out": ["STRING"],
+                        "writes": False, "desc": "VAE 设备选择（值透传）"},
+    "MergeImageLists": {"fn": _n_MergeLists, "in": ["list1?", "list2?", "lists?"], "out": ["LIST"],
+                        "writes": False, "desc": "合并图像列表"},
+    "MergeTextLists": {"fn": _n_MergeLists, "in": ["list1?", "list2?", "lists?"], "out": ["LIST"],
+                       "writes": False, "desc": "合并文本列表"},
+    "PadImageNode": {"fn": _n_PadImageNode, "in": ["image", "out", "left?", "top?", "right?", "bottom?", "color?"],
+                     "out": ["IMAGE"], "writes": True, "desc": "图像边缘填充"},
+    "ResizeImageMaskNode": {"fn": _n_ResizeImageMaskNode, "in": ["image", "out", "width?", "height?", "method?"],
+                            "out": ["IMAGE"], "writes": True, "desc": "图像/遮罩缩放"},
+    "ComfyMathExpression": {"fn": _n_ComfyMathExpression, "in": ["expression?"], "out": ["FLOAT"],
+                            "writes": False, "desc": "安全算术表达式"},
+})
+
+
+# ── 2026-11-02 · 天真第四批：列表/正则/颜色空间（9 个纯 CPU）──
+def _n_CreateList(inputs, ctx):
+    v = inputs.get("items", inputs.get("value", inputs.get("list")))
+    if isinstance(v, list):
+        return {"ok": True, "value": list(v), "count": len(v)}
+    return {"ok": True, "value": [] if v is None else [v], "count": 0 if v is None else 1}
+
+
+def _n_GetItemFromList(inputs, ctx):
+    lst = inputs.get("list")
+    if isinstance(lst, str):
+        try:
+            import json as _json
+            lst = _json.loads(lst)
+        except Exception:  # noqa: BLE001
+            lst = []
+    if not isinstance(lst, (list, tuple)):
+        return {"ok": False, "error": "user_error: GetItemFromList 要 list"}
+    try:
+        i = int(inputs.get("index") or 0)
+        return {"ok": True, "value": lst[i]}
+    except Exception:  # noqa: BLE001
+        return {"ok": False, "error": "user_error: index 越界"}
+
+
+def _n_CustomCombo(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("value") or inputs.get("text") or "")}
+
+
+def _n_StripWhitespace(inputs, ctx):
+    return {"ok": True, "value": str(inputs.get("string") or inputs.get("text") or "").strip()}
+
+
+def _n_RegexMatch(inputs, ctx):
+    import re
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    p = str(inputs.get("pattern") or "")
+    try:
+        return {"ok": True, "value": bool(re.search(p, s))}
+    except re.error as e:
+        return {"ok": False, "error": "user_error: 正则错误 %s" % e}
+
+
+def _n_RegexExtract(inputs, ctx):
+    import re
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    p = str(inputs.get("pattern") or "")
+    try:
+        m = re.search(p, s)
+        if not m:
+            return {"ok": True, "value": ""}
+        g = int(inputs.get("group") or 0)
+        return {"ok": True, "value": m.group(g)}
+    except (re.error, IndexError) as e:
+        return {"ok": False, "error": "user_error: 正则提取失败 %s" % e}
+
+
+def _n_RegexReplace(inputs, ctx):
+    import re
+    s = str(inputs.get("string") or inputs.get("text") or "")
+    p = str(inputs.get("pattern") or "")
+    r = str(inputs.get("replacement") or inputs.get("replace") or "")
+    try:
+        return {"ok": True, "value": re.sub(p, r, s)}
+    except re.error as e:
+        return {"ok": False, "error": "user_error: 正则错误 %s" % e}
+
+
+def _n_ImageRGBToYUV(inputs, ctx):
+    import numpy as np
+    from PIL import Image
+    src = inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: 要 image"}
+    im = Image.open(str(src)).convert("RGBA")
+    a = np.asarray(im).astype(np.float32)
+    r, g, b = a[:, :, 0], a[:, :, 1], a[:, :, 2]
+    y = 0.299 * r + 0.587 * g + 0.114 * b
+    u = -0.147 * r - 0.289 * g + 0.436 * b + 128.0
+    v = 0.615 * r - 0.515 * g - 0.100 * b + 128.0
+    out_arr = np.dstack([y, u, v, a[:, :, 3]]).clip(0, 255).astype(np.uint8)
+    out_img = Image.fromarray(out_arr, "RGBA")
+    out = _save(out_img, inputs, "rgb2yuv")
+    return {"ok": True, "out": out, "space": "YUV"}
+
+
+def _n_ImageYUVToRGB(inputs, ctx):
+    import numpy as np
+    from PIL import Image
+    src = inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: 要 image"}
+    im = Image.open(str(src)).convert("RGBA")
+    a = np.asarray(im).astype(np.float32)
+    y, u, v = a[:, :, 0], a[:, :, 1] - 128.0, a[:, :, 2] - 128.0
+    r = y + 1.140 * v
+    g = y - 0.395 * u - 0.581 * v
+    b = y + 2.032 * u
+    out_arr = np.dstack([r, g, b, a[:, :, 3]]).clip(0, 255).astype(np.uint8)
+    out_img = Image.fromarray(out_arr, "RGBA")
+    out = _save(out_img, inputs, "yuv2rgb")
+    return {"ok": True, "out": out, "space": "RGB"}
+
+
+NODES.update({
+    "CreateList": {"fn": _n_CreateList, "in": ["items?", "value?"], "out": ["LIST"],
+                   "writes": False, "desc": "创建列表"},
+    "GetItemFromList": {"fn": _n_GetItemFromList, "in": ["list?", "index?"], "out": ["VALUE"],
+                        "writes": False, "desc": "按索引取列表项"},
+    "CustomCombo": {"fn": _n_CustomCombo, "in": ["value?"], "out": ["STRING"],
+                    "writes": False, "desc": "自定义选择值"},
+    "StripWhitespace": {"fn": _n_StripWhitespace, "in": ["string?"], "out": ["STRING"],
+                        "writes": False, "desc": "去首尾空白"},
+    "RegexMatch": {"fn": _n_RegexMatch, "in": ["string?", "pattern?"], "out": ["BOOLEAN"],
+                   "writes": False, "desc": "正则匹配"},
+    "RegexExtract": {"fn": _n_RegexExtract, "in": ["string?", "pattern?", "group?"], "out": ["STRING"],
+                     "writes": False, "desc": "正则提取"},
+    "RegexReplace": {"fn": _n_RegexReplace, "in": ["string?", "pattern?", "replacement?"], "out": ["STRING"],
+                     "writes": False, "desc": "正则替换"},
+    "ImageRGBToYUV": {"fn": _n_ImageRGBToYUV, "in": ["image", "out"], "out": ["IMAGE"],
+                      "writes": True, "desc": "RGB→YUV 通道（BT.601）"},
+    "ImageYUVToRGB": {"fn": _n_ImageYUVToRGB, "in": ["image", "out"], "out": ["IMAGE"],
+                      "writes": True, "desc": "YUV→RGB 通道（BT.601）"},
+})
+
+
+# ── 2026-11-02 · 天真第五批：图层/形态学/空洞/分辨率/列表（7 个纯 CPU）──
+def _n_AddLayer(inputs, ctx):
+    from PIL import Image
+    p1 = inputs.get("image1") or inputs.get("image") or inputs.get("base")
+    p2 = inputs.get("image2") or inputs.get("layer")
+    if not p1 or not p2:
+        return {"ok": False, "error": "user_error: AddLayer 要 image1/image2"}
+    a = Image.open(str(p1)).convert("RGBA")
+    b = Image.open(str(p2)).convert("RGBA")
+    if b.size != a.size:
+        b = b.resize(a.size)
+    opacity = max(0.0, min(1.0, float(inputs.get("opacity") if inputs.get("opacity") is not None else 1.0)))
+    if opacity < 1.0:
+        alpha = b.getchannel("A").point(lambda x: int(x * opacity))
+        b.putalpha(alpha)
+    out_img = Image.alpha_composite(a, b)
+    out = _save(out_img, inputs, "addlayer")
+    return {"ok": True, "out": out, "opacity": opacity, "width": out_img.width, "height": out_img.height}
+
+
+def _n_Morphology(inputs, ctx):
+    from PIL import Image, ImageFilter
+    src = inputs.get("image") or inputs.get("mask") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: Morphology 要 image/mask"}
+    img = Image.open(str(src)).convert("L")
+    k = max(1, int(inputs.get("kernel_size") or inputs.get("kernel") or 3))
+    op = str(inputs.get("operation") or inputs.get("op") or "dilate").lower()
+    f = ImageFilter.MaxFilter(k if k % 2 else k + 1) if op.startswith("dil") else ImageFilter.MinFilter(k if k % 2 else k + 1)
+    out_img = img.filter(f).convert("RGBA")
+    out = _save(out_img, inputs, "morphology")
+    return {"ok": True, "out": out, "operation": op, "kernel": k}
+
+
+def _n_FillHoles(inputs, ctx):
+    import numpy as np
+    from collections import deque
+    from PIL import Image
+    src = inputs.get("mask") or inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: FillHoles 要 mask"}
+    img = Image.open(str(src)).convert("L")
+    a = np.asarray(img).copy()
+    h, w = a.shape
+    bg = a < 128
+    seen = np.zeros_like(bg, dtype=bool)
+    q = deque()
+    for x in range(w):
+        for y in (0, h - 1):
+            if bg[y, x] and not seen[y, x]:
+                seen[y, x] = True; q.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if bg[y, x] and not seen[y, x]:
+                seen[y, x] = True; q.append((y, x))
+    while q:
+        y, x = q.popleft()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < h and 0 <= nx < w and bg[ny, nx] and not seen[ny, nx]:
+                seen[ny, nx] = True; q.append((ny, nx))
+    filled = a.copy()
+    filled[bg & ~seen] = 255
+    out_img = Image.fromarray(filled, "L").convert("RGBA")
+    out = _save(out_img, inputs, "fillholes")
+    return {"ok": True, "out": out, "filled": int((bg & ~seen).sum())}
+
+
+def _n_ResolutionBucket(inputs, ctx):
+    w = int(inputs.get("width") or 1024)
+    h = int(inputs.get("height") or 1024)
+    bucket = "landscape" if w > h else ("portrait" if h > w else "square")
+    return {"ok": True, "width": w, "height": h, "bucket": bucket, "value": [w, h]}
+
+
+def _n_ShuffleDataset(inputs, ctx):
+    import random
+    data = inputs.get("dataset", inputs.get("items", inputs.get("list", [])))
+    if not isinstance(data, list):
+        return {"ok": False, "error": "user_error: ShuffleDataset 要 list"}
+    out = list(data)
+    seed = int(inputs.get("seed") or 0)
+    random.Random(seed).shuffle(out)
+    return {"ok": True, "value": out, "count": len(out), "seed": seed}
+
+
+def _n_CreateBoundingBoxes(inputs, ctx):
+    boxes = inputs.get("boxes", inputs.get("value", []))
+    if not isinstance(boxes, list):
+        boxes = []
+    return {"ok": True, "value": boxes, "count": len(boxes)}
+
+
+def _n_LayersFromBoundingBoxes(inputs, ctx):
+    boxes = inputs.get("boxes", inputs.get("value", []))
+    if not isinstance(boxes, list):
+        boxes = []
+    return {"ok": True, "value": boxes, "layers": len(boxes)}
+
+
+NODES.update({
+    "AddLayer": {"fn": _n_AddLayer, "in": ["image1", "image2", "out", "opacity?"], "out": ["IMAGE"],
+                 "writes": True, "desc": "图层叠加（Pillow alpha composite）"},
+    "Morphology": {"fn": _n_Morphology, "in": ["image", "out", "operation?", "kernel_size?"], "out": ["IMAGE"],
+                    "writes": True, "desc": "灰度形态学（膨胀/腐蚀）"},
+    "FillHoles": {"fn": _n_FillHoles, "in": ["mask", "out"], "out": ["MASK"],
+                  "writes": True, "desc": "填遮罩孔洞（边界背景泛洪）"},
+    "ResolutionBucket": {"fn": _n_ResolutionBucket, "in": ["width?", "height?"], "out": ["INT", "INT"],
+                         "writes": False, "desc": "分辨率分桶"},
+    "ShuffleDataset": {"fn": _n_ShuffleDataset, "in": ["dataset?", "seed?"], "out": ["LIST"],
+                       "writes": False, "desc": "数据集洗牌（seed 可复现）"},
+    "CreateBoundingBoxes": {"fn": _n_CreateBoundingBoxes, "in": ["boxes?"], "out": ["LIST"],
+                            "writes": False, "desc": "包围盒列表"},
+    "LayersFromBoundingBoxes": {"fn": _n_LayersFromBoundingBoxes, "in": ["boxes?"], "out": ["LIST"],
+                                "writes": False, "desc": "包围盒转图层列表"},
+})
+
+
+# ── 2026-11-02 · 天真第六批：Canny 边缘（numpy 实现，不依赖 cv2）──
+def _n_Canny(inputs, ctx):
+    import numpy as np
+    from PIL import Image, ImageFilter
+
+    src = inputs.get("image") or inputs.get("path")
+    if not src:
+        return {"ok": False, "error": "user_error: 要 image"}
+    low = float(inputs.get("low_threshold") if inputs.get("low_threshold") is not None else 100)
+    high = float(inputs.get("high_threshold") if inputs.get("high_threshold") is not None else 200)
+    img = Image.open(str(src)).convert("L").filter(ImageFilter.GaussianBlur(1.4))
+    a = np.asarray(img, dtype=np.float32)
+    p = np.pad(a, 1, mode="edge")
+    gx = (p[:-2, 2:] + 2 * p[1:-1, 2:] + p[2:, 2:]) - (p[:-2, :-2] + 2 * p[1:-1, :-2] + p[2:, :-2])
+    gy = (p[2:, :-2] + 2 * p[2:, 1:-1] + p[2:, 2:]) - (p[:-2, :-2] + 2 * p[:-2, 1:-1] + p[:-2, 2:])
+    mag = np.hypot(gx, gy)
+    ang = (np.rad2deg(np.arctan2(gy, gx)) + 180) % 180
+    nms = np.zeros_like(mag)
+    for y in range(1, mag.shape[0] - 1):
+        for x in range(1, mag.shape[1] - 1):
+            d = ang[y, x]
+            if d < 22.5 or d >= 157.5:
+                n1, n2 = mag[y, x - 1], mag[y, x + 1]
+            elif d < 67.5:
+                n1, n2 = mag[y - 1, x + 1], mag[y + 1, x - 1]
+            elif d < 112.5:
+                n1, n2 = mag[y - 1, x], mag[y + 1, x]
+            else:
+                n1, n2 = mag[y - 1, x - 1], mag[y + 1, x + 1]
+            if mag[y, x] >= n1 and mag[y, x] >= n2:
+                nms[y, x] = mag[y, x]
+    strong = nms >= high
+    weak = (nms >= low) & ~strong
+    edges = strong.copy()
+    for _ in range(2):
+        grow = edges.copy()
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+            grow |= np.roll(edges, (dy, dx), axis=(0, 1))
+        edges = grow & (strong | weak)
+    out_img = Image.fromarray((edges * 255).astype(np.uint8), "L").convert("RGBA")
+    out = _save(out_img, inputs, "canny")
+    return {"ok": True, "out": out, "edge_pixels": int(edges.sum()),
+            "low": low, "high": high, "width": out_img.width, "height": out_img.height}
+
+
+NODES["Canny"] = {
+    "fn": _n_Canny,
+    "in": ["image", "out", "low_threshold?", "high_threshold?"],
+    "out": ["IMAGE"],
+    "writes": True,
+    "desc": "Canny 边缘（numpy 实现，不依赖 cv2）",
+}
+
+
+# ── 2026-11-02 · 本地 ComfyUI object_info 真快照里的最后 traditional：SaveImageWebsocket ──
+def _n_SaveImageWebsocket(inputs, ctx):
+    """ComfyUI 自定义节点同名：保存 images 到本地（不真开 websocket）。"""
+    import os
+    import shutil
+    src = inputs.get("images") or inputs.get("image") or inputs.get("path")
+    if isinstance(src, (list, tuple)):
+        src = src[0] if src else ""
+    if not src:
+        return {"ok": False, "error": "user_error: SaveImageWebsocket 要 images"}
+    out = inputs.get("out")
+    if not out:
+        out = _out_path(inputs, "websocket_image")
+    p = os.fspath(out)
+    os.makedirs(os.path.dirname(p), exist_ok=True) if os.path.dirname(p) else None
+    shutil.copyfile(str(src), p)
+    return {"ok": True, "out": p, "bytes": os.path.getsize(p), "ui": {"images": [p]}}
+
+
+NODES["SaveImageWebsocket"] = {
+    "fn": _n_SaveImageWebsocket,
+    "in": ["images", "out?"],
+    "out": ["IMAGE"],
+    "writes": True,
+    "desc": "保存 images（ComfyUI websocket image save 的本地等效）",
+}
+
+
+# ── 2026-11-02 · 本地 Diffusers SD-Turbo：不装 ComfyUI 也能文生图 ──
+_SD_TURBO_PIPE = {"path": None, "pipe": None, "load_s": None}
+
+
+def _sd_turbo_path():
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    rel = os.path.join("vendor", "hf", "hub",
+                       "models--stabilityai--sd-turbo", "snapshots",
+                       "b261bac6fd2cf515557d5d0707481eafa0485ec2")
+    for base in (root, os.path.dirname(root)):
+        p = os.path.join(base, rel)
+        if os.path.isdir(p):
+            return p
+    return ""
+
+
+def _n_t2i_sdturbo(inputs, ctx):
+    """本地 Diffusers SD-Turbo CPU 文生图（不依赖 ComfyUI）。"""
+    import os
+    import sys
+    import time
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (root, os.path.dirname(root)):
+        pylibs = os.path.join(base, "vendor", "pylibs")
+        if os.path.isdir(pylibs) and pylibs not in sys.path:
+            sys.path.insert(0, pylibs)
+    model = str(inputs.get("model") or _sd_turbo_path())
+    if not model or not os.path.isdir(model):
+        return {"ok": False, "status": "needs_dependency",
+                "error": "本地 SD-Turbo 权重不在；需要 vendor/hf 下的 sd-turbo snapshot"}
+    prompt = str(inputs.get("prompt") or inputs.get("text") or "").strip()
+    if not prompt:
+        return {"ok": False, "error": "user_error: 要 prompt"}
+    try:
+        import torch
+        from diffusers import AutoPipelineForText2Image
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "status": "needs_dependency",
+                "error": "缺少 torch/diffusers：%s" % str(e)[:160]}
+    t0 = time.time()
+    if _SD_TURBO_PIPE["pipe"] is None or _SD_TURBO_PIPE["path"] != model:
+        pipe = AutoPipelineForText2Image.from_pretrained(
+            model, torch_dtype=torch.float32, local_files_only=True,
+            safety_checker=None, requires_safety_checker=False)
+        pipe.to("cpu")
+        _SD_TURBO_PIPE.update({"path": model, "pipe": pipe,
+                               "load_s": round(time.time() - t0, 2)})
+    size = int(inputs.get("size") or inputs.get("width") or 256)
+    size = max(64, min(512, size))
+    steps = max(1, min(4, int(inputs.get("steps") or 1)))
+    seed = int(inputs.get("seed") or 0)
+    gen = torch.Generator(device="cpu").manual_seed(seed)
+    t1 = time.time()
+    img = _SD_TURBO_PIPE["pipe"](
+        prompt=prompt, num_inference_steps=steps, guidance_scale=0.0,
+        width=size, height=size, generator=gen).images[0]
+    out = _save(img.convert("RGBA"), inputs, "sdturbo")
+    return {"ok": True, "out": out, "prompt": prompt, "size": [size, size],
+            "steps": steps, "seed": seed,
+            "load_s": _SD_TURBO_PIPE["load_s"],
+            "generation_s": round(time.time() - t1, 2),
+            "engine": "diffusers SD-Turbo CPU（本地权重）"}
+
+
+NODES["t2i_sdturbo"] = {
+    "fn": _n_t2i_sdturbo,
+    "in": ["prompt", "out", "size?", "steps?", "seed?", "model?"],
+    "out": ["IMAGE"],
+    "writes": True,
+    "desc": "本地 Diffusers SD-Turbo CPU 文生图（不走 ComfyUI/云端）",
+}
+
+
+# ── 2026-11-03 · 融合权重节点：RV5.1 × Tiny-SD（本地 gbt-fused-sd15）──
+_FUSED_PIPE = {"path": None, "pipe": None, "load_s": None}
+
+
+def _fused_path():
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (root, os.path.dirname(root)):
+        p = os.path.join(base, "vendor", "hf", "gbt-fused-sd15")
+        if os.path.isdir(p):
+            return p
+    return ""
+
+
+def _n_t2i_fused(inputs, ctx):
+    """用我们自己融合的 SD1.5 权重出图（本地，不碰云端/ComfyUI）。"""
+    import os
+    import sys
+    import time
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (root, os.path.dirname(root)):
+        pylibs = os.path.join(base, "vendor", "pylibs")
+        if os.path.isdir(pylibs) and pylibs not in sys.path:
+            sys.path.insert(0, pylibs)
+    model = str(inputs.get("model") or _fused_path())
+    if not model or not os.path.isdir(model):
+        return {"ok": False, "status": "needs_dependency",
+                "error": "本地融合权重 gbt-fused-sd15 不在"}
+    prompt = str(inputs.get("prompt") or inputs.get("text") or "").strip()
+    if not prompt:
+        return {"ok": False, "error": "user_error: 要 prompt"}
+    try:
+        import torch
+        from diffusers import StableDiffusionPipeline
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "status": "needs_dependency",
+                "error": "缺少 torch/diffusers：%s" % str(e)[:160]}
+    t0 = time.time()
+    if _FUSED_PIPE["pipe"] is None or _FUSED_PIPE["path"] != model:
+        pipe = StableDiffusionPipeline.from_pretrained(
+            model, torch_dtype=torch.float32, local_files_only=True)
+        pipe.to("cpu")
+        pipe.enable_attention_slicing()
+        _FUSED_PIPE.update({"path": model, "pipe": pipe,
+                            "load_s": round(time.time() - t0, 2)})
+    size = int(inputs.get("size") or 256)
+    size = max(64, min(512, size))
+    steps = max(1, min(20, int(inputs.get("steps") or 8)))
+    seed = int(inputs.get("seed") or 0)
+    g = torch.Generator(device="cpu").manual_seed(seed)
+    t1 = time.time()
+    img = _FUSED_PIPE["pipe"](prompt=prompt, num_inference_steps=steps,
+                              guidance_scale=7.0, width=size, height=size,
+                              generator=g).images[0]
+    out = _save(img.convert("RGBA"), inputs, "t2ifused")
+    return {"ok": True, "out": out, "prompt": prompt, "size": [size, size],
+            "steps": steps, "seed": seed,
+            "load_s": _FUSED_PIPE["load_s"],
+            "generation_s": round(time.time() - t1, 2),
+            "engine": "本地融合权重 gbt-fused-sd15（RV5.1×Tiny-SD）"}
+
+
+NODES["t2i_fused"] = {
+    "fn": _n_t2i_fused,
+    "in": ["prompt", "out", "size?", "steps?", "seed?", "model?"],
+    "out": ["IMAGE"],
+    "writes": True,
+    "desc": "本地融合权重文生图（RV5.1×Tiny-SD，不碰云/ComfyUI）",
+}

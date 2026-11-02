@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 # 🔴 2026-09-25 事故恢复：本文件曾被一次**编码损坏的整文件改写**弄坏（见账 §一百三十七）。
 # 恢复依据：① `__pycache__/caps_registry.cpython-314.pyc`（数据表与 docstring 逐字取回）；
 #           ② `git show :gbt_allinone/caps_registry.py`（注释）。
@@ -57,7 +57,22 @@ BENIGN_CAPS = {
         "handler": 'body_open',
         "safe": True,
     },
-    "hand_retarget": {
+    "body_realtime": {
+        "domain": 'device',
+        "desc": '身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。',
+        "handler": 'body_realtime',
+        "safe": True,
+    },    "hand_realtime": {
+        "domain": 'device',
+        "desc": '手·眼手脑同拍（灵巧手 loopback）：21 点流 → hand_retarget → hand_bridge.move → read_state，同一 tick 闭环；op=status/loop（hz/seconds）。loopback 是仿真，不驱动真手。',
+        "handler": 'hand_realtime',
+        "safe": True,
+    },    "hand_vision": {
+        "domain": 'device',
+        "desc": '手·眼睛：本地 MediaPipe Hands 从摄像头/图片/视频取 21 点（x,y,z+左右手）；op=status/image/camera。摄像头不可用如实 needs_camera，不伪造；输出归一化坐标，接真手前需标定。',
+        "handler": 'hand_vision',
+        "safe": True,
+    },    "hand_retarget": {
         "domain": 'device',
         "desc": '身体·手语翻译（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：把 21 点手部跟踪'
                 '（Vision Pro/Quest3/摄像头/IMU 手套先转 21 点）映射成目标灵巧手关节角；内置 '
@@ -3555,3 +3570,6 @@ def params_hint(kind: str) -> str:
     if need:
         return str((need or {}).get("hint") or "")
     return str((BENIGN_CAPS.get(k) or {}).get("params_hint") or "")
+
+
+

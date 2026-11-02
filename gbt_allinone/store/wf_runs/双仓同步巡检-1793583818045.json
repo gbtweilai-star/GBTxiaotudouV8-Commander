@@ -1,0 +1,228 @@
+{
+  "record": {
+    "run_id": "双仓同步巡检-1793583818045",
+    "workflow": "双仓同步巡检",
+    "params": {},
+    "status": "ok",
+    "nodes": {
+      "guard": "ok",
+      "voice": "ok"
+    },
+    "elapsed_s": 12.225,
+    "finished_at": "2026-11-02T08:43:38"
+  },
+  "results": {
+    "guard": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "sync_guard",
+        "result": {
+          "ok": true,
+          "op": "patrol",
+          "aligned": false,
+          "verdict": "DRIFT",
+          "alerts": [
+            {
+              "level": "warn",
+              "code": "sync_drift",
+              "message": "双仓源码面漂移：only_live=38 only_delivery=555 differ=43",
+              "fix": "tools\\two-way-sync.ps1 pull -Apply  # 或 push -Apply -Refresh"
+            }
+          ],
+          "reading": {
+            "verdict": "DRIFT",
+            "live_caps": 385,
+            "delivery_caps": 385,
+            "live_files": 2924,
+            "delivery_files": 3455,
+            "only_live_n": 38,
+            "only_delivery_n": 555,
+            "differ_n": 43,
+            "only_live": [
+              "data/scope-samples/bugcrowd-sample.json",
+              "data/scope-samples/hackerone-sample.json",
+              "docs/120-bounty-report-and-tracker.md",
+              "docs/121-platform-scope-import.md",
+              "docs/122-submit-bundle.md",
+              "docs/123-platform-status-sync.md",
+              "docs/124-omni-all-sync.md",
+              "docs/125-alarm-rootcause-fixes.md",
+              "docs/126-security-policy-three-rules.md",
+              "docs/127-attack-evidence-only.md",
+              "docs/128-attack-evidence-admission.md",
+              "docs/129-full-forensics-chain.md",
+              "docs/130-engine-gpu-vulkan.md",
+              "gbt_allinone/attack_evidence.py",
+              "gbt_allinone/attack_forensics.py",
+              "gbt_allinone/bounty_core.py",
+              "gbt_allinone/memory_bank.py",
+              "gbt_allinone/memory_sync.py",
+              "gbt_allinone/omni_all.py",
+              "gbt_allinone/omni_attr.py"
+            ],
+            "only_delivery": [
+              "desktop/main.js",
+              "desktop/package-lock.json",
+              "desktop/package.json",
+              "docs/120-memory-api.md",
+              "docs/121-console-3d-vendor.md",
+              "docs/122-team-collab-redesign.md",
+              "docs/123-mind-task-guidance-redo.md",
+              "docs/124-blueprint-3d-preview.md",
+              "docs/125-tentacle-binding-map.md",
+              "docs/126-app-skin-datacube.md",
+              "docs/127-dark-settings-portable.md",
+              "docs/128-desktop-electron-app.md",
+              "docs/86-comfyui-local.md",
+              "gbt_allinone/tools/memory_sync.py",
+              "holo_pet_w3/activity/index.html",
+              "holo_pet_w3/ai-board/ai-board-data.js",
+              "holo_pet_w3/ai-board/index.html",
+              "holo_pet_w3/blueprint/blueprint-data.js",
+              "holo_pet_w3/blueprint/index.html",
+              "holo_pet_w3/blueprint3d/bp3d.css"
+            ],
+            "differ": [
+              "CHANGELOG.md",
+              "assets/panels/console-bounty.webp",
+              "assets/panels/console-plug.webp",
+              "docs/README.md",
+              "gbt_allinone/bounty.py",
+              "gbt_allinone/console_service.py",
+              "gbt_allinone/cross_scan.py",
+              "gbt_allinone/deployment_rehearsal.py",
+              "gbt_allinone/preflight.py",
+              "gbt_allinone/profession_dispatch.py",
+              "gbt_allinone/room_space.py",
+              "gbt_allinone/tools/belief_forge.py",
+              "gbt_allinone/tools/case_mine.py",
+              "gbt_allinone/tools/creation_camp.py",
+              "gbt_allinone/tools/db_probe.py",
+              "gbt_allinone/tools/long_run_supervisor.py",
+              "gbt_allinone/tools/look_grade_cap.py",
+              "gbt_allinone/tools/policy_delta.py",
+              "holo_pet/assets/console/index.html",
+              "holo_pet/assets/freebuff/index.html"
+            ],
+            "quiet_age_s": 11189.2
+          },
+          "delivery": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
+          "live": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main",
+          "fix": "tools\\two-way-sync.ps1 status / pull -Apply / push -Apply -Refresh / verify",
+          "record": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\state\\sync_guard.jsonl",
+          "notified": "notified_error",
+          "pushed": "toast_ok"
+        }
+      }
+    },
+    "voice": {
+      "gbt_stamp": {
+        "framework": "GBT小土豆",
+        "version": "8.0.0",
+        "mark": "GBT",
+        "developer": "自由的风",
+        "ownership": "independent-personal",
+        "note": "本作品由 GBT小土豆V8 框架生成 · 开发者：自由的风 · 独立私人框架，与任何企业公司无关"
+      },
+      "gbt_result": {
+        "status": "ok",
+        "kind": "alerts",
+        "result": {
+          "quiet": true,
+          "quiet_means": "窗口内没有**现行故障**（runtime_faults=0）；但异常事件数不为 0 ⇒ 仍需人逐条看一眼",
+          "any_signal": true,
+          "needs_a_look": true,
+          "needs_a_look_means": "真故障(runtime/guard) 或 在册能力位异常 ⇒ True；只有不在册名字上的测试足迹 ⇒ False",
+          "sockets": {
+            "alert": false,
+            "counts": {
+              "added": 0,
+              "removed": 0,
+              "flipped": 0
+            },
+            "removed": [],
+            "flipped": [],
+            "at": "2026-11-02T08:43:34",
+            "how": "omni_open op=diff 看全量；op=scan 立刻重扫"
+          },
+          "registered_anomalies": 1,
+          "unregistered_footprints": [
+            "_def_probe.txt",
+            "backtest_api_v2",
+            "blockchain_bridge",
+            "cis_harvesting_v2",
+            "cis_v42_trader",
+            "crypto_gateway",
+            "gate_daemon",
+            "gbt_cap_bridge"
+          ],
+          "anomalies": 4,
+          "runtime_faults": 0,
+          "by_signal": {
+            "runtime": 0,
+            "guard": 0,
+            "trace": 1,
+            "legacy": 1,
+            "recovered": 2
+          },
+          "by_event": {
+            "pipeline_blocked": 1,
+            "svc_down": 1,
+            "error": 2
+          },
+          "top_offenders": [
+            {
+              "capability": "_def_probe.txt",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 1,
+              "legacy": 0,
+              "total": 1
+            },
+            {
+              "capability": "payment_gateway",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "blockchain_bridge",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "social_trading_v2",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            },
+            {
+              "capability": "monitor_service",
+              "runtime": 0,
+              "guard": 0,
+              "trace": 0,
+              "legacy": 1,
+              "total": 1
+            }
+          ],
+          "note": "runtime=要追的病；guard=护栏正常工作；trace=测试足迹；legacy=历史缺席；recovered=历史掉线已恢复。⚠️ **别只看 quiet**：anomalies 不为 0 就得逐条看，否则那几条会一直挂着没人碰。"
+        }
+      }
+    }
+  }
+}
