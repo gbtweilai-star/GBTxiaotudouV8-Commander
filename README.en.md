@@ -54,7 +54,7 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 | Claim | Reading | Where |
 |---|---|---|
 | Capability benchmark | 335 items · mean cov **0.9873** · **PASS45 330/335 = 98.51%** (2nd run); **99.10%** (1st run) | [docs/04-evaluation.md](docs/04-evaluation.md) |
-| Every bit live-tested | **340 ok / 0 needs-ticket / 1 needs-input / 0 failed = 341**（快照；现役注册表 427） | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
+| Every bit live-tested | **306 ok / 88 needs-ticket / 30 needs-input / 2 denied = 427** (live at 2026-11-04T14:13:12; 0 unattributed, 0 timeout) | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
 | Concurrency | 512 → 4096 concurrent calls, **100% success**, ~260/s, +~50 MB | [docs/08-concurrency.md](docs/08-concurrency.md) |
 | Multi-domain regression | 29 domains / 236 bits: **221 ok · 15 need ticket · 0 regressions** | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
 | Reverse-calling cloud compute | model `200 · 1.2s` · 3/3 images `29.7s` · local CPU `321.1 GFLOP/s` · video **27.0s / 49,893 B / sha_match=true** | [docs/13-omni-plug.md](docs/13-omni-plug.md) |

@@ -37,8 +37,13 @@ jobs:
 
       - name: 导入与能力面冒烟
         shell: bash
+        # -X faulthandler：2026-11-04 windows-latest/py3.10 曾出现退出时段错误
+        # （断言全过、exit 139，重跑即绿）。加它之后段错误会打印 Python 堆栈，
+        # 下次崩就能直接定位到哪个原生库，而不是只看到一个退出码。
         run: |
-          python - <<'PY'
+          python -X faulthandler - <<'PY'
+          import faulthandler
+          faulthandler.enable()
           import sys
           sys.path.insert(0, ".")
           import gbt_allinone as gbt
@@ -57,3 +62,10 @@ jobs:
           set -e
           python tests/test_legacy_guard.py
           python tests/test_autonomy.py
+
+      # 口径防复发：README/README.en 的读数行必须与 data/ 里的真身一致。
+      # 曾经因为「图由脚本硬编码 341 + README 手改数字」导致首屏与正文长期脱节，
+      # 这里把「一致」变成 CI 判据，而不是靠人记得去改。
+      - name: 文档口径与真身一致（漂移即红）
+        shell: bash
+        run: python tools/codex-scripts/sync-readme-figures.py --check
