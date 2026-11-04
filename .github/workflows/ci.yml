@@ -71,3 +71,40 @@ jobs:
       - name: 文档口径与真身一致（漂移即红）
         shell: bash
         run: python tools/codex-scripts/sync-readme-figures.py --check
+
+  # ── 判据 job（2026-11-04 新增）──────────────────────────────────────────────
+  # 血账：这批判据（能力位三处齐 / 双向绑定 / 链路真调 / 六面可感知）**一直没进 CI**。
+  #   原因不是懒，是结构性的 —— `state/` 整目录被 gitignore，判据的输入根本不入库，
+  #   接进来也只会红。2026-11-04 给 state/ 开了 4 文件白名单之后，这个前提才成立。
+  # 「判据长期不跑」= 假绿，比没有判据更坏，所以这里补上。
+  gates:
+    name: 判据（能力位 · 绑定 · 链路 · 六面）
+    runs-on: ubuntu-latest
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+      # tests/__init__.py 拒绝在「已绑定生产 store」的进程里跑测试（那是设计不是 bug），
+      # 所以指到 runner 的临时目录。
+      GBT_STORE_DIR: ${{ runner.temp }}/gbt_test_store
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: 六面状态必须读得出来（缺件不许伪装成读失败）
+        run: python tools/framework_state.py
+
+      - name: 能力位三处齐 · 双向绑定 · 缺口有名有姓（判据 A/B/C/D）
+        run: python -m unittest -v gbt_allinone.tests.test_cap_bind_bidirectional
+
+      - name: 链路工具真调（说能操控就必须调得通）
+        run: python -m unittest -v gbt_allinone.tests.test_chain_readiness
+
+      - name: LLM 绑定
+        run: python -m unittest -v gbt_allinone.tests.test_llm_bind_wired
+
+      - name: 护栏审查（危险能力与资金转账必须仍在票门里）
+        run: python tools/codex-scripts/guardrail-check.py --selftest
