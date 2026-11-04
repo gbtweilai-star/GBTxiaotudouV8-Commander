@@ -184,6 +184,23 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 
 
 
+## 4.3 修复纪律（主人令 2026-11-04，三条都是硬要求）
+
+> 「每次必须使用万能插和多域监控，以及修复必须走镜像多维度空间原子替换。」
+
+| 时机 | 必须做 | 不做的后果 |
+|---|---|---|
+| **动手前** | `omni_plug` 先认接口（`op=universal` 现场识别 target），不要猜它的类型 | 猜错就是把开放面当封闭面读（2026-11-04 把万能插说成「7 类插座」，被主人当面纠正） |
+| **改完** | `python tools/codex-scripts/multi-domain-monitor.py --diff` 跑整面复查 | 改一处坏一处没人知道；且「未通过」必须逐条点名，不许只说个数 |
+| **落地** | 走镜像维度原子替换：`mirror_shape` → `mirror_scan` → `mirror_simulate` → `mirror_parity` → `mirror_rehearse` → `mirror_release` | 直接写生产等于没有回滚点 |
+
+**镜像流程的两条铁律**（2026-11-04 实测）：
+
+1. `mirror_release` 返回 `blocked: true`（"生产前排练未全绿，禁止晋升"）时**停手**，不许绕过、不许调高判据。当轮它就拦住了一次不合格晋升——原因是产物页面缺「开发者：自由的风」署名。
+2. 产物页面必须自带署名。`console_pages.py` 的 `_shell()` 现在在 `<body>` 后写一行 HTML 注释钢印；新写任何生成器都要照做，否则 `mirror_scan` 的 `signature` 项会红。
+
+**本轮实测数据**：scan 5/5 · simulate 9/9 · parity ok · rehearse ok · release **version 16 / 23 文件**（dimension 从 11 文件扩到 23，把 `holo_pet/assets` 12 个页面纳入维度层）。
+
 ## 5. 改完必须自查
 
 ```powershell

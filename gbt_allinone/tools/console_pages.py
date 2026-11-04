@@ -126,6 +126,7 @@ def _shell(title: str, subtitle: str, body: str, script: str, extra_css: str = "
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><style>{TOKENS}{hcss}{extra_css}</style></head><body>
+<!-- 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属 -->
 <div class="top"><div class="brand"><span class="mark"></span>
 <div><h1>{title}</h1><div class="sub">{subtitle}</div></div></div>
 <div class="chip">{time.strftime("%Y-%m-%d %H:%M")} · 快照内联 · 数据源 console_hub</div></div>
