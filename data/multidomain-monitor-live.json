@@ -1,5 +1,5 @@
 {
- "at": "2026-11-04T14:57:21",
+ "at": "2026-11-04T15:38:33",
  "domains": {
   "body_control": {
    "tested": 1,
@@ -141,12 +141,9 @@
   },
   "security": {
    "tested": 24,
-   "ok": 22,
+   "ok": 24,
    "skip": 10,
-   "bad": {
-    "sec_scan": "timeout",
-    "sec_chain": "timeout"
-   }
+   "bad": {}
   },
   "social": {
    "tested": 2,
@@ -205,37 +202,37 @@
  "per_cap": {
   "body_control": {
    "result": "ok",
-   "ms": 75,
+   "ms": 60,
    "why": ""
   },
   "dream_replay": {
    "result": "ok",
-   "ms": 11,
+   "ms": 2,
    "why": ""
   },
   "absorb_loop": {
    "result": "ok",
-   "ms": 6,
+   "ms": 10,
    "why": ""
   },
   "route_ledger": {
    "result": "ok",
-   "ms": 7,
+   "ms": 4,
    "why": ""
   },
   "semantic_match": {
    "result": "ok",
-   "ms": 76,
+   "ms": 64,
    "why": ""
   },
   "stigmergy": {
    "result": "ok",
-   "ms": 14,
+   "ms": 0,
    "why": ""
   },
   "coze_mail": {
    "result": "ok",
-   "ms": 9,
+   "ms": 14,
    "why": ""
   },
   "email_cap": {
@@ -245,57 +242,57 @@
   },
   "viral_forge": {
    "result": "ok",
-   "ms": 16,
+   "ms": 15,
    "why": ""
   },
   "taste_guard": {
    "result": "ok",
-   "ms": 33,
+   "ms": 15,
    "why": ""
   },
   "comfy_forge": {
    "result": "ok",
-   "ms": 10,
+   "ms": 20,
    "why": ""
   },
   "create": {
    "result": "ok",
-   "ms": 7,
+   "ms": 6,
    "why": ""
   },
   "drama": {
    "result": "ok",
-   "ms": 8,
+   "ms": 7,
    "why": ""
   },
   "ref3d": {
    "result": "ok",
-   "ms": 8,
+   "ms": 5,
    "why": ""
   },
   "music_publishing": {
    "result": "ok",
-   "ms": 6,
+   "ms": 4,
    "why": ""
   },
   "anim_audit": {
    "result": "ok",
-   "ms": 9,
+   "ms": 5,
    "why": ""
   },
   "dh_asset_gate": {
    "result": "ok",
-   "ms": 6,
+   "ms": 5,
    "why": ""
   },
   "brand_outro": {
    "result": "ok",
-   "ms": 2,
+   "ms": 5,
    "why": ""
   },
   "emotion_projection": {
    "result": "ok",
-   "ms": 11,
+   "ms": 4,
    "why": ""
   },
   "scene_anchor": {
@@ -305,22 +302,22 @@
   },
   "code_art": {
    "result": "ok",
-   "ms": 0,
+   "ms": 3,
    "why": ""
   },
   "render_evolution": {
    "result": "ok",
-   "ms": 16,
+   "ms": 10,
    "why": ""
   },
   "diagram_distill": {
    "result": "ok",
-   "ms": 11,
+   "ms": 6,
    "why": ""
   },
   "machine_distill": {
    "result": "ok",
-   "ms": 3,
+   "ms": 1,
    "why": ""
   },
   "cad_distill": {
@@ -330,202 +327,202 @@
   },
   "console_pages": {
    "result": "ok",
-   "ms": 91,
+   "ms": 62,
    "why": ""
   },
   "image_scout": {
    "result": "ok",
-   "ms": 260,
+   "ms": 339,
    "why": ""
   },
   "lobehub": {
    "result": "ok",
-   "ms": 19,
+   "ms": 15,
    "why": ""
   },
   "comfyui": {
    "result": "ok",
-   "ms": 2055,
+   "ms": 2064,
    "why": ""
   },
   "comfy_native": {
    "result": "ok",
-   "ms": 15,
+   "ms": 10,
    "why": ""
   },
   "tentacle_comfy_bridge": {
    "result": "ok",
-   "ms": 4084,
+   "ms": 4075,
    "why": ""
   },
   "one_shot": {
    "result": "ok",
-   "ms": 7,
+   "ms": 0,
    "why": ""
   },
   "dl_forge": {
    "result": "ok",
-   "ms": 5,
+   "ms": 17,
    "why": ""
   },
   "dh_realism": {
    "result": "ok",
-   "ms": 7,
+   "ms": 4,
    "why": ""
   },
   "dh_brain": {
    "result": "ok",
-   "ms": 6,
+   "ms": 8,
    "why": ""
   },
   "creation_camp": {
    "result": "ok",
-   "ms": 4,
+   "ms": 5,
    "why": ""
   },
   "flow_canvas": {
    "result": "ok",
-   "ms": 5,
+   "ms": 6,
    "why": ""
   },
   "ui_render": {
    "result": "ok",
-   "ms": 4,
+   "ms": 7,
    "why": ""
   },
   "ui_kit": {
    "result": "ok",
-   "ms": 11,
+   "ms": 2,
    "why": ""
   },
   "design_atlas": {
    "result": "ok",
-   "ms": 9,
+   "ms": 16,
    "why": ""
   },
   "motion_kit": {
    "result": "ok",
-   "ms": 5,
+   "ms": 4,
    "why": ""
   },
   "bits_kit": {
    "result": "ok",
-   "ms": 12,
+   "ms": 13,
    "why": ""
   },
   "intake_kit": {
    "result": "ok",
-   "ms": 7,
+   "ms": 2,
    "why": ""
   },
   "echo": {
    "result": "ok",
-   "ms": 8,
+   "ms": 11,
    "why": ""
   },
   "count_words": {
    "result": "ok",
-   "ms": 8,
+   "ms": 2,
    "why": ""
   },
   "audit_query": {
    "result": "ok",
-   "ms": 7,
+   "ms": 9,
    "why": ""
   },
   "datakit": {
    "result": "ok",
-   "ms": 2,
+   "ms": 4,
    "why": ""
   },
   "account_registry": {
    "result": "ok",
-   "ms": 17,
+   "ms": 0,
    "why": ""
   },
   "bi_distill": {
    "result": "ok",
-   "ms": 0,
+   "ms": 13,
    "why": ""
   },
   "db_plugin": {
    "result": "ok",
-   "ms": 13,
+   "ms": 0,
    "why": ""
   },
   "db_probe": {
    "result": "ok",
-   "ms": 257,
+   "ms": 222,
    "why": ""
   },
   "control_loop": {
    "result": "ok",
-   "ms": 16,
+   "ms": 11,
    "why": ""
   },
   "body_map": {
    "result": "ok",
-   "ms": 2930,
+   "ms": 2555,
    "why": ""
   },
   "body_see": {
    "result": "ok",
-   "ms": 68,
+   "ms": 60,
    "why": ""
   },
   "body_say": {
    "result": "ok",
-   "ms": 77,
+   "ms": 56,
    "why": ""
   },
   "body_type": {
    "result": "ok",
-   "ms": 68,
+   "ms": 52,
    "why": ""
   },
   "body_click": {
    "result": "ok",
-   "ms": 71,
+   "ms": 52,
    "why": ""
   },
   "body_volume": {
    "result": "ok",
-   "ms": 76,
+   "ms": 55,
    "why": ""
   },
   "body_open": {
    "result": "ok",
-   "ms": 87,
+   "ms": 57,
    "why": ""
   },
   "body_realtime": {
    "result": "ok",
-   "ms": 16,
+   "ms": 11,
    "why": ""
   },
   "hand_realtime": {
    "result": "ok",
-   "ms": 12,
+   "ms": 2,
    "why": ""
   },
   "hand_vision": {
    "result": "failed",
-   "ms": 11,
+   "ms": 0,
    "why": "No module named 'cv2'"
   },
   "hand_retarget": {
    "result": "ok",
-   "ms": 10,
+   "ms": 15,
    "why": ""
   },
   "body_sense": {
    "result": "ok",
-   "ms": 3053,
+   "ms": 3042,
    "why": ""
   },
   "bluetooth": {
    "result": "denied",
-   "ms": 7,
+   "ms": 16,
    "missing_scopes": [
     "device_control"
    ],
@@ -533,7 +530,7 @@
   },
   "bt_control": {
    "result": "denied",
-   "ms": 5,
+   "ms": 4,
    "missing_scopes": [
     "device_control"
    ],
@@ -541,357 +538,357 @@
   },
   "body_eye": {
    "result": "ok",
-   "ms": 333,
+   "ms": 321,
    "why": ""
   },
   "devour_auto": {
    "result": "ok",
-   "ms": 10,
+   "ms": 12,
    "why": ""
   },
   "devour_scan": {
    "result": "ok",
-   "ms": 0,
+   "ms": 6,
    "why": ""
   },
   "devour_reflect": {
    "result": "ok",
-   "ms": 33,
+   "ms": 26,
    "why": ""
   },
   "devour_pulse": {
    "result": "ok",
-   "ms": 7585,
+   "ms": 8670,
    "why": ""
   },
   "devour_fusion": {
    "result": "ok",
-   "ms": 8,
+   "ms": 11,
    "why": ""
   },
   "wf_status": {
    "result": "ok",
-   "ms": 10,
+   "ms": 0,
    "why": ""
   },
   "energy_core": {
    "result": "ok",
-   "ms": 6048,
+   "ms": 6088,
    "why": ""
   },
   "transfer": {
    "result": "ok",
-   "ms": 18,
+   "ms": 12,
    "why": ""
   },
   "wf_cache_clear": {
    "result": "ok",
-   "ms": 26,
+   "ms": 0,
    "why": ""
   },
   "sched_tick": {
    "result": "ok",
-   "ms": 53,
+   "ms": 29,
    "why": ""
   },
   "sched_status": {
    "result": "ok",
-   "ms": 30,
+   "ms": 10,
    "why": ""
   },
   "world_forge": {
    "result": "ok",
-   "ms": 40,
+   "ms": 7,
    "why": ""
   },
   "quant_strategy": {
    "result": "ok",
-   "ms": 23,
+   "ms": 8,
    "why": ""
   },
   "quant_backtest": {
    "result": "ok",
-   "ms": 21,
+   "ms": 3,
    "why": ""
   },
   "quant_params": {
    "result": "ok",
-   "ms": 18,
+   "ms": 11,
    "why": ""
   },
   "quant": {
    "result": "ok",
-   "ms": 21,
+   "ms": 6,
    "why": ""
   },
   "gate_visibility": {
    "result": "ok",
-   "ms": 17,
+   "ms": 10,
    "why": ""
   },
   "a1art_skill": {
    "result": "ok",
-   "ms": 17,
+   "ms": 7,
    "why": ""
   },
   "cloud_plugin": {
    "result": "ok",
-   "ms": 12,
+   "ms": 9,
    "why": ""
   },
   "cloud_pc": {
    "result": "ok",
-   "ms": 12,
+   "ms": 6,
    "why": ""
   },
   "mcp_register": {
    "result": "ok",
-   "ms": 37,
+   "ms": 17,
    "why": ""
   },
   "mcp_servers": {
    "result": "ok",
-   "ms": 11,
+   "ms": 6,
    "why": ""
   },
   "mcp_unregister": {
    "result": "ok",
-   "ms": 41,
+   "ms": 19,
    "why": ""
   },
   "mcp_health": {
    "result": "ok",
-   "ms": 41,
+   "ms": 17,
    "why": ""
   },
   "feishu_embed": {
    "result": "ok",
-   "ms": 15,
+   "ms": 2,
    "why": ""
   },
   "telegram_embed": {
    "result": "ok",
-   "ms": 27,
+   "ms": 17,
    "why": ""
   },
   "whatsapp_embed": {
    "result": "ok",
-   "ms": 20,
+   "ms": 9,
    "why": ""
   },
   "life": {
    "result": "ok",
-   "ms": 21,
+   "ms": 15,
    "why": ""
   },
   "codex_status": {
    "result": "ok",
-   "ms": 35,
+   "ms": 4,
    "why": ""
   },
   "codex_tools": {
    "result": "ok",
-   "ms": 11,
+   "ms": 15,
    "why": ""
   },
   "codex_thread_new": {
    "result": "ok",
-   "ms": 475,
+   "ms": 459,
    "why": ""
   },
   "codex_models": {
    "result": "ok",
-   "ms": 81,
+   "ms": 29,
    "why": ""
   },
   "context_guard": {
    "result": "ok",
-   "ms": 37,
+   "ms": 11,
    "why": ""
   },
   "llm_chat": {
    "result": "failed",
-   "ms": 40,
+   "ms": 20,
    "why": "缺少 prompt：请给出要问其他 AI 的问题"
   },
   "llm_status": {
    "result": "ok",
-   "ms": 22,
+   "ms": 8,
    "why": ""
   },
   "cloud_llm": {
    "result": "ok",
-   "ms": 17,
+   "ms": 6,
    "why": ""
   },
   "brain_verify": {
    "result": "ok",
-   "ms": 90,
+   "ms": 31,
    "why": ""
   },
   "brain_health": {
    "result": "ok",
-   "ms": 495,
+   "ms": 180,
    "why": ""
   },
   "prompt_bridge": {
    "result": "ok",
-   "ms": 15,
+   "ms": 6,
    "why": ""
   },
   "llm_watch": {
    "result": "ok",
-   "ms": 27,
+   "ms": 11,
    "why": ""
   },
   "task_graph": {
    "result": "ok",
-   "ms": 15,
+   "ms": 5,
    "why": ""
   },
   "replan_loop": {
    "result": "ok",
-   "ms": 13,
+   "ms": 5,
    "why": ""
   },
   "duty_board": {
    "result": "ok",
-   "ms": 321,
+   "ms": 122,
    "why": ""
   },
   "ring_context": {
    "result": "ok",
-   "ms": 16,
+   "ms": 8,
    "why": ""
   },
   "warm_switch": {
    "result": "ok",
-   "ms": 362,
+   "ms": 502,
    "why": ""
   },
   "fact_gate": {
    "result": "ok",
-   "ms": 12,
+   "ms": 8,
    "why": ""
   },
   "policy_gate": {
    "result": "ok",
-   "ms": 16,
+   "ms": 6,
    "why": ""
   },
   "transformer": {
    "result": "ok",
-   "ms": 24,
+   "ms": 10,
    "why": ""
   },
   "automation_keys": {
    "result": "ok",
-   "ms": 15,
+   "ms": 6,
    "why": ""
   },
   "model_key_pool": {
    "result": "ok",
-   "ms": 29,
+   "ms": 10,
    "why": ""
   },
   "energy_scheduler": {
    "result": "ok",
-   "ms": 33,
+   "ms": 10,
    "why": ""
   },
   "freellmapi": {
    "result": "ok",
-   "ms": 4067,
+   "ms": 4083,
    "why": ""
   },
   "train_recipe": {
    "result": "ok",
-   "ms": 31,
+   "ms": 5,
    "why": ""
   },
   "offload_distill": {
    "result": "ok",
-   "ms": 119,
+   "ms": 48,
    "why": ""
   },
   "local_llm": {
    "result": "ok",
-   "ms": 2040,
+   "ms": 2041,
    "why": ""
   },
   "lr_tick": {
    "result": "ok",
-   "ms": 61,
+   "ms": 15,
    "why": ""
   },
   "lr_status": {
    "result": "ok",
-   "ms": 26,
+   "ms": 6,
    "why": ""
   },
   "tactics_advise": {
    "result": "ok",
-   "ms": 15,
+   "ms": 4,
    "why": ""
   },
   "experience_forge": {
    "result": "ok",
-   "ms": 23,
+   "ms": 14,
    "why": ""
   },
   "brain_vault": {
    "result": "ok",
-   "ms": 20,
+   "ms": 8,
    "why": ""
   },
   "turn_trace": {
    "result": "ok",
-   "ms": 25,
+   "ms": 6,
    "why": ""
   },
   "reminder": {
    "result": "ok",
-   "ms": 25,
+   "ms": 6,
    "why": ""
   },
   "api_slot": {
    "result": "ok",
-   "ms": 23,
+   "ms": 5,
    "why": ""
   },
   "thought_stream": {
    "result": "ok",
-   "ms": 26,
+   "ms": 2,
    "why": ""
   },
   "context_inject": {
    "result": "ok",
-   "ms": 16,
+   "ms": 0,
    "why": ""
   },
   "focus_stack": {
    "result": "ok",
-   "ms": 6,
+   "ms": 18,
    "why": ""
   },
   "mind": {
    "result": "ok",
-   "ms": 25,
+   "ms": 6,
    "why": ""
   },
   "director_mood": {
    "result": "ok",
-   "ms": 9,
+   "ms": 4,
    "why": ""
   },
   "proactive_report": {
    "result": "ok",
-   "ms": 13,
+   "ms": 9,
    "why": ""
   },
   "observer_anchor": {
    "result": "ok",
-   "ms": 26,
+   "ms": 1,
    "why": ""
   },
   "obsidian_vault": {
@@ -901,477 +898,477 @@
   },
   "wiki_graph": {
    "result": "ok",
-   "ms": 22,
+   "ms": 6,
    "why": ""
   },
   "doc_intake": {
    "result": "ok",
-   "ms": 18,
+   "ms": 7,
    "why": ""
   },
   "memory_bank": {
    "result": "ok",
-   "ms": 14,
+   "ms": 6,
    "why": ""
   },
   "memory_manager": {
    "result": "ok",
-   "ms": 24,
+   "ms": 9,
    "why": ""
   },
   "code_graph": {
    "result": "ok",
-   "ms": 28,
+   "ms": 6,
    "why": ""
   },
   "meta_cognition": {
    "result": "ok",
-   "ms": 24,
+   "ms": 11,
    "why": ""
   },
   "local_brain": {
    "result": "ok",
-   "ms": 23,
+   "ms": 5,
    "why": ""
   },
   "auto_switch": {
    "result": "ok",
-   "ms": 32,
+   "ms": 8,
    "why": ""
   },
   "brain_council": {
    "result": "ok",
-   "ms": 17,
+   "ms": 7,
    "why": ""
   },
   "agent_council": {
    "result": "ok",
-   "ms": 14,
+   "ms": 5,
    "why": ""
   },
   "belief_forge": {
    "result": "ok",
-   "ms": 24,
+   "ms": 11,
    "why": ""
   },
   "command_chain": {
    "result": "ok",
-   "ms": 24,
+   "ms": 11,
    "why": ""
   },
   "mirror_shape": {
    "result": "ok",
-   "ms": 44,
+   "ms": 13,
    "why": ""
   },
   "mirror_scan": {
    "result": "ok",
-   "ms": 44,
+   "ms": 19,
    "why": ""
   },
   "mirror_plan": {
    "result": "ok",
-   "ms": 48,
+   "ms": 14,
    "why": ""
   },
   "mirror_simulate": {
    "result": "ok",
-   "ms": 226,
+   "ms": 41,
    "why": ""
   },
   "mirror_parity": {
    "result": "ok",
-   "ms": 57,
+   "ms": 37,
    "why": ""
   },
   "mirror_rehearse": {
    "result": "ok",
-   "ms": 145,
+   "ms": 107,
    "why": ""
   },
   "mirror_release": {
    "result": "ok",
-   "ms": 239,
+   "ms": 102,
    "why": ""
   },
   "mirror_ascend": {
    "result": "ok",
-   "ms": 127,
+   "ms": 34,
    "why": ""
   },
   "mirror_status": {
    "result": "ok",
-   "ms": 32,
+   "ms": 18,
    "why": ""
   },
   "mirror_rewind": {
    "result": "ok",
-   "ms": 32,
+   "ms": 14,
    "why": ""
   },
   "pipeline_submit": {
    "result": "ok",
-   "ms": 61,
+   "ms": 27,
    "why": ""
   },
   "pipeline_status": {
    "result": "ok",
-   "ms": 45,
+   "ms": 11,
    "why": ""
   },
   "ghost_guard": {
    "result": "ok",
-   "ms": 2199,
+   "ms": 1109,
    "why": ""
   },
   "svc_inspect": {
    "result": "ok",
-   "ms": 630,
+   "ms": 632,
    "why": ""
   },
   "sync_guard": {
    "result": "ok",
-   "ms": 7907,
+   "ms": 3303,
    "why": ""
   },
   "platform_profile": {
    "result": "ok",
-   "ms": 15,
+   "ms": 13,
    "why": ""
   },
   "project_context": {
    "result": "ok",
-   "ms": 45,
+   "ms": 14,
    "why": ""
   },
   "research_intel": {
    "result": "ok",
-   "ms": 20,
+   "ms": 5,
    "why": ""
   },
   "trend_watch": {
    "result": "ok",
-   "ms": 15,
+   "ms": 12,
    "why": ""
   },
   "music_intel": {
    "result": "ok",
-   "ms": 27,
+   "ms": 4,
    "why": ""
   },
   "video_intel": {
    "result": "ok",
-   "ms": 12,
+   "ms": 8,
    "why": ""
   },
   "film_intel": {
    "result": "ok",
-   "ms": 12,
+   "ms": 7,
    "why": ""
   },
   "verification_watch": {
    "result": "ok",
-   "ms": 13,
+   "ms": 1,
    "why": ""
   },
   "rea_reverse": {
    "result": "ok",
-   "ms": 32,
+   "ms": 16,
    "why": ""
   },
   "recon_distill": {
    "result": "ok",
-   "ms": 16,
+   "ms": 11,
    "why": ""
   },
   "scrapling": {
    "result": "ok",
-   "ms": 17,
+   "ms": 5,
    "why": ""
   },
   "case_mine": {
    "result": "ok",
-   "ms": 38,
+   "ms": 13,
    "why": ""
   },
   "dual_gate": {
    "result": "ok",
-   "ms": 19,
+   "ms": 3,
    "why": ""
   },
   "sec_surface": {
    "result": "ok",
-   "ms": 2542,
+   "ms": 1180,
    "why": ""
   },
   "sec_scan": {
-   "result": "timeout",
-   "ms": 90000,
-   "why": "> 90s"
+   "result": "ok",
+   "ms": 60361,
+   "why": ""
   },
   "sec_chain": {
-   "result": "timeout",
-   "ms": 90000,
-   "why": "> 90s"
+   "result": "ok",
+   "ms": 60470,
+   "why": ""
   },
   "sec_defenses": {
    "result": "ok",
-   "ms": 99,
+   "ms": 76,
    "why": ""
   },
   "pentest_flow": {
    "result": "ok",
-   "ms": 16,
+   "ms": 10,
    "why": ""
   },
   "lan_pairing": {
    "result": "ok",
-   "ms": 49,
+   "ms": 16,
    "why": ""
   },
   "pairing": {
    "result": "ok",
-   "ms": 16,
+   "ms": 0,
    "why": ""
   },
   "pentest_distill": {
    "result": "ok",
-   "ms": 14,
+   "ms": 16,
    "why": ""
   },
   "code_audit": {
    "result": "ok",
-   "ms": 34,
+   "ms": 11,
    "why": ""
   },
   "install_selfcheck": {
    "result": "ok",
-   "ms": 0,
+   "ms": 4,
    "why": ""
   },
   "sec_sweeper": {
    "result": "ok",
-   "ms": 16,
+   "ms": 12,
    "why": ""
   },
   "penetrating_cross_scan": {
    "result": "ok",
-   "ms": 27,
+   "ms": 10,
    "why": ""
   },
   "hook_enforcer": {
    "result": "ok",
-   "ms": 16,
+   "ms": 6,
    "why": ""
   },
   "omission_detector": {
    "result": "ok",
-   "ms": 6,
+   "ms": 1,
    "why": ""
   },
   "social_eng": {
    "result": "ok",
-   "ms": 16,
+   "ms": 14,
    "why": ""
   },
   "paywallbuster": {
    "result": "ok",
-   "ms": 16,
+   "ms": 1,
    "why": ""
   },
   "asset_vault_freeze": {
    "result": "ok",
-   "ms": 945,
+   "ms": 1108,
    "why": ""
   },
   "onboarding_gate": {
    "result": "ok",
-   "ms": 3,
+   "ms": 0,
    "why": ""
   },
   "event_ledger": {
    "result": "ok",
-   "ms": 15,
+   "ms": 12,
    "why": ""
   },
   "llm_redteam": {
    "result": "ok",
-   "ms": 1,
+   "ms": 7,
    "why": ""
   },
   "policy_delta": {
    "result": "ok",
-   "ms": 16,
+   "ms": 8,
    "why": ""
   },
   "review_gate": {
    "result": "ok",
-   "ms": 16,
+   "ms": 6,
    "why": ""
   },
   "bounty_ops": {
    "result": "ok",
-   "ms": 16,
+   "ms": 9,
    "why": ""
   },
   "eigenflux": {
    "result": "ok",
-   "ms": 16,
+   "ms": 9,
    "why": ""
   },
   "auto_publish": {
    "result": "ok",
-   "ms": 16,
+   "ms": 6,
    "why": ""
   },
   "health": {
    "result": "ok",
-   "ms": 99,
+   "ms": 49,
    "why": ""
   },
   "selfscan": {
    "result": "ok",
-   "ms": 200,
+   "ms": 91,
    "why": ""
   },
   "alerts": {
    "result": "ok",
-   "ms": 16,
+   "ms": 7,
    "why": ""
   },
   "cap_self": {
    "result": "ok",
-   "ms": 0,
+   "ms": 8,
    "why": ""
   },
   "orchestration": {
    "result": "ok",
-   "ms": 116,
+   "ms": 68,
    "why": ""
   },
   "root_cause": {
    "result": "ok",
-   "ms": 16,
+   "ms": 8,
    "why": ""
   },
   "execution_guard": {
    "result": "ok",
-   "ms": 122,
+   "ms": 54,
    "why": ""
   },
   "truth_scan": {
    "result": "ok",
-   "ms": 10,
+   "ms": 6,
    "why": ""
   },
   "root_fix": {
    "result": "ok",
-   "ms": 31,
+   "ms": 11,
    "why": ""
   },
   "cross_scan": {
    "result": "ok",
-   "ms": 80712,
+   "ms": 56695,
    "why": ""
   },
   "inventory": {
    "result": "ok",
-   "ms": 92,
+   "ms": 57,
    "why": ""
   },
   "auth_gate_status": {
    "result": "ok",
-   "ms": 9,
+   "ms": 4,
    "why": ""
   },
   "signature_guard": {
    "result": "ok",
-   "ms": 163,
+   "ms": 114,
    "why": ""
   },
   "file_hygiene": {
    "result": "ok",
-   "ms": 6054,
+   "ms": 4908,
    "why": ""
   },
   "ux_doctrine": {
    "result": "ok",
-   "ms": 0,
+   "ms": 13,
    "why": ""
   },
   "welcome": {
    "result": "ok",
-   "ms": 15,
+   "ms": 0,
    "why": ""
   },
   "god_view": {
    "result": "ok",
-   "ms": 3,
+   "ms": 0,
    "why": ""
   },
   "update_chain": {
    "result": "ok",
-   "ms": 0,
+   "ms": 15,
    "why": ""
   },
   "update_verify": {
    "result": "ok",
-   "ms": 14,
+   "ms": 8,
    "why": ""
   },
   "resource_snapshot": {
    "result": "ok",
-   "ms": 167,
+   "ms": 160,
    "why": ""
   },
   "trace_store": {
    "result": "ok",
-   "ms": 0,
+   "ms": 6,
    "why": ""
   },
   "wave_probe": {
    "result": "ok",
-   "ms": 167,
+   "ms": 155,
    "why": ""
   },
   "tentacle_arm": {
    "result": "ok",
-   "ms": 14,
+   "ms": 10,
    "why": ""
   },
   "project_drift": {
    "result": "ok",
-   "ms": 0,
+   "ms": 2,
    "why": ""
   },
   "shared_resources": {
    "result": "ok",
-   "ms": 0,
+   "ms": 11,
    "why": ""
   },
   "hook_registry": {
    "result": "ok",
-   "ms": 21,
+   "ms": 6,
    "why": ""
   },
   "orchestration_kernel": {
    "result": "ok",
-   "ms": 5,
+   "ms": 6,
    "why": ""
   },
   "caps_called_audit": {
    "result": "ok",
-   "ms": 2273,
+   "ms": 2421,
    "why": ""
   },
   "tentacle_cognition": {
    "result": "ok",
-   "ms": 0,
+   "ms": 6,
    "why": ""
   },
   "coverage_auditor": {
    "result": "ok",
-   "ms": 16,
+   "ms": 7,
    "why": ""
   },
   "gods_eye": {
@@ -1381,42 +1378,42 @@
   },
   "cap_tags": {
    "result": "ok",
-   "ms": 82,
+   "ms": 66,
    "why": ""
   },
   "action_gate": {
    "result": "ok",
-   "ms": 5,
+   "ms": 4,
    "why": ""
   },
   "growth_hooks": {
    "result": "ok",
-   "ms": 12,
+   "ms": 16,
    "why": ""
   },
   "agent_console": {
    "result": "ok",
-   "ms": 5,
+   "ms": 7,
    "why": ""
   },
   "agent_rig": {
    "result": "ok",
-   "ms": 11,
+   "ms": 7,
    "why": ""
   },
   "console_hub": {
    "result": "ok",
-   "ms": 7,
+   "ms": 0,
    "why": ""
   },
   "skill_watch": {
    "result": "ok",
-   "ms": 107,
+   "ms": 110,
    "why": ""
   },
   "page_scan": {
    "result": "ok",
-   "ms": 15,
+   "ms": 10,
    "why": ""
   },
   "surface_bind": {
@@ -1426,122 +1423,122 @@
   },
   "task_manager": {
    "result": "ok",
-   "ms": 11,
+   "ms": 10,
    "why": ""
   },
   "energy_pool": {
    "result": "ok",
-   "ms": 2,
+   "ms": 7,
    "why": ""
   },
   "tentacle_bind": {
    "result": "ok",
-   "ms": 14,
+   "ms": 11,
    "why": ""
   },
   "asset_index": {
    "result": "ok",
-   "ms": 8,
+   "ms": 12,
    "why": ""
   },
   "context_vault": {
    "result": "ok",
-   "ms": 6,
+   "ms": 8,
    "why": ""
   },
   "ledger_note": {
    "result": "ok",
-   "ms": 16,
+   "ms": 11,
    "why": ""
   },
   "agent_control": {
    "result": "ok",
-   "ms": 14,
+   "ms": 16,
    "why": ""
   },
   "answer_shaper": {
    "result": "ok",
-   "ms": 2,
+   "ms": 6,
    "why": ""
   },
   "handoff": {
    "result": "ok",
-   "ms": 13,
+   "ms": 9,
    "why": ""
   },
   "slim_profile": {
    "result": "ok",
-   "ms": 9,
+   "ms": 5,
    "why": ""
   },
   "spend_guard": {
    "result": "ok",
-   "ms": 7,
+   "ms": 9,
    "why": ""
   },
   "detail_habit": {
    "result": "ok",
-   "ms": 4,
+   "ms": 6,
    "why": ""
   },
   "codepage": {
    "result": "ok",
-   "ms": 0,
+   "ms": 9,
    "why": ""
   },
   "desktop_commander": {
    "result": "ok",
-   "ms": 17,
+   "ms": 10,
    "why": ""
   },
   "tentacle_manifest": {
    "result": "ok",
-   "ms": 0,
+   "ms": 10,
    "why": ""
   },
   "trunk_cover": {
    "result": "ok",
-   "ms": 15,
+   "ms": 13,
    "why": ""
   },
   "trunk_reason": {
    "result": "ok",
-   "ms": 2015,
+   "ms": 2030,
    "why": ""
   },
   "autonomy": {
    "result": "ok",
-   "ms": 6,
+   "ms": 0,
    "why": ""
   },
   "blueprint": {
    "result": "ok",
-   "ms": 9,
+   "ms": 16,
    "why": ""
   },
   "legacy_guard": {
    "result": "ok",
-   "ms": 201,
+   "ms": 214,
    "why": ""
   },
   "skills_hub": {
    "result": "ok",
-   "ms": 13,
+   "ms": 16,
    "why": ""
   },
   "chain_kernel": {
    "result": "ok",
-   "ms": 0,
+   "ms": 20,
    "why": ""
   },
   "cap_pack": {
    "result": "ok",
-   "ms": 16,
+   "ms": 0,
    "why": ""
   },
   "omni_open": {
    "result": "ok",
-   "ms": 0,
+   "ms": 13,
    "why": ""
   },
   "agency_tentacles": {
@@ -1551,37 +1548,37 @@
   },
   "tentacle_pipeline": {
    "result": "ok",
-   "ms": 1,
+   "ms": 15,
    "why": ""
   },
   "long_run_supervisor": {
    "result": "ok",
-   "ms": 0,
+   "ms": 3,
    "why": ""
   },
   "mcp_connect": {
    "result": "failed",
-   "ms": 29,
+   "ms": 22,
    "why": "需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）"
   },
   "mcp_tools": {
    "result": "ok",
-   "ms": 6,
+   "ms": 7,
    "why": ""
   },
   "mcp_call": {
    "result": "failed",
-   "ms": 14,
+   "ms": 18,
    "why": "需要 server 与 tool（参数放 arguments）"
   },
   "tentacle_status": {
    "result": "ok",
-   "ms": 0,
+   "ms": 4,
    "why": ""
   },
   "desktop_distill": {
    "result": "ok",
-   "ms": 17,
+   "ms": 12,
    "why": ""
   },
   "tentacle_scale": {
@@ -1591,7 +1588,7 @@
   },
   "express_direct": {
    "result": "ok",
-   "ms": 14,
+   "ms": 16,
    "why": ""
   },
   "projection_card": {
@@ -1606,7 +1603,7 @@
   },
   "freebuff_term": {
    "result": "ok",
-   "ms": 8,
+   "ms": 22,
    "why": ""
   },
   "repo_publish": {
@@ -1616,32 +1613,32 @@
   },
   "pulse_direct": {
    "result": "ok",
-   "ms": 20,
+   "ms": 11,
    "why": ""
   },
   "awesome_tools_index": {
    "result": "ok",
-   "ms": 17,
+   "ms": 21,
    "why": ""
   },
   "git_read": {
    "result": "ok",
-   "ms": 63,
+   "ms": 71,
    "why": ""
   },
   "ui_card": {
    "result": "ok",
-   "ms": 13,
+   "ms": 0,
    "why": ""
   },
   "hunyuan_video": {
    "result": "ok",
-   "ms": 5,
+   "ms": 17,
    "why": ""
   },
   "media_pipeline": {
    "result": "ok",
-   "ms": 5,
+   "ms": 6,
    "why": ""
   },
   "video_hub": {
@@ -1656,52 +1653,52 @@
   },
   "digital_human": {
    "result": "ok",
-   "ms": 15,
+   "ms": 16,
    "why": ""
   },
   "i2v_agnes": {
    "result": "ok",
-   "ms": 8,
+   "ms": 7,
    "why": ""
   },
   "libtv_skill": {
    "result": "ok",
-   "ms": 6,
+   "ms": 8,
    "why": ""
   },
   "libtv_workflow": {
    "result": "ok",
-   "ms": 7,
+   "ms": 3,
    "why": ""
   },
   "h3_video_gen": {
    "result": "ok",
-   "ms": 5,
+   "ms": 0,
    "why": ""
   },
   "vision": {
    "result": "ok",
-   "ms": 10,
+   "ms": 16,
    "why": ""
   },
   "vlx_flow": {
    "result": "ok",
-   "ms": 5,
+   "ms": 0,
    "why": ""
   },
   "vision_grounding": {
    "result": "ok",
-   "ms": 3,
+   "ms": 16,
    "why": ""
   },
   "vision_print": {
    "result": "ok",
-   "ms": 9,
+   "ms": 0,
    "why": ""
   },
   "vision_arsenal": {
    "result": "ok",
-   "ms": 7,
+   "ms": 12,
    "why": ""
   },
   "ocr": {
@@ -1711,83 +1708,93 @@
   },
   "uia_tree": {
    "result": "ok",
-   "ms": 10,
+   "ms": 0,
    "why": ""
   },
   "vision_detect": {
    "result": "ok",
-   "ms": 7,
+   "ms": 0,
    "why": ""
   },
   "vision_embed": {
    "result": "ok",
-   "ms": 9,
+   "ms": 0,
    "why": ""
   },
   "vision_pose": {
    "result": "ok",
-   "ms": 6,
+   "ms": 16,
    "why": ""
   },
   "vision_segment": {
    "result": "ok",
-   "ms": 5,
+   "ms": 0,
    "why": ""
   },
   "vision_track": {
    "result": "ok",
-   "ms": 6,
+   "ms": 14,
    "why": ""
   },
   "kws": {
    "result": "ok",
-   "ms": 6,
+   "ms": 1,
    "why": ""
   },
   "voice_stream": {
    "result": "ok",
-   "ms": 7,
+   "ms": 0,
    "why": ""
   },
   "voice_settings": {
    "result": "ok",
-   "ms": 6,
+   "ms": 18,
    "why": ""
   },
   "voice": {
    "result": "failed",
-   "ms": 9,
+   "ms": 0,
    "why": "缺少 text：要合成的文本"
   },
   "voice_orchestra": {
    "result": "ok",
-   "ms": 614,
+   "ms": 635,
    "why": ""
   },
   "hf_voice": {
    "result": "ok",
-   "ms": 8,
+   "ms": 0,
    "why": ""
   },
   "voice_studio": {
    "result": "ok",
-   "ms": 2041,
+   "ms": 2063,
    "why": ""
   }
  },
- "elapsed_s": 402.7,
+ "elapsed_s": 237.8,
  "totals": {
   "tested": 313,
-  "ok": 304,
-  "not_ok": 9
+  "ok": 306,
+  "not_ok": 7
+ },
+ "coverage": {
+  "registry_domains": 32,
+  "tested_domains": 31,
+  "no_testable_domain": [
+   "automation"
+  ],
+  "skipped": {
+   "safe_false": 88,
+   "requires_params": 26,
+   "write_only": 313
+  },
+  "note": "本位只测 safe=true 且无需必填参数的位；safe=False 的写口/需授权位（如 omni_plug）不在本表，其读数见 data/capability-live-test.json"
  },
  "diff": {
-  "regressed": [
-   "sec_scan",
-   "sec_chain"
-  ],
+  "regressed": [],
   "fixed": [],
-  "regressed_count": 2,
+  "regressed_count": 0,
   "fixed_count": 0,
   "semantics": "改前 ok → 现在不 ok = 回归；改前不 ok → 现在 ok = 修好；两条都空 = 整面稳定"
  },
