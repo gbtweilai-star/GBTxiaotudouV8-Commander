@@ -1,1744 +1,4921 @@
 {
- "at": "2026-10-21T16:13:42",
- "schema": "capability-proof-v2",
- "total": 341,
+ "at": "2026-11-04T13:44:52",
+ "total": 427,
  "counts": {
-  "ok": 340,
-  "denied": 0,
-  "needs_params": 1,
-  "needs_auth": 0,
-  "needs_dependency": 0,
-  "failed": 0,
-  "timeout": 0,
-  "exception": 0
+  "ok": 297,
+  "needs_auth": 88,
+  "failed": 10,
+  "needs_params": 26,
+  "timeout": 4,
+  "denied": 2
  },
- "buckets": {
-  "ok": 340,
-  "needs_input": 1
- },
- "by_source": {
-  "monitor": 216,
-  "remaining": 44,
-  "ticket": 10,
-  "params": 16,
-  "chain": 1,
-  "room": 1,
-  "write": 49,
-  "offense": 2,
-  "figure": 1,
-  "freegpu": 1
- },
- "sources": {
-  "read": "只读且无需参数：空 payload 真调（probe-caps-live.py）",
-  "params": "需参数：人写样本参数真跑（probe-caps-params*.py，隔离 store、非主人会话）",
-  "write": "写口：隔离 store 真跑（probe-caps-write.py），高危 8 位不跑",
-  "none": "三路都没覆盖到（如实列出）"
- },
- "rows": {
-  "a1art_skill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "absorb_loop": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "account_registry": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "action_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "actioncam": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "agency_tentacles": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "agent_console": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "agent_control": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（17ms）"
-  },
-  "agent_council": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "agent_rig": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "alerts": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "anatomy_figures": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "anim_audit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "anim_fix": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "answer_shaper": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "art_brief": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "art_chain": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "asset_index": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（48ms）"
-  },
-  "asset_vault_freeze": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5407ms）"
-  },
-  "audio_extract": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "audio_mix": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "audit_query": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "auth_gate_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "auto_publish": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "auto_switch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "automation_keys": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "autopilot": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "awesome_tools_index": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（29ms）"
-  },
-  "belief_forge": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "bi_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "bits_kit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（14ms）"
-  },
-  "blender": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "bluetooth": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "book_skill": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"book_skill\", \"source\": \"README.md\""
-  },
-  "brain_council": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "brain_execute": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "brain_health": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2540ms）"
-  },
-  "brain_route": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "brain_unify": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "brain_vault": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（68ms）"
-  },
-  "brain_verify": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2302ms）"
-  },
-  "brand_outro": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "browser": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "bt_control": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：蓝牙意图已执行"
-  },
-  "cad_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "cadgen": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "cap_tags": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（55ms）"
-  },
-  "capability_net": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（21ms）"
-  },
-  "caps_called_audit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4594ms）"
-  },
-  "case_mine": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "chart_html": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：从文件画出图表页"
-  },
-  "claude_code": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "cli_chat": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "cli_ify": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "cloud_llm": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "cloud_pc": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "cloud_plugin": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "code_art": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "code_audit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "code_patch": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "codebuddy": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "codex_chat": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "codex_interrupt": {
-   "bucket": "needs_input",
-   "src": "chain",
-   "note": "同进程三步探针：断在 interrupt —— turn/interrupt 失败: no active turn to interrupt（不是「没有这个功能」，是「打断活回合的前置不成立」，逐条原因见 data/codex-interrupt-live.json）"
-  },
-  "codex_models": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "codex_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（20ms）"
-  },
-  "codex_thread_new": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：新线程已建"
-  },
-  "codex_tools": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "codex_turn_send": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：长回合已发"
-  },
-  "collab_gateway": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "comfy_cloud": {
-   "bucket": "ok",
-   "src": "freegpu",
-   "note": "免费 GPU 路真跑：route=free-hf · Sneezemande/wan22-comfyui-demo · 29.3s · 73884 字节 · sha256=7a2f0ca6d8b0…（付费卡 0/15 运行）"
-  },
-  "comfy_forge": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（101ms）"
-  },
-  "comfy_native": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（3049ms）"
-  },
-  "comfyui": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2049ms）"
-  },
-  "command_chain": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "console_hub": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "console_pages": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1727ms）"
-  },
-  "context_vault": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "control_loop": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "count_words": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "coverage_auditor": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "coze_mail": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "create": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "creation_camp": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "credential_steal": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：op=creds 暴露面扫描"
-  },
-  "cross_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（51508ms）"
-  },
-  "data_hijack": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：op=baseline / session 完整性检查"
-  },
-  "datakit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "db_plugin": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "db_probe": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（3174ms）"
-  },
-  "delivery_gate": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "deploy_queue": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "design_atlas": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "desktop_commander": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（150ms）"
-  },
-  "desktop_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "detail_habit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "device_takeover": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "devour_fusion": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（138ms）"
-  },
-  "devour_github": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "devour_pulse": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "devour_reflect": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（66ms）"
-  },
-  "devour_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（14ms）"
-  },
-  "dh_asset_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "dh_brain": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "dh_pose": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "dh_realism": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "diagram_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "digital_human": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "director_mood": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "dl_forge": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "doc_intake": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "drama": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "dream_replay": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（86ms）"
-  },
-  "duty_board": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（456ms）"
-  },
-  "echo": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "edit_pipeline": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "eigenflux": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（55ms）"
-  },
-  "emotion_projection": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "energy_pool": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "energy_scheduler": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（16ms）"
-  },
-  "event_ledger": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "express_direct": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "fact_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "feishu_embed": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "figure_gate": {
-   "bucket": "ok",
-   "src": "figure",
-   "note": "出图门自判可交付：4 轮看图 · 最新一轮未清 0 · 数已声明（tools/codex-scripts/render-test-figures.py）"
-  },
-  "file_hygiene": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9233ms）"
-  },
-  "film_intel": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "filmkit": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "flow_canvas": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "forge_mastery": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"forge_mastery\", \"goal\": \"做一个落地页\", "
-  },
-  "freebuff_term": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "freellmapi": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2023ms）"
-  },
-  "gate_visibility": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "genoffice": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "genoffice_bridge": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "ghost_guard": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5211ms）"
-  },
-  "git_read": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（178ms）"
-  },
-  "git_write": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "god_view": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（220ms）"
-  },
-  "gods_eye": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1433ms）"
-  },
-  "growth_hooks": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（535ms）"
-  },
-  "gs_h3": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "h3_video_gen": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（14ms）"
-  },
-  "handoff": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "health": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（81ms）"
-  },
-  "hf_voice": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "hook_enforcer": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（23ms）"
-  },
-  "hook_registry": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "humanizer": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"before_hits\": [], \"after_hits\": [], \"fixes\": [], \"text\":"
-  },
-  "image_scout": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（181ms）"
-  },
-  "impact_check": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "install_selfcheck": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "intake_kit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "inventory": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（325ms）"
-  },
-  "key_gateway": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "keylogger": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "know_map": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "ledger_note": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "libtv_skill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
-  },
-  "libtv_workflow": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "life": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（19ms）"
-  },
-  "llm_chat": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"reply\": \"\\n\\n好\", \"provider\": \"agnes\", \"model\": \"agnes-2."
-  },
-  "llm_redteam": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "llm_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（34ms）"
-  },
-  "llm_watch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（17ms）"
-  },
-  "lobehub": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2078ms）"
-  },
-  "local_brain": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "long_run_supervisor": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "look_grade": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "lr_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "lr_submit": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "lr_tick": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（22ms）"
-  },
-  "machine_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "machine_film": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "mcp_call": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：MCP echo 已调"
-  },
-  "mcp_connect": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：MCP 已连"
-  },
-  "mcp_tools": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "media_license": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "media_pipeline": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "media_publish": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "media_run": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "media_stamp": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "memory_bank": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "memory_manager": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（339ms）"
-  },
-  "meta_cognition": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
+ "elapsed_s": 254.6,
+ "rule": "只读且无需参数的能力位**真调一次**；需参数的不瞎编（needs_params）；写口/花钱/出网的一律不跑（needs_auth）。超时记 timeout，不记 0。",
+ "by_domain": {
+  "device": {
+   "ok": 12,
+   "needs_auth": 4,
+   "failed": 1,
+   "denied": 2
+  },
+  "project": {
+   "ok": 3
+  },
+  "creation": {
+   "ok": 35,
+   "needs_auth": 23
   },
   "mind": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "mirror_ascend": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：晋升到 version 33 / 25 文件 + 护照"
-  },
-  "mirror_parity": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "same_host 一致"
-  },
-  "mirror_plan": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"name\": \"default\", \"defined_at\": \"2026-09-19T08:07:05\", \""
-  },
-  "mirror_rehearse": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：排练报告已生成（plan_sha 绑定）"
-  },
-  "mirror_release": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：带排练指纹发布成功"
-  },
-  "mirror_rewind": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：一次性全量回滚成功（rolled_back_to=1）"
-  },
-  "mirror_scan": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "5/5 全绿（真 store，25 文件）"
-  },
-  "mirror_shape": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "成形成功"
-  },
-  "mirror_simulate": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：9/9 静态推演"
-  },
-  "mirror_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（41ms）"
-  },
-  "model_key_pool": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "motion_kit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "multimodal_port": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "music_auto": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"music_auto\", \"goal\": \"做一段轻音乐\", \"st"
-  },
-  "music_intel": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "music_publishing": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "n8n_wf": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：n8n 应答"
-  },
-  "notion_bridge": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "observer_anchor": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "obsidian_vault": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（15ms）"
-  },
-  "offense_ops": {
-   "bucket": "ok",
-   "src": "offense",
-   "note": "本机回环目标（127.0.0.1:8080）真跑 op=plan：五阶段 5 条 · 三条判据；只出计划不动手"
-  },
-  "offload_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（102ms）"
-  },
-  "omarchy_bridge": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：assess 现读三根线（宿主无 Omarchy，能力本身可用）"
-  },
-  "omission_detector": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（21ms）"
-  },
-  "omni_arm": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "omni_plug": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "omni_web": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：read_source 读了 octocat/Hello-World"
-  },
-  "onboarding_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "one_key_deploy": {
-   "bucket": "ok",
-   "src": "room",
-   "note": "房间 release-20261021 真跑全绿并晋升：acceptance=py-syntax-sweep 真执行 · reality 77 件 · 2026-10-21T15:04:41"
-  },
-  "one_shot": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "orchestration_kernel": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "osint_scan": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "page_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2682ms）"
-  },
-  "paywallbuster": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "penetrating_cross_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（22ms）"
-  },
-  "pentest": {
-   "bucket": "ok",
-   "src": "offense",
-   "note": "本机回环目标真跑 op=verify（已登记授权目标 127.0.0.1:8080）"
-  },
-  "pentest_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "persona_kernel": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "pipeline_rollback": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：生产产物回滚成功"
-  },
-  "pipeline_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（39ms）"
-  },
-  "pipeline_submit": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：产物 probe 已入管线"
-  },
-  "pipeline_versions": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "platform_profile": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "pod_link": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "policy_delta": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "policy_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "proactive_report": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "project_context": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（20ms）"
-  },
-  "project_drift": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1039ms）"
-  },
-  "projection_card": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "prompt_bridge": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "pulse_direct": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（30ms）"
-  },
-  "quant": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "quant_backtest": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "quant_params": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "quant_plan": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "quant_strategy": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（14ms）"
-  },
-  "rea_reverse": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（21ms）"
-  },
-  "recon_distill": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "record_grid": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "redteam_recon": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "remote_confinement": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "remote_domain": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "render_evolution": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "replan_loop": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "repo_publish": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（267ms）"
-  },
-  "review_gate": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "rig_audit": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "rig_fix": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "ring_context": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（26ms）"
-  },
-  "room_space": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "root_fix": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（20ms）"
-  },
-  "scan_cap": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "scene_anchor": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4ms）"
-  },
-  "sched_define": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "sched_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "sched_tick": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（21ms）"
-  },
-  "scrapling": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "screen_sniff": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "sec_chain": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（61526ms）"
-  },
-  "sec_defenses": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1460ms）"
-  },
-  "sec_llm": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "sec_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（62361ms）"
-  },
-  "sec_surface": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（29473ms）"
-  },
-  "sec_sweeper": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "self_intake": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"known\": false, \"topic\": \"AI 行业动态\", \"next_action\": \"intak"
-  },
-  "selfscan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1249ms）"
-  },
-  "shared_resources": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "shot_director": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"plan\", \"kind\": \"shot_director\", \"idea\": \"咖啡店宣传\", \""
-  },
-  "showcase_ops": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"concept\", \"kind\": \"showcase_ops\", \"idea\": \"能力位路由演示"
-  },
-  "signature_guard": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（728ms）"
-  },
-  "skill_finder": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"q\": \"找一个能做表格的技能\", \"count\": 12, \"candidates\": [{\"name\": \""
-  },
-  "skill_forge": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：{\"ok\": true, \"op\": \"think\", \"kind\": \"skill_forge\", \"subject\": \"周报整理\", "
-  },
-  "skill_watch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（481ms）"
-  },
-  "slim_profile": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "social_eng": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "spend_guard": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（20ms）"
-  },
-  "spider_ops": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：公网爬取完成"
-  },
-  "stigmergy": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（13ms）"
-  },
-  "surface_bind": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（48ms）"
-  },
-  "svc_inspect": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（415ms）"
-  },
-  "tactics_advise": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
-  },
-  "task_graph": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "task_manager": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1701ms）"
-  },
-  "telegram_embed": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
+   "ok": 25,
+   "needs_auth": 1,
+   "needs_params": 1
+  },
+  "system": {
+   "needs_auth": 6,
+   "ok": 52,
+   "timeout": 1,
+   "needs_params": 1
   },
   "tentacle": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
+   "needs_auth": 8,
+   "ok": 19,
+   "needs_params": 1,
+   "failed": 2
   },
-  "tentacle_arm": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（14ms）"
+  "llm": {
+   "ok": 26,
+   "needs_params": 8,
+   "failed": 1,
+   "needs_auth": 8
   },
-  "tentacle_bind": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（276ms）"
+  "data": {
+   "ok": 8,
+   "needs_params": 1,
+   "needs_auth": 3
   },
-  "tentacle_cognition": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
+  "finance": {
+   "ok": 4
   },
-  "tentacle_comfy_bridge": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（4077ms）"
+  "recon": {
+   "needs_params": 2,
+   "ok": 10,
+   "needs_auth": 6
   },
-  "tentacle_equip": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
+  "engine": {
+   "needs_params": 4,
+   "ok": 7,
+   "needs_auth": 1
   },
-  "tentacle_learn": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
+  "longrun": {
+   "needs_params": 1,
+   "ok": 3
   },
-  "tentacle_manifest": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
+  "devour": {
+   "ok": 4,
+   "needs_params": 1,
+   "timeout": 1
   },
-  "tentacle_pipeline": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（6ms）"
+  "video": {
+   "ok": 9,
+   "needs_auth": 9
   },
-  "tentacle_scale": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
+  "integration": {
+   "ok": 7,
+   "needs_auth": 4
   },
-  "tentacle_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
+  "security": {
+   "ok": 22,
+   "timeout": 2,
+   "needs_params": 1,
+   "needs_auth": 9
   },
-  "thebrain_bridge": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "theme_cap": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "判据工作正常：结论是 holo_pet/styles.css 未通过调色板检查（能力跑通，产物不过）"
-  },
-  "think_loop": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
-  },
-  "tool_bay": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "topic_watch": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
-  },
-  "topic_web": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "trace_store": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "train_ground": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "train_recipe": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（11ms）"
-  },
-  "transfer": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "transformer": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（20ms）"
-  },
-  "trend_watch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（518ms）"
-  },
-  "tripo": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "truth_scan": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "ui_kit": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（82ms）"
-  },
-  "ui_render": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "ul_tars_desktop": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过（隔离 store）"
-  },
-  "ux_doctrine": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（9ms）"
-  },
-  "verification_watch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
-  },
-  "video_intel": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
+  "pipeline": {
+   "needs_params": 4,
+   "ok": 9,
+   "failed": 5
   },
   "vision": {
-   "bucket": "ok",
-   "src": "ticket",
-   "note": "带票真跑通过"
+   "needs_auth": 1,
+   "ok": 12
   },
-  "vision_grounding": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
-  },
-  "vision_loop": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "vision_print": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（10ms）"
-  },
-  "vlx_flow": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
+  "comms": {
+   "ok": 2
   },
   "voice": {
-   "bucket": "ok",
-   "src": "remaining",
-   "note": "真跑通过：TTS 已合成"
+   "ok": 6,
+   "failed": 1
   },
-  "voice_orchestra": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（625ms）"
+  "body_control": {
+   "ok": 1
   },
-  "voice_studio": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（2053ms）"
+  "ui": {
+   "ok": 1
   },
-  "warm_switch": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（1141ms）"
+  "automation": {
+   "needs_params": 1,
+   "needs_auth": 1
   },
-  "wave_probe": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5195ms）"
+  "life": {
+   "ok": 1
   },
-  "welcome": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（5ms）"
+  "tools": {
+   "ok": 7,
+   "needs_auth": 2
   },
-  "wf_cache_clear": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（7ms）"
+  "brain": {
+   "ok": 4
   },
-  "wf_define": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
+  "collab": {
+   "needs_auth": 1,
+   "ok": 1
   },
-  "wf_resume": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
+  "image_video": {
+   "ok": 1
   },
-  "wf_run": {
-   "bucket": "ok",
-   "src": "params",
-   "note": "真跑通过"
+  "desktop": {
+   "ok": 1,
+   "needs_auth": 1
   },
-  "wf_status": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（83ms）"
+  "infra": {
+   "ok": 2
   },
-  "whatsapp_embed": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（8ms）"
+  "framework": {
+   "ok": 1
   },
-  "wiki_graph": {
-   "bucket": "ok",
-   "src": "monitor",
-   "note": "监控账 90s 超时下真调通过（12ms）"
-  },
-  "workflow_forge": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
-  },
-  "zimage_rewash": {
-   "bucket": "ok",
-   "src": "write",
-   "note": "真跑通过（写入落临时 store）"
+  "social": {
+   "ok": 2
   }
- }
+ },
+ "rows": [
+  {
+   "capability": "body_map",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 3017,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_see",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 80,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "see_camera",
+   "domain": "device",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "body_say",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 80,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_type",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 75,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_click",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 77,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_volume",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 77,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_open",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 88,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_realtime",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hand_realtime",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 25,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hand_vision",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 11,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "No module named 'cv2'"
+  },
+  {
+   "capability": "hand_retarget",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hand_bridge",
+   "domain": "device",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "sync_guard",
+   "domain": "project",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2442,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "viral_forge",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 20,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "drama_forge",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "taste_guard",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 46,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "experience_forge",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 15,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mirror_stage",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "remote_controller",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "codex_status",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 29,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "codex_tools",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "codex_thread_new",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 494,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "codex_turn_send",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "codex_interrupt",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "codex_chat",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "codex_models",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 31,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "desktop_commander",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 29,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "health",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 120,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "echo",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "count_words",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "audit_query",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "quant_strategy",
+   "domain": "finance",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 10,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "quant_backtest",
+   "domain": "finance",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "platform_profile",
+   "domain": "project",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "quant_params",
+   "domain": "finance",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "osint_scan",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "record_grid",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "wf_define",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "wf_run",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "wf_status",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "wf_resume",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "lr_submit",
+   "domain": "longrun",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "lr_tick",
+   "domain": "longrun",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 22,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "lr_status",
+   "domain": "longrun",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "selfscan",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 256,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "alerts",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tentacle",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "tentacle_manifest",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 180,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "commander",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "pulse_core",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "cap_self",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 24,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "trunk_cover",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6203,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_sense",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 3088,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_auto",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 22,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "trunk_reason",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2016,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "context_guard",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 51,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "research_intel",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hunyuan_video",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "energy_core",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6045,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "orchestration",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 16,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "autonomy",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "blueprint",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 35,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "legacy_guard",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 214,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "skills_hub",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 24,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "chain_kernel",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 12,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "root_cause",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "execution_guard",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 13,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cap_pack",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 15,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mcp_register",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 21,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dual_gate",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 13,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mcp_servers",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mcp_unregister",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 22,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mcp_health",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 22,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "omni_open",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sec_surface",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 1157,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sec_scan",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "timeout",
+   "ms": 20000,
+   "note": "超过 20s 没回"
+  },
+  {
+   "capability": "sec_chain",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "timeout",
+   "ms": 20000,
+   "note": "超过 20s 没回"
+  },
+  {
+   "capability": "sec_defenses",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 82,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sec_llm",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "truth_scan",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "autopilot",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "llm_chat",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 22,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "缺少 prompt：请给出要问其他 AI 的问题"
+  },
+  {
+   "capability": "llm_status",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 493,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cloud_llm",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 10,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "key_gateway",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "multimodal_port",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "genoffice_bridge",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "brain_route",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "brain_execute",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "brain_verify",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 226,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "brain_health",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 92,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "brain_unify",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "root_fix",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 17,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cross_scan",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "timeout",
+   "ms": 20000,
+   "note": "超过 20s 没回"
+  },
+  {
+   "capability": "inventory",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 21,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "brain_vault",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "think_loop",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "one_key_deploy",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "deploy_queue",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "mirror_shape",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mirror_scan",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mirror_plan",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 7,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "排练计划不存在: default"
+  },
+  {
+   "capability": "mirror_simulate",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 19,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "排练计划不存在: default"
+  },
+  {
+   "capability": "mirror_parity",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 18,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "排练计划不存在: default"
+  },
+  {
+   "capability": "mirror_rehearse",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 18,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "排练计划不存在: default"
+  },
+  {
+   "capability": "mirror_release",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 18,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "排练计划不存在: default"
+  },
+  {
+   "capability": "mirror_ascend",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 19,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mirror_status",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mirror_rewind",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 16,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "auth_gate_status",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "transfer",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "wf_cache_clear",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 15,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "signature_guard",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 63,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "file_hygiene",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4894,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_scan",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_github",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "tentacle_equip",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "tool_bay",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "remote_confinement",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "cli_ify",
+   "domain": "integration",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "tentacle_learn",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "skill_finder",
+   "domain": "data",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "humanizer",
+   "domain": "data",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "chart_html",
+   "domain": "data",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "workflow_forge",
+   "domain": "engine",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "forge_mastery",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "showcase_ops",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "spider_ops",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "offense_ops",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "skill_forge",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "shot_director",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "book_skill",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "music_auto",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "train_ground",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "quant_plan",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "know_map",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "topic_web",
+   "domain": "recon",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "self_intake",
+   "domain": "mind",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "comfy_forge",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "scan_cap",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "figure_gate",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "theme_cap",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "omarchy_bridge",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "delivery_gate",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "ux_doctrine",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "welcome",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "god_view",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_loop",
+   "domain": "vision",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "agency_tentacles",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "media_pipeline",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "edit_pipeline",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "tentacle_pipeline",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "long_run_supervisor",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_reflect",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 25,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_pulse",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": false,
+   "result": "timeout",
+   "ms": 20000,
+   "note": "超过 20s 没回"
+  },
+  {
+   "capability": "mcp_connect",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 16,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）"
+  },
+  {
+   "capability": "mcp_tools",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mcp_call",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 18,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "需要 server 与 tool（参数放 arguments）"
+  },
+  {
+   "capability": "coze_mail",
+   "domain": "comms",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "email_cap",
+   "domain": "comms",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "create",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "drama",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tentacle_status",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 10,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tactics_advise",
+   "domain": "longrun",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pipeline_submit",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 23,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pipeline_versions",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "pipeline_rollback",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "pipeline_status",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ghost_guard",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 1027,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sched_define",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "sched_tick",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 20,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sched_status",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "svc_inspect",
+   "domain": "pipeline",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 629,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vlx_flow",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "prompt_bridge",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "audio_extract",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "audio_mix",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "media_license",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "world_forge",
+   "domain": "engine",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pentest_flow",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "update_chain",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "kws",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "voice_stream",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "update_verify",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "lan_pairing",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pairing",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "turn_trace",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ref3d",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "video_hub",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "media_library",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "resource_snapshot",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 159,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "reminder",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "api_slot",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "thought_stream",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "context_inject",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_control",
+   "domain": "body_control",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "focus_stack",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "voice_settings",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ui_card",
+   "domain": "ui",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "datakit",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "media_run",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "omni_plug",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "media_stamp",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "media_publish",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "voice",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "failed",
+   "ms": 4,
+   "status": "error",
+   "denied": false,
+   "missing_scopes": null,
+   "error": "缺少 text：要合成的文本"
+  },
+  {
+   "capability": "voice_orchestra",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 606,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "browser",
+   "domain": "automation",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "bluetooth",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "denied",
+   "ms": 7,
+   "status": "denied",
+   "denied": true,
+   "missing_scopes": null,
+   "error": "需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+  },
+  {
+   "capability": "bt_control",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "denied",
+   "ms": 5,
+   "status": "denied",
+   "denied": true,
+   "missing_scopes": null,
+   "error": "需要人工授权（device_control）：连接、写入或控制蓝牙及其他外部设备"
+  },
+  {
+   "capability": "quant",
+   "domain": "finance",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "life",
+   "domain": "life",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "mind",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "project_context",
+   "domain": "project",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 10,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "topic_watch",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "trend_watch",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "projection_card",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "trace_store",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "wave_probe",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 57,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dream_replay",
+   "domain": "brain",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "capability_net",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 38,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "director_mood",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "music_publishing",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dh_pose",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "anatomy_figures",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "machine_film",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "rig_audit",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "rig_fix",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "anim_audit",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "anim_fix",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "dh_asset_gate",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "omni_arm",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "tentacle_arm",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "project_drift",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "impact_check",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "music_intel",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "video_intel",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "film_intel",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "account_registry",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "verification_watch",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "shared_resources",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "brand_outro",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "emotion_projection",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "proactive_report",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "observer_anchor",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "persona_kernel",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": true,
+   "result": "needs_params",
+   "ms": null,
+   "note": "需要业务参数 ⇒ 不瞎编，未跑"
+  },
+  {
+   "capability": "hook_registry",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "scene_anchor",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "code_art",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "orchestration_kernel",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "render_evolution",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "caps_called_audit",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2071,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tentacle_cognition",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "coverage_auditor",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "gods_eye",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 1433,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "obsidian_vault",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cap_tags",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 52,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "action_gate",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "growth_hooks",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "devour_fusion",
+   "domain": "devour",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "wiki_graph",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "doc_intake",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "llm_watch",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "task_graph",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "replan_loop",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "duty_board",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 36,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "rea_reverse",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "recon_distill",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "desktop_distill",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pentest_distill",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "diagram_distill",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "machine_distill",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cad_distill",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "bi_distill",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "memory_bank",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "agent_console",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "code_audit",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "agent_rig",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "console_hub",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "console_pages",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 82,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "freebuff_term",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hf_voice",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "voice_studio",
+   "domain": "voice",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2058,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "digital_human",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "image_scout",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 130,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "install_selfcheck",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "room_space",
+   "domain": "system",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "collab_gateway",
+   "domain": "collab",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "lobehub",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 12,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "comfyui",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2036,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "comfy_native",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 59,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ring_context",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "skill_watch",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 36,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_grounding",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tentacle_comfy_bridge",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4085,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "repo_publish",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 125,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pulse_direct",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "warm_switch",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 339,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "page_scan",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "fact_gate",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "policy_gate",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "one_shot",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "surface_bind",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "memory_manager",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "i2v_agnes",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "code_graph",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "sec_sweeper",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "task_manager",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "transformer",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "automation_keys",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "model_key_pool",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "meta_cognition",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "libtv_skill",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "a1art_skill",
+   "domain": "image_video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "energy_pool",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "scrapling",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "genoffice",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "blender",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "gs_h3",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "actioncam",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "look_grade",
+   "domain": "video",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "penetrating_cross_scan",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "hook_enforcer",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "omission_detector",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "zimage_rewash",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "n8n_wf",
+   "domain": "automation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "filmkit",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "tentacle_bind",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "asset_index",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "control_loop",
+   "domain": "desktop",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "local_brain",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "auto_switch",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "context_vault",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "feishu_embed",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dl_forge",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dh_realism",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cloud_plugin",
+   "domain": "infra",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "db_plugin",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "telegram_embed",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "whatsapp_embed",
+   "domain": "integration",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "libtv_workflow",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "gate_visibility",
+   "domain": "framework",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "dh_brain",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "eigenflux",
+   "domain": "social",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "h3_video_gen",
+   "domain": "video",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "absorb_loop",
+   "domain": "brain",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cloud_pc",
+   "domain": "infra",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "auto_publish",
+   "domain": "social",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "awesome_tools_index",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 18,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "stigmergy",
+   "domain": "collab",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 9,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ledger_note",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 10,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "code_patch",
+   "domain": "tools",
+   "readonly": false,
+   "requires_params": true,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "git_read",
+   "domain": "tools",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 69,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "git_write",
+   "domain": "tools",
+   "readonly": false,
+   "requires_params": true,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "brain_council",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "omni_web",
+   "domain": "tentacle",
+   "readonly": false,
+   "requires_params": true,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "ul_tars_desktop",
+   "domain": "desktop",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "claude_code",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "codebuddy",
+   "domain": "llm",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "redteam_recon",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "pentest",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "keylogger",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "screen_sniff",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "remote_domain",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "device_takeover",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "credential_steal",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "data_hijack",
+   "domain": "security",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "social_eng",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "paywallbuster",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "asset_vault_freeze",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 1129,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "onboarding_gate",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "agent_control",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 13,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "agent_council",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "answer_shaper",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "belief_forge",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "case_mine",
+   "domain": "recon",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cli_chat",
+   "domain": "integration",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "command_chain",
+   "domain": "mind",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "creation_camp",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "db_probe",
+   "domain": "data",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 174,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "energy_scheduler",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "event_ledger",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "flow_canvas",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "freellmapi",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4093,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "handoff",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "llm_redteam",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "notion_bridge",
+   "domain": "integration",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "policy_delta",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "slim_profile",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "spend_guard",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "thebrain_bridge",
+   "domain": "integration",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "train_recipe",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 11,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tripo",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "ui_render",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "review_gate",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "detail_habit",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "tentacle_scale",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "express_direct",
+   "domain": "tentacle",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_print",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "cadgen",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "ui_kit",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "design_atlas",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "art_chain",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "motion_kit",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "bits_kit",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "art_brief",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "intake_kit",
+   "domain": "creation",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "offload_distill",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 14,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "pod_link",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "comfy_cloud",
+   "domain": "creation",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "body_excrete",
+   "domain": "device",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "body_eye",
+   "domain": "device",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 314,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "body_immune",
+   "domain": "device",
+   "readonly": false,
+   "requires_params": false,
+   "result": "needs_auth",
+   "ms": null,
+   "note": "会写盘/花钱/出网 ⇒ 未跑（开源测试不越授权门）"
+  },
+  {
+   "capability": "bounty_ops",
+   "domain": "security",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "codepage",
+   "domain": "system",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "local_llm",
+   "domain": "llm",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 2050,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_arsenal",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "ocr",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "route_ledger",
+   "domain": "brain",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 7,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "semantic_match",
+   "domain": "brain",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "uia_tree",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 8,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_detect",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_embed",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_pose",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 6,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_segment",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 5,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  },
+  {
+   "capability": "vision_track",
+   "domain": "vision",
+   "readonly": true,
+   "requires_params": false,
+   "result": "ok",
+   "ms": 4,
+   "status": "ok",
+   "denied": false,
+   "missing_scopes": null,
+   "error": null
+  }
+ ]
 }

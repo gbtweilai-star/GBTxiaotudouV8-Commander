@@ -7,7 +7,8 @@
 - **纯文本修正**：README 清除 10 处控制字符污染（能力名首字母被控制码顶替，造成 GitHub 上表格断行）；「只读 389 · 会改状态 38」把两个维度搬错，修正为 **339 / 88**；能力域表 8 个域位数对齐 `docs/03-capabilities.md`；英文版 348 位 / 30 域 → 427 位 / 32 域。
 - **时点声明**：`docs/04-evaluation.md` 标注 335 题基准构建于 341 位快照、现役 427 位中 **86 位未纳入**；`docs/188` 标注 410 位时期读数；README 插图标明 341 位时期快照，非当前状态。
 - **badge**：`Docs-93_pages` → **364 页**（含 docs/legacy 归档 67 页）；静态 Tests badge 换成 CI 活链。
-- **未重跑项（如实留案）**：427 位逐位真调、335 题基准在 427 口径下的复跑 —— 均无新回执，故不作为当前结论。
+- **逐位真调重跑（2026-11-04 13:44）**：`probe-caps-live.py` 全量跑完 **427 位 / 254.6s** —— **313 位可跑、297 通过**；88 位需授权、26 位需参数不瞎编；**16 位如实列案**：`hand_vision` 缺 cv2 · `mirror_plan/simulate/parity/rehearse/release` 缺 default 排练计划 · `llm_chat`/`voice`/`mcp_connect`/`mcp_call` 缺参 · `sec_scan`/`sec_chain`/`cross_scan`/`devour_pulse` 超时 · `bluetooth`/`bt_control` 需 device_control 授权。`data/capability-live-test.json` 已更新，首屏图第三卡由「0 失败」换成真实读数 **313 / 297 通过**。
+- **仍未重跑**：335 题基准在 427 口径下的复跑 —— 无新回执，不作为当前结论。
 
 ## 2026-11-01 · 第十五批：手部两枚原生位 + 双仓同步 + 巡检位
 
