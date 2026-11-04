@@ -71,6 +71,27 @@ print(gbt.run_task("selfscan"))                     # 五维自检
 
 Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd holo_pet_w3 && npx --no-install electron shell/main.cjs`。
 
+### 30 秒看到什么
+
+不给 `--endpoint` 时它**完全不调模型**，纯关键字兜底——下面这段是真跑输出，不是示意：
+
+```text
+$ python demo.py "把这次发布推到生产"
+
+① 这台机器的能力目录（机器可读，不是截图）
+   427 位能力 · 32 个域 · 只读 389 · 会改状态 38 · 挂作用域 38
+
+② 按你的那句话，落点候选（关键字打分，不是模型决策）：
+   [1000.0] one_key_deploy   pipeline  会改状态  要票：deploy_publish,process_execute,filesystem_write
+            一指定江山乾坤换位：抓取→镜像→验证→晋升，一条命令
+
+③ 在这台机器上，它就是这么被调用的（唯一门，绕过它没有留痕）：
+   py -3.14 tools/codex-scripts/five-dim.py cap one_key_deploy '{}'
+   ⚠️ 这一位挂了作用域 ⇒ 门会先拒，等主人发票（AI 不能给自己发）
+```
+
+一句话看清三件事：**有多少能力位、这句话落到哪一位、这一位要不要票。**
+
 ## 🏛 架构
 
 <p align="center">
