@@ -37,7 +37,7 @@
     "release:sync": "py -3.14 ../tools/codex-scripts/release-runtime-sync.py --apply"
   },
   "devDependencies": {
-    "electron": "43.0.0",
+    "electron": "43.8.1",
     "electron-builder": "^26.15.3"
   },
   "comment_deps": "壳只 require `electron` 一个外部包（其余是 node 内建 + 本地 ./xxx.cjs）。本机已有全局 electron v43.0.0 可用；`npm install` 只有在要**锁定版本、离线打包**时才需要 —— 装包属于闸二，须先问主人。",
