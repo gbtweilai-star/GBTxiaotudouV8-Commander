@@ -82,6 +82,7 @@ def read_figures() -> dict:
         "cap_total": cap_total,
         "domains": domains,
         "ok": ok,
+        "not_ok": cap_total - ok,
         "unattributed": unattributed,
         "bench": bench,
         "bench_note": bench_note,
@@ -165,7 +166,7 @@ h1{{font-size:50px;font-weight:700;letter-spacing:.5px;line-height:1.15;color:#f
     <div class="card b"><div class="num b">{f['bench']}</div>
       <div class="cap"><i>{f['bench_note']}</i></div></div>
     <div class="card o"><div class="num o">{f['ok']}</div>
-      <div class="cap"><i>位真调通过</i> · {f['unattributed']} 位无法归因</div></div>
+      <div class="cap"><i>位真调通过</i> · {f['not_ok']} 位均已归因</div></div>
   </div>
   <div class="code">
     <div class="cmd">python demo.py "我要把 Markdown 变成 PPT"</div>

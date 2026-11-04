@@ -9,6 +9,7 @@
 - **badge**：`Docs-93_pages` → **364 页**（含 docs/legacy 归档 67 页）；静态 Tests badge 换成 CI 活链。
 - **逐位真调重跑（2026-11-04 13:53）**：修掉探针两处缺陷后全量重跑 427 位（221.3s）。① 分类缺陷 —— 原先只按 `status` 判定，把「缺少 prompt / 需要 server」这类调用方问题混记成 failed，现按错误原文分入 `needs_params` / `needs_dependency` / `needs_state`；② 看门狗过短 —— 20s 误杀 `sec_scan`（实测 66.4s），提到 120s。结果：**ok 301 · needs_auth 88 · needs_params 30 · needs_state 5 · denied 2 · needs_dependency 1 = 427，failed 0 / timeout 0**。5 位 `needs_state` 为 `mirror_plan/simulate/parity/rehearse/release` 缺 default 排练计划，**未擅自创建** —— 因 `mirror_release` 语义是「全量晋升生产」而注册表 `safe` 标为 true，属元数据隐患，留案待复核；`hand_vision` 缺 cv2 且嵌入式 Python 无 pip，装不了。`data/capability-live-test.json` 已更新，首屏图第三卡为真实读数 **301 / 0 位无法归因**（3D 版重绘）。
 - **首屏图脚本根治**：`render-social-preview.py` 原先硬编码「341 位 / 30 个域 / 0 失败 / 总指挥大模型」——注册表涨到 427 后重跑脚本仍出旧图，**这才是图与正文脱节的真正根因**（不在 PNG 文件）。现改为全部从 `data/capabilities.json` 与 `data/capability-live-test.json` 读取，分类合计≠注册表即报错不出图；渲染由 PIL 扁平绘制改为 HTML+Chrome，保留 3D 立体层次；基准读数优先读 `state/model-deploy/live-eval-v2.json`，缺失则回退 docs/04 记录并在输出中标注「未重跑」。
+- **账目补齐（126 位去向）**：首屏图与 README 原先只列「88 需授权 / 30 缺参 / 5 缺计划 / 1 缺 cv2」= 124，漏了 `denied` 2 位（`bluetooth`、`bt_control`，作用域 `device_control`）。现统一为 **301 通过 + 126 已归因 = 427**：88 需授权不跑、30 缺参不瞎编、5 缺前置排练计划、2 被授权门拒绝、1 缺 cv2。首屏第三卡改为「301 位真调通过 · 126 位均已归因」，脚本新增 `not_ok` 字段自动计算，不再手写数字。
 - **仍未重跑**：335 题基准在 427 口径下的复跑 —— 无新回执，不作为当前结论。
 
 ## 2026-11-01 · 第十五批：手部两枚原生位 + 双仓同步 + 巡检位
