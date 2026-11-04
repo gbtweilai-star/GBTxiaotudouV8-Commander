@@ -9,3 +9,15 @@
 from .api import run_task, list_capabilities, DANGEROUS_ENABLED
 from .store import audit, query_log, log_count
 from .soul import SOUL, stamp_result
+
+# 编码守门：Windows 控制台默认 cp936 / cp1252，print 中文会 UnicodeEncodeError。
+# 在 import 时把标准流切到 UTF-8；切不动就静默放过（不影响核心功能）。
+import sys as _sys
+
+for _stream in (_sys.stdout, _sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        pass
+del _stream
+

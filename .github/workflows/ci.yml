@@ -14,6 +14,11 @@ jobs:
   smoke:
     name: 冒烟（${{ matrix.os }} / py${{ matrix.python }}）
     runs-on: ${{ matrix.os }}
+    env:
+      # Windows runner 的 stdout 默认是 cp1252，打印中文会 UnicodeEncodeError。
+      # 这里强制 UTF-8，与本仓「中文输出不许静默变空」的守门口径一致。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
     strategy:
       fail-fast: false
       matrix:
