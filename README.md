@@ -163,7 +163,7 @@ run_task(kind, payload)
 | 指标 | 读数 | 复核命令 |
 |---|---|---|
 | 能力位 | **427** | `cap_self verify` |
-| 逐位真调 | **313 位可跑 · 297 通过**（88 位需授权、26 位需参数未跑；16 位如实列案） | `python tools/codex-scripts/probe-caps-live.py` |
+| 逐位真调 | **301 / 427 通过**（88 位需授权、30 位需参数、5 位缺前置计划、1 位缺 cv2；**0 位无法归因、0 超时**） | `python tools/codex-scripts/probe-caps-live.py --timeout 120` |
 | 审计条数 | 现读 | `gbt.log_count()` |
 | 自检 | clean | `selfscan` |
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |

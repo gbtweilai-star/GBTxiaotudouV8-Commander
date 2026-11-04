@@ -30,6 +30,12 @@ for _s in (sys.stdout, sys.stderr):
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+# 失败不等于能力坏了：按错误原文把「缺参 / 缺依赖 / 缺前置状态」分出来，
+# 避免把环境或调用方的问题混记成 failed（那是尺子的问题，不是位的问题）。
+INPUT_HINTS = ("缺少", "需要 server", "需要 tool", "必须给", "不能为空", "请给出", "要 image", "要 text")
+DEP_HINTS = ("No module named", "ModuleNotFoundError", "未安装", "not running", "no_such")
+STATE_HINTS = ("不存在", "未找到", "not found", "没有默认", "先创建")
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -76,12 +82,27 @@ def main() -> int:
                 status = str(r.get("status") or "")
                 inner = r.get("result") if isinstance(r.get("result"), dict) else {}
                 ok = (not denied) and (status == "ok") and (inner.get("ok") is not False)
-                row.update({"result": "ok" if ok else ("denied" if denied else "failed"),
+                err = (r.get("reason") or r.get("error")
+                       or (inner.get("error") if isinstance(inner, dict) else None))
+                if ok:
+                    verdict = "ok"
+                elif denied:
+                    verdict = "denied"
+                else:
+                    msg = str(err or "")
+                    if any(k in msg for k in INPUT_HINTS):
+                        verdict = "needs_params"
+                    elif any(k in msg for k in DEP_HINTS):
+                        verdict = "needs_dependency"
+                    elif any(k in msg for k in STATE_HINTS):
+                        verdict = "needs_state"
+                    else:
+                        verdict = "failed"
+                row.update({"result": verdict,
                             "ms": ms, "status": status,
                             "denied": denied,
                             "missing_scopes": r.get("missing_scopes") or None,
-                            "error": (r.get("reason") or r.get("error")
-                                      or (inner.get("error") if isinstance(inner, dict) else None))})
+                            "error": err})
         except cf.TimeoutError:
             row.update({"result": "timeout", "ms": a.timeout * 1000,
                         "note": "超过 %ds 没回" % a.timeout})
