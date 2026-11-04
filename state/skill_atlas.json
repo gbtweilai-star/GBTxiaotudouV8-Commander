@@ -1,0 +1,3460 @@
+{
+ "_generated_by": "tools/build-skill-atlas.py",
+ "_source": "gbt_allinone/caps_registry.all_caps()（现读，非硬编码）",
+ "_note": "原始生成器 omni.py 在本仓从未存在；本图鉴是注册表的投影，语义 = 「该能力位在册即收录」。若日后拿到 omni.py build，可整体覆盖本文件",
+ "_口径": "caps[].kind 就是能力位名；判据只读这个字段",
+ "generated_at": "2026-11-04T16:54:55",
+ "count": 427,
+ "by_domain": {
+  "automation": 2,
+  "body_control": 1,
+  "brain": 4,
+  "collab": 2,
+  "comms": 2,
+  "creation": 58,
+  "data": 12,
+  "desktop": 2,
+  "device": 19,
+  "devour": 6,
+  "engine": 12,
+  "finance": 4,
+  "framework": 1,
+  "image_video": 1,
+  "infra": 2,
+  "integration": 11,
+  "life": 1,
+  "llm": 43,
+  "longrun": 4,
+  "mind": 27,
+  "pipeline": 18,
+  "project": 3,
+  "recon": 18,
+  "security": 34,
+  "social": 2,
+  "system": 60,
+  "tentacle": 30,
+  "tools": 9,
+  "ui": 1,
+  "video": 18,
+  "vision": 13,
+  "voice": 7
+ },
+ "caps": [
+  {
+   "kind": "a1art_skill",
+   "domain": "image_video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "a1.art API 技能（只读骨架·门）：五原语 LOOKUP→UPLOAD→GENERATE→OPTIMIZE→POLL；密钥只走 DPAPI/密钥池、结果必须落盘、不调不支持组件、810012 如实报"
+  },
+  {
+   "kind": "absorb_loop",
+   "domain": "brain",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【吞天·闭环】吞天闭环（只读骨架）：蒸馏 DISTILL → 提炼 REFINE → 吸收 ABSORB + 回灌 FED_BACK；四条机械闸（stage_dirty 阶段间不许留垃圾 / loop_not_closed 三阶段必须齐且回灌 / junk_left_silently 垃圾要么清要么登记 / not_r"
+  },
+  {
+   "kind": "account_registry",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "AI 账号登记表只读校验：一人一号（不共用账号/不共用凭证/只记路径/不许无主账号）"
+  },
+  {
+   "kind": "action_gate",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "先看→动脑→执行 前置闸（主人令「做事拥有先看在动脑执行，拒绝所有的无脑操作以及盲猜」）：**没证据不许动手**（evidence 必须真在盘上）· **证据要新**（默认 ≤600s，旧读数不许当现状）· **必须写预期**（hypothesis ≥8 字，否则算盲猜）· **写/执行要票**（scope 或 own"
+  },
+  {
+   "kind": "actioncam",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "动作镜头控制系统（拍子表制）：10 种动作运镜语法（POV 主观/甩镜/急推/手持抖/推拉/环绕/打击帧停格）× 4 种机位角度（仰/俯/平/荷兰角）× 画质档（hd/fhd/cinema）；拍子表 manifest 为唯一真相，逐拍渲染 + 总装调色；零逗号表达式纪律 + 种子锁定；plan/seg/build/ad"
+  },
+  {
+   "kind": "agency_tentacles",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "职业触手中枢：吸收 Agency Agents 职业资料；每根触手独立统一大模型会话与隔离镜像房间；支持并发汇总"
+  },
+  {
+   "kind": "agent_console",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "代理驾驶舱：**任务监督循环 + 连接请求审批桥**（蒸馏自 GitHub 周榜 #05 paperclip，只取架构）：`add` 登记被监督任务（判活看**读数有没有如期更新**，不是 exit code）· `tick` 定时检查出 ok/stale/failed 并列出该做什么（**不擅自执行**）· `ret"
+  },
+  {
+   "kind": "agent_control",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Agent 统一控制面（nasiko #04 蒸馏）：六面读数收进一屏——部署/路由/鉴权/限流/成本/链路，**每面带 src、不新起网关/Sidecar、只读不改配置**；读不到就写读不到（未验≠没有），成本面如实标 unknown。op=roster/facets/where"
+  },
+  {
+   "kind": "agent_council",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "多智能体议事会（蒸馏自 2026-09-28 主人给的周榜卡 AutoGen 61.2k★ 微软开源，只取**开会这一面**；并行干活已有 agent_rig/orca，拍板已有 Jev 四角色引擎，不重造）：`convene` 定题定角色（默认对位 Jev 四角色）· **发言权** round_robin 下抢话 "
+  },
+  {
+   "kind": "agent_rig",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "编码智能体编队：**把本机已装的 CLI agent 编成并行流水线**（蒸馏自 GitHub 周榜 #02 orca，只取架构）：`agents` 只读盘点可编排的 agent（fail-closed）· `plan` 把一批任务分成 N 份（每份 worktree + 端口段 + 隔离 HOME + 独立日志，口径"
+  },
+  {
+   "kind": "alerts",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "框架声带：近期异常摘要+根源线索（按能力聚合）"
+  },
+  {
+   "kind": "anatomy_figures",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Anatomy 等轴详解图（外部成熟件 · 主人 2026-10-19 指名抓取「这两个能力不就可以完美补齐缺失了吗」 · 上游 wheresryan22/anatomy · MIT · 15.9k★）：**把一个概念做成一台真机器**的等轴 SVG 图（零件级 40~150 件 · 四色明暗 · 画家排序 · 卡框带"
+  },
+  {
+   "kind": "anim_audit",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "动画体检（**纯读免门**）：直接解析 GLB 的 animation 通道，把每根骨「首帧 vs 静止姿势」的夹角从大到小排出来（当初就是它量出髋骨被扭 177.2°/176.3°）。阈值 --threshold 默认 30°，all 打全量。op=status/run/where"
+  },
+  {
+   "kind": "anim_fix",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "动画手术（GLB 层面 · **六条自检，不过就不写盘**）：把点名骨头的 rotation 轨道归位到静止姿势（髋骨 LeftUpLeg/RightUpLeg）或写成**量出来的**姿势（手臂组的值来自闭环解算，不许手搓）；平移/缩放通道一律不碰；自检=命中通道/采样形状/四元数模长/写回逐帧复查/**只改这些字节（"
+  },
+  {
+   "kind": "answer_shaper",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "行动优先输出核（蒸馏自 2026-09-28 主人给的周榜截图 ayghri/i-have-adhd——截图只给仓库名，**未联网核验、未引用该仓任何代码/文本**；纪律取自本仓自己的沟通纪律与已有技能 gbt-adhd-mode，本件补**运行时可机检的核**）：`check` 五条确定性规则逐条判定（R1 首行是行"
+  },
+  {
+   "kind": "api_slot",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**动态 API 槽定义口**（主人 P1，2026-11-02）：op=schema/validate/register/remove/list/call/verify。只登记槽定义：https-only、拒 localhost/私网/URL 凭据、密钥只存环境变量引用名、参数白名单、超时 1..30s、上限 20；"
+  },
+  {
+   "kind": "art_brief",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**作品策划位**（人话一次问，四路知识同时到位 + 给出可直接照抄的出片命令）。四路： `ui_kit` **可渲件**（纯 HTML/CSS，能直接进渲染器）· `bits_kit` **参考件**（react-bits 的 React 实现，**只读来学**——许可禁止再分发/移植）· `motion_kit` "
+  },
+  {
+   "kind": "art_chain",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**作品链**（一条命令：挑组件 → 取件 → **真渲** → 调优，每步带读数）。① `ui_kit.find(q)` 挑头一件（带外链数）② `ui_kit.take` 拷进 `outputs/art-chain/`③ 调 `render_page.py` **真 Chromium 渲**（该件自带禁网 + 逐条"
+  },
+  {
+   "kind": "asset_index",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "资产索引：**整棵树都连上 + 连上即可秒查**（主人令 2026-09-27）。build 把全树扫进 state/asset_index.db（键=跟随软链的物理真身，与绑定系统同口径，软链别名去重）；wire 给每个资产补触手标签（启发式优先，认不出用回退标签 project_context —— 诚实标注归属，"
+  },
+  {
+   "kind": "asset_vault_freeze",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "资产单点损失**体检**（防御侧）：卷影副本/防篡改开关/BitLocker/关键资产清单，不加密不冻结"
+  },
+  {
+   "kind": "audio_extract",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "从视频里取出声音（本机 ffmpeg，**零出网**）：probe/tracks 读流与音轨（只读）；extract 真出音频件（mp3/aac/m4a/wav/flac/ogg/opus/wma 八种，可切段/调音量/响度归一）。**产出即验证**：落盘后 ffprobe 回读产物，把真读数一并返回。写面自收窄到 p"
+  },
+  {
+   "kind": "audio_mix",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "混音与母带（本机 ffmpeg，**零出网**）：`mix` 多轨合成（amix，逐路音量，显式 normalize=0）；`master` 响度归一（**两遍法 loudnorm**：先量后施加，第一遍的四个测量值随结果返回）。响度标准表 streaming -14 / podcast -16 / broadcast"
+  },
+  {
+   "kind": "audit_query",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "查审计账本（只读）：`event` 可选，按事件名过滤；回 `total` 与最近 10 条 `sample`。它是「无痕即不存在」这条公理的读口 —— 能力有没有真跑、门有没有真拦，都从这里取证。作用域 `audit_read`（读审计历史本身也要票）。"
+  },
+  {
+   "kind": "auth_gate_status",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "人工授权门状态：各作用域可用授权数（只读；授权只能人发放）"
+  },
+  {
+   "kind": "auto_publish",
+   "domain": "social",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "社交推广 / 发布作品 / 收益平台·**全自动执行**（只读骨架·门）：五原语 PLAN/COMPOSE/PUBLISH/TRACK/SETTLE；核心口径 = **全自动 = 除「发布/提现/改价」之外全自动**（那几下不可逆+涉钱 ⇒ 必须过门：逐条确认或有 TTL 的令牌，默认 0 张）；六条红线（发布过门/密"
+  },
+  {
+   "kind": "auto_switch",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "自动化切换引擎（只读骨架·内调）：意图分析(L1解析+L2交叉验证+L3置信度)→任务分级→模型切换→原生执行→验证审计；接线点只有 Intent JSON；五条红线（低置信先问主人/不许直接执行/每次切换记 model_used/不可逆二次确认/身份不许改写）"
+  },
+  {
+   "kind": "automation_keys",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "自动化配置密钥口（APP 设置调它）：六个槽位（codex/claude/deepseek/browser/free_pool/sec_llm）每槽只存**引用**（env:<环境变量名> / vault:<DPAPI profile> / local），**不存值**；输出只有掩码（前 4 字符 + ****）；se"
+  },
+  {
+   "kind": "autonomy",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "自主契约：架构声明之后，除 **danger（终端危险能力）** 与 **transfer（转账/花钱）** 外，**禁止打扰主人、禁止要求主人帮助**。op=status 契约状态；op=declare 声明架构已给；op=check {\"kind\":...} 判定能不能问（只有两个例外放行）；op=guard {\""
+  },
+  {
+   "kind": "autopilot",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "自主编排环：目标→LLM拆解→本地校验→执行→自检→修复循环（轮数上限防失控）"
+  },
+  {
+   "kind": "awesome_tools_index",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Awesome Tools 蒸馏索引（只读骨架·地图）：四原语 INDEX/LOOKUP/MAP/VERIFY；三条带牙判据（**索引只读** index_not_readonly / **映射可追** map_without_source / **未核实不标绿** unverified_green）+ 五条红线（只读"
+  },
+  {
+   "kind": "belief_forge",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "信念锻造（hindsight 学习半蒸馏）：**观察 → 信念（会学习，不改写历史）→ 心智模型**——`observe` 登记观察（**必须带证据与来源**）· `consolidate` 把同类观察巩固成信念（置信度=证据加权；move ∈ strengthen/weaken/extend，**history 只追"
+  },
+  {
+   "kind": "bi_distill",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【蒸馏·BI 件】**蒸馏件**（不是外挂）：把吞入件 dataease/dataease（**GPL-3.0**〔README 徽章明写 GPL v3；GitHub 未识别才标 NOASSERTION〕· 24603星 · Java「人人可用的开源 BI 工具」）蒸成三条取法+一条红线：①拖拽即建模（先把数据做成可拖"
+  },
+  {
+   "kind": "bits_kit",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**动效组件图鉴的口**（人话 → react-bits 哪个组件 · 干什么 · **源码在哪 · 会不会联网 · 依赖什么**）。素材：`DavidHDev/react-bits`（**MIT + Commons Clause v1.0** · ★49005 · 216 组件 · 5 类：Animations 39"
+  },
+  {
+   "kind": "blender",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "三维电影引擎（Blender 4.2.16 LTS·本机）：Cycles 电影级光追/EEVEE 实时/几何节点/VSE 剪辑/bpy 全脚本自动化；3D 场景（义庄/血月/墨线阵）、摄影机动画、GPU 渲染；status 免门，一切 run（渲染/脚本/导出）过 filesystem_write 门（处理器层挂闸）"
+  },
+  {
+   "kind": "blueprint",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "蓝图主链五段：op=make 架构→蓝图（阶段/任务/验收/风险，落 state/blueprints/）；op=approve 主人过目（**唯一允许的交互**，批准即进入自主模式、不再打扰）；op=mindmap 分析推理→任务图+依赖（mermaid 思维导图）；op=dispatch 按依赖拓扑派遣触手执行（*"
+  },
+  {
+   "kind": "bluetooth",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "蓝牙设备控制：扫描附近 BLE 设备、连接读写 GATT 特征（操控空调/灯/音箱等家居设备）、经典蓝牙状态报告"
+  },
+  {
+   "kind": "body_click",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·点：按坐标点按（参数 x,y,clicks）"
+  },
+  {
+   "kind": "body_control",
+   "domain": "body_control",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**身体控制 / 触手 / 全息投影状态口**（主人 2026-11-02 定名）：op=schema/status/inventory/move/verify。**如实报缺**：缺感觉/执行器（未绑定或已被主人拔掉）报 not_supported；全绑定也最多 partial 且 `executed=false` —"
+  },
+  {
+   "kind": "body_excrete",
+   "domain": "device",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·排泄（2026-11-04 主人令）：把代谢垃圾**排出体外并送进 Windows 回收站**（可还原），不是硬删 —— 「不让垃圾留在文件里当垃圾」。只排可再生代谢物（__pycache__/*.pyc/*.tmp/~$*/Thumbs.db/超期日志），源码·配置·账本·能力包·解释器属器官一律保护。**默认"
+  },
+  {
+   "kind": "body_eye",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·眼睛（2026-11-04 主人令：把散装的视觉收成**一个入口**）。接线前实况（已核实，勿再误传）：`ocr` 与 `vision_arsenal` 早就在册、各是一个位各一套参数；但 2026-11-04 新做的 `vision_detect`(YOLO) / `vision_embed`(CLIP) / "
+  },
+  {
+   "kind": "body_immune",
+   "domain": "device",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·免疫（2026-11-04 主人令）：**自我保护机制**。自己长，不外包给 Defender（实测 Defender 实时保护开着、特征库当日更新，aclui.dll.js 蠕虫在启动文件夹躺了 43 天却一条记录都没有）。六类检测：注册表 Run 指向脚本/Temp、启动文件夹放 .js/.vbs、计划任务用"
+  },
+  {
+   "kind": "body_map",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·清单：现读这台设备的七根感官与六根动作（零作用域，只读）"
+  },
+  {
+   "kind": "body_open",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·打开：用系统默认程序打开文件/网址（参数 target）"
+  },
+  {
+   "kind": "body_realtime",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。"
+  },
+  {
+   "kind": "body_say",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·说：系统 TTS 念一句（参数 text，可调 rate）"
+  },
+  {
+   "kind": "body_see",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·看：截当前屏幕落 png（可选 monitor 序号）"
+  },
+  {
+   "kind": "body_sense",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体知觉三合一：op=proprio 本体感觉（分区×左右×机构在位，**没接机械臂就如实报 false**）；op=pain 痛觉（剧痛=身体失联 / 钝痛=部分不可用 / 酸=需票；每条带部位·原因·怎么办，追加落 state/body-pain.jsonl）；op=neighborhood 神经邻域（器官间共享能"
+  },
+  {
+   "kind": "body_type",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·打字：向前台窗口键入文本（参数 text）"
+  },
+  {
+   "kind": "body_volume",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·音量：读或设主音量（参数 level 0~1；不传则只读）"
+  },
+  {
+   "kind": "book_skill",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**书→技能**（主人令 2026-10-16：把 book-to-skill 变成我们的原生能力）：蒸自 **virgiliojr94/book-to-skill**（MIT）—— 把任何技术书/文档集（PDF·EPUB·DOCX·MD·HTML·RTF·MOBI）变成**结构化技能、按需加载**：提取器（确定性）与"
+  },
+  {
+   "kind": "bounty_ops",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "安全众测闭环（2026-11-04 主人令：把 2026-11-02 写完却没接线的 6 件**收成一个入口**）。来历：这 6 件当时就已经写好，但**从没注册能力位、从没被任何地方 import**，一直躺在 `state/proactive/work/g-1/`（一份失败工单的旧仓库快照）里 —— 不先捞出来，清"
+  },
+  {
+   "kind": "brain_council",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "脑会·编队群决策引擎：各脑出本域提案，委员长聚合裁决（纯推演·不出网·不落盘）；执行仍走主脑既有授权门"
+  },
+  {
+   "kind": "brain_execute",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "大脑执行层·执行维：单能力直调或多能力并行（万能插线程池）"
+  },
+  {
+   "kind": "brain_health",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·健康维：五维自检评分（路由/执行/触手/视觉/审计）"
+  },
+  {
+   "kind": "brain_route",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "大脑执行层·路由维：意图→能力动态路由（语义匹配+备选建议）"
+  },
+  {
+   "kind": "brain_unify",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "大脑执行层·五维合一：一次跑完 route → execute → verify → health（**是顺序串链，数据顺着走**：route 的 best.kind 喂给 execute，chain 字典逐步累积）。🔴 2026-09-22 更正：这里原先写着「**星形**，unify 直接分别调四维，**不是**串"
+  },
+  {
+   "kind": "brain_vault",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "脑库接入：Obsidian 记忆库的读（recall=记忆总纲+收集箱）/ 写（remember=追加一条）/ 体检（status）—— 追加式、**没有任何删除路径**，写进去的想忘都忘不了"
+  },
+  {
+   "kind": "brain_verify",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·验证维：触手肉眼验证现实（视觉指纹+UIA穿透读回）"
+  },
+  {
+   "kind": "brand_outro",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "品牌片尾只读渲染：署名/自述/致谢三层 + 四条红线（署名不造假·致谢不套话·承诺可追溯·观众不当流量）"
+  },
+  {
+   "kind": "browser",
+   "domain": "automation",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "浏览器自动化入口（良性子集）。op=open/search/fetch/automate 走 browser_cap 三级后端；op=native（别名 deep/controller/cdp）走原生浏览器窗口 native_browser.py（Chrome DevTools Protocol，自带最小 RFC645"
+  },
+  {
+   "kind": "bt_control",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "AI 智能蓝牙操控：自然语言意图→扫描识别设备→协议匹配→组装指令→写入执行→验证（协议库只收公开文档协议，未知如实报告）"
+  },
+  {
+   "kind": "cad_distill",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【蒸馏·CAD 件】**蒸馏件**（不是外挂）：把吞入件 neka-nat/freecad-mcp（MIT · 2833星 · Python：「Control FreeCAD from Claude Desktop and other MCP clients … run FEM analyses」）的**挂载取法**提"
+  },
+  {
+   "kind": "cadgen",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**本机 CAD 链的口**（2026-10-13 建位）：只调真件 `cadgen`，不手搓几何。常用说法（人这么问就命得中）：建模 / 零件 / 三维 / 模型渲染 / 渲染 / 出图 / 看图 / 看件 / 工程图 / 导出 STEP / STL / 3MF / GLB / DXF / 3D 打印。能力面（照真件"
+  },
+  {
+   "kind": "cap_pack",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能力包：丢一个含 capability.json 的目录 = 多一个能力（与框架代码解耦）。op=discover 扫包（packs/、state/packs/、$GBT_CAP_PACKS）；op=info {\"name\":...}；op=status 几个包/几个可执行；op=run {\"name\",\"action"
+  },
+  {
+   "kind": "cap_self",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能力自知：**问自己有什么**时只有一个真源（注册表现读）。op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；op=brief 压成能进上下文的 32 域自述；op=verify **三源对账**（注"
+  },
+  {
+   "kind": "cap_tags",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "GBT 技能标签 + 主人调用许可（主人令「将所有的原生能力注册出专属的 GBT 技能标签，只有我允许了才能调用我的能力」）：每个能力位一个稳定标签 `GBT-<域>-<能力位>`，**从注册表现算**；权限类**由框架自己的判据推**（`policy.evaluate` 逐 op 问作用域 + 图鉴 safe/nee"
+  },
+  {
+   "kind": "capability_net",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "穿透网七栏只读读数：indexed/entry_known/reachable/verified×2/has_test/penetrate_ready"
+  },
+  {
+   "kind": "caps_called_audit",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能力位调用点审计（只读）：动态算 called_by，列出零调用点孤儿清单（同名模块自称不算接线）"
+  },
+  {
+   "kind": "case_mine",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "案例挖掘（starter story 架构蒸馏）：**公开盈利案例 → 结构化案例卡**——`sources` 登记源与抓取口径 · `fetch` **经唯一门**取公开页正文（`run_task('tentacle', web_read)`，本件自己不发 HTTP）· `ingest` 正文→案例卡（营收/起步/工"
+  },
+  {
+   "kind": "chain_kernel",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "唯一执行路径：Step -1→5 七步链，**不可跳步**、每步有准入/准出、每步必须产出证据。op=run {\"goal\":\"...\",\"approve\":false} 跑链（approve=true 才真派工，默认只读面）；op=status 七步与门禁；op=gate {\"step\":1} 看单步条件。某步没证据"
+  },
+  {
+   "kind": "chart_html",
+   "domain": "data",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**数据 → 自包含交互 ECharts HTML**（蒸馏自 skills.sh smart-charts，只蒸思想不搬代码；2026-10-17）：CSV/TSV/JSON/XLSX → 单文件 HTML（ECharts 内联，零外链、离线可开）；自动推题型（bar/line/pie）与轴；落 state/char"
+  },
+  {
+   "kind": "claude_code",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Claude Code CLI: official Anthropic coding agent"
+  },
+  {
+   "kind": "cli_chat",
+   "domain": "integration",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "外部 CLI 助手**对话面板**（把「集成」面板真的接到对话上）：`agents` 只读底表（装没装/版本/**能不能一次性驱动**/一次形态）· `send` **真发一句话**给选定的 CLI 助手（claude `-p` / codebuddy `-p` / codex `exec` / copilot `-p"
+  },
+  {
+   "kind": "cli_ify",
+   "domain": "integration",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**软件命令化**（主人令 2026-10-16 深度蒸馏自 HKUDS/CLI-Anything）：上游原文现读（200·80,551 字）后补齐三块——**Agent-Software Gap**（智能体推理强、用真业务软件很差；焦位版重写会丢 90% 功能 ⇒ **包壳不重写**）· **7 相流水线**（Ana"
+  },
+  {
+   "kind": "cloud_llm",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "云端大模型通道（Agnes AI 等）：把当前任务数据发给外部模型服务再收回执。🔴 它不是只读位：虽然注册表标 safe，实际按 `external_llm` 收口（要票，且数据会离开本机）；`op=materialize` 这类写动作按写类 fail-closed。"
+  },
+  {
+   "kind": "cloud_pc",
+   "domain": "infra",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "云电脑独立窗口（只读骨架·门）：面板加一个**独立窗口**给她（数字人）**安装**云电脑（卡片 + 触手，**不是 iframe**）；五原语 PROVISION/CONNECT/STATUS/SNAPSHOT/RELEASE（逐个标花钱与不可逆）；五条红线（密钥DPAPI/先算账再花钱/每次留痕 source_ki"
+  },
+  {
+   "kind": "cloud_plugin",
+   "domain": "infra",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "云插件（只读骨架）：**云源注册表 + 触手双向连接**。**无限扩容 = 加一行**（SOURCES 元组）—— 现登记 10 个云源（云卡触手 / 云电脑 / 云卡ComfyUI / 能源池 / 统一密钥网关 / 免费模型池 / H3mini / a1.art / LibTV / Tripo3D）。**绑定一次两个"
+  },
+  {
+   "kind": "code_art",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "代码艺术内核（只读骨架）：INDEX/SEED/CANVAS/LAYER/EXPORT 五原语；无种子不许导出"
+  },
+  {
+   "kind": "code_audit",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "代码安全审计：**多阶段 + 机器可读 findings + 独立验证 + 可复现**（蒸馏自 GitHub 周榜 #03 security-audit-skill，只取架构）：五条规则（凭证面/注入面/破坏面/判据面）· findings 契约含 severity/证据/复现命令 · **两路读法都命中才算确认**（"
+  },
+  {
+   "kind": "code_graph",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "代码知识图谱（主人令 2026-10-29，蒸馏自 symchenry/codegraph 的机制、不抄代码）：**本地 AST 预索引 → SQLite 图谱（symbols/edges/files + FTS5）→ 结构化查询**。给 AI 的是「文件:行 + 类型 + 签名 + 调用链」，**不是文件正文** —"
+  },
+  {
+   "kind": "code_patch",
+   "domain": "tools",
+   "safe": false,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "**改代码的唯一过门入口**（2026-09-23 接）：此前 agent 直接 edit/write 落盘 ⇒ **不过门、没审计、没信封、没改前改后凭据**。⚠️ **默认原子替换 · 无伤修复**（2026-11-03 主人令逐字：「只要是修复代码必须使用原子替换无伤修复」）：`apply`/`create` *"
+  },
+  {
+   "kind": "codebuddy",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "CodeBuddy CLI: AI coding assistant"
+  },
+  {
+   "kind": "codepage",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "代码页索引（2026-11-04 主人令「速度不能使用触手双向绑定每一页，覆盖每一个代码每一页可以和所有页面互通，实现精准直达脉冲提速」）：**一次建索引，之后毫秒直达**。实测代码库 4013 个 .py / 52.46MB / 约 115 万行；本机模型零系统提示 1.4 秒/次 ⇒ 逐页问模型要 94 分钟（物理"
+  },
+  {
+   "kind": "codex_chat",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "官方 Codex 同步对话：跑完一个回合并返回文本（需 process_execute + external_llm 授权）"
+  },
+  {
+   "kind": "codex_interrupt",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "官方 Codex 写操作：中断当前回合（需 process_execute 授权）"
+  },
+  {
+   "kind": "codex_models",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "官方 Codex 只读：可用模型清单（需 external_llm 授权）"
+  },
+  {
+   "kind": "codex_status",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "官方 Codex 只读状态：进程/会话/并发上限(1)/空闲回收(600s)"
+  },
+  {
+   "kind": "codex_thread_new",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "官方 Codex 写操作：新建线程（需 process_execute 授权）"
+  },
+  {
+   "kind": "codex_tools",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "官方 Codex 只读：可用动态工具清单（gbt_* **十个**）"
+  },
+  {
+   "kind": "codex_turn_send",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "官方 Codex 写操作：发送回合并流式回传（需 process_execute 授权，并发上限 1）"
+  },
+  {
+   "kind": "collab_gateway",
+   "domain": "collab",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "协作网关（多智能体会话/信箱/同伴注册）：open_session/close_session/status/inbox/register_peer/peer_status/request_peer/server_status/start_server。**F12 补齐**：同上，原先没进注册表 ⇒ 门看不见它。"
+  },
+  {
+   "kind": "comfy_cloud",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**云卡 ComfyUI 触手**（主人令 2026-10-13「她不需要 ComfyUI，直接使用触手就可以生产出高质量视频」）：把云卡上的 ComfyUI **包成她自己的器官**——她不用知道 ComfyUI 是什么。本机到 8188 没路（实测代理 404），所以所有调用都在**卡内**执行，经云卡触手 pod"
+  },
+  {
+   "kind": "comfy_forge",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**创作融合台**（主人令 2026-10-15「借助秋叶版的节点来融合她的创作能力」）：把秋叶版 ComfyUI 已抓下的节点（**现读 1495 把**，带完整输入 schema；图鉴文案原写 962，以盘上快照为准）按**创作用途分族**，并说清每族饲哪些创作能力位（生图/控图预处理/视频/音频/3D/模型补丁）"
+  },
+  {
+   "kind": "comfy_native",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**GBT天真** —— 触手自己的 ComfyUI 能力（主人命名 2026-10-11「触手的 ComfyUI 我们取名叫 GBT天真」）。常用说法（人这么问就命得中）：**放大 / 锐化 / 高清 / 4K / 图片放大 / 传统放大 / 洗图 / 出图放大**。（触发词前置是好习惯；但**截断已不再影响路由**"
+  },
+  {
+   "kind": "comfyui",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "ComfyUI（秋叶整合版）全控（主人令 2026-09-27「这个必须也是一个不漏的双向绑定，才能实现无限制审查生产」）：**966 个节点**（每把一把键）+ 11 个 API 端点 + 14 个启动开关 + 模型清单（checkpoints/loras/controlnet）；**节点消失=断连**（要解释或补）"
+  },
+  {
+   "kind": "command_chain",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "指挥链·总指挥参谋部（主人令 2026-10-01「全部统一品牌统一智能体以 GBT小土豆V8 为主延申…不能重复和错误指挥」）：五段全踩已有件不重造 —— ①接令·理解意图（brain_route）②双顾问意见（大脑执行层读数 + gods_eye 顾问席，主人 9-28 分工口径）③总指挥决策（确定性合并成工作单元"
+  },
+  {
+   "kind": "commander",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手主干·原生指挥官（**自有大模型权重 → 本机推理 → 主干判决**）：op=status 现读「权重/引擎/模型」三项（缺哪件说哪件，不编）；op=route 给一句意图，在**真名表**里选一个触手方法（不在候选里一律不采信＝幻觉防护）；op=ask 直接问权重一句；op=start/stop 起停本机引擎（幂"
+  },
+  {
+   "kind": "console_hub",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "工作台中枢：**所有独立页面的唯一数据源**（主人令 2026-09-28「把所有触手连接全面专业化 3D 可视化…每个工作流的独立页面需要精细设计排布…必须先全面扫描确保不能遗漏」）：`pages` 页面登记表（单一真相）· `graph` 3D 图（32 域→427 能力→绑定弧→**运行脉冲=真台账尾**）· `"
+  },
+  {
+   "kind": "console_pages",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "工作台页面渲染器：把 `console_hub` 的真读数**内联**进页面（渲染产物，file:// 直开）——Bento 自定义工作台（9 部件/拖拽编排/布局记忆）· 触手 3D 全景（域环→能力节点→绑定弧→运行脉冲，签名元素占首屏≥1/5、有光、字不歪）· 每工作流独立页（film/movie/music/s"
+  },
+  {
+   "kind": "context_guard",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "上下文守卫：实时看环形上下文（窗口/溢出/落库三项），异常回大脑执行层纠正。op=status 环读数+异常诊断；op=tick 采样→诊断→（可选）回大脑→纠正；op=bind 双插（触手↔环，落 state/context-bindings.json）；op=bindings 列全部双插；op=bind_guard"
+  },
+  {
+   "kind": "context_inject",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**上下文注入选择器**（主人 P1，2026-11-02）：op=schema/select/verify。给 query + 候选（记忆/最近对话/UI 信号/工具结果/预取缓存），纯确定性选出有预算上限的注入项：过期丢弃/去重/相关度/来源优先级/新鲜度/来源配额/字符预算。**零作用域**（不调模型/不出网/不"
+  },
+  {
+   "kind": "context_vault",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "上下文归档库（只读骨架·内调）：**索引+检索层，不是第四处存储**（只引用不复制正文）；内存多大上下文就多长（按**可用**内存算预算，不足则降级如实报）；快速搜索=倒排求交→打分→按预算裁剪"
+  },
+  {
+   "kind": "control_loop",
+   "domain": "desktop",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "快慢双脑控制回路（蒸馏自 Jev/TypeSafe System One + browser-use/jev-ultrafast）：动作是**枚举**（CLICK/TYPE_TEXT/SELECT/SCROLL_*/WAIT/DONE/BLOCKED，枚举外不存在）· 一次观测出「操作+目标」两个头 · 只为 TYPE"
+  },
+  {
+   "kind": "count_words",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数词数：吃 `text`，回 `words`（按空白切分）与 `chars`（字符数，含中文）。只读、零作用域；用于产出字数核对（比如「这段旁白是不是 300 字」）。"
+  },
+  {
+   "kind": "coverage_auditor",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手覆盖审计（只读骨架）：八短板↔八触手组 + 覆盖率读数 + 死角登记 + 五条红线"
+  },
+  {
+   "kind": "coze_mail",
+   "domain": "comms",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "通信域：对主人自有的单一地址（@coze.email）收发与整理；白名单默认空（全拒）、confirm_token 绑定内容、正文不入档、独立通道 coze_mail"
+  },
+  {
+   "kind": "create",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "创作出口：创作意图/产物登记 ＋ **仅限 outputs/ 的文本写入（已接线：gbt_allinone/file_operation.py，policy 挂 filesystem_write）**；**网络出口**待接线（如实报 pending、不发网络请求）、覆盖必带 confirm_token ＋ 写前备份 ＋"
+  },
+  {
+   "kind": "creation_camp",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "创造营编排（「AI 视觉创造营」形式蒸馏）：**主题 → 逐日营计划**——7 天基准节奏（开营定题→采样风格→构图分镜→批量出图→修饰选片→编排成片→展陈复盘），每天三件（任务/产出物/验收点）。**零网络零 LLM**（确定性）；点名的能力位**现读注册表**，缺的落「缺口」（幽灵能力红）；视觉工具**只引用现成位"
+  },
+  {
+   "kind": "credential_steal",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "凭据**暴露面**审计（防御侧）：只报位置/体积/权限与风险，**绝不读取或导出文件内容**"
+  },
+  {
+   "kind": "cross_scan",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "扫描一下/扫一下/深度扫描/交叉扫描/穿透式扫描/全框架扫：深度穿透式交叉验证（注册↔路由↔导入↔断链↔运行时↔多扫描器互证，十维），扫描器互相咬、不各报各的"
+  },
+  {
+   "kind": "data_hijack",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "会话/数据**完整性**检测（防御侧）：本地会话 + 浏览器凭据库落点 + 文件树指纹漂移"
+  },
+  {
+   "kind": "datakit",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本地数据工具（**只读**）：html→markdown · html→表格结构 · xlsx 字节→JSON · JSON 美化/排序 · 多段 CSV 合并（`op` 分派，见 `tools/datakit.py` 的 OPS）。🔴 **结果从返回里给、不落盘** ⇒ 作用域天然为空，**不需要也不该改 `poli"
+  },
+  {
+   "kind": "db_plugin",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数据库插件（只读骨架）：**存储后端注册表 + 触手双向连接**。**无限扩容 = 加一行**（BACKENDS 元组）—— 现登记 9 个后端（SQLite+FTS5 / 只读查询台 / 资产索引 / Obsidian / 记忆银行 / JSONL台账 / 飞书 / Notion / TheBrain）。**绑定一次"
+  },
+  {
+   "kind": "db_probe",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本地只读查询台（dbx 蒸馏）：**SQLite 概览 + JSONL 行统计**——`sources` 列可查本地源 · `tables` 静态 SQL 列表/视图 · `schema` 参数化取 DDL + Python 解析列 · `counts` 每表行数（iterdump 文本计数）· `jsonl` 行统计"
+  },
+  {
+   "kind": "delivery_gate",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**交付闸**（主人令 2026-10-09：「每一个能力必须单独跑通闭环才能交付，要不然我不管你做了多久我直接丢垃圾桶不带说的」）。移植来源 V9 core/delivery_gate.py，**设计借过来、件按 V8 自己造**：V8 的「独立验收器」= caps_sweep 真过唯一门调用那位能力 + 它自己的测"
+  },
+  {
+   "kind": "deploy_queue",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "AI 接管部署队列：submit 入队 / tick 部署下一个（完一个自动下一个）/ status 全景"
+  },
+  {
+   "kind": "design_atlas",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**设计与审美图鉴的口**（吞天吞来的外部手册 → 人话找到\"该读哪一节\"）。素材：`flash-hero/GOATED-UI-SKILL`（**MIT**）的 18 份手册（component-recipes / webgl-shaders-3d / interactions / scroll-gsap / moti"
+  },
+  {
+   "kind": "desktop_commander",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "桌面指挥官（Desktop Commander MCP）：终端+文件系统全能力触手；支持本地 stdio 与 remote 设备模式"
+  },
+  {
+   "kind": "desktop_distill",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**蒸馏件**（不是外挂）：把吞入件 CursorTouch/Windows-MCP（MIT · 8871★ · MCP Server for Computer Use in Windows）的**取法**提炼成我们自己的桌面操作判据（主人令 2026-10-12「我们吞噬都是加入蒸馏提炼出契合我们的能力」）。四条：①"
+  },
+  {
+   "kind": "detail_habit",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "细节化习惯 · **调用侧**门口（只读）：五问为准（输入/动作/明细/判据/接点 —— 与既有判据件 `tools/codex-scripts/detail-check.py`（主人令 2026-10-09）**同源**，op=same_source 逐字比对、分叉即红）+ 明细必须逐项（只报合计数 = 没有细节）+"
+  },
+  {
+   "kind": "device_takeover",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机设备接管定位与校验：只在本机 PnP 清单里找目标，接管指令交回既有 device_control 底座（不并存第二条接管路径）"
+  },
+  {
+   "kind": "devour_auto",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "自主吞食：op=tick 自主跑一轮——扫本地可食源（docs/tools/examples/skills），与**她自己的缺口**（无实现文件的能力位/依赖仓外模块的位）做相关度打分，score≥2 才吞；吞=摘 digest 进 state/devour-digest.md；**拒的也记账**（state/devo"
+  },
+  {
+   "kind": "devour_fusion",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "吞天 × 原生能力 融合台账（主人令「把蒸馏提炼出契合自己的原生能力和吞天融合到一起…以及记入能力」）：吞进来的东西**三件齐才算融合** —— ①原生位三处齐（注册/分派/图鉴）②有效触手标签 ③触手库永久记忆页；`status=已融合` 而三件不齐**当场拒**（假账拦下）。`fuse` 补第三件（调 obsidi"
+  },
+  {
+   "kind": "devour_github",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "吞天：吞噬 GitHub 仓库为知识胶囊（自我进化的核心——吸收外部能力）"
+  },
+  {
+   "kind": "devour_pulse",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "吞天：完整认知循环（吞噬→反思→消化→重组→进化）"
+  },
+  {
+   "kind": "devour_reflect",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "吞天：反思（回顾吞噬历史学习模式，发现弱能力与重组机会）"
+  },
+  {
+   "kind": "devour_scan",
+   "domain": "devour",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【吞天·缺口扫描】吞天：能力缺口扫描（域覆盖对照+进化方向）"
+  },
+  {
+   "kind": "dh_asset_gate",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数字人资产八条闸（**纯读免门 · 一条命令验完**）：① 单网格单蒙皮 ② 没有 42 顶点杂物球 ③ 身高 1.720±0.02（**在文件空间量 POSITION 的 Y 跨度**，不在 Blender 的 Z 里量）④ 无死顶点 ⑤ 髋骨没被扭（<0.5°）⑥ 手臂垂放（40°~120°）⑦ 循环闭合（首末帧差"
+  },
+  {
+   "kind": "dh_brain",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数字人本体（只读能力位·2026-10-08 主人点名「元数据没接入」补齐）：把她（数字人）的**元数据经统一门暴露**——op=status/spec/actions/voice/metadata/health。op 一律**现读单一真源**（state/digital-human-rig.json / digita"
+  },
+  {
+   "kind": "dh_pose",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数字人动作控制（主人令 2026-10-13「触手化作骨架操控数字人的所有动作」+「连带手指脚趾都要绑骨」）：`status` 读现状 · `semantics` 读 42 条「意图→骨/轴/符号」语义表 · `compile` 把人话（抬臂/屈指/转身…）编译成骨角度 JSON · `pose` 编译+渲染一张（经 "
+  },
+  {
+   "kind": "dh_realism",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数字人逼真度位（只读骨架）：**把专业流程固化成可机检的能力**。来源=Eurographics 2026 STAR《How to Build Digital Humans? From Priors to Photorealistic Avatars》（CGF 45(2)·Meta/TUM/Google/清华/MPI/"
+  },
+  {
+   "kind": "diagram_distill",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**蒸馏件**（不是外挂）：把吞入件 wheresryan22/anatomy（MIT · 7551★ · 零依赖 Node）的 **craft 取法**提炼成我们自己的**概念物化图判据**：①概念物化（先把抽象概念发明成一个「它怎么转就是这个概念」的物理机构）②单一数源（图上每个数来自同一个驱动模型的读数）③几何不"
+  },
+  {
+   "kind": "digital_human",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数字人「以图生视频」（本地 SadTalker，零账号/零验证）：**一张照片 + 一段配音 ⇒ 带头部动作与口型同步的说话视频**。ops：status/probe 只读（引擎·权重·venv 缺件如实报）· capabilities 读边界 · render 写（异步出片回 task_id；写面自收窄在 outpu"
+  },
+  {
+   "kind": "director_mood",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "导演 AI 情绪内核（只读）：七情六欲 + 半衰期；情绪只改『怎么看』，不改『看到什么』"
+  },
+  {
+   "kind": "dl_forge",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "3D 锻造融合位（只读骨架）：**秋叶节点 × 原生触手 × 专业标尺 三合一**。主人令「把学到的跟秋叶版的哪些节点以及契约，和我们的原生触手融合，实现原生能力也能做出高级作品和 3D 建模，都要达到专业水准」。**八段链**：①形象进件(控图预处理) ②图生3D ③网格(体素→网格/减面/平滑) ④贴图与烘焙 ⑤绑"
+  },
+  {
+   "kind": "doc_intake",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "知识库·**解析 → 入库 → 同步**那条链（吞 WeKnora 后蒸的另一面：本仓原来只有单件 `datakit`/`genoffice`）。三条口径：① **只吃本地文件**（出网那条路另挂门，本位不偷偷下载）② **不新造解析器**：md/txt 直读、html 只做去标签（**并如实标注不是真解析**）、其余"
+  },
+  {
+   "kind": "drama",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "剧本转分镜/拆分镜/分镜/短剧/故事板/剧本理解：剧本 → 结构化镜头表（景别·运镜·时长·情绪·角色位置·描述），字段齐全度与时长和逐条如实报；确定性路径离线只做切分，语义路径走她的模型通道，两条不互相冒充"
+  },
+  {
+   "kind": "drama_forge",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "短剧产线（2026-11-01）：剧本（0s–4s 时间码）→ 分镜（复用 drama 链头）→ 本地 SAPI 旁白 + 同源 SRT 字幕 → ffmpeg 竖屏 1080×1920 成片（H.264/AAC/软字幕）；给 assets_dir 用自有图，没给就渲染**分镜卡 animatic**（明标，不冒充 A"
+  },
+  {
+   "kind": "dream_replay",
+   "domain": "brain",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "做梦技能只读重演：五原语闭环，不写盘、不执行（巩固默认不开）"
+  },
+  {
+   "kind": "dual_gate",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "双脑确认：危险动作之前，推理脑（作用域该不该要票 / 金额上限 / 收款人必填 / force 与 dry_run 互斥）+ 编程脑（能力位存在 / 必填参数齐 / 落点路径存在）各自出一份裁决，**两脑都点头才执行**，任一否决即 rejected。op=check {\"kind\":..., \"payload\":{."
+  },
+  {
+   "kind": "duty_board",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·**在岗看板**（主人令 2026-10-13「大脑执行层必须确保所有大脑都是在运行干活的」）：读 skill_watch 观测账 + 图鉴位面，算出**在跑（零失败）/ 跑过但有失败 / 卡住（失败≥2笔）/ 从未用过**四类；卡住的**主动进主脑队列**。忙闲**按读数算**，不靠感觉；读不到就如实说读"
+  },
+  {
+   "kind": "echo",
+   "domain": "data",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "联调回显位：把 payload 原样打回来（回执里 `echo` 字段＝你发进去的那份）。用来验证「门 → 分派 → 回执」这条链通不通、信封形状对不对；不改状态、不出网、零作用域，永远是最安全的第一根探针。"
+  },
+  {
+   "kind": "edit_pipeline",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "剪辑引擎（蒸馏剪映时间线语义）：轨道→片段→目标/源时间区间→变速/音量/转场/文本，真渲染 1080x1920 成片（ffmpeg + libass 烧字幕）或导出剪映草稿；写面自收窄到 projects/·outputs/·.scratch/（policy 无条目 ⇒ 门内零作用域，故自钉）"
+  },
+  {
+   "kind": "eigenflux",
+   "domain": "social",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "AI 朋友圈（EigenFlux）· **只读能力位**（主人令 2026-10-08「数字人可以自己找朋友、看朋友圈有没有好玩和有用的消息」）：op=status/feed/friends/candidates/digest/metadata/where。一律**现读** `~/.eigenflux/servers/"
+  },
+  {
+   "kind": "email_cap",
+   "domain": "comms",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**通信域 · email_cap（= coze_mail 的审计别名）**：对主人自有单一地址收发与整理；白名单默认空=全拒、confirm_token 绑定内容、正文不入档、独立通道 coze_mail。闸门/配额/账本已实现；默认 transport 未接线时如实报 needs_dependency，不伪造成功。"
+  },
+  {
+   "kind": "emotion_projection",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "情感投射只读骨架：叙事四问 → 投射细节 → 四项校验；『身临其境』只有人能判"
+  },
+  {
+   "kind": "energy_core",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能源核心读数：本机 7.6B 权重是**唯一一块电池**。op=status 在不在/几个取电口/在用几个/最近功率；op=meter 电表（调用数·token·等待时长·功率）。取电统一走 energy_core.think()：排队→占一个口→记账；没电如实报，不假装想过。"
+  },
+  {
+   "kind": "energy_pool",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能源池（只读骨架·内调）：模型=燃料不是身份；能源抽象 EnergySource + 原生衍生器 + 按需分配；五条红线（模型非身份/能源可换栈不动/衍生码走原生路由/按需/没能源如实报缺）"
+  },
+  {
+   "kind": "energy_scheduler",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "能源调度面（蒸馏自 2026-09-28 主人给的周榜卡 vllm 92.7k★，只取**调度架构**，不引 CUDA 内核——本机零算力造了也是空壳）：批量 prompt → 多能源分配（**每源并发上限** 按池内 status 档 · **失败冷却** 同源连败 3 次 ⇒ 300s 不再派 · **公平** l"
+  },
+  {
+   "kind": "event_ledger",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "签名事件账（蒸馏自 2026-09-28 主人给的周榜卡 buzz block/buzz 34,934★，只取**账本纪律**「每条消息都是签名记录」，不引 Nostr 中继/网络面——出网归门与它自己的闸；人机同室协作已有 collab_gateway）：哈希链 + HMAC 签名，`hash=sha256(prev"
+  },
+  {
+   "kind": "execution_guard",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "执行防线：审编排账本，专抓四类\"自己骗自己\"——① 写动作完成却没带 evidence；② 连续 ≥3 个写动作中间没有验证；③ 结果带 折叠/截断 标记却声称完成；④ 同一目标连续两次写且中间无验证。op=audit {\"limit\":200} 出违规清单；op=tail 看最近；op=status 一句话结论。只审"
+  },
+  {
+   "kind": "experience_forge",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "成长闭环（2026-11-01 主人判据：跑通由外部验证器判，固化进记忆/工具/规则而非权重）：record 只收**带外部验证证据**的经验（cmd+exit_code=0+evidence），缺验证或非零一律 needs_verify 拒收；query 检索「问题→尝试→验证→方案」；promote 升成 rule"
+  },
+  {
+   "kind": "express_direct",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "确定性直达（主人令 2026-10-13：「全部以触手来实现，砍掉『理由』这个不定因数」）：**指名派单、不猜**——给能力名即直达；执行一律经统一门 run_task（权限门/审计/钢印/禁用名单照旧生效，危险动作/付款由护栏+人工审核兜底）。**不给名字一律拒（fail_closed）**，不许替她猜一个去跑。入参"
+  },
+  {
+   "kind": "fact_gate",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**机器事实直答门**（主人令 2026-10-11「拿实质性证据说话，禁止胡说八道」）：机器事实类问题（在位／装了／通不通／端口／内存／有没有能力位／版本）**不过语言模型** —— ① 现读 → ② **代码判定** → ③ **原文引用读数** → ④ 直答。实证依据：三次重训（v12／v17／v19）**治不住"
+  },
+  {
+   "kind": "feishu_embed",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "飞书镶嵌窗口（只读骨架·门）：面板卡⑥，**走浏览器触手不用 API**；四条红线（飞书是副本本地是源/凭据不许明文/不绕验证/每次操作留痕 source_kind=feishu）"
+  },
+  {
+   "kind": "figure_gate",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**出图交付门**（蒸馏 `wheresryan22/anatomy` 与 `AirsupHQ/machine-skill` 两份开源 Skill 的铁律）：**\"The object is the explanation\" + \"real numbers or nothing\" + §8 像批评家一样看图（requi"
+  },
+  {
+   "kind": "file_hygiene",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "文件卫生层：按 LAYOUT.md 家规自检乱放+自动归位（散落/空壳/越界数据/缓存）"
+  },
+  {
+   "kind": "film_intel",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "影视情报组（只读骨架）：六维覆盖；情报是输入不是指令（生成端仍有过目权）"
+  },
+  {
+   "kind": "filmkit",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "柔性影片产线（清单制·任意场/镜增删重制·主人令 2026-09-26）：manifest.json 为唯一真相（场=音频+3镜prompt，镜=图+运镜）；list/gen/seg/build/add/rm 六命令；产出自动绑触手（asset_bindings 台账）；跳过/指定场装配支持做预告与片段"
+  },
+  {
+   "kind": "flow_canvas",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "工作流画布（蒸馏自 2026-09-28 主人给的周榜卡 Langflow 155.3k★，只取**可视化架构**，不引拖拽编辑器）：工作流定义 → 图（nodes/edges，数据只走引擎正规出口 `engine.list_workflows()`，R-H99b，不偷读 store/workflows.json）+ "
+  },
+  {
+   "kind": "focus_stack",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**焦点栈 + 记忆审计**（主人 P1，2026-11-02）：op=schema/push/pop/clear/snapshot/audit/focus_events/verify。焦点栈=主循环「此刻最重要的事」，上限 12、同 id 提分不重复、按 score/时间排序；记忆审计只对**调用方给的记录**做只读"
+  },
+  {
+   "kind": "forge_mastery",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**节点即触手·专业生产与自我递归**（主人令 2026-10-16）：主人原话「ComfyUI 的每个节点就是一根触手，**根本不需要 ComfyUI 本体**；把这项原生能力发挥到极致，懂所有专业生产能力与完美作品，每次使用都要自我评判哪里不足，**无限制自我递归**」。落法：① **一节点=一触手**（用途/输入"
+  },
+  {
+   "kind": "freebuff_term",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "freebuff 终端集成（主人令 2026-09-28「把 freebuff 这个终端集成进我们的对话面板，编程就走这个」）：**正常 HOME 下 EPERM 起不来**（只认 $HOME/.config/manicode），隔离 HOME（%LOCALAPPDATA%\\gbt-freebuff\\home）下装成并"
+  },
+  {
+   "kind": "freellmapi",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "FreeLLMAPI（本机免费大模型池 127.0.0.1:31415，34 家供应商 / 635 免费端点汇成一个 OpenAI 兼容 /v1）**接入层的**能力位：`status` 总表（探活 + 文档 + 可选供应商读数）· `probe` 探活（`/api/ping`，**明确无鉴权**的口，不拿需要登录的端"
+  },
+  {
+   "kind": "gate_visibility",
+   "domain": "framework",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "门可见性审计（只读骨架·门）：三态=已纳入/显式不纳入/未决定 —— 回答『门看得见什么、看不见什么』（坑册 §60）；可见范围只从 framework_gate 读，不复刻第二份范围表；四条机械闸（三态不许漏/不纳必须带出处/已纳入必须命中门规则/空样本不许当绿）"
+  },
+  {
+   "kind": "genoffice",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "办公文档（GenOffice **蒸馏版** · 本地 CLI 0.10+）：info/pdf/guide/capabilities + convert/create/merge/slides/sheet/docs/render **全部接通**（文档处理全本地、零云依赖）；search/image/media 保留（"
+  },
+  {
+   "kind": "genoffice_bridge",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "GenOffice AI 线 → 统一密钥网关的**本地 OpenAI 兼容桥**（127.0.0.1:31716）：GenOffice 侧只需握一把 gbtv8- 统一密钥，换道/冷却/禁用/耗尽全由网关机械闸管 ——**不新增 AI 线，只换接头**（保留其 custom provider）。op=status/p"
+  },
+  {
+   "kind": "ghost_guard",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "防复发检测：幽灵目录/备份散件/攻击残留/注册表冲突扫描"
+  },
+  {
+   "kind": "git_read",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）· **反选项注入**（rev/path"
+  },
+  {
+   "kind": "git_write",
+   "domain": "tools",
+   "safe": false,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "**版本库写面**：stage（`git add -- <paths>`）· commit（**pathspec-limited**：`git commit -m … -- <paths>`，只提交点名的路径，不动索引里别的暂存内容）· **push/force_push/rebase/reset**（2026-11-"
+  },
+  {
+   "kind": "god_view",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**上帝视角**（主人令 2026-10-09：「上帝视角也是一个超级导航和给你意见和建议也是一种给项目增加的定心丸」）。来历如实：索引里 OpenClaw Monitor → god_view，2026-09-20 盘上 0 命中、只能标 unverified；原先 V8 只有一块**只读总览**（自述「只呈现，不执"
+  },
+  {
+   "kind": "gods_eye",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "上帝之眼（主人令 2026-09-27）：**看得见创作页面**（7 个面板 + 服务端口真连）+ **两位顾问（权限机器可读）**——Claude 只出意见建议（架构/方向/评审，**无决策权**）· CodeBuddy 只做杂事（**对主项目没有执行权**，点主项目路径一律拒，只服从与待命）· **决策权在主体**"
+  },
+  {
+   "kind": "growth_hooks",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "短板钩子 + 自主进化钩子（主人令「设计好短板钩子和自主进化钩子实现自我进化」）：短板**从已有读数算**（六面 + 未清故障 + 未实现 + 触手库覆盖 + 许可缺口），**每条带 src**；进化只**自动做不带门的**（读类/生成索引/补记忆），带门的列成待主人清单。两条纪律写死：**不自批授权**；**撞 st"
+  },
+  {
+   "kind": "gs_h3",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "GS-prompt-extend 提示词工作台接线（三节点一个不差）：模型加载器/提示词工作台/模型卸载器 → op=loader/workbench/unload；H3 规则与组装零依赖可跑（rules/compose），扩写走我们的模型链（external_llm）不必下 GGUF；ComfyUI 依赖用 40 行"
+  },
+  {
+   "kind": "h3_video_gen",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "H3mini 视频生成（只读骨架·门）：四原语 T2VA/I2VA/FL2VA/Ref2VA + 三条带牙用例（密钥不走明文 / 结果必须落盘 / 提示词必须走官方六段式不接受散文式）+ 五条红线（密钥DPAPI/结果落盘/不绕官方入口/硬件门槛先验/每次留痕）；**引用官方仓库技能，不复制 SKILL.md**；ty"
+  },
+  {
+   "kind": "hand_bridge",
+   "domain": "device",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·手部硬件桥（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：灵巧手 HAL —— connect/read_state/move/stop/disconnect；传输 loopback（**仿真真跑**）/ Modbus TCP（纯 stdlib 组 MBAP+PDU 真帧）/ 串口 / "
+  },
+  {
+   "kind": "hand_realtime",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "手·眼手脑同拍（灵巧手 loopback）：21 点流 → hand_retarget → hand_bridge.move → read_state，同一 tick 闭环；op=status/loop（hz/seconds）。loopback 是仿真，不驱动真手。"
+  },
+  {
+   "kind": "hand_retarget",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·手语翻译（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：把 21 点手部跟踪（Vision Pro/Quest3/摄像头/IMU 手套先转 21 点）映射成目标灵巧手关节角；内置 generic_15dof / generic_20dof 模型，也接受自定义 chain/joints/l"
+  },
+  {
+   "kind": "hand_vision",
+   "domain": "device",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "手·眼睛：本地 MediaPipe Hands 从摄像头/图片/视频取 21 点（x,y,z+左右手）；op=status/image/camera。摄像头不可用如实 needs_camera，不伪造；输出归一化坐标，接真手前需标定。"
+  },
+  {
+   "kind": "handoff",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "跨体接续包（ai-memory #08 蒸馏）：三桶=架构背景/失败尝试/未完成任务（缺桶必须显式空数组）；**没 src 不收**（传闻不入账）；只追加不删（作废走 retract）；read 给『每桶最新一条 + 未完成计数』供接手第一眼。op=write/read/retract/verify/where"
+  },
+  {
+   "kind": "health",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "系统健康信息（平台/Python/时间）"
+  },
+  {
+   "kind": "hf_voice",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Hugging Face 歌声/语音（**3 臂轮询**，主人令 2026-09-28「把插件连接好部署语音…安装 3 个这个插件轮询使用避免卡壳」）：本机零算力跑不动歌声合成（语音中枢 v2.0 一手实测）⇒ 真唱走云。**3 臂（hf-1/2/3）按轮询 + 冷却换道**用（与 key_gateway 同一纪律）："
+  },
+  {
+   "kind": "hook_enforcer",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "钩子强制器：对指定目标跑同一套交叉钩子，逐单元回报「已钩住/未钩住」与多路读法的指纹一致性——只回答『钩子有没有真触发』，不做覆盖率结论（那是 omission_detector 的活）"
+  },
+  {
+   "kind": "hook_registry",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "钩子矩阵只读注册表：50 钩子/六类/三层 + 三条红线（L3 不许挂触手内·失败隔离·链可中断）"
+  },
+  {
+   "kind": "humanizer",
+   "domain": "data",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**去 AI 味改写器**（蒸馏自 skills.sh humanizer-zh，只蒸思想；2026-10-17）：与 `human-tone-check` **同源**规则表，改写前后用同一判据量；中文优先（改成人话）。op=rewrite（text 或 file · out 可选）；返回 before_hits/a"
+  },
+  {
+   "kind": "hunyuan_video",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "混元视频 HunyuanVideo 1.5（8.3B）**只读骨架**：op=status 看设计/依赖/显存门槛，不真出视频（真跑要 GPU 与模型权重，缺就如实报）。"
+  },
+  {
+   "kind": "i2v_agnes",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** （HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 op=status/dryrun/submit/verify。**缺钥 fail"
+  },
+  {
+   "kind": "image_scout",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**美图精准抓取**（主人令 2026-10-17「去精准抓取美图能力给她注入」）：只做\"找对图+把关质量与许可\"，不做下载/写盘。多源（Openverse 免钥匙 CC 系 · Unsplash/Pexels 有钥匙才用）· 质量门槛（min_width/min_height/aspect/license/exten"
+  },
+  {
+   "kind": "impact_check",
+   "domain": "system",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "**影响面检查（多域监控的读数面）**（主人令 2026-10-19：「修改一个地方的时候要分出触手关注跟这个修复的地方相连的所有地方，确保你修改其他地方不会被连带故障」）：读 `state/model-pack/wiring.json` 邻接图（现读 **6301 节点 / 951536 有向边 / 单连通分量 10"
+  },
+  {
+   "kind": "install_selfcheck",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**装机自检 · 查病毒木马/后门**（主人 2026-10-17 令「安装上我们的大模型就自动自检一遍排除病毒木马等」）：按 **OS 结构**做只读检查 —— Windows(Run/RunOnce 自启键·计划任务·服务·Winlogon·监听端口·PE 头) · Linux(cron/systemd/rc.lo"
+  },
+  {
+   "kind": "intake_kit",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**外部件接入图鉴**（七件 · 七步法全走）：身份 · 许可 · **只读体检读数** · 知识面在哪。素材落 `_upstream/`：`motionsites.ai`（65 条设计提示词）· `impeccable`（设计语言系统 · 24 份 SKILL）· `hyperframes`（HTML→视频 · 40"
+  },
+  {
+   "kind": "inventory",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "全息盘点：一次输出你的视图+框架的视图（归属四分类：框架/环境/数据/异物）——对齐两个世界"
+  },
+  {
+   "kind": "key_gateway",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "统一密钥网关：**唯一密钥真源**（链序/冷却/禁用/耗尽/换道）+ 触手统一密钥（`gbtv8-<32hex>`，库内只存 blake2b 摘要）的铸造与校验 —— 也是触手密钥 Y 字端口的取钥处（R-H201：不另开第二条取密钥的路）。op=status/whoami/energy/plan/keys/compa"
+  },
+  {
+   "kind": "keylogger",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机输入活动记录：只写本地 jsonl、有 pid 可停、可列可取走，模块内无任何出网路径"
+  },
+  {
+   "kind": "know_map",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**理解任何事**（主人令 2026-10-15 蒸馏自 GitHub Trending #1 「Understand Anything」）：把任何仓/库/文档变成一张**可点、可搜、可问的分层知识图**。三步：scan（走盘+找入口）→ build（三层建图，**每条边带 evidence = path:line**"
+  },
+  {
+   "kind": "kws",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**声学关键词唤醒 KWS**（主人 P2-14，2026-11-03）：op=schema/status/detect/detect_wav/verify。本机 sherpa-onnx + 中文 zipformer 3.3M 模型（Apache-2.0，约 13MB）+ 拼音关键词 `x iǎo t ǔ d òu @"
+  },
+  {
+   "kind": "lan_pairing",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**局域网配对监听/自签证书**（主人 2026-11-03 批准）：op=schema/start/stop/status/cert/verify。只绑一个私有 LAN IPv4（或 loopback），拒 0.0.0.0/公网；端口 8767..8770；TLS 自签（cert/key 放 state/）；一次性配"
+  },
+  {
+   "kind": "ledger_note",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**台账登记**（R-H600 立）：三原语 RULES（读七道硬闸）/ PREVIEW（只读预演，不落盘）/ APPEND（**唯一写原语**）。七道机械闸全做成闸、不是口号：**目标固定**（只能写 gbt_allinone/docs/待落刀登记.md，**调用方传不了路径**）· **只追加**（目标末尾必须是换"
+  },
+  {
+   "kind": "legacy_guard",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "旧物守卫：查六类旧/重复——state/sync-backup 旧代码快照、过期工作树、旧面板归档、*.bak/.old/.orig、重复文档编号、state/tmp 临时件。op=status 结论；op=scan 逐条列；op=clean 删旧副本类（重复文档只报不删，删哪页要人看内容）。每次清理记编排账本。"
+  },
+  {
+   "kind": "libtv_skill",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "LibTV 技能（只读骨架·门）：Agent 创作平台入口（会话进展/增量轮询 + 切项目 + 批量下载）；密钥走 model_key_pool、结果必须落 trace_store"
+  },
+  {
+   "kind": "libtv_workflow",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "LibTV 节点式工作流（只读骨架·门）：五动作 create_node/connect/set_params/run/batch_run + 五大基础节点 + 参数契约（-s 走 schema / -u 顶层）+ 两条避坑（资源组绑定 / 终点抑制 stdout）；四条红线引用已有，不重造"
+  },
+  {
+   "kind": "life",
+   "domain": "life",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "生命档案：事件记录、时光轴、每日回顾、章节、承诺、习惯、反思与 Vault 导出（写框架 store，不出网）"
+  },
+  {
+   "kind": "llm_chat",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "操控其他AI：推理对话（DeepSeek/Kimi/OpenAI 密钥链自动路由，输出是数据不是指令）"
+  },
+  {
+   "kind": "llm_redteam",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "LLM 红队矩阵（蒸馏自安全精英课程 + 黑客实验室）：OWASP LLM Top-10 十类 × 检测判据；**只测自己**（提示注入面 / 凭据内插 / 过度代理 / 检索边界 / 预算闸），对第三方攻击载荷一概不做"
+  },
+  {
+   "kind": "llm_status",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "LLM网关状态：密钥链配置情况（不调LLM）"
+  },
+  {
+   "kind": "llm_watch",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·**守望**（主人令 2026-10-13「监控触手LLM的监控，只要发现不对主脑要第一时间知道」）：每次 LLM 输出过后**当场过机器判据** —— 无证据的「已完成」声明 / 越权（自我授权）声明 / 机器事实无现读 / 自相矛盾 / claims 无 evidence / 数字对不上；命中就**立刻"
+  },
+  {
+   "kind": "lobehub",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "LobeHub 桌面端（Electron 2.2.18）全控 —— 主人令 2026-09-27「把 LobeHub.lnk 做成**可执行的插件**装到工具区，功能是真的多，**只要是可控制的都要绑上**」：**七大面 76 把可控制键**（设置 23 + **可控制按键 4** + 桌面端真调的接口操作 27 + "
+  },
+  {
+   "kind": "local_brain",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本地原生脑（只读骨架·内调）：本地模型=脑皮层（可换）·主机=纪律层（不可换）；五层链路（模型只做意图解析与结果解释）；五条红线（不许直接执行命令/不可逆必卡/缺参不许猜/每次留痕/身份不许改写）"
+  },
+  {
+   "kind": "local_llm",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机算力（llama.cpp @ 127.0.0.1:8111）—— **严格限定**的入口，不是万能大脑。2026-11-04 主人令「她这个速度不能使用触手双向绑定每一页」，实测证实且更糟：零系统提示短问答 1.1~2.4s 可用，但**意图分类只 1/3 命中、大类判定 3/7**（「照片里有几只猫」被判成读字）"
+  },
+  {
+   "kind": "long_run_supervisor",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "长程无人值守任务监督：租约、心跳、检查点、有界重试、断点续作和主人升级"
+  },
+  {
+   "kind": "look_grade",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "外观库触手（词即指令）：一处定义多样的味道（电影感/做旧/潮湿阴冷/热血橙青/褪色胶片/黑白纪实/赛博霓虹/**原样**…**条数现算，见 `op=list`，本描述不写数**）+ 人话取味（pick：说「潮湿阴冷」「热血一点」「像老照片」即取到对应味，认不出如实标回落）+ 单帧试看（preview：定了再上全片；支持"
+  },
+  {
+   "kind": "lr_status",
+   "domain": "longrun",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "长程任务看板：读任务图里每个任务的进度与详情（提交/推进/完成/卡住在哪一步），不推进、不写盘。只读，零作用域。"
+  },
+  {
+   "kind": "lr_submit",
+   "domain": "longrun",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "长程任务层：提交任务（非LLM验收+重试+停滞升级，跨进程可续）"
+  },
+  {
+   "kind": "lr_tick",
+   "domain": "longrun",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "长程任务层：推进任务图（执行→验收→完成/重试/停滞）"
+  },
+  {
+   "kind": "machine_distill",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**蒸馏件**（不是外挂）：把吞入件 AirsupHQ/machine-skill（MIT · 91星 · three.js · 无构建步）的**取法**提炼成我们自己的**求解器驱动可视化判据**：①每帧真解不查表（Brayton/火箭室/Cp(λ,β)/Darcy… 每台机器自带小求解器，画面每个数当帧解出来，还能"
+  },
+  {
+   "kind": "machine_film",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Machine 光写实仿真成片（外部成熟件 · 主人 2026-10-19 指名抓取 · 上游 AirsupHQ/machine-skill · MIT）：**一句话 → 一台光写实可交互三维真机（单文件 HTML）→ 28 秒成片（MP4）**。真尺寸（米）/真材料（PBR 金属·涂装·玻璃）/影棚光软阴影/爆炸·剖"
+  },
+  {
+   "kind": "mcp_call",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手契约层：按契约调用已连接服务器的任意工具"
+  },
+  {
+   "kind": "mcp_connect",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手契约层：连接任意 MCP 工具服务器（学会契约协议=接入整个 MCP 生态）"
+  },
+  {
+   "kind": "mcp_health",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "MCP 体检：对每台登记服务器真连一次、列一次工具、断开，返回 up/down/tools/耗时。会起子进程，过 process_execute 门；连不上如实报 down（不伪造 up）。"
+  },
+  {
+   "kind": "mcp_register",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "MCP 注册：把标准 mcpServers 配置（mcp.json：command/args/cwd/env）读进 state/mcp-servers.json，op=path 指定配置文件；默认 merge 不覆盖同名。写盘过 filesystem_write 门。"
+  },
+  {
+   "kind": "mcp_servers",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "MCP 服务器清单：列出已登记的服务器（名称/命令/工作目录/说明）；只读。"
+  },
+  {
+   "kind": "mcp_tools",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手契约层：列出已连接服务器的工具契约清单（名称+参数 schema）"
+  },
+  {
+   "kind": "mcp_unregister",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "MCP 注销：从 state/mcp-servers.json 移除一台（op=server）；写盘过 filesystem_write 门。"
+  },
+  {
+   "kind": "media_library",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**媒体舞台/音乐库/历史索引**（主人 P2，2026-11-03）：op=schema/build/history/verify。只聚合**既有产物**：视频/图片/音频按扩展名分类、去重、mtime 倒序、上限 120；不读内容/不转码/不上传/不生成缩略图；**零作用域**纯归一化。文件服务由 console-"
+  },
+  {
+   "kind": "media_license",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "素材许可账（三方向流程台「家规第 2 条：没有许可的素材不许进成品格」的数据源）：`register` 逐件登记（**现算 sha256** + 出处 + 授权 + 时间）、`unregister` 撤销（**必须写 why**，留档在 removed）、`status`/`list`/`check` 只读核对（账↔盘"
+  },
+  {
+   "kind": "media_pipeline",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布"
+  },
+  {
+   "kind": "media_publish",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "三方向**发布到赚钱平台**的准备与授权门：`platforms <方向>` 读平台口径（**音乐复用能力位 `music_publishing` 的 13 平台，不另造**；短视频 7 / 电影 6 为内置候选表，**全部标「未核实」**）· `prepare` 备发布包（产物 sha256 + 许可摘录 + 元数据"
+  },
+  {
+   "kind": "media_run",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "三方向自动化工作流**执行器**：一次调用把一条链从头走到尾，每步落真件 + 同批登记许可。链取自 `media_pipeline.KINDS`（music: lyrics→arrangement→audio→master→export · short_video: script→storyboard→assets→e"
+  },
+  {
+   "kind": "media_stamp",
+   "domain": "video",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "音视频**钢印**（作品出处）：把署名写进**容器元数据**（title/artist/album/comment/description）并用 ffprobe **回读校验**。op=status/tags/verify 为**读类直连**（status 报可打类型；tags 现读一件；verify 逐件报「带/不带"
+  },
+  {
+   "kind": "memory_bank",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "记忆银行：**来源追踪 + 别名 + 零停机迁移**（蒸馏自 GitHub 周榜 #01 hindsight，只取架构）：`stamp` 给每条记忆打来源印章（ref/sha256/origin/session/why/evidence）；`trace` 同时报**印章在不在**与**内容有没有被改过**（当前 sha"
+  },
+  {
+   "kind": "memory_manager",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "记忆管理 + 万能精准秒搜（主人令 2026-09-27）：SQLite **FTS5 全文索引**（实测中文可检索）·七类源（记忆/文档/技能/状态/**能力位**/代理/助手记忆）⇒ find 秒级返回「路径+类型+高亮片段」，并**同时端出匹配的能力位**（\"想到匹配面出现的能力\"）；index 增量（mtime"
+  },
+  {
+   "kind": "meta_cognition",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "元认知循环（只读骨架）：自省→查内部→查外部→问主人→沉淀 + 五条红线（自省不是自责/不许硬猜/先查后问/问完沉淀/大脑也自省）"
+  },
+  {
+   "kind": "mind",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "心智引擎：开工前预演 pre_work、评估、内部状态、经验召回与反思（写框架 store，不出网）"
+  },
+  {
+   "kind": "mirror_ascend",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：跨维晋升（验证全绿才放行；一次性全量写入现实+护照+时间线；现实零修改）"
+  },
+  {
+   "kind": "mirror_parity",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：沙盒与生产环境契约一致性（平台/Python/依赖/工具/密钥存在性/路径）"
+  },
+  {
+   "kind": "mirror_plan",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：生产前排练计划（假设/架构/步骤/服务与环境契约/验收/回滚）"
+  },
+  {
+   "kind": "mirror_rehearse",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：生产前排练（静态推演→环境一致性→沙盒闭环→指纹绑定报告）"
+  },
+  {
+   "kind": "mirror_release",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：排练全绿后一次性全量晋升生产（树/计划指纹绑定，失败即阻断）"
+  },
+  {
+   "kind": "mirror_rewind",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：时间线回滚（回到过去的时间线，同样一次性全量替换）"
+  },
+  {
+   "kind": "mirror_scan",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：维度体检（完整性/署名/纪律/入口——跨维晋升前置）"
+  },
+  {
+   "kind": "mirror_shape",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：维度成形（假设/架构虚拟/反复打磨全在镜像维度，现实无感知）"
+  },
+  {
+   "kind": "mirror_simulate",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：静态推演（文件/依赖图/端口/入口/契约/闭环定义，不碰生产）"
+  },
+  {
+   "kind": "mirror_stage",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像工作空间（2026-11-01 主人口径：生产永不被试验污染，跑通才整页原子替换）：create 把生产目标复制进 state/mirror/stage/<id>/（生产只读）→ write 只写镜像候选（可多候选）→ verify 在镜像 work/ 跑外部验证器（cmd+exit_code）→ promote "
+  },
+  {
+   "kind": "mirror_status",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像空间：维度状态（镜像/现实指纹、现实漂移检测、时间线史）"
+  },
+  {
+   "kind": "model_key_pool",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "模型密钥池（只读骨架）：按 owner_ai_id 分池、触手只借不拥有、DPAPI 只存路径、超限只上报"
+  },
+  {
+   "kind": "motion_kit",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**动效引擎的口**（人话 → anime.js 的真 API，并**本机原生真跑**证明引擎可用）。素材：`juliangarnier/anime`（**MIT** · ★73546 · animejs v4.5.0 · **67 导出**）落 `_upstream/anime`。常用说法：动画 / 动效 / 补间 "
+  },
+  {
+   "kind": "multimodal_port",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "多模态维度 × 触手密钥 **Y 字端口**：请求在一处分叉、**一次只走一臂** ——独立臂（该维度专属密钥）/ 共享臂（共享密钥对按维度分账，须恰好成对、指纹互不相同、带 owner_ai_id 可追）；覆盖 text/vision/image/video/code 五维度，七道闸 Y0-Y6 机械把关，返回值**"
+  },
+  {
+   "kind": "music_auto",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**音乐自动化**（主人令 2026-10-16：把 Folia 蒸馏到音乐自动化里）：蒸自 **chthollyphile/folia-major**（AGPL-3.0，**只蒸思想不搬代码**）。核心不是做播放器，是**四条时间轴对齐**：歌词 · 音频 · 主题（配色）· 动画；六步流水线：选源→匹词→定题→出片"
+  },
+  {
+   "kind": "music_intel",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "音乐情报组（只读骨架）：合规红线/过审/流量/画像/竞品/**禁区清单** 六维覆盖"
+  },
+  {
+   "kind": "music_publishing",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "AI 音乐发布平台三层只读归位（生成端/Agent 原生端/分发端）；全部标『未核实』"
+  },
+  {
+   "kind": "n8n_wf",
+   "domain": "automation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "n8n 工作流控制（我们自己的自托管 n8n 2.30·数据在 ~/.n8n）：status/list 只读直连；export/import/active/hook 过 filesystem_write 门；hook 可 POST /webhook/gbt 触发 n8n 工作流——「N8N 有的我们都有」的双向桥（n8"
+  },
+  {
+   "kind": "notion_bridge",
+   "domain": "integration",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Notion 资料舱（只读状态/最近页面/搜索/页面正文提取；凭证只从 env 或保险箱读）：status/recent/search/page。**F12 补齐** —— 这个模块有 run()、却没在册，门看不见它；现在按唯一门接线（safe=false：会出网读外部资料）。"
+  },
+  {
+   "kind": "observer_anchor",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "观察者锚点律只读骨架：三公理 + 六短板补齐 + 五条红线（同一方不许既扫又报/审计器必须被审/递归封顶/终止点只能由人设/关键节点人在场）"
+  },
+  {
+   "kind": "obsidian_vault",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Obsidian 永久记忆层（主人令 2026-09-27「让触手的吞天拥有永久记忆 Obsidian，所有触手每一根都绑定独立的 Obsidian，再把所有的 Obsidian 和本体的自研 Obsidian 双向绑定到一起互通共享」）：**227 根触手各一本独立库**（`vaults/<触手>/`：README "
+  },
+  {
+   "kind": "ocr",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**看图读字**（2026-11-04 主人令「看图片用原生视觉，别走附件系统」）：给一张**本地图片路径**，把图上的字读成**纯文本**交给脑子 —— 车道① Windows.Media.Ocr（系统内置 · 零安装 · 离线 · zh-Hans-CN）；车道② python winrt（装了 winrt-* 才走"
+  },
+  {
+   "kind": "offense_ops",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/"
+  },
+  {
+   "kind": "offload_distill",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【蒸馏·内存墙】**内存墙蒸馏件**（Edge0 思路 → 我们的运行纪律 + **触手映射**）。上游 `Edge0-AI/Edge0`（**Apache-2.0** · ★4612 · arXiv 2609.18063）做到「35B 只吃 ~2.5 GB 内存」。四条机制：**权重离芯**（SSD 流式 + mma"
+  },
+  {
+   "kind": "omarchy_bridge",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**Omarchy 桥**（2026-10-15 主人拍 A 案：小土豆住进 Omarchy 当智能层）。接官方三根线：① `omarchy` CLI（含 `commands --json` 机读）；② `omarchy-shell` 的 UNIX-socket IPC（socket 名 = md5(OMARCHY_P"
+  },
+  {
+   "kind": "omission_detector",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "遗漏检测器：覆盖率 = 已钩住/总数；<100% 触发有界补扫；仍钩不住**如实报 missing**（不许折叠成绿）——零遗漏的唯一裁判"
+  },
+  {
+   "kind": "omni_arm",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Omni-Arm（主人 2026-10-19 六件设计稿的实现版）：**22DoF 手 + 9 骨手臂 + 8 段触手 = 40 骨**，真几何（1080 顶点）/真蒙皮（每顶点权重和=1）/真 GLB，Blender 4.2 本地建件零付费。设计稿归档在 `vendor/omni-arm/source/`；原件**跑"
+  },
+  {
+   "kind": "omni_open",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "万能插·全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉价探针，不跑 26s 的全量 disco"
+  },
+  {
+   "kind": "omni_plug",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "万能插：把「能力位」拓成「插座」——**没有固定类目**，任意外部对象插一个描述符就变成一根可扫可控的分支。**op=universal（或不给 socket 的 run）现场识别 target、按 kind 动态生成适配器**（kind 是从 target 读出的事实，不是枚举集合；认不出如实说 unknown，不硬"
+  },
+  {
+   "kind": "omni_web",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "万能触手·Web六态：看结构/读源码/读讲解/改文件/交给AI/跑项目；git+github+stackblitz一键触达"
+  },
+  {
+   "kind": "onboarding_gate",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "未接线能力上手指引门：如实报「登记了但没实现」的缺口，并给出三处接线配方"
+  },
+  {
+   "kind": "one_key_deploy",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "一指定江山乾坤换位：抓取(GitHub/本地)→镜像→验证→晋升一条命令，一次性上线零修改"
+  },
+  {
+   "kind": "one_shot",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "一句话 → 全链计划（主人令 2026-09-27「想什么就能生产什么画面」）：把一句话翻成产线输入 ——节奏词→BPM（紧凑120/常规100/舒缓80）· 时长词→分钟 · **帧率由 BPM 反推**（每拍帧数必须整数）·题材词→调色（走 filmgrade.INTENT_MAP）· 段落模板（8 拍：运动/机位"
+  },
+  {
+   "kind": "orchestration",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "编排账本与面板：六类动作 scan/add/edit/deploy/fix/run 只追加落 state/orchestration-ledger.jsonl。op=record 手记一条；op=panel 重启先看这一屏（本会话动作计数·最近条目·各类扫描最后时间·能力位 vs 快照漂移·自上次看图以来新增）；op="
+  },
+  {
+   "kind": "orchestration_kernel",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "编排内核（三源蒸馏）：状态/动作空间 + 角色/流程 + 可存储图/挂起恢复；只读能力真执行"
+  },
+  {
+   "kind": "osint_scan",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "OSINT 扫描（DNS/WHOIS/子域名/端口/指纹/邮箱/IP归属/社交；拒绝内网目标）"
+  },
+  {
+   "kind": "page_scan",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**按绑定逐页并发扫**（主人 2026-10-12 定的架构「触手随每一页绑定好，扫的时候按绑定一页一页传回来」）：源 = state/page-bindings.json 的逐页（页→落点→正向_能力位，全在盘）；**按契约判色**——绿=跑通 / 黄=需参数或需授权（契约与门，不是故障）/ **红=契约也满足却仍"
+  },
+  {
+   "kind": "pairing",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**局域网配对/证书安全原语**（主人 P2-12 已点头：先本机/局域网安全设计）：op=schema/code/claim/devices/revoke/cert/cert_verify/verify。6 位一次性配对码 TTL 300s/最多 3 次尝试；设备白名单 + 一次性 device token（只存 s"
+  },
+  {
+   "kind": "paywallbuster",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "内容门**检测**（防御侧）：离线判定页面是否被付费墙/同意门挡住，只判不绕（不伪装 UA、不伪造 cookie）"
+  },
+  {
+   "kind": "penetrating_cross_scan",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "穿透式交叉扫描引擎（增强版）：触手到位**必须**调用钩子（未触发=失败）· 步骤锁（跳步当场拒）· 每单元 ≥2 路独立读交叉互扫（不一致→第三路仲裁）· 遗漏检测（覆盖率<100% 有界补扫）· 全程留痕 source_kind=cross_scan；三种目标 bindings/registry/tree:<目录>"
+  },
+  {
+   "kind": "pentest",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "授权渗透验证：只对**已登记授权**的目标做非破坏性检查（TCP 可达/TLS 握手/安全响应头），未登记目标一律拒"
+  },
+  {
+   "kind": "pentest_distill",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**蒸馏件**（不是外挂）：把吞入件 CyberStrikeus/CyberStrike（AGPL-3.0 · 3129★ · TypeScript ·「Open-source AI-powered offensive security harness for automated penetration testing"
+  },
+  {
+   "kind": "pentest_flow",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**授权渗透流水线内核**（吞噬 Shannon 蒸出的「No exploit, no report」那一层，2026-11-02 主人令）：op=schema/scope/target/surface/reconcile/agent_plan/agent_ingest/exploit_queue/validate/r"
+  },
+  {
+   "kind": "persona_kernel",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "性格内核 v4.0：外温表达十律 + 内刚四基石（止损/主动/洞察/静待）+ 十条机械红线；四大基石原文一字不差；evolve 是唯一写口（驱动心智演化）"
+  },
+  {
+   "kind": "pipeline_rollback",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "生产管线：回滚产物到历史版本（回滚也走审计留痕）"
+  },
+  {
+   "kind": "pipeline_status",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "生产管线：查发布记录（发布/阻断全留痕）"
+  },
+  {
+   "kind": "pipeline_submit",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "生产管线：镜像多维度空间→门禁审计→生产写入（唯一交付通道）"
+  },
+  {
+   "kind": "pipeline_versions",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "生产管线：产物版本历史与当前指纹（.versions/ 链）"
+  },
+  {
+   "kind": "platform_profile",
+   "domain": "project",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【量化·项目结构】读取量化项目结构（真实测绘；外部业务模块 quant_tech，未挂载则如实报缺口）"
+  },
+  {
+   "kind": "pod_link",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**云卡触手**（她自己的传输器官：本机 ⇄ GPU 卡 · 在卡上跑命令 · 看卡状态）。op=status/ls/up/down/run/where：`status` 读卡清单（id/状态/价/卷/端口/公网IP）+ Jupyter 通不通；`ls` 列卡上目录；**`up` 本机→卡**（字节级 base64 上"
+  },
+  {
+   "kind": "policy_delta",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "策略影响预检（OpenShell 蒸馏）：**改前先算\"会放行什么\"**——`tables` 只读三张权限表层（门/预检的只读白名单 + 作用域表）并报**两表分叉**；`propose` 对拟放行动作做只读影响预检（哪些从被收卡变免卡 + **历史账露面次数现读现数** + 风险分级 + 必带「需主人授权」）。🔴 *"
+  },
+  {
+   "kind": "policy_gate",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**权限／付款直答门**（fact_gate 同族 · 主人令「拿实质性证据说话」）：能不能做／要不要授权**也是事实**，不该过模型。实测病根：终考里「买 4090」不是机器事实 ⇒ 没过 fact_gate ⇒ 模型又编市场数据（编出「本机 4194x2 已满」「4090 价格带 150-250 元」+ 一个 UR"
+  },
+  {
+   "kind": "proactive_report",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "主动汇报引擎只读判据层：四类汇报（新奇发现/主人需要/记忆命中/赚钱机会）+ 四维打分 + 不打扰门（静默时段/预算/去重/及格线）+ 短律成句；只判不说"
+  },
+  {
+   "kind": "project_context",
+   "domain": "project",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "项目上下文：**文档面**（blueprint 蓝图 / brief 简报 / search 只读检索 / status）＋ **代码结构四面**（2026-09-23 接，补上「专业级编程AI」缺的那半身）：`symbols` 符号（顶层 def/class，可按名问「在哪定义」）· `deps` 依赖（内部 imp"
+  },
+  {
+   "kind": "project_drift",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**全项目变化监控（第三块监控：全控变化）**（主人 2026-10-19：「多余监控还缺了一个全控变化，也就是要有一个看着整个项目变化的」）：跟 heartbeat（每根触手还通不通）与 impact_check（这一刀会撞到谁）并列 —— 本位回答「**整个项目从基线到现在变了什么、变得合不合理**」。基线不重扫全"
+  },
+  {
+   "kind": "projection_card",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "空间投射只读卡片：5 原语全标未核实 + ARM ≠ LIVE 红线（只呈现不执行）"
+  },
+  {
+   "kind": "prompt_bridge",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "提示词转化挂件（只读/纯本地）：大白话 -> 四段结构化提示词；compile / passthrough / status"
+  },
+  {
+   "kind": "pulse_core",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手四合一原生位：**脉冲提速**（一次拿全身状态）· **量化压缩**（主道 Q5_0，fp16 的 2.7×）· **按需激活**（引擎闲置卸权重、来请求再醒，起停过 process_execute 门）· **精准直达**（召回先兜住**全部能力位 + 全部触手方法**（条数现读，不写死），权重只在这份候选里挑）"
+  },
+  {
+   "kind": "pulse_direct",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**脉冲直达**（主人令 2026-10-11「把脉冲给大模型，让她把所有的能力按触手双向绑定的部署方式**急速运行**、**省去不必要的多绕** —— 本来向前跨一步就到的东西，别跑一大圈才跨那一步」）：一句意图 => **一步**解析到能力位 => 给出那一条命令与要过的门，并把 **hops（绕弯数）写进账**："
+  },
+  {
+   "kind": "quant",
+   "domain": "finance",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【量化·总入口】量化/回测入口（外部业务模块 quant_tech，未挂载则如实报缺口）"
+  },
+  {
+   "kind": "quant_backtest",
+   "domain": "finance",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【量化·回测接口】读取真实回测 API，返回类/函数/默认参数（外部业务模块 quant_tech，未挂载则如实报缺口）"
+  },
+  {
+   "kind": "quant_params",
+   "domain": "finance",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【量化·数值参数】读取真实量化引擎的数值型策略参数（动量/ATR/止损；外部业务模块 quant_tech）"
+  },
+  {
+   "kind": "quant_plan",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**压缩与直达**（主人令 2026-10-16 深度蒸馏自 Bonsai 2 27B）：把**压缩体积**与**直达线路**变成她的原生能力。①压缩：每档 bits/weight ⇒ 估算体积（27B × b/w ÷ 8 × 容器开销 1.3）⇒ 能否落在 8GB 级；参考一手读数（ternary PTQ1_0 = "
+  },
+  {
+   "kind": "quant_strategy",
+   "domain": "finance",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "【量化·策略信号】读取真实量化引擎，返回策略信号/仓位模型（外部业务模块 quant_tech，未挂载则如实报缺口）"
+  },
+  {
+   "kind": "rea_reverse",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "REA 桥 —— 吞天吞进来的第一件「能装能跑」的外部能力（主人 2026-10-11 图片 ⇒ devour_github 真吞成胶囊 devoured_morluto_rea；上游 https://rea.tools/ · morluto/rea · npm rea-agents 6.4.0 · MIT）。给编码助"
+  },
+  {
+   "kind": "recon_distill",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**蒸馏件**（不是外挂）：把吞入件 morluto/rea 的方法论提炼成**我们自己的**逆向取证骨架（主人令 2026-10-12「我们吞噬都是加入蒸馏提炼出契合我们的能力」「蒸馏提炼出契合我们的能力才是我们的」）。四条蒸馏：①证据契约 op=evidence（claim/evidence/unknown/lim"
+  },
+  {
+   "kind": "record_grid",
+   "domain": "data",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "行式记录网格：陌生文本结构画像/草案骨架/逐行解析/回写自证/词表校验（op=profile|draft|parse|emit|verify|vocab|presets）"
+  },
+  {
+   "kind": "redteam_recon",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机侦察面（只读枚举）：监听端口/防火墙三档/本地账号/自启动项/自动服务/凭据落点"
+  },
+  {
+   "kind": "ref3d",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**参考图 → 可拆解 3D 交互页**（主人 2026-11-03 抖音 Salticus JS-8）：op=schema/status/build/verify。参考图只提供外观/比例/配色；主体是我们自己的数字人 DH-V7 GLB（1 skinned mesh/66 bones），可旋转/缩放/皮肤透明/骨架/"
+  },
+  {
+   "kind": "reminder",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**提醒能力位**（主人 P1，2026-11-02）：op=schema/create/list/cancel/complete/due/verify。创建/列出/取消提醒；写 `state/reminders.json` 前先过 **filesystem_write 门**（可信会话免票，其余要一次性授权；gate"
+  },
+  {
+   "kind": "remote_confinement",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**执行者隔离**（主人 2026-10-09 点破：「沙盒隔离的是被测试的靶标，没隔离执行的人」）：exec 中继若在宿主以主人账号跑，云端敲的命令就跑在真机上。op=assess/verdict 现读执行身份（whoami+是否提权）与三条隔离路（Docker 守护/WSL 发行版/低权账号）**并真验每条能不能跑"
+  },
+  {
+   "kind": "remote_controller",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "远程接管授权内核（2026-11-01 主人硬规矩：**必须远端用户点击同意**，请求方不能自批）：request 生成一次性 code + agent_secret（只给远端）→ approve 必须 remote_user.confirmed=true 且持 secret 的 HMAC 签名 → session 仅"
+  },
+  {
+   "kind": "remote_domain",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "自有设备中继登记：**公网端点一律拒**，只服务本机/内网设备的中继"
+  },
+  {
+   "kind": "render_evolution",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "渲染进化内核（只读骨架）：五原语 + 三闭环 + 六红线；帕累托前沿机器画、人点"
+  },
+  {
+   "kind": "replan_loop",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·**回流环**（主人令 2026-10-13「遇到问题不能直接停下把问题返回大脑执行层，分析推理规划从新生成任务图在继续推进以此循环」）：卡点 → 交回大脑执行层 → **重生成图**（增「排因」步、rev+1、重出 markmap）→ 继续。**轮次上限 3**，到顶如实报到顶，不假装还能推。op=tic"
+  },
+  {
+   "kind": "repo_publish",
+   "domain": "tools",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**远端发布面**（补 `git_write` 的另一半 · 主人 2026-10-11 当场指出：tools 域只有 `git_read` 与只能 stage/commit 的 `git_write`⇒ **push 到远端 / 建仓 / 发 Release 根本没有能力位** ⇒ 前面全靠手搓 git push/w"
+  },
+  {
+   "kind": "research_intel",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "调研 AI 情报部门：三组只读骨架（画禁区 / 找流量 / 定方向）。op=coverage 覆盖读数，op=group 分组。**只读**，不发布、不改生产。"
+  },
+  {
+   "kind": "resource_snapshot",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**本机资源快照**（主人 P2，2026-11-03）：op=schema/snapshot/normalize/verify。只读采样 CPU/内存/磁盘/uptime/主机/平台；Windows ctypes（GlobalMemoryStatusEx/GetSystemTimes/GetTickCount64）+"
+  },
+  {
+   "kind": "review_gate",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "独立终审位（C-15「验收方 ≠ 产出方」的最小实现 · 2026-10-08 在册）：接线件 `tools/codex-scripts/terminal-review.py`。`review` **只读盘**现算 sha256/字节/空否/BOM/关键词，判据只用非 LLM 四族（file_exists:/conta"
+  },
+  {
+   "kind": "rig_audit",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "绑骨体检（Blender 4.2 · 本地 · 零付费）：DCC 级量骨架/骨数/层级深度/每骨权重顶点数与权重和/未绑顶点/非归一化权重/零长骨/左右镜像/包围盒/缩放是否已应用；**自动剔除 Blender 导入器造的 42 顶点 Icosphere 显示形状**（文件里没有它，别当杂物球）。op=status（纯"
+  },
+  {
+   "kind": "rig_fix",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "绑骨修复（Blender 4.2 · 本地 · 零付费）：**自动定轴**（三轴跨度取最大为身高轴，不再假设 Y-up/Z-up）· 补权重 · 归一化 · 去杂物（可选）· 转台照 · **六条硬判据**（单网格+蒙皮 / 无 42 顶点杂物球 / 量具自证换算 0.3~3 / 身高 1.720±0.02 在**文件"
+  },
+  {
+   "kind": "ring_context",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**环形自动化上下文**（主人令 2026-10-11「设计一个圆型的自动化上下文，一直保持上下文长度却不会顶到溢出；另一边直接进数据库，需要查秒查」）：把上下文做成**一屏环**+**全量落库**+**秒查**。① 环形窗口：window() 恒定 ≤ window_chars，滑进来的进来、最老的挤出去 ⇒ **永"
+  },
+  {
+   "kind": "room_space",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "镜像房间空间（**隔离排练现实**，主人令生产面红线：所有假设/模拟/推演/打磨一律在房间里跑，房间不覆盖全局 mirror_space/reality）：create/enter/define_plan/get_plan/frame/gate/namespace/shape/scan/simulate/parity/"
+  },
+  {
+   "kind": "root_cause",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "病因定位：把症状映射成**我们自己的**可验证假设（能力位三数不一致 / 自检不干净 / 署名缺失 / 根目录异物 / 旧物 / 静默造假 / 最近失败），每条假设必须挂真调用读数，取不到标 unknown **不猜**；一条不成立就如实说 inconclusive。op=diagnose {\"symptom\":..."
+  },
+  {
+   "kind": "root_fix",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "根治环：症状五问诊断/补丁债量化/根治铁律——她自己必须懂的根源追踪纪律"
+  },
+  {
+   "kind": "route_ledger",
+   "domain": "brain",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**路由台账 · 反思账本**：记「用户原话 → 路由结果 → 实际用了哪个」，让触发词从**真实使用**里长出来，而不是编。op=stats（攒到哪了：真实问法 / 能力覆盖 / 探针剔掉多少）· op=plan（**动手前先算账**：该补哪个能力、还差几条、下一级是什么）· op=export（导出可用的 (原话 "
+  },
+  {
+   "kind": "scan_cap",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**统一扫描位**（蒸馏 20 个星标最高、原理各异的开源扫描器：Trivy/Grype/OSV · Semgrep/CodeQL/Bandit ·gitleaks/TruffleHog · nuclei/ZAP · Syft · Checkov/tfsec/kube-linter/kube-bench · ClamA"
+  },
+  {
+   "kind": "scene_anchor",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "场景锚定只读骨架：8 大类场景 + 灵魂四要素 + 钩子锚场景不锚情绪（作品是为场景做的）"
+  },
+  {
+   "kind": "sched_define",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "定时触发器：定义调度（工作流 + 间隔），无人值守自动执行"
+  },
+  {
+   "kind": "sched_status",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "定时触发器：查调度状态（上次执行/结果）"
+  },
+  {
+   "kind": "sched_tick",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "定时触发器：扫描到期调度并执行（可由循环/计划任务驱动）"
+  },
+  {
+   "kind": "scrapling",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "网页抓取（Scrapling 0.4）：自适应选择器+反爬对抗；只抓公网（每个 URL 过 net_guard 边界，内网一律拒）；缺库如实报缺不冒充；响应体限量 2MB；浏览器级隐身抓取需另装内核，缺哪个说哪个"
+  },
+  {
+   "kind": "screen_sniff",
+   "domain": "security",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机屏幕采集：只写本地 PNG、可列可删，不做出网/OCR/内容解析"
+  },
+  {
+   "kind": "sec_chain",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "黑客大脑：利用链构建（从漏洞清单推演攻击路径+影响评估）"
+  },
+  {
+   "kind": "sec_defenses",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "黑客大脑：蓝队防御验证（检查防御措施是否真实生效）"
+  },
+  {
+   "kind": "sec_llm",
+   "domain": "security",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "黑客大脑推理引擎（独立大模型+独立密钥）：abliteration.ai 无限制模型，专用通道不与其他能力混用"
+  },
+  {
+   "kind": "sec_scan",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "黑客大脑：漏洞扫描（OWASP Top 10 + CWE 模式库，扫描自有代码）"
+  },
+  {
+   "kind": "sec_surface",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "黑客大脑：攻击面测绘（用户输入/网络/文件操作/入口点向量分析+风险评分）"
+  },
+  {
+   "kind": "sec_sweeper",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "安全棒（主人令 2026-09-27）：一根专职安全触手，**每半天**把尺子挨个过唯一门跑一遍 —— 全量穿透式交叉扫描（钩子/步骤锁/交叉验证/遗漏补扫）+ 安全模式分诊（eval/exec/shell/凭据/反序列化…）+ 覆盖无死角 + 双向绑定 + 技能源↔装；结果收成**健康账**，异常即**报警**；**"
+  },
+  {
+   "kind": "see_camera",
+   "domain": "device",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "身体·摄像头之眼（2026-11-04 主人令：「她的摄像头调用可用于跟用户对话，手机版和电脑版都可以，可通过摄像头陪用户看世间万物美景」）。`BODY_SENSES` 里早有 `see_camera: 摄像头`，但此前**没有任何能力位承接**——词汇在册、手是空的；这一位把它接上。op=status 枚举**真能读"
+  },
+  {
+   "kind": "self_intake",
+   "domain": "mind",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**未命中即取源 · 自递归改进**（主人令 2026-10-15：「在她的知识库未命中的时候转抓取全网国内外的论文来实现自我递归改进，这样就不会出现自己都不懂的东西就无脑操作了」。回路：**known（先查本地知识库）→ 未命中 ⇒ intake（抓取全网取源）→ 蒸馏胶囊（带出处）→ 钢印护照 + 入 contex"
+  },
+  {
+   "kind": "selfscan",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "体检一下/自检/查毛病/有没有问题/哪里有问题/框架健康：五维扫描（路由/模块/存储/审计/桩缺口），P0断连第一时间报警"
+  },
+  {
+   "kind": "semantic_match",
+   "domain": "brain",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**中文语义匹配**（bge-small-zh-v1.5 · ONNX 94.85MB · 零 torch）：把一句话编码成 512 维向量，和 424 个能力描述算余弦，给 top-k **参考**候选。铁律：**只给候选、不拍板**（返回里没有 best/chosen），不改任何现有排序。实测口径：短词（≤4 字）"
+  },
+  {
+   "kind": "shared_resources",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "共享资源池（只读骨架）：虚拟号/邮箱按需租借——资源可共享、身份不共享、每次调用留痕"
+  },
+  {
+   "kind": "shot_director",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**镜头导演**（主人令 2026-10-16：把 **Seedance 2.0 Skill OS** 蒸进来）：蒸自 **Emily2040/seedance-2.0**（**MIT** · v6.7.0）的思想—— 视频模型 = **一个从没见过你的剧组**（不能提问 · 按字面渲染 · 只做第一个动作 · 跳剪忘"
+  },
+  {
+   "kind": "showcase_ops",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**作品解剖与展示**（主人令 2026-10-16：让每一次的作品都能完美的展示能力）：蒸自 **wheresryan22/anatomy**（MIT · 13,459 星 · agent-skill）的**思路与架构**—— 「**用一个真会动的实物来讲解一个概念**」：概念→会动的实物（例：cache key⇒弹"
+  },
+  {
+   "kind": "signature_guard",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "署名守卫：扫描全框架页面开发者署名完整性，缺失即报可按需自动补回（禁止删除）"
+  },
+  {
+   "kind": "skill_finder",
+   "domain": "data",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**技能检索器**（蒸馏自 skills.sh find-skills，只蒸思想；2026-10-17）：一句需求 → 候选技能 + 来源/装与否/风险三列；另有 op=vet 出供应链体检报告。只读本机图鉴与技能目录，**不出网、不装不改**。op=find（q）/ vet（name）。"
+  },
+  {
+   "kind": "skill_forge",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**技能蒸馏五式**（主人令 2026-10-16：把五个 skill 蒸成我们的原生能力）：蒸自五个 MIT 仓的思想—— ① **女娃**（nuwa-skill）不是复制人、是提炼思维框架（心智模型/决策启发式/表达 DNA/边界）② **last30days**：agent 主导的搜索、按投票与真实金额计分（非编"
+  },
+  {
+   "kind": "skill_watch",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**技能观察器**（主人令 2026-10-11「使用技能在每次使用的时候都要注意技能的**变化和短板**来打磨进化」）：每次用技能留三笔 —— **用成没成（读数）· 它变了没（面漂移）· 它短板在哪（打磨点）**。① observe：cap/成败/耗时/错误类/被门拦 ⇒ 只追加落账；② snapshot+drif"
+  },
+  {
+   "kind": "skills_hub",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "技能库：能力位是**手**（真跑留痕），skill 是**做法**（先想清楚再动手）。op=list 列全部（name/来源/一行描述）；op=get {\"name\":...} 取全文；op=match {\"query\":...} 按任务文本匹配最相关 skill；op=verify 体检（数量/重名）。现有 20 个"
+  },
+  {
+   "kind": "slim_profile",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "瘦身画像（simslim 架构蒸馏）：**命名类别 + profile + 三档闸 + 裁后复核**——`plan` 只读量出按类别的可回收体积（同 disk-plan）；`cut` **必须 confirm=true** 且**只搬不删**（.trash/slim-<ts>/<类别>/，可原路取回）；`verify`"
+  },
+  {
+   "kind": "social_eng",
+   "domain": "security",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "钓鱼**识别**（防御侧）：12 条规则加权打分 + 落点分类，只判不造、不自动点链接"
+  },
+  {
+   "kind": "spend_guard",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "花费守卫（paperclip 成本治理蒸馏）：**按维度追踪调用与 token + 阈值三态判定**——`ledger` 从 key_gateway 真账按日/按源聚合（token 记多少报多少，**免费通道 0 就报 0**，不按价目表脑补）· `policy` 阈值策略（数据文件，主人可改；缺则如实标\"默认\"）· "
+  },
+  {
+   "kind": "spider_ops",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**自适应抓取编排**（主人令 2026-10-16：把 **Scrapling** 蒸成原生能力）：蒸自 **D4Vinci/Scrapling**（BSD-3-Clause · Python · 88,008 星）的思想—— 核心是 **adaptive**：页面结构一变选择器就废 ⇒ **多候选路径 + 结构指纹"
+  },
+  {
+   "kind": "stigmergy",
+   "domain": "collab",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**协作层的间接通道**：Stigmergy（共识主动性 / 信息素场地）。四原语 DEPOSIT/READ/DECAY/FORAGE；只有 DEPOSIT 会写、且**只追加**（挥发是读数，账本可回放）。五条红线做成机械闸：**无源不许留** deposit_without_source · **种类白名单** d"
+  },
+  {
+   "kind": "surface_bind",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "通用「可控制面」绑定器（主人令 2026-09-27：「其他工具全部都要可控按键一个不漏的绑定好」）：**让每个工具自己报出可控制键**（ffmpeg -filters/-encoders/-formats… · git help -a · genoffice --help · freebuff --help · py"
+  },
+  {
+   "kind": "svc_inspect",
+   "domain": "pipeline",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "服务巡检：探活已登记服务端口并落审计（只看不动）"
+  },
+  {
+   "kind": "sync_guard",
+   "domain": "project",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "双仓同步巡检（2026-11-01）：交付树 ↔ live 工作仓 的 sha1 对账——status（只报差异）/ verify（判 ALIGNED：only_live=0 · 非档案 only_delivery=0 · differ=0 · 两边 cap 计数相等）/ patrol（verify + 可选写 sta"
+  },
+  {
+   "kind": "tactics_advise",
+   "domain": "longrun",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "察言观色层：识别沟通信号→给出表达分寸（只调怎么说，不改事实）"
+  },
+  {
+   "kind": "task_graph",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "大脑执行层·**任务图**（主人令 2026-10-13「每次指派任务都要有任务细节以及每一步怎么做…细致的思维导图任务图，LLM 领取任务图执行任务」）：一句话 → **细到步**的图，每步五件齐（干什么 / 怎么做 / 注意什么 / 合格判据 / 谁干），并同时给 markmap 文本（可渲染成思维导图）。op=d"
+  },
+  {
+   "kind": "task_manager",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "任务管理器（主人令 2026-09-27）：一屏看全「任务 / 归属 / 内存占用 / CPU / 端口 / 进程ID」；psutil 读**真进程**（CPU 需两次采样：process_iter 的 info 是首次缓存，第二遍必须直接再调）；归属按**进程名优先**认（血账：只看命令行会把 chrome 误认成框"
+  },
+  {
+   "kind": "taste_guard",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "反 AI 烂大街设计闸（2026-11-01 蒸馏 Leonxlnx/taste-skill · MIT · 只蒸规则未搬代码）：把上游 house rules 钉成可离线数的 18 条：渐变/玻璃/阴影/眉标/等宽/编号/图标卡阵/emoji/紫靛助手色/lorem/无 h1/真图不足/字体过多/动效不足；op=st"
+  },
+  {
+   "kind": "telegram_embed",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Telegram 镶嵌窗口（只读骨架·门）：面板卡⑧，**默认走浏览器触手**（Bot API 要 bot 身份，跟「你这个号」不是一回事 ⇒ 只作可选支路，token 只从 env/DPAPI 读）；四条红线（Telegram是副本本地是源/凭据不许明文/不绕验证/每次操作留痕 source_kind=telegra"
+  },
+  {
+   "kind": "tentacle",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "触手/眼睛/双手/手：默认调本体原生能力，给意图自动命中，不给方法名也行；桌面动作见 see/read_text/click/type/list_windows（**条目数现算，见 tentacle_manifest**，不手写）"
+  },
+  {
+   "kind": "tentacle_arm",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**触手操控臂**（主人令 2026-10-19「你要以这些能力的思路来操控触手，本身触手就是我们的手，所以必须学会这样的操控精度」）：把 Omni-Arm 的五层精度模型套到能力位上 —— 关节 = 一次 (kind, op, payload)；`dof` = 该位在注册表登记的几个 op；`limits` **现算"
+  },
+  {
+   "kind": "tentacle_bind",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "资产↔触手穿透式绑定（主人令 2026-09-26）：每个资产绑定到产生/维护它的触手；bind/unbind/auto/sweep 增删绑定，scan 全量体检（红点只剩「触手断连」一种：资产缺失或触手不在注册表），coverage 报穿透率，一切动作追加写 state/asset_bindings.jsonl 台账"
+  },
+  {
+   "kind": "tentacle_cognition",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手认知包（只读骨架）：任务上下文/角色边界/自检三问/不确定上报/操作留痕 + 五条零容忍红线"
+  },
+  {
+   "kind": "tentacle_comfy_bridge",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**第 1530 根触手 · ComfyUI 桥**（主人令 2026-10-11「ComfyUI 不是生图工具，是第 1530 根触手的底座」）：把外部 ComfyUI 当**贴图工厂／概念工厂**用，并**双向绑定** —— ① 工作流 = 契约（`state/comfy_workflows/*.json`，Com"
+  },
+  {
+   "kind": "tentacle_equip",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手**自配装备与账号**（主人令 2026-10-09）：**先有职业再谈装备** —— 职业从「vaults/agency_tentacles/library/zh」现读（272 个职业 / 19 个分域，三件套 count/examined/truncated 不截断），按分域 + 职业名关键词算出「这根触手要什"
+  },
+  {
+   "kind": "tentacle_learn",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**触手扫描·采集·学习**（主人令 2026-10-16：这是必要的）：四步闭环 **scan → collect → extract → learn**，末尾**复验**“真的进了语料/可被现读”。面：能力面·页面面·文件面·设备面·网面（只对授权域）。红线：只扫/只采**授权与公开**面 · 隐私脱敏 · 采集物"
+  },
+  {
+   "kind": "tentacle_manifest",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手能力总纲（注入大脑上下文）：**条目数运行时现算，不手写**（手写数会腐烂——2026-10-13 实测 66/85 两处打架、都没人数过）+ 三通道感官 + 六铁律"
+  },
+  {
+   "kind": "tentacle_pipeline",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手自动化流水线：四层七步、三公理、五红线；隔离执行、逐层汇报、dry-run 读数、终审只判不改、发布带回滚"
+  },
+  {
+   "kind": "tentacle_scale",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "亿万触手寻址（逻辑 · 只读）：10^8 地址空间按算不占盘（t00000001…）+ 1024 分片 + 每根钥匙由主密钥 HMAC 派生（同一根永远同一把、彼此不同、可复算）· 钥匙只回指纹。**实体化/落盘不做**（新增位无 policy 分支 = 零作用域，属登记在册的坑，要开请主人在 security/pol"
+  },
+  {
+   "kind": "tentacle_status",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手自诊断：硬件层就绪度 + 依赖分层 + 邻域覆盖"
+  },
+  {
+   "kind": "thebrain_bridge",
+   "domain": "integration",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "TheBrain 15 思维导图**接入桥**（把图集成进框架 + 把 AI 连上，**过变压器**）：`status` 探针（TheBrain 装/跑 · 数据面 Brain.db/MetaDB/AiConversations · Orion · 我们的 AI 端点 · 变压器，只读）· `graph`/`searc"
+  },
+  {
+   "kind": "theme_cap",
+   "domain": "system",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**主题能力位**（蒸馏自 Omarchy 的 \"colors.toml 主色 + 模板重生成全系统配置\"）：**一份取值空间（[colors] + [dims]） ⇒ 四个界面 CSS 的主题块一起变**。op=list/show 看色源；check 判据（漂移 + 悬空引用 + 颜色尺寸各有人用）；render 预"
+  },
+  {
+   "kind": "think_loop",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "推演环：理解需求→镜像维度推演→调用工具执行→自我纠错→反向延伸→反思进取→整理结果（完整心智循环）"
+  },
+  {
+   "kind": "thought_stream",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**思考流/行动流归一化**（主人 P1，2026-11-02）：op=schema/normalize/verify。把已有 JSONL 事件行统一成 thought/action/result/guard/system 五类，带时间/actor/title/detail/来源；坏行跳过、凭据脱敏、去重、上限 200"
+  },
+  {
+   "kind": "tool_bay",
+   "domain": "tentacle",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "装备坞：触手「自配装备」走的那道门。白名单 15 件（本仓自定口径），每件状态靠**现跑探针**得出（没探针的如实报「无探针」，不得报已装）。install 三态：① 已在位（不耗票）② 需授权接上（screen/ui_tree/comfyui，**真过 auth_gate 的 check_and_consume**，"
+  },
+  {
+   "kind": "topic_watch",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "话题追踪：追踪/盯着/有变化/告诉/话题/持续关注/每天给我/早报/动态/最新/行业/新闻/股价/行情/视频。追踪你关心的话题，梳理最新动态，有变化就告诉我。触发词表全量见 topic_watch.INTENT_MAP；命中后转邻域技能链，不新增进程、不复制技能实现。"
+  },
+  {
+   "kind": "topic_web",
+   "domain": "recon",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**主题共现网**（主人令 2026-10-15：把 AI Safety HOT Hub 的**连接思路**蒸馏成契合触手的能力）：它的灵魂是「**不问这是什么，问它和谁一起出现**」—— 857 信源汇成条目（来源/时间/关注度/多标签），再用标签与机构做**共现图**（线 = 同一条材料里同时出现）。本位只做这一件"
+  },
+  {
+   "kind": "trace_store",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "痕迹库只读读数：五张表（wave_samples/traces/trace_links/promotes/obsessions）条数"
+  },
+  {
+   "kind": "train_ground",
+   "domain": "llm",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**回炉训练场（她的手）**（主人令 2026-10-16：「必须使用万能插来无死角训练大模型把所有能力以及执行层所有能力都对齐训练好」「必须让她直达万能插就是她的手原生态执行手」）：回炉训练不再靠外部手摇脚本。op=plan（直达路线）·status（卡/日志/GPU/语料哈希，只读）·monitor（进度/loss"
+  },
+  {
+   "kind": "train_recipe",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "训练配方与就绪闸（train-llm-from-scratch #10 蒸馏）：**本机零算力 ⇒ 不接真训练**；readiness 现读 torch/CUDA/磁盘/语料并逐条报缺口（缺什么谁能补）；plan 出七阶段配方（每阶段输入/输出/判据）；ledger 实验账**没 src 不收**。op=readine"
+  },
+  {
+   "kind": "transfer",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子"
+  },
+  {
+   "kind": "transformer",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "变压器（**核心已按成熟成品吃透后重做** 2026-09-27）：LLMLingua 的「显式预算 + 段落保护」（`compress=False` 思想 ⇒ **指令/结构段一字不动**，只压参考叙述，支持 rate/target_chars）+ GPTCache 的「近似命中」本地近似（simhash 汉明距离；"
+  },
+  {
+   "kind": "trend_watch",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "爆火作品观察/热门爆款/热搜/点赞高/涨粉快/用户喜欢什么/什么受欢迎/偏好：每日观测爆火作品的细微点，落成用户偏好台账（作品·平台·热度·细微点·偏好条目），挂现成心跳、零新增进程；拿不到数据如实报缺口，绝不编偏好"
+  },
+  {
+   "kind": "tripo",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Tripo3D 三维生成（文/图→3D 模型 + 自动绑骨 + 动作库）：status/balance/text_to_model/image_to_model/multiview_to_model/upload_file/rig_check/rig/animate/wait_task/full_pipeline。**"
+  },
+  {
+   "kind": "trunk_cover",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手覆盖：**每个代码文件都要被某根触手认领**。op=status 覆盖率与按 owner 分布；op=scan 重扫落 state/trunk-cover.json；op=verify 判据（兜底率超阈值即红，并列出缺口文件）。认领规则从硬到软：同名文件 → 实现文件映射 → tools 同名 → import 关"
+  },
+  {
+   "kind": "trunk_reason",
+   "domain": "tentacle",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "触手推理环：op=agent 跑一轮\"看→想→动→再想\"——先跑真实只读自检，再把现状喂给本机 7.6B 权重判断真风险/误报/下一步，然后按建议**只跑白名单内的只读检查**拿新证据，最后复核初判。op=reflect 单次反思；op=status 看大脑在不在。边界：act 只跑只读能力位，绝不写盘/执行/越权；大"
+  },
+  {
+   "kind": "truth_scan",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "真实性审计层：逐能力验证真执行，零假执行铁律（probe 模式含副作用探针）"
+  },
+  {
+   "kind": "turn_trace",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**轮次追踪 Turn Trace**（主人 P2，2026-11-03）：op=schema/normalize/verify。把已有 JSONL 执行账按 session + 间隔（默认 45s）归并成“轮”：步骤/结果/证据/耗时；没有 input 字段就 null，不伪造用户输入/证据；**零作用域**只读归并"
+  },
+  {
+   "kind": "ui_card",
+   "domain": "ui",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**ACUI 卡片协议**（吞噬上游参考项目 Scene Protocol/ACUI 蒸出的我们自己的版本，2026-11-02 主人令）：op=schema/validate/create/close/action/snapshot/events/clear/verify。卡片是**纯数据**：kind/action"
+  },
+  {
+   "kind": "ui_kit",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**UI 组件库的口**（吞天吞来的素材 → 可检索 · 可取件 · 读数如实）。素材：`uiverse-io/galaxy`（**MIT** · ★13478 · 3802 件 · 11 类目）落 `_upstream/galaxy`。常用说法：UI 组件 / 按钮 / 卡片 / 加载动画 / 开关 / 输入框 / "
+  },
+  {
+   "kind": "ui_render",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "受控界面渲染（json-render #09 蒸馏）：模型只产 spec，组件必须命中白名单；未知组件/未列动作/脚本/外链一律拒 ⇒ 先 check 再 render；产物自包含零脚本零外链；指标必须带 src（没带的照渲但标红）。op=spec/check/render/where"
+  },
+  {
+   "kind": "uia_tree",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**UIA 控件树**（Windows UI Automation · 原生结构通道 · 实测 1012ms / 6 窗口 / 14.5k 字）：读出原生窗口的结构化控件 —— 类型 + 名称 + 屏幕坐标（x/y/w/h），**可寻址、无视遮挡**，是「看」的 L1 结构层首选（先结构后像素）。真实实现是触手方法 `"
+  },
+  {
+   "kind": "ul_tars_desktop",
+   "domain": "desktop",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "Ul-TARS Desktop desktop agent"
+  },
+  {
+   "kind": "update_chain",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**本地更新测试链**（P2-13，主人批准 B，2026-11-03）：op=schema/init/stage/confirm/rollback/status/verify。只在 `state/updates-test/` 内：dev Ed25519 签名清单 → 校验 sha256/签名 → 安全解包暂存 → 一"
+  },
+  {
+   "kind": "update_verify",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**更新清单/签名校验**（主人 P2-13 的可做安全面，2026-11-03）：op=schema/verify/sign/verify_self。校验 app_id/semver/https 非私网产物/sha256/size/Ed25519 签名；**不下载、不安装、不推送**；无公钥/无签名一律不可安装；真正"
+  },
+  {
+   "kind": "ux_doctrine",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**交互铁律**（主人令 2026-10-09）：「在框架里面出来必须要用户求助帮忙的其他全部禁止掉……你开口要求用户的时候你就输了」「可以跟用户商量项目架构和排布，严禁要求用户帮助」「每次停下要么是项目部署完成，要么就是真正需要用户来操作的可以停下，其他时候你停下干嘛」。移植自 V9 core/ux_doctrine"
+  },
+  {
+   "kind": "verification_watch",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "人机验证情报台账（只读）：不主动绕做成机械闸；三部门各一张空台账"
+  },
+  {
+   "kind": "video_hub",
+   "domain": "video",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**视频舱 / 视频能力融合**（主人 2026-11-03）：op=schema/catalog/verify。只读编目全部视频生态能力位（domain=video/image_video + Comfy/数字人/音乐/剪辑/钢印/发布/情报），按 生成→编辑/成片→音频→钢印/许可/发布→情报/外观→库/舞台 六段"
+  },
+  {
+   "kind": "video_intel",
+   "domain": "recon",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "短视频情报组（只读骨架）：六维覆盖；禁区清单优先于流量趋势"
+  },
+  {
+   "kind": "viral_forge",
+   "domain": "creation",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "爆款拆解·克隆配方（2026-11-01 吸收 hypit-ai/hypit 设计，未复制其代码）：字幕/逐句稿 → ①爆款拆解（时长/语速/黄金 3 秒钩子/钩子类型/每 5 秒节奏/段落角色/CTA）②词锚克隆配方 viral_clone_v1（场景表/变体槽位/N 条模板钩子，可交 edit_pipeline）③"
+  },
+  {
+   "kind": "vision",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "视觉/图像识别入口（良性子集，需外部依赖时留待接入）"
+  },
+  {
+   "kind": "vision_arsenal",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**视觉作战区 · 唯一区块**（主人令 2026-11-04「把开源排名前十的视觉能力吞噬一遍，补齐缺失的视觉，全部整理到一个区块，让大脑执行层自动决策使用哪个视觉能力」）：19 个视觉能力位 / 4 组（读·懂·找·造），可用性**现算**不写死。开源基线（GitHub CV 榜 2026-09-27，已 devo"
+  },
+  {
+   "kind": "vision_detect",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**目标检测**（ultralytics YOLO11n · ONNX 路线 · 不装 torch）：框出并分类画面里的**真实物体**（人/车/动物/电脑），回坐标 + 类别 + 置信度。对纯 UI 截图基本只认「一整块屏幕」—— 界面元素请用 region_scan 或 body_eye，别拿它找按钮。op=det"
+  },
+  {
+   "kind": "vision_embed",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**语义相似度**（CLIP ViT-B/32 视觉编码器 · ONNX 352MB · 不装 torch）：判定两张图是不是「同一回事」—— 补 aHash 的盲区：主题切换/反色时 aHash 归零，它仍认得出（实测 0.94 vs 0.00）。op=similarity（image_a + image_b → 分"
+  },
+  {
+   "kind": "vision_grounding",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**视觉/定位通道契约**（主人令 2026-10-11「视觉必须达到 VLX-Flow 水平，脑-手同步**不能使用传统截图**看来在操作」）：把「看」分层钉死 —— **L1 结构层**（UIA 控件树 domain_index/domain_read/domain_act/domain_type · CDP DO"
+  },
+  {
+   "kind": "vision_loop",
+   "domain": "vision",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**原生四觉闭环**（主人令 2026-10-09：「她的视觉每次都要跟手分开去使用传统的**瞎子操作**……把视觉这么使用给她**钉死在上面**」「我看她每次执行任务就是**瞎还没脑**」＋「还有耳，嘴」）。**眼·耳·嘴·手四觉 → 脑 → 手 → 验**，缺一觉就不许动/说：①眼 tentacle see（已实测"
+  },
+  {
+   "kind": "vision_pose",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**姿态**（YOLO11n-pose · ONNX 11.3MB · 不装 torch）：人体 17 关键点 + 粗几何判定（举手 / 站坐 / 是否正对）；**不做动作语义识别**。铁律：关键点不可见就不判（实测 306~378ms/张，纯 CPU）。op=pose（image + conf/kp_vis/max_"
+  },
+  {
+   "kind": "vision_print",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**视觉打印**（主人令 2026-10-13「看到的东西都可以原样以代码打印并渲染成看到的样子」）：五段链 —— ①see 原生眼取帧（`tentacle/omni_core._screen_capture`：dxcam→mss→pyautogui，或直接喂图）②print 码落地（**码由她/调用方给**，本件**"
+  },
+  {
+   "kind": "vision_segment",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**通用分割**（slimsam-77 蒸馏版 SAM · 两段 ONNX 共 38MB · 不装 torch）：点一下或框一下，把目标**精确抠出来**（去背景、边界级 mask）。实测：encoder 3.2s（每图一次，带缓存）/ decoder 0.08~0.37s；框提示 iou 0.913 覆盖 31.3%"
+  },
+  {
+   "kind": "vision_track",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**目标跟踪**（贪心 IoU 关联，纯 Python 零依赖 · 不装 supervision）：跨帧认住同一个目标 —— 「还是它吗」。核心只是上一帧框 ↔ 这一帧框的配对（取最大值问题）。op=update（boxes → 关联并回 id）· track（frames → 自动检测+关联）· reset · st"
+  },
+  {
+   "kind": "vlx_flow",
+   "domain": "vision",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**流式观察 + 两层记忆**（接自 om-ai-lab/VLX-Flow · 七步法第一步落 _upstream/VLX-Flow/）。上游当前是**纯文档仓**（Checkpoints: Coming soon）⇒ 按七步法「招一 纯逻辑直取」取它的**架构契约**、按「招三 手用我们自己的」语义那步留给自己的模型"
+  },
+  {
+   "kind": "voice",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "本机语音入口（良性子集）：空 payload 默认落到 TTS，真让本机发声 ⇒ 要 `audio_output`；另有 ASR 入口。本机实测口径：WASAPI 活动渲染端点 1 个、活动录音端点 0 个 ⇒「能出声」已验证，「能听」当前不可用（不是没有麦克风，是录音端点没起来）。"
+  },
+  {
+   "kind": "voice_orchestra",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "语音技能中枢（多维度场景编排，只读）：技能原子检索 / 场景 Pipeline / 本机可跑性；今日挂 tools tab，升格条件见模块 docstring"
+  },
+  {
+   "kind": "voice_settings",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**语音设置契约**（主人 P1，2026-11-02）：op=schema/validate/resolve/verify。TTS 音色/语速/音高/音量 + ASR 后端（auto/whisper/windows）+ 语言 + 自动朗读；纯校验/解析，**零作用域**（不写盘/不出网）；持久化由 console-s"
+  },
+  {
+   "kind": "voice_stream",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**流式语音（P2-14 可做面）**：op=schema/start/chunk/reset/end/verify。收 PCM16 16k base64 分片 → 内存缓冲（≤60s）→ 显式 partial 且 ≥2s 时本地 Whisper 局部转写，end 时最终转写；临时 WAV 即用即删。**不是真 KWS"
+  },
+  {
+   "kind": "voice_studio",
+   "domain": "voice",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "VoiceStudio（debpalash · AGPL-3.0 · 只蒸馏思想不搬代码）**两层面**。① **桥接面**（要上游后端在线）：status/capabilities/transcribe/plan/mcp_info/where —— 上游 Local API 现读**只给「听」不给「说」**（/v1/"
+  },
+  {
+   "kind": "warm_switch",
+   "domain": "llm",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**按需常驻开关**（主人 2026-10-12「可以通过隧道，你这么跳都一样」+「**触手就是最好的传输工具，比隧道还好**」）：开工挂热 / 收工放掉缩 0。口径：**心跳走本机桥（触手）**，不裸打云端 —— 走的同一条真实通路，顺带持续验链，协议差/门/审计全带上（裸隧道这些都没有）。实测口径：热时第一句 ~1"
+  },
+  {
+   "kind": "wave_probe",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "痕迹触手只读量一次波动（默认只量不写；trigger_mode 与盲区一并回报）"
+  },
+  {
+   "kind": "welcome",
+   "domain": "system",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**启动欢迎语**（主人令 2026-10-10：「启动APP数字人的欢迎语，你来看看说什么，要有 GBT小土豆V8 和 开发者：自由的风，其他你来想要有未来感的语言」）。文字是**单一真源**（gbt_allinone/welcome.py 的 WELCOME；必含项由 check() 机械咬住）。三个 op：tex"
+  },
+  {
+   "kind": "wf_cache_clear",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "万能插：清空传输缓存（同输入复用的节点结果缓存）"
+  },
+  {
+   "kind": "wf_define",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "万能插执行引擎：定义工作流（DAG，校验环/依赖/能力合法性）"
+  },
+  {
+   "kind": "wf_resume",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "万能插执行引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的）"
+  },
+  {
+   "kind": "wf_run",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": true,
+   "status": "enabled",
+   "desc": "万能插执行引擎：分层并行执行工作流，节点结果如实落盘"
+  },
+  {
+   "kind": "wf_status",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "万能插执行引擎：查运行记录（可按工作流名过滤）"
+  },
+  {
+   "kind": "whatsapp_embed",
+   "domain": "integration",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "WhatsApp 镶嵌窗口（只读骨架·门）：面板卡⑦，**走浏览器触手不用 API**（官方 API 走 Business 账号+独立号码，不是「你这个号」）；四条红线（WhatsApp是副本本地是源/凭据不许明文/不绕验证/每次操作留痕 source_kind=whatsapp）；**发消息是不可逆动作 ⇒ 停在授权"
+  },
+  {
+   "kind": "wiki_graph",
+   "domain": "mind",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "知识库·**自维护百科 + 知识图谱 + 回滚**（吞 `Tencent/WeKnora` 后蒸的那一面：本仓原来只有碎片 `brain_vault`/`thebrain_bridge`/`asset_index`）。四件铁律：① **每页必须有出处**（无源页 verify 点名）② **悬空边**必须点名，不许静默"
+  },
+  {
+   "kind": "workflow_forge",
+   "domain": "engine",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语表与决策记录）④ **arch_revi"
+  },
+  {
+   "kind": "world_forge",
+   "domain": "engine",
+   "safe": true,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "**世界锻造内核**（吞噬 AEON/WorldX/Temporal God 蒸出的第 0 步，2026-11-02 主人令）：op=schema/spec/gen/step/focus/person/god/rewind/branch/encode/decode/view3d/view/summary/verify。"
+  },
+  {
+   "kind": "zimage_rewash",
+   "domain": "creation",
+   "safe": false,
+   "requires_params": false,
+   "status": "enabled",
+   "desc": "洗图流水线（看图→反推提示词→重绘→放大）：**放大环已可用**（ffmpeg lanczos+unsharp，零依赖）；反推环**已接线**（2026-10-15 起 zimage_rewash_cap 走 vision 通道；2026-10-16 增形式化反推件 tools/codex-scripts/img-re"
+  }
+ ]
+}

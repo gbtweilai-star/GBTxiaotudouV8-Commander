@@ -402,7 +402,19 @@ render/video/
 state/heartbeat/
 
 # ── 2026-11-01 仓库清理：运行态/产物/二进制不进版本库 ──
-state/
+# ══ 2026-11-04 白名单（主人令：判据依赖的数据必须入库，否则 CI 永远跑不了它们）══
+# 血账：原来整行 `state/` 把整个目录排除 ⇒ test_cap_bind_bidirectional /
+#   test_chain_readiness 这些判据**在 CI 里根本没有输入**，只能长期不跑。
+#   「判据长期不跑」= 假绿，比没有判据更坏。所以只放**判据真正依赖的 4 个文件**。
+#
+# git 的硬规则：父目录被排除时，子文件的 `!` 白名单**不生效**。
+# 所以必须写成三段式：① `state/*` 排除第一层 ② `!` 逐个放行 ③ `state/*/` 重新排除所有子目录。
+state/*
+!state/skill_atlas.json
+!state/asset_bindings.json
+!state/cap_tags.json
+!state/unimplemented.json
+state/*/
 store/
 dist/
 runtime/
