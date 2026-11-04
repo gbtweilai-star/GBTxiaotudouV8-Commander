@@ -473,7 +473,7 @@
   }
 
 
-  /* ───────── 功能表（385 位，可搜可筛） ───────── */
+  /* ───────── 功能表（427 位，可搜可筛） ───────── */
   function renderCaps(d) {
     var items = (d.caps && d.caps.items) || [];
     var sel = $("cap-domain");

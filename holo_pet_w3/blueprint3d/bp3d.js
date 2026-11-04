@@ -10,7 +10,7 @@ var API = "/api/blueprint";
 
 var DELIVERABLES = [
   { key: "chat", name: "聊天窗口", desc: "你和它说话的地方：问什么答什么，上下文不会断。", url: "/console/index.html#chat", status: "done" },
-  { key: "caps", name: "它会做的事（385 项）", desc: "它所有能力列成一张表，点开就能用，不用记命令。", url: "/console/index.html#caps", status: "done" },
+  { key: "caps", name: "它会做的事（427 项）", desc: "它所有能力列成一张表，点开就能用，不用记命令。", url: "/console/index.html#caps", status: "done" },
   { key: "space", name: "能力星图", desc: "一眼看到它会什么、分几大类，是一张活的星图。", url: "/console/index.html#space", status: "done" },
   { key: "team", name: "分工网络", desc: "多个角色怎么协作、消息怎么流转，像一张会呼吸的网。", url: "/console/index.html#team", status: "done" },
   { key: "mind", name: "任务指引", desc: "接到任务后拆成一步步：做什么、怎么判定成功、卡住怎么办。", url: "/console/index.html#mind", status: "done" },
