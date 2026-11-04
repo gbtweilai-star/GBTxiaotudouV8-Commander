@@ -79,7 +79,7 @@ Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd hol
 $ python demo.py "把这次发布推到生产"
 
 ① 这台机器的能力目录（机器可读，不是截图）
-   427 位能力 · 32 个域 · 只读 389 · 会改状态 38 · 挂作用域 38
+   427 位能力 · 32 个域 · 只读 339 · 会改状态 88 · 挂作用域 38
 
 ② 按你的那句话，落点候选（关键字打分，不是模型决策）：
    [1000.0] one_key_deploy   pipeline  会改状态  要票：deploy_publish,process_execute,filesystem_write
@@ -113,18 +113,16 @@ run_task(kind, payload)
 
 | 域 | 数量 | 代表能力 |
 |---|---:|---|
-| 创作（视频/图像/音乐/剧本） | 57 | iral_forge drama_forge shot_director |
-| 系统（自检/编排/修复） | 54 | selfscan orchestration 
-oot_fix |
-| 大模型（本机/云端/上下文） | 42 | codex_* context_guard energy_core |
-| 安全（测绘/扫描/防御） | 29 | sec_surface sec_scan sec_defenses |
-| 触手（总指挥/脉冲/覆盖） | 27 | 	entacle pulse_core 	runk_cover |
-| 心智（记忆/人格/情绪） | 21 | experience_forge rain_vault persona_kernel |
-| 情报（OSINT/研究/学习） | 18 | osint_scan 
-esearch_intel 	opic_web |
+| 创作（视频/图像/音乐/剧本） | 58 | viral_forge drama_forge shot_director |
+| 系统（自检/编排/修复） | 60 | selfscan orchestration root_fix |
+| 大模型（本机/云端/上下文） | 43 | codex_* context_guard energy_core |
+| 安全（测绘/扫描/防御） | 34 | sec_surface sec_scan sec_defenses |
+| 触手（总指挥/脉冲/覆盖） | 30 | tentacle pulse_core trunk_cover |
+| 心智（记忆/人格/情绪） | 27 | experience_forge brain_vault persona_kernel |
+| 情报（OSINT/研究/学习） | 18 | osint_scan research_intel topic_web |
 | 管线（镜像/部署/回滚） | 18 | one_key_deploy mirror_* deploy_queue |
-| 视频（生成/剪辑/混音） | 16 | hunyuan_video media_pipeline udio_mix |
-| 身体（看/说/按/敲） | 12 | ody_see ody_click ody_type |
+| 视频（生成/剪辑/混音） | 18 | hunyuan_video media_pipeline audio_mix |
+| 身体（看/说/按/敲） | 19 | body_see body_click body_type |
 
 完整 32 域 + 10 个可抄用法 + 边界说明：[**docs/90-what-she-can-do.md**](docs/90-what-she-can-do.md)
 
