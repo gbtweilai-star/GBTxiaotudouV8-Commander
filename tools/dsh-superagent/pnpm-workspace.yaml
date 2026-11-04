@@ -1,0 +1,18 @@
+# pnpm 11 配置（2026-11-04 立）
+#
+# 为什么在这里而不是 package.json 的 "pnpm" 字段：
+#   pnpm v10 起**不再读** package.json 的 pnpm 字段，实测告警原文 ——
+#   `The "pnpm" field in package.json is no longer read by pnpm.
+#    The following keys were ignored: "pnpm.overrides".
+#    See https://pnpm.io/settings for the new home of each setting.`
+#   ⇒ 写在那儿等于没写，Dependabot 的 30 个告警一个都不会消。
+#
+# overrides 的用途：把传递依赖钉到已修复版本（这些包不在本项目的 dependencies 里，
+# 由上游 @deepseek-ai/* 带进来；不钉就只能等上游发版）。
+overrides:
+  undici: ^8.12.2          # GHSA: >= 8.0.0, < 8.12.2（high，16 条）
+  fast-uri: ^3.1.9         # >= 3.0.0, < 3.1.9（medium，4 条）
+  source-map-js: ^1.2.2    # >= 1.0.0, < 1.2.2（high，1 条）
+  vite: ^8.2.4             # >= 8.2.0, <= 8.2.3（low，6 条）
+  "@vitest/mocker": ^4.1.12  # >= 2.1.0-beta.7, < 4.1.12（medium，2 条）
+  zod: ^4.6.6              # < 4.6.6（high，2 条；直接依赖已升，这里钉死传递依赖）
