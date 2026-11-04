@@ -27,6 +27,7 @@ from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -1166,6 +1167,232 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
                          body, script, extra, hero=hero))
 
 
+def _caps_all() -> list:
+    """现读注册表（失败就空表，页面照常能开，不因取数失败白屏）。"""
+    try:
+        from .. import caps_registry as _cr
+    except Exception:                                          # noqa: BLE001
+        try:
+            _cr = importlib.import_module("gbt_allinone.caps_registry")
+        except Exception:                                      # noqa: BLE001
+            return []
+    try:
+        return _cr.all_caps()
+    except Exception:                                          # noqa: BLE001
+        return []
+
+
+def render_brain() -> dict:
+    """大脑执行层（仓根 brain.html）—— `brain_*` 能力位逐个现读，不写死。"""
+    rows = [c for c in _caps_all() if str(c.get("name", "")).startswith("brain")]
+    data = [{"n": c["name"], "d": c.get("domain"), "s": bool(c.get("safe")),
+             "sc": list(c.get("scopes_static") or []),
+             "p": bool(c.get("requires_params")),
+             "t": " ".join(str(c.get("desc") or "").split())[:240]} for c in rows]
+    body = """
+<div class="wrap">
+  <div class="card"><h2>这一页是什么</h2>
+    <p class="mut">大脑执行层的**能力位视图**：把注册表里所有 <code>brain*</code> 位逐个列出来 ——
+    名字、是否只读、要不要票、需不需要参数，全部现读，没有一个是手写的。</p>
+    <div class="src">数据源 caps_registry.all_caps() · 筛选 name.startswith("brain")</div></div>
+  <div class="card"><h2>能力位 <span class="mut" id="n"></span></h2><div id="list"></div>
+    <div class="src">每位一行；红=需授权 · 绿=只读</div></div>
+</div>"""
+    script = """
+const D = __DATA__;
+document.getElementById("n").textContent = "（" + D.length + " 位）";
+document.getElementById("list").innerHTML = D.map(c=>`
+  <div class="rw">
+    <span class="nm">${c.n}</span>
+    <span class="tg ${c.s?'ok':'warn'}">${c.s?'只读':'需授权'}</span>
+    <span class="mut">${c.p?'需参数':'无必填'}</span>
+    <span class="src">${c.sc.length? c.sc.join(' · ') : '零作用域'}</span>
+    <div class="desc">${c.t}</div>
+  </div>`).join("") || '<div class="mut">注册表里没有 brain* 位</div>';
+"""
+    extra = """
+.rw{display:grid;grid-template-columns:150px 62px 64px minmax(0,1fr);gap:10px;
+  align-items:center;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.rw:last-child{border-bottom:0}
+.nm{font-family:var(--mono);font-size:12px}
+.tg{font-size:11px;padding:1px 7px;border-radius:999px;text-align:center}
+.tg.ok{color:#22C55E;background:rgba(34,197,94,.12)}
+.tg.warn{color:#F5B041;background:rgba(245,176,65,.12)}
+.desc{grid-column:1/-1;font-size:11.5px;color:var(--dim-2);line-height:1.5}
+"""
+    html = _shell("大脑执行层 · 能力位视图",
+                  "brain* 位逐个现读 · 注册表为唯一真相",
+                  body, script.replace("__DATA__", json.dumps(data, ensure_ascii=False)), extra,
+                  hero=_hero("大脑执行层", "%d 位 brain* 能力 · 全部现读" % len(data),
+                             chip="engine", accent="深空紫", seed="brain", kind="wave",
+                             sub="GBT BRAIN / ENGINE"))
+    return _write("brain.html", html)
+
+
+def render_capabilities() -> dict:
+    """能力球（仓根 capabilities.html）—— 427 位按域聚球，数据现读。"""
+    caps = _caps_all()
+    by_dom: dict = {}
+    for c in caps:
+        by_dom.setdefault(c.get("domain") or "other", []).append(c)
+    data = [{"d": k, "n": len(v),
+             "ok": sum(1 for c in v if c.get("safe")),
+             "names": [c["name"] for c in v][:40]}
+            for k, v in sorted(by_dom.items(), key=lambda kv: -len(kv[1]))]
+    body = """
+<div class="wrap">
+  <div class="card"><h2>能力球 <span class="mut" id="tot"></span></h2>
+    <p class="mut">每个圆球 = 一个域，球的大小按该域真实位数算；点球展开能力名。
+    <b>没有一个是手写的</b> —— 全从注册表现读。</p>
+    <div id="balls" class="balls"></div>
+    <div class="src">数据源 caps_registry.all_caps()</div></div>
+  <div class="card"><h2>展开</h2><div id="detail" class="mut">点一个球</div></div>
+</div>"""
+    script = """
+const D = __DATA__;
+const tot = D.reduce((a,b)=>a+b.n,0);
+document.getElementById("tot").textContent = "（" + tot + " 位 / " + D.length + " 域）";
+const mx = Math.max(...D.map(x=>x.n));
+document.getElementById("balls").innerHTML = D.map((x,i)=>{
+  const r = 22 + 34 * Math.sqrt(x.n / mx);
+  return `<button class="ball" data-i="${i}" style="width:${r*2}px;height:${r*2}px">
+    <b>${x.d}</b><span>${x.n}</span></button>`;}).join("");
+document.getElementById("balls").addEventListener("click", e=>{
+  const b = e.target.closest(".ball"); if(!b) return;
+  const x = D[+b.dataset.i];
+  document.getElementById("detail").innerHTML =
+    `<div><b>${x.d}</b> · ${x.n} 位（只读 ${x.ok} / 需授权 ${x.n-x.ok}）</div>
+     <div style="margin-top:8px">${x.names.map(n=>`<span class="chip">${n}</span>`).join("")}
+     ${x.n>x.names.length?`<span class="mut">…另 ${x.n-x.names.length} 位</span>`:""}</div>`;
+});
+"""
+    extra = """
+.balls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.ball{border-radius:50%;border:1px solid var(--line);background:rgba(0,229,255,.05);
+  color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:.15s}
+.ball:hover{border-color:rgba(245,176,65,.6);background:rgba(245,176,65,.08)}
+.ball b{font-size:10.5px;font-weight:600;max-width:92%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ball span{font-family:var(--mono);font-size:11px;color:var(--dim-2)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 7px;margin:2px 4px 0 0;
+  border:1px solid var(--line-soft);border-radius:var(--r-sm)}
+"""
+    html = _shell("能力球 · 全域聚簇",
+                  "%d 位分 %d 域 · 注册表现读" % (len(caps), len(by_dom)),
+                  body, script.replace("__DATA__", json.dumps(data, ensure_ascii=False)), extra,
+                  hero=_hero("能力球", "%d 位 · %d 域 · 球径按位数算" % (len(caps), len(by_dom)),
+                             chip="framework", accent="深空紫", seed="caps", kind="orb",
+                             sub="GBT CAPABILITIES"))
+    return _write("capabilities.html", html)
+
+
+def render_media_console() -> dict:
+    """三方向自动化工作流（仓根 media-console.html）—— 四条产线目录现读。"""
+    hub = _load_hub()
+    rows = []
+    for k, spec in sorted(getattr(hub, "WORKFLOWS", {}).items()):
+        try:
+            w = _walk_workflow(spec["dir"]) if "_walk_workflow" in globals() else {}
+        except Exception:                                      # noqa: BLE001
+            w = {}
+        rows.append({"k": k, "label": spec.get("label", k), "dir": spec.get("dir", ""),
+                     "files": w.get("files", 0), "kb": w.get("kb", 0),
+                     "newest_h": w.get("newest_h", 0)})
+    body = """
+<div class="wrap">
+  <div class="card"><h2>三方向产线总览</h2>
+    <p class="mut">电影 / 成片 / 音乐 / 短视频四条线的**真实目录读数**：
+    产出件数、占用体量、最新改动距今多久。数字来自盘上现扫，不写死。</p>
+    <div id="lines" class="lines"></div>
+    <div class="src">数据源 console_hub.WORKFLOWS + 各线产出目录现扫</div></div>
+  <div class="card"><h2>本页与 wf-* 的关系</h2>
+    <p class="mut">本页是<b>四线横向总览</b>；每条的阶段/判据/交付物细则请看各自的独立页
+    （<code>wf-film</code> / <code>wf-movie</code> / <code>wf-music</code> / <code>wf-short-video</code>）。</p></div>
+</div>"""
+    script = """
+const D = __DATA__;
+document.getElementById("lines").innerHTML = D.map(x=>`
+  <div class="ln">
+    <b>${x.label}</b>
+    <span class="mut">${x.files} 件 · ${x.kb}KB</span>
+    <span class="src">${x.newest_h===null||x.newest_h===undefined?'无产出':'最新 '+x.newest_h+'h 前'} · ${x.dir}</span>
+    <a class="chip" href="../wf-${x.k}/index.html">看独立页</a>
+  </div>`).join("") || '<div class="mut">没有登记的产线</div>';
+"""
+    extra = """
+.lines{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ln{display:grid;grid-template-columns:150px 160px minmax(0,1fr) 96px;gap:12px;
+  align-items:center;padding:9px 12px;border:1px solid var(--line-soft);border-radius:var(--r-sm);
+  background:rgba(0,229,255,.02)}
+.ln .chip{text-align:center;text-decoration:none;color:var(--text)}
+"""
+    html = _shell("媒体产线总览",
+                  "四条线横向对比 · 目录现扫",
+                  body, script.replace("__DATA__", json.dumps(rows, ensure_ascii=False)), extra,
+                  hero=_hero("媒体产线总览", "%d 条产线 · 产出目录现扫" % len(rows),
+                             chip="media", accent="深空紫", seed="media", kind="highway",
+                             sub="GBT MEDIA / WORKFLOWS"))
+    return _write("media-console.html", html)
+
+
+def render_skin_preview() -> dict:
+    """皮肤预览（仓根 skin-preview.html）—— 读真实 CSS 变量，不编色值。"""
+    SKINS = [
+        ("skin-cube", "立方皮肤", "holo_pet_w3/console/skin-cube.css"),
+        ("page-skins", "页面皮肤", "holo_pet_w3/page-skins.css"),
+        ("skin-mission-control", "任务控制", "holo_pet_w3/skin-mission-control.css"),
+    ]
+    out = []
+    for sid, label, rel in SKINS:
+        p = _ROOT / rel
+        vars_ = []
+        if p.is_file():
+            txt = p.read_text(encoding="utf-8", errors="replace")
+            for m in re.finditer(r"(--[a-z0-9-]+)\s*:\s*([^;{}]+);", txt[:200000]):
+                name, val = m.group(1), m.group(2).strip()
+                if name not in [v[0] for v in vars_] and len(vars_) < 28:
+                    vars_.append([name, val])
+        out.append({"id": sid, "label": label, "rel": rel,
+                    "exists": p.is_file(),
+                    "kb": round(p.stat().st_size / 1024, 1) if p.is_file() else 0,
+                    "vars": vars_})
+    body = """
+<div class="wrap">
+  <div class="card"><h2>皮肤清单</h2>
+    <p class="mut">下面每张卡对应一个**真实存在的 CSS 文件**，色块与色值都是从该文件里现读的变量，
+    <b>没有一个是编的</b>；文件不在就如实标「缺」。</p>
+    <div class="src">数据源：holo_pet_w3/ 下的 skin*.css 现读 --变量</div></div>
+  <div id="skins"></div>
+</div>"""
+    script = """
+const D = __DATA__;
+document.getElementById("skins").innerHTML = D.map(s=>`
+  <div class="card">
+    <h2>${s.label} <span class="mut">${s.exists? s.kb+'KB':'文件缺失'}</span></h2>
+    <div class="src">${s.rel}</div>
+    <div class="sw">${s.vars.map(v=>`
+      <div class="one"><i style="background:${v[1]}"></i>
+        <span class="vn">${v[0]}</span><span class="vv">${v[1]}</span></div>`).join("")
+      || '<div class="mut">该文件里没有 --变量，或文件不存在</div>'}</div>
+  </div>`).join("");
+"""
+    extra = """
+.sw{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.one{display:flex;align-items:center;gap:8px;border:1px solid var(--line-soft);
+  border-radius:var(--r-sm);padding:5px 9px;font-size:11px}
+.one i{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.15);flex:0 0 auto}
+.vn{font-family:var(--mono);color:var(--dim-2)}
+.vv{font-family:var(--mono);font-size:10.5px}
+"""
+    html = _shell("皮肤预览",
+                  "读真实 CSS 变量 · 缺文件如实标",
+                  body, script.replace("__DATA__", json.dumps(out, ensure_ascii=False)), extra,
+                  hero=_hero("皮肤预览", "%d 套皮肤 · 色值现读" % len(out),
+                             chip="design", accent="深空紫", seed="skin", kind="orb",
+                             sub="GBT SKINS"))
+    return _write("skin-preview.html", html)
+
+
 def render(target: str = "all", **_kw) -> dict:
     out = []
     t = (target or "all").lower()
@@ -1181,6 +1408,17 @@ def render(target: str = "all", **_kw) -> dict:
         out.append(render_home())
     if t in ("all", "freebuff"):
         out.append(render_freebuff())
+    # 2026-11-04 补齐：hub 登记但从未建过的 4 页（brain / capabilities /
+    # media-console / skin-preview）。数据全部现读，不写死。
+    # V22 两页未建：全仓零实现、零设计稿，建就是编设计稿（见 CHANGELOG）。
+    if t in ("all", "brain"):
+        out.append(render_brain())
+    if t in ("all", "capabilities"):
+        out.append(render_capabilities())
+    if t in ("all", "media-console"):
+        out.append(render_media_console())
+    if t in ("all", "skin-preview"):
+        out.append(render_skin_preview())
     if t in ("all", "workflows") or t.startswith("workflow:"):
         keys = sorted(_load_hub().WORKFLOWS) if t != "workflows" else []
         if t.startswith("workflow:"):

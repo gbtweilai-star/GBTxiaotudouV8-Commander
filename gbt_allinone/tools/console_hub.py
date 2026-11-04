@@ -90,10 +90,11 @@ PAGES = [
      "workflow": "media", "what": "三方向自动化工作流面板（1.3MB）"},
     {"page": "skin-preview", "path": "skin-preview.html", "kind": "门面",
      "workflow": "design", "what": "仙侠×科技 皮肤预览"},
-    {"page": "v22-prototype", "path": "V22 GBT小土豆V8-可交互原型.html", "kind": "原型",
-     "workflow": "design", "what": "能力中枢·可交互原型（V21/V22）"},
-    {"page": "v22-canvas", "path": "V22 GBT小土豆V8-无限画布.html", "kind": "原型",
-     "workflow": "design", "what": "能力中枢·无限画布（V21/V22）"},
+    # 2026-11-04 摘除 v22-prototype / v22-canvas 两条登记：
+    #   追根结果 —— 全仓零实现、零设计稿，`git log --all -- "<path>"` 从未有过记录，
+    #   唯一依据就是登记表里这一行字。留着它只会让 op=scan 永远报 2 条 broken，
+    #   而按名字硬造两个「V22 原型」就是编设计稿（违反 AGENTS.md §4.4）。
+    #   要建先出设计稿，再登记。
     # 仓根两个老页：**扫描抓到的漏项**，登记进来（不再是"没人知道的页面"）
     {"page": "brain", "path": "brain.html", "kind": "执行台",
      "workflow": "engine", "what": "大脑执行层（仓根老页，2026-09-13 前）"},
