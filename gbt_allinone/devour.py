@@ -378,6 +378,29 @@ class DevourTentacle:
             self.state["last_devour_at"] = datetime.now().isoformat()
             self._save_state()
 
+            # ⑦ 【2026-11-04 补线】**登记进融合台账** —— 这是「吞」与「化」之间的接线。
+            #   血账：此前这里写完胶囊就直接 return，**从不调 devour_fusion.intake**。
+            #   后果：40 个胶囊躺在 store/devoured/ 里，而 state/devour_fusion.jsonl 压根不存在，
+            #   `devour_fusion list` 永远 count=0，「三件齐才算融合」这条判据永远没有输入
+            #   ⇒ 系统**无法回答**"我吞进来的东西有没有化成原生能力"
+            #   ⇒ 这正是主人说的「只堆积不进化，无脑堆积就是自造垃圾」的技术根因。
+            #   登记用 status=已吸收（胶囊在盘、来源清楚，但还没接成原生位），
+            #   之后由 audit 逐条列出缺哪三件、fuse 补齐后才允许写"已融合"。
+            #   注意：**登记失败不能影响吞噬本身**（吞成了就是吞成了），只留痕。
+            try:
+                from .tools import devour_fusion as _df
+                _ing = _df.intake(
+                    id=cap_name,
+                    source=f"https://github.com/{owner}/{repo}",
+                    status="已吸收",
+                    note=f"devour_tentacle 自动登记：{context} · {summary['stars']}★ · {summary['language']}",
+                )
+                if not _ing.get("ok"):
+                    _record_swallow(RuntimeError(f"fusion intake 未通过: {_ing.get('error') or _ing.get('missing')}"),
+                                    "devour_tentacle")
+            except Exception as _e:                            # noqa: BLE001
+                _record_swallow(_e, "devour_tentacle:fusion_intake")
+
             try:
                 self.inject_to_tentacle(f"github_{owner}_{repo}".lower()[:60], knowledge[:500])
             except Exception as _e:
