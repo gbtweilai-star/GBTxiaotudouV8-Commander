@@ -1,6 +1,6 @@
 {
  "count": 427,
- "at": "2026-11-04T15:16:43",
+ "at": "2026-11-04T16:54:55",
  "capabilities": [
   {
    "name": "a1art_skill",
@@ -800,7 +800,7 @@
   {
    "name": "cap_self",
    "domain": "system",
-   "desc": "能力自知：**问自己有什么**时只有一个真源（注册表现读）。op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；op=brief 压成能进上下文的 30 域自述；op=verify **三源对账**（注册表 ↔ data 快照 ↔ api 分派 + desc + policy），任何一处漂移当场红并给差集与修法。全只读、零作用域。",
+   "desc": "能力自知：**问自己有什么**时只有一个真源（注册表现读）。op=has 给名字 → 有/没有，没有时分清「没登记 / 登记了没分派 / 要票」三种；op=list 按域枚举；op=ask 一句话 → 可选候选（召回，不调模型）；op=brief 压成能进上下文的 32 域自述；op=verify **三源对账**（注册表 ↔ data 快照 ↔ api 分派 + desc + policy），任何一处漂移当场红并给差集与修法。全只读、零作用域。",
    "safe": true,
    "requires_params": false,
    "params": [],
@@ -1222,7 +1222,7 @@
   {
    "name": "console_hub",
    "domain": "system",
-   "desc": "工作台中枢：**所有独立页面的唯一数据源**（主人令 2026-09-28「把所有触手连接全面专业化 3D 可视化…每个工作流的独立页面需要精细设计排布…必须先全面扫描确保不能遗漏」）：`pages` 页面登记表（单一真相）· `graph` 3D 图（30 域→209 能力→绑定弧→**运行脉冲=真台账尾**）· `widgets` Bento 九部件（**每个数带 src**）· `layout` 布局记忆 · `scan` **「不能遗漏」机检**（盘上现读 vs 登记表双向比对，未登记=盲区必须 0）。op=pages/graph/widgets/layout/scan/verify/where",
+   "desc": "工作台中枢：**所有独立页面的唯一数据源**（主人令 2026-09-28「把所有触手连接全面专业化 3D 可视化…每个工作流的独立页面需要精细设计排布…必须先全面扫描确保不能遗漏」）：`pages` 页面登记表（单一真相）· `graph` 3D 图（32 域→427 能力→绑定弧→**运行脉冲=真台账尾**）· `widgets` Bento 九部件（**每个数带 src**）· `layout` 布局记忆 · `scan` **「不能遗漏」机检**（盘上现读 vs 登记表双向比对，未登记=盲区必须 0）。op=pages/graph/widgets/layout/scan/verify/where",
    "safe": true,
    "requires_params": false,
    "params": [],
@@ -3242,7 +3242,7 @@
   {
    "name": "omni_plug",
    "domain": "llm",
-   "desc": "万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成一根可扫可控的分支。op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。",
+   "desc": "万能插：把「能力位」拓成「插座」——**没有固定类目**，任意外部对象插一个描述符就变成一根可扫可控的分支。**op=universal（或不给 socket 的 run）现场识别 target、按 kind 动态生成适配器**（kind 是从 target 读出的事实，不是枚举集合；认不出如实说 unknown，不硬套类别）；op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 插上就能用时自身的能源。",
    "safe": false,
    "requires_params": false,
    "params": [],

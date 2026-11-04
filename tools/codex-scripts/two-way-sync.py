@@ -41,7 +41,8 @@ EXCLUDE_FILES = {
     "holo_pet/assets/digital-human/standard/tex/source-copy.png",
     "holo_pet_w3/kaleido/v2.html", "holo_pet_w3/kaleido/v3c.html",
     "holo_pet_w3/kaleido/v9c.html", "holo_pet_w3/kaleido/v12.html",
-    "tools/codex-scripts/ninfer_verify.ps1",
+    # 2026-11-04：ninfer_verify.ps1 已删 —— 它在 git 全历史里只有 1 个提交且 size=0
+    # （从没写过任何内容），属于误提交的占位文件。排除清单里留着它没有意义。
 }
 # 交付档案：只属于交付树，绝不推 live
 DELIVERY_ONLY_FILES = {"MANIFEST.json", "整理说明.md"}
