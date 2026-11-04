@@ -26,9 +26,11 @@ jobs:
         python: ["3.10", "3.12"]
 
     steps:
-      - uses: actions/checkout@v4
+      # action 版本：github 已弃用 Node 20 runner，checkout@v4 / setup-python@v5 会刷
+      # 「Node.js 20 is deprecated」警告。2026-11-04 升至 v7（checkout v7.0.1 / setup-python v7.1.0）。
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
