@@ -1,11 +1,14 @@
-# 07 · 能力自证：341 位逐位真调（不是"模型会背"，是"调得动"）
+# 07 · 能力自证：427 位逐位真调（不是"模型会背"，是"调得动"）
 
 > 前一页证明**它说得出**；这一页证明**它真调得动**。
-> 读数由**三路真跑**合成（只读位空参真调 / 需参数位带真参真跑 / 写口位隔离 store 真跑），
-> 由 `tools/codex-scripts/gen-capability-proof.py` 合并成一份账：
-> [`../data/capability-live-test.json`](../data/capability-live-test.json)（**341 位一位一行，不重叠**）。
+> 现役读数由 `tools/codex-scripts/probe-caps-live.py` **逐位真调一次**生成：
+> [`../data/capability-live-test.json`](../data/capability-live-test.json)（**427 位一位一行，不重叠**）。
+> 历史版本曾由 `gen-capability-proof.py` 合成三路真跑（341 位快照期），下文读数小节保留那份记录**作对照**。
 
 ![能力自证](../assets/fig-caps.png)
+
+> **2026-11-04 现役读数**：**ok 306 · needs_auth 88 · needs_params 30 · denied 2 · needs_dependency 1 = 427**
+> （0 位无法归因、0 超时；耗时 248.4s）。旧账「340 通过 / 0 要票 / 1 缺输入 = 341」仅作历史对照，**不是当前状态**。
 
 ## 一、规则（先写死，再跑）
 
@@ -17,7 +20,7 @@
 
 每发调用带 **12 秒看门狗**；超时记 `timeout`（**不记 0、不记 ok**）。
 
-## 二、读数（多路真跑合成 · 2026-10-21 现读）
+## 二、读数（2026-10-21 · 341 位快照期，历史对照 —— 现役读数见页首）
 
 | 结果 | 位数 | 来源 / 说明 |
 |---|---:|---|
