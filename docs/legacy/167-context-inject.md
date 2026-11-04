@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/context_inject.py`](gbt_allinone/tools/context_inject.py) · `verify()` **17 项** |
+| 模块/契约 | [`gbt_allinone/tools/context_inject.py`](../../gbt_allinone/tools/context_inject.py) · `verify()` **17 项** |
 | 统一门 | 注册能力位 **`context_inject`**（`run_task`，zero-scope） |
 | API | `GET/POST /api/context`：query + 真实候选（焦点栈 / memory_bank 印章 / 最近编排账）→ 选择结果；POST 可传自有 candidates/budget |
 | APP 接线 | 右栏「上下文注入」：按最后一条用户消息预览；显示选中项（来源/分数）、预算 used/budget、丢因计数 |
-| 验收 | [`tests/test_context_inject.py`](tests/test_context_inject.py) |
+| 验收 | [`tests/test_context_inject.py`](../../tests/test_context_inject.py) |
 
 ## 二、选择判据
 

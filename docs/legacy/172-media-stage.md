@@ -7,11 +7,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/media_library.py`](gbt_allinone/tools/media_library.py) · `verify()` **17 项** |
+| 模块/契约 | [`gbt_allinone/tools/media_library.py`](../../gbt_allinone/tools/media_library.py) · `verify()` **17 项** |
 | 统一门 | 注册能力位 **`media_library`**（`run_task`，zero-scope 纯归一化） |
 | API | `GET /api/media?kind=&limit=` 索引 + 历史；`GET /api/media/file?path=` 在允许根内服务（支持 Range） |
 | APP 接线 | console 顶部「媒体舞台」：全部/视频/图片/音频筛选、卡片、最近产物、点开预览/播放/查看 |
-| 验收 | [`tests/test_media_library.py`](tests/test_media_library.py) |
+| 验收 | [`tests/test_media_library.py`](../../tests/test_media_library.py) |
 
 ## 二、聚合口径
 

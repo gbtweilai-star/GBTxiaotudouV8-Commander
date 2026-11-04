@@ -11,10 +11,10 @@
 
 | 页面 | 位置 | 说明 |
 |---|---|---|
-| 项目落地页 | [`index.html`](../index.html) | 对外介绍 + PWA 安装入口（手机可装） |
-| 启动页 | [`holo_pet_w3/welcome/index.html`](../holo_pet_w3/welcome/index.html) | 桌面壳启动时的第一屏 |
-| 控制台主页 | [`holo_pet_w3/panel/index.html`](../holo_pet_w3/panel/index.html) | 总控：能量、绑定、触手、任务 |
-| Worker 页 | `worker.html` | PWA Service Worker 的离线壳 |
+| 项目落地页 | [`index.html`](../../index.html) | 对外介绍 + PWA 安装入口（手机可装） |
+| 启动页 | [`holo_pet_w3/welcome/index.html`](../../holo_pet_w3/welcome/index.html) | 桌面壳启动时的第一屏 |
+| 控制台主页 | [`holo_pet/assets/console/index.html`](../../holo_pet/assets/console/index.html) | 总控：能量、绑定、触手、任务（**更正 2026-11-04**：原表写的 `holo_pet_w3/panel/index.html` 在本仓 git 全历史中从未存在） |
+| Worker 页 | —（已移除） | 原登记为 PWA 离线壳 `worker.html`，实为上游 symlink 被当文本恢复，2026-11-04 已删 |
 
 ## 二、28 个面板（一屏一问）
 

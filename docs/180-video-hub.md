@@ -7,11 +7,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/video_hub.py`](gbt_allinone/tools/video_hub.py) · `verify()` 8 项 |
+| 模块/契约 | [`gbt_allinone/tools/video_hub.py`](../gbt_allinone/tools/video_hub.py) · `verify()` 8 项 |
 | 统一门 | 能力位 **`video_hub`**（`run_task`，只读） |
 | API | `GET /api/video`：全部视频生态能力编目 |
 | APP 接线 | console 顶部「视频舱」：六段能力总览、每件 domain/说明 |
-| 验收 | [`tests/test_video_hub.py`](tests/test_video_hub.py) |
+| 验收 | [`tests/test_video_hub.py`](../tests/test_video_hub.py) |
 
 ## 二、六段编目
 

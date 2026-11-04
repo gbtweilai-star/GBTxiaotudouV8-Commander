@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/focus_stack.py`](gbt_allinone/tools/focus_stack.py) · `verify()` **18 项** |
+| 模块/契约 | [`gbt_allinone/tools/focus_stack.py`](../../gbt_allinone/tools/focus_stack.py) · `verify()` **18 项** |
 | 统一门 | 注册能力位 **`focus_stack`**（`run_task`，纯数据 zero-scope，`policy.py` 未改） |
 | API | `GET/POST /api/focus`：snapshot / push / pop / clear / audit；真实读 `state/memory_bank.jsonl` 做只读审计；写 `outputs/focus/audit.jsonl` |
 | APP 接线 | console 右栏「焦点栈」：分数排序、× 弹出、刷新；审计行显示 verdict/记录数/源 |
-| 验收 | [`tests/test_focus_stack.py`](tests/test_focus_stack.py) |
+| 验收 | [`tests/test_focus_stack.py`](../../tests/test_focus_stack.py) |
 
 ## 二、判据
 

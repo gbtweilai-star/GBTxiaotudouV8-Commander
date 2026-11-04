@@ -7,10 +7,10 @@
 
 | 件 | 落点 |
 |---|---|
-| 生成器 | [`tools/bind_pages.py`](tools/bind_pages.py)：`--apply` 生成 / `--check` 判据 |
+| 生成器 | [`tools/bind_pages.py`](../tools/bind_pages.py)：`--apply` 生成 / `--check` 判据 |
 | 唯一真源 | `state/page-bindings.json` |
 | 消费者 | `page_scan`（只读这份文件） |
-| 验收 | [`tests/test_page_bindings.py`](tests/test_page_bindings.py) |
+| 验收 | [`tests/test_page_bindings.py`](../tests/test_page_bindings.py) |
 
 ## 二、口径
 

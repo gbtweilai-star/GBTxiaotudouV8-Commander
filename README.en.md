@@ -1,6 +1,6 @@
 # 🥔 GBT Xiaotudou V8 · Standalone Digital-Human Framework
 
-**English** · [中文](legacy/README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/)
+**English** · [中文](README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/)
 
 > **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 427 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
 >

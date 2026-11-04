@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/update_chain.py`](gbt_allinone/tools/update_chain.py) · `verify()` 13 项 |
+| 模块/契约 | [`gbt_allinone/tools/update_chain.py`](../gbt_allinone/tools/update_chain.py) · `verify()` 13 项 |
 | 统一门 | 能力位 **`update_chain`**（`run_task`，只写测试根） |
 | API | `GET/POST /api/update-chain`：init / stage / confirm / rollback / status |
 | APP 接线 | 右栏「更新校验 → 本地测试链」：init / stage / confirm / rollback，显示版本/备份 |
-| 验收 | [`tests/test_update_chain.py`](tests/test_update_chain.py) |
+| 验收 | [`tests/test_update_chain.py`](../tests/test_update_chain.py) |
 
 ## 二、链路（无密钥）
 

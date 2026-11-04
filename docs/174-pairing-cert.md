@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/pairing.py`](gbt_allinone/tools/pairing.py) · `verify()` **16 项** |
+| 模块/契约 | [`gbt_allinone/tools/pairing.py`](../gbt_allinone/tools/pairing.py) · `verify()` **16 项** |
 | 统一门 | 能力位 **`pairing`**（`run_task`）；设备表写面过 `filesystem_write`（可信会话免票，gate 异常 fail-closed） |
 | API | `GET/POST /api/pairing`：code / claim / devices / revoke / cert / cert_verify；**无监听端口** |
 | APP 接线 | console 右栏「配对/证书」：生成一次性码、设备名+码 claim、设备列表、撤销；token 只显示一次 |
-| 验收 | [`test_pairing.py`](tests/test_pairing.py) + 公共 CA PEM 夹具 |
+| 验收 | [`test_pairing.py`](../tests/test_pairing.py) + 公共 CA PEM 夹具 |
 
 ## 二、安全口径
 

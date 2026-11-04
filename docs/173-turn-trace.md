@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/turn_trace.py`](gbt_allinone/tools/turn_trace.py) · `verify()` **16 项** |
+| 模块/契约 | [`gbt_allinone/tools/turn_trace.py`](../gbt_allinone/tools/turn_trace.py) · `verify()` **16 项** |
 | 统一门 | 注册能力位 **`turn_trace`**（`run_task`，zero-scope 只读归并） |
 | API | `GET /api/turns?gap=&limit=`：读 `state/orchestration-ledger.jsonl`（若存在 `action_gate.jsonl` 一并归并） |
 | APP 接线 | console 顶部「轮次追踪」：左侧轮次列表（时间/session/步数/状态），右侧步骤/结果/证据/耗时 |
-| 验收 | [`tests/test_turn_trace.py`](tests/test_turn_trace.py) |
+| 验收 | [`tests/test_turn_trace.py`](../tests/test_turn_trace.py) |
 
 ## 二、归并口径
 

@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/voice_stream.py`](gbt_allinone/tools/voice_stream.py) · `verify()` 15 项 |
+| 模块/契约 | [`gbt_allinone/tools/voice_stream.py`](../gbt_allinone/tools/voice_stream.py) · `verify()` 15 项 |
 | 统一门 | 能力位 **`voice_stream`**（`run_task`，zero-scope 会话缓冲） |
 | API | `POST /api/voice/stream`：start / chunk / end / reset；PCM16 16k base64 分片 |
 | APP 接线 | 右栏「流式语音」：开始/停止、实时时长、局部文本、最终文本；浏览器 `getUserMedia` → 16k PCM 分片 |
-| 验收 | [`tests/test_voice_stream.py`](tests/test_voice_stream.py) + 真机 API 静音链 |
+| 验收 | [`tests/test_voice_stream.py`](../tests/test_voice_stream.py) + 真机 API 静音链 |
 
 ## 二、口径
 

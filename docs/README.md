@@ -311,8 +311,8 @@
 | 157 | [157-native-sdturbo.md](legacy/157-native-sdturbo.md) | 删ComfyUI后本地SD-Turbo原生出图：256/24.24s/121KB |
 | 158 | [158-desktop-native-t2i-512.md](158-desktop-native-t2i-512.md) | 桌面API接SD-Turbo：256/512，缓存load4.68s，512生成27.13s |
 | 159 | [159-native-shortfilm-nightlight.md](159-native-shortfilm-nightlight.md) |
-| 160 | [160-voice-intercom.md](legacy/160-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
-| 161 | [161-gap-matrix.md](161-gap-matrix.md) | 上游参考项目 → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
+| 160 | [160-bailongma-voice-intercom.md](legacy/160-bailongma-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
+| 161 | [161-bailongma-gap-matrix.md](161-bailongma-gap-matrix.md) | 上游参考项目 → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
 | 162 | [162-native-browser-embed.md](legacy/162-native-browser-embed.md) | 我们自己的原生浏览器：Electron WebContentsView 宿主（标签/地址栏/下载/权限/边界）+ 契约与真机读数 |
 | 163 | [163-ui-card-acui.md](legacy/163-ui-card-acui.md) | ACUI 卡片协议 ui_card：schema/白名单/纯文本/TTL/动作只回事件 + 能力位/统一门/console 卡片栈（P0 完成） |
 | 164 | [164-voice-settings.md](legacy/164-voice-settings.md) | 语音设置页：TTS 音色/语速/音高/音量 + ASR 后端 auto/whisper/windows + 自动朗读（能力位/统一门/数字人弹窗） |

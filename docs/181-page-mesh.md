@@ -7,7 +7,7 @@
 
 | 件 | 说明 |
 |---|---|
-| [`page-mesh.js`](holo_pet_w3/console/page-mesh.js) | 给每个视图注入 `.page-pulse`；BroadcastChannel 页间总线；hello/ack/ping/pulse；共享缓存 |
+| [`page-mesh.js`](../holo_pet_w3/console/page-mesh.js) | 给每个视图注入 `.page-pulse`；BroadcastChannel 页间总线；hello/ack/ping/pulse；共享缓存 |
 | `app.css` | 脉冲点动画、HUD、每页脉冲样式 |
 | `app.js` | 切视图调用 `__meshSwitch(name)` |
 | HUD | `PAGE MESH · 页 20 · 双向链 380 · pulse N · 对端 N · cache Nms` |

@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/update_verify.py`](gbt_allinone/tools/update_verify.py) · `verify()` **16 项** |
+| 模块/契约 | [`gbt_allinone/tools/update_verify.py`](../gbt_allinone/tools/update_verify.py) · `verify()` **16 项** |
 | 统一门 | 能力位 **`update_verify`**（`run_task`，zero-scope 只校验） |
 | API | `GET/POST /api/update`：schema / verify（manifest + Ed25519 公钥） |
 | APP 接线 | console 右栏「更新校验」：粘贴清单 JSON/公钥 → 校验 → 显示 signed/signature_ok/newer/install_supported=false |
-| 验收 | [`test_update_verify.py`](tests/test_update_verify.py) |
+| 验收 | [`test_update_verify.py`](../tests/test_update_verify.py) |
 
 ## 二、校验口径
 

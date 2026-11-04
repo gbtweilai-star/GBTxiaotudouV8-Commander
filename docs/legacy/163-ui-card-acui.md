@@ -27,11 +27,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/ui_card.py`](gbt_allinone/tools/ui_card.py) · `verify()` **22 项** |
+| 模块/契约 | [`gbt_allinone/tools/ui_card.py`](../../gbt_allinone/tools/ui_card.py) · `verify()` **22 项** |
 | 统一门 | 注册能力位 `ui_card`（`caps_registry` + `api.run_task` 分派；零作用域纯数据，`policy.py` 未改） |
 | API | `GET/POST /api/ui/cards`（create/close/action/snapshot/events/schema/verify）；动作/创建/关闭追加 `outputs/ui-cards/audit.jsonl` |
-| APP 接线 | console 右下卡片栈 [`ui-cards.js`](holo_pet_w3/console/ui-cards.js)：纯文本渲染、动作回 POST、TTL 倒计时、关闭；轮询 8s |
-| 验收 | [`tests/test_ui_card.py`](tests/test_ui_card.py) |
+| APP 接线 | console 右下卡片栈 [`ui-cards.js`](../../holo_pet_w3/console/ui-cards.js)：纯文本渲染、动作回 POST、TTL 倒计时、关闭；轮询 8s |
+| 验收 | [`tests/test_ui_card.py`](../../tests/test_ui_card.py) |
 
 ## 三、真机读数（2026-11-02 APP）
 

@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/body_control.py`](gbt_allinone/tools/body_control.py) · `verify()` **17 项** |
+| 模块/契约 | [`gbt_allinone/tools/body_control.py`](../../gbt_allinone/tools/body_control.py) · `verify()` **17 项** |
 | 统一门 | 注册能力位 **`body_control`**（zero-scope 状态/清单；`policy.py` 未改） |
 | API | `GET/POST /api/body`：status / inventory / verify / move；真实读 `state/body_control.json`（不存在=未绑定） |
 | APP 接线 | console 右栏「身体控制 / 触手 / 全息投影」状态块：`not_supported` + 缺项 + `wired=false` |
-| 验收 | [`tests/test_body_control.py`](tests/test_body_control.py) |
+| 验收 | [`tests/test_body_control.py`](../../tests/test_body_control.py) |
 
 ## 二、状态口径（没有 ready）
 

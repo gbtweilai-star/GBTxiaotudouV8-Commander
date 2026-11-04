@@ -2,7 +2,7 @@
 
 > 主人令 2026-11-02：「把这些全部仔细挨个拔出我们缺失的吞噬」。
 > 来源：**AEON: Living Worlds** · **WorldX** · **Temporal God Simulation 3D**（链接与读数见
-> [`整理报告/吞噬-AEON-WorldX-TemporalGod.md`](../整理报告/吞噬-AEON-WorldX-TemporalGod.md)）。
+> `整理报告/吞噬-AEON-WorldX-TemporalGod.md`（**仓外私有文档，未随仓分发**；本仓与 git 历史中均无此文件，2026-11-04 核对）。
 > 执行方式：**万能插能力位 `devour_github` 真吞**（不是手写脚本抄 README），吞完再 `devour_reflect`，
 > 逐仓对照本仓能力面拔缺口，并把三家共有的那层**确定性世界内核**先落地成可跑代码。
 

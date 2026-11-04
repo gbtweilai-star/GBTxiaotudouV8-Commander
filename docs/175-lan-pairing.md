@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/lan_pairing.py`](gbt_allinone/tools/lan_pairing.py) · `verify()` **15 项** |
+| 模块/契约 | [`gbt_allinone/tools/lan_pairing.py`](../gbt_allinone/tools/lan_pairing.py) · `verify()` **15 项** |
 | 统一门 | 能力位 **`lan_pairing`**（`run_task`）；start/stop 只从本机 APP 控制 |
 | API | `GET/POST /api/lan`（本机状态/启停）；TLS 端 `GET /api/lan/health`、`POST /api/lan/pair`、`GET /api/lan/status` |
 | APP 接线 | console 右栏「配对/证书」：**启动局域网 / 停止**；显示 URL、指纹、模式 |
-| 验收 | [`test_lan_pairing.py`](tests/test_lan_pairing.py) **28 ok**（含真 TLS 监听/pair/401/stop） |
+| 验收 | [`test_lan_pairing.py`](../tests/test_lan_pairing.py) **28 ok**（含真 TLS 监听/pair/401/stop） |
 
 ## 二、你问的三件事（已定）
 

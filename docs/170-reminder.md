@@ -7,11 +7,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/reminder.py`](gbt_allinone/tools/reminder.py) · `verify()` **18 项** |
+| 模块/契约 | [`gbt_allinone/tools/reminder.py`](../gbt_allinone/tools/reminder.py) · `verify()` **18 项** |
 | 统一门 | 注册能力位 **`reminder`**；写面在 handler 过 **`filesystem_write`**（可信会话免票，其余要一次性授权；gate 不可用 fail-closed） |
 | API | `GET/POST /api/reminders`：list/due/create/cancel/complete；写面走能力门；落 `state/reminders.json` + `outputs/reminders/audit.jsonl` |
 | APP 接线 | console 右栏「提醒」：标题 + `datetime-local` + 创建；列表显示到期时间；× 取消；到点计数 |
-| 验收 | [`tests/test_reminder.py`](tests/test_reminder.py) |
+| 验收 | [`tests/test_reminder.py`](../tests/test_reminder.py) |
 
 ## 二、契约
 

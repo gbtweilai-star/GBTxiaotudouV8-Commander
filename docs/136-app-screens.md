@@ -6,30 +6,32 @@
 
 | 页面 | 截图 |
 |---|---|
-| 对话 | ![对话](./01-对话.png) |
-| 功能表 | ![功能表](./02-功能表.png) |
-| 技能栏 | ![技能栏](./03-技能栏.png) |
-| 3D 星图 | ![3D 星图](./04-3D星图.png) |
-| 大脑执行层 | ![大脑执行层](./05-大脑执行层.png) |
-| 万能插 · 多域监控 | ![万能插 · 多域监控](./06-万能插.png) |
-| 触手协作 | ![触手协作](./07-触手协作.png) |
-| 思维导图 | ![思维导图](./08-思维导图.png) |
-| 穿透扫描 | ![穿透扫描](./09-穿透扫描.png) |
-| 职业 | ![职业](./10-职业.png) |
-| 赏金 | ![赏金](./11-赏金.png) |
-| 仪表盘 | ![仪表盘](./12-仪表盘.png) |
-| AI 朋友圈 | ![AI 朋友圈](./13-AI朋友圈.png) |
-| 数字人 | ![数字人](./14-数字人.png) |
+| 对话 | ![对话 |
+| 功能表 | ![功能表](../assets/panels/console-caps.webp) |
+| 技能栏 | ![技能栏](../assets/panels/console-skills.webp) |
+| 3D 星图 | ![3D 星图](../assets/panels/console-space.webp) |
+| 大脑执行层 | ![大脑执行层](../assets/panels/console-brain.webp) |
+| 万能插 · 多域监控 | ![万能插 · 多域监控](../assets/panels/console-plug.webp) |
+| 触手协作 | ![触手协作](../assets/panels/console-team.webp) |
+| 思维导图 | ![思维导图](../assets/panels/console-mind.webp) |
+| 穿透扫描 | ![穿透扫描](../assets/panels/console-scan.webp) |
+| 职业 | ![职业](../assets/panels/console-prof.webp) |
+| 赏金 | ![赏金](../assets/panels/console-bounty.webp) |
+| 仪表盘 | ![仪表盘](../assets/panels/console-dash.webp) |
+| AI 朋友圈 | ![AI 朋友圈 |
+| 数字人 | ![数字人 |
+
+> **未入库的截图**：对话 / AI 朋友圈 / 数字人 / 设置 5 页共 8 张原图未随仓分发（它们拍的是本机运行态）。要看真界面，本地起 `python main.py` 后点对应页。
 
 ## 设置弹窗 5 页
 
 | 页面 | 截图 |
 |---|---|
-| 设置 · 模型 | ![设置 · 模型](./settings-1.png) |
-| 设置 · 外观 | ![设置 · 外观](./settings-2.png) |
-| 设置 · 行为 | ![设置 · 行为](./settings-3.png) |
-| 设置 · 数据 | ![设置 · 数据](./settings-4.png) |
-| 设置 · 高级 | ![设置 · 高级](./settings-5.png) |
+| 设置 · 模型 | ![设置 · 模型 |
+| 设置 · 外观 | ![设置 · 外观 |
+| 设置 · 行为 | ![设置 · 行为 |
+| 设置 · 数据 | ![设置 · 数据 |
+| 设置 · 高级 | ![设置 · 高级 |
 
 ---
 

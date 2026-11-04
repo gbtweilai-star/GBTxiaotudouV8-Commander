@@ -37,7 +37,7 @@ penetrate_ready 288 口 / 288 位
 
 ## 四、验收
 
-[`tests/test_cap_verification.py`](tests/test_cap_verification.py)：
+[`tests/test_cap_verification.py`](../tests/test_cap_verification.py)：
 - 台账 410 位、verified≥260、has_test≥250、非 safe 不标只读；
 - `capability_net` entry 410/410、verified 不再是 5、has_test 不再是 2；
 - `docs` 顶层无重复编号；`legacy_guard clean`；`docs/legacy` 存在。

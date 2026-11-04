@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/resource_snapshot.py`](gbt_allinone/tools/resource_snapshot.py) · `verify()` **16 项** |
+| 模块/契约 | [`gbt_allinone/tools/resource_snapshot.py`](../../gbt_allinone/tools/resource_snapshot.py) · `verify()` **16 项** |
 | 统一门 | 注册能力位 **`resource_snapshot`**（`run_task`，zero-scope 只读） |
 | API | `GET /api/resources`：真采样快照（只读） |
 | APP 接线 | console 右栏「本机资源」：CPU/内存/磁盘条 + host/uptime/进程/平台，10s 刷新 |
-| 验收 | [`tests/test_resource_snapshot.py`](tests/test_resource_snapshot.py) |
+| 验收 | [`tests/test_resource_snapshot.py`](../../tests/test_resource_snapshot.py) |
 
 ## 二、读数口径
 
