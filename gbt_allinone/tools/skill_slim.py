@@ -261,7 +261,7 @@ def main(argv=None) -> int:
                 lock["skills"][s["path"]] = rec
         lock["generated_at"] = datetime.now().isoformat(timespec="seconds")
         LOCK_PATH.write_text(json.dumps(lock, ensure_ascii=False, indent=1), encoding="utf-8")
-        print(f"[relock] {len(lock["skills"])} 条 -> {LOCK_PATH}")
+        print(f"[relock] {len(lock['skills'])} 条 -> {LOCK_PATH}")
         return 0
 
     if not todo:
