@@ -15,7 +15,7 @@
   <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
   <img alt="Caps" src="https://img.shields.io/badge/Capabilities-427-F5B041">
   <img alt="Tests" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
-  <img alt="Docs" src="https://img.shields.io/badge/Docs-93_pages-00E5FF">
+  <img alt="Docs" src="https://img.shields.io/badge/Docs-364_pages-00E5FF">
   <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
   <img alt="Status" src="https://img.shields.io/badge/Status-active-7C4DFF">
 </p>
@@ -49,7 +49,7 @@
 <p align="center">
   <img src="assets/demo.gif" alt="30 秒 demo（真跑回放）" width="720">
   <br>
-  <sub>30 秒 demo：真跑回放，不是录屏剪的</sub>
+  <sub>30 秒 demo：真跑回放，不是录屏剪的（2026-11-01 录制，位数为当时读数）</sub>
 </p>
 
 ## 🚀 快速开始
@@ -171,7 +171,7 @@ run_task(kind, payload)
 
 <table>
 <tr>
-  <td><img src="assets/fig-caps.png" alt="能力面"></td>
+  <td><img src="assets/fig-caps.png" alt="能力面 · 341 位时期实测快照"></td>
   <td><img src="assets/fig-concurrency.png" alt="并发实测"></td>
 </tr>
 <tr>
@@ -180,9 +180,11 @@ run_task(kind, payload)
 </tr>
 </table>
 
+> **插图时点**：上述插图为 **341 位时期（2026-10-21）** 的真跑回执快照。现役注册表已到 **427 位**，其中新增的 86 位尚未重跑逐位真调，故图中位数为当时读数 —— **不是当前状态**。当前权威读数以本表与 cap_self verify 的现读为准。
+
 ## 📚 文档
 
-索引：[docs/legacy/README.md](docs/legacy/README.md)（93 页，按编号）
+索引：[docs/legacy/README.md](docs/legacy/README.md)（364 页，含 docs/legacy 归档 67 页，按编号）
 
 - [模型卡](docs/01-model-card.md) · [架构](docs/02-architecture.md) · [能力面](docs/03-capabilities.md)
 - [部署](docs/05-deployment.md) · [并发实测](docs/08-concurrency.md) · [安全与控制](docs/14-security-and-control.md)

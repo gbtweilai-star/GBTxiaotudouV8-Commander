@@ -1,4 +1,4 @@
-# 🥔 GBT Xiaotudou V8 · The Commander Model
+# 🥔 GBT Xiaotudou V8 · Standalone Digital-Human Framework
 
 **English** · [中文](legacy/README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/)
 
@@ -61,6 +61,8 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 
 Every figure above has a raw JSON receipt under `data/` and a figure under `assets/`.
 Where something did **not** work, the doc says so in the same table (see the "known gaps" section of `docs/07`).
+
+> **Figure snapshot:** these figures were captured at the **341-bit snapshot (2026-10-21)**. The live registry now holds **427 bits**; the 86 new bits have not been re-run through the per-bit live test, so the numbers inside the figures are historical — **not the current state**. Authoritative current readings are the table above and cap_self verify.
 
 ## On a phone (real screenshots, not mockups)
 
