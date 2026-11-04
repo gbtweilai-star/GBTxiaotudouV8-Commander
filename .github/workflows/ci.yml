@@ -84,8 +84,12 @@ jobs:
       PYTHONIOENCODING: utf-8
       PYTHONUTF8: "1"
       # tests/__init__.py 拒绝在「已绑定生产 store」的进程里跑测试（那是设计不是 bug），
-      # 所以指到 runner 的临时目录。
-      GBT_STORE_DIR: ${{ runner.temp }}/gbt_test_store
+      # 所以指到临时目录。
+      # 🔴 2026-11-04 血账：这里**不能**写 `${{ runner.temp }}` —— `runner` 上下文在
+      #   job 级 `env` 里不可用（只在 step 级可用）。用了它整个 workflow 会在编译期失效：
+      #   GitHub 把 run 的 name 退化成 `.github/workflows/ci.yml`、job 一个都不创建，
+      #   而 check-runs 里连报错都看不到，极难定位。这个 job 只在 ubuntu 跑，用固定路径即可。
+      GBT_STORE_DIR: /tmp/gbt_test_store
 
     steps:
       - uses: actions/checkout@v7
