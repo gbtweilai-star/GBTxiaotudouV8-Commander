@@ -120,24 +120,37 @@ def is_trusted() -> bool:
 AUTONOMOUS_ENV = "GBT_AUTONOMOUS"
 MONEY_KINDS = frozenset({"transfer"})          # 转账类：**仍要主人**（钱不能让她自己拍）
 
-# ── 要票集合（模块级：PolicyDecision.restricted / gated 要读它）──────────────────
-# 主人 2026-11-03 令（逐字）：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
-# 收敛后**只剩两类**：
-#   ① 危险能力（G1 黑客全能力）：privacy_read · osint_private · remote_device
-#      · desktop_control · browser_control · device_control
-#      —— 后三个是「替人动手」（模拟键鼠/点按钮/输内容、操控浏览器、驱动外部设备），
-#         属 G1 面，源码注释第 243 行原本就把它列为 G1 四件套之一，收敛时被漏掉。
-#   ② 转账 transfer（经 MONEY_KINDS 同步判定）——钱不能让她自己拍
-# 一律免票：process_execute · filesystem_write · audio_output · network_private ·
-#   deploy_publish · deploy_force · external_llm · data_export
-# 「自己的身体」另有豁免：见 evaluate() 末尾 _OWN_SENSES（把 desktop_control 等
-#   从自身感官类 kind 的 scopes 里剔除），所以上面加进来**不会**让动自己键鼠重新要票。
+# ── 要票集合 = **单一真源**（模块级：PolicyDecision.restricted / gated 读它）──
+# ══ 2026-11-04 口径统一（主人令，逐字）══
+#   「守住危险能力和资金转账要票」「不能有能力上的限制以及能力阉割」
+#
+# **血账**：本集合与 `auth_gate.ENFORCED_SCOPES` 曾是**两套独立定义**，互不一致 ——
+#   · HUMAN_GATES 有 desktop/browser/device_control（政策层还要票），
+#     而 ENFORCED_SCOPES 被我按新口径移出了（机制层已放行）⇒ 面板说"要票"、真调却不拦；
+#   · `transfer`（转账）在 HUMAN_GATES 里，却**不在** ENFORCED_SCOPES
+#     ⇒ 主人的硬要求「资金转账必须拿票」在机制层**根本没生效**。
+# 现在改为：**本集合是唯一真源**，`auth_gate.ENFORCED_SCOPES` 从它派生（见 auth_gate.py）。
+# 改口径只改这一处，另一处自动跟随；两边再分裂，guardrail-check 会当场红。
+#
+# 判定标准：只有「可能伤害主人之外的对象」或「不可逆/资金损失」才要票。
+#   危险：privacy_read（读屏幕/摄像头/麦克风）· process_execute（任意代码执行）
+#         · network_private（内网/保留地址）· osint_private（内网扫描）
+#         · remote_device（远控接管）· deploy_publish（写生产不可逆）· deploy_force（越过体检）
+#   资金：transfer（转账）· external_llm（外部计费模型）· data_export（数据出框架收不回）
+# 一律免票（2026-11-04 主人令「其他全面开放」）：
+#   browser_control · desktop_control · device_control（操控的是主人自己的设备与会话，
+#     否则 body_click/body_type 那批「设备即本体」位等于被阉割）
+#   audio_output（edge-tts 免费 / 本地 SAPI 兜底，不花钱）· filesystem_write（自我保护机制在代码里，但不要票）
 HUMAN_GATES = frozenset({
-    "privacy_read", "osint_private", "remote_device",
-    "desktop_control", "browser_control", "device_control",
-    "transfer",
-    "owner_control",          # 通道件（它是授权本身，不是第四道）
+    # 危险能力
+    "privacy_read", "process_execute", "network_private", "osint_private",
+    "remote_device", "deploy_publish", "deploy_force",
+    # 资金 / 转账（主人明确要求必须拿票）
+    "transfer", "external_llm", "data_export",
 })
+# `owner_control` 是**通道件**（发授权这件事本身），不是被拦的动作：
+# 它只出现在「授权类」能力位上，若把它算作要票，等于"要授权才能授权"。
+CHANNEL_SCOPES = frozenset({"owner_control"})
 
 # 机制层自保：11-03 令已全部免票 ⇒ 空集。
 # 保留这个名字是因为 runtime/static_check.py 会 AST 读它（判据侧见原子4）。

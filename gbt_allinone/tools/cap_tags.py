@@ -81,8 +81,31 @@ def tag_of(kind: str, spec: dict | None = None) -> str:
 
 
 def _classify(kind: str, spec: dict) -> dict:
-    """权限类：**默认严**（读不出来就是 owner）。"""
+    """权限类：**与真门同口径**。
+
+    ══ 2026-11-04 口径翻正（主人令）══
+    「不能有能力上的限制以及能力阉割；危险能力和资金转账需要找我拿票，其他全面开放」
+
+    原口径：`if scopes or conf or not safe:` ⇒ owner。
+    病根（实测）：这版把两批**不需要票**的位也判成了 owner ——
+      · 「图鉴标了 safe=false」61 位（作用域为空，只是会改状态）；
+      · 「policy 要求 filesystem_write」26 位 —— 而 filesystem_write 按 2026-10-19
+        主人令**已不在 ENFORCED_SCOPES 里**（`auth_gate` 直接放行）。
+    于是出现口径分裂：**标签说要票、真调时门却放行**，面板上那 135 个 owner
+    有一半是假的，等于把「能力阉割」写进了展示层。
+
+    新口径：owner **只**由「真门」或「显式声明要确认」决定 ——
+      · `scopes ∩ ENFORCED_SCOPES` 非空（危险/资金类，见 auth_gate 的判定标准）；
+      · 或图鉴显式声明 `needs_confirmation`（那是有意为之的确认，不是保守默认）。
+    `safe=false`（会改状态）**不再**单独触发 owner —— 改状态不等于要票。
+    """
     P = _policy()
+    try:
+        from ..auth_gate import ENFORCED_SCOPES as _ENF
+    except ImportError:                                        # 独立跑本文件的兜底
+        sys.path.insert(0, str(_ROOT))
+        from gbt_allinone.auth_gate import ENFORCED_SCOPES as _ENF  # type: ignore
+
     scopes: list = []
     for op in _ops_of(kind, spec):
         try:
@@ -94,18 +117,22 @@ def _classify(kind: str, spec: dict) -> dict:
             return {"permission": _OWNER, "scopes": [],
                     "why": f"问不出作用域（{type(exc).__name__}: {str(exc)[:80]}）⇒ 按 owner 处理",
                     "unknown": True}
-    safe = spec.get("safe") is True
+    enforced = [s for s in scopes if s in _ENF]
+    auto = [s for s in scopes if s not in _ENF]
     conf = bool(spec.get("needs_confirmation"))
-    if scopes or conf or not safe:
+    if enforced or conf:
         why = []
-        if scopes:
-            why.append("policy 要求作用域：" + "、".join(scopes))
+        if enforced:
+            why.append("需要票的作用域：" + "、".join(enforced))
         if conf:
             why.append("图鉴标了 needs_confirmation")
-        if not safe:
-            why.append("图鉴标了 safe=false")
+        if auto:
+            why.append("（" + "、".join(auto) + " 已按主人令自动放行，不构成 owner 理由）")
         return {"permission": _OWNER, "scopes": scopes, "why": "；".join(why)}
-    return {"permission": _OPEN, "scopes": [], "why": "policy 无作用域 + 图鉴 safe 且无需确认"}
+    why = "policy 无作用域"
+    if auto:
+        why = "作用域 " + "、".join(auto) + " 已按主人令自动放行"
+    return {"permission": _OPEN, "scopes": [], "why": why}
 
 
 def tags(**_kw) -> dict:
@@ -125,7 +152,11 @@ def tags(**_kw) -> dict:
     dup = {k: n for k, n in dup.items() if n > 1}
     doc = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "count": len(out),
            "by_permission": by_perm, "duplicate_tags": dup, "tags": out,
-           "_口径": "标签=从注册表现算；权限类=policy.evaluate 逐 op 问作用域 + 图鉴声明；**读不到就是 owner**"}
+           "_口径": "标签=从注册表现算；权限类=**与真门同口径**（scopes ∩ auth_gate.ENFORCED_SCOPES "
+                    "非空，或图鉴显式声明 needs_confirmation 才算 owner）。2026-11-04 口径翻正："
+                    "原先 `not safe` 与「任意作用域」都判 owner，导致 135 个 owner 里有一半在真门上"
+                    "根本不需要票（filesystem_write 已按 2026-10-19 主人令自动放行）—— 那是把"
+                    "能力阉割写进了展示层。主人令：危险能力与资金转账要票，其他全面开放"}
     _TAGS.parent.mkdir(parents=True, exist_ok=True)
     tmp = _TAGS.with_name(_TAGS.name + ".tmp")
     tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")

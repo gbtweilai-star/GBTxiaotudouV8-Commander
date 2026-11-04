@@ -34,6 +34,13 @@ _GRANTS = _paths.STORE_DIR / "auth_grants.jsonl"
 
 SCOPES = {
     "osint_private": "OSINT 扫描自有内网/保留地址（一次性授权）",
+    # 🔴 2026-11-04 补：`transfer` 一直是**漏注册**的 ——
+    #   policy.HUMAN_GATES 把它列为「转账必须主人批准」，`evaluate("transfer")` 也确实
+    #   返回 restricted=True，但本表没有它 ⇒ `check_and_consume("transfer")` 直接返回
+    #   「未知授权作用域: transfer」。后果是**转账永远发不出授权**：
+    #   要么永久拦死（主人批了也没用），要么在机制层被当成"非护栏"放行。
+    #   这正是本文件 37-39 行注释里记的同一型血账（「未注册作用域 ⇒ 该能力永久不可授权」）。
+    "transfer": "转账/付款 —— 钱不能让她自己拍（主人令：资金转账必须拿票）",
     # 其余 13 项由 security/policy.py 的 SCOPE_DESCRIPTIONS 声明。历史上两次只改 policy、
     # 漏改本表 → 未注册作用域在 check_and_consume* 直接返回"未知授权作用域"，任何授权都
     # 满足不了 → 该能力对非主人调用者永久不可授权。
@@ -79,20 +86,30 @@ DEFAULT_TTL_S = 600   # 授权默认 10 分钟有效
 # ⚠️ 这**不是**"AI 可以给自己发票"：SCOPES 与发放路径一个都没动，终端 YES 仍是唯一入口。
 # ⚠️ 与本仓判据 `guardrail-check.py`（"护栏只有三道"）**同一口径** —— 那份打印的就是这 12 条；
 #    两边必须一致，改一边就得改另一边（否则就是"门和判据各算各的"）。
-ENFORCED_SCOPES = frozenset({
-    # ① 黑客全能力
-    "browser_control", "desktop_control", "device_control", "network_private",
-    "privacy_read", "process_execute", "remote_device",
-    # 2026-10-21 补（主人当场批准的那个词的**第二处**）：`osint_scan` 对私有网段声明的作用域是
-    # `osint_private`（policy.py 的 `elif kind == "osint_scan": add("osint_private")`）。
-    # 本集合里只有 `network_private` ⇒ 前者落进"非三道护栏"分支被**自动放行**，
-    # 于是内网扫描不打票就能跑（实测 127.0.0.1 → ok）。两处名字必须同时认，门才算真的在。
-    "osint_private",
-    # ② 转账 / 付款
-    "audio_output", "data_export", "external_llm",
-    # ③ 生产面板
-    "deploy_publish", "deploy_force",
-})
+# ══ 2026-11-04 口径统一：**本集合从 policy.HUMAN_GATES 派生，不再独立定义** ══
+# 主人令（逐字）：「守住危险能力和资金转账要票」「不能有能力上的限制以及能力阉割」
+#
+# 血账：这里曾是第二份手写定义，与 policy.HUMAN_GATES 各行其是 ——
+#   · 我按新口径把 desktop/browser/device_control 移出本集合，但 policy 那边还留着
+#     ⇒ 面板说"要票"，真调时这里却放行（口径分裂）；
+#   · 更要命：`transfer`（转账）在 policy.HUMAN_GATES 里，**却不在本集合**
+#     ⇒ 主人的硬要求「资金转账必须拿票」在机制层根本没生效（实测 transfer 直接放行）。
+# 现在只留一份真源（policy.HUMAN_GATES），本集合由它派生 + 去掉通道件。
+# 两边再分裂，`tools/codex-scripts/guardrail-check.py` 的「门与判据不许漂移」会当场红。
+def _derive_enforced() -> frozenset:
+    try:
+        from .security.policy import CHANNEL_SCOPES, HUMAN_GATES
+        return frozenset(HUMAN_GATES - CHANNEL_SCOPES)
+    except Exception:                                          # noqa: BLE001
+        # 读不到就用写死的兜底（与 policy 同步；读不到时宁可多拦，不可少拦）
+        return frozenset({
+            "privacy_read", "process_execute", "network_private", "osint_private",
+            "remote_device", "deploy_publish", "deploy_force",
+            "transfer", "external_llm", "data_export",
+        })
+
+
+ENFORCED_SCOPES = _derive_enforced()
 
 # ── 作用域分级（Owner 2026-09-25 令：「改成时段授权：TTL 内可多次用，危险类保持一次性」）
 #
