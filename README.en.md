@@ -2,9 +2,9 @@
 
 **English** · [中文](legacy/README.md) · [Project page](https://gbtweilai-star.github.io/GBTxiaotudouV8-Commander/)
 
-> **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 348 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
+> **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 427 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
 >
-> **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (release snapshot; registry now 348) (1 needs an extra input); every figure in this repo comes with a real receipt file.
+> **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (release snapshot; registry now 427) (1 needs an extra input); every figure in this repo comes with a real receipt file.
 >
 > **30 seconds, no GPU, no weights, zero dependencies:**
 >
@@ -28,7 +28,7 @@ whether it writes to disk / spends money / goes online, and whether a human tick
 
 Three properties are trained into the weights, not bolted on with prompts:
 
-1. **Every one of the 348 bits is describable** — what it does, which of the 30 domains it belongs to, what it needs.
+1. **Every one of the 427 bits is describable** — what it does, which of the 32 domains it belongs to, what it needs.
 2. **Requests land on a concrete bit**, not on a vague suggestion (and the runtime **verifies the name against the catalog** — a hallucinated bit is rejected, not executed).
 3. **Irreversible / billable / outbound actions ask first.** The runtime gate, not the model, is what actually refuses.
 
@@ -39,7 +39,7 @@ Three properties are trained into the weights, not bolted on with prompts:
 This repo is not only a model card. It ships a small, dependency-free Python client and a CLI:
 
 ```bash
-python -m gbt_commander stats                 # 348 bits · 30 domains · 262 read-only · 35 gated
+python -m gbt_commander stats                 # 427 bits · 32 domains · 339 read-only · 88 gated
 python -m gbt_commander catalog --domain pipeline
 python -m gbt_commander search "roll back to the previous version"
 python -m gbt_commander route "ship this to production" --endpoint http://127.0.0.1:8000/v1 --model gbt-v8
@@ -54,7 +54,7 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 | Claim | Reading | Where |
 |---|---|---|
 | Capability benchmark | 335 items · mean cov **0.9873** · **PASS45 330/335 = 98.51%** (2nd run); **99.10%** (1st run) | [docs/04-evaluation.md](docs/04-evaluation.md) |
-| Every bit live-tested | **340 ok / 0 needs-ticket / 1 needs-input / 0 failed = 341**（快照；现役注册表 348） | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
+| Every bit live-tested | **340 ok / 0 needs-ticket / 1 needs-input / 0 failed = 341**（快照；现役注册表 427） | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
 | Concurrency | 512 → 4096 concurrent calls, **100% success**, ~260/s, +~50 MB | [docs/08-concurrency.md](docs/08-concurrency.md) |
 | Multi-domain regression | 29 domains / 236 bits: **221 ok · 15 need ticket · 0 regressions** | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
 | Reverse-calling cloud compute | model `200 · 1.2s` · 3/3 images `29.7s` · local CPU `321.1 GFLOP/s` · video **27.0s / 49,893 B / sha_match=true** | [docs/13-omni-plug.md](docs/13-omni-plug.md) |
@@ -89,7 +89,7 @@ Bypassing it means bypassing audit, which the project treats as the failure mode
 |---|---|
 | [01 model card](docs/01-model-card.md) | base model, training target, limits |
 | [02 architecture](docs/02-architecture.md) | single gate, ticket model, audit ledger |
-| [03 capabilities](docs/03-capabilities.md) | 348 bits across 30 domains |
+| [03 capabilities](docs/03-capabilities.md) | 427 bits across 32 domains |
 | [04 evaluation](docs/04-evaluation.md) | benchmark construction, greedy decoding, PASS45 |
 | [05 deployment](docs/05-deployment.md) | vLLM serve, packaging |
 | [06 showcase](docs/06-showcase.md) | verbatim receipts (unedited) |
