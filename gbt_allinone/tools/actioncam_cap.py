@@ -56,12 +56,25 @@ def _gate(what: str) -> dict | None:
 
 
 def status(**_kw) -> dict:
-    return {"ok": _AC_PATH.is_file(), "op": "status", "kind": "actioncam",
-            "impl": str(_AC_PATH), "read_ops": list(READ_OPS),
-            "write_ops": list(WRITE_OPS), "manifests": _manifests(),
-            "moves": "pov_bob/whip_lr/whip_rl/crash_zoom/dolly_in/push_out/arc_lr/shake/impact_hold",
-            "angles": "eye/low/high/dutch", "quality": "hd/fhd/cinema",
-            "口径": "plan/status 只读免门；gen/seg/build/add/rm 过 filesystem_write 门（生图出网/ffmpeg/落盘）"}
+    # 【2026-11-04 修】缺依赖不许报成"能力坏了"（AGENTS 三态：失败是代码的事，
+    # needs_dependency 是环境的事）。原来只回 ok:false，判据 test_chain_readiness::test_d
+    # 无从分辨「外部脚本没装」与「说能操控却调不通」，只能一律判红 ⇒ 红着的判据没人看。
+    have = _AC_PATH.is_file()
+    out = {"ok": have, "op": "status", "kind": "actioncam",
+           "impl": str(_AC_PATH), "read_ops": list(READ_OPS),
+           "write_ops": list(WRITE_OPS), "manifests": _manifests(),
+           "moves": "pov_bob/whip_lr/whip_rl/crash_zoom/dolly_in/push_out/arc_lr/shake/impact_hold",
+           "angles": "eye/low/high/dutch", "quality": "hd/fhd/cinema",
+           "口径": "plan/status 只读免门；gen/seg/build/add/rm 过 filesystem_write 门（生图出网/ffmpeg/落盘）"}
+    if not have:
+        out.update({
+            "needs_dependency": True,
+            "status": "needs_dependency",
+            "error_class": "needs_dependency",
+            "message": f"外部脚本不在：{_AC_PATH}。本能力位自身接线正常，装好脚本即用；"
+                       f"不是「说能操控却调不通」",
+        })
+    return out
 
 
 def plan(manifest: str = "", verbose: bool = False) -> dict:

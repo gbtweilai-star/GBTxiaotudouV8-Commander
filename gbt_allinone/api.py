@@ -170,6 +170,18 @@ def _run_benign(kind, payload, policy_decision=None):
         from . import vision_eye as _eye
         kw = dict(payload or {})
         return _eye.run(str(kw.pop("op", "status")), **kw)
+    if kind == "see_camera":
+        # 摄像头（2026-11-04）：看**真实世界**。与 body_eye（看屏幕）、vision（看已有的图）
+        # 三件分家，不许混成一个入口 —— 混了就会出现「拿屏幕截图冒充摄像头现场」。
+        # 【2026-11-04 补线】实现在 gbt_allinone/see_camera.py 早已写好（status/snapshot/
+        # watch/frame_b64/phone/talk/probe 共 8 个 op），desc、INTENT_MAP、intent 索引三道门
+        # 也都过了，**唯独 api.py 漏了分派** ⇒ run_task 返回 not_wired：
+        #   「已登记，但没有分派分支 —— _run_benign 里找不到 if kind == "see_camera"」
+        # 抓它的是 tools/framework_state.py 的 A 面（registry 与 api 分派做差集），
+        # 不是靠人记得。此处按 body_eye 的同一形状补齐。
+        from . import see_camera as _cam
+        kw = dict(payload or {})
+        return _cam.run(str(kw.pop("op", "status")), **kw)
     if kind == "bounty_ops":
         # 安全众测闭环（2026-11-04 主人令）：把 2026-11-02 写完却没接线的 6 件收成一个入口。
         # 这 6 件当时就写好了，但没注册位、没被 import —— 一直躺在 state/proactive/work/g-1/

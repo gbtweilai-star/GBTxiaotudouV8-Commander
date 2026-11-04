@@ -86,10 +86,21 @@ def plan(manifest: str = "") -> dict:
 def run(op: str = "status", manifest: str = "", **kw) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return {"ok": _FK_PATH.is_file(), "op": "status", "kind": "filmkit",
-                "impl": str(_FK_PATH), "read_ops": list(READ_OPS),
-                "write_ops": list(WRITE_OPS), "manifests": _manifests(),
-                "口径": "status/plan 只读免门；gen/seg/build/add/rm 过 filesystem_write 门（生图/渲染/落盘）"}
+        # 【2026-11-04 修】同 actioncam_cap：缺依赖 ≠ 能力坏了（AGENTS 三态）
+        have = _FK_PATH.is_file()
+        out = {"ok": have, "op": "status", "kind": "filmkit",
+               "impl": str(_FK_PATH), "read_ops": list(READ_OPS),
+               "write_ops": list(WRITE_OPS), "manifests": _manifests(),
+               "口径": "status/plan 只读免门；gen/seg/build/add/rm 过 filesystem_write 门（生图/渲染/落盘）"}
+        if not have:
+            out.update({
+                "needs_dependency": True,
+                "status": "needs_dependency",
+                "error_class": "needs_dependency",
+                "message": f"外部脚本不在：{_FK_PATH}。本能力位自身接线正常，装好脚本即用；"
+                           f"不是「说能操控却调不通」",
+            })
+        return out
     if op == "plan":
         return plan(manifest)
     if op not in WRITE_OPS:

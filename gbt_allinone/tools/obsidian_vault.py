@@ -90,7 +90,21 @@ def _labels() -> list:
     return sorted(set(BENIGN_CAPS) | {"domain:" + d for d in doms})
 
 
-def _gate(scope: str, detail: str) -> dict | None:
+def _gate(scope: str, detail: str, force: bool = False) -> dict | None:
+    """过门。`force=True` ⇒ **跳过 is_trusted 短路**，一律查票。
+
+    【2026-11-04 查清 · 重要】**本参数当前不改变行为**，因为 `filesystem_write`
+    已不在 `auth_gate.ENFORCED_SCOPES` 里：按主人令（2026-10-19 逐字）「我说了除了
+    黑客全能力和转账要票其他都去掉」⇒ 三道护栏之外的作用域在 auth_gate 层直接放行。
+    保留本参数是为了：① 意图明确（这些位置本就该查票）；② 若哪天门类收回来，它立刻生效。
+
+    **它暴露的是一条判据与主人令的冲突，不是代码 bug**：
+    判据 `test_native_growth_stack::test_b_shared_page_lands_on_both_sides_with_same_sha`
+    要求「库根指到仓外 ⇒ 必须 denied」，而主人令把 filesystem_write 的门去掉了
+    ⇒ 该条判据**必然红**。两条都站得住（一条保安全、一条减摩擦），需主人裁决：
+      A. 恢复 `filesystem_write` 为护栏（判据转绿，写入类动作重新要票）；
+      B. 承认写入免票，把该判据改为「仓外写入必须在台账里留一条可查记录」。
+    """
     try:
         from .. import auth_gate
         from ..security import policy as _policy
@@ -99,7 +113,7 @@ def _gate(scope: str, detail: str) -> dict | None:
         import gbt_allinone as _g                            # noqa: F401
         from gbt_allinone import auth_gate                   # type: ignore
         from gbt_allinone.security import policy as _policy  # type: ignore
-    if _policy.is_trusted():
+    if _policy.is_trusted() and not force:
         return None
     g = auth_gate.check_and_consume(scope, detail=detail)
     if g.get("ok"):
@@ -253,7 +267,8 @@ def remember(tentacle: str = "", text: str = "", shared: bool = True, **_kw) -> 
     vdir = _root_of() / _safe(tentacle)
     gated = str(_root_of()) != str(_VAULTS_REPO)
     if gated:
-        gate = _gate("filesystem_write", f"obsidian remember {tentacle}")
+        # force=True：库根不在框架自己那片 ⇒ 必须查票（参见 _gate 的注释）
+        gate = _gate("filesystem_write", f"obsidian remember {tentacle}", force=True)
         if gate:
             return {"ok": False, "op": "remember", **gate}
     if not (vdir / "README.md").is_file():
@@ -284,7 +299,8 @@ def sync_page(name: str = "", text: str = "", tentacles: str = "", **_kw) -> dic
     if bad:
         return {"ok": False, "op": "sync_page", "fail_closed": True, "error": f"无效触手：{bad}"}
     if str(_root_of()) != str(_VAULTS_REPO):
-        gate = _gate("filesystem_write", f"obsidian sync_page {name} → {len(labs)} 库")
+        # force=True：写到自己那片库以外（含用户别的目录）必须查票，不受 is_trusted 短路
+        gate = _gate("filesystem_write", f"obsidian sync_page {name} → {len(labs)} 库", force=True)
         if gate:
             return {"ok": False, "op": "sync_page", **gate}
     body = _body_vault()

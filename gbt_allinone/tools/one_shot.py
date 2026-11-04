@@ -147,6 +147,18 @@ def plan(prompt: str = "", bpm: float = 0.0, minutes: float = 0.0, fps: int = 30
     """**只读**：一句话 → 全链计划。不写盘、不出帧、不渲染。"""
     if not prompt.strip():
         return {"ok": False, "error": "prompt 不能为空（给一句话）", "fail_closed": True}
+    # 【2026-11-04 修】依赖脚本不在 ⇒ 报 needs_dependency，不许抛裸异常。
+    # 原样是 FileNotFoundError 冒到 run_task 变成 status=error，判据
+    # test_chain_readiness::test_d 只能把它算成「说能操控却调不通」的**真坏**。
+    # 按 AGENTS 三态：缺依赖是环境的事，不是代码坏；如实分出来才不会让判据长期红着没人看。
+    _deps = ("tools/beatgrid.py", "tools/actioncam.py", "tools/filmgrade.py")
+    _missing = [p for p in _deps if not (_ROOT / p).is_file()]
+    if _missing:
+        return {"ok": False, "status": "needs_dependency", "needs_dependency": True,
+                "error_class": "needs_dependency", "op": "plan", "kind": "one_shot",
+                "missing": _missing,
+                "message": f"只读计划所需的脚本不在：{_missing}。本能力位自身接线正常；"
+                           f"装好脚本即用，不是「说能操控却调不通」"}
     bg = _load("tools/beatgrid.py", "bg")
     ac = _load("tools/actioncam.py", "ac")
     fg = _load("tools/filmgrade.py", "fg")
