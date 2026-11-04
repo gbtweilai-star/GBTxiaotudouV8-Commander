@@ -1,5 +1,5 @@
 /* GBT小土豆V8 · 认知界面
- * 1:1 照 BaiLongma Brain UI（MIT © xiaoyuanda666-ship-it）：
+ * 三栏认知界面（自研布局与设计令牌）：
  *   · 设计令牌与命名同源（--bg0/--panel/--console-bg/--line-strong/--warm/--cool/--side-panel-width …）
  *   · 布局同构：.app-titlebar + .app-viewport 内 #panel-l1 / .console#chat-area / #panel-l2（fixed 三栏）
  *   · 内容 / 数据 / 头像 = 我们自己的

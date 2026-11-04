@@ -217,7 +217,7 @@
 | 99 | [99-agent-skills-spec.md](99-agent-skills-spec.md) | 吞噬 Agent Skills 规范：校验/打包/安装/渐进读取 |
 | 100 | [100-gsap-skill.md](100-gsap-skill.md) | 实战：把 GSAP 8 个技能蒸馏成 1 个（validate/pack/match 闭环） |
 | 101 | [101-panel-anim.md](101-panel-anim.md) | 面板动效真落地：GSAP 接三页 + 截图对比（5.75%/15.81% 像素变化） |
-| 102 | [102-cognitive-console.md](102-cognitive-console.md) | 认知界面：拆 28 面板 + 照白龙马 1:1 三栏 + 土豆 Logo + 无限上下文 |
+| 102 | [102-cognitive-console.md](102-cognitive-console.md) | 认知界面：拆 28 面板 + 照参考布局 1:1 三栏 + 土豆 Logo + 无限上下文 |
 | 103 | [103-console-views-3d.md](103-console-views-3d.md) | 控制台四视图：功能表 385 / 技能栏 23 / 仪表盘 / 3D 触手星图（15,400 根） |
 | 104 | [104-bloom-and-live-tentacles.md](104-bloom-and-live-tentacles.md) | 3D Bloom 辉光 + 按真实审计点亮触手（ok:385+30+15400+4） |
 | 105 | [105-live-tentacles-sse.md](105-live-tentacles-sse.md) | 实时触手：SSE 推审计事件，3D 当场点亮（实测 inventory 事件） |
@@ -311,8 +311,8 @@
 | 157 | [157-native-sdturbo.md](157-native-sdturbo.md) | 删ComfyUI后本地SD-Turbo原生出图：256/24.24s/121KB |
 | 158 | [158-desktop-native-t2i-512.md](158-desktop-native-t2i-512.md) | 桌面API接SD-Turbo：256/512，缓存load4.68s，512生成27.13s |
 | 159 | [159-native-shortfilm-nightlight.md](159-native-shortfilm-nightlight.md) |
-| 160 | [160-bailongma-voice-intercom.md](160-bailongma-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
-| 161 | [161-bailongma-gap-matrix.md](161-bailongma-gap-matrix.md) | BaiLongma → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
+| 160 | [160-voice-intercom.md](160-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
+| 161 | [161-gap-matrix.md](161-gap-matrix.md) | 上游参考项目 → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
 | 162 | [162-native-browser-embed.md](162-native-browser-embed.md) | 我们自己的原生浏览器：Electron WebContentsView 宿主（标签/地址栏/下载/权限/边界）+ 契约与真机读数 |
 | 163 | [163-ui-card-acui.md](163-ui-card-acui.md) | ACUI 卡片协议 ui_card：schema/白名单/纯文本/TTL/动作只回事件 + 能力位/统一门/console 卡片栈（P0 完成） |
 | 164 | [164-voice-settings.md](164-voice-settings.md) | 语音设置页：TTS 音色/语速/音高/音量 + ASR 后端 auto/whisper/windows + 自动朗读（能力位/统一门/数字人弹窗） |

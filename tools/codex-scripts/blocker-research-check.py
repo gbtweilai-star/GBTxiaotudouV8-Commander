@@ -10,8 +10,8 @@
 今天真实栽的跟头（本闸就是为它立的）：
     本会话探到「浏览器 `enumerateDevices` 0 个 audioinput + `getUserMedia` 抛 NotFoundError
     + WASAPI 活动录音端点 0」，就下了结论「**这台机器没有可用的麦 / 只有主人能启用设备**」，停了。
-    主人一句「**白龙马开源项目的麦克风这么部署的你不看的吗**」——去查才发现两件事：
-      ① 白龙马 `electron/main.cjs` 第 779-787 行**显式给 media 权限放行**
+    主人一句「**上游开源项目的麦克风这么部署的你不看的吗**」——去查才发现两件事：
+      ① 上游参考项目 `electron/main.cjs` 第 779-787 行**显式给 media 权限放行**
          （`setPermissionRequestHandler` / `setPermissionCheckHandler`），而且三个窗都放行
          （主窗 779-787 · focusBannerWindow 974-981 · wakeProbeWindow 1463-1467）；
       ② 采集端 `src/ui/brain-ui/voice-core.js` 有**约束对象 + deviceId 回退链 + 显式采样率 +
@@ -399,7 +399,7 @@ CASE_POS = """# 正例：三查齐全（结论句与留痕同段）
 
 本机活动录音端点 0 ⇒ 乍看"这台机器没有可用的麦克风"。
 查①本机既有实现：`state/surfaces/netsh.json` 43 把键 + `run tentacle_manifest` 回执（在册 5 个录音设备，DISABLED 1）；
-查②上游参照项目：`BaiLongma/electron/main.cjs` 第 779-787 行给 media 放行（gh api 现读原文）；
+查②上游参照项目：`electron/main.cjs` 第 779-787 行给 media 放行（gh api 现读原文）；
 查③官方文档/本机 API 清单：`py -3.14 -m gbt_allinone list` 回执（240 位）→ 结论：能做到，怎么做到：给壳加权限放行 + deviceId 回退链。
 """
 

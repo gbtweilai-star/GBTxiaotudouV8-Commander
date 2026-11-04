@@ -457,7 +457,7 @@ def main() -> int:
                 "未验": ["真麦克风采集（本机录音端点在场 0 个：WASAPI 0 / winmm 0 / Chromium 0）",
                          "流式 interim 上屏（离线识别器只有整段/定长返回）",
                          "真 barge-in 打断（离线识别器不能边说边听）",
-                         "白龙马的 Whisper+VAD 参数（RMS 三阈值/2s 切句）——本机不跑 Whisper，未接",
+                         "上游参考项目的 Whisper+VAD 参数（RMS 三阈值/2s 切句）——本机不跑 Whisper，未接",
                          "hf_voice 云臂（缺 HF 密钥，未验）",
                          "真实窗内出声（需壳的 audio_autoplay + 真实音频设备；无头取证拿不到声音）"],
                 "判据来源": "本件与页面各自独立实现同一套运动学；两套对账一致才算过"},

@@ -43,7 +43,7 @@ def main() -> int:
     check("三栏结构（panel-l1/chat-area/panel-l2）",
           all(k in html for k in ('id="panel-l1"', 'id="chat-area"', 'id="panel-l2"')))
 
-    print("[2b] 1:1 设计令牌/布局（照 BaiLongma）")
+    print("[2b] 1:1 设计令牌/布局（照上游参考项目）")
     css = (con / "app.css").read_text(encoding="utf-8")
     for token in ("--side-panel-width: clamp(260px, 25vw, 362px)",
                   "--bg0: #111821", "--warm: #ff9f1c",

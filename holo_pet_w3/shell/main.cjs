@@ -1302,7 +1302,7 @@ function createWindow(entry) {
      托盘图标构造失败会让 startSse 永远不跑（本文件上面记着这条实测），
      那种缺陷只有走真链才抓得到。**只改两个字段，不设这个变量时行为一个字节不动。** */
   const PROBE = process.env.GBT_W3_STARTUP_PROBE === "1";
-  /* 🔴 主人令 2026-10-08（照白龙马口径）：「打开 APP 直接就是数字人语音交互页」。
+  /* 🔴 主人令 2026-10-08（照上游参考项目口径）：「打开 APP 直接就是数字人语音交互页」。
      🔴 2026-10-28 主人令改为「APP 必须是一体式，跳转页面全部融合」：
         启动唯一可见窗从 digital-human 换成 app-shell（一体式外壳，顶栏 + iframe）。
         数字人不再是入口，而是外壳的首屏 —— 外壳把 ../digital-human/index.html?embed=1 装进 iframe。
@@ -1402,10 +1402,10 @@ function createWindow(entry) {
     }
   });
 
-  /* 🔴 **麦克风采集权限**（2026-10-08 加 · 口径照白龙马 BaiLongma 的 electron/main.cjs）：
-     病根（白龙马那边与我们都实测到）：Chromium 默认**不把麦克风交给页面** ——
+  /* 🔴 **麦克风采集权限**（2026-10-08 加 · 口径照上游参考项目的 electron/main.cjs）：
+     病根（上游参考项目那边与我们都实测到）：Chromium 默认**不把麦克风交给页面** ——
      `enumerateDevices()` 数不到 audioinput（标签也拿不到）、`getUserMedia` 直接落
-     `NotFoundError`。白龙马的解法是给**那一扇窗**的 session 装两个处理器：
+     `NotFoundError`。上游参考项目的解法是给**那一扇窗**的 session 装两个处理器：
        `setPermissionRequestHandler`（异步请求：放 media）
        `setPermissionCheckHandler`（同步检查：放 media）
      本壳照抄这套，但**口径收得比它更窄**（窄口径，不许全局放开）：
