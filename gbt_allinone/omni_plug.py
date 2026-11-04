@@ -1357,6 +1357,10 @@ def run(op: str = "status", **kw) -> dict:
     if op == "status":
         return {"ok": True, "op": "status", "名字": "万能插",
                 "插座类型": list(SOCKET_KINDS),
+                "插座类型口径": "以上只是**内置默认面，不是穷举**。任意 target 走 op=universal"
+                                "（或不给 socket 的 run）⇒ 现场识别 kind 并按 kind **动态生成适配器**；"
+                                "认不出会如实返回 unknown，不硬套类别。kind 是「从 target 读出来的事实」，"
+                                "不是枚举出来的封闭集合（见 tools/omni_adapter.py:classify）",
                 "能源观": dict(SOCKET_ENERGY),
                 "与 V9 的分工": "V9 插座无作用域门；本位把门留在 V8 的能力位边界"
                                             "（process→process_execute · file写→filesystem_write · "

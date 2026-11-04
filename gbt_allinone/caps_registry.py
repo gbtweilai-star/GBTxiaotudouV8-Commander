@@ -1613,13 +1613,13 @@ BENIGN_CAPS = {
     },
     "omni_plug": {
         "domain": 'llm',  # 🔴 2026-10-28：desc 从 6 个 op 补到 24 个（含别名）——主脑读声明做决策，没写进去的入口等于不存在。判据 omni-monitor.py --gap（AST 三向对账）。⚠️ 本段**行数必须恒定**：main.cjs 的 TOOLS_CAPS 按 caps_registry.py:NNN 钉指针，加行会让后面全体错位。
-        "desc": '万能插：把「能力位」拓成「插座」——任何外部对象（process/file/api/web/**app**）插一个描述符就变成'
-                '一根可扫可控的分支。op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；'
+        "desc": '万能插：把「能力位」拓成「插座」——**没有固定类目**，任意外部对象插一个描述符就变成'
+                '一根可扫可控的分支。**op=universal（或不给 socket 的 run）现场识别 target、按 kind 动态生成适配器**（kind 是从 target 读出的事实，不是枚举集合；认不出如实说 unknown，不硬套类别）；op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；'
                 'run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write · api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。'
                 '**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。'
                 '**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。'
                 '**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。'
-                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。',
+                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 插上就能用时自身的能源。',
         "handler": 'omni_plug',
         "safe": False,
     },

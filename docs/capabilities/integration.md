@@ -1,4 +1,4 @@
-# 集成（飞书/Notion/CLI） · `integration`（7 位）
+# 集成（飞书/Notion/CLI） · `integration`（11 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 

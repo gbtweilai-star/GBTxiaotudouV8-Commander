@@ -169,7 +169,7 @@ run_task(kind, payload)
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |
 | 脉冲直达 | ≈90% 请求 0 token 命中（≈4ms） | `pulse_core verify` |
 | 图像算子 | **170** 个（图像/音频/文本，纯 CPU） | `comfy_native status` |
-| 多域监控 | 31 域 / 313 位只读位：**304 通过 · 9 未通过**（7 位被拒/缺依赖/失败 + 2 位 60s+ 慢位触到看门狗） | `python tools/codex-scripts/multi-domain-monitor.py --diff` |
+| 多域监控 | 注册表 **32 域**，其中 **31 域有可测位**（`automation` 两位均不可测：`browser` 要参数、`n8n_wf` safe=False）；共 313 位只读无参位：**304 通过 · 9 未通过**（7 被拒/缺依赖/失败 + 2 位 60s+ 慢位触到看门狗）。**`safe=False` 的 88 位（含 `omni_plug`）不在本表**，其读数见上一行逐位真调 | `python tools/codex-scripts/multi-domain-monitor.py --diff` |
 | 评测（历史） | 335 题 PASS45 **99.10%** —— 建于 **341 位快照期（2026-10-21）**，**未在 427 位重跑** | 见 [docs/04-evaluation.md](docs/04-evaluation.md) |
 
 <table>

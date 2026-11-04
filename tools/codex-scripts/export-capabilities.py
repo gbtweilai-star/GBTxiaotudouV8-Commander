@@ -18,19 +18,29 @@ for _s in (sys.stdout, sys.stderr):
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
-from gbt_allinone.caps_registry import BENIGN_CAPS          # noqa: E402
+from gbt_allinone.caps_registry import all_caps             # noqa: E402
 from gbt_allinone.security import policy                    # noqa: E402
 
+# 🔴 2026-11-04 修：原先直接遍历 BENIGN_CAPS，而 BENIGN_CAPS 的 meta 只有
+#   desc/domain/handler/safe 四个键 —— `requires_params` 是 `all_caps()` 从
+#   PARAM_REQUIRED 派生出来的，绕过它导出 ⇒ data/capabilities.json 里这些位
+#   的 requires_params 恒为缺失。后果：任何拿快照判断「这位要不要参数」的人
+#   （多域监控、审计脚本）都会把 browser / tentacle / wf_run 这类要参数的位
+#   误判成「只读不成参、本该被测却没测」。改走 all_caps() 并显式带出契约。
 out = []
-for name, meta in sorted(BENIGN_CAPS.items()):
+for row in sorted(all_caps(), key=lambda r: r["name"]):
+    name = row["name"]
     try:
         d = policy.evaluate(name, {})
         scopes = list(d.scopes)
         risk = d.risk
     except Exception:                                        # noqa: BLE001
         scopes, risk = [], "unknown"
-    out.append({"name": name, "domain": meta.get("domain"),
-                "desc": meta.get("desc"), "safe": bool(meta.get("safe")),
+    out.append({"name": name, "domain": row.get("domain"),
+                "desc": row.get("desc"), "safe": bool(row.get("safe")),
+                "requires_params": bool(row.get("requires_params")),
+                "params": list(row.get("params") or []),
+                "params_hint": str(row.get("params_hint") or ""),
                 "readonly": not scopes, "scopes_static": scopes, "risk": risk})
 
 dst = os.path.join(ROOT, "data", "capabilities.json")

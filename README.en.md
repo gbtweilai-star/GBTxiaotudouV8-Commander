@@ -56,7 +56,7 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 | Capability benchmark | 335 items · mean cov **0.9873** · **PASS45 330/335 = 98.51%** (2nd run); **99.10%** (1st run) | [docs/04-evaluation.md](docs/04-evaluation.md) |
 | Every bit live-tested | **306 ok / 88 needs-ticket / 30 needs-input / 2 denied = 427** (live at 2026-11-04T14:13:12; 0 unattributed, 0 timeout) | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
 | Concurrency | 512 → 4096 concurrent calls, **100% success** (4096/4096), ~150–190/s, memory flat ~7.0 GB (2026-11-04) | [docs/08-concurrency.md](docs/08-concurrency.md) |
-| Multi-domain monitor | 31 domains / 313 read-only bits: **304 ok · 9 not ok** (7 denied / missing-dep / failed + 2 timeouts on 60s+ scanners), 2026-11-04 | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
+| Multi-domain monitor | Registry has **32 domains, 31 testable** (`automation` has none: `browser` needs params, `n8n_wf` is not `safe`); across 313 read-only param-free bits: **304 ok · 9 not ok** (7 denied / missing-dep / failed + 2 timeouts on 60s+ scanners). The **88 `safe=False` bits (including `omni_plug`) are not in this table** — see the per-bit live test above | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
 | Reverse-calling cloud compute | model `200 · 1.2s` · 3/3 images `29.7s` · local CPU `321.1 GFLOP/s` · video **27.0s / 49,893 B / sha_match=true** | [docs/13-omni-plug.md](docs/13-omni-plug.md) |
 
 Every figure above has a raw JSON receipt under `data/` and a figure under `assets/`.

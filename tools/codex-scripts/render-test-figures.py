@@ -421,10 +421,24 @@ def fig_monitor(out: pathlib.Path, data_dir: pathlib.Path) -> None:
 
     w, h = 1000, 780
     img, dd = canvas(w, h)
-    dd.text((28, 20), "多域监控 · %d 个域 %d 位只读位逐位真调（改一处，整面复查）"
-            % (len(doms), tested), font=font(19), fill=TXT)
-    dd.text((28, 48), "只测「只读且无需参数」的位；写口/需参数不跑（不越门）。被门拒 ≠ 坏：那是授权结构在生效。",
-            font=font(13), fill=DIM)
+    # 域数一律写「覆盖 N / 注册表 M」：只写 N 会被读成注册表规模
+    # （2026-11-04 踩过：把 31 写进标题，读者以为注册表从 32 变成了 31）
+    try:
+        from gbt_allinone import caps_registry as _R
+
+        _all = _R.all_caps()
+        _n_reg_dom = len({c.get("domain") for c in _all})
+        n_off = sum(1 for c in _all if not c.get("safe"))
+        n_par = sum(1 for c in _all if c.get("safe") and c.get("requires_params"))
+        sub = ("只测「只读且无需参数」的位 —— 注册表 %d 域 / 覆盖 %d 域；未测：safe=False %d 位"
+               "（写口/需授权，omni_plug 即在其中，本表不含）· 需参数 %d 位"
+               % (_n_reg_dom, len(doms), n_off, n_par))
+    except Exception:                                                    # noqa: BLE001
+        _n_reg_dom = len(doms)
+        sub = "只测「只读且无需参数」的位；写口/需参数不跑（不越门）"
+    dd.text((28, 20), "多域监控 · 覆盖 %d/%d 域 · %d 位只读位逐位真调"
+            % (len(doms), _n_reg_dom, tested), font=font(19), fill=TXT)
+    dd.text((28, 48), sub, font=font(12), fill=DIM)
 
     not_ok = tested - ok
     cards = [

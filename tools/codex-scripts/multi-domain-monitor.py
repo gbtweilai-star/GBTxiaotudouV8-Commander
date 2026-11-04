@@ -88,8 +88,21 @@ def main() -> int:
         else:
             skipped[dom] = skipped.get(dom, 0) + 1
 
-    print("多域监控：%d 个域 · 测 %d 位只读位（另有 %d 位写口/需参数不跑）"
-          % (len(by_dom), sum(len(v) for v in by_dom.values()), sum(skipped.values())))
+    n_tested = sum(len(v) for v in by_dom.values())
+    reg_doms = {c.get("domain") for c in caps}
+    # 未测的 114 位要**拆开说**：混成一句「写口/需参数」会让读者
+    # 以为 omni_plug 这种也测过了 —— 它 safe=False，压根不进本位。
+    n_off = sum(1 for c in caps if not c.get("safe"))
+    n_param = sum(1 for c in caps if c.get("safe") and c.get("requires_params"))
+    n_wonly = sum(1 for c in caps if c.get("safe") and not c.get("requires_params") and not c.get("readonly"))
+    print("多域监控：注册表 %d 域 / 有可测位的 %d 域 · 测 %d 位" % (len(reg_doms), len(by_dom), n_tested))
+    print("  未测 %d 位 = safe=False（写口/需授权，如 omni_plug）%d + 需参数 %d + 仅写口 %d"
+          % (len(caps) - n_tested, n_off, n_param, n_wonly))
+    no_test = sorted(d for d in reg_doms - set(by_dom) if d)
+    if no_test:
+        print("  ⚠️ 有域但无可测位（不会出现在下面结果里）：%s"
+              % "、".join("%s（%s）" % (d, "、".join(c["name"] for c in caps if c.get("domain") == d))
+                         for d in no_test))
 
     now = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "domains": {}, "per_cap": {}}
     t0 = time.time()
@@ -137,6 +150,16 @@ def main() -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         payload = dict(now)
         payload["totals"] = {"tested": tot, "ok": tot_ok, "not_ok": tot - tot_ok}
+        # 覆盖口径随读数一起落盘：不写清「32 域里只有 31 域有位可测」，
+        # 读者会把「31 域」当成注册表规模。
+        payload["coverage"] = {
+            "registry_domains": len(reg_doms),
+            "tested_domains": len(by_dom),
+            "no_testable_domain": list(no_test),
+            "skipped": {"safe_false": n_off, "requires_params": n_param, "write_only": n_wonly},
+            "note": "本位只测 safe=true 且无需必填参数的位；safe=False 的写口/需授权位"
+                    "（如 omni_plug）不在本表，其读数见 data/capability-live-test.json",
+        }
         payload["diff"] = diff
         payload["baseline"] = str(BASE.relative_to(ROOT))
         out.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
