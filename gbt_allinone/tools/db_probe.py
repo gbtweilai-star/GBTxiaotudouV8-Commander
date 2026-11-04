@@ -34,6 +34,7 @@
 3. **结果不落盘**；表/文件不在 ⇒ 结构化报缺。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import re
@@ -93,7 +94,7 @@ def _connect_ro(db: str):
     return con, p
 
 
-def sources(**_kwargs) -> dict:
+def sources() -> dict:
     """现读可查的本地源（只读列举）：store/state 下的 *.db/*.jsonl。"""
     roots = [_store_root(), ROOT / "state", ROOT / "gbt_allinone" / "store"]
     seen, dbs, jsonls = set(), [], []
@@ -246,7 +247,7 @@ def run_op(op: str = "sources", **params) -> dict:
     for n, fn in (("sources", sources), ("tables", tables), ("schema", schema),
                   ("counts", counts), ("jsonl", jsonl), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": "未知 op:%s（sources/tables/schema/counts/jsonl/where）" % op}
 

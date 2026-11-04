@@ -36,6 +36,39 @@ HEAVY_DOMAINS = {"video", "creation", "llm", "recon", "devour", "image_video", "
 HEAVY_CAPS = {"sec_chain", "sec_scan", "cross_scan", "page_scan"}
 SMOKE = {"text": "GBT全开自检"}
 
+# 🔴 2026-11-04：冒烟的默认参数原来是**一个固定字典** `{'text':...}` 喂所有位。
+#   实测 426 位全开后 25 个失败，其中 13 个是 needs_input —— 不是位坏了，
+#   是「喂了它不需要的东西，又没喂它要的东西」。
+#   现在按 PARAM_REQUIRED 登记的必填参数补**安全占位值**，让它们能真跑到业务逻辑。
+#   ⚠️ 但要过真实目标参数的位（url/repo/target…）**故意不补** ——
+#      给假目标会真发网络请求，那比"如实报缺参数"更坏。这类继续落 needs_input。
+_SAFE_FILL = {
+    "text": "GBT全开自检", "description": "GBT全开自检", "goal": "GBT全开自检",
+    "intent": "GBT全开自检", "message": "GBT全开自检", "need": "GBT全开自检",
+    "prompt": "GBT全开自检", "query": "自检", "name": "smoke",
+    "kind": "status", "action": "caps", "nodes": [], "symbol": "run",
+    "thread_id": "smoke", "cwe": "CWE-79",
+    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+}
+_NEEDS_REAL_TARGET = ("url", "repo", "target", "domain", "host", "path", "workdir")
+
+
+def _smoke_payload(cap: str) -> dict:
+    """给某一位产冒烟参数：只补**无害**的占位，要真目标的位不补（宁可如实报缺）。"""
+    need = []
+    try:
+        from .caps_registry import PARAM_REQUIRED
+        need = ((PARAM_REQUIRED.get(cap) or {}).get("params") or [])
+    except Exception:                                              # noqa: BLE001
+        pass
+    payload = {"text": "GBT全开自检"}
+    for k in need:
+        if k in _NEEDS_REAL_TARGET:
+            continue
+        if k in _SAFE_FILL:
+            payload[k] = _SAFE_FILL[k]
+    return payload
+
 
 def _timeout_for(cap: str, base: float) -> float:
     if cap in HEAVY_CAPS:
@@ -57,10 +90,16 @@ def _run_one(cap: str, timeout: float) -> dict:
     code = (
         "import sys,json;sys.path.insert(0,%r);"
         "import gbt_allinone as g;"
-        "r=g.run_task(%r, {'text': 'GBT全开自检'});"
+        "r=g.run_task(%r, %s);"
         "err = r.get('error') or (r.get('gbt_result') or {}).get('error') or '';"
-        "print(json.dumps({'ok':bool(r.get('ok')), 'error': str(err)[:300]},ensure_ascii=False))"
-        % (str(ROOT), cap)
+        # 🔴 2026-11-04：很多 tools 位的返回**本来就没有 ok 字段**（只回业务字段）。
+        #   原来 bool(r.get('ok')) 一律判成 False ⇒ 跑成功也记失败（实测 5 个 A 族就是这样）。
+        #   现在：没显式 ok 且没 error ⇒ 视为成功，并标 ok_inferred 让人看得见这是推断。
+        "okv = r.get('ok');"
+        "okv = (not bool(err)) if okv is None else bool(okv);"
+        "print(json.dumps({'ok':okv, 'ok_inferred': r.get('ok') is None,"
+        " 'error': str(err)[:300]},ensure_ascii=False))"
+        % (str(ROOT), cap, json.dumps(_smoke_payload(cap), ensure_ascii=False))
     )
     t0 = time.time()
     try:
@@ -89,6 +128,8 @@ def _run_one(cap: str, timeout: float) -> dict:
             return {"cap": cap, "ok": False, "ms": ms,
                     "error": "子进程输出不是 JSON：" + (p.stdout or "")[-120:]}
         out = {"cap": cap, "ok": bool(d.get("ok")), "ms": ms}
+        if d.get("ok_inferred"):
+            out["ok_inferred"] = True          # 该位没回 ok，是按「无 error」推断的成功
         if not out["ok"]:
             out["error"] = str(d.get("error") or "")[:300] or "ok=false（无 error 字段）"
         if cleaned:
@@ -131,11 +172,18 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
 
     for i, cap in enumerate(target, 1):
         meta = table.get(cap) or {}
-        if not bool(meta.get("safe")) and not ticket:
-            blocked.append({"cap": cap, "reason": "需授权位：没票不执行（已打开、被票挡）"})
-            continue
-        # 🔒 安全策略闸（主人令 2026-11-02）：
-        #   黑客全能力 → 必须主人终端确认；受攻击 → V8 自我决策；转账 → 永远要确认
+        # 🔴 2026-11-04 主人令（`security/policy.py:1173` 原话逐字）：
+        #   「除了她使用**危险能力和转账能力**需要票，其他一切都要以设备算力推理分析来做决策」
+        #   原来这里用注册表 `safe` 字段当门 —— 那个字段的含义是「**有没有副作用**」
+        #   （会写盘 / 会起进程），**不是**「危险不危险」。
+        #   实测全开 426 位时 87 个被这道门挡掉，其中 **78 个是普通干活的位**
+        #   （humanizer 去AI味 · chart_html 画图 · skill_finder 检索 · showcase_ops 展示 · music_auto …），
+        #   它们被提前拦下，**根本走不到下面那层能区分 hacker / transfer / normal 的判据**。
+        #   现在按主人令改口径：**只由 security_policy 判**。
+        #   · normal   → 放行（运行时若还需 scope 票，由 security/policy.py 拦，落 blocked_policy）
+        #   · hacker   → 要主人终端确认（除非已给 ticket）
+        #   · transfer → 永远要票，攻击模式也不例外
+        #   ⚠️ 副作用已知：normal 里会写盘的位现在会**真写**（主人 2026-11-04 选「严格按主人令放开」）。
         try:
             from gbt_allinone import security_policy as _sp
             dec = _sp.check(cap)
@@ -144,7 +192,7 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         if dec.get("decision") == "blocked_transfer":
             blocked_transfer.append({"cap": cap, "reason": dec.get("reason")})
             continue
-        if dec.get("decision") == "need_terminal_confirm":
+        if dec.get("decision") == "need_terminal_confirm" and not ticket:
             blocked_terminal.append({"cap": cap, "reason": dec.get("reason"),
                                      "hint": "主人终端执行：python tools/confirm-security.py request %s" % cap})
             continue
@@ -181,8 +229,6 @@ def run_all_sync(caps: list | None = None, timeout_per_cap: float = 12.0,
         "executed": len(results), "ok_count": ok_n, "fail_count": len(results) - ok_n,
         "blocked_by_ticket": blocked,
         "blocked_by_policy": blocked_policy,
-        "blocked_by_terminal_confirm": blocked_terminal,
-        "blocked_transfer": blocked_transfer,
         "blocked_by_terminal_confirm": blocked_terminal,
         "blocked_transfer": blocked_transfer,
         "results": results,

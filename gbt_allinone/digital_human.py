@@ -28,6 +28,7 @@
   · 不假装：引擎缺件就如实报缺 + 给补齐的那一步。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -491,7 +492,7 @@ def run_op(op: str = 'status', **kw) -> dict:
         return {'ok': False, 'cap': 'digital_human', 'why': 'unknown op: %s' % op,
                 'ops': list(_OPS)}
     try:
-        return fn(**kw)
+        return _oc_call(fn, kw)
     except TypeError as e:
         return {'ok': False, 'cap': 'digital_human', 'op': op, 'why': 'args: %s' % e}
     except Exception as e:                                            # noqa: BLE001

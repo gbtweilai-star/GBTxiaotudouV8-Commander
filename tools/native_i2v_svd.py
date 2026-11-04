@@ -41,9 +41,10 @@ def main() -> int:
     from PIL import Image
 
     t0 = time.time()
+    dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     pipe = StableVideoDiffusionPipeline.from_pretrained(
-        MODEL, torch_dtype=torch.float16, local_files_only=True, variant="fp16")
-    pipe.to("cpu")
+        MODEL, torch_dtype=dtype, local_files_only=True, variant="fp16")
+    pipe.to("cpu" if not torch.cuda.is_available() else "cuda")
     pipe.enable_attention_slicing()
     load_s = round(time.time() - t0, 2)
     image = Image.open(args.image).convert("RGB")
@@ -65,11 +66,13 @@ def main() -> int:
     print(json.dumps({"ok": True, "image": args.image, "out": args.out,
                       "frames": len(frames), "size": [args.width, args.height],
                       "fps": args.fps, "load_s": load_s, "generation_s": gen_s,
-                      "engine": "StableVideoDiffusionPipeline CPU fp16（本地 SVD-XT）"},
+                      "engine": "StableVideoDiffusionPipeline CPU fp32（本地 SVD-XT）"},
                      ensure_ascii=False))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 

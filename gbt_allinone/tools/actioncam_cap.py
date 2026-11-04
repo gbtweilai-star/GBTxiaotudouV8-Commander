@@ -15,13 +15,14 @@
 （仰/俯/平/荷兰角）+ `dur`（时长=时机）+ `prompt`（英文，动作构图）+ `seed`（锁定）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import contextlib
 import importlib.util
 import io
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 _AC_PATH = ROOT / "tools" / "actioncam.py"
 READ_OPS = ("plan", "status", "qc")
 WRITE_OPS = ("gen", "seg", "build", "add", "rm")
@@ -98,7 +99,7 @@ def plan(manifest: str = "", verbose: bool = False) -> dict:
 def run(op: str = "plan", manifest: str = "", **kw) -> dict:
     op = (op or "plan").lower()
     if op == "status":
-        return status(**kw)
+        return _oc_call(status, kw)
     if op == "plan":
         return plan(manifest)
     if op == "qc":

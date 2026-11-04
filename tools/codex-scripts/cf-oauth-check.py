@@ -36,7 +36,7 @@ def check_profile(path: str) -> dict:
     env.pop("CLOUDFLARE_API_TOKEN", None)      # 有令牌就会盖掉 OAuth 读数，这里必须去掉
     try:
         out = subprocess.run(["wrangler", "whoami"], capture_output=True, text=True,
-                             timeout=90, env=env, shell=True).stdout
+                             timeout=90, env=env, shell=False).stdout
     except Exception as exc:                                    # noqa: BLE001
         return {"logged_in": False, "why": str(exc)[:120]}
     if "Not logged in" in out:

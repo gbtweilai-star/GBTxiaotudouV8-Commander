@@ -26,6 +26,7 @@
 5. 天数可调（3–14）；7 天为基准节奏（照截图原文「7 天」）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import sys
 from pathlib import Path
@@ -155,7 +156,7 @@ def where(**_kw) -> dict:
             ]}
 
 
-def sources(**_kwargs) -> dict:
+def sources() -> dict:
     return {"ok": True, "op": "sources", "sources": SOURCES}
 
 
@@ -163,7 +164,7 @@ def run_op(op: str = "sources", **params) -> dict:
     op = (op or "sources").lower()
     for n, fn in (("sources", sources), ("caps", caps), ("plan", plan), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op:%s（sources/caps/plan/where）" % op}
 
 

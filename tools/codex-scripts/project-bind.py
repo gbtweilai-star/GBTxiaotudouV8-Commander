@@ -185,7 +185,10 @@ def main():
  # 2026-10-22 主人令：`state/PROJECT-INDEX.html` 已下线（搬到 state/legacy/，见 panel/index.html
     #   与 selfcheck-all.py 的同日留痕）。本工具因此**不再以"索引在盘"为通过条件**：
     #   原期望 ok_idx = IDX.is_file()；翻成「索引可以不在」，但分片/注入那两条判据一条没放松。
-    ok_idx = IDX.is_file() or True
+    # 2026-11-03 修 JDG-001 写法陷阱：原为 `IDX.is_file() or True`。
+    #   语义本来就是"恒真"（主人令 2026-10-22：索引已下线，不再作为通过条件），
+    #   但 `X or True` 会让读者以为 IDX 参与了判定（实际被短路吃掉）⇒ 写成显式常量。
+    ok_idx = True   # 恒真，by design（见上）；分片/注入两条判据一条没放松
     shard_total = 0
     for sf in sorted(SHARD.glob("shard-*.html")):
         shard_total += sf.read_text(encoding="utf-8", errors="replace").count("<li><a href=")

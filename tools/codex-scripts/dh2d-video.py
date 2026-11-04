@@ -31,7 +31,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LAB = os.path.join(ROOT, 'holo_pet_w3', 'voice-theater', 'dh2d-lab.html')
-FFMPEG = shutil.which('ffmpeg') or r'C:\Users\ADMIN\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffmpeg.exe'
+FFMPEG = shutil.which('ffmpeg') or str(__import__("pathlib").Path.home() / "AppData" / "Local" / "Microsoft" / "WinGet" / "Packages" / "Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe" / "ffmpeg-8.1.2-full_build" / "bin" / "ffmpeg.exe")
 
 
 def find_chrome():

@@ -59,15 +59,58 @@ class VisionLoopTest(unittest.TestCase):
         self.assertIn("没内容就不说", str(r.get("为什么")))
 
     def test_gate_matches_inner_calls(self):
-        want = {"status": set(), "look": {"privacy_read"}, "hear": {"privacy_read"},
-                "speak": {"audio_output"}, "act": {"desktop_control", "privacy_read"},
-                "loop": {"desktop_control", "privacy_read"}}
-        for op, exp in want.items():
-            got = set(policy.evaluate("vision_loop", {"op": op}).scopes)
-            self.assertEqual(got, exp, "vision_loop.%s 的门与内层调用不同口径" % op)
-        # 耳：voice.listen 必须是隐私载体（原来空 ⇒ 麦克风不开票就开）
-        self.assertIn("privacy_read", set(policy.evaluate("voice", {"op": "listen"}).scopes),
-                      "voice.listen 没门 ⇒ 耳是裸的")
+        """门与内层真调用**同口径** —— 2026-11-04 改的是口径分层，不是放宽。
+
+        原来这里断言 `.scopes`，因为那时候「记录」与「要票」是同一张表。
+        2026-11-01 主人令撤掉身体类（desktop_control / audio_output /
+        browser_control / device_control / network_private）的票之后，`add()`
+        把被撤票的作用域**整条丢弃** ⇒ 门不但不要票，连痕迹都没有：
+        「撤票」被做成了「失明」——实测 vision_loop.act 返回 ['privacy_read']，
+        少了 desktop_control，而这台机器动过键鼠这件事在审计里查不到。
+
+        现在两份口径分开：
+          · observed = 真实发生的作用域（**审计口径**，必须与内层调用逐项一致）
+          · scopes   = 仍要票的作用域（**授权口径**，身体类应为空）
+        """
+        obs = {"status": set(), "look": {"privacy_read"}, "hear": {"privacy_read"},
+               "speak": {"audio_output"}, "act": {"desktop_control", "privacy_read"},
+               "loop": {"desktop_control", "privacy_read"}}
+        for op, exp in obs.items():
+            d = policy.evaluate("vision_loop", {"op": op})
+            self.assertEqual(set(d.observed), exp,
+                             "vision_loop.%s 的 observed 与内层调用不同口径" % op)
+            self.assertEqual(set(d.scopes), set(),
+                             "vision_loop.%s 属身体（2026-11-01 主人令）不该要票" % op)
+
+        # 耳：voice.listen 必须被记成隐私载体（原来空 ⇒ 麦克风开了没人知道）
+        self.assertIn("privacy_read",
+                      set(policy.evaluate("voice", {"op": "listen"}).observed),
+                      "voice.listen 没被记账 ⇒ 耳是裸的")
+
+        # 同一件「听」在两个入口上必须同口径（vision_loop.hear vs voice.listen）
+        self.assertEqual(
+            set(policy.evaluate("voice", {"op": "listen"}).observed),
+            set(policy.evaluate("vision_loop", {"op": "hear"}).observed),
+            "同一件「听」在 voice 与 vision_loop 上口径不同")
+
+    def test_dangerous_faces_still_need_ticket(self):
+        """护栏：这次改口径**不许**放宽危险面（自证用，防我顺手放松）。"""
+        cases = [("body_open", {}, "process_execute"),          # 起外部程序
+                 ("osint_scan", {"target": "127.0.0.1"}, "osint_private"),  # 内网扫描
+                 ("mirror_ascend", {}, "deploy_publish"),       # G3 生产面板
+                 ("keylogger", {}, "privacy_read")]             # 黑客面
+        for kind, payload, want in cases:
+            got = set(policy.evaluate(kind, payload).scopes)
+            self.assertIn(want, got, "%s 的 %s 被放宽了" % (kind, want))
+
+    def test_observed_superset_of_scopes(self):
+        """铁律：审计口径必须覆盖授权口径 —— scopes 里有的，observed 一条都不能漏。"""
+        for kind, payload in (("vision_loop", {"op": "act"}), ("voice", {"op": "listen"}),
+                              ("body_click", {}), ("body_open", {}),
+                              ("osint_scan", {"target": "127.0.0.1"})):
+            d = policy.evaluate(kind, payload)
+            self.assertLessEqual(set(d.scopes), set(d.observed),
+                                 "%s: scopes 里有 observed 没记到的作用域" % kind)
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-ROOT = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+ROOT = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 HOME = os.path.expanduser("~")
 SKIP = {"__pycache__", ".git", "node_modules", ".venv", "site-packages"}
 CONTAINERS = [

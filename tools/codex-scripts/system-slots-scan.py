@@ -11,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 import gbt_allinone as gbt  # noqa: E402
 

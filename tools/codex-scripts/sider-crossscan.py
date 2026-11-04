@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parents[2]
 EXT_ID = "difoiogjjojoaoomphldepapgpbgkhkb"
 NATIVE = ROOT / "gbt_allinone" / "store" / "native_browser" / "profile" / "Default"
 OUT = ROOT / "state" / "sider-crossscan.json"
-V9_EXT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9\state\chrome_cdp\Default\Extensions") / EXT_ID
+V9_EXT = Path.home() / "Desktop" / "GBT小土豆V9" / "state" / "chrome_cdp" / "Default" / "Extensions" / EXT_ID
 
 
 def _newest(base: Path):

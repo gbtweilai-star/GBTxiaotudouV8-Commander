@@ -30,6 +30,7 @@
 op=stamp / trace / alias / resolve / aliases / migrate / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -305,6 +306,6 @@ def run_op(op: str = "aliases", **params) -> dict:
                      ("aliases", aliases), ("migrate", migrate),
                      ("migrate_apply", migrate_apply), ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（stamp/trace/alias/resolve/aliases/migrate/migrate_apply/verify/where）"}

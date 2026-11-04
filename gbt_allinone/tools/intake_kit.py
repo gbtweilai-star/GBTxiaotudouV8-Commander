@@ -31,6 +31,7 @@ DeepSeek-Bot 的文档与功能表）
 4. **体检读数带日期**（写死会过期 ⇒ 标成"某日某探针的读数"，不假装是实时值）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import math
@@ -518,7 +519,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("build", build), ("find", find), ("api", api),
                    ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

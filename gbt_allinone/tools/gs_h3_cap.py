@@ -31,13 +31,14 @@
 （吃显存/内存）⇒ 过 **`filesystem_write`**。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import os
 import sys
 import types
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 READ_OPS = ("status", "nodes", "rules", "compose")
 WRITE_OPS = ("expand", "loader", "unload")
 _MODES = ("full_ref", "T2VA", "I2VA", "FL2VA", "L2VA")
@@ -366,6 +367,6 @@ def run(op: str = "status", **kw) -> dict:
         return {"status": status, "nodes": nodes, "rules": rules, "compose": compose,
                 "loader": loader, "unload": unload}[op](**kw)
     if op in ("workbench", "expand"):   # workbench = 别名（与插件节点同名，顺手认）
-        return workbench(**kw)
+        return _oc_call(workbench, kw)
     return {"ok": False, "error": f"未知 op:{op}（{'/'.join(READ_OPS + WRITE_OPS)}）",
             "fail_closed": True}

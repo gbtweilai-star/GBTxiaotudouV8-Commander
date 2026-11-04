@@ -40,11 +40,11 @@ import urllib.request
 from datetime import datetime
 
 # ---------------------------------------------------------------- 常量
-PROXY = r"C:\Users\ADMIN\.codex\deepseek_proxy.py"
-REPO = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+PROXY = str(__import__("pathlib").Path.home() / ".codex" / "deepseek_proxy.py")
+REPO = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 PORT = int(os.environ.get("GBT_RELAY_PORT", "4446"))
 HEALTH_URL = os.environ.get("GBT_RELAY_HEALTH_URL", "http://127.0.0.1:%d/health" % PORT)
-LOG_DIR = os.environ.get("GBT_RELAY_LOG_DIR", r"C:\Users\ADMIN\.codex\log")
+LOG_DIR = os.environ.get("GBT_RELAY_LOG_DIR", str(__import__("pathlib").Path.home() / ".codex" / "log"))
 LOG_FILE = os.path.join(LOG_DIR, "relay_watchdog.log")
 STATE_FILE = os.path.join(LOG_DIR, "relay_watchdog.state.json")
 LOCK_FILE = os.path.join(LOG_DIR, "relay_watchdog.lock")

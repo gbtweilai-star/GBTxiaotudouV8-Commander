@@ -2,12 +2,12 @@
   "status": "user_error",
   "kind": "mirror_parity",
   "fingerprint": "9421dc01cd457b357163f1c88c0a8352aaa71c44b808107a7f7fe79c1f7a5ef2",
-  "pid": 19584,
-  "started_at": 1793563852.7772079,
-  "started_iso": "2026-11-02T03:10:52",
-  "finished_at": 1793563852.8271587,
-  "finished_iso": "2026-11-02T03:10:52",
+  "pid": 19532,
+  "started_at": 1793665317.9578574,
+  "started_iso": "2026-11-03T07:21:57",
+  "finished_at": 1793665317.9757757,
+  "finished_iso": "2026-11-03T07:21:57",
   "detail": {
-    "error": "缺少 plan：排练计划不存在: default"
+    "error": "排练计划不存在: default"
   }
 }

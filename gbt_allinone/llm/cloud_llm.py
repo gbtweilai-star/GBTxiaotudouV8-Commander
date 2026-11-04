@@ -1117,6 +1117,36 @@ def _private_egress_allowed() -> bool:
         return False
 
 
+def _is_own_weights_lane(url: str) -> bool:
+    """是不是**她本人的本机权重车道**（回环 + 本机自训权重）。
+
+    🔴 2026-11-03 主人令（逐字）：「只有黑客全能力和转账需要终端YES，
+    其他全部由GBT小土豆V8指挥官大模型分析决策」。
+
+    `net_guard` 的 `allow_private` 原本为挡 SSRF/内网穿透而设；而**打自己的 8111**
+    既不是出网、也不是花钱：权重在本机、算力在本机、数据不出本机（边际成本 $0）。
+    把它归进"未授权内网出站"等于**拿设备自己的算力还要发票**，与主人令相反。
+    判据收紧到三条同时成立，不含任何"信任整个内网"的放宽：
+      ① 主机是回环（127.0.0.1 / localhost / ::1）—— 硬编码白名单，不走 DNS；
+      ② 端口命中车道表里声明的本机口（默认 8111）；
+      ③ provider 声明的 URL 本身就是回环（防止 GBT_POTATO_BASE_URL 被指向云端后仍免票）。
+    """
+    try:
+        from ..security import net_guard as _ng
+        if not _ng.is_loopback(url):
+            return False
+        host = urllib.parse.urlsplit(str(url)).hostname or ""
+        if host.lower() not in ("127.0.0.1", "localhost", "::1"):
+            return False
+        from . import key_gateway as _kg
+        spec = (_kg._BY_NAME.get("potato") or {})
+        lane_url = str(_kg._url_of(spec) if hasattr(_kg, "_url_of") else spec.get("url") or "")
+        return bool(lane_url) and _ng.is_loopback(lane_url)
+    except Exception:                                          # noqa: BLE001
+        return False
+
+
+
 def _safe_json(url, body, headers, timeout, *, audit_provider=None,
                audit_model=None, audit_session_id=None, method="POST"):
     """统一出站口：net_guard 守门 + 应用层 AI 审计（只记元数据，不记内容）。
@@ -1134,10 +1164,13 @@ def _safe_json(url, body, headers, timeout, *, audit_provider=None,
                        request_body=body, headers=headers,
                        session_id=audit_session_id)
     payload = json.dumps(body).encode("utf-8") if body is not None else None
+    # 2026-11-03：本机自训权重车道（回环 8111）免 `allow_private` 票 —— 见 `_is_own_weights_lane`。
+    # 云端车道一个字没变：仍走 `_private_egress_allowed()`（要求可信会话或 network_private 票）。
+    _allow_priv = _private_egress_allowed() or _is_own_weights_lane(url)
     try:
         response = _ng.safe_request_json(
             url, method=method, headers=headers, body=payload, timeout=timeout,
-            max_bytes=8_000_000, allow_private=_private_egress_allowed())
+            max_bytes=8_000_000, allow_private=_allow_priv)
     except Exception as exc:  # noqa: BLE001
         _audit.finish(ctx, ok=False, error=exc)
         raise

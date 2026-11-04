@@ -24,9 +24,9 @@ import shutil
 import sys
 from mathutils import Vector
 
-SRC = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v2-rigged.glb"
-DST = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v3-jaw.glb"
-BAK = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\_backup\dh-v2-rigged.glb"
+SRC = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v2-rigged.glb")
+DST = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v3-jaw.glb")
+BAK = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "_backup" / "dh-v2-rigged.glb")
 
 # 嘴带参数（Blender 世界坐标；Z 是高度，−Y 是她的正前方）
 MOUTH_Z = (1.545, 1.640)     # 唇线上下各 ~2.5cm

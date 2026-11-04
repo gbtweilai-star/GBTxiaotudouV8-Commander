@@ -146,6 +146,22 @@ PROBES: dict = {
 KEEPER = "身"
 
 
+def _evict(p) -> tuple:
+    """排泄（主人令 2026-11-04）：垃圾送 **Windows 回收站**，不硬删。
+
+    改造前的卫生层是 shutil.rmtree / Path.unlink —— 那是「烧毁」：
+    删完不可恢复，判错一次就丢资产。排泄是**可逆的**：排出去，但还在系统里，
+    能从「回收站」捡回来。这是有没有「排泄器官」的分界线，不是写法偏好。
+
+    实现见 gbt_allinone/excrete.py（shell32.SHFileOperationW + FOF_ALLOWUNDO）。
+    """
+    try:
+        from .excrete import _recycle_one
+        return _recycle_one(str(p))
+    except Exception as exc:                                     # noqa: BLE001
+        return False, "%s: %s" % (type(exc).__name__, str(exc)[:100])
+
+
 def _resolve_keeper() -> tuple:
     """返回 (实际值日的分类代号, 是否配置有问题)。
 
@@ -496,23 +512,24 @@ class HeartbeatTentacle:
             if p.is_dir() and low in _GARBAGE_DIRS:
                 res["garbage"].append(name + "/")
                 if clean:
-                    try:
-                        import shutil as _sh
-                        _sh.rmtree(p, ignore_errors=False)
+                    # 排泄 ≠ 烧毁：整棵垃圾目录送回收站，判错也能捡回来
+                    _ok, _why = _evict(p)
+                    if _ok:
                         res["cleaned"].append(name + "/")
-                    except Exception as e:  # noqa: BLE001
-                        res["errors"].append(f"{name}: {type(e).__name__}")
+                    else:
+                        res["errors"].append(f"{name}: {_why}")
                 continue
 
             # ② 垃圾文件
             if p.is_file() and (low in _GARBAGE_NAMES or low.endswith(_GARBAGE_SUFFIX)):
                 res["garbage"].append(name)
                 if clean:
-                    try:
-                        p.unlink()
+                    # 同上：送回收站，不 unlink
+                    _ok, _why = _evict(p)
+                    if _ok:
                         res["cleaned"].append(name)
-                    except Exception as e:  # noqa: BLE001
-                        res["errors"].append(f"{name}: {type(e).__name__}")
+                    else:
+                        res["errors"].append(f"{name}: {_why}")
                 continue
 
             # ③ 合法件
@@ -533,11 +550,12 @@ class HeartbeatTentacle:
             res["overflow"] = [p.name for _, p in scans[KEEP_SCANS:]]
             if clean:
                 for _, p in scans[KEEP_SCANS:]:
-                    try:
-                        p.unlink()
+                    # 超额扫描件也走回收站：环形保留判错时不至于把账毁掉
+                    _ok, _why = _evict(p)
+                    if _ok:
                         res["cleaned"].append(p.name)
-                    except Exception as e:  # noqa: BLE001
-                        res["errors"].append(f"{p.name}: {type(e).__name__}")
+                    else:
+                        res["errors"].append(f"{p.name}: {_why}")
 
         # ⑥ 整理：各触手那一格的 category 必须与文件名一致（错位=被写脏）
         for code in TX.CATEGORIES:
@@ -882,6 +900,41 @@ def scan_all(mode: str = TIER_LIGHT, persist: bool = True, clean: bool = False) 
         # 会稳定多出 1 份（实测 21 > 20）。这里写完再收一次，让"≤20"成为真不变量。
         if clean:
             _prune_scans(KEEP_SCANS)
+
+    # ── 自主排泄（主人令 2026-11-04）────────────────────────────────────
+    # 生理上排泄是**心跳驱动**的，不是"有人记得加 --clean"驱动的。
+    # 所以在这儿挂一跳：config.auto 为真 + 距上次排泄超过 auto_min_gap_s
+    # + 体内 strict 垃圾超过 threshold_mb ⇒ 自动送回收站。
+    # 三条纪律不变：①走回收站（可还原）②有间隔与阈值（不空转扫盘）③失败如实报。
+    if not clean:
+        try:
+            from . import excrete as _ex
+            _c = _ex._cfg()
+            if _c.get("auto"):
+                _gap = float(_c.get("auto_min_gap_s", 1800))
+                _last_m = 0.0
+                try:
+                    _last_m = os.path.getmtime(_ex._LAST)
+                except OSError:
+                    pass
+                if time.time() - _last_m >= _gap:
+                    _thr = float(_c.get("threshold_mb", 200)) * 1024 * 1024
+                    _st = _ex.op_status()
+                    _sb = int((_st.get("strict") or {}).get("bytes", 0))
+                    if _sb >= _thr:
+                        report["excrete"] = _ex.op_auto(force=True)
+                    else:
+                        report["excrete"] = {
+                            "ok": True, "skipped": True,
+                            "reason": "未达阈值 %s（当前 %s）"
+                                      % (_ex._human(int(_thr)),
+                                         (_st.get("strict") or {}).get("human"))}
+                else:
+                    report["excrete"] = {"ok": True, "skipped": True,
+                                         "reason": "距上次排泄不足 %d 秒" % int(_gap)}
+        except Exception as _e:                                  # noqa: BLE001
+            report["excrete"] = {"ok": False,
+                                 "error": "%s: %s" % (type(_e).__name__, str(_e)[:120])}
     return report
 
 
@@ -900,11 +953,10 @@ def _prune_scans(keep: int = KEEP_SCANS) -> int:
         scans.sort(reverse=True)
         n = 0
         for _, p in scans[keep:]:
-            try:
-                p.unlink()
+            # 排泄而不是烧毁（主人令 2026-11-04）：回收站可还原
+            _ok, _why = _evict(p)
+            if _ok:
                 n += 1
-            except OSError:
-                pass
         return n
     except Exception:  # noqa: BLE001
         return 0

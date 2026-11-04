@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_realtime — 眼手脑同拍 · 灵巧手 loopback 版。
 
 链路（同一拍，不是三段式）：

@@ -25,9 +25,9 @@ import sys
 import numpy as np
 from PIL import Image, ImageFilter
 
-SRC = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\jaw-fix\dh-v4-jaw.glb"   # 流水线上游：v3 →(dh-jaw-fix)→ v4 →(本件)→ v5
-OUTDIR = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\tex"          # 只放证据（贴图 / 对比图）
-ASSET_DIR = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets"
+SRC = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "jaw-fix" / "dh-v4-jaw.glb")   # 流水线上游：v3 →(dh-jaw-fix)→ v4 →(本件)→ v5
+OUTDIR = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "tex")          # 只放证据（贴图 / 对比图）
+ASSET_DIR = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets")
 OUT = os.path.join(ASSET_DIR, "dh-v6-skin.glb")   # 在役件只有一份：不在仓里留第二份副本
 # 命名口径：v5 = 只调了颜色；v6 = 颜色 + **粗糙度基线抬升**（去"抛光塑料"高光）⇒ 换名字，不叫 v5 了
 

@@ -27,6 +27,7 @@
 5. **读不到就如实报**：语料为空 / 来源未登记 ⇒ 结构化拒绝（fail-closed），不返空即绿。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -225,7 +226,7 @@ def fetch(url: str, source_key: str = "starterstory", keyword: str = "") -> dict
             "via": "run_task('tentacle', web_read)（唯一门）"}
 
 
-def sources(**_kwargs) -> dict:
+def sources() -> dict:
     return {"ok": True, "op": "sources", "sources": SOURCES,
             "_口径": "只读公开页；取数一律经唯一门（触手 web_read）；本件自己不发 HTTP"}
 
@@ -257,7 +258,7 @@ def run_op(op: str = "sources", **params) -> dict:
     for n, fn in (("sources", sources), ("fetch", fetch), ("ingest", ingest),
                   ("save", save), ("search", search), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": "未知 op:%s（sources/fetch/ingest/save/search/where）" % op}
 

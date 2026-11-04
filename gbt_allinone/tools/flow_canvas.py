@@ -27,6 +27,7 @@
    （console 页账的口径是 holo_pet/assets/*/index.html + 仓根 *.html，不掺花）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import time
@@ -180,7 +181,7 @@ def run_op(op: str = "from_wf", **params) -> dict:
     for name, fn in (("from_wf", from_wf), ("from_dag", from_dag), ("render", render),
                      ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（from_wf/from_dag/render/where）"}
 

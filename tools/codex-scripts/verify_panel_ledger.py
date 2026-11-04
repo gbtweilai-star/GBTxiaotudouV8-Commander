@@ -2,7 +2,7 @@ import json
 import os
 import sys
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-ws = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+ws = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 
 
 def rows(p):

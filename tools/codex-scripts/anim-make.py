@@ -25,7 +25,7 @@ _ARM = ("LeftShoulder", "RightShoulder", "LeftArm", "RightArm",
 _LEG = ("LeftUpLeg", "RightUpLeg", "LeftLeg", "RightLeg",
         "LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase")
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 SRC = DH / "raw/rig/model-rigged.glb"                 # 低模绑骨件（动画挂它：小、快、随时可换高模）
 OUT = DH / "raw/rig/model-rigged-anim.glb"

@@ -32,6 +32,7 @@ ops：`status` / `limits` / `plan` / `move` / `where`
   · `move` —— 逐关节走 `run_task`，**每一位的票由那一位自己的门收**（本模块不另加门，也不绕门）
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import re
@@ -321,7 +322,7 @@ def run_op(op: str = "status", **kw) -> dict:
     if fn is None:
         return {"ok": False, "op": op, "status": "unknown_op", "available": sorted(table),
                 "fail_closed": True}
-    return fn(**kw)
+    return _oc_call(fn, kw)
 
 
 if __name__ == "__main__":

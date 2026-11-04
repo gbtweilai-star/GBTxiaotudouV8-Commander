@@ -35,6 +35,28 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
+
+def _comfy_cands() -> list[Path]:
+    """ComfyUI 可能的位置：COMFY_DIR → 用户家目录 → 包内。"""
+    cs = []
+    env = os.environ.get("COMFY_DIR")
+    if env:
+        cs.append(Path(env))
+    cs += [Path.home() / "ComfyUI", ROOT / "ComfyUI"]
+    return cs
+
+
+def start_hint(port: int = 8188) -> str:
+    """ComfyUI 的起法。找不到就**如实说找不到**（连同找过哪几处），不编一个假路径。"""
+    cs = _comfy_cands()
+    for c in cs:
+        if (c / "main.py").is_file():
+            venv = c / ".venv" / "Scripts" / "python.exe"
+            py = venv if venv.is_file() else "python"
+            return f"cd {c}; {py} main.py --cpu --port {port}"
+    return (f"没找到 ComfyUI（找过：{'、'.join(map(str, cs))}）。"
+            f"装好后把目录设进 COMFY_DIR，再 cd 进去跑 main.py --cpu --port {port}")
+
 HOST = os.environ.get("COMFY_HOST", "http://127.0.0.1:8188")
 UA = "gbt-comfy-probe/1.0 (+local)"
 CKPT = "v1-5-pruned-emaonly-fp16.safetensors"
@@ -97,7 +119,7 @@ def once(prompt: str, negative: str, size: int, steps: int, outdir: Path, timeou
     st = http(HOST + "/system_stats", timeout=10)
     if not st["ok"]:
         print("ComfyUI 未就绪（未读到）：%s" % st.get("err"))
-        print("  起法：cd C:\\Users\\ADMIN\\ComfyUI; .\\.venv\\Scripts\\python.exe main.py --cpu --port 8188")
+        print("  起法：" + start_hint())
         return 2
     dev = json.loads(st["bytes"].decode("utf-8", "replace")).get("devices") or [{}]
     print("ComfyUI 就绪 · 设备=%s" % dev[0].get("name"))

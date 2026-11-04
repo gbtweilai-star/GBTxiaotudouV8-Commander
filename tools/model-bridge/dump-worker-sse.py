@@ -13,7 +13,7 @@ import urllib.error
 import urllib.request
 
 URL = "https://gbt-potato-cloud-10.paysssk.workers.dev/v1/chat/completions"
-CRED = r"C:\Users\ADMIN\.dsh\.credentials.yaml"
+CRED = str(__import__("pathlib").Path.home() / ".dsh" / ".credentials.yaml")
 
 
 def gw():

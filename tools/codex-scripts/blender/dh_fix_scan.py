@@ -22,7 +22,7 @@ import os
 import sys
 import time
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[3])
 
 
 def parse_args():

@@ -8,7 +8,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 RIG = DH / "raw/rig/model-rigged-hi.glb"
 BASE = DH / "raw/phase4-4k/tripo-out/gbt-4k-tex-convert-0d1f0aa6/model.glb"

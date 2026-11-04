@@ -7,7 +7,7 @@ from pathlib import Path
 
 BASE = next(p for p in Path(__file__).resolve().parents
             if (p / "gbt_allinone").is_dir())   # 修：原 `.parent.parent` 只到 tools/（少一层）
-EF = r"C:\Users\ADMIN\AppData\Local\local\bin\eigenflux.exe"
+EF = str(Path.home() / "AppData" / "Local" / "local" / "bin" / "eigenflux.exe")
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 

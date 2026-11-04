@@ -1,4 +1,4 @@
-# 90 · 她能干嘛：30 域 385 位能力（现读版）
+# 90 · 她能干嘛：32 域 427 位能力（现读版）
 
 > 本文由 `gbt_allinone/caps_registry.py` **实时生成**（不是手写宣传语）。
 > 想知道某一位到底能干什么，看命令 `gbt.run_task('<名字>', {'op':'status'})`。
@@ -12,7 +12,7 @@ import gbt_allinone as gbt
 gbt.run_task("cap_self", {"op": "brief"})   # 她现读的自述：我能干什么、部署在哪
 ```
 
-## 二、30 个域（按能力数量排序）
+## 二、32 个域（按能力数量排序）
 
 | 域 | 能力数 | 代表能力 | 一句话 |
 |---|---|---:|---|
@@ -139,7 +139,7 @@ print(r.get('gbt_result', {}).get('result'))
 ## 五、怎么自己核
 
 ```bash
-python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 385
+python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 427
 python -m gbt_allinone list                                                                          # 逐位列出
 ```
 

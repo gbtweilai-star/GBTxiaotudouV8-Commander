@@ -1,170 +1,153 @@
 {
-  "total_devours": 22,
-  "total_absorbed": 22,
+  "total_devours": 0,
+  "total_absorbed": 0,
   "total_caps_created": 0,
-  "last_devour_at": "2026-11-01T09:19:50.792858",
+  "last_devour_at": null,
   "absorbed_skills": [],
-  "scan_learnings": [
-    "[CyanHaze/Awesome-Dexterous-Hands] A curated list of papers, datasets, simulators, hardware platforms, and open-sou",
-    "[yanming03/awesome-humanoid-manipulation] A curated list of awesome papers and resources on humanoid manipulation, dextero",
-    "[zihanwang0422/awesome-loco-manipulation] Paper and Github repos about locomotion, manipulation and loco-manipulation.",
-    "[zhaohengyin/lightning-grasp] The Lightning Grasp System",
-    "[LFGfg/TransDex]    TransDex: a 3D visuo-tactile fusion motor policy based on point cloud reconst",
-    "[Janebek/AdaDexTrack] [CVPR 2026] \"AdaDexTrack: Dynamic Modulation for Adaptive and Generalizable Dext",
-    "[hsp-iit/PCHands] Repository hosting the official code of the paper \"PCHands: PCA-based Hand Pose ",
-    "[12-Twelve-12/robolings] Small exercises for robot learning, rustlings style: kinematics, dexterous hands",
-    "[Dengfeng-Yan/Dexterous-Soft-Hand] This is a library that provides dexterous hand manipulation tasks and its model-",
-    "[qqsq12321/AnyDexRetarget] High-precision hand pose retargeting for multiple dexterous hands. Supports Visi",
-    "[Bobyue0118/BrainCo-Revo2-Dex-Retargeting] 支持BrainCo Revo2灵巧手（实时）重定向及手部动作生成  / Real-time Dex-retargeting & Hand Control",
-    "[alexandertianlin/hand-tracking-fusion-system] Multi-modal hand tracking fusion system: HaMeR + ViTPose + IMU glove + depth cam",
-    "[cjgogo27/DexFingerGuessing] DexFinger Guessing: a PaXini DexH13 dexterous hand plays rock-paper-scissors wit",
-    "[ookkshirsagar/rh56dfx_description] ROS 2 URDF description package for the Inspire Robotics RH56DFX 6-DOF dexterous ",
-    "[yuzhench/inspire-hand-rh56-py] Pure-Python driver for the Inspire RH56DFTP dexterous hand — Modbus TCP, no ROS,",
-    "[Roboparty/rp_dexhand] RP Hand dexterous hand: product documentation, hardware, companion software, CAD",
-    "[TOHgoto/dexterous_hand_ros2] 🦾 A universal ROS 2 package for dexterous hands with 6 active DOFs. Features a u",
-    "[tesollodelto/tesollo_ros2] ROS 2 drivers and control packages for Tesollo robotic hands and grippers, inclu",
-    "[Blue-Hill-Tech/artly-dex-hand] Artly Dex Hand: SDKs, CAD, simulation models and technical documentation for Art",
-    "[Juxi-Technology/AmazingHand] Control software and CAD models for the AmazingHand 8-DOF bionic dexterous hand",
-    "[cbbtoagi/Mood-Gesture] 情指传暖 Mood-Gesture — 基于单只开源灵巧手的人脸情绪感知与虚实双轨情感陪伴系统：Face emotion → LLM blessing → de",
-    "[hypit-ai/hypit] Clone any viral video with AI agents. Not just a script, the whole workflow: swa"
-  ],
-  "known_issues": {
-    "devoured_github_cyanhaze_awesome-dexterous-hands": {
-      "skill": "github_cyanhaze_awesome-dexterous-hands",
-      "knowledge": "# CyanHaze/Awesome-Dexterous-Hands 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:30:44 | 来源: https://github.com/CyanHaze/Awesome-Dexterous-Hands\n> Stars: 50 | 语言: None | 许可: CC-BY-4.0\n\n## 项目概览\n- 描述: A curated list of papers, datasets, simulators, hardware platforms, and open-source resources for dexterous robot hands and hand-object manipulation.\n- 主题: awesome-list, dexterous-grasping, dexterous-hand, dexterous-hands, dexterous-manipulation, dexterous-robotic-hand, hand-object-interaction, hand-o",
-      "devoured_at": "2026-11-01T07:30:45.003842"
-    },
-    "devoured_github_yanming03_awesome-humanoid-manipulation": {
-      "skill": "github_yanming03_awesome-humanoid-manipulation",
-      "knowledge": "# yanming03/awesome-humanoid-manipulation 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:30 | 来源: https://github.com/yanming03/awesome-humanoid-manipulation\n> Stars: 164 | 语言: None | 许可: unknown\n\n## 项目概览\n- 描述: A curated list of awesome papers and resources on humanoid manipulation, dexterous manipulation, bimanual dexterous manipulation, in-hand manipulation, and humanlike manipulation.\n- 主题: awesome, awesome-list, bimanual-manipulation, dexterous-grasping, dexterous-hand, dexterous-manipulatio",
-      "devoured_at": "2026-11-01T07:31:30.340765"
-    },
-    "devoured_github_zihanwang0422_awesome-loco-manipulation": {
-      "skill": "github_zihanwang0422_awesome-loco-manipulation",
-      "knowledge": "# zihanwang0422/awesome-loco-manipulation 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:32 | 来源: https://github.com/zihanwang0422/awesome-loco-manipulation\n> Stars: 9 | 语言: None | 许可: unknown\n\n## 项目概览\n- 描述: Paper and Github repos about locomotion, manipulation and loco-manipulation.\n- 主题: dexterous-hand, dexterous-manipulation, loco-manipulation, whole-body-control\n- 分支: main | 最近推送: 2026-09-07\n\n## README 摘要\n# Awesome-Loco-Manipulation\n\n## Table of Contents\n\n1. [Manipulation](manipulation.md)\n",
-      "devoured_at": "2026-11-01T07:31:32.967216"
-    },
-    "devoured_github_zhaohengyin_lightning-grasp": {
-      "skill": "github_zhaohengyin_lightning-grasp",
-      "knowledge": "# zhaohengyin/lightning-grasp 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:34 | 来源: https://github.com/zhaohengyin/lightning-grasp\n> Stars: 226 | 语言: Python | 许可: NOASSERTION\n\n## 项目概览\n- 描述: The Lightning Grasp System\n- 主题: dexterous-hand, dexterous-manipulation, gpu, graphics-3d, grasping\n- 分支: main | 最近推送: 2026-06-12\n\n## README 摘要\n<center>\n\n# Lightning Grasp\nPublic repository for the Lightning Grasp system. [paper](https://arxiv.org/abs/2511.07418)\n\nThe enhanced core grasp generation engine,",
-      "devoured_at": "2026-11-01T07:31:34.210483"
-    },
-    "devoured_github_lfgfg_transdex": {
-      "skill": "github_lfgfg_transdex",
-      "knowledge": "# LFGfg/TransDex 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:35 | 来源: https://github.com/LFGfg/TransDex\n> Stars: 14 | 语言: Python | 许可: unknown\n\n## 项目概览\n- 描述:    TransDex: a 3D visuo-tactile fusion motor policy based on point cloud reconstruction pre-training.\n- 主题: dexterous-hand, dexterous-manipulation, robot-learning\n- 分支: main | 最近推送: 2026-10-03\n\n## README 摘要\n# TransDex: Interaction Geometry Enables Robust Visuo-Tactile Dexterous Manipulation of Transparent Objects\n<div align=\"center\">\n\n[",
-      "devoured_at": "2026-11-01T07:31:35.669914"
-    },
-    "devoured_github_janebek_adadextrack": {
-      "skill": "github_janebek_adadextrack",
-      "knowledge": "# Janebek/AdaDexTrack 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:36 | 来源: https://github.com/Janebek/AdaDexTrack\n> Stars: 5 | 语言: Python | 许可: BSD-3-Clause\n\n## 项目概览\n- 描述: [CVPR 2026] \"AdaDexTrack: Dynamic Modulation for Adaptive and Generalizable Dexterous Manipulation Tracking\"\n- 主题: dexterous-hand, reinforcement-learning, robotics\n- 分支: main | 最近推送: 2026-10-27\n\n## README 摘要\n<h1 align=\"center\">AdaDexTrack: Dynamic Modulation for Adaptive and Generalizable Dexterous Manipulation Tracking</h",
-      "devoured_at": "2026-11-01T07:31:37.015768"
-    },
-    "devoured_github_hsp-iit_pchands": {
-      "skill": "github_hsp-iit_pchands",
-      "knowledge": "# hsp-iit/PCHands 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:38 | 来源: https://github.com/hsp-iit/PCHands\n> Stars: 7 | 语言: Python | 许可: BSD-3-Clause\n\n## 项目概览\n- 描述: Repository hosting the official code of the paper \"PCHands: PCA-based Hand Pose Retargeting on Manipulators with N-DoF\" \n- 主题: cross-embodiment, dexterous-hand, dexterous-manipulation, gripper, reinforcement-learning\n- 分支: main | 最近推送: 2026-03-19\n\n## README 摘要\n<h1 align=\"center\">\n    :hand::love_you_gesture: PCHands :vulcan_salute",
-      "devoured_at": "2026-11-01T07:31:38.533057"
-    },
-    "devoured_github_12-twelve-12_robolings": {
-      "skill": "github_12-twelve-12_robolings",
-      "knowledge": "# 12-Twelve-12/robolings 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:39 | 来源: https://github.com/12-Twelve-12/robolings\n> Stars: 13 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: Small exercises for robot learning, rustlings style: kinematics, dexterous hands, control, diffusion policy, flow matching. NumPy only.\n- 主题: dexterous-hand, diffusion-policy, embodied-ai, exercises, flow-matching, imitation-learning, kalman-filter, kinematics, learning-by-doing, lerobot\n- 分支: main | 最近推送: 2026-10-08\n\n## REA",
-      "devoured_at": "2026-11-01T07:31:39.893881"
-    },
-    "devoured_github_dengfeng-yan_dexterous-soft-hand": {
-      "skill": "github_dengfeng-yan_dexterous-soft-hand",
-      "knowledge": "# Dengfeng-Yan/Dexterous-Soft-Hand 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:41 | 来源: https://github.com/Dengfeng-Yan/Dexterous-Soft-Hand\n> Stars: 1 | 语言: None | 许可: unknown\n\n## 项目概览\n- 描述: This is a library that provides dexterous hand manipulation tasks and its model-file through Mujoco.\n- 主题: dexterous-hand, reinforcement-learning\n- 分支: main | 最近推送: 2025-04-07\n\n## README 摘要\n# Dexterous-Soft-Hand\n\n## 对 GBT 的启示\n- 可吸收点: 结合仓库定位与 README 技术栈, 提炼可注入 GBT cap 的知识",
-      "devoured_at": "2026-11-01T07:31:41.384445"
-    },
-    "devoured_github_qqsq12321_anydexretarget": {
-      "skill": "github_qqsq12321_anydexretarget",
-      "knowledge": "# qqsq12321/AnyDexRetarget 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:42 | 来源: https://github.com/qqsq12321/AnyDexRetarget\n> Stars: 92 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: High-precision hand pose retargeting for multiple dexterous hands. Supports Vision Pro, Quest 3, camera, and more.\n- 主题: dexterous-hand, hand-tracking, mujoco, quest3, retargeting, robotics, teleoperation, vision-pro\n- 分支: master | 最近推送: 2026-10-29\n\n## README 摘要\n[中文](README.zh.md) | English\n\n# AnyDexRetarget\n\n[![License:",
-      "devoured_at": "2026-11-01T07:31:42.843986"
-    },
-    "devoured_github_bobyue0118_brainco-revo2-dex-retargeting": {
-      "skill": "github_bobyue0118_brainco-revo2-dex-retargeting",
-      "knowledge": "# Bobyue0118/BrainCo-Revo2-Dex-Retargeting 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:44 | 来源: https://github.com/Bobyue0118/BrainCo-Revo2-Dex-Retargeting\n> Stars: 38 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: 支持BrainCo Revo2灵巧手（实时）重定向及手部动作生成  / Real-time Dex-retargeting & Hand Control\n- 主题: dexterous-hand, retargeting-motion\n- 分支: main | 最近推送: 2026-04-29\n\n## README 摘要\n# 📚 BrainCo Hand Retargeting System\n\n**Version 2.1.0** - Complete hand motion retargeting from video/image to robotic hand contr",
-      "devoured_at": "2026-11-01T07:31:44.311940"
-    },
-    "devoured_github_alexandertianlin_hand-tracking-fusion-system": {
-      "skill": "github_alexandertianlin_hand-tracking-fusion-system",
-      "knowledge": "# alexandertianlin/hand-tracking-fusion-system 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:45 | 来源: https://github.com/alexandertianlin/hand-tracking-fusion-system\n> Stars: 1 | 语言: C | 许可: MIT\n\n## 项目概览\n- 描述: Multi-modal hand tracking fusion system: HaMeR + ViTPose + IMU glove + depth camera, with per-finger confidence-gated switching and Slerp complementary filter. Consolidated from 6 repos with full fusion algorithm docs, evaluation report, MIT License, and CITATION.cff.\n- 主题: dexterous-han",
-      "devoured_at": "2026-11-01T07:31:45.977901"
-    },
-    "devoured_github_cjgogo27_dexfingerguessing": {
-      "skill": "github_cjgogo27_dexfingerguessing",
-      "knowledge": "# cjgogo27/DexFingerGuessing 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:47 | 来源: https://github.com/cjgogo27/DexFingerGuessing\n> Stars: 1 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: DexFinger Guessing: a PaXini DexH13 dexterous hand plays rock-paper-scissors with you and mirrors your fingers. Python + Modbus, no vendor SDK.\n- 主题: dexh13, dexterous-hand, hand-tracking, mediapipe, modbus, paxini, python, robotics, rock-paper-scissors\n- 分支: main | 最近推送: 2026-10-31\n\n## README 摘要\n# DexFingerGuessing\n\n",
-      "devoured_at": "2026-11-01T07:31:47.460092"
-    },
-    "devoured_github_ookkshirsagar_rh56dfx_description": {
-      "skill": "github_ookkshirsagar_rh56dfx_description",
-      "knowledge": "# ookkshirsagar/rh56dfx_description 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:48 | 来源: https://github.com/ookkshirsagar/rh56dfx_description\n> Stars: 16 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: ROS 2 URDF description package for the Inspire Robotics RH56DFX 6-DOF dexterous hand. Supports left and right variants with mesh geometry, joint limits, RViz visualisation, and ros2_control integration.\n- 主题: ai, dexterous-hand, grasp-planning, imitation-learning, inspire-robotics, isaac-sim, manipulati",
-      "devoured_at": "2026-11-01T07:31:48.943348"
-    },
-    "devoured_github_yuzhench_inspire-hand-rh56-py": {
-      "skill": "github_yuzhench_inspire-hand-rh56-py",
-      "knowledge": "# yuzhench/inspire-hand-rh56-py 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:50 | 来源: https://github.com/yuzhench/inspire-hand-rh56-py\n> Stars: 5 | 语言: Python | 许可: MIT\n\n## 项目概览\n- 描述: Pure-Python driver for the Inspire RH56DFTP dexterous hand — Modbus TCP, no ROS, with a browser debug UI.                                               \n- 主题: dexterous-hand, dexterous-manipulation, dexterous-robotic-hand, hand-driver, inspire-robotics, modbus-tcp, python, rh56, rh56dftp, robot-control\n- 分支: mai",
-      "devoured_at": "2026-11-01T07:31:50.376792"
-    },
-    "devoured_github_roboparty_rp_dexhand": {
-      "skill": "github_roboparty_rp_dexhand",
-      "knowledge": "# Roboparty/rp_dexhand 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:51 | 来源: https://github.com/Roboparty/rp_dexhand\n> Stars: 10 | 语言: Python | 许可: unknown\n\n## 项目概览\n- 描述: RP Hand dexterous hand: product documentation, hardware, companion software, CAD/URDF/MJCF and SDK guides.\n- 主题: can-fd, dexterous-hand, humanoid-robot, robotics\n- 分支: main | 最近推送: 2026-10-19\n\n## README 摘要\n<a id=\"top\"></a>\n\n<p align=\"center\">\n  <a href=\"https://github.com/Roboparty/RP1\">RP1 Humanoid</a> &nbsp; / &nbsp; <stro",
-      "devoured_at": "2026-11-01T07:31:51.910025"
-    },
-    "devoured_github_tohgoto_dexterous_hand_ros2": {
-      "skill": "github_tohgoto_dexterous_hand_ros2",
-      "knowledge": "# TOHgoto/dexterous_hand_ros2 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:53 | 来源: https://github.com/TOHgoto/dexterous_hand_ros2\n> Stars: 4 | 语言: C++ | 许可: MIT\n\n## 项目概览\n- 描述: 🦾 A universal ROS 2 package for dexterous hands with 6 active DOFs. Features a unified HAL for CAN/Serial hardware and a local mock driver.\n- 主题: dexterous-hand, dexterous-manipulation, dexterous-robotic-hand, dexterous-workspace, ros2\n- 分支: main | 最近推送: 2026-04-23\n\n## README 摘要\n# dexterous_hand\n\n[![CI](https://github.",
-      "devoured_at": "2026-11-01T07:31:53.409274"
-    },
-    "devoured_github_tesollodelto_tesollo_ros2": {
-      "skill": "github_tesollodelto_tesollo_ros2",
-      "knowledge": "# tesollodelto/tesollo_ros2 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:54 | 来源: https://github.com/tesollodelto/tesollo_ros2\n> Stars: 4 | 语言: None | 许可: BSD-3-Clause\n\n## 项目概览\n- 描述: ROS 2 drivers and control packages for Tesollo robotic hands and grippers, including ros2_control, MoveIt 2, Gazebo simulation, and SDK integration.\n- 主题: dexterous-hand, gazebo, moveit2, robot-drivers, robotic-gripper, robotic-hand, robotics, ros2, ros2-control, tesollo\n- 分支: main | 最近推送: 2026-10-15\n\n## README 摘",
-      "devoured_at": "2026-11-01T07:31:54.905988"
-    },
-    "devoured_github_blue-hill-tech_artly-dex-hand": {
-      "skill": "github_blue-hill-tech_artly-dex-hand",
-      "knowledge": "# Blue-Hill-Tech/artly-dex-hand 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:56 | 来源: https://github.com/Blue-Hill-Tech/artly-dex-hand\n> Stars: 0 | 语言: Python | 许可: unknown\n\n## 项目概览\n- 描述: Artly Dex Hand: SDKs, CAD, simulation models and technical documentation for Artly dexterous robot hands. D21 is the first model.\n- 主题: artly, cad, d21, dexterous-hand, mujoco, python, robot-hand, robotics, ros2, urdf\n- 分支: main | 最近推送: 2026-10-22\n\n## README 摘要\n# Artly Dex Hand\n\n**Dexterous robot hands from ",
-      "devoured_at": "2026-11-01T07:31:56.417141"
-    },
-    "devoured_github_juxi-technology_amazinghand": {
-      "skill": "github_juxi-technology_amazinghand",
-      "knowledge": "# Juxi-Technology/AmazingHand 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:57 | 来源: https://github.com/Juxi-Technology/AmazingHand\n> Stars: 0 | 语言: JavaScript | 许可: unknown\n\n## 项目概览\n- 描述: Control software and CAD models for the AmazingHand 8-DOF bionic dexterous hand\n- 主题: 3d-printing, amazinghand, arduino, dexterous-hand, feetech, juxi-technology, juxitechnology, open-source-hardware, pollen-robotics, python\n- 分支: main | 最近推送: 2026-10-22\n\n## README 摘要\nEnglish | [简体中文](README_CN.md)\n\n# Amazin",
-      "devoured_at": "2026-11-01T07:31:57.766855"
-    },
-    "devoured_github_cbbtoagi_mood-gesture": {
-      "skill": "github_cbbtoagi_mood-gesture",
-      "knowledge": "# cbbtoagi/Mood-Gesture 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T07:31:59 | 来源: https://github.com/cbbtoagi/Mood-Gesture\n> Stars: 0 | 语言: Python | 许可: NOASSERTION\n\n## 项目概览\n- 描述: 情指传暖 Mood-Gesture — 基于单只开源灵巧手的人脸情绪感知与虚实双轨情感陪伴系统：Face emotion → LLM blessing → dexterous-hand gesture → AI postcard\n- 主题: dexterous-hand, emotion-recognition, fastapi, human-robot-interaction, llm, mediapipe, robotics, websocket\n- 分支: main | 最近推送: 2026-09-05\n\n## README 摘要\n# 情指传暖 Mood‑Gesture\n\n基于单只开源灵巧手（softsync 六自由度 / Fl",
-      "devoured_at": "2026-11-01T07:31:59.226379"
-    },
-    "devoured_github_hypit-ai_hypit": {
-      "skill": "github_hypit-ai_hypit",
-      "knowledge": "# hypit-ai/hypit 吞噬记录 — devour_tentacle\n> 吞噬日期: 2026-11-01T09:19:50 | 来源: https://github.com/hypit-ai/hypit\n> Stars: 27145 | 语言: TypeScript | 许可: NOASSERTION\n\n## 项目概览\n- 描述: Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one command, and get your 100M views.\n- 主题: agentic-ai, ai, ai-agents, ai-video, compiler, dsl, ffmpeg, generative-ai, llm, markup-language\n- 分支: main | 最近推送: 2026-10-31\n\n## README 摘要\n<p alig",
-      "devoured_at": "2026-11-01T09:19:50.792858"
-    }
-  },
-  "topology": {},
   "reflections": [
     {
-      "at": "2026-11-01T07:32:11.515598",
-      "total_caps": 21,
+      "at": "2026-11-03T05:55:51.783732",
+      "total_caps": 0,
       "weak": 0,
-      "strong": 21
+      "strong": 0
     },
     {
-      "at": "2026-11-02T02:17:02.280813",
-      "total_caps": 22,
+      "at": "2026-11-03T05:57:21.341228",
+      "total_caps": 0,
       "weak": 0,
-      "strong": 22
+      "strong": 0
     },
     {
-      "at": "2026-11-02T02:39:00.172585",
-      "total_caps": 22,
+      "at": "2026-11-03T05:58:52.052186",
+      "total_caps": 0,
       "weak": 0,
-      "strong": 22
+      "strong": 0
     },
     {
-      "at": "2026-11-02T02:49:55.344308",
-      "total_caps": 22,
+      "at": "2026-11-03T05:59:51.402216",
+      "total_caps": 0,
       "weak": 0,
-      "strong": 22
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:02:43.033378",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:11:02.929317",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:21:52.791516",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:23:22.572893",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:24:52.551339",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:26:22.665106",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:27:52.453334",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:29:22.498256",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:30:52.945132",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:32:22.939894",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:33:40.330934",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:34:43.191108",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:35:49.574561",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:36:43.483218",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:37:56.262346",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:39:43.836866",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T06:50:37.661695",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T07:11:57.788324",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T07:15:23.358875",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
+    },
+    {
+      "at": "2026-11-03T07:20:56.643749",
+      "total_caps": 0,
+      "weak": 0,
+      "strong": 0
     }
   ]
 }

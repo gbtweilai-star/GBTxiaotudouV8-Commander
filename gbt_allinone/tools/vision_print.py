@@ -46,6 +46,7 @@
    「码→图」与「图→图」两条腿，**不证明她真看过屏幕** —— 这条边界写进返回值，不靠人记。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import base64
 import hashlib
@@ -979,7 +980,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("see", see), ("print", print_code), ("diff", diff), ("loop", loop),
                    ("polish", polish), ("ask_model", ask_model), ("status", status), ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": "未知 op:%s（see/print/diff/loop/polish/ask_model/status/where）" % op}
 

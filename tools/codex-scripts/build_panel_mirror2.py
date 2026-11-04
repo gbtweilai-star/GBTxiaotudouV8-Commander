@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / ".scratch" / "codex_v2_mirror" / "panel_server_mirror.py"
 DST = ROOT / ".scratch" / "codex_v2_mirror" / "panel_server_mirror2.py"
 LINEMAP = ROOT / ".scratch" / "panel_server_mirror2.line-map.md"

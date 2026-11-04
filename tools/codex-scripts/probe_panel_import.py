@@ -2,7 +2,7 @@ import os
 import sys
 import tempfile
 import traceback
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 os.environ["GBT_STORE_DIR"] = tempfile.mkdtemp(prefix="gbt_panel_import_")
 os.environ["GBT_SERVICE_DISCOVERY"] = "0"
 os.environ["GBT_OWNER_SESSION"] = "1"

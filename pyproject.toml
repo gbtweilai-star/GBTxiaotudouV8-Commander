@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gbt-commander"
 version = "1.0.0"
-description = "GBT小土豆V8 总指挥模型的最小客户端：读 341 位能力目录、按意图检索、把模型给的能力位名按目录校一遍"
+description = "GBT小土豆V8 总指挥模型的最小客户端：读 427 位能力目录、按意图检索、把模型给的能力位名按目录校一遍"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }

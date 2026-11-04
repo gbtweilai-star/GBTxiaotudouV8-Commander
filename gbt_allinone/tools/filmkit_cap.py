@@ -19,7 +19,7 @@ import importlib.util
 import io
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 _FK_PATH = ROOT / "tools" / "filmkit.py"
 READ_OPS = ("status", "plan")
 WRITE_OPS = ("gen", "seg", "build", "add", "rm")

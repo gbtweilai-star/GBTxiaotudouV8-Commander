@@ -29,7 +29,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REG = ROOT / "gbt_allinone" / "caps_registry.py"
-COMFY = Path(r"C:\Users\ADMIN\ComfyUI")
+COMFY = Path.home() / "ComfyUI"
 VNV = COMFY / ".venv" / "Scripts" / "python.exe"
 
 # **阈值不是拍的，是从观测数据推的**（2026-09-25 自纠）：

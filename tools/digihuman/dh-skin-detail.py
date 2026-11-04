@@ -24,10 +24,10 @@ from PIL import Image, ImageFilter
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-ASSET_DIR = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets"
+ASSET_DIR = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets")
 SRC = os.path.join(ASSET_DIR, "dh-v6-skin.glb")
 OUT = os.path.join(ASSET_DIR, "dh-v7-detail.glb")
-EVID = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\tex"
+EVID = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "tex")
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--apply", action="store_true")

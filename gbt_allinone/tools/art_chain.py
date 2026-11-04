@@ -26,6 +26,7 @@
 3. **上游一个字节不动**。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import subprocess
@@ -159,10 +160,10 @@ def where(**_kw) -> dict:
 def run(op: str = "status", **params) -> dict:
     op = str(op or "status").lower()
     if op == "run":
-        return run_chain(**params)
+        return _oc_call(run_chain, params)
     for nm, fn in (("status", status), ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

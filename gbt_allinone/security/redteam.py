@@ -39,6 +39,7 @@ Owner 2026-09-25 令：
    而授权是主人给的、不是受害者给的 —— 所以这五位不做成攻击工具。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import ipaddress
@@ -1197,7 +1198,7 @@ def _credential_steal(**_kw) -> dict:
 
 def _redteam_recon(**_kw) -> dict:
     """`redteam_recon` = 侦察维总入口。"""
-    return recon(**_kw)
+    return _oc_call(recon, _kw)
 
 
 OPS = {
@@ -1234,7 +1235,7 @@ def run(cap: str, payload: dict | None = None) -> dict:
                 kw["action"] = kw.pop(alt)
                 break
     kw.pop("op", None)
-    return fn(**kw)
+    return _oc_call(fn, kw)
 
 
 if __name__ == "__main__":                                      # 被 detach 的记录子进程用

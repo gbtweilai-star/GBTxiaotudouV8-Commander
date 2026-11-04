@@ -28,6 +28,7 @@
 3. **不编语义**：效果标签只认**代码里真出现的**特征串；认不出就如实留空。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -268,7 +269,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("build", build), ("find", find),
                    ("take", take), ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

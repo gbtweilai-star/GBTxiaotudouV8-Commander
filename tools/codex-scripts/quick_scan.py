@@ -405,9 +405,9 @@ def scan_plane1_prod(prod):
  # 2026-09-24 修一条**引用型/自指型假红**（与 TEST_CALIBER_HIJACK 同一类：判据分不清"病"和"讲病的教材"）。
     #    实测：本仓 21 条 MOJIBAKE 命中**全部**属于下面两类，没有一条是真乱码 ——
     #      · `tools/codex-scripts/quick_scan.py` L291：**它自己的乱码正则字面量**（自指）
-    #      · `skills/gbt-quickscan/SKILL.md` L216 引用实例 `GBTС����V8`（讲控制台代码页那一课）
-    #      · `skills/gbt-finance/SKILL.md` 引用 `����`（讲 PowerShell 管道解码那一课）
-    #      · `skills/gbt-creation/SKILL.md` 引用 `ģ��1 �籾����` · `skills/gbt-dangerous/SKILL.md` 引用 `����ǽ�ƹ�`
+    #      · `skills/gbt-quickscan/SKILL.md` L216 引用实例 `GBTС????V8`（讲控制台代码页那一课）
+    #      · `skills/gbt-finance/SKILL.md` 引用 `????`（讲 PowerShell 管道解码那一课）
+    #      · `skills/gbt-creation/SKILL.md` 引用 `ģ??1 ?籾????` · `skills/gbt-dangerous/SKILL.md` 引用 `????ǽ?ƹ?`
     #    ⇒ 修法两条，都不削弱"真乱码要报"：
     #      ① 匹配前**去掉行内代码 `…` 与围栏块 ```…```**（教材里的例子都写在代码span里）；
     #      ② **跳过定义这份模式表的本文件自己**（自指没法靠 ① 解决）。
@@ -2144,3 +2144,4 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         raise SystemExit(3)
+

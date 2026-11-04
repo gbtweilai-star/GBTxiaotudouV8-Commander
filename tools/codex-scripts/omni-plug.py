@@ -32,7 +32,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "state" / "omni-plug.json"
-V9 = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9")
+V9 = Path.home() / "Desktop" / "GBT小土豆V9"
 
 FACES = {
     "文本": "对话/写作/推理",

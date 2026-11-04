@@ -1,6 +1,6 @@
 {
- "count": 388,
- "at": "2026-11-01T15:07:43",
+ "count": 410,
+ "at": "2026-11-03T05:48:45",
  "capabilities": [
   {
    "name": "a1art_skill",
@@ -132,6 +132,15 @@
    "name": "answer_shaper",
    "domain": "system",
    "desc": "行动优先输出核（蒸馏自 2026-09-28 主人给的周榜截图 ayghri/i-have-adhd——截图只给仓库名，**未联网核验、未引用该仓任何代码/文本**；纪律取自本仓自己的沟通纪律与已有技能 gbt-adhd-mode，本件补**运行时可机检的核**）：`check` 五条确定性规则逐条判定（R1 首行是行动不是铺垫 · R2 有编号步骤 · R3 步骤≤5 · R4 无客套收尾 · R5 有下一步），零模型零出网零幻觉、每条带命中细节；`shape` **纯机械重排**（剥铺垫/抽编号步骤/截到 5 步），抽不出的原样进「未判定」区标需人看——**不替作者补写一字**。op=check/shape/where",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "api_slot",
+   "domain": "mind",
+   "desc": "**动态 API 槽定义口**（主人 P1，2026-11-02）：op=schema/validate/register/remove/list/call/verify。只登记槽定义：https-only、拒 localhost/私网/URL 凭据、密钥只存环境变量引用名、参数白名单、超时 1..30s、上限 20；**零作用域**，不读 secret 值、不发请求。`call()` 永远 not_supported（执行器未接，需 network egress 门+注入），不假装调通。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -329,6 +338,15 @@
    "risk": "low"
   },
   {
+   "name": "body_control",
+   "domain": "body_control",
+   "desc": "**身体控制 / 触手 / 全息投影状态口**（主人 2026-11-02 定名）：op=schema/status/inventory/move/verify。**如实报缺**：缺感觉/执行器（未绑定或已被主人拔掉）报 not_supported；全绑定也最多 partial 且 `executed=false` —— 深度学习 + 无模型不等于能动，不假装能动。本件 zero-scope，只读状态/清单；不驱动任何硬件。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "body_map",
    "domain": "device",
    "desc": "身体·清单：现读这台设备的七根感官与六根动作（零作用域，只读）",
@@ -347,6 +365,15 @@
     "process_execute"
    ],
    "risk": "high"
+  },
+  {
+   "name": "body_realtime",
+   "domain": "device",
+   "desc": "身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
   },
   {
    "name": "body_say",
@@ -849,6 +876,15 @@
    "risk": "low"
   },
   {
+   "name": "context_inject",
+   "domain": "mind",
+   "desc": "**上下文注入选择器**（主人 P1，2026-11-02）：op=schema/select/verify。给 query + 候选（记忆/最近对话/UI 信号/工具结果/预取缓存），纯确定性选出有预算上限的注入项：过期丢弃/去重/相关度/来源优先级/新鲜度/来源配额/字符预算。**零作用域**（不调模型/不出网/不写盘）；模型上下文仍由调用方使用。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "context_vault",
    "domain": "system",
    "desc": "上下文归档库（只读骨架·内调）：**索引+检索层，不是第四处存储**（只引用不复制正文）；内存多大上下文就多长（按**可用**内存算预算，不足则降级如实报）；快速搜索=倒排求交→打分→按预算裁剪",
@@ -1242,6 +1278,15 @@
    "risk": "low"
   },
   {
+   "name": "email_cap",
+   "domain": "comms",
+   "desc": "**通信域 · email_cap（= coze_mail 的审计别名）**：对主人自有单一地址收发与整理；白名单默认空=全拒、confirm_token 绑定内容、正文不入档、独立通道 coze_mail。闸门/配额/账本已实现；默认 transport 未接线时如实报 needs_dependency，不伪造成功。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "emotion_projection",
    "domain": "creation",
    "desc": "情感投射只读骨架：叙事四问 → 投射细节 → 四项校验；『身临其境』只有人能判",
@@ -1371,6 +1416,15 @@
    "name": "flow_canvas",
    "domain": "creation",
    "desc": "工作流画布（蒸馏自 2026-09-28 主人给的周榜卡 Langflow 155.3k★，只取**可视化架构**，不引拖拽编辑器）：工作流定义 → 图（nodes/edges，数据只走引擎正规出口 `engine.list_workflows()`，R-H99b，不偷读 store/workflows.json）+ dag 运行账 → 运行图（带 done/failed 读数）→ **自包含 SVG 画布页**（零外链零脚本，离线可开可审计）落 outputs/flow-canvas/。**只画不跑**：执行仍走 wf_run/dagrun 的门，产物不掺页面登记面。op=from_wf/from_dag/render/where",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "focus_stack",
+   "domain": "mind",
+   "desc": "**焦点栈 + 记忆审计**（主人 P1，2026-11-02）：op=schema/push/pop/clear/snapshot/audit/focus_events/verify。焦点栈=主循环「此刻最重要的事」，上限 12、同 id 提分不重复、按 score/时间排序；记忆审计只对**调用方给的记录**做只读体检（缺 id/文本/时间、重复、过短/超长、明显凭据 secret_like），不回显凭据原文、不改记录；**零作用域**（不读盘/不写盘/不出网）。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -1514,9 +1568,27 @@
    "risk": "low"
   },
   {
+   "name": "hand_realtime",
+   "domain": "device",
+   "desc": "手·眼手脑同拍（灵巧手 loopback）：21 点流 → hand_retarget → hand_bridge.move → read_state，同一 tick 闭环；op=status/loop（hz/seconds）。loopback 是仿真，不驱动真手。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "hand_retarget",
    "domain": "device",
    "desc": "身体·手语翻译（2026-11-01 蒸馏自 dexterous-hand 知识胶囊）：把 21 点手部跟踪（Vision Pro/Quest3/摄像头/IMU 手套先转 21 点）映射成目标灵巧手关节角；内置 generic_15dof / generic_20dof 模型，也接受自定义 chain/joints/limit 模型；几何向量法（**非 IK**）：三点屈曲 + 掌平面外展 + 关节限位 + 中性位标定 + 左右手符号，纯计算零依赖。op=status/models/retarget/where。诚实边界：无接触/触觉建模；外展/对掌为掌平面近似；高精度需逆运动学求解器（本仓暂无）",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "hand_vision",
+   "domain": "device",
+   "desc": "手·眼睛：本地 MediaPipe Hands 从摄像头/图片/视频取 21 点（x,y,z+左右手）；op=status/image/camera。摄像头不可用如实 needs_camera，不伪造；输出归一化坐标，接真手前需标定。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -1664,6 +1736,24 @@
    "domain": "recon",
    "desc": "**理解任何事**（主人令 2026-10-15 蒸馏自 GitHub Trending #1 「Understand Anything」）：把任何仓/库/文档变成一张**可点、可搜、可问的分层知识图**。三步：scan（走盘+找入口）→ build（三层建图，**每条边带 evidence = path:line**）→ 四功能 tour（引导导览）·ask（词面检索，不冒充语义）·impact（变更影响）·layers（分层视图）。op=status/layers/tour/ask/impact（只读）· scan/build（build 写 state/know_map）。",
    "safe": false,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "kws",
+   "domain": "voice",
+   "desc": "**声学关键词唤醒 KWS**（主人 P2-14，2026-11-03）：op=schema/status/detect/detect_wav/verify。本机 sherpa-onnx + 中文 zipformer 3.3M 模型（Apache-2.0，约 13MB）+ 拼音关键词 `x iǎo t ǔ d òu @小土豆`；CPU、无网络、无密钥。没装 sherpa/模型时 available=false，不假装能唤醒。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "lan_pairing",
+   "domain": "security",
+   "desc": "**局域网配对监听/自签证书**（主人 2026-11-03 批准）：op=schema/start/stop/status/cert/verify。只绑一个私有 LAN IPv4（或 loopback），拒 0.0.0.0/公网；端口 8767..8770；TLS 自签（cert/key 放 state/）；一次性配对码换 Bearer device token；只开 health/pair/status，**无远程命令/文件接口**。",
+   "safe": true,
    "readonly": true,
    "scopes_static": [],
    "risk": "low"
@@ -1904,6 +1994,15 @@
     "filesystem_write"
    ],
    "risk": "high"
+  },
+  {
+   "name": "media_library",
+   "domain": "video",
+   "desc": "**媒体舞台/音乐库/历史索引**（主人 P2，2026-11-03）：op=schema/build/history/verify。只聚合**既有产物**：视频/图片/音频按扩展名分类、去重、mtime 倒序、上限 120；不读内容/不转码/不上传/不生成缩略图；**零作用域**纯归一化。文件服务由 console-server 在允许根（交付成片/kaleido/outputs）内单独做。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
   },
   {
    "name": "media_license",
@@ -2335,6 +2434,15 @@
    "risk": "low"
   },
   {
+   "name": "pairing",
+   "domain": "security",
+   "desc": "**局域网配对/证书安全原语**（主人 P2-12 已点头：先本机/局域网安全设计）：op=schema/code/claim/devices/revoke/cert/cert_verify/verify。6 位一次性配对码 TTL 300s/最多 3 次尝试；设备白名单 + 一次性 device token（只存 sha256）；证书只做 **PEM SHA-256 指纹校验**。**不开监听端口、不生成证书、不暴露公网**；设备表写面过 filesystem_write（可信会话免票）。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "paywallbuster",
    "domain": "security",
    "desc": "内容门**检测**（防御侧）：离线判定页面是否被付费墙/同意门挡住，只判不绕（不伪装 UA、不伪造 cookie）",
@@ -2365,6 +2473,15 @@
    "name": "pentest_distill",
    "domain": "security",
    "desc": "**蒸馏件**（不是外挂）：把吞入件 CyberStrikeus/CyberStrike（AGPL-3.0 · 3129★ · TypeScript ·「Open-source AI-powered offensive security harness for automated penetration testing」）的 **Intelligence Layer 四条取法**提炼成我们自己的**授权渗透编排判据**：①阶段聚焦+上下文护栏（一次只推一个阶段）②按发现编排工具（下一步由上一步读数决定，不跑死脚本）③结果结构化归一（门已在做）④**授权范围纪律（我们加严，不是抄的）**：未登记目标一律拒 · AI 不许自发放行。op=tools **现读** `caps_registry.BENIGN_CAPS` 报安全域可编排位（26）与编排通道 omni_plug/mcp_tools/mcp_call/mcp_connect/desktop_commander；op=provenance 逐条指回原话（含**未蒸馏**两行：它的规模 13+ agents / 7600+ skills 不取 · Bolt 远程执行与后渗透**不取**）。**零作用域**：无 subprocess / 无 urllib / 无写盘。边界：接入端 ≡ 我们**已有**的安全位（pentest / sec_* / redteam_*）；本位只蒸取法，**不建平行位**（会撞 新增即清旧）。op=method/tools/provenance/where",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "pentest_flow",
+   "domain": "security",
+   "desc": "**授权渗透流水线内核**（吞噬 Shannon 蒸出的「No exploit, no report」那一层，2026-11-02 主人令）：op=schema/scope/target/surface/reconcile/agent_plan/agent_ingest/exploit_queue/validate/report/gate/workspace/resume/pipeline/verify。**纯函数·零作用域**：不攻击/不发请求/不起进程/不出网/不写盘；授权+范围 fail-closed（生产默认拒、凭据只收槽名）；双流对账（recon×SAST）；只有可复现 PoC 才进报告/SARIF 2.1.0/CI 闸；真 exploit 仍由既有授权手执行。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -2600,6 +2717,24 @@
    "risk": "low"
   },
   {
+   "name": "ref3d",
+   "domain": "creation",
+   "desc": "**参考图 → 可拆解 3D 交互页**（主人 2026-11-03 抖音 Salticus JS-8）：op=schema/status/build/verify。参考图只提供外观/比例/配色；主体是我们自己的数字人 DH-V7 GLB（1 skinned mesh/66 bones），可旋转/缩放/皮肤透明/骨架/线框/拆解层/动作；Three.js/GLTFLoader 本地零网络。`build` 复制独立页并写 meta，必须过 filesystem_write 门。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "reminder",
+   "domain": "mind",
+   "desc": "**提醒能力位**（主人 P1，2026-11-02）：op=schema/create/list/cancel/complete/due/verify。创建/列出/取消提醒；写 `state/reminders.json` 前先过 **filesystem_write 门**（可信会话免票，其余要一次性授权；gate 不可用 fail-closed）。上限 200，due_at ISO/epoch，repeat none/daily/weekly；不做网络通知/后台线程，不假装已通知。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "remote_confinement",
    "domain": "tentacle",
    "desc": "**执行者隔离**（主人 2026-10-09 点破：「沙盒隔离的是被测试的靶标，没隔离执行的人」）：exec 中继若在宿主以主人账号跑，云端敲的命令就跑在真机上。op=assess/verdict 现读执行身份（whoami+是否提权）与三条隔离路（Docker 守护/WSL 发行版/低权账号）**并真验每条能不能跑**；ttl 读看门狗（中继最长 TTL）；grant **只查**主人发的 remote_device 票（AI 不发）；guard 是启中继前的最后一道闸：**未隔离 + 无票 ⇒ 一律拒启**（fail-closed），拒了说清怎么开。本件已焊进 desktop_commander.remote_start。",
@@ -2659,6 +2794,15 @@
    "name": "research_intel",
    "domain": "recon",
    "desc": "调研 AI 情报部门：三组只读骨架（画禁区 / 找流量 / 定方向）。op=coverage 覆盖读数，op=group 分组。**只读**，不发布、不改生产。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "resource_snapshot",
+   "domain": "system",
+   "desc": "**本机资源快照**（主人 P2，2026-11-03）：op=schema/snapshot/normalize/verify。只读采样 CPU/内存/磁盘/uptime/主机/平台；Windows ctypes（GlobalMemoryStatusEx/GetSystemTimes/GetTickCount64）+ shutil.disk_usage，**零第三方依赖**（psutil 可选，没有就 process_count=null，不硬装）；不写盘/不起进程/不出网。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -3184,6 +3328,15 @@
    "risk": "high"
   },
   {
+   "name": "thought_stream",
+   "domain": "mind",
+   "desc": "**思考流/行动流归一化**（主人 P1，2026-11-02）：op=schema/normalize/verify。把已有 JSONL 事件行统一成 thought/action/result/guard/system 五类，带时间/actor/title/detail/来源；坏行跳过、凭据脱敏、去重、上限 200；**零作用域**（只读归一化/不出网/不写盘），不伪造事件。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "tool_bay",
    "domain": "tentacle",
    "desc": "装备坞：触手「自配装备」走的那道门。白名单 15 件（本仓自定口径），每件状态靠**现跑探针**得出（没探针的如实报「无探针」，不得报已装）。install 三态：① 已在位（不耗票）② 需授权接上（screen/ui_tree/comfyui，**真过 auth_gate 的 check_and_consume**，没票如实报 needs_grant）③ 第三方件需主人装（**不代下、也不为此耗票**）。每装一次落账 state/tool_bay.jsonl。op=state 读类，install 写类。",
@@ -3301,6 +3454,24 @@
    "risk": "low"
   },
   {
+   "name": "turn_trace",
+   "domain": "mind",
+   "desc": "**轮次追踪 Turn Trace**（主人 P2，2026-11-03）：op=schema/normalize/verify。把已有 JSONL 执行账按 session + 间隔（默认 45s）归并成“轮”：步骤/结果/证据/耗时；没有 input 字段就 null，不伪造用户输入/证据；**零作用域**只读归并（不调模型/不写盘）。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "ui_card",
+   "domain": "ui",
+   "desc": "**ACUI 卡片协议**（吞噬上游参考项目 Scene Protocol/ACUI 蒸出的我们自己的版本，2026-11-02 主人令）：op=schema/validate/create/close/action/snapshot/events/clear/verify。卡片是**纯数据**：kind/action.type 白名单 · 纯文本（拒 HTML/脚本/事件属性）· TTL 到期自动清 · 最多 20 张/4 动作/2000 字；动作只回发 `ui_card_action` 事件给主循环（`executed=false`），不在这里执行任何工具。**纯函数·零作用域**：不写盘/不出网；审计由调用方追加。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "ui_kit",
    "domain": "creation",
    "desc": "**UI 组件库的口**（吞天吞来的素材 → 可检索 · 可取件 · 读数如实）。素材：`uiverse-io/galaxy`（**MIT** · ★13478 · 3802 件 · 11 类目）落 `_upstream/galaxy`。常用说法：UI 组件 / 按钮 / 卡片 / 加载动画 / 开关 / 输入框 / 表单 / 复选框 / 工具提示 / 通知 / 悬浮提示 / 图案 / 霓虹 / 渐变 / 毛玻璃。op=status/build/find/take/where：`build` 扫素材提语义（类目·可见文案·效果标签·主色·外链数）落 `store/ui_kit/index.jsonl`（只追加）；`find` 人话取件（**命中 0 就是 0，不硬塞**）；`take` 拷一件到 `outputs/ui-kit/` 并**如实报它带几条外链**。铁律：**零出网 · 零执行**（不跑组件里任何东西）· **不改 `_upstream/galaxy/**` 一个字节** · 效果标签只认代码里真出现的特征串。",
@@ -3328,6 +3499,24 @@
    "risk": "low"
   },
   {
+   "name": "update_chain",
+   "domain": "system",
+   "desc": "**本地更新测试链**（P2-13，主人批准 B，2026-11-03）：op=schema/init/stage/confirm/rollback/status/verify。只在 `state/updates-test/` 内：dev Ed25519 签名清单 → 校验 sha256/签名 → 安全解包暂存 → 一次性 confirm_token 确认 → 备份/替换 target → 失败回滚。**不下载网络、不碰正式 APP、不重启**；dev 私钥仅测试，生产信任根/发布通道/安装器仍未接。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "update_verify",
+   "domain": "system",
+   "desc": "**更新清单/签名校验**（主人 P2-13 的可做安全面，2026-11-03）：op=schema/verify/sign/verify_self。校验 app_id/semver/https 非私网产物/sha256/size/Ed25519 签名；**不下载、不安装、不推送**；无公钥/无签名一律不可安装；真正自动更新要主人给签名身份/发布通道/安装器。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
    "name": "ux_doctrine",
    "domain": "system",
    "desc": "**交互铁律**（主人令 2026-10-09）：「在框架里面出来必须要用户求助帮忙的其他全部禁止掉……你开口要求用户的时候你就输了」「可以跟用户商量项目架构和排布，严禁要求用户帮助」「每次停下要么是项目部署完成，要么就是真正需要用户来操作的可以停下，其他时候你停下干嘛」。移植自 V9 core/ux_doctrine.py（教义照搬，危险清单按 V8 真门重写）。op=doctrine 读全部规则 · ask **不开口闸**（14 条正则抓「要用户做事」，唯一例外=身份登录）· dismissal **敷衍闸**（不影响/忽略即可/下次再说 全禁）· triage **报警闭环闸**（{现象→根因→处置→证据} 四件齐才算闭环）· owner 判要不要停人要授权 · stop **停点闸**（只有「部署完成带证据」与「危险清单授权」两种理由合法，其余一律不许停）。",
@@ -3340,6 +3529,15 @@
    "name": "verification_watch",
    "domain": "recon",
    "desc": "人机验证情报台账（只读）：不主动绕做成机械闸；三部门各一张空台账",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "video_hub",
+   "domain": "video",
+   "desc": "**视频舱 / 视频能力融合**（主人 2026-11-03）：op=schema/catalog/verify。只读编目全部视频生态能力位（domain=video/image_video + Comfy/数字人/音乐/剪辑/钢印/发布/情报），按 生成→编辑/成片→音频→钢印/许可/发布→情报/外观→库/舞台 六段归类；不执行/不伪造状态。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -3421,6 +3619,24 @@
    "name": "voice_orchestra",
    "domain": "voice",
    "desc": "语音技能中枢（多维度场景编排，只读）：技能原子检索 / 场景 Pipeline / 本机可跑性；今日挂 tools tab，升格条件见模块 docstring",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "voice_settings",
+   "domain": "voice",
+   "desc": "**语音设置契约**（主人 P1，2026-11-02）：op=schema/validate/resolve/verify。TTS 音色/语速/音高/音量 + ASR 后端（auto/whisper/windows）+ 语言 + 自动朗读；纯校验/解析，**零作用域**（不写盘/不出网）；持久化由 console-server 以 trusted-owner 写 state/voice-settings.json，与现有设置同一条本地写面。",
+   "safe": true,
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "voice_stream",
+   "domain": "voice",
+   "desc": "**流式语音（P2-14 可做面）**：op=schema/start/chunk/reset/end/verify。收 PCM16 16k base64 分片 → 内存缓冲（≤60s）→ 显式 partial 且 ≥2s 时本地 Whisper 局部转写，end 时最终转写；临时 WAV 即用即删。**不是真 KWS**（无 sherpa-onnx 唤醒模型），识别文本按外部内容纪律处理；不执行指令。",
    "safe": true,
    "readonly": true,
    "scopes_static": [],
@@ -3535,38 +3751,20 @@
    "risk": "low"
   },
   {
-   "name": "zimage_rewash",
-   "domain": "creation",
-   "desc": "洗图流水线（看图→反推提示词→重绘→放大）：**放大环已可用**（ffmpeg lanczos+unsharp，零依赖）；反推环**已接线**（2026-10-15 起 zimage_rewash_cap 走 vision 通道；2026-10-16 增形式化反推件 tools/codex-scripts/img-reverse.py）；**语义反推**仍待外部理解通道（teamorouter 401 / 本地 8111 未监听）——缺什么就写什么；重绘环**未接线**（未装 ComfyUI；pollinations img2img 需公网可达图 URL）；含降噪强度口径表 0.15→0.85 四档。⚠️ **2026-10-13 收敛（主人令「每一个调节都要触手可控」）**：本位是**历史腿**，主腿 = `comfy_native.upscale_4k`（PIL LANCZOS + USM；`vision_print.polish` 的清晰度腿走它）。收敛**分两类做、不搞假统一**：① **几何旋钮真统一** —— `scale`（新名，倍数）＝旧名 `factor`，且都接受 `size`（目标绝对宽，按源图宽换算成倍数走同一条路）；两个名字同时给且不等 ⇒ **fail-closed**。② **锐化旋钮不统一、且显式拒** —— 本位只有 `unsharp`（**ffmpeg unsharp 滤镜的 amount**），主腿是 `sharpen`（**PIL USM 的 percent 比例**），**两个算法两个量纲**；把 `sharpen` 传给本位 ⇒ **当场 fail-closed 并指路主腿**（改名冒充＝假统一，更害人）。参数判在**过门之前**（参数错不消耗授权）。",
-   "safe": false,
+   "name": "world_forge",
+   "domain": "engine",
+   "desc": "**世界锻造内核**（吞噬 AEON/WorldX/Temporal God 蒸出的第 0 步，2026-11-02 主人令）：op=schema/spec/gen/step/focus/person/god/rewind/branch/encode/decode/view3d/view/summary/verify。**纯函数·零作用域**：不出网/不起进程/不写盘；同 seed+spec ⇒ 同世界；命名 RNG 流；世界之灵只发被夹紧的 Directive（不许直接改人口）；rewind=重放+hash 对账；branch=多时间线；encode/decode 存档编解码（真落盘由调用方走 filesystem_write 门）。",
+   "safe": true,
    "readonly": true,
    "scopes_static": [],
    "risk": "low"
   },
   {
-   "name": "body_realtime",
-   "domain": "device",
-   "desc": "身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。",
-   "safe": true,
-   "readonly": false,
-   "scopes_static": [],
-   "risk": "low"
-  },
-  {
-   "name": "hand_realtime",
-   "domain": "device",
-   "desc": "手·眼手脑同拍（灵巧手 loopback）：21 点流 → hand_retarget → hand_bridge.move → read_state，同一 tick 闭环；op=status/loop（hz/seconds）。loopback 是仿真，不驱动真手。",
-   "safe": true,
-   "readonly": false,
-   "scopes_static": [],
-   "risk": "low"
-  },
-  {
-   "name": "hand_vision",
-   "domain": "device",
-   "desc": "手·眼睛：本地 MediaPipe Hands 从摄像头/图片/视频取 21 点（x,y,z+左右手）；op=status/image/camera。摄像头不可用如实 needs_camera，不伪造；输出归一化坐标，接真手前需标定。",
-   "safe": true,
-   "readonly": false,
+   "name": "zimage_rewash",
+   "domain": "creation",
+   "desc": "洗图流水线（看图→反推提示词→重绘→放大）：**放大环已可用**（ffmpeg lanczos+unsharp，零依赖）；反推环**已接线**（2026-10-15 起 zimage_rewash_cap 走 vision 通道；2026-10-16 增形式化反推件 tools/codex-scripts/img-reverse.py）；**语义反推**仍待外部理解通道（teamorouter 401 / 本地 8111 未监听）——缺什么就写什么；重绘环**未接线**（未装 ComfyUI；pollinations img2img 需公网可达图 URL）；含降噪强度口径表 0.15→0.85 四档。⚠️ **2026-10-13 收敛（主人令「每一个调节都要触手可控」）**：本位是**历史腿**，主腿 = `comfy_native.upscale_4k`（PIL LANCZOS + USM；`vision_print.polish` 的清晰度腿走它）。收敛**分两类做、不搞假统一**：① **几何旋钮真统一** —— `scale`（新名，倍数）＝旧名 `factor`，且都接受 `size`（目标绝对宽，按源图宽换算成倍数走同一条路）；两个名字同时给且不等 ⇒ **fail-closed**。② **锐化旋钮不统一、且显式拒** —— 本位只有 `unsharp`（**ffmpeg unsharp 滤镜的 amount**），主腿是 `sharpen`（**PIL USM 的 percent 比例**），**两个算法两个量纲**；把 `sharpen` 传给本位 ⇒ **当场 fail-closed 并指路主腿**（改名冒充＝假统一，更害人）。参数判在**过门之前**（参数错不消耗授权）。",
+   "safe": false,
+   "readonly": true,
    "scopes_static": [],
    "risk": "low"
   }

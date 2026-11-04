@@ -36,6 +36,7 @@ ops：
   panel                       上帝之眼页面（我们视觉语言 · 快照内联）
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -54,7 +55,7 @@ _STATE = _ROOT / "state"
 _PLAN = _STATE / "gods_eye_plan.jsonl"
 _SNAP = _STATE / "gods_eye.json"
 _PANEL = _ROOT / "holo_pet" / "assets" / "godview" / "index.html"
-_PROBE_WS = Path(r"C:\Users\ADMIN\Desktop\GBT探针")
+_PROBE_WS = Path.home() / "Desktop" / "GBT探针"
 
 # 创作页面（眼睛要看得见的那些）+ 服务端口
 CREATION_PAGES = [
@@ -1202,6 +1203,6 @@ def run_op(op: str = "see", **params) -> dict:
                      ("decide", decide), ("daily", daily), ("plan", plan), ("panel", panel),
                      ("loop", loop), ("advance", advance), ("image", _cloud_image_op)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（see/advisors/ask/roles/decide/daily/plan/panel/loop/advance/image）"}

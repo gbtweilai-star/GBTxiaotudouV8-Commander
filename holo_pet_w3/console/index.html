@@ -13,6 +13,7 @@
 <link rel="icon" href="../../icons/avatar-96.png" />
 <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png" />
 <link rel="stylesheet" href="./app.css" />
+<link rel="stylesheet" href="./skin-cube.css" />
 <script type="importmap">{"imports":{"three":"../../assets/vendor/three/three.module.js","three/addons/":"../../assets/vendor/three/"}}</script>
 </head>
 <body data-theme="midnight">
@@ -58,6 +59,8 @@
     <div class="panel-actions">
       <button class="reset-view" id="reset-view-btn" type="button">重置节点图</button>
       <button class="reset-view" id="refresh-btn" type="button">重读数据</button>
+      <a class="reset-view" href="/blueprint3d/" target="_blank" rel="noopener">成品预览</a>
+      <a class="reset-view" href="/tentacle3d/" target="_blank" rel="noopener">触手绑定</a>
     </div>
 
     <div class="sign">开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属</div>
@@ -127,6 +130,174 @@
           </div>
         </div>
       </section>
+
+      <section class="l2-module focus-module" aria-labelledby="focus-title">
+        <div class="focus-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">FOCUS STACK</div>
+              <h2 class="l2-module-title" id="focus-title">焦点栈</h2>
+            </div>
+            <span class="focus-count" id="focus-count">0/12</span>
+          </div>
+          <div class="focus-list" id="focus-list">
+            <div class="focus-empty">暂无焦点（主循环把此刻最重要的事压进来）</div>
+          </div>
+          <div class="focus-audit" id="focus-audit">记忆审计：—</div>
+          <button class="focus-refresh" id="focus-refresh" type="button">刷新焦点/审计</button>
+        </div>
+      </section>
+
+      <section class="l2-module body-module" aria-labelledby="body-title">
+        <div class="body-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">BODY CONTROL</div>
+              <h2 class="l2-module-title" id="body-title">身体控制 / 触手 / 全息投影</h2>
+            </div>
+            <span class="body-state" id="body-state">not_supported</span>
+          </div>
+          <div class="body-detail" id="body-detail">感觉/执行器未绑定 → 如实报缺，不假装能动。</div>
+          <div class="body-note" id="body-note">深度学习 + 无模型不等于能动。</div>
+        </div>
+      </section>
+
+      <section class="l2-module inject-module" aria-labelledby="inject-title">
+        <div class="inject-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">CONTEXT INJECT</div>
+              <h2 class="l2-module-title" id="inject-title">上下文注入</h2>
+            </div>
+            <span class="inject-budget" id="inject-budget">0/3000</span>
+          </div>
+          <div class="inject-items" id="inject-items"><div class="inject-empty">预览：按当前问题选记忆/焦点/工具结果</div></div>
+          <div class="inject-meta" id="inject-meta">候选：—</div>
+          <button class="inject-preview" id="inject-preview" type="button">注入预览</button>
+        </div>
+      </section>
+
+      <section class="l2-module api-module" aria-labelledby="api-title">
+        <div class="api-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">API SLOTS</div>
+              <h2 class="l2-module-title" id="api-title">动态 API 槽</h2>
+            </div>
+            <span class="api-count" id="api-count">0/20</span>
+          </div>
+          <div class="api-list" id="api-list"><div class="api-empty">只登记定义；执行器未接（call = not_supported）</div></div>
+          <div class="api-note" id="api-note">https-only · 拒私网 · 密钥只存 env 引用名</div>
+        </div>
+      </section>
+
+      <section class="l2-module reminder-module" aria-labelledby="rem-title">
+        <div class="reminder-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">REMINDERS</div>
+              <h2 class="l2-module-title" id="rem-title">提醒</h2>
+            </div>
+            <span class="reminder-count" id="rem-count">0</span>
+          </div>
+          <div class="reminder-form">
+            <input class="rem-input" id="rem-input" type="text" maxlength="120" placeholder="提醒标题…">
+            <input class="rem-time" id="rem-time" type="datetime-local">
+            <button class="rem-add" id="rem-add" type="button">创建</button>
+          </div>
+          <div class="reminder-list" id="rem-list"><div class="reminder-empty">暂无提醒</div></div>
+          <div class="reminder-note" id="rem-note">写面过 filesystem_write 门；不做网络通知</div>
+        </div>
+      </section>
+
+      <section class="l2-module resource-module" aria-labelledby="res-title">
+        <div class="resource-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">RESOURCE SNAPSHOT</div>
+              <h2 class="l2-module-title" id="res-title">本机资源</h2>
+            </div>
+            <span class="res-host" id="res-host">—</span>
+          </div>
+          <div class="res-row"><span>CPU</span><div class="res-bar"><i id="res-cpu-bar"></i></div><b id="res-cpu">—</b></div>
+          <div class="res-row"><span>内存</span><div class="res-bar"><i id="res-mem-bar"></i></div><b id="res-mem">—</b></div>
+          <div class="res-row"><span>磁盘</span><div class="res-bar"><i id="res-disk-bar"></i></div><b id="res-disk">—</b></div>
+          <div class="res-note" id="res-note">uptime — · 进程 —</div>
+        </div>
+      </section>
+
+      <section class="l2-module pair-module" aria-labelledby="pair-title">
+        <div class="pair-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">PAIRING / CERT</div>
+              <h2 class="l2-module-title" id="pair-title">配对 / 证书</h2>
+            </div>
+            <span class="pair-count" id="pair-count">0</span>
+          </div>
+          <div class="pair-actions">
+            <button type="button" id="pair-code-btn">生成配对码</button>
+            <span class="pair-code" id="pair-code">—</span>
+          </div>
+          <div class="pair-form">
+            <input id="pair-name" maxlength="32" placeholder="设备名">
+            <input id="pair-code-input" maxlength="6" placeholder="6 位码">
+            <button type="button" id="pair-claim">配对</button>
+          </div>
+          <div class="pair-lan">
+            <button type="button" id="pair-lan-start">启动局域网</button>
+            <button type="button" id="pair-lan-stop">停止</button>
+            <span class="pair-lan-state" id="pair-lan-state">未启动</span>
+          </div>
+          <div class="pair-lan-info" id="pair-lan-info">只绑私有 LAN；TLS 自签；无远程命令</div>
+          <div class="pair-list" id="pair-list"><div class="pair-empty">暂无已配对设备</div></div>
+          <div class="pair-note" id="pair-note">不开监听/不生成证书；只做配对码/白名单/证书指纹</div>
+        </div>
+      </section>
+
+      <section class="l2-module update-module" aria-labelledby="up-title">
+        <div class="update-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">UPDATE VERIFY</div>
+              <h2 class="l2-module-title" id="up-title">更新校验</h2>
+            </div>
+            <span class="up-state" id="up-state">未配置</span>
+          </div>
+          <textarea id="up-manifest" class="up-manifest" placeholder='粘贴更新清单 JSON（只校验，不下载）'></textarea>
+          <input id="up-key" class="up-key" placeholder="Ed25519 公钥 PEM（可空）">
+          <button id="up-check" class="up-check" type="button">校验清单</button>
+          <div class="up-result" id="up-result">install_supported=false · 不下载/不安装</div>
+          <div class="up-chain">
+            <div class="up-chain-head">本地测试链（只 state/updates-test）</div>
+            <div class="up-chain-actions">
+              <button type="button" id="up-chain-init">init</button>
+              <button type="button" id="up-chain-stage">stage</button>
+              <button type="button" id="up-chain-confirm" disabled>confirm</button>
+              <button type="button" id="up-chain-rollback">rollback</button>
+            </div>
+            <div class="up-chain-result" id="up-chain-result">未初始化</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="l2-module stream-voice-module" aria-labelledby="vs-title">
+        <div class="stream-voice-surface">
+          <div class="l2-module-head compact">
+            <div>
+              <div class="l2-module-kicker">VOICE STREAM</div>
+              <h2 class="l2-module-title" id="vs-title">流式语音</h2>
+            </div>
+            <span class="vs-state" id="vs-state">未启动</span>
+          </div>
+          <div class="vs-actions">
+            <button type="button" id="vs-start">开始</button>
+            <button type="button" id="vs-stop">停止</button>
+            <span class="vs-time" id="vs-time">0.0s</span>
+          </div>
+          <div class="vs-text" id="vs-text">PCM16 16k 分片；局部/最终 Whisper；真 KWS 未做</div>
+        </div>
+      </section>
     </div>
   </aside>
 
@@ -134,18 +305,27 @@
   <section class="console" id="chat-area" data-view="chat">
     <nav class="view-tabs" aria-label="视图切换">
       <button class="view-tab is-active" data-view="chat" type="button">对话</button>
-      <button class="view-tab" data-view="caps" type="button">功能表 <b id="tab-caps-n">385</b></button>
-      <button class="view-tab" data-view="skills" type="button">技能栏 <b id="tab-skills-n">23</b></button>
+      <button class="view-tab" data-view="caps" type="button">功能表 <b id="tab-caps-n">408</b></button>
+      <button class="view-tab" data-view="skills" type="button">技能栏 <b id="tab-skills-n">25</b></button>
       <button class="view-tab" data-view="space" type="button">3D 星图</button>
+      <button class="view-tab" data-view="media" type="button">媒体舞台</button>
+      <button class="view-tab" data-view="video" type="button">视频舱</button>
+      <button class="view-tab" data-view="world" type="button">世界</button>
+      <button class="view-tab" data-view="browser" type="button">浏览器</button>
       <button class="view-tab" data-view="brain" type="button">大脑执行层</button>
       <button class="view-tab" data-view="plug" type="button">万能插</button>
       <button class="view-tab" data-view="team" type="button">触手协作</button>
       <button class="view-tab" data-view="mind" type="button">思维导图</button>
+      <button class="view-tab" data-view="stream" type="button">思考流</button>
+      <button class="view-tab" data-view="turns" type="button">轮次追踪</button>
       <button class="view-tab" data-view="scan" type="button">穿透扫描</button>
       <button class="view-tab" data-view="prof" type="button">职业</button>
       <button class="view-tab" data-view="bounty" type="button">赏金</button>
       <button class="view-tab" data-view="dash" type="button">仪表盘</button>
+      <button class="view-tab" data-view="moments" type="button">AI 朋友圈</button>
+        <button class="view-tab" data-view="teardown" type="button">数字人 3D</button>
     </nav>
+    <div id="mesh-hud-slot" class="mesh-hud-slot"></div>
 
     <!-- 视图 1：对话（底部座席，DSH 样式输入卡） -->
     <div class="view view-chat">
@@ -154,10 +334,21 @@
       </div>
       <form class="chat-composer" id="chat-composer" autocomplete="off">
         <div class="dsh-composer">
-          <textarea id="chat-input" rows="1" placeholder="对她说点什么…"></textarea>
+          <div class="cap-quick" id="cap-quick" title="万能插 · 四类能力（看屏幕 / 开网页 / 读写文件 / 看图）">
+            <span class="cap-quick-label">万能插</span>
+            <button class="cap-chip" type="button" data-cap="screen" title="经万能插 app 插座取整屏">看屏幕</button>
+            <button class="cap-chip" type="button" data-cap="web" title="经万能插 web 插座开网页">开网页</button>
+            <button class="cap-chip" type="button" data-cap="file" title="经万能插 file 插座读文件">读文件</button>
+            <button class="cap-chip" type="button" data-cap="image" title="经万能插 universal 插座看图">看图</button>
+          </div>
+          <textarea id="chat-input" rows="1" placeholder="对她说点什么…（可粘贴图片）"></textarea>
+          <div class="chat-attach-preview" id="chat-attach-preview" hidden></div>
+          <input type="file" id="chat-file" accept="image/*" hidden>
+          <input type="file" id="chat-upload" hidden>
           <div class="composer-toolbar">
             <div class="composer-left">
-              <button class="tool-btn" type="button" title="附件（占位）">+</button>
+              <button class="tool-btn" id="chat-attach" type="button" title="添加图片">+</button>
+              <button class="tool-btn file-btn" id="chat-attach-file" type="button" title="发送文件">文件</button>
               <span class="model-chip" id="model-chip">本机指挥官 · 无限上下文</span>
             </div>
             <div class="composer-right">
@@ -212,6 +403,117 @@
       </div>
     </div>
 
+    <!-- 视图：世界锻造（P1 · 确定性活体世界 / 体素 + 城市） -->
+    <div class="view view-world">
+      <div class="space3d-wrap">
+        <canvas id="world3d-canvas"></canvas>
+        <div class="world3d-fallback" id="world3d-fallback" hidden></div>
+        <div class="space3d-hud">
+          <span class="space3d-title">世界锻造 · 确定性活体世界</span>
+          <span class="space3d-hint">拖动旋转 · 滚轮缩放 · 柱高=海拔 · 颜色=生物群系 · 金点=城市 · 水面=海平面</span>
+        </div>
+        <div class="world3d-tools">
+          <span class="space3d-hint" id="world3d-status">载入中…</span>
+          <button class="reset-view" id="world3d-regen" type="button">换一个世界</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图：内置浏览器（Electron 内嵌 Chromium）；右上是原生浏览器（Chrome CDP）控制条 -->
+    <div class="view view-browser">
+      <div class="gbt-browser">
+        <div class="gbt-browser-tabs" id="bw-tabs"></div>
+        <div class="gbt-browser-bar">
+          <button class="bw-btn" id="bw-back" type="button" title="后退">←</button>
+          <button class="bw-btn" id="bw-forward" type="button" title="前进">→</button>
+          <button class="bw-btn" id="bw-reload" type="button" title="刷新">⟳</button>
+          <input id="bw-url" class="bw-url" type="text" spellcheck="false"
+                 placeholder="输入网址或搜索词，回车打开（如 example.com）">
+          <button class="bw-btn bw-go" id="bw-go" type="button">打开</button>
+          <button class="bw-btn" id="bw-external" type="button" title="用系统浏览器打开">外部</button>
+        </div>
+        <div class="gbt-browser-native">
+          <span class="bw-native-label">原生浏览器（Chrome CDP）：<b id="bw-native-state">未检测</b></span>
+          <button class="bw-mini" id="bw-native-check" type="button">检测</button>
+          <button class="bw-mini" id="bw-native-launch" type="button">启动 Chrome</button>
+          <button class="bw-mini" id="bw-native-open" type="button">在 Chrome 打开当前页</button>
+          <button class="bw-mini" id="bw-native-read" type="button">AI 读当前页</button>
+        </div>
+        <pre class="gbt-browser-ai" id="bw-ai-read" hidden></pre>
+        <div class="gbt-browser-body">
+          <webview id="gbt-webview" src="about:blank" partition="persist:gbt-browser"
+                   webpreferences="contextIsolation=yes, nodeIntegration=no"></webview>
+          <div class="gbt-browser-fallback" id="bw-fallback" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图：轮次追踪（Turn Trace：session+间隔归并） -->
+    <div class="view view-turns">
+      <div class="tt-wrap">
+        <div class="tt-side">
+          <div class="tt-bar">
+            <span class="tt-title">轮次追踪</span>
+            <span class="tt-count" id="tt-count">—</span>
+            <button class="tt-refresh" id="tt-refresh" type="button">刷新</button>
+          </div>
+          <div class="tt-list" id="tt-list"><div class="tt-empty">暂无轮次</div></div>
+        </div>
+        <div class="tt-detail" id="tt-detail"><div class="tt-empty">选一个轮次查看步骤/结果/证据</div></div>
+      </div>
+    </div>
+
+    <!-- 视图：视频舱（全部视频能力融合编目） -->
+    <div class="view view-video">
+      <div class="vh-wrap">
+        <div class="vh-bar">
+          <span class="vh-title">视频舱 · 全部视频能力融合</span>
+          <span class="vh-count" id="vh-count">—</span>
+          <button class="vh-refresh" id="vh-refresh" type="button">刷新</button>
+          <button class="vh-run" id="vh-run" type="button">六段联跑（只读探针）</button>
+        </div>
+        <div class="vh-run-result" id="vh-run-result">只跑只读探针；不生成视频、不伪造</div>
+        <div class="vh-stages" id="vh-stages"><div class="vh-empty">读取视频能力编目…</div></div>
+      </div>
+    </div>
+
+    <!-- 视图：媒体舞台 / 音乐库 / 历史（只聚合既有产物） -->
+    <div class="view view-media">
+      <div class="ms-wrap">
+        <div class="ms-bar">
+          <span class="ms-title">媒体舞台 / 音乐库 / 历史</span>
+          <span class="ms-count" id="ms-count">—</span>
+          <div class="ms-filters">
+            <button type="button" class="ms-filter is-active" data-kind="">全部</button>
+            <button type="button" class="ms-filter" data-kind="video">视频</button>
+            <button type="button" class="ms-filter" data-kind="image">图片</button>
+            <button type="button" class="ms-filter" data-kind="audio">音频</button>
+          </div>
+          <button type="button" class="ms-refresh" id="ms-refresh">刷新</button>
+        </div>
+        <div class="ms-grid" id="ms-grid"><div class="ms-empty">暂无媒体产物</div></div>
+        <div class="ms-history" id="ms-history"><b>最近产物</b><span>—</span></div>
+      </div>
+      <div class="ms-modal" id="ms-modal" hidden>
+        <div class="ms-modal-card">
+          <div class="ms-modal-head"><b id="ms-modal-title">预览</b><button type="button" id="ms-modal-close">×</button></div>
+          <div class="ms-modal-body" id="ms-modal-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图：思考流 / 行动流（只读归一化） -->
+    <div class="view view-stream">
+      <div class="ts-wrap">
+        <div class="ts-bar">
+          <span class="ts-title">思考流 / 行动流</span>
+          <span class="ts-count" id="ts-count">—</span>
+          <button class="ts-refresh" id="ts-refresh" type="button">刷新</button>
+        </div>
+        <div class="ts-list" id="ts-list"><div class="ts-empty">暂无事件</div></div>
+      </div>
+    </div>
+
     <!-- 视图 6：大脑执行层（七步执行路径 × 审计闭环） -->
     <div class="view view-brain">
       <div class="brain-wrap">
@@ -230,14 +532,31 @@
         <div class="space3d-hud">
           <span class="space3d-title">万能插 · 数字流动的结 × 万能插口</span>
           <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 结=触手本体 · 数字=流动数据 · 8 插口=能力域</span>
-          <span class="omni-actions">
-            <button id="omni-run" type="button">全开同步执行（385 位）</button>
-            <button id="omni-attr" type="button">失败归因</button>
-            <b id="omni-status">未执行</b>
-            <button id="omni-policy-btn" type="button">策略状态</button>
-            <b id="omni-policy">策略加载中…</b>
-          </span>
         </div>
+        <button class="omni-mon-toggle" id="om-toggle" type="button">▸ 多域监控</button>
+        <button class="proactive-toggle" id="proactive-toggle" type="button">⚡ 主动智能体</button>
+        <aside class="proactive-panel" id="proactive-panel">
+          <header><b>主动智能体</b><span id="pa-sub">读取中…</span>
+            <button id="pa-start" type="button">启动</button><button id="pa-stop" type="button">停止</button>
+            <button id="pa-blueprint" type="button">蓝图建单</button><button id="pa-close" type="button">收起</button></header>
+          <div class="pa-counts" id="pa-counts"></div>
+          <form id="pa-form"><textarea id="pa-input" rows="2" placeholder="给主动智能体下一单…"></textarea>
+            <button type="submit">提交工单</button></form>
+          <div class="pa-list" id="pa-list"></div>
+        </aside>
+        <aside class="omni-mon collapsed" id="omni-mon">
+          <header class="om-head">
+            <div>
+              <b>多域监控</b>
+              <span id="om-sub">采样中…</span>
+            </div>
+            <button id="om-selftest" type="button">全开自检</button>
+            <button id="om-collapse" type="button" title="收起">收起</button>
+          </header>
+          <div class="om-grid" id="om-grid"></div>
+          <div class="om-recent-head">最近变化 · 细微级</div>
+          <div class="om-recent" id="om-recent"></div>
+        </aside>
       </div>
     </div>
 
@@ -247,7 +566,7 @@
         <canvas id="team3d-canvas"></canvas>
         <div class="space3d-hud">
           <span class="space3d-title">触手协作 · 共享任务 × 8 协作角色</span>
-          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 弧线=协作链 · 流动光点=协作消息 · 底座环=共享账本</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 亮点=协作角色/能力位 · 细线=协作链（呼吸式淡入淡出）· 金光点=协作消息</span>
         </div>
       </div>
     </div>
@@ -257,9 +576,22 @@
       <div class="mind-wrap">
         <canvas id="mindmap-canvas"></canvas>
         <div class="space3d-hud">
-          <span class="space3d-title">思维导图 · 任务指引（框架真在用的流程）</span>
-          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 6 分支（理解/计划/执行/验证/留痕/交付）× 每支 3 条具体动作</span>
+          <span class="space3d-title">思维导图 · 任务指引（意图 → 精细步骤 → 卡点回路）</span>
+          <span class="space3d-hint">输入任务生成步骤 · 点步骤看做法/判定/卡点 · 卡点→回大脑执行层查资料/论文→吸收→重生成 · 拖动旋转</span>
         </div>
+        <div class="mind-command">
+          <input id="mind-task" type="text" placeholder="要做什么？例如：帮我注册一个邮箱" />
+          <button id="mind-run" type="button">生成指引</button>
+          <button id="mind-next" type="button">推进</button>
+          <button id="mind-blocker" type="button">标卡点</button>
+          <label class="mind-model"><input id="mind-model" type="checkbox" /> 模型生成</label>
+          <div class="mind-meter">
+            <b id="mind-progress">0 / 0</b>
+            <div id="mind-seg" class="mind-seg" aria-hidden="true"></div>
+          </div>
+          <span id="mind-state" class="mind-state">待命</span>
+        </div>
+        <aside id="mind-detail" class="mind-detail" aria-live="polite"></aside>
       </div>
     </div>
 
@@ -324,8 +656,6 @@
         <input id="bounty-target" type="text" placeholder="目标域名或 IP（例：example.com）" />
         <button id="bounty-check" type="button">范围检查</button>
         <button id="bounty-add-demo" type="button">录入示例发现</button>
-        <button id="bounty-import" type="button">导入示例 scope</button>
-        <button id="bounty-platform-sync" type="button">同步平台状态</button>
         <span id="bounty-gate-result"></span>
       </div>
       <div class="bounty-list" id="bounty-findings"></div>
@@ -355,6 +685,73 @@
         </section>
       </div>
     </div>
+
+    <!-- 视图 5：AI 朋友圈（动态流 / 发布 / 点赞） -->
+<div class="view view-moments">
+  <div class="moments-head">
+    <div>
+      <span class="view-title">AI 朋友圈</span>
+      <span class="view-sub" id="moments-sub">动态 · 广播 · 评论 · 私信 · 通知</span>
+    </div>
+    <button id="moments-refresh" class="moments-btn" type="button">刷新</button>
+  </div>
+  <div class="moments-tabs">
+    <button class="moments-tab active" data-mtab="feed" type="button">动态</button>
+    <button class="moments-tab" data-mtab="broadcast" type="button">广播</button>
+    <button class="moments-tab" data-mtab="dm" type="button">私信 <b class="mtab-badge" id="badge-dm"></b></button>
+    <button class="moments-tab" data-mtab="notify" type="button">通知 <b class="mtab-badge" id="badge-notify"></b></button>
+  </div>
+  <div class="moments-panels">
+    <section class="moments-panel active" id="mpanel-feed">
+      <div class="moments-composer">
+        <div class="mc-modes">
+          <button class="mc-mode active" data-mode="moment" type="button">动态</button>
+          <button class="mc-mode" data-mode="broadcast" type="button">广播</button>
+          <button class="mc-mode" data-mode="poll" type="button">投票</button>
+        </div>
+        <textarea id="moments-input" rows="2" placeholder="以主人身份发一条…"></textarea>
+        <div class="mc-poll" id="mc-poll" style="display:none">
+          <input id="poll-a" placeholder="选项 A" autocomplete="off">
+          <input id="poll-b" placeholder="选项 B" autocomplete="off">
+          <input id="poll-c" placeholder="选项 C（可选）" autocomplete="off">
+        </div>
+        <div class="mc-row">
+          <select id="moments-visibility">
+            <option value="public">公开</option>
+            <option value="friends">仅好友</option>
+            <option value="private">仅自己</option>
+          </select>
+          <label class="mc-pin"><input type="checkbox" id="moments-pinned"> 置顶</label>
+          <button id="moments-publish" class="moments-btn primary" type="button">发布</button>
+        </div>
+      </div>
+      <div class="moments-feed" id="moments-feed"></div>
+    </section>
+    <section class="moments-panel" id="mpanel-broadcast">
+      <div class="moments-feed" id="moments-broadcast"></div>
+    </section>
+    <section class="moments-panel" id="mpanel-dm">
+      <div class="dm-wrap">
+        <aside class="dm-list" id="dm-list"></aside>
+        <div class="dm-main">
+          <div class="dm-head" id="dm-head">选择好友私信</div>
+          <div class="dm-thread" id="dm-thread"></div>
+          <form class="dm-form" id="dm-form" autocomplete="off">
+            <input id="dm-input" placeholder="说点什么…">
+            <button class="moments-btn primary" type="submit">发送</button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <section class="moments-panel" id="mpanel-notify">
+      <div class="moments-notify" id="moments-notify"></div>
+    </section>
+  </div>
+</div>
+
+    <!-- 数字人 3D：我们自己的 DH-V7（唯一数字人页面；旧 dh-live 已归档） -->
+    <div class="view view-teardown"><iframe id="teardown-frame" data-src="/teardown/" title="3D 拆解"></iframe></div>
+
   </section>
 
 </main>
@@ -365,7 +762,124 @@ window.addEventListener("error", function (e) {
   document.documentElement.dataset.space3d = "error:" + String(e.message || "script").slice(0, 80);
 });
 </script>
+
+<!-- 设置：模型 / 外观 / 行为 / 数据 / 高级 -->
+<div id="set-modal" class="sm" hidden aria-hidden="true">
+  <div class="sm-card" role="dialog" aria-modal="true" aria-labelledby="sm-title">
+    <header class="sm-head">
+      <div><h2 id="sm-title">设置</h2><p>模型 · 外观 · 行为 · 数据 · 高级</p></div>
+      <button class="sm-x" id="sm-close" type="button" aria-label="关闭">×</button>
+    </header>
+    <div class="sm-main">
+      <nav class="sm-tabs" id="sm-tabs">
+        <button data-tab="model" class="on" type="button">模型</button>
+        <button data-tab="appearance" type="button">外观</button>
+        <button data-tab="behavior" type="button">行为</button>
+        <button data-tab="data" type="button">数据</button>
+        <button data-tab="advanced" type="button">高级</button>
+      </nav>
+      <div class="sm-panes" id="sm-panes">
+        <section data-pane="model">
+          <label class="sm-row"><span>提供方</span>
+            <select id="set-provider"><option value="openai-compatible">OpenAI 兼容（/v1/chat/completions）</option></select>
+          </label>
+          <label class="sm-row"><span>Base URL</span>
+            <input id="set-base-url" placeholder="http://127.0.0.1:8080/v1" autocomplete="off" />
+          </label>
+          <label class="sm-row"><span>API Key</span>
+            <input id="set-api-key" type="password" placeholder="sk-…（本地模型可留空）" autocomplete="off" />
+          </label>
+          <label class="sm-row"><span>模型名</span>
+            <input id="set-model-name" placeholder="例如 qwen2.5-32b / claude-sonnet-4-5 / gpt-4.1" autocomplete="off" />
+          </label>
+          <div class="sm-grid3">
+            <label class="sm-row"><span>temperature</span><input id="set-temp" type="number" step="0.1" min="0" max="2" /></label>
+            <label class="sm-row"><span>max_tokens</span><input id="set-max" type="number" min="1" max="200000" /></label>
+            <label class="sm-row"><span>timeout(s)</span><input id="set-timeout" type="number" min="5" max="600" /></label>
+          </div>
+          <label class="sm-row sm-col"><span>系统提示词</span><textarea id="set-sys" rows="3" placeholder="可选；例如：你是 GBT小土豆V8，回答简洁"></textarea></label>
+          <div class="sm-actions">
+            <button id="set-test" type="button" class="sm-btn">测试连接</button>
+            <span id="set-test-state" class="sm-state"></span>
+          </div>
+          <p class="sm-hint">支持任何 OpenAI 兼容服务：llama.cpp / Ollama / vLLM / LM Studio / Claude 代理 / OpenAI。保存后网页对话立刻走你的模型。</p>
+        </section>
+        <section data-pane="appearance" hidden>
+          <label class="sm-row"><span>主题</span>
+            <select id="set-theme"><option value="dark">深色（默认）</option><option value="system">跟随系统</option></select>
+          </label>
+          <label class="sm-row"><span>字号缩放</span>
+            <select id="set-font"><option value="0.92">紧凑 92%</option><option value="1">标准 100%</option><option value="1.08">舒适 108%</option><option value="1.16">大号 116%</option></select>
+          </label>
+          <label class="sm-row"><span>信息密度</span>
+            <select id="set-density"><option value="comfortable">舒适</option><option value="compact">紧凑</option></select>
+          </label>
+          <label class="sm-check"><input id="set-motion" type="checkbox" /><span>减少动画（关闭进入动效）</span></label>
+        </section>
+        <section data-pane="behavior" hidden>
+          <label class="sm-row"><span>界面语言</span>
+            <select id="set-lang"><option value="zh-CN">简体中文</option><option value="en-US">English</option></select>
+          </label>
+          <label class="sm-check"><input id="set-enter" type="checkbox" /><span>Enter 发送 · Shift+Enter 换行</span></label>
+          <label class="sm-check"><input id="set-notify" type="checkbox" /><span>任务完成时发系统通知</span></label>
+          <label class="sm-check"><input id="set-sound" type="checkbox" /><span>完成提示音</span></label>
+          <label class="sm-check"><input id="set-autostart" type="checkbox" /><span>开机自启（由安装脚本写入；打包版用 安装自启.bat）</span></label>
+        </section>
+        <section data-pane="data" hidden>
+          <label class="sm-row"><span>数据目录</span><input id="set-datadir" readonly /></label>
+          <label class="sm-check"><input id="set-memory" type="checkbox" /><span>启用记忆链（/api/memory）</span></label>
+          <label class="sm-check"><input id="set-backup" type="checkbox" /><span>自动备份状态与记忆</span></label>
+          <label class="sm-row"><span>备份目录</span><input id="set-backupdir" placeholder="例如 D:\GBT备份" /></label>
+          <div class="sm-actions">
+            <button id="set-export" type="button" class="sm-btn">导出设置</button>
+            <button id="set-import" type="button" class="sm-btn">导入设置</button>
+            <button id="set-export-mem" type="button" class="sm-btn">导出记忆索引</button>
+            <input id="set-import-file" type="file" accept="application/json" hidden />
+          </div>
+          <p class="sm-hint">导出文件可带到另一台机器；记忆索引导出为 JSON（只读快照，不回写）。</p>
+        </section>
+        <section data-pane="advanced" hidden>
+          <label class="sm-row"><span>网络代理</span><input id="set-proxy" placeholder="http://127.0.0.1:7890（留空不走代理）" /></label>
+          <label class="sm-row"><span>失败重试</span><input id="set-retries" type="number" min="0" max="5" /></label>
+          <label class="sm-row"><span>上下文模式</span>
+            <select id="set-ctx"><option value="ring">ring（有界窗口 + 全量落库）</option><option value="full">full（尽量带全量）</option></select>
+          </label>
+          <label class="sm-row"><span>窗口字符数</span><input id="set-window" type="number" min="1000" max="200000" /></label>
+          <p class="sm-hint">当前版本用 ring 上下文；代理与重试写入配置，网关层接入后生效。</p>
+        </section>
+      </div>
+    </div>
+    <footer class="sm-foot">
+      <span id="sm-saved"></span>
+      <button id="sm-save" class="sm-btn primary" type="button">保存设置</button>
+    </footer>
+  </div>
+</div>
+
+
 <script src="../../state/console-data.js"></script>
+<script src="./skin-cube.js"></script>
+<script src="../../assets/gsap.min.js"></script>
+<div class="ui-cards" id="ui-cards" aria-live="polite"></div>
 <script src="./app.js"></script>
+<script src="./ui-cards.js"></script>
+<script src="./focus-panel.js"></script>
+<script src="./body-panel.js"></script>
+<script src="./context-panel.js"></script>
+<script src="./thought-stream.js"></script>
+<script src="./video-hub.js"></script>
+<script src="./page-mesh.js"></script>
+<script src="./media-stage.js"></script>
+<script src="./turn-trace.js"></script>
+<script src="./pairing-panel.js"></script>
+<script src="./update-panel.js"></script>
+<script src="./voice-stream-panel.js"></script>
+<script src="./api-slot-panel.js"></script>
+<script src="./reminder-panel.js"></script>
+<script src="./resource-panel.js"></script>
+<script src="./settings.js"></script>
+<script src="./moments.js"></script>
+<script src="./omni-monitor.js"></script>
+<script src="./proactive.js"></script>
 </body>
 </html>

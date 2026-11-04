@@ -5,7 +5,7 @@ import json
 import struct
 import sys
 
-GLB = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v5-color.glb"
+GLB = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v5-color.glb")
 
 raw = open(GLB, "rb").read()
 magic, ver, length = struct.unpack_from("<III", raw, 0)

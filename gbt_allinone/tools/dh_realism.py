@@ -37,7 +37,7 @@ DOMAIN = "creation"
 CAP_TYPE = "internal"
 TRACE_SOURCE_KIND = "dh_realism"
 
-V8 = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+V8 = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 
 # ══════════════════════════════════════════════════════════════════════════
 # ★ 八步流程（照 REALISM.md + PIPELINE.md 蒸馏；每步带判据）

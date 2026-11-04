@@ -29,6 +29,7 @@ README 18,481 B ⇒ 吞天 devour_github 真吞成胶囊 devoured_morluto_rea
 op=status / knowledge / commands / plan / cli / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import re
@@ -242,4 +243,4 @@ def run_op(op: str = "status", **params) -> dict:
     if extra:
         return {"ok": False, "op": op, "fail_closed": True,
                 "error": f"不认的参数：{sorted(extra)}", "allowed": sorted(_ALLOWED[op])}
-    return fn(**params)
+    return _oc_call(fn, params)

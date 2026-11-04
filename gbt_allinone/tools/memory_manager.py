@@ -42,6 +42,7 @@
 ops：index（增量）/ find（秒搜）/ store（存记忆·过写门）/ stats
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import glob
 import hashlib
@@ -266,5 +267,5 @@ def run_op(op: str = "stats", **params) -> dict:
     op = (op or "stats").lower()
     for name, fn in (("index", index), ("find", find), ("store", store), ("stats", stats)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "error": f"未知 op:{op}（index/find/store/stats）", "fail_closed": True}

@@ -58,6 +58,7 @@ DeepSeek Harness 的执行力、克劳德的意见和建议，以及一个内置
   ⇒ `test` 与 `pick` **一个字都不写配置**，只读计算（需要时写运行态）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -658,26 +659,26 @@ def where(**_kw) -> dict:
 def run_op(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return status(**params)
+        return _oc_call(status, params)
     if op == "set":
-        return set_ref(**params)
+        return _oc_call(set_ref, params)
     if op == "unset":
-        return unset(**params)
+        return _oc_call(unset, params)
     if op == "test":
-        return test(**params)
+        return _oc_call(test, params)
     if op == "where":
-        return where(**params)
+        return _oc_call(where, params)
     # ── 2026-09-28 新增 ──
     if op == "pick":
-        return pick(**params)
+        return _oc_call(pick, params)
     if op == "report":
-        return report(**params)
+        return _oc_call(report, params)
     if op == "mark_fail":
-        return mark_fail(**params)
+        return _oc_call(mark_fail, params)
     if op == "switch":
-        return switch(**params)
+        return _oc_call(switch, params)
     if op == "energy":
-        return energy(**params)
+        return _oc_call(energy, params)
     return {"ok": False, "error": f"未知 op:{op}"
                                   f"（status/set/unset/test/where/pick/report/mark_fail/switch/energy）",
             "fail_closed": True}

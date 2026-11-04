@@ -11,7 +11,7 @@
     python tools/blueprint-land.py --list                     # 列出所有蓝图与进度
 
 行为：
-  · 已完成的任��**不重跑**（读 runs.jsonl）；
+  · 已完成的任务务**不重跑**（读 runs.jsonl）；
   · 失败就下一轮重试（只重试失败项）；
   · 只剩"需要票"的任务（危险能力/转账）时**才**停下并说明；
   · 每轮都写编码账本；退出码 0=落地，1=未落地/需票。
@@ -66,3 +66,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

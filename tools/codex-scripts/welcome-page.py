@@ -117,9 +117,21 @@ def main() -> int:
     html = (TPL.replace("__LINES__", lines).replace("__AUDIO__", audio_block)
                .replace("__SIG__", SIG).replace("__REQ__", " 与 ".join(REQUIRED))
                .replace("__VERDICT__", "PASS" if c["ok"] else "FAIL"))
-    PAGE.parent.mkdir(parents=True, exist_ok=True)
-    PAGE.write_text(clean_html(html), encoding="utf-8")
-    print("已渲启动页：%s（音频：%s）" % (PAGE.relative_to(ROOT), audio or "**未造**"))
+    # --out：把页面渲到指定路径（默认仍写生产）。给「无伤落地」留通道：
+    # 先渲到临时文件 → mirror_stage verify → promote，生产不会出现半成品。
+    # （主人令 2026-11-03：修复必须原子替换无伤 —— 见宪章第二十八章）
+    out = PAGE
+    if "--out" in sys.argv:
+        i = sys.argv.index("--out")
+        if i + 1 < len(sys.argv):
+            out = Path(sys.argv[i + 1]).resolve()
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(clean_html(html), encoding="utf-8")
+    try:
+        shown = str(out.relative_to(ROOT))
+    except ValueError:
+        shown = str(out)
+    print("已渲启动页：%s（音频：%s）" % (shown, audio or "**未造**"))
     return 0 if c["ok"] else 1
 
 

@@ -11,13 +11,13 @@ import sys
 import threading
 import time
 
-CODEX = r"C:\Users\ADMIN\AppData\Local\OpenAI\Codex\bin\bffc5354119c8421\codex.exe"
+CODEX = str(__import__("pathlib").Path.home() / "AppData" / "Local" / "OpenAI" / "Codex" / "bin" / "bffc5354119c8421" / "codex.exe")
 WORKDIR = os.path.abspath(".")
 
 
 def main() -> int:
     env = dict(os.environ)
-    env["CODEX_HOME"] = r"C:\Users\ADMIN\.codex"
+    env["CODEX_HOME"] = str(__import__("pathlib").Path.home() / ".codex")
     env["RUST_LOG"] = "warn"
     proc = subprocess.Popen(
         [CODEX, "app-server", "--listen", "stdio://"],

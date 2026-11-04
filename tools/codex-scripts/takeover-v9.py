@@ -42,7 +42,7 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-V9 = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9")
+V9 = Path.home() / "Desktop" / "GBT小土豆V9"
 OUT = Path(__file__).resolve().parents[2] / "state" / "takeover-v9.json"
 OUR_BRAIN = {"OPENAI_BASE_URL": "http://127.0.0.1:11434/v1",
              "OPENAI_API_KEY": "ollama",

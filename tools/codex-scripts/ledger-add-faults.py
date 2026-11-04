@@ -12,7 +12,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-LEDGER = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\排查台账.json"
+LEDGER = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "排查台账.json")
 
 NEW = [
     {

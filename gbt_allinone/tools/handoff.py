@@ -29,6 +29,7 @@
 4. **读侧给"先读这三句"**：`read` 返回每桶最新一条 + 未完成任务的计数（接手先看这个）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import time
@@ -161,7 +162,7 @@ def run_op(op: str = "read", **params) -> dict:
     for n, fn in (("write", write), ("read", read), ("retract", retract),
                   ("verify", verify), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（write/read/retract/verify/where）"}
 

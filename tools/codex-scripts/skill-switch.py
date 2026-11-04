@@ -34,7 +34,7 @@ import time
 import tomllib
 from pathlib import Path
 
-CFG = Path(r"C:\Users\ADMIN\.codex\config.toml")
+CFG = Path.home() / ".codex" / "config.toml"
 BLOCK = re.compile(r"\[\[skills\.config\]\]\s*\n((?:[^\[]|\[(?!\[))*?)(?=\n\[|\Z)", re.S)
 
 

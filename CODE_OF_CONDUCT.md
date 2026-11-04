@@ -36,3 +36,7 @@
 ## 归属
 
 本准则改编自 [Contributor Covenant](https://www.contributor-covenant.org) v2.1。
+
+---
+
+> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

@@ -13,7 +13,7 @@
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5_3.10-3776AB?logo=python&logoColor=white">
   <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
-  <img alt="Caps" src="https://img.shields.io/badge/Capabilities-385-F5B041">
+  <img alt="Caps" src="https://img.shields.io/badge/Capabilities-427-F5B041">
   <img alt="Tests" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
   <img alt="Docs" src="https://img.shields.io/badge/Docs-93_pages-00E5FF">
   <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
@@ -41,7 +41,7 @@
 一个**本地优先的独立数字人框架**：大脑（大模型）+ 触手（操作系统能力）+ 审计账（每次调用可追），
 所有能力通过**唯一入口** `run_task(kind, payload)` 调度，写盘 / 花钱 / 出网一律过授权门。
 
-- **不是聊天壳**：385 个能力位落在 30 个域，本机真跑、真留痕。
+- **不是聊天壳**：427 个能力位落在 32 个域，本机真跑、真留痕。
 - **不是玩具**：每次调用落 `audit.jsonl`（call / ok / error / denied），可查、可计数。
 - **不依赖云**：核心只用标准库；大模型可换本机 GGUF，也可以接任意 OpenAI 兼容端点。
 - **可自检**：`selfscan` 五维扫描、`trunk_cover` 代码全覆盖、`legacy_guard` 旧物六类扫描。
@@ -63,7 +63,7 @@ cd GBTxiaotudouV8-Commander
 import sys; sys.path.insert(0, ".")
 import gbt_allinone as gbt
 
-print(len(gbt.list_capabilities()))                 # 385
+print(len(gbt.list_capabilities()))                 # 427
 print(gbt.run_task("health"))                       # 环境自检
 print(gbt.run_task("cap_self", {"op": "brief"}))    # 她自己的自述（现读）
 print(gbt.run_task("selfscan"))                     # 五维自检
@@ -81,12 +81,12 @@ Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd hol
 run_task(kind, payload)
    │
    ├─ 授权门 security/policy.py（15 个作用域：付款/隐私/生产写入/远控/发声/出网…）
-   ├─ 能力位 caps_registry.py（385 个，30 域）
+   ├─ 能力位 caps_registry.py（427 个，32 域）
    ├─ 触手层 tentacle/（识别 / 执行 / 自检 / 编排 / 蓝图 / 脉冲直达）
    └─ 审计 store/audit.jsonl（call / ok / error / denied 全程落盘）
 ```
 
-## 🧠 她能干嘛（30 域 · 385 位）
+## 🧠 她能干嘛（32 域 · 427 位）
 
 **给她一句话，她自己选能力位、过授权门、真跑、留审计、出结果。**
 
@@ -105,7 +105,7 @@ esearch_intel 	opic_web |
 | 视频（生成/剪辑/混音） | 16 | hunyuan_video media_pipeline udio_mix |
 | 身体（看/说/按/敲） | 12 | ody_see ody_click ody_type |
 
-完整 30 域 + 10 个可抄用法 + 边界说明：[**docs/90-what-she-can-do.md**](docs/90-what-she-can-do.md)
+完整 32 域 + 10 个可抄用法 + 边界说明：[**docs/90-what-she-can-do.md**](docs/90-what-she-can-do.md)
 
 > 边界：危险动作（转账/隐私/生产写入/远控/外发）一律要主人发授权；缺钥/缺依赖**如实报**，不装成功。
 
@@ -122,7 +122,7 @@ esearch_intel 	opic_web |
 
 打开：`python tools/console-server.py` → <http://127.0.0.1:8766/>（实时数据 + 真对话）；
 或双击 `holo_pet_w3/console/index.html`（离线快照）。
-细节：[**docs/102-cognitive-console.md**](docs/102-cognitive-console.md)
+细节：[**docs/legacy/102-cognitive-console.md**](docs/legacy/102-cognitive-console.md)
 
 ## 🧩 能力面
 
@@ -143,7 +143,7 @@ esearch_intel 	opic_web |
 
 | 指标 | 读数 | 复核命令 |
 |---|---|---|
-| 能力位 | **385** | `cap_self verify` |
+| 能力位 | **427** | `cap_self verify` |
 | 审计条数 | 现读 | `gbt.log_count()` |
 | 自检 | clean | `selfscan` |
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |
@@ -163,11 +163,11 @@ esearch_intel 	opic_web |
 
 ## 📚 文档
 
-索引：[docs/README.md](docs/README.md)（93 页，按编号）
+索引：[docs/legacy/README.md](docs/legacy/README.md)（93 页，按编号）
 
 - [模型卡](docs/01-model-card.md) · [架构](docs/02-architecture.md) · [能力面](docs/03-capabilities.md)
 - [部署](docs/05-deployment.md) · [并发实测](docs/08-concurrency.md) · [安全与控制](docs/14-security-and-control.md)
-- [蓝图主链](docs/68-blueprint-chain.md) · [跑到落地](docs/69-run-to-landing.md) · [旧物守卫](docs/79-legacy-guard.md) · [仓库整理](docs/87-repo-cleanup-done.md)
+- [蓝图主链](docs/68-blueprint-chain.md) · [跑到落地](docs/69-run-to-landing.md) · [旧物守卫](docs/79-legacy-guard.md) · [仓库整理](docs/legacy/87-repo-cleanup-done.md)
 
 ## 🤝 参与
 

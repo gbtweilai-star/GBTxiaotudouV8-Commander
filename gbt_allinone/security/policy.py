@@ -1,4 +1,4 @@
-﻿# gbt-capability: dynamic-import
+# gbt-capability: dynamic-import
 """能力风险策略：保留全部能力，给高风险动作增加主人会话与一次性授权边界。
 
 策略原则：
@@ -78,8 +78,21 @@ class PolicyDecision:
     details: dict = field(default_factory=dict)
 
     @property
+    def gated(self) -> tuple:
+        """真正需要**人工授权**的作用域（HUMAN_GATES 命中项）。
+
+        2026-11-03 修（语义分离）：`scopes` 记的是「这个动作动了什么」——
+        审计、风险分级、判据断言都要用**全量**；`gated` 才是「要不要主人在终端发授权」。
+        原实现把两件事塞进同一个集合，add() 只收门里的项 ⇒ 主人一免票，
+        作用域记录被连同抹掉：`evaluate()` 对任何 kind 都返回 scopes=()，
+        审计看不出动作影响、risk 恒为 low、作用域判据全红。
+        """
+        return tuple(s for s in self.scopes if s in HUMAN_GATES)
+
+    @property
     def restricted(self) -> bool:
-        return bool(self.scopes)
+        """要不要走人工授权：**只看 HUMAN_GATES**（主人 2026-11-03 令）。"""
+        return bool(self.gated)
 
 
 def owner_session() -> contextlib.AbstractContextManager:
@@ -106,9 +119,46 @@ def is_trusted() -> bool:
 # 主人原话（逐字）：「门在自主长线任务的时候除了转账，黑客能力，其他皆可GBT小土豆V8判断点授权」
 AUTONOMOUS_ENV = "GBT_AUTONOMOUS"
 MONEY_KINDS = frozenset({"transfer"})          # 转账类：**仍要主人**（钱不能让她自己拍）
+
+# ── 要票集合（模块级：PolicyDecision.restricted / gated 要读它）──────────────────
+# 主人 2026-11-03 令（逐字）：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
+# 收敛后**只剩两类**：
+#   ① 危险能力（G1 黑客全能力）：privacy_read · osint_private · remote_device
+#      · desktop_control · browser_control · device_control
+#      —— 后三个是「替人动手」（模拟键鼠/点按钮/输内容、操控浏览器、驱动外部设备），
+#         属 G1 面，源码注释第 243 行原本就把它列为 G1 四件套之一，收敛时被漏掉。
+#   ② 转账 transfer（经 MONEY_KINDS 同步判定）——钱不能让她自己拍
+# 一律免票：process_execute · filesystem_write · audio_output · network_private ·
+#   deploy_publish · deploy_force · external_llm · data_export
+# 「自己的身体」另有豁免：见 evaluate() 末尾 _OWN_SENSES（把 desktop_control 等
+#   从自身感官类 kind 的 scopes 里剔除），所以上面加进来**不会**让动自己键鼠重新要票。
+HUMAN_GATES = frozenset({
+    "privacy_read", "osint_private", "remote_device",
+    "desktop_control", "browser_control", "device_control",
+    "transfer",
+    "owner_control",          # 通道件（它是授权本身，不是第四道）
+})
+
+# 机制层自保：11-03 令已全部免票 ⇒ 空集。
+# 保留这个名字是因为 runtime/static_check.py 会 AST 读它（判据侧见原子4）。
+MECHANISM_GATES: frozenset = frozenset()
 _DEFENSIVE_SECURITY = frozenset({              # security 域里这些是"防御/登记"面，不算黑客能力
     "event_ledger", "review_gate", "policy_delta", "hook_enforcer",
     "omission_detector", "onboarding_gate", "sec_defenses",
+    # 2026-11-03 补：这 3 条是**防御面**（自检 / 扫描 / 清扫），原表漏列 ⇒ 被
+    # _hacker_kinds() 误判成进攻面，连带 body_sense 把「免疫」「肾·过滤」报成"酸"。
+    "install_selfcheck", "sec_scan", "sec_sweeper",
+    # ── 2026-11-03 主人令补全：「危险能力 + 转账要票，其他一切都不需要」──────────────
+    # 下列 10 条此前被 _hacker_kinds() 误当"进攻面"，实测要票 24 个，其中这 10 个不该要。
+    # 分类依据都能在名册 desc 里查到，不是拍脑袋：
+    #   审计/扫描面（她自己的眼睛）
+    "code_audit", "penetrating_cross_scan",
+    # 安全域自检与机制本体（护栏 ≠ 攻击）
+    "dual_gate", "sec_chain", "sec_llm", "sec_surface",
+    # 设备配对：功能性握手，不产生攻击能力
+    "pairing", "lan_pairing",
+    # 金库冻结：**保护**动作（冻结比解冻更安全）
+    "asset_vault_freeze",
 })
 
 
@@ -185,6 +235,34 @@ def _needs_private_network(payload: dict) -> bool:
     return False
 
 
+# ── 2026-11-03：本机自训权重车道 ≠ 外部大模型服务 ─────────────────────────────
+# 主人令：「只有黑客全能力和转账需要终端YES，其他全部由指挥官大模型分析决策」。
+# `external_llm` 是 G2 付款门（发外部计费模型 = 花钱）。本机回环车道 $0、数据不出网，
+# 既不是"外部"，也不是"转账" ⇒ 免票。
+# 判据**只看落点 URL**（现读 key_gateway 车道表），不看 provider 名字 ——
+# 这样 GBT_POTATO_BASE_URL 被改成云端 RunPod 时，同一份代码会自动恢复要票（不假免票）。
+_LOOPBACK_HOSTS = ("127.0.0.1", "localhost", "::1", "[::1]", "0.0.0.0")
+
+
+def _lane_is_loopback(payload: dict) -> bool:
+    """本次 llm 调用的落点是不是本机回环。读不到就**按要票处理**（fail-closed）。"""
+    name = str(payload.get("provider") or "").strip().lower()
+    if not name:
+        return False                      # 没点名 ⇒ 自动路可能落云端 ⇒ 保持原语义（要票）
+    url = ""
+    try:
+        from ..llm import key_gateway as _kg
+        spec = (_kg._BY_NAME.get(name) or {}) if hasattr(_kg, "_BY_NAME") else {}
+        url = str(_kg._url_of(spec) if hasattr(_kg, "_url_of") else spec.get("url") or "")
+    except Exception:                                            # noqa: BLE001
+        return False                      # 车道表读不到 ⇒ 不假装免票
+    if not url:
+        return False
+    low = url.lower()
+    return any(h in low for h in _LOOPBACK_HOSTS)
+
+
+
 def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     p = dict(payload or {})
     op = str(p.get("op") or p.get("action") or p.get("method") or "").lower()
@@ -203,37 +281,27 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     #    怎么回滚：py -3.14 -X utf8 tools/codex-scripts/relax-gates-20261019.py --rollback
     # 机制层自我保护：**要票**，但不归三道护栏（主人 2026-10-19 核实：
     # 上一版白名单过滤器把 filesystem_write 吃掉了 ⇒ 全仓 10+ 处 add 空转）。
-    MECHANISM_GATES = {"filesystem_write"}
-    HUMAN_GATES = {
-        # ── 主人 2026-10-19 正表（真源：guardrail-check.py 文件头 2026-10-10 主人令）──
-        # G1 黑客全能力
-        # 2026-11-01 主人令：「除了她使用危险能力和转账能力需要票，其他一切都要以设备算力
-        # 推理分析来做决策」⇒ 移出人工门：network_private / browser_control / desktop_control /
-        # device_control / audio_output（这些是"身体"，不是"攻击面"）。
-        "process_execute", "remote_device", "privacy_read",
-        # 2026-10-21 补（主人当场批准）：本表原写 `network_private`，而 `osint_scan` 分支
-        # add 的是 `osint_private` —— 两个名字都在作用域表里，但 add() 只认白名单里的名字，
-        # 于是内网扫描那道护栏**被静默放行**（实测：target=127.0.0.1 直接 ok）。
-        # 上面第 190 行的设计注释本来就写着 G1 应含 `osint_private` ⇒ 这次是**把门补上**，
-        # 不是放宽；四条判据（auth_gate_flow / osint_guard / sec_defenses·net_guard /
-        # longrun_escalate）此前一直红，根因就是这一个词。
-        "osint_private",
-        # G2 付款
-        "external_llm", "data_export", "audio_output",
-        # G3 生成代码禁入生产面板
-        "deploy_publish", "deploy_force",
-        # 通道件（它是授权本身，不是第四道）
-        "owner_control",
-        # ⚠️ 上一版漏了 process_execute/browser_control/device_control/network_private/audio_output，
-        #    等于把 G1 与 G2 人工授权一起撤掉；2026-10-19 按正表补齐（备份见 state/authz-relax-20261019/）。
-    }
+    # 2026-11-03 主人令：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
+    # ⇒ 机制门取消：filesystem_write 不再要票（每次落盘都发一次票 = 直接拖效率）。
+    # 要票集合已提到模块级（HUMAN_GATES / MECHANISM_GATES）：
+    # PolicyDecision.restricted 与 .gated 要读同一份，放在函数里会让两处口径漂。
+    # 口径正文见模块级定义处（2026-11-03 主人令）。
 
     def add(*items: str) -> None:
         nonlocal risk
         for item in items:
-            if item and (item in HUMAN_GATES or item in MECHANISM_GATES) and item not in scopes:
+            # 🔴 2026-11-03 修（真 bug）：**一律如实记录**，不因为"免票"就把作用域丢掉。
+            #    原实现只收 HUMAN_GATES / MECHANISM_GATES 里的项 ⇒ 免票之后
+            #    `add("filesystem_write")` / `add("process_execute")` 这类几十处调用
+            #    全部**静默落空**，scopes 永远为空：审计看不出动作影响、risk 恒 low、
+            #    作用域判据（scan_cap/figure_gate/ledger_note/code_patch 等）全红。
+            #    "要不要票"由 PolicyDecision.gated 单独判定，与"动了什么"无关。
+            if item and item not in scopes:
                 scopes.append(item)
+        # 风险分级：**读隐私比落盘更重**。原表漏了 privacy_read / osint_private / transfer
+        # ⇒ 读摄像头/麦克风/屏幕只判 medium，而写个文件就判 high —— 分级倒挂。
         if any(x in scopes for x in (
+            "privacy_read", "osint_private", "transfer",
             "remote_device", "process_execute", "filesystem_write", "deploy_publish",
             "network_private", "browser_control", "desktop_control", "device_control",
             "external_llm", "data_export",
@@ -558,6 +626,11 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
                      "scheme": "app", "unix": "process",
                      "mcp": "process", "remote": "process"}.get(_k, "process")
             _pop = "run"
+        # 🔴 2026-11-03：`op=page_run` 是**真起子进程**跑包内页（python -m <module>），
+        #   风险等级等同 process 插座 ⇒ 必须过 `process_execute` 门。
+        #   不挂这条 = 新开了一个"免门执行任意页"的后门（正是本仓最忌的那种漏）。
+        if _pop in ("page_run", "开页", "page"):
+            add("process_execute")
         if _pop == "run":
             if _sock == "process":
                 add("process_execute")
@@ -668,7 +741,18 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     elif kind == "devour_pulse":
         add("data_export", "filesystem_write", "external_llm")
     elif kind in ("llm_chat", "sec_llm", "autopilot", "think_loop"):
-        add("external_llm")
+        # 🔴 2026-11-03 主人令（逐字）：「只有黑客全能力和转账需要终端YES，
+        #    其他全部由GBT小土豆V8指挥官大模型分析决策」。
+        #    `external_llm` 的本质是 **G2 付款**（把数据发给按量计费的外部模型 = 花钱）。
+        #    打到**本机回环**的自训权重（127.0.0.1，边际成本 $0、数据不出网）不构成
+        #    「外部大模型服务」，也不构成转账 ⇒ **不挂票**，由指挥官模型自己决策。
+        #    判据只看**实际落点 URL**（现读车道表），不看 provider 名字：
+        #      · potato 声明是 127.0.0.1:8111 ⇒ 免票；
+        #      · 若 GBT_POTATO_BASE_URL 被指向 RunPod 云端 ⇒ 自动恢复要票（同一份代码两种落点都对）。
+        #    不点名（没给 provider）时行为**一字不变** —— 仍按原来挂 external_llm，
+        #    因为自动路可能落到云端免费池/付费池（测试 test_human_view_gates 钉着这条）。
+        if not _lane_is_loopback(p):
+            add("external_llm")
     # ── 2026-09-28 补：新增三能力位的作用域声明（主人令：新增能力全部要与触手双向绑定）──
     # 为什么**必须**在这里补，光注册名字不够：
     #   本函数对**未列出的 kind 是 fail-open** —— `scopes=()` ⇒ `decision.restricted` 为假
@@ -1156,6 +1240,12 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
         risk = "low" if not scopes else risk
         details["web_read_only"] = True
 
+    # 2026-11-03 补漏：transfer 是 **kind** 不是 scope，上面各分支从不 add 它
+    # ⇒ 非自主模式下 MONEY_KINDS 形同虚设（实测 evaluate("transfer") scopes 为空）。
+    # 这里按 kind 补判一次，让"转账必票"真正生效。
+    if kind in MONEY_KINDS:
+        add("transfer")
+
     return PolicyDecision(kind=kind, risk=risk, scopes=tuple(scopes),
                           action=action, allow_private=allow_private, details=details)
 
@@ -1178,9 +1268,9 @@ def authorize(kind: str, payload: dict | None = None) -> dict:
             "scopes": list(decision.scopes),
             "authorizations": [],
         }
-    auto_ok, auto_reason = autonomous_self_judgment(kind, decision.scopes)
+    auto_ok, auto_reason = autonomous_self_judgment(kind, decision.gated)
     if auto_ok:
-        _audit_autonomous(kind, decision.scopes, decision.action, auto_reason)
+        _audit_autonomous(kind, decision.gated, decision.action, auto_reason)
         return {
             "ok": True,
             "trusted": False,
@@ -1193,8 +1283,10 @@ def authorize(kind: str, payload: dict | None = None) -> dict:
             "note": "自主长线任务：除转账/黑客能力外由她自行判断授权（主人 2026-10-17 令）",
         }
     from .. import auth_gate
+    # 只拿**要票的那些**去消耗授权：scopes 是"动了什么"（含已免票的项），
+    # 若整份拿去要票，等于把免掉的票又逐条要回来（11-03 令当场失效）。
     result = auth_gate.check_and_consume_many(
-        decision.scopes, detail=f"{kind}:{decision.action}")
+        decision.gated, detail=f"{kind}:{decision.action}")
     if not result.get("ok"):
         return {
             "ok": False,

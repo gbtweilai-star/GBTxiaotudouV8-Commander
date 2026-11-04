@@ -35,6 +35,7 @@
 5. **不跟符号链接**：遍历时不跟随（防顺链删到目标之外）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -264,7 +265,7 @@ def run_op(op: str = "profiles", **params) -> dict:
     for n, fn in (("plan", plan), ("cut", cut), ("verify", verify),
                   ("profiles", profiles), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（plan/cut/verify/profiles/where）"}
 

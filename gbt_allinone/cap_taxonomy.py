@@ -42,7 +42,7 @@ import sys
 CATEGORIES: dict = {
     "身": {
         "title": "身 · 操控部位",
-        "domains": ["device", "desktop", "tentacle"],
+        "domains": ["device", "desktop", "tentacle", "body_control"],
         "desc": "这台机器的七根感官与六根动作，以及桌面操控与触手本体。",
     },
     "感": {
@@ -62,7 +62,7 @@ CATEGORIES: dict = {
     },
     "造": {
         "title": "造 · 内容生产",
-        "domains": ["creation", "video", "image_video"],
+        "domains": ["creation", "video", "image_video", "ui"],
         "desc": "图文、视频、音频、数字人、剪辑、调色、发布准备。",
     },
     "工": {

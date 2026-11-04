@@ -10,7 +10,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 LOW = DH / "raw/rig/model-rigged.glb"               # 已绑骨（含 JOINTS_0/WEIGHTS_0）—— 注意不是绑骨前的转换件
 HIGH = DH / "raw/phase2a/model.glb"                  # 高保真 T-pose（762k）

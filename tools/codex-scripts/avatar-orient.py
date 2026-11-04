@@ -23,7 +23,7 @@ import sys
 
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "holo_pet/assets/digital-human/raw/phase1-owner/model.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WS / "holo_pet/assets/digital-human/raw/avatarmesh/model-facing.glb"
 

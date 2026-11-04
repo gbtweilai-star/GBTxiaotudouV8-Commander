@@ -33,7 +33,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/rig/avatar-talk.glb"
 OUT = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else DH / "raw/rig/avatar-specl.glb"

@@ -19,7 +19,7 @@ import math
 import os
 import sys
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[3])
 
 PALETTE = {
     "hips": (0.90, 0.20, 0.20), "spine": (0.95, 0.55, 0.10), "chest": (0.95, 0.90, 0.15),

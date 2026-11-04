@@ -38,6 +38,7 @@
    ⇒ **本机跑不了那条**；Windows 那条是 **C++ + Vulkan**（要单独编译 + 23 GB 权重）。**本件不假装能跑。**
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import os
 import shutil
@@ -198,7 +199,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("where", where), ("mechanism", mechanism),
                    ("map", map_tentacle), ("probe", probe)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

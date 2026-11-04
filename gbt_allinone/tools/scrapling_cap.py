@@ -14,6 +14,7 @@ ops：
   fetch  url= [, selector]      抓取公网页面，返回状态/标题/正文摘要；给 selector 则返回命中文本
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import re
 
@@ -123,8 +124,8 @@ def fetch(url: str = "", selector: str = "", timeout: int = 30, **_kw) -> dict:
 def run(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return status(**params)
+        return _oc_call(status, params)
     if op == "fetch":
-        return fetch(**params)
+        return _oc_call(fetch, params)
     return {"ok": False, "error": "未知 op:%s（可用：status / fetch）" % op,
             "fail_closed": True}

@@ -9,7 +9,7 @@ import pathlib
 import sys
 from playwright.sync_api import sync_playwright
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 BASE = "http://127.0.0.1:8788"
 

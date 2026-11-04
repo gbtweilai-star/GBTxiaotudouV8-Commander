@@ -31,6 +31,7 @@ ops：
   verify                  判据：清单完整性 + 无未解释的消失键
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -313,6 +314,6 @@ def run_op(op: str = "keys", **params) -> dict:
     for name, fn in (("surface", surface), ("keys", keys), ("bpy", bpy),
                      ("data", data), ("verify", verify), ("config", config)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（surface/keys/bpy/data/verify/config）"}

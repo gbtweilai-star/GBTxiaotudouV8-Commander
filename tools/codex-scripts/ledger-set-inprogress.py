@@ -14,7 +14,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-PATH = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\排查台账.json"
+PATH = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "排查台账.json")
 
 TEXT = (
     "2026-10-22：**开机自检 45 步 / 红 0 全绿（43.3 秒）**；页面卡死的两个真因已钉死。"

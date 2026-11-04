@@ -8,8 +8,8 @@ import json
 import subprocess
 import sys
 
-CODEX = r"C:\Users\ADMIN\AppData\Local\OpenAI\Codex\bin\bffc5354119c8421\codex.exe"
-WORKDIR = "C:\\Users\\ADMIN\\Desktop\\GBT\u5c0f\u571f\u8c46V8"
+CODEX = str(__import__("pathlib").Path.home() / "AppData" / "Local" / "OpenAI" / "Codex" / "bin" / "bffc5354119c8421" / "codex.exe")
+WORKDIR = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 
 
 def run_rpc(payload_bytes: bytes, label: str) -> None:

@@ -6,6 +6,7 @@
   "use strict";
 
   var MODE = { online: false, data: null };
+  var ATTACH = null;   // 对话 + 号附图（dataURL/name/bytes）
   var $ = function (id) { return document.getElementById(id); };
   var el = function (tag, cls, text) {
     var n = document.createElement(tag);
@@ -29,7 +30,7 @@
     };
   }
 
-  function loadData() {
+  function loadData(silent) {
     // 先渲染内联快照（有 <script src=state/console-data.js> 就有数据）——
     // 这样即使 /api/data 慢/挂，页面也不会空白。
     MODE.data = fallback();
@@ -42,6 +43,7 @@
         else throw new Error((j && j.error) || "无数据");
       })
       .catch(function (e) {
+        if (silent && MODE.online) return;      // 静默刷新失败：保留当前实时数据，不污染界面
         MODE.data = fallback();
         render(MODE.data);
         addBot("⚠ 读不到实时数据（" + e.message + "），显示的是内联快照。起服务：python tools/console-server.py");
@@ -229,8 +231,78 @@
 
   function addBot(text, meta) { return addMsg("bot", text, meta); }
 
+  function fmtSize(n) {
+    n = Number(n) || 0;
+    if (n < 1024) return n + "B";
+    if (n < 1048576) return (n / 1024).toFixed(1) + "KB";
+    return (n / 1048576).toFixed(1) + "MB";
+  }
+
+  /* ───────── 对话 + 号附图：选图/粘贴/预览/移除/发送 ───────── */
+  function clearAttachPreview() {
+    ATTACH = null;
+    var box = $("chat-attach-preview");
+    if (box) { box.hidden = true; box.innerHTML = ""; }
+  }
+
+  function showAttachPreview(a) {
+    var box = $("chat-attach-preview");
+    if (!box) return;
+    box.innerHTML = "";
+    var im;
+    if (a.kind === "image") {
+      im = document.createElement("img");
+      im.className = "attach-thumb"; im.src = a.dataUrl; im.alt = a.name || "附图";
+    } else {
+      im = el("span", "attach-thumb attach-file-icon", "文");
+    }
+    var name = el("span", "attach-name",
+      (a.name || "附件") + " · " + fmtSize(a.bytes));
+    var x = el("button", "attach-x", "×");
+    x.type = "button"; x.title = "移除附图";
+    x.onclick = function () { clearAttachPreview(); };
+    box.appendChild(im); box.appendChild(name); box.appendChild(x);
+    box.hidden = false;
+  }
+
+  function setAttach(file, mode) {
+    if (!file) return;
+    var isImg = /^image\//.test(file.type || "");
+    if (mode === "image" && !isImg) {
+      addBot("⚠ 图片入口只接图片（png/jpg/webp/gif…）；其它文件请用「文件」入口", "附图");
+      return;
+    }
+    var maxBytes = isImg ? 8 * 1024 * 1024 : 20 * 1024 * 1024;
+    if (file.size > maxBytes) { addBot("⚠ 文件太大（> " + (maxBytes / 1048576) + "MB）", "附图"); return; }
+    var fr = new FileReader();
+    fr.onload = function () {
+      ATTACH = { kind: isImg ? "image" : "file", name: file.name,
+                 type: file.type || "", dataUrl: String(fr.result || ""), bytes: file.size };
+      showAttachPreview(ATTACH);
+    };
+    fr.onerror = function () { addBot("⚠ 文件读取失败", "附件"); };
+    fr.readAsDataURL(file);
+  }
+
+  function addUserMsg(text, att) {
+    var m = addMsg("user", text || (att ? (att.kind === "image" ? "（附图）" : "（附件）") : ""));
+    if (att && att.kind === "image") {
+      var im = document.createElement("img");
+      im.className = "msg-attach"; im.src = att.dataUrl; im.alt = "附图";
+      m.appendChild(im);
+    } else if (att) {
+      var sp = document.createElement("span");
+      sp.className = "msg-file";
+      sp.textContent = "附件：" + (att.name || "文件") + " · " + fmtSize(att.bytes);
+      m.appendChild(sp);
+    }
+    return m;
+  }
+
   function chatSubmit(text) {
-    addMsg("user", text);
+    var _att = ATTACH;
+    addUserMsg(text, _att);
+    if (_att) clearAttachPreview();
     var btn = document.querySelector(".send-btn");
     btn.disabled = true;
     var pending = addBot("…");
@@ -243,15 +315,34 @@
     }
     fetch("/api/chat", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: text, context: "console-web" })
+      body: JSON.stringify({
+        text: text, context: "console-web",
+        image: (_att && _att.kind === "image") ? _att.dataUrl : "",
+        image_name: (_att && _att.kind === "image") ? (_att.name || "") : "",
+        file: (_att && _att.kind === "file") ? _att.dataUrl : "",
+        file_name: (_att && _att.kind === "file") ? (_att.name || "") : "",
+        file_type: (_att && _att.kind === "file") ? (_att.type || "") : ""
+      })
     }).then(function (r) { return r.json(); }).then(function (j) {
       pending.remove();
       if (j && j.ok) {
-        var meta = (j.usage ? j.usage.completion_tokens + " tok · " : "") +
-          (j.ms != null ? j.ms + "ms · " : "") + "temperature=0";
-        var ring = j.ring || {};
-        meta += " · 上下文 seq " + (ring.seq != null ? ring.seq : "?") +
-          " / 历史 " + (ring.db_turns != null ? ring.db_turns : "?") + " 轮";
+        var meta;
+        if (j.via === "capability_router") {
+          // 2026-11-02：四类能力（看屏幕/开网页/读写文件/看图）走万能插真执行，回执如实标出来
+          meta = "万能插 · " + (j.label || j.intent || "能力") +
+            (j.ms != null ? " · " + j.ms + "ms" : "") + " · 已落审计";
+        } else if (j.via && (j.via.indexOf("file:") === 0 || j.via === "vision:local")) {
+          // 2026-11-02：对话附图 / 文件发送 —— 本地解析，不借云端
+          var vLabel = j.via === "vision:local" ? "附图视觉读数"
+            : (j.via === "file:text" ? "文本附件" : (j.via === "file:binary" ? "二进制附件" : "本地附件"));
+          meta = "本地附件 · " + vLabel + (j.ms != null ? " · " + j.ms + "ms" : "") + " · 不借云端";
+        } else {
+          meta = (j.usage ? j.usage.completion_tokens + " tok · " : "") +
+            (j.ms != null ? j.ms + "ms · " : "") + "temperature=0";
+          var ring = j.ring || {};
+          meta += " · 上下文 seq " + (ring.seq != null ? ring.seq : "?") +
+            " / 历史 " + (ring.db_turns != null ? ring.db_turns : "?") + " 轮";
+        }
         addBot(String(j.text || "").trim() || "(空回答)", meta);
       } else {
         addBot("⚠ " + ((j && j.error) || "调用失败"), "如实报错");
@@ -263,10 +354,60 @@
   }
 
   function wire() {
+    /* P1：万能插四类快捷条（点一下就等于发一句对应人话；执行仍走 /api/chat → capability_router） */
+    var CAP_TEMPLATES = {
+      screen: "帮我看看屏幕",
+      web: "打开 https://example.com",
+      file: "读文件 README.md",
+      image: "看图 icons/avatar.png"
+    };
+    /* 2026-11-02：对话 + 号附图（文件选择 / 粘贴图片 / 预览 / 移除） */
+    var attachBtn = $("chat-attach");
+    var fileInput = $("chat-file");
+    if (attachBtn && fileInput) {
+      attachBtn.addEventListener("click", function () { fileInput.click(); });
+      fileInput.addEventListener("change", function () {
+        var f = fileInput.files && fileInput.files[0];
+        if (f) setAttach(f, "image");
+        fileInput.value = "";
+      });
+    }
+    var fileBtn = $("chat-attach-file");
+    var uploadInput = $("chat-upload");
+    if (fileBtn && uploadInput) {
+      fileBtn.addEventListener("click", function () { uploadInput.click(); });
+      uploadInput.addEventListener("change", function () {
+        var f = uploadInput.files && uploadInput.files[0];
+        if (f) setAttach(f, "file");
+        uploadInput.value = "";
+      });
+    }
+    var chatInputEl = $("chat-input");
+    if (chatInputEl) {
+      chatInputEl.addEventListener("paste", function (e) {
+        var items = (e.clipboardData && e.clipboardData.items) || [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.indexOf("image/") === 0) {
+            var f = items[i].getAsFile();
+            if (f) { setAttach(f); e.preventDefault(); }
+            break;
+          }
+        }
+      });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("#cap-quick .cap-chip"), function (b) {
+      b.addEventListener("click", function () {
+        var t = CAP_TEMPLATES[b.getAttribute("data-cap")];
+        if (!t) return;
+        var inp = $("chat-input");
+        if (inp) inp.value = t;
+        chatSubmit(t);
+      });
+    });
     $("chat-composer").addEventListener("submit", function (e) {
       e.preventDefault();
       var t = $("chat-input").value.trim();
-      if (!t) return;
+      if (!t && !ATTACH) return;
       $("chat-input").value = "";
       chatSubmit(t);
     });
@@ -282,9 +423,11 @@
       drawGraph((MODE.data && MODE.data.domains) || []);
     });
     $("voice-btn").addEventListener("click", function () {
-      addBot("语音入口在壳的 connect 页（ASR/TTS 未在这页接）。", "占位");
+      var t = document.querySelector('.view-tab[data-view="teardown"]');
+      if (t) t.click();
     });
     $("settings-btn").addEventListener("click", function () {
+      if (window.__openSettings) { window.__openSettings(); return; }
       addBot("设置：模型/语音/社交在壳的 connect 页；本页只读状态。", "占位");
     });
     var tb = $("titlebar-time");
@@ -668,10 +811,6 @@
     kpi("critical", by.critical || 0);
     kpi("high", by.high || 0);
     kpi("medium", by.medium || 0);
-    var st = d.by_status || {};
-    Object.keys(st).forEach(function (k) { kpi("状态 " + k, st[k]); });
-    var avg = d.avg_cvss;
-    if (avg != null) kpi("平均 CVSS", avg);
     var pay = d.payout_total || {};
     var keys = Object.keys(pay);
     if (!keys.length) kpi("赔付账本", "0");
@@ -709,9 +848,7 @@
         sev.textContent = "[" + (f.severity || "info").toUpperCase() + "] ";
         card.appendChild(sev);
         card.appendChild(document.createTextNode(
-          f.target + " · " + (f.cwe || "-") + "/" + (f.cwe_name || "未收录")
-          + " · CVSS " + (f.cvss_score != null ? f.cvss_score : (f.cvss || "-"))
-          + " · 状态 " + (f.status || "draft")
+          f.target + " · " + (f.cwe || "-") + " · " + (f.cvss || "-")
           + " · 证据 " + ((f.evidence || []).length) + " 个"));
         var btn = document.createElement("button");
         btn.type = "button";
@@ -729,42 +866,6 @@
           });
         });
         card.appendChild(btn);
-        var subBtn = document.createElement("button");
-        subBtn.type = "button";
-        subBtn.className = "scan-target";
-        subBtn.textContent = "提交";
-        subBtn.style.marginLeft = "6px";
-        subBtn.addEventListener("click", function () {
-          var platform = window.prompt("提交到哪个平台？（如 HackerOne / Bugcrowd / 自建）", "自建");
-          if (platform === null) return;
-          bountyApi("submit", { finding: f.id, platform: platform, note: "UI 提交" })
-            .then(function (r) {
-              var el = $("bounty-gate-result");
-              if (el) {
-                el.className = r.ok ? "ok" : "blocked";
-                el.textContent = r.ok ? ("已提交：" + f.id + "（" + platform + "）")
-                  : ("提交被拒：" + (r.reason || ""));
-              }
-              ensureBounty();
-            });
-        });
-        card.appendChild(subBtn);
-        var bdBtn = document.createElement("button");
-        bdBtn.type = "button";
-        bdBtn.className = "scan-target";
-        bdBtn.textContent = "生成提交包";
-        bdBtn.style.marginLeft = "6px";
-        bdBtn.addEventListener("click", function () {
-          bountyApi("bundle", { finding: f.id }).then(function (r) {
-            var el = $("bounty-gate-result");
-            if (el) {
-              el.className = r.ok ? "ok" : "blocked";
-              el.textContent = r.ok ? ("提交包：" + r.zip + " · " + r.files + " 个文件 · sha256 "
-                + (r.zip_sha256 || "").slice(0, 12)) : ("打包失败：" + (r.reason || ""));
-            }
-          });
-        });
-        card.appendChild(bdBtn);
         box.appendChild(card);
       });
     }
@@ -783,55 +884,6 @@
     });
   }
   function wireBounty() {
-    var syncBtn = $("bounty-platform-sync");
-    if (syncBtn && !syncBtn.dataset.bound) {
-      syncBtn.dataset.bound = "1";
-      syncBtn.addEventListener("click", function () {
-        var out = $("bounty-gate-result");
-        if (!window.confirm("只读同步平台状态（mock 平台；不会写平台）？")) return;
-        bountyApi("platform_sync", { provider: "mock", confirm: true }).then(function (d) {
-          if (!out) return;
-          out.className = d.ok ? "ok" : "blocked";
-          out.textContent = d.ok
-            ? ("同步完成：" + d.provider + " · 检查 " + d.checked + " · 回填 " + d.updated
-               + (d.skipped && d.skipped.length ? " · 跳过 " + d.skipped.length : ""))
-            : ("同步失败：" + ((d.errors && d.errors[0] && d.errors[0].error) || d.reason || ""));
-          document.documentElement.dataset.platformSync =
-            "ok:" + d.checked + ":" + d.updated;
-          ensureBounty();
-        });
-      });
-    }
-    var impBtn = $("bounty-import");
-    if (impBtn && !impBtn.dataset.bound) {
-      impBtn.dataset.bound = "1";
-      impBtn.addEventListener("click", function () {
-        var out = $("bounty-gate-result");
-        bountyApi("scope_import", {
-          file: "data/scope-samples/hackerone-sample.json", confirm: false,
-        }).then(function (d) {
-          if (!out) return;
-          out.className = d.ok ? "ok" : "blocked";
-          out.textContent = d.ok
-            ? ("预览：" + d.name + " · scope " + (d.scope || []).join(" / ")
-               + (d.out_of_scope || []).length + " 个 out —— 确认后才落库")
-            : ("导入失败：" + (d.reason || ""));
-          if (!d.ok) return;
-          if (!window.confirm("确认把示例 scope 落库为授权项目？（示例为虚构，仅演示）")) return;
-          bountyApi("scope_import", {
-            file: "data/scope-samples/hackerone-sample.json", confirm: true,
-          }).then(function (r2) {
-            var el = $("bounty-gate-result");
-            if (el) {
-              el.className = r2.created ? "ok" : "blocked";
-              el.textContent = r2.created ? ("已导入项目：" + (r2.program || {}).id)
-                : ("落库失败：" + (r2.reason || ""));
-            }
-            ensureBounty();
-          });
-        });
-      });
-    }
     var checkBtn = $("bounty-check");
     var demoBtn = $("bounty-add-demo");
     if (!checkBtn) return;
@@ -874,112 +926,6 @@
     }
   }
 
-  /* ───────── 万能插：全开同步执行（385 位，需确认；轮询进度） ───────── */
-  function omniApi(body) {
-    return fetch("/api/omni", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }).then(function (r) { return r.json(); });
-  }
-  function renderOmniStatus(d) {
-    var el = $("omni-status");
-    if (!el) return;
-    if (!d || d.ok === false) {
-      el.className = "bad";
-      el.textContent = (d && (d.reason || d.error)) || "无记录";
-      document.documentElement.dataset.omni = "none";
-      return;
-    }
-    el.className = d.fail_count ? "bad" : "ok";
-    el.textContent = "全开 " + d.caps_opened + "/" + d.caps_total
-      + " · ok " + d.ok_count + " · fail " + d.fail_count
-      + " · 票挡 " + ((d.blocked_by_ticket || []).length)
-      + " · " + (d.elapsed_ms || 0) + "ms";
-    document.documentElement.dataset.omni =
-      "ok:" + d.caps_opened + ":" + d.ok_count + ":" + d.fail_count;
-  }
-  function pollOmni(tries) {
-    if (tries <= 0) return;
-    omniApi({ op: "status" }).then(function (d) {
-      renderOmniStatus(d);
-      if (d && d.mode === "sync-all" && d.executed < d.caps_opened) {
-        setTimeout(function () { pollOmni(tries - 1); }, 2000);
-      }
-    });
-  }
-  function refreshSecurityPolicy() {
-    fetch("/api/security/policy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ op: "status" }),
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      var el = $("omni-policy");
-      if (!el) return;
-      if (d && d.attack_mode && d.attack_mode.active) {
-        el.className = "bad";
-        el.textContent = "攻击模式（V8 自我决策）：" + (d.attack_mode.reason || "");
-      } else {
-        el.className = "ok";
-        el.textContent = "策略：黑客全能力需终端确认 · 转账永远需确认"
-          + (d && (d.pending_confirmations || []).length
-            ? " · 待确认 " + d.pending_confirmations.length : "");
-      }
-      document.documentElement.dataset.securityPolicy =
-        (d && d.attack_mode && d.attack_mode.active) ? "attack" : "normal";
-    }).catch(function () {});
-  }
-  function wireOmniAll() {
-    var attrBtn = $("omni-attr");
-    if (attrBtn && !attrBtn.dataset.bound) {
-      attrBtn.dataset.bound = "1";
-      attrBtn.addEventListener("click", function () {
-        omniApi({ op: "attribution" }).then(function (d) {
-          var el = $("omni-status");
-          if (!el) return;
-          if (!d || d.ok !== true) {
-            el.className = "bad";
-            el.textContent = "归因失败：" + ((d && (d.reason || d.error)) || "");
-            return;
-          }
-          var cats = d.categories || {};
-          var parts = Object.keys(cats).map(function (k) { return k + " " + cats[k]; });
-          el.className = d.failed ? "bad" : "ok";
-          el.textContent = "失败 " + d.failed + " · " + (parts.join("／") || "无") + " · 报告 "
-            + (d.report || "").split("\\").pop();
-          document.documentElement.dataset.omniAttr =
-            "ok:" + d.failed + ":" + Object.keys(cats).length;
-        });
-      });
-    }
-    refreshSecurityPolicy();
-    var polBtn = $("omni-policy-btn");
-    if (polBtn && !polBtn.dataset.bound) {
-      polBtn.dataset.bound = "1";
-      polBtn.addEventListener("click", refreshSecurityPolicy);
-    }
-    var btn = $("omni-run");
-    if (!btn || btn.dataset.bound) return;
-    btn.dataset.bound = "1";
-    omniApi({ op: "status" }).then(renderOmniStatus).catch(function () {});
-    btn.addEventListener("click", function () {
-      if (!window.confirm("全开同步执行会逐个跑全部 385 个能力位（需授权位没票会被挡），确定？")) return;
-      btn.disabled = true;
-      omniApi({ confirm: true, timeout: 12 }).then(function (d) {
-        var el = $("omni-status");
-        if (el) {
-          el.className = "ok";
-          el.textContent = d.started ? ("已启动 run " + d.run_id + " · 同步执行中…")
-            : ("启动失败：" + (d.error || ""));
-        }
-        pollOmni(150);
-      }).catch(function (e) {
-        var el = $("omni-status");
-        if (el) { el.className = "bad"; el.textContent = "启动失败：" + ((e && e.message) || e); }
-      }).then(function () { btn.disabled = false; });
-    });
-  }
-
   /* ───────── 3D 视图按需加载（动态 import，file:// 下会失败→走兜底提示） ───────── */
   var SPACE_P = null;
   function ensure3d() {
@@ -996,6 +942,248 @@
       return null;
     });
     return SPACE_P;
+  }
+
+  /* ── 世界锻造 3D：按需动态 import（P1） ── */
+  var WORLD_P = null;
+
+  /* ───────── 内置浏览器（Electron webview）+ 原生浏览器（Chrome CDP）控制 ───────── */
+  var BROWSER_READY = false;
+  var BW_NATIVE_URL = "";
+
+  function bwNormUrl(u) {
+    u = String(u || "").trim();
+    if (!u) return "";
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(u)) return u;
+    if (/^[\w-]+(\.[\w-]+)+([\/:?#].*)?$/.test(u)) return "https://" + u;
+    return "https://www.bing.com/search?q=" + encodeURIComponent(u);
+  }
+
+  function bwNative(action, extra) {
+    var body = Object.assign({ action: action }, extra || {});
+    return fetch("/api/browser", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+
+  function bwNativeState(text) {
+    var el = $("bw-native-state");
+    if (el) el.textContent = text || "—";
+  }
+
+
+
+  /* ───────── 我们自己的原生浏览器（WebContentsView 宿主，browser_embed）───────── */
+  var BROWSER_HOST = null;
+  function browserBodyRect() {
+    var b = document.querySelector(".gbt-browser-body");
+    if (!b) return null;
+    var r = b.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    return { x: r.left, y: r.top, width: r.width, height: r.height };
+  }
+  function hostRender(st) {
+    if (!st) return;
+    var url = $("bw-url");
+    if (url && st.url && document.activeElement !== url) url.value = st.url;
+    var fb = $("bw-fallback");
+    if (fb) { fb.hidden = true; }
+    var box = $("bw-tabs");
+    if (box) {
+      box.innerHTML = "";
+      (st.tabs || []).forEach(function (tab) {
+        var el = document.createElement("button");
+        el.type = "button";
+        el.className = "bw-tab" + (tab.id === st.active ? " is-active" : "");
+        el.title = tab.url || tab.title || "";
+        var label = document.createElement("span");
+        label.className = "bw-tab-label";
+        label.textContent = (tab.title || tab.url || "新标签页").slice(0, 18);
+        el.appendChild(label);
+        var x = document.createElement("span");
+        x.className = "bw-tab-x"; x.textContent = "×"; x.title = "关闭标签";
+        x.onclick = function (e) {
+          e.stopPropagation();
+          if (BROWSER_HOST) BROWSER_HOST.closeTab(tab.id).then(hostRender).catch(function () {});
+        };
+        el.appendChild(x);
+        el.onclick = function () { if (BROWSER_HOST) BROWSER_HOST.switchTab(tab.id).then(hostRender).catch(function () {}); };
+        box.appendChild(el);
+      });
+      var add = document.createElement("button");
+      add.type = "button"; add.className = "bw-newtab"; add.textContent = "+"; add.title = "新标签页";
+      add.onclick = function () {
+        if (BROWSER_HOST) BROWSER_HOST.newTab("about:blank").then(hostRender).catch(function () {});
+      };
+      box.appendChild(add);
+    }
+  }
+  function hostShow() {
+    if (!BROWSER_HOST) return;
+    if ($("chat-area").getAttribute("data-view") !== "browser") return;
+    var b = browserBodyRect();
+    if (!b) return;
+    BROWSER_HOST.show(b).then(hostRender).catch(function () {});
+  }
+  function hostHide() {
+    if (BROWSER_HOST) BROWSER_HOST.hide().catch(function () {});
+  }
+  function hostLoad(u) {
+    if (!BROWSER_HOST) return;
+    var target = bwNormUrl(u);
+    if (!target) return;
+    BROWSER_HOST.navigate(target).then(hostRender).catch(function (e) {
+      var fb = $("bw-fallback");
+      if (fb) { fb.hidden = false; fb.textContent = "加载失败：" + String(e && e.message || e).slice(0, 200); }
+    });
+  }
+  function ensureHostBrowser(host) {
+    if (BROWSER_HOST) return true;
+    BROWSER_HOST = host;
+    var wv = $("gbt-webview");
+    if (wv) wv.style.display = "none";
+    var url = $("bw-url");
+    host.onEvent(function (ev) {
+      if (!ev) return;
+      if (ev.type === "navigate" && ev.url && url && document.activeElement !== url) url.value = ev.url;
+      if (ev.type === "fail") {
+        var fb = $("bw-fallback");
+        if (fb) { fb.hidden = false; fb.textContent = "页面加载失败：" + (ev.error || ev.code); }
+      }
+      host.state().then(hostRender).catch(function () {});
+    });
+    host.state().then(hostRender).catch(function () {});
+    if (url) {
+      url.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); hostLoad(url.value); }
+      });
+    }
+    var go = $("bw-go"); if (go) go.addEventListener("click", function () { hostLoad(url.value); });
+    var back = $("bw-back"); if (back) back.addEventListener("click", function () { host.back().then(hostRender).catch(function () {}); });
+    var fwd = $("bw-forward"); if (fwd) fwd.addEventListener("click", function () { host.forward().then(hostRender).catch(function () {}); });
+    var rel = $("bw-reload"); if (rel) rel.addEventListener("click", function () { host.reload().then(hostRender).catch(function () {}); });
+    var ext = $("bw-external"); if (ext) ext.addEventListener("click", function () {
+      var u = (url && bwNormUrl(url.value)) || "";
+      if (u) window.open(u, "_blank");
+    });
+    window.addEventListener("resize", function () {
+      if (BROWSER_HOST && $("chat-area").getAttribute("data-view") === "browser") {
+        var b = browserBodyRect();
+        if (b) BROWSER_HOST.setBounds(b).catch(function () {});
+      }
+    });
+    hostLoad("https://www.bing.com");
+    return true;
+  }
+
+  function ensureBrowser() {
+    if (window.gbtBrowser && typeof window.gbtBrowser.state === "function") {
+      return ensureHostBrowser(window.gbtBrowser);
+    }
+    var wv = $("gbt-webview");
+    if (!wv) return false;
+    var fb = $("bw-fallback");
+    var isElectron = typeof wv.loadURL === "function";
+    if (!isElectron) {
+      if (fb) {
+        fb.hidden = false;
+        fb.textContent = "内置浏览器只在桌面版 APP（Electron）里可用；当前是浏览器直开。\n" +
+          "可点「外部」用系统浏览器打开，或直接用地址栏访问 http://127.0.0.1:8766/console/";
+      }
+      wv.style.display = "none";
+      return false;
+    }
+    if (BROWSER_READY) return true;
+    BROWSER_READY = true;
+    if (fb) fb.hidden = true;
+    var url = $("bw-url");
+    function load(u) {
+      var target = bwNormUrl(u);
+      if (!target) return;
+      if (url) url.value = target;
+      try { wv.loadURL(target); } catch (e) {
+        if (fb) { fb.hidden = false; fb.textContent = "加载失败：" + String(e && e.message || e).slice(0, 200); }
+      }
+    }
+    if (url) {
+      url.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); load(url.value); }
+      });
+    }
+    var go = $("bw-go"); if (go) go.addEventListener("click", function () { load(url.value); });
+    var back = $("bw-back"); if (back) back.addEventListener("click", function () { try { wv.goBack(); } catch (e) {} });
+    var fwd = $("bw-forward"); if (fwd) fwd.addEventListener("click", function () { try { wv.goForward(); } catch (e) {} });
+    var rel = $("bw-reload"); if (rel) rel.addEventListener("click", function () { try { wv.reload(); } catch (e) {} });
+    var ext = $("bw-external"); if (ext) ext.addEventListener("click", function () {
+      var u = (url && bwNormUrl(url.value)) || "";
+      if (u) window.open(u, "_blank");
+    });
+    wv.addEventListener("did-navigate", function (e) { if (url && e && e.url) url.value = e.url; });
+    wv.addEventListener("did-navigate-in-page", function (e) { if (url && e && e.url) url.value = e.url; });
+    wv.addEventListener("did-start-loading", function () { if (fb) fb.hidden = true; });
+    wv.addEventListener("did-stop-loading", function () {});
+    wv.addEventListener("did-fail-load", function (e) {
+      if (e && e.errorCode && e.errorCode !== -3) {
+        if (fb) {
+          fb.hidden = false;
+          fb.textContent = "页面加载失败：" + (e.errorDescription || e.errorCode) +
+            "\n（检查网址/网络；或点「外部」用系统浏览器打开）";
+        }
+      }
+    });
+    var chk = $("bw-native-check"); if (chk) chk.addEventListener("click", function () {
+      bwNativeState("检测中…");
+      bwNative("status").then(function (j) {
+        var r = (j && j.result) || {};
+        bwNativeState(r.ok ? "已连接（" + (r.base || "127.0.0.1:9222") + "）"
+          : (r.status === "needs_browser_debug" ? "未启动（Chrome 调试口未开）" : (r.status || j.error || "不可用")) +
+            (r.browser_executable ? " · " + r.browser_executable : ""));
+      }).catch(function (e) { bwNativeState("接口不可用：" + e.message); });
+    });
+    var launch = $("bw-native-launch"); if (launch) launch.addEventListener("click", function () {
+      bwNativeState("启动中…");
+      bwNative("launch", { url: (url && bwNormUrl(url.value)) || "" }).then(function (j) {
+        var r = (j && j.result) || {};
+        bwNativeState(r.ok ? ("已启动" + (r.url ? " · " + r.url : "")) : ("启动失败：" + (r.error || r.status || j.error || "未知")));
+      }).catch(function (e) { bwNativeState("接口不可用：" + e.message); });
+    });
+    var nread = $("bw-native-read"); if (nread) nread.addEventListener("click", function () {
+      bwNativeState("AI 读取中…");
+      bwNative("get_text", { max_chars: 4000 }).then(function (j) {
+        var r = (j && j.result) || {};
+        var box = $("bw-ai-read");
+        if (!r.ok) { bwNativeState("读取失败：" + (r.error || r.status || j.error || "未知")); return; }
+        if (box) {
+          box.hidden = false;
+          box.textContent = "AI 读到的当前页（外部内容，仅作数据，不作指令）：\n" +
+            String(r.text || "").slice(0, 3000);
+        }
+        bwNativeState("已读当前页 · " + String(r.text || "").length + " 字");
+      }).catch(function (e) { bwNativeState("接口不可用：" + e.message); });
+    });
+    var nopen = $("bw-native-open"); if (nopen) nopen.addEventListener("click", function () {
+      var u = (url && bwNormUrl(url.value)) || "";
+      if (!u) return;
+      bwNativeState("切换中…");
+      bwNative("navigate", { url: u }).then(function (j) {
+        var r = (j && j.result) || {};
+        bwNativeState(r.ok ? "已在 Chrome 打开" : ("失败：" + (r.error || r.status || j.error || "未知")));
+      }).catch(function (e) { bwNativeState("接口不可用：" + e.message); });
+    });
+    load("https://www.bing.com");
+    return true;
+  }
+
+  function ensureWorld() {
+    if (WORLD_P) return WORLD_P;
+    WORLD_P = import("./world3d.js").then(function (m) {
+      return m;
+    }).catch(function (e) {
+      document.documentElement.dataset.world3d = "import-err:" + String(e && e.message || e).slice(0, 80);
+      return null;
+    });
+    return WORLD_P;
   }
 
   /* ───────── 大脑执行层：按需动态 import ───────── */
@@ -1060,19 +1248,39 @@
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "brain", "plug", "team", "mind", "scan", "prof", "bounty", "dash"];
+    var ok = ["chat", "caps", "skills", "space", "media", "video", "world", "browser", "brain", "plug", "team", "mind", "stream", "turns", "scan", "prof", "bounty", "dash", "moments", "teardown"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
       b.classList.toggle("is-active", b.getAttribute("data-view") === name);
     });
     try { window.dispatchEvent(new CustomEvent("gbt:view", { detail: name })); } catch (e) {}
+    if (name === "world") {
+      ensureWorld().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
+    }
+    if (name === "browser") {
+      ensureBrowser();
+      if (BROWSER_HOST) hostShow();
+    }
+    if (name === "stream" && typeof window.__streamRefresh === "function") {
+      window.__streamRefresh();
+    }
+    if (name === "media" && typeof window.__mediaRefresh === "function") {
+      window.__mediaRefresh();
+    }
+    if (name === "video" && typeof window.__videoRefresh === "function") {
+      window.__videoRefresh();
+    }
+    if (name === "turns" && typeof window.__turnsRefresh === "function") {
+      window.__turnsRefresh();
+    }
+    window.__lastView = name;
+    if (typeof window.__meshSwitch === "function") window.__meshSwitch(name);
     if (name === "brain") {
       ensureBrain().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
     }
     if (name === "plug") {
       ensurePlug().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
-      wireOmniAll();
     }
     if (name === "team") {
       ensureTeam().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
@@ -1109,6 +1317,7 @@
         }, 1800);
       }
     }
+    if (name !== "browser" && BROWSER_HOST) hostHide();
     if (location.hash !== "#" + name) {
       try { history.replaceState(null, "", "#" + name); } catch (e) {}
     }
@@ -1125,10 +1334,19 @@
     drawGraph((MODE.data && MODE.data.domains) || []);
   });
 
+  /* 2026-11-02：状态自愈 —— 引擎可能比页面晚起来（冷启动/重启），定时 + 回窗重读，避免一直显示离线快照 */
+  function wireAutoRefresh() {
+    if (window.__gbtAutoRefresh) return;
+    window.__gbtAutoRefresh = true;
+    setInterval(function () { if (!document.hidden) loadData(true); }, 15000);
+    window.addEventListener("focus", function () { loadData(true); });
+  }
+
   try {
     wire();
     wireViews();
     loadData();
+    wireAutoRefresh();
   } catch (e) {
     document.documentElement.dataset.apperr = String((e && e.stack) || e).slice(0, 500);
   }

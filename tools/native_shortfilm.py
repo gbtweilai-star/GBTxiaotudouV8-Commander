@@ -123,7 +123,9 @@ def main():
         fd = max(1, int(shot_dur * 25))
         vf = ("[0:v]split=2[bg][fg];"
               "[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=18:5[bg2];"
-              "[fg]scale=1080:1080[fg2];[bg2][fg2]overlay=(W-w)/2:(H-h)/2,format=yuv420p")
+              "[fg]scale=1080:1080[fg2];[bg2][fg2]overlay=(W-w)/2:(H-h)/2,"
+              "zoompan=z='min(zoom+0.002,1.18)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=%d:s=1080x1920:fps=25,"
+              "format=yuv420p" % fd)
         run([FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-loop", "1", "-i", img,
              "-t", "%.3f" % shot_dur, "-r", "25", "-filter_complex", vf,
              "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", clip])

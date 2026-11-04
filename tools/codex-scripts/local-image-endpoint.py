@@ -37,6 +37,7 @@ UA = "gbt-local-image-endpoint/1.0 (+local)"
 CFG = {"port": 8114, "steps": 6, "size": 512, "timeout": 900.0,
        "comfy": "http://127.0.0.1:8188", "ckpt": "v1-5-pruned-emaonly-fp16.safetensors",
        "lora": "lcm-lora-sdv1-5.safetensors"}
+COMFY_PORT = int(CFG["comfy"].rstrip("/").rsplit(":", 1)[-1])
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import importlib.util                                          # noqa: E402
@@ -78,7 +79,7 @@ def generate(prompt: str, negative: str, size: int, steps: int) -> dict:
     alive = comfy_alive()
     if not alive["up"]:
         return {"ok": False, "reason": "未读到", "detail": "ComfyUI 没起：%s" % alive["why"],
-                "how": "cd C:\\Users\\ADMIN\\ComfyUI; .\\.venv\\Scripts\\python.exe main.py --cpu --port 8188"}
+                "how": lci.start_hint(COMFY_PORT)}
     wf = lci.build_workflow(prompt, negative, size, steps, int(time.time()) % 100000, "gbt_api")
     t0 = time.time()
     r = _http(CFG["comfy"] + "/prompt", method="POST", payload={"prompt": wf, "client_id": "gbt-api"}, timeout=30)

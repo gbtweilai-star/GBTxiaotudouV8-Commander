@@ -2,12 +2,12 @@
   "status": "user_error",
   "kind": "git_write",
   "fingerprint": "ab4ae2584697537e77045c9c0a5c40cb197b629dfc177d804fac4d1b12f6eec5",
-  "pid": 8656,
-  "started_at": 1793462941.5965817,
-  "started_iso": "2026-10-31T23:09:01",
-  "finished_at": 1793462941.6060681,
-  "finished_iso": "2026-10-31T23:09:01",
+  "pid": 1460,
+  "started_at": 1793665259.050657,
+  "started_iso": "2026-11-03T07:20:59",
+  "finished_at": 1793665259.0693228,
+  "finished_iso": "2026-11-03T07:20:59",
   "detail": {
-    "error": "git_write 不认 op=（只认 stage/add/commit）"
+    "error": "git_write 不认 op=（只认 stage/add/commit/push/force_push/rebase/reset）"
   }
 }

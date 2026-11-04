@@ -35,7 +35,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILE = ROOT / "state" / "browser_own_profile"
-V9_PROFILE = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9\state\browser_own_profile")
+V9_PROFILE = Path.home() / "Desktop" / "GBT小土豆V9" / "state" / "browser_own_profile"
 LEDGER = ROOT / "state" / "sider_plug.jsonl"
 ENTRY = "https://sider.ai/zh-CN/"
 CLOUD_PC = "https://sider.ai/zh-CN/cloud-pc"

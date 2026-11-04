@@ -30,6 +30,7 @@ ops：
   health               读当前健康账（人读/机读）
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
@@ -450,6 +451,6 @@ def run_op(op: str = "health", **params) -> dict:
                      ("energy", energy), ("panel", panel), ("health", health),
                      ("tidy", tidy), ("accelerate", accelerate)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "error": f"未知 op:{op}（start/sweep/keys/energy/panel/health/tidy/accelerate）",
             "fail_closed": True}

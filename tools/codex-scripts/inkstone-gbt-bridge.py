@@ -29,7 +29,7 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 ROOT = Path(__file__).resolve().parents[2]
-PY = os.environ.get("GBT_PY", r"C:\Users\ADMIN\AppData\Roaming\uv\python\cpython-3.14.0-windows-x86_64-none\python.exe")
+PY = os.environ.get("GBT_PY", str(Path.home() / "AppData" / "Roaming" / "uv" / "python" / "cpython-3.14.0-windows-x86_64-none" / "python.exe"))
 SCI = Path(r"C:\Program Files\inkstone\resources\science-mcp")
 SCI_PY = Path(r"C:\Program Files\inkstone\resources\science-pack\python\python.exe")
 PKG = SCI / "lib" / "mcp_gbt"

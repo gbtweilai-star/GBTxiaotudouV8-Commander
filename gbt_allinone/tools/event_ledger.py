@@ -30,6 +30,7 @@
 4. **传输另走门**：跨体传输仍走 `collab_gateway`；本件只管**账本本身**的真伪。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import hmac as _hmac
@@ -171,7 +172,7 @@ def run_op(op: str = "status", **params) -> dict:
     for name, fn in (("append", append), ("verify", verify), ("tail", tail),
                      ("status", status), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（append/verify/tail/status/where）"}
 

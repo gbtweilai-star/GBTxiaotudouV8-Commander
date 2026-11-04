@@ -1,4 +1,4 @@
-﻿# gbt-capability: hand_retarget
+# gbt-capability: hand_retarget
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """hand_retarget — 手部姿态重定向（原生位 · 2026-11-01 蒸馏自 dexterous-hand 知识胶囊）。
 

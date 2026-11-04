@@ -20,6 +20,7 @@
   · 本模块只给"镜头"，**不给结论**：它说不出"这条红不重要"，它只能说"我用什么色调看它"。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import time
 
@@ -238,7 +239,7 @@ def run(op="status", **params) -> dict:
             raise ValueError("feel 需要 emotion（七情：%s）" % "/".join(EMOTIONS))
         return fn(params["emotion"], **{k: v for k, v in params.items() if k in _FEEL_KEYS})
     keep = {k: v for k, v in params.items() if k == "now"}
-    return fn(**keep)
+    return _oc_call(fn, keep)
 
 
 HONEST_BOUNDARY = (

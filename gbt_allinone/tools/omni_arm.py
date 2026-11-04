@@ -23,6 +23,7 @@ fk 只算 2D、ik 不是 CCD、random 决定骨架轴（不可复现）、生成
 ops：`status` / `spec` / `build` / `where`
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import subprocess
@@ -150,7 +151,7 @@ def run_op(op: str = "status", **kw) -> dict:
     if fn is None:
         return {"ok": False, "op": op, "status": "unknown_op", "available": sorted(table),
                 "fail_closed": True}
-    return fn(**kw)
+    return _oc_call(fn, kw)
 
 
 if __name__ == "__main__":

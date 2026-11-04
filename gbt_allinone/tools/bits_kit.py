@@ -30,6 +30,7 @@ Animations 39 · Backgrounds 62 · Components 48 · Micro 34 · TextAnimations 3
 3. **不编**：说明只取自 `public/llms.txt` 的原文；清单与盘上对不上的地方**如实带出来**。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import math
@@ -372,7 +373,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("build", build), ("find", find), ("api", api),
                    ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

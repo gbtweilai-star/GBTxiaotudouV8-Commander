@@ -13,6 +13,7 @@
   * 超时 300s（渲染可慢），输出截断 4KB。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import shutil
 import subprocess
@@ -95,7 +96,7 @@ def _ROOT_OF():
 def run_op(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return status(**params)
+        return _oc_call(status, params)
     if op == "run":
         return run(args=params.get("args"), timeout=params.get("timeout", 300),
                    **{k: v for k, v in params.items() if k != "args"})

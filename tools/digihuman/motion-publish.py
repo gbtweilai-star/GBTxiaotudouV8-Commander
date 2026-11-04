@@ -77,7 +77,7 @@ def put(local: Path, key: str, ctype: str) -> dict:
     up = subprocess.run(["wrangler", "r2", "object", "put", "%s/%s" % (BUCKET, key),
                          "--file", str(local), "--remote", "--content-type", ctype],
                         capture_output=True, text=True, encoding="utf-8", errors="replace",
-                        env=env, shell=True)
+                        env=env, shell=False)
     if "Upload complete" not in ((up.stdout or "") + (up.stderr or "")):
         return {"ok": False, "why": "upload", "tail": ((up.stdout or "") + (up.stderr or ""))[-300:]}
     url = "%s/%s" % (PUBLIC, key)

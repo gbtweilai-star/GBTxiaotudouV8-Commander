@@ -7,7 +7,7 @@ import pathlib
 import sys
 from PIL import Image, ImageDraw
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 R = WS / "render"
 
 name, times, outname = sys.argv[1], sys.argv[2].split(','), sys.argv[3]

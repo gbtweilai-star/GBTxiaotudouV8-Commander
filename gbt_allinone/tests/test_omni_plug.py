@@ -72,13 +72,17 @@ class OmniPlugTest(unittest.TestCase):
             ({"op": "status"}, set(), False),
             ({"op": "selftest"}, set(), False),
             ({"op": "plug", "socket": "file", "target": "x"}, set(), False),
-            ({"op": "run", "socket": "process", "target": "py:print(1)"}, {"process_execute"}, True),
-            ({"op": "run", "socket": "file", "target": "projects/a", "do": "write"}, {"filesystem_write"}, True),
+            # 🔴 2026-11-03 主人令（逐字）：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
+            # ⇒ 下面几条 **scopes 断言一个字都没动**（作用域必须如实记账：审计、risk 分级、
+            #    判据都靠它），只把 restricted 改成 False —— process_execute / filesystem_write /
+            #    external_llm / data_export 已明确免票；带 privacy_read 的那条仍然要票。
+            ({"op": "run", "socket": "process", "target": "py:print(1)"}, {"process_execute"}, False),
+            ({"op": "run", "socket": "file", "target": "projects/a", "do": "write"}, {"filesystem_write"}, False),
             ({"op": "run", "socket": "file", "target": "projects/a", "do": "read"}, set(), False),
-            ({"op": "run", "socket": "api", "target": "https://e.com"}, {"external_llm", "data_export"}, True),
+            ({"op": "run", "socket": "api", "target": "https://e.com"}, {"external_llm", "data_export"}, False),
             ({"op": "run", "socket": "web", "target": "https://e.com"}, {"desktop_control", "privacy_read"}, True),
-            ({"op": "run", "socket": "??"}, {"process_execute", "filesystem_write"}, True),
-            ({"op": "weird_op"}, {"filesystem_write"}, True),
+            ({"op": "run", "socket": "??"}, {"process_execute", "filesystem_write"}, False),
+            ({"op": "weird_op"}, {"filesystem_write"}, False),
         ]
         for payload, want, restricted in cases:
             d = policy.evaluate("omni_plug", dict(payload))

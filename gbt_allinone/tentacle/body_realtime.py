@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """body_realtime — 眼手脑同拍：采集线程持续看，控制环边看边动。
 
 和 body_see/body_click 的区别：

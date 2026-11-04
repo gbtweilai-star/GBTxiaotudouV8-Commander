@@ -28,6 +28,7 @@
 4. **不编数**：spec 里的数值必须带 `src`（出处）；没 src 的数**照渲但在页面上标红**（不许悄悄进页面）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import time
@@ -180,7 +181,7 @@ def run_op(op: str = "spec", **params) -> dict:
     op = (op or "spec").lower()
     for n, fn in (("spec", spec), ("check", check), ("render", render), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": f"未知 op:{op}（spec/check/render/where）"}
 
 

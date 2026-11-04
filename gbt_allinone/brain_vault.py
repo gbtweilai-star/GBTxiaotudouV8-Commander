@@ -21,7 +21,7 @@ import os
 import time
 from pathlib import Path
 
-_DEFAULT_VAULT = Path(r"C:\Users\ADMIN\Documents\Codex\ObsidianVault")
+_DEFAULT_VAULT = Path.home() / "Documents" / "Codex" / "ObsidianVault"
 _INBOX = "收集箱.md"
 _MAIN = "地图/记忆总纲.md"
 

@@ -17,8 +17,8 @@ import sys
 import bpy
 from mathutils import Euler
 
-GLB = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v3-jaw.glb"
-OUTDIR = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\jaw-fix"
+GLB = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v3-jaw.glb")
+OUTDIR = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "jaw-fix")
 OUTGLB = os.path.join(OUTDIR, "dh-v4-jaw.glb")
 
 # ── 从纵剖面读出来的边界（单位 m，Blender Z-up）────────────────────────────────

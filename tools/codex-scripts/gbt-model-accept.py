@@ -43,7 +43,7 @@ BASE = "http://%s:%d/v1" % (HOST, PORT)
 APPDIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "gbt-cliproxy"
 MODEL = os.environ.get("GBT_ACCEPT_MODEL", "gbt-potato-v8")
 CODEX = Path(os.environ.get("CODEX_CLI_PATH") or
-             r"C:\Users\ADMIN\AppData\Local\OpenAI\Codex\bin\2e5e00daee91c61d\codex.exe")
+             str(Path.home() / "AppData" / "Local" / "OpenAI" / "Codex" / "bin" / "2e5e00daee91c61d" / "codex.exe"))
 RESULTS: list = []
 
 

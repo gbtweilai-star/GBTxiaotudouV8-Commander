@@ -24,7 +24,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 GLB = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "holo_pet/assets/digital-human/raw/avatarmesh/avatar-lowpoly.glb"
 OUT_JSON = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else WS / "holo_pet/assets/digital-human/raw/rig/skeleton.json"
 OUT_IMG = WS / "render/绑骨-骨架落在实体上.png"

@@ -7,7 +7,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 BODY = DH / "raw/phase7-body-low/tripo-out/gbt-body-low-convert-98605f3a/model.glb"
 HEAD = DH / "raw/rig/part-head.glb"

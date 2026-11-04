@@ -45,8 +45,8 @@ WS = pathlib.Path(__file__).resolve().parents[1]
 DH = WS / "holo_pet/assets/digital-human"
 WORLDS = WS / "output/worlds"
 TRACE = WS / "store/trace/walkable_world.jsonl"
-COMFY = pathlib.Path(r"C:\Users\ADMIN\ComfyUI")
-LEGACY_LIB = pathlib.Path(r"C:\Users\ADMIN\ComfyUI-SkinTokens")      # 隔壁那件（不是本域）
+COMFY = pathlib.Path.home() / "ComfyUI"
+LEGACY_LIB = pathlib.Path.home() / "ComfyUI-SkinTokens"      # 隔壁那件（不是本域）
 
 
 # ══════════════════════════════════════════════════════════════════════════

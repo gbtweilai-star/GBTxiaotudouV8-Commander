@@ -26,7 +26,8 @@ def check(name, cond, detail=""):
 def main() -> int:
     print("[1] 旧 28+ 面板已拆（只留 assets/theme/shell/tests/console）")
     w3 = ROOT / "holo_pet_w3"
-    keep = {"assets", "theme", "shell", "tests", "console"}
+    keep = {"assets", "theme", "shell", "tests", "console",
+            "dh-live", "blueprint3d", "teardown"}
     left = sorted(p.name for p in w3.iterdir() if p.is_dir() and p.name not in keep)
     check("面板目录清零", not left, left)
     arch = ROOT / ".archive" / "panels-20261101"
@@ -81,6 +82,14 @@ def main() -> int:
     vendor = ROOT / "holo_pet_w3" / "assets" / "vendor" / "three"
     check("Bloom 后处理已内置", (vendor / "postprocessing" / "UnrealBloomPass.js").is_file())
     check("EffectComposer 已内置", (vendor / "postprocessing" / "EffectComposer.js").is_file())
+    # 2026-11-02: 只查 three.module.js 不够 —— 它是 r180 的「壳」，内部 import 了
+    #   './three.core.min.js'；core 缺了 ⇒ 六个 3D 视图全变
+    #   "Failed to fetch dynamically imported module"，页面只留一句报错。
+    _core = vendor / "three.core.min.js"
+    check("three.core.min.js 分块在位（入口库的依赖）",
+          _core.is_file() and "export" in _core.read_text(encoding="utf-8", errors="replace"))
+    _s3 = (vendor / "postprocessing" / "UnrealBloomPass.js").read_text(encoding="utf-8", errors="replace")
+    check("addon 裸模块名已接 importmap（from 'three'）", "from 'three'" in _s3 or 'from "three"' in _s3)
     check("3D 用 Bloom", "UnrealBloomPass" in sj)
     check("3D 有真实调用点亮", "pulse" in sj and "pulseOverlay" in sj)
     check("3D 支持实时 SSE", "EventSource" in sj and "liveBurst" in sj)
@@ -109,6 +118,9 @@ def main() -> int:
     check("触手协作有脉冲特效", "ringSprite" in tjs and "waves" in tjs)
     check("脉冲标记可巡检", "team3dPulses" in tjs)
     check("脉冲有自检/演示开关", "pulse" in tjs and "selftest" in tjs)
+    # 2026-11-02 重做：参考视频是点云 + 线段的"星座网络"，不是彩色粗管/底座环
+    check("协作是点云+线段（星座网络）", "LineSegments" in tjs and "Points" in tjs)
+    check("协作有呼吸（每线相位）", "edgeCol" in tjs and "Math.sin(t * e.speed + e.phase)" in tjs)
     check("思维导图视图", 'data-view="mind"' in html and 'id="mindmap-canvas"' in html)
     mj = (con / "mindmap3d.js")
     check("mindmap3d.js 存在", mj.is_file())
@@ -195,8 +207,14 @@ def main() -> int:
     check("服务端有 /api/events", '"/api/events"' in srv and "text/event-stream" in srv)
     import re as _re
     data = (ROOT / "state" / "console-data.js").read_text(encoding="utf-8")
-    check("数据含 385 能力位", '"items"' in data and _re.search(r'"total": 385', data) is not None)
-    check("数据含 23 技能", _re.search(r'"count": 23', data) is not None)
+    from gbt_allinone import api as _api
+    _caps = len(_api.list_capabilities())
+    check("数据含 %d 能力位" % _caps,
+          '"items"' in data and _re.search(r'"total": %d' % _caps, data) is not None)
+    _dskills = __import__("json").loads(data[data.find("{"):data.rfind("}") + 1])
+    _skills = (_dskills.get("skills") or {}).get("count") or 0
+    check("数据含 %d 技能" % _skills,
+          _re.search(r'"count": %d' % _skills, data) is not None)
 
     print("[4] 本地服务 + 数据 + Logo 生成器")
     check("console-server 存在", (ROOT / "tools" / "console-server.py").is_file())

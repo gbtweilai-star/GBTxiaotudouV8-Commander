@@ -37,7 +37,7 @@ BATCH = 8
 def run(args: list[str], timeout=180) -> tuple[bool, dict | str]:
     try:
         r = subprocess.run(["lark-cli"] + args, capture_output=True, text=True,
-                           encoding="utf-8", timeout=timeout, cwd=str(ROOT), shell=True)
+                           encoding="utf-8", timeout=timeout, cwd=str(ROOT), shell=False)
     except Exception as exc:                                    # noqa: BLE001
         return False, f"{type(exc).__name__}: {exc}"
     s = (r.stdout or "").strip()

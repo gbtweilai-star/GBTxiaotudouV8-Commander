@@ -26,6 +26,7 @@
 3. **不编**：签名与说明只从 `dist/modules/**/*.d.ts` 现读；取不到就留空（不写"应该"）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import math
@@ -425,7 +426,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("build", build), ("find", find), ("api", api),
                    ("prove", prove), ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

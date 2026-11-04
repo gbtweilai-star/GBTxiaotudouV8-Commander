@@ -33,6 +33,7 @@
 op=status / surface / settings / shortcuts / ops / agents / runtime / bridge / launch / close / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -52,7 +53,7 @@ _ROOT = Path(__file__).resolve().parents[2]
 _STATE = _ROOT / "state"
 _MANIFEST = _STATE / "surfaces" / "lobehub.json"
 _LEDGER = _STATE / "lobehub.jsonl"
-_LNK = Path(r"C:\Users\ADMIN\Desktop\LobeHub.lnk")
+_LNK = Path.home() / "Desktop" / "LobeHub.lnk"
 _EXE_DEFAULTS = [
     Path(os.path.expandvars(r"%LOCALAPPDATA%\Programs\LobeHub\LobeHub.exe")),
     Path(os.path.expandvars(r"%PROGRAMFILES%\LobeHub\LobeHub.exe")),
@@ -429,7 +430,7 @@ def bridge(**_kw) -> dict:
         return {"ok": False, "op": "bridge", "error": "日志里没有 StaticFileServerManager 的端口行"}
     root = _bridge_get(port, "/")
     outside = _bridge_get(port, "/C:/Windows/win.ini")
-    cn = _bridge_get(port, urllib.parse.quote("/C:/Users/ADMIN/Desktop/GBT小土豆V8/AGENTS.md"))
+    cn = _bridge_get(port, urllib.parse.quote("/" + str(Path(__file__).resolve().parents[2] / "AGENTS.md").replace("\\", "/")))
     code = cn.get("code")
     if code == 500:
         cn_verdict = "撑不住（应用侧 URIError: URI malformed）"
@@ -602,7 +603,7 @@ def run_op(op: str = "status", **params) -> dict:
                      ("runtime", runtime), ("bridge", bridge), ("launch", launch),
                      ("close", close), ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（status/surface/settings/shortcuts/ops/agents/runtime/bridge/"
                      f"launch/close/verify/where）"}

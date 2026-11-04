@@ -668,7 +668,7 @@ function startSse(broadcast) {
 const TOOLS_CAPS = [
   {
     cap: "prompt_bridge",
-    registered: "caps_registry.py:941",
+    registered: "caps_registry.py:1373",
     actions: [
       { name: "status", state: "live", reason: "只读纯函数：先问当前态再决定发不发车（零副作用）" },
       { name: "compile", state: "live", reason: "只读纯本地：四段模板 + 原意保真自检（丢词即 intent_loss）" },
@@ -685,7 +685,7 @@ const TOOLS_CAPS = [
   },
   {
     cap: "coze_mail",
-    registered: "caps_registry.py:836",
+    registered: "caps_registry.py:1260",
     actions: [
       { name: "status", state: "live", reason: "只读探针：读 state.json 与通道行数，不调能力层" },
       { name: "search", state: "pending", reason: "后端未接线 backend_not_wired（coze_mail_cap.py:69 _UnwiredTransport）" },
@@ -695,7 +695,7 @@ const TOOLS_CAPS = [
   },
   {
     cap: "create",
-    registered: "caps_registry.py:842",
+    registered: "caps_registry.py:1274",
     actions: [
       { name: "status", state: "live", reason: "只读探针：读 state.json 与写根存在性，零字节零目录" },
       { name: "intent", state: "pending", reason: "本地登记（不发网络）；本轮不开放点击" },
@@ -1472,8 +1472,21 @@ function createWindow(entry) {
       console.log("[w3] 已拦窗内跳转（页面固定）：" + String(url).slice(0, 120));
     }
   });
-  /* 外链/新窗一律不开新 Electron 窗（壳不做通用浏览器；要开走「在浏览器打开」动作口）。 */
-  win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  /* 外链/新窗默认不开新 Electron 窗（壳不做通用浏览器）；
+     仅允许本机 console 的页面网格开第二窗口（2026-11-03 主人「每页双绑」）。 */
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    try {
+      const u = new URL(url);
+      if (u.origin === "http://127.0.0.1:8766" && u.pathname.startsWith("/console")) {
+        return { action: "allow", overrideBrowserWindowOptions: {
+          width: 1280, height: 860, minWidth: 1024, minHeight: 640,
+          title: "GBT小土豆V8 · 页面网格", backgroundColor: "#111315",
+          autoHideMenuBar: true,
+        } };
+      }
+    } catch (e) {}
+    return { action: "deny" };
+  });
 
   /* 🔴 2026-10-27 实测**否定**：这两个事件**不能**解决我们的卡死。
      背景：探针 S:respond 逐窗问一句 `1+1` —— 主窗（根 index.html / 3D 全脑页）

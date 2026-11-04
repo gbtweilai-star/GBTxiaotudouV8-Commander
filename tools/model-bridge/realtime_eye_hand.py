@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """realtime_eye_hand.py — 眼手脑同一拍：采集线程持续看，控制环边看边动。
 
 不是 see -> 子进程 -> click 的两段式；这里：

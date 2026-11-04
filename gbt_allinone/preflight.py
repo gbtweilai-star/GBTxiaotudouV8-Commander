@@ -729,7 +729,7 @@ def _observe_mirror_plan(payload: dict) -> dict:
         "plan_sha": incoming_sha,
         "reason": "plan_already_equal" if matched else "plan_absent_or_changed",
         "note": ("同名排练计划已经与本次内容一致，复用现有定义。"
-                 if matched else "缺少 plan：排练计划不存在或内容不同，继续原定义动作。"),
+                 if matched else "排练计划不存在或内容不同，继续原定义动作。"),
     }
 
 

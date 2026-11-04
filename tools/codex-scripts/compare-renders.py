@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
 import pathlib
-R = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8\render")
+R = pathlib.Path(__file__).resolve().parents[2] / "render"
 a = Image.open(R/"宝箱-渲染-v1平光.png").convert("RGB")
 b = Image.open(R/"宝箱-渲染.png").convert("RGB")
 H = 700

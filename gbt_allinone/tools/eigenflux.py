@@ -34,6 +34,7 @@ op：`status` / `feed` / `friends` / `candidates` / `digest` / `metadata` / `whe
 **不在本件**，见 `docs/数字人社交环-eigenflux只读接入.md` 的「官方面 / 等门面」表。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -538,7 +539,7 @@ def run(op: str = "status", **kw) -> dict:
     if fn is None:
         return {"ok": False, "fail_closed": True, "kind": _CAP,
                 "error": "未知 op:%s（status/feed/friends/candidates/digest/metadata/where）" % op}
-    return fn(**kw)
+    return _oc_call(fn, kw)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@
   · import/export/active/hook 过 filesystem_write 门（改盘或触发外部执行）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import shutil
@@ -107,7 +108,7 @@ def status(**_kw) -> dict:
 def run(op: str = "status", **p) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return status(**p)
+        return _oc_call(status, p)
     if op == "list":
         return _run(["list:workflow"], timeout=120)
     if op == "export":

@@ -25,6 +25,7 @@ create · convert · merge · slides · sheet · docs —— 文档处理**全�
   读类直连、写类过 `filesystem_write` 门 —— 与仓内「写面过门」同律，**不碰 security/policy.py**。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import subprocess
 import sys
@@ -194,9 +195,9 @@ def run(args: list | None = None, allow_control_endpoint: bool = False, **_kw) -
 def run_op(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
     if op == "status":
-        return status(**params)
+        return _oc_call(status, params)
     if op == "ops":
-        return ops(**params)
+        return _oc_call(ops, params)
     # 逐命令接好的命名入口（主控靠它，不必拼 argv）
     if op in _CONTROL:
         return run(args=[op] + [str(a) for a in (params.get("args") or [])],

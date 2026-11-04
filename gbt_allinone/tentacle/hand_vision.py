@@ -11,6 +11,7 @@
   - MediaPipe 的 21 点坐标是归一化图像坐标，不是米制；标定后再接真手。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -88,7 +89,14 @@ def _winrt_capture():
     script = os.path.join(ROOT, "tools", "camera-winrt.ps1")
     if not os.path.isfile(script):
         return None
-    fd, out = tempfile.mkstemp(prefix="winrt-cam-", suffix=".jpg", dir=os.path.join(ROOT, ".scratch", "lead"))
+    # 🔴 2026-11-04：tempfile.mkstemp 的 dir 不存在会直接抛 FileNotFoundError，
+    # 而这一行在 try 之外 ⇒ 整条 WinRT 回退永远走不到。先建目录。
+    tmpdir = os.path.join(ROOT, ".scratch", "lead")
+    try:
+        os.makedirs(tmpdir, exist_ok=True)
+    except Exception:  # noqa: BLE001
+        return None
+    fd, out = tempfile.mkstemp(prefix="winrt-cam-", suffix=".jpg", dir=tmpdir)
     os.close(fd)
     try:
         r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
@@ -146,7 +154,7 @@ def run(op="status", payload=None, **_kw):
     payload = payload or {}
     op = str(op or "status").lower()
     if op == "status":
-        return status(**payload)
+        return _oc_call(status, payload)
     if op in ("image", "detect"):
         return detect_image(str(payload.get("image") or payload.get("path") or ""), **payload)
     if op == "camera":

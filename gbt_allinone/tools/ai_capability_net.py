@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -78,19 +79,42 @@ def _local_nodes() -> list:
     pkg = ROOT / "gbt_allinone"
     GREEN = {"brain_vault", "project_context", "root_fix", "selfscan", "topic_watch"}
     TESTED = {"project_context", "prompt_bridge"}
+    ledger = {}
+    try:
+        import json as _json
+        ledger = _json.loads((ROOT / "state" / "cap-verification.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        ledger = {}
+    lcap = ledger.get("caps") or {}
+    # 入口不是“只有顶层的同名 .py 才算”：先认 api 分派键，再认实现文件（tools/tentacle/security 等）。
+    api_src = (pkg / "api.py").read_text(encoding="utf-8", errors="replace")
+    routed = set(re.findall(r'kind\s*==\s*"([^"]+)"', api_src))
+    for m0 in re.finditer(r"kind\s+in\s+\(([^)]+)\)", api_src):
+        routed.update(re.findall(r'"([^"]+)"', m0.group(1)))
+    stems = {}
+    for f in pkg.rglob("*.py"):
+        st = f.stem
+        for key in (st, st.replace("_cap", ""), st.replace("_caps", "")):
+            stems.setdefault(key, f)
     nodes = []
     for c in C.all_caps():
-        # 2026-10-17：`handler` 改为**分派键真名**后，这里要拿"实现模块"去判 on_disk ⇒ 读 `impl` 兜底。
+        # handler 是分派键；入口 = api 有这条分派，或能找到实现文件。
         h = str(c.get("impl") or c.get("handler") or "")
         blocked = h == "blocked"
-        on_disk = (pkg / (h + ".py")).is_file() if h and not blocked else False
+        on_disk = bool(h) and not blocked and (h in routed or h in stems
+                                                or (h + "_cap") in stems
+                                                or (h + "_caps") in stems)
+        cname = str(c.get("name") or h)
+        ev = lcap.get(cname) or {}
+        vr = bool(ev.get("verified_readonly")) if ev else (h in GREEN)
+        ht = bool(ev.get("has_test")) if ev else (h in TESTED)
         nodes.append(CapabilityNode(
-            name=str(c.get("name") or h), category=str(c.get("domain") or ""),
+            name=cname, category=str(c.get("domain") or ""),
             desc=str(c.get("desc") or "")[:80], source="local",
             indexed=True, entry_known=on_disk,
             reachable=on_disk, verified_reachable=on_disk,
-            verified_readonly=h in GREEN, has_test=h in TESTED,
-            penetrate_ready=h in GREEN,
+            verified_readonly=vr, has_test=ht,
+            penetrate_ready=bool(vr and on_disk),
             invoke_mode="api" if on_disk else "unknown",
             auth_type="blocked" if blocked else "unknown",
             requires_params=["params"] if c.get("requires_params") else [],

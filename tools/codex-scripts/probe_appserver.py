@@ -10,7 +10,7 @@ import subprocess
 import sys
 import threading
 
-CODEX = r"C:\Users\ADMIN\AppData\Local\OpenAI\Codex\bin\bffc5354119c8421\codex.exe"
+CODEX = str(__import__("pathlib").Path.home() / "AppData" / "Local" / "OpenAI" / "Codex" / "bin" / "bffc5354119c8421" / "codex.exe")
 
 
 def main() -> int:
@@ -59,7 +59,7 @@ def main() -> int:
                 send({
                     "jsonrpc": "2.0", "id": 2, "method": "thread/start",
                     "params": {
-                        "cwd": r"C:\Users\ADMIN\Desktop\GBT小土豆V8",
+                        "cwd": str(__import__("pathlib").Path(__file__).resolve().parents[2]),
                         "sandbox": "read-only",
                         "ephemeral": True,
                         "approvalPolicy": "never",

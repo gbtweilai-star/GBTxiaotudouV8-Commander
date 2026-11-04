@@ -27,6 +27,7 @@
 op=tags / check / permits / how / audit / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -311,7 +312,7 @@ def run_op(op: str = "tags", **params) -> dict:
     for name, fn in (("tags", tags), ("check", check), ("permits", permits), ("how", how),
                      ("audit", audit), ("verify", verify), ("where", where), ("permit", permit)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（tags/check/permits/how/audit/verify/where/permit）"}
 

@@ -14,7 +14,7 @@ import struct
 import sys
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 # 可传参：autorig-skin.py <低模.glb> <骨架.json> <绑骨输出.glb> <姿态测试.glb>
 SRC = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else DH / "raw/avatarmesh/avatar-lowpoly.glb"

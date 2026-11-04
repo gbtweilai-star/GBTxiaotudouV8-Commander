@@ -168,7 +168,7 @@ def _gpu_rows() -> dict:
         cp = t.get("communityPrice")
         sp = t.get("securePrice")
         if cp in (None, 0) and sp in (None, 0):
-            continue                      # 两个池都没报��� ⇒ 当前不可选（不是"免费"）
+            continue                      # 两个池都没报价价价 ⇒ 当前不可选（不是"免费"）
         rows.append({"id": t.get("id"), "name": t.get("displayName") or t.get("id"),
                      "显存G": t.get("memoryInGb"), "社区价": cp, "安全价": sp})
     rows.sort(key=lambda x: (x.get("社区价") if x.get("社区价") not in (None, 0) else 9e9))
@@ -645,3 +645,5 @@ if __name__ == "__main__":                                   # 主人的终端�
     print(json.dumps(run_dispatch(a.cmd, **json.loads(a.json or "{}")), ensure_ascii=False, indent=1))
 
 # 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
+
+

@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 PROD = ROOT / "holo_pet" / "panel_server.py"
 PROBE = ROOT / ".scratch" / "block3_probe.py"
 SRC = ROOT / ".scratch" / "block3_probe_prod.json"

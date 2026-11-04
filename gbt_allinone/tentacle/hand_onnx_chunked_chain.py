@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_onnx_chunked_chain — 长视频分 chunk 进程回收 + 手部 IK/HAL 同链。
 
 每个 chunk 子进程只做视觉（OpenCV DNN，模型一次），父进程拿 landmarks 做 IK + loopback。

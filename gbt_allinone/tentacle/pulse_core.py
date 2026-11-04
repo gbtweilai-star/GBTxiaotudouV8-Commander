@@ -230,6 +230,11 @@ def body_organs() -> dict:
     try:
         from ..security import policy as P
         scoped = {k for k in caps if P.evaluate(k, {}).scopes}
+        # 2026-11-03 主人令：只有「不可自行授权」的才算需票 —— 判据直接用
+        # policy.autonomous_exclusion（转账 MONEY_KINDS + security 域黑客面），不另写一套。
+        # 其余受限动作由大脑执行层自行决策；否则 process_execute / filesystem_write
+        # 这类机制门会被静态 scopes 报成「酸」（假痛），掩盖真正的病。
+        scoped = {k for k in scoped if P.autonomous_exclusion(k)}
     except Exception:  # noqa: BLE001
         scoped = set()
 

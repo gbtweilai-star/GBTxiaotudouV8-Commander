@@ -10,8 +10,8 @@ import json
 import os
 import sys
 
-SRC = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v2-rigged.glb"
-OUT = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\app-after\blender-inspect.json"
+SRC = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v2-rigged.glb")
+OUT = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "app-after" / "blender-inspect.json")
 
 # 清场
 bpy.ops.wm.read_factory_settings(use_empty=True)

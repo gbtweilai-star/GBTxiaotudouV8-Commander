@@ -40,8 +40,8 @@ import sys
 from pathlib import Path
 
 # 装机真身的位置（**现读，不猜**）：npm 缓存里的 npx 安装 + DSH_HOME
-NPX = Path(r"C:\Users\ADMIN\AppData\Local\npm-cache\_npx\1e7f6d9597241db0")
-DSH_HOME = Path(r"C:\Users\ADMIN\.dsh")
+NPX = Path.home() / "AppData" / "Local" / "npm-cache" / "_npx" / "1e7f6d9597241db0"
+DSH_HOME = Path.home() / ".dsh"
 PKG_SCOPE = "@deepseek-ai"
 
 for _s in (sys.stdout, sys.stderr):

@@ -38,7 +38,7 @@ def cli(params: dict) -> dict:
             ["lark-cli", "drive", "files", "list", "--as", "user",
              "--params", p, "--format", "json"],
             capture_output=True, text=True, encoding="utf-8", timeout=90,
-            cwd=str(ROOT), shell=True)
+            cwd=str(ROOT), shell=False)
     except Exception as exc:                                   # noqa: BLE001
         return {"ok": False, "error": {"message": f"{type(exc).__name__}: {exc}"}}
     s = (r.stdout or "").strip()

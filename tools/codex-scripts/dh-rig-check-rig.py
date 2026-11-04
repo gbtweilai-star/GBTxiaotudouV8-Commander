@@ -32,7 +32,7 @@ import struct
 import sys
 import time
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 OUT = os.path.join(WS, "projects", "digital-human", "out")
 GLB = os.path.join(OUT, "dh_rigged.glb")
 TRACE = os.path.join(OUT, "trace.json")

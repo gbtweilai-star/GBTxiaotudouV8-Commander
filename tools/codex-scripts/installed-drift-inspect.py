@@ -19,7 +19,7 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-ROOT = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+ROOT = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 SOURCE = os.path.join(ROOT, "plugins", "gbt-master")
 PROFILES = os.path.join(os.path.expanduser("~"), ".dsh", "profiles")
 SKIP = {"node_modules", ".git", "__pycache__"}

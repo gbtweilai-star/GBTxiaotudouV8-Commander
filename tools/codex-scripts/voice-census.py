@@ -11,8 +11,8 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
-SKILLS = Path(r"C:\Users\ADMIN\.openclaw-autoclaw\skills")
+ROOT = Path(__file__).resolve().parents[2]
+SKILLS = Path.home() / ".openclaw-autoclaw" / "skills"
 sys.path.insert(0, str(ROOT))
 
 print("=" * 78)
@@ -116,7 +116,7 @@ print()
 print("=" * 78)
 print("⑥ 本机有没有已下的语音模型权重（按目录名粗扫）")
 print("=" * 78)
-roots = [ROOT / "store", ROOT / "holo_pet" / "assets", Path(r"C:\Users\ADMIN\.cache"),
+roots = [ROOT / "store", ROOT / "holo_pet" / "assets", Path.home() / ".cache",
          Path(os.environ.get("LOCALAPPDATA", "")) / "huggingface"]
 pat2 = ("whisper", "vits", "sovits", "rvc", "xtts", "tortoise", "bark", "piper",
         "vocoder", "speech", "tts", "wav2vec", "hubert")

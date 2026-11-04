@@ -23,6 +23,7 @@
 op = status / sources / search / curate / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -274,4 +275,4 @@ def run_op(op: str = "status", **kw) -> dict:
     if fn is None:
         return {"ok": False, "op": op, "status": "unknown_op", "available": sorted(table),
                 "_口径": "未知 op 一律拒，不猜"}
-    return fn(**kw)
+    return _oc_call(fn, kw)

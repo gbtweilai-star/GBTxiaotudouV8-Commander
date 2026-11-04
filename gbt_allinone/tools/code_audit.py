@@ -35,21 +35,50 @@ op=scan / diff_audit / findings / verify_finding / repro / report / verify / whe
 """
 from __future__ import annotations
 
+import ast
 import hashlib
+import io
 import json
 import os
 import re
 import subprocess
 import sys
 import time
+import tokenize
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[2]
 _STATE = _ROOT / "state"
 _FINDINGS = _STATE / "code_audit_findings.json"   # findings（原子写：重扫覆盖，id 稳定）
 _LEDGER = _STATE / "code_audit.jsonl"             # 每次扫描/验证（追加式）
-SKIP_DIRS = {".git", ".pylibs", "node_modules", "store", "vaults", "out", ".scratch",
-             "__pycache__", ".mimosa", "_upstream", "delivery", "output", "generated-images"}
+# ── 地毯式覆盖（主人令 2026-11-03）────────────────────────────────────────────
+# 旧口径只认 5 种扩展名（.py/.js/.ts/.cjs/.mjs）⇒ .html 内联 JS、.ps1/.bat/.cmd/.sh
+# 脚本、.tsx 组件、.json 配置全部**免检**。地毯式把那 996 个盲区全部纳入视野。
+SCAN_EXT = (".py", ".pyw", ".js", ".jsx", ".ts", ".tsx", ".cjs", ".mjs",
+            ".ps1", ".bat", ".cmd", ".sh", ".html", ".htm", ".json")
+
+# 排除目录 = **目录 → 理由**（唯一来源）。关键纪律：排除不是"看不见"，
+# 每个被排除的目录都会在 coverage.excluded_dirs 里**报出路径**，可追可审。
+EXCLUDED_DIRS = {
+    ".git": "版本库元数据（非源码）",
+    ".pylibs": "vendored 依赖（第三方）",
+    "node_modules": "第三方依赖",
+    "store": "运行时存储（数据非代码）",
+    "vaults": "金库（凭据区，另有专审）",
+    "out": "构建产物",
+    ".scratch": "临时探针区（本仓自用草稿）",
+    "__pycache__": "字节码缓存",
+    ".mimosa": "第三方镜像快照",
+    "_upstream": "上游快照（第三方）",
+    "delivery": "交付产物",
+    "output": "输出产物",
+    "generated-images": "生成图片",
+    ".archive": "历史归档（已退役代码，仍在盘上）",
+    "state": "运行时/证据区（findings、镜像备份、暂存稿、图快照）—— 扫它等于自己扫自己",
+    "vendor": "第三方上游快照（与 skills/ 内容重复，扫了只会双报）",
+}
+SKIP_DIRS = set(EXCLUDED_DIRS)   # 单一来源：排除集合由理由表派生，不另写一份
+
 MAX_FILES = 4000
 MAX_BYTES = 900_000
 EXEMPT_PATHS = {
@@ -65,6 +94,14 @@ EXEMPT_PATHS = {
     "gbt_allinone/tools/penetrating_cross_scan.py": "穿透式交叉扫描的模式表与分诊表（同上）",
     "gbt_allinone/tools/hook_enforcer.py": "钩子强制器的模式表（同上）",
     "gbt_allinone/tools/skill_vetting.py": "技能安检器：它维护的正是**危险词清单**（清单不是漏洞）",
+    # ── 验证器本体（**按类豁免**）：它们的职责就是"把被测对象跑起来看结果"，
+    #    所以 `exec(compile(...))` / `exec(fn, g)` 是**本职动作**，不是漏洞。
+    "tools/codex-scripts/verify_ledger_sink.py": "验证器本体：exec 是它执行被测对象的方式",
+    "tools/codex-scripts/verify_loader_scope.py": "验证器本体：同上（装载域验证）",
+    "tools/codex-scripts/verify_loader_scope2.py": "验证器本体：同上（装载域验证 v2）",
+    # ── 能力位**本职动作**：文件系统域（第十四章补的第 9 域）的删除能力本身。
+    #    规则表报它 = 报警器报自己会响。豁免只覆盖这一个文件，且理由在此可见。
+    "gbt_allinone/tentacle/omni_fs.py": "文件系统能力位本体：rmtree 是它的删除能力（本职）",
 }
 
 # 危险字面量用括号类表达（语义等价；源码里不复现危险字面量，免得被安全钩子按字面量拦下）
@@ -108,7 +145,9 @@ RULES = [
      "what": "shell=True 或字符串拼命令（subprocess/os.system 吃变量）",
      # ⚠️ 精度（实测收噪声）：`subprocess.run([prog] + args)` 是**列表拼接**、安全（本就等价 shell=False），
      #    第一版把它也算进来 ⇒ 一屏噪音。现在只认真正把字符串交给 shell 的两种写法。
-     "rx": re.compile(r"(shell\s*=\s*True|os\.system\s*\()"),
+     # 词边界（2026-11-03 实测）：`dict(c, empty_shell=True)` 里的 `empty_shell=True`
+    #   会被 `shell\s*=\s*True` 当成命中 —— 加 `(?<![A-Za-z0-9_])` 排除"某某_shell"。
+    "rx": re.compile(r"(?<![A-Za-z0-9_])(shell\s*=\s*True|os\.system\s*\()"),
      "ctx": re.compile(r"."),
      "repro": ("python -c \"import pathlib;print([l.strip() for l in pathlib.Path('%s')"
                ".read_text(encoding='utf-8',errors='replace').splitlines() if 'shell=True' in l][:3])\"")},
@@ -131,7 +170,108 @@ RULES = [
 PLACEHOLDER = re.compile(r"(?i)(example|demo|sample|dummy|placeholder|xxx+|\.\.\.|your[_-]?key|<[^>]{2,20}>|abcdef|123456|deadbeef|f{4,}|0{6,}|qwerty)")
 
 
-def _triage(rel: str, line_txt: str, rule: str) -> str:
+def _prose_spans(src: str) -> list:
+    """收集源码里**所有"散文"区间**：(首行, 首列, 末行, 末列)。
+
+    散文 = 字符串字面量（含 docstring / f-string）**+ 注释**。两者都不是可执行代码：
+      · `"shell=True"` 是 Constant(str)，`shell=True` 是 ast.keyword —— 语法上完全不同
+      · `# 受限builtins exec(含前文)` 是注释，不是调用
+    ast 不含注释，所以注释区间用 tokenize 取；语法有错时优雅降级（宁可不判，不乱报）。
+    """
+    spans = []
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        tree = None
+    if tree is not None:
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                pass
+            elif isinstance(node, ast.JoinedStr):        # f-string
+                pass
+            else:
+                continue
+            spans.append((node.lineno, node.col_offset,
+                          getattr(node, "end_lineno", node.lineno) or node.lineno,
+                          getattr(node, "end_col_offset", node.col_offset) or 0))
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(src).readline):
+            if tok.type == tokenize.COMMENT:
+                spans.append((tok.start[0], tok.start[1], tok.end[0], tok.end[1]))
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        pass   # 非 Python / 语法错：注释区间拿不到就不拿，不影响字符串判定
+    return spans
+
+
+def _line_prose(line: str, col: int) -> bool:
+    """非 Python 文件的单行散文判定（.js/.ts/.tsx/.mjs 没有 Python AST）。
+
+    三条判据（覆盖 JS 生态 99% 的单行散文）：
+      1. `/* ... */` 块注释内
+      2. `//` 之后的行注释
+      3. 引号配对（单引号 / 双引号 / 反引号）—— 奇偶判定，跳过反斜杠转义
+    跨行模板串判不了（要真词法分析器），那种情况仍会报 —— **宁可漏判不放行**。
+    """
+    for m in re.finditer(r"/\*.*?\*/", line):
+        if m.start() <= col < m.end():
+            return True
+    d = line.find("//")
+    if d >= 0 and col > d:
+        return True
+    q = None
+    i = 0
+    while i < col and i < len(line):
+        ch = line[i]
+        if q is None and ch in "'\"`":
+            q = ch
+        elif q is not None and ch == q and (i == 0 or line[i - 1] != "\\"):
+            q = None
+        i += 1
+    return q is not None
+
+
+def _in_span(spans: list, lineno: int, col: int) -> bool:
+    """(行, 列) 是否落在某个字符串字面量内部。"""
+    for sl, sc, el, ec in spans:
+        if lineno < sl or lineno > el:
+            continue
+        if lineno == sl and col < sc:
+            continue
+        if lineno == el and col >= ec:
+            continue
+        return True
+    return False
+
+
+_TEMP_SRC = re.compile(r"(mkdtemp|TemporaryDirectory|NamedTemporaryFile|gettempdir)", re.I)
+
+
+def _temp_origin(lines: list, line_no: int, var: str, lookback: int = 60):
+    """简易数据流：同文件内 `var` 是否被赋值为**临时目录**。
+
+    只做一件事、只信一种证据：赋值右侧出现 mkdtemp / TemporaryDirectory /
+    NamedTemporaryFile / gettempdir。查不到就返回 False（**不猜**）。
+    这样 `rmtree(mkdtemp(...))` 这种标准清理能判 by design，
+    而 `rmtree(user_data)` 仍然进人核。
+    """
+    if not lines or not var:
+        return False
+    rx = re.compile(r"^\s*" + re.escape(var) + r"\s*(?::[^=]+)?=\s*(.+)$")
+    lo = max(0, (line_no or 1) - lookback)
+    for i in range(lo, min(len(lines), (line_no or 1))):
+        m = rx.match(lines[i])
+        if m and _TEMP_SRC.search(m.group(1)):
+            return True
+    return False
+
+
+_RX_OBJ = re.compile(r"^(re|RE|rx|_re|_rx|regex|regexp|pattern|pat|PATTERN)$")
+_RX_PREFIX = re.compile(r"^(RE|RX|PAT|PATTERN|REGEX|REGEXP)_")   # RX_PATTERN / RE_FENCE
+_RX_SUFFIX = re.compile(r"(_RE|_RX|_re|_rx|_RegExp|_regex)$")     # TITLE_RE / matcher_rx
+_RX_LITERAL = re.compile(r"/[^/\n]+/\s*\.\s*(?:ex[ae]c|test)\s*\(")
+
+
+def _triage(rel: str, line_txt: str, rule: str, ctx=None) -> str:
     """分诊。三条原则性规则（都可复核，不是拍脑袋）：
     ① **扫描器/清单类文件按类豁免**（模式串不是漏洞）；
     ② **纯注释行里的"可执行类"命中**（INJ/DES/JDG）→ **需人核**，因为注释不会执行；
@@ -145,15 +285,80 @@ def _triage(rel: str, line_txt: str, rule: str) -> str:
         return "占位符/示例形状（无真实凭据形状）"
     if rule == "CRED-001" and re.search(r"(?i)(assert|unittest|test_|fixture|mock)", line_txt):
         return "测试夹具里的合成值"
+    if rule == "JDG-001" and re.search(r"\blambda\b[^:]*:[^\n]*\bor\s+True\b", line_txt):
+        # `lambda text: seen.update(text=text) or True` —— dict.update() 返回 None，
+        # 用 `or True` 让 lambda **有真返回值**。这是测试桩技巧，不是"判据撒谎"。
+        # （与已修的 `bool(r) or True` 区别：那个在**判据**里恒真，这个在**桩**里补返回值。）
+        return "测试桩技巧（lambda 内 `x or True` 让返回值变真）⇒ 需人核"
     if rule == "JDG-001" and re.search(r"audit-dead-judgments|KNOWN\s*=", line_txt):
         return "判据扫描器自身的模式表"
+    if rule == "INJ-002":
+        # 2026-11-03 逐条追踪 19 条后定的口径：
+        #   · 首参是**列表**的（`run([...], shell=True)`）⇒ shell 纯属多余且有害，
+        #     已在代码里改成 shell=False（Windows 上会走 cmd.exe 拼串，反而引入引号风险）；
+        #   · 首参是**字符串字面量**且含管道（`"tail -60 x" % LOG`）⇒ 真需要 shell（Linux 远程机）；
+        #   · 首参是**变量/入参**（payload["cmd"] / action["cmd"] / 函数入参）⇒
+        #     **静态判不出 cmd 来源**，按第八章「分不清的不硬报」进人核。
+        return ("NEEDS_HUMAN:shell=True 且命令来自变量/入参"
+                "（静态判不出 cmd 来源；要人核它吃不吃外部输入）")
+    if rule == "INJ-001":
+        mo = re.search(r"([A-Za-z_$][\w$]*)\s*\.\s*(ex[ae]c|ev[ae]l)\s*\(", line_txt)
+        if mo:
+            obj = mo.group(1)
+            if _RX_OBJ.match(obj) or _RX_SUFFIX.search(obj) or _RX_PREFIX.match(obj):
+                # 对象名就是正则约定（re / rx / pattern / XXX_RE）⇒ RegExp.prototype.exec
+                return "正则对象的 .exec()（对象名 %r 是正则约定）⇒ 不是动态执行" % obj
+        if _RX_LITERAL.search(line_txt):
+            return "正则字面量的 .exec()（/…/.exec）⇒ 不是动态执行"
+    if rule == "INJ-001" and rel.endswith((".ts", ".tsx", ".mts", ".cts")):
+        # TS 语境（2026-11-03 实测）：`.ts/.tsx` 里 `exec(x)` 是 **child_process.exec**
+        #   （Node 跑子进程的标准 API）或 RegExp.exec，都不是"把字符串当代码跑"。
+        #   只对 exec 放宽 —— **eval 在 TS 里一样危险，照报不误**。
+        if re.search(r"\bexec\s*\(", line_txt) and not re.search(r"\beval\s*\(", line_txt):
+            return ("TS 语境的 exec()（child_process / RegExp）⇒ 需人核；"
+                    "同行的 eval() 不受此放宽")
+    if rule == "INJ-001":
+        # 精度（2026-11-03 地毯式实测）：`ex[ae]c(` 会把 **RegExp.prototype.exec** 与
+        #   **Playwright 的 page.eval** 一起命中 —— READY_LINE.exec(str) /
+        #   /正则字面量/.exec(text) / page.eval(probe) 都不是"把字符串当代码跑"。
+        #   可靠的静态区分：正则 exec 与对象方法**必然挂在 `.` 后面**；真正危险的
+        #   动态执行是**裸调用** eval( / exec(（直接吃字符串）。
+        #   ⇒ 挂对象的按宪章「分不清的不硬报」进 needs_human，裸调用才留 finding。
+        if not re.search(r"(?<![.\w$])(ev[ae]l|ex[ae]c)\s*\(", line_txt):
+            return ("NEEDS_HUMAN:挂在对象上的 .eval/.exec（RegExp.exec、page.eval 这类）"
+                    "—— 静态分不出是不是动态执行，要人看一眼")
+        if re.search(r"(async\s+)?(ev[ae]l|ex[ae]c)\s*\([^)]*\)\s*\{", line_txt):
+            return "方法/函数**定义**而非调用（形如 eval(x) { ... }）⇒ 需人核"
     s = line_txt.strip()
     if rule != "CRED-001" and (s.startswith(("#", "//", "*", "·", ">")) or s.startswith('"')):
         return "**纯注释/文档行里的提及**（不可执行）⇒ 需人核，不算 finding"
     if rule == "DES-001" and re.search(r"rmtree\([^)]*(tmp|temp|iso|scratch|cache|staging|__pycache__)",
                                        line_txt, re.I):
         return "清理**临时/暂存/缓存目录**（by design）⇒ 需人核，不算 finding"
-    if rule == "DES-001" and re.search(r"rmtree\(\s*([A-Za-z_]\w*)\s*\)", line_txt):
+    if rule == "DES-001" and ctx is not None:
+        lines, line_no = ctx
+        mv = re.search(r"rmtree\(\s*([A-Za-z_]\w*)\s*[,)]", line_txt)
+        if mv and _temp_origin(lines, line_no, mv.group(1)):
+            return ("清理**自建临时目录**（数据流：%s 的赋值为 mkdtemp/TemporaryDirectory）"
+                    "⇒ by design" % mv.group(1))
+    if rule == "DES-001" and rel.startswith(("gbt_allinone/tests/", "tests/")):
+        # 测试夹具（2026-11-03 实测 12 条）：全是清理**自建临时目录**的三个固定形态 ——
+        #   rmtree(self.xxx, ...) / rmtree(xxx_dir(), ...) / addCleanup(shutil.rmtree, ...)
+        # 场景明确但静态仍判不出指向（self.xxx 的值是运行时才定的），按第八章进 needs_human。
+        if (re.search(r"rmtree\(\s*self\.[A-Za-z_]", line_txt)
+                # `x_dir()` / `CM.channel_dir()` / `FO.channel_dir()` —— 补上"模块.方法()"形态
+                or re.search(r"rmtree\(\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*_dir\(\)", line_txt)
+                or re.search(r"addCleanup\(\s*(lambda\s*:\s*)?(shutil\.)?rmtree", line_txt)):
+            return "NEEDS_HUMAN:测试夹具自建目录的清理（self.* / *_dir() / addCleanup）⇒ 需人核"
+    if rule == "DES-001" and re.search(r"rmtree\(\s*[A-Za-z_]\w*\s*/\s*[\"\']", line_txt):
+        # `rmtree(BASE / "selftest", ...)` —— 目标是"路径常量下的**字面量子目录**"。
+        # 形态是确定的（不是变量），但 BASE 指向哪要人确认 ⇒ 按第八章进 needs_human。
+        return ("NEEDS_HUMAN:删除的是**路径常量下的字面量子目录**（BASE / \"name\"）"
+                "⇒ 形态确定，但要人确认 BASE 指向哪")
+    if rule == "DES-001" and re.search(r"rmtree\(\s*[A-Za-z_]\w*\.[A-Za-z_]\w*\s*[,)]", line_txt):
+        # `rmtree(probe.parent)` —— 属性目标，静态完全判不出指向。
+        return "NEEDS_HUMAN:删除目标是**对象属性**（probe.parent 这类）⇒ 静态判不出指向"
+    if rule == "DES-001" and re.search(r"rmtree\(\s*([A-Za-z_]\w*)\s*[,)]", line_txt):
         # **变量目标**：没有数据流分析，静态判不出它指向临时目录还是真身目录。
         #   ⇒ 按本模块自己的规矩进 `needs_human`（分不清的**不硬报**）。
         #   真要判，跑 grep 看那个变量怎么来的，或过 action_gate（先看→动脑）再动手。
@@ -165,50 +370,199 @@ def _triage(rel: str, line_txt: str, rule: str) -> str:
     return ""
 
 
-def _walk(target: str) -> list:
+def _walk_ex(target: str) -> tuple:
+    """走一遍 target ⇒ (files, stats)。**没扫的必须带原因回来**，绝不静默。
+
+    stats 里三本账：
+      skipped_dir  —— 排除目录（路径 → 理由），逐个报出
+      skipped_big  —— 超过 MAX_BYTES 被跳过的大文件（路径）
+      truncated    —— 撞到 MAX_FILES 上限（True ⇒ 本次覆盖不完整，必须标红）
+    """
     base = Path(target) if target else _ROOT
     if not base.is_absolute():
         base = _ROOT / target
+    st = {"dir": str(target), "skipped_dir": {}, "skipped_big": [], "truncated": False}
     if base.is_file():
-        return [base]
+        return [base], st
     out = []
     for root, dirs, files in os.walk(base):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        keep = []
+        for d in dirs:
+            if d in SKIP_DIRS:
+                rel = str((Path(root) / d).relative_to(_ROOT)).replace("\\", "/")
+                st["skipped_dir"][rel] = EXCLUDED_DIRS.get(d, "排除")
+            else:
+                keep.append(d)
+        dirs[:] = keep
         for f in files:
-            if f.endswith((".py", ".js", ".ts", ".cjs", ".mjs")):
-                p = Path(root) / f
-                try:
-                    if p.stat().st_size > MAX_BYTES:
-                        continue
-                except OSError:
+            if not f.lower().endswith(SCAN_EXT):
+                continue
+            p = Path(root) / f
+            try:
+                if p.stat().st_size > MAX_BYTES:
+                    st["skipped_big"].append(str(p.relative_to(_ROOT)).replace("\\", "/"))
                     continue
-                out.append(p)
-                if len(out) >= MAX_FILES:
-                    return out
-    return out
+            except OSError:
+                continue
+            out.append(p)
+            if len(out) >= MAX_FILES:
+                st["truncated"] = True
+                return out, st
+    return out, st
 
 
-def scan(target: str = "gbt_allinone,tools", rules: str = "", **_kw) -> dict:
-    """**多阶段**扫描（凭证 / 注入 / 破坏 / 判据）⇒ findings；命中先过分诊。"""
+def _walk(target: str) -> list:
+    """兼容旧调用：只要文件清单，记账见 _walk_ex。"""
+    return _walk_ex(target)[0]
+
+
+def _eligible(tgts) -> tuple:
+    """该扫基盘：scope 内扩展名合规、且不在排除目录的文件总数（覆盖率分母）。"""
+    total, ex = 0, {}
+    for t in tgts:
+        base = _ROOT if t in (".", "", None) else (_ROOT / t)
+        if not base.is_dir():
+            if base.is_file() and base.name.lower().endswith(SCAN_EXT):
+                total += 1
+            continue
+        for root, dirs, files in os.walk(base):
+            keep = []
+            for d in dirs:
+                if d in SKIP_DIRS:
+                    rel = str((Path(root) / d).relative_to(_ROOT)).replace("\\", "/")
+                    ex[rel] = EXCLUDED_DIRS.get(d, "排除")
+                else:
+                    keep.append(d)
+            dirs[:] = keep
+            total += sum(1 for f in files if f.lower().endswith(SCAN_EXT))
+    return total, ex
+
+
+def _coverage(paths, eligible, walk_stats, ex_dirs, tgts) -> dict:
+    """覆盖率硬账：rate==1.0 且没截断才算地毯式跑全。"""
+    scanned = len(paths)
+    trunc = [s["dir"] for s in walk_stats if s.get("truncated")]
+    big = [x for s in walk_stats for x in (s.get("skipped_big") or [])]
+    rate = round(scanned / eligible, 4) if eligible else 1.0
+    return {
+        "scope": list(tgts),
+        "eligible": eligible, "scanned": scanned, "rate": rate,
+        "missed": max(0, eligible - scanned),
+        "truncated_at": trunc,
+        "skipped_big": big[:20], "skipped_big_count": len(big),
+        "excluded_dirs": dict(sorted(ex_dirs.items())),
+        # 两种达标口径：
+        #   full           —— 严格：一个都不缺（rate==1.0 且无截断）
+        #   no_silent_gap  —— 纪律口径：**没有静默缺口**。缺的都是已记账的大文件，就算达标。
+        #                     这正是「无所遁形」的真意：不是必须扫 100%，而是没扫的每一个都有原因且可见。
+        "full": bool(eligible and scanned >= eligible and not trunc),
+        "no_silent_gap": bool(not trunc and max(0, eligible - scanned) <= len(big)),
+        "_口径": "eligible = scope 内扩展名合规且不在排除目录的文件数；scanned = 本次实际读入。"
+                 "rate<1 必有原因，逐条列在 truncated_at / skipped_big / excluded_dirs。"
+                 "地毯式达标判据：full == True（rate==1.0 且无截断、无大文件跳过）。",
+    }
+
+
+# ── 2026-11-03 影子分诊（DES-001 误报根治第一步：只记录，不生效）──────────────
+# 现有 _triage 的 DES-001 分支靠【变量名】含 tmp|cache 判 by-design，而变量名是人起的
+# （pc / d / x）⇒ 规则必然失效（root_fix 诊断：补丁债 3，根治方向=规则/源头分类）。
+# 新口径只用两个**单一来源**，不枚举任何文件名：
+#   ① 这份文件归哪个能力位 —— state/trunk-cover.json 的 rows（file → owners）
+#   ② 该能力位的职责 —— caps_registry 的 desc 是否声明了清理语义
+# 本段只产出 triage_shadow（比对用），**不参与** triaged / findings 的任何判定。
+_CLEANUP_WORDS = ("清理", "卫生", "归位", "旧物", "清空", "回退", "删除")
+
+_TC_OWNERS: dict | None = None
+
+
+def _owners_of(rel: str) -> tuple:
+    """现读 trunk-cover 快照拿该文件的 owner（单一来源，不重扫）。"""
+    global _TC_OWNERS
+    if _TC_OWNERS is None:
+        _TC_OWNERS = {}
+        try:
+            doc = json.loads((_STATE / "trunk-cover.json").read_text(encoding="utf-8"))
+            for row in (doc.get("rows") or []):
+                f = str(row.get("file") or "").replace("\\", "/")
+                if f:
+                    _TC_OWNERS[f] = tuple(row.get("owners") or ())
+        except Exception:                                        # noqa: BLE001
+            pass
+    return _TC_OWNERS.get(rel, ())
+
+
+def _triage_shadow(rel: str, rule: str, why_now: str) -> str:
+    """影子分诊：按源头分类判 DES-001 是否属于"清理器本职"。只记录，不生效。
+
+    ⚠️ NEEDS_HUMAN **不算已定论** —— 它正是"静态分不清、要人核"的那一类，
+       最该让新口径给建议。只有已被明确分掉（豁免/占位符/纯注释…）才让位。
+    """
+    if rule != "DES-001":
+        return ""
+    if why_now and not why_now.startswith("NEEDS_HUMAN:"):
+        return ""
+    owners = _owners_of(rel)
+    if not owners:
+        return ""
+    try:
+        from ..caps_registry import BENIGN_CAPS
+    except Exception:                                            # noqa: BLE001
+        return ""
+    for cap in owners:
+        desc = str((BENIGN_CAPS.get(cap) or {}).get("desc") or "")
+        if any(w in desc for w in _CLEANUP_WORDS):
+            return "所有者能力位本职含清理（%s）⇒ by design（源头分类）" % cap
+    return ""
+
+
+def scan(target: str = "all", rules: str = "", **_kw) -> dict:
+    """**地毯式多阶段**扫描（凭证 / 注入 / 破坏 / 判据）⇒ findings + 覆盖率账。
+
+    主人令 2026-11-03「扫描必须地毯式穿透交叉，让故障/漏洞无所遁形」的落地口径：
+      · 地毯式 —— 默认 target="all" 走全树；SCAN_EXT 15 种全覆盖（含 html 内联 JS /
+        ps1 / bat / cmd / sh / tsx / json）；**没扫的必须记账**（excluded_dirs /
+        skipped_big / truncated_at），一个文件都不许静默消失。
+      · 穿透式 —— 规则面不动，深挖由 penetrating_cross_scan 六步接力（不在此重写）。
+      · 交叉   —— findings 仍需 verify_finding 两路读法复核才算 confirmed。
+    """
     want = {x.strip().upper() for x in rules.split(",") if x.strip()}
     active = [r for r in RULES if not want or r["rule"] in want]
     if not active:
         return {"ok": False, "op": "scan", "fail_closed": True,
                 "error": f"rules 过滤后没有可用规则（可用：{[r['rule'] for r in RULES]}）"}
-    paths = []
-    for t in [x.strip() for x in target.split(",") if x.strip()]:
-        paths.extend(_walk(t))
-    findings, triaged, rows, needs = [], {}, 0, []
+    tgts = [x.strip() for x in (target or "").split(",") if x.strip()] or ["all"]
+    tgts = ["." if t in ("all", "*") else t for t in tgts]
+    walk_stats, paths, seen = [], [], set()
+    for t in tgts:
+        fs, st = _walk_ex(t)
+        walk_stats.append(st)
+        for p in fs:
+            key = str(p).lower()
+            if key not in seen:
+                seen.add(key)
+                paths.append(p)
+    eligible, ex_dirs = _eligible(tgts)
+    coverage = _coverage(paths, eligible, walk_stats, ex_dirs, tgts)
+    findings, triaged, rows, needs, shadow = [], {}, 0, [], []
+    doc_mentions = 0   # 命中落在字符串/文档里的次数（可核，不算 finding）
     for p in paths:
         try:
             txt = p.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         rel = str(p.relative_to(_ROOT)).replace("\\", "/") if _ROOT in p.parents else str(p)
-        for i, line in enumerate(txt.splitlines(), 1):
+        spans = _prose_spans(txt)   # 该文件的散文区间（字符串 + 注释）
+        _lines = txt.splitlines()   # 供 _triage 做简易数据流（查变量赋值来源）
+        for i, line in enumerate(_lines, 1):
             rows += 1
             for r in active:
-                if not r["rx"].search(line):
+                m = r["rx"].search(line)
+                if not m:
+                    continue
+                if _in_span(spans, i, m.start()) or (
+                        p.suffix.lower() != ".py" and _line_prose(line, m.start())):
+                    # 命中的是**字符串/注释里的提及**，不是可执行代码 ⇒ 不报 finding
+                    doc_mentions += 1
                     continue
                 if r["rule"] != "DES-001" and not r["ctx"].search(line):
                     continue
@@ -220,7 +574,11 @@ def scan(target: str = "gbt_allinone,tools", rules: str = "", **_kw) -> dict:
                     assigned = bool(re.search(r"(?i)(key|token|secret|password|passwd)\w*\s*[:=]\s*['\"]", line))
                     if not (prefixed or assigned):
                         continue
-                why = _triage(rel, line, r["rule"])
+                why = _triage(rel, line, r["rule"], ctx=(_lines, i))
+                _sh = _triage_shadow(rel, r["rule"], why)
+                if _sh:
+                    shadow.append({"rule": r["rule"], "file": rel, "line": i,
+                                   "would_be": _sh, "snippet": line.strip()[:140]})
                 key = ("已分诊", r["rule"], why)
                 if why:
                     triaged[key] = triaged.get(key, 0) + 1
@@ -240,8 +598,10 @@ def scan(target: str = "gbt_allinone,tools", rules: str = "", **_kw) -> dict:
                     "verified_by": "", "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                 })
     doc = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "target": target, "files": len(paths),
-           "lines": rows, "findings": findings, "triaged": [list(k) for k in triaged],
+           "lines": rows, "coverage": coverage, "findings": findings,
+           "triaged": [list(k) for k in triaged],
            "needs_human": needs[:200],
+           "triage_shadow": shadow[:300],
            "_口径": "命中先分诊；**分不清的进 needs_human，不硬报**；全量面天然含框架自家的清理路径，"
                     "日常该用的是 diff_audit（改动面）或 rules= 定向。"}
     tmp = _FINDINGS.with_name(_FINDINGS.name + ".tmp")
@@ -251,6 +611,7 @@ def scan(target: str = "gbt_allinone,tools", rules: str = "", **_kw) -> dict:
           "lines": rows, "findings": len(findings), "by_severity": {s: sum(1 for f in findings if f["severity"] == s)
                           for s in ("high", "medium", "low")}})
     return {"ok": True, "op": "scan", "files": len(paths), "lines": rows,
+            "coverage": coverage, "doc_mentions": doc_mentions,
             "findings": len(findings), "needs_human": len(needs),
             "by_severity": {s: sum(1 for f in findings if f["severity"] == s)
                             for s in ("high", "medium", "low")},

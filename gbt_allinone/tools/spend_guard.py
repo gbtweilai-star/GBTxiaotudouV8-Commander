@@ -25,6 +25,7 @@
 4. **读不到如实报**：账不在 ⇒ 结构化说明（不许拿 0 冒充"零花费"）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import sys
@@ -170,7 +171,7 @@ def run_op(op: str = "verdict", **params) -> dict:
     op = (op or "verdict").lower()
     for n, fn in (("ledger", ledger), ("policy", policy), ("verdict", verdict), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op:%s（ledger/policy/verdict/where）" % op}
 
 

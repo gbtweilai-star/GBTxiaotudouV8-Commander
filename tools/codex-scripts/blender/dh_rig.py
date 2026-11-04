@@ -35,7 +35,7 @@ import sys
 import time
 import traceback
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[3])
 DEFAULT_GLB = os.path.join(os.path.expanduser("~"), "Downloads",
                            "futuristic cosplay outfit 3d model.glb")
 DEFAULT_OUT = os.path.join(WS, "projects", "digital-human", "out")

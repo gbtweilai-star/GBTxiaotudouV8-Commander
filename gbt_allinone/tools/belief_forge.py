@@ -28,6 +28,7 @@
 4. **置信度有界**：夹在 0..1，且每次改动都留 `为什么`（哪条观察推的）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -140,7 +141,7 @@ def consolidate(claim: str = "") -> dict:
             "_口径": "历史只追加（不覆盖）；置信度=证据加权；move ∈ strengthen/weaken/extend"}
 
 
-def beliefs(min_conf: float = 0.0, **_kwargs) -> dict:
+def beliefs(min_conf: float = 0.0) -> dict:
     """现读信念（每条取最新一版；`history` 在盘上保留）。"""
     rows = {}
     for b in _read_jsonl(_store_dir() / "beliefs.jsonl"):
@@ -208,7 +209,7 @@ def run_op(op: str = "beliefs", **params) -> dict:
     for n, fn in (("observe", observe), ("consolidate", consolidate),
                   ("beliefs", beliefs), ("model", model), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": "未知 op:%s（observe/consolidate/beliefs/model/where）" % op}
 

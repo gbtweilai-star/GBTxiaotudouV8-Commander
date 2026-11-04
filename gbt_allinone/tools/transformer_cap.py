@@ -38,6 +38,7 @@ ops：
   stats / selftest
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -571,15 +572,15 @@ def selftest() -> int:
 def run_op(op: str = "stats", **params) -> dict:
     op = (op or "stats").lower()
     if op == "compress":
-        return compress(**params)
+        return _oc_call(compress, params)
     if op == "cache_get":
-        return cache_get(**params)
+        return _oc_call(cache_get, params)
     if op == "cache_put":
-        return cache_put(**params)
+        return _oc_call(cache_put, params)
     if op == "autosize":
-        return autosize(**params)
+        return _oc_call(autosize, params)
     if op == "stats":
-        return stats(**params)
+        return _oc_call(stats, params)
     if op == "selftest":
         import contextlib
         import io

@@ -1,4 +1,4 @@
-﻿"""GBT小土豆V8 · 统一接口：run_task / list_capabilities。路由到良性能力，禁用危险能力。
+"""GBT小土豆V8 · 统一接口：run_task / list_capabilities。路由到良性能力，禁用危险能力。
 V8 行为准则（见 soul.py）：
 - 每次调用先落审计（call/ok/error/denied 全程可追踪）；
 - 执行结果默认携带 GBT 钢印（声明独立私人框架出处）；
@@ -158,12 +158,59 @@ def _run_benign(kind, payload, policy_decision=None):
     if kind in ("body_see", "body_say", "body_type", "body_click", "body_volume", "body_open"):
         from . import body_bridge
         return body_bridge.run(kind[5:], payload or {})
+    if kind == "body_eye":
+        # 身体·眼睛（2026-11-04 主人令）：把散装视觉收成一个入口。
+        # 接线前实况（已核实）：ocr 与 vision_arsenal 早在册；但新做的
+        # vision_detect(YOLO) / vision_embed(CLIP) / vision_ui(界面元素) **没有注册位**，
+        # 大脑调不到 = 白做；且看懂屏幕要记三套调用形状。这一位收成一条。
+        # 【2026-11-04 补正】上面那句「没有注册位」已过时：detect / embed / segment /
+        # pose / track / uia_tree 六位均已建位并直调通过（见本文件下方同批分支）。
+        # body_eye 不再是唯一入口，但仍是「一次调用看全」的聚合口 —— 两者并存不冲突。
+        # op 省略 ⇒ 看现况(status)；op=see ⇒ 截屏+理解+回坐标（给 query 直接定位）。
+        from . import vision_eye as _eye
+        kw = dict(payload or {})
+        return _eye.run(str(kw.pop("op", "status")), **kw)
+    if kind == "bounty_ops":
+        # 安全众测闭环（2026-11-04 主人令）：把 2026-11-02 写完却没接线的 6 件收成一个入口。
+        # 这 6 件当时就写好了，但没注册位、没被 import —— 一直躺在 state/proactive/work/g-1/
+        # （失败工单的旧仓库快照）里，清旧副本时不先捞出来就永久丢了。
+        # 与主干 security/policy.py 是**两层闸**：那层按动作类型收票，这层按能力位判定，
+        # 且多一条主干没有的规则（受攻击时最高决策=本机自我判断）。
+        # 高危不代批：approve 不暴露（只能在主人终端）；respond 要 confirm=true + 非空 reason。
+        from . import bounty_ops as _bo
+        kw = dict(payload or {})
+        return _bo.run(str(kw.pop("op", "status")), **kw)
+    if kind == "codepage":
+        # 代码页索引（2026-11-04 主人令）：一次建索引，之后毫秒直达。
+        # 逐页问模型 1.4s×4013 页＝94 分钟，物理上不成立；索引直达 17.9ms、55 次/秒。
+        from . import codepage as _cp
+        kw = dict(payload or {})
+        return _cp.run(str(kw.pop("op", "stats")), **kw)
+    if kind == "local_llm":
+        # 本机算力（2026-11-04 主人令）：**严格限定**的入口。
+        # 实测意图分类 1/3、大类判定 3/7 ⇒ 拒绝 classify/route/page_bind，
+        # 只做确定性短任务（算术 8/8、JSON 抽取）。慢就 ok=False + fallback，不假装算完。
+        from . import local_llm as _ll
+        kw = dict(payload or {})
+        return _ll.run(str(kw.pop("op", "status")), **kw)
     if kind == "body_realtime":
         from .tentacle import body_realtime as _br
         return _br.run(str((payload or {}).get("op", "status")), payload or {})
     if kind == "body_map":
         from . import body_bridge
         return body_bridge.body_map()
+    if kind == "body_excrete":
+        # 身体·排泄（2026-11-04 主人令）：代谢垃圾排出体外，且必须进 Windows 回收站
+        # （shell32.SHFileOperationW + FOF_ALLOWUNDO）。默认 dry_run=True，只报不排。
+        from . import excrete as _ex
+        kw = dict(payload or {})
+        return _ex.run(str(kw.pop("op", "status")), **kw)
+    if kind == "body_immune":
+        # 身体·免疫（2026-11-04 主人令）：自我保护机制。查六类持久化 + 活体，
+        # 能自动清的清，需提权的如实上报。默认 dry_run=True。
+        from . import immune as _im
+        kw = dict(payload or {})
+        return _im.run(str(kw.pop("op", "status")), **kw)
     if kind == "health":
         return {"platform": _plat_str(), "python": platform.python_version(),
                 "time": time.strftime("%Y-%m-%dT%H:%M:%S")}
@@ -177,11 +224,116 @@ def _run_benign(kind, payload, policy_decision=None):
         return {"total": len(query_log()), "sample": query_log(event=ev, limit=10)}
     # 本地数据工具（第 54–55 轮接入）：**只读**，结果从返回里给 ⇒ 作用域天然为空。
     # 口径见 `tools/datakit.py` 的模块 docstring：不给落盘版（会写盘却没有 policy 分支＝绕门）。
+    if kind == "update_chain":
+        # 本地更新测试链（只 state/updates-test，不碰正式 APP）
+        from .tools import update_chain as _uc
+        kw = dict(payload or {})
+        return _uc.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "kws":
+        # 声学 KWS：本机 sherpa-onnx（2026-11-03 主人 P2）
+        from .tools import kws as _kws
+        kw = dict(payload or {})
+        return _kws.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "voice_stream":
+        # 流式语音：PCM 分片 + Whisper 局部/最终转写（2026-11-03 主人 P2）
+        from .tools import voice_stream as _vs
+        kw = dict(payload or {})
+        return _vs.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "update_verify":
+        # 更新清单/签名校验：只离线校验，不下载/安装（2026-11-03 主人 P2）
+        from .tools import update_verify as _uv
+        kw = dict(payload or {})
+        return _uv.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "lan_pairing":
+        # 局域网配对监听：只绑私有/回环，TLS 自签（2026-11-03 主人批准）
+        from .tools import lan_pairing as _lp
+        kw = dict(payload or {})
+        return _lp.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "pairing":
+        # 配对/证书安全原语：不开监听、不生成证书（2026-11-03 主人已点头）
+        from .tools import pairing as _pg
+        kw = dict(payload or {})
+        return _pg.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "turn_trace":
+        # 轮次追踪：只读归并（2026-11-03 主人 P2）
+        from .tools import turn_trace as _tt
+        kw = dict(payload or {})
+        return _tt.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "ref3d":
+        # 参考图 → 可拆解 3D 页（2026-11-03 Salticus JS-8）
+        from .tools import ref3d as _r3
+        kw = dict(payload or {})
+        return _r3.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "video_hub":
+        # 视频能力融合编目：只读（2026-11-03 主人）
+        from .tools import video_hub as _vh
+        kw = dict(payload or {})
+        return _vh.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "media_library":
+        # 媒体舞台索引：只聚合既有产物、纯归一化（2026-11-03 主人 P2）
+        from .tools import media_library as _ml
+        kw = dict(payload or {})
+        return _ml.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "resource_snapshot":
+        # 本机资源快照：只读采样，零依赖（2026-11-03 主人 P2）
+        from .tools import resource_snapshot as _rs
+        kw = dict(payload or {})
+        return _rs.run(str(kw.pop("op", "snapshot")), **kw)
+    if kind == "reminder":
+        # 提醒：写面在 handler 过 filesystem_write 门（2026-11-02 主人 P1）
+        from .tools import reminder as _rm
+        kw = dict(payload or {})
+        return _rm.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "api_slot":
+        # 动态 API 槽：只登记定义，call 永远 not_supported（2026-11-02 主人 P1）
+        from .tools import api_slot as _as
+        kw = dict(payload or {})
+        return _as.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "thought_stream":
+        # 思考流/行动流：只读归一化，零作用域（2026-11-02 主人 P1）
+        from .tools import thought_stream as _ts
+        kw = dict(payload or {})
+        return _ts.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "context_inject":
+        # 上下文注入选择器：纯确定性、零作用域（2026-11-02 主人 P1）
+        from .tools import context_inject as _ci
+        kw = dict(payload or {})
+        return _ci.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "body_control":
+        # 身体控制状态口：如实 not_supported/partial；动作口永远不执行（2026-11-02 主人定名）
+        from .tools import body_control as _bc
+        kw = dict(payload or {})
+        return _bc.run(str(kw.pop("op", "status")), **kw)
+    if kind == "focus_stack":
+        # 焦点栈 + 记忆审计：纯数据、零作用域（2026-11-02 主人 P1）
+        from .tools import focus_stack as _fs
+        kw = dict(payload or {})
+        return _fs.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "voice_settings":
+        # 语音设置：纯校验/解析，零作用域；持久化在服务端本地设置面（2026-11-02 主人 P1）
+        from .tools import voice_settings as _vs
+        kw = dict(payload or {})
+        return _vs.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "ui_card":
+        # ACUI 卡片协议：零作用域纯数据；动作只回事件，不执行工具（2026-11-02 主人令）
+        from .tools import ui_card as _uc
+        kw = dict(payload or {})
+        return _uc.run(str(kw.pop("op", "schema")), **kw)
     if kind == "datakit":
         from .tools import datakit as _dk
         kw = dict(payload or {})
         op = str(kw.pop("op", "tools"))
         return _dk.run(op, **kw)
+    if kind == "world_forge":
+        # 世界锻造内核：纯函数、零作用域（不出网/不起进程/不写盘），2026-11-02 主人令注册
+        from .tools import world_forge as _wf
+        kw = dict(payload or {})
+        return _wf.run(str(kw.pop("op", "schema")), **kw)
+    if kind == "pentest_flow":
+        # 授权渗透流水线：纯函数、零作用域（不攻击/不出网/不写盘），注册后仍需既有授权手真执行
+        from .tools import pentest_flow as _pf
+        kw = dict(payload or {})
+        return _pf.run(str(kw.pop("op", "schema")), **kw)
     # 外部业务能力（量化项目桥）：模块挂载即用，未挂载如实报缺口
     if kind in ("quant_strategy", "quant_backtest", "platform_profile",
                 "quant_params"):
@@ -2037,7 +2189,7 @@ def _run_benign(kind, payload, policy_decision=None):
         return DC.status()   # 默认只读（探测安全）
 
     # 通信域（R104 · 刀一 coze_mail）：对主人自有单一地址做收发与整理。
-    if kind == "coze_mail":
+    if kind in ("coze_mail", "email_cap"):
         from . import coze_mail_cap as CM
         return CM.run((payload or {}).get("op") or "status", payload or {})
 
@@ -2180,6 +2332,93 @@ def _run_benign(kind, payload, policy_decision=None):
         return vision_cap.run(p.get("op", "analyze"),
                               image=p.get("image"), region=p.get("region"),
                               grid=p.get("grid", 4), prompt=p.get("prompt"))
+    if kind == "vision_arsenal":
+        # 视觉作战区：唯一区块 · 大脑选型入口（2026-11-04 主人令）
+        from . import vision_arsenal as _va
+        p = payload or {}
+        return _va.run(str(p.get("op") or "decide"),
+                       **{k: v for k, v in p.items() if k != "op"})
+    if kind == "ocr":
+        # 看图读字：本地路径进 → 纯文本出（2026-11-04 主人令「看图片用原生视觉，别走附件系统」）
+        # 存在的意义：图片永不进上下文 ⇒ 不产生远程 URL ⇒ 不会 HTTP 471，也不吃图片 token。
+        from . import vision_ocr
+        p = payload or {}
+        return vision_ocr.run(str(p.get("op") or "read"),
+                              image=p.get("image") or p.get("path"),
+                              lang=p.get("lang"))
+    if kind in ("vision_embed", "vision_detect", "vision_segment",
+                "vision_pose", "vision_track"):
+        # 2026-11-04 补位：视觉作战区 19 位里有 5 位原本**只有模块、没有能力位** ——
+        # decide 能返回 kind=vision_detect，但 run_task("vision_detect") 实测回
+        # `unknown capability`。决策与执行必须同一个名字，否则「接入」是假的。
+        #
+        # ⚠️ 默认 op 不能照抄模块签名：vision_segment / vision_track 的默认是 `status`
+        #   （体检，ok=true 但**不产视觉**）。实测传 {"boxes":[...]} 却回 alive_tracks=0 ——
+        #   「看起来接好了、其实没干活」。所以这层按**给了料就干活**推断，
+        #   没给料才走 status（不做无稽之谈）。
+        from importlib import import_module as _im
+        _mod = _im("." + kind, __package__)
+        _kw = dict(payload or {})
+        _op = _kw.pop("op", None)
+        if not _op:
+            if kind == "vision_embed":
+                _op = "nearest" if _kw.get("candidates") else (
+                    "similarity" if (_kw.get("image_b") or _kw.get("b") or _kw.get("template"))
+                    else ("embed" if _kw.get("image") else "status"))
+            elif kind == "vision_detect":
+                _op = "detect" if _kw.get("image") else "status"
+            elif kind == "vision_segment":
+                _op = "segment" if (_kw.get("image") and (
+                    _kw.get("point") or _kw.get("xy") or _kw.get("box") or _kw.get("bbox"))) else "status"
+            elif kind == "vision_pose":
+                _op = "pose" if _kw.get("image") else "status"
+            elif kind == "vision_track":
+                _op = "track" if _kw.get("frames") else (
+                    "update" if _kw.get("boxes") is not None else "status")
+        return _mod.run(str(_op), **_kw)
+    # UIA 控件树：真实实现是触手方法 omni_domain.domain_index（mixin，不是模块）。
+    # 2026-11-04 建位：vision_arsenal 的 uia_tree 原来把 kind 写成 `domain_index`，
+    # 那既不是能力位也不是模块名 —— 决策指向一个调不动的名字。收成一个正式位。
+    if kind == "semantic_match":
+        # 2026-11-04 吞入的中文语义模型（bge-small-zh / ONNX / 零 torch）。
+        # 只给参考候选，不拍板 —— 实测它在极短词上错得离谱（-47.6pp），
+        # 所以绝不能用它替代关键词路由。
+        from . import semantic_match as _sm
+        _kw = dict(payload or {})
+        _op = str(_kw.pop("op", None) or "match")
+        return _sm.run(_op, **_kw)
+    if kind == "route_ledger":
+        # 2026-11-04 建位：台账原本只有本文件内部 import —— 她问不了
+        # 「我说话你认不认得出」。注册成能力位后，大脑执行层能自己查账、
+        # 自己算缺口再动手（op=plan），而不是由外面写死一个常量。
+        from . import route_ledger as _rl
+        _kw = dict(payload or {})
+        _op = str(_kw.pop("op", None) or "stats")
+        return _rl.run(_op, **_kw)
+    if kind == "uia_tree":
+        # UIA 控件树：真实实现是触手方法 `omni_domain.domain_index`（mixin，不是模块）。
+        # 2026-11-04 建位：vision_arsenal 的 uia_tree 原来把 kind 写成 `domain_index` ——
+        # 那既不是能力位也不是模块名，等于「决策指向一个调不动的名字」。
+        # 唯一入口是 bridge.invoke()（不是 call()，别照名字猜）；它把 kwargs 直接透传给
+        # 方法签名，所以**只透传已知参数**，未知键如实回执，不静默吞。
+        from .tentacle import bridge as _tb
+        _kw = dict(payload or {})
+        _args = {}
+        for _k in ("max_windows", "control_depth"):
+            if _kw.get(_k) is not None:
+                try:
+                    _args[_k] = int(_kw[_k])
+                except (TypeError, ValueError):
+                    return {"ok": False, "kind": kind,
+                            "error": "%s 需要整数，收到 %r" % (_k, _kw.get(_k))}
+        _unknown = [k for k in _kw if k not in _args and k != "op"]
+        _r = _tb.invoke("domain_index", **_args)
+        if _unknown and isinstance(_r, dict):
+            _r.setdefault("ignored_params", _unknown)
+            _r.setdefault("ignored_note",
+                          "uia_tree 只接 max_windows / control_depth"
+                          "（触手方法 domain_index 的真实签名）")
+        return _r
     if kind == "chart_html":
         # 2026-10-17 注册：数据 -> 自包含交互 ECharts HTML（蒸馏自 smart-charts）
         from . import chart_html as _chart
@@ -3094,6 +3333,25 @@ def _run_task_core_body(kind, payload=None, stamp=True, probe=False):
             "note": decision.get("note"),
         }
 
+    # 2026-11-04：把「真实发生但不要票」的感官作用域落审计。
+    # 2026-11-01 主人令撤掉 desktop_control / audio_output / browser_control /
+    # device_control / network_private 的票之后，这些动作不再进 scopes ⇒
+    # 「谁动过键鼠、谁开过麦」在审计里**一个字都没有**（实测 vision_loop.act 只剩
+    # privacy_read 一条痕迹，desktop_control 凭空消失）。
+    # **撤票 ≠ 不记** —— 所以单记一条；只在有增量（observed 里有 scopes 之外的）时写，
+    # 免得给每次普通只读调用都刷一遍账。probe 同样豁免。
+    try:
+        if not _probe:
+            _dec = decision.get("decision")
+            _obs = list(getattr(_dec, "observed", ()) or decision.get("observed") or ())
+            _tkt = set(getattr(_dec, "scopes", ()) or ())
+            _free = [x for x in _obs if x not in _tkt]
+            if _free:
+                _audit("senses_recorded",
+                       {"kind": kind, "observed": _obs, "free": _free})
+    except Exception:                                           # noqa: BLE001
+        pass
+
     from . import preflight as _preflight
     force_requested = bool(payload.get("force") or payload.get("_force"))
     force = force_requested and bool(decision.get("trusted"))
@@ -3338,6 +3596,83 @@ def run_task(kind, payload=None, stamp=True, safe=False, probe=False):
                         str(_d.get('error') or '')[:200], _gate)
         except Exception:
             pass
+
+    # ── 路由台账（2026-11-04）：只记**带查询类字段**的直达调用。
+    # 为什么只记这些：audit.jsonl 已经记了「哪个能力被调」（实测 23996 次 / 53 个能力），
+    # 再记一遍 kind 是重复劳动；真正缺的是「人是怎么问的」⇒ 只捞 payload 里的查询文本。
+    # 旁路纪律：异常一律吞掉，绝不改变返回（改前 6 个能力的返回已录基线用于逐字对比）。
+    try:
+        # 🔴 2026-11-04：探针/实验不记账。理由同 router.py —— 跑一次批量实验
+        # 就能把台账灌满噪音，并让 stats 报出「假达标」。
+        import os as _os_probe
+        if (isinstance(payload, dict)
+                and _os_probe.environ.get("GBT_PROBE") not in ("1", "true", "yes")):
+            _hit_q = ""
+            # ⚠️ 2026-11-04 收紧：**只收「用户原话」形态的键**。
+            #   原来还收 `text` / `target`，结果是灾难性的：`text` 是
+            #   semantic_match / ocr 这类能力的**输入参数**（"要匹配的文本"），
+            #   `target` 是操作对象。测试时 {"op":"match","text":"画面上有几个人"}
+            #   里的那句是**被匹配对象**，却被当成"用户原话"记进台账，
+            #   又被当成种子种进捷径表 ⇒ 「画面上有几个人」直接被指向 semantic_match。
+            #   教训：**参数名长得像原话，不等于它承载原话。**
+            for _qk in ("query", "q", "prompt", "ask", "intent", "goal",
+                        "instruction", "message", "question", "request", "utterance"):
+                _qv = payload.get(_qk)
+                if not isinstance(_qv, str):
+                    continue
+                _qv = _qv.strip()
+                # 2~200 字；像路径的不算"人话"，不收（避免把一堆文件名灌进台账）
+                if 2 <= len(_qv) <= 200 and not any(c in _qv for c in ("\\", "/", ":", "=")):
+                    _hit_q = _qv
+                    break
+
+            # 🔴 2026-11-04 提速接线：payload 没带原话时，**自己回捞最近一次路由**。
+            # 现实流程是「用户说话 → router 判出 kind → 调 api(kind)」，原话在 router
+            # 那一侧，kind 在这一侧 —— 不接起来，chosen 永远空、台账永远攒不满，
+            # 而这件事不该由调用方改习惯来配合。
+            # 三道闸，防串号（宁可漏记也不记错）：
+            #   ① routed 必须与本次 kind 一致  ② 时差 ≤ 120s  ③ 原话长度合法
+            _q_src = "payload"
+            if not _hit_q:
+                try:
+                    import json as _j3, time as _t3
+                    # ⚠️ 用 _os_probe 而不是裸 os：本文件顶层**只 import 了 platform / time**，
+                    #   没有 `import os`。第一版这里写裸 os ⇒ NameError，被 except 静默吞掉，
+                    #   表现为「接线看起来做了、其实一条没记」。教训：函数内用到某个名字前，
+                    #   先确认它真的在作用域里，别照习惯写。
+                    _sp = _os_probe.path.join(
+                        _os_probe.path.dirname(_os_probe.path.dirname(
+                            _os_probe.path.abspath(__file__))),
+                        "state", "last_route.json")
+                    with open(_sp, "r", encoding="utf-8") as _f:
+                        _lr = _j3.load(_f)
+                    if (str(_lr.get("routed") or "") == str(kind)
+                            and (_t3.time() - float(_lr.get("ts") or 0)) <= 120.0):
+                        _cq = str(_lr.get("query") or "").strip()
+                        if 2 <= len(_cq) <= 200:
+                            _hit_q = _cq
+                            _q_src = "last_route"
+                except Exception as _e_lr:
+                    # 🔴 不许静默吞。第一版这里写的是 `pass`，结果它悄悄失败，
+                    # 我按行号追了五轮才定位到「异常发生在这里」——
+                    # 静默的 except 不是"稳健"，是把病历烧掉。
+                    _hit_q = ""
+                    _q_src = "lookup_failed:%s:%s" % (
+                        type(_e_lr).__name__, str(_e_lr)[:80])
+
+            if _hit_q:
+                from . import route_ledger as _rl
+                # 🔴 2026-11-04 修真 bug：原来把 kind 写进 **routed**，而 chosen 永远为空。
+                #   `export()` 只认 chosen ⇒ **数据一直在记，却一条都导不出来**。
+                #   而这里的 kind 是调用方明确要执行的能力 —— 它本来就是**真值**，
+                #   不是"路由猜的"（路由发生在 router.py，不在这里）。
+                #   写对字段后，已有的真原话立刻变成可用的 (query → 能力) 训练对，
+                #   不用等人再补 70 句。
+                _rl.record(_hit_q, routed=None, layer="DIRECT",
+                           chosen=str(kind), source="api",
+                           note=("原话回捞自 last_route" if _q_src == "last_route" else ""))
+    except Exception:
+        pass
     return _r
 
 

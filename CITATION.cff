@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "引用本作品时请使用以下信息（Citation for this work）"
 title: "GBT小土豆V8 总指挥大模型（GBTxiaotudouV8 Commander）"
 abstract: >-
-  一个把「指挥」练进权重里的 7.6B 中文模型：能说清 341 个原生能力位（30 个域）每一个是做什么的、
+  一个把「指挥」练进权重里的 7.6B 中文模型：能说清 427 个原生能力位（32 个域）每一个是做什么的、
   属于哪个域、调用要注意什么，并把自然语言需求落到具体能力位；对写盘/花钱/出网类动作要求先取得人工授权。
 type: software
 authors:

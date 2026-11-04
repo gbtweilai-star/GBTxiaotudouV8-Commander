@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_realtime video：本地手部视频 → 21 点 → IK → loopback 手。"""
 from __future__ import annotations
 

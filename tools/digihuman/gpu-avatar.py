@@ -160,7 +160,7 @@ def cmd_publish(a) -> int:
     up = subprocess.run(["wrangler", "r2", "object", "put", "%s/%s" % (R2_BUCKET, key),
                          "--file", str(src), "--remote", "--content-type", "video/mp4"],
                         capture_output=True, text=True, encoding="utf-8", errors="replace",
-                        env=env, shell=True)
+                        env=env, shell=False)
     ok = "Upload complete" in ((up.stdout or "") + (up.stderr or ""))
     url = "%s/%s" % (R2_PREFIX, key)
     print(json.dumps({"ok": ok, "url": url, "key": key,

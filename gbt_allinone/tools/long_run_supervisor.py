@@ -4,6 +4,7 @@
 外部调度器周期性调用 tick，工作者通过 claim/heartbeat/complete_step 推进。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -249,7 +250,7 @@ def tick(task_id: str, *, now: str = "") -> dict:
             "owner_action_required": state.get("owner_action_required", False)}
 
 
-def status(task_id: str = "", **_kwargs) -> dict:
+def status(task_id: str = "") -> dict:
     if task_id:
         return {"ok": True, "readonly": True, "task": _read(task_id)}
     tasks = []
@@ -312,4 +313,4 @@ def run(op: str = "status", **params: Any) -> dict:
     handler = handlers.get(op)
     if not handler:
         return {"ok": False, "error": f"unknown op: {op}"}
-    return handler(**params)
+    return _oc_call(handler, params)

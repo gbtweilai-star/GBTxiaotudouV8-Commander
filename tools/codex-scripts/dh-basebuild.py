@@ -18,7 +18,7 @@ import sys
 
 import bpy
 
-OUT = sys.argv[-1] if "--" in sys.argv else r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet\assets\digital-human\raw"
+OUT = sys.argv[-1] if "--" in sys.argv else str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet" / "assets" / "digital-human" / "raw")
 RIG_DIR = os.path.join(OUT, "rig")
 PHASE1 = os.path.join(OUT, "phase1")
 os.makedirs(RIG_DIR, exist_ok=True)

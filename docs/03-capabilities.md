@@ -1,44 +1,45 @@
-# 能力总表 · 共 385 位 / 30 个域
+# 能力总表 · 共 427 位 / 32 个域
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。机器可读版：[`data/capabilities.json`](../data/capabilities.json)。
 
-- **口径（两套数，不是一个数）**：本表 = **注册表现读**（385 位）；其中 7 位 `body_*`（`device` 域身体桥：see/say/open/click/type/map/volume，2026-10-24 之后补）**不在 2026-10-21 权重发布快照的 341 位之内**。README 与海报里的 **341 指那次发布**；两边不是打架，是时点不同。
-
-- **只读 300 位**：不改状态、不出网，可直接调用。
-- **改状态/出网 85 位**：会写盘、花钱或把数据发到外部服务 —— 必须先过人给的授权门。
+- **本表 = 注册表现读**：427 位（只读 339 / 需授权 88）。
+- **只读 339 位**：不改状态、不出网，可直接调用。
+- **改状态/出网 88 位**：会写盘、花钱或把数据发到外部服务 —— 必须先过人给的授权门。
 
 | 域 | 中文 | 位数 | 只读 | 需授权 | 详解 |
 |---|---|---|---|---|---|
-| `creation` | 创作 | 57 | 34 | 23 | [打开](capabilities/creation.md) |
-| `system` | 系统 | 56 | 50 | 6 | [打开](capabilities/system.md) |
-| `llm` | 大模型与大脑 | 42 | 34 | 8 | [打开](capabilities/llm.md) |
-| `security` | 安全 | 30 | 21 | 9 | [打开](capabilities/security.md) |
+| `system` | 系统 | 60 | 54 | 6 | [打开](capabilities/system.md) |
+| `creation` | 创作 | 58 | 35 | 23 | [打开](capabilities/creation.md) |
+| `llm` | 大模型与大脑 | 43 | 35 | 8 | [打开](capabilities/llm.md) |
+| `security` | 安全 | 34 | 25 | 9 | [打开](capabilities/security.md) |
 | `tentacle` | 触手（手眼网耳） | 30 | 22 | 8 | [打开](capabilities/tentacle.md) |
-| `mind` | 心智 | 21 | 20 | 1 | [打开](capabilities/mind.md) |
-| `pipeline` | 流水线与发布 | 18 | 18 | 0 | [打开](capabilities/pipeline.md) |
+| `mind` | 心智 | 27 | 26 | 1 | [打开](capabilities/mind.md) |
+| `device` | 设备 | 19 | 15 | 4 | [打开](capabilities/device.md) |
 | `recon` | 只读侦察 | 18 | 12 | 6 | [打开](capabilities/recon.md) |
-| `video` | 视频 | 16 | 7 | 9 | [打开](capabilities/video.md) |
+| `video` | 视频 | 18 | 9 | 9 | [打开](capabilities/video.md) |
+| `pipeline` | 流水线与发布 | 18 | 18 | 0 | [打开](capabilities/pipeline.md) |
+| `vision` | 视觉 | 13 | 12 | 1 | [打开](capabilities/vision.md) |
 | `data` | 数据 | 12 | 9 | 3 | [打开](capabilities/data.md) |
-| `device` | 设备 | 12 | 11 | 1 | [打开](capabilities/device.md) |
-| `engine` | 引擎（工作流/定时） | 11 | 10 | 1 | [打开](capabilities/engine.md) |
-| `tools` | 工具与改代码 | 9 | 7 | 2 | [打开](capabilities/tools.md) |
+| `engine` | 引擎（工作流/定时） | 12 | 11 | 1 | [打开](capabilities/engine.md) |
 | `integration` | 集成（飞书/Notion/CLI） | 11 | 7 | 4 | [打开](capabilities/integration.md) |
+| `tools` | 工具与改代码 | 9 | 7 | 2 | [打开](capabilities/tools.md) |
+| `voice` | 语音 | 7 | 7 | 0 | [打开](capabilities/voice.md) |
 | `devour` | 吞天（自我进化） | 6 | 6 | 0 | [打开](capabilities/devour.md) |
-| `vision` | 视觉 | 5 | 4 | 1 | [打开](capabilities/vision.md) |
 | `finance` | 财务 | 4 | 4 | 0 | [打开](capabilities/finance.md) |
 | `longrun` | 长程任务 | 4 | 4 | 0 | [打开](capabilities/longrun.md) |
-| `voice` | 语音 | 4 | 4 | 0 | [打开](capabilities/voice.md) |
+| `brain` | 梦境/闭环 | 4 | 4 | 0 | [打开](capabilities/brain.md) |
 | `project` | 项目测绘 | 3 | 3 | 0 | [打开](capabilities/project.md) |
+| `comms` | 通信 | 2 | 2 | 0 | [打开](capabilities/comms.md) |
 | `automation` | 浏览器自动化 | 2 | 1 | 1 | [打开](capabilities/automation.md) |
-| `brain` | 梦境/闭环 | 2 | 2 | 0 | [打开](capabilities/brain.md) |
 | `collab` | 协作（信息素场地） | 2 | 1 | 1 | [打开](capabilities/collab.md) |
 | `desktop` | 桌面智能体 | 2 | 1 | 1 | [打开](capabilities/desktop.md) |
 | `infra` | 基础设施（云电脑） | 2 | 2 | 0 | [打开](capabilities/infra.md) |
 | `social` | 社交发布 | 2 | 2 | 0 | [打开](capabilities/social.md) |
-| `comms` | 通信 | 1 | 1 | 0 | [打开](capabilities/comms.md) |
-| `framework` | 框架自省 | 1 | 1 | 0 | [打开](capabilities/framework.md) |
-| `image_video` | 图像/视频生成 | 1 | 1 | 0 | [打开](capabilities/image_video.md) |
+| `body_control` | — | 1 | 1 | 0 | [打开](capabilities/body_control.md) |
+| `ui` | — | 1 | 1 | 0 | [打开](capabilities/ui.md) |
 | `life` | 生命档案 | 1 | 1 | 0 | [打开](capabilities/life.md) |
+| `image_video` | 图像/视频生成 | 1 | 1 | 0 | [打开](capabilities/image_video.md) |
+| `framework` | 框架自省 | 1 | 1 | 0 | [打开](capabilities/framework.md) |
 
 ---
 

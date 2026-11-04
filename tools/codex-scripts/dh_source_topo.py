@@ -16,7 +16,7 @@ import sys
 
 import numpy as np
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 SRC = os.path.join(os.path.expanduser("~"), "Downloads", "futuristic cosplay outfit 3d model.glb")
 REPORT = os.path.join(WS, "projects", "digital-human", "out", "rig_report.json")
 OUT = os.path.join(WS, ".scratch", "dh_source_topo.json")

@@ -1,4 +1,4 @@
-﻿# gbt-capability: hand_bridge
+# gbt-capability: hand_bridge
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """hand_bridge — 灵巧手硬件桥（原生位 · 2026-11-01 蒸馏自 dexterous-hand 知识胶囊）。
 

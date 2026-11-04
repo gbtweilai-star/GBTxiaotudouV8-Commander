@@ -2,11 +2,11 @@
   "status": "user_error",
   "kind": "wf_run",
   "fingerprint": "55e9d0ae13f9d11731e81bf42ce654918a9952772f1d74d0724708d8b8d30d75",
-  "pid": 12904,
-  "started_at": 1793563517.630229,
-  "started_iso": "2026-11-02T03:05:17",
-  "finished_at": 1793563517.6388838,
-  "finished_iso": "2026-11-02T03:05:17",
+  "pid": 19412,
+  "started_at": 1793665275.1788013,
+  "started_iso": "2026-11-03T07:21:15",
+  "finished_at": 1793665275.1959424,
+  "finished_iso": "2026-11-03T07:21:15",
   "detail": {
     "error": "工作流不存在: （先 wf_define）"
   }

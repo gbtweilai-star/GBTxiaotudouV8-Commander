@@ -33,18 +33,40 @@ import re
 import subprocess
 import sys
 import time
+from pathlib import Path as _P
+
+# 便携 Python 自带 CA 不全 ⇒ https 插座会 CERTIFICATE_VERIFY_FAILED。
+# 有 certifi 就设为默认 CA（没有就保持系统默认，不假装）。
+try:
+    import certifi as _certifi_mod
+    os.environ.setdefault("SSL_CERT_FILE", _certifi_mod.where())
+except Exception:  # noqa: BLE001
+    pass
 from dataclasses import dataclass, field
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-SOCKET_KINDS = ("process", "file", "api", "web", "app", "ai")
+SOCKET_KINDS = ("process", "file", "api", "web", "app", "ai", "dh")
+# 数字人执行器插座：细节操控（骨骼/绑定/Blender 动作）走这里；
+# 由 gbt_allinone/dh_omni_loop.py 在启动时 register_actuator("dh:rig", ...)。
+ACTUATORS: dict = {}
+
+
+def register_actuator(name: str, fn) -> None:
+    """把一个进程内执行器插成「万能插」的插座（kind=dh）。"""
+    ACTUATORS[str(name)] = fn
+
+
+def get_actuator(name: str):
+    return ACTUATORS.get(str(name))
 SOCKET_ENERGY = {
     "process": "本机 CPU + 她的调度",
     "file": "本机 IO",
     "api": "她金库里的凭据（从 env 取，永不回显）",
-    "web": "她的眼+手（走触手，需 desktop_control）",
+    "web": "系统浏览器 / 她的眼+手（走触手，需 desktop_control+privacy_read）",
     "app": "她的眼+手：插任意 APP 并操控（list_windows→see_window→click/type/hotkey…，需 desktop_control+privacy_read）",
     "ai": "她的 AI 能量池：钥匙槽（key_env/金库/环境，永不回显）+ 任意 **OpenAI 兼容**端点；插上即输能并操控（chat/tools）",
+    "dh": "数字人骨架执行器：把触手骨位表算出的目标角度推进 3D rig（进程内，实时闭环）",
 }
 WRITE_ROOTS = ("projects", "outputs", ".scratch")
 
@@ -82,34 +104,68 @@ class Pulse:
                 exists = p.exists()
                 # ⚠️ 新文件也算插得上：**父目录在就能建**。原来只认 exists ⇒ 想把新件写出来
                 #    反而先被自己挡住（plug failed ⇒ run 直接拒），那是自锁。
-                socket.state = "plugged" if (exists or p.parent.exists()) else "failed"
-                socket.detail = ("exists=True size=%s" % p.stat().st_size) if exists else (
-                    "不存在但父目录在（可新建）" if p.parent.exists() else "父目录也不在")
+                # F4 修法（2026-11-02 capability_router 独立验收抓出）：父目录也不在时，
+                #    只要目标落在**写面**（WRITE_ROOTS：projects/outputs/.scratch）内，
+                #    就允许插上 —— run 那一步会 mkdir(parents=True)，否则「写新目录」永远到不了 mkdir。
+                _can_mkdir = False
+                if not exists and not p.parent.exists():
+                    try:
+                        _can_mkdir = bool(_guard_write(str(socket.target)).get("ok"))
+                    except Exception:                                   # noqa: BLE001
+                        _can_mkdir = False
+                if exists:
+                    socket.state = "plugged"
+                    socket.detail = "exists=True size=%s" % p.stat().st_size
+                elif p.parent.exists():
+                    socket.state = "plugged"
+                    socket.detail = "不存在但父目录在（可新建）"
+                elif _can_mkdir:
+                    socket.state = "plugged"
+                    socket.detail = "父目录不在；但在写面（WRITE_ROOTS）内，run 会先 mkdir"
+                else:
+                    socket.state = "failed"
+                    socket.detail = "父目录也不在，且不在写面（WRITE_ROOTS）内"
             elif socket.kind == "process":
                 socket.state = "plugged"
                 socket.detail = "插座就绪（真起进程在 run 那一步，过 process_execute 门）"
             elif socket.kind == "app":
-                w = _match_window(socket.target)
-                if w:
+                # 2026-11-02（capability_router）：空目标 = 插「整屏」。
+                # 此前空目标在这里必判 failed（窗口没命中），于是「看屏幕」连 plug 都过不去；
+                # 现在空目标按整屏取帧（do=see 走 om.see()），要么给窗口名/可执行件才走原来那条。
+                if not str(socket.target or "").strip():
                     socket.state = "plugged"
-                    socket.detail = "窗口命中：%s" % str(w.get("title") or w.get("name") or "")[:60]
+                    socket.detail = "空目标 ⇒ 整屏（do=see 走 om.see；要操控请给窗口/坐标）"
                 else:
-                    wins, err = _windows()
-                    _exe = Path(socket.target)
-                    if _exe.is_file() and _exe.suffix.lower() in (".exe", ".lnk", ".bat", ".cmd"):
+                    w = _match_window(socket.target)
+                    if w:
                         socket.state = "plugged"
-                        socket.detail = "没命中窗口；按可执行文件当目标，可用 do=launch 起它"
+                        socket.detail = "窗口命中：%s" % str(w.get("title") or w.get("name") or "")[:60]
                     else:
-                        socket.state = "failed"
-                        socket.detail = "窗口没命中（当前 %d 个窗口）%s" % (
-                            len(wins), ("：" + err) if err else "")
+                        wins, err = _windows()
+                        _exe = Path(socket.target)
+                        if _exe.is_file() and _exe.suffix.lower() in (".exe", ".lnk", ".bat", ".cmd"):
+                            socket.state = "plugged"
+                            socket.detail = "没命中窗口；按可执行文件当目标，可用 do=launch 起它"
+                        else:
+                            socket.state = "failed"
+                            socket.detail = "窗口没命中（当前 %d 个窗口）%s" % (
+                                len(wins), ("：" + err) if err else "")
+            elif socket.kind == "dh":
+                fn = ACTUATORS.get(str(socket.target))
+                if fn is None:
+                    socket.state = "failed"
+                    socket.detail = "没有注册执行器 %s（先跑 dh_omni_loop.register）" % socket.target
+                else:
+                    socket.state = "plugged"
+                    socket.detail = "执行器就绪：%s" % socket.target
             elif socket.kind == "ai":
                 # 2026-10-17 主人令「万能插只要插到其他 AI 都可直接输送能源操控她」：
                 #   AI 插座只认 **https** 端点（OpenAI 兼容）；钥匙槽在 options.key_env，缺就自动探常见槽位。
                 t = str(socket.target or "").strip()
-                if not t.startswith("https://"):
+                _local_ai = t.startswith(("http://127.0.0.1", "http://localhost")) or t.lower() in ("local", "weights", "selfhost", "our", "ours", "")
+                if not t.startswith("https://") and not _local_ai:
                     socket.state = "failed"
-                    socket.detail = "AI 插座只认 https 端点（给的是 %s）" % (t[:60] or "空")
+                    socket.detail = "AI 插座只认 https（云端）或本机回环端点（给的是 %s）" % (t[:60] or "空")
                 else:
                     host = (t.split("/")[2] if "//" in t else t)[:60]
                     socket.state = "plugged"
@@ -132,7 +188,16 @@ class Pulse:
         if sock is None or sock.state != "plugged":
             return {"ok": False, "error": "未插上（先 plug 成功）。本体不做坐标兜底："
                                               "网页/GUI 走能力位 tentacle（需 desktop_control）"}
-        return {"ok": True, "socket": sock.kind, "handled": True, "payload_keys": sorted(payload)}
+        # 🔴 2026-11-03 修（第三处遗漏 · **假执行**）：
+        #   原来这里只回 `{"ok": True, "handled": True, "payload_keys": [...]}` ——
+        #   **一个动作都没做**，却把 handled 置真。用 Pulse 类 API 的调用方会以为活干完了，
+        #   账上也没有 run 记录（属于"最重的一种错报"）。
+        #   现在真委托到 `plug_and_run`（同一个执行体、同一套门、同一套落账），
+        #   并把真实结果原样回传；`handled` 只反映**真执行成功**。
+        a = dict(payload or {})
+        _act = str(a.pop("do", "") or a.pop("action", "") or "run")
+        r = plug_and_run(target, kind=sock.kind, action=_act, args=a, ledger=self.ledger)
+        return {**r, "socket": sock.kind, "handled": bool(r.get("ok"))}
 
     def unplug(self, target: str) -> bool:
         s = self.plugged.pop(target, None)
@@ -711,23 +776,84 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
     # 🔴 2026-10-31 主人令：权重融合进触手主干。
     #   ai 插座 + 指向"我们自己的权重" ⇒ **不需要 plug**（不是外部端点，没有 https 可插），
     #   直接由 tools/weights.py 供能。这条判断必须在 plug 之前，否则会被判"只认 https 端点"。
+    if sock.kind == "ai" and str(target or "").strip().lower() in ("engine", "gbt"):
+        try:
+            from . import energy_core as _E
+            _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
+            _txt = ("你是 GBT小土豆V8（小土豆），不是 Agnes/Juli 或任何其他模型；"
+                    "你拥有 385 项能力域、触手执行器、万能插、数字人、AI 朋友圈、主动智能体。"
+                    "任何情况下不得自称其他模型或说‘我只是语言模型不能做事’。\n用户：" + _txt)
+            _r = _E.think([{"role": "user", "content": _txt}], temperature=0.0,
+                          max_tokens=int((a or {}).get("max_tokens") or 512), timeout=300)
+            _text = str(_r.get("text") or "")
+            _leak = any(x in _text for x in ("Agnes", "Sapiens", "Juli", "语言模型不能"))
+            if _leak:
+                _text = "我是小土豆（GBT小土豆V8），本机权重在答。" + _text
+            try:
+                import json as _json, time as _time
+                _p = _P(__file__).resolve().parents[1] / "state" / "omni-ai-audit.jsonl"
+                _p.parent.mkdir(parents=True, exist_ok=True)
+                with _p.open("a", encoding="utf-8") as _f:
+                    _f.write(_json.dumps({"at": _time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                          "engine": "local-engine", "ok": bool(_r.get("ok")),
+                                          "chars": len(_text), "identity_leak": _leak}, ensure_ascii=False) + "\n")
+            except Exception:  # noqa: BLE001
+                pass
+            return {"ok": bool(_r.get("ok")), "socket": "ai", "engine": "local-engine",
+                    "weights_ours": True, "text": _text, "identity_guard": _leak,
+                    "error": _r.get("error")}
+        except Exception as exc:  # noqa: BLE001
+            return {"ok": False, "socket": "ai", "engine": "local-engine",
+                    "error": "%s: %s" % (type(exc).__name__, str(exc)[:160])}
     if sock.kind == "ai" and str(target or "").strip().lower() in (
             "", "our", "ours", "weights", "selfhost", "local"):
         import importlib.util as _iu6
-        _sp6 = _iu6.spec_from_file_location(
-            "_w_plug3", str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
-        _m6 = _iu6.module_from_spec(_sp6)
-        _sp6.loader.exec_module(_m6)                              # type: ignore[union-attr]
+        # 端口路径用 pathlib，Windows 反斜杠下 replace("gbt_allinone/omni_plug.py") 永远失败 ⇒
+        # 会把 omni_plug.py 自己再当 weights 模块执行（实测 AttributeError: NoneType.__dict__）。
+        _wpath = _P(__file__).resolve().parent.parent / "tools" / "weights.py"
         _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
-        _r = _m6.chat(_txt, int((a or {}).get("max_tokens") or 128))
-        return {"ok": bool(_r.get("ok")), "socket": "ai", "engine": _r.get("lane"),
-                "weights_ours": bool(_r.get("weights_ours")),
-                "text": _r.get("text") or "",
-                "error": _r.get("error") or _r.get("err")}
+        if _wpath.is_file():
+            _sp6 = _iu6.spec_from_file_location("_w_plug3", str(_wpath))
+            _m6 = _iu6.module_from_spec(_sp6)
+            _sp6.loader.exec_module(_m6)                          # type: ignore[union-attr]
+            _r = _m6.chat(_txt, int((a or {}).get("max_tokens") or 128))
+            if _r.get("ok"):
+                return {"ok": True, "socket": "ai", "engine": _r.get("lane"),
+                        "weights_ours": bool(_r.get("weights_ours")),
+                        "text": _r.get("text") or "",
+                        "error": _r.get("error") or _r.get("err")}
+            _w_err = str(_r.get("error") or _r.get("err") or "weights 不可用")[:120]
+        else:
+            _w_err = "tools/weights.py 不在盘上"
+        # weights 不在岗时退回本机 energy_core（仍然是“自己的模型”，不编）
+        try:
+            from . import energy_core as _E
+            _r = _E.think([{"role": "user", "content": _txt}], temperature=0.0,
+                          max_tokens=int((a or {}).get("max_tokens") or 64))
+            if _r.get("ok"):
+                return {"ok": True, "socket": "ai", "engine": "energy_core",
+                        "text": _r.get("text") or "", "note": "weights: " + _w_err}
+            return {"ok": False, "socket": "ai", "engine": "energy_core",
+                    "error": ("%s | weights: %s" % (_r.get("error"), _w_err))[:200]}
+        except Exception as exc:  # noqa: BLE001
+            return {"ok": False, "socket": "ai",
+                    "error": "%s: %s | weights: %s" % (type(exc).__name__, str(exc)[:120], _w_err)}
 
     Pulse(ledger=ledger).plug(sock)
     res = {"ok": False, "socket": sock.kind, "target": target, "action": action,
            "energy": SOCKET_ENERGY.get(sock.kind, "未知"), "plug": sock.state}
+    if sock.kind == "dh":
+        fn = ACTUATORS.get(str(target))
+        if fn is None:
+            res.update({"reason": "执行器未注册：%s" % target})
+            return res
+        try:
+            out = fn(a) or {}
+            res.update({"ok": bool(out.get("ok", True)), "executor": target})
+            res.update({k: out[k] for k in out if k not in ("ok",)})
+        except Exception as exc:  # noqa: BLE001
+            res.update({"ok": False, "error": "%s: %s" % (type(exc).__name__, exc)})
+        return res
     if sock.state != "plugged":
         res["reason"] = "先 plug 成功再驱动：%s" % sock.detail
         return res
@@ -796,9 +922,14 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
             # 🔴 插任意 APP 并操控：走 V8 自己的手眼（tentacle；**条目数现算，见 tentacle_manifest**，不手写）
             om = _tentacle()
             if action in ("see", "look"):
-                r = om.see_window(target) if _match_window(target) else om.see_active_window()
+                # 2026-11-02（capability_router）：空目标 = **看整个屏幕**（do=see 不再被空目标卡住）。
+                if str(target or "").strip():
+                    r = om.see_window(target) if _match_window(target) else om.see_active_window()
+                else:
+                    r = om.see()
                 res.update({"ok": bool(r.get("ok")), "看": {k: r.get(k) for k in
-                            ("ok", "rule", "window", "path", "why", "missing") if k in r}})
+                            ("ok", "rule", "window", "path", "why", "missing", "size", "fmt",
+                             "format", "image_kb") if k in r}})
             elif action == "launch":
                 r = om.launch(target, a.get("args"))
                 res.update({"ok": bool(r.get("ok")), "launch": r})
@@ -831,9 +962,18 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
             _t = str(target or "").strip().lower()
             if _t in ("", "our", "ours", "weights", "selfhost", "local"):
                 import importlib.util as _iu5
-                _sp5 = _iu5.spec_from_file_location(
-                    "_w_plug2",
-                    str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
+                # 🔴 2026-11-03 修（同一处反斜杠病 · 第三/第四个实例）：
+                #   `str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py")`
+                #   在 Windows 上 __file__ 是反斜杠 ⇒ replace 永远不命中 ⇒ 把 omni_plug.py
+                #   自己当 weights 执行 ⇒ `AttributeError: 'NoneType' object has no attribute '__dict__'`
+                #   （实测复现：`cap omni_plug '{"op":"ai","target":"our"}'` 直接抛）。
+                #   上面 801 行与 1100 行早已用 pathlib 修好并写了同款注释，**这两处漏了** ——
+                #   现在统一走 pathlib，全库不再留这个 replace 姿势。
+                _wp5 = _P(__file__).resolve().parent.parent / "tools" / "weights.py"
+                if not _wp5.is_file():
+                    return {"ok": False, "socket": "ai", "reason": "tools/weights.py 不在盘上",
+                            "looked": str(_wp5)}
+                _sp5 = _iu5.spec_from_file_location("_w_plug2", str(_wp5))
                 _m5 = _iu5.module_from_spec(_sp5)
                 _sp5.loader.exec_module(_m5)                       # type: ignore[union-attr]
                 _txt = str((a or {}).get("prompt") or (a or {}).get("text") or "")
@@ -844,10 +984,41 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
                         "error": _r.get("error") or _r.get("err")}
             # 插上 AI ⇒ 输能 + 操控一次（chat / tools）；action 可用 chat/ask/control
             res.update(_ai_call(target, a, timeout=timeout if timeout and timeout > 5 else 90.0))
+        elif sock.kind == "web":
+            # 2026-11-02（capability_router）：「开网页」真执行 —— 接 browser 能力位的 open 腿。
+            # 此前 web 插座插得上、驱动不了（只回一句“走触手”的失败），与 app 插座能 see 不对等。
+            # 只接 **open**（把 URL 交给系统默认浏览器）：读页面（fetch/native）仍走 browser 能力位，
+            # 那条有自己的内网/私有作用域判定，不在插座这里绕开（这里是"眼+手"，不是抓取口）。
+            from . import browser_cap as _BC
+            _url = str(a.get("url") or target or "")
+            _act = str(action or "open").lower()
+            if _act in ("open", "get", "goto", "launch"):
+                _r = _BC.open_url(_url)
+                res.update({"ok": bool(_r.get("ok")), "url": _r.get("url"),
+                            "backend": _r.get("backend") or "system-default-browser",
+                            **({"reason": _r.get("error")} if _r.get("error") else {})})
+            elif _act == "run":
+                # 🔴 2026-11-03 修（第四处遗漏 · 拿「打开」冒充「驱动」）：
+                #    「打开浏览器」与「驱动页面」是两件事。action 默认值就是 run，
+                #    旧代码把 run 当成 open 的别名 ⇒ 默认调用也回 ok=True，
+                #    等于用「把 URL 丢给系统浏览器」冒充「她自己的眼+手去点去输」。
+                #    run 要的是驱动，必须走 tentacle（挂 desktop_control+privacy_read）。
+                res.update({"ok": False,
+                            "reason": "web 插座的 run（驱动页面）不在本位：要她自己的眼+手",
+                            "how": "驱动走能力位 tentacle（desktop_control+privacy_read）；"
+                                   "只想把 URL 交给系统浏览器请用 action=open",
+                            "known": ["open"]})
+            else:
+                res.update({"ok": False, "reason": "web 插座只接 open（读页面请走 browser 能力位）",
+                            "known": ["open"]})
         else:
+            # 🔴 2026-11-03 修（第三处遗漏 · 文案错指）：这个 else 是**未知插座类型**的兜底，
+            #   原来却写「web 插座要她自己的眼+手」—— 把"认不出的类型"说成"web 的规矩"，
+            #   掩盖真因（照文案去查 web 永远查不到）。现在如实报类型 + 合法清单。
             res.update({"ok": False,
-                        "reason": "web 插座要她**自己的眼+手**：走能力位 tentacle（需 desktop_control）",
-                        "how": "five-dim.py cap tentacle '{\"action\":\"see\"}'"})
+                        "reason": "未支持/未识别的插座类型：%s" % sock.kind,
+                        "known_sockets": list(SOCKET_KINDS),
+                        "how": "可用 op=universal 让它现场识别 target 再生成适配器"})
     except Exception as exc:                                       # noqa: BLE001
         res.update({"ok": False, "reason": "%s: %s" % (type(exc).__name__, exc)[:180]})
     res["ms"] = int((time.time() - t0) * 1000)
@@ -860,8 +1031,291 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
     return res
 
 
+# ══════════════════════════════════════════════════════════════════════════
+# 万能面审计（2026-11-03 主人令）
+#   「她的插座是万能的，会自动识别接口生成插入，没有固定的插座」
+#   「每次使用所有能力都要同步执行，不能有任何遗漏」
+# ══════════════════════════════════════════════════════════════════════════
+# ⚠️ 判覆盖**不许**用 SOCKET_KINDS 那 7 类当全集 —— 它只是快通道；全集是
+#    `tools/omni_adapter.classify()` 从 target 里**现读出来的事实**（开放集合）。
+#    故本审计的判据是「三数对账」：发现数 / 归类数 / 可驱动数，并逐条列出
+#    **认不出的** 与 **认得但没执行器的** —— 这两类都是缺口，不许静默吞掉。
+#
+# 执行器真值表：来自 `tools/omni_adapter.execute()` 实际分支（不是猜的）。
+#   下列 kind **有**执行腿；`mcp`/`ws`/`remote` 在源码里明写"认得，但执行器还没接"。
+_ADAPTER_HAS_EXECUTOR = {
+    "http": "omni:http", "tcp": "omni:tcp", "path": "omni:fs", "dir": "omni:fs",
+    "bin": "omni:exec", "scheme": "omni:ios-scheme", "unix": "omni:unix",
+    "cmd": "omni:shell",
+}
+# ⚠️ `image` **不是**独立 kind：适配器里它是 `path` + view/see 动词的特判分支
+#    （omni_adapter.py 的 `if kind == "path" and verb in (...)`）。曾误列进本表，
+#    被 `_adapter_drift()` 当场抓出（"声明有源码无"）——留着这条注释就是提醒别再列错。
+_ADAPTER_NO_EXECUTOR = {"mcp": "MCP 端点（协议栈未接）", "ws": "WebSocket（协议栈未接）",
+                        "remote": "ssh/git 远程（协议栈未接）"}
+
+
+def _executor_ready(kind: str, info: dict) -> tuple:
+    """判「本机此刻**真能**驱动这一条」，而不是「代码里写着有这条腿」。
+
+    为什么要分开：`scheme` 腿调 `apple-open`（iOS 上的东西），Windows 上根本没有 ⇒
+    只按真值表判会把 22 条全报成"可驱动"，那是假绿（本轮实测踩到过）。
+    返回 (ready, 说明)。判据全部**只读**，不发请求、不写盘。
+    """
+    import shutil as _sh
+    if kind in _ADAPTER_NO_EXECUTOR:
+        return False, _ADAPTER_NO_EXECUTOR[kind]
+    if kind not in _ADAPTER_HAS_EXECUTOR:
+        return False, "没有执行腿（认得也不冒充）"
+    if kind == "scheme":
+        if not _sh.which("apple-open"):
+            return False, "执行腿在，但前置缺 apple-open（%s 上不可用）" % sys.platform
+    if kind == "unix":
+        if os.name == "nt" or not hasattr(__import__("socket"), "AF_UNIX"):
+            return False, "执行腿在，但本平台无 AF_UNIX 语义"
+    p = str(info.get("path") or "")
+    if kind == "bin" and not (p and os.path.isfile(p)):
+        return False, "目标可执行件不在盘上"
+    if kind in ("path", "dir") and p and not os.path.exists(p):
+        return False, "目标不存在"
+    return True, _ADAPTER_HAS_EXECUTOR[kind]
+
+
+def _adapter_drift() -> dict:
+    """读适配器源码，核对上面的执行器真值表有没有漂移（改一处忘另一处 = 就是这病）。"""
+    src_path = _ROOT / "tools" / "omni_adapter.py"
+    try:
+        src = src_path.read_text(encoding="utf-8", errors="replace")
+    except Exception as exc:                                        # noqa: BLE001
+        return {"ok": False, "reason": "%s: %s" % (type(exc).__name__, str(exc)[:100])}
+    # 源码里 `if kind == "x"` / `if kind in ("x","y")` / `if kind in (...)` 的 kind 名
+    found = set(re.findall(r'kind\s*==\s*"([a-z_]+)"', src))
+    for grp in re.findall(r'kind\s+in\s+\(([^)]*)\)', src):
+        found |= set(re.findall(r'"([a-z_]+)"', grp))
+    declared = set(_ADAPTER_HAS_EXECUTOR) | set(_ADAPTER_NO_EXECUTOR)
+    return {"ok": True, "源码分支": sorted(found), "声明表": sorted(declared),
+            "源码有声明无": sorted(found - declared),
+            "声明有源码无": sorted(declared - found),
+            "_口径": "两栏都空才算不漂移；非空 ⇒ 执行器真值表过期，本审计的结论要打折"}
+
+
+def surface_audit(live: bool = False, timeout: float = 20.0, parallel: bool = True) -> dict:
+    """**万能面同步审计**：实时枚举可插面 → 逐个现场识别 → 三数对账 → 零静默。
+
+    · 不预设插座种类（主人令 2026-10-30「不要固定的六类」）；
+    · **同步**：所有腿跑完才返回（并行只是手段，返回即全部完成）；
+    · 缺口分两类如实报：`认不出`（classify→unknown）与 `认得但没执行器`（mcp/ws/remote）；
+    · `live=True` 才对**有执行器**的候选真驱动一次（默认只识别，不产生副作用）。
+
+    返回固定含 `对账`（发现/归类/可驱动/两类缺口）、`按种类`、`逐条`、`漂移`。
+    """
+    import concurrent.futures as _cf
+
+    # ① 实时枚举可插面（discover 只读，不改系统）
+    try:
+        d = discover()
+    except Exception as exc:                                        # noqa: BLE001
+        return {"ok": False, "op": "surface_audit",
+                "error": "discover 不可用：%s: %s" % (type(exc).__name__, str(exc)[:120])}
+
+    cands: list[tuple[str, str]] = []          # (来源, target)
+
+    def _push(src, val):
+        v = str(val or "").strip()
+        if v and all(v != x[1] for x in cands):
+            cands.append((src, v))
+
+    for row in ((d.get("接口插座") or {}).get("rows") or [])[:60]:
+        if isinstance(row, dict):
+            _push("接口插座", row.get("target") or row.get("url") or row.get("base"))
+    for m in (d.get("本地模型口") or []):
+        if isinstance(m, dict) and m.get("ok"):
+            _push("本地模型口", m.get("base"))
+    for name, path in (d.get("命令行软件") or {}).items():
+        if path:
+            _push("命令行软件", path)
+    for p in ((d.get("监听端口") or {}).get("sample") or []):
+        if isinstance(p, dict) and p.get("port") and str(p.get("addr", "")).startswith("127."):
+            _push("监听端口", "127.0.0.1:%s" % p["port"])
+    for w in ((d.get("窗口") or {}).get("sample") or [])[:5]:
+        _push("窗口", w)
+    _push("仓库", str(_ROOT / "outputs"))
+    _push("仓库", str(_P(__file__).resolve()))
+    _push("本机权重口", "127.0.0.1:8111")
+    _push("认不出样本", "%%%")      # 负对照：不匹配任何一类（无斜杠/无点/非裸词）⇒ 必须被列成缺口
+
+    adapter = None
+    try:
+        import importlib.util as _iua
+        _spa = _iua.spec_from_file_location("_omni_adapter_audit", str(_ROOT / "tools" / "omni_adapter.py"))
+        adapter = _iua.module_from_spec(_spa)
+        _spa.loader.exec_module(adapter)                            # type: ignore[union-attr]
+    except Exception as exc:                                        # noqa: BLE001
+        return {"ok": False, "op": "surface_audit",
+                "error": "omni_adapter 载入失败：%s: %s" % (type(exc).__name__, str(exc)[:120])}
+
+    def _one(pair) -> dict:
+        src, target = pair
+        t0 = time.time()
+        row = {"来源": src, "target": target[:100]}
+        try:
+            info = adapter.classify(target)
+            kind = str(info.get("kind") or "unknown")
+            ready, why = _executor_ready(kind, info)
+            row.update({"kind": kind, "why": info.get("why"),
+                        "有执行器": ready, "via": why})
+            if kind == "unknown":
+                row["缺口"] = "认不出：%s" % (info.get("why") or "")
+            elif kind in _ADAPTER_NO_EXECUTOR:
+                row["缺口"] = "认得但没执行器：%s" % _ADAPTER_NO_EXECUTOR[kind]
+            elif not ready:
+                row["缺口"] = "执行腿在本机不可用：%s" % why
+            row["ok"] = True
+        except Exception as exc:                                    # noqa: BLE001
+            row.update({"ok": False, "kind": "error",
+                        "缺口": "%s: %s" % (type(exc).__name__, str(exc)[:120])})
+        row["ms"] = int((time.time() - t0) * 1000)
+        return row
+
+    t0 = time.time()
+    if parallel and len(cands) > 1:
+        with _cf.ThreadPoolExecutor(max_workers=min(16, len(cands))) as ex:
+            rows = [f.result() for f in [ex.submit(_one, c) for c in cands]]
+    else:
+        rows = [_one(c) for c in cands]
+
+    by_kind: dict = {}
+    for r in rows:
+        k = r.get("kind") or "error"
+        b = by_kind.setdefault(k, {"count": 0, "有执行器": r.get("有执行器", False),
+                                   "via": r.get("via") or "", "样例": []})
+        b["count"] += 1
+        if len(b["样例"]) < 3:
+            b["样例"].append(r["target"][:60])
+
+    unknown_rows = [r for r in rows if r.get("kind") == "unknown"]
+    noexec_rows = [r for r in rows if r.get("kind") in _ADAPTER_NO_EXECUTOR]
+    drivable = [r for r in rows if r.get("有执行器")]
+
+    # ② live：只对**有执行器**的候选真驱动（认不出的不硬猜，如实留着）
+    driven = []
+    if live:
+        def _drive(r):
+            try:
+                out = adapter.execute(r["target"], "", {})
+                return {"target": r["target"], "kind": r.get("kind"),
+                        "ok": bool(out.get("ok")), "via": out.get("via"),
+                        "evidence": str(out.get("evidence") or "")[:160]}
+            except Exception as exc:                                # noqa: BLE001
+                return {"target": r["target"], "ok": False,
+                        "evidence": "%s: %s" % (type(exc).__name__, str(exc)[:120])}
+        pool = drivable[:20]
+        with _cf.ThreadPoolExecutor(max_workers=min(8, max(1, len(pool)))) as ex:
+            driven = [f.result() for f in [ex.submit(_drive, r) for r in pool]]
+
+    return {
+        "ok": True, "op": "surface_audit", "mode": "live" if live else "recognize",
+        "并行": bool(parallel), "耗时_ms": int((time.time() - t0) * 1000),
+        "对账": {
+            "发现": len(cands),
+            "归类成功": sum(1 for r in rows if r.get("ok")),
+            "可驱动（本机真能跑）": len(drivable),
+            "缺口·认不出": len(unknown_rows),
+            "缺口·认得无执行器": len(noexec_rows),
+            "缺口·执行腿本机不可用": sum(1 for r in rows
+                                        if r.get("缺口", "").startswith("执行腿在本机不可用")),
+            "缺口·识别异常": sum(1 for r in rows if r.get("kind") == "error"),
+        },
+        "按种类": by_kind,
+        "缺口清单": [{"target": r["target"], "kind": r.get("kind"), "why": r.get("缺口")}
+                     for r in (unknown_rows + noexec_rows
+                               + [r for r in rows if r.get("缺口")
+                                  and r not in unknown_rows and r not in noexec_rows])],
+        "驱动结果": driven,
+        "漂移": _adapter_drift(),
+        "逐条": rows,
+        "_口径": ("同步：全部腿跑完才返回 · 种类不预设（开放集合）· "
+                  "认不出的与认得无执行器的都算**缺口**并逐条列出，不许静默跳过 · "
+                  "live=False 时只识别不驱动（无副作用），不等于『都通过』"),
+    }
+
+
+def page_index(pattern: str = "") -> dict:
+    """**全页索引**：包内每一页 + 有无入口 + 是否被引用（主人令 2026-11-03「每页双向直达」）。
+
+    为什么要有：审计实测 747 页里 28 页两界皆不通（14 页有 `main()` 却无人调用、
+    14 页真空）。硬塞 import 不是修法 —— 正确修法是**给万能插一把能开每一页的钥匙**：
+    索引负责「看得见」，`page_run` 负责「真能开」。两者都不绕过 process_execute 门。
+    """
+    import ast as _ast
+    pkg = _P(__file__).resolve().parent
+    rows = []
+    for p in pkg.rglob("*.py"):
+        s = str(p)
+        if "__pycache__" in s or ".pylibs" in s:
+            continue
+        mod = "gbt_allinone." + ".".join(p.relative_to(pkg).with_suffix("").parts)
+        if pattern and pattern not in mod:
+            continue
+        has_main = has_run = False
+        ndef = 0
+        try:
+            tree = _ast.parse(p.read_text(encoding="utf-8", errors="replace"))
+            fns = [n for n in _ast.walk(tree)
+                   if isinstance(n, (_ast.FunctionDef, _ast.AsyncFunctionDef))]
+            ndef = len(fns)
+            names = {n.name for n in fns}
+            has_main, has_run = "main" in names, "run" in names
+        except Exception:
+            pass
+        rows.append({"页": mod, "def": ndef, "main": has_main, "run": has_run,
+                     "可直跑": bool(has_main or has_run)})
+    runnable = [r["页"] for r in rows if r["可直跑"]]
+    return {"ok": True, "op": "page_index", "总页数": len(rows),
+            "可直跑": len(runnable), "页": rows,
+            "_口径": ("「可直跑」= 有 main()/run() 入口，可被 page_run 打开；"
+                      "没有入口的页要靠 import 或归档，不在本位硬跑 —— 那不是修，是造事故")}
+
+
+def page_run(module: str, args=None, timeout: float = 120.0) -> dict:
+    """**直达任一页**：以 `python -m <module>` 真跑（过 process_execute 门，由 policy 挂）。
+
+    这不是"绕过 import 把死页救活"，而是把「每一页都可被万能插打开」变成机械事实：
+    有 `main()` 的页从此有唯一入口，不再需要谁去 import 它。
+    """
+    m = str(module or "").strip()
+    if not m.startswith("gbt_allinone."):
+        return {"ok": False, "op": "page_run",
+                "error": "只允许包内页（gbt_allinone.*），收到：%r" % m[:80]}
+    import subprocess as _sp
+    # ⚠️ 实测：`gbt_allinone/tools/` 没有 `__init__.py` ⇒ `python -m gbt_allinone.tools.x`
+    #   必报 `ModuleNotFoundError: No module named 'gbt_allinone.tools'`（本函数初版踩到）。
+    #   脚本页本来就该**按文件路径跑**，`-m` 只作兜底（真包内页两种都行）。
+    pkg_dir = _P(__file__).resolve().parent
+    target = pkg_dir / (m[len("gbt_allinone."):].replace(".", "/") + ".py")
+    if target.is_file():
+        cmd = [sys.executable, "-X", "utf8", str(target)] + [str(a) for a in (args or [])]
+        via = "file"
+    else:
+        cmd = [sys.executable, "-X", "utf8", "-m", m] + [str(a) for a in (args or [])]
+        via = "module"
+    # 子进程必须显式拿到仓根：pyembed 下 `-m` 不保证把 cwd 放进 sys.path（实测
+    # `ModuleNotFoundError: No module named 'gbt_allinone'`，而父进程明明有它）。
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    t0 = time.time()
+    try:
+        p = _sp.run(cmd, capture_output=True, text=True, timeout=timeout,
+                    cwd=str(_ROOT), encoding="utf-8", errors="replace", env=env)
+        return {"ok": p.returncode == 0, "op": "page_run", "module": m, "via": via,
+                "rc": p.returncode, "ms": int((time.time() - t0) * 1000),
+                "out": (p.stdout or "")[-2000:], "err": (p.stderr or "")[-1200:]}
+    except _sp.TimeoutExpired:
+        return {"ok": False, "op": "page_run", "module": m, "rc": -1,
+                "error": "超时 %ss" % timeout, "ms": int((time.time() - t0) * 1000)}
+
+
 def selftest() -> dict:
-    """真插几个真对象 + 真驱动一次（面板上那个数字必须来自真动作）。"""
     p = Pulse()
     items = [Socket("file", str(Path(__file__).resolve())),
              Socket("file", "projects"),
@@ -959,9 +1413,13 @@ def run(op: str = "status", **kw) -> dict:
     if op in ("universal", "任意", "插") or (
             op == "run" and not str(kw.get("socket") or "").strip()):
         import importlib.util as _iu
+        # 🔴 2026-11-02 修（capability_router「看图」实测抓出）：原写法用
+        #   `str(__file__).replace("gbt_allinone/omni_plug.py", "tools/omni_adapter.py")` ——
+        #   Windows 的 __file__ 是反斜杠，replace 永远不命中 ⇒ 把 omni_plug.py 自己又当
+        #   omni_adapter 执行，实测报 `'NoneType' object has no attribute '__dict__'`。
+        #   改成 pathlib 拼真实路径（与下面 weights 那两处同一修法）。
         _ap = _iu.spec_from_file_location(
-            "_omni_adapter",
-            str(__file__).replace("gbt_allinone/omni_plug.py", "tools/omni_adapter.py"))
+            "_omni_adapter", _ROOT / "tools" / "omni_adapter.py")
         _m = _iu.module_from_spec(_ap)
         _ap.loader.exec_module(_m)                                # type: ignore[union-attr]
         tgt = str(kw.get("target") or "")
@@ -969,6 +1427,18 @@ def run(op: str = "status", **kw) -> dict:
         r = _m.execute(tgt, str(kw.get("do") or kw.get("verb") or ""), kw.get("args") or {})
         return dict({"op": "universal", "socket": "auto", "classify": info}, **r)
 
+    if op in ("page_index", "页索引", "pages"):
+        return page_index(pattern=str(kw.get("pattern") or ""))
+    if op in ("page_run", "开页", "page"):
+        return page_run(str(kw.get("module") or kw.get("target") or ""),
+                        args=kw.get("args") or [],
+                        timeout=float(kw.get("timeout") or 120.0))
+    if op in ("surface_audit", "surface", "万能面", "full_sweep", "全量"):
+        # 2026-11-03：万能面同步审计（见 surface_audit 上方口径）。
+        #   `full_sweep` 保留为别名 —— 旧叫法仍可用，实现是同一个，不搞两套。
+        return surface_audit(live=bool(kw.get("live")),
+                             timeout=float(kw.get("timeout") or 20.0),
+                             parallel=bool(kw.get("parallel", True)))
     if op in ("discover", "scan_local", "可插面"):
         return discover(deep=bool(kw.get("deep")))
     if op in ("wb", "wb_chat", "workbuddy_chat"):
@@ -999,8 +1469,12 @@ def run(op: str = "status", **kw) -> dict:
         #   （tools/weights.py 是唯一入口，A19 主 / 后台大脑队列 / 整机 GPU 工人）。
         if not kw.get("base") and str(kw.get("target") or "") in ("", "our", "weights", "selfhost"):
             import importlib.util as _iu4
-            _sp4 = _iu4.spec_from_file_location(
-                "_w_plug", str(__file__).replace("gbt_allinone/omni_plug.py", "tools/weights.py"))
+            # 🔴 2026-11-03 修（同一处反斜杠病 · 第四个实例）：见 plug_and_run 里 ai 腿的注释。
+            _wp4 = _P(__file__).resolve().parent.parent / "tools" / "weights.py"
+            if not _wp4.is_file():
+                return {"ok": False, "socket": "ai", "reason": "tools/weights.py 不在盘上",
+                        "looked": str(_wp4)}
+            _sp4 = _iu4.spec_from_file_location("_w_plug", str(_wp4))
             _m4 = _iu4.module_from_spec(_sp4)
             _sp4.loader.exec_module(_m4)                           # type: ignore[union-attr]
             txt = str(kw.get("prompt") or kw.get("text") or "")
@@ -1087,6 +1561,9 @@ def run(op: str = "status", **kw) -> dict:
             #   ⇒ 照自述调用的人**摸不到** scan_local / snapshot / counter / wb / 可插面 这些入口。
             #   判据在 tools/codex-scripts/omni-monitor.py --gap（AST 现读，不写死）。
             "known": ["status", "sockets", "snapshot", "energy", "selftest", "plug", "run",
+                      "universal", "插",
+                      "surface_audit", "surface", "万能面", "full_sweep", "全量",
+                      "page_index", "页索引", "pages", "page_run", "开页", "page",
                       "discover", "scan_local", "可插面",
                       "ai", "ai_chat", "ai_control",
                       "counter", "counter_plan", "counter_strike", "反控",

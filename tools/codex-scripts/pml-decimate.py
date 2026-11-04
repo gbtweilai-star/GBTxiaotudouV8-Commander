@@ -5,7 +5,7 @@ import pathlib
 import sys
 import pymeshlab as ml
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 SRC = sys.argv[1] if len(sys.argv) > 1 else str(WS / "holo_pet/assets/digital-human/raw/rig/part-head.glb")
 OUT = sys.argv[2] if len(sys.argv) > 2 else str(WS / "holo_pet/assets/digital-human/raw/rig/head-pml-low.glb")
 TARGET = int(sys.argv[3]) if len(sys.argv) > 3 else 75000

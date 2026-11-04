@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_pipeline — 常驻推理进程 + 复用 tracker + 线程/帧池。
 
 结构：

@@ -36,6 +36,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -43,14 +44,20 @@ for _s in (sys.stdout, sys.stderr):
     if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8", errors="replace")
 
-OPS = ("status", "impact", "risky", "where")
+OPS = ("status", "impact", "risky", "where", "recent")
 MAX_DEPTH = 3
 _ROOT = Path(__file__).resolve().parents[2]
 _WIRING = _ROOT / "state" / "model-pack" / "wiring.json"
 _KINDS = ("page", "code", "cap", "tent", "carrier", "handler")
-_EXT_CODE = (".py", ".js", ".ts", ".mjs", ".cjs")
-_EXT_PAGE = (".html", ".htm")
-_EXT_DATA = (".json", ".jsonl", ".md", ".csv")
+# ⚠️ 这两组扩展名**必须与 tools/codex-scripts/wiring-build.py:52-53 一字不差**。
+#   图里的节点名是那份脚本产出的；我这边若换成另一套口径，就会「路径判错前缀
+#   ⇒ in_graph 恒 false ⇒ 影响面恒 0」。2026-11-04 实测踩到：改 .txt / .png / .toml
+#   全报"0 处受影响"，而图里明明有对应节点 —— 那不是"很安全"，是量具坏了。
+#   对拍：gbt_allinone.tests.test_impact_node_prefix（改这里它就红）。
+_EXT_CODE = (".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".sh", ".ps1", ".cmd", ".bat")
+_EXT_PAGE = (".html", ".htm", ".md", ".txt", ".json", ".jsonl", ".csv", ".svg", ".css", ".yml", ".yaml")
+# 兜底判据：文件名末尾带扩展名 ⇒ 它是「文件」，不是「能力位」
+_FILEISH_RE = re.compile(r"\.[a-z0-9]{1,8}$")
 
 _CACHE: dict = {"key": None, "adj": None, "strong": None}
 
@@ -83,7 +90,12 @@ def _load() -> tuple:
 
 
 def normalize(s: str) -> str:
-    """路径/名字 ⇒ 图里的节点名。**已带合法前缀的原样返回**（不二次加前缀）。"""
+    """路径/名字 ⇒ 图里的节点名。**已带合法前缀的原样返回**（不二次加前缀）。
+
+    兜底口径与 wiring-build 对齐：
+      · 有扩展名且不在两组里 ⇒ ``code:``（未知后缀按代码件，与 builder 一致）
+      · 没有扩展名 ⇒ ``cap:``（传进来的是能力位名，如 omni_plug / route_ledger）
+    """
     s = str(s or "").strip().replace("\\", "/")
     if ":" in s:
         head = s.split(":", 1)[0]
@@ -94,8 +106,11 @@ def normalize(s: str) -> str:
         return "page:" + s
     if low.endswith(_EXT_CODE):
         return "code:" + s
-    if low.endswith(_EXT_DATA):
-        return "page:" + s          # 数据/文档件在图里归到 page: 前缀下（与量具同口径）
+    # 🔴 2026-11-04 修：原先这里无条件 `return "cap:" + s`，把 .txt / .png / .toml
+    #   这些文件全塞进"能力位"命名空间，而图里它们是 code:/page: —— 两边对不上，
+    #   in_graph 恒 false、影响面恒 0。对"改一处看一圈"来说，这就是把量具读数抹平。
+    if _FILEISH_RE.search(low.rsplit("/", 1)[-1]):
+        return "code:" + s
     return "cap:" + s
 
 
@@ -153,10 +168,6 @@ def _components(adj: dict) -> dict:
             "incoming_only_nodes": incoming_only}
 
 
-def _op_status(adj: dict) -> dict:
-    st = _WIRING.stat()
-    comp = _components(adj)
-    kinds: dict = {}
 def _op_status(adj: dict, meta: dict | None = None) -> dict:
     meta = meta or {}
     st = _WIRING.stat()
@@ -289,6 +300,75 @@ def _op_where() -> dict:
                    '\'{"op":"impact","target":"code:gbt_allinone/api.py"}\' --stdin'}
 
 
+def _to_node(target: str) -> str:
+    """万能插留痕里的**绝对路径** ⇒ 图里的节点名（去 payload 前缀再 normalize）。
+
+    ⚠️ 2026-11-04 实测踩到的坑：target 经过 JSON 转义后可能是 `C:\\Users\\...`
+    （字面双反斜杠），直接 `replace("\\\\", "/")` 会得到 `C://Users//...`，
+    与图节点永远对不上 ⇒ in_graph 恒 false、impact_count 恒 0。
+    所以先折叠多重反斜杠，再把重复斜杠压成单个，最后才比前缀。
+    """
+    s = str(target or "")
+    while "\\\\" in s:
+        s = s.replace("\\\\", "\\")
+    s = s.replace("\\", "/")
+    while "//" in s:
+        s = s.replace("//", "/")
+    root = str(_ROOT).replace("\\", "/")
+    while "//" in root:
+        root = root.replace("//", "/")
+    root = root.rstrip("/")
+    if s.lower().startswith(root.lower()):
+        s = s[len(root):].lstrip("/")
+    return normalize(s)
+
+
+def _op_recent(state: dict, n: int = 10) -> dict:
+    """**万能插 × 多域监控的读取口**：最近万能插动作，以及各自会撞到谁。
+
+    主人令 2026-11-04「多域监控必须和万能插同步执行」的落实：
+      · 写侧（omni_plug._sync_impact）只追加一行，**不加载图**；
+      · 读侧（这里）才拿邻接图算受影响面。
+    这样执行永远不被 4.3MB 的图拖慢 —— 否则监控自己就成了新的故障点。
+    """
+    n = max(1, min(int(n or 10), 100))
+    p = _ROOT / "state" / "omni-impact.jsonl"
+    if not p.is_file():
+        return {"ok": True, "op": "recent", "count": 0,
+                "why": "还没有万能插动作留痕（state/omni-impact.jsonl 不存在）"}
+    rows = []
+    try:
+        with p.open(encoding="utf-8") as f:
+            for ln in f:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    rows.append(json.loads(ln))
+                except Exception:                                  # noqa: BLE001
+                    continue
+    except Exception as exc:                                       # noqa: BLE001
+        return {"ok": False, "op": "recent",
+                "error": "%s: %s" % (type(exc).__name__, str(exc)[:120])}
+
+    adj = state.get("adj") or {}
+    out = []
+    for r in reversed(rows[-n:]):
+        node = _to_node(r.get("target") or "")
+        in_graph = node in adj
+        reach = sorted(impact(adj, node, 2)) if in_graph else []
+        out.append({"ts": r.get("ts"), "socket": r.get("socket"),
+                    "action": r.get("action"), "ok": r.get("ok"),
+                    "ms": r.get("ms"), "target": r.get("target"),
+                    "node": node, "in_graph": in_graph,
+                    "impact_count": len(reach), "impact_sample": reach[:8],
+                    "reason": r.get("reason")})
+    return {"ok": True, "op": "recent", "count": len(out),
+            "graph_nodes": len(adj),
+            "note": "impact_count = 这一刀 2 跳内可达的节点数；0 且 in_graph=false 说明该目标不在图里（新文件/非仓库件）",
+            "rows": out}
+
+
 def run_op(op: str = "status", **params) -> dict:
     """统一入口（api.py 分派到这里）。未知 op ⇒ 带原因拒绝，不静默回落。"""
     op = str(op or "status").strip() or "status"
@@ -303,6 +383,8 @@ def run_op(op: str = "status", **params) -> dict:
                 "why": err.get("why", "")}
     if op == "status":
         return _op_status(state["adj"], state.get("meta") or {})
+    if op == "recent":
+        return _op_recent(state, n=params.get("n", 10))
     if op == "impact":
         return _op_impact(state, target=params.get("target"),
                           targets=params.get("targets"), depth=params.get("depth", 2))

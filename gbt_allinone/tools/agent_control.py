@@ -26,6 +26,7 @@
 3. 只读视图：本件**不改任何配置**（要改配置走主人的终端）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import pathlib
@@ -138,7 +139,7 @@ def run_op(op: str = "facets", **params) -> dict:
     op = (op or "facets").lower()
     for n, fn in (("roster", roster), ("facets", facets), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": f"未知 op:{op}（roster/facets/where）"}
 
 

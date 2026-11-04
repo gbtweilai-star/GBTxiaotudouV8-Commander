@@ -36,24 +36,43 @@ def target() -> Path:
 
 
 def render() -> str:
+    """生成登录自启包装器。
+
+    走 console_service.start（不直接起 console-server）：
+      · 幂等：已在跑就 already=true 退出 ⇒ 不双开、不留第二个窗口；
+      · 状态文件写**真 pid** ⇒ status/stop 有依据；
+      · 服务进程由 CREATE_NO_WINDOW 拉起 ⇒ 任务栏不挂一个最小化控制台窗口；
+      · stdout/stderr 落 state/console-server.log ⇒ 起不来时看得见原因，不是静默失败。
+    """
     py = ROOT / "pyembed" / "python.exe"
     py_line = str(py) if py.is_file() else "python"
     return (
         "@echo off\r\n"
+        # 本文件是 UTF-8（含中文路径）：先切 65001，避免非 UTF-8 代码页的机器上 cmd 把路径读成乱码。
+        "chcp 65001 >nul\r\n"
         "rem GBT小土豆V8 · 认知界面服务 :%d 登录自启（删掉本文件即取消）\r\n"
         "cd /d \"%s\"\r\n"
-        "start \"\" /min \"%s\" -X utf8 \"tools\\console-server.py\" --port %d\r\n"
-        % (PORT, ROOT, py_line, PORT)
+        "\"%s\" -X utf8 \"gbt_allinone\\console_service.py\" start >> \"%s\\state\\console-server.log\" 2>&1\r\n"
+        % (PORT, ROOT, py_line, ROOT)
     )
 
 
 def probe(port: int = PORT) -> bool:
-    try:
-        import urllib.request
-        with urllib.request.urlopen("http://127.0.0.1:%d/api/state" % port, timeout=1.2) as r:
-            return r.status == 200
-    except Exception:  # noqa: BLE001
-        return False
+    """探活：先轻量 /api/ping（不触发 console 数据构建），没有再退回 /api/state。
+
+    🔴 2026-11-02：原来只探 /api/state + 1.2s，冷缓存建数据慢 ⇒ 假阴性（和 console_service
+       双开事故同一根因）。判据要轻。
+    """
+    import urllib.request
+    for path in ("/api/ping", "/api/state"):
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:%d%s" % (port, path),
+                                        timeout=2.5) as r:
+                if r.status == 200:
+                    return True
+        except Exception:  # noqa: BLE001
+            continue
+    return False
 
 
 def install() -> int:

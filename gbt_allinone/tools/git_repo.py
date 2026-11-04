@@ -24,24 +24,43 @@
   6. **超时 + 输出上限**：60s / 200KB（不许挂死，也不许把巨型 diff 灌回来）
   7. **读面零作用域**：`git_read` 在 `policy` 里**不挂任何 scope**
 
-## ⚠️ 诚实边界
+## 写面（2026-11-03 补齐）
 
-  · 本件**不做** rebase / reset --hard / push / force —— 那些是"改历史/出网"，
-    要单独设计（尤其是 push 挂的是出网，不是 filesystem_write）；本轮**如实不做**。
-  · `commit` 用 **pathspec-limited**（`git commit -m … -- <paths>`）：只提交点名的路径，
-    **不动索引里别的暂存内容**。
+  · `stage` / `commit`：点名路径；commit 仍用 pathspec-limited，不动别的暂存内容。
+  · `push` / `force_push`：真 `git push`；`force_push` 用 `--force-with-lease`；
+    必须有 `confirm=true` + `remote` + `branch`，不允许 force 到任意 URL。
+  · `rebase`：工作区必须干净；`confirm=true`；冲突时返回冲突列表，不自动 `--abort`。
+  · `reset --hard`：**破坏性**；`confirm=true` + 明确 `rev`；只动本地工作区。
+  · 以上全部仍走 `git_write` 的 `filesystem_write` 门；push 另在返回里标 `network=true`，
+    需要出网授权时由调用方/门决定，**能力自己不偷偷推**。
 """
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[2]
 TIMEOUT_S = 60
+
+
+def _git_exe() -> str:
+    """Windows 安装 Git 后当前进程 PATH 未必刷新；按常见落点兜底。"""
+    found = shutil.which("git")
+    if found:
+        return found
+    for p in (r"C:\Program Files\Git\cmd\git.exe",
+              r"C:\Program Files (x86)\Git\cmd\git.exe",
+              os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs", "Git", "cmd", "git.exe")):
+        if p and Path(p).is_file():
+            return p
+    return "git"
+
 MAX_OUT = 200 * 1024
 
 _READ_OPS = ("status", "diff", "log", "show", "branch_list", "branch", "stash_list")
-_WRITE_OPS = ("stage", "add", "commit")
+_WRITE_OPS = ("stage", "add", "commit", "push", "force_push", "rebase", "reset")
 
 
 class GitRepoError(ValueError):
@@ -84,7 +103,7 @@ def _rel_inside(raw) -> str:
 def _git(args: list, *, timeout: int = TIMEOUT_S) -> dict:
     """跑一条 git。**永远 shell=False**。返回 `{ok, rc, out, err, truncated}`。"""
     try:
-        p = subprocess.run(["git", *args], cwd=str(_ROOT), shell=False,
+        p = subprocess.run([_git_exe(), *args], cwd=str(_ROOT), shell=False,
                            capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=timeout)
     except FileNotFoundError:
@@ -155,12 +174,56 @@ def run_read(payload: dict | None = None) -> dict:
 
 
 # ── 写面（永远挂 filesystem_write；永远要点名路径）──────────────────────────
+def _need_confirm(p: dict, op: str) -> None:
+    if p.get("confirm") is not True:
+        raise GitRepoError("confirm_required",
+                           "%s 是写/破坏/出网动作，必须显式 confirm=true（不接受默认）" % op)
+
+
+def _safe_ref(name: str, field: str) -> str:
+    s = str(name or "").strip()
+    if not s or s.startswith("-") or any(c in s for c in " \t\n\r"):
+        raise GitRepoError("bad_%s" % field, "%s 非法：%r" % (field, name))
+    return s
+
+
 def run_write(payload: dict | None = None) -> dict:
     p = dict(payload or {})
     op = str(p.get("op") or "").strip().lower()
     if op not in _WRITE_OPS:
         raise GitRepoError("unknown_op",
                            "git_write 不认 op=%s（只认 %s）" % (op, "/".join(_WRITE_OPS)))
+
+    if op in ("push", "force_push"):
+        _need_confirm(p, op)
+        remote = _safe_ref(p.get("remote") or "origin", "remote")
+        branch = _safe_ref(p.get("branch") or "", "branch")
+        if not branch:
+            raise GitRepoError("branch_required", "push 必须点名 branch（不猜当前分支）")
+        args = ["push"] + (["--force-with-lease"] if op == "force_push" else []) + [remote, branch]
+        r = _git(args, timeout=120)
+        return {"ok": r["ok"], "readonly": False, "op": op, "remote": remote,
+                "branch": branch, "network": True, "text": r["out"] or r["err"],
+                "note": "已真推；force_push 只允许 --force-with-lease，绝不裸 --force"}
+    if op == "rebase":
+        _need_confirm(p, op)
+        onto = _safe_ref(p.get("onto") or p.get("rev") or "origin/main", "onto")
+        st = _git(["status", "--porcelain"])
+        if (st["out"] or "").strip():
+            raise GitRepoError("worktree_dirty", "rebase 前工作区必须干净（有未提交改动）")
+        r = _git(["rebase", onto], timeout=180)
+        return {"ok": r["ok"], "readonly": False, "op": "rebase", "onto": onto,
+                "conflict": (not r["ok"]), "text": r["out"] or r["err"],
+                "note": "冲突不自动 abort；由调用方看 text 后决定 git rebase --abort/--continue"}
+    if op == "reset":
+        _need_confirm(p, op)
+        rev = _safe_ref(p.get("rev") or "HEAD", "rev")
+        if rev == "HEAD":
+            raise GitRepoError("rev_required", "reset --hard 必须点名 rev，不接受默认 HEAD")
+        r = _git(["reset", "--hard", rev], timeout=120)
+        return {"ok": r["ok"], "readonly": False, "op": "reset", "rev": rev,
+                "destructive": True, "text": r["out"] or r["err"],
+                "note": "只动本地工作区/索引；不推远端"}
 
     raw_paths = p.get("paths") or ([p["path"]] if p.get("path") else [])
     if not isinstance(raw_paths, (list, tuple)) or not raw_paths:

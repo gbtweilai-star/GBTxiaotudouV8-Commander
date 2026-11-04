@@ -34,6 +34,7 @@ import base64
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import time
@@ -58,8 +59,7 @@ def _key(explicit: str = "") -> tuple:
 
 def status() -> dict:
     k, src = _key()
-    have_ff = bool(subprocess.run(["sh", "-c", "command -v ffprobe"],
-                                  capture_output=True).stdout.strip())
+    have_ff = bool(shutil.which("ffprobe"))
     return {"ok": True, "op": "status", "model": MODEL, "base": DEFAULT_BASE,
             "key_present": bool(k), "key_source": src or None,
             "key_env_names": list(KEY_ENVS),
@@ -120,8 +120,7 @@ def dryrun(image: str, prompt: str) -> dict:
 
 
 def _ffprobe(path: pathlib.Path) -> dict:
-    if not subprocess.run(["sh", "-c", "command -v ffprobe"],
-                          capture_output=True).stdout.strip():
+    if not shutil.which("ffprobe"):
         return {"ok": None, "why": "本机没有 ffprobe"}
     try:
         r = subprocess.run(["ffprobe", "-v", "error", "-show_entries",

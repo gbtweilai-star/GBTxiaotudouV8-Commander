@@ -118,6 +118,41 @@ def _heuristic_caps(intent: str) -> list:
     return scored
 
 
+def _vision_lane(intent: str):
+    """视觉意图 → 视觉作战区裁决。不是视觉意图就回 None，交回原主路。
+
+    2026-11-04 主人令「统统整理到一个区块，让大脑执行层自动决策使用哪个视觉能力」：
+    视觉类意图不再走通用 2-gram 竞猜，直接由 `vision_arsenal` 的 19 个位裁决，
+    主选必为**本机真能跑**的位，缺依赖的如实进 `missing`。
+    """
+    try:
+        from . import vision_arsenal as VA
+        # 门禁交给作战区自己的词汇表 —— 不用外挂提示词（会漏判，也会误劫持）
+        if not VA.matched(intent):
+            return None
+        d = VA.decide(intent)
+        if not d.get("ok") or not d.get("pick"):
+            return None
+        pick = d["pick"]
+        return {
+            "ok": True, "intent": str(intent)[:120],
+            "best": {"kind": pick.get("kind"), "domain": "vision",
+                     "desc": str(pick.get("why") or "")[:50],
+                     "via": "vision_arsenal", "position": pick.get("id")},
+            "alternatives": [{"kind": a.get("kind"), "domain": "vision",
+                              "position": a.get("id")}
+                             for a in (d.get("alternatives") or [])],
+            "candidates": 1,
+            "path": "vision_arsenal",
+            "degraded": bool(d.get("degraded")),
+            "degraded_reason": d.get("degraded_reason") or "",
+            "vision": {"pick": pick, "missing": d.get("missing") or []},
+            "elapsed_ms": 0.0,
+        }
+    except Exception:
+        return None
+
+
 @_spanned
 def route(intent: str) -> dict:
     """意图动态路由 —— 主路 `semantic_route`，辅路本体能力启发式（降级必须自曝）。
@@ -141,6 +176,14 @@ def route(intent: str) -> dict:
     if not intent:
         raise BrainExecError("需要 intent：任务意图描述")
     t0 = time.time()
+
+    # ── ⓪ 视觉专用车道（2026-11-04 主人令）──
+    # 命中视觉意图时由视觉作战区裁决「用哪个视觉能力」；主选必为真能跑的位，
+    # 缺依赖的如实进 missing —— 不让通用 2-gram 在 19 个视觉位里瞎猜。
+    _vis = _vision_lane(intent)
+    if _vis:
+        _vis["elapsed_ms"] = round((time.time() - t0) * 1000, 1)
+        return _vis
 
     scored = _heuristic_caps(intent)
     top = scored[:5]

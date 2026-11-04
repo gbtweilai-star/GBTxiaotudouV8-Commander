@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>做好之后长这样 · 成品预览</title>
+<link rel="stylesheet" href="./bp3d.css" />
+</head>
+<body>
+<header class="top">
+  <div class="brand"><i></i><h1>做好之后长这样</h1></div>
+  <p class="lede">下面每一张都是真实跑出来的画面，不是效果图。往下滚一页页看成品；点任意一块的「试用」可以直接用真功能；不满意随时提整改，批准后它自己做到完。</p>
+  <div class="kpis">
+    <div><b id="k-pct">0%</b><span>完成度</span></div>
+    <div><b id="k-count">0 / 0</b><span>模块</span></div>
+    <div><b id="k-state">—</b><span>状态</span></div>
+    <div><b id="k-exec">—</b><span>自动执行</span></div>
+  </div>
+  <div class="acts">
+    <button id="b-approve" type="button">批准开工</button>
+    <button id="b-land" type="button">自动做到完</button>
+    <button id="b-refresh" type="button">刷新</button>
+  </div>
+</header>
+
+<div class="scroll-space">
+  <section class="stage" id="stage">
+    <div class="world" id="world"></div>
+    <div class="cap">
+      <div class="cap-l">
+        <h2 id="cap-name">—</h2>
+        <p id="cap-desc">往下滚，一页页看成品。</p>
+        <p id="cap-bp" class="bp-line"></p>
+      </div>
+      <div class="cap-r">
+        <span id="cap-status" class="chip">—</span>
+        <a id="cap-open" class="open" href="#" target="_blank" rel="noopener">打开实际页面 →</a>
+        <button id="cap-revise" type="button">提整改</button>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+  </section>
+</div>
+
+<div class="try" id="try" hidden>
+  <div class="try-box">
+    <div class="try-head">
+      <h3>试用一下 · 用的都是真功能</h3>
+      <div class="try-tabs">
+        <button data-tab="memory" type="button">记忆</button>
+        <button data-tab="chat" type="button">对话</button>
+        <button data-tab="page" type="button">看真页面</button>
+      </div>
+      <button id="try-close" type="button" aria-label="关闭">×</button>
+    </div>
+
+    <section class="try-pane" data-pane="memory">
+      <p class="try-note">写进的是<b>真实的记忆链</b>（src=trial），存完立刻查回来给你看命中。</p>
+      <input id="t-mem-in" type="text" placeholder="存一句试试，例如：我的项目代号是小土豆" />
+      <button id="t-mem-save" type="button">存进记忆</button>
+      <div class="try-row">
+        <input id="t-mem-q" type="text" placeholder="再查一句，例如：项目代号" />
+        <button id="t-mem-find" type="button">查回来</button>
+      </div>
+      <pre id="t-mem-out" class="try-out">还没有结果。</pre>
+    </section>
+
+    <section class="try-pane" data-pane="chat">
+      <p class="try-note">直接问她（走 /api/chat 真模型；本机模型可能慢，几十秒是正常的，超时会如实报）。</p>
+      <div class="try-row">
+        <input id="t-chat-in" type="text" placeholder="问一句，例如：用一句话介绍你自己" />
+        <button id="t-chat-go" type="button">问她</button>
+      </div>
+      <pre id="t-chat-out" class="try-out">还没有回答。</pre>
+    </section>
+
+    <section class="try-pane" data-pane="page">
+      <p class="try-note">下面是<b>真页面</b>（同源 iframe），可以直接点、可以直接用。</p>
+      <div class="try-row">
+        <select id="t-page-sel"></select>
+        <a id="t-page-open" class="open" href="#" target="_blank" rel="noopener">新窗口打开 →</a>
+      </div>
+      <iframe id="t-page-frame" title="真页面" src="about:blank"></iframe>
+    </section>
+  </div>
+</div>
+
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <h3 id="d-title">提整改</h3>
+    <button id="d-close" type="button" aria-label="关闭">×</button>
+  </div>
+  <p id="d-meta" class="meta"></p>
+  <textarea id="d-note" rows="4" placeholder="这一块哪里不满意？想要改成什么样？（不用懂代码，说人话就行）"></textarea>
+  <div class="row">
+    <button id="d-submit" type="button">提交整改</button>
+    <button id="d-ack" type="button">已处理</button>
+  </div>
+  <div class="revlist">
+    <h4>整改记录 <b id="r-count">0</b></h4>
+    <div id="r-list"></div>
+  </div>
+</aside>
+
+<footer class="foot">
+  真实画面来自本机 8766 的现跑结果 · 落地进度读 <code>/api/blueprint</code> ·
+  批准开工后自动做到完（除危险/转账不再打扰）。
+</footer>
+
+<script src="../../assets/gsap.min.js"></script>
+<script src="./bp3d.js"></script>
+</body>
+</html>

@@ -23,6 +23,7 @@
 op=pages / graph / widgets / layout / scan / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import collections
 import json
@@ -341,6 +342,6 @@ def run_op(op: str = "pages", **params) -> dict:
     for name, fn in (("pages", pages), ("graph", graph), ("widgets", widgets),
                      ("layout", layout), ("scan", scan), ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（pages/graph/widgets/layout/scan/verify/where）"}

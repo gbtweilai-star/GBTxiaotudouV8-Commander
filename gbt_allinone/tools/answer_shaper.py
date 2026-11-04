@@ -20,6 +20,7 @@
 3. **分数可见**：check 的每条规则带命中细节，哪条红哪条过，看得见。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import re
 
@@ -114,7 +115,7 @@ def run_op(op: str = "check", **params) -> dict:
     op = (op or "check").lower()
     for name, fn in (("check", check), ("shape", shape), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（check/shape/where）"}
 

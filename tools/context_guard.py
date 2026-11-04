@@ -224,7 +224,9 @@ def correct(rc, s: dict, anomalies: list[dict]) -> dict:
                          "note": "整理后仍超预算，需要人工调 window_budget" if still else "已回到预算内"})
         elif act == "rebuild_window":
             r = rc.window()
-            acts.append({"action": act, "ok": bool(r) or True,
+            # 2026-11-03 修 JDG-001 真 bug：原为 `bool(r) or True` —— 恒真，空窗口也报 ok（假绿）。
+            #   作者意图显然是"重读成功与否"，故如实按 r 是否非空判定。
+            acts.append({"action": act, "ok": bool(r),
                          "note": "窗口已重读 %d 条" % len(r or [])})
         elif act == "dedupe":
             acts.append({"action": act, "ok": True,

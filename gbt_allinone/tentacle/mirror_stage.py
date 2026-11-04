@@ -75,7 +75,8 @@ def _meta(stage: Path) -> dict:
 
 
 def _save(stage: Path, meta: dict):
-    (stage / "stage.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
+    (stage / "stage.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1),
+                                      encoding="utf-8", newline="\n")
 
 
 def _create(payload):
@@ -92,20 +93,46 @@ def _create(payload):
         for rel in targets:
             r = _safe_rel(rel)
             src = (repo / r).resolve()
-            if not src.is_file():
-                return {"ok": False, "status": "missing_target", "error": "生产目标不存在：%s" % r}
             dst = stage / "work" / r
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
-            copied.append({"path": r, "src_sha256": _sha(src), "staged_sha256": _sha(dst)})
+            if src.is_file():
+                shutil.copy2(src, dst)
+                copied.append({"path": r, "mode": "edit",
+                               "src_sha256": _sha(src), "staged_sha256": _sha(dst)})
+            else:
+                # 新建：生产还没有这个文件。允许，但**必须显式标 mode=new** ——
+                #   promote 时无旧可备份；rollback 时"恢复"等于把它删掉。
+                #   不允许静默新建：mode 会写进 stage.json，可审可查。
+                copied.append({"path": r, "mode": "new",
+                               "src_sha256": "", "staged_sha256": ""})
         meta = {"id": sid, "repo": str(repo), "targets": [c["path"] for c in copied],
+                "modes": {c["path"]: c["mode"] for c in copied},
                 "created": time.strftime("%Y-%m-%dT%H:%M:%S"), "status": "staged",
                 "verify": None, "promoted": []}
         _save(stage, meta)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "status": "failed", "error": "%s: %s" % (type(e).__name__, str(e)[:160])}
     return {"ok": True, "status": "staged", "id": sid, "stage": str(stage), "targets": copied,
-            "note": "生产文件只被复制，未被改动；候选只写 stage/work/"}
+            "new_files": [c["path"] for c in copied if c["mode"] == "new"],
+            "note": "生产文件只被复制，未被改动；候选只写 stage/work/；mode=new 表示生产尚无此文件"}
+
+
+def _eol_of(path: Path) -> str:
+    """探测既有文件的换行风格：CRLF 占多数则 CRLF，否则 LF；读不到按 LF。
+
+    为什么需要它：Path.write_text() 默认走 open(mode="w")，在 Windows 上会把
+    每个 "\n" 换成 os.linesep（CRLF）——镜像里写出 LF、promote 后再 copy2 进
+    生产，整个文件的换行符就被静默翻面了（2026-11-03 实测：4 个 LF 生产文件
+    被 promote 翻成 CRLF，字节级 sha 从此永远显示"改过"）。
+    修法不是硬钉一种风格（项目里 LF 3489 / CRLF 194 / MIXED 41，.bat/.cmd 还
+    必须 CRLF），而是**沿用该文件原本的风格**：原子替换只该换内容，不该换格式。
+    """
+    try:
+        head = path.read_bytes()[:65536]
+    except Exception:  # noqa: BLE001
+        return "\n"
+    crlf = head.count(b"\r\n")
+    return "\r\n" if crlf > (head.count(b"\n") - crlf) else "\n"
 
 
 def _write(payload):
@@ -119,9 +146,15 @@ def _write(payload):
     if rel not in meta.get("targets", []):
         return {"ok": False, "status": "not_declared", "error": "只能写 create 时登记的 target：%s" % rel}
     dst = stage / "work" / rel
+    prod = repo / rel  # 生产原件：只读它的换行风格，不写不碰
     try:
         if payload.get("content") is not None:
-            dst.write_text(str(payload["content"]), encoding="utf-8")
+            # 先归一成 LF，再按生产原件的既有风格铺开，最后 newline="" 禁掉平台转换
+            text = str(payload["content"]).replace("\r\n", "\n").replace("\r", "\n")
+            eol = _eol_of(prod if prod.is_file() else dst)
+            if eol != "\n":
+                text = text.replace("\n", eol)
+            dst.write_text(text, encoding="utf-8", newline="")
         elif payload.get("src"):
             src = Path(payload["src"]).resolve()
             dst.write_bytes(src.read_bytes())
@@ -132,7 +165,7 @@ def _write(payload):
     meta["status"] = "edited"
     _save(stage, meta)
     return {"ok": True, "status": "written", "id": sid, "path": rel, "sha256": _sha(dst),
-            "note": "只写镜像；生产未动"}
+            "eol": _eol_of(dst), "note": "只写镜像；生产未动；换行风格沿用生产原件"}
 
 
 def _verify(payload):
@@ -228,11 +261,16 @@ def _rollback(payload):
         rel = item.get("path")
         b = backup / rel
         dst = (repo / rel).resolve()
+        mode = (meta.get("modes") or {}).get(rel, "edit")
         if b.is_file():
             tmp = dst.with_name(dst.name + ".mirror-rb-%s" % time.strftime("%H%M%S"))
             shutil.copy2(b, tmp)
             os.replace(str(tmp), str(dst))
             restored.append({"path": rel, "sha256": _sha(dst)})
+        elif mode == "new" and dst.is_file():
+            # 回滚一个"新建" = 把生产里那个本来不存在的文件删掉（无旧版可恢复）
+            dst.unlink()
+            restored.append({"path": rel, "removed": True})
     meta["status"] = "rolled_back"
     _save(stage, meta)
     return {"ok": True, "status": "rolled_back", "restored": restored, "backup": str(backup)}

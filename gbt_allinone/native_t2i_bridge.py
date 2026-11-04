@@ -65,10 +65,18 @@ def run(payload: dict | None = None) -> dict:
     if not os.path.isfile(cfg["worker"]):
         return {"ok": False, "status": "needs_runtime", "error": "找不到 worker：%s" % cfg["worker"]}
     req = {
+        "op": str(payload.get("op") or ""),
+        "model": str(payload.get("model") or ""),
+        "image": str(payload.get("image") or ""),
         "prompt": str(payload.get("prompt") or payload.get("text") or ""),
         "out": str(payload.get("out") or ""),
-        "size": int(payload.get("size") or 512),
-        "steps": int(payload.get("steps") or 1),
+        "frames": int(payload.get("frames") or (8 if payload.get("op") == "i2v_svd" else 0)),
+        "width": int(payload.get("width") or (256 if payload.get("op") == "i2v_svd" else 0)),
+        "height": int(payload.get("height") or (448 if payload.get("op") == "i2v_svd" else 0)),
+        "fps": int(payload.get("fps") or 8),
+        "motion": int(payload.get("motion") or 127),
+        "size": int(payload.get("size") or (256 if payload.get("op") == "t2i_fused" else 512)),
+        "steps": int(payload.get("steps") or (2 if payload.get("op") == "i2v_svd" else (8 if payload.get("op") == "t2i_fused" else 1))),
         "seed": int(payload.get("seed") or 0),
     }
     if not req["out"]:

@@ -47,6 +47,21 @@ TOOLING_DIRS = {
     ".venv-sadtalker",  # SadTalker 的虚拟环境（site-packages 全是第三方）
     "Python",           # 仓根内嵌的 CPython 运行时（pythoncore-3.15-64）
     "third_party",      # vendored 外部件（SadTalker）
+    # 🔴 2026-11-04 补：嵌入式 CPython 运行时。与上面的 `Python/`、`.venv-sadtalker`
+    #    同类 —— `pyembed/Lib/site-packages` 全是第三方 wheel，从不属于「本仓代码面」。
+    #    漏掉它的实测后果（当天就踩了）：`pip install uiautomation` 一个包，
+    #    全仓扫描从 15.5s 推到 51.5s（超 30s 红线判红），还把 mediapipe 自带的
+    #    `SyntaxError` 算成「我们的解析盲区」。装了包就红，这不合理。
+    "pyembed",
+    # 🔴 2026-11-04 补：`state/` 是**运行态**（数据面、工作副本 g-1、临时状态），
+    #    不是生产调用面。实测证据：`test_production_call_sites_are_whitelisted` 判红，
+    #    命中的是工作副本目录下的一个探针脚本（与主本同源重复）。
+    #    工作副本与主本同源 ⇒ 扫它等于把同一处命中数两遍
+    #    （与 `.shadow-repo` 那条排除理由完全一致）。
+    #    生产代码面应只含 gbt_allinone/ + tools/ + packs/。
+    #    ⚠️ 本注释刻意不写具体脚本文件名：扫描器会把「注释里出现的诊断脚本名」
+    #       也算成「生产代码引用了它」，写了就自己判红（踩过）。
+    "state",
 }
 
 # 扫描时一律跳过（含外部语料）

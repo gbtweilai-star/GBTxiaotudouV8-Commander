@@ -85,7 +85,7 @@ man["social"] = {
     "scanned_at": __import__("time").strftime("%Y-%m-%dT%H:%M:%S"),
     "eigenflux": {
         "zh": "AI朋友圈（EigenFlux）",
-        "cli": {"path": r"C:\Users\ADMIN\AppData\Local\local\bin\eigenflux.exe",
+        "cli": {"path": str(Path.home() / "AppData" / "Local" / "local" / "bin" / "eigenflux.exe"),
                 "version": ver.get("cli_version"), "commit": ver.get("commit"),
                 "go": ver.get("go_version"), "client_id": ver.get("client_id"),
                 "home": ver.get("home")},

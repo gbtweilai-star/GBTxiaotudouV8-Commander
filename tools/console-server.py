@@ -151,10 +151,287 @@ def _dh_ctl():
 
 
 # ---- /api/asr：本机离线听觉（Windows 桌面识别器），供数字人语音指挥 ----
-def _asr_local(seconds=5.0, culture="zh-CN"):
+VOICE_SETTINGS_PATH = REPO / "state" / "voice-settings.json"
+
+
+def _voice_settings():
+    """读本地语音设置（不存在→默认；坏文件→默认 + 不崩）。"""
+    try:
+        from gbt_allinone.tools import voice_settings as _VS
+        if VOICE_SETTINGS_PATH.is_file():
+            data = json.loads(VOICE_SETTINGS_PATH.read_text(encoding="utf-8"))
+            return _VS.validate(data)
+        return dict(_VS.DEFAULTS)
+    except Exception:  # noqa: BLE001
+        try:
+            from gbt_allinone.tools import voice_settings as _VS
+            return dict(_VS.DEFAULTS)
+        except Exception:
+            return {"asr_backend": "auto", "culture": "zh-CN", "auto_speak": True}
+
+
+def _memory_audit_records():
+    """把 memory_bank 的印章行转成审计记录（只读；不把长原文搬进 UI）。"""
+    out = []
+    f = REPO / "state" / "memory_bank.jsonl"
+    if not f.is_file():
+        return out
+    try:
+        for ln in f.read_text(encoding="utf-8", errors="replace").splitlines():
+            ln = ln.strip()
+            if not ln:
+                continue
+            try:
+                r = json.loads(ln)
+            except Exception:  # noqa: BLE001
+                out.append({"id": "", "text": "", "at": "", "origin": "memory_bank"})
+                continue
+            if not isinstance(r, dict):
+                continue
+            ref = str(r.get("ref") or r.get("path") or "")
+            text = str(r.get("why") or r.get("summary") or ref or "")
+            out.append({"id": str(r.get("ref") or r.get("sha256") or r.get("at") or ""),
+                        "text": text[:2000], "at": r.get("at") or "",
+                        "origin": r.get("origin") or ""})
+            if len(out) >= 500:
+                break
+    except Exception:  # noqa: BLE001
+        return out
+    return out
+
+
+def _api_slots_snapshot():
+    from gbt_allinone.tools import api_slot as _AS
+    from gbt_allinone import api as _api
+    f = REPO / "state" / "api_slots.json"
+    try:
+        if f.is_file() and _AS._REG.list().get("count", 0) == 0:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            for s in (data if isinstance(data, list) else []):
+                _api.run_task("api_slot", {"op": "register", "slot": s}, safe=True)
+    except Exception:  # noqa: BLE001
+        pass
+    env = _api.run_task("api_slot", {"op": "list"}, safe=True)
+    return ((env.get("gbt_result") or {}).get("result") if isinstance(env, dict) else None) or {}
+
+
+def _api_slots_save():
+    from gbt_allinone.tools import api_slot as _AS
+    try:
+        f = REPO / "state" / "api_slots.json"
+        f.parent.mkdir(parents=True, exist_ok=True)
+        tmp = f.with_suffix(".tmp")
+        tmp.write_text(json.dumps(_AS._REG.list().get("slots") or [], ensure_ascii=False, indent=1),
+                       encoding="utf-8")
+        tmp.replace(f)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+MEDIA_ROOTS = [REPO / "media", REPO / "交付成片", REPO / "holo_pet_w3" / "kaleido", REPO / "outputs"]
+
+
+def _turn_rows(limit=500):
+    rows = []
+    for name in ("orchestration-ledger.jsonl", "action_gate.jsonl"):
+        f = REPO / "state" / name
+        if not f.is_file():
+            continue
+        try:
+            for ln in f.read_text(encoding="utf-8", errors="replace").splitlines()[-int(limit):]:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    r = json.loads(ln)
+                except Exception:  # noqa: BLE001
+                    continue
+                if isinstance(r, dict):
+                    r.setdefault("source", name.replace(".jsonl", ""))
+                    rows.append(r)
+        except OSError:
+            continue
+    return rows
+
+
+def _media_scan(max_items=500):
+    from gbt_allinone.tools import media_library as _ML
+    out = []
+    for root in MEDIA_ROOTS:
+        if not root.is_dir():
+            continue
+        try:
+            for p in root.rglob("*"):
+                if len(out) >= max_items:
+                    break
+                if not p.is_file():
+                    continue
+                if not _ML.classify(str(p)):
+                    continue
+                try:
+                    st = p.stat()
+                except OSError:
+                    continue
+                out.append({"path": p.relative_to(REPO).as_posix(),
+                            "size": int(st.st_size), "mtime": float(st.st_mtime)})
+        except OSError:
+            continue
+    return out
+
+
+def _media_resolve(rel):
+    from gbt_allinone.tools import media_library as _ML
+    try:
+        rel = urllib.parse.unquote(str(rel or "")).replace("\\", "/").strip()
+    except Exception:  # noqa: BLE001
+        return None
+    if not rel or rel.startswith("/") or ".." in rel.split("/") or ":" in rel.split("/")[0]:
+        return None
+    try:
+        cand = (REPO / rel).resolve()
+    except OSError:
+        return None
+    for root in MEDIA_ROOTS:
+        try:
+            if cand.is_relative_to(root.resolve()) and cand.is_file() and _ML.classify(str(cand)):
+                return cand
+        except (OSError, ValueError):
+            continue
+    return None
+
+
+def _serve_media(handler, f):
+    import mimetypes
+    size = f.stat().st_size
+    ctype = mimetypes.guess_type(str(f))[0] or "application/octet-stream"
+    start, end = 0, size - 1
+    rng = handler.headers.get("Range") or ""
+    status = 200
+    if rng.startswith("bytes="):
+        try:
+            a, _, b = rng[6:].partition("-")
+            if a:
+                start = int(a)
+                end = int(b) if b else size - 1
+            else:
+                start = max(0, size - int(b or 0))
+            if start < 0 or start >= size or end < start:
+                handler.send_response(416)
+                handler.send_header("Content-Range", "bytes */%d" % size)
+                handler.end_headers()
+                return
+            end = min(end, size - 1)
+            status = 206
+        except (ValueError, TypeError):
+            start, end = 0, size - 1
+    length = end - start + 1
+    handler.send_response(status)
+    handler.send_header("Content-Type", ctype)
+    handler.send_header("Content-Length", str(length))
+    handler.send_header("Accept-Ranges", "bytes")
+    if status == 206:
+        handler.send_header("Content-Range", "bytes %d-%d/%d" % (start, end, size))
+    handler.send_header("Cache-Control", "no-store")
+    handler.end_headers()
+    try:
+        with open(f, "rb") as fh:
+            fh.seek(start)
+            left = length
+            while left > 0:
+                chunk = fh.read(min(65536, left))
+                if not chunk:
+                    break
+                handler.wfile.write(chunk)
+                left -= len(chunk)
+    except (BrokenPipeError, ConnectionResetError):
+        pass
+
+
+def _stream_rows(limit=300):
+    rows = []
+    try:
+        f = REPO / "state" / "orchestration-ledger.jsonl"
+        if f.is_file():
+            for ln in f.read_text(encoding="utf-8", errors="replace").splitlines()[-int(limit):]:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    rows.append(json.loads(ln))
+                except Exception:  # noqa: BLE001
+                    rows.append({"kind": "system", "detail": "bad json row"})
+        f2 = REPO / "state" / "audit.jsonl"
+        if f2.is_file():
+            for ln in f2.read_text(encoding="utf-8", errors="replace").splitlines()[-int(limit):]:
+                try:
+                    rows.append(json.loads(ln))
+                except Exception:  # noqa: BLE001
+                    pass
+    except Exception:  # noqa: BLE001
+        pass
+    return rows
+
+
+def _context_candidates():
+    """真实候选：焦点栈 + memory_bank 印章 + 最近编排账（只读）。"""
+    out = []
+    try:
+        from gbt_allinone.tools import focus_stack as _FS
+        for it in _FS._BOARD.snapshot().get("items") or []:
+            out.append({"id": "focus:" + it["id"], "source": "focus",
+                        "text": (it.get("title") or "") + ((" · " + it["target"]) if it.get("target") else ""),
+                        "at": it.get("at"), "priority": 0.95})
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        import json as _json
+        f = REPO / "state" / "memory_bank.jsonl"
+        if f.is_file():
+            rows = f.read_text(encoding="utf-8", errors="replace").splitlines()[-50:]
+            for ln in rows:
+                try:
+                    r = _json.loads(ln)
+                except Exception:  # noqa: BLE001
+                    continue
+                if not isinstance(r, dict):
+                    continue
+                ref = str(r.get("ref") or r.get("path") or "")
+                text = str(r.get("why") or r.get("summary") or ref or "")
+                if text:
+                    out.append({"id": "mem:" + (ref or str(len(out))), "source": "memory_bank",
+                                "text": text, "at": r.get("at"), "priority": 0.8})
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        import json as _json
+        f = REPO / "state" / "orchestration-ledger.jsonl"
+        if f.is_file():
+            rows = f.read_text(encoding="utf-8", errors="replace").splitlines()[-30:]
+            for ln in rows:
+                try:
+                    r = _json.loads(ln)
+                except Exception:  # noqa: BLE001
+                    continue
+                if not isinstance(r, dict):
+                    continue
+                text = str(r.get("action") or r.get("kind") or r.get("summary") or "")
+                if text:
+                    out.append({"id": "ledger:" + str(len(out)), "source": "tool_result",
+                                "text": text[:500], "at": r.get("at") or r.get("ts"),
+                                "priority": 0.7})
+    except Exception:  # noqa: BLE001
+        pass
+    return out[:200]
+
+
+def _body_control_status_or_none():
+    pass
+
+
+def _asr_local(seconds=5.0, culture="zh-CN", wav=None, device=None):
     from gbt_allinone import voice_cap as VC
     r = VC.asr_local(seconds=float(seconds), culture=str(culture or "zh-CN"),
-                     min_confidence=0.0)
+                     min_confidence=0.0, wav=wav, device=device)
     out = {"ok": bool(r.get("ok")), "heard": bool(r.get("heard")),
            "text": r.get("text") or "", "confidence": r.get("confidence"),
            "status": r.get("status"), "reason": r.get("reason"),
@@ -311,7 +588,9 @@ def _openai_chat(text: str, m: dict) -> dict:
             "provider": m.get("provider") or "openai-compatible"}
 
 
-def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True) -> dict:
+def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
+          image=None, image_name: str = "", file=None, file_name: str = "",
+          file_type: str = "") -> dict:
     """无限上下文 + 稳定输出：temperature=0，context 走 ring_context。
 
     2026-11-02 主人令：先过 `capability_router` ——「看屏幕 / 开网页 / 读写文件 / 看图」四类
@@ -320,7 +599,52 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True)
     开关：body 里 `capability:false` 或环境变量 `GBT_CAPABILITY_ROUTER=0`。
     """
     t0 = time.time()
-    if use_capabilities and os.environ.get("GBT_CAPABILITY_ROUTER", "1") != "0":
+    # 2026-11-02：聊天 + 附图 —— 先做本地视觉读数（零出网/零写盘），再决定回读数还是带图上下文对话
+    _img = None
+    _visual_note = ""
+    _ci = None
+    if image:
+        try:
+            from gbt_allinone import chat_image as _ci
+            _img = _ci.analyze(image)
+        except Exception as _cie:  # noqa: BLE001
+            _img = {"ok": False, "error": "%s: %s" % (type(_cie).__name__, str(_cie)[:160])}
+    if _img is not None:
+        _ask = bool(_ci is not None and _ci.looks_image_question(str(text or "")))
+        if not str(text or "").strip() or _ask:
+            return {"ok": bool(_img.get("ok")),
+                    "text": (_img.get("brief") if _img.get("ok")
+                             else "附图读取失败：" + str(_img.get("error"))[:160]),
+                    "via": "vision:local", "capability": _img,
+                    "elapsed_ms": int((time.time() - t0) * 1000),
+                    "context": {"mode": "local-vision", "name": context}}
+        _visual_note = "（用户附了一张图，本地视觉读数：%s）\n" % (
+            _img.get("brief") if _img.get("ok") else "读取失败：" + str(_img.get("error"))[:120])
+    # 2026-11-02：聊天「发送文件」—— 文本/代码读前 N 字，图片转视觉读数，二进制只报元数据（不假装解析）
+    _file = None
+    _file_note = ""
+    _cf = None
+    if file:
+        try:
+            from gbt_allinone import chat_file as _cf
+            _file = _cf.analyze(file_name or "附件", file, file_type)
+        except Exception as _fe:  # noqa: BLE001
+            _file = {"ok": False, "error": "%s: %s" % (type(_fe).__name__, str(_fe)[:160])}
+    if _file is not None:
+        _fask = bool(_cf is not None and _cf.looks_file_question(str(text or "")))
+        if not str(text or "").strip() or _fask:
+            _brief = (_file.get("brief") if _file.get("ok")
+                      else "附件读取失败：" + str(_file.get("error"))[:160])
+            if _file.get("kind") == "text" and _file.get("preview"):
+                _brief = _brief + "\n\n--- 文件前 %d 字 ---\n%s" % (
+                    min(len(_file["preview"]), 3000), _file["preview"][:3000])
+            return {"ok": bool(_file.get("ok")), "text": _brief,
+                    "via": "file:" + str(_file.get("kind") or "file"),
+                    "capability": _file,
+                    "elapsed_ms": int((time.time() - t0) * 1000),
+                    "context": {"mode": "local-file", "name": context}}
+        _file_note = "（用户附了一个文件，本地读数：%s）\n" % (_file.get("brief") or "读取失败")
+    if use_capabilities and _img is None and _file is None and os.environ.get("GBT_CAPABILITY_ROUTER", "1") != "0":
         try:
             from gbt_allinone import capability_router as _CR
             cap = _CR.run(text, context=context)
@@ -336,7 +660,7 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True)
             except Exception:  # noqa: BLE001
                 pass
     m = _settings_load().get("model") or {}
-    prompt_text = GBT_PERSONA + "\n\n用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
+    prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
     # 2026-11-02 主人令：Agnes 只做“反向调用云端算力”，不是聊天模型；
     # 聊天永远先用我们自己的本机权重。除非显式 GBT_ALLOW_EXTERNAL_MODEL=1，否则不允许外部模型接聊天。
     if m.get("base_url") and m.get("name") and os.environ.get("GBT_ALLOW_EXTERNAL_MODEL") == "1":
@@ -644,6 +968,142 @@ def _omni_monitor():
                         "sockets": len(plugged)}}
 
 
+def _omni_impact(target: str = "", n: int = 8) -> dict:
+    """多域监控 · 改动影响面：「我这一刀，顺着关系会撞到谁」。
+
+    主人令 2026-11-04 更正口径：本面板**不是**在监控别的页面、别的能力位活着没活着
+    —— 那件事归 heartbeat / 服务巡检。这里只回答一个问题：
+    **改了这一处，哪些部位必须一起验。**
+
+    判据全部来自 wiring 图（5601 节点 / 65814 有向边），且写侧留痕由
+    omni_plug._sync_impact() 在每次真执行时**同步**追加，不经后台补写：
+
+      · 1 跳 = 直接引用它 / 被它引用的部位（改名字、改签名，这些立刻断）
+      · 2 跳 = 外圈间接依赖（回归时扫一遍）
+      · 不在图里 = 新文件或不在扫描范围，撞不到别处（**如实说，不当成"安全"**）
+    """
+    import re as _re
+    from gbt_allinone.tools import impact_check as IC
+
+    st, err = IC._load()
+    if st is None:
+        return {"ok": False, "error": "关系图不可用：%s" % err,
+                "how": "按顺序重建：repo-pack.py scan → refs → wiring-build.py"}
+    adj = st["adj"]
+    meta = st.get("meta") or {}
+    n = max(3, min(int(n or 8), 20))
+
+    def _split(node):
+        kind, sep, path = str(node or "").partition(":")
+        if not sep:
+            return "cap", str(node or "")
+        return kind, path
+
+    def _human(node):
+        kind, path = _split(node)
+        return {"node": node, "kind": kind, "path": path,
+                "label": path.rsplit("/", 1)[-1] or path}
+
+    def _abs(t):
+        """留痕里的相对路径要拼回仓根，否则永远对不上图节点（会假报 0 处）。"""
+        t = str(t or "").strip()
+        if not t:
+            return ""
+        if _re.match(r"^[A-Za-z]:[\\/]", t) or t.startswith("/"):
+            return t
+        return str(REPO / t)
+
+    def _reach(node, depth):
+        return len(IC.impact(adj, node, depth)) if node in adj else 0
+
+    graph = {"parts": len(adj),
+             "links": int(meta.get("edges_directed") or 0),
+             "core_share": float(meta.get("largest_share") or 0),
+             "islands": int(meta.get("components") or 0),
+             "built_at": str(meta.get("at") or "")}
+
+    # ① 现场算一个目标（改之前先查一圈）
+    probe = None
+    if str(target or "").strip():
+        node = IC._to_node(_abs(target))
+        in_g = node in adj
+        probe = dict(_human(node), input=str(target).strip(), in_graph=in_g,
+                     reach1=_reach(node, 1), reach2=_reach(node, 2),
+                     sample=[_human(x)["path"] for x in sorted(IC.impact(adj, node, 1))[:24]]
+                     if in_g else [])
+
+    # ② 排行：最不能随便动的文件（按 1 跳强依赖数）
+    rk = IC.run_op("risky", n=n * 3)
+    ranking = []
+    for row in (rk.get("top") or []):
+        h = _human(row.get("node") or "")
+        if h["kind"] != "code":
+            continue
+        ranking.append({"path": h["path"], "label": h["label"],
+                        "reach": int(row.get("strong") or 0),
+                        "total": int(row.get("total") or 0),
+                        "files": int(row.get("files") or 0),
+                        "caps": int(row.get("caps") or 0)})
+        if len(ranking) >= n:
+            break
+
+    # ③ 时间线：万能插每真执行一刀就有一条（写侧同步落盘，这里只读）
+    recent = []
+    lp = REPO / "state" / "omni-impact.jsonl"
+    rows = []
+    if lp.is_file():
+        for ln in lp.read_text(encoding="utf-8", errors="replace").splitlines()[-60:]:
+            ln = ln.strip()
+            if not ln.startswith("{"):
+                continue
+            try:
+                rows.append(json.loads(ln))
+            except Exception:  # noqa: BLE001
+                continue
+    for r in rows[-12:][::-1]:
+        node = IC._to_node(_abs(r.get("target")))
+        recent.append({"ts": r.get("ts"), "action": r.get("action"),
+                       "target": str(r.get("target") or ""), "node": node,
+                       "in_graph": node in adj, "ok": bool(r.get("ok")),
+                       "reach1": _reach(node, 1), "reach2": _reach(node, 2)})
+
+    # ④ 一句话结论（给不看图的人）
+    #   分级按**占比**而不是绝对数：图一共 5601 个部位，658 处是 11.7%（牵连面不小），
+    #   4877 处才是 87%（核心区）。只看绝对数会把前者也说成"核心"，结论就不值钱了。
+    _parts = max(1, graph["parts"])
+
+    def _say(in_g, r1, r2):
+        share = (r2 / _parts * 100.0) if _parts else 0.0
+        if not in_g:
+            return {"level": "grey", "head": "这一处不在关系图里",
+                    "body": "新文件，或不在扫描范围内。改动不会顺着仓库关系撞到别处。"}
+        if share >= 25:
+            return {"level": "red", "head": "核心区：一改会碰到 %d 处（%.0f%%）" % (r2, share),
+                    "body": "先看 1 跳那 %d 处 —— 改了它，这些是最先断的。" % r1}
+        if share >= 3:
+            return {"level": "amber", "head": "会牵连 %d 处（%.1f%%）" % (r2, share),
+                    "body": "1 跳 %d 处必须一起验，外圈跑冒烟即可。" % r1}
+        if r2 == 0:
+            return {"level": "green", "head": "图上没连到别处",
+                    "body": "单独改、单独验就行。"}
+        return {"level": "green", "head": "只碰到 %d 处（%.1f%%）" % (r2, share),
+                "body": "1 跳 %d 处，范围很小。" % r1}
+
+    verdict = None
+    if probe:
+        verdict = _say(probe["in_graph"], probe["reach1"], probe["reach2"])
+    elif recent:
+        worst = max(recent, key=lambda x: x["reach2"])
+        verdict = _say(worst["in_graph"], worst["reach1"], worst["reach2"])
+        verdict["head"] = "最近一次改动 · " + verdict["head"]
+        verdict["body"] = "（%s）%s" % (worst["target"], verdict["body"])
+
+    return {"ok": True, "graph": graph, "probe": probe, "ranking": ranking,
+            "recent": recent, "verdict": verdict,
+            "note": "1 跳=直接依赖，改了最先断；2 跳=外圈；"
+                    "「波及 0 处」只说明它不在仓库关系图里，不等于安全"}
+
+
 def _omni_fullopen():
     """万能插默认全开自检：7 类插座逐个真插/真驱动，逐项回执（单个失败不拖垮整体）。"""
     from gbt_allinone import omni_plug as OP
@@ -771,6 +1231,14 @@ class Handler(BaseHTTPRequestHandler):
                 if str(op).lower() == "monitor":
                     from gbt_allinone import omni_monitor as _OM
                     return self._json(_OM.monitor())
+                if str(op).lower() == "impact":
+                    tgt = (q.get("target") or [""])[0]
+                    nn = (q.get("n") or ["8"])[0]
+                    try:
+                        nn = int(nn)
+                    except Exception:  # noqa: BLE001
+                        nn = 8
+                    return self._json(_omni_impact(tgt, nn))
                 if str(op).lower() == "fullopen":
                     return self._json(_omni_fullopen())
                 return self._json(_omni_read(op))
@@ -812,6 +1280,287 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/stream":
+            # 2026-11-02：思考流/行动流（真实读 orchestration-ledger/audit，只读归一化）
+            try:
+                from gbt_allinone import api as _api
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                limit = int((qs.get("limit") or ["80"])[0] or 80)
+                kinds = qs.get("kinds")
+                rows = _stream_rows(300)
+                env = _api.run_task("thought_stream", {"op": "normalize", "rows": rows,
+                                                       "limit": limit, "kinds": kinds}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/context":
+            # 2026-11-02：上下文注入预览（focus + memory_bank + 最近编排账；纯确定性选择）
+            try:
+                from gbt_allinone import api as _api
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                query = str((qs.get("query") or [""])[0])
+                try:
+                    budget = int((qs.get("budget") or ["3000"])[0])
+                except Exception:  # noqa: BLE001
+                    budget = 3000
+                cands = _context_candidates()
+                env = _api.run_task("context_inject", {"op": "select", "query": query,
+                                                       "candidates": cands,
+                                                       "budget": budget}, safe=True)
+                sel = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json({"ok": bool(sel.get("ok")), "selection": sel,
+                                   "candidates": len(cands),
+                                   "sources": ["focus", "memory_bank", "orchestration-ledger"]})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
+        if path == "/api/kws":
+            # 2026-11-03：声学 KWS 状态（本机 sherpa-onnx）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("kws", {"op": "status"}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
+        if path == "/api/update-chain":
+            # 2026-11-03：本地更新测试链状态（不下载/不碰正式 APP）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("update_chain", {"op": "status"}, safe=True)
+                st = ((env.get("gbt_result") or {}).get("result")
+                      if isinstance(env, dict) else None) or {}
+                return self._json(st)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/update":
+            # 2026-11-03：更新校验状态（不下载/不安装）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("update_verify", {"op": "schema"}, safe=True)
+                sch = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json({"ok": True, "install_supported": False, "download": False,
+                                   "public_key_configured": False, "schema": sch,
+                                   "note": "只做离线清单/签名校验；安装器/发布通道未接"})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/lan":
+            # 2026-11-03：局域网配对监听状态（不自动启动；start 走 POST）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("lan_pairing", {"op": "status"}, safe=True)
+                st = ((env.get("gbt_result") or {}).get("result")
+                      if isinstance(env, dict) else None) or {}
+                env2 = _api.run_task("lan_pairing", {"op": "schema"}, safe=True)
+                sch = ((env2.get("gbt_result") or {}).get("result")
+                       if isinstance(env2, dict) else None) or {}
+                env3 = _api.run_task("lan_pairing", {"op": "cert"}, safe=True)
+                cert = ((env3.get("gbt_result") or {}).get("result")
+                        if isinstance(env3, dict) else None) or {}
+                return self._json({"ok": bool(st.get("ok")), "status": st, "schema": sch,
+                                   "cert": {k: v for k, v in cert.items() if k != "key"}})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/pairing":
+            # 2026-11-03：配对/证书安全原语（只读状态；不开端口/不生成证书）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("pairing", {"op": "devices"}, safe=True)
+                dev = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                env2 = _api.run_task("pairing", {"op": "schema"}, safe=True)
+                sch = ((env2.get("gbt_result") or {}).get("result")
+                       if isinstance(env2, dict) else None) or {}
+                return self._json({"ok": bool(dev.get("ok")), "devices": dev.get("devices") or [],
+                                   "count": dev.get("count") or 0, "active": dev.get("active") or 0,
+                                   "max": dev.get("max") or 32, "schema": sch})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
+        if path == "/api/turns":
+            # 2026-11-03：轮次追踪（真实读编排账/action_gate，只读归并）
+            try:
+                from gbt_allinone import api as _api
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                try:
+                    gap = int((qs.get("gap") or ["45"])[0])
+                except Exception:  # noqa: BLE001
+                    gap = 45
+                try:
+                    limit = int((qs.get("limit") or ["50"])[0])
+                except Exception:  # noqa: BLE001
+                    limit = 50
+                rows = _turn_rows(500)
+                env = _api.run_task("turn_trace", {"op": "normalize", "rows": rows,
+                                                    "gap_s": gap, "limit": limit}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/ref3d":
+            # 2026-11-03：ref-to-3d 技能状态
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("ref3d", {"op": "status"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/video":
+            # 2026-11-03：视频能力融合编目（只读）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("video_hub", {"op": "catalog"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/media":
+            # 2026-11-03：媒体舞台索引（只聚合既有产物；不读内容/不转码）
+            try:
+                from gbt_allinone import api as _api
+                qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                kind = str((qs.get("kind") or [""])[0])
+                try:
+                    limit = int((qs.get("limit") or ["120"])[0])
+                except Exception:  # noqa: BLE001
+                    limit = 120
+                rows = _media_scan(500)
+                env = _api.run_task("media_library", {"op": "build", "items": rows,
+                                                       "kind": kind, "limit": limit}, safe=True)
+                idx = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                env2 = _api.run_task("media_library", {"op": "history", "items": rows,
+                                                        "limit": 20}, safe=True)
+                hist = ((env2.get("gbt_result") or {}).get("result")
+                        if isinstance(env2, dict) else None) or {}
+                if isinstance(idx, dict):
+                    idx["history"] = hist.get("entries") or []
+                    idx["roots"] = [r.name for r in MEDIA_ROOTS if r.is_dir()]
+                return self._json(idx)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/media/file":
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            f = _media_resolve((q.get("path") or [""])[0])
+            if not f:
+                return self._json({"ok": False, "error": "not found / not allowed"}, 404)
+            return _serve_media(self, f)
+        if path == "/api/resources":
+            # 2026-11-03：本机资源快照（只读；不写盘/不起进程）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("resource_snapshot", {"op": "snapshot"}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/reminders":
+            # 2026-11-02：提醒（读面免门；写面在能力 handler 过 filesystem_write）
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("reminder", {"op": "list"}, safe=True)
+                lst = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                env2 = _api.run_task("reminder", {"op": "due"}, safe=True)
+                due = ((env2.get("gbt_result") or {}).get("result")
+                       if isinstance(env2, dict) else None) or {}
+                return self._json({"ok": bool(lst.get("ok")), "reminders": lst.get("reminders") or [],
+                                   "count": lst.get("count") or 0,
+                                   "pending": lst.get("pending") or 0,
+                                   "due": due.get("due") or [], "due_count": due.get("count") or 0})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/slots":
+            # 2026-11-02：动态 API 槽（只读定义；执行器未接，call 永远 not_supported）
+            try:
+                from gbt_allinone import api as _api
+                snap = _api_slots_snapshot()
+                env = _api.run_task("api_slot", {"op": "schema"}, safe=True)
+                schema = ((env.get("gbt_result") or {}).get("result")
+                          if isinstance(env, dict) else None) or {}
+                return self._json({"ok": bool(snap.get("ok")), "slots": snap.get("slots") or [],
+                                   "count": snap.get("count") or 0,
+                                   "executor": snap.get("executor") or "not_wired",
+                                   "schema": schema})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/body":
+            # 2026-11-02：body_control 状态口（真实读 state/body_control.json；默认未接线）
+            try:
+                from gbt_allinone import api as _api
+                bindings = None
+                bf = REPO / "state" / "body_control.json"
+                if bf.is_file():
+                    try:
+                        bindings = json.loads(bf.read_text(encoding="utf-8"))
+                    except Exception:  # noqa: BLE001
+                        bindings = None
+                env = _api.run_task("body_control", {"op": "status", "bindings": bindings}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/focus":
+            # 2026-11-02：焦点栈 + 记忆审计（真实读 state/memory_bank.jsonl，只读体检）
+            try:
+                from gbt_allinone import api as _api
+                recs = _memory_audit_records()
+                env = _api.run_task("focus_stack", {"op": "audit", "records": recs}, safe=True)
+                audit = ((env.get("gbt_result") or {}).get("result")
+                         if isinstance(env, dict) else None) or {}
+                env2 = _api.run_task("focus_stack", {"op": "snapshot"}, safe=True)
+                focus = ((env2.get("gbt_result") or {}).get("result")
+                         if isinstance(env2, dict) else None) or {}
+                return self._json({"ok": True, "focus": focus, "audit": audit,
+                                   "audit_source": "state/memory_bank.jsonl",
+                                   "audit_rows": len(recs)})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/voice/settings":
+            try:
+                from gbt_allinone.tools import voice_settings as _VS
+                s = _voice_settings()
+                return self._json({"ok": True, "settings": s, "schema": _VS.schema()})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/ui/cards":
+            # 2026-11-02：ACUI 卡片只看板；真实写操作走统一门 ui_card
+            try:
+                from gbt_allinone import api as _api
+                env = _api.run_task("ui_card", {"op": "snapshot"}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/asr":
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             try:
@@ -820,6 +1569,19 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/voice/audio":
+            # 2026-11-02：对讲 TTS 回放（只读 outputs/voice-intercom 下的 wav）
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            name = str((q.get("name") or [""])[0])
+            safe = "".join(ch for ch in name if ch.isalnum() or ch in "._-")
+            if not safe or safe != name or ".." in safe or not (
+                    safe.lower().endswith(".wav") or safe.lower().endswith(".mp3")):
+                return self._send(404, b"not found", "text/plain; charset=utf-8")
+            f = (REPO / "outputs" / "voice-intercom" / safe)
+            if not f.is_file():
+                return self._send(404, b"not found", "text/plain; charset=utf-8")
+            ctype = "audio/mpeg" if safe.lower().endswith(".mp3") else "audio/wav"
+            return self._send(200, f.read_bytes(), ctype)
         if path == "/api/moments":
             try:
                 from gbt_allinone import moments_hub as MH
@@ -872,6 +1634,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True, "caps": d["caps"]["total"],
                                "skills": d["skills"]["count"],
                                "engine": d["engine"], "guards": d["guards"]})
+        if path in ("/api/team-mirror", "/team-mirror", "/team-mirror.html"):
+            base = REPO if REPO.is_dir() else __import__("pathlib").Path(__file__).resolve().parents[1]
+            jp = base / "state" / "team-mirror.json"
+            hp = base / "交付成片" / "团队镜像" / "team-mirror.html"
+            if path in ("/team-mirror", "/team-mirror.html"):
+                if hp.is_file():
+                    return self._send(200, hp.read_bytes(), "text/html; charset=utf-8")
+                return self._send(404, b"team-mirror.html not found", "text/plain; charset=utf-8")
+            if jp.is_file():
+                return self._json({"ok": True, "data": json.loads(jp.read_text(encoding="utf-8")),
+                                   "source": str(jp), "ts": time.time()})
+            return self._json({"ok": False, "error": "team-mirror.json missing"}, 404)
         if path.startswith("/icons/"):
             # 头像/图标在仓库根 icons/（不在 holo_pet_w3 里）：单独放行
             f = (REPO / path.lstrip("/")).resolve()
@@ -1341,9 +2115,12 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 from gbt_allinone.tools import comfy_native as CN
                 op = str(body.get("op") or "status")
-                if op not in ("run", "validate", "gate", "import", "import_dir"):
+                if op not in ("run", "validate", "gate", "import", "import_dir", "t2i_sdturbo", "t2i_fused", "i2v_svd"):
                     return self._json({"ok": False, "op": op,
-                                       "error": "user_error: /api/tianzhen POST 只允许 run/validate/gate/import"}, 400)
+                                       "error": "user_error: /api/tianzhen POST 只允许 run/validate/gate/import/t2i_sdturbo/t2i_fused/i2v_svd"}, 400)
+                if op in ("t2i_sdturbo", "t2i_fused", "i2v_svd"):
+                    from gbt_allinone.native_t2i_bridge import run as native_t2i
+                    return self._json(native_t2i(body))
                 return self._json(CN.run(dict(body)))
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
@@ -1365,12 +2142,64 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/asr":
+            # 2026-11-02：数字人页面用 getUserMedia 录好 16k WAV（wav_b64）上传，
+            # 这里必须识别上传音频；旧实现忽略上传、改录服务器默认麦 ⇒ 数字人听不到主人说话。
+            tmp = None
             try:
+                raw_b64 = body.get("wav_b64") or body.get("wav") or ""
+                wav_path = None
+                if isinstance(raw_b64, str) and raw_b64.strip():
+                    import base64 as _b64
+                    import tempfile as _tf
+                    raw = _b64.b64decode(raw_b64.split(",", 1)[-1])
+                    if len(raw) > 12 * 1024 * 1024:
+                        return self._json({"ok": False,
+                                           "error": "user_error: 上传音频 >12MB"}, 413)
+                    if len(raw) < 44:
+                        return self._json({"ok": False,
+                                           "error": "user_error: 上传音频太短/不是 WAV"}, 400)
+                    tmp = _tf.NamedTemporaryFile(prefix="gbt-asr-", suffix=".wav",
+                                                 delete=False)
+                    tmp.write(raw)
+                    tmp.close()
+                    wav_path = tmp.name
+                if wav_path:
+                    # 2026-11-02：按语音设置选后端（auto=Whisper 优先 / whisper=只 Whisper / windows=只系统）
+                    _vset = _voice_settings()
+                    _backend = str(_vset.get("asr_backend") or "auto")
+                    _aw_err = None
+                    if _backend != "windows":
+                        try:
+                            from gbt_allinone.tools import asr_whisper as _AW
+                            _av = _AW.available()
+                            if _av.get("ok"):
+                                _wr = _AW.transcribe(wav_path)
+                                if _wr.get("ok"):
+                                    _wr["via"] = "whisper:" + _backend
+                                    _wr["settings_backend"] = _backend
+                                    return self._json(_wr)
+                                _aw_err = _wr.get("error") or _wr.get("status")
+                            else:
+                                _aw_err = _av.get("reason")
+                        except Exception as _we:  # noqa: BLE001
+                            _aw_err = "%s: %s" % (type(_we).__name__, str(_we)[:120])
+                    if _backend == "whisper":
+                        return self._json({"ok": False, "status": "error",
+                                           "backend": "faster-whisper:base",
+                                           "error": _aw_err or "Whisper 不可用",
+                                           "hint": "设置里 ASR=whisper（只 Whisper）；要回退请改成 auto/windows"})
                 return self._json(_asr_local(body.get("seconds") or 5,
-                                             body.get("culture") or "zh-CN"))
+                                             body.get("culture") or "zh-CN",
+                                             wav=wav_path, device=body.get("device")))
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+            finally:
+                if tmp is not None:
+                    try:
+                        os.unlink(tmp.name)
+                    except Exception:  # noqa: BLE001
+                        pass
         if path == "/api/moments":
             try:
                 from gbt_allinone import moments_hub as MH
@@ -1428,13 +2257,580 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/world":
+            # 2026-11-02 P1：世界锻造只读数据面（spec/gen/step/view3d/summary；纯函数不落盘）
+            try:
+                from gbt_allinone.tools import world_forge as _WF
+                op = str(body.get("op") or "view3d")
+                p = {k: v for k, v in body.items() if k != "op"}
+                return self._json(_WF.run(op, **p))
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/stream":
+            # 2026-11-02：思考流（可传 rows 做归一化/过滤）
+            try:
+                from gbt_allinone import api as _api
+                rows = body.get("rows")
+                if not isinstance(rows, list):
+                    rows = _stream_rows(300)
+                env = _api.run_task("thought_stream", {
+                    "op": "normalize", "rows": rows,
+                    "limit": body.get("limit") or 80,
+                    "kinds": body.get("kinds")}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/context":
+            # 2026-11-02：上下文注入（预览/选择）；纯选择，不调模型
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "select").lower()
+                if op == "select":
+                    cands = body.get("candidates")
+                    if not isinstance(cands, list):
+                        cands = _context_candidates()
+                    env = _api.run_task("context_inject", {
+                        "op": "select", "query": body.get("query") or "",
+                        "candidates": cands,
+                        "budget": body.get("budget") or 3000}, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    return self._json(res)
+                env = _api.run_task("context_inject", {"op": "schema"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
+        if path == "/api/kws":
+            # 2026-11-03：KWS 检测（PCM base64）或状态；只本机
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "status").lower()
+                if op == "detect":
+                    import base64 as _b64
+                    pcm = _b64.b64decode(str(body.get("pcm_base64") or ""), validate=False)
+                    env = _api.run_task("kws", {"op": "detect", "pcm": pcm,
+                                                "rate": int(body.get("rate") or 16000)}, safe=True)
+                else:
+                    env = _api.run_task("kws", {"op": "status"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/voice/stream":
+            # 2026-11-03：流式语音（PCM 分片；局部/最终 Whisper）
+            try:
+                from gbt_allinone import api as _api
+                import tempfile as _tempfile
+                from gbt_allinone.tools import voice_stream as _VS
+                from gbt_allinone.tools import asr_whisper as _AW
+                op = str(body.get("op") or "start").lower()
+                if op == "start":
+                    env = _api.run_task("voice_stream", {"op": "start",
+                                                         "session": body.get("session")}, safe=True)
+                    return self._json(((env.get("gbt_result") or {}).get("result")
+                                       if isinstance(env, dict) else None) or {})
+                if op in ("chunk", "end", "reset"):
+                    sid = body.get("session") or ""
+                    if op == "chunk":
+                        env = _api.run_task("voice_stream", {"op": "chunk", "session": sid,
+                                                             "pcm_base64": body.get("pcm_base64")}, safe=True)
+                        res = ((env.get("gbt_result") or {}).get("result")
+                               if isinstance(env, dict) else None) or {}
+                        if res.get("ok") and body.get("partial") and float(res.get("duration") or 0) >= _VS.PARTIAL_MIN_S:
+                            try:
+                                with _tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
+                                    path = tf.name
+                                _VS.write_wav(path, _api.run_task("voice_stream", {"op": "end",
+                                                                                   "session": sid}, safe=True)
+                                              .get("gbt_result", {}).get("result", {}).get("pcm", b"")
+                                              if False else b"")
+                                # 上面的分支只用于保持导入紧凑；真正局部转写在下方直接取缓冲
+                                try:
+                                    from gbt_allinone.tools.voice_stream import _STORE as _VS_STORE
+                                    _VS.write_wav(path, _VS_STORE.get(sid))
+                                    tr = _AW.transcribe(path)
+                                    res["partial"] = tr.get("text") or ""
+                                    res["partial_status"] = tr.get("status")
+                                    res["wake"] = _VS.detect_wake(res["partial"])
+                                finally:
+                                    try:
+                                        import os as _os
+                                        _os.unlink(path)
+                                    except OSError:
+                                        pass
+                            except Exception as _pe:  # noqa: BLE001
+                                res["partial_error"] = "%s: %s" % (type(_pe).__name__, str(_pe)[:100])
+                        try:
+                            from gbt_allinone.tools import kws as _KWS
+                            from gbt_allinone.tools.voice_stream import _STORE as _VS_STORE
+                            if _KWS.available().get("ok"):
+                                res["acoustic_wake"] = _KWS.detect_pcm(_VS_STORE.get(sid))
+                        except Exception as _ke:  # noqa: BLE001
+                            res["acoustic_wake_error"] = "%s: %s" % (type(_ke).__name__, str(_ke)[:80])
+                        return self._json(res)
+                    env = _api.run_task("voice_stream", {"op": op, "session": sid}, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    if op == "end" and res.get("ok"):
+                        pcm = res.get("pcm") or b""
+                        try:
+                            with _tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
+                                path = tf.name
+                            _VS.write_wav(path, pcm)
+                            tr = _AW.transcribe(path)
+                            res.pop("pcm", None)
+                            res["transcribe"] = tr
+                            res["text"] = tr.get("text") or ""
+                            res["wake"] = _VS.detect_wake(res["text"])
+                            try:
+                                from gbt_allinone.tools import kws as _KWS
+                                if _KWS.available().get("ok"):
+                                    res["acoustic_wake"] = _KWS.detect_pcm(pcm)
+                            except Exception as _ke:  # noqa: BLE001
+                                res["acoustic_wake_error"] = "%s: %s" % (type(_ke).__name__, str(_ke)[:80])
+                        finally:
+                            try:
+                                import os as _os
+                                _os.unlink(path)
+                            except Exception:  # noqa: BLE001
+                                pass
+                    return self._json(res)
+                return self._json({"ok": False, "error": "user_error: 未知 op"})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/video":
+            # 2026-11-03：视频舱六段只读探针/单能力路由；执行仍走各自统一门
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "run").lower()
+                if op == "dispatch":
+                    env = _api.run_task("video_hub", {"op": "dispatch",
+                                                       "cap": body.get("cap") or "",
+                                                       "payload": body.get("payload") or {}}, safe=True)
+                else:
+                    env = _api.run_task("video_hub", {"op": "run"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/update-chain":
+            # 2026-11-03：本地测试链 init/stage/confirm/rollback（只 state/updates-test）
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "status").lower()
+                payload = {"op": op}
+                if op == "confirm":
+                    payload["stage_id"] = body.get("stage_id") or ""
+                    payload["token"] = body.get("token") or ""
+                env = _api.run_task("update_chain", payload, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                if res.get("ok") and op in ("init", "stage", "confirm", "rollback"):
+                    try:
+                        d = REPO / "outputs" / "update-chain"
+                        d.mkdir(parents=True, exist_ok=True)
+                        safe_res = {k: v for k, v in res.items() if k not in ("confirm_token", "dev_key")}
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                "op": op, "result": safe_res},
+                                               ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/update":
+            # 2026-11-03：离线验签；绝不下载/安装
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "verify").lower()
+                if op == "verify":
+                    env = _api.run_task("update_verify", {
+                        "op": "verify", "manifest": body.get("manifest") or {},
+                        "public_key": body.get("public_key") or "",
+                        "current_version": body.get("current_version") or "0.0.0"}, safe=True)
+                    return self._json(((env.get("gbt_result") or {}).get("result")
+                                       if isinstance(env, dict) else None) or {})
+                env = _api.run_task("update_verify", {"op": "schema"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/lan":
+            # 2026-11-03：start/stop 局域网监听；默认只绑私有地址；无远程命令
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "status").lower()
+                payload = {"op": op}
+                if op == "start":
+                    payload["host"] = body.get("host") or "lan"
+                    payload["port"] = body.get("port") or 8767
+                env = _api.run_task("lan_pairing", payload, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                if res.get("ok") and op in ("start", "stop"):
+                    try:
+                        d = REPO / "outputs" / "pairing"
+                        d.mkdir(parents=True, exist_ok=True)
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                "op": "lan_" + op, "result": res},
+                                               ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/pairing":
+            # 2026-11-03：生成码/claim/撤销/证书指纹；不写 token 到审计
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "").lower()
+                payload = {"op": op}
+                if op == "claim":
+                    payload["code"] = body.get("code") or ""
+                    payload["name"] = body.get("name") or ""
+                elif op == "revoke":
+                    payload["id"] = body.get("id") or ""
+                elif op in ("cert", "cert_verify"):
+                    payload["pem"] = body.get("pem") or ""
+                    payload["expected"] = body.get("expected") or ""
+                env = _api.run_task("pairing", payload, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                if res.get("ok") and op in ("code", "claim", "revoke"):
+                    try:
+                        d = REPO / "outputs" / "pairing"
+                        d.mkdir(parents=True, exist_ok=True)
+                        safe_res = {k: v for k, v in res.items() if k not in ("device",)}
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                "op": op, "result": safe_res},
+                                               ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/reminders":
+            # 2026-11-02：提醒 create/cancel/complete；写面由 reminder 能力过分filesystem_write 门
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "create").lower()
+                payload = {"op": op}
+                if op == "create":
+                    payload["reminder"] = body.get("reminder") or {}
+                if op in ("cancel", "complete"):
+                    payload["id"] = body.get("id") or ""
+                env = _api.run_task("reminder", payload, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                if res.get("ok"):
+                    try:
+                        d = REPO / "outputs" / "reminders"
+                        d.mkdir(parents=True, exist_ok=True)
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                "op": op, "result": res},
+                                               ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/slots":
+            # 2026-11-02：注册/删除/调用槽；call 走门但永远返回 not_supported（不发请求）
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "list").lower()
+                if op == "register":
+                    env = _api.run_task("api_slot", {"op": "register", "slot": body.get("slot")}, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    if res.get("ok"):
+                        _api_slots_save()
+                    return self._json(res)
+                if op == "remove":
+                    env = _api.run_task("api_slot", {"op": "remove", "name": body.get("name")}, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    if res.get("ok"):
+                        _api_slots_save()
+                    return self._json(res)
+                if op == "call":
+                    env = _api.run_task("api_slot", {"op": "call", "name": body.get("name")}, safe=True)
+                    return self._json(((env.get("gbt_result") or {}).get("result")
+                                       if isinstance(env, dict) else None) or {})
+                return self._json(_api_slots_snapshot())
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/body":
+            # 2026-11-02：body_control 只接受 status/inventory/verify/move（move 也如实拒，不执行）
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "status").lower()
+                payload = {"op": op}
+                if op == "move":
+                    payload["action"] = body.get("action") or ""
+                env = _api.run_task("body_control", payload, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/focus":
+            # 2026-11-02：焦点栈 push/pop/clear/audit；审计由主循环调用，UI 只读列表
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "snapshot").lower()
+                if op == "audit":
+                    recs = body.get("records")
+                    if not isinstance(recs, list):
+                        recs = _memory_audit_records()
+                    env = _api.run_task("focus_stack", {"op": "audit", "records": recs}, safe=True)
+                    return self._json(((env.get("gbt_result") or {}).get("result")
+                                       if isinstance(env, dict) else None) or {})
+                if op in ("push", "pop", "clear"):
+                    payload = {"op": op}
+                    if op == "push":
+                        payload["item"] = body.get("item")
+                    if op == "pop" and body.get("id"):
+                        payload["id"] = body.get("id")
+                    env = _api.run_task("focus_stack", payload, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    if res.get("ok"):
+                        try:
+                            d = REPO / "outputs" / "focus"
+                            d.mkdir(parents=True, exist_ok=True)
+                            with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                                f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                    "op": op, "result": res},
+                                                   ensure_ascii=False) + "\n")
+                        except Exception:  # noqa: BLE001
+                            pass
+                    return self._json(res)
+                env = _api.run_task("focus_stack", {"op": "snapshot"}, safe=True)
+                return self._json(((env.get("gbt_result") or {}).get("result")
+                                   if isinstance(env, dict) else None) or {})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/ui/cards":
+            # 2026-11-02：ACUI 卡片协议（创建/关闭/动作）；动作只回事件，不执行工具
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "snapshot").lower()
+                payload = {"op": op, "id": body.get("id"), "action": body.get("action"),
+                           "payload": body.get("payload"), "card": body.get("card"),
+                           "reason": body.get("reason")}
+                payload = {k: v for k, v in payload.items() if v is not None}
+                env = _api.run_task("ui_card", payload, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                if res.get("ok") and op in ("create", "close", "action"):
+                    try:
+                        import json as _json
+                        d = REPO / "outputs" / "ui-cards"
+                        d.mkdir(parents=True, exist_ok=True)
+                        row = {"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "op": op,
+                               "card": res.get("card") or {}, "result": res.get("event") or {}}
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(_json.dumps(row, ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                return self._json(res)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/voice/settings":
+            # 2026-11-02：语音设置保存；校验走统一门 voice_settings，落盘在 trusted-owner 本地设置面
+            try:
+                from gbt_allinone import api as _api
+                op = str(body.get("op") or "save").lower()
+                if op == "resolve":
+                    env = _api.run_task("voice_settings", {
+                        "op": "resolve", "settings": body.get("settings") or {},
+                        "voices": body.get("voices") or []}, safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    return self._json(res)
+                if op == "save":
+                    env = _api.run_task("voice_settings", {
+                        "op": "validate", "settings": body.get("settings") or {}},
+                        safe=True)
+                    res = ((env.get("gbt_result") or {}).get("result")
+                           if isinstance(env, dict) else None) or {}
+                    if not res.get("ok"):
+                        return self._json(res)
+                    settings = res["settings"]
+                    VOICE_SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    tmp = VOICE_SETTINGS_PATH.with_suffix(".tmp")
+                    tmp.write_text(json.dumps(settings, ensure_ascii=False, indent=1),
+                                   encoding="utf-8")
+                    tmp.replace(VOICE_SETTINGS_PATH)
+                    try:
+                        d = REPO / "outputs" / "voice-settings"
+                        d.mkdir(parents=True, exist_ok=True)
+                        with open(d / "audit.jsonl", "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                "settings": settings}, ensure_ascii=False) + "\n")
+                    except Exception:  # noqa: BLE001
+                        pass
+                    return self._json({"ok": True, "settings": settings})
+                return self._json({"ok": False, "error": "user_error: 未知 op %s" % op}, 400)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/voice/intercom":
+            # 2026-11-02：语音对讲（蒸馏上游参考项目语音球/唤醒/打断；真录放仍走 voice 能力位）
+            try:
+                from gbt_allinone import api as _api
+                from gbt_allinone.tools import voice_intercom as _VI
+                op = str(body.get("op") or "status").lower()
+
+                def _inner(env):
+                    return ((env.get("gbt_result") or {}).get("result")
+                            if isinstance(env, dict) else None) or {}
+
+                if op == "status":
+                    legs = {}
+                    try:
+                        legs["voice"] = _inner(_api.run_task("voice", {"op": "status"}, safe=True))
+                    except Exception as exc:  # noqa: BLE001
+                        legs["voice"] = {"ok": False, "error": "%s: %s"
+                                         % (type(exc).__name__, str(exc)[:160])}
+                    try:
+                        from gbt_allinone.tentacle import commander as _C
+                        legs["brain"] = _C.alive()
+                    except Exception as exc:  # noqa: BLE001
+                        legs["brain"] = {"ok": False, "error": str(exc)[:160]}
+                    return self._json({"ok": True, "wake_words": list(_VI.WAKE_WORDS),
+                                       "states": list(_VI.STATES), "legs": legs,
+                                       "verify": _VI.verify()})
+                if op == "wake":
+                    w = _VI.should_wake(body.get("text"))
+                    return self._json({"ok": True, **w})
+                if op == "listen":
+                    env = _api.run_task("voice", {"op": "listen",
+                                                  "seconds": float(body.get("seconds") or 5),
+                                                  "culture": str(body.get("culture") or "zh-CN")},
+                                        safe=True)
+                    res = _inner(env)
+                    out = {"ok": bool(res.get("ok")), "heard": bool(res.get("heard")),
+                           "text": res.get("text") or "", "status": res.get("status"),
+                           "reason": res.get("reason"), "confidence": res.get("confidence"),
+                           "denied": bool(env.get("denied") if isinstance(env, dict) else False),
+                           "missing_scopes": env.get("missing_scopes") if isinstance(env, dict) else None,
+                           "legs": res.get("legs") or []}
+                    return self._json(out)
+                if op == "say":
+                    speech = _VI.speakable(body.get("text"))
+                    if not speech:
+                        return self._json({"ok": False, "error": "user_error: 没有可朗读文字"}, 400)
+                    out_dir = REPO / "outputs" / "voice-intercom"
+                    out_dir.mkdir(parents=True, exist_ok=True)
+                    wav = out_dir / ("tts-%s.mp3" % time.strftime("%Y%m%d-%H%M%S"))
+                    env = _api.run_task("voice", {"op": "tts", "text": speech,
+                                                  "out": str(wav), "play": False}, safe=True)
+                    res = _inner(env)
+                    backend = str(res.get("backend") or "")
+                    if "sapi" in backend and wav.is_file():
+                        final = wav.with_suffix(".wav")
+                        try:
+                            wav.replace(final)
+                            wav = final
+                        except Exception:  # noqa: BLE001
+                            pass
+                    ok = bool(res.get("ok")) and wav.is_file()
+                    return self._json({"ok": ok, "text": speech,
+                                       "url": ("/api/voice/audio?name=" + wav.name) if ok else "",
+                                       "backend": res.get("backend"), "result": res})
+                if op == "turn":
+                    env = _api.run_task("voice", {"op": "listen",
+                                                  "seconds": float(body.get("seconds") or 5),
+                                                  "culture": str(body.get("culture") or "zh-CN")},
+                                        safe=True)
+                    lres = _inner(env)
+                    if not (lres.get("ok") and lres.get("heard")):
+                        return self._json({"ok": False, "stage": "listen",
+                                           "error": lres.get("reason") or lres.get("status")
+                                           or "没听到（不是坏了）",
+                                           "listened": lres,
+                                           "missing_scopes": env.get("missing_scopes")
+                                           if isinstance(env, dict) else None})
+                    w = _VI.should_wake(lres.get("text"))
+                    q = w.get("query") or lres.get("text")
+                    chat = _chat(q, "console-web", use_capabilities=True)
+                    reply = str(chat.get("text") or "").strip()
+                    speech = _VI.speakable(reply)
+                    url = ""
+                    say = {}
+                    if speech:
+                        out_dir = REPO / "outputs" / "voice-intercom"
+                        out_dir.mkdir(parents=True, exist_ok=True)
+                        wav = out_dir / ("tts-%s.wav" % time.strftime("%Y%m%d-%H%M%S"))
+                        env2 = _api.run_task("voice", {"op": "tts", "text": speech,
+                                                       "out": str(wav), "play": False}, safe=True)
+                        say = _inner(env2)
+                        if say.get("ok") and wav.is_file():
+                            url = "/api/voice/audio?name=" + wav.name
+                    return self._json({"ok": True, "transcript": lres.get("text"),
+                                       "wake": w, "query": q, "reply": reply,
+                                       "speech": speech, "url": url, "say": say,
+                                       "chat": {"ok": chat.get("ok"), "via": chat.get("via"),
+                                                "ms": chat.get("elapsed_ms")},
+                                       "listen": {"status": lres.get("status"),
+                                                  "confidence": lres.get("confidence"),
+                                                  "legs": lres.get("legs") or []}})
+                if op == "interrupt":
+                    return self._json({"ok": True, "state": "idle"})
+                return self._json({"ok": False, "error": "user_error: 未知 op %s" % op}, 400)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/browser":
+            # 2026-11-02：内置浏览器页的「原生浏览器（Chrome CDP）」控制面；只走 run_task 门，不绕过
+            try:
+                from gbt_allinone import api as _api
+                act = str(body.get("action") or "status")
+                params = {k: v for k, v in body.items() if k not in ("op", "action")}
+                env = _api.run_task("browser", {"op": "native", "action": act, **params}, safe=True)
+                res = ((env.get("gbt_result") or {}).get("result")
+                       if isinstance(env, dict) else None) or {}
+                return self._json({"ok": bool(res.get("ok")), "action": act,
+                                   "result": res, "envelope_ok": bool(env.get("gbt_result"))
+                                   if isinstance(env, dict) else False})
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
         if path == "/api/chat":
             text = str(body.get("text") or "").strip()
-            if not text:
-                return self._json({"ok": False, "error": "user_error: 需要 text"}, 400)
+            if not text and not body.get("image") and not body.get("file"):
+                return self._json({"ok": False, "error": "user_error: 需要 text / image / file"}, 400)
             try:
                 return self._json(_chat(text, str(body.get("context") or CONTEXT_NAME),
-                                        use_capabilities=body.get("capability") is not False))
+                                        use_capabilities=body.get("capability") is not False,
+                                        image=body.get("image"),
+                                        image_name=str(body.get("image_name") or ""),
+                                        file=body.get("file"),
+                                        file_name=str(body.get("file_name") or ""),
+                                        file_type=str(body.get("file_type") or "")))
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:160])}, 500)
         return self._json({"ok": False, "error": "not found"}, 404)
@@ -1460,3 +2856,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

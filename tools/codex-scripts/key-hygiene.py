@@ -39,7 +39,7 @@ NPX = shutil.which("npx") or shutil.which("npx.cmd") or "npx.cmd"
 PYEXE = sys.executable or "py"
 
 ROOT = Path(__file__).resolve().parents[2]
-CF_ENV = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9\state\keys.env")
+CF_ENV = Path.home() / "Desktop" / "GBT小土豆V9" / "state" / "keys.env"
 SINGLE, LIST = "GBT_ENDPOINT_TOKEN", "GBT_ENDPOINT_TOKENS"
 GRACE_MIN = 30
 ROWS = []
@@ -225,8 +225,8 @@ def check_library():
 
 def check_local(retired):
     files = [ROOT / "deploy/cloud-10/.dev.vars", ROOT / "state/keys.env",
-             Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V9\state\keys.env"),
-             Path(r"C:\Users\ADMIN\gbt-potato-v9\state\keys.env")]
+             Path.home() / "Desktop" / "GBT小土豆V9" / "state" / "keys.env",
+             Path.home() / "gbt-potato-v9" / "state" / "keys.env"]
     hits = []
     for f in files:
         try:

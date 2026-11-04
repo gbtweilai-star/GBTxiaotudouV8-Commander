@@ -37,6 +37,7 @@
 不出网、不碰密钥。`commit` 只把分派写进自己的台账（state/command_chain.jsonl）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -612,7 +613,7 @@ def run(op: str = "status", **params) -> dict:
     if fn is None:
         return {"ok": False, "fail_closed": True,
                 "error": f"未知 op:{op}（plan/commit/close/assignments/roster/status）"}
-    return fn(**params)
+    return _oc_call(fn, params)
 
 
 def where(**_kw) -> dict:

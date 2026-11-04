@@ -30,7 +30,7 @@ DOMAIN = "creation"
 CAP_TYPE = "internal"
 TRACE_SOURCE_KIND = "dl_forge"
 
-V8 = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+V8 = str(__import__("pathlib").Path(__file__).resolve().parents[2])
 
 # ══════════════════════════════════════════════════════════════════════════
 # ★ 秋叶 3D 节点 → 她的原生触手（96 个真名，按用途归到 8 段）

@@ -25,6 +25,7 @@
 4. **本机没有 FreeCAD** 这条写进 `status` —— 免得后人以为本位接的是 FreeCAD。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import os
 import shutil
@@ -163,7 +164,7 @@ def run(op: str = "status", **params) -> dict:
     for nm, fn in (("status", status), ("where", where), ("version", version),
                    ("doctor", doctor), ("help", help), ("snapshot", snapshot)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "op": op, "fail_closed": True,
             "error": "未知 op：%s" % op, "ops": list(_OPS)}
 

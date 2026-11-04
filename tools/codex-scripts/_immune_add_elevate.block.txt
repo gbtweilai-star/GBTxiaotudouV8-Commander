@@ -1,0 +1,345 @@
+# ══════════════════════════════════════════════════════════════
+# L2.5 交付通道：把「需提权」变成可执行脚本（生成，不代跑）
+# ══════════════════════════════════════════════════════════════
+# 由来（2026-11-04 实战血账）：
+#   计划任务 \Skype（伪装成 Skype）每 30 分钟空跑，动作指向已删除的
+#   %TEMP%\aclui.dll.js，Windows Script Host 于是每半小时弹一次
+#   「无法找到脚本文件」。op_scan 跑一次就抓到了 —— 但判据只把它标成
+#   admin=True / auto_fixable=False，而当时**没有任何东西把这行标注
+#   变成动作**，于是报告烂在文件里 43 天，弹窗照弹。
+#   结论：判据没错，缺的是出口。这一层只补出口 ——
+#   把 blocked 项写成脚本，人点一次 UAC 就结算；脚本里每一项逐条报
+#   OK / FAIL / SKIP，失败的如实写出来，不假装做到。
+_WORK = os.path.join(_HOME, "work")
+
+
+def _elevate_payload(rows: list[dict]) -> list[dict]:
+    """挑出提权脚本该处理的项，裁成 ps1 需要的字段。"""
+    keep = []
+    for f in rows:
+        if not f.get("admin"):
+            continue
+        keep.append({
+            "kind": f.get("kind") or "",
+            "fix": f.get("fix") or "",
+            "where": f.get("where") or "",
+            "name": f.get("name") or "",
+            "target": f.get("target") or "",
+            "pid": int(f.get("pid") or 0),
+        })
+    return keep
+
+
+def _build_elevate_ps1(items: list[dict], log_path: str) -> str:
+    """生成提权脚本正文。数据驱动：项走 JSON、逻辑走 switch，不逐项拼代码。"""
+    data = json.dumps(items, ensure_ascii=False)
+    tpl = r'''# -*- coding: utf-8 -*-
+# body_immune 生成的提权清除脚本 —— 不会自己跑，必须人点 UAC。
+# 生成于 __AT__
+# 下面每一项都会逐条报 OK / FAIL / SKIP；失败的如实写出来，不假装做到。
+
+$ErrorActionPreference = "Continue"
+$Log = "__LOG__"
+$Done = 0
+$Fail = 0
+$Skip = 0
+
+function W([string]$m) {
+    $line = "[{0}] {1}" -f (Get-Date -Format "HH:mm:ss"), $m
+    Write-Host $line
+    try { $line | Out-File -FilePath $Log -Append -Encoding UTF8 } catch { }
+}
+
+W "=============================================================="
+W " body_immune elevate"
+W "=============================================================="
+
+$me = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not $me.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    W "ABORT: 当前不是管理员，本脚本什么也不做。"
+    W "请改用同目录的 .cmd 启动，它会自己请求提权。"
+    exit 10
+}
+W "elevated = True"
+
+$Items = '__ITEMS__' | ConvertFrom-Json
+
+foreach ($it in $Items) {
+    W "--------------------------------------------------------------"
+    W ("[item] " + $it.kind + "    fix=" + $it.fix)
+    if ($it.where)  { W ("       where  : " + $it.where) }
+    if ($it.target) { W ("       target : " + $it.target) }
+
+    $ok = $false
+    $skip = $false
+
+    switch ($it.fix) {
+        "delete_task" {
+            $name = ([string]$it.where).TrimStart('\')
+            $file = Join-Path $env:WINDIR ("System32\Tasks\" + $name)
+            if (Test-Path $file) {
+                # 恶意件常见手法：建完任务就把创建者削成只读、删除权收归管理员。
+                # 不先夺回来，schtasks /Delete 一样会被拒（0x80070005）。
+                $null = takeown /f "$file" /a 2>&1
+                $null = icacls "$file" /grant "*S-1-5-32-544:(F)" /c 2>&1
+            }
+            $null = schtasks /Delete /TN "$name" /F 2>&1
+            $still = Get-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
+            if ($still -and (Test-Path $file)) {
+                $null = Remove-Item $file -Force -ErrorAction SilentlyContinue
+                $still = Get-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
+            }
+            $ok = -not $still
+        }
+        "del_reg" {
+            $null = reg delete "$($it.where)" /v "$($it.name)" /f 2>&1
+            $ok = ($LASTEXITCODE -eq 0)
+        }
+        "kill" {
+            if ([int]$it.pid -gt 0) {
+                Stop-Process -Id ([int]$it.pid) -Force -ErrorAction SilentlyContinue
+                $ok = -not (Get-Process -Id ([int]$it.pid) -ErrorAction SilentlyContinue)
+            }
+        }
+        "recycle" {
+            $p = ([string]$it.target)
+            if (Test-Path $p) {
+                try {
+                    $sh = New-Object -ComObject Shell.Application
+                    $folder = $sh.NameSpace((Split-Path $p -Parent))
+                    $leaf = Split-Path $p -Leaf
+                    if ($folder) { $folder.ParseName($leaf).InvokeVerb("delete") }
+                    Start-Sleep -Milliseconds 400
+                    $ok = -not (Test-Path $p)
+                } catch { $ok = $false }
+            } else { $ok = $true }
+        }
+        default {
+            W "       SKIP 不认识的处置方式，留给人工"
+            $skip = $true
+        }
+    }
+
+    if ($skip) {
+        $Skip++
+    } elseif ($ok) {
+        W "       OK   已清除"
+        $Done++
+    } else {
+        W "       FAIL 未能清除（权限仍不足 / 目标被占用 / 需重启后重试）"
+        $Fail++
+    }
+}
+
+W "=============================================================="
+W ("结果  OK={0}   FAIL={1}   SKIP={2}" -f $Done, $Fail, $Skip)
+W ("日志  {0}" -f $Log)
+W "=============================================================="
+if ($Fail -gt 0) { exit 3 } else { exit 0 }
+'''
+    return (tpl.replace("__AT__", time.strftime("%Y-%m-%d %H:%M:%S"))
+               .replace("__LOG__", log_path)
+               .replace("__ITEMS__", data))
+
+
+def _build_elevate_cmd(ps1_name: str) -> str:
+    """包装器：双击即自提权，用户只点一次 UAC。"""
+    return "\r\n".join([
+        "@echo off",
+        "title body_immune - 提权清除",
+        "net session >nul 2>&1",
+        "if %errorlevel%==0 goto RUN",
+        "echo [*] 需要管理员权限，正在请求提权...",
+        "echo [*] 请在 UAC 窗口点【是】",
+        "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Start-Process -FilePath '%~f0' -Verb RunAs\"",
+        "exit /b",
+        ":RUN",
+        "echo [+] 已提权，开始执行",
+        "echo.",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File \"%~dp0{0}\"".format(ps1_name),
+        "echo.",
+        "pause",
+        "",
+    ])
+
+
+def op_elevate(scan: dict = None, dry_run: bool = False) -> dict:
+    """把 admin=True 的项写成「一键提权」脚本。只生成，不代跑。
+
+    提权必须由人点确认 —— agent 不能替人按 UAC，也不该绕。
+    """
+    rep = op_scan() if scan is None else scan
+    items = _elevate_payload(rep.get("findings", []))
+    if not items:
+        return {"ok": True, "count": 0,
+                "msg": "没有需要提权的项；op=purge 就能清完"}
+
+    ts = time.strftime("%Y%m%d-%H%M%S")
+    if dry_run:
+        return {"ok": True, "dry_run": True, "count": len(items),
+                "items": items,
+                "note": "演习。真生成给 dry_run=false，会在 state/immune/work 下写 .ps1 + .cmd。"}
+
+    os.makedirs(_WORK, exist_ok=True)
+    ps1_path = os.path.join(_WORK, "elevate-%s.ps1" % ts)
+    cmd_path = os.path.join(_WORK, "elevate-%s.cmd" % ts)
+    log_path = os.path.join(_WORK, "elevate-%s.log" % ts)
+
+    body = _build_elevate_ps1(items, log_path)
+    # .ps1 一律 utf-8-sig：PowerShell 5.1 读无 BOM 的 UTF-8 会按 GBK 解，
+    # 中文乱码还会吃掉字符串结束引号（AGENTS.md 3.1 第二条）。
+    with open(ps1_path, "w", encoding="utf-8-sig", newline="\r\n") as fh:
+        fh.write(body)
+    # .cmd 用 GBK：cmd.exe 默认按 ANSI 读，UTF-8 中文会花
+    with open(cmd_path, "w", encoding="gbk", errors="replace", newline="\r\n") as fh:
+        fh.write(_build_elevate_cmd(os.path.basename(ps1_path)))
+
+    _ledger_append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "op": "elevate",
+                    "count": len(items), "ps1": ps1_path,
+                    "targets": [i["where"] or i["target"] for i in items]})
+    return {
+        "ok": True, "count": len(items), "dry_run": False,
+        "ps1": ps1_path, "cmd": cmd_path, "log": log_path,
+        "items": [{"kind": i["kind"], "fix": i["fix"],
+                   "where": i["where"], "target": i["target"]} for i in items],
+        "how": "双击 .cmd，UAC 点【是】。脚本逐项报 OK / FAIL，失败的不装成功。",
+    }
+
+
+# ══════════════════════════════════════════════════════════════
+# L3.5 常态核对：拿这次和上次比，只报变化
+# ══════════════════════════════════════════════════════════════
+# 为什么要有这一层：
+#   \Skype 那 43 天里，op_scan 从来没被执行过 —— 抓到也白抓。
+#   核对的价值不在「今天有几项」，而在「今天比昨天多了什么」。
+_PATROL = os.path.join(_HOME, "patrol")
+_PATROL_LAST = os.path.join(_PATROL, "last.json")
+_PATROL_TASK = "GBT-ImmunePatrol"
+_PATROL_RUNNER = os.path.join(_HOME, "patrol_run.py")
+
+
+def _patrol_key(f: dict) -> str:
+    return "|".join([str(f.get("kind") or ""), str(f.get("where") or ""),
+                     str(f.get("name") or "")])
+
+
+def op_patrol(persist: bool = True) -> dict:
+    """跑一次体检，与上次快照比，报新增 / 消失 / 仍在。"""
+    rep = op_scan()
+    cur = {}
+    for f in rep.get("findings", []):
+        cur[_patrol_key(f)] = f
+
+    prev = {}
+    try:
+        with open(_PATROL_LAST, "r", encoding="utf-8") as fh:
+            snap = json.load(fh)
+        for row in snap.get("items", []):
+            k = row.get("key")
+            if k:
+                prev[k] = row
+    except Exception:                                        # noqa: BLE001
+        prev = {}
+
+    added = [cur[k] for k in cur if k not in prev]
+    gone = [prev[k] for k in prev if k not in cur]
+    stayed = [cur[k] for k in cur if k in prev]
+
+    now = time.strftime("%Y-%m-%dT%H:%M:%S")
+    if persist:
+        os.makedirs(_PATROL, exist_ok=True)
+        rows = []
+        for k, v in cur.items():
+            row = dict(v)
+            row["key"] = k
+            rows.append(row)
+        tmp = _PATROL_LAST + ".tmp"
+        try:
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump({"at": now, "items": rows}, fh, ensure_ascii=False, indent=2)
+            os.replace(tmp, _PATROL_LAST)                    # 原子替换，半个快照不落盘
+        except Exception:                                    # noqa: BLE001
+            pass
+        _ledger_append({"at": now, "op": "patrol", "found": len(cur),
+                        "added": len(added), "gone": len(gone),
+                        "stayed": len(stayed)})
+
+    if added:
+        verdict = "新增 %d 项 —— 需要立刻看" % len(added)
+    elif cur:
+        verdict = "与上次一致：%d 项仍在（未处理，不是已清）" % len(cur)
+    else:
+        verdict = "干净：无持久化异常"
+
+    def brief(rows):
+        return [{"kind": r.get("kind"), "where": r.get("where"),
+                 "target": (r.get("target") or "")[:120]} for r in rows[:20]]
+
+    return {
+        "ok": True, "at": now, "found": len(cur), "verdict": verdict,
+        "added": brief(added), "gone": brief(gone), "stayed": brief(stayed),
+        "snapshot": _PATROL_LAST if persist else None,
+        "next": "op=elevate 生成提权脚本 / op=purge dry_run=false 清可自动项",
+    }
+
+
+def _patrol_runner_src() -> str:
+    """每日核对入口。路径自推导，不写死。"""
+    return (
+        "# -*- coding: utf-8 -*-\n"
+        "# body_immune 每日核对入口（由 op=install_patrol 生成，勿手改）\n"
+        "import os\n"
+        "import sys\n"
+        "\n"
+        "_here = os.path.dirname(os.path.abspath(__file__))\n"
+        "_root = os.path.dirname(os.path.dirname(_here))\n"
+        "sys.path.insert(0, _root)\n"
+        "\n"
+        "from gbt_allinone import immune\n"
+        "\n"
+        "r = immune.op_patrol()\n"
+        "print(r.get('verdict'))\n"
+        "for it in r.get('added') or []:\n"
+        "    print('  + %s %s' % (it.get('kind'), it.get('where')))\n"
+    )
+
+
+def op_install_patrol(dry_run: bool = True, at: str = "09:00",
+                      remove: bool = False) -> dict:
+    """注册 / 卸载「每日核对」计划任务（HKCU 级，不需要管理员）。
+
+    默认 dry_run=True：只把要执行的命令摆出来给人看，不真装。
+    """
+    if remove:
+        cmd = ["schtasks", "/Delete", "/TN", _PATROL_TASK, "/F"]
+        what = "卸载每日核对任务"
+    else:
+        cmd = ["schtasks", "/Create", "/TN", _PATROL_TASK,
+               "/TR", '"%s" "%s"' % (sys.executable, _PATROL_RUNNER),
+               "/SC", "DAILY", "/ST", str(at), "/F"]
+        what = "注册每日核对任务（每天 %s）" % at
+
+    if dry_run:
+        return {"ok": True, "dry_run": True, "task": _PATROL_TASK,
+                "would": what, "cmd": cmd,
+                "note": "演习。真装给 dry_run=false。"}
+
+    if not remove:
+        os.makedirs(_HOME, exist_ok=True)
+        with open(_PATROL_RUNNER, "w", encoding="utf-8") as fh:
+            fh.write(_patrol_runner_src())
+
+    try:
+        p = subprocess.run(cmd, capture_output=True, text=True, timeout=60,
+                           encoding="utf-8", errors="replace")
+        out = ((p.stdout or "") + (p.stderr or "")).strip()
+        ok = p.returncode == 0
+    except Exception as exc:                                 # noqa: BLE001
+        ok, out = False, "%s: %s" % (type(exc).__name__, str(exc)[:120])
+
+    _ledger_append({"at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "op": "install_patrol", "remove": bool(remove),
+                    "ok": ok, "msg": out[:200]})
+    return {"ok": ok, "dry_run": False, "task": _PATROL_TASK,
+            "did": what, "output": out[:400],
+            "verify": "schtasks /Query /TN %s" % _PATROL_TASK}

@@ -16,6 +16,7 @@
 门：`status` / `semantics` / `compile` 是**纯读**（不写盘、不起进程）；`pose` / `acts` 会写盘并起 Blender
      ⇒ 一律经 `blender` 位（那位的 `filesystem_write` 门挂在处理器层），本格不自己造第二道门。
 """
+from gbt_allinone.tools._opcall import call as _oc_call
 import json
 import os
 from pathlib import Path
@@ -324,4 +325,4 @@ def run(op="status", **params) -> dict:
     if not fn:
         return {"ok": False, "error": "未知 op：%s" % op, "fail_closed": True,
                 "ops": ["status", "semantics", "compile", "pose", "acts"]}
-    return fn(**params)
+    return _oc_call(fn, params)

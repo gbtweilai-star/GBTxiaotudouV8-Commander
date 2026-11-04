@@ -88,7 +88,7 @@ def publish() -> dict:
                              "--file", str(p), "--remote",
                              "--content-type", CT.get(p.suffix, "application/octet-stream")],
                             capture_output=True, text=True, encoding="utf-8",
-                            errors="replace", env=env, shell=True, timeout=900)
+                            errors="replace", env=env, shell=False, timeout=900)
         blob = (up.stdout or "") + (up.stderr or "")
         if "Upload complete" not in blob:
             bad.append({"file": p.name, "why": "upload", "tail": blob[-200:]})

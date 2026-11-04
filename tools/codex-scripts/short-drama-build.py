@@ -38,7 +38,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parents[2]
-FFBIN = Path(r"C:\Users\ADMIN\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin")
+FFBIN = Path.home() / "AppData" / "Local" / "Microsoft" / "WinGet" / "Packages" / "Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe" / "ffmpeg-8.1.2-full_build" / "bin"
 FFMPEG, FFPROBE = FFBIN / "ffmpeg.EXE", FFBIN / "ffprobe.EXE"
 # 2026-10-10 扩成**三支一起达标**（原来只做合体版）：
 #    判据 film-audio-guard 咬出：ep01-05export / ep02-05export **都是 0 音轨的真缺陷**，

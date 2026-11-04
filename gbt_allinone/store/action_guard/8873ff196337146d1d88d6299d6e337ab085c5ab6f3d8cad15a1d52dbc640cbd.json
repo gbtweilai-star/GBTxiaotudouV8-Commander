@@ -2,11 +2,11 @@
   "status": "ok",
   "kind": "devour_reflect",
   "fingerprint": "8873ff196337146d1d88d6299d6e337ab085c5ab6f3d8cad15a1d52dbc640cbd",
-  "pid": 18592,
-  "started_at": 1793561940.155694,
-  "started_iso": "2026-11-02T02:39:00",
-  "finished_at": 1793561940.177127,
-  "finished_iso": "2026-11-02T02:39:00",
+  "pid": 12076,
+  "started_at": 1793665256.6228435,
+  "started_iso": "2026-11-03T07:20:56",
+  "finished_at": 1793665256.648748,
+  "finished_iso": "2026-11-03T07:20:56",
   "detail": {
     "ok": true,
     "result_status": null

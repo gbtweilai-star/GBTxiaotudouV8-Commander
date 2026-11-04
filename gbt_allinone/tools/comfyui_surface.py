@@ -1,4 +1,4 @@
-﻿# gbt-capability: comfyui
+# gbt-capability: comfyui
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
 """ComfyUI（秋叶整合版）可控制面 · **一个不漏的双向绑定**（主人令 2026-09-27）。
 

@@ -26,6 +26,7 @@
 op=matrix / selfcheck / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import re
 from pathlib import Path
@@ -245,7 +246,7 @@ def run_op(op: str = "matrix", **params) -> dict:
     op = (op or "matrix").lower()
     for name, fn in (("matrix", matrix), ("selfcheck", selfcheck), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": "未知 op:%s（matrix/selfcheck/where）" % op}
 

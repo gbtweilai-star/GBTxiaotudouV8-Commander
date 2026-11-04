@@ -23,6 +23,7 @@ Obsidian**，再把所有的 Obsidian 和**本体的自研 Obsidian 双向绑定
 op=status / provision / remember / sync_page / bind / recall / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -419,6 +420,6 @@ def run_op(op: str = "status", **params) -> dict:
                      ("sync_page", sync_page), ("bind", bind), ("recall", recall),
                      ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（status/provision/remember/sync_page/bind/recall/verify/where）"}

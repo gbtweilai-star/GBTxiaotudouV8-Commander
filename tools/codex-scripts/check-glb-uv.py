@@ -5,7 +5,7 @@ import struct
 import pathlib
 import numpy as np
 
-P = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8\assets\treasure-chest.glb")
+P = pathlib.Path(__file__).resolve().parents[2] / "assets" / "treasure-chest.glb"
 raw = P.read_bytes()
 jlen, = struct.unpack_from("<I", raw, 12)
 j = json.loads(raw[20:20 + jlen].decode("utf-8"))

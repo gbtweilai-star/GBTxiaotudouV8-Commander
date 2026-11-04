@@ -1,4 +1,4 @@
-﻿# gbt-capability: coding
+# gbt-capability: coding
 """GBT小土豆V8 · 内生编程纪律（Codex-style engineering discipline）。
 
 这是运行时的默认真序，不是需要主人每次提醒的提示词。凡任务被识别为编程/修复/
@@ -57,7 +57,11 @@ PHASES = {
     ),
     "verify": (
         "按证据阶梯验证：语法/静态检查 → 目标单测 → 集成测试 → 负例/错误路径 → "
-        "并发与幂等 → 安全边界 → 全量回归。不能运行的项目必须明确说明原因和残余风险。"
+        "并发与幂等 → 安全边界 → **地毯式扫描** → 全量回归。"
+        "地毯式扫描 = 默认全树、代码类扩展名全覆盖（含 html 内联 JS / ps1 / bat / cmd / sh / "
+        "tsx / json）；没扫的文件（排除目录 / 超限大文件 / 截断）必须逐条记账且可见，"
+        "**一个文件都不许静默消失**；命中项须两路读法交叉复核才算确认，"
+        "分不清的进 needs_human 而**不硬报**。不能运行的项目必须明确说明原因和残余风险。"
     ),
     "harden": (
         "主动检查边界：空值、超时、取消、进程残留、竞态、原子写、路径逃逸、凭证泄露、"
@@ -82,6 +86,8 @@ INVARIANTS = (
     "已经满足就复用，已经在执行就不重复动手，确认未满足才执行；"
     "force 只能显式表达主人要求重复执行，不能代替执行前观察。",
     "新能力要接进现有统一入口、能力注册、审计和测试，不另造旁路。",
+    "扫描必须地毯式穿透交叉：默认全树、代码类扩展名全覆盖，排除目录/超大文件/截断"
+    "必须逐条记账且可见，一个文件都不许静默消失；单一读法的命中不得当已确认。",
 )
 
 VERIFICATION_ORDER = (
@@ -93,6 +99,7 @@ VERIFICATION_ORDER = (
     "negative and malformed input",
     "concurrency, timeout, cleanup",
     "security and boundary checks",
+    "carpet scan: full tree + every file either scanned or accounted",
     "broader regression suite",
 )
 
@@ -126,6 +133,8 @@ CHARTER_TITLES = (
     "第二十四章 · 锚点必须同换行符",
     "第二十五章 · 终端失败必须响",
     "第二十六章 · 判据必须与文件主流匹配",
+    "第二十七章 · 扫描必须地毯式穿透交叉",
+    "第二十八章 · 修复代码必须原子替换无伤",
 )
 
 CHARTER_SUMMARY = "\n".join(

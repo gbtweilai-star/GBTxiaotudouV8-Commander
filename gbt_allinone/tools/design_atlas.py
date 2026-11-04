@@ -29,6 +29,7 @@
 3. **不编**：摘要只从**该节自己的正文**里取；取不到就留空。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import math
@@ -244,7 +245,7 @@ def run(op: str = "status", **params) -> dict:
     op = str(op or "status").lower()
     for nm, fn in (("status", status), ("build", build), ("find", find), ("where", where)):
         if op == nm:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op：%s" % op, "ops": list(_OPS)}
 
 

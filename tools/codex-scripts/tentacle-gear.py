@@ -75,7 +75,7 @@ PAGE_DATA = PAGE_DIR / "tentacles-data.js"
 PY = sys.executable
 PLAYWRIGHT_PY = Path(os.environ.get(
     "GBT_TENTACLE_PLAYWRIGHT_PY",
-    r"C:\Users\ADMIN\.workbuddy-ai\binaries\python\envs\default\Scripts\python.exe"))
+    str(Path.home() / ".workbuddy-ai" / "binaries" / "python" / "envs" / "default" / "Scripts" / "python.exe")))
 
 TID_RE = __import__("re").compile(r"^[A-Za-z0-9_-]{1,16}$")
 

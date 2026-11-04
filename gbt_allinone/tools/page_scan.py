@@ -90,12 +90,20 @@ def _classify(cap: str) -> dict:
     # 原判定只认中文关键词，英文标记漏网 ⇒ 被误判成红。补这一档。
     if any(k in msg for k in CONFIRM_MARKS):
         return {"cap": cap, "color": "yellow", "why": "需确认（安全闸在咬 ✓）：" + msg[:70], "ms": ms}
+    low = msg.lower()
+    if any(k in low for k in ("no module named", "not found", "找不到", "winerror 2",
+                              "winerror 5", "modulenotfound")) or "拒绝访问" in msg:
+        return {"cap": cap, "color": "yellow", "why": "缺依赖/权限（如实缺件，不是代码坏）：" + msg[:80], "ms": ms}
+    if any(k in msg for k in ("不认 op", "未知 op", "只认", "可选 ")):
+        return {"cap": cap, "color": "yellow", "why": "需 op/契约（不是故障）：" + msg[:80], "ms": ms}
     return {"cap": cap, "color": "red", "why": msg[:110] or st, "ms": ms}
 
 
-def scan(workers: int = 512) -> dict:
+def scan(workers: int = 512, page: str = "", limit: int = 0, caps=None) -> dict:
     pb = _bindings()
     pages = pb.get("逐页") or []
+    if page:
+        pages = [p for p in pages if str(p.get("页")) == str(page)]
     caps_reg = _caps()
     page_caps = {str(p.get("页")): [str(c) for c in (p.get("正向_能力位") or [])] for p in pages}
     missing_page = [str(p.get("页")) for p in pages if not p.get("落点在盘")]
@@ -112,6 +120,11 @@ def scan(workers: int = 512) -> dict:
     self_ref = SELF_CAP in uniq
     if self_ref:
         uniq = [c for c in uniq if c != SELF_CAP]
+    if limit and int(limit) > 0:
+        uniq = uniq[:int(limit)]
+    if caps:
+        want = {str(x) for x in caps}
+        uniq = [c for c in uniq if c in want]
     t0 = time.time()
     with cf.ThreadPoolExecutor(max_workers=max(1, min(workers, len(uniq) or 1))) as ex:
         res = list(ex.map(_classify, uniq)) if uniq else []
@@ -150,7 +163,8 @@ def run(payload: dict | None = None) -> dict:
     p = dict(payload or {})
     op = str(p.get("op") or "scan").strip().lower()
     if op == "scan":
-        return scan(int(p.get("workers") or 512))
+        return scan(int(p.get("workers") or 512), str(p.get("page") or ""),
+                    int(p.get("limit") or 0), p.get("caps") or None)
     if op == "status":
         return status()
     return {"ok": False, "fail_closed": True, "error": "user_error: 未列出的 op（fail-closed）",

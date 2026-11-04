@@ -58,7 +58,7 @@ def how(cid: str):
 
 def _dump(prof: str) -> str:
     cp = subprocess.run(["dsh", "--profile", prof, "--dump-config"],
-                        capture_output=True, shell=True)
+                        capture_output=True, shell=False)
     return ((cp.stdout or b"") + (cp.stderr or b"")).decode("utf-8", "replace")
 
 

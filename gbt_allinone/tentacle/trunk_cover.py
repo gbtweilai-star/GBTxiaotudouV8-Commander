@@ -69,6 +69,8 @@ SUPPORT_RULES = (
     ("mobile", lambda rel: rel.startswith(("mobile/", "ios/"))),
     ("assets", lambda rel: rel.startswith(("assets/", "icons/"))),
     ("runtime", lambda rel: rel.startswith(("runtime/", "state/", "logs/"))),
+    ("skills", lambda rel: rel.startswith("skills/")),
+    ("packs", lambda rel: rel.startswith("packs/")),
 )
 
 

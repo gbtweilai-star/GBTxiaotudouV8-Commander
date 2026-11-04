@@ -1,0 +1,165 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>我们的数字人 · DH-V7 · 可交互 3D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;height:100%;background:#080a0c;color:#e9e7e1;font-family:Inter,system-ui,"Microsoft YaHei",sans-serif;overflow:hidden}
+#c{position:fixed;inset:0;display:block}
+.hud{position:fixed;top:16px;left:16px;width:258px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:rgba(9,13,17,.88);padding:12px;font-size:11px;line-height:1.55;backdrop-filter:blur(8px)}
+.hud h1{font-size:12px;margin:0 0 2px;color:#fff;letter-spacing:.05em}.hud .sub{color:#8b8d8b;font-size:9px;margin-bottom:8px}
+.hud .k{color:#8b8d8b}.hud b{float:right;color:#ffb02e;font:600 11px/1.4 ui-monospace,monospace}
+.right{left:auto;right:16px;width:238px}.row{margin:6px 0}.bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:3px}.bar i{display:block;height:100%;background:#c96442;border-radius:2px;transition:width .12s}
+input[type=range]{width:100%;accent-color:#c96442}.tag{display:inline-block;border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:2px 7px;margin:2px 3px 0 0;font-size:9px;color:#b8b8b4}
+.btns{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}.btns button{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#d8d7d2;border-radius:6px;padding:3px 7px;font-size:9px;cursor:pointer}
+.btns button.on{border-color:#c96442;color:#ffb02e;background:rgba(201,100,66,.1)}
+#img{width:100%;margin-top:4px;color:#8b8d8b;font-size:9px}
+.sw{display:inline-block;width:18px;height:10px;border-radius:3px;margin-right:3px;border:1px solid rgba(255,255,255,.2);vertical-align:middle}
+.refbox{display:flex;gap:8px;align-items:center;margin-top:8px;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px;background:rgba(255,255,255,.025)}
+.refthumb{width:42px;height:64px;object-fit:cover;border-radius:5px;border:1px solid rgba(255,255,255,.15)}
+.legend{position:fixed;left:16px;bottom:14px;color:#777a78;font-size:9px;line-height:1.6;background:rgba(10,14,18,.6);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 8px}
+#load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#080a0c;color:#b8b8b4;font:400 12px/1.6 ui-monospace,monospace;z-index:5;transition:opacity .4s}
+#load.gone{opacity:0;visibility:hidden;pointer-events:none}.err{color:#f08a7a;font-size:10px;margin-top:6px}
+</style></head><body>
+<canvas id="c"></canvas><div id="load">加载我们的数字人 DH-V7…</div>
+<div class="hud" id="left">
+  <h1>DIGITAL HUMAN · DH-V7</h1>
+  <div class="sub">我们自己的数字人 · 可拆解/可透视 · 不是 Salticus 蜘蛛</div>
+  <div><span class="k">状态</span><b id="status">加载中</b></div>
+  <div><span class="k">网格</span><b id="meshes">0</b></div>
+  <div><span class="k">骨骼</span><b id="bones">0</b></div>
+  <div><span class="k">动画</span><b id="anim">—</b></div>
+  <div class="row"><span class="k">皮肤透明度</span><input id="opacity" type="range" min="8" max="100" value="100"></div>
+  <div class="row"><span class="k">拆解层</span><input id="ex" type="range" min="0" max="100" value="0"><div class="bar"><i id="exbar"></i></div></div>
+  <div class="btns">
+    <button id="skeleton">骨架</button><button id="wire">线框</button><button id="reset">回正</button>
+  </div>
+  <div class="btns" id="acts"></div>
+  <div class="refbox"><img id="refthumb" class="refthumb" src="/assets/dh/ref.jpg" alt="参考图"><div><div class="k">参考图 = 外观</div><div class="sub" style="margin:0">黑/黄战术装 · 长靴</div></div></div>
+  <div class="row"><span class="k">换参考图</span><input id="img" type="file" accept="image/*"></div>
+  <div id="imgmeta" class="sub">默认载入我们自己的参考图</div>
+  <div id="err" class="err"></div>
+</div>
+<div class="hud right">
+  <h1>为什么是我们的数字人</h1><div class="sub">资产：voice-theater / dh-v7-detail.glb</div>
+  <div><span class="k">来源</span><b>我们自己的 GLB</b></div>
+  <div><span class="k">模式</span><b id="mode">待机</b></div>
+  <div><span class="k">参考色</span><b id="accent">#c96442</b></div>
+  <div class="row"><span class="k">拆解读数</span><b id="exreading">0%</b><div class="bar"><i id="exbar2"></i></div></div>
+  <div style="margin-top:8px;color:#8b8d8b;font-size:9.5px">拆解：皮肤变透 → 骨骼/关节显影；这不是把数字人拆成机械块。参考图只提供配色/比例，不改资产结构。</div>
+  <div id="swatches" style="margin-top:6px"></div>
+</div>
+<div class="legend">拖拽旋转 · 滚轮缩放 · 骨架/线框/透明度/拆解层</div>
+<script src="../assets/vendor/three.global.js"></script>
+<script src="../assets/vendor/GLTFLoader.global.js"></script>
+<script>
+(function(){
+  "use strict";
+  var T=window.THREE, err=document.getElementById("err");
+  if(!T){ err.textContent="Three.js 未加载"; return; }
+  var scene=new T.Scene(); scene.background=new T.Color(0x080a0c); scene.fog=new T.Fog(0x080a0c,4,11);
+  var camera=new T.PerspectiveCamera(32,innerWidth/innerHeight,.05,60); camera.position.set(0,1.15,3.5); camera.lookAt(0,.95,0);
+  var ren=new T.WebGLRenderer({canvas:document.getElementById("c"),antialias:true}); ren.setSize(innerWidth,innerHeight); ren.setPixelRatio(Math.min(2,devicePixelRatio||1));
+  ren.outputColorSpace=T.SRGBColorSpace; ren.toneMapping=T.ACESFilmicToneMapping; ren.toneMappingExposure=1.05;
+  scene.add(new T.HemisphereLight(0xdfeaff,0x1a1410,1.3));
+  var key=new T.DirectionalLight(0xfff1e0,2.2); key.position.set(2.5,4,3); scene.add(key);
+  var rim=new T.PointLight(0xff9a3c,2.2,8); rim.position.set(-2.4,2,-2.4); scene.add(rim);
+  scene.add(new T.GridHelper(7,28,0x222a30,0x12181d));
+  var rings=[]; for(var i=0;i<3;i++){ var rg=new T.Mesh(new T.TorusGeometry(.8+i*.18,.006,6,80),new T.MeshBasicMaterial({color:0xc96442,transparent:true,opacity:.18-i*.04})); rg.rotation.x=Math.PI/2; rg.position.y=.02+i*.01; scene.add(rg); rings.push(rg); }
+  var root=new T.Group(); scene.add(root);
+  var model=null, mixer=null, clips=[], bones=[], meshes=[], skelHelper=null, wire=false, skel=false;
+  var state={mode:"idle", opacity:1, explode:0, palette:null, meshes:0, bones:0, clips:0};
+  window.__dh3d={state:state, root:root, get model(){return model;}};
+  function setStatus(s){ document.getElementById("status").textContent=s; }
+  function collect(){
+    meshes=[]; bones=[];
+    if(!model) return;
+    model.traverse(function(o){ if(o.isMesh||o.isSkinnedMesh) meshes.push(o); if(o.isBone) bones.push(o); });
+    state.meshes=meshes.length; state.bones=bones.length;
+    document.getElementById("meshes").textContent=meshes.length;
+    document.getElementById("bones").textContent=bones.length;
+    if(bones.length){ skelHelper=new T.SkeletonHelper(model); skelHelper.visible=false; scene.add(skelHelper); }
+    window.__dh3d.meshes=meshes; window.__dh3d.bones=bones;
+  }
+  function applyOpacity(v){ state.opacity=v; meshes.forEach(function(m){ if(m.material){ m.material.transparent=true; m.material.opacity=v; } }); }
+  function applyWire(on){ wire=on; meshes.forEach(function(m){ if(m.material) m.material.wireframe=on; }); document.getElementById("wire").classList.toggle("on",on); }
+  function act(name){
+    state.mode=name; document.getElementById("mode").textContent=name;
+    if(name==="reset"){ root.rotation.set(0,0,0); root.position.y=0; return; }
+    if(!mixer) return;
+    var found=null; clips.forEach(function(c){ if(String(c.name).toLowerCase().indexOf(name)>=0) found=c; });
+    if(!found && clips.length) found=clips[0];
+    if(found){ mixer.stopAllAction(); var a=mixer.clipAction(found); a.reset(); a.setLoop(T.LoopRepeat,Infinity); a.play(); document.getElementById("anim").textContent=found.name; }
+  }
+  var loader=new T.GLTFLoader();
+  loader.load("../assets/dh/dh-v7-detail.glb", function(gltf){
+    model=gltf.scene||(gltf.scenes&&gltf.scenes[0]);
+    if(!model){ err.textContent="模型为空"; return; }
+    root.add(model);
+    var box=new T.Box3().setFromObject(model); var size=new T.Vector3(); box.getSize(size);
+    var k=1.78/(size.y||1); model.scale.multiplyScalar(k); box.setFromObject(model);
+    var c=new T.Vector3(); box.getCenter(c); model.position.x-=c.x; model.position.z-=c.z; model.position.y-=box.min.y;
+    model.traverse(function(o){ if(o.isMesh||o.isSkinnedMesh){ o.frustumCulled=false; o.castShadow=true; if(o.material){ o.material.transparent=true; o.material.opacity=1; } } });
+    collect();
+    clips=gltf.animations||[]; state.clips=clips.length;
+    if(clips.length){ mixer=new T.AnimationMixer(model); var idle=clips.find(function(c){return /idle|breath|stand/i.test(c.name)})||clips[0]; var a=mixer.clipAction(idle); a.play(); document.getElementById("anim").textContent=idle.name; }
+    var acts=document.getElementById("acts");
+    // 只生成资产里真实存在的动画按钮；没有的旧动作不摆出来假装能用
+    if(clips.length){
+      clips.forEach(function(c){
+        var b=document.createElement("button"); b.textContent=c.name;
+        b.addEventListener("click", function(){
+          if(!mixer) return;
+          mixer.stopAllAction(); var a=mixer.clipAction(c); a.reset(); a.setLoop(T.LoopRepeat,Infinity); a.play();
+          document.getElementById("anim").textContent=c.name; document.getElementById("mode").textContent=c.name;
+        });
+        acts.appendChild(b);
+      });
+    } else {
+      var none=document.createElement("span"); none.className="sub"; none.textContent="该 GLB 没有动画剪辑"; acts.appendChild(none);
+    }
+    setStatus("在线"); document.getElementById("load").classList.add("gone");
+    buildFromImage("/assets/dh/ref.jpg").catch(function(er){ err.textContent="参考图载入失败："+er; });
+  }, function(x){ setStatus("加载 "+(x.total?Math.round(x.loaded/x.total*100):0)+"%"); }, function(e){
+    setStatus("离线"); err.textContent="模型加载失败："+e; document.getElementById("load").textContent="数字人 GLB 加载失败（本地资产缺失）";
+  });
+
+  var drag=false,lx=0,ly=0,rotY=0,rotX=0,zoom=1;
+  ren.domElement.addEventListener("pointerdown",function(e){drag=true;lx=e.clientX;ly=e.clientY;});
+  addEventListener("pointerup",function(){drag=false;});
+  addEventListener("pointermove",function(e){ if(!drag)return; rotY+=(e.clientX-lx)*.006; rotX+=(e.clientY-ly)*.004; rotX=Math.max(-.45,Math.min(.45,rotX)); lx=e.clientX; ly=e.clientY; });
+  addEventListener("wheel",function(e){ e.preventDefault(); zoom+=e.deltaY*.0008; zoom=Math.max(.6,Math.min(1.8,zoom)); },{passive:false});
+  addEventListener("resize",function(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); ren.setSize(innerWidth,innerHeight); });
+  document.getElementById("opacity").addEventListener("input",function(e){ applyOpacity(parseFloat(e.target.value)/100); });
+  document.getElementById("ex").addEventListener("input",function(e){ state.explode=parseFloat(e.target.value)/100; document.getElementById("exreading").textContent=Math.round(state.explode*100)+"%"; document.getElementById("exbar").style.width=(state.explode*100)+"%"; document.getElementById("exbar2").style.width=(state.explode*100)+"%"; applyOpacity(1-state.explode*.72); if(skelHelper){ skelHelper.visible=state.explode>0.04||skel; } });
+  document.getElementById("skeleton").addEventListener("click",function(){ skel=!skel; if(skelHelper) skelHelper.visible=skel||state.explode>0.04; this.classList.toggle("on",skel); });
+  document.getElementById("wire").addEventListener("click",function(){ applyWire(!wire); });
+  document.getElementById("reset").addEventListener("click",function(){ rotY=0; rotX=0; zoom=1; root.position.y=0; act("reset"); });
+  function sample(src){ return new Promise(function(res,rej){ var im=new Image(); im.onload=function(){res(im)}; im.onerror=rej; im.src=src; }); }
+  async function buildFromImage(src){
+    var im=await sample(src); var cv=document.createElement("canvas"); cv.width=im.naturalWidth; cv.height=im.naturalHeight;
+    var cx=cv.getContext("2d"); cx.drawImage(im,0,0); var cols=6,rows=4,R=0,G=0,B=0,n=0,swatches=[];
+    for(var r=0;r<rows;r++)for(var c=0;c<cols;c++){ var x=Math.floor(c*cv.width/cols), y=Math.floor(r*cv.height/rows), w=Math.max(1,cv.width/cols), h=Math.max(1,cv.height/rows); var d=cx.getImageData(x,y,w,h).data,rr=0,gg=0,bb=0,a=0; for(var i=0;i<d.length;i+=16){rr+=d[i];gg+=d[i+1];bb+=d[i+2];a++;} rr=Math.round(rr/a);gg=Math.round(gg/a);bb=Math.round(bb/a); R+=rr;G+=gg;B+=bb;n++; if(swatches.length<6) swatches.push([rr,gg,bb]); }
+    R=Math.round(R/n);G=Math.round(G/n);B=Math.round(B/n);
+    state.palette={r:R,g:G,b:B};
+    // 全图像素扫最饱和色（只取外观强调色；参考图背景灰，平均色会吃掉黑/黄）
+    var pix=cx.getImageData(0,0,cv.width,cv.height).data, best=[R,G,B], bs=-1;
+    for(var pi=0;pi<pix.length;pi+=64){
+      var pr=pix[pi],pg=pix[pi+1],pb=pix[pi+2];
+      var mx=Math.max(pr,pg,pb),mn=Math.min(pr,pg,pb);
+      if(mx<80) continue;
+      var sat=(mx-mn)/mx, score=sat*100 + mx/255*30; var hue=0; if(mx===pr) hue=((pg-pb)/(mx-mn))*60; else if(mx===pg) hue=(2+(pb-pr)/(mx-mn))*60; else hue=(4+(pr-pg)/(mx-mn))*60; if(hue<0)hue+=360; if(hue>=35&&hue<=75) score+=70;
+      if(sat>0.18 && score>bs){ bs=score; best=[pr,pg,pb]; }
+    }
+    var acol=new T.Color('rgb('+best[0]+','+best[1]+','+best[2]+')');
+    rim.color.copy(acol).offsetHSL(0,0,.08); matsTint(acol);
+    document.getElementById("accent").textContent='#'+acol.getHexString();
+    var sw=document.getElementById("swatches"); sw.innerHTML="";
+    swatches.forEach(function(s){ var b=document.createElement("span"); b.className="sw"; b.style.background='rgb('+s[0]+','+s[1]+','+s[2]+')'; sw.appendChild(b); });
+    document.getElementById("imgmeta").textContent="参考图已载入 "+im.naturalWidth+"×"+im.naturalHeight+" · 只取配色/比例";
+    return {ok:true,width:im.naturalWidth,height:im.naturalHeight,palette:{r:R,g:G,b:B},meshes:state.meshes,bones:state.bones,clips:state.clips};
+  }
+  function matsTint(col){ meshes.forEach(function(m){ if(m.material){ m.material.emissive=new T.Color(col.r*.06,col.g*.04,col.b*.03); } }); }
+  document.getElementById("img").addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(!f)return; var rd=new FileReader(); rd.onload=function(){ buildFromImage(rd.result).catch(function(er){err.textContent="参考图失败："+er;}); }; rd.readAsDataURL(f); });
+  window.__dh3d.buildFromImage=buildFromImage; window.__dh3d.act=act; window.__dh3d.applyOpacity=applyOpacity;
+  var clock=new T.Clock(), phase=0;
+  function frame(){ requestAnimationFrame(frame); var dt=Math.min(.05,clock.getDelta()); phase+=dt; if(mixer) mixer.update(dt); if(!model) root.position.y=Math.sin(phase)*.005; else root.position.y=Math.sin(phase*.9)*.008; root.rotation.y=rotY; root.rotation.x=rotX; camera.position.set(0,1.15*zoom,3.5*zoom); camera.lookAt(0,.95,0); rings.forEach(function(r,i){ r.rotation.z=phase*(.15+i*.05); r.material.opacity=.13-i*.03+Math.sin(phase+i)*.02; }); ren.render(scene,camera); }
+  frame();
+})();
+</script></body></html>

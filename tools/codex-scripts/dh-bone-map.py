@@ -23,10 +23,10 @@ for _s in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-RAW = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\app-after\bone-raw.json"
-OUT_JSON = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\dh-bone-map.json"
-OUT_JS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\digital-human\bone-map.js"
-OUT_MD = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\dh-bone-map.md"
+RAW = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "app-after" / "bone-raw.json")
+OUT_JSON = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "dh-bone-map.json")
+OUT_JS = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "digital-human" / "bone-map.js")
+OUT_MD = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "dh-bone-map.md")
 
 FINGER_CN = {"Thumb": "拇指", "Index": "食指", "Middle": "中指", "Ring": "无名指", "Pinky": "小指"}
 BASE_CN = {

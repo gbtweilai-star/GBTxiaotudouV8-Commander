@@ -6,7 +6,7 @@ import hashlib
 import sys
 from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 PAIRS = [(".scratch/block2_probe.py", ".scratch/block2_probe_postland.py"),
          (".scratch/block2_m5_probe.py", ".scratch/block2_m5_probe_postland.py")]
 for src_rel, dst_rel in PAIRS:

@@ -96,16 +96,83 @@ def act_see(args):
         Image.frombytes("RGB", raw.size, raw.bgra, "raw", "BGRX").save(path)
     return {"ok": True, "path": path, "bytes": os.path.getsize(path)}
 
+# ── 口：发声 ───────────────────────────────────────────────
+# 🔴 2026-11-04 修（主人投诉「语音不对，设置好的台湾腔女声呢」的根因）：
+#   原来 act_say 只有一段 PowerShell SAPI，**没有指定发音人** ⇒ 系统默认落到
+#   `Microsoft Huihui Desktop`（zh-CN 大陆腔）。而主人 2026-10-04 定的台湾腔
+#   （edge-tts `zh-TW-HsiaoChenNeural`）+ fail-closed 规则写在 `gbt_allinone/voice_cap.py` 里，
+#   **body_say 这条最常用的念话入口从来没接上** —— 两套并存，走的是错的那套。
+#   现在三级：edge-tts 台湾腔 → SAPI 显式 zh-TW(Hanhan) → fail-closed 不出声。
+#   绝不拿大陆腔顶替（那是主人明令禁止的「鬼叫声」）。
+_EDGE_VOICE = os.environ.get("GBT_TTS_VOICE") or "zh-TW-HsiaoChenNeural"
+_EDGE_RATE = os.environ.get("GBT_TTS_RATE") or "+15%"
+
+def _say_edge(text):
+    """台湾腔（edge-tts 免费神经语音）。返回 (ok, info)。"""
+    try:
+        import asyncio
+        import edge_tts
+        out = os.path.join(os.environ.get("TEMP", os.environ.get("TMP", ".")),
+                           "body-say-%d.mp3" % int(time.time() * 1000))
+        async def _syn():
+            await edge_tts.Communicate(text, _EDGE_VOICE, rate=_EDGE_RATE).save(out)
+            return out
+        path = asyncio.run(_syn())
+        # os.startfile 不经 shell、不拼命令；与 voice_cap._edge_tts 同一口径
+        os.startfile(path)
+        return True, {"backend": "edge-tts", "voice": _EDGE_VOICE, "edge_rate": _EDGE_RATE,
+                      "file": path}
+    except Exception as exc:                                     # noqa: BLE001
+        return False, {"backend": "edge-tts", "error": "%s: %s" % (type(exc).__name__, str(exc)[:160])}
+
+
+def _say_sapi(text, rate=0):
+    """SAPI 兜底：**必须**显式选 zh-TW 发音人；选不到就 fail-closed，不用大陆腔顶替。"""
+    ps = (
+        "Add-Type -AssemblyName System.Speech; "
+        "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+        "$tw = $s.GetInstalledVoices() | Where-Object { $_.VoiceInfo.Culture.Name -eq 'zh-TW' } "
+        "| Select-Object -First 1; "
+        "if (-not $tw) { Write-Output 'NO_ZH_TW'; exit 3 }; "
+        "$s.SelectVoice($tw.VoiceInfo.Name); "
+        "$s.Rate = %d; $s.Speak([Console]::In.ReadToEnd()); "
+        "Write-Output ('USED:' + $tw.VoiceInfo.Name)" % int(rate)
+    )
+    r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
+                       capture_output=True, text=True, timeout=120)
+    used = ""
+    for ln in (r.stdout or "").splitlines():
+        if ln.startswith("USED:"):
+            used = ln[5:].strip()
+    if r.returncode == 3 or "NO_ZH_TW" in (r.stdout or ""):
+        return False, {"backend": "sapi", "error": "本机无 zh-TW 发音人 ⇒ 按主人令不出声"}
+    return r.returncode == 0, {"backend": "sapi", "voice": used, "err": (r.stderr or "")[:120]}
+
+
 def act_say(args):
     text = str(args.get("text") or "")[:300]
     if not text:
         return {"ok": False, "error": "缺 text"}
-    ps = ("Add-Type -AssemblyName System.Speech; "
-          "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
-          "$s.Rate = %d; $s.Speak([Console]::In.ReadToEnd())" % int(args.get("rate", 0)))
-    r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
-                       capture_output=True, text=True, timeout=90)
-    return {"ok": r.returncode == 0, "chars": len(text), "err": (r.stderr or "")[:120]}
+    base = {"chars": len(text), "text": text[:60]}
+    # 显式点大陆腔（voice 以 zh-CN 开头）才允许走默认 SAPI —— 与 voice_cap 同一放行口径
+    want = str(args.get("voice") or "").strip()
+    if want.startswith("zh-CN"):
+        ps = ("Add-Type -AssemblyName System.Speech; "
+              "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+              "$s.Rate = %d; $s.Speak([Console]::In.ReadToEnd())" % int(args.get("rate", 0)))
+        r = subprocess.run(["powershell", "-NoProfile", "-c", ps], input=text,
+                           capture_output=True, text=True, timeout=90)
+        return dict(base, ok=r.returncode == 0, backend="sapi-explicit-zhCN",
+                    err=(r.stderr or "")[:120])
+    ok, info = _say_edge(text)
+    if ok:
+        return dict(base, ok=True, **info)
+    ok2, info2 = _say_sapi(text, args.get("rate", 0))
+    if ok2:
+        return dict(base, ok=True, edge_fallback=info.get("error"), **info2)
+    return dict(base, ok=False,
+                error="台湾腔两条路都不通 ⇒ 按主人令不出声（绝不拿大陆腔顶替）",
+                edge=info, sapi=info2)
 
 def act_type(args):
     import pyautogui

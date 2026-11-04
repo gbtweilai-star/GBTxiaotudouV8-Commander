@@ -23,6 +23,7 @@
 op=render（all|workbench|tentacle3d|workflow:film|movie|music|short-video）/ list / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
@@ -1247,6 +1248,6 @@ def run_op(op: str = "render", **params) -> dict:
     op = (op or "render").lower()
     for name, fn in (("render", render), ("list", list_pages), ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（render/list/verify/where）"}

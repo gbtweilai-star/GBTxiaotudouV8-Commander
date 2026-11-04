@@ -83,6 +83,43 @@ def _tree_fingerprint(root: Path) -> dict:
 
 # ── 镜像部署区（沙箱：随便改）──
 
+# 2026-11-03 根治（code_audit DES-001 high / needs_human 5 处）：
+# 整树替换的"层名"**单一来源** —— 镜像维度（_MIRROR/<层>）与房间空间
+# （_MIRROR/rooms/<id>/<层>）共用同一套层名，两侧不许各自再抄一份。
+# 新增层必须先登记到这里，替换守卫才认（防"枚举白名单追新"：这里是结构定义，不是放行名单）。
+_REPLACEABLE_LAYERS = frozenset({
+    "dimension", "reality", "timelines", "passports",
+    "snapshots", "plans", "reports", "rehearsals", "runtimes", "frames",
+})
+
+
+def _guard_replace_target(dst: Path) -> Path:
+    """整树替换硬守卫 —— 三条结构规则，不枚举具体路径。
+
+    由来（2026-11-03 · code_audit DES-001）：
+        `room_space.release/ascend` 会调本模块替换**现实层**
+        （`MS._replace_tree(dirs["dimension"], dirs["reality"])`），
+        而 `_replace_tree` 原本**一行校验都没有** ⇒ dst 算歪一次就是
+        `rmtree` 打在生产上。这是"整树先清后拷"这个动作本身的风险，
+        不是某个调用方的失误，所以守在这里（一处收口）。
+
+    规则：
+      ① 目标必须在镜像空间根 `_MIRROR` 之内（镜像维度与房间空间共用此根）；
+      ② 目标不能是 `_MIRROR` 本身；
+      ③ 目标末段必须是已登记层名（_REPLACEABLE_LAYERS）。
+    违反任一条 ⇒ 抛 ValueError：不静默、不降级、不"尽力而为"。
+    """
+    d = Path(dst).resolve()
+    root = _MIRROR.resolve()
+    if d == root:
+        raise ValueError("拒绝整树替换：目标是镜像空间根")
+    if root not in d.parents:
+        raise ValueError("拒绝整树替换：目标不在镜像空间内 → %s" % d)
+    if d.name not in _REPLACEABLE_LAYERS:
+        raise ValueError("拒绝整树替换：末段不是已登记层名(%s) → %s" % (d.name, d))
+    return d
+
+
 def _replace_tree(src: Path, dst: Path) -> None:
     """整树一次性替换（先清后拷）—— 镜像 / 房间 / 生产共用同一处实现。
 
@@ -91,7 +128,11 @@ def _replace_tree(src: Path, dst: Path) -> None:
     （`AttributeError: module 'gbt_allinone.mirror_space' has no attribute '_replace_tree'`）。
     同类"名字对不上"已出现三次（`mirror_release` 的入参、`one_key_deploy` 的入参、这里）——
     凡是跨模块调用的私有名，都必须有一条用例把它钉住。
+
+    2026-11-03 加防复发锁：入口先过 `_guard_replace_target`，
+    没通过守卫就**不会**走到 rmtree（见 code_audit DES-001）。
     """
+    dst = _guard_replace_target(dst)
     if dst.exists():
         shutil.rmtree(dst)
     dst.parent.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_onnx — 本地 OpenCV DNN 手部关键点（MediaPipe 模型的 ONNX 版）。
 
 为什么另起一条：

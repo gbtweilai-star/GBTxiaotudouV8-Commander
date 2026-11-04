@@ -6,7 +6,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 SRC = DH / "raw/rig/model-rigged-anim.glb"
 

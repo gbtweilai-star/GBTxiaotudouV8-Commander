@@ -15,7 +15,7 @@ import numpy as np
 import cv2
 from PIL import Image
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 GLB = WS / "holo_pet/assets/digital-human/raw/rig/model-rigged-anim.glb"
 STRENGTH = 1.0          # 细节强度（0.5=很轻 3=明显）
 

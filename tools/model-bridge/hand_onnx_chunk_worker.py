@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_onnx_chunk_worker — 单 chunk 推理子进程（用于进程回收）。"""
 from __future__ import annotations
 

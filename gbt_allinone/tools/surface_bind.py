@@ -19,6 +19,7 @@ Blender 的 `bpy.ops` 枚举…），落成清单 `state/surfaces/<工具>.json`
 ops：probe（单工具）/ sweep（所有装了的一遍）/ keys（摘要）/ verify（判据）
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
@@ -365,5 +366,5 @@ def run_op(op: str = "keys", **params) -> dict:
     op = (op or "keys").lower()
     for name, fn in (("probe", probe), ("sweep", sweep), ("keys", keys), ("verify", verify)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": f"未知 op:{op}（probe/sweep/keys/verify）"}

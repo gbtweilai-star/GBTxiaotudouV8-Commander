@@ -21,6 +21,7 @@
 需要处置时给出建议命令，由主人在终端决定。`op=status/scan/persistence/plan/where`。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -227,4 +228,4 @@ def run_op(op: str = "status", **kw) -> dict:
     fn = table.get(str(op or "status").strip().lower())
     if fn is None:
         return {"ok": False, "op": op, "status": "unknown_op", "available": sorted(table)}
-    return fn(**kw)
+    return _oc_call(fn, kw)

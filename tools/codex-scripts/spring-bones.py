@@ -8,7 +8,7 @@ import pathlib
 import struct
 import numpy as np
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 DH = WS / "holo_pet/assets/digital-human"
 import sys  # noqa: E402
 MODE = sys.argv[1] if len(sys.argv) > 1 else "both"

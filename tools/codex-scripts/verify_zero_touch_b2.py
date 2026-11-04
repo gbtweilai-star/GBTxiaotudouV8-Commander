@@ -3,7 +3,7 @@ import sys
 import time
 from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 
 TARGETS = {
     "holo_pet/panel_server.py": "d74caae258dbfd549f49119c7a04a3d8f1ad33f05bca6f8b75112d3134615214",

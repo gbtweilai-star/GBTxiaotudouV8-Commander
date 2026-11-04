@@ -34,7 +34,13 @@ HACKER_PATTERNS = ("pentest", "redteam", "exploit", "payload", "attack", "cross_
 # 守卫/自检类不放行闸（它们本来就要常跑）
 GUARD_CAPS = {"selfscan", "inventory", "signature_guard", "legacy_guard", "cap_self",
               "execution_guard", "proc_guard", "review_gate", "ghost_guard",
-              "truth_scan", "doc_counts", "file_hygiene", "code_audit"}
+              "truth_scan", "doc_counts", "file_hygiene", "code_audit",
+              # 2026-11-04 主人令：bounty_ops 是**自带门禁的门面**，不该再被外层按域一刀切。
+              # 它自己把 op 分成：READ_ONLY 8 个（status/cvss/cwe/policy/classify/evidence/
+              # detect/scope，零副作用直接放行）、DANGEROUS 1 个（respond，必须显式 confirm=true）。
+              # 外层判 hacker 会导致「算个 CVSS 分」都要主人终端令牌，与
+              # 「除危险能力和转账能力外，其他一切以设备算力推理分析做决策」相冲突。
+              "bounty_ops"}
 # 转账类（任何模式都必须主人确认）
 TRANSFER_CAPS = {"transfer", "wallet", "pay", "withdraw", "recharge", "refund",
                  "bank_transfer", "settle"}
@@ -71,14 +77,6 @@ def _audit(event: str, **kw) -> None:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def _danger_caps() -> set:
-    try:
-        from gbt_allinone.caps_registry import BENIGN_CAPS
-        return {k for k, v in BENIGN_CAPS.items() if not (v or {}).get("safe")}
-    except Exception:  # noqa: BLE001
-        return set()
-
-
 def classify(cap: str) -> str:
     """normal / hacker / transfer。"""
     c = str(cap or "").lower()
@@ -96,8 +94,6 @@ def classify(cap: str) -> str:
             return "hacker"
     except Exception:  # noqa: BLE001
         pass
-    if cap in _danger_caps():
-        return "danger"
     return "normal"
 
 
@@ -217,13 +213,6 @@ def check(cap: str) -> dict:
     if kind == "transfer":
         return {"cap": cap, "kind": "transfer", "decision": "blocked_transfer",
                 "reason": "转账必须主人终端确认——任何模式（含受攻击）都不例外"}
-    if kind == "danger":
-        tok = _consume(cap)
-        if tok:
-            return {"cap": cap, "kind": "danger", "decision": "allow",
-                    "reason": "主人已终端确认（危险能力一次性放行）", "token": tok}
-        return {"cap": cap, "kind": "danger", "decision": "need_terminal_confirm",
-                "reason": "危险能力：必须主人终端 YES 才放行（python tools/confirm-security.py request %s）" % cap}
     if kind == "hacker":
         if atk.get("active"):
             _audit("allow_attack", cap=cap, reason=atk.get("reason"),

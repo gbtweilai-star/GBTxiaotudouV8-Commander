@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_ik 判据：三连杆 box-constrained IK 的角度/残差/限位。"""
 from __future__ import annotations
 

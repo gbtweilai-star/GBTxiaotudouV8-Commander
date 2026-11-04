@@ -19,6 +19,7 @@ ops：
   show                                               上次计划
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
@@ -236,7 +237,7 @@ def show(**_kw) -> dict:
 def run_op(op: str = "show", **params) -> dict:
     op = (op or "show").lower()
     if op == "plan":
-        return plan(**params)
+        return _oc_call(plan, params)
     if op == "show":
-        return show(**params)
+        return _oc_call(show, params)
     return {"ok": False, "fail_closed": True, "error": f"未知 op:{op}（plan/show）"}

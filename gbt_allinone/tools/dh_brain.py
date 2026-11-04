@@ -24,6 +24,7 @@
 op：`status` / `spec` / `actions` / `voice` / `metadata` / `health` / `where`
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 from pathlib import Path
@@ -197,7 +198,7 @@ def run(op: str = "status", **kw) -> dict:
     if fn is None:
         return {"ok": False, "fail_closed": True, "kind": _CAP,
                 "error": "未知 op:%s（status/spec/actions/voice/metadata/health/where）" % op}
-    return fn(**kw)
+    return _oc_call(fn, kw)
 
 
 if __name__ == "__main__":

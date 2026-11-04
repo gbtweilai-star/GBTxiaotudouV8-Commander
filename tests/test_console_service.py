@@ -1,7 +1,7 @@
 """test_console_service.py · 原生壳自启认知界面服务（:8766）
 
 不做"文件存在就算过"的假验证：
-  1) 真起一个隔离端口（18766）的 console-server，确认 /api/state 200、caps=385；
+  1) 真起一个隔离端口（18766）的 console-server，确认 /api/state 200、caps=当前真源；
   2) 用状态文件里的 pid 真停掉，确认端口回到离线；
   3) 再确保正式端口（8766）在线，状态文件恢复指向正式进程；
   4) 静态检查三条原生入口都挂了自启：Electron main.cjs / Python 桌面壳 app.py / 启动-GBT.cmd。
@@ -10,6 +10,7 @@
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import sys
 
@@ -37,7 +38,10 @@ def main() -> int:
     check("测前离线", down.get("ok") is False, str(down.get("reason"))[:60])
     r = CS.start(18766, wait_s=25)
     check("start ok", r.get("ok") is True, str(r.get("reason"))[:80])
-    check("start 报 caps=385", r.get("caps") == 385, str(r.get("caps")))
+    from gbt_allinone.tentacle import doc_counts as DC
+    expect_caps = DC.current_count()
+    # start 的 caps 来自 /api/state 冷缓存，可能为空；状态下真查到的必须等于真源
+    check("start 返回 caps 或留空", r.get("caps") in (None, expect_caps), str(r.get("caps")))
     up = CS.ping(18766)
     check("起后在线", up.get("ok") is True)
     stopped = CS.stop()
@@ -58,9 +62,29 @@ def main() -> int:
     check("8766 在线", a.get("ok") is True, str(a.get("reason"))[:80])
     st = CS.status(8766)
     check("status.up", st.get("up") is True)
-    check("status caps=385", st.get("caps") == 385, str(st.get("caps")))
+    check("status caps=真源", st.get("caps") == expect_caps,
+          "%s != %s" % (st.get("caps"), expect_caps))
     _last = st.get("last") or {}
     check("状态文件指向 8766", _last.get("port") == 8766, str(_last))
+
+    print("[2b] 双开事故回归（2026-11-02：健康检查假阴性 + Windows 端口复用 ⇒ 两个 server 抢请求）")
+    srv_src = (ROOT / "tools" / "console-server.py").read_text(encoding="utf-8")
+    svc_src = (ROOT / "gbt_allinone" / "console_service.py").read_text(encoding="utf-8")
+    check("服务端有轻量 /api/ping", '"/api/ping"' in srv_src and '"pong"' in srv_src)
+    check("Windows 禁止端口复用（防双开）", 'allow_reuse_address = sys.platform != "win32"' in srv_src)
+    check("健康检查先探 /api/ping", '"/api/ping"' in svc_src)
+    check("already 分支保留真 pid", 'p.get("pid")' in svc_src)
+    check("stop 先验命令行（不误杀）", "_ours(" in svc_src and "console-server.py" in svc_src)
+    again = CS.start(8766)
+    check("连 start 第二次 already=true（不双开）",
+          again.get("ok") is True and again.get("already") is True, str(again)[:140])
+    pids = CS._listener_pids(8766)
+    check("8766 只有一个监听进程", len(pids) == 1, str(pids))
+    check("ping 报的 pid == 监听 pid", again.get("pid") in pids,
+          str({"ping": again.get("pid"), "listen": pids}))
+    _st2 = json.loads((ROOT / "gbt_allinone" / "store" / "console-server.json").read_text(encoding="utf-8")) \
+        if (ROOT / "gbt_allinone" / "store" / "console-server.json").is_file() else {}
+    check("状态文件 pid 非 0（stop 才有得杀）", int(_st2.get("pid") or 0) > 0, str(_st2.get("pid")))
 
     print("[3] 三条原生入口都挂了自启")
     cjs = ROOT / "holo_pet_w3" / "shell" / "console-service.cjs"

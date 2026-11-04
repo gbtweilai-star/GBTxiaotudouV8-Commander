@@ -17,7 +17,7 @@ import math
 import os
 import sys
 
-WS = r"C:\Users\ADMIN\Desktop\GBT小土豆V8"
+WS = str(__import__("pathlib").Path(__file__).resolve().parents[3])
 LIMB_GROUP = {"hips": "torso", "spine": "torso", "chest": "torso", "neck": "torso", "head": "torso",
               "shoulder_L": "armL", "upper_arm_L": "armL", "forearm_L": "armL", "hand_L": "armL",
               "shoulder_R": "armR", "upper_arm_R": "armR", "forearm_R": "armR", "hand_R": "armR",

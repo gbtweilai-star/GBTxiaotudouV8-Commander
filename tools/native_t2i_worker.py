@@ -23,7 +23,14 @@ def main() -> int:
             continue
         try:
             req = json.loads(line)
-            r = CN.NODES["t2i_sdturbo"]["fn"](req, {})
+            op = str(req.get("op") or "")
+            if op == "i2v_svd":
+                node = "i2v_svd"
+            elif op == "t2i_fused" or str(req.get("model") or "") == "fused":
+                node = "t2i_fused"
+            else:
+                node = "t2i_sdturbo"
+            r = CN.NODES[node]["fn"](req, {})
         except Exception as e:  # noqa: BLE001
             r = {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:300])}
         sys.stdout.write(json.dumps(r, ensure_ascii=False) + "\n")

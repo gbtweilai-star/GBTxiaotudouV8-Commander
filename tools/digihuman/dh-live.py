@@ -254,7 +254,7 @@ def publish(bid: str) -> dict:
                              "--file", str(p), "--remote",
                              "--content-type", CTYPE.get(p.suffix, "application/octet-stream")],
                             capture_output=True, text=True, encoding="utf-8",
-                            errors="replace", env=env, shell=True, timeout=900)
+                            errors="replace", env=env, shell=False, timeout=900)
         blob = (up.stdout or "") + (up.stderr or "")
         if "Upload complete" not in blob:          # 与 motion-publish 同一条判据
             bad.append({"file": rel, "why": "upload", "tail": blob[-300:]})

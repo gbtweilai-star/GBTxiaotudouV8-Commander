@@ -1,4 +1,4 @@
-﻿# Cloudflare AI Gateway 评估（能否替代原设计的 LiteLLM 网关）
+# Cloudflare AI Gateway 评估（能否替代原设计的 LiteLLM 网关）
 
 > 性质：**评估稿**。只评估，不动手——不改生产代码、不建网关、不申请令牌、不发网络请求、不起 GUI。
 > 取证日期：2026-09-17 · 取证方式：全仓只读扫描 + 本机 Cloudflare 官方 skill 参考文档（离线）+ 保险箱只读存在性检查（**未打印任何凭据内容**）。

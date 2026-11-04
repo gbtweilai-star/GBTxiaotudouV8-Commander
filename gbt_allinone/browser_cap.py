@@ -14,6 +14,7 @@
 3. automate（Playwright/Selenium）：未安装时如实返回 needs_dependency + 安装指引
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -178,7 +179,7 @@ def run(op="open", **params):
         return fetch(params.get("url"), int(params.get("timeout", 20)),
                      int(params.get("max_chars", 20000)))
     if op == "automate":
-        return automate(**params)
+        return _oc_call(automate, params)
     if op == "status":
         try:
             import playwright  # noqa: F401

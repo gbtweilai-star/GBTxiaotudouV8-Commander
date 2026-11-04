@@ -1,4 +1,4 @@
-# 主脑离线听觉 · Windows 桌面识别器（System.Speech）· 零密钥、零安装
+﻿# 主脑离线听觉 · Windows 桌面识别器（System.Speech）· 零密钥、零安装
 #
 # 为什么要有它：`voice` 能力位的 asr 原来只认云端 `GBT_ASR_BASE_URL/API_KEY`，
 # 没配就如实报 `needs_dependency` ⇒ **「没密钥就听不见」**。而本机现读有

@@ -337,8 +337,6 @@ class CallSiteWhitelistTests(unittest.TestCase):
     """
 
     ALLOWED_PROD = {
-        ("holo_pet/panel_server.py", "_sensory_hand"),
-        ("holo_pet/panel_server.py", "_safe_bt_status"),
         # R-H295 补登记：R-H101 给沙盘看板加的取数唯一口径 `_api_read`
         # （gbt_allinone/tools/dd_visualizer.py:78）。它是**第三个合法理由**，
         # 与上面两处同构：看板 5 秒轮询一次，不标 probe=True 会把审计刷成一堵墙
@@ -353,6 +351,22 @@ class CallSiteWhitelistTests(unittest.TestCase):
         #   把观察者的足迹伪装成业务足迹，正是上面 dd_visualizer 那条要防的病，同构。
         #   登记的是「决定」不是「让测试变绿」：理由写在这里，改名/挪位即失效。
         ("gbt_allinone/tools/page_scan.py", "_classify"),
+        # 2026-11-04 补登记：`root_cause._cap` —— 根因诊断模块的统一取数口径。
+        #   它必须拿**完整信封**（gbt_result.result 里的 verdict / error）才能判根因，
+        #   而带 `probe=True` 的理由与上面 dd_visualizer / page_scan 同构：
+        #   **诊断行为不能被写成业务足迹** —— 观察者的足迹伪装成业务足迹，
+        #   等于让审计读不出真实业务。同构，不是新开一类例外。
+        #   登记的是「决定」，不是「让测试变绿」：理由写在这里，改名/挪位即失效。
+        ("gbt_allinone/tentacle/root_cause.py", "_cap"),
+        # 2026-11-04 同批登记（与 root_cause 同构：诊断/执行器要完整信封，
+        # 且不能让观察者足迹写进业务审计）：
+        #   chain_kernel._cap  —— 七步链唯一执行路径，要拿 gbt_result.result 判每步准出
+        #   gen-console-data._cap —— 生成 state/console-data.js 的工具，批量真调能力，
+        #                            不标 probe 会把一次取样刷成几百条业务足迹
+        #   probe-one.<module> —— 一次性「跑一个能力看结果」诊断脚本
+        ("gbt_allinone/tentacle/chain_kernel.py", "_cap"),
+        ("tools/gen-console-data.py", "_cap"),
+        ("tools/probe-one.py", "<module>"),
     }
 
     # 诊断脚本区（**结构性**豁免，不是"某几个文件名免检"）。

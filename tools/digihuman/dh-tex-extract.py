@@ -7,8 +7,8 @@ import struct
 
 from PIL import Image
 
-GLB = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\holo_pet_w3\voice-theater\assets\dh-v5-color.glb"
-OUT = r"C:\Users\ADMIN\Desktop\GBT小土豆V8\state\hd\tex"
+GLB = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "holo_pet_w3" / "voice-theater" / "assets" / "dh-v5-color.glb")
+OUT = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "state" / "hd" / "tex")
 os.makedirs(OUT, exist_ok=True)
 
 raw = open(GLB, "rb").read()

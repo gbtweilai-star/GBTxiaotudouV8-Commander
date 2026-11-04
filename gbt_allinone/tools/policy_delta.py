@@ -27,6 +27,7 @@
 4. **不猜**：表读不到 ⇒ 结构化报"未读到"，不拿空表当"没有影响"。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import sys
@@ -55,7 +56,7 @@ def _tables() -> dict:
     return out
 
 
-def tables(**_kwargs) -> dict:
+def tables() -> dict:
     t = _tables()
     a = set(t.get("门（policy）·只读免卡动作") or [])
     b = set(t.get("预检（preflight）·只读免卡动作") or [])
@@ -132,7 +133,7 @@ def run_op(op: str = "tables", **params) -> dict:
     op = (op or "tables").lower()
     for n, fn in (("tables", tables), ("propose", propose), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True, "error": "未知 op:%s（tables/propose/where）" % op}
 
 

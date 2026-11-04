@@ -30,6 +30,7 @@
 op=fingerprint / engines / evidence / obligations / provenance / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import importlib.util
@@ -254,4 +255,4 @@ def run_op(op: str = "where", **params) -> dict:
     if extra:
         return {"ok": False, "op": op, "fail_closed": True,
                 "error": "不认的参数：" + str(sorted(extra)), "allowed": sorted(_ALLOWED[op])}
-    return fn(**params)
+    return _oc_call(fn, params)

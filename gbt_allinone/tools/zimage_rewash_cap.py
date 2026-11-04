@@ -21,12 +21,13 @@
 门：读面（status/denoise_table）免门；`upscale` 写盘 ⇒ 过 `filesystem_write`。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import shutil
 import subprocess
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+ROOT = Path(__file__).resolve().parents[2]
 READ_OPS = ("status", "denoise_table")
 WRITE_OPS = ("upscale", "reverse", "rewash")
 
@@ -245,7 +246,7 @@ def run(op: str = "status", **kw) -> dict:
     if op in ("status", "denoise_table"):
         return {"status": status, "denoise_table": denoise_table}[op](**kw)
     if op == "upscale":
-        return upscale(**kw)
+        return _oc_call(upscale, kw)
     if op in ("reverse", "rewash"):
         return {"reverse": reverse, "rewash": rewash}[op](**kw)
     return {"ok": False, "error": f"未知 op:{op}（{'/'.join(READ_OPS + WRITE_OPS)}）",

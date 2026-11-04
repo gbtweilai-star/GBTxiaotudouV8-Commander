@@ -51,6 +51,7 @@ op = status / graph / search / notes / ask / summarize / endpoint / serve / thin
       verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -785,7 +786,7 @@ def run_op(op: str = "status", **params) -> dict:
     if op == "ask":
         return ask(params.pop("prompt", "") or params.pop("q", ""), **params)
     if op == "summarize":
-        return summarize(**params)
+        return _oc_call(summarize, params)
     if op == "endpoint":
         return endpoint(int(params.get("port", 31717)))
     if op == "serve":

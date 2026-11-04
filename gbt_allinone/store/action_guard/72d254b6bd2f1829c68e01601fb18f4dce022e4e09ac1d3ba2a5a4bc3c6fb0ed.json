@@ -2,11 +2,11 @@
   "status": "user_error",
   "kind": "wf_resume",
   "fingerprint": "72d254b6bd2f1829c68e01601fb18f4dce022e4e09ac1d3ba2a5a4bc3c6fb0ed",
-  "pid": 12904,
-  "started_at": 1793563517.630229,
-  "started_iso": "2026-11-02T03:05:17",
-  "finished_at": 1793563517.6388838,
-  "finished_iso": "2026-11-02T03:05:17",
+  "pid": 19412,
+  "started_at": 1793665275.1788013,
+  "started_iso": "2026-11-03T07:21:15",
+  "finished_at": 1793665275.1937263,
+  "finished_iso": "2026-11-03T07:21:15",
   "detail": {
     "error": "运行记录不存在: "
   }

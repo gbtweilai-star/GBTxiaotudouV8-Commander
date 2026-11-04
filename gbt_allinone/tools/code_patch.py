@@ -43,12 +43,36 @@
     # 需要 filesystem_write 授权（门会拦；缺授权如实报缺）
     py -3.14 tools/codex-scripts/five-dim.py cap code_patch '{"op":"create","path":"new.py","content":"..."}'
     # 新建文件（同样挂在 filesystem_write 下：policy 对 code_patch 是黑名单 fail-closed）
+
+## 默认：原子替换 · 无伤修复（2026-11-03 主人令）
+
+主人令（逐字）：「只要是修复代码必须使用原子替换无伤修复」。
+
+⇒ `apply` / `create` **默认不再直接写生产**，而是自动走 mirror_stage 全流程：
+
+    ① create  生产目标只读复制进 state/mirror/stage/<id>/（生产一个字节都没动）
+    ② write   候选只写镜像 work/
+    ③ verify  自动验证器按扩展名挑：
+                .py/.pyw → AST 语法解析（不产生 pyc）
+                .json    → json 解析
+                .js/.mjs/.cjs → node --check
+                其他     → 退到"完整性校验"（staged 字节 == 算出来的字节），
+                           **如实标注 sha_only，不假装语义验证过**
+             也可用 `verify_cmd` 传自己的验证命令（例如跑该模块的单测）
+    ④ promote 仅当 verify.exit_code == 0 才做**整文件 os.replace 原子替换**，
+              替换前把原件备份到 state/mirror/backups/<时间戳>-<id>/（可 rollback）
+
+**验证不过 ⇒ 绝不落盘**，并且把失败证据（stdout/stderr 尾巴）一起返回。
+
+应急口：`allow_unverified=true` 走旧的直写路径（仍逐字节替换 + 原子写），
+但回执里记 `bypass: true` 与原因 —— 是**留痕**，不是免检。
 """
 from __future__ import annotations
 
 import hashlib
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -157,7 +181,8 @@ def _atomic_write(p: Path, data: bytes) -> None:
             pass
 
 
-def create(path: str, content: str, note: str = "", expect_absent: bool = True) -> dict:
+def create(path: str, content: str, note: str = "", expect_absent: bool = True,
+           verify_cmd: str = "", allow_unverified: bool = False) -> dict:
     """**新建文件**（2026-10-18 补）。
 
     ## 为什么必须有这一支
@@ -195,9 +220,17 @@ def create(path: str, content: str, note: str = "", expect_absent: bool = True) 
         raise CodePatchError("too_large", "内容 %d 字节 > 上限 %d —— 拒绝" % (len(data), MAX_BYTES))
     if b"\x00" in data[:_BIN_SNIFF]:
         raise CodePatchError("binary_content", "内容里有 NUL —— 二进制不许当文本建")
+    after_sha = _sha(data)
+
+    # 默认：新建也走无伤修复（镜像验证通过才落盘）
+    if not allow_unverified:
+        # rel 在原函数里后面才算；mirror 分支要用，先在此算好（同值重复赋值无害）
+        rel0 = str(p.relative_to(_ROOT)).replace("\\", "/")
+        return _mirror_repair(rel0, data, after_sha, verify_cmd=verify_cmd,
+                              note=note, is_create=True)
+
     p.parent.mkdir(parents=True, exist_ok=True)
     _atomic_write(p, data)
-    after_sha = _sha(data)
     d = _store_dir()
     d.mkdir(parents=True, exist_ok=True)
     at = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -205,6 +238,7 @@ def create(path: str, content: str, note: str = "", expect_absent: bool = True) 
     rel = str(p.relative_to(_ROOT)).replace("\\", "/")
     rec = {"receipt_id": rid, "at": at, "op": "create", "path": rel,
            "before_sha256": "", "after_sha256": after_sha, "bytes": len(data),
+           "via": "direct", "bypass": True,
            "note": (note or "")[:120],
            "rollback": "移到 store/code_patch/rolledback/（不删，字节保留）"}
     (d / (rid + ".json")).write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -237,6 +271,136 @@ def _rollback_create(rec: dict, path: str = "") -> dict:
             "note": "create 已回滚：文件移到 rolledback/（字节保留，未删除）"}
 
 
+# ══════════════════════════════════════════════════════════════════════
+# 默认无伤修复：镜像 → 验证 → 原子替换（2026-11-03 主人令）
+# ══════════════════════════════════════════════════════════════════════
+
+# 按扩展名挑验证器：(kind, argv 模板)。{py} 会被替换成当前解释器。
+_AUTO_VERIFY: dict = {
+    ".py": ("py_ast", ["{py}", "-X", "utf8", "-c",
+                       "import ast,sys;ast.parse(open(sys.argv[1],encoding='utf-8')"
+                       ".read(),filename=sys.argv[1])"]),
+    ".pyw": ("py_ast", ["{py}", "-X", "utf8", "-c",
+                        "import ast,sys;ast.parse(open(sys.argv[1],encoding='utf-8')"
+                        ".read(),filename=sys.argv[1])"]),
+    ".json": ("json_parse", ["{py}", "-X", "utf8", "-c",
+                             "import json,sys;json.load(open(sys.argv[1],encoding='utf-8'))"]),
+    ".js": ("node_check", ["node", "--check"]),
+    ".mjs": ("node_check", ["node", "--check"]),
+    ".cjs": ("node_check", ["node", "--check"]),
+}
+
+
+def _q(s: str) -> str:
+    """cmd 里的一个参数：含空格/反斜杠就加引号（Windows 路径必含反斜杠）。"""
+    s = str(s)
+    return '"%s"' % s if (" " in s or "\\" in s) else s
+
+
+def _verify_argv(staged: Path, after_sha: str) -> tuple:
+    """给候选文件挑验证器。没有语义验证器就退到完整性校验，并**如实**标注。"""
+    spec = _AUTO_VERIFY.get(staged.suffix.lower())
+    if spec:
+        kind, argv = spec
+        built = [a.replace("{py}", sys.executable) for a in argv] + [str(staged)]
+        return built, kind
+    # 退路：只证明"写进镜像的字节 == 算出来的那串字节"，不假装语义正确
+    built = [sys.executable, "-X", "utf8", "-c",
+             "import hashlib,sys;"
+             "h=hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest();"
+             "sys.exit(0 if h==sys.argv[2] else 1)",
+             str(staged), after_sha]
+    return built, "sha_only"
+
+
+def _mirror_repair(rel: str, new_bytes: bytes, after_sha: str,
+                   verify_cmd: str = "", note: str = "",
+                   find: str = "", replace: str = "",
+                   before_sha: str = "", is_create: bool = False) -> dict:
+    """无伤修复主干：生产只读 → 候选写镜像 → 验证 → 通过才原子替换。
+
+    返回体与旧 apply 兼容（path/abs/*_sha256/wrote/ok），另加 mirror 证据字段。
+    验证不过时 **不 promote**，返回 ok=False + 证据，生产零改动。
+    """
+    from ..tentacle import mirror_stage as MS
+
+    sid = "cp-%s-%06d" % (time.strftime("%Y%m%d-%H%M%S"),
+                          time.time_ns() // 1000 % 1000000)
+    # ① 建镜像（生产只读复制）
+    r = MS.run("create", targets=[rel], id=sid)
+    if not r.get("ok"):
+        raise CodePatchError("mirror_create_failed",
+                             "建镜像失败：%s" % (r.get("error") or r.get("status")))
+
+    # ② 候选写镜像（src 分支 = 字节级保真，不碰行尾）
+    incoming = _ROOT / "state" / "mirror" / ".incoming"
+    incoming.mkdir(parents=True, exist_ok=True)
+    tmp = incoming / ("%s.bin" % sid)
+    tmp.write_bytes(new_bytes)
+    try:
+        r = MS.run("write", id=sid, path=rel, src=str(tmp))
+    finally:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+    if not r.get("ok"):
+        raise CodePatchError("mirror_write_failed",
+                             "候选写镜像失败：%s" % (r.get("error") or r.get("status")))
+
+    staged = _ROOT / "state" / "mirror" / "stage" / sid / "work" / rel
+    argv, kind = _verify_argv(staged, after_sha)
+    cmd = str(verify_cmd or "").strip() or " ".join(_q(a) for a in argv)
+
+    # ③ 验证（在镜像 work/ 里跑，生产不参与）
+    r = MS.run("verify", id=sid, cmd=cmd)
+    v = (r or {}).get("verify") or {}
+    if not r.get("ok") or int(v.get("exit_code", 1)) != 0:
+        return {
+            "op": "apply", "ok": False, "wrote": False, "status": "verify_failed",
+            "path": rel, "mirror_stage": sid, "verify_kind": kind, "verify_cmd": cmd,
+            "verify_exit_code": v.get("exit_code"),
+            "stdout_tail": (v.get("stdout_tail") or "")[-800:],
+            "stderr_tail": (v.get("stderr_tail") or "")[-800:],
+            "note": "验证没通过 ⇒ 生产一个字节都没动。修好候选后用同一 op 重试，"
+                    "或 op=rollback 清掉这个 stage。",
+        }
+
+    # ④ 原子整页替换（先备份，可 rollback）
+    r = MS.run("promote", id=sid, confirm=True)
+    if not r.get("ok"):
+        raise CodePatchError("mirror_promote_failed",
+                             "替换失败：%s" % (r.get("error") or r.get("status")))
+
+    # ⑤ 仍写 code_patch 回执（与旧通道一致，回滚口径不变）
+    # 🔴 三件套必须写真实值：find/replace/before_sha256 留空 ⇒ op=rollback 直接坏
+    #    （实测：空 find 会让 _compute 抛 empty_find，回滚通道当场失效）。
+    d = _store_dir()
+    d.mkdir(parents=True, exist_ok=True)
+    at = time.strftime("%Y-%m-%dT%H:%M:%S")
+    rid = "%s-%s" % (time.strftime("%Y%m%dT%H%M%S"), after_sha[:8])
+    rec = {"receipt_id": rid, "at": at, "path": rel,
+           "op": "create" if is_create else "apply",
+           "find": find, "replace": replace,
+           "before_sha256": before_sha, "after_sha256": after_sha,
+           "via": "mirror_stage", "mirror_stage": sid, "verify_kind": kind,
+           "note": (note or "")[:200] or "镜像验证通过后原子替换；原件备份在 state/mirror/backups/"}
+    (d / (rid + ".json")).write_text(
+        json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    return {
+        "op": "create" if is_create else "apply", "ok": True, "wrote": True,
+        "status": "promoted",
+        "path": rel, "abs": str(_ROOT / rel),
+        "before_sha256": before_sha,
+        "after_sha256": after_sha,
+        "mirror_stage": sid, "verify_kind": kind, "verify_cmd": cmd,
+        "backup": r.get("backup"),
+        "receipt_id": rid, "receipt": str(d / (rid + ".json")), "at": at,
+        "note": "无伤修复：镜像验证通过 → 整文件原子替换；原件已备份，可 rollback",
+    }
+
+
 def dry_run(path: str, find: str, replace: str, expect_sha256: str = "") -> dict:
     r = _compute(path, find, replace, expect_sha256)
     r.pop("_before", None)
@@ -246,11 +410,26 @@ def dry_run(path: str, find: str, replace: str, expect_sha256: str = "") -> dict
     return r
 
 
-def apply(path: str, find: str, replace: str, expect_sha256: str = "") -> dict:
+def apply(path: str, find: str, replace: str, expect_sha256: str = "",
+          verify_cmd: str = "", allow_unverified: bool = False) -> dict:
     r = _compute(path, find, replace, expect_sha256)
-    p = Path(r["abs"])
-    _atomic_write(p, r.pop("_after"))
+    after = r.pop("_after")
     r.pop("_before", None)
+
+    # 默认：原子替换 · 无伤修复（验证不过绝不落盘）
+    if not allow_unverified:
+        out = _mirror_repair(r["path"], after, r["after_sha256"],
+                             verify_cmd=verify_cmd,
+                             find=find, replace=replace,
+                             before_sha=r["before_sha256"])
+        for k in ("before_sha256", "bytes_before", "bytes_after", "bytes_delta", "occurrences"):
+            if k in r:
+                out.setdefault(k, r[k])
+        return out
+
+    # 应急直写：仍逐字节 + 原子写，但回执必须留痕
+    p = Path(r["abs"])
+    _atomic_write(p, after)
     d = _store_dir()
     d.mkdir(parents=True, exist_ok=True)
     at = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -258,10 +437,14 @@ def apply(path: str, find: str, replace: str, expect_sha256: str = "") -> dict:
     rec = {"receipt_id": rid, "at": at, "path": r["path"],
            "find": find, "replace": replace,
            "before_sha256": r["before_sha256"], "after_sha256": r["after_sha256"],
-           "note": "回滚三件套：确认当前哈希==after_sha256，再把 replace 换回 find"}
+           "via": "direct", "bypass": True,
+           "note": "⚠️ 走了 allow_unverified 应急直写（未经镜像验证）——留痕备查。"
+                   "回滚三件套：确认当前哈希==after_sha256，再把 replace 换回 find"}
     (d / (rid + ".json")).write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding="utf-8")
     r.update({"op": "apply", "wrote": True, "ok": True, "receipt_id": rid,
-              "receipt": str(d.joinpath(rid + ".json")), "at": at})
+              "receipt": str(d.joinpath(rid + ".json")), "at": at,
+              "via": "direct", "bypass": True,
+              "warning": "未经镜像验证（allow_unverified=true）：这是应急口，不是默认路径"})
     return r
 
 
@@ -303,10 +486,14 @@ def run(payload: dict | None = None) -> dict:
                        p.get("expect_sha256"))
     if op in ("apply", "write", "patch"):
         return apply(p.get("path"), p.get("find"), p.get("replace"),
-                     p.get("expect_sha256"))
+                     p.get("expect_sha256"),
+                     verify_cmd=p.get("verify_cmd", ""),
+                     allow_unverified=bool(p.get("allow_unverified", False)))
     if op in ("create", "new", "add"):
         return create(p.get("path"), p.get("content"), p.get("note", ""),
-                      bool(p.get("expect_absent", True)))
+                      bool(p.get("expect_absent", True)),
+                      verify_cmd=p.get("verify_cmd", ""),
+                      allow_unverified=bool(p.get("allow_unverified", False)))
     if op in ("rollback", "revert", "undo"):
         return rollback(p.get("receipt_id"), p.get("path"))
     raise CodePatchError("unknown_op",

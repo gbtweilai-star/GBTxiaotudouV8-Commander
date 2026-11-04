@@ -29,6 +29,7 @@
 op=intake / list / audit / fuse / verify / where
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import os
@@ -259,6 +260,6 @@ def run_op(op: str = "list", **params) -> dict:
     for name, fn in (("intake", intake), ("list", list), ("audit", audit), ("fuse", fuse),
                      ("verify", verify), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（intake/list/audit/fuse/verify/where）"}

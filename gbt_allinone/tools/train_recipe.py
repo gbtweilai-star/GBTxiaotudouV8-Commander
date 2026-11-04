@@ -27,6 +27,7 @@
 3. **实验账只增不删**：`train_recipe_ledger.jsonl` 追加式；每条带 `src`（谁在什么机器上量的）。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import importlib.util
 import json
@@ -145,7 +146,7 @@ def run_op(op: str = "readiness", **params) -> dict:
     op = (op or "readiness").lower()
     for n, fn in (("readiness", readiness), ("plan", plan), ("ledger", ledger), ("where", where)):
         if op == n:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（readiness/plan/ledger/where）"}
 

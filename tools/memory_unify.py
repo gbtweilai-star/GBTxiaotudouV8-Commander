@@ -68,6 +68,14 @@ def _conn():
         c.execute("CREATE VIRTUAL TABLE IF NOT EXISTS mem_fts USING fts5(text, tokenize='unicode61')")
     except sqlite3.OperationalError:
         pass
+    # 中文 trigram 索引：unicode61 把连续汉字当一个 token ⇒ 「统一层」这种子串搜不到。
+    # trigram 让 >=3 字的词做**子串**命中（2 字仍不行，索引也更大 —— 这是实测口径，不吹）。
+    try:
+        c.execute("CREATE VIRTUAL TABLE IF NOT EXISTS mem_fts_tri "
+                  "USING fts5(text, tokenize='trigram')")
+    except sqlite3.OperationalError:
+        pass
+    c.execute("PRAGMA busy_timeout=8000")
     return c
 
 
@@ -141,6 +149,11 @@ def index(sources: tuple = ("ring", "devoured")) -> dict:
         c.execute("insert into mem (h,src,ref,name,at,role,text,tag) values (?,?,?,?,?,?,?,?)", row)
         c.execute("insert into mem_fts (rowid, text) values ((select rowid from mem where h=?), ?)",
                   (row[0], row[6]))
+        try:
+            c.execute("insert into mem_fts_tri (rowid, text) values ((select rowid from mem where h=?), ?)",
+                      (row[0], row[6]))
+        except sqlite3.OperationalError:
+            pass
         added[row[1] if row[1] in added else "ring"] += 1
     c.commit()
     c.close()
@@ -198,20 +211,71 @@ def _terms(q: str) -> list:
     return uniq[:16]
 
 
+def _tri_backfill(c) -> int:
+    """给旧行补 trigram 索引（老库加表后第一次 recall 用；幂等）。"""
+    n = 0
+    try:
+        miss = c.execute("select m.rowid, m.text from mem m "
+                         "left join mem_fts_tri t on t.rowid=m.rowid "
+                         "where t.rowid is null").fetchall()
+        for rowid, text in miss:
+            c.execute("insert into mem_fts_tri (rowid, text) values (?, ?)", (rowid, text or ""))
+            n += 1
+        if n:
+            c.commit()
+    except sqlite3.OperationalError:
+        return 0
+    return n
+
+
+def _tri_rows(c, q: str, k: int, tag_clause: str) -> list:
+    """trigram 子串检索：>=3 字的中文词能按**子串**命中（unicode61 做不到）。"""
+    q = str(q or "").strip()
+    if not q:
+        return []
+
+    def _q_one(term: str) -> list:
+        if len(term) < 3:
+            return []
+        try:
+            return c.execute(
+                "select m.src, m.ref, m.name, m.at, m.role, m.text, m.tag from mem_fts_tri f "
+                "join mem m on m.rowid=f.rowid where mem_fts_tri match ?" + tag_clause +
+                " order by rank limit ?",
+                ('"' + term.replace('"', '""') + '"', max(k * 4, 8))).fetchall()
+        except sqlite3.OperationalError:
+            return []
+
+    rows = _q_one(q)
+    if rows:
+        return rows[:k]
+    seen, got = set(), []
+    for t in [x for x in re.split(r"\s+", q) if len(x) >= 3][:8]:
+        for r in _q_one(t):
+            key = (r[0], r[1])
+            if key not in seen:
+                seen.add(key)
+                got.append(r)
+    return got[:k]
+
+
 def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
     """一句查全册。默认**不含**测试噪音。"""
     c = _conn()
     tag_clause = "" if include_test else " and m.tag='real'"
+    _tri_backfill(c)
     try:
         rows = c.execute(
             "select m.src, m.ref, m.name, m.at, m.role, m.text, m.tag from mem_fts f "
             "join mem m on m.rowid=f.rowid where mem_fts match ?" + tag_clause +
-            " order by rank limit ?", (q, k)).fetchall()
+            " order by rank limit ?", (q, max(k * 4, 16))).fetchall()
     except sqlite3.OperationalError:
         rows = c.execute(
             "select src, ref, name, at, role, text, tag from mem "
             "where text like ?" + (" and tag='real'" if not include_test else "") +
-            " order by at desc limit ?", ("%" + q + "%", k)).fetchall()
+            " order by at desc limit ?", ("%" + q + "%", max(k * 4, 16))).fetchall()
+    if not rows:                                  # 中文子串（trigram，>=3 字）
+        rows = _tri_rows(c, q, max(k * 4, 16), tag_clause)
     if not rows:                                  # 词面兜底：拆词再查（**中文必须按字切**）
         # 🔴 2026-10-29 实测：问「怎么做设计才有品味，别那么套路？」
         #   FTS 与按空格切都命中 0 —— **中文没有空格**，整句被当成一个超长 token。
@@ -224,14 +288,14 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
                 rr = c.execute(
                     "select m.src, m.ref, m.name, m.at, m.role, m.text, m.tag from mem_fts f "
                     "join mem m on m.rowid=f.rowid where mem_fts match ?" + tag_clause +
-                    " order by rank limit ?", (t, k)).fetchall()
+                    " order by rank limit ?", (t, max(k * 2, 8))).fetchall()
             except sqlite3.OperationalError:
                 rr = []
             if not rr:
                 rr = c.execute(
                     "select src, ref, name, at, role, text, tag from mem "
                     "where text like ?" + real_clause + " order by at desc limit ?",
-                    ("%" + t + "%", k)).fetchall()
+                    ("%" + t + "%", max(k * 2, 8))).fetchall()
             for x in rr:
                 key = (x[0], x[1])
                 score[key] = score.get(key, 0) + 1        # 命中词数越多越相关
@@ -239,7 +303,19 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
                     seen.add(key)
                     got.append(x)
         got.sort(key=lambda x: -score.get((x[0], x[1]), 0))
-        rows = got[:k]
+        rows = got
+    merged = len(rows)
+    # 同一句话被重复写多次（压测/重复探针）时，别让重复把召回窗口占满：
+    # 正文归一化后去重，保留排名靠前的那条。raw 在 dedup.before 里如实记账。
+    if rows:
+        seen_txt, uniq = set(), []
+        for r in rows:
+            key = re.sub(r"\s+", "", str(r[5] or ""))[:300]
+            if key in seen_txt:
+                continue
+            seen_txt.add(key)
+            uniq.append(r)
+        rows = uniq[:k]
     c.close()
     hits = [{"src": r[0], "ref": r[1], "name": r[2], "at": r[3],
              "role": r[4], "text": (r[5] or "")[:300], "tag": r[6]} for r in rows]
@@ -247,7 +323,8 @@ def recall(q: str, k: int = 10, include_test: bool = False) -> dict:
     for h in hits:
         by.setdefault(h["src"], []).append(h)
     return {"ok": True, "query": q, "total": len(hits),
-            "by_src": {k2: len(v) for k2, v in by.items()}, "hits": hits}
+            "by_src": {k2: len(v) for k2, v in by.items()}, "hits": hits,
+            "dedup": {"before": merged, "after": len(rows)}}
 
 
 SRC_RE = re.compile(r"来源[:：]\s*(https?://[^\s|)）]+)")
@@ -324,9 +401,14 @@ def stats() -> dict:
     c = _conn()
     tot = c.execute("select count(*) from mem").fetchone()[0]
     bysrc = c.execute("select src, tag, count(*) from mem group by src, tag").fetchall()
+    try:
+        tri = c.execute("select count(*) from mem_fts_tri").fetchone()[0]
+    except sqlite3.OperationalError:
+        tri = 0
     c.close()
     return {"total": tot,
-            "by_src_tag": [{"src": a, "tag": b, "n": n} for a, b, n in bysrc]}
+            "by_src_tag": [{"src": a, "tag": b, "n": n} for a, b, n in bysrc],
+            "fts": {"unicode61": tot, "trigram": tri}}
 
 
 def main() -> int:

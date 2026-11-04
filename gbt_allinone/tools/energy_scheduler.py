@@ -26,6 +26,7 @@
 4. **公平**：同批内负载最低者优先（round-robin by least-load），不 Starve 单源。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import time
@@ -216,7 +217,7 @@ def run_op(op: str = "status", **params) -> dict:
     op = (op or "status").lower()
     for name, fn in (("plan", plan), ("run", run), ("status", status), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（plan/run/status/where）"}
 

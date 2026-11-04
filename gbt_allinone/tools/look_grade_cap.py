@@ -18,15 +18,13 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]  # 仓库根（不再写死 ADMIN 桌面）
-_FG = ROOT / "tools" / "filmgrade.py"  # 外部调色工具（没装 = 环境缺件）
+ROOT = Path(__file__).resolve().parents[2]
+_FG = ROOT / "tools" / "filmgrade.py"
 READ_OPS = ("list", "pick", "qc")
 WRITE_OPS = ("preview",)
 
 
 def _fg():
-    if not _FG.is_file():
-        raise RuntimeError("缺少 filmgrade.py（外部调色工具未安装）：%s" % _FG)
     spec = importlib.util.spec_from_file_location("filmgrade", _FG)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
@@ -47,15 +45,22 @@ def _gate(what: str) -> dict | None:
 
 def status(**_kw) -> dict:
     return {"ok": True, "op": "status", "kind": "look_grade",
-            "impl": str(_FG), "read_ops": list(READ_OPS), "write_ops": list(WRITE_OPS),
-            "口径": "list/pick/qc 免门；preview 写盘过 filesystem_write；外观库一处定义、两条产线同款引用"}
+            "impl": str(_FG), "impl_exists": _FG.is_file(),
+            "read_ops": list(READ_OPS), "write_ops": list(WRITE_OPS),
+            "口径": "list/pick/qc 免门；preview 写盘过 filesystem_write；外观库一处定义、两条产线同款引用",
+            "missing": "" if _FG.is_file() else "filmgrade.py 未在本仓（外观库实现缺失）"}
 
 
 def run(op: str = "list", **kw) -> dict:
     op = (op or "list").lower()
-    fg = _fg()
     if op == "status":
         return status(**kw)
+    try:
+        fg = _fg()
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "status": "needs_dependency", "reason": "filmgrade_missing",
+                "detail": "tools/filmgrade.py 缺失：%s" % str(e)[:120],
+                "impl": str(_FG)}
     if op == "list":
         return fg.looks_list()
     if op == "pick":

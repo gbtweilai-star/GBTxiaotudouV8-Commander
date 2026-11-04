@@ -28,17 +28,32 @@ import sys
 
 SCHEME_RE = re.compile(r"^([a-z][a-z0-9+.\-]*):", re.I)
 HOSTPORT_RE = re.compile(r"^(\[[0-9a-f:]+\]|[A-Za-z0-9_.\-]+):(\d{1,5})$")
+# 2026-11-02（capability_router）：图片文件 = 「看图」这一类插座的目标。
+# 判类仍是**纯看扩展名**（不打开文件、不读字节），执行才交给本机视觉。
+IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tif", ".tiff", ".ico")
 
 
 def _is_executable(p: pathlib.Path) -> bool:
     """iSH 上几乎每个文件都是 X_OK，所以**不能**只看权限位 —— 要看真内容。
-    ELF(\x7fELF) 或 shebang(#!) 才算可执行。"""
+    可执行真身三种：ELF(\x7fELF) · shebang(#!) · **Windows PE/COFF(MZ)**。
+
+    2026-11-03 补 PE（修双错）：原实现只认 ELF 与 shebang ⇒ 盘上真存在的
+    `C:\\...\\tool.exe` 被判成 `path`；而 policy 的 socket 表是
+    `"path": "file"` / `"bin": "process"` ⇒ **起进程却走文件门**，
+    等于绕开 `process_execute`。补上 MZ 后它归 `bin` ⇒ 回到 process 门。
+    后缀兜底给 .bat/.cmd 这类纯文本脚本（它们没有 MZ 头）。
+    方向 fail-closed：宁可多判成 bin（要票），不把真程序误放成文件。
+    """
     try:
         with open(p, "rb") as fh:
             head = fh.read(4)
-        return head[:4] == b"\x7fELF" or head[:2] == b"#!"
-    except Exception:                                             # noqa: BLE001
-        return False
+        if head[:4] == b"\x7fELF" or head[:2] == b"#!":
+            return True
+        if head[:2] == b"MZ":                    # Windows PE/COFF（DOS 头）
+            return True
+    except Exception:                                            # noqa: BLE001
+        pass
+    return p.suffix.lower() in (".exe", ".com", ".bat", ".cmd", ".msi")
 
 
 def classify(target: str) -> dict:
@@ -46,6 +61,26 @@ def classify(target: str) -> dict:
     t = (target or "").strip()
     if not t:
         return {"kind": "unknown", "why": "target 为空"}
+
+    # 🔴 2026-11-02 修（capability_router 实测抓出）：Windows 盘符路径 `C:\...` 会被
+    #   SCHEME_RE 当成 scheme "C:" ⇒ 一路走到「App/系统 scheme」，看图/读文件全错类。
+    #   盘符路径必须在 scheme 判定**之前**判掉。也顺手接住「盘上真存在的相对路径」
+    #   （如 `icons/avatar.png`）——它们也不该被下一条「裸域名 ⇒ https」抢走。
+    if re.match(r"^[A-Za-z]:[\\/]", t):
+        p = pathlib.Path(t)
+        if p.is_dir():
+            return {"kind": "dir", "path": str(p), "why": "目录（盘符路径）"}
+        if p.exists():
+            if p.is_file() and _is_executable(p):
+                return {"kind": "bin", "path": str(p), "why": "可执行文件（盘符路径）"}
+            return {"kind": "path", "path": str(p), "why": "文件（盘符路径）"}
+        return {"kind": "path", "path": str(p), "why": "路径（不存在）"}
+    if "/" in t or "\\" in t:
+        p = pathlib.Path(t)
+        if p.exists():
+            if p.is_dir():
+                return {"kind": "dir", "path": str(p), "why": "目录（相对路径）"}
+            return {"kind": "path", "path": str(p), "why": "文件（相对路径）"}
 
     m = SCHEME_RE.match(t)
     if m:
@@ -126,12 +161,49 @@ def _tcp_probe(hostport, timeout=3):
         return {"ok": False, "detail": "%s" % type(e).__name__}
 
 
+def _vision_view(path: str) -> dict:
+    """看图：把图片交给本机视觉能力位（`vision` op=analyze，PIL 像素级）。
+
+    2026-11-02（capability_router）：「看图」是四类里的第三/四类之一，这里只做
+    **判类之后的执行腿** —— 缺视觉依赖（Pillow/numpy）就如实报缺，不伪造识图结果。
+    """
+    try:
+        from gbt_allinone import vision_cap as _vc
+        r = _vc.analyze(image=path)
+        if r.get("ok"):
+            size = r.get("size") or [0, 0]
+            return {"ok": True, "kind": "image", "via": "omni:vision",
+                    "evidence": "看图 %s · %sx%s · 亮度=%s · 对比度=%s"
+                                % (path, size[0], size[1], r.get("brightness"),
+                                   r.get("contrast")),
+                    "result": r}
+        return {"ok": False, "kind": "image", "via": "omni:vision",
+                "evidence": "看图没成：%s" % str(r.get("error") or r.get("status") or "?")[:160],
+                "result": r}
+    except Exception as exc:                                        # noqa: BLE001
+        return {"ok": False, "kind": "image", "via": "omni:vision",
+                "evidence": "看图需要本机视觉依赖（Pillow/numpy）：%s: %s"
+                            % (type(exc).__name__, str(exc)[:120])}
+
+
 def execute(target: str, verb: str = "", args: dict | None = None) -> dict:
     """万能入口：判断 → 生成适配器 → 执行。verb 不传就按 kind 选默认动作。"""
     args = args or {}
     info = classify(target)
     kind = info["kind"]
     verb = (verb or "").lower()
+
+    # 2026-11-02（capability_router）：看图 —— 图片文件 + view/see/analyze 类动词。
+    # 没给动词时**不**自动把图片当看图（读类默认仍是读字节），免得改掉旧行为。
+    # F6 修法（独立验收抓出）：图片不存在时不能掉进下面的 path 分支去「当命令跑」，
+    #   要如实报「图片不存在」（失败语义仍如实，但不再是 FileNotFoundError 冒充执行回执）。
+    if kind == "path" and verb in ("view", "see", "look", "analyze", "看图", "识图"):
+        p = info["path"]
+        if str(p).lower().endswith(IMAGE_EXTS):
+            if os.path.isfile(p):
+                return _vision_view(p)
+            return {"ok": False, "kind": "image", "via": "omni:vision",
+                    "evidence": "图片不存在或不是文件：%s（看图不做执行兜底）" % p}
 
     if kind == "http":
         url = info.get("url") or target

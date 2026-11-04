@@ -9,7 +9,7 @@
 | `code_patch` | **需授权** | 是 | **未登记**（注册表要参数，必填名待补） | `user_error` / `failed` | **改代码的唯一过门入口**（2026-09-23 接）：此前 agent 直接 edit/write 落盘 ⇒ **不过门、没审计、没信封、没改前改后凭据**。三原语 dry_run（**默认，只算不写**）/ apply（落盘，挂 filesystem_write）/ rol… |
 | `freebuff_term` | 只读 | — | —（注册表：无必填） | `user_error` | freebuff 终端集成（主人令 2026-09-28「把 freebuff 这个终端集成进我们的对话面板，编程就走这个」）：**正常 HOME 下 EPERM 起不来**（只认 $HOME/.config/manicode），隔离 HOME（%LOCALAPPDATA%\gb… |
 | `git_read` | 只读 | — | —（注册表：无必填） | `user_error` | **版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）… |
-| `git_write` | **需授权** | 是 | **未登记**（注册表要参数，必填名待补） | `denied: missing_scopes` / `user_error` | **版本库写面**（只两个 op，且**永远要点名路径**）：stage（`git add -- <paths>`）· commit（**pathspec-limited**：`git commit -m … -- <paths>`，只提交点名的路径，**不动索引里别的暂存内容*… |
+| `git_write` | **需授权** | 是 | **未登记**（注册表要参数，必填名待补） | `denied: missing_scopes` / `user_error` | **版本库写面**：stage/commit + push/force_push/rebase/reset（confirm=true；push network；force_push 只允许 --force-with-lease）… |
 | `projection_card` | 只读 | — | —（注册表：无必填） | `user_error` | 空间投射只读卡片：5 原语全标未核实 + ARM ≠ LIVE 红线（只呈现不执行） |
 | `pulse_direct` | 只读 | — | —（注册表：无必填） | `user_error` | **脉冲直达**（主人令 2026-10-11「把脉冲给大模型，让她把所有的能力按触手双向绑定的部署方式**急速运行**、**省去不必要的多绕** —— 本来向前跨一步就到的东西，别跑一大圈才跨那一步」）：一句意图 => **一步**解析到能力位 => 给出那一条命令与要过的门，… |
 | `repo_publish` | 只读 | — | —（注册表：无必填） | `user_error` | **远端发布面**（补 `git_write` 的另一半 · 主人 2026-10-11 当场指出：tools 域只有 `git_read` 与只能 stage/commit 的 `git_write`⇒ **push 到远端 / 建仓 / 发 Release 根本没有能力位**… |
@@ -71,7 +71,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）· **反选项注入**（rev/path 不许以 `-` 开头）· **路径必须在仓内** · **每条命令带 `--`** · **超时 60s + 输出上限 200KB** · status 只报数量与前 40 条（本仓脏行上万，全量灌回来没意义）· **零作用域**（policy 里不挂任何 scope）。⚠️ 不做 rebase/reset --hard/push —— 那些是「改历史/出网」，要单独设计。type=internal
+- **它做什么**：**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）· **反选项注入**（rev/path 不许以 `-` 开头）· **路径必须在仓内** · **每条命令带 `--`** · **超时 60s + 输出上限 200KB** · status 只报数量与前 40 条（本仓脏行上万，全量灌回来没意义）· **零作用域**（policy 里不挂任何 scope）。写面 push/rebase/reset 已由 git_write 补齐（需 confirm）；本位仍只读、零作用域。type=internal
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap git_read '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -82,7 +82,7 @@
 - **要哪张票（静态）**：`filesystem_write`
 - **必填载荷**：**未登记**：注册表标了 `requires_params=true`，但 `PARAM_REQUIRED` 里还没有它的必填名 —— 先按模块代码现读，不要猜（空载荷会撞 user_error）
 - **常见错误**：缺票 → `denied`，回执点名 `missing_scopes`（本行静态票：`filesystem_write`）；参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
-- **它做什么**：**版本库写面**（只两个 op，且**永远要点名路径**）：stage（`git add -- <paths>`）· commit（**pathspec-limited**：`git commit -m … -- <paths>`，只提交点名的路径，**不动索引里别的暂存内容**）。为什么必须点名：本仓脏行可能上万，`commit -a` 一次就把不相干的全卷进去。**永远挂 `filesystem_write`**（不按 op 判 —— 拆成独立能力位就是为了让门的判据平凡正确）。与 `git_read` 分开登记：`safe` 是按能力位记的，不是按 op 记的。type=internal
+- **它做什么**：**版本库写面**：stage / commit（pathspec-limited）· **push / force_push / rebase / reset**（2026-11-03 补齐：必须 `confirm=true`；push 标 `network=true`；force_push 只允许 `--force-with-lease`；rebase 要求工作区干净；reset --hard 必须点名 rev）。永远挂 `filesystem_write`；与 `git_read` 分开登记。type=internal
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap git_write '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 

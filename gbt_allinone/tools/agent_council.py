@@ -19,6 +19,7 @@
 4. **纪要带印**：纪要 = 主题 + 轮次 + 投票 + 全文 sha256；篡改发言记录 ⇒ 纪要校验当场报"被改过"。
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import hashlib
 import json
@@ -275,7 +276,7 @@ def run_op(op: str = "status", **params) -> dict:
                      ("vote", vote), ("minutes", minutes), ("verify", verify),
                      ("status", status), ("where", where)):
         if op == name:
-            return fn(**params)
+            return _oc_call(fn, params)
     return {"ok": False, "fail_closed": True,
             "error": f"未知 op:{op}（convene/speak/speak_auto/vote/minutes/verify/status/where）"}
 

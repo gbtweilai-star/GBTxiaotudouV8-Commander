@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # 🔴 2026-09-25 事故恢复：本文件曾被一次**编码损坏的整文件改写**弄坏（见账 §一百三十七）。
 # 恢复依据：① `__pycache__/caps_registry.cpython-314.pyc`（数据表与 docstring 逐字取回）；
 #           ② `git show :gbt_allinone/caps_registry.py`（注释）。
@@ -26,6 +26,23 @@ BENIGN_CAPS = {
         "desc": '身体·看：截当前屏幕落 png（可选 monitor 序号）',
         "handler": 'body_see',
         "safe": True,
+    },
+    "see_camera": {
+        "domain": 'device',
+        "desc": '身体·摄像头之眼（2026-11-04 主人令：「她的摄像头调用可用于跟用户对话，'
+                '手机版和电脑版都可以，可通过摄像头陪用户看世间万物美景」）。'
+                '`BODY_SENSES` 里早有 `see_camera: 摄像头`，但此前**没有任何能力位承接**——'
+                '词汇在册、手是空的；这一位把它接上。'
+                'op=status 枚举**真能读到帧**的摄像头（读不到的不列，不拿「有设备」充数）；'
+                'snapshot 抓一帧落 .scratch/camera/；watch 连拍看动态；'
+                'phone 起局域网页面（手机同一 WiFi 打开即用前后摄像头拍帧回传，'
+                '自动连拍 2.5s/帧）；talk 取帧→交理解层（默认 body_eye）→body_say 读出来。'
+                '与 body_see/body_eye 分工：那两位看**屏幕**，本位看**真实世界**。 '
+                '摄像头打不开如实 needs_camera，**不造帧、不脑补画面**。'
+                '常用说法：打开摄像头 / 用摄像头看看 / 手机当摄像头 / 陪我看看外面 / '
+                '摄像头里有什么 / 看看我这边 / 拍一张 / 连拍几张。',
+        "handler": 'see_camera',
+        "safe": False,
     },
     "body_say": {
         "domain": 'device',
@@ -155,7 +172,7 @@ BENIGN_CAPS = {
                 'create 把生产目标复制进 state/mirror/stage/<id>/（生产只读）→ write 只写镜像候选（可多候选）→ '
                 'verify 在镜像 work/ 跑外部验证器（cmd+exit_code）→ promote 仅在 verify.exit_code=0 且 confirm=true 时'
                 '做**整文件 os.replace 原子替换**（先备份，支持 rollback）。没验过/失败/越界一律拒。'
-                'op=status/create/list/write/verify/promote/rollback/where。边界：不含远程桌面/隧道/语音（另位）。',
+                'op=status/create/list/write/verify/promote/rollback/where。边界：不含远程桌面/隧道/语音（另位）。''🔴 2026-11-03 主人令后，本件是**改代码的默认唯一落地方式**：code_patch 的 apply/create 默认自动调它，调用方不必感知（除非要走应急直写）。',
         "handler": 'mirror_stage',
         "safe": False,
     },
@@ -1263,6 +1280,14 @@ BENIGN_CAPS = {
         "handler": 'coze_mail',
         "safe": True,
     },
+    "email_cap": {
+        "domain": "comms",
+        "desc": ("**通信域 · email_cap（= coze_mail 的审计别名）**：对主人自有单一地址收发与整理；"
+                 "白名单默认空=全拒、confirm_token 绑定内容、正文不入档、独立通道 coze_mail。"
+                 "闸门/配额/账本已实现；默认 transport 未接线时如实报 needs_dependency，不伪造成功。"),
+        "handler": "email_cap",
+        "safe": True,
+    },
     "create": {
         "domain": 'creation',
         "desc": '创作出口：创作意图/产物登记 ＋ **仅限 outputs/ 的文本写入（已接线：gbt_allinone/file_operation.py，policy 挂 filesystem_write）**；**网络出口**待接线（如实报 pending、不发网络请求）、覆盖必带 confirm_token ＋ 写前备份 ＋ 双向 SHA、独立通道 create',
@@ -1385,6 +1410,194 @@ BENIGN_CAPS = {
         "desc": '素材许可账（三方向流程台「家规第 2 条：没有许可的素材不许进成品格」的数据源）：`register` 逐件登记（**现算 sha256** + 出处 + 授权 + 时间）、`unregister` 撤销（**必须写 why**，留档在 removed）、`status`/`list`/`check` 只读核对（账↔盘：陈旧 / sha 对不上 / 漏登）。🔴 **source 与 license 为空一律拒绝**——空着的许可记录比没有记录更坏（让人以为查过了）。只登记盘上真有的仓内素材；写面只落 `projects/_shared/licenses/`。**只登记与核对，不判定授权是否真实/充分**（那是主人的事）。',
         "handler": 'media_license',
         "safe": False,
+    },
+    "world_forge": {
+        "domain": "engine",
+        "desc": ("**世界锻造内核**（吞噬 AEON/WorldX/Temporal God 蒸出的第 0 步，2026-11-02 主人令）："
+                 "op=schema/spec/gen/step/focus/person/god/rewind/branch/encode/decode/view3d/view/summary/verify。"
+                 "**纯函数·零作用域**：不出网/不起进程/不写盘；同 seed+spec ⇒ 同世界；命名 RNG 流；"
+                 "世界之灵只发被夹紧的 Directive（不许直接改人口）；rewind=重放+hash 对账；branch=多时间线；"
+                 "encode/decode 存档编解码（真落盘由调用方走 filesystem_write 门）。"),
+        "handler": 'world_forge',
+        "safe": True,
+    },
+    "pentest_flow": {
+        "domain": "security",
+        "desc": ("**授权渗透流水线内核**（吞噬 Shannon 蒸出的「No exploit, no report」那一层，2026-11-02 主人令）："
+                 "op=schema/scope/target/surface/reconcile/agent_plan/agent_ingest/exploit_queue/validate/report/gate/"
+                 "workspace/resume/pipeline/verify。**纯函数·零作用域**：不攻击/不发请求/不起进程/不出网/不写盘；"
+                 "授权+范围 fail-closed（生产默认拒、凭据只收槽名）；双流对账（recon×SAST）；"
+                 "只有可复现 PoC 才进报告/SARIF 2.1.0/CI 闸；真 exploit 仍由既有授权手执行。"),
+        "handler": 'pentest_flow',
+        "safe": True,
+    },
+    "update_chain": {
+        "domain": "system",
+        "desc": ("**本地更新测试链**（P2-13，主人批准 B，2026-11-03）：op=schema/init/stage/confirm/rollback/status/verify。"
+                 "只在 `state/updates-test/` 内：dev Ed25519 签名清单 → 校验 sha256/签名 → 安全解包暂存 → "
+                 "一次性 confirm_token 确认 → 备份/替换 target → 失败回滚。**不下载网络、不碰正式 APP、不重启**；"
+                 "dev 私钥仅测试，生产信任根/发布通道/安装器仍未接。"),
+        "handler": "update_chain",
+        "safe": True,
+    },
+    "kws": {
+        "domain": "voice",
+        "desc": ("**声学关键词唤醒 KWS**（主人 P2-14，2026-11-03）：op=schema/status/detect/detect_wav/verify。"
+                 "本机 sherpa-onnx + 中文 zipformer 3.3M 模型（Apache-2.0，约 13MB）+ "
+                 "拼音关键词 `x iǎo t ǔ d òu @小土豆`；CPU、无网络、无密钥。"
+                 "没装 sherpa/模型时 available=false，不假装能唤醒。"),
+        "handler": "kws",
+        "safe": True,
+    },
+    "voice_stream": {
+        "domain": "voice",
+        "desc": ("**流式语音（P2-14 可做面）**：op=schema/start/chunk/reset/end/verify。"
+                 "收 PCM16 16k base64 分片 → 内存缓冲（≤60s）→ 显式 partial 且 ≥2s 时本地 Whisper 局部转写，"
+                 "end 时最终转写；临时 WAV 即用即删。**不是真 KWS**（无 sherpa-onnx 唤醒模型），"
+                 "识别文本按外部内容纪律处理；不执行指令。"),
+        "handler": "voice_stream",
+        "safe": True,
+    },
+    "update_verify": {
+        "domain": "system",
+        "desc": ("**更新清单/签名校验**（主人 P2-13 的可做安全面，2026-11-03）：op=schema/verify/sign/verify_self。"
+                 "校验 app_id/semver/https 非私网产物/sha256/size/Ed25519 签名；**不下载、不安装、不推送**；"
+                 "无公钥/无签名一律不可安装；真正自动更新要主人给签名身份/发布通道/安装器。"),
+        "handler": "update_verify",
+        "safe": True,
+    },
+    "lan_pairing": {
+        "domain": "security",
+        "desc": ("**局域网配对监听/自签证书**（主人 2026-11-03 批准）：op=schema/start/stop/status/cert/verify。"
+                 "只绑一个私有 LAN IPv4（或 loopback），拒 0.0.0.0/公网；端口 8767..8770；TLS 自签（cert/key 放 state/）；"
+                 "一次性配对码换 Bearer device token；只开 health/pair/status，**无远程命令/文件接口**。"),
+        "handler": "lan_pairing",
+        "safe": True,
+    },
+    "pairing": {
+        "domain": "security",
+        "desc": ("**局域网配对/证书安全原语**（主人 P2-12 已点头：先本机/局域网安全设计）："
+                 "op=schema/code/claim/devices/revoke/cert/cert_verify/verify。"
+                 "6 位一次性配对码 TTL 300s/最多 3 次尝试；设备白名单 + 一次性 device token（只存 sha256）；"
+                 "证书只做 **PEM SHA-256 指纹校验**。**不开监听端口、不生成证书、不暴露公网**；"
+                 "设备表写面过 filesystem_write（可信会话免票）。"),
+        "handler": "pairing",
+        "safe": True,
+    },
+    "turn_trace": {
+        "domain": "mind",
+        "desc": ("**轮次追踪 Turn Trace**（主人 P2，2026-11-03）：op=schema/normalize/verify。"
+                 "把已有 JSONL 执行账按 session + 间隔（默认 45s）归并成“轮”：步骤/结果/证据/耗时；"
+                 "没有 input 字段就 null，不伪造用户输入/证据；**零作用域**只读归并（不调模型/不写盘）。"),
+        "handler": "turn_trace",
+        "safe": True,
+    },
+    "ref3d": {
+        "domain": "creation",
+        "desc": ("**参考图 → 可拆解 3D 交互页**（主人 2026-11-03 抖音 Salticus JS-8）："
+                 "op=schema/status/build/verify。参考图只提供外观/比例/配色；主体是我们自己的"
+                 "数字人 DH-V7 GLB（1 skinned mesh/66 bones），可旋转/缩放/皮肤透明/骨架/线框/拆解层/动作；"
+                 "Three.js/GLTFLoader 本地零网络。`build` 复制独立页并写 meta，必须过 filesystem_write 门。"),
+        "handler": "ref3d",
+        "safe": True,
+    },
+    "video_hub": {
+        "domain": "video",
+        "desc": ("**视频舱 / 视频能力融合**（主人 2026-11-03）：op=schema/catalog/verify。"
+                 "只读编目全部视频生态能力位（domain=video/image_video + Comfy/数字人/音乐/剪辑/钢印/发布/情报），"
+                 "按 生成→编辑/成片→音频→钢印/许可/发布→情报/外观→库/舞台 六段归类；不执行/不伪造状态。"),
+        "handler": "video_hub",
+        "safe": True,
+    },
+    "media_library": {
+        "domain": "video",
+        "desc": ("**媒体舞台/音乐库/历史索引**（主人 P2，2026-11-03）：op=schema/build/history/verify。"
+                 "只聚合**既有产物**：视频/图片/音频按扩展名分类、去重、mtime 倒序、上限 120；"
+                 "不读内容/不转码/不上传/不生成缩略图；**零作用域**纯归一化。文件服务由 console-server "
+                 "在允许根（交付成片/kaleido/outputs）内单独做。"),
+        "handler": "media_library",
+        "safe": True,
+    },
+    "resource_snapshot": {
+        "domain": "system",
+        "desc": ("**本机资源快照**（主人 P2，2026-11-03）：op=schema/snapshot/normalize/verify。"
+                 "只读采样 CPU/内存/磁盘/uptime/主机/平台；Windows ctypes（GlobalMemoryStatusEx/"
+                 "GetSystemTimes/GetTickCount64）+ shutil.disk_usage，**零第三方依赖**（psutil 可选，没有就 "
+                 "process_count=null，不硬装）；不写盘/不起进程/不出网。"),
+        "handler": "resource_snapshot",
+        "safe": True,
+    },
+    "reminder": {
+        "domain": "mind",
+        "desc": ("**提醒能力位**（主人 P1，2026-11-02）：op=schema/create/list/cancel/complete/due/verify。"
+                 "创建/列出/取消提醒；写 `state/reminders.json` 前先过 **filesystem_write 门**（可信会话免票，"
+                 "其余要一次性授权；gate 不可用 fail-closed）。上限 200，due_at ISO/epoch，repeat none/daily/weekly；"
+                 "不做网络通知/后台线程，不假装已通知。"),
+        "handler": "reminder",
+        "safe": True,
+    },
+    "api_slot": {
+        "domain": "mind",
+        "desc": ("**动态 API 槽定义口**（主人 P1，2026-11-02）：op=schema/validate/register/remove/list/call/verify。"
+                 "只登记槽定义：https-only、拒 localhost/私网/URL 凭据、密钥只存环境变量引用名、"
+                 "参数白名单、超时 1..30s、上限 20；**零作用域**，不读 secret 值、不发请求。"
+                 "`call()` 永远 not_supported（执行器未接，需 network egress 门+注入），不假装调通。"),
+        "handler": "api_slot",
+        "safe": True,
+    },
+    "thought_stream": {
+        "domain": "mind",
+        "desc": ("**思考流/行动流归一化**（主人 P1，2026-11-02）：op=schema/normalize/verify。"
+                 "把已有 JSONL 事件行统一成 thought/action/result/guard/system 五类，带时间/actor/title/detail/来源；"
+                 "坏行跳过、凭据脱敏、去重、上限 200；**零作用域**（只读归一化/不出网/不写盘），不伪造事件。"),
+        "handler": "thought_stream",
+        "safe": True,
+    },
+    "context_inject": {
+        "domain": "mind",
+        "desc": ("**上下文注入选择器**（主人 P1，2026-11-02）：op=schema/select/verify。"
+                 "给 query + 候选（记忆/最近对话/UI 信号/工具结果/预取缓存），纯确定性选出有预算上限的注入项："
+                 "过期丢弃/去重/相关度/来源优先级/新鲜度/来源配额/字符预算。"
+                 "**零作用域**（不调模型/不出网/不写盘）；模型上下文仍由调用方使用。"),
+        "handler": "context_inject",
+        "safe": True,
+    },
+    "body_control": {
+        "domain": "body_control",
+        "desc": ("**身体控制 / 触手 / 全息投影状态口**（主人 2026-11-02 定名）：op=schema/status/inventory/"
+                 "move/verify。**如实报缺**：缺感觉/执行器（未绑定或已被主人拔掉）报 not_supported；"
+                 "全绑定也最多 partial 且 `executed=false` —— 深度学习 + 无模型不等于能动，不假装能动。"
+                 "本件 zero-scope，只读状态/清单；不驱动任何硬件。"),
+        "handler": "body_control",
+        "safe": True,
+    },
+    "focus_stack": {
+        "domain": "mind",
+        "desc": ("**焦点栈 + 记忆审计**（主人 P1，2026-11-02）：op=schema/push/pop/clear/snapshot/"
+                 "audit/focus_events/verify。焦点栈=主循环「此刻最重要的事」，上限 12、同 id 提分不重复、"
+                 "按 score/时间排序；记忆审计只对**调用方给的记录**做只读体检（缺 id/文本/时间、重复、"
+                 "过短/超长、明显凭据 secret_like），不回显凭据原文、不改记录；**零作用域**（不读盘/不写盘/不出网）。"),
+        "handler": "focus_stack",
+        "safe": True,
+    },
+    "voice_settings": {
+        "domain": "voice",
+        "desc": ("**语音设置契约**（主人 P1，2026-11-02）：op=schema/validate/resolve/verify。"
+                 "TTS 音色/语速/音高/音量 + ASR 后端（auto/whisper/windows）+ 语言 + 自动朗读；"
+                 "纯校验/解析，**零作用域**（不写盘/不出网）；持久化由 console-server 以 trusted-owner "
+                 "写 state/voice-settings.json，与现有设置同一条本地写面。"),
+        "handler": "voice_settings",
+        "safe": True,
+    },
+    "ui_card": {
+        "domain": "ui",
+        "desc": ("**ACUI 卡片协议**（吞噬上游参考项目 Scene Protocol/ACUI 蒸出的我们自己的版本，2026-11-02 主人令）："
+                 "op=schema/validate/create/close/action/snapshot/events/clear/verify。卡片是**纯数据**："
+                 "kind/action.type 白名单 · 纯文本（拒 HTML/脚本/事件属性）· TTL 到期自动清 · 最多 20 张/4 动作/2000 字；"
+                 "动作只回发 `ui_card_action` 事件给主循环（`executed=false`），不在这里执行任何工具。"
+                 "**纯函数·零作用域**：不写盘/不出网；审计由调用方追加。"),
+        "handler": "ui_card",
+        "safe": True,
     },
     "datakit": {
         "domain": 'data',
@@ -2626,27 +2839,27 @@ BENIGN_CAPS = {
     },
     "code_patch": {
         "domain": 'tools',
-        "desc": '**改代码的唯一过门入口**（2026-09-23 接）：此前 agent 直接 edit/write 落盘 ⇒ **不过门、没审计、没信封、没改前改后凭据**。三原语 dry_run（**默认，只算不写**）/ apply（落盘，挂 filesystem_write）/ rollback（按回执退回）。九道机械闸：**仓内**（路径解析后必须在仓内）· **find 恰好一次**（0 次 not_found；>1 次 ambiguous —— **绝不替你挑一个**）· **空改动拒写** · `expect_sha256` 对不上拒（防拿陈旧内容改）· **二进制拒改**（前 8KB 有 NUL）· >4MB 拒改 · **逐字节替换**（换行/BOM 一个字节不动 —— 文本层替换会把整个文件行尾改掉）· **原子写**（tmp+os.replace）· **回执可回滚**（记 find/replace/改前改后哈希；回滚前先核 after_sha256，对不上就拒）。type=internal',
+        "desc": '**改代码的唯一过门入口**（2026-09-23 接）：此前 agent 直接 edit/write 落盘 ⇒ **不过门、没审计、没信封、没改前改后凭据**。⚠️ **默认原子替换 · 无伤修复**（2026-11-03 主人令逐字：「只要是修复代码必须使用原子替换无伤修复」）：`apply`/`create` **默认不再直接写生产**，自动走 mirror_stage —— 生产只读复制 → 候选写镜像 → 按扩展名自动验证（.py=AST 语法 / .json=解析 / .js=node --check；无验证器则退到 sha_only 并**如实标注**，不假装语义验过）→ **仅当 verify.exit_code==0 才整文件原子替换**，替换前备份可 rollback。**验证不过 ⇒ 绝不落盘，生产一个字节都不动**，失败证据（stdout/stderr 尾巴）随返回一起给。四原语 dry_run（**默认，只算不写**）/ apply / create / rollback（按回执退回）；应急口 `allow_unverified=true` 走旧直写，回执记 bypass 留痕（是留痕，不是免检）。九道机械闸：**仓内**（路径解析后必须在仓内）· **find 恰好一次**（0 次 not_found；>1 次 ambiguous —— **绝不替你挑一个**）· **空改动拒写** · `expect_sha256` 对不上拒（防拿陈旧内容改）· **二进制拒改**（前 8KB 有 NUL）· >4MB 拒改 · **逐字节替换**（换行/BOM 一个字节不动 —— 文本层替换会把整个文件行尾改掉）· **原子写**（tmp+os.replace）· **回执可回滚**（记 find/replace/改前改后哈希；回滚前先核 after_sha256，对不上就拒）。type=internal',
         "handler": 'code_patch',
         "safe": False,
         "requires_params": True,
         "params": ['path', 'find', 'replace'],
-        "params_hint": 'path=仓内相对路径；find=必须**恰好出现一次**的原文；replace=新文；默认 op=dry_run（只算不写），要落盘给 op=apply（要 filesystem_write 授权）',
+        "params_hint": 'path=仓内相对路径；find=必须**恰好出现一次**的原文；replace=新文；默认 op=dry_run（只算不写），要落盘给 op=apply。**默认原子替换无伤修复**：可用 verify_cmd 指定自己的验证命令（如该模块的单测），不指定则按扩展名自动选验证器；验证不过绝不落盘。应急口 allow_unverified=true 直写但留 bypass 痕迹',
     },
     "git_read": {
         "domain": 'tools',
-        "desc": '**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）· **反选项注入**（rev/path 不许以 `-` 开头）· **路径必须在仓内** · **每条命令带 `--`** · **超时 60s + 输出上限 200KB** · status 只报数量与前 40 条（本仓脏行上万，全量灌回来没意义）· **零作用域**（policy 里不挂任何 scope）。⚠️ 不做 rebase/reset --hard/push —— 那些是「改历史/出网」，要单独设计。type=internal',
+        "desc": '**版本库只读面**（2026-09-23 接，补 `code_patch` 的另一半：「改完要能看、要能回滚」）：op=status/diff/log/show/branch_list/stash_list。七道机械闸：**绝不过 shell**（一律 shell=False）· **反选项注入**（rev/path 不许以 `-` 开头）· **路径必须在仓内** · **每条命令带 `--`** · **超时 60s + 输出上限 200KB** · status 只报数量与前 40 条（本仓脏行上万，全量灌回来没意义）· **零作用域**（policy 里不挂任何 scope）。写面 push/rebase/reset 已由 git_write 补齐（需 confirm）；本位仍只读、零作用域。type=internal',
         "handler": 'git_read',
         "safe": True,
     },
     "git_write": {
         "domain": 'tools',
-        "desc": '**版本库写面**（只两个 op，且**永远要点名路径**）：stage（`git add -- <paths>`）· commit（**pathspec-limited**：`git commit -m … -- <paths>`，只提交点名的路径，**不动索引里别的暂存内容**）。为什么必须点名：本仓脏行可能上万，`commit -a` 一次就把不相干的全卷进去。**永远挂 `filesystem_write`**（不按 op 判 —— 拆成独立能力位就是为了让门的判据平凡正确）。与 `git_read` 分开登记：`safe` 是按能力位记的，不是按 op 记的。type=internal',
+        "desc": '**版本库写面**：stage（`git add -- <paths>`）· commit（**pathspec-limited**：`git commit -m … -- <paths>`，只提交点名的路径，不动索引里别的暂存内容）· **push/force_push/rebase/reset**（2026-11-03 补齐：必须 `confirm=true`；push 标 `network=true`；force_push 只允许 `--force-with-lease`；rebase 要求工作区干净；reset --hard 必须点名 rev）。永远挂 `filesystem_write`；与 `git_read` 分开登记。type=internal',
         "handler": 'git_write',
         "safe": False,
         "requires_params": True,
         "params": ['paths', 'message'],
-        "params_hint": 'paths=要动的仓内路径列表（**必填、不许空**）；commit 还要 message；op=stage|commit',
+        "params_hint": 'paths=要动的仓内路径（必填）；commit 还要 message；push 要 remote+branch；rebase 要 onto；reset 要 rev；高级 op 全部 confirm=true',
     },
 
     "brain_council": {
@@ -3376,6 +3589,301 @@ BENIGN_CAPS = {
         ,
         "handler": 'comfy_cloud',
         "safe": False,
+    },
+    "body_excrete": {
+        "domain": 'device',
+        "desc": '身体·排泄（2026-11-04 主人令）：把代谢垃圾**排出体外并送进 Windows 回收站**'
+                '（可还原），不是硬删 —— 「不让垃圾留在文件里当垃圾」。只排可再生代谢物'
+                '（__pycache__/*.pyc/*.tmp/~$*/Thumbs.db/超期日志），源码·配置·账本·能力包·'
+                '解释器属器官一律保护。**默认只报不排**，要显式 dry_run=false 才动手；'
+                '排完逐条验证是否真从原处消失。op=schema/status/scan/excrete/record/auto/config/where',
+        "handler": 'body_excrete',
+        "safe": False,
+    },
+    "body_eye": {
+        "domain": 'device',
+        "desc": '身体·眼睛（2026-11-04 主人令：把散装的视觉收成**一个入口**）。'
+                '接线前实况（已核实，勿再误传）：`ocr` 与 `vision_arsenal` 早就在册、各是一个位各一套参数；'
+                '但 2026-11-04 新做的 `vision_detect`(YOLO) / `vision_embed`(CLIP) / `vision_ui`(界面元素) '
+                '**根本没注册**，大脑调不到 = 做出来也白搭；且同一件事（看懂屏幕）要记 3 套调用形状。'
+                '这一位把它们收成一条：'
+                'op=see 一步到位（截屏→理解→回坐标，给 query 就直接定位要点的东西）；'
+                '另可显式指定：'
+                'ocr/boxes（读字，每行带坐标）、'
+                'ui/parse（界面元素：按钮/输入框/文本/图标/容器）、'
+                'find（按文字找位置 —— 「点那个写着 XX 的按钮」的正解）、'
+                'outline（按类型的一句话摘要，省 token）、'
+                'detect（真实照片的 COCO 80 类物体）、'
+                'embed/similarity/nearest（图像特征，aHash 的补盲区：反色/深色主题）、'
+                'region（找矩形区块）、template（找图标模板）、'
+                'status（看这一层与 19 位矩阵现况）、matrix。'
+                '**只回结构化数据+坐标，绝不回图。** '
+                '诚实边界：detect 不适用界面截图（COCO 无「按钮」类）；'
+                '无 OCR 时如实报缺不猜字。',
+        "handler": 'body_eye',
+        "safe": True,
+        "params": ['op'],
+        "params_hint": 'op 省略则看现况(status)；要一步定位给 op=see + query=要找的文字；'
+                       '要读字给 op=ocr + image；要识别界面给 op=ui + image',
+    },
+    "body_immune": {
+        "domain": 'device',
+        "desc": '身体·免疫（2026-11-04 主人令）：**自我保护机制**。自己长，不外包给 Defender'
+                '（实测 Defender 实时保护开着、特征库当日更新，aclui.dll.js 蠕虫在启动文件夹'
+                '躺了 43 天却一条记录都没有）。六类检测：注册表 Run 指向脚本/Temp、启动文件夹'
+                '放 .js/.vbs、计划任务用脚本宿主、脚本宿主跑临时目录、WMI 事件订阅常驻、'
+                'AppData 游离脚本。判定只看**行为特征**不看文件名，系统/框架/用户程序进白名单；'
+                '清剿顺序＝断自启→杀活体→送回收站；需提权的项**如实列 requires_admin，'
+                '不假装做到**。op=schema/status/scan/purge/record',
+        "handler": 'body_immune',
+        "safe": False,
+    },
+    "bounty_ops": {
+        "domain": 'security',
+        "desc": '安全众测闭环（2026-11-04 主人令：把 2026-11-02 写完却没接线的 6 件**收成一个入口**）。'
+                '来历：这 6 件当时就已经写好，但**从没注册能力位、从没被任何地方 import**，'
+                '一直躺在 `state/proactive/work/g-1/`（一份失败工单的旧仓库快照）里 —— '
+                '不先捞出来，清旧副本时就永久丢了。'
+                '内含：'
+                '`bounty_core`（CVSS 3.1 Base/Temporal/Environmental + CWE 中文修复建议）、'
+                '`security_policy`（**能力位级**放行闸）、'
+                '`attack_evidence`（举证门槛）、'
+                '`attack_forensics`（本机取证与合法防御）、'
+                '`scope_import`（平台 scope 归一化）、'
+                '`platform_sync`（平台状态只读同步）。'
+                '**与主干 `security/policy.py` 不重复、是两层**：'
+                '那一层按**动作类型**收票（process_execute / filesystem_write / desktop_control…）；'
+                '这一层按**能力位**判定，且多一条主干没有的规则：'
+                '「受攻击时进极限并发模式，最高决策 = 本机自我判断，不需主人确认」。'
+                'op：status / cvss / cwe / policy / classify / evidence / detect / baseline / '
+                'scope / sync / collect / respond。'
+                '**诚实边界**：'
+                '① 举证门槛不可绕：没有强证据或主人陈述，`evidence` 只会回「未发现被攻击证据」，'
+                '不粉饰成「疑似」；'
+                '② 高危不代批：`respond` 必须 `confirm=true` + 非空 reason，'
+                '`approve`（批准授权）**本门面根本不暴露** —— 按设计只能在主人终端做；'
+                '③ 转账任何时候都要确认，攻击模式也不例外；'
+                '④ 越界请求如实拒（`counterstrike` 回「未知动作；只做本机取证与合法防御」），不找旁路。'
+                '常用说法：算漏洞分 / CVSS 评分 / 漏洞多严重 / 漏洞类型怎么修 / CWE 查一下 / '
+                '这个能力位要不要主人确认 / 放行判定 / 这个位要票吗 / '
+                '有没有被攻击 / 被攻击的证据 / 举证 / 收集证据 / '
+                '平台范围 / scope 导入 / 众测范围。',
+        "handler": 'bounty_ops',
+        "safe": True,
+        "params": ['op'],
+        "params_hint": 'op 省略看现况；算分 = cvss + vector；查漏洞类型 = cwe + cwe=CWE-79；'
+                       '这一刀要不要票 = policy + cap=能力位名；有什么证据 = evidence / detect；'
+                       '平台范围归 = scope + doc={...}',
+    },
+    "codepage": {
+        "domain": 'system',
+        "desc": '代码页索引（2026-11-04 主人令「速度不能使用触手双向绑定每一页，'
+                '覆盖每一个代码每一页可以和所有页面互通，实现精准直达脉冲提速」）：'
+                '**一次建索引，之后毫秒直达**。实测代码库 4013 个 .py / 52.46MB / 约 115 万行；'
+                '本机模型零系统提示 1.4 秒/次 ⇒ 逐页问模型要 94 分钟（物理上不成立），'
+                '索引直达 **17.9ms/次、55 次/秒（快 78 倍）**，建索引 13 秒（一次性）。'
+                '覆盖全部 4013 页（core 1730 / state 1765 / vendor 518），符号级 45,689 个。'
+                'op=build（全量重建）、find（关键词→文件:行号，含同义归一与喊名字直达）、'
+                'goto（精确符号 + 可选上下文源码）、stats（覆盖现况）。'
+                '诚实边界：字面索引不是语义理解，首位准确率实测 9/10，'
+                '所以 find 一次给 8 个候选；语法坏的文件如实计入 bad，不静默丢。',
+        "handler": 'codepage',
+        "safe": True,
+        "params": ['op'],
+        "params_hint": 'op 省略看现况；找代码 = find + query；跳符号 = goto + symbol；'
+                       '重建 = build（13 秒）。支持 tier=core 只看她自己的器官',
+    },
+    "local_llm": {
+        "domain": 'llm',
+        "desc": '本机算力（llama.cpp @ 127.0.0.1:8111）—— **严格限定**的入口，'
+                '不是万能大脑。2026-11-04 主人令「她这个速度不能使用触手双向绑定每一页」，'
+                '实测证实且更糟：零系统提示短问答 1.1~2.4s 可用，但**意图分类只 1/3 命中、'
+                '大类判定 3/7**（「照片里有几只猫」被判成读字）—— 慢且不准的分类器接在路由前'
+                '比没有更糟，所以本模块**拒绝提供 classify/route/page_bind**，并在返回值里'
+                '写明该走哪条路。真正稳的是确定性任务：算术（并发 8/8、串行 8/8 全对）、'
+                'JSON 结构化抽取。'
+                'op=status（现况+用途边界）、bench（现场复测速度）、'
+                'calc（算数，只回数字）、extract（文本+字段→JSON）、'
+                'ask（短问答，**不加系统提示**，带了就退化到 8~13s）。'
+                '慢就 `ok=False` + `fallback`，绝不假装算完。',
+        "handler": 'local_llm',
+        "safe": True,
+        "params": ['op'],
+        "params_hint": 'op 省略看现况；算数 = calc + expr；抽取 = extract + text + fields；'
+                       '短问答 = ask + prompt。**不要拿它做分类/路由/逐页绑定**',
+    },
+    "body_realtime": {
+        "domain": 'device',
+        "desc": '身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。',
+        "handler": 'body_realtime',
+        "safe": True,
+    },
+    "vision_arsenal": {
+        "domain": 'vision',
+        "desc": ('**视觉作战区 · 唯一区块**（主人令 2026-11-04「把开源排名前十的视觉能力吞噬一遍，'
+                 '补齐缺失的视觉，全部整理到一个区块，让大脑执行层自动决策使用哪个视觉能力」）：'
+                 '19 个视觉能力位 / 4 组（读·懂·找·造），可用性**现算**不写死。'
+                 '开源基线（GitHub CV 榜 2026-09-27，已 devour 吞过）：transformers 166.7k / opencv 91.0k / '
+                 'stable-diffusion 73.5k / ultralytics 62.0k / yolov5 58.1k / segment-anything 54.9k / '
+                 'supervision 51.1k / timm 37.2k / detectron2 34.7k / diffusers 34.6k。'
+                 'op=decide（给意图→选一位，主选必为真能跑的位，缺依赖进 missing 如实报）· status（全量体检）· '
+                 'matrix（四组矩阵）· template_match（图标定位·opencv·回坐标不回图·带方差守卫）· '
+                 'region_scan（可点区块扫描·opencv 轮廓）。'
+                 '铁律：主选必须真能跑 · 图不进上下文 · 降级必须自曝。'
+                 '常用说法（人这么问就命得中）：视觉能力 / 视觉作战区 / 视觉矩阵 / 用哪个视觉 / 视觉体检 / 视觉选型。'),
+        "handler": 'vision_arsenal',
+        "safe": True,
+    },
+    "ocr": {
+        "domain": 'vision',
+        "desc": ('**看图读字**（2026-11-04 主人令「看图片用原生视觉，别走附件系统」）：'
+                 '给一张**本地图片路径**，把图上的字读成**纯文本**交给脑子 —— '
+                 '车道① Windows.Media.Ocr（系统内置 · 零安装 · 离线 · zh-Hans-CN）；'
+                 '车道② python winrt（装了 winrt-* 才走）；车道③ pytesseract（装了 tesseract.exe 才走）。'
+                 '铁律：**只吃本地路径**（URL 会先落本地再读）· **只回文本**（图片本身永不进上下文 ⇒ 不产生远程 URL ⇒ 不会 HTTP 471 ⇒ 不吃图片 token）· '
+                 '读不到就如实报「没读到字」，**绝不编字**。'
+                 '常用说法（人这么问就命得中）：读字 / 识别文字 / OCR / 图里写的什么 / 提取文本 / 截图转文字。'
+                 '参数 image（本地路径）。op=read/lanes'),
+        "handler": 'ocr',
+        "safe": True,
+    },
+    "route_ledger": {
+        "domain": 'brain',
+        "desc": ('**路由台账 · 反思账本**：记「用户原话 → 路由结果 → 实际用了哪个」，'
+                 '让触发词从**真实使用**里长出来，而不是编。'
+                 'op=stats（攒到哪了：真实问法 / 能力覆盖 / 探针剔掉多少）· '
+                 'op=plan（**动手前先算账**：该补哪个能力、还差几条、下一级是什么）· '
+                 'op=export（导出可用的 (原话 → 能力) 真值对）· '
+                 'op=record（记账，内部用）。'
+                 '铁律：分母取 orchestration-ledger 的**真实调用分布**，不是能力总数；'
+                 '读不到真实分布就**拒绝盲补**（盲补即等于编）。'
+                 '常用说法：路由还缺什么 / 该补哪个能力 / 触发词够不够 / 台账攒到哪了 / '
+                 '路由质量 / 说话认不认得出 / 规则还差多少 / 还差几条。'),
+        "handler": 'route_ledger',
+        "safe": True,
+    },
+    # 2026-11-04 吞入（bge-small-zh-v1.5 · ONNX 94.85MB · 零 torch）。
+    # 定位来自实测而不是想象：在 63 条真触发词上，它的 top1 比生产 router **低 47.6pp**。
+    # 输的 38 条全是极短词（读字→body_volume / OCR→codebuddy / 抠图→image_scout），
+    # 赢的 4 条全是组合词（UI 组件 / 动画 / 动效 / 出作品）。
+    # ⇒ 所以它**不是替代品**，只做「关键词没候选时的第二个视角」。
+    "semantic_match": {
+        "domain": 'brain',
+        "desc": ('**中文语义匹配**（bge-small-zh-v1.5 · ONNX 94.85MB · 零 torch）：'
+                 '把一句话编码成 512 维向量，和 424 个能力描述算余弦，给 top-k **参考**候选。'
+                 '铁律：**只给候选、不拍板**（返回里没有 best/chosen），不改任何现有排序。'
+                 '实测口径：短词（≤4 字）错误率最高，那类输入请走关键词精确匹配；'
+                 '组合词/长句自然表达才是它的主场。'
+                 'op=match（text + top_k）· status · build（重建向量缓存）。'
+                 '常用说法：语义匹配 / 意思相近 / 像哪个能力 / 换个说法认不认得出 / 语义找能力。'),
+        "handler": 'semantic_match',
+        "safe": True,
+    },
+    "vision_grounding": {
+        "domain": 'vision',
+        "desc": ('**视觉/定位通道契约**（主人令 2026-10-11「视觉必须达到 VLX-Flow 水平，脑-手同步**不能使用传统截图**看来在操作」）：'
+                 '把「看」分层钉死 —— **L1 结构层**（UIA 控件树 domain_index/domain_read/domain_act/domain_type · CDP DOM browser op=native · HTTP/API 读数）优先；'
+                 '**L2 接地层**（像素 + 模型 grounding，VLX-Flow 级）**仅兜底**（自绘 UI/Canvas/游戏/无 a11y 窗口）；'
+                 '**L3 回读层**（每次动手后用 L1 再读一次确认）。'
+                 '铁律：**先结构后像素**（用 L2 而无 L1 尝试记录 ⇒ 记违规 struct_first）· **动完没回读 ⇒ unverified** · 不编（读不到就如实报控件不在 a11y 树里）。'
+                 'op=channels/record/audit'),
+        "handler": 'vision_grounding',
+        "safe": True,
+    },
+    "uia_tree": {
+        "domain": 'vision',
+        "desc": ('**UIA 控件树**（Windows UI Automation · 原生结构通道 · 实测 1012ms / 6 窗口 / 14.5k 字）：'
+                 '读出原生窗口的结构化控件 —— 类型 + 名称 + 屏幕坐标（x/y/w/h），'
+                 '**可寻址、无视遮挡**，是「看」的 L1 结构层首选（先结构后像素）。'
+                 '真实实现是触手方法 `omni_domain.domain_index`（mixin，不是独立模块）。'
+                 '参数：max_windows（默认 30）· control_depth（默认 3 —— 实测 2 漏控件、4 太慢）。'
+                 '铁律：读不到就如实报「不在 a11y 树里」，不编控件。'
+                 '常用说法：控件 / 控件树 / 窗口列表 / 有哪些窗口 / 输入框在哪 / 菜单在哪 / 元素在哪 / 原生 / 软件界面。'),
+        "handler": 'uia_tree',
+        "safe": True,
+    },
+    "vision_arsenal": {
+        "domain": 'vision',
+        "desc": ('**视觉作战区 · 唯一区块**（主人令 2026-11-04「把开源排名前十的视觉能力吞噬一遍，'
+                 '补齐缺失的视觉，全部整理到一个区块，让大脑执行层自动决策使用哪个视觉能力」）：'
+                 '19 个视觉能力位 / 4 组（读·懂·找·造），可用性**现算**不写死。'
+                 '开源基线（GitHub CV 榜 2026-09-27，已 devour 吞过）：transformers 166.7k / opencv 91.0k / '
+                 'stable-diffusion 73.5k / ultralytics 62.0k / yolov5 58.1k / segment-anything 54.9k / '
+                 'supervision 51.1k / timm 37.2k / detectron2 34.7k / diffusers 34.6k。'
+                 'op=decide（给意图→选一位，主选必为真能跑的位，缺依赖进 missing 如实报）· status（全量体检）· '
+                 'matrix（四组矩阵）· template_match（图标定位·opencv·回坐标不回图·带方差守卫）· '
+                 'region_scan（可点区块扫描·opencv 轮廓）。'
+                 '铁律：主选必须真能跑 · 图不进上下文 · 降级必须自曝。'
+                 '常用说法（人这么问就命得中）：视觉能力 / 视觉作战区 / 视觉矩阵 / 用哪个视觉 / 视觉体检 / 视觉选型。'),
+        "handler": 'vision_arsenal',
+        "safe": True,
+    },
+    "ocr": {
+        "domain": 'vision',
+        "desc": ('**看图读字**（2026-11-04 主人令「看图片用原生视觉，别走附件系统」）：'
+                 '给一张**本地图片路径**，把图上的字读成**纯文本**交给脑子 —— '
+                 '车道① Windows.Media.Ocr（系统内置 · 零安装 · 离线 · zh-Hans-CN）；'
+                 '车道② python winrt（装了 winrt-* 才走）；车道③ pytesseract（装了 tesseract.exe 才走）。'
+                 '铁律：**只吃本地路径**（URL 会先落本地再读）· **只回文本**（图片本身永不进上下文 ⇒ 不产生远程 URL ⇒ 不会 HTTP 471 ⇒ 不吃图片 token）· '
+                 '读不到就如实报「没读到字」，**绝不编字**。'
+                 '常用说法（人这么问就命得中）：读字 / 识别文字 / OCR / 图里写的什么 / 提取文本 / 截图转文字。'
+                 '参数 image（本地路径）。op=read/lanes'),
+        "handler": 'ocr',
+        "safe": True,
+    },
+    "vision_detect": {
+        "domain": 'vision',
+        "desc": ('**目标检测**（ultralytics YOLO11n · ONNX 路线 · 不装 torch）：'
+                 '框出并分类画面里的**真实物体**（人/车/动物/电脑），回坐标 + 类别 + 置信度。'
+                 '对纯 UI 截图基本只认「一整块屏幕」—— 界面元素请用 region_scan 或 body_eye，别拿它找按钮。'
+                 'op=detect（image + conf/iou/max_det/imgsz/only）· status（模型就绪度）。'
+                 '铁律：只吃本地路径 · 图不进上下文 · 没检出如实报 0 个，不编框。'
+                 '常用说法：检测 / 找出来 / 有哪些物体 / 框出来 / 几个人 / 识别出 / 目标 / 照片里 / 画面里有什么。'),
+        "handler": 'vision_detect',
+        "safe": True,
+    },
+    "vision_embed": {
+        "domain": 'vision',
+        "desc": ('**语义相似度**（CLIP ViT-B/32 视觉编码器 · ONNX 352MB · 不装 torch）：'
+                 '判定两张图是不是「同一回事」—— 补 aHash 的盲区：主题切换/反色时 aHash 归零，'
+                 '它仍认得出（实测 0.94 vs 0.00）。'
+                 'op=similarity（image_a + image_b → 分数）· embed（image → 512 维向量）· '
+                 'nearest（base + candidates 列表 → 排序）· status（模型就绪度）。'
+                 '铁律：只吃本地路径 · 只回数值或向量，图片本身不进上下文。'
+                 '常用说法：相似 / 像不像 / 同一个 / 是不是同一张 / 比对 / 指纹 / 多像 / 差多少 / 相似度。'),
+        "handler": 'vision_embed',
+        "safe": True,
+    },
+    "vision_pose": {
+        "domain": 'vision',
+        "desc": ('**姿态**（YOLO11n-pose · ONNX 11.3MB · 不装 torch）：'
+                 '人体 17 关键点 + 粗几何判定（举手 / 站坐 / 是否正对）；**不做动作语义识别**。'
+                 '铁律：关键点不可见就不判（实测 306~378ms/张，纯 CPU）。'
+                 'op=pose（image + conf/kp_vis/max_people）· status。'
+                 '常用说法：姿态 / 姿势 / 关键点 / 手势 / 骨架 / 举手 / 举着 / 站姿 / 坐姿 / 什么姿势 / 怎么站的 / 在做什么动作。'),
+        "handler": 'vision_pose',
+        "safe": True,
+    },
+    "vision_segment": {
+        "domain": 'vision',
+        "desc": ('**通用分割**（slimsam-77 蒸馏版 SAM · 两段 ONNX 共 38MB · 不装 torch）：'
+                 '点一下或框一下，把目标**精确抠出来**（去背景、边界级 mask）。'
+                 '实测：encoder 3.2s（每图一次，带缓存）/ decoder 0.08~0.37s；'
+                 '框提示 iou 0.913 覆盖 31.3%（整人）· 点提示 iou 0.688 覆盖 1.1%（常只抠局部）。'
+                 'op=segment（image + point=[x,y] 或 box=[x1,y1,x2,y2] + save）· status。'
+                 '产物落本地文件只回路径。'
+                 '常用说法：抠图 / 分割 / 去背景 / 边界 / mask / 轮廓精确 / 抠出来。'),
+        "handler": 'vision_segment',
+        "safe": True,
+    },
+    "vision_track": {
+        "domain": 'vision',
+        "desc": ('**目标跟踪**（贪心 IoU 关联，纯 Python 零依赖 · 不装 supervision）：'
+                 '跨帧认住同一个目标 —— 「还是它吗」。核心只是上一帧框 ↔ 这一帧框的配对（取最大值问题）。'
+                 'op=update（boxes → 关联并回 id）· track（frames → 自动检测+关联）· reset · status。'
+                 '常用说法：跟踪 / 追踪 / 跟随 / 连续 / 视频里 / 还是它。'),
+        "handler": 'vision_track',
+        "safe": True,
     },
 }
 

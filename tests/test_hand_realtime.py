@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """hand_realtime 判据：同拍 loopback 真跑，不要求硬件。"""
 from __future__ import annotations
 

@@ -2127,3 +2127,150 @@ NODES["t2i_fused"] = {
     "writes": True,
     "desc": "本地融合权重文生图（RV5.1×Tiny-SD，不碰云/ComfyUI）",
 }
+
+
+# ── 2026-11-03 · 真图生视频：本地 SVD-XT（CPU fp32）──
+_SVD_PIPE = {"path": None, "pipe": None, "load_s": None}
+
+
+def _svd_model_dir():
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (root, os.path.dirname(root)):
+        p = os.path.join(base, "vendor", "hf", "svd-xt-fp16")
+        if os.path.isdir(p):
+            return p
+    return ""
+
+
+def _n_i2v_svd(inputs, ctx):
+    """本地 SVD-XT 图生视频：真帧，不调用 ComfyUI/云端。"""
+    import os
+    import shutil
+    import subprocess
+    import sys
+    import tempfile
+    import time
+
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for base in (root, os.path.dirname(root)):
+        pylibs = os.path.join(base, "vendor", "pylibs")
+        if os.path.isdir(pylibs) and pylibs not in sys.path:
+            sys.path.insert(0, pylibs)
+    image = str(inputs.get("image") or inputs.get("path") or "").strip()
+    if not image or not os.path.isfile(image):
+        return {"ok": False, "error": "user_error: 要 image 本地图片路径"}
+    model = _svd_model_dir()
+    if not model:
+        return {"ok": False, "status": "needs_dependency", "error": "本地 SVD-XT 不在"}
+    out = str(inputs.get("out") or "").strip()
+    if not out:
+        out = os.path.join(root, "state", "i2v-%d.mp4" % int(time.time()))
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    try:
+        import torch
+        from diffusers import StableVideoDiffusionPipeline
+        from PIL import Image
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "status": "needs_dependency", "error": "缺少 torch/diffusers：%s" % str(e)[:160]}
+    frames_n = max(2, min(25, int(inputs.get("frames") or 8)))
+    width = max(128, min(1024, int(inputs.get("width") or 256)))
+    height = max(128, min(1024, int(inputs.get("height") or 448)))
+    steps = max(1, min(25, int(inputs.get("steps") or 2)))
+    fps = max(4, min(30, int(inputs.get("fps") or 8)))
+    seed = int(inputs.get("seed") or 42)
+    t0 = time.time()
+    if _SVD_PIPE["pipe"] is None:
+        pipe = StableVideoDiffusionPipeline.from_pretrained(
+            model, torch_dtype=torch.float32, local_files_only=True, variant="fp16")
+        pipe.to("cpu")
+        pipe.enable_attention_slicing()
+        _SVD_PIPE.update({"path": model, "pipe": pipe,
+                          "load_s": round(time.time() - t0, 2)})
+    t1 = time.time()
+    gen = torch.Generator(device="cpu").manual_seed(seed)
+    frames = _SVD_PIPE["pipe"](Image.open(image).convert("RGB"),
+                               num_frames=frames_n, decode_chunk_size=1,
+                               motion_bucket_id=int(inputs.get("motion") or 127),
+                               noise_aug_strength=0.02,
+                               height=height, width=width,
+                               num_inference_steps=steps, generator=gen).frames[0]
+    gen_s = round(time.time() - t1, 2)
+    tmp = tempfile.mkdtemp(prefix="gbt-i2v-")
+    try:
+        for i, fr in enumerate(frames):
+            fr.save(os.path.join(tmp, "f%03d.png" % i))
+        ffmpeg = ""
+        for base in (root, os.path.dirname(root)):
+            p = os.path.join(base, "vendor", "ffmpeg", "bin", "ffmpeg.exe")
+            if os.path.isfile(p):
+                ffmpeg = p
+                break
+        if not ffmpeg:
+            return {"ok": False, "status": "needs_dependency", "error": "找不到 ffmpeg"}
+        subprocess.run([ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+                        "-framerate", str(fps), "-i", os.path.join(tmp, "f%03d.png"),
+                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+                        "-pix_fmt", "yuv420p", "-movflags", "+faststart", out], check=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return {"ok": True, "out": out, "image": image, "frames": frames_n,
+            "size": [width, height], "fps": fps, "steps": steps, "seed": seed,
+            "load_s": _SVD_PIPE["load_s"], "generation_s": gen_s,
+            "engine": "StableVideoDiffusionPipeline CPU fp32（本地 SVD-XT）"}
+
+
+NODES["i2v_svd"] = {
+    "fn": _n_i2v_svd,
+    "in": ["image", "out", "frames?", "width?", "height?", "steps?", "fps?", "seed?", "motion?"],
+    "out": ["VIDEO"],
+    "writes": True,
+    "desc": "本地 SVD-XT 真图生视频（CPU fp32，不碰云/ComfyUI）",
+}
+
+
+# ── 2026-11-03 · 吞噬 shuohao-skills：GBT天真直接跑短剧制作 skill ──
+def _n_shuohao_skill(inputs, ctx):
+    """调用本地 shuohao-skills 的确定性 Node 脚本（无 npm 依赖、无云端）。"""
+    import json
+    import os
+    import shlex
+    import subprocess
+
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    base = os.path.join(root, "gbt_allinone", "skills", "shuohao")
+    skill = str(inputs.get("skill") or "").strip()
+    script = str(inputs.get("script") or "").strip()
+    if not skill or not script:
+        return {"ok": False, "error": "user_error: 要 skill 与 script"}
+    if "/" in skill or "\\" in skill or ".." in skill:
+        return {"ok": False, "error": "user_error: 非法 skill"}
+    skdir = os.path.join(base, skill)
+    spath = os.path.join(skdir, "scripts", script)
+    if not os.path.isfile(spath):
+        return {"ok": False, "status": "needs_dependency", "error": "脚本不存在：%s" % spath}
+    args = inputs.get("args") or []
+    if isinstance(args, str):
+        args = shlex.split(args)
+    if not isinstance(args, list):
+        return {"ok": False, "error": "user_error: args 要是数组或字符串"}
+    cmd = ["node", spath] + [str(x) for x in args]
+    try:
+        r = subprocess.run(cmd, cwd=skdir, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=120)
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": "timeout: skill 脚本超过 120s"}
+    out = (r.stdout or "")[-120000:]
+    err = (r.stderr or "")[-120000:]
+    return {"ok": r.returncode == 0, "skill": skill, "script": script,
+            "cmd": cmd, "exit": r.returncode, "stdout": out, "stderr": err,
+            "engine": "本地 shuohao-skills（Node，零 npm 依赖）"}
+
+
+NODES["shuohao_skill"] = {
+    "fn": _n_shuohao_skill,
+    "in": ["skill", "script", "args?"],
+    "out": ["JSON"],
+    "writes": False,
+    "desc": "跑本地 shuohao-skills 短剧 skill（大纲/角色/美术/剧本/站位/分镜）",
+}

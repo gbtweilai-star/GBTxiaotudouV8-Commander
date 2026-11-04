@@ -7,7 +7,7 @@ import struct
 import numpy as np
 import pymeshlab as ml
 
-WS = pathlib.Path(r"C:\Users\ADMIN\Desktop\GBT小土豆V8")
+WS = pathlib.Path(__file__).resolve().parents[2]
 RIG = WS / "holo_pet/assets/digital-human/raw/rig"
 SRC = RIG / "part-head.glb"
 OBJ = pathlib.Path(r"C:\gbt_pml\head_low.obj")

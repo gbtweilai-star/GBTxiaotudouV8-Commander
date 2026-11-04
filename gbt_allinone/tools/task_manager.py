@@ -20,6 +20,7 @@ ops：
   page                 生成给我们 APP 用的静态页（我们的视觉语言：深色 + 青/橙 + SVG 图标、无 emoji）
 """
 from __future__ import annotations
+from gbt_allinone.tools._opcall import call as _oc_call
 
 import json
 import time
@@ -212,9 +213,9 @@ def page(**_kw) -> dict:
 def run_op(op: str = "list", **params) -> dict:
     op = (op or "list").lower()
     if op == "list":
-        return list_procs(**params)
+        return _oc_call(list_procs, params)
     if op == "stop":
-        return stop(**params)
+        return _oc_call(stop, params)
     if op == "page":
-        return page(**params)
+        return _oc_call(page, params)
     return {"ok": False, "error": f"未知 op:{op}（list/stop/page）", "fail_closed": True}
