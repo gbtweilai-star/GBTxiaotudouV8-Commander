@@ -424,3 +424,6 @@ outputs/
 
 # 2026-11-01 旧面板备份（本地恢复用，不进仓）
 .archive/
+
+# Third-party pip bootstrap is not tracked (kept in git history)
+tools/get-pip.py
