@@ -205,7 +205,7 @@
 | 84 | [84-remote-controller.md](84-remote-controller.md) | 远程接管授权内核：远端用户点同意 + agent 签名才发 session |
 | 85 | [85-local-only-audit.md](85-local-only-audit.md) | 本地算力审计：云 TTS/云取图点名，本地优先 fail-closed |
 | 89 | [89-history-rewrite.md](legacy/89-history-rewrite.md) | 方案A：历史重写（362→351 提交，193.1→177.2MB，HEAD 不变） |
-| 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：30 域 375 位（从注册表实时生成） |
+| 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：32 域 427 位（从注册表实时生成） |
 | 91 | [91-visual-pages.md](legacy/91-visual-pages.md) | 所有可视化页面：28 面板 + 落地页 + 图集 |
 | 92 | [92-absorb-superpowers.md](legacy/92-absorb-superpowers.md) | 吞噬 superpowers-zh：20 个方法论 skill → skills_hub（第 376 位） |
 | 93 | [93-gbtv5-full-review.md](legacy/93-gbtv5-full-review.md) | GBT-Framework v5 全量核对（897 文件/192 cap）+ chain_kernel 七步纪律 |

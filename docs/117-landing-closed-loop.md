@@ -46,7 +46,7 @@ API：POST /api/dispatch {"task":"扫描安全疑点做无死角","confirm":true
 | 能力位 385（注册=快照=派发） | ✅ | `cap_self verify` 385=385=385 |
 | 技能 23（Agent Skills 合规） | ✅ | `skills_hub validate` clean 23 |
 | 真实穿透扫描 + 无死角（coverage=1.0，0 死角，70 死角已修） | ✅ | `docs/112-114` |
-| 触手职业 21 种 · 覆盖 385/385 位 · 30/30 域 · 孤儿 0 | ✅ | `data/professions.json` coverage |
+| 触手职业 21 种 · 覆盖 427/427 位 · 32/32 域 · 孤儿 0 | ✅ | `data/professions.json` coverage |
 | **职业路由 + 派单闭环 + 账本** | ✅ | 本文 |
 | 触手协作 SSE + 脉冲特效 | ✅ | `docs/105/111` |
 | 原生 APP 自启认知界面服务（Electron/Python 壳/启动器） | ✅ | `docs/109`，`console_service.py` |

@@ -6,7 +6,7 @@
 
 | 项 | 做法 |
 |---|---|
-| **全开** | 每次使用枚举**全部 385 个能力位**（一个不漏），`full_open=true`；子集只用于测试/排查 |
+| **全开** | 每次使用枚举**全部 427 个能力位**（一个不漏），`full_open=true`；子集只用于测试/排查 |
 | **同步** | 按顺序逐个在独立子进程执行（不并发、不异步），带超时；超时 kill |
 | **需授权位** | 85 个需授权位**没票不执行**，进 `blocked_by_ticket`（打开但被票挡，不假装跑过）；带票才执行 |
 | **留痕** | 每轮写 `state/omni-plug.json`（含逐条结果）+ `state/omni-plug.jsonl` + orchestration-ledger |
@@ -17,12 +17,12 @@
 - `gbt_allinone/omni_all.py`：`run_all_sync(caps=None, timeout, ticket)`；
 - `tools/omni-run.py`：CLI 全开执行 / `--status`；
 - `POST /api/omni`：`confirm=true` 后台起全开执行（不阻塞 HTTP）；`op=status` 查进度；
-- `#plug`（万能插）视图：**「全开同步执行（385 位）」**按钮 + 实时状态条（全开数/ok/fail/票挡/耗时）。
+- `#plug`（万能插）视图：**「全开同步执行（427 位）」**按钮 + 实时状态条（全开数/ok/fail/票挡/耗时）。
 
 ## 三、实测
 
 ```
-口径：注册表 385 位，全开 = caps=None（full_open=True）
+口径：注册表 427 位，全开 = caps=None（full_open=True）
 子集自测：body_map / body_see / body_say 顺序执行，results 顺序 == 入参顺序（同步，无并发）
 票挡：需授权位 hand_bridge 无票 → executed=0，进 blocked_by_ticket（不假装执行）
 落盘：state/omni-plug.json + jsonl 都写
@@ -43,7 +43,7 @@ ok=251 · fail=49 · elapsed=224,446ms（约 3.7 分钟，同步逐个）
 
 ## 五、边界（如实）
 
-- 全开 385 位**耗时不短**（每位的子进程耗时累加）；界面轮询显示进度，不假装秒完；
+- 全开 427 位**耗时不短**（每位的子进程耗时累加）；界面轮询显示进度，不假装秒完；
 - 需授权位（85）没票只"打开"不执行——这是危险边界，不能因为"全开"就绕；
 - 全开执行结果里失败的位会如实统计 `fail_count`，不折叠成成功。
 
