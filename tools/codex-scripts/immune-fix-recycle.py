@@ -3,7 +3,7 @@
 
 原因：elevate 的 ps1 只认 delete_task / del_reg / kill / recycle，
       recycle_manual 会落到 default 分支被 SKIP —— 也就是扫得到却清不掉，
-      正是 r"\Skype" 那 43 天的同一个病。
+      正是 Skype 那 43 天的同一个病。
 
 用法：python immune-fix-recycle.py [--apply]
 """
