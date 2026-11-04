@@ -75,6 +75,12 @@ def en_row(f: dict) -> str:
             f"[docs/07-capability-proof.md](docs/07-capability-proof.md) |")
 
 
+def docs_pages() -> int:
+    """docs/ 下 Markdown 页数（README 的 Docs 徽章口径）。"""
+    d = ROOT / "docs"
+    return len(list(d.glob("*.md"))) if d.is_dir() else 0
+
+
 TARGETS = (
     (("README.md", r"^\| 逐位真调 \|.*$", cn_row)),
     (("README.en.md", r"^\| Every bit live-tested \|.*$", en_row)),
@@ -108,6 +114,23 @@ def main() -> int:
         else:
             path.write_text(new_text, encoding="utf-8")
             print(f"  {fname}: 已同步 1 行")
+    # badges 同步：shields.io URL 里的数字也会漂移（曾出现 docs 徽章写 364 而实际 264）。
+    # 这一层不要求「恰好 1 行」，而是每处匹配都替换；没有匹配说明徽章被删了，只提示不报错。
+    readme = ROOT / "README.md"
+    if readme.is_file():
+        text = readme.read_text(encoding="utf-8")
+        new = re.sub(r"badge/Capabilities-\d+", f"badge/Capabilities-{f['total']}", text)
+        new = re.sub(r"badge/Docs-\d+_pages", f"badge/Docs-{docs_pages()}_pages", new)
+        if new != text:
+            drift += 1
+            if check:
+                print("  README.md badges: 有漂移")
+            else:
+                readme.write_text(new, encoding="utf-8")
+                print(f"  README.md badges: 已同步（Capabilities={f['total']} · Docs={docs_pages()} pages）")
+        else:
+            print("  README.md badges: 已一致")
+
     if check and drift:
         print(f"漂移 {drift} 处 → 退出码 1")
         return 1

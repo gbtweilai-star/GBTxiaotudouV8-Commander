@@ -15,7 +15,7 @@
   <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
   <img alt="Caps" src="https://img.shields.io/badge/Capabilities-427-F5B041">
   <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Docs" src="https://img.shields.io/badge/Docs-364_pages-00E5FF">
+  <img alt="Docs" src="https://img.shields.io/badge/Docs-264_pages-00E5FF">
   <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
   <img alt="Status" src="https://img.shields.io/badge/Status-active-7C4DFF">
 </p>
