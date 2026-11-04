@@ -13,6 +13,7 @@
 - **口径防复发（数据驱动闭环）**：新增 `sync-readme-figures.py` —— README / README.en 的读数行改由 `data/capabilities.json` 与 `data/capability-live-test.json` 同步，锚点命中数必须恰好 1 行，否则拒绝写入；`--check` 模式已接进 CI（「文档口径与真身一致」步），数字一漂移直接红。配合 `render-social-preview.py` 的读数自动读取，形成「探针 → 数据 → README/首屏图」单一来源链，人不再手改数字。
 - **镜像维度补齐**：建立 `default` 排练计划（`goal` / `assumptions`×3 / `architecture.components`×4 / `environment.production.mode=same_host` / `static_only` / `rollback.strategy`，`plan_sha=e50435ca…`），`mirror_status/scan/plan/simulate/parity/rehearse/release` 七步全部可调用；真调中 5 位 `needs_state` 转为 `ok`，通过数 301 → **306**。仍需注意：`store/mirror_space/{dimension,reality}` 在 clone 下为空（store 被 gitignore），`mirror_scan` 实为 3/5、`mirror_simulate` 6/9 —— 调用通路通 ≠ 维度已成形。
 - **CI 偶发段错误留痕**：`windows-latest / py3.10` 冒烟步曾 exit 139（断言全过，崩在进程退出），重跑即绿。已在冒烟步加 `-X faulthandler` + `faulthandler.enable()`，下次崩会打印 Python 堆栈而不是只留一个退出码。
+- **镜像维度真正成形（不再是空转）**：新增 `seed-mirror-dimension.py` —— 把发布清单（11 文件 / 869 KB：入口 `main.py`、README、docs/03、docs/09、CHANGELOG、注册表、真调账、三个可复核脚本、首屏图）shape 进 `store/mirror_space/dimension`，二进制走 `shape_bytes` 逐字节落盘。实跑结果：体检 **5/5**、推演 **9/9**（此前 3/5 与 6/9）、一致性 11 文件；`mirror_rehearse` 全绿后 `mirror_release` 晋升成功，`mirror_status` 记为 **versions=1 / timelines=1**。首轮 release 曾被正确阻断（`blocked: 生产前排练未全绿`，simulate 缺两个入口脚本），补齐清单后自然放行——没有用 `deploy_force` 绕过门。因 `store/` 被 gitignore，clone 后跑一次本脚本即可复现。
 - **仍未重跑**：335 题基准在 427 口径下的复跑 —— 无新回执，不作为当前结论。
 
 ## 2026-11-01 · 第十五批：手部两枚原生位 + 双仓同步 + 巡检位
