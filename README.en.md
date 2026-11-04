@@ -4,7 +4,7 @@
 
 > **One line:** a 7.6B Chinese "commander" LLM that turns a natural-language request into **one of 427 native capability bits**, knows what each bit needs, and refuses to run anything that writes, costs money, or leaves the machine without a human ticket.
 >
-> **Why trust it:** 335-item capability benchmark **PASS45 99.10% / 98.51%** over two full runs; all **341 bits live-tested — 340 pass, 0 fail** (release snapshot; registry now 427) (1 needs an extra input); every figure in this repo comes with a real receipt file.
+> **Why trust it:** all **427 bits live-tested on 2026-11-04** — **306 pass · 88 need a ticket · 30 need input · 2 denied · 1 missing dependency · 0 unattributed · 0 timeout**; a 335-item benchmark scores **PASS45 99.10% / 98.51%** over two full runs (341-bit snapshot, not re-run since); every figure in this repo comes with a real receipt file.
 >
 > **30 seconds, no GPU, no weights, zero dependencies:**
 >
@@ -16,7 +16,7 @@
 >
 > It prints the capability it picked, that bit's gate status, and the exact command the runtime would execute.
 
-<p><img src="assets/fig-caps.png" width="640" alt="341 capability bits, live-tested (snapshot)"></p>
+<p><img src="assets/fig-caps.png" width="640" alt="427 capability bits, live-tested 2026-11-04"></p>
 
 ---
 
@@ -55,14 +55,15 @@ python -m gbt_commander route "ship this to production" --endpoint http://127.0.
 |---|---|---|
 | Capability benchmark | 335 items · mean cov **0.9873** · **PASS45 330/335 = 98.51%** (2nd run); **99.10%** (1st run) | [docs/04-evaluation.md](docs/04-evaluation.md) |
 | Every bit live-tested | **306 ok / 88 needs-ticket / 30 needs-input / 2 denied = 427** (live at 2026-11-04T14:13:12; 0 unattributed, 0 timeout) | [docs/07-capability-proof.md](docs/07-capability-proof.md) |
-| Concurrency | 512 → 4096 concurrent calls, **100% success**, ~260/s, +~50 MB | [docs/08-concurrency.md](docs/08-concurrency.md) |
-| Multi-domain regression | 29 domains / 236 bits: **221 ok · 15 need ticket · 0 regressions** | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
+| Concurrency | 512 → 4096 concurrent calls, **100% success** (4096/4096), ~150–190/s, memory flat ~7.0 GB (2026-11-04) | [docs/08-concurrency.md](docs/08-concurrency.md) |
+| Multi-domain monitor | 31 domains / 313 read-only bits: **304 ok · 9 not ok** (7 denied / missing-dep / failed + 2 timeouts on 60s+ scanners), 2026-11-04 | [docs/12-multidomain-monitor.md](docs/12-multidomain-monitor.md) |
 | Reverse-calling cloud compute | model `200 · 1.2s` · 3/3 images `29.7s` · local CPU `321.1 GFLOP/s` · video **27.0s / 49,893 B / sha_match=true** | [docs/13-omni-plug.md](docs/13-omni-plug.md) |
 
 Every figure above has a raw JSON receipt under `data/` and a figure under `assets/`.
 Where something did **not** work, the doc says so in the same table (see the "known gaps" section of `docs/07`).
 
-> **Figure snapshot:** these figures were captured at the **341-bit snapshot (2026-10-21)**. The live registry now holds **427 bits**; the 86 new bits have not been re-run through the per-bit live test, so the numbers inside the figures are historical — **not the current state**. Authoritative current readings are the table above and cap_self verify.
+> Every figure is rendered by a script that reads the receipts **at render time** — re-run the script and the figure reproduces.
+> Each figure carries its own data timestamp; nothing here is a mockup, and nothing is left as a "to be redrawn" placeholder.
 
 ## On a phone (real screenshots, not mockups)
 

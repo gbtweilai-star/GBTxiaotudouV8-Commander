@@ -1,5 +1,5 @@
 {
- "at": "2026-10-21T13:19:57",
+ "at": "2026-11-04T14:47:50",
  "名称": "GBT天真（主人命名 2026-10-11「触手的 ComfyUI 我们取名叫 GBT天真」）",
  "能力位": "comfy_native",
  "域": "creation",
@@ -18,38 +18,181 @@
    "in_position": true,
    "why": "本机 AMD 无 CUDA + 总内存 7.39 GB ⇒ ComfyUI 本体跑不动重模型；按其架构用轻量小算子自食其力（不装重壳、不下权重、不起 8188）",
    "deps": {
-    "PIL": "12.3.0",
-    "kornia": "0.8.2",
-    "numpy": "2.4.6",
-    "torch": "2.14.1+cpu"
+    "PIL": "13.0.0",
+    "kornia": "缺失(ModuleNotFoundError)",
+    "numpy": "2.3.5",
+    "torch": "缺失(ModuleNotFoundError)"
    },
    "nodes": [
+    "AddLayer",
     "AddTextPrefix",
     "AddTextSuffix",
+    "AdjustBrightness",
+    "AdjustContrast",
+    "AudioAdjustVolume",
+    "AudioConcat",
+    "AudioEqualizer3Band",
+    "BatchImagesNode",
+    "BatchMasksNode",
+    "Canny",
+    "CaseConverter",
+    "CenterCropImages",
+    "ColorToRGBInt",
+    "ColorTransfer",
+    "ComfyMathExpression",
+    "ComfyNumberConvert",
+    "ComfySoftSwitchNode",
+    "ComfySwitchNode",
+    "ConvertArrayToString",
+    "ConvertDictionaryToString",
+    "ConvertStringToComboNode",
+    "CreateBoundingBoxes",
+    "CreateList",
+    "CropByBBoxes",
+    "CropMask",
+    "CustomCombo",
+    "EmptyAudio",
     "EmptyImage",
+    "EndLoop",
+    "FeatherMask",
+    "FillHoles",
+    "FlipSigmas",
+    "GetImageSize",
+    "GetItemFromList",
+    "GrowMask",
+    "ImageAddNoise",
     "ImageBatch",
     "ImageBatchMulti",
     "ImageBlend",
     "ImageBlur",
+    "ImageBrightness",
+    "ImageColorSpace",
+    "ImageColorToMask",
+    "ImageCompare",
     "ImageCompositeMasked",
+    "ImageCompositor",
+    "ImageContrast",
     "ImageCrop",
+    "ImageCropToMask",
+    "ImageCropV2",
+    "ImageDeduplication",
+    "ImageDesaturate",
+    "ImageFlip",
+    "ImageFlipX",
+    "ImageFromBatch",
+    "ImageGamma",
+    "ImageGrid",
+    "ImageHistogram",
     "ImageHueSaturation",
     "ImageInvert",
     "ImageLevels",
     "ImagePadForOutpaint",
+    "ImagePosterize",
+    "ImageQuantize",
+    "ImageRGBToYUV",
     "ImageRotate",
+    "ImageSaturation",
     "ImageScale",
+    "ImageScaleBy",
+    "ImageScaleToMaxDimension",
+    "ImageScaleToTotalPixels",
+    "ImageSharpen",
+    "ImageStitch",
     "ImageToMask",
     "ImageTranspose",
+    "ImageYUVToRGB",
+    "InvertBooleanNode",
+    "InvertMask",
+    "JoinAudioChannels",
+    "JoinImageWithAlpha",
+    "JsonExtractString",
+    "KSamplerSelect",
+    "LayersFromBoundingBoxes",
+    "LoadAudio",
     "LoadImage",
+    "LoadImageDataSetFromFolder",
+    "LoadImageMask",
+    "LoadImageOutput",
+    "LoadImageTextDataSetFromFolder",
+    "LoopIteration",
+    "LoopProgress",
+    "LoopResult",
     "MaskBlur",
     "MaskComposite",
+    "MaskPreview",
     "MaskToImage",
+    "MergeImageLists",
+    "MergeTextLists",
+    "Morphology",
+    "NormalizeImages",
+    "PadImageNode",
+    "PorterDuffImageComposite",
+    "PreviewAny",
+    "PreviewAudio",
+    "PreviewImage",
+    "PrimitiveBoolean",
+    "PrimitiveBoundingBox",
+    "PrimitiveFloat",
+    "PrimitiveInt",
+    "PrimitiveString",
+    "PrimitiveStringMultiline",
+    "QuiverTextToSVGNodeV2",
+    "RandomCropImages",
+    "RebatchImages",
+    "RegexExtract",
+    "RegexMatch",
+    "RegexReplace",
+    "RepeatImageBatch",
+    "ReplaceText",
+    "ResizeAndPadImage",
+    "ResizeImageMaskNode",
+    "ResizeImagesByLongerEdge",
+    "ResizeImagesByShorterEdge",
+    "ResolutionBucket",
+    "ResolutionSelector",
+    "SaveAnimatedPNG",
+    "SaveAnimatedWEBP",
+    "SaveAudio",
+    "SaveAudioAdvanced",
     "SaveImage",
+    "SaveImageAdvanced",
+    "SaveImageDataSetToFolder",
+    "SaveImageTextDataSetToFolder",
+    "SaveImageWebsocket",
+    "SaveText",
+    "SelectCLIPDevice",
+    "SelectModelDevice",
+    "SelectVAEDevice",
+    "ShuffleDataset",
+    "ShuffleImageTextDataset",
+    "SolidMask",
+    "SplitAudioChannels",
+    "SplitImageToTileList",
+    "SplitImageWithAlpha",
+    "StartLoop",
+    "StringCompare",
+    "StringConcatenate",
+    "StringContains",
+    "StringFormat",
+    "StringLength",
+    "StringReplace",
+    "StringSubstring",
+    "StringTrim",
+    "StripWhitespace",
+    "TextOverlay",
+    "TextToLowercase",
+    "TextToUppercase",
+    "ThresholdMask",
+    "TrimAudioDuration",
+    "TruncateText",
     "copy",
+    "i2v_svd",
     "info",
     "sha",
+    "shuohao_skill",
+    "t2i_fused",
     "t2i_qwen",
+    "t2i_sdturbo",
     "upscale_4k"
    ],
    "read_ops": [
@@ -58,7 +201,12 @@
     "graph",
     "gate",
     "contract",
-    "validate"
+    "validate",
+    "coverage",
+    "harvest",
+    "import",
+    "import_dir",
+    "runs"
    ],
    "write_ops": [
     "run"
@@ -70,135 +218,32 @@
     "任何重生成模型（文生图/图生图/神经超分）—— 要 GPU 或 ≥16 GB 内存"
    ],
    "honest": "神经超分（spandrel 那些权重）**未接**：要权重 + 内存，本机没有",
-   "runs_file": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\runs.jsonl"
+   "runs_file": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\runs.jsonl"
   },
-  "elapsed_s": 5.24
+  "elapsed_s": 0.2
  },
  "contract": {
-  "ok": true,
-  "op": "contract",
-  "source": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\state\\comfyui_object_info.json",
-  "contract_nodes": 1495,
-  "native_nodes": [
-   "AddTextPrefix",
-   "AddTextSuffix",
-   "EmptyImage",
-   "ImageBatch",
-   "ImageBatchMulti",
-   "ImageBlend",
-   "ImageBlur",
-   "ImageCompositeMasked",
-   "ImageCrop",
-   "ImageHueSaturation",
-   "ImageInvert",
-   "ImageLevels",
-   "ImagePadForOutpaint",
-   "ImageRotate",
-   "ImageScale",
-   "ImageToMask",
-   "ImageTranspose",
-   "LoadImage",
-   "MaskBlur",
-   "MaskComposite",
-   "MaskToImage",
-   "SaveImage",
-   "copy",
-   "info",
-   "sha",
-   "t2i_qwen",
-   "upscale_4k"
-  ],
-  "native_also_in_contract": [
-   "AddTextPrefix",
-   "AddTextSuffix",
-   "EmptyImage",
-   "ImageBatch",
-   "ImageBatchMulti",
-   "ImageBlend",
-   "ImageBlur",
-   "ImageCompositeMasked",
-   "ImageCrop",
-   "ImageInvert",
-   "ImagePadForOutpaint",
-   "ImageRotate",
-   "ImageScale",
-   "ImageToMask",
-   "LoadImage",
-   "MaskComposite",
-   "MaskToImage",
-   "SaveImage"
-  ],
-  "native_only": [
-   "ImageHueSaturation",
-   "ImageLevels",
-   "ImageTranspose",
-   "MaskBlur",
-   "copy",
-   "info",
-   "sha",
-   "t2i_qwen",
-   "upscale_4k"
-  ],
-  "native_coverage_pct": 1.2,
-  "contract_only": 1477,
-  "not_native_by_reason": {
-   "传统算法面：**可原生**（未接的按需再长）": {
-    "count": 809,
-    "sample": [
-     "ADE_AnimateDiffKeyframe",
-     "ADE_AnimateDiffLoRALoader",
-     "ADE_AnimateDiffSamplingSettings",
-     "ADE_AnimateDiffUniformContextOptions",
-     "ADE_BatchedContextOptions",
-     "ADE_ContextExtras_ContextRef",
-     "ADE_ContextExtras_ContextRef_Keyframe",
-     "ADE_ContextExtras_ContextRef_KeyframeFromList"
-    ]
-   },
-   "重生成/模型面：要权重与 GPU（本机无 CUDA、内存 7.39GB）": {
-    "count": 359,
-    "sample": [
-     "ADE_AttachLoraHookToCLIP",
-     "ADE_AttachLoraHookToConditioning",
-     "ADE_CombineLoraHooks",
-     "ADE_CombineLoraHooksEight",
-     "ADE_CombineLoraHooksFour",
-     "ADE_ConditioningSetMask",
-     "ADE_LoraHookKeyframe",
-     "ADE_LoraHookKeyframeFromStrengthList"
-    ]
-   },
-   "控图/检测面：部分可原生（已接预处理），其余需权重": {
-    "count": 290,
-    "sample": [
-     "AIO_Preprocessor",
-     "AddMask",
-     "AnimalPosePreprocessor",
-     "AnimeFace_SemSegPreprocessor",
-     "AnimeLineArtPreprocessor",
-     "AnyLineArtPreprocessor_aux",
-     "AnyPipeToBasic",
-     "BAE-NormalMapPreprocessor"
-    ]
-   },
-   "云端 API 节点：要出网与凭据": {
-    "count": 19,
-    "sample": [
-     "AceStepAudioCodes",
-     "AceStepSettings",
-     "AceStepShowText",
-     "AceStepText2MusicGenParams",
-     "AceStepText2MusicServer",
-     "ByteDanceImageEditNode",
-     "IdeogramV1",
-     "IdeogramV2"
-    ]
-   }
-  },
-  "口径": "契约用它的（socket 名与类型），算子用我们的（纯 CPU）；「原生未接」不算失败，只不许假装能跑"
+  "ok": false,
+  "reason": "no_contract_snapshot",
+  "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\state\\comfyui_object_info.json",
+  "detail": "契约快照读不到（未读到，不当空）"
  },
- "nodes_count": 27,
+ "nodes_count": 170,
  "nodes": [
+  {
+   "node": "AddLayer",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "opacity?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "图层叠加（Pillow alpha composite）"
+  },
   {
    "node": "AddTextPrefix",
    "in": [
@@ -224,6 +269,317 @@
    "desc": "文本后缀（纯函数）"
   },
   {
+   "node": "AdjustBrightness",
+   "in": [
+    "image",
+    "out",
+    "factor?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "亮度（factor=1 原样）"
+  },
+  {
+   "node": "AdjustContrast",
+   "in": [
+    "image",
+    "out",
+    "factor?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "对比度（factor=1 原样）"
+  },
+  {
+   "node": "AudioAdjustVolume",
+   "in": [
+    "audio",
+    "out",
+    "factor?"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "音量调整（wav 增益）"
+  },
+  {
+   "node": "AudioConcat",
+   "in": [
+    "audios",
+    "out"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "拼接多段 wav（参数须一致）"
+  },
+  {
+   "node": "AudioEqualizer3Band",
+   "in": [
+    "audio",
+    "out",
+    "low?",
+    "mid?",
+    "high?"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "三频段均衡（dB，numpy FFT）"
+  },
+  {
+   "node": "BatchImagesNode",
+   "in": [
+    "images"
+   ],
+   "out": [
+    "IMAGE",
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "多图成批（校验存在，返回首个）"
+  },
+  {
+   "node": "BatchMasksNode",
+   "in": [
+    "masks"
+   ],
+   "out": [
+    "MASK",
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "多遮罩成批（校验存在）"
+  },
+  {
+   "node": "Canny",
+   "in": [
+    "image",
+    "out",
+    "low_threshold?",
+    "high_threshold?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "Canny 边缘（numpy 实现，不依赖 cv2）"
+  },
+  {
+   "node": "CaseConverter",
+   "in": [
+    "text",
+    "mode?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串大小写转换"
+  },
+  {
+   "node": "CenterCropImages",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "居中裁成正方形（边长=短边）"
+  },
+  {
+   "node": "ColorToRGBInt",
+   "in": [
+    "color"
+   ],
+   "out": [
+    "INT"
+   ],
+   "writes": false,
+   "desc": "颜色 → 0xRRGGBB 整数"
+  },
+  {
+   "node": "ColorTransfer",
+   "in": [
+    "image1",
+    "image2",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "色彩迁移（均值/方差；需 numpy）"
+  },
+  {
+   "node": "ComfyMathExpression",
+   "in": [
+    "expression?"
+   ],
+   "out": [
+    "FLOAT"
+   ],
+   "writes": false,
+   "desc": "安全算术表达式"
+  },
+  {
+   "node": "ComfyNumberConvert",
+   "in": [
+    "value",
+    "to?"
+   ],
+   "out": [
+    "NUMBER"
+   ],
+   "writes": false,
+   "desc": "数值类型转换（int/float）"
+  },
+  {
+   "node": "ComfySoftSwitchNode",
+   "in": [
+    "condition?",
+    "on_true?",
+    "on_false?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "软条件开关"
+  },
+  {
+   "node": "ComfySwitchNode",
+   "in": [
+    "condition?",
+    "on_true?",
+    "on_false?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "条件开关"
+  },
+  {
+   "node": "ConvertArrayToString",
+   "in": [
+    "array",
+    "separator?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "数组 → 字符串（可选分隔符）"
+  },
+  {
+   "node": "ConvertDictionaryToString",
+   "in": [
+    "dict"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字典 → JSON 字符串"
+  },
+  {
+   "node": "ConvertStringToComboNode",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串转选择值"
+  },
+  {
+   "node": "CreateBoundingBoxes",
+   "in": [
+    "boxes?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "包围盒列表"
+  },
+  {
+   "node": "CreateList",
+   "in": [
+    "items?",
+    "value?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "创建列表"
+  },
+  {
+   "node": "CropByBBoxes",
+   "in": [
+    "image",
+    "out",
+    "bboxes"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "按 bbox 裁剪（取第一个框）"
+  },
+  {
+   "node": "CropMask",
+   "in": [
+    "mask",
+    "out",
+    "x?",
+    "y?",
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "裁遮罩（ComfyUI 同名）"
+  },
+  {
+   "node": "CustomCombo",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "自定义选择值"
+  },
+  {
+   "node": "EmptyAudio",
+   "in": [
+    "out",
+    "duration?",
+    "sample_rate?"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "生成静音 wav（16bit 单声道）"
+  },
+  {
    "node": "EmptyImage",
    "in": [
     "out",
@@ -236,6 +592,106 @@
    ],
    "writes": true,
    "desc": "空画布"
+  },
+  {
+   "node": "EndLoop",
+   "in": [],
+   "out": [
+    "LOOP"
+   ],
+   "writes": false,
+   "desc": "循环终点（必须与 StartLoop 配对）"
+  },
+  {
+   "node": "FeatherMask",
+   "in": [
+    "mask",
+    "out",
+    "left?",
+    "top?",
+    "right?",
+    "bottom?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "遮罩羽化（高斯近似）"
+  },
+  {
+   "node": "FillHoles",
+   "in": [
+    "mask",
+    "out"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "填遮罩孔洞（边界背景泛洪）"
+  },
+  {
+   "node": "FlipSigmas",
+   "in": [
+    "sigmas"
+   ],
+   "out": [
+    "SIGMAS"
+   ],
+   "writes": false,
+   "desc": "翻转 sigma 序列"
+  },
+  {
+   "node": "GetImageSize",
+   "in": [
+    "image"
+   ],
+   "out": [
+    "width",
+    "height",
+    "size"
+   ],
+   "writes": false,
+   "desc": "只读宽高"
+  },
+  {
+   "node": "GetItemFromList",
+   "in": [
+    "list?",
+    "index?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "按索引取列表项"
+  },
+  {
+   "node": "GrowMask",
+   "in": [
+    "mask",
+    "out",
+    "expand?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "遮罩膨胀（MaxFilter 近似）"
+  },
+  {
+   "node": "ImageAddNoise",
+   "in": [
+    "image",
+    "out",
+    "seed?",
+    "strength?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "图像加高斯噪声（ComfyUI 同名；seed 可复现）"
   },
   {
    "node": "ImageBatch",
@@ -294,6 +750,58 @@
    "desc": "高斯模糊"
   },
   {
+   "node": "ImageBrightness",
+   "in": [
+    "image",
+    "out",
+    "brightness?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "亮度（1.0 原样）"
+  },
+  {
+   "node": "ImageColorSpace",
+   "in": [
+    "image",
+    "out",
+    "color_space?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "颜色空间转换（RGB/HSV/LAB/L/CMYK）"
+  },
+  {
+   "node": "ImageColorToMask",
+   "in": [
+    "image",
+    "out",
+    "color?",
+    "tolerance?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "按颜色取遮罩（容差）"
+  },
+  {
+   "node": "ImageCompare",
+   "in": [
+    "image1",
+    "image2"
+   ],
+   "out": [
+    "DIFF"
+   ],
+   "writes": false,
+   "desc": "两图对比（平均绝对差/是否相同）"
+  },
+  {
    "node": "ImageCompositeMasked",
    "in": [
     "image1",
@@ -310,6 +818,33 @@
    "desc": "带遮罩合成"
   },
   {
+   "node": "ImageCompositor",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "mask?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "按遮罩把 image2 叠到 image1"
+  },
+  {
+   "node": "ImageContrast",
+   "in": [
+    "image",
+    "out",
+    "contrast?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "对比度（1.0 原样）"
+  },
+  {
    "node": "ImageCrop",
    "in": [
     "image",
@@ -324,6 +859,138 @@
    ],
    "writes": true,
    "desc": "裁切"
+  },
+  {
+   "node": "ImageCropToMask",
+   "in": [
+    "image",
+    "out",
+    "x?",
+    "y?",
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "IMAGE",
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "裁块并给出遮罩"
+  },
+  {
+   "node": "ImageCropV2",
+   "in": [
+    "image",
+    "out",
+    "x?",
+    "y?",
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "裁剪 v2（越界夹紧）"
+  },
+  {
+   "node": "ImageDeduplication",
+   "in": [
+    "images"
+   ],
+   "out": [
+    "IMAGE",
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "按 8×8 指纹去重（返回唯一/重复）"
+  },
+  {
+   "node": "ImageDesaturate",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "去色（L 通道）"
+  },
+  {
+   "node": "ImageFlip",
+   "in": [
+    "image",
+    "out",
+    "mode?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "翻转（horizontal/vertical）"
+  },
+  {
+   "node": "ImageFlipX",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "水平翻转（PIL FLIP_LEFT_RIGHT）（image 族脚手架生成 2026-11-01）"
+  },
+  {
+   "node": "ImageFromBatch",
+   "in": [
+    "image",
+    "out",
+    "index?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "从批次取第 index 张（单图只支持 0）"
+  },
+  {
+   "node": "ImageGamma",
+   "in": [
+    "image",
+    "out",
+    "gamma?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "gamma 校正（LUT）"
+  },
+  {
+   "node": "ImageGrid",
+   "in": [
+    "images",
+    "out",
+    "columns?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "多图拼网格"
+  },
+  {
+   "node": "ImageHistogram",
+   "in": [
+    "image"
+   ],
+   "out": [
+    "HISTOGRAM"
+   ],
+   "writes": false,
+   "desc": "直方图读数（非零桶/峰值）"
   },
   {
    "node": "ImageHueSaturation",
@@ -384,6 +1051,45 @@
    "desc": "朩边（外绘预备）"
   },
   {
+   "node": "ImagePosterize",
+   "in": [
+    "image",
+    "out",
+    "levels?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "色阶分离（LUT）"
+  },
+  {
+   "node": "ImageQuantize",
+   "in": [
+    "image",
+    "out",
+    "colors?",
+    "dither?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "调色板量化（PIL quantize）"
+  },
+  {
+   "node": "ImageRGBToYUV",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "RGB→YUV 通道（BT.601）"
+  },
+  {
    "node": "ImageRotate",
    "in": [
     "image",
@@ -396,6 +1102,19 @@
    ],
    "writes": true,
    "desc": "旋转"
+  },
+  {
+   "node": "ImageSaturation",
+   "in": [
+    "image",
+    "out",
+    "saturation?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "饱和度（1.0 原样）"
   },
   {
    "node": "ImageScale",
@@ -411,6 +1130,75 @@
    ],
    "writes": true,
    "desc": "所放（Pillow）：与 ComfyUI 同名同契约，纯 CPU"
+  },
+  {
+   "node": "ImageScaleBy",
+   "in": [
+    "image",
+    "out",
+    "scale?",
+    "upscale_method?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "按倍率缩放（PIL，纯 CPU）—— ComfyUI 同名同契约"
+  },
+  {
+   "node": "ImageScaleToMaxDimension",
+   "in": [
+    "image",
+    "out",
+    "max_dimension?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "最长边缩放到 max_dimension"
+  },
+  {
+   "node": "ImageScaleToTotalPixels",
+   "in": [
+    "image",
+    "out",
+    "megapixels?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "缩放到目标总像素（MP）"
+  },
+  {
+   "node": "ImageSharpen",
+   "in": [
+    "image",
+    "out",
+    "radius?",
+    "sigma?",
+    "percent?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "USM 锐化（PIL）"
+  },
+  {
+   "node": "ImageStitch",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "direction?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "横/纵向拼接两张图"
   },
   {
    "node": "ImageToMask",
@@ -439,6 +1227,113 @@
    "desc": "翻转/旋转 90°系"
   },
   {
+   "node": "ImageYUVToRGB",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "YUV→RGB 通道（BT.601）"
+  },
+  {
+   "node": "InvertBooleanNode",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "BOOLEAN"
+   ],
+   "writes": false,
+   "desc": "布尔取反"
+  },
+  {
+   "node": "InvertMask",
+   "in": [
+    "mask",
+    "out"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "遮罩取反（ComfyUI 同名）"
+  },
+  {
+   "node": "JoinAudioChannels",
+   "in": [
+    "left",
+    "right",
+    "out"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "L+R → 立体声"
+  },
+  {
+   "node": "JoinImageWithAlpha",
+   "in": [
+    "image",
+    "mask",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "RGB + alpha 合成"
+  },
+  {
+   "node": "JsonExtractString",
+   "in": [
+    "json?",
+    "key?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "JSON 取字符串"
+  },
+  {
+   "node": "KSamplerSelect",
+   "in": [
+    "sampler_name?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "采样器名选择（不跑采样）"
+  },
+  {
+   "node": "LayersFromBoundingBoxes",
+   "in": [
+    "boxes?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "包围盒转图层列表"
+  },
+  {
+   "node": "LoadAudio",
+   "in": [
+    "audio?"
+   ],
+   "out": [
+    "AUDIO",
+    "INFO"
+   ],
+   "writes": false,
+   "desc": "读 wav（只读，回参数）"
+  },
+  {
    "node": "LoadImage",
    "in": [
     "image",
@@ -450,6 +1345,86 @@
    ],
    "writes": false,
    "desc": "读图（只读，回尺寸与哈希；image 与 path 两个名都认）"
+  },
+  {
+   "node": "LoadImageDataSetFromFolder",
+   "in": [
+    "folder"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "扫文件夹里的图"
+  },
+  {
+   "node": "LoadImageMask",
+   "in": [
+    "image",
+    "out",
+    "channel?"
+   ],
+   "out": [
+    "MASK",
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "读图出遮罩（alpha/luminance/red…）"
+  },
+  {
+   "node": "LoadImageOutput",
+   "in": [
+    "image",
+    "path?",
+    "out?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": false,
+   "desc": "从产物目录读回图"
+  },
+  {
+   "node": "LoadImageTextDataSetFromFolder",
+   "in": [
+    "folder"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "扫图+txt 配对数据集"
+  },
+  {
+   "node": "LoopIteration",
+   "in": [],
+   "out": [
+    "INT"
+   ],
+   "writes": false,
+   "desc": "当前迭代序号"
+  },
+  {
+   "node": "LoopProgress",
+   "in": [
+    "progress?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "循环进度透传"
+  },
+  {
+   "node": "LoopResult",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "循环结果透传"
   },
   {
    "node": "MaskBlur",
@@ -481,6 +1456,17 @@
    "desc": "遮罩运算"
   },
   {
+   "node": "MaskPreview",
+   "in": [
+    "mask"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "预览遮罩"
+  },
+  {
    "node": "MaskToImage",
    "in": [
     "mask",
@@ -491,6 +1477,427 @@
    ],
    "writes": true,
    "desc": "遮罩→图"
+  },
+  {
+   "node": "MergeImageLists",
+   "in": [
+    "list1?",
+    "list2?",
+    "lists?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "合并图像列表"
+  },
+  {
+   "node": "MergeTextLists",
+   "in": [
+    "list1?",
+    "list2?",
+    "lists?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "合并文本列表"
+  },
+  {
+   "node": "Morphology",
+   "in": [
+    "image",
+    "out",
+    "operation?",
+    "kernel_size?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "灰度形态学（膨胀/腐蚀）"
+  },
+  {
+   "node": "NormalizeImages",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "对比度归一（拉伸全量程）"
+  },
+  {
+   "node": "PadImageNode",
+   "in": [
+    "image",
+    "out",
+    "left?",
+    "top?",
+    "right?",
+    "bottom?",
+    "color?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "图像边缘填充"
+  },
+  {
+   "node": "PorterDuffImageComposite",
+   "in": [
+    "image1",
+    "image2",
+    "out",
+    "mode?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "Porter-Duff 合成（over/multiply/screen/add/difference）"
+  },
+  {
+   "node": "PreviewAny",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "VALUE"
+   ],
+   "writes": false,
+   "desc": "任意值透传预览"
+  },
+  {
+   "node": "PreviewAudio",
+   "in": [
+    "audio"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "预览音频（拷一份 preview_*.wav）"
+  },
+  {
+   "node": "PreviewImage",
+   "in": [
+    "image"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "预览一份（落 preview_*.png，不覆盖产物）"
+  },
+  {
+   "node": "PrimitiveBoolean",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "BOOLEAN"
+   ],
+   "writes": false,
+   "desc": "布尔常量"
+  },
+  {
+   "node": "PrimitiveBoundingBox",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "BBOX"
+   ],
+   "writes": false,
+   "desc": "包围盒常量"
+  },
+  {
+   "node": "PrimitiveFloat",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "FLOAT"
+   ],
+   "writes": false,
+   "desc": "浮点常量"
+  },
+  {
+   "node": "PrimitiveInt",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "INT"
+   ],
+   "writes": false,
+   "desc": "整数常量"
+  },
+  {
+   "node": "PrimitiveString",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串常量"
+  },
+  {
+   "node": "PrimitiveStringMultiline",
+   "in": [
+    "value?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "多行字符串常量"
+  },
+  {
+   "node": "QuiverTextToSVGNodeV2",
+   "in": [
+    "text",
+    "out",
+    "width?"
+   ],
+   "out": [
+    "SVG"
+   ],
+   "writes": true,
+   "desc": "文本 → 简单 SVG"
+  },
+  {
+   "node": "RandomCropImages",
+   "in": [
+    "image",
+    "out",
+    "width?",
+    "height?",
+    "seed?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "随机裁剪（seed 可复现）"
+  },
+  {
+   "node": "RebatchImages",
+   "in": [
+    "image",
+    "out",
+    "batch_size?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "重分批（单图流水只落一张）"
+  },
+  {
+   "node": "RegexExtract",
+   "in": [
+    "string?",
+    "pattern?",
+    "group?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "正则提取"
+  },
+  {
+   "node": "RegexMatch",
+   "in": [
+    "string?",
+    "pattern?"
+   ],
+   "out": [
+    "BOOLEAN"
+   ],
+   "writes": false,
+   "desc": "正则匹配"
+  },
+  {
+   "node": "RegexReplace",
+   "in": [
+    "string?",
+    "pattern?",
+    "replacement?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "正则替换"
+  },
+  {
+   "node": "RepeatImageBatch",
+   "in": [
+    "image",
+    "out",
+    "amount?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "重复 N 张（单图只落一张）"
+  },
+  {
+   "node": "ReplaceText",
+   "in": [
+    "text",
+    "find",
+    "replace"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "替换文本（返回替换次数）"
+  },
+  {
+   "node": "ResizeAndPadImage",
+   "in": [
+    "image",
+    "out",
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "等比缩放 + 居中补边"
+  },
+  {
+   "node": "ResizeImageMaskNode",
+   "in": [
+    "image",
+    "out",
+    "width?",
+    "height?",
+    "method?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "图像/遮罩缩放"
+  },
+  {
+   "node": "ResizeImagesByLongerEdge",
+   "in": [
+    "image",
+    "out",
+    "longer_edge?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "按长边缩放"
+  },
+  {
+   "node": "ResizeImagesByShorterEdge",
+   "in": [
+    "image",
+    "out",
+    "shorter_edge?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "按短边缩放"
+  },
+  {
+   "node": "ResolutionBucket",
+   "in": [
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "INT",
+    "INT"
+   ],
+   "writes": false,
+   "desc": "分辨率分桶"
+  },
+  {
+   "node": "ResolutionSelector",
+   "in": [
+    "width?",
+    "height?"
+   ],
+   "out": [
+    "INT",
+    "INT"
+   ],
+   "writes": false,
+   "desc": "分辨率选择"
+  },
+  {
+   "node": "SaveAnimatedPNG",
+   "in": [
+    "images",
+    "out",
+    "duration?",
+    "loop?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "多帧 → 动图 PNG（APNG）"
+  },
+  {
+   "node": "SaveAnimatedWEBP",
+   "in": [
+    "images",
+    "out",
+    "duration?",
+    "loop?",
+    "quality?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "多帧 → 动图 WEBP"
+  },
+  {
+   "node": "SaveAudio",
+   "in": [
+    "audio",
+    "out"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "落盘 wav"
+  },
+  {
+   "node": "SaveAudioAdvanced",
+   "in": [
+    "audio",
+    "out"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "音频落盘（只接 wav；MP3/Opus 如实不接）"
   },
   {
    "node": "SaveImage",
@@ -505,6 +1912,378 @@
    "desc": "写盘（过闸才认账）"
   },
   {
+   "node": "SaveImageAdvanced",
+   "in": [
+    "image",
+    "out",
+    "quality?",
+    "compress_level?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "落盘（质量/压缩可调）"
+  },
+  {
+   "node": "SaveImageDataSetToFolder",
+   "in": [
+    "images",
+    "folder"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": true,
+   "desc": "图集合存目录（同名跳过）"
+  },
+  {
+   "node": "SaveImageTextDataSetToFolder",
+   "in": [
+    "images",
+    "text",
+    "folder"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": true,
+   "desc": "图+文本配对存目录"
+  },
+  {
+   "node": "SaveImageWebsocket",
+   "in": [
+    "images",
+    "out?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "保存 images（ComfyUI websocket image save 的本地等效）"
+  },
+  {
+   "node": "SaveText",
+   "in": [
+    "text",
+    "out"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": true,
+   "desc": "文本落盘（.txt/.md/.json）"
+  },
+  {
+   "node": "SelectCLIPDevice",
+   "in": [
+    "device?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "CLIP 设备选择（值透传）"
+  },
+  {
+   "node": "SelectModelDevice",
+   "in": [
+    "device?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "模型设备选择（值透传）"
+  },
+  {
+   "node": "SelectVAEDevice",
+   "in": [
+    "device?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "VAE 设备选择（值透传）"
+  },
+  {
+   "node": "ShuffleDataset",
+   "in": [
+    "dataset?",
+    "seed?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "数据集洗牌（seed 可复现）"
+  },
+  {
+   "node": "ShuffleImageTextDataset",
+   "in": [
+    "pairs",
+    "seed?"
+   ],
+   "out": [
+    "LIST"
+   ],
+   "writes": false,
+   "desc": "打乱配对（seed 可复现）"
+  },
+  {
+   "node": "SolidMask",
+   "in": [
+    "out",
+    "width?",
+    "height?",
+    "value?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "纯色遮罩（ComfyUI 同名）"
+  },
+  {
+   "node": "SplitAudioChannels",
+   "in": [
+    "audio",
+    "out"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "立体声拆 L/R（写出 L，返回 R）"
+  },
+  {
+   "node": "SplitImageToTileList",
+   "in": [
+    "image",
+    "out",
+    "columns?",
+    "rows?"
+   ],
+   "out": [
+    "IMAGE",
+    "LIST"
+   ],
+   "writes": true,
+   "desc": "切成 tile 并返回列表"
+  },
+  {
+   "node": "SplitImageWithAlpha",
+   "in": [
+    "image",
+    "out"
+   ],
+   "out": [
+    "IMAGE",
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "拆 RGB 与 alpha"
+  },
+  {
+   "node": "StartLoop",
+   "in": [
+    "iterations?"
+   ],
+   "out": [
+    "LOOP"
+   ],
+   "writes": false,
+   "desc": "循环起点标记（真循环由引擎 times 语义执行）"
+  },
+  {
+   "node": "StringCompare",
+   "in": [
+    "a?",
+    "b?",
+    "op?"
+   ],
+   "out": [
+    "BOOLEAN"
+   ],
+   "writes": false,
+   "desc": "字符串比较"
+  },
+  {
+   "node": "StringConcatenate",
+   "in": [
+    "a?",
+    "b?",
+    "separator?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串拼接"
+  },
+  {
+   "node": "StringContains",
+   "in": [
+    "string?",
+    "substring?"
+   ],
+   "out": [
+    "BOOLEAN"
+   ],
+   "writes": false,
+   "desc": "字符串包含"
+  },
+  {
+   "node": "StringFormat",
+   "in": [
+    "format?",
+    "values?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串格式化（Python format）"
+  },
+  {
+   "node": "StringLength",
+   "in": [
+    "string?"
+   ],
+   "out": [
+    "INT"
+   ],
+   "writes": false,
+   "desc": "字符串长度"
+  },
+  {
+   "node": "StringReplace",
+   "in": [
+    "string?",
+    "find?",
+    "replace?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串替换"
+  },
+  {
+   "node": "StringSubstring",
+   "in": [
+    "string?",
+    "start?",
+    "length?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串截取"
+  },
+  {
+   "node": "StringTrim",
+   "in": [
+    "string?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "字符串去空白"
+  },
+  {
+   "node": "StripWhitespace",
+   "in": [
+    "string?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "去首尾空白"
+  },
+  {
+   "node": "TextOverlay",
+   "in": [
+    "image",
+    "out",
+    "text",
+    "x?",
+    "y?",
+    "font_size?",
+    "color?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "在图上写字"
+  },
+  {
+   "node": "TextToLowercase",
+   "in": [
+    "text"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "转小写"
+  },
+  {
+   "node": "TextToUppercase",
+   "in": [
+    "text"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "转大写"
+  },
+  {
+   "node": "ThresholdMask",
+   "in": [
+    "mask",
+    "out",
+    "value?"
+   ],
+   "out": [
+    "MASK"
+   ],
+   "writes": true,
+   "desc": "阈值二值化"
+  },
+  {
+   "node": "TrimAudioDuration",
+   "in": [
+    "audio",
+    "out",
+    "start?",
+    "end?"
+   ],
+   "out": [
+    "AUDIO"
+   ],
+   "writes": true,
+   "desc": "裁剪音频时长（start/end 秒）"
+  },
+  {
+   "node": "TruncateText",
+   "in": [
+    "text",
+    "max_length?"
+   ],
+   "out": [
+    "STRING"
+   ],
+   "writes": false,
+   "desc": "截断到 max_length"
+  },
+  {
    "node": "copy",
    "in": [
     "src",
@@ -515,6 +2294,25 @@
    ],
    "writes": true,
    "desc": "原样落盘（图里做物化）"
+  },
+  {
+   "node": "i2v_svd",
+   "in": [
+    "image",
+    "out",
+    "frames?",
+    "width?",
+    "height?",
+    "steps?",
+    "fps?",
+    "seed?",
+    "motion?"
+   ],
+   "out": [
+    "VIDEO"
+   ],
+   "writes": true,
+   "desc": "本地 SVD-XT 真图生视频（CPU fp32，不碰云/ComfyUI）"
   },
   {
    "node": "info",
@@ -540,6 +2338,35 @@
    "desc": "算产物哈希（钉进证据链）"
   },
   {
+   "node": "shuohao_skill",
+   "in": [
+    "skill",
+    "script",
+    "args?"
+   ],
+   "out": [
+    "JSON"
+   ],
+   "writes": false,
+   "desc": "跑本地 shuohao-skills 短剧 skill（大纲/角色/美术/剧本/站位/分镜）"
+  },
+  {
+   "node": "t2i_fused",
+   "in": [
+    "prompt",
+    "out",
+    "size?",
+    "steps?",
+    "seed?",
+    "model?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "本地融合权重文生图（RV5.1×Tiny-SD，不碰云/ComfyUI）"
+  },
+  {
    "node": "t2i_qwen",
    "in": [
     "prompt",
@@ -552,6 +2379,22 @@
    ],
    "writes": true,
    "desc": "文生图（Qwen-Image-2.1-Turbo · 8 步计划 · 同源 Qwen · 开放权重）—— 本机无 CUDA ⇒ 返 needs_dependency；要云"
+  },
+  {
+   "node": "t2i_sdturbo",
+   "in": [
+    "prompt",
+    "out",
+    "size?",
+    "steps?",
+    "seed?",
+    "model?"
+   ],
+   "out": [
+    "IMAGE"
+   ],
+   "writes": true,
+   "desc": "本地 Diffusers SD-Turbo CPU 文生图（不走 ComfyUI/云端）"
   },
   {
    "node": "upscale_4k",
@@ -671,10 +2514,11 @@
     "SaveImage"
    ],
    "contract_only_used": [],
+   "unwired_nodes": [],
    "unknown_nodes": [],
    "verdict": "可跑（全在原生表内）"
   },
-  "elapsed_s": 0.02
+  "elapsed_s": 0.01
  },
  "validate_bad": {
   "workflow": {
@@ -767,6 +2611,7 @@
     "LoadImage"
    ],
    "contract_only_used": [],
+   "unwired_nodes": [],
    "unknown_nodes": [
     "ImageFantasy"
    ],
@@ -802,7 +2647,7 @@
      },
      "_out": {
       "ok": true,
-      "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+      "out": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
       "width": 256,
       "height": 256,
       "method": "lanczos"
@@ -817,7 +2662,7 @@
      "_out": {
       "ok": true,
       "out": ".scratch\\comfy-live-check\\out.png",
-      "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+      "sha256": "acf035b8a5538680991d6308e2f7c486a102a94956c43c30588a71174ef91a51"
      }
     }
    ],
@@ -864,7 +2709,7 @@
       },
       "_out": {
        "ok": true,
-       "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+       "out": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
        "width": 256,
        "height": 256,
        "method": "lanczos"
@@ -879,7 +2724,7 @@
       "_out": {
        "ok": true,
        "out": ".scratch\\comfy-live-check\\out.png",
-       "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+       "sha256": "acf035b8a5538680991d6308e2f7c486a102a94956c43c30588a71174ef91a51"
       }
      }
     ],
@@ -904,7 +2749,7 @@
   "result": {
    "ok": true,
    "products": [
-    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
     ".scratch\\comfy-live-check\\out.png"
    ],
    "trace": [
@@ -912,7 +2757,7 @@
      "id": "n1",
      "node": "LoadImage",
      "ok": true,
-     "ms": 56.9,
+     "ms": 22.4,
      "out": {
       "ok": true,
       "image": "holo_pet/assets/digital-human/standard/reference-front.jpg",
@@ -926,10 +2771,10 @@
      "id": "n2",
      "node": "ImageScale",
      "ok": true,
-     "ms": 37.8,
+     "ms": 47.7,
      "out": {
       "ok": true,
-      "out": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+      "out": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
       "width": 256,
       "height": 256,
       "method": "lanczos"
@@ -938,14 +2783,14 @@
       "pass": true,
       "problems": [],
       "info": {
-       "path": "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
+       "path": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
        "exists": true,
-       "bytes": 73991,
+       "bytes": 74241,
        "width": 256,
        "height": 256,
        "mode": "RGBA",
        "format": "PNG",
-       "sha256": "3a6fb8cede62a1ff"
+       "sha256": "acf035b8a5538680"
       }
      }
     },
@@ -953,11 +2798,11 @@
      "id": "n3",
      "node": "SaveImage",
      "ok": true,
-     "ms": 0.0,
+     "ms": 2.0,
      "out": {
       "ok": true,
       "out": ".scratch\\comfy-live-check\\out.png",
-      "sha256": "3a6fb8cede62a1ffea77b72628cf0cb946dc81e797f732e54e1d0287679b93ab"
+      "sha256": "acf035b8a5538680991d6308e2f7c486a102a94956c43c30588a71174ef91a51"
      },
      "gate": {
       "pass": true,
@@ -965,20 +2810,25 @@
       "info": {
        "path": ".scratch\\comfy-live-check\\out.png",
        "exists": true,
-       "bytes": 73991,
+       "bytes": 74241,
        "width": 256,
        "height": 256,
        "mode": "RGBA",
        "format": "PNG",
-       "sha256": "3a6fb8cede62a1ff"
+       "sha256": "acf035b8a5538680"
       }
      }
     }
    ],
-   "seconds": 0.1,
-   "note": "证据已追加到 store/comfy_native/runs.jsonl"
+   "seconds": 0.08,
+   "snapshot": {
+    "hash": "0f5acd71521f",
+    "file": "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\state\\comfy-runs\\0f5acd71521f.json",
+    "products": 2
+   },
+   "note": "证据已追加到 store/comfy_native/runs.jsonl；快照见 state/comfy-runs/"
   },
-  "elapsed_s": 0.13
+  "elapsed_s": 0.1
  },
  "run_bad": {
   "workflow": {
@@ -1059,133 +2909,293 @@
    "ok": false,
    "error": "user_error: 白名单里没有这些节点：['ImageFantasy']",
    "known": [
+    "AddLayer",
     "AddTextPrefix",
     "AddTextSuffix",
+    "AdjustBrightness",
+    "AdjustContrast",
+    "AudioAdjustVolume",
+    "AudioConcat",
+    "AudioEqualizer3Band",
+    "BatchImagesNode",
+    "BatchMasksNode",
+    "Canny",
+    "CaseConverter",
+    "CenterCropImages",
+    "ColorToRGBInt",
+    "ColorTransfer",
+    "ComfyMathExpression",
+    "ComfyNumberConvert",
+    "ComfySoftSwitchNode",
+    "ComfySwitchNode",
+    "ConvertArrayToString",
+    "ConvertDictionaryToString",
+    "ConvertStringToComboNode",
+    "CreateBoundingBoxes",
+    "CreateList",
+    "CropByBBoxes",
+    "CropMask",
+    "CustomCombo",
+    "EmptyAudio",
     "EmptyImage",
+    "EndLoop",
+    "FeatherMask",
+    "FillHoles",
+    "FlipSigmas",
+    "GetImageSize",
+    "GetItemFromList",
+    "GrowMask",
+    "ImageAddNoise",
     "ImageBatch",
     "ImageBatchMulti",
     "ImageBlend",
     "ImageBlur",
+    "ImageBrightness",
+    "ImageColorSpace",
+    "ImageColorToMask",
+    "ImageCompare",
     "ImageCompositeMasked",
+    "ImageCompositor",
+    "ImageContrast",
     "ImageCrop",
+    "ImageCropToMask",
+    "ImageCropV2",
+    "ImageDeduplication",
+    "ImageDesaturate",
+    "ImageFlip",
+    "ImageFlipX",
+    "ImageFromBatch",
+    "ImageGamma",
+    "ImageGrid",
+    "ImageHistogram",
     "ImageHueSaturation",
     "ImageInvert",
     "ImageLevels",
     "ImagePadForOutpaint",
+    "ImagePosterize",
+    "ImageQuantize",
+    "ImageRGBToYUV",
     "ImageRotate",
+    "ImageSaturation",
     "ImageScale",
+    "ImageScaleBy",
+    "ImageScaleToMaxDimension",
+    "ImageScaleToTotalPixels",
+    "ImageSharpen",
+    "ImageStitch",
     "ImageToMask",
     "ImageTranspose",
+    "ImageYUVToRGB",
+    "InvertBooleanNode",
+    "InvertMask",
+    "JoinAudioChannels",
+    "JoinImageWithAlpha",
+    "JsonExtractString",
+    "KSamplerSelect",
+    "LayersFromBoundingBoxes",
+    "LoadAudio",
     "LoadImage",
+    "LoadImageDataSetFromFolder",
+    "LoadImageMask",
+    "LoadImageOutput",
+    "LoadImageTextDataSetFromFolder",
+    "LoopIteration",
+    "LoopProgress",
+    "LoopResult",
     "MaskBlur",
     "MaskComposite",
+    "MaskPreview",
     "MaskToImage",
+    "MergeImageLists",
+    "MergeTextLists",
+    "Morphology",
+    "NormalizeImages",
+    "PadImageNode",
+    "PorterDuffImageComposite",
+    "PreviewAny",
+    "PreviewAudio",
+    "PreviewImage",
+    "PrimitiveBoolean",
+    "PrimitiveBoundingBox",
+    "PrimitiveFloat",
+    "PrimitiveInt",
+    "PrimitiveString",
+    "PrimitiveStringMultiline",
+    "QuiverTextToSVGNodeV2",
+    "RandomCropImages",
+    "RebatchImages",
+    "RegexExtract",
+    "RegexMatch",
+    "RegexReplace",
+    "RepeatImageBatch",
+    "ReplaceText",
+    "ResizeAndPadImage",
+    "ResizeImageMaskNode",
+    "ResizeImagesByLongerEdge",
+    "ResizeImagesByShorterEdge",
+    "ResolutionBucket",
+    "ResolutionSelector",
+    "SaveAnimatedPNG",
+    "SaveAnimatedWEBP",
+    "SaveAudio",
+    "SaveAudioAdvanced",
     "SaveImage",
+    "SaveImageAdvanced",
+    "SaveImageDataSetToFolder",
+    "SaveImageTextDataSetToFolder",
+    "SaveImageWebsocket",
+    "SaveText",
+    "SelectCLIPDevice",
+    "SelectModelDevice",
+    "SelectVAEDevice",
+    "ShuffleDataset",
+    "ShuffleImageTextDataset",
+    "SolidMask",
+    "SplitAudioChannels",
+    "SplitImageToTileList",
+    "SplitImageWithAlpha",
+    "StartLoop",
+    "StringCompare",
+    "StringConcatenate",
+    "StringContains",
+    "StringFormat",
+    "StringLength",
+    "StringReplace",
+    "StringSubstring",
+    "StringTrim",
+    "StripWhitespace",
+    "TextOverlay",
+    "TextToLowercase",
+    "TextToUppercase",
+    "ThresholdMask",
+    "TrimAudioDuration",
+    "TruncateText",
     "copy",
+    "i2v_svd",
     "info",
     "sha",
+    "shuohao_skill",
+    "t2i_fused",
     "t2i_qwen",
+    "t2i_sdturbo",
     "upscale_4k"
    ]
   },
   "elapsed_s": 0.0
  },
  "写面门规约": "op=run 走同一道 run_task 门；按主人 2026-10-19 令，filesystem_write 已不再要票（auth_gate.ENFORCED_SCOPES 只留浏览器/桌面/设备/内网/隐私/进程/远端/发声/数据外发/外部大模型/生产发布/强制放行）⇒ 写面会真写盘，落点由 out/filename_prefix 决定，缺省落 store/comfy_native，并落审计与 runs.jsonl",
- "runs_total": 122,
+ "runs_total": 648,
  "runs_last": [
   {
-   "at": "2026-10-18T06:53:38",
-   "nodes": 3,
-   "seconds": 8.97,
+   "at": "2026-11-03T01:37:48",
+   "nodes": 5,
+   "seconds": 0.23,
    "products": [
-    "holo_pet\\assets\\digital-human\\standard\\tex\\_w\\4k.png",
-    "holo_pet/assets/digital-human/standard/tex/HERO-4096.png"
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\comfy_native\\empty_668033.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\comfy_native\\addnoise_668201.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\comfy_native\\padimage_668208.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\GBTxiaotudouV8-Commander\\GBTxiaotudouV8-Commander-main\\gbt_allinone\\store\\comfy_native\\canny_668222.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\deepseek-harness\\default-workspace\\gbt-wf-purecpu-o5mgo9hc\\workflow.png"
    ],
    "trace": [
     {
-     "node": "LoadImage",
+     "node": "EmptyImage",
      "ok": true,
-     "ms": 27.1,
-     "gate_pass": null,
-     "sha16": null
+     "ms": 49.7,
+     "gate_pass": true,
+     "sha16": "e0a600268e4e838c"
     },
     {
-     "node": "upscale_4k",
+     "node": "ImageAddNoise",
      "ok": true,
-     "ms": 7958.3,
+     "ms": 148.3,
      "gate_pass": true,
-     "sha16": "9ff91cefa4468fb5"
+     "sha16": "aea4cbd0829a521f"
+    },
+    {
+     "node": "PadImageNode",
+     "ok": true,
+     "ms": 5.1,
+     "gate_pass": true,
+     "sha16": "99f663f3bc2f6b5f"
+    },
+    {
+     "node": "Canny",
+     "ok": true,
+     "ms": 11.8,
+     "gate_pass": true,
+     "sha16": "43bed9819b60e718"
     },
     {
      "node": "SaveImage",
      "ok": true,
-     "ms": 19.5,
+     "ms": 5.1,
      "gate_pass": true,
-     "sha16": "9ff91cefa4468fb5"
+     "sha16": "43bed9819b60e718"
     }
    ]
   },
   {
-   "at": "2026-10-21T13:18:26",
+   "at": "2026-11-04T14:47:30",
    "nodes": 3,
-   "seconds": 0.1,
+   "seconds": 0.07,
    "products": [
-    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_506565.png",
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_450083.png",
     ".scratch\\comfy-live-check\\out.png"
    ],
    "trace": [
     {
      "node": "LoadImage",
      "ok": true,
-     "ms": 48.3,
+     "ms": 31.8,
      "gate_pass": null,
      "sha16": null
     },
     {
      "node": "ImageScale",
      "ok": true,
-     "ms": 37.5,
+     "ms": 39.3,
      "gate_pass": true,
-     "sha16": "3a6fb8cede62a1ff"
-    },
-    {
-     "node": "SaveImage",
-     "ok": true,
-     "ms": 3.4,
-     "gate_pass": true,
-     "sha16": "3a6fb8cede62a1ff"
-    }
-   ]
-  },
-  {
-   "at": "2026-10-21T13:19:57",
-   "nodes": 3,
-   "seconds": 0.1,
-   "products": [
-    "C:\\Users\\ADMIN\\Desktop\\GBT小土豆V8\\gbt_allinone\\store\\comfy_native\\scale_597724.png",
-    ".scratch\\comfy-live-check\\out.png"
-   ],
-   "trace": [
-    {
-     "node": "LoadImage",
-     "ok": true,
-     "ms": 56.9,
-     "gate_pass": null,
-     "sha16": null
-    },
-    {
-     "node": "ImageScale",
-     "ok": true,
-     "ms": 37.8,
-     "gate_pass": true,
-     "sha16": "3a6fb8cede62a1ff"
+     "sha16": "acf035b8a5538680"
     },
     {
      "node": "SaveImage",
      "ok": true,
      "ms": 0.0,
      "gate_pass": true,
-     "sha16": "3a6fb8cede62a1ff"
+     "sha16": "acf035b8a5538680"
+    }
+   ]
+  },
+  {
+   "at": "2026-11-04T14:47:50",
+   "nodes": 3,
+   "seconds": 0.08,
+   "products": [
+    "C:\\Users\\Lenovo E14 Gen 5\\Documents\\GBTxiaotudouV8-Commander\\gbt_allinone\\store\\comfy_native\\scale_469948.png",
+    ".scratch\\comfy-live-check\\out.png"
+   ],
+   "trace": [
+    {
+     "node": "LoadImage",
+     "ok": true,
+     "ms": 22.4,
+     "gate_pass": null,
+     "sha16": null
+    },
+    {
+     "node": "ImageScale",
+     "ok": true,
+     "ms": 47.7,
+     "gate_pass": true,
+     "sha16": "acf035b8a5538680"
+    },
+    {
+     "node": "SaveImage",
+     "ok": true,
+     "ms": 2.0,
+     "gate_pass": true,
+     "sha16": "acf035b8a5538680"
     }
    ]
   }

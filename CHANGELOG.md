@@ -1,5 +1,17 @@
 # 变更记录
 
+## 2026-11-04 · 第十七批：可视化面板全部重绘（旧账清零）
+
+- **根因不在 PNG，在脚本**：`render-test-figures.py` 有三处结构性缺陷，导致「数据早已 427、图却永远是 341」——① 数据目录只找 `outputs/open-source-release/data/`，而并发/监控/天真三份实测账一直躺在仓库根 `data/`，找不到就**静默跳过**，那三张图于是永久冻结在旧文件上；② `rows` 被当成 dict 走 `.items()`，新探针落的是 **list**，一跑就崩；③ 直接 `json.loads(state/weights/ACTIVE.json)`，该文件不在版本控制里，缺失时整个渲染进程退出。现分别改为：`data_file()` 双路径回退、list/dict 双形状兼容、缺数据**如实跳过并打印原因**（绝不画一张 `0.00%` 的空图）。
+- **重绘 7 张**：`fig-caps`（**427 位 / 306 通过 / 88 需授权 / 30 缺参 / 2 被门拒 / 1 缺依赖**，五类全部上图，断言 306+88+30+2+1=427）· `fig-domains`（427 位 / 32 域，改为**全域绘制**——旧版只画前 16 域却标「共 N 域」，图与标题自相矛盾）· `fig-concurrency` · `fig-monitor` · `fig-tianzhen` · `fig-cable-all` · `fig-compute-vs-llm` · `fig-pure-compute`。
+- **旧数据全部重跑**（不是拿旧账重画）：并发压测 **512→4096 全档 100% 成功**（4096/4096，22.34s，183/s，内存平稳 ~7.0 GB）；天真 `comfy_native` **170 算子**、正例校验通过、反例抓 3 条错、写面真跑；多域监控 **31 域 / 313 只读位 / 304 通过 / 402.7s**，9 位未通过**逐条点名**（`hand_vision` 缺 cv2 · `bluetooth`/`bt_control` 被门拒 · `llm_chat`/`mcp_connect`/`mcp_call`/`voice` 服务未起 · `sec_scan`/`sec_chain` 60s+ 慢位触及 90s 看门狗）。
+- **如实记录 2 位回归**：monitor 第 2 轮相对第 1 轮出现 `sec_scan`、`sec_chain` 超时。判定为**并行跑其它任务造成的资源争用**（这两位单独跑约 66s，紧贴 90s 看门狗），不是代码回归；图上照实标红并点名，未调高看门狗来「消除」它。
+- **下架 2 张孤儿图**：`fig-dispatch-ok.png`（README 首屏展示，但**全仓找不到任何生成脚本、也没有对应数据源**）与 `fig-dispatch-denied.png`（零引用）—— 一并从 `assets/` 与 `MANIFEST.json` 删除。README 首屏四图位改为 **caps / concurrency / domains / monitor**，全部有脚本、有数据源、可一键复现。
+- **删掉「打补丁」式声明**：README 中文第 184 行「插图为 341 位时期历史快照……插画待下次重绘替换」与英文版同款 `Figure snapshot` 段落全部移除。数字过期就重跑脚本，不再靠正文免责。
+- **顺手清掉三处旧数字**：① `comfy_native` 算子 **118 → 170**（`README` 能力域表 + 实测读数表两处，旧数已与实测差 52）；② 并发 `~260/s` → **~150–190/s**（附 4096 档实测）；③ 多域监控 `29 域 / 236 位 · 221 ok · 0 regressions` → **31 域 / 313 位 · 304 ok / 9 未通过**（中英同步）。
+- **评测图按证据分层**：`fig-eval`（335 题 PASS45 99.10%）**无法重绘** —— `state/weights/ACTIVE.json` 与 `state/model-deploy/live-eval-v2.json` 均不在仓内；`fig-chain` 同样缺 `.scratch/chain_out.txt`。两者保留为历史回执，README 不再首屏展示，改为表内一行写明「建于 341 位快照期（2026-10-21）、**未在 427 位重跑**」并链到 `docs/04-evaluation.md`——不让历史读数冒充当前状态。
+- **校验**：`sync-readme-figures.py --check` 全绿（中英 README + badges 与 `data/capability-live-test.json` 一致）。
+
 ## 2026-11-04 · 第十六批：能力面刷新至 427 位 + 文档口径统一
 
 - **能力位**：注册表扩至 **427 位 / 32 个域**（只读 339 / 需授权 88；零作用域 389 / 需过门 38）；`data/capabilities.json` 与 `docs/capabilities-full.json` 均为 427 条，前后一致。

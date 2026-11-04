@@ -67,10 +67,35 @@ def footer(d: ImageDraw.ImageDraw, w: int, h: int, note: str) -> None:
            font=font(13), fill=DIM)
 
 
+def data_file(name: str, data_dir: pathlib.Path) -> pathlib.Path | None:
+    """按优先级定位数据文件：先 outputs 侧，再仓库根 data/。
+
+    2026-11-04 修：此前只找 outputs/open-source-release/data，而并发/监控/天真
+    三份实测账一直躺在仓库根 data/ 下 —— 找不到就静默跳过，图于是永久停留在
+    旧账上（图上印 341，数据早已 427）。找不到返回 None，由调用方如实跳过并报出。
+    """
+    for p in (data_dir / name, ROOT / "data" / name):
+        if p.is_file():
+            return p
+    return None
+
+
+def cap_total() -> tuple[int, int]:
+    """现役能力位总数与域数 —— 现读注册表，绝不写死（写死就是下一轮假账的种子）。"""
+    try:
+        from gbt_allinone import caps_registry as R
+
+        caps = R.all_caps()
+        return len(caps), len({c.get("domain") or "other" for c in caps})
+    except Exception as e:  # noqa: BLE001
+        print("  （注册表现读失败，退回写死值：%s）" % e)
+        return 0, 0
+
+
 def fig_eval(scores: dict, live: dict, out: pathlib.Path) -> None:
     w, h = 1000, 460
     img, d = canvas(w, h)
-    d.text((28, 22), "评测读数 · 335 条能力位题（贪心 · repetition_penalty=1.15 · PASS45 = cov ≥ 0.45）",
+    d.text((28, 22), "评测读数 · 335 题（341 位快照期 · 2026-10-21）· PASS45 = cov ≥ 0.45",
            font=font(19), fill=TXT)
 
     cards = [
@@ -78,7 +103,7 @@ def fig_eval(scores: dict, live: dict, out: pathlib.Path) -> None:
         # ACTIVE.json 里的键是 mean（不是 mean_cov）—— 取错键会印出 0.0000，已修
         ("mean cov", "%.4f" % float(live.get("mean", live.get("mean_cov", 0))), "逐题覆盖率均值", BLUE),
         ("零覆盖", str(live.get("zero", 0)), "335 题里没答出来的", AMBER),
-        ("样本", str(live.get("n", 0)), "覆盖 30 个域", DIM),
+        ("样本", str(live.get("n", 0)), "题面覆盖全域（时点见标题）", DIM),
     ]
     x = 28
     for name, val, sub, color in cards:
@@ -106,9 +131,13 @@ def fig_eval(scores: dict, live: dict, out: pathlib.Path) -> None:
     d.text((28, 356),
            "未过的两项：health（LoRA 未覆盖住底座先验）· voice_studio（判据与数据不同源，非模型错）",
            font=font(14), fill=AMBER)
+    total_caps, _n_dom = cap_total()
+    n_eval = int(live.get("n", 0))
+    gap = (total_caps - n_eval) if total_caps else 0
     d.text((28, 384),
-           "边界：另有 74 个能力位未进入本基准，所以 99.10%（第1轮 332/335）与 98.51%（第2轮 330/335）"
-           "都不等于「341 位全过」。",
+           "边界：本基准 %d 题建于 341 位快照（2026-10-21）；现役 %d 位新增 %d 位尚未纳入，"
+           "99.10%% 不等于「%d 位全过」。"
+           % (n_eval, total_caps, gap, total_caps),
            font=font(14), fill=DIM)
     footer(d, w, h, "数据源：state/weights/ACTIVE.json + 线上全量评测账（n=%d）" % live.get("n", 0))
     img.save(out)
@@ -154,10 +183,11 @@ def fig_domains(out: pathlib.Path) -> None:
         a[0] += 1
         if c.get("safe"):
             a[1] += 1
-    rows = sorted(agg.items(), key=lambda kv: (-kv[1][0], kv[0]))[:16]
+    # 全部域都画：旧版只截前 16，标题却写「共 N 域」—— 图与标题自相矛盾
+    rows = sorted(agg.items(), key=lambda kv: (-kv[1][0], kv[0]))
     mx = max(v[0] for _, v in rows)
     w = 900
-    rh = 30
+    rh = 26
     h = 92 + rh * len(rows) + 62
     img, d = canvas(w, h)
     d.text((26, 20), "能力位域分布（共 %d 位 / %d 域）" % (len(caps), len(agg)), font=font(19), fill=TXT)
@@ -179,9 +209,9 @@ def fig_domains(out: pathlib.Path) -> None:
 
 def fig_caps(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     """能力自证：只读真调 vs 需参数 vs 需授权 vs 门后证据。"""
-    p = data_dir / "capability-live-test.json"
-    if not p.is_file():
-        print("  （跳过 fig-caps：没有 capability-live-test.json）")
+    p = data_file("capability-live-test.json", data_dir)
+    if p is None:
+        print("  （跳过 fig-caps：找不到 capability-live-test.json）")
         return
     d = json.loads(p.read_text(encoding="utf-8"))
     cnt = d["counts"]
@@ -192,53 +222,73 @@ def fig_caps(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     dep = cnt.get("needs_dependency", 0)
     slow = cnt.get("timeout", 0) + cnt.get("failed", 0) + cnt.get("exception", 0)
     total = d["total"]
-    # 来源表由数据自己给（2026-10-21 修：此前副标题把来源写死成「三路」，
-    # 而账里其实已经有 6 路证据 —— 读数与出处不一致，属假账的一种）
+    # 来源表：老账有 by_source，新账只有 by_domain —— 有什么画什么，没有就不编来源
     srcs = d.get("by_source") or {}
-    src_line = " · ".join("%s %d" % (k, v) for k, v in
-                          sorted(srcs.items(), key=lambda kv: -kv[1])) or "（无来源读数）"
-    # 要票那几位点名（让读者自己去核，不用猜）
-    rows = d.get("rows") or {}
-    ticket_names = [c for c, v in rows.items() if v.get("bucket") == "needs_ticket"]
+    if srcs:
+        src_line = "证据来源计数：" + " · ".join(
+            "%s %d" % (k, v) for k, v in sorted(srcs.items(), key=lambda kv: -kv[1]))
+    else:
+        byd = d.get("by_domain") or {}
+
+        def _dn(v: object) -> int:
+            """一个域下的位数 = 该域各结果计数之和（值是 {'ok':12,'needs_auth':4} 这种字典）"""
+            if isinstance(v, dict):
+                return sum(x for x in v.values() if isinstance(x, int))
+            return int(v or 0) if isinstance(v, (int, float)) else 0
+
+        top = sorted(byd.items(), key=lambda kv: -_dn(kv[1]))[:6]
+        src_line = "覆盖 %d 个域，前 6 域位数：%s" % (
+            len(byd), " · ".join("%s %d" % (k, _dn(v)) for k, v in top))
+    # 「谁在门后」点名（让读者自己去核，不用猜）
+    # 2026-11-04 修：新探针把 rows 落成 list 且没有 bucket 字段（旧代码 .items() 必崩），
+    # 门后判定改看 denied / missing_scopes 这条真实证据链。
+    rows = d.get("rows") or []
+    pairs = (list(rows.items()) if isinstance(rows, dict)
+             else [(r.get("capability") or "", r) for r in rows if isinstance(r, dict)])
+    ticket_names = [c for c, v in pairs
+                    if v.get("bucket") == "needs_ticket"
+                    or v.get("denied") or (v.get("missing_scopes") or [])]
 
     w, h = 1000, 430
     img, dd = canvas(w, h)
     dd.text((28, 22), "能力自证 · %d 个原生能力位逐位真调（不是「模型会背」，是「调得动」）" % total,
             font=font(19), fill=TXT)
-    dd.text((28, 50), "五类真跑 · 只读空参 / 需参数带真参 / 写口隔离 store / 带票真跑 / 房间晋升",
+    dd.text((28, 50), "只读位真调一次 · 需参数的不瞎编 · 写口/花钱/出网一律不跑（超时记 timeout，不记 0）",
             font=font(13), fill=DIM)
     cards = [
-        ("真跑通过", str(ok), "只读+带参+写口", GREEN_L),
-        ("要票未跑", str(denied), "缺哪张票说得出", BLUE),
-        ("缺输入", str(need_p), "不瞎编参数", AMBER),
-        ("高危未跑", str(need_a), "不拿真仓库试", DIM),
+        ("真跑通过", str(ok), "只读+带参真调", GREEN_L),
+        ("需授权", str(need_a), "高危，不拿真仓库试", BLUE),
+        ("缺参数", str(need_p), "不瞎编入参", AMBER),
+        ("被门拒", str(denied), "授权结构在生效", DIM),
+        ("缺依赖", str(dep), "环境没装，如实记", DIM),
     ]
     x = 28
     for name, val, sub, color in cards:
-        dd.rounded_rectangle([x, 78, x + 228, 208], radius=12, fill=CARD, outline=LINE, width=2)
-        dd.text((x + 16, 92), name, font=font(14), fill=DIM)
-        dd.text((x + 16, 116), val, font=font(38), fill=color)
-        dd.text((x + 16, 172), sub, font=font(13), fill=DIM)
-        x += 240
-    dd.text((28, 232), "另：缺依赖 %d 位（n8n 没起）· 失败 %d 位 · 三态合计 %d = %d（生成器断言）"
-            % (dep, slow, ok + denied + need_p + need_a + dep + slow, total),
+        dd.rounded_rectangle([x, 78, x + 179, 208], radius=12, fill=CARD, outline=LINE, width=2)
+        dd.text((x + 12, 90), name, font=font(13), fill=DIM)
+        dd.text((x + 12, 112), val, font=font(32), fill=color)
+        dd.text((x + 12, 176), sub, font=font(11), fill=DIM)
+        x += 191
+    dd.text((28, 232), "五类合计 %d = %d（逐位可核；失败/异常 %d 位，0 位无法归因）"
+            % (ok + denied + need_p + need_a + dep + slow, total, slow),
             font=font(14), fill=TXT)
-    dd.text((28, 262), "门后证据 ≠ 失败：要票那 %d 位正好证明「危险动作必须人给票」这条结构在生效%s"
-            % (denied, ("（点名：" + "、".join(ticket_names[:4]) + "）") if ticket_names else ""),
+    dd.text((28, 262), "门后证据 ≠ 失败：需授权/被拒共 %d 位，正好证明「危险动作必须人给票」在生效%s"
+            % (need_a + denied, ("（点名：" + "、".join(ticket_names[:4]) + "）") if ticket_names else ""),
             font=font(14), fill=DIM)
-    dd.text((28, 296), "证据来源计数：" + src_line, font=font(13), fill=DIM)
+    dd.text((28, 296), src_line, font=font(13), fill=DIM)
     dd.text((28, 322), "机器可读逐位读数：data/capability-live-test.json（每位：结果/耗时/状态/缺什么票）",
             font=font(13), fill=DIM)
-    footer(dd, w, h, "数据源：tools/codex-scripts/gen-capability-proof.py 合成多路真跑（%s）" % d.get("at", ""))
+    footer(dd, w, h, "数据源：tools/codex-scripts/probe-caps-live.py 逐位真调（%s，用时 %.0fs）"
+           % (d.get("at", ""), d.get("elapsed_s", 0) or 0))
     img.save(out / "fig-caps.png")
     print("  fig-caps.png")
 
 
 def fig_conc(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     """触手并发爆发力：N 路同时调能力位，成功率/中位/最大/内存。"""
-    p = data_dir / "concurrency-bench.json"
-    if not p.is_file():
-        print("  （跳过 fig-conc：没有 concurrency-bench.json）")
+    p = data_file("concurrency-bench.json", data_dir)
+    if p is None:
+        print("  （跳过 fig-conc：找不到 concurrency-bench.json）")
         return
     d = json.loads(p.read_text(encoding="utf-8"))
     rows = [r for r in d["rows"] if "n" in r and r.get("ok") is not None]
@@ -277,9 +327,9 @@ def fig_conc(out: pathlib.Path, data_dir: pathlib.Path) -> None:
 
 def fig_tianzhen(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     """GBT天真：不装 ComfyUI 跑 ComfyUI 契约（算子数/同名数/校验/写面真跑）。"""
-    p = data_dir / "gbt-tianzhen-live.json"
-    if not p.is_file():
-        print("  （跳过 fig-tianzhen：没有 gbt-tianzhen-live.json）")
+    p = data_file("gbt-tianzhen-live.json", data_dir)
+    if p is None:
+        print("  （跳过 fig-tianzhen：找不到 gbt-tianzhen-live.json）")
         return
     d = json.loads(p.read_text(encoding="utf-8"))
     con = d.get("contract") or {}
@@ -359,9 +409,9 @@ def fig_tianzhen(out: pathlib.Path, data_dir: pathlib.Path) -> None:
 
 def fig_monitor(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     """多域监控：29 域逐位真调 + 与基线的回归比对（改一处，整面复查）。"""
-    p = data_dir / "multidomain-monitor-live.json"
-    if not p.is_file():
-        print("  （跳过 fig-monitor：没有 multidomain-monitor-live.json）")
+    p = data_file("multidomain-monitor-live.json", data_dir)
+    if p is None:
+        print("  （跳过 fig-monitor：找不到 multidomain-monitor-live.json）")
         return
     d = json.loads(p.read_text(encoding="utf-8"))
     tot = d.get("totals") or {}
@@ -369,16 +419,17 @@ def fig_monitor(out: pathlib.Path, data_dir: pathlib.Path) -> None:
     diff = d.get("diff") or {}
     doms = sorted((d.get("domains") or {}).items())
 
-    w, h = 1000, 700
+    w, h = 1000, 780
     img, dd = canvas(w, h)
     dd.text((28, 20), "多域监控 · %d 个域 %d 位只读位逐位真调（改一处，整面复查）"
             % (len(doms), tested), font=font(19), fill=TXT)
     dd.text((28, 48), "只测「只读且无需参数」的位；写口/需参数不跑（不越门）。被门拒 ≠ 坏：那是授权结构在生效。",
             font=font(13), fill=DIM)
 
+    not_ok = tested - ok
     cards = [
         ("真调通过", str(ok), "空 payload 真跑", GREEN_L),
-        ("被门挡住", str(tested - ok), "如实记缺哪张票", BLUE),
+        ("未通过", str(not_ok), "被拒/缺依赖/超时，逐条列名", BLUE),
         ("回归", str(diff.get("regressed_count", 0)), "改前 ok → 现在不 ok",
          GREEN_L if not diff.get("regressed_count") else RED),
         ("修好", str(diff.get("fixed_count", 0)), "改前不 ok → 现在 ok",
@@ -406,9 +457,22 @@ def fig_monitor(out: pathlib.Path, data_dir: pathlib.Path) -> None:
             y += 22
 
     ys = y0 + 22 * half + 18
-    dd.text((28, ys), "比对口径：与基线 state/monitor/domain-baseline.json 逐位比；回归 0 且修好 0，说明整面稳定（不是「没跑」）。",
-            font=fm, fill=DIM)
-    dd.text((28, ys + 26), "用时 %.1fs（含安全扫描类 28~65s 的慢位）—— 没为「快」牺牲覆盖。"
+    # 未通过的位必须点名：只说「N 位未通过」等于让人去猜 —— 有的被门拒、有的缺依赖、有的超时
+    bad = [(c, (v or {}).get("result")) for c, v in (d.get("per_cap") or {}).items()
+           if isinstance(v, dict) and v.get("result") != "ok"]
+    if bad:
+        dd.text((28, ys), "未通过点名（%d 位）：%s" % (
+            len(bad), " · ".join("%s=%s" % (c, r) for c, r in bad[:8])),
+            font=fm, fill=AMBER)
+        ys += 26
+    reg = diff.get("regressed_count") or 0
+    if reg:
+        dd.text((28, ys), "比对口径：与基线逐位比 —— 本轮回归 %d 位（%s），不是「没跑」。"
+                % (reg, "、".join(diff.get("regressed") or [])), font=fm, fill=RED)
+    else:
+        dd.text((28, ys), "比对口径：与基线 state/monitor/domain-baseline.json 逐位比；"
+                "回归 0 且修好 0 = 整面稳定（不是「没跑」）。", font=fm, fill=DIM)
+    dd.text((28, ys + 26), "用时 %.1fs（含安全扫描类 60s+ 慢位；并行跑别的任务时可能触到 90s 看门狗）。"
             % d.get("elapsed_s", 0), font=fm, fill=DIM)
     footer(dd, w, h, "数据源：tools/codex-scripts/multi-domain-monitor.py --diff（%s）" % d.get("at", ""))
     img.save(out / "fig-monitor.png")
@@ -425,22 +489,33 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     data_dir = out.parent / "data"
 
-    act = json.loads((ROOT / "state/weights/ACTIVE.json").read_text(encoding="utf-8"))
-    scores = act.get("active_scores") or {}
+    # 评测账两处来源都可能不在仓里（state/weights 不进版本控制）——
+    # 缺就如实跳过，绝不用空值画一张「0.00%」的假图
+    act_path = ROOT / "state/weights/ACTIVE.json"
+    scores: dict = {}
+    if act_path.is_file():
+        scores = json.loads(act_path.read_text(encoding="utf-8")).get("active_scores") or {}
+    else:
+        print("  （缺 state/weights/ACTIVE.json：得分权重不可得）")
     # 以**最新一次全量线上评测**为准（v2 那次；修了 health 题面 + voice_studio gold）
-    live = {}
+    live: dict = {}
     le = pathlib.Path(a.live_eval)
     if le.is_file():
         live = json.loads(le.read_text(encoding="utf-8"))
-    else:
+    if not live and scores:
         live = scores.get("live_eval") or {}
     chain_file = pathlib.Path(a.chain)
-    chain_txt = chain_file.read_text(encoding="utf-8", errors="replace") if chain_file.is_file() else \
-        "（没有 chain 输出文件：先跑 chain-check.py 再渲染）"
 
     print("渲染：")
-    fig_eval(scores, live, out / "fig-eval.png")
-    fig_chain(chain_txt, out / "fig-chain.png")
+    if live.get("n"):
+        fig_eval(scores, live, out / "fig-eval.png")
+    else:
+        print("  （跳过 fig-eval：没有可核的评测账；不画空图）")
+    # 输入缺失就跳过，绝不拿一张「没有 chain 输出文件」的占位图去覆盖真图
+    if chain_file.is_file():
+        fig_chain(chain_file.read_text(encoding="utf-8", errors="replace"), out / "fig-chain.png")
+    else:
+        print("  （跳过 fig-chain：缺 %s，先跑 chain-check.py；不覆盖旧图）" % chain_file)
     fig_domains(out / "fig-domains.png")
     fig_caps(out, data_dir)
     fig_conc(out, data_dir)

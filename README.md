@@ -151,7 +151,7 @@ run_task(kind, payload)
 | 执行 | `tentacle` · `omni_*` · `body_*` | 看屏 / 点按 / 键入 / 窗口 / 进程 / 剪贴板（万能插即插即用） |
 | 自检 | `selfscan` · `trunk_cover` · `legacy_guard` | 路由对账 / 代码全覆盖 / 旧物六类 |
 | 编排 | `orchestration` · `blueprint` · `wf_*` | 编排账本 / 架构→蓝图→派遣→落地 / DAG 工作流 |
-| 图像 | `comfy_native` | 118 个纯 CPU 算子（音频/图像/文本），契约面覆盖 10.1% |
+| 图像 | `comfy_native` | 170 个纯 CPU 算子（图像/音频/文本），不装 ComfyUI 也跑它的节点契约 |
 | 安全 | `signature_guard` · `sec_*` | 署名守卫 / 攻击面测绘 / 漏洞扫描 / 防御验证 |
 
 完整清单：`gbt.run_task("caps_list")`，或看 [docs/capabilities](docs/capabilities/)。
@@ -168,20 +168,24 @@ run_task(kind, payload)
 | 自检 | clean | `selfscan` |
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |
 | 脉冲直达 | ≈90% 请求 0 token 命中（≈4ms） | `pulse_core verify` |
-| 图像算子 | 118 个（纯 CPU） | `comfy_native status` |
+| 图像算子 | **170** 个（图像/音频/文本，纯 CPU） | `comfy_native status` |
+| 多域监控 | 31 域 / 313 位只读位：**304 通过 · 9 未通过**（7 位被拒/缺依赖/失败 + 2 位 60s+ 慢位触到看门狗） | `python tools/codex-scripts/multi-domain-monitor.py --diff` |
+| 评测（历史） | 335 题 PASS45 **99.10%** —— 建于 **341 位快照期（2026-10-21）**，**未在 427 位重跑** | 见 [docs/04-evaluation.md](docs/04-evaluation.md) |
 
 <table>
 <tr>
-  <td><img src="assets/fig-caps.png" alt="能力面 · 341 位时期实测快照"></td>
-  <td><img src="assets/fig-concurrency.png" alt="并发实测"></td>
+  <td><img src="assets/fig-caps.png" alt="能力面 · 427 位逐位真调"></td>
+  <td><img src="assets/fig-concurrency.png" alt="并发实测 · 4096 路全通过"></td>
 </tr>
 <tr>
-  <td><img src="assets/fig-eval.png" alt="评测"></td>
-  <td><img src="assets/fig-dispatch-ok.png" alt="真跑回执"></td>
+  <td><img src="assets/fig-domains.png" alt="能力位域分布 · 427 位 / 32 域"></td>
+  <td><img src="assets/fig-monitor.png" alt="多域监控 · 逐位真调与回归比对"></td>
 </tr>
 </table>
 
-> **插图时点**：上述插图为 **341 位时期（2026-10-21）** 的历史回执快照，图中位数为当时读数 —— **不是当前状态**。427 位的逐位真调已于 **2026-11-04** 全量重跑完毕，读数见上表「逐位真调」行与 `data/capability-live-test.json`；插画待下次重绘替换。
+> 四图都由脚本**现场读账渲染**，重跑一次即复现：`data/capability-live-test.json`（逐位真调）·
+> `data/concurrency-bench.json`（4096 路压测）· `data/multidomain-monitor-live.json`（多域监控）· 注册表现读（域分布）。
+> 图上一律带数据时点，**不写「示意」也不写「待重绘」** —— 数字过期就重跑脚本，不靠正文打补丁。
 
 ## 📚 文档
 

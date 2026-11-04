@@ -1,7 +1,7 @@
 {
  "generated_at": "2026-11-03T07:24:39+0700",
  "target": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
- "note": "本清单由 .scratch\\lead\\verify_target.py 生成：逐文件 size + sha256，可逐文件核对；清单文件自身不计入 files[]（避免自指哈希）。",
+ "note": "本清单由 .scratch\\lead\\verify_target.py 生成：逐文件 size + sha256，可逐文件核对；清单文件自身不计入 files[]（避免自指哈希）。 | 2026-11-04：移除无生成器、无数据源的孤儿图（fig-dispatch-ok / -denied）",
  "self_excluded": true,
  "totals": {
   "files": 3634,
@@ -3018,16 +3018,6 @@
    "path": "assets/fig-concurrency.png",
    "size": 65202,
    "sha256": "682383fe0a89582e74e39995a16e2e61d6a2de5c95b94ad7b9728ff02247f814"
-  },
-  {
-   "path": "assets/fig-dispatch-denied.png",
-   "size": 130359,
-   "sha256": "66def862bd4a245a7e8972a077e10c7af5fc600b80a83c9e4ca12eec7cb7f0d9"
-  },
-  {
-   "path": "assets/fig-dispatch-ok.png",
-   "size": 120160,
-   "sha256": "1d3de45eadb5017630b777bc43f9971bde29566e8e606b55795826ea911411a3"
   },
   {
    "path": "assets/fig-domains.png",
