@@ -1,0 +1,1 @@
+{"args":{"max_out":800},"socket":"process","timeout":15,"op":"run","target":"py:import json,urllib.request;d=json.load(urllib.request.urlopen('http://127.0.0.1:8791/health',timeout=8));print(json.dumps({'default':d.get('default'),'selfhost':d.get('selfhost')},ensure_ascii=False))","do":"run"}

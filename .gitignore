@@ -439,3 +439,10 @@ outputs/
 
 # Third-party pip bootstrap is not tracked (kept in git history)
 tools/get-pip.py
+# ══════════════════════════════════════════════════════════════════════
+# 2026-11-06 补 —— 全仓回扫发现的两处漏网（此前无规则，靠「没人 add」偶然没进库）
+# ══════════════════════════════════════════════════════════════════════
+# 第三方 embeddable Python 运行时（1,669 文件 / 84 MB，可整包替换，非自有源码）
+pyembed/
+# render 根下的 png 是 HUD 渲染产物（hud-base / hud-draft* / crop-*），非源码
+render/*.png
