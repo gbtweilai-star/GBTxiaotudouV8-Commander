@@ -1,6 +1,6 @@
 {
  "built_by": "tools/codex-scripts/omni.py build",
- "built_at": "2026-11-05T05:39:57",
+ "built_at": "2026-11-06T09:35:32",
  "note": "框架职业技能图鉴。口径：`omnipulg` = 走万能插（run_task 唯一门）的能力位；`agent-skill` = 由 agent 按技能名加载执行的技能；`design-asset` = 审美素材（料，不是可调用能力）。本图鉴是**现扫**产物，不是手抄清单。",
  "caps_error": "",
  "caps": [
@@ -20,7 +20,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_map"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_map"
   },
   {
    "kind": "body_see",
@@ -38,7 +38,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_see"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_see"
   },
   {
    "kind": "see_camera",
@@ -56,7 +56,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap see_camera"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap see_camera"
   },
   {
    "kind": "body_say",
@@ -74,7 +74,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_say"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_say"
   },
   {
    "kind": "body_type",
@@ -92,7 +92,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_type"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_type"
   },
   {
    "kind": "body_click",
@@ -110,7 +110,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_click"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_click"
   },
   {
    "kind": "body_volume",
@@ -128,7 +128,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_volume"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_volume"
   },
   {
    "kind": "body_open",
@@ -146,7 +146,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_open"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_open"
   },
   {
    "kind": "body_realtime",
@@ -164,7 +164,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_realtime"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_realtime"
   },
   {
    "kind": "hand_realtime",
@@ -182,7 +182,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hand_realtime"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hand_realtime"
   },
   {
    "kind": "hand_vision",
@@ -200,7 +200,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hand_vision"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hand_vision"
   },
   {
    "kind": "hand_retarget",
@@ -218,7 +218,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hand_retarget"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hand_retarget"
   },
   {
    "kind": "hand_bridge",
@@ -236,7 +236,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hand_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hand_bridge"
   },
   {
    "kind": "sync_guard",
@@ -254,7 +254,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sync_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sync_guard"
   },
   {
    "kind": "viral_forge",
@@ -272,7 +272,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap viral_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap viral_forge"
   },
   {
    "kind": "drama_forge",
@@ -290,7 +290,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap drama_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap drama_forge"
   },
   {
    "kind": "taste_guard",
@@ -308,7 +308,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap taste_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap taste_guard"
   },
   {
    "kind": "experience_forge",
@@ -326,7 +326,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap experience_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap experience_forge"
   },
   {
    "kind": "mirror_stage",
@@ -344,7 +344,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_stage"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_stage"
   },
   {
    "kind": "remote_controller",
@@ -362,7 +362,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap remote_controller"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap remote_controller"
   },
   {
    "kind": "codex_status",
@@ -380,7 +380,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_status"
   },
   {
    "kind": "codex_tools",
@@ -398,7 +398,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_tools"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_tools"
   },
   {
    "kind": "codex_thread_new",
@@ -416,7 +416,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_thread_new"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_thread_new"
   },
   {
    "kind": "codex_turn_send",
@@ -436,7 +436,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_turn_send"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_turn_send"
   },
   {
    "kind": "codex_interrupt",
@@ -456,7 +456,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_interrupt"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_interrupt"
   },
   {
    "kind": "codex_chat",
@@ -476,7 +476,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_chat"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_chat"
   },
   {
    "kind": "codex_models",
@@ -494,7 +494,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codex_models"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codex_models"
   },
   {
    "kind": "desktop_commander",
@@ -512,7 +512,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap desktop_commander"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap desktop_commander"
   },
   {
    "kind": "health",
@@ -530,7 +530,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap health"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap health"
   },
   {
    "kind": "echo",
@@ -548,7 +548,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap echo"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap echo"
   },
   {
    "kind": "count_words",
@@ -566,7 +566,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap count_words"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap count_words"
   },
   {
    "kind": "audit_query",
@@ -584,7 +584,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap audit_query"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap audit_query"
   },
   {
    "kind": "quant_strategy",
@@ -602,7 +602,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap quant_strategy"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap quant_strategy"
   },
   {
    "kind": "quant_backtest",
@@ -620,7 +620,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap quant_backtest"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap quant_backtest"
   },
   {
    "kind": "platform_profile",
@@ -638,7 +638,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap platform_profile"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap platform_profile"
   },
   {
    "kind": "quant_params",
@@ -656,7 +656,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap quant_params"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap quant_params"
   },
   {
    "kind": "osint_scan",
@@ -676,7 +676,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap osint_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap osint_scan"
   },
   {
    "kind": "record_grid",
@@ -697,7 +697,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap record_grid"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap record_grid"
   },
   {
    "kind": "wf_define",
@@ -718,7 +718,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wf_define"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wf_define"
   },
   {
    "kind": "wf_run",
@@ -738,7 +738,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wf_run"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wf_run"
   },
   {
    "kind": "wf_status",
@@ -756,7 +756,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wf_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wf_status"
   },
   {
    "kind": "wf_resume",
@@ -776,7 +776,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wf_resume"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wf_resume"
   },
   {
    "kind": "lr_submit",
@@ -796,7 +796,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap lr_submit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap lr_submit"
   },
   {
    "kind": "lr_tick",
@@ -814,7 +814,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap lr_tick"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap lr_tick"
   },
   {
    "kind": "lr_status",
@@ -832,7 +832,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap lr_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap lr_status"
   },
   {
    "kind": "selfscan",
@@ -850,7 +850,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap selfscan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap selfscan"
   },
   {
    "kind": "alerts",
@@ -868,7 +868,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap alerts"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap alerts"
   },
   {
    "kind": "tentacle",
@@ -888,7 +888,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle"
   },
   {
    "kind": "tentacle_manifest",
@@ -906,7 +906,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_manifest"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_manifest"
   },
   {
    "kind": "commander",
@@ -924,7 +924,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap commander"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap commander"
   },
   {
    "kind": "pulse_core",
@@ -942,7 +942,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pulse_core"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pulse_core"
   },
   {
    "kind": "cap_self",
@@ -960,7 +960,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cap_self"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cap_self"
   },
   {
    "kind": "trunk_cover",
@@ -978,7 +978,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap trunk_cover"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap trunk_cover"
   },
   {
    "kind": "body_sense",
@@ -996,7 +996,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_sense"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_sense"
   },
   {
    "kind": "devour_auto",
@@ -1014,7 +1014,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_auto"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_auto"
   },
   {
    "kind": "trunk_reason",
@@ -1032,7 +1032,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap trunk_reason"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap trunk_reason"
   },
   {
    "kind": "context_guard",
@@ -1050,7 +1050,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap context_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap context_guard"
   },
   {
    "kind": "research_intel",
@@ -1068,7 +1068,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap research_intel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap research_intel"
   },
   {
    "kind": "hunyuan_video",
@@ -1086,7 +1086,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hunyuan_video"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hunyuan_video"
   },
   {
    "kind": "energy_core",
@@ -1104,7 +1104,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap energy_core"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap energy_core"
   },
   {
    "kind": "orchestration",
@@ -1122,7 +1122,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap orchestration"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap orchestration"
   },
   {
    "kind": "autonomy",
@@ -1140,7 +1140,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap autonomy"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap autonomy"
   },
   {
    "kind": "blueprint",
@@ -1158,7 +1158,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap blueprint"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap blueprint"
   },
   {
    "kind": "legacy_guard",
@@ -1176,7 +1176,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap legacy_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap legacy_guard"
   },
   {
    "kind": "skills_hub",
@@ -1194,7 +1194,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap skills_hub"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap skills_hub"
   },
   {
    "kind": "chain_kernel",
@@ -1212,7 +1212,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap chain_kernel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap chain_kernel"
   },
   {
    "kind": "root_cause",
@@ -1230,7 +1230,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap root_cause"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap root_cause"
   },
   {
    "kind": "execution_guard",
@@ -1248,7 +1248,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap execution_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap execution_guard"
   },
   {
    "kind": "cap_pack",
@@ -1266,7 +1266,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cap_pack"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cap_pack"
   },
   {
    "kind": "mcp_register",
@@ -1284,7 +1284,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_register"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_register"
   },
   {
    "kind": "dual_gate",
@@ -1302,7 +1302,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dual_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dual_gate"
   },
   {
    "kind": "mcp_servers",
@@ -1320,7 +1320,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_servers"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_servers"
   },
   {
    "kind": "mcp_unregister",
@@ -1338,7 +1338,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_unregister"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_unregister"
   },
   {
    "kind": "mcp_health",
@@ -1356,14 +1356,14 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_health"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_health"
   },
   {
    "kind": "omni_open",
    "domain": "tentacle",
-   "desc": "全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉价探针，不跑 26s 的全量 discover、不擅自起进程；「没探到」绝不说成「已打开」。",
+   "desc": "万能插·全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉价探针，不跑 26s 的全量 discover、不擅自起进程；「没探到」绝不说成「已打开」。",
    "desc_tail": "",
-   "desc_full_chars": 182,
+   "desc_full_chars": 186,
    "desc_truncated": false,
    "enabled": true,
    "reason": "",
@@ -1374,7 +1374,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omni_open"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omni_open"
   },
   {
    "kind": "sec_surface",
@@ -1392,7 +1392,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_surface"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_surface"
   },
   {
    "kind": "sec_scan",
@@ -1410,7 +1410,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_scan"
   },
   {
    "kind": "sec_chain",
@@ -1428,7 +1428,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_chain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_chain"
   },
   {
    "kind": "sec_defenses",
@@ -1446,7 +1446,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_defenses"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_defenses"
   },
   {
    "kind": "sec_llm",
@@ -1466,7 +1466,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_llm"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_llm"
   },
   {
    "kind": "truth_scan",
@@ -1484,7 +1484,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap truth_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap truth_scan"
   },
   {
    "kind": "autopilot",
@@ -1504,7 +1504,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap autopilot"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap autopilot"
   },
   {
    "kind": "llm_chat",
@@ -1522,7 +1522,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap llm_chat"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap llm_chat"
   },
   {
    "kind": "llm_status",
@@ -1540,7 +1540,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap llm_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap llm_status"
   },
   {
    "kind": "cloud_llm",
@@ -1558,7 +1558,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cloud_llm"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cloud_llm"
   },
   {
    "kind": "key_gateway",
@@ -1576,7 +1576,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap key_gateway"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap key_gateway"
   },
   {
    "kind": "multimodal_port",
@@ -1594,7 +1594,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap multimodal_port"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap multimodal_port"
   },
   {
    "kind": "genoffice_bridge",
@@ -1612,7 +1612,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap genoffice_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap genoffice_bridge"
   },
   {
    "kind": "brain_route",
@@ -1632,7 +1632,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_route"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_route"
   },
   {
    "kind": "brain_execute",
@@ -1652,7 +1652,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_execute"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_execute"
   },
   {
    "kind": "brain_verify",
@@ -1670,7 +1670,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_verify"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_verify"
   },
   {
    "kind": "brain_health",
@@ -1688,7 +1688,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_health"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_health"
   },
   {
    "kind": "brain_unify",
@@ -1708,7 +1708,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_unify"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_unify"
   },
   {
    "kind": "root_fix",
@@ -1726,7 +1726,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap root_fix"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap root_fix"
   },
   {
    "kind": "cross_scan",
@@ -1744,7 +1744,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cross_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cross_scan"
   },
   {
    "kind": "inventory",
@@ -1762,7 +1762,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap inventory"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap inventory"
   },
   {
    "kind": "brain_vault",
@@ -1780,7 +1780,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_vault"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_vault"
   },
   {
    "kind": "think_loop",
@@ -1800,7 +1800,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap think_loop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap think_loop"
   },
   {
    "kind": "one_key_deploy",
@@ -1820,7 +1820,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap one_key_deploy"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap one_key_deploy"
   },
   {
    "kind": "deploy_queue",
@@ -1840,7 +1840,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap deploy_queue"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap deploy_queue"
   },
   {
    "kind": "mirror_shape",
@@ -1858,7 +1858,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_shape"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_shape"
   },
   {
    "kind": "mirror_scan",
@@ -1876,7 +1876,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_scan"
   },
   {
    "kind": "mirror_plan",
@@ -1894,7 +1894,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_plan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_plan"
   },
   {
    "kind": "mirror_simulate",
@@ -1912,7 +1912,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_simulate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_simulate"
   },
   {
    "kind": "mirror_parity",
@@ -1930,7 +1930,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_parity"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_parity"
   },
   {
    "kind": "mirror_rehearse",
@@ -1948,7 +1948,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_rehearse"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_rehearse"
   },
   {
    "kind": "mirror_release",
@@ -1966,7 +1966,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_release"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_release"
   },
   {
    "kind": "mirror_ascend",
@@ -1984,7 +1984,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_ascend"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_ascend"
   },
   {
    "kind": "mirror_status",
@@ -2002,7 +2002,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_status"
   },
   {
    "kind": "mirror_rewind",
@@ -2020,7 +2020,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mirror_rewind"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mirror_rewind"
   },
   {
    "kind": "auth_gate_status",
@@ -2038,7 +2038,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap auth_gate_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap auth_gate_status"
   },
   {
    "kind": "transfer",
@@ -2056,7 +2056,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap transfer"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap transfer"
   },
   {
    "kind": "wf_cache_clear",
@@ -2074,7 +2074,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wf_cache_clear"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wf_cache_clear"
   },
   {
    "kind": "signature_guard",
@@ -2092,7 +2092,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap signature_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap signature_guard"
   },
   {
    "kind": "file_hygiene",
@@ -2110,7 +2110,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap file_hygiene"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap file_hygiene"
   },
   {
    "kind": "devour_scan",
@@ -2128,7 +2128,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_scan"
   },
   {
    "kind": "devour_github",
@@ -2148,7 +2148,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_github"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_github"
   },
   {
    "kind": "tentacle_equip",
@@ -2166,7 +2166,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_equip"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_equip"
   },
   {
    "kind": "tool_bay",
@@ -2184,7 +2184,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tool_bay"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tool_bay"
   },
   {
    "kind": "remote_confinement",
@@ -2202,7 +2202,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap remote_confinement"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap remote_confinement"
   },
   {
    "kind": "cli_ify",
@@ -2220,7 +2220,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cli_ify"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cli_ify"
   },
   {
    "kind": "tentacle_learn",
@@ -2238,7 +2238,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_learn"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_learn"
   },
   {
    "kind": "skill_finder",
@@ -2256,7 +2256,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap skill_finder"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap skill_finder"
   },
   {
    "kind": "humanizer",
@@ -2274,7 +2274,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap humanizer"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap humanizer"
   },
   {
    "kind": "chart_html",
@@ -2292,7 +2292,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap chart_html"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap chart_html"
   },
   {
    "kind": "workflow_forge",
@@ -2310,7 +2310,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap workflow_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap workflow_forge"
   },
   {
    "kind": "forge_mastery",
@@ -2328,7 +2328,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap forge_mastery"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap forge_mastery"
   },
   {
    "kind": "showcase_ops",
@@ -2346,7 +2346,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap showcase_ops"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap showcase_ops"
   },
   {
    "kind": "spider_ops",
@@ -2364,14 +2364,14 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap spider_ops"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap spider_ops"
   },
   {
    "kind": "offense_ops",
    "domain": "security",
-   "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/g…【图鉴截断：原文 328 字（尾部见 desc_tail，打分已接回）】",
-   "desc_tail": "ate/check/route（**全只读·零作用域）。",
-   "desc_full_chars": 328,
+   "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/g…【图鉴截断：原文 645 字（尾部见 desc_tail，打分已接回）】",
+   "desc_tail": "ate/check/route（**全只读·零作用域） · **2026-11-06 补原生挖洞链**：op=hunt（一条命令跑全链：面测绘→OWASP/CWE 模式库→多阶段 SAST→LLM 面探针→污点候选，合并去重+覆盖账）· op=swarm（多触手并行跑同一条链，各出独立回执）· op=coverage（只回答覆盖到哪、哪里没覆盖）· op=knowledge（挖洞方法论/判据/CWE 表的机器可读版）。**全在本机跑：不引云、不装外挂扫描器、不出网**；要票的只有危险作用域与资金转账。常用说法：挖漏洞 / 找漏洞 / 漏洞排查 / 扫一遍有没有洞 / 全仓挖洞 / 渗透测试 / 打点 / 触手大军排查 / 多触手一起扫 / 安全体检 / 代码审计找洞 / 攻击面测绘",
+   "desc_full_chars": 645,
    "desc_truncated": true,
    "enabled": true,
    "reason": "",
@@ -2382,7 +2382,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap offense_ops"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap offense_ops"
   },
   {
    "kind": "skill_forge",
@@ -2400,7 +2400,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap skill_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap skill_forge"
   },
   {
    "kind": "shot_director",
@@ -2418,7 +2418,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap shot_director"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap shot_director"
   },
   {
    "kind": "book_skill",
@@ -2436,7 +2436,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap book_skill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap book_skill"
   },
   {
    "kind": "music_auto",
@@ -2454,7 +2454,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap music_auto"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap music_auto"
   },
   {
    "kind": "train_ground",
@@ -2472,7 +2472,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap train_ground"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap train_ground"
   },
   {
    "kind": "quant_plan",
@@ -2490,7 +2490,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap quant_plan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap quant_plan"
   },
   {
    "kind": "know_map",
@@ -2508,7 +2508,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap know_map"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap know_map"
   },
   {
    "kind": "topic_web",
@@ -2526,7 +2526,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap topic_web"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap topic_web"
   },
   {
    "kind": "self_intake",
@@ -2544,7 +2544,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap self_intake"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap self_intake"
   },
   {
    "kind": "comfy_forge",
@@ -2562,7 +2562,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap comfy_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap comfy_forge"
   },
   {
    "kind": "scan_cap",
@@ -2580,7 +2580,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap scan_cap"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap scan_cap"
   },
   {
    "kind": "figure_gate",
@@ -2598,7 +2598,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap figure_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap figure_gate"
   },
   {
    "kind": "theme_cap",
@@ -2616,7 +2616,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap theme_cap"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap theme_cap"
   },
   {
    "kind": "omarchy_bridge",
@@ -2634,7 +2634,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omarchy_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omarchy_bridge"
   },
   {
    "kind": "delivery_gate",
@@ -2652,7 +2652,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap delivery_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap delivery_gate"
   },
   {
    "kind": "ux_doctrine",
@@ -2670,7 +2670,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ux_doctrine"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ux_doctrine"
   },
   {
    "kind": "welcome",
@@ -2688,7 +2688,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap welcome"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap welcome"
   },
   {
    "kind": "god_view",
@@ -2706,7 +2706,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap god_view"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap god_view"
   },
   {
    "kind": "vision_loop",
@@ -2724,7 +2724,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_loop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_loop"
   },
   {
    "kind": "agency_tentacles",
@@ -2742,14 +2742,14 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap agency_tentacles"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap agency_tentacles"
   },
   {
    "kind": "media_pipeline",
    "domain": "video",
-   "desc": "AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布",
+   "desc": "AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布；op=verify 是**成片验收**（2026-11-06：零外部依赖，自己解 MP4/ASS 容器，不 shell 出去调 ffprobe —— 本机没有 ffmpeg 也照样能验收）。常用说法：验收成片 / 成片过线了吗 / 检查成片 / 成片体检 / 这条片子合格吗 / 成片参数多少",
    "desc_tail": "",
-   "desc_full_chars": 48,
+   "desc_full_chars": 195,
    "desc_truncated": false,
    "enabled": true,
    "reason": "",
@@ -2760,7 +2760,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_pipeline"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_pipeline"
   },
   {
    "kind": "edit_pipeline",
@@ -2778,7 +2778,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap edit_pipeline"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap edit_pipeline"
   },
   {
    "kind": "tentacle_pipeline",
@@ -2796,7 +2796,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_pipeline"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_pipeline"
   },
   {
    "kind": "long_run_supervisor",
@@ -2814,7 +2814,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap long_run_supervisor"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap long_run_supervisor"
   },
   {
    "kind": "devour_reflect",
@@ -2832,7 +2832,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_reflect"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_reflect"
   },
   {
    "kind": "devour_pulse",
@@ -2850,7 +2850,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_pulse"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_pulse"
   },
   {
    "kind": "mcp_connect",
@@ -2868,7 +2868,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_connect"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_connect"
   },
   {
    "kind": "mcp_tools",
@@ -2886,7 +2886,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_tools"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_tools"
   },
   {
    "kind": "mcp_call",
@@ -2904,7 +2904,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mcp_call"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mcp_call"
   },
   {
    "kind": "coze_mail",
@@ -2922,7 +2922,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap coze_mail"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap coze_mail"
   },
   {
    "kind": "email_cap",
@@ -2940,7 +2940,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap email_cap"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap email_cap"
   },
   {
    "kind": "create",
@@ -2958,7 +2958,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap create"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap create"
   },
   {
    "kind": "drama",
@@ -2976,7 +2976,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap drama"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap drama"
   },
   {
    "kind": "tentacle_status",
@@ -2994,7 +2994,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_status"
   },
   {
    "kind": "tactics_advise",
@@ -3012,7 +3012,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tactics_advise"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tactics_advise"
   },
   {
    "kind": "pipeline_submit",
@@ -3030,7 +3030,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pipeline_submit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pipeline_submit"
   },
   {
    "kind": "pipeline_versions",
@@ -3050,7 +3050,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pipeline_versions"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pipeline_versions"
   },
   {
    "kind": "pipeline_rollback",
@@ -3070,7 +3070,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pipeline_rollback"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pipeline_rollback"
   },
   {
    "kind": "pipeline_status",
@@ -3088,7 +3088,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pipeline_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pipeline_status"
   },
   {
    "kind": "ghost_guard",
@@ -3106,7 +3106,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ghost_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ghost_guard"
   },
   {
    "kind": "sched_define",
@@ -3128,7 +3128,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sched_define"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sched_define"
   },
   {
    "kind": "sched_tick",
@@ -3146,7 +3146,7 @@
    "needs_confirmation": true,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sched_tick"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sched_tick"
   },
   {
    "kind": "sched_status",
@@ -3164,7 +3164,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sched_status"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sched_status"
   },
   {
    "kind": "svc_inspect",
@@ -3182,7 +3182,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap svc_inspect"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap svc_inspect"
   },
   {
    "kind": "vision",
@@ -3200,7 +3200,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision"
   },
   {
    "kind": "vlx_flow",
@@ -3218,7 +3218,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vlx_flow"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vlx_flow"
   },
   {
    "kind": "prompt_bridge",
@@ -3236,7 +3236,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap prompt_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap prompt_bridge"
   },
   {
    "kind": "audio_extract",
@@ -3254,7 +3254,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap audio_extract"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap audio_extract"
   },
   {
    "kind": "audio_mix",
@@ -3272,7 +3272,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap audio_mix"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap audio_mix"
   },
   {
    "kind": "media_license",
@@ -3290,7 +3290,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_license"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_license"
   },
   {
    "kind": "world_forge",
@@ -3308,7 +3308,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap world_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap world_forge"
   },
   {
    "kind": "pentest_flow",
@@ -3326,7 +3326,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pentest_flow"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pentest_flow"
   },
   {
    "kind": "update_chain",
@@ -3344,7 +3344,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap update_chain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap update_chain"
   },
   {
    "kind": "kws",
@@ -3362,7 +3362,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap kws"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap kws"
   },
   {
    "kind": "voice_stream",
@@ -3380,7 +3380,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap voice_stream"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap voice_stream"
   },
   {
    "kind": "update_verify",
@@ -3398,7 +3398,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap update_verify"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap update_verify"
   },
   {
    "kind": "lan_pairing",
@@ -3416,7 +3416,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap lan_pairing"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap lan_pairing"
   },
   {
    "kind": "pairing",
@@ -3434,7 +3434,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pairing"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pairing"
   },
   {
    "kind": "turn_trace",
@@ -3452,7 +3452,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap turn_trace"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap turn_trace"
   },
   {
    "kind": "ref3d",
@@ -3470,7 +3470,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ref3d"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ref3d"
   },
   {
    "kind": "video_hub",
@@ -3488,7 +3488,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap video_hub"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap video_hub"
   },
   {
    "kind": "media_library",
@@ -3506,7 +3506,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_library"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_library"
   },
   {
    "kind": "resource_snapshot",
@@ -3524,7 +3524,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap resource_snapshot"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap resource_snapshot"
   },
   {
    "kind": "reminder",
@@ -3542,7 +3542,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap reminder"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap reminder"
   },
   {
    "kind": "api_slot",
@@ -3560,7 +3560,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap api_slot"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap api_slot"
   },
   {
    "kind": "thought_stream",
@@ -3578,7 +3578,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap thought_stream"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap thought_stream"
   },
   {
    "kind": "context_inject",
@@ -3596,7 +3596,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap context_inject"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap context_inject"
   },
   {
    "kind": "body_control",
@@ -3614,7 +3614,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_control"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_control"
   },
   {
    "kind": "focus_stack",
@@ -3632,7 +3632,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap focus_stack"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap focus_stack"
   },
   {
    "kind": "voice_settings",
@@ -3650,7 +3650,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap voice_settings"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap voice_settings"
   },
   {
    "kind": "ui_card",
@@ -3668,7 +3668,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ui_card"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ui_card"
   },
   {
    "kind": "datakit",
@@ -3686,7 +3686,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap datakit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap datakit"
   },
   {
    "kind": "media_run",
@@ -3704,14 +3704,14 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_run"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_run"
   },
   {
    "kind": "omni_plug",
    "domain": "llm",
-   "desc": "万能插：把「能力位」拓成「插座」——**没有固定类目**，任意外部对象插一个描述符就变成一根可扫可控的分支。**op=universal（或不给 socket 的 run）现场识别 target、按 kind 动态生成适配器**（kind 是从 target 读出的事实，不是枚举集合；认不出如实说 unknown，不硬套类别）；op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write …【图鉴截断：原文 1111 字（尾部见 desc_tail，打分已接回）】",
-   "desc_tail": "· api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 插上就能用时自身的能源。",
-   "desc_full_chars": 1111,
+   "desc": "万能插：把「能力位」拓成「插座」——**没有固定类目**，任意外部对象插一个描述符就变成一根可扫可控的分支。**op=universal（或不给 socket 的 run）现场识别 target、按 kind 动态生成适配器**（kind 是从 target 读出的事实，不是枚举集合；认不出如实说 unknown，不硬套类别）；op=status/sockets/snapshot/energy/selftest 为**读类直连**；plug 只做存在性探测；run **真执行**（按插座类型过门：process→process_execute · file写→filesystem_write …【图鉴截断：原文 1319 字（尾部见 desc_tail，打分已接回）】",
+   "desc_tail": "· api→external_llm+data_export · web/app→desktop_control+privacy_read（app 还能 do=launch 起进程）· 未知插座 fail-closed）。**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。**全开**（别名 万能面 / 全量）：`op=surface_audit`（别名 surface / full_sweep）同步枚举全部可插面 → 逐个现场识别 → 三数对账、零静默；`op=discover`（别名 scan_local）只读枚举可插面。**没有 `op=all`** —— 2026-11-03 起只剩这两个真 op，旧写法会得到「不认的 op」。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 万能插全开 / 全部能力全开 / 万能面 / 插上就能用时自身的能源。",
+   "desc_full_chars": 1319,
    "desc_truncated": true,
    "enabled": true,
    "reason": "",
@@ -3722,7 +3722,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omni_plug"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omni_plug"
   },
   {
    "kind": "media_stamp",
@@ -3740,7 +3740,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_stamp"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_stamp"
   },
   {
    "kind": "media_publish",
@@ -3758,7 +3758,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap media_publish"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap media_publish"
   },
   {
    "kind": "voice",
@@ -3776,7 +3776,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap voice"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap voice"
   },
   {
    "kind": "voice_orchestra",
@@ -3794,7 +3794,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap voice_orchestra"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap voice_orchestra"
   },
   {
    "kind": "browser",
@@ -3814,7 +3814,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap browser"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap browser"
   },
   {
    "kind": "bluetooth",
@@ -3832,7 +3832,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap bluetooth"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap bluetooth"
   },
   {
    "kind": "bt_control",
@@ -3850,7 +3850,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap bt_control"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap bt_control"
   },
   {
    "kind": "quant",
@@ -3868,7 +3868,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap quant"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap quant"
   },
   {
    "kind": "life",
@@ -3886,7 +3886,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap life"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap life"
   },
   {
    "kind": "mind",
@@ -3904,7 +3904,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap mind"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap mind"
   },
   {
    "kind": "project_context",
@@ -3922,7 +3922,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap project_context"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap project_context"
   },
   {
    "kind": "topic_watch",
@@ -3942,7 +3942,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap topic_watch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap topic_watch"
   },
   {
    "kind": "trend_watch",
@@ -3960,7 +3960,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap trend_watch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap trend_watch"
   },
   {
    "kind": "projection_card",
@@ -3978,7 +3978,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap projection_card"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap projection_card"
   },
   {
    "kind": "trace_store",
@@ -3996,7 +3996,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap trace_store"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap trace_store"
   },
   {
    "kind": "wave_probe",
@@ -4014,7 +4014,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wave_probe"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wave_probe"
   },
   {
    "kind": "dream_replay",
@@ -4032,7 +4032,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dream_replay"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dream_replay"
   },
   {
    "kind": "capability_net",
@@ -4050,7 +4050,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap capability_net"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap capability_net"
   },
   {
    "kind": "director_mood",
@@ -4068,7 +4068,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap director_mood"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap director_mood"
   },
   {
    "kind": "music_publishing",
@@ -4086,7 +4086,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap music_publishing"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap music_publishing"
   },
   {
    "kind": "dh_pose",
@@ -4104,7 +4104,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dh_pose"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dh_pose"
   },
   {
    "kind": "anatomy_figures",
@@ -4122,7 +4122,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap anatomy_figures"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap anatomy_figures"
   },
   {
    "kind": "machine_film",
@@ -4140,7 +4140,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap machine_film"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap machine_film"
   },
   {
    "kind": "rig_audit",
@@ -4158,7 +4158,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap rig_audit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap rig_audit"
   },
   {
    "kind": "rig_fix",
@@ -4176,7 +4176,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap rig_fix"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap rig_fix"
   },
   {
    "kind": "anim_audit",
@@ -4194,7 +4194,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap anim_audit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap anim_audit"
   },
   {
    "kind": "anim_fix",
@@ -4212,7 +4212,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap anim_fix"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap anim_fix"
   },
   {
    "kind": "dh_asset_gate",
@@ -4230,7 +4230,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dh_asset_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dh_asset_gate"
   },
   {
    "kind": "omni_arm",
@@ -4248,7 +4248,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omni_arm"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omni_arm"
   },
   {
    "kind": "tentacle_arm",
@@ -4266,7 +4266,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_arm"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_arm"
   },
   {
    "kind": "project_drift",
@@ -4284,7 +4284,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap project_drift"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap project_drift"
   },
   {
    "kind": "impact_check",
@@ -4304,7 +4304,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap impact_check"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap impact_check"
   },
   {
    "kind": "music_intel",
@@ -4322,7 +4322,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap music_intel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap music_intel"
   },
   {
    "kind": "video_intel",
@@ -4340,7 +4340,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap video_intel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap video_intel"
   },
   {
    "kind": "film_intel",
@@ -4358,7 +4358,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap film_intel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap film_intel"
   },
   {
    "kind": "account_registry",
@@ -4376,7 +4376,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap account_registry"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap account_registry"
   },
   {
    "kind": "verification_watch",
@@ -4394,7 +4394,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap verification_watch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap verification_watch"
   },
   {
    "kind": "shared_resources",
@@ -4412,7 +4412,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap shared_resources"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap shared_resources"
   },
   {
    "kind": "brand_outro",
@@ -4430,7 +4430,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brand_outro"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brand_outro"
   },
   {
    "kind": "emotion_projection",
@@ -4448,7 +4448,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap emotion_projection"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap emotion_projection"
   },
   {
    "kind": "proactive_report",
@@ -4466,7 +4466,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap proactive_report"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap proactive_report"
   },
   {
    "kind": "observer_anchor",
@@ -4484,7 +4484,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap observer_anchor"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap observer_anchor"
   },
   {
    "kind": "persona_kernel",
@@ -4504,7 +4504,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap persona_kernel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap persona_kernel"
   },
   {
    "kind": "hook_registry",
@@ -4522,7 +4522,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hook_registry"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hook_registry"
   },
   {
    "kind": "scene_anchor",
@@ -4540,7 +4540,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap scene_anchor"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap scene_anchor"
   },
   {
    "kind": "code_art",
@@ -4558,7 +4558,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap code_art"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap code_art"
   },
   {
    "kind": "orchestration_kernel",
@@ -4576,7 +4576,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap orchestration_kernel"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap orchestration_kernel"
   },
   {
    "kind": "render_evolution",
@@ -4594,7 +4594,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap render_evolution"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap render_evolution"
   },
   {
    "kind": "caps_called_audit",
@@ -4612,7 +4612,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap caps_called_audit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap caps_called_audit"
   },
   {
    "kind": "tentacle_cognition",
@@ -4630,7 +4630,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_cognition"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_cognition"
   },
   {
    "kind": "coverage_auditor",
@@ -4648,7 +4648,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap coverage_auditor"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap coverage_auditor"
   },
   {
    "kind": "gods_eye",
@@ -4666,7 +4666,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap gods_eye"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap gods_eye"
   },
   {
    "kind": "obsidian_vault",
@@ -4684,7 +4684,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap obsidian_vault"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap obsidian_vault"
   },
   {
    "kind": "cap_tags",
@@ -4702,7 +4702,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cap_tags"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cap_tags"
   },
   {
    "kind": "action_gate",
@@ -4720,7 +4720,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap action_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap action_gate"
   },
   {
    "kind": "growth_hooks",
@@ -4738,7 +4738,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap growth_hooks"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap growth_hooks"
   },
   {
    "kind": "devour_fusion",
@@ -4756,7 +4756,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap devour_fusion"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap devour_fusion"
   },
   {
    "kind": "wiki_graph",
@@ -4774,7 +4774,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap wiki_graph"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap wiki_graph"
   },
   {
    "kind": "doc_intake",
@@ -4792,7 +4792,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap doc_intake"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap doc_intake"
   },
   {
    "kind": "llm_watch",
@@ -4810,7 +4810,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap llm_watch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap llm_watch"
   },
   {
    "kind": "task_graph",
@@ -4828,7 +4828,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap task_graph"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap task_graph"
   },
   {
    "kind": "replan_loop",
@@ -4846,7 +4846,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap replan_loop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap replan_loop"
   },
   {
    "kind": "duty_board",
@@ -4864,7 +4864,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap duty_board"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap duty_board"
   },
   {
    "kind": "rea_reverse",
@@ -4882,7 +4882,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap rea_reverse"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap rea_reverse"
   },
   {
    "kind": "recon_distill",
@@ -4900,7 +4900,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap recon_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap recon_distill"
   },
   {
    "kind": "desktop_distill",
@@ -4918,7 +4918,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap desktop_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap desktop_distill"
   },
   {
    "kind": "pentest_distill",
@@ -4936,7 +4936,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pentest_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pentest_distill"
   },
   {
    "kind": "diagram_distill",
@@ -4954,7 +4954,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap diagram_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap diagram_distill"
   },
   {
    "kind": "machine_distill",
@@ -4972,7 +4972,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap machine_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap machine_distill"
   },
   {
    "kind": "cad_distill",
@@ -4990,7 +4990,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cad_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cad_distill"
   },
   {
    "kind": "bi_distill",
@@ -5008,7 +5008,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap bi_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap bi_distill"
   },
   {
    "kind": "memory_bank",
@@ -5026,7 +5026,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap memory_bank"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap memory_bank"
   },
   {
    "kind": "agent_console",
@@ -5044,7 +5044,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap agent_console"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap agent_console"
   },
   {
    "kind": "code_audit",
@@ -5062,7 +5062,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap code_audit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap code_audit"
   },
   {
    "kind": "agent_rig",
@@ -5080,7 +5080,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap agent_rig"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap agent_rig"
   },
   {
    "kind": "console_hub",
@@ -5098,7 +5098,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap console_hub"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap console_hub"
   },
   {
    "kind": "console_pages",
@@ -5116,7 +5116,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap console_pages"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap console_pages"
   },
   {
    "kind": "freebuff_term",
@@ -5134,7 +5134,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap freebuff_term"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap freebuff_term"
   },
   {
    "kind": "hf_voice",
@@ -5152,7 +5152,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hf_voice"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hf_voice"
   },
   {
    "kind": "voice_studio",
@@ -5170,7 +5170,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap voice_studio"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap voice_studio"
   },
   {
    "kind": "digital_human",
@@ -5188,7 +5188,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap digital_human"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap digital_human"
   },
   {
    "kind": "image_scout",
@@ -5206,7 +5206,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap image_scout"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap image_scout"
   },
   {
    "kind": "install_selfcheck",
@@ -5224,7 +5224,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap install_selfcheck"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap install_selfcheck"
   },
   {
    "kind": "room_space",
@@ -5242,7 +5242,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap room_space"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap room_space"
   },
   {
    "kind": "collab_gateway",
@@ -5260,7 +5260,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap collab_gateway"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap collab_gateway"
   },
   {
    "kind": "lobehub",
@@ -5278,7 +5278,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap lobehub"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap lobehub"
   },
   {
    "kind": "comfyui",
@@ -5296,7 +5296,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap comfyui"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap comfyui"
   },
   {
    "kind": "comfy_native",
@@ -5314,7 +5314,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap comfy_native"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap comfy_native"
   },
   {
    "kind": "ring_context",
@@ -5332,7 +5332,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ring_context"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ring_context"
   },
   {
    "kind": "skill_watch",
@@ -5350,7 +5350,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap skill_watch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap skill_watch"
   },
   {
    "kind": "vision_grounding",
@@ -5368,7 +5368,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_grounding"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_grounding"
   },
   {
    "kind": "tentacle_comfy_bridge",
@@ -5386,7 +5386,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_comfy_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_comfy_bridge"
   },
   {
    "kind": "repo_publish",
@@ -5404,7 +5404,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap repo_publish"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap repo_publish"
   },
   {
    "kind": "pulse_direct",
@@ -5422,7 +5422,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pulse_direct"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pulse_direct"
   },
   {
    "kind": "warm_switch",
@@ -5440,7 +5440,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap warm_switch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap warm_switch"
   },
   {
    "kind": "page_scan",
@@ -5458,7 +5458,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap page_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap page_scan"
   },
   {
    "kind": "fact_gate",
@@ -5476,7 +5476,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap fact_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap fact_gate"
   },
   {
    "kind": "policy_gate",
@@ -5494,7 +5494,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap policy_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap policy_gate"
   },
   {
    "kind": "one_shot",
@@ -5512,7 +5512,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap one_shot"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap one_shot"
   },
   {
    "kind": "surface_bind",
@@ -5530,7 +5530,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap surface_bind"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap surface_bind"
   },
   {
    "kind": "memory_manager",
@@ -5548,7 +5548,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap memory_manager"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap memory_manager"
   },
   {
    "kind": "i2v_agnes",
@@ -5566,7 +5566,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap i2v_agnes"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap i2v_agnes"
   },
   {
    "kind": "code_graph",
@@ -5584,7 +5584,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap code_graph"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap code_graph"
   },
   {
    "kind": "sec_sweeper",
@@ -5602,7 +5602,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap sec_sweeper"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap sec_sweeper"
   },
   {
    "kind": "task_manager",
@@ -5620,7 +5620,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap task_manager"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap task_manager"
   },
   {
    "kind": "transformer",
@@ -5638,7 +5638,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap transformer"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap transformer"
   },
   {
    "kind": "automation_keys",
@@ -5656,7 +5656,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap automation_keys"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap automation_keys"
   },
   {
    "kind": "model_key_pool",
@@ -5674,7 +5674,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap model_key_pool"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap model_key_pool"
   },
   {
    "kind": "meta_cognition",
@@ -5692,7 +5692,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap meta_cognition"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap meta_cognition"
   },
   {
    "kind": "libtv_skill",
@@ -5710,7 +5710,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap libtv_skill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap libtv_skill"
   },
   {
    "kind": "a1art_skill",
@@ -5728,7 +5728,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap a1art_skill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap a1art_skill"
   },
   {
    "kind": "energy_pool",
@@ -5746,7 +5746,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap energy_pool"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap energy_pool"
   },
   {
    "kind": "scrapling",
@@ -5764,7 +5764,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap scrapling"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap scrapling"
   },
   {
    "kind": "genoffice",
@@ -5782,7 +5782,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap genoffice"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap genoffice"
   },
   {
    "kind": "blender",
@@ -5800,7 +5800,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap blender"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap blender"
   },
   {
    "kind": "gs_h3",
@@ -5818,7 +5818,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap gs_h3"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap gs_h3"
   },
   {
    "kind": "actioncam",
@@ -5836,7 +5836,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap actioncam"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap actioncam"
   },
   {
    "kind": "look_grade",
@@ -5854,7 +5854,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap look_grade"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap look_grade"
   },
   {
    "kind": "penetrating_cross_scan",
@@ -5872,7 +5872,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap penetrating_cross_scan"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap penetrating_cross_scan"
   },
   {
    "kind": "hook_enforcer",
@@ -5890,7 +5890,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap hook_enforcer"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap hook_enforcer"
   },
   {
    "kind": "omission_detector",
@@ -5908,7 +5908,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omission_detector"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omission_detector"
   },
   {
    "kind": "zimage_rewash",
@@ -5926,7 +5926,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap zimage_rewash"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap zimage_rewash"
   },
   {
    "kind": "n8n_wf",
@@ -5944,7 +5944,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap n8n_wf"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap n8n_wf"
   },
   {
    "kind": "filmkit",
@@ -5962,7 +5962,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap filmkit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap filmkit"
   },
   {
    "kind": "tentacle_bind",
@@ -5980,7 +5980,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_bind"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_bind"
   },
   {
    "kind": "asset_index",
@@ -5998,7 +5998,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap asset_index"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap asset_index"
   },
   {
    "kind": "control_loop",
@@ -6016,7 +6016,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap control_loop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap control_loop"
   },
   {
    "kind": "local_brain",
@@ -6034,7 +6034,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap local_brain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap local_brain"
   },
   {
    "kind": "auto_switch",
@@ -6052,7 +6052,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap auto_switch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap auto_switch"
   },
   {
    "kind": "context_vault",
@@ -6070,7 +6070,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap context_vault"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap context_vault"
   },
   {
    "kind": "feishu_embed",
@@ -6088,7 +6088,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap feishu_embed"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap feishu_embed"
   },
   {
    "kind": "dl_forge",
@@ -6106,7 +6106,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dl_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dl_forge"
   },
   {
    "kind": "dh_realism",
@@ -6124,7 +6124,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dh_realism"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dh_realism"
   },
   {
    "kind": "cloud_plugin",
@@ -6142,7 +6142,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cloud_plugin"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cloud_plugin"
   },
   {
    "kind": "db_plugin",
@@ -6160,7 +6160,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap db_plugin"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap db_plugin"
   },
   {
    "kind": "telegram_embed",
@@ -6178,7 +6178,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap telegram_embed"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap telegram_embed"
   },
   {
    "kind": "whatsapp_embed",
@@ -6196,7 +6196,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap whatsapp_embed"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap whatsapp_embed"
   },
   {
    "kind": "libtv_workflow",
@@ -6214,7 +6214,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap libtv_workflow"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap libtv_workflow"
   },
   {
    "kind": "gate_visibility",
@@ -6232,7 +6232,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap gate_visibility"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap gate_visibility"
   },
   {
    "kind": "dh_brain",
@@ -6250,7 +6250,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap dh_brain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap dh_brain"
   },
   {
    "kind": "eigenflux",
@@ -6268,7 +6268,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap eigenflux"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap eigenflux"
   },
   {
    "kind": "h3_video_gen",
@@ -6286,7 +6286,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap h3_video_gen"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap h3_video_gen"
   },
   {
    "kind": "absorb_loop",
@@ -6304,7 +6304,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap absorb_loop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap absorb_loop"
   },
   {
    "kind": "cloud_pc",
@@ -6322,7 +6322,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cloud_pc"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cloud_pc"
   },
   {
    "kind": "auto_publish",
@@ -6340,7 +6340,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap auto_publish"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap auto_publish"
   },
   {
    "kind": "awesome_tools_index",
@@ -6358,7 +6358,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap awesome_tools_index"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap awesome_tools_index"
   },
   {
    "kind": "stigmergy",
@@ -6376,7 +6376,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap stigmergy"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap stigmergy"
   },
   {
    "kind": "ledger_note",
@@ -6394,7 +6394,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ledger_note"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ledger_note"
   },
   {
    "kind": "code_patch",
@@ -6416,7 +6416,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap code_patch"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap code_patch"
   },
   {
    "kind": "git_read",
@@ -6434,7 +6434,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap git_read"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap git_read"
   },
   {
    "kind": "git_write",
@@ -6455,7 +6455,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap git_write"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap git_write"
   },
   {
    "kind": "brain_council",
@@ -6476,7 +6476,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap brain_council"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap brain_council"
   },
   {
    "kind": "omni_web",
@@ -6496,7 +6496,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap omni_web"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap omni_web"
   },
   {
    "kind": "ul_tars_desktop",
@@ -6514,7 +6514,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ul_tars_desktop"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ul_tars_desktop"
   },
   {
    "kind": "claude_code",
@@ -6532,7 +6532,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap claude_code"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap claude_code"
   },
   {
    "kind": "codebuddy",
@@ -6550,7 +6550,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codebuddy"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codebuddy"
   },
   {
    "kind": "redteam_recon",
@@ -6568,7 +6568,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap redteam_recon"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap redteam_recon"
   },
   {
    "kind": "pentest",
@@ -6586,7 +6586,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pentest"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pentest"
   },
   {
    "kind": "keylogger",
@@ -6604,7 +6604,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap keylogger"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap keylogger"
   },
   {
    "kind": "screen_sniff",
@@ -6622,7 +6622,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap screen_sniff"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap screen_sniff"
   },
   {
    "kind": "remote_domain",
@@ -6640,7 +6640,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap remote_domain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap remote_domain"
   },
   {
    "kind": "device_takeover",
@@ -6658,7 +6658,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap device_takeover"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap device_takeover"
   },
   {
    "kind": "credential_steal",
@@ -6676,7 +6676,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap credential_steal"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap credential_steal"
   },
   {
    "kind": "data_hijack",
@@ -6694,7 +6694,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap data_hijack"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap data_hijack"
   },
   {
    "kind": "social_eng",
@@ -6712,7 +6712,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap social_eng"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap social_eng"
   },
   {
    "kind": "paywallbuster",
@@ -6730,7 +6730,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap paywallbuster"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap paywallbuster"
   },
   {
    "kind": "asset_vault_freeze",
@@ -6748,7 +6748,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap asset_vault_freeze"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap asset_vault_freeze"
   },
   {
    "kind": "onboarding_gate",
@@ -6766,7 +6766,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap onboarding_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap onboarding_gate"
   },
   {
    "kind": "agent_control",
@@ -6784,7 +6784,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap agent_control"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap agent_control"
   },
   {
    "kind": "agent_council",
@@ -6802,7 +6802,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap agent_council"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap agent_council"
   },
   {
    "kind": "answer_shaper",
@@ -6820,7 +6820,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap answer_shaper"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap answer_shaper"
   },
   {
    "kind": "belief_forge",
@@ -6838,7 +6838,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap belief_forge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap belief_forge"
   },
   {
    "kind": "case_mine",
@@ -6856,7 +6856,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap case_mine"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap case_mine"
   },
   {
    "kind": "cli_chat",
@@ -6874,7 +6874,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cli_chat"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cli_chat"
   },
   {
    "kind": "command_chain",
@@ -6892,7 +6892,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap command_chain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap command_chain"
   },
   {
    "kind": "creation_camp",
@@ -6910,7 +6910,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap creation_camp"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap creation_camp"
   },
   {
    "kind": "db_probe",
@@ -6928,7 +6928,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap db_probe"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap db_probe"
   },
   {
    "kind": "energy_scheduler",
@@ -6946,7 +6946,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap energy_scheduler"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap energy_scheduler"
   },
   {
    "kind": "event_ledger",
@@ -6964,7 +6964,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap event_ledger"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap event_ledger"
   },
   {
    "kind": "flow_canvas",
@@ -6982,7 +6982,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap flow_canvas"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap flow_canvas"
   },
   {
    "kind": "freellmapi",
@@ -7000,7 +7000,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap freellmapi"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap freellmapi"
   },
   {
    "kind": "handoff",
@@ -7018,7 +7018,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap handoff"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap handoff"
   },
   {
    "kind": "llm_redteam",
@@ -7036,7 +7036,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap llm_redteam"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap llm_redteam"
   },
   {
    "kind": "notion_bridge",
@@ -7054,7 +7054,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap notion_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap notion_bridge"
   },
   {
    "kind": "policy_delta",
@@ -7072,7 +7072,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap policy_delta"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap policy_delta"
   },
   {
    "kind": "slim_profile",
@@ -7090,7 +7090,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap slim_profile"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap slim_profile"
   },
   {
    "kind": "spend_guard",
@@ -7108,7 +7108,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap spend_guard"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap spend_guard"
   },
   {
    "kind": "thebrain_bridge",
@@ -7126,7 +7126,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap thebrain_bridge"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap thebrain_bridge"
   },
   {
    "kind": "train_recipe",
@@ -7144,7 +7144,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap train_recipe"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap train_recipe"
   },
   {
    "kind": "tripo",
@@ -7162,7 +7162,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tripo"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tripo"
   },
   {
    "kind": "ui_render",
@@ -7180,7 +7180,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ui_render"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ui_render"
   },
   {
    "kind": "review_gate",
@@ -7198,7 +7198,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap review_gate"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap review_gate"
   },
   {
    "kind": "detail_habit",
@@ -7216,7 +7216,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap detail_habit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap detail_habit"
   },
   {
    "kind": "tentacle_scale",
@@ -7234,7 +7234,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap tentacle_scale"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap tentacle_scale"
   },
   {
    "kind": "express_direct",
@@ -7252,7 +7252,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap express_direct"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap express_direct"
   },
   {
    "kind": "vision_print",
@@ -7270,7 +7270,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_print"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_print"
   },
   {
    "kind": "cadgen",
@@ -7288,7 +7288,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap cadgen"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap cadgen"
   },
   {
    "kind": "ui_kit",
@@ -7306,7 +7306,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ui_kit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ui_kit"
   },
   {
    "kind": "design_atlas",
@@ -7324,7 +7324,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap design_atlas"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap design_atlas"
   },
   {
    "kind": "art_chain",
@@ -7342,7 +7342,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap art_chain"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap art_chain"
   },
   {
    "kind": "motion_kit",
@@ -7360,7 +7360,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap motion_kit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap motion_kit"
   },
   {
    "kind": "bits_kit",
@@ -7378,7 +7378,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap bits_kit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap bits_kit"
   },
   {
    "kind": "art_brief",
@@ -7396,7 +7396,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap art_brief"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap art_brief"
   },
   {
    "kind": "intake_kit",
@@ -7414,7 +7414,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap intake_kit"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap intake_kit"
   },
   {
    "kind": "offload_distill",
@@ -7432,7 +7432,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap offload_distill"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap offload_distill"
   },
   {
    "kind": "pod_link",
@@ -7450,7 +7450,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap pod_link"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap pod_link"
   },
   {
    "kind": "comfy_cloud",
@@ -7468,7 +7468,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap comfy_cloud"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap comfy_cloud"
   },
   {
    "kind": "body_excrete",
@@ -7486,7 +7486,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_excrete"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_excrete"
   },
   {
    "kind": "body_eye",
@@ -7506,7 +7506,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_eye"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_eye"
   },
   {
    "kind": "body_immune",
@@ -7524,7 +7524,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap body_immune"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap body_immune"
   },
   {
    "kind": "bounty_ops",
@@ -7544,7 +7544,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap bounty_ops"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap bounty_ops"
   },
   {
    "kind": "codepage",
@@ -7564,7 +7564,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap codepage"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap codepage"
   },
   {
    "kind": "local_llm",
@@ -7584,7 +7584,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap local_llm"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap local_llm"
   },
   {
    "kind": "vision_arsenal",
@@ -7602,7 +7602,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_arsenal"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_arsenal"
   },
   {
    "kind": "ocr",
@@ -7620,7 +7620,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap ocr"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap ocr"
   },
   {
    "kind": "route_ledger",
@@ -7638,7 +7638,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap route_ledger"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap route_ledger"
   },
   {
    "kind": "semantic_match",
@@ -7656,7 +7656,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap semantic_match"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap semantic_match"
   },
   {
    "kind": "uia_tree",
@@ -7674,7 +7674,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap uia_tree"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap uia_tree"
   },
   {
    "kind": "vision_detect",
@@ -7692,7 +7692,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_detect"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_detect"
   },
   {
    "kind": "vision_embed",
@@ -7710,7 +7710,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_embed"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_embed"
   },
   {
    "kind": "vision_pose",
@@ -7728,7 +7728,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_pose"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_pose"
   },
   {
    "kind": "vision_segment",
@@ -7746,7 +7746,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_segment"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_segment"
   },
   {
    "kind": "vision_track",
@@ -7764,7 +7764,7 @@
    "needs_confirmation": false,
    "unimplemented": false,
    "channel": "omnipulg",
-   "invoke": "python tools/codex-scripts/five-dim.py cap vision_track"
+   "invoke": "./pyembed/python.exe tools/codex-scripts/five-dim.py cap vision_track"
   }
  ],
  "skills": [
@@ -7915,6 +7915,26 @@
    "root_count": 1
   },
   {
+   "name": "database-expert",
+   "displayName": "",
+   "desc": "数据库专家：库表设计、索引与查询调优、迁移、一致性体检，并统一按「所有项目都入库」的规矩落项目数据（SQLite 单库多项目：projects / artifacts / links / runs）。当用户说「建表 / 表结构 / 索引 / 慢查询 / EXPLAIN / 迁移 / 加字段 / 数据对账 / 一致性 / 主键外键 / 项目存哪 / 数据入库」时使用。边界：给设计与可复跑的诊断；生产库的 DDL/DML 一律先出脚本 + 回滚点，不直接改数据。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [],
+   "version": "",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\database-expert",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": true,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills"
+   ],
+   "root_count": 1
+  },
+  {
    "name": "design-taste-frontend",
    "displayName": "",
    "desc": "tasteskill v2, the anti-slop frontend skill. Art direction for websites, distilled from a study of 247 curated gallery sites (One Page Love, Awwwards Sites of the Day). Deals researched directions (idea, composition, type, palette, photographs, section blueprints) from a library, enforces a strict no-slop house style with a real-browser inspector, and runs a look-and-fix loop on screenshots. Use t…【图鉴截断：原文 948 字（尾部见 desc_tail，打分已接回）】",
@@ -8060,6 +8080,38 @@
    "root_count": 2
   },
   {
+   "name": "gbt-pentest",
+   "displayName": "挖漏洞 · 原生渗透排查",
+   "desc": "在本机把「找漏洞」这件事做成一条可复核的链：定面 → 取证扫描 → 去伪 → 验证 → 成链 → 报告。全部走本仓原生能力位（sec_surface / sec_scan / code_audit / llm_redteam / pentest_flow / offense_ops），不引云、不装外挂扫描器、不出网。当用户说「挖漏洞 / 找漏洞 / 漏洞排查 / 扫一遍有没有洞 / 全仓挖洞 / 渗透测试 / 安全体检 / 代码审计找洞 / 触手大军排查」时使用。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [
+    "挖漏洞",
+    "找漏洞",
+    "漏洞排查",
+    "扫一遍有没有洞",
+    "全仓挖洞",
+    "渗透测试",
+    "安全体检",
+    "代码审计找洞",
+    "触手大军排查",
+    "攻击面测绘"
+   ],
+   "version": "1.0.0",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\gbt-pentest",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": false,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+    "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\skills"
+   ],
+   "root_count": 2
+  },
+  {
    "name": "gbt-selfgrowth",
    "displayName": "",
    "desc": "自生长知识库 4.0（Codex + Google WikiSkill）蒸馏进本仓：Raw/Trace/Pattern/Skill 四段生命周期 + 三条复利循环 + 四判据 + 适用边界。回答\"做事的经验如何不在轨迹里消失\"，并与本仓既有的台账/坑册/判据/镜像门控一一对位。",
@@ -8132,6 +8184,26 @@
    "has_assets": false,
    "roots": [
     "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\skills"
+   ],
+   "root_count": 1
+  },
+  {
+   "name": "link-layout-expert",
+   "displayName": "",
+   "desc": "链路排布：把一组能力/节点/依赖排成一条真能跑的链，给出分层、关键路径、环与失败面，并落成可读图（Mermaid/SVG/HTML）。当用户说「链路排布 / 排一下链路 / 这些能力怎么接 / 拓扑 / 依赖图 / 调用链 / 谁喂谁 / 关键路径 / 数据流」时使用。边界：只排布、算路径、画图；改运行时接线是另一件事。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [],
+   "version": "",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\link-layout-expert",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": true,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills"
    ],
    "root_count": 1
   },
@@ -8357,6 +8429,112 @@
    "roots": [
     "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
     "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\gbt_allinone\\skills"
+   ],
+   "root_count": 2
+  },
+  {
+   "name": "omni-plug",
+   "displayName": "",
+   "desc": "本机执行器（看屏 / 点按 / 键入 / 窗口 / 进程 / 剪贴板 / 文件 / 监控）。上层 AI 只需下发一句目标，它自带小脑完成看→定位→动→校验；写盘、出网、控屏一律过授权门并落审计。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [],
+   "version": "3.0.0",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\omni-plug",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": false,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills"
+   ],
+   "root_count": 1
+  },
+  {
+   "name": "pro-bookkeeping",
+   "displayName": "记账与对账 · 专业包",
+   "desc": "复式记账、日常对账、月末结账的工序与判据——凭证借贷必平、流水逐笔归因、试算平衡为零、差异必须开差异单。当用户说「记账 / 对账 / 做账 / 流水核对 / 月结 / 试算平衡 / 凭证 / 资产负债表 / 利润表」时使用。边界：本包产出的是**账务处理与核对结果**，不是审计意见、不代办纳税申报；涉及税务口径、收入确认政策、关联交易定价必须由持有资质的人确认。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [
+    "记账",
+    "对账",
+    "做账",
+    "流水核对",
+    "月结",
+    "试算平衡",
+    "凭证"
+   ],
+   "version": "1.0.0",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\pro-bookkeeping",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": false,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+    "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\skills"
+   ],
+   "root_count": 2
+  },
+  {
+   "name": "pro-contract-review",
+   "displayName": "合同审查 · 专业包",
+   "desc": "合同/协议审查的工序与判据——抽要素、扫红旗、给替代文本、出审查备忘录。当用户说「看下这份合同 / 帮我审合同 / 这个条款有没有坑 / 合作协议 / 保密协议 / 服务合同 / 采购合同」时使用。边界：本包产出的是**审查意见与改写建议**，不构成法律意见、不代为签署；涉诉、涉外、金额超阈值、股权/担保/知识产权转让必须转执业律师。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [
+    "审合同",
+    "看下这份合同",
+    "合同有没有坑",
+    "合作协议",
+    "保密协议",
+    "服务合同"
+   ],
+   "version": "1.0.0",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\pro-contract-review",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": false,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+    "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\skills"
+   ],
+   "root_count": 2
+  },
+  {
+   "name": "pro-customer-service",
+   "displayName": "客服与工单 · 专业包",
+   "desc": "客服会话的分级、首响、定位、给方案、升级与归档工序，含禁语表与判据。当用户说「客服 / 回客户 / 工单 / 投诉 / 安抚 / 退款怎么说 / 话术 / SLA」时使用。边界：本包只管**怎么把事说清楚、怎么升级**，不授权任何赔付/退款/折扣承诺；涉及资金、隐私、法律威胁、媒体曝光的一律升级给人。",
+   "desc_tail": "",
+   "desc_truncated": false,
+   "triggers": [
+    "客服",
+    "回客户",
+    "工单",
+    "投诉",
+    "话术",
+    "SLA",
+    "安抚"
+   ],
+   "version": "1.0.0",
+   "channel": "agent-skill",
+   "root": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+   "path": "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills\\pro-customer-service",
+   "why": "本会话（DSH）实际读取的技能目录",
+   "has_references": false,
+   "has_scripts": false,
+   "has_assets": false,
+   "roots": [
+    "C:\\Users\\Lenovo E14 Gen 5\\.agents\\skills",
+    "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8\\skills"
    ],
    "root_count": 2
   },
@@ -8689,11 +8867,11 @@
   "caps": 427,
   "caps_enabled": 427,
   "caps_safe_no_args": 264,
-  "skills": 33,
-  "skills_raw_before_dedupe": 49,
-  "skills_multi_root": 9,
+  "skills": 40,
+  "skills_raw_before_dedupe": 60,
+  "skills_multi_root": 13,
   "skills_by_channel": {
-   "agent-skill": 33
+   "agent-skill": 40
   },
   "design_assets_bulk_total": 0,
   "domains": 32
