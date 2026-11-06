@@ -1,4 +1,4 @@
-# 90 · 她能干嘛：32 域 427 位能力（现读版）
+# 90 · 她能干嘛：30 域 410 位能力（现读版）
 
 > 本文由 `gbt_allinone/caps_registry.py` **实时生成**（不是手写宣传语）。
 > 想知道某一位到底能干什么，看命令 `gbt.run_task('<名字>', {'op':'status'})`。
@@ -12,7 +12,7 @@ import gbt_allinone as gbt
 gbt.run_task("cap_self", {"op": "brief"})   # 她现读的自述：我能干什么、部署在哪
 ```
 
-## 二、32 个域（按能力数量排序）
+## 二、30 个域（按能力数量排序）
 
 | 域 | 能力数 | 代表能力 | 一句话 |
 |---|---|---:|---|
@@ -27,7 +27,7 @@ gbt.run_task("cap_self", {"op": "brief"})   # 她现读的自述：我能干什�
 | **视频（生成/剪辑/混音）** | 16 | `hunyuan_video`, `media_pipeline`, `edit_pipeline`, `audio_extract` | 混元视频 HunyuanVideo 1.5（8.3B）**只读骨架** |
 | **身体（看/说/按/敲）** | 12 | `body_map`, `body_see`, `body_say`, `body_type` | 身体·清单 |
 | **数据（审计/图表/检索）** | 12 | `echo`, `count_words`, `audit_query`, `record_grid` | 联调回显位 |
-| **引擎（DAG/能源/缓存）** | 11 | `wf_define`, `wf_run`, `wf_status`, `wf_resume` | 万能插执行引擎 |
+| **引擎（DAG/能源/缓存）** | 11 | `wf_define`, `wf_run`, `wf_status`, `wf_resume` | 工作流引擎 |
 | **集成（飞书/TG/WA/Notion）** | 11 | `mcp_register`, `mcp_servers`, `mcp_unregister`, `mcp_health` | MCP 注册 |
 | **工具（投影卡/仓库/补丁）** | 9 | `projection_card`, `capability_net`, `freebuff_term`, `repo_publish` | 空间投射只读卡片 |
 | **吞噬（GitHub→知识→进化）** | 6 | `devour_auto`, `devour_scan`, `devour_github`, `devour_reflect` | 自主吞食 |
@@ -139,7 +139,7 @@ print(r.get('gbt_result', {}).get('result'))
 ## 五、怎么自己核
 
 ```bash
-python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 427
+python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 410
 python -m gbt_allinone list                                                                          # 逐位列出
 ```
 

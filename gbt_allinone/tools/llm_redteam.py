@@ -128,17 +128,25 @@ def _probe_prompt_sink() -> dict:
 def _probe_secret_in_prompt() -> dict:
     """LLM02 · 凭据内插：提示模板里直接插密钥/令牌 = 泄露面。"""
     hits = []
-    pat = re.compile(r'(sk-[A-Za-z0-9_\-]{6,}|api[_-]?key\s*=\s*["\'][^"\']{8,})', re.I)
+    skipped_placeholders = 0
+    # 词边界：`paysssk-creator` 这类 GitHub 用户名里也有 `sk-`，不能从中间截中。
+    pat = re.compile(r'(?<![A-Za-z0-9_\-])(?:sk-[A-Za-z0-9_\-]{6,}|api[_-]?key\s*=\s*["\'][^"\']{8,})', re.I)
+    # 顺序占位串：自检样本 / 测试输入，不是真密钥。
+    placeholder = re.compile(r'(abcdefghijklmnopqrstuvwxyz|0123456789|1234567890|abcdef1234567890|abcdefghijkl)', re.I)
     for f in _scan_files({".py", ".md"}, ["gbt_allinone", "tools"]):
         try:
             txt = f.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         for m in pat.finditer(txt):
+            if placeholder.search(m.group(0)):
+                skipped_placeholders += 1
+                continue
             line = txt[:m.start()].count("\n") + 1
             hits.append({"file": str(f.relative_to(_ROOT)), "line": line,
                          "snip": m.group(0)[:6] + "****"})      # **掩码**：本件也不回显明文
-    return {"probe": "secret_in_prompt", "owasp": "LLM02", "hits": hits[:8], "count": len(hits)}
+    return {"probe": "secret_in_prompt", "owasp": "LLM02", "hits": hits[:8],
+            "count": len(hits), "skipped_placeholders": skipped_placeholders}
 
 
 def _probe_agent_scopes() -> dict:

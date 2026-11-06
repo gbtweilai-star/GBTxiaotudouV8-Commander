@@ -24,10 +24,11 @@ _BASE = Path(__file__).resolve().parent
 class MCPBridge:
     """单台 MCP 服务器的客户端会话（stdio JSON-RPC）。"""
 
-    def __init__(self, command, name="mcp-server"):
+    def __init__(self, command, name="mcp-server", cwd=None):
         """command: 启动命令（list 形式，如 ['npx', '-y', '@modelcontextprotocol/server-everything']）。"""
         self.command = command
         self.name = name
+        self.cwd = cwd   # 2026-11-06：cwd 走宽字符，中文安装路径靠它
         self.proc = None
         self._id = 0
         self._lock = threading.Lock()
@@ -50,7 +51,7 @@ class MCPBridge:
             self.proc = subprocess.Popen(
                 self._resolve_cmd(self.command), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                cwd=str(_BASE.parent.parent))
+                cwd=str(self.cwd or _BASE.parent.parent))
         except Exception as e:  # noqa: BLE001
             return {"ok": False, "error": f"{type(e).__name__}: {e}"[:160]}
         # 初始化握手
@@ -142,12 +143,12 @@ class MCPBridge:
 _SESSIONS = {}
 
 
-def connect(server_key, command):
+def connect(server_key, command, cwd=None):
     """连接/复用一台 MCP 服务器。"""
     if server_key in _SESSIONS and _SESSIONS[server_key].proc and \
             _SESSIONS[server_key].proc.poll() is None:
         return {"ok": True, "note": "复用已有会话", "server": server_key}
-    b = MCPBridge(command, name=server_key)
+    b = MCPBridge(command, name=server_key, cwd=cwd)
     r = b.start()
     if r.get("ok"):
         _SESSIONS[server_key] = b
@@ -268,7 +269,7 @@ def connect_registered(name: str, timeout: float = 20.0) -> dict:
     spec = reg.get(name)
     if not spec:
         return {"ok": False, "error": "user_error: 没登记这个服务器：%s" % name}
-    r = connect(name, list(spec.get("command") or []))
+    r = connect(name, list(spec.get("command") or []), cwd=spec.get("cwd"))
     if not r.get("ok"):
         return r
     t = list_tools(name)
@@ -284,7 +285,7 @@ def health(timeout: float = 15.0) -> dict:
     for name, spec in reg.items():
         t0 = time.time()
         try:
-            r = connect(name, list(spec.get("command") or []))
+            r = connect(name, list(spec.get("command") or []), cwd=spec.get("cwd"))
             if not r.get("ok"):
                 rows.append({"server": name, "up": False, "error": r.get("error"),
                              "ms": int((time.time() - t0) * 1000)})

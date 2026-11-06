@@ -187,7 +187,7 @@ def main() -> int:
     print("-" * 92)
     print("  搬后 vendor 包：%s" % ", ".join(sorted(still)) or "(空)")
     print("  %s `three` 仍在（生成器源完好）" % ("✅" if "three" in still else "🔴"))
-    print("  下一步自证：py -3.14 tools/codex-scripts/vendor_three.py --check")
+    print("  下一步自证：./pyembed/python.exe tools/codex-scripts/vendor_three.py --check")
     return 0 if not bad and "three" in still else 2
 
 

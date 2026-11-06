@@ -10,10 +10,10 @@
 | 方式 | 命令 / 文件 | 适合 |
 |---|---|---|
 | **按人话搜** | `python -m gbt_commander search "回滚到上一个版本"` | 只记得想干什么，不记得能力名 |
-| **看某个域** | `python -m gbt_commander catalog --domain pipeline` | 知道大概属于哪个域（32 个域任选） |
-| **一次看全部** | [`03-capabilities.md`](03-capabilities.md)（**427 项 · 本表由注册表现生成**） | 通读、比对 |
+| **看某个域** | `python -m gbt_commander catalog --domain pipeline` | 知道大概属于哪个域（30 个域任选） |
+| **一次看全部** | [`03-capabilities.md`](03-capabilities.md)（**368 项 · 本表由注册表现生成**） | 通读、比对 |
 | **要全文说明** | [`capabilities-full.json`](capabilities-full.json)（**快照 2026-10-25 · 349 条**；现读请用 `run_task("cap_self", {"op":"verify"})` 或 `caps_registry`） | 机器读、要完整触发词 |
-| **要人读全文** | [`capabilities/`](capabilities/)（32 份，**本轮已按 427 位重生成**） | 人读、要上下文 |
+| **要人读全文** | [`capabilities/`](capabilities/)（30 份，**本轮已按 368 位重生成**） | 人读、要上下文 |
 | **按意图逛** | [`18-native-cloud-catalog.md`](18-native-cloud-catalog.md) | 「我要看/听/说/记事/省内存/稳定输出」 |
 
 **⚠️ 总表的说明列是简版（约 70 字）。触发词（放大 / 洗图 / 高清 / 4K …）在**
@@ -25,7 +25,7 @@
 
 | 文档 | 一句话 |
 |---|---|
-| [`01-model-card.md`](01-model-card.md) | 模型卡：7.6B 中文「总指挥」· **427 位能力（现读）** · 一个门 |
+| [`01-model-card.md`](01-model-card.md) | 模型卡：7.6B 中文「总指挥」· **368 位能力（现读）** · 一个门 |
 | [`02-architecture.md`](02-architecture.md) | 架构：为什么它敢叫「总指挥」 |
 | [`18-native-cloud-catalog.md`](18-native-cloud-catalog.md) | **能力总目录（按「我要干什么」查）** ← 最实用 |
 
@@ -35,11 +35,11 @@
 
 | 文档 | 一句话 + 关键词 |
 |---|---|
-| [`03-capabilities.md`](03-capabilities.md) | 能力总表入口 · **427 位 / 32 域（注册表现生成）** · 两套数口径 |
-| [`03-capabilities.md`](03-capabilities.md) + [`capabilities/`](capabilities/) | **逐条清单**（427 项 · 本轮重生成）· 域 / 类型 / 需参数 / 常见错误 / 它做什么 |
+| [`03-capabilities.md`](03-capabilities.md) | 能力总表入口 · **368 位 / 30 域（注册表现生成）** · 两套数口径 |
+| [`03-capabilities.md`](03-capabilities.md) + [`capabilities/`](capabilities/) | **逐条清单**（368 项 · 本轮重生成）· 域 / 类型 / 需参数 / 常见错误 / 它做什么 |
 | [`07-capability-proof.md`](07-capability-proof.md) | **逐位真调**（341 位那一轮）· 340 ok / 1 needs-input · 零失败 |
 | [`16-capability-audit-341.md`](16-capability-audit-341.md) | 全量核对（341 位）· 红黄清零 · 8 处修复 · 3 个教训 |
-| [`capabilities/`](capabilities/) | 32 个域各一份，含「它做什么 / 怎么调」 |
+| [`capabilities/`](capabilities/) | 30 个域各一份，含「它做什么 / 怎么调」 |
 | [`capabilities-full.json`](capabilities-full.json) | **机器可读全文** · name/domain/desc/bind/carrier/wired/proof |
 
 ---
@@ -205,7 +205,7 @@
 | 84 | [84-remote-controller.md](84-remote-controller.md) | 远程接管授权内核：远端用户点同意 + agent 签名才发 session |
 | 85 | [85-local-only-audit.md](85-local-only-audit.md) | 本地算力审计：云 TTS/云取图点名，本地优先 fail-closed |
 | 89 | [89-history-rewrite.md](legacy/89-history-rewrite.md) | 方案A：历史重写（362→351 提交，193.1→177.2MB，HEAD 不变） |
-| 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：32 域 427 位（从注册表实时生成） |
+| 90 | [90-what-she-can-do.md](90-what-she-can-do.md) | 她能干嘛：30 域 375 位（从注册表实时生成） |
 | 91 | [91-visual-pages.md](legacy/91-visual-pages.md) | 所有可视化页面：28 面板 + 落地页 + 图集 |
 | 92 | [92-absorb-superpowers.md](legacy/92-absorb-superpowers.md) | 吞噬 superpowers-zh：20 个方法论 skill → skills_hub（第 376 位） |
 | 93 | [93-gbtv5-full-review.md](legacy/93-gbtv5-full-review.md) | GBT-Framework v5 全量核对（897 文件/192 cap）+ chain_kernel 七步纪律 |
@@ -311,8 +311,8 @@
 | 157 | [157-native-sdturbo.md](legacy/157-native-sdturbo.md) | 删ComfyUI后本地SD-Turbo原生出图：256/24.24s/121KB |
 | 158 | [158-desktop-native-t2i-512.md](158-desktop-native-t2i-512.md) | 桌面API接SD-Turbo：256/512，缓存load4.68s，512生成27.13s |
 | 159 | [159-native-shortfilm-nightlight.md](159-native-shortfilm-nightlight.md) |
-| 160 | [160-bailongma-voice-intercom.md](legacy/160-bailongma-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
-| 161 | [161-bailongma-gap-matrix.md](161-bailongma-gap-matrix.md) | 上游参考项目 → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
+| 160 | [160-voice-intercom.md](legacy/160-voice-intercom.md) | 数字人语音对讲：MIC/空格 PTT + 对话面板 + 本机 Whisper 识别 + 中文女声（内核 27 项 + 验收 29 项） |
+| 161 | [161-gap-matrix.md](161-gap-matrix.md) | 上游参考项目 → GBT 全能力对照 / 吞噬台账（20 组：已吞/部分/缺/不吞 + P0–P2 排期） | 原生SD-Turbo竖屏成片《夜灯》：15.84s/1080×1920/本地Hanhan |
 | 162 | [162-native-browser-embed.md](legacy/162-native-browser-embed.md) | 我们自己的原生浏览器：Electron WebContentsView 宿主（标签/地址栏/下载/权限/边界）+ 契约与真机读数 |
 | 163 | [163-ui-card-acui.md](legacy/163-ui-card-acui.md) | ACUI 卡片协议 ui_card：schema/白名单/纯文本/TTL/动作只回事件 + 能力位/统一门/console 卡片栈（P0 完成） |
 | 164 | [164-voice-settings.md](legacy/164-voice-settings.md) | 语音设置页：TTS 音色/语速/音高/音量 + ASR 后端 auto/whisper/windows + 自动朗读（能力位/统一门/数字人弹窗） |
@@ -353,8 +353,9 @@
 | 170 | [170-red-eye-character-film.md](legacy/170-red-eye-character-film.md) | 《红瞳》中式僵尸竖屏短片 1080×1920/24.2s |
 | 171 | [171-red-eye-all-motion.md](171-red-eye-all-motion.md) | 《红瞳》全SVD真运动版 1080×1920/22.52s |
 | 172 | [172-gbt-i2v-svd-node-api.md](172-gbt-i2v-svd-node-api.md) | GBT天真 i2v_svd 节点/API 实测 |
-| 173 | [173-shuohao-skills-absorbed.md](173-shuohao-skills-absorbed.md) | 吞噬 shuohao-skills：7技能+GBT节点+AI漫剧成片 |
-| 174 | [174-e01-detail-rework.md](174-e01-detail-rework.md) | E01-01细节返工：cut3主角4帧+台词字幕混音 |
-| 175 | [175-e01-v5.md](175-e01-v5.md) | 渡口 E01-01 v5：cut1/cut4返工+字幕修正 |
-| 177 | [177-e01-v7.md](177-e01-v7.md) | E01-01 v7：cut1 素色/皮箱/泥路修正 |
+| 189 | [189-shuohao-skills-absorbed.md](189-shuohao-skills-absorbed.md) | 吞噬 shuohao-skills：7技能+GBT节点+AI漫剧成片 |
+| 190 | [190-e01-detail-rework.md](190-e01-detail-rework.md) | E01-01细节返工：cut3主角4帧+台词字幕混音 |
+| 191 | [191-e01-v5.md](191-e01-v5.md) | 渡口 E01-01 v5：cut1/cut4返工+字幕修正 |
+| 192 | [192-e01-v6.md](192-e01-v6.md) | E01-01 v6：cut2 重做 + 离线男声 + 字幕尾端达标 |
+| 193 | [193-e01-v7.md](193-e01-v7.md) | E01-01 v7：cut1 素色/皮箱/泥路修正 |
 

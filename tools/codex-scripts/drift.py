@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """drift.py —— 全项目变化监控的**零引号**入口（主人专用）。
 
-    py -3.14 tools/codex-scripts/drift.py            # 基线在哪、多旧、多少件
-    py -3.14 tools/codex-scripts/drift.py check      # 变了什么（全仓 stat 一遍，约 90 秒）
-    py -3.14 tools/codex-scripts/drift.py check gbt_allinone/   # 只看某个目录
-    py -3.14 tools/codex-scripts/drift.py freeze     # 冻结新基线（要 filesystem_write 票）
+    ./pyembed/python.exe tools/codex-scripts/drift.py            # 基线在哪、多旧、多少件
+    ./pyembed/python.exe tools/codex-scripts/drift.py check      # 变了什么（全仓 stat 一遍，约 90 秒）
+    ./pyembed/python.exe tools/codex-scripts/drift.py check gbt_allinone/   # 只看某个目录
+    ./pyembed/python.exe tools/codex-scripts/drift.py freeze     # 冻结新基线（要 filesystem_write 票）
 
 仍走唯一门 `gbt_allinone.run_task`；本件只把"人话参数"翻译成 payload。
 """
@@ -20,10 +20,10 @@ for _s in (sys.stdout, sys.stderr):
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 USAGE = """全项目变化监控（零引号入口）
-  py -3.14 tools/codex-scripts/drift.py            基线状态（快）
-  py -3.14 tools/codex-scripts/drift.py check      变了什么（全仓 stat，约 90 秒）
-  py -3.14 tools/codex-scripts/drift.py check <前缀>  只看某个目录/前缀
-  py -3.14 tools/codex-scripts/drift.py freeze     把现状冻结成新基线（要 filesystem_write 票）
+  ./pyembed/python.exe tools/codex-scripts/drift.py            基线状态（快）
+  ./pyembed/python.exe tools/codex-scripts/drift.py check      变了什么（全仓 stat，约 90 秒）
+  ./pyembed/python.exe tools/codex-scripts/drift.py check <前缀>  只看某个目录/前缀
+  ./pyembed/python.exe tools/codex-scripts/drift.py freeze     把现状冻结成新基线（要 filesystem_write 票）
 """
 
 
@@ -48,7 +48,7 @@ def _show_status(out: dict) -> int:
         return 1
     if not out.get("baseline"):
         print("还没有基线 —— 这**不等于**『项目没变』，只是还看不见。")
-        print("建基线：py -3.14 tools/codex-scripts/drift.py freeze")
+        print("建基线：./pyembed/python.exe tools/codex-scripts/drift.py freeze")
         return 0
     age = out.get("age_s")
     print("基线 %s · 覆盖 %d 件 · %s" % (out["at"], out["files"],

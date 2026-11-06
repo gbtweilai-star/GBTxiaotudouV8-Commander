@@ -279,6 +279,8 @@ body.density-compact .msg{padding:8px 12px!important}
 
 /* ── Electron 窗口：隐藏原生标题栏，自己画一条拖拽条 ── */
 body.electron-app { padding-top: 30px; }
+/* 拖拽条右端的时钟（app.js 写入；非 Electron 时整条标题栏隐藏，不影响） */
+body.electron-app #titlebar-time { position: absolute; right: 14px; top: 0; height: 30px; display: flex; align-items: center; color: rgba(236, 236, 235, .45); font: 400 10px/1 var(--mono, monospace); letter-spacing: .06em; -webkit-app-region: no-drag; }
 body.electron-app .app-titlebar {
   display: block !important;
   position: fixed; left: 0; right: 0; top: 0; height: 30px; z-index: 90;
@@ -461,3 +463,94 @@ body.electron-app .console { max-height: calc(100vh - 66px) !important; }
 .view-teardown iframe{width:100%;height:100%;border:0;border-radius:12px;background:#0b0d0f}
 
 .chat-attach-preview{padding:6px 0}.attach-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 6px;background:rgba(0,0,0,.25);font-size:10px}.attach-chip img{width:34px;height:34px;object-fit:cover;border-radius:5px}.attach-chip b{font-weight:500;color:#d8d8d4}.attach-chip i{cursor:pointer;color:#9a9c98;font-style:normal;padding:0 2px}
+/* ── 改动影响 · 多域监控（2026-11-04 重做）
+ *   回答一个问题：「我这一刀改下去，哪些部位会跟着坏」。
+ *   配色只承担三档含义（红=核心区 / 黄=牵连面不小 / 蓝=范围小），
+ *   长度表达波及面大小 —— 不靠文字数字也看得出谁最危险。 */
+.im-verdict {
+  margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08); border-left: 3px solid #6f7270;
+  background: rgba(255,255,255,.03);
+}
+.im-v-head { font-size: 13px; font-weight: 600; line-height: 1.45; }
+.im-v-body { margin-top: 4px; color: #9a9c99; font-size: 11px; line-height: 1.6; }
+
+.im-ask { display: flex; gap: 6px; margin-top: 10px; }
+.im-ask input {
+  flex: 1; min-width: 0; border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.28); color: #e6e6e3; border-radius: 8px; padding: 7px 9px;
+  font: 11px/1.4 var(--mono); letter-spacing: .01em;
+}
+.im-ask input::placeholder { color: #6f7270; }
+.im-ask input:focus { outline: none; border-color: rgba(242,86,94,.55); }
+.im-ask button {
+  flex: none; border: 1px solid rgba(255,255,255,.14); background: #232426;
+  color: #ececeb; border-radius: 8px; padding: 7px 11px; font-size: 11px; cursor: pointer;
+}
+.im-ask button:hover { border-color: rgba(242,86,94,.55); }
+
+.im-probe {
+  margin-top: 8px; padding: 9px 11px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.02);
+}
+.im-p-head { font-size: 11.5px; line-height: 1.6; }
+.im-p-head b { color: #e6e6e3; font-family: var(--mono); }
+.im-sample { margin-top: 6px; color: #8b8d8b; font-size: 10px; line-height: 1.9; }
+.im-sample u {
+  display: inline-block; text-decoration: none; margin: 0 5px 2px 0; padding: 1px 6px;
+  border-radius: 5px; background: rgba(255,255,255,.05);
+  font: 400 9.5px/1.5 var(--mono); color: #b8b8b4;
+}
+
+.im-nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+.im-num {
+  border: 1px solid rgba(255,255,255,.07); border-radius: 9px;
+  padding: 8px 9px; background: rgba(255,255,255,.025);
+}
+.im-num b { display: block; font: 600 16px/1.15 var(--mono); color: #e6e6e3; }
+.im-num span { display: block; font-size: 10px; color: #9a9c99; margin-top: 1px; }
+.im-num i {
+  display: block; font: 400 9px/1.45 inherit; color: #6f7270;
+  font-style: normal; margin-top: 3px;
+}
+
+.im-sec { margin: 12px 0 6px; color: #8b8d8b; font-size: 10px; letter-spacing: .05em; }
+.im-bars { display: flex; flex-direction: column; gap: 8px; }
+.im-bar-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.im-bar-top span {
+  font: 400 10.5px/1.4 var(--mono); color: #d8d8d4;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.im-bar-top b { flex: none; font: 600 11px/1 var(--mono); }
+.im-bar-track {
+  height: 5px; border-radius: 3px; background: rgba(255,255,255,.07);
+  margin-top: 4px; overflow: hidden;
+}
+.im-bar-fill { height: 100%; border-radius: 3px; }
+.im-bar-sub {
+  margin-top: 3px; font-size: 9px; color: #6f7270;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.im-feed { display: flex; flex-direction: column; }
+.im-ev {
+  display: grid; grid-template-columns: 38px 54px 1fr auto; gap: 7px;
+  align-items: baseline; padding: 4px 0;
+  border-top: 1px solid rgba(255,255,255,.05); font-size: 10px;
+}
+.im-ev:first-child { border-top: none; }
+.im-ev-t { color: #6f7270; font-family: var(--mono); }
+.im-ev-a { color: #9a9c99; font-family: var(--mono); }
+.im-ev-a.bad { color: #F2565E; }
+.im-ev-n {
+  color: #d8d8d4; font-family: var(--mono);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.im-ev-r { flex: none; text-align: right; font: 600 9.5px/1 var(--mono); }
+
+.im-legend {
+  margin-top: 12px; padding-top: 9px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  color: #6f7270; font-size: 9.5px; line-height: 1.75;
+}
+.im-empty { color: #6f7270; font-size: 10px; padding: 8px 0; }

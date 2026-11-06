@@ -229,6 +229,28 @@ class TestGrowthHooks(unittest.TestCase):
         self.assertTrue(r.get("shortboard"), "没挑出短板")
 
 
+    def test_d_shortboard_src_points_to_real_file(self):
+        """短板 src 必须回得到真源：`模块::函数` 或 `state/*.json` 都得在盘上。
+
+        血账：`覆盖` 曾指向 `state/coverage_matrix.json` —— 该文件**从来不存在**，
+        真源是 `gbt_allinone/positions.py::audit()`。指错源 = 让人去修一个不存在的东西。
+        """
+        r = self.m.shortboard()
+        for it in r["top"]:
+            rel = str(it.get("src") or "").split("::")[0].strip()
+            self.assertTrue((self.m._ROOT / rel).is_file(),
+                            f"src 指向不存在的文件（登记幻影）：{it}")
+
+    def test_e_unimplemented_names_are_readable(self):
+        """读数里不许出现 None —— 那是「读错键」，不是「没有名字」。"""
+        r = self.m.shortboard()
+        for it in r["top"]:
+            self.assertNotIn("None", str(it.get("what")), f"读错键了：{it}")
+        self.assertEqual(["a.py"], self.m._names([{"where": "a.py", "kind": "x"}]))
+        self.assertEqual(["?"], self.m._names([{}]))
+        self.assertEqual(-1.0, self.m._age_hours("not-a-time"))
+
+
 class TestDevourFusion(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

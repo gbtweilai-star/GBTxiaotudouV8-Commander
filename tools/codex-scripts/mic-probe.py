@@ -24,7 +24,7 @@ try:
     import numpy as np
     import sounddevice as sd
 except ImportError as exc:                                        # noqa: BLE001
-    print(json.dumps({"ok": False, "why": "缺依赖：%s（用装了 numpy/sounddevice 的解释器，如 C:\\Python312\\python.exe）" % exc},
+    print(json.dumps({"ok": False, "why": "缺依赖：%s（用装了 numpy/sounddevice 的解释器，如 ./pyembed/python.exe）" % exc},
                      ensure_ascii=False))
     raise SystemExit(2)
 

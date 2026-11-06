@@ -1091,11 +1091,28 @@ class TestFramework(unittest.TestCase):
         self.assertGreater(size[1], 0)
 
     def test_tentacle_vision_snapshot_full_frame(self):
+        """强制全屏帧：尺寸必须等于**本机真实屏幕**，不是某台机器的固定值。
+
+        🔴 2026-11-06 判据修正：这里原来写死 `assertEqual(res.get("size"), [1920, 1080])`
+        —— 本机屏幕是 **1920×1200**，于是这条**恒红**。红的是判据，不是代码：
+        判据绑死在别人的机器规格上，换台机器就换个结论。
+        现在改成先问 `screen_size` 要真实尺寸，再比对帧尺寸 —— 意图（"全屏帧尺寸稳定"）
+        一个字没变，只是把"稳定在哪里"从写死改成现读。
+        """
+        ss = _body(gbt.run_task("tentacle", {"action": "screen_size"}))
+        self.assertEqual(ss["status"], "ok")
+        true_size = [ss["result"].get("width"), ss["result"].get("height")]
+        self.assertTrue(true_size[0] and true_size[1], "读不到真实屏幕尺寸：%r" % (true_size,))
+
         r = _body(gbt.run_task("tentacle", {"action": "vision_snapshot"}))
         self.assertEqual(r["status"], "ok")
         res = r["result"]
         self.assertTrue(res.get("ok"))
-        self.assertEqual(res.get("size"), [1920, 1080])   # 强制全屏帧：尺寸稳定
+        got = res.get("size")
+        self.assertTrue(got and got[0] > 0 and got[1] > 0, "帧尺寸必须为正：%r" % (got,))
+        self.assertEqual(got, true_size,
+                         "全屏帧尺寸 %r 与真实屏幕 %r 不一致 —— 帧被裁过或采集没取全屏"
+                         % (got, true_size))
         self.assertTrue(res.get("fingerprint"))
 
     def test_tentacle_manifest(self):
@@ -1877,10 +1894,24 @@ def _skip_if_unconfigured(case, body, what=""):
     return body
 
 
-import pytest  # noqa: E402  （只为给下面那个类挂超时标记）
+try:  # 只为给下面那个类挂超时标记
+    import pytest  # noqa: E402
+except ImportError:  # pragma: no cover
+    # 🔴 2026-11-05 血账：这一行原来是无条件的 `import pytest`，于是「没装 pytest」
+    # 的机器上 unittest 连本模块都 import 不了 —— 这份文件里 36 项判据**一条都跑不起来**，
+    # 报出来的却是一个和判据毫无关系的 `No module named 'pytest'`。
+    # 缺一个可选标记库属于 needs_dependency（AGENTS.md §2.1），不该把整份回归变成 error。
+    pytest = None
 
 
-@pytest.mark.timeout(240)
+def _maybe_timeout(seconds):
+    """有 pytest 就挂超时标记；没有就退化成透明装饰器，别因此废掉整个文件。"""
+    if pytest is None:
+        return lambda cls: cls
+    return pytest.mark.timeout(seconds)
+
+
+@_maybe_timeout(240)
 class TestProductionStoreIsolation(unittest.TestCase):
     """测试期绝不许写生产 store（第一次实证：2026-09-17 `t-sched-run` 被写进生产 schedules.json）。
 

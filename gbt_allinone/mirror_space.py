@@ -264,7 +264,7 @@ def ascend(purpose: str = "", owner_override: bool = False,
             return {"ok": False, "blocked": True, "reason": "验证未全绿，禁止晋升",
                     "validate": v,
                     "如何放行": ("这不是技术层死限：主人在终端发**专用一次性钥匙** `deploy_force`"
-                              "（python -m gbt_allinone auth grant --scope deploy_force --ttl 600，"
+                              r"（.\pyembed\python.exe tools\codex-scripts\auth-grant.py --scope deploy_force --ttl 600，"
                               "提示符敲 YES），再带 owner_override=true 重调即可放行；"
                               "放行会写审计 deploy_promote_overridden。")}
         _reason = str(override_reason or purpose or "(未写理由)")[:200]

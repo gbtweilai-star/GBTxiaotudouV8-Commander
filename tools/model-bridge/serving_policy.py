@@ -1,116 +1,160 @@
-# ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
-"""本地服务策略层（serving_policy）· 2026-11-04 补齐
+# -*- coding: utf-8 -*-
+"""serving_policy —— 内容策略开关层（粗粒度 · 不是安全保证）。
 
-## 为什么有这个文件
+⚠️ **重建版。** 2026-11-05 发现全仓（含备份/归档）**0 命中 `serving_policy*`**，
+而两个地方都在 import 它：
+  · `tools/model-bridge/server.py:642`  `import serving_policy as _sp` → `_sp.Policy.load()`
+  · `tools/model-bridge/local_llm_server.py:170`  同上
+两处都包在 `try/except` 里 ⇒ 缺了不崩，但 `server.py:633-636` 的注释说得很清楚：
 
-`tools/model-bridge/local_llm_server.py:170` 与 `server.py:633` 都写着
+    这补的是**真实缺口**：`serving_policy.py` 原来只被 `local_llm_server.py` 引用，
+    而默认车道是 `selfhost_gpu`（走 llama-server）⇒ **桥这层根本没有策略**。
+    也就是说「我们有内容策略开关」这个对外说法，在**默认路径上是空的**。
 
-    import serving_policy as _sp
-    _pol = _sp.Policy.load()
-    if _pol.mode != "uncensored": ...   # 拦
+文件一丢，那个补丁就等于没打过 —— 开关在，闸门不在。
 
-但 **serving_policy.py 在本仓从未存在**（git 全历史 0 条）。于是行为变成
-「导入失败 ⇒ except ⇒ 不拦」——**靠缺件实现的放行**。
+**定位照两个引用方的原注释，一个字没改口径**：
+  · 本层只做「档位声明 + 粗粒度拦截 + 可解释拒绝 + 审计」，**不是安全保证**
+  · 默认档 `uncensored`（自用）；开放给他人前先 `--set-mode filter-lite|strict`
+  · 只判 chat/completions 里 user 的文字；拒的时候回 200 + 结构化说明，
+    让下游能分清「被策略拦」与「模型坏了」
 
-这种状态有两个毛病：
-1. **不可审计**：盘上没有文件，谁都不知道这一层实际拦不拦、按什么拦；
-2. **不稳**：哪天有人补上这个文件，拦截就悄悄恢复，而没人会想起这件事。
+**刻意不做**：不做内容审核引擎、不内置大词表。编一张大词表既会误伤，
+又会让人误以为「有安全保证」。内置规则只放**无歧义的违法类**，其余自行在
+`state/serving-policy.json` 里扩充。
 
-## 本文件的口径（主人令 2026-11-04，逐字）
-
-> 「不能有能力上的限制以及能力阉割，只要是技术能达到的地方都可以，
->   危险能力和资金转账需要找我拿票，其他全面开放」
-
-⇒ **模型输出层不设任何拒绝机制。** 这一层是**内容闸**，不是**授权闸**：
-   - 授权（危险能力 / 资金转账要票）在 `gbt_allinone/auth_gate.py` 的
-     `ENFORCED_SCOPES` 里，与本文件无关，**本文件不碰它、也绕不过它**；
-   - 本文件只管「模型吐出来的话要不要拦」，而按主人令：**不拦**。
-
-默认 `mode = "uncensored"` ⇒ `check()` 永远 `allow=True`，且如实标明
-「本发未过任何内容闸」，让下游能分清「没人拦」与「拦了放行」。
-
-## 如果哪天要临时开内容闸
-
-不改代码，设环境变量即可：
-
-    $env:GBT_SERVING_POLICY_MODE = "censor"
-    # 规则表：tools/model-bridge/serving_policy.rules.json（{"categories": {"名字": ["词", ...]}}）
-
-开了闸它也**只做分类统计 + 记录**，不替主人决定「能不能说」——判定口径写在
-`check()` 的返回里，主人一眼能看见是哪条命中的。
+用法：
+    python serving_policy.py --show
+    python serving_policy.py --set-mode uncensored|filter-lite|strict
 """
 from __future__ import annotations
 
+import argparse
+import io
 import json
 import os
-from pathlib import Path
+import pathlib
+import sys
 
-_HERE = Path(__file__).resolve().parent
-RULES_PATH = _HERE / "serving_policy.rules.json"
-MODE_ENV = "GBT_SERVING_POLICY_MODE"
-DEFAULT_MODE = "uncensored"          # 主人令 2026-11-04：模型输出层不设拒绝
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+STATE = ROOT / "state" / "serving-policy.json"
+
+MODES = ("uncensored", "filter-lite", "strict")
+DEFAULT_MODE = "uncensored"
+
+# 内置规则：只放**无歧义**的违法类，宁少不多。
+# 词少是刻意的 —— 这是开关，不是审核系统；要更严就自己往 json 里加。
+_BUILTIN = {
+    "filter-lite": {
+        "child_sexual": ("儿童色情", "未成年性", "child porn"),
+        "explosive": ("制作炸弹", "制造炸弹", "自制炸药", "build a bomb"),
+    },
+    "strict": {
+        "child_sexual": ("儿童色情", "未成年性", "child porn"),
+        "explosive": ("制作炸弹", "制造炸弹", "自制炸药", "build a bomb"),
+        "self_harm": ("自杀方法", "怎么自杀", "how to kill myself"),
+        "weapon_build": ("自制枪支", "3d打印枪", "ghost gun"),
+    },
+}
 
 
 class Policy:
-    """策略档位 + 规则表。`uncensored` ⇒ 一律放行；`censor` ⇒ 只统计、按规则表判。"""
+    """档位 + 规则 + 判定。`check()` 返回可解释结果，调用方据此回 200 + 结构化信封。"""
 
     def __init__(self, mode: str = DEFAULT_MODE, rules: dict | None = None):
-        self.mode = (mode or DEFAULT_MODE).strip().lower()
-        self.rules = rules or {}
+        self.mode = mode if mode in MODES else DEFAULT_MODE
+        self.rules = rules if isinstance(rules, dict) else {}
 
-    # ── 载入 ──────────────────────────────────────────────────────
+    # ---------- 读写 ----------
     @classmethod
-    def load(cls) -> "Policy":
-        mode = os.environ.get(MODE_ENV) or DEFAULT_MODE
-        rules: dict = {}
-        if RULES_PATH.is_file():
-            try:
-                rules = (json.loads(RULES_PATH.read_text(encoding="utf-8")) or {}).get("categories") or {}
-            except Exception:                                   # noqa: BLE001
-                rules = {}          # 规则表坏了也不许把整条路堵死
-        return cls(mode=mode, rules=rules)
+    def load(cls, path: str | os.PathLike | None = None) -> "Policy":
+        """读状态文件。**读不到就用默认档，不抛**（策略层坏掉不许把桥打死）。"""
+        p = pathlib.Path(path) if path else STATE
+        try:
+            with io.open(p, encoding="utf-8") as fh:
+                d = json.load(fh)
+            if isinstance(d, dict):
+                return cls(str(d.get("mode") or DEFAULT_MODE), d.get("rules") or {})
+        except (OSError, ValueError):
+            pass
+        return cls()
 
-    # ── 判定 ──────────────────────────────────────────────────────
-    def check(self, text: str = "") -> dict:
-        """返回 {allow, reason, mode, hits, enforced}。
+    def save(self, path: str | os.PathLike | None = None) -> pathlib.Path:
+        """原子写（tmp + fsync + os.replace），写完读回校验。"""
+        p = pathlib.Path(path) if path else STATE
+        p.parent.mkdir(parents=True, exist_ok=True)
+        tmp = p.with_name("%s.tmp-%d" % (p.name, os.getpid()))
+        payload = json.dumps({"mode": self.mode, "rules": self.rules},
+                             ensure_ascii=False, indent=2) + "\n"
+        with io.open(tmp, "w", encoding="utf-8", newline="") as fh:
+            fh.write(payload)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, p)
+        back = json.loads(io.open(p, encoding="utf-8").read())
+        if back.get("mode") != self.mode:
+            raise RuntimeError("读回校验失败：mode 不一致")
+        return p
 
-        `uncensored`（默认）⇒ allow=True 且 `enforced=False`，
-        并在 reason 里写明「本层未拦」，避免下游把「没人拦」误读成「已审过」。
-        """
-        if self.mode == "uncensored":
-            return {"allow": True, "mode": self.mode, "enforced": False,
-                    "reason": "本层为 uncensored（主人令 2026-11-04：模型输出层不设拒绝机制）",
-                    "hits": []}
+    # ---------- 判定 ----------
+    def _active_rules(self) -> dict:
+        """当前档位生效的规则：json 里的优先，没写就退内置。"""
+        if self.mode == DEFAULT_MODE:
+            return {}
+        if self.rules:
+            return self.rules
+        return dict(_BUILTIN.get(self.mode, {}))
 
-        # censor 档：只做分类统计，命中也不改写内容，只如实上报
+    def check(self, text: str) -> dict:
+        """判一段 user 文本。返回 `{allow, mode, reason, hits}` —— 永远不抛。"""
+        if self.mode == DEFAULT_MODE:
+            return {"allow": True, "mode": self.mode, "reason": "默认档，不拦", "hits": []}
+        low = str(text or "").lower()
+        if not low.strip():
+            return {"allow": True, "mode": self.mode, "reason": "空文本", "hits": []}
         hits = []
-        low = (text or "").lower()
-        for cat, words in (self.rules or {}).items():
-            for w in words or []:
-                if w and str(w).lower() in low:
-                    hits.append({"category": cat, "word": w})
+        for cat, words in (self._active_rules() or {}).items():
+            for w in (words or ()):
+                ws = str(w or "").strip().lower()
+                if ws and ws in low:
+                    hits.append({"category": str(cat), "matched": str(w)})
                     break
-        # 保留「命中即拒」的能力，但**默认规则表为空 ⇒ 什么都不命中**。
-        # 也就是说：即使把档位切到 censor，只要主人不亲自填规则，它仍然不拦。
-        deny = bool(self.rules) and bool(hits)
-        return {"allow": not deny, "mode": self.mode, "enforced": True,
-                "reason": ("命中规则表：%s" % "、".join(h["category"] for h in hits)) if hits
-                          else "规则表为空 ⇒ 无命中",
-                "hits": hits}
-
-    # ── 自述 ──────────────────────────────────────────────────────
-    def where(self) -> dict:
-        return {"ok": True, "module": "serving_policy", "mode": self.mode,
-                "default_mode": DEFAULT_MODE,
-                "mode_env": MODE_ENV,
-                "rules_file": str(RULES_PATH), "rules_categories": sorted((self.rules or {}).keys()),
-                "口径": "模型输出层不设拒绝（主人令 2026-11-04）。授权闸在 "
-                        "gbt_allinone/auth_gate.py::ENFORCED_SCOPES —— 本文件不碰、也绕不过"}
+        if hits:
+            return {
+                "allow": False,
+                "mode": self.mode,
+                "reason": "命中 %s（本层是本地粗粒度开关，不是安全保证）"
+                          % "、".join(h["category"] for h in hits),
+                "hits": hits,
+            }
+        return {"allow": True, "mode": self.mode, "reason": "未命中", "hits": []}
 
 
-def where() -> dict:
-    return Policy.load().where()
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="内容策略开关（档位声明 + 粗粒度拦截）")
+    ap.add_argument("--show", action="store_true", help="显示当前档位与生效规则数")
+    ap.add_argument("--set-mode", choices=MODES, help="切换档位并落盘")
+    args = ap.parse_args(argv)
+
+    pol = Policy.load()
+    if args.set_mode:
+        pol = Policy(args.set_mode, pol.rules)
+        p = pol.save()
+        print("已切到 %s → %s" % (pol.mode, p.relative_to(ROOT) if p.is_relative_to(ROOT) else p))
+        if pol.mode != DEFAULT_MODE and not pol.rules:
+            print("  注意：json 里没有自定义规则，当前用内置的最小规则集（%d 类）"
+                  % len(_BUILTIN.get(pol.mode, {})))
+        return 0
+
+    active = pol._active_rules()
+    print("档位        : %s" % pol.mode)
+    print("状态文件    : %s" % (STATE.relative_to(ROOT) if STATE.is_relative_to(ROOT) else STATE))
+    print("自定义规则  : %d 类" % len(pol.rules))
+    print("生效规则    : %d 类 %s" % (len(active), sorted(active) if active else "（默认档不拦）"))
+    print()
+    print("口径：本层只做档位声明 + 粗粒度拦截 + 可解释拒绝，**不是安全保证**。")
+    return 0
 
 
 if __name__ == "__main__":
-    print(json.dumps(Policy.load().where(), ensure_ascii=False, indent=1))
+    sys.exit(main())

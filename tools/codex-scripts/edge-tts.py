@@ -2,7 +2,10 @@
 # 开发者：自由的风 · 永久钢印 · 禁止删除
 """edge-tts.py — 台湾腔女声（zh-TW-HsiaoChenNeural）合成；需联网。
 
-为什么不用 SAPI：本机 SAPI 只有 zh-CN Huihui，没有 zh-TW 女声（实测 GetInstalledVoices）。
+为什么不用 SAPI：本机音色随系统语言包漂移，不能拿来当既定音色。
+（2026-11-04 复测：本机已装 Microsoft Hanhan Desktop / zh-TW / Female，同时也装着 zh-CN Huihui；
+ 旧注释「本机 SAPI 只有 zh-CN Huihui、没有 zh-TW 女声」已过时 —— 以 GetInstalledVoices 现读为准，
+ 不要在注释里断言某台机器的音色清单。）
 Edge TTS 的 zh-TW-HsiaoChenNeural 是台湾腔女声；edge-tts 依赖装在 vendor/pylibs（不进源码）。
 用法：py tools/codex-scripts/edge-tts.py --text-file in.txt --out out.mp3 [--voice zh-TW-HsiaoChenNeural]
 """

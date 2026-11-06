@@ -325,16 +325,19 @@ def keys(tool: str = "", **_kw) -> dict:
         return {"ok": True, "op": "keys", "tool": tool, "counts": d.get("counts"),
                 "min_keys": d.get("min_keys"), "tentacle": d.get("tentacle"),
                 "sample": (d.get("keys") or [])[:15], "gone": len(d.get("gone") or [])}
-    rows = []
+    rows, unread = [], []
     for f in sorted(_DIR.glob("*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, OSError) as _e:
+            unread.append({"file": f.name, "why": type(_e).__name__})
             continue
         rows.append({"tool": d.get("tool"), "keys": (d.get("counts") or {}).get("keys"),
                      "min_keys": d.get("min_keys"), "gone": len(d.get("gone") or []),
                      "at": d.get("at"), "tentacle": d.get("tentacle")})
     return {"ok": True, "op": "keys", "surfaces": rows,
+            "unread": unread[:20], "unread_n": len(unread),
+            "coverage_complete": not unread,
             "_口径": "每行=一个工具的可控制面（键数 / 阈值 / 消失键数 / 触手）"}
 
 

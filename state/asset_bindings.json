@@ -1,1231 +1,4668 @@
 {
- "docs/02-architecture.md": {
+ "docs/157-p1-registration-app.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T12:58:52"
- },
- "docs/03-capabilities.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T12:58:52"
- },
- "docs/90-what-she-can-do.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T12:58:52"
+  "bound_at": "2026-11-02T22:46:20"
  },
  "docs/README.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T12:58:52"
+  "bound_at": "2026-11-02T22:46:20"
  },
- "gbt_allinone/tools/skill_slim.py": {
+ "tools/native_i2v_svd.py": {
+  "tentacles": [
+   "world_forge",
+   "selfscan",
+   "voice_stream",
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T22:46:20"
+ },
+ "tools/console-server.py": {
+  "tentacles": [
+   "world_forge",
+   "ui_card",
+   "voice_settings",
+   "body_control",
+   "context_inject",
+   "thought_stream",
+   "api_slot",
+   "reminder",
+   "resource_snapshot",
+   "media_library",
+   "turn_trace",
+   "pairing",
+   "lan_pairing",
+   "update_verify",
+   "selfscan",
+   "voice_stream",
+   "update_chain",
+   "kws",
+   "video_hub",
+   "hunyuan_video",
+   "ref3d",
+   "llm_chat",
+   "health",
+   "impact_check",
+   "omni_plug",
+   "tentacle",
+   "media_pipeline",
+   "project_drift",
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:13:00"
+ },
+ "gbt_allinone/tools/voice_intercom.py": {
   "tentacles": [
    "domain:tools"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T12:58:52"
- },
- "gbt_allinone/__init__.py": {
-  "tentacles": [
-   "health"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:01:28"
- },
- "docs/04-evaluation.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:40:28"
- },
- "docs/188-cap-verification.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:40:28"
- },
- "docs/capabilities-full.json": {
-  "tentacles": [
-   "body_map",
-   "console_pages",
-   "console_hub"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:40:28"
- },
- "gbt_allinone/store/devoured/水下声学通信/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/水下声学通信/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/水下声学通信/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/太赫兹成像/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/太赫兹成像/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/太赫兹成像/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/卫星互联网终端/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/卫星互联网终端/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/卫星互联网终端/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_bobyue0/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_bobyue0/absorbed_knowledge.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_bobyue0/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_bobyue0/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_blue-hi/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_blue-hi/absorbed_knowledge.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_blue-hi/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_blue-hi/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_alexand/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_alexand/absorbed_knowledge.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_alexand/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/devoured_12-twelve-12_robolings_x_devoured_alexand/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent谈判协议/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent谈判协议/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent谈判协议/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent信誉系统/.gbt_dir_marker": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent信誉系统/knowledge.json": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "gbt_allinone/store/devoured/agent信誉系统/run.py": {
-  "tentacles": [
-   "devour_pulse"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:44:27"
- },
- "holo_pet/assets/workbench/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/wf-short-video/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/wf-music/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/wf-movie/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/wf-film/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/tentacle3d/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/home/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/gallery/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/freebuff/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "holo_pet/assets/console/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "tools/codex-scripts/probe-caps-live.py": {
-  "tentacles": [
-   "sec_scan"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:49:37"
- },
- "gbt_allinone/store/devoured/联邦学习投毒防御/.gbt_dir_marker": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/联邦学习投毒防御/knowledge.json": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/联邦学习投毒防御/run.py": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/prompt注入防火墙/.gbt_dir_marker": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/prompt注入防火墙/knowledge.json": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/prompt注入防火墙/run.py": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/npu编译器/.gbt_dir_marker": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/npu编译器/knowledge.json": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/npu编译器/run.py": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/ai模型水印检测/.gbt_dir_marker": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/ai模型水印检测/knowledge.json": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/ai模型水印检测/run.py": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/agent梦境模拟/.gbt_dir_marker": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/agent梦境模拟/knowledge.json": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "gbt_allinone/store/devoured/agent梦境模拟/run.py": {
-  "tentacles": [
-   "caps_called_audit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T13:53:14"
- },
- "tools/codex-scripts/render-social-preview.py": {
-  "tentacles": [
-   "brain_route"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:05:46"
- },
- "gbt_allinone/store/devoured/数字孪生建模引擎/.gbt_dir_marker": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/数字孪生建模引擎/knowledge.json": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/数字孪生建模引擎/run.py": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/存内计算框架/.gbt_dir_marker": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/存内计算框架/knowledge.json": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/存内计算框架/run.py": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/因果图自动发现/.gbt_dir_marker": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/因果图自动发现/knowledge.json": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/因果图自动发现/run.py": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/光子神经网络sdk/.gbt_dir_marker": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/光子神经网络sdk/knowledge.json": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/光子神经网络sdk/run.py": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/ai碳排放追踪/.gbt_dir_marker": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/ai碳排放追踪/knowledge.json": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "gbt_allinone/store/devoured/ai碳排放追踪/run.py": {
-  "tentacles": [
-   "ghost_guard"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:12:49"
- },
- "tools/codex-scripts/seed-mirror-dimension.py": {
-  "tentacles": [
-   "mirror_scan",
-   "echo"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:20:18"
- },
- "tools/codex-scripts/sync-readme-figures.py": {
-  "tentacles": [
-   "mirror_scan",
-   "echo"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T14:20:18"
- },
- "tools/codex-scripts/render-test-figures.py": {
-  "tentacles": [
+  "bound_at": "2026-11-02T23:13:00"
+ },
+ "tools/aki_range_download.py": {
+  "tentacles": [
+   "world_forge",
+   "selfscan",
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:45:50"
+ },
+ "gbt_allinone/tools/asr_whisper.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:45:50"
+ },
+ "gbt_allinone/tools/browser_embed.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:51:52"
+ },
+ "gbt_allinone/api.py": {
+  "tentacles": [
+   "ui_card",
+   "voice_settings",
+   "focus_stack",
+   "body_control",
+   "context_inject",
+   "thought_stream",
+   "api_slot",
+   "reminder",
+   "resource_snapshot",
+   "media_library",
+   "turn_trace",
+   "pairing",
+   "lan_pairing",
+   "update_verify",
+   "voice_stream",
+   "update_chain",
+   "kws",
+   "video_hub",
+   "ref3d",
+   "email_cap",
+   "selfscan",
+   "health",
+   "see_camera",
+   "cap_tags",
+   "look_grade",
+   "mcp_register"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:53:37"
+ },
+ "gbt_allinone/caps_registry.py": {
+  "tentacles": [
+   "ui_card",
+   "voice_settings",
+   "focus_stack",
+   "body_control",
+   "context_inject",
+   "thought_stream",
+   "api_slot",
+   "reminder",
+   "resource_snapshot",
+   "media_library",
+   "turn_trace",
+   "pairing",
+   "lan_pairing",
+   "update_verify",
+   "voice_stream",
+   "update_chain",
+   "kws",
+   "video_hub",
+   "ref3d",
+   "email_cap",
+   "selfscan",
+   "capability_net",
    "echo",
+   "health",
    "omni_plug",
-   "mirror_shape"
+   "cap_tags",
+   "console_hub",
+   "impact_check",
+   "media_pipeline",
+   "codepage",
+   "skills_hub"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T14:46:26"
+  "bound_at": "2026-11-02T23:53:37"
  },
- "docs/07-capability-proof.md": {
+ "gbt_allinone/tools/ui_card.py": {
+  "tentacles": [
+   "ui_card"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-02T23:53:37"
+ },
+ "docs/02-architecture.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:11:46"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "docs/12-multidomain-monitor.md": {
+ "docs/03-capabilities.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:11:46"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "holo_pet/assets/structure/index.html": {
+ "docs/11-five-dim.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "holo_pet/assets/console3d/index.html": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/01-model-card.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/103-console-views-3d.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/115-tentacle-professions.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/117-landing-closed-loop.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/124-omni-all-sync.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:00:59"
  },
  "docs/13-omni-plug.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "docs/18-native-cloud-catalog.md": {
+ "docs/15-tentacle-counter.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "docs/22-a19-ops-playbook.md": {
+ "docs/90-what-she-can-do.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "docs/42-cap-self.md": {
+ "gbt_allinone/tools/voice_settings.py": {
   "tentacles": [
-   "project_context"
+   "voice_settings"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:00:59"
  },
- "docs/待授权清单一页.md": {
+ "gbt_allinone/tools/focus_stack.py": {
   "tentacles": [
-   "project_context"
+   "focus_stack"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:07:21"
  },
- "docs/capabilities/body_control.md": {
+ "gbt_allinone/tools/body_control.py": {
   "tentacles": [
-   "project_context"
+   "body_control"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:13:53"
  },
- "docs/capabilities/brain.md": {
+ "tools/weight_fusion_sd15.py": {
   "tentacles": [
-   "project_context"
+   "focus_stack",
+   "media_library",
+   "lan_pairing",
+   "wf_status"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:21:04"
  },
- "docs/capabilities/comms.md": {
+ "gbt_allinone/tools/context_inject.py": {
   "tentacles": [
-   "project_context"
+   "context_inject"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:27:34"
  },
- "docs/capabilities/creation.md": {
+ "gbt_allinone/tools/thought_stream.py": {
   "tentacles": [
-   "project_context"
+   "thought_stream"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:33:17"
  },
- "docs/capabilities/device.md": {
+ "gbt_allinone/tools/api_slot.py": {
   "tentacles": [
-   "project_context"
+   "api_slot"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
+  "bound_at": "2026-11-03T00:38:38"
  },
- "docs/capabilities/engine.md": {
+ "gbt_allinone/tools/reminder.py": {
   "tentacles": [
-   "project_context"
+   "reminder"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/integration.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/llm.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/mind.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/security.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/system.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/tentacle.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/ui.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/video.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/vision.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "docs/capabilities/voice.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "skills/gbt-selfgrowth/SKILL.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "skills/gbt-ai-101/SKILL.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "tools/codex-scripts/export-capabilities.py": {
-  "tentacles": [
-   "mirror_shape",
-   "console_pages"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "tools/codex-scripts/multi-domain-monitor.py": {
-  "tentacles": [
-   "mirror_shape"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "gbt_allinone/caps_registry.py": {
-  "tentacles": [
-   "mirror_shape",
-   "console_hub"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "gbt_allinone/omni_plug.py": {
-  "tentacles": [
-   "omni_plug"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:36:56"
- },
- "gbt_allinone/tools/console_pages.py": {
-  "tentacles": [
-   "console_pages"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T15:40:16"
- },
- "tools/dsh-superagent/package.json": {
-  "tentacles": [
-   "console_pages"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:03:54"
- },
- "tools/dsh-superagent/pnpm-lock.yaml": {
-  "tentacles": [
-   "console_pages"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:03:54"
- },
- "tools/dsh-superagent/pnpm-workspace.yaml": {
-  "tentacles": [
-   "console_pages"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:03:54"
- },
- "gbt_allinone/tools/console_hub.py": {
-  "tentacles": [
-   "console_hub"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:04:56"
- },
- "docs/136-app-screens.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
- },
- "docs/155-living-world-devour.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
- },
- "docs/156-shannon-devour.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T00:44:24"
  },
  "docs/170-reminder.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T00:46:41"
+ },
+ "gbt_allinone/tools/resource_snapshot.py": {
+  "tentacles": [
+   "resource_snapshot"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T00:51:07"
+ },
+ "gbt_allinone/tools/media_library.py": {
+  "tentacles": [
+   "media_library"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T00:58:39"
+ },
+ "gbt_allinone/tools/turn_trace.py": {
+  "tentacles": [
+   "turn_trace"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:03:32"
  },
  "docs/173-turn-trace.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T01:04:45"
+ },
+ "tools/hf_range_download.py": {
+  "tentacles": [
+   "pairing"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:18:04"
+ },
+ "gbt_allinone/tools/pairing.py": {
+  "tentacles": [
+   "pairing"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:18:04"
  },
  "docs/174-pairing-cert.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T01:21:20"
+ },
+ "gbt_allinone/tools/lan_pairing.py": {
+  "tentacles": [
+   "lan_pairing"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:29:10"
  },
  "docs/175-lan-pairing.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T01:34:32"
+ },
+ "gbt_allinone/tools/update_verify.py": {
+  "tentacles": [
+   "update_verify"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:39:56"
+ },
+ "docs/160-weight-fusion-rv-tiny.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:41:08"
  },
  "docs/176-update-verify.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T01:41:08"
+ },
+ "gbt_allinone/tools/comfy_nodes_extra.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:41:08"
+ },
+ "tools/native_t2i_worker.py": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:47:55"
+ },
+ "gbt_allinone/native_t2i_bridge.py": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:47:55"
+ },
+ "docs/162-desktop-api-t2i-fused.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:52:28"
+ },
+ "gbt_allinone/tools/voice_stream.py": {
+  "tentacles": [
+   "voice_stream"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T01:59:53"
+ },
+ "docs/163-svd-i2v-cpu-fp32.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T02:04:44"
  },
  "docs/177-voice-stream.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T02:04:44"
+ },
+ "gbt_allinone/tools/update_chain.py": {
+  "tentacles": [
+   "update_chain"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T02:08:35"
  },
  "docs/178-update-chain-local.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T02:13:33"
+ },
+ "docs/164-svd-8frame-cpu.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T02:28:00"
+ },
+ "docs/165-svd-vertical-1080.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T02:28:00"
+ },
+ "docs/166-svd-narrated-shot.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T02:51:49"
+ },
+ "docs/120-memory-api.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/121-console-3d-vendor.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/122-team-collab-redesign.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/123-mind-task-guidance-redo.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/124-blueprint-3d-preview.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/125-tentacle-binding-map.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/126-app-skin-datacube.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/127-dark-settings-portable.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/128-desktop-electron-app.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/129-ai-moments-digital-human-test.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/130-dh-live-omni-loop.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/131-blender-rerig-ptt.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/132-omni-capability-audit.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/134-related-lines-monitor.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/136-app-screens.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/138-superagent-capability-gap.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/167-two-shot-motion.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:00:01"
+ },
+ "docs/168-three-shot-motion.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:14:14"
+ },
+ "gbt_allinone/tools/kws.py": {
+  "tentacles": [
+   "kws"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:14:14"
  },
  "docs/179-kws.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T03:26:07"
+ },
+ "docs/169-three-shot-polished.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:34:42"
+ },
+ "gbt_allinone/tentacle/blueprint.py": {
+  "tentacles": [
+   "blueprint"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T03:34:42"
+ },
+ "docs/171-red-eye-all-motion.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T04:30:04"
+ },
+ "docs/172-gbt-i2v-svd-node-api.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T04:30:04"
+ },
+ "gbt_allinone/tools/video_hub.py": {
+  "tentacles": [
+   "video_hub"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T04:30:04"
  },
  "docs/180-video-hub.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T04:31:46"
  },
  "docs/181-page-mesh.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T04:31:46"
+ },
+ "skills/ref-to-3d/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T04:57:52"
+ },
+ "gbt_allinone/tools/ref3d.py": {
+  "tentacles": [
+   "ref3d"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T04:57:52"
  },
  "docs/182-ref3d.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T05:01:08"
+ },
+ "docs/183-email-cap.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T05:54:35"
+ },
+ "tools/cap_probe_one.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T05:54:35"
+ },
+ "tools/cap_smoke.py": {
+  "tentacles": [
+   "ui_kit",
+   "keylogger"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T05:54:35"
+ },
+ "gbt_allinone/secrets/event_ledger_key.dpapi": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T05:57:12"
+ },
+ "gbt_allinone/tools/look_grade_cap.py": {
+  "tentacles": [
+   "look_grade"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T05:58:47"
+ },
+ "tools/bind_pages.py": {
+  "tentacles": [
+   "page_scan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:06:12"
  },
  "docs/184-page-bindings.md": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:07:37"
  },
- "docs/91-visual-pages.md": {
+ "holo_pet/assets/workbench/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:11:01"
  },
- "docs/能力总表.md": {
+ "holo_pet/assets/tentacle3d/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:11:01"
  },
- "docs/legacy/163-ui-card-acui.md": {
+ "holo_pet/assets/home/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:11:01"
  },
- "docs/legacy/164-voice-settings.md": {
+ "holo_pet/assets/gallery/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:11:02"
  },
- "docs/legacy/165-focus-stack-memory-audit.md": {
+ "holo_pet/assets/console/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:11:02"
  },
- "docs/legacy/166-body-control.md": {
+ "holo_pet/assets/wf-short-video/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:13:02"
  },
- "docs/legacy/167-context-inject.md": {
+ "holo_pet/assets/wf-music/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:13:03"
  },
- "docs/legacy/168-thought-stream.md": {
+ "holo_pet/assets/wf-movie/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:13:03"
  },
- "docs/legacy/169-api-slot.md": {
+ "holo_pet/assets/wf-film/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:13:04"
  },
- "docs/legacy/171-resource-snapshot.md": {
+ "holo_pet/assets/freebuff/index.html": {
   "tentacles": [
    "project_context"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:13:05"
  },
- "docs/legacy/172-media-stage.md": {
+ "tools/blueprint-land.py": {
   "tentacles": [
-   "project_context"
+   "selfscan"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "docs/legacy/91-visual-pages.md": {
+ "tools/page_lazy.py": {
   "tentacles": [
-   "project_context"
+   "selfscan",
+   "wf_status",
+   "impact_check"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:20:41"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/framework_state.py": {
+ "tools/model-bridge/hand_onnx_chunked.py": {
   "tentacles": [
-   "obsidian_vault",
-   "one_shot"
+   "selfscan",
+   "wf_status"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:33:47"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/api.py": {
+ "tools/model-bridge/hand_onnx_chunk_worker.py": {
   "tentacles": [
-   "obsidian_vault"
+   "selfscan",
+   "wf_status"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:33:47"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/build-skill-atlas.py": {
+ "tools/model-bridge/hand_onnx_profile.py": {
   "tentacles": [
-   "one_shot"
+   "selfscan",
+   "wf_status"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:35:09"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/tools/actioncam_cap.py": {
+ "tools/model-bridge/realtime_eye_hand.py": {
   "tentacles": [
-   "actioncam"
+   "selfscan",
+   "wf_status"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:37:15"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/tools/filmkit_cap.py": {
+ "tools/codex-scripts/quick_scan.py": {
   "tentacles": [
-   "filmkit"
+   "selfscan",
+   "wf_status",
+   "cap_self"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:37:15"
+  "bound_at": "2026-11-03T06:15:26"
+ },
+ "gbt_allinone/coding_discipline.py": {
+  "tentacles": [
+   "selfscan",
+   "wf_status",
+   "echo"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:15:26"
  },
  "gbt_allinone/tools/comfyui_surface.py": {
   "tentacles": [
-   "comfyui"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：api.py:1028 comfyui 分派",
-  "bound_at": "2026-11-04T16:39:08"
- },
- "gbt_allinone/tools/zimage_rewash_cap.py": {
-  "tentacles": [
-   "zimage_rewash"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：api.py:1418 zimage_rewash 分派",
-  "bound_at": "2026-11-04T16:39:08"
- },
- "gbt_allinone/tools/edit_core.py": {
-  "tentacles": [
-   "edit_pipeline"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：api.py:2040 edit_pipeline 分派",
-  "bound_at": "2026-11-04T16:39:08"
- },
- "gbt_allinone/tools/audio_extract.py": {
-  "tentacles": [
-   "audio_extract"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:08"
- },
- "gbt_allinone/tools/audio_mix.py": {
-  "tentacles": [
-   "audio_mix"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/tools/media_run.py": {
-  "tentacles": [
-   "media_run"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/tools/media_publish.py": {
-  "tentacles": [
-   "media_publish"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/voice_cap.py": {
-  "tentacles": [
-   "voice"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：api.py:2449 voice 分派",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/voice_orchestra.py": {
-  "tentacles": [
-   "voice_orchestra"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/tools/research_intel.py": {
-  "tentacles": [
-   "music_intel"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：api.py:1210 music_intel 分组分派",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/tools/music_publishing.py": {
-  "tentacles": [
-   "music_publishing"
-  ],
-  "note": "2026-11-04 补绑（反查未绑定链路位）：handler 同名实现",
-  "bound_at": "2026-11-04T16:39:09"
- },
- "gbt_allinone/tools/one_shot.py": {
-  "tentacles": [
-   "one_shot"
+   "domain:tools"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:39:18"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/tools/obsidian_vault.py": {
+ "gbt_allinone/tools/pod_link.py": {
   "tentacles": [
-   "obsidian_vault"
+   "pod_link"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:41:00"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/codex-scripts/immune-fix-recycle.py": {
+ "gbt_allinone/tentacle/body_realtime.py": {
   "tentacles": [
-   "console_pages"
+   "body_realtime"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:54:11"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/codex-scripts/two-way-sync.py": {
+ "gbt_allinone/tentacle/hand_bridge.py": {
   "tentacles": [
-   "console_hub"
+   "hand_bridge"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T16:56:23"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/auth_gate.py": {
+ "gbt_allinone/tentacle/hand_onnx.py": {
   "tentacles": [
-   "cap_tags",
-   "one_shot"
+   "domain:tentacle"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T17:05:03"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "gbt_allinone/tools/cap_tags.py": {
+ "gbt_allinone/tentacle/hand_onnx_chunked_chain.py": {
   "tentacles": [
-   "cap_tags"
+   "domain:tentacle"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T17:05:03"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/codex-scripts/guardrail-check.py": {
+ "gbt_allinone/tentacle/hand_pipeline.py": {
   "tentacles": [
-   "body_map",
-   "one_shot"
+   "domain:tentacle"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T17:07:37"
+  "bound_at": "2026-11-03T06:15:26"
  },
- "tools/model-bridge/serving_policy.py": {
+ "gbt_allinone/tentacle/hand_realtime.py": {
   "tentacles": [
-   "omni_plug"
+   "hand_realtime"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T17:17:17"
+  "bound_at": "2026-11-03T06:15:26"
+ },
+ "gbt_allinone/tentacle/hand_retarget.py": {
+  "tentacles": [
+   "hand_retarget"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:15:26"
+ },
+ "gbt_allinone/tentacle/hand_video.py": {
+  "tentacles": [
+   "domain:tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:15:26"
  },
  "gbt_allinone/security/policy.py": {
   "tentacles": [
    "domain:security"
   ],
   "note": "autobind",
-  "bound_at": "2026-11-04T17:31:31"
+  "bound_at": "2026-11-03T06:15:26"
+ },
+ "docs/185-native-scan.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:17:08"
+ },
+ "gbt_allinone/tools/ai_capability_net.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:19:35"
+ },
+ "tools/page_scan_shards.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:21:52"
+ },
+ "tools/run_payload_one.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:21:52"
+ },
+ "gbt_allinone/tools/page_scan.py": {
+  "tentacles": [
+   "page_scan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:37:54"
+ },
+ "tools/control_loop.py": {
+  "tentacles": [
+   "control_loop"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:39:42"
+ },
+ "tools/page_scan_tail.py": {
+  "tentacles": [
+   "keylogger"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:42:08"
+ },
+ "tools/i2v_agnes.py": {
+  "tentacles": [
+   "i2v_agnes"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:49:24"
+ },
+ "gbt_allinone/tools/git_repo.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T06:50:33"
+ },
+ "docs/186-git-advanced.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "docs/187-console-layout.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "docs/188-cap-verification.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "docs/legacy/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "docs/capabilities/tools.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "tools/cap_verification.py": {
+  "tentacles": [
+   "capability_net"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:15"
+ },
+ "tools/fix_mesh_hud_layout.py": {
+  "tentacles": [
+   "capability_net"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:16"
+ },
+ "gbt_allinone/tests/test_git_advanced.py": {
+  "tentacles": [
+   "capability_net"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:05:16"
+ },
+ "tools/fix_legacy_doc_links.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:20:52"
+ },
+ "tools/page_scan_chunks.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T07:20:52"
+ },
+ "tools/assemble_e01_final.py": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T09:24:15"
+ },
+ "tools/render_storyboard_segment.py": {
+  "tentacles": [
+   "llm_chat"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T09:24:16"
+ },
+ "tools/model-bridge/本地权重-起引擎.cmd": {
+  "tentacles": [
+   "llm_chat"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T09:24:16"
+ },
+ "gbt_allinone/llm/cloud_llm.py": {
+  "tentacles": [
+   "cloud_llm"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T09:36:58"
+ },
+ "tools/team_mirror.py": {
+  "tentacles": [
+   "llm_chat"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T09:47:54"
+ },
+ "gbt_allinone/omni_plug.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T10:20:40"
+ },
+ "gbt_allinone/cap_taxonomy.py": {
+  "tentacles": [
+   "mirror_stage",
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T11:15:27"
+ },
+ "gbt_allinone/mirror_space.py": {
+  "tentacles": [
+   "mirror_stage",
+   "wf_status",
+   "tentacle_status",
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T11:47:21"
+ },
+ "gbt_allinone/tools/code_audit.py": {
+  "tentacles": [
+   "code_audit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T11:57:44"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/frame.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/h3-prompt.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/seedance-prompt.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/shot-writing.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/storyboard-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/test-fixtures/upstream/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/test-fixtures/shot-recipes/hands-tell.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/test-fixtures/shot-recipes/insert-beat.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-storyboard/references/test-fixtures/shot-recipes/ots-shot-reverse.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/references/read-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/references/staging-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-staging/references/test-fixtures/upstream/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/references/script-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-script/references/test-fixtures/upstream/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/references/episode-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/references/outline-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-outline/references/volume-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/profile-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/roster-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/sheet.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/references/test-fixtures/upstream/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-characters/examples/渡口-cast.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/prop-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/report-style.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/scene-pass.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/sheet.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/novel-art/references/test-fixtures/upstream/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/README.en.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/references/intake.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/references/models.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/references/prompting.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "gbt_allinone/skills/shuohao/character-refs/references/schema.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:05:09"
+ },
+ "tools/omni_adapter.py": {
+  "tentacles": [
+   "wf_status",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:18:31"
+ },
+ "gbt_allinone/cross_scan.py": {
+  "tentacles": [
+   "cross_scan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:18:31"
+ },
+ "gbt_allinone/tentacle/mirror_stage.py": {
+  "tentacles": [
+   "mirror_stage"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:18:31"
+ },
+ "tools/context_guard.py": {
+  "tentacles": [
+   "context_guard"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:47:17"
+ },
+ "tools/codex-scripts/project-bind.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:47:17"
+ },
+ "tools/digihuman/dh-live.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/digihuman/dh-puppet.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/digihuman/gpu-avatar.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/digihuman/motion-publish.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/codex-scripts/cf-oauth-check.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/codex-scripts/dsh-bus.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/codex-scripts/lark_delete_caches.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "tools/codex-scripts/lark_inventory.py": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T12:58:13"
+ },
+ "docs/19-taste-absorbed.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/39-commander-trunk.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/40-page-binding-audit.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/43-omni-open-auto.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/44-diagnostic-round.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/47-deploy-install-supervisor.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/75-sync-guard.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/77-drama-forge.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/82-experience-forge.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/89-hand-realtime.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "docs/legacy/128-delivery-cleanup.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt-frame-reader.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt-frames.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt-framesources.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt-record-loop.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt-video.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/camera-winrt.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "tools/start-comfyui-local.ps1": {
+  "tentacles": [
+   "wf_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "gbt_allinone/requirements.txt": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "gbt_allinone/docs/CloudflareAIGateway评估.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "gbt_allinone/docs/EigenFlux集成设计.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "gbt_allinone/docs/wallet-ledger-architecture.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T13:11:45"
+ },
+ "gbt_allinone/tools/code_patch.py": {
+  "tentacles": [
+   "code_patch"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T14:01:16"
+ },
+ "tools/codex-scripts/welcome-page.py": {
+  "tentacles": [
+   "echo"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T14:18:13"
+ },
+ "gbt_allinone/tests/test_omni_plug.py": {
+  "tentacles": [
+   "echo",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-03T14:18:13"
+ },
+ "docs/161-bailongma-gap-matrix.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/102-cognitive-console.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/160-bailongma-voice-intercom.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/163-ui-card-acui.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/164-voice-settings.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/165-focus-stack-memory-audit.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/167-context-inject.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/168-thought-stream.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "docs/legacy/169-api-slot.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/filmgrade.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/walkable_world.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/model-bridge/body.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/model-bridge/dump-worker-sse.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/model-bridge/probe-worker.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/model-bridge/worker-body-matrix.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-add-jaw.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-blender-inspect.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-face-profile.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-glb-textures.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-grade-texture.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-jaw-fix.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-jaw-report.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-skin-detail.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/digihuman/dh-tex-extract.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/add-eyes.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/anim-idle.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/anim-make.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/anim-talk.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/atomic-sync.py": {
+  "tentacles": [
+   "health",
+   "omni_plug",
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/autorig-pose-hi.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/autorig-skeleton.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/autorig-skin.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/autorig-transfer.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/avatar-orient.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/blocker-research-check.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/build_panel_mirror2.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/build_v19_manifest.py": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/bust-rig.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/check-glb-uv.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/compare-renders.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/compose-strip.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/detail-normal.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh-basebuild.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh-bone-map.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh-rig-check-rig.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh-rig-check.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh2d-video.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh_source_probe.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dh_source_topo.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/dsh-plugin-audit.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/film-audio-guard.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/fix-admin-paths.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/gbt-model-accept.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/hair-final.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/hair-rebind.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/hair-retip.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/hair-springs.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/head-fix-decimate.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/head-graft-np.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/head-graft.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/head-orient.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/immune-add-elevate.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/immune-fix-recycle.py": {
+  "tentacles": [
+   "health",
+   "voice_settings"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/inkstone-gbt-bridge.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/installed-drift-inspect.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/key-hygiene.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/ledger-add-faults.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/ledger-restore-from-git.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/ledger-set-inprogress.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/local-comfy-image.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/local-image-endpoint.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/make_block3_baseline_final.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/make_postland_probes.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/make_treasure_chest.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/measure-clarity.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/measure-regions.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/merge-4k-rig.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/merge-panel-tier.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/mesh-decimate.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/nested-skill-probe.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/omni-plug.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/pipeline-preflight.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/pml-decimate.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/pml-to-glb.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_appserver.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_encoding.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_panel_import.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_social_graph.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_social_live.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/probe_turn.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/qem-islands.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/release-check.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/sample-baseline.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/short-drama-build.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/shot-glb.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/shot-page.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/sider-crossscan.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/sider-plug.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/skill-switch.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/skin-detail.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/skin-specular.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/skin-tone.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/split-parts.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/spring-bones.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/spring-hair.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/system-slots-scan.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/takeover-v9.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/tentacle-gear.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/verify_panel_ledger.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/verify_zero_touch_b2.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/voice-census.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/blender/dh_fix_scan.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/blender/dh_fix_view.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/blender/dh_rig.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "tools/codex-scripts/blender/dh_sail_weights.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/bounty_ops.py": {
+  "tentacles": [
+   "bounty_ops"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/brain_exec.py": {
+  "tentacles": [
+   "health",
+   "selfscan",
+   "brain_vault",
+   "brain_route",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/brain_vault.py": {
+  "tentacles": [
+   "brain_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/browser_cap.py": {
+  "tentacles": [
+   "browser"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/codepage.py": {
+  "tentacles": [
+   "codepage"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/digital_human.py": {
+  "tentacles": [
+   "digital_human"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/excrete.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/heartbeat_tentacle.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/image_scout.py": {
+  "tentacles": [
+   "image_scout"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/immune.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/install_selfcheck.py": {
+  "tentacles": [
+   "install_selfcheck"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/local_llm.py": {
+  "tentacles": [
+   "local_llm"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/omni_all.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/route_cache.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/route_ledger.py": {
+  "tentacles": [
+   "route_ledger"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/security_policy.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/see_camera.py": {
+  "tentacles": [
+   "see_camera"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/semantic_match.py": {
+  "tentacles": [
+   "semantic_match"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:55"
+ },
+ "gbt_allinone/thebrain_bridge.py": {
+  "tentacles": [
+   "thebrain_bridge"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_arsenal.py": {
+  "tentacles": [
+   "vision_arsenal"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_detect.py": {
+  "tentacles": [
+   "vision_detect"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_embed.py": {
+  "tentacles": [
+   "vision_embed"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_eye.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_ocr.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_pose.py": {
+  "tentacles": [
+   "vision_pose"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_segment.py": {
+  "tentacles": [
+   "vision_segment"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_track.py": {
+  "tentacles": [
+   "vision_track"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/vision_ui.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/voice_studio.py": {
+  "tentacles": [
+   "voice_studio"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/__init__.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/actioncam_cap.py": {
+  "tentacles": [
+   "actioncam"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/action_gate.py": {
+  "tentacles": [
+   "action_gate"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/agent_console.py": {
+  "tentacles": [
+   "agent_console"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/agent_control.py": {
+  "tentacles": [
+   "agent_control"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/agent_council.py": {
+  "tentacles": [
+   "agent_council"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/agent_rig.py": {
+  "tentacles": [
+   "agent_rig"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/anatomy_cap.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/answer_shaper.py": {
+  "tentacles": [
+   "answer_shaper"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/art_brief.py": {
+  "tentacles": [
+   "art_brief"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/art_chain.py": {
+  "tentacles": [
+   "art_chain"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/automation_keys.py": {
+  "tentacles": [
+   "automation_keys"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/belief_forge.py": {
+  "tentacles": [
+   "belief_forge"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/bits_kit.py": {
+  "tentacles": [
+   "bits_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/bi_distill.py": {
+  "tentacles": [
+   "bi_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/blender_cap.py": {
+  "tentacles": [
+   "blender"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/blender_surface.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/cadgen_cap.py": {
+  "tentacles": [
+   "cadgen"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/cad_distill.py": {
+  "tentacles": [
+   "cad_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/cap_tags.py": {
+  "tentacles": [
+   "cap_tags"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/case_mine.py": {
+  "tentacles": [
+   "case_mine"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/command_chain.py": {
+  "tentacles": [
+   "command_chain"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/console_hub.py": {
+  "tentacles": [
+   "console_hub"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/console_pages.py": {
+  "tentacles": [
+   "console_pages"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/creation_camp.py": {
+  "tentacles": [
+   "creation_camp"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/db_probe.py": {
+  "tentacles": [
+   "db_probe"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/design_atlas.py": {
+  "tentacles": [
+   "design_atlas"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/desktop_distill.py": {
+  "tentacles": [
+   "desktop_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/devour_fusion.py": {
+  "tentacles": [
+   "devour_fusion"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/dh_brain.py": {
+  "tentacles": [
+   "dh_brain"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/dh_pose.py": {
+  "tentacles": [
+   "dh_pose"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/dh_realism.py": {
+  "tentacles": [
+   "dh_realism"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/diagram_distill.py": {
+  "tentacles": [
+   "diagram_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/director_mood.py": {
+  "tentacles": [
+   "director_mood"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/dl_forge.py": {
+  "tentacles": [
+   "dl_forge"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/eigenflux.py": {
+  "tentacles": [
+   "eigenflux"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/energy_scheduler.py": {
+  "tentacles": [
+   "energy_scheduler"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/event_ledger.py": {
+  "tentacles": [
+   "event_ledger"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/filmkit_cap.py": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/flow_canvas.py": {
+  "tentacles": [
+   "flow_canvas"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/freebuff_term.py": {
+  "tentacles": [
+   "freebuff_term"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/genoffice_cap.py": {
+  "tentacles": [
+   "genoffice"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/gods_eye.py": {
+  "tentacles": [
+   "gods_eye"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/growth_hooks.py": {
+  "tentacles": [
+   "growth_hooks"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/gs_h3_cap.py": {
+  "tentacles": [
+   "gs_h3"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/handoff.py": {
+  "tentacles": [
+   "handoff"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/hf_voice.py": {
+  "tentacles": [
+   "hf_voice"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/impact_check.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/intake_kit.py": {
+  "tentacles": [
+   "intake_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/llm_redteam.py": {
+  "tentacles": [
+   "llm_redteam"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/lobehub.py": {
+  "tentacles": [
+   "lobehub"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/long_run_supervisor.py": {
+  "tentacles": [
+   "long_run_supervisor"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/machine_cap.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/machine_distill.py": {
+  "tentacles": [
+   "machine_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/memory_bank.py": {
+  "tentacles": [
+   "memory_bank"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/memory_manager.py": {
+  "tentacles": [
+   "memory_manager"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/motion_kit.py": {
+  "tentacles": [
+   "motion_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/n8n_wf_cap.py": {
+  "tentacles": [
+   "n8n_wf"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/obsidian_vault.py": {
+  "tentacles": [
+   "obsidian_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/offload_distill.py": {
+  "tentacles": [
+   "offload_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/omni_arm.py": {
+  "tentacles": [
+   "omni_arm"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/one_shot.py": {
+  "tentacles": [
+   "one_shot"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/pentest_distill.py": {
+  "tentacles": [
+   "pentest_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/policy_delta.py": {
+  "tentacles": [
+   "policy_delta"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/rea_reverse.py": {
+  "tentacles": [
+   "rea_reverse"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/recon_distill.py": {
+  "tentacles": [
+   "recon_distill"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/scan_scope.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/scrapling_cap.py": {
+  "tentacles": [
+   "scrapling"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/sec_sweeper.py": {
+  "tentacles": [
+   "sec_sweeper"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/skill_slim.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/slim_profile.py": {
+  "tentacles": [
+   "slim_profile"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/spend_guard.py": {
+  "tentacles": [
+   "spend_guard"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/surface_bind.py": {
+  "tentacles": [
+   "surface_bind"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/task_manager.py": {
+  "tentacles": [
+   "task_manager"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/tentacle_arm.py": {
+  "tentacles": [
+   "tentacle_arm"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/train_recipe.py": {
+  "tentacles": [
+   "train_recipe"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/transformer_cap.py": {
+  "tentacles": [
+   "transformer"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/ui_kit.py": {
+  "tentacles": [
+   "ui_kit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/ui_render.py": {
+  "tentacles": [
+   "ui_render"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/vision_print.py": {
+  "tentacles": [
+   "vision_print"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tools/zimage_rewash_cap.py": {
+  "tentacles": [
+   "zimage_rewash"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tests/test_api_probe.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tests/test_vision_loop.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/tentacle/hand_vision.py": {
+  "tentacles": [
+   "hand_vision"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/security/redteam.py": {
+  "tentacles": [
+   "domain:security"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/docs/卡点三查与能力自知.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/docs/待落刀登记.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "gbt_allinone/deploy/codex_relay_watchdog.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:31:56"
+ },
+ "docs/189-shuohao-skills-absorbed.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:48:55"
+ },
+ "docs/190-e01-detail-rework.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:48:55"
+ },
+ "docs/191-e01-v5.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:48:55"
+ },
+ "docs/192-e01-v6.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:48:55"
+ },
+ "docs/193-e01-v7.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:48:55"
+ },
+ "tools/codex-scripts/edge-tts.py": {
+  "tentacles": [
+   "voice_settings"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:52:06"
+ },
+ "gbt_allinone/tentacle/drama_forge.py": {
+  "tentacles": [
+   "drama_forge"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T14:52:06"
+ },
+ "tools/build-skill-atlas.py": {
+  "tentacles": [
+   "cap_tags"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:44:37"
+ },
+ "tools/framework_state.py": {
+  "tentacles": [
+   "cap_tags"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:44:37"
+ },
+ "holo_pet/assets/structure/index.html": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:57:35"
+ },
+ "docs/capabilities-full.json": {
+  "tentacles": [
+   "console_hub",
+   "impact_check",
+   "omni_plug",
+   "brain_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:57:35"
+ },
+ "tools/codex-scripts/export-capabilities.py": {
+  "tentacles": [
+   "console_hub"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:57:35"
+ },
+ "tools/codex-scripts/two-way-sync.py": {
+  "tentacles": [
+   "console_hub"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T16:57:35"
+ },
+ "tools/model-bridge/start-local-llm.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:50:16"
+ },
+ "tools/model-bridge/verify-local-llm.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:50:16"
+ },
+ "tools/model-bridge/diag-multiturn.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:56:51"
+ },
+ "gbt_allinone/energy_core.py": {
+  "tentacles": [
+   "energy_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:59:43"
+ },
+ "gbt_allinone/proactive.py": {
+  "tentacles": [
+   "pulse_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:59:43"
+ },
+ "gbt_allinone/weights.py": {
+  "tentacles": [
+   "pulse_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:59:43"
+ },
+ "gbt_allinone/tentacle/commander.py": {
+  "tentacles": [
+   "commander"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T20:59:43"
+ },
+ "tools/codex-scripts/wiring-build.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T21:36:43"
+ },
+ "gbt_allinone/tactile_tree.py": {
+  "tentacles": [
+   "impact_check",
+   "omni_plug",
+   "codepage",
+   "pulse_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T21:36:43"
+ },
+ "gbt_allinone/tests/test_tactile_tree.py": {
+  "tentacles": [
+   "impact_check",
+   "pulse_core",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T21:36:43"
+ },
+ "tools/codex-scripts/recall-snapshot.py": {
+  "tentacles": [
+   "codepage"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:23:23"
+ },
+ "tools/codex-scripts/commander-coverage.py": {
+  "tentacles": [
+   "pulse_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:26:16"
+ },
+ "gbt_allinone/tentacle/pulse_core.py": {
+  "tentacles": [
+   "pulse_core"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:37:14"
+ },
+ "tools/codex-scripts/guard-three.py": {
+  "tentacles": [
+   "omni_plug",
+   "tentacle_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:48:23"
+ },
+ "tools/omni_discover.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:57:25"
+ },
+ "gbt_allinone/tests/test_omni_perf.py": {
+  "tentacles": [
+   "omni_plug",
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T22:59:55"
+ },
+ "tools/codex-scripts/ci-static-check.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:12:45"
+ },
+ "tools/codex-scripts/warmup.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:12:45"
+ },
+ "gbt_allinone/tools/standards_pack.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:25:36"
+ },
+ "gbt_allinone/tools/tentacle_cognition.py": {
+  "tentacles": [
+   "tentacle_cognition"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:25:36"
+ },
+ "gbt_allinone/tests/test_standards_pack.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:25:36"
+ },
+ "gbt_allinone/tentacle/bridge.py": {
+  "tentacles": [
+   "domain:tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:25:36"
+ },
+ "gbt_allinone/tests/test_capability_no_cripple.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:41:35"
+ },
+ "gbt_allinone/auth_gate.py": {
+  "tentacles": [
+   "omni_plug",
+   "think_loop",
+   "tentacle_status"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-04T23:44:05"
+ },
+ "gbt_allinone/codex_bridge.py": {
+  "tentacles": [
+   "omni_plug",
+   "git_read",
+   "tentacle_status",
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:46:36"
+ },
+ "gbt_allinone/store/life_vault/.gbt-life-manifest.json": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Timeline.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Projects/Index.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/People/Index.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Lessons/Index.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Chapters/Index.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Capabilities/Index.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/Attachments/.keep": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/00_Meta/Commitments.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/00_Meta/Habits.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/00_Meta/Identity.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life_vault/00_Meta/Values.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life/state.json": {
+  "tentacles": [
+   "omni_plug",
+   "tentacle_status",
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/store/life/state.json.lock": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T00:58:02"
+ },
+ "gbt_allinone/tests/test_brain_health_vision.py": {
+  "tentacles": [
+   "selfscan",
+   "brain_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:10:39"
+ },
+ "gbt_allinone/tests/test_framework.py": {
+  "tentacles": [
+   "selfscan",
+   "brain_vault",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:21:27"
+ },
+ "gbt_allinone/tentacle/omni_core.py": {
+  "tentacles": [
+   "domain:tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:21:27"
+ },
+ "tools/codex-scripts/run-tests.py": {
+  "tentacles": [
+   "brain_vault",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:34:48"
+ },
+ "holo_pet/app.js": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:43:48"
+ },
+ "tools/codex-scripts/auth-grant.py": {
+  "tentacles": [
+   "think_loop"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:48:22"
+ },
+ "gbt_allinone/deployment_rehearsal.py": {
+  "tentacles": [
+   "tentacle_status",
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:51:01"
+ },
+ "gbt_allinone/qiankun.py": {
+  "tentacles": [
+   "tentacle_status",
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:51:01"
+ },
+ "gbt_allinone/README.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T01:51:01"
+ },
+ "gbt_allinone/store/life/events.jsonl": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T02:15:50"
+ },
+ "gbt_allinone/store/life/events.jsonl.lock": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T02:15:50"
+ },
+ "gbt_allinone/store/life/life.lock": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T02:15:50"
+ },
+ "docs/capabilities/system.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T03:23:39"
+ },
+ "gbt_allinone/tests/test_wiring_v4_guard.py": {
+  "tentacles": [
+   "omni_plug",
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T03:27:31"
+ },
+ "tools/codex-scripts/sync-capabilities-doc.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T03:40:09"
+ },
+ "gbt_allinone/tests/test_diag_kou_jing.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T03:55:06"
+ },
+ "gbt_allinone/tests/test_impact_ranking.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T04:02:35"
+ },
+ "tools/model-bridge/lane_guard.py": {
+  "tentacles": [
+   "echo"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T04:21:49"
+ },
+ "tools/model-bridge/serving_policy.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T04:29:58"
+ },
+ "tools/codex-scripts/omni-monitor.py": {
+  "tentacles": [
+   "impact_check",
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T04:50:28"
+ },
+ "tools/skills_sync.py": {
+  "tentacles": [
+   "impact_check",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T04:56:47"
+ },
+ "gbt_allinone/tests/test_skills_install_sync.py": {
+  "tentacles": [
+   "omni_plug",
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:01:22"
+ },
+ "tools/model-bridge/endpoint-rescue.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/model-bridge/tpu-register.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/audit-skill-roots.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/blueprint-first.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/cap-pages.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/capability-supervisor.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/check-cap-links.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/decision-direct.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/drift.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/ledger-refresh.py": {
+  "tentacles": [
+   "impact_check",
+   "code_patch"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/make_capability_console.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/make_hitl1_screen.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/make_storyboard_fill_page.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/make_workspace_index.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/mic-probe.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/model-align.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/render-demo-gif.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/rig-audit.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/vendor-node-trim.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/verify_v21.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:06:18"
+ },
+ "tools/codex-scripts/omni.py": {
+  "tentacles": [
+   "impact_check",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:10:33"
+ },
+ "tools/codex-scripts/skill-triggers.json": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:16:56"
+ },
+ "docs/能力总表.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:41:12"
+ },
+ "docs/capabilities/engine.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:41:12"
+ },
+ "docs/capabilities/tentacle.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:41:12"
+ },
+ "gbt_allinone/docs/CAPABILITIES-索引.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T05:41:12"
+ },
+ "tools/model-bridge/server.py": {
+  "tentacles": [
+   "code_patch",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T06:40:10"
+ },
+ "tools/codex-scripts/codex-local-profile.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T06:41:20"
+ },
+ "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/absorbed_knowledge.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T07:34:20"
+ },
+ "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/knowledge.json": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T07:34:20"
+ },
+ "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/run.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T07:34:20"
+ },
+ "gbt_allinone/tools/responses_bridge.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T07:43:10"
+ },
+ "tools/codex-scripts/codex-deepseek-profile.py": {
+  "tentacles": [
+   "code_patch"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T07:48:30"
+ },
+ "tools/codex-scripts/codex-deepseek-serve.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T08:07:00"
+ },
+ "tools/codex-scripts/codex-deepseek-apply.py": {
+  "tentacles": [
+   "impact_check"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T08:22:37"
+ },
+ "tools/codex-scripts/deepseek-key.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T08:24:05"
+ },
+ "tools/engine-up.py": {
+  "tentacles": [
+   "ui_card",
+   "commander",
+   "brain_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T09:43:50"
+ },
+ "tools/gen-console-data.py": {
+  "tentacles": [
+   "ui_card",
+   "brain_vault"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T09:43:50"
+ },
+ "tools/codex-scripts/command-ai-mcp.py": {
+  "tentacles": [
+   "health"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T21:21:01"
+ },
+ "tools/codex-scripts/build-operator-index.py": {
+  "tentacles": [
+   "impact_check",
+   "brain_route"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T21:57:42"
+ },
+ "gbt_allinone/operator_index.py": {
+  "tentacles": [
+   "brain_route",
+   "omni_plug",
+   "tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T21:59:41"
+ },
+ "gbt_allinone/tests/test_operator_index.py": {
+  "tentacles": [
+   "omni_plug",
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T22:53:28"
+ },
+ "gbt_allinone/tests/test_router_grams.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T23:10:50"
+ },
+ "tools/codex-scripts/lanes.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T23:17:10"
+ },
+ "gbt_allinone/tests/test_method_fast_lane.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T23:17:10"
+ },
+ "gbt_allinone/tests/test_console_method_lane.py": {
+  "tentacles": [
+   "tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-05T23:22:40"
+ },
+ "tools/film-gate.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:11:07"
+ },
+ "gbt_allinone/tools/film_gate.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:11:07"
+ },
+ "gbt_allinone/tools/media_pipeline.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:11:07"
+ },
+ "gbt_allinone/tests/test_film_gate.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:11:07"
+ },
+ "gbt_allinone/commission.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:12:08"
+ },
+ "gbt_allinone/tests/test_commission.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:12:08"
+ },
+ "gbt_allinone/tools/project_drift.py": {
+  "tentacles": [
+   "project_drift"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:28:49"
+ },
+ "gbt_allinone/tentacle/trunk_cover.py": {
+  "tentacles": [
+   "trunk_cover"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:30:43"
+ },
+ "gbt_allinone/omni_lines.py": {
+  "tentacles": [
+   "media_pipeline",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:34:10"
+ },
+ "gbt_allinone/omni_monitor.py": {
+  "tentacles": [
+   "media_pipeline"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:34:10"
+ },
+ "gbt_allinone/tests/test_capability_registry.py": {
+  "tentacles": [
+   "trunk_cover",
+   "impact_check",
+   "codepage"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T00:45:16"
+ },
+ "gbt_allinone/tests/test_engine_layout.py": {
+  "tentacles": [
+   "project_drift"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:13:59"
+ },
+ "tools/codex-scripts/engine-layout.py": {
+  "tentacles": [
+   "focus_stack"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:20:15"
+ },
+ "gbt_allinone/tests/test_atomic_sync_tiers.py": {
+  "tentacles": [
+   "omni_plug",
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:39:23"
+ },
+ "tools/codex-scripts/claim-audit.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:50:02"
+ },
+ "tools/codex-scripts/criterion_bench.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:50:02"
+ },
+ "skills/pro-customer-service/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:52:42"
+ },
+ "skills/pro-contract-review/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:52:42"
+ },
+ "skills/pro-bookkeeping/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T01:52:42"
+ },
+ "tools/llm_guard.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "tools/omni_guard.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "tools/codex-scripts/iron-rules-check.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "tools/codex-scripts/no-ask-check.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "tools/codex-scripts/quickscan_security.py": {
+  "tentacles": [
+   "cap_self"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "gbt_allinone/tools/comfy_native.py": {
+  "tentacles": [
+   "comfy_native"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "gbt_allinone/tools/false_report_audit.py": {
+  "tentacles": [
+   "domain:tools"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "gbt_allinone/tools/observer_anchor.py": {
+  "tentacles": [
+   "observer_anchor"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "gbt_allinone/security/security_brain.py": {
+  "tentacles": [
+   "domain:security"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:14:05"
+ },
+ "gbt_allinone/offense_ops.py": {
+  "tentacles": [
+   "offense_ops"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:20:59"
+ },
+ "gbt_allinone/.env": {
+  "tentacles": [
+   "pentest_flow"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:25:01"
+ },
+ "gbt_allinone/tools/pentest_flow.py": {
+  "tentacles": [
+   "pentest_flow"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:25:01"
+ },
+ "skills/gbt-pentest/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T02:26:22"
+ },
+ "gbt_allinone/tests/test_native_growth_stack.py": {
+  "tentacles": [
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T03:07:50"
+ },
+ "gbt_allinone/tests/test_console_chat_print.py": {
+  "tentacles": [
+   "mirror_stage",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T03:26:03"
+ },
+ "gbt_allinone/capability_router.py": {
+  "tentacles": [
+   "code_patch"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T03:32:14"
+ },
+ "gbt_allinone/tentacle/taste_guard.py": {
+  "tentacles": [
+   "taste_guard"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T03:36:44"
+ },
+ "tools/codex-scripts/ledger-rebuild-20261106.py": {
+  "tentacles": [
+   "code_patch"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T03:40:25"
+ },
+ "gbt_allinone/tentacle/mcp_bridge.py": {
+  "tentacles": [
+   "domain:tentacle"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T06:35:00"
+ },
+ "tools/console_settings.py": {
+  "tentacles": [
+   "ui_card",
+   "resource_snapshot"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T06:42:47"
+ },
+ "gbt_allinone/vision_loop.py": {
+  "tentacles": [
+   "vision_loop"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T07:56:24"
+ },
+ "render/crop-ctr.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
+ },
+ "render/crop-foot.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
+ },
+ "render/crop-tl.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
+ },
+ "render/hud-base.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
+ },
+ "render/hud-draft1.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
+ },
+ "render/hud-draft2.png": {
+  "tentacles": [
+   "filmkit"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-06T08:54:19"
  }
 }

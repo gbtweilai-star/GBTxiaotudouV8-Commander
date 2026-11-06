@@ -14,9 +14,9 @@
   holo_pet_w3/model-align/model-align-data.js    （页面数据，globalThis.GBT_MODEL_ALIGN）
 
 用法：
-  py -3.14 -X utf8 tools/codex-scripts/model-align.py probe            # 现读 + 落盘
-  py -3.14 -X utf8 tools/codex-scripts/model-align.py --check          # 判据（四环不全绿=rc1）
-  py -3.14 -X utf8 tools/codex-scripts/model-align.py --selftest       # 负对照（喂坏值必红）
+  ./pyembed/python.exe -X utf8 tools/codex-scripts/model-align.py probe            # 现读 + 落盘
+  ./pyembed/python.exe -X utf8 tools/codex-scripts/model-align.py --check          # 判据（四环不全绿=rc1）
+  ./pyembed/python.exe -X utf8 tools/codex-scripts/model-align.py --selftest       # 负对照（喂坏值必红）
 """
 from __future__ import annotations
 
@@ -289,8 +289,8 @@ def probe() -> dict:
         "note": "四环全绿 ⇒ 云上答话的就是这一版权重；有红 ⇒ 页面照红；⚠未验 ⇒ 没读到（超时/断链），"
                 "不等于不符，也不许念成通 —— 重跑 probe 取真读数",
         "commands": {
-            "probe": "py -3.14 -X utf8 tools/codex-scripts/model-align.py probe",
-            "check": "py -3.14 -X utf8 tools/codex-scripts/model-align.py --check",
+            "probe": "./pyembed/python.exe -X utf8 tools/codex-scripts/model-align.py probe",
+            "check": "./pyembed/python.exe -X utf8 tools/codex-scripts/model-align.py --check",
             "page": "holo_pet_w3/model-align/index.html",
         },
     }
@@ -301,7 +301,7 @@ def render(d: dict) -> None:
     OUT.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
     DATA.parent.mkdir(parents=True, exist_ok=True)
     DATA.write_text(
-        "/* 自动生成，别手改。重建：py -3.14 tools/codex-scripts/model-align.py probe\n"
+        "/* 自动生成，别手改。重建：./pyembed/python.exe tools/codex-scripts/model-align.py probe\n"
         "   数据源：state/model-deploy/cloud-align.json（四环现读）*/\n"
         "globalThis.GBT_MODEL_ALIGN = " + json.dumps(d, ensure_ascii=False) + ";\n",
         encoding="utf-8")
@@ -452,7 +452,7 @@ def main() -> int:
     if cold:
         print("⚠ 冷端点：%s ⇒ 要第一句就快，先挂热："
               % "、".join(sorted(set(cold))))
-        print("   '{\"op\":\"on\"}' | py -3.14 tools/codex-scripts/five-dim.py cap warm_switch --stdin")
+        print("   '{\"op\":\"on\"}' | ./pyembed/python.exe tools/codex-scripts/five-dim.py cap warm_switch --stdin")
         print("   收工：'{\"op\":\"off\"}' | …（挂热期间按 worker 秒计费，别忘关）")
     return 0 if d["all_ok"] else 2
 

@@ -135,6 +135,16 @@ def main() -> int:
             picked2.extend(by_dom2[dom][: args.sample])
         items = picked2
         print("抽样后待跑:", len(items), "（按域每域", args.sample, "项，已排除跑过的）")
+    if args.recall_only:
+        # 召回是**另一种口径**：不许复用 model 模式的已完成行。
+        # 实测血账（2026-11-04）：混用把 recall 误报成 96.39%（真值 99.8%）——
+        # 20 个 MISS 里 12 个是从 coverage-rows.jsonl 抄来的 model 结论，
+        # 一个都没重算；而且抄得越多错得越多（第一次 done 只有 23 行时只错 1 个）。
+        # 「候选池有没有兜住真名」和「权重有没有选对」是两件事，不能互相顶替。
+        if done:
+            print("召回口径：忽略已完成 %d 行（那是 model 模式的结果，不可混用）"
+                  % len(done))
+        done = {}
     if done:
         print("续跑：已完成 %d 项，跳过" % len(done))
     t_all = time.time()

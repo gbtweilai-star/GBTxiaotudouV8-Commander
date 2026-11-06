@@ -65,8 +65,11 @@ powershell -ExecutionPolicy Bypass -File launch-gui.ps1
   **不是"被安全策略挡住"**（两者差别很大，别念错）。
 - **真正把关的是"授权门"**：`gbt_allinone/security/policy.py` 的 15 个作用域
   （付款／隐私／生产写入／远控／发声／出网…）。授权**只能主人在终端发放**：
-  `python -m gbt_allinone auth grant --scope <作用域> --ttl <秒>`；
+  `.\pyembed\python.exe tools\codex-scripts\auth-grant.py --scope <作用域> --ttl <秒>`；
   **AI 永远无权给自己发授权**，缺哪个就如实报哪个。
+  > 为什么不是 `.\pyembed\python.exe tools\codex-scripts\auth-grant.py`：本仓的 `pyembed/` 是 embeddable 包
+  > （`._pth` ⇒ isolated），`-m` 在它下面必然报 `No module named 'gbt_allinone'` ——
+  > 主人 2026-11-06 照旧文档敲过一次，当场撞上。壳脚本是 pyembed 下唯一走通的路径。
 - **门是"主人的开关"，不是"技术限制"**：门开着，技术全在。
 - 只读类（`mirror_scan` / `mirror_status` 等）不需要授权。
 ## 数据后台（可追踪）
@@ -80,7 +83,7 @@ powershell -ExecutionPolicy Bypass -File launch-gui.ps1
 python gbt_allinone\tests\test_framework.py   # 52 项：钢印/理念/引擎/管线/防复发/调度/巡检/长程/察言观色/体检层/触手
 ```
 
-## 万能插执行引擎（替代子代理）
+## 工作流引擎（替代子代理）
 
 V8 立场：框架内不依赖子代理。脑子只有一份（SOUL + run_task），手有很多只（引擎线程池）。
 
@@ -213,7 +216,7 @@ V8 立场：框架内不依赖子代理。脑子只有一份（SOUL + run_task�
 - 管线发布时文本/网页产物自动注入署名；file_hygiene 铁律 9 顺带管署名
 - 日常：`g.run_task('signature_guard', {'restore': True})`
 
-## 万能插执行引擎（延伸：四把节点级武器）
+## 工作流引擎（延伸：四把节点级武器）
 
 - `timeout`：节点超时秒数，超时如实报错，不拖垮整个工作流
 - `when`：条件执行表达式（AST 白名单求值，安全），不满足则跳过、不算失败

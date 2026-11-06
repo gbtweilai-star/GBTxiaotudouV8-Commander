@@ -51,9 +51,47 @@ class TestSkillsInstallSync(unittest.TestCase):
         self.assertTrue(TOOL.is_file(), f"同步器不在位：{TOOL}")
         self.assertNotIn("error", self.survey, f"对账失败：{self.survey.get('error')}")
         total = len(self.survey["rows"])
-        self.assertGreater(total, 50,
-                           f"只枚举到 {total} 个技能 —— 要么源目录空了，要么读数漏了"
-                           f"（空集合过关=假绿，本判据专门挡它）")
+        # ── 2026-11-05 改：`assertGreater(total, 50)` 换成「读数 vs 独立枚举」对账 ──────
+        # 取证：实测源根下只有 8 个技能包 / 33 个 SKILL.md（含 superpowers 20 子、
+        # shuohao 7 子）。**50 这个数在任何口径下都到不了** —— 于是这条判据永远红，
+        # 而且红在一个永远修不好的原因上。判据自身失真比没有判据更糟：红灯久了没人看。
+        # 换成独立数一遍（不经过被测工具），逐项对账 —— 严格更强：
+        #   源空了 / 工具漏报 / 两边口径漂了，三种都在这里红。
+        # 独立枚举的口径必须与工具一致：**一个带 SKILL.md 的目录 = 一个技能**
+        # （目录有根 SKILL.md 就是它自己；没有则每个带 SKILL.md 的直接子目录各算一个）。
+        # 2026-11-05 改：原来只数顶层目录（8 个包），而工具已改按技能数（33 条），
+        # 两种口径对账必然误报。名字取 frontmatter `name:`，退回目录名。
+        import re as _re
+        skip = {"__pycache__", ".git", "node_modules"}
+
+        def _nm(d):
+            try:
+                _h = (d / "SKILL.md").read_text(encoding="utf-8", errors="replace")[:2000]
+            except OSError:
+                return d.name
+            _m = _re.search(r"(?m)^name:\s*(.+?)\s*$", _h)
+            return (_m.group(1).strip().strip("'\"") or d.name) if _m else d.name
+
+        independent = set()
+        for base in (ROOT / "skills", ROOT / "gbt_allinone" / "skills"):
+            if not base.is_dir():
+                continue
+            for pkg in base.iterdir():
+                if not (pkg.is_dir() and pkg.name not in skip):
+                    continue
+                if (pkg / "SKILL.md").is_file():
+                    independent.add(_nm(pkg))
+                    continue
+                for sub in pkg.iterdir():
+                    if sub.is_dir() and sub.name not in skip and (sub / "SKILL.md").is_file():
+                        independent.add(_nm(sub))
+        self.assertGreater(len(independent), 0,
+                           "源一个技能包都没有 —— 空集合过关=假绿，本判据专门挡它")
+        orphans = sum(1 for r in self.survey["rows"] if r["status"].startswith("孤儿"))
+        self.assertEqual(total, len(independent) + orphans,
+                         f"读数与独立枚举对不上：工具报 {total} 行，"
+                         f"盘上 {len(independent)} 个包 + {orphans} 个孤儿 = "
+                         f"{len(independent) + orphans} —— 要么工具漏报，要么口径漂了")
         home = Path(self.survey["home_hub"])
         self.assertTrue(home.is_dir(),
                         f"运行时枢纽不存在：{home} ⇒ 修法：python tools/skills_sync.py sync")

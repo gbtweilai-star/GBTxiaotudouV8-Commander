@@ -584,7 +584,7 @@ def check() -> int:
         return 0
     print("🔴 产物与模板**不一致**：盘上 %d 字 vs 生成 %d 字" % (len(now), len(html)))
     print("   ⇒ 要么工作区变了（读数过期：重新生成即可），要么有人只改了产物（手补的会被冲掉）。")
-    print("   ⇒ 修法：`py -3.14 tools/codex-scripts/make_workspace_index.py`")
+    print("   ⇒ 修法：`./pyembed/python.exe tools/codex-scripts/make_workspace_index.py`")
     return 1
 
 

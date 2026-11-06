@@ -66,6 +66,26 @@ def _faces() -> dict:
         return {"_error": f"{type(exc).__name__}: {str(exc)[:120]}"}
 
 
+def _names(rows: list) -> list:
+    """未实现条目的姓名：**`where` 才是它的名字**（旧码读 `kind` ⇒ 读数全是 None）。"""
+    out = []
+    for r in rows or []:
+        if isinstance(r, dict):
+            out.append(str(r.get("where") or r.get("name") or r.get("kind") or "?"))
+        else:
+            out.append(str(r))
+    return out
+
+
+def _age_hours(ts) -> float:
+    """`YYYY-mm-ddTHH:MM:SS` → 小时数；**读不动回 -1**（不许当成 0 = 刚更新过）。"""
+    try:
+        t = time.mktime(time.strptime(str(ts), "%Y-%m-%dT%H:%M:%S"))
+    except (TypeError, ValueError):
+        return -1.0
+    return max(0.0, (time.time() - t) / 3600.0)
+
+
 def shortboard(**_kw) -> dict:
     """算最短板（每条带 src + 怎么补）。"""
     faces = _faces()
@@ -99,15 +119,21 @@ def shortboard(**_kw) -> dict:
     unimpl = _load("unimplemented.json", {}) or {}
     um = unimpl.get("items") or []
     if um:
-        add("未实现", 60, f"未实现登记 {len(um)} 条：{[i.get('kind') for i in um][:4]}",
+        add("未实现", 60, f"未实现登记 {len(um)} 条：{_names(um)[:4]}",
             "state/unimplemented.json", "能做的做掉；做不了的说清谁有权修")
     cov = faces.get("覆盖矩阵") or {}
-    if cov and not cov.get("全绿", True):
+    cov_src = cov.get("src") or "gbt_allinone/positions.py::audit()"
+    if cov and cov.get("present") is False:
+        add("覆盖", 86, "覆盖矩阵读不动（positions.audit() 失败）—— 读不到不等于全绿", cov_src,
+            "先修 positions.audit()；**缺读数不许当 0**")
+    elif cov and not cov.get("全绿", True):
         add("覆盖", 88, f"覆盖矩阵非全绿（盲区 {len(cov.get('盲区') or [])}）",
-            "state/coverage_matrix.json", "补扫盲区树，或写清排除理由")
-    if (cov.get("年龄h") or 0) > 24:
-        add("覆盖", 50, f"覆盖矩阵读数 {cov.get('年龄h')}h 未更新", "state/coverage_matrix.json",
-            "重跑 tools/coverage_matrix.py")
+            cov_src, "职位要求的能力还没长出来（不是代码错）：接生成端前先把 min_level 如实降级；"
+                     "与「未实现」第 3 条同根因，别当两件事各补一遍")
+    age_h = _age_hours(cov.get("at") if cov else "")
+    if age_h > 24:
+        add("覆盖", 50, f"覆盖矩阵读数 {age_h:.1f}h 未更新", cov_src,
+            "重跑 tools/framework_state.py 的 collect()（读 positions.audit()，没有 coverage_matrix.py）")
     # 触手库覆盖（本轮新增的记忆面）
     ov = _STATE / "obsidian_vaults.json"
     if not ov.is_file():

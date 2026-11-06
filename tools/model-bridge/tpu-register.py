@@ -9,8 +9,8 @@
   ④ 不碰任何云端、不碰 Worker（真切换走部署门 D5）。
 
 用法：
-  py -3.14 tools/model-bridge/tpu-register.py --base-url http://10.0.0.5:8000/v1 --model gbt-potato-v8
-  py -3.14 tools/model-bridge/tpu-register.py --base-url ... --dry-run   # 只验活不写
+  ./pyembed/python.exe tools/model-bridge/tpu-register.py --base-url http://10.0.0.5:8000/v1 --model gbt-potato-v8
+  ./pyembed/python.exe tools/model-bridge/tpu-register.py --base-url ... --dry-run   # 只验活不写
 """
 import argparse
 import json
@@ -116,7 +116,7 @@ def main():
         fh.write("\n")
     os.replace(tmp, REG)
     print("\n✅ 已登记并 enable：tpu-torchtpu → %s（priority=5）" % base)
-    print("   下一步：py -3.14 tools/model-bridge/lane-failover.py --promote tpu-torchtpu")
+    print("   下一步：./pyembed/python.exe tools/model-bridge/lane-failover.py --promote tpu-torchtpu")
     print("   注意：这只改本地登记/意图；Worker 上游要动仍走部署门 D5。")
     return 0
 

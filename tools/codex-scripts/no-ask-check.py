@@ -43,11 +43,12 @@ def scan() -> dict:
     files = [p for p in (ROOT / "gbt_allinone").rglob("*.py")
              if "_legacy" not in str(p) and "vendor" not in str(p) and "test" not in p.name
              and p.name != "ux_doctrine.py"]
-    hits, declared_hit = [], []
+    hits, declared_hit, unread = [], [], []
     for p in files:
         try:
             lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
-        except OSError:
+        except OSError as _e:
+            unread.append("%s (%s)" % (p, type(_e).__name__))
             continue
         for i, line in enumerate(lines, 1):
             s = line.strip()
@@ -59,8 +60,9 @@ def scan() -> dict:
             key = "%s:%d" % (p.relative_to(ROOT).as_posix(), i)
             row = {"件": key, "命中": r["命中句式"][:1], "原文": s[:110]}
             (declared_hit if key in DECLARED else hits).append(row)
-    return {"ok": not hits, "扫描件数": len(files), "违规": hits,
-            "已申报放行": declared_hit, "申报表条数": len(DECLARED)}
+    return {"ok": not hits and not unread, "扫描件数": len(files), "违规": hits,
+            "已申报放行": declared_hit, "申报表条数": len(DECLARED),
+            "读不到": unread[:20], "读不到件数": len(unread)}
 
 
 def selftest() -> int:

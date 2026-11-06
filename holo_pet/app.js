@@ -1321,8 +1321,14 @@ async function refreshState(options = {}) {
     applySensoryState(state.sensory);
     applyNotionStatus(state.notion);
     applyEigenFluxStatus(state.eigenflux);
-    const model = state?.codex?.server?.model || state?.codex?.model;
-    if (model) $("#chip-model").textContent = `模型 · ${model}`;
+    // 对外只报身份名；底层内核型号放 tooltip —— 面上统一叫 GBT小土豆V8，
+    // 但排障时要能溯源到"究竟是哪个内核在答"，所以信息不丢、只是不占主位。
+    const identity = state?.codex?.identity || "GBT小土豆V8";
+    const kernelModel = state?.codex?.server?.model || state?.codex?.model;
+    $("#chip-model").textContent = `模型 · ${identity}`;
+    if (kernelModel && kernelModel !== identity) {
+      $("#chip-model").title = `内核型号：${kernelModel}（对外身份统一为 ${identity}）`;
+    }
   } catch (error) {
     if (!options.quiet) {
       addTimeline("本地面板桥未连接", error.message, "error");

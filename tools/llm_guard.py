@@ -49,7 +49,8 @@ WHITELIST = {
 
 
 def scan() -> list:
-    hits = []
+    hits, unread = [], []
+    scan.unread = unread          # 未读位挂在函数上，调用方与判据都能读到
     # 只扫描业务逻辑层，不扫基础设施层
     scan_dirs = [ROOT / 'holo_pet_w3', ROOT / 'runtime', ROOT / 'docs']
     for scan_dir in scan_dirs:
@@ -62,7 +63,8 @@ def scan() -> list:
                 continue
             try:
                 text = p.read_text(encoding="utf-8", errors="ignore")
-            except Exception:                                        # noqa: BLE001
+            except Exception as _e:                                  # noqa: BLE001
+                unread.append({"file": str(p), "why": type(_e).__name__})
                 continue
             if ALLOW_MARK in text:
                 continue                      # 显式豁免
@@ -86,7 +88,12 @@ def scan() -> list:
 
 def main(argv) -> int:
     hits = scan()
-    if not hits:
+    unread = getattr(scan, "unread", [])
+    if unread:
+        print("  ⚠️ %d 个文件读不到 -> 本次结论**只覆盖读到的部分**" % len(unread))
+        for u in unread[:10]:
+            print("    %s  %s" % (u["file"], u["why"]))
+    if not hits and not unread:
         print("  ✅ 无违规：全仓没有直接打外部 LLM 端点的地方")
         print("  口径：要脑子只能走 tools/weights.py（我们自己的权重）")
         print("  例外：Agnes 需带 # llm-guard: allow 标记（知识库补充）")

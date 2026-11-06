@@ -2,11 +2,11 @@
 """把一次**真跑**的 demo stdout 回放成 15 秒 GIF（README 用）。
 
 不是"合成一段好看的终端"：本脚本**只回放** `outputs/demo-gif/demo-run-raw.txt`，
-那个文件是 `py -3.14 demo.py "我要把 Markdown 变成 PPT"` 的真实输出（2>&1 原样落盘）。
+那个文件是 `./pyembed/python.exe demo.py "我要把 Markdown 变成 PPT"` 的真实输出（2>&1 原样落盘）。
 帧里自报"实跑回放"，不冒充录屏。
 
 产物：outputs/open-source-release/assets/demo.gif（+ 预览帧 demo-lastframe.png）
-用法：py -3.12 -X utf8 tools/codex-scripts/render-demo-gif.py
+用法：./pyembed/python.exe -X utf8 tools/codex-scripts/render-demo-gif.py
 """
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ def color_of(line: str):
 
 def main() -> int:
     if not RAW.is_file():
-        print("缺原始输出：%s（先跑 py -3.14 demo.py \"我要把 Markdown 变成 PPT\" 2>&1 > 该文件）" % RAW)
+        print("缺原始输出：%s（先跑 ./pyembed/python.exe demo.py \"我要把 Markdown 变成 PPT\" 2>&1 > 该文件）" % RAW)
         return 1
     raw_lines = [ln.rstrip() for ln in RAW.read_text(encoding="utf-8", errors="replace").splitlines()]
     plain = [display(ln) for ln in raw_lines if ln.strip()] or ["（空输出）"]

@@ -50,6 +50,7 @@ OPS = ("status", "drift", "baseline", "where")
 ROOT = Path(__file__).resolve().parents[2]
 DRIFT_DIR = ROOT / "state" / "drift"
 BASELINE = DRIFT_DIR / "baseline.json"
+BASELINE_REL = "state/drift/baseline.json"
 PACK_FILES = ROOT / "outputs" / "repo-pack" / "files.jsonl"
 
 # 与 repo-pack.py scan 同一口径（两处必须一致，否则"变了"会是口径差而不是真变化）
@@ -123,6 +124,8 @@ def _walk_now() -> tuple:
                     rel = str(Path(e.path).relative_to(ROOT)).replace("\\", "/")
                 except ValueError:
                     continue
+                if rel == BASELINE_REL:
+                    continue
                 seen[rel] = [int(st.st_size), int(st.st_mtime)]
     return seen, unreadable, time.time() - t0
 
@@ -148,7 +151,7 @@ def _baseline_from_pack() -> dict:
             except ValueError:
                 continue
             p = r.get("path")
-            if not p:
+            if not p or p == BASELINE_REL:
                 continue
             files[p] = [r.get("bytes"), r.get("mtime"), r.get("sha16")]
             n += 1
@@ -318,6 +321,25 @@ def _op_drift(top: int = 40, scope: str = "") -> dict:
                     "哈希预算 %d 件/次，超了就如实写『未验内容』" % HASH_BUDGET}
 
 
+def _atomic_write_text(path: Path, text: str) -> None:
+    """基线的原子写：临时文件 + fsync + os.replace，并把结果读回校验。"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name("%s.tmp-%d-%d" % (path.name, os.getpid(), int(time.time() * 1000)))
+    try:
+        with open(tmp, "w", encoding="utf-8", newline="") as fh:
+            fh.write(text)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        raise
+    json.loads(path.read_text(encoding="utf-8"))
+
+
 def _op_baseline(from_pack: bool = True) -> dict:
     DRIFT_DIR.mkdir(parents=True, exist_ok=True)
     if from_pack:
@@ -333,7 +355,7 @@ def _op_baseline(from_pack: bool = True) -> dict:
                 "source": "live_stat", "mode": "live_stat",
                 "files": {k: [v[0], v[1], None] for k, v in now.items()},
                 "count": len(now), "unreadable": unreadable, "walk_s": round(walk_s, 2)}
-    BASELINE.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    _atomic_write_text(BASELINE, json.dumps(data, ensure_ascii=False))
     return {"ok": True, "op": "baseline",
             "path": str(BASELINE.relative_to(ROOT)),
             "mode": data.get("mode"), "at": data["at"],

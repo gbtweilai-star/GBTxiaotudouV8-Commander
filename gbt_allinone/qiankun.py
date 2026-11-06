@@ -300,7 +300,7 @@ def one_key_deploy(target: str, purpose: str = "", plan=None, name: str = "",
                            "确要写全局生产，显式传 into_global_production=true"
                            "（经 run_task 会另要 deploy_publish 人工授权）。"),
                 "如何放行": ("要**不声明落点**也跑：主人在终端发**专用一次性钥匙** `deploy_force`"
-                          "（python -m gbt_allinone auth grant --scope deploy_force --ttl 600，提示符敲 YES），"
+                          r"（.\pyembed\python.exe tools\codex-scripts\auth-grant.py --scope deploy_force --ttl 600，提示符敲 YES），"
                           "再带 owner_override=true 重调 —— 那会按'全局生产'放行并写审计；"
                           "但这等于绕开落点声明这一步，推荐仍用 into_global_production=true 明写。")}
         _reason = str(override_reason or purpose or "(未写理由)")[:200]

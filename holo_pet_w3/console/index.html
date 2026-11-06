@@ -14,11 +14,17 @@
 <link rel="apple-touch-icon" href="../../icons/apple-touch-icon.png" />
 <link rel="stylesheet" href="./app.css" />
 <link rel="stylesheet" href="./skin-cube.css" />
+  <link rel="stylesheet" href="./settings-page.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./skin-hud.css" />
+  <link rel="stylesheet" href="./skin-hud-live.css" />
 <script type="importmap">{"imports":{"three":"../../assets/vendor/three/three.module.js","three/addons/":"../../assets/vendor/three/"}}</script>
 </head>
 <body data-theme="midnight">
 
-<header class="app-titlebar" aria-label="窗口拖拽区"></header>
+<header class="app-titlebar" aria-label="窗口拖拽区"><span id="titlebar-time" class="titlebar-time"></span></header>
 
 <main class="app-viewport">
   <div class="grid-overlay" aria-hidden="true"></div>
@@ -30,10 +36,10 @@
       <div class="brand-mark" aria-hidden="true"></div>
       <div class="brand-copy">
         <div class="eyebrow">认知界面</div>
-        <div class="brand-title" id="agent-brand-name">GBT小土豆V8</div>
+        <h1 class="brand-title" id="agent-brand-name">GBT小土豆V8</h1>
       </div>
-      <button class="icon-btn" id="voice-btn" title="语音" type="button">🎤</button>
-      <button class="icon-btn" id="settings-btn" title="设置" type="button">⚙</button>
+      <button class="icon-btn" id="voice-btn" title="语音" type="button" aria-label="语音"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M8 1.8a2.1 2.1 0 0 1 2.1 2.1v3.3a2.1 2.1 0 0 1-4.2 0V3.9A2.1 2.1 0 0 1 8 1.8Z"/><path d="M3.7 7.2a4.3 4.3 0 0 0 8.6 0M8 11.5v2.7"/></svg></button>
+      <button class="icon-btn" id="settings-btn" title="设置" type="button" aria-label="设置"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.9v1.7M8 12.4v1.7M1.9 8h1.7M12.4 8h1.7M3.7 3.7l1.2 1.2M11.1 11.1l1.2 1.2M12.3 3.7l-1.2 1.2M4.9 11.1l-1.2 1.2"/></svg></button>
     </header>
 
     <div class="stream-meta">
@@ -219,9 +225,9 @@
             </div>
             <span class="res-host" id="res-host">—</span>
           </div>
-          <div class="res-row"><span>CPU</span><div class="res-bar"><i id="res-cpu-bar"></i></div><b id="res-cpu">—</b></div>
-          <div class="res-row"><span>内存</span><div class="res-bar"><i id="res-mem-bar"></i></div><b id="res-mem">—</b></div>
-          <div class="res-row"><span>磁盘</span><div class="res-bar"><i id="res-disk-bar"></i></div><b id="res-disk">—</b></div>
+          <div class="res-row"><span>CPU</span><div class="res-bar"><span class="res-bar-fill" id="res-cpu-bar"></span></div><b id="res-cpu">—</b></div>
+          <div class="res-row"><span>内存</span><div class="res-bar"><span class="res-bar-fill" id="res-mem-bar"></span></div><b id="res-mem">—</b></div>
+          <div class="res-row"><span>磁盘</span><div class="res-bar"><span class="res-bar-fill" id="res-disk-bar"></span></div><b id="res-disk">—</b></div>
           <div class="res-note" id="res-note">uptime — · 进程 —</div>
         </div>
       </section>
@@ -304,7 +310,7 @@
   <!-- 中栏：对话 -->
   <section class="console" id="chat-area" data-view="chat">
     <nav class="view-tabs" aria-label="视图切换">
-      <button class="view-tab is-active" data-view="chat" type="button">对话</button>
+      <button class="view-tab" data-view="chat" type="button">对话</button>
       <button class="view-tab" data-view="caps" type="button">功能表 <b id="tab-caps-n">408</b></button>
       <button class="view-tab" data-view="skills" type="button">技能栏 <b id="tab-skills-n">25</b></button>
       <button class="view-tab" data-view="space" type="button">3D 星图</button>
@@ -313,11 +319,13 @@
       <button class="view-tab" data-view="world" type="button">世界</button>
       <button class="view-tab" data-view="browser" type="button">浏览器</button>
       <button class="view-tab" data-view="brain" type="button">大脑执行层</button>
-      <button class="view-tab" data-view="plug" type="button">万能插</button>
+      <button class="view-tab is-active" data-view="plug" type="button">万能插</button>
       <button class="view-tab" data-view="team" type="button">触手协作</button>
       <button class="view-tab" data-view="mind" type="button">思维导图</button>
       <button class="view-tab" data-view="stream" type="button">思考流</button>
       <button class="view-tab" data-view="turns" type="button">轮次追踪</button>
+
+      <button class="view-tab" data-view="flow" type="button">全链路</button>
       <button class="view-tab" data-view="scan" type="button">穿透扫描</button>
       <button class="view-tab" data-view="prof" type="button">职业</button>
       <button class="view-tab" data-view="bounty" type="button">赏金</button>
@@ -349,7 +357,7 @@
             <div class="composer-left">
               <button class="tool-btn" id="chat-attach" type="button" title="添加图片">+</button>
               <button class="tool-btn file-btn" id="chat-attach-file" type="button" title="发送文件">文件</button>
-              <span class="model-chip" id="model-chip">本机指挥官 · 无限上下文</span>
+              <span class="model-chip" id="model-chip">本机指挥官 · ctx —</span>
             </div>
             <div class="composer-right">
               <button class="send-btn" type="submit" title="发送（Enter）">↑</button>
@@ -358,6 +366,7 @@
         </div>
         <div class="composer-hint" id="composer-hint">Enter 发送 · Shift+Enter 换行 · 直开 file:// 为快照</div>
       </form>
+      <div class="console-foot"><span id="console-sub"></span><span id="footer-at"></span></div>
     </div>
 
     <!-- 视图 2：功能表（427 位，可搜可筛） -->
@@ -531,10 +540,11 @@
         <canvas id="plug3d-canvas"></canvas>
         <div class="space3d-hud">
           <span class="space3d-title">万能插 · 数字流动的结 × 万能插口</span>
-          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 结=触手本体 · 数字=流动数据 · 8 插口=能力域</span>
+          <span class="space3d-hint">按住鼠标左键拖动旋转 · 滚轮缩放 · 结=触手本体 · 数字=流动数据 · 插口=能力域（实读 /api/data，点插口看该域能力与改动影响）</span>
         </div>
         <button class="omni-mon-toggle" id="om-toggle" type="button">▸ 多域监控</button>
-        <button class="proactive-toggle" id="proactive-toggle" type="button">⚡ 主动智能体</button>
+        <button class="omni-mon-toggle" id="im-toggle" type="button">▸ 改动影响</button>
+        <button class="proactive-toggle" id="proactive-toggle" type="button"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="currentColor"><path d="M9.4 1.3 4.2 9h2.9l-1 5.7L11.8 7H8.8l.6-5.7Z"/></svg><span>主动智能体</span></button>
         <aside class="proactive-panel" id="proactive-panel">
           <header><b>主动智能体</b><span id="pa-sub">读取中…</span>
             <button id="pa-start" type="button">启动</button><button id="pa-stop" type="button">停止</button>
@@ -556,6 +566,35 @@
           <div class="om-grid" id="om-grid"></div>
           <div class="om-recent-head">最近变化 · 细微级</div>
           <div class="om-recent" id="om-recent"></div>
+        </aside>
+        <aside class="omni-mon collapsed" id="impact-mon">
+          <header class="om-head">
+            <div>
+              <b>改动影响 · 多域监控</b>
+              <span id="im-sub">改一处之前，先看它连到哪</span>
+            </div>
+            <button id="im-refresh" type="button">刷新</button>
+            <button id="im-collapse" type="button" title="收起">收起</button>
+          </header>
+
+          <div class="im-verdict" id="im-verdict"></div>
+
+          <form class="im-ask" id="im-ask">
+            <input id="im-path" type="text" spellcheck="false"
+                   placeholder="要改哪个文件？例如 gbt_allinone/api.py">
+            <button type="submit">查这一刀</button>
+          </form>
+          <div class="im-probe" id="im-probe" style="display:none"></div>
+
+          <div class="im-nums" id="im-nums"></div>
+
+          <div class="im-sec">最不能随便动的 · 改了最容易坏别处</div>
+          <div class="im-bars" id="im-bars"></div>
+
+          <div class="im-sec">刚才动了什么 · 会连带碰到多少处</div>
+          <div class="im-feed" id="im-feed"></div>
+
+          <div class="im-legend" id="im-legend"></div>
         </aside>
       </div>
     </div>
@@ -613,12 +652,12 @@
         <div class="scan-senses" aria-label="五感覆盖（真实能力位）">
           <div class="scan-sense" data-sense="eye">
             <b>眼睛</b><span>视觉全谱 · 不止 OCR</span>
-            <i>vision_loop · vision · vision_grounding · vision_print · body_see · gods_eye · screen_sniff · video_intel · image_scout · zimage_rewash · chart_html</i>
+            <span class="scan-note">vision_loop · vision · vision_grounding · vision_print · body_see · gods_eye · screen_sniff · video_intel · image_scout · zimage_rewash · chart_html</span>
           </div>
-          <div class="scan-sense" data-sense="ear"><b>耳朵</b><span>听异常 / 语音 / 音频</span><i>音频与语音输入，扫到异常会静下来听</i></div>
-          <div class="scan-sense" data-sense="mouth"><b>嘴巴</b><span>报结论 / 对话</span><i>每轮扫完把结论说出来，不闷着</i></div>
-          <div class="scan-sense" data-sense="hand"><b>手</b><span>执行 / 穿透</span><i>疑点处纵深穿透，run_task 真做</i></div>
-          <div class="scan-sense" data-sense="brain"><b>大脑</b><span>反思 / 推理 / 规划</span><i>遇到疑点先想：为什么红、该不该穿透</i></div>
+          <div class="scan-sense" data-sense="ear"><b>耳朵</b><span>听异常 / 语音 / 音频</span><span class="scan-note">音频与语音输入，扫到异常会静下来听</span></div>
+          <div class="scan-sense" data-sense="mouth"><b>嘴巴</b><span>报结论 / 对话</span><span class="scan-note">每轮扫完把结论说出来，不闷着</span></div>
+          <div class="scan-sense" data-sense="hand"><b>手</b><span>执行 / 穿透</span><span class="scan-note">疑点处纵深穿透，run_task 真做</span></div>
+          <div class="scan-sense" data-sense="brain"><b>大脑</b><span>反思 / 推理 / 规划</span><span class="scan-note">遇到疑点先想：为什么红、该不该穿透</span></div>
         </div>
         <div class="space3d-hud">
           <span class="space3d-title">穿透式交叉扫描 · 427 位全量（绿=只读 / 红=需授权疑点）</span>
@@ -664,27 +703,103 @@
     <!-- 视图 4：仪表盘（可视化：域分布 / 门占比 / 守卫 / 电表 / 流水） -->
     <div class="view view-dash">
       <div class="dash-grid">
-        <section class="dash-card">
+        <section class="dash-panel dash-panel--hero">
           <div class="view-title">能力域分布 <span class="view-sub">32 域</span></div>
           <div class="dash-bars" id="dash-bars"></div>
         </section>
-        <section class="dash-card">
+        <section class="dash-panel dash-panel--ring">
           <div class="view-title">门占比 <span class="view-sub" id="dash-gate-sub"></span></div>
           <div class="dash-donut-wrap">
             <div class="dash-donut" id="dash-donut"></div>
             <div class="dash-legend" id="dash-gate-legend"></div>
           </div>
         </section>
-        <section class="dash-card">
+        <section class="dash-panel dash-panel--kv">
           <div class="view-title">守卫 / 引擎</div>
           <div class="dash-kv" id="dash-kv"></div>
         </section>
-        <section class="dash-card">
+        <section class="dash-panel dash-panel--flow">
           <div class="view-title">编排流水 <span class="view-sub" id="dash-flow-sub"></span></div>
           <div class="dash-flow" id="dash-flow"></div>
         </section>
       </div>
     </div>
+
+    <!-- 视图：全链路（agent-graph 设计模型：泳道 + 状态 + 会话侧栏） -->
+
+    <div class="view view-flow">
+
+      <div class="flow-stats" id="flow-stats"></div>
+
+      <section class="flow-now" id="flow-now">
+
+        <div class="flow-now-head">
+
+          <span class="flow-now-title">现在 · 正在执行</span>
+
+          <span class="flow-now-sub" id="flow-now-sub">最近 5 分钟的运行链</span>
+
+        </div>
+
+        <div class="flow-now-list" id="flow-now-list"></div>
+
+      </section>
+
+      <div class="flow-board">
+
+        <div class="flow-board-head">
+
+          <div class="view-title">运行链路 <span class="view-sub" id="flow-sub"></span></div>
+
+          <div class="flow-tools">
+
+            <div class="flow-legend" id="flow-legend"></div>
+
+            <button id="flow-refresh" class="flow-btn" type="button">刷新</button>
+
+          </div>
+
+        </div>
+
+        <div class="flow-board-body">
+
+          <div class="flow-cols" id="flow-cols"></div>
+
+          <aside class="flow-drawer" id="flow-drawer" aria-hidden="true">
+
+            <div class="flow-drawer-head">
+
+              <div class="flow-drawer-title" id="flow-drawer-title">节点</div>
+
+              <button id="flow-drawer-close" class="flow-btn" type="button">收起</button>
+
+            </div>
+
+            <div class="flow-drawer-body" id="flow-drawer-body"></div>
+
+          </aside>
+
+        </div>
+
+      </div>
+
+      <section class="flow-pages">
+
+        <div class="flow-pages-head">
+
+          <div class="view-title">APP 页面分类占比 <span class="view-sub" id="flow-pages-sub"></span></div>
+
+          <div class="flow-pages-bar" id="flow-pages-bar"></div>
+
+        </div>
+
+        <div class="flow-page-grid" id="flow-page-grid"></div>
+
+      </section>
+
+    </div>
+
+
 
     <!-- 视图 5：AI 朋友圈（动态流 / 发布 / 点赞） -->
 <div class="view view-moments">
@@ -880,6 +995,11 @@ window.addEventListener("error", function (e) {
 <script src="./settings.js"></script>
 <script src="./moments.js"></script>
 <script src="./omni-monitor.js"></script>
+<script src="./impact-board.js"></script>
 <script src="./proactive.js"></script>
+
+<script src="./flow-map.js"></script>
+  <script src="./settings-page.js"></script>
+  <script src="./skin-hud-live.js"></script>
 </body>
 </html>

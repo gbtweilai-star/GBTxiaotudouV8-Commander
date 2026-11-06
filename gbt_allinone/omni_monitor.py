@@ -223,6 +223,77 @@ def _proactive_state() -> dict:
         return {"error": "%s: %s" % (type(e).__name__, str(e)[:80])}
 
 
+def _tentacle_live() -> dict:
+    """触手本体读数 —— 监控的**主视角**（2026-11-06 主人令：「监控使用触手来精准监控」）。
+
+    为什么不重扫：`trunk_cover op=scan` 实测 7.6s（2928 文件 + AST 解析），
+    塞进 2.5s 轮询会互相踩。这里只读它上一次落盘的 `state/trunk-cover.json`，
+    并带上 `scanned_at` + `stale` 阈值位 —— 旧读数必须自己会说「我旧了」，不许假装实时。
+
+    实测成本（本机 2026-11-06）：`coverage` 0.10s · `self_diagnose` 0.23s · 读缓存 <5ms。
+    失败一律落 `error` 字段，不抛 —— 监控炸掉比监控不到更糟。
+    """
+    out: dict = {}
+    cov = {}
+    diag = {}
+    try:
+        from .tentacle import bridge as TB
+        cov = TB.coverage() or {}
+        diag = TB.self_diagnose() or {}
+    except Exception as e:                                        # noqa: BLE001
+        out["error"] = "%s: %s" % (type(e).__name__, str(e)[:80])
+    if cov:
+        out.update({
+            "domains": cov.get("total_domains"),
+            "actions_used": cov.get("total_tentacle_methods_used"),
+            "actions_covered": cov.get("covered_actions"),
+            "uncovered": cov.get("uncovered_count"),
+            "coverage_pct": cov.get("intent_coverage_pct"),
+            "eye_ready": bool(cov.get("eye_ready")),
+            "per_domain": {k: (v or {}).get("methods")
+                           for k, v in (cov.get("coverage") or {}).items()},
+        })
+    if diag:
+        deps = diag.get("deps") or {}
+        out.update({
+            "grab_ok": bool(diag.get("grab_ok")),
+            "eye_error": diag.get("eye_error"),
+            "methods": diag.get("manifest_methods"),
+            "deps_missing": sorted(k for k, v in deps.items()
+                                   if not (v or {}).get("ok")),
+        })
+    tc = _read_json(STATE / "trunk-cover.json", {}) or {}
+    if tc:
+        age = None
+        try:
+            age = round(time.time() - (STATE / "trunk-cover.json").stat().st_mtime, 1)
+        except Exception:  # noqa: BLE001
+            age = None
+        out["files"] = {
+            "total": tc.get("files"),
+            "owned": tc.get("owned"),
+            "support": tc.get("support"),
+            "core": tc.get("core"),
+            "orphan": tc.get("orphan_n"),
+            "caps": tc.get("caps"),
+            "caps_with_owner": tc.get("caps_with_owner"),
+            "cap_coverage": tc.get("cap_coverage"),
+            "states": tc.get("states"),
+            "scanned_at": tc.get("at"),
+            # 不许把「会自己走的秒数」放进被 diff 的快照：每次轮询都 +0.1s，
+            # 会把台账刷成一堆无意义变化（与 `omni_plug` 的 status 空行同类）。
+            # 只报一个稀疏阈值位；精确年龄由前端拿 scanned_at 现算。
+            "stale": bool(age is not None and age > 86400),
+        }
+        out["healthy"] = bool(
+            (tc.get("orphan_n") == 0)
+            and ((tc.get("cap_coverage") or 0) >= 0.99)
+            and out.get("uncovered") == 0
+            and out.get("eye_ready")
+        )
+    return out
+
+
 def sample() -> dict:
     """读一遍所有域；与上次做逐字段 diff。"""
     now = time.time()
@@ -231,7 +302,8 @@ def sample() -> dict:
         "system": _system_state(),
         "omni": _omni_domains(),
         "memory": _memory_state(),
-        "tentacle": {**_count_bindings(), **_tentacle_coverage()},
+        "tentacle": {**_count_bindings(), **_tentacle_coverage(),
+                     **_tentacle_live()},
         "blueprint": _blueprint_state(),
         "files": _files_state(),
         "dh": _dh_state(),

@@ -9,8 +9,8 @@
 
 ## 两个子命令
 
-    py -3.14 tools/codex-scripts/capability-supervisor.py watch     # 跑一轮审计 → 判定 → 打印报警
-    py -3.14 tools/codex-scripts/capability-supervisor.py heal      # 只对**白名单内、可回滚**的项动手
+    ./pyembed/python.exe tools/codex-scripts/capability-supervisor.py watch     # 跑一轮审计 → 判定 → 打印报警
+    ./pyembed/python.exe tools/codex-scripts/capability-supervisor.py heal      # 只对**白名单内、可回滚**的项动手
 
     heal --dry-run            只出计划，不落手
     heal --only <item-id>     只修一条（可重复）
@@ -67,9 +67,9 @@ BACKUP_ROOT = ROOT / "state" / "_heal_backup"
 
 S_OK, S_BAD, S_MISS, S_UNK = "接上", "断连", "缺失", "未探测"
 
-CMD_WATCH = "py -3.14 tools/codex-scripts/capability-supervisor.py watch"
-CMD_HEAL = "py -3.14 tools/codex-scripts/capability-supervisor.py heal"
-CMD_AUDIT = "py -3.14 tools/codex-scripts/capability-audit.py"
+CMD_WATCH = "./pyembed/python.exe tools/codex-scripts/capability-supervisor.py watch"
+CMD_HEAL = "./pyembed/python.exe tools/codex-scripts/capability-supervisor.py heal"
+CMD_AUDIT = "./pyembed/python.exe tools/codex-scripts/capability-audit.py"
 
 ACTOR = "capability-supervisor.py"
 
@@ -161,9 +161,9 @@ def escalate_for(item: dict) -> tuple:
 # 白名单与动作
 # ══════════════════════════════════════════════════════════════════════════
 def _norm_cmd(cmd: list) -> list:
-    """把写成人读形态的命令（`py -3.14 xxx.py …`）换成**当前解释器**（`sys.executable`）。
+    """把写成人读形态的命令（`./pyembed/python.exe xxx.py …`）换成**当前解释器**（`sys.executable`）。
 
-    为什么：生成器命令是以 `py -3.14 …` 记的（给人看的，与仓里别处一致）；真正 spawn 时
+    为什么：生成器命令是以 `./pyembed/python.exe …` 记的（给人看的，与仓里别处一致）；真正 spawn 时
     用 `sys.executable`，免得依赖 PATH 上的 `py` 启动器（也免得多一层进程）。
     """
     c = list(cmd)
@@ -190,7 +190,7 @@ def artifact_action(item: dict):
 def bridge_action(item: dict):
     if item.get("id") != "bridge.panel-8765":
         return None
-    return {"label": "起面板桥：py -3.14 holo_pet/launch_panel.py --no-browser",
+    return {"label": "起面板桥：./pyembed/python.exe holo_pet/launch_panel.py --no-browser",
             "cmd": [sys.executable, "holo_pet/launch_panel.py", "--no-browser"],
             "cwd": str(ROOT), "kind": "process", "port": 8765, "reversible": True}
 
@@ -406,7 +406,7 @@ def cmd_watch(_args) -> int:
     if not human:
         print("    （无）")
     print("-" * 78)
-    print("  判据：py -3.14 tools/codex-scripts/capability-audit.py --check")
+    print("  判据：./pyembed/python.exe tools/codex-scripts/capability-audit.py --check")
     return 0
 
 

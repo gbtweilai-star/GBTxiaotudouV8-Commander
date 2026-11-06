@@ -592,7 +592,7 @@ def wb_models(**_kw) -> dict:
 
 
 def wb_chat(prompt: str = "", messages=None, model: str = "", base: str = "",
-            timeout: float = 120.0, max_tokens: int = 1024, **_kw) -> dict:
+            timeout: float = 120.0, max_tokens: int = 1024, upstream: str = "", **_kw) -> dict:
     """**反向调用** WorkBuddy 免费通道（回环 OpenAI 兼容口）；不注册进 DSH。"""
     d = {"ok": True, "base": base} if base else wb_discover(quiet=True)
     if not d.get("ok"):
@@ -603,6 +603,12 @@ def wb_chat(prompt: str = "", messages=None, model: str = "", base: str = "",
         return {"ok": False, "op": "wb_chat", "reason": "需要 prompt 或 messages"}
     body = {"model": model or "default-model", "messages": msgs, "stream": False,
             "max_tokens": int(max_tokens)}
+    upstream = str(upstream or "" ).strip()
+    if upstream and upstream != "selfhost":
+        return {"ok": False, "op": "wb_chat", "reason": "wb_chat 只允许指定 selfhost 本机权重车道"}
+    if upstream:
+        body["upstream"] = "selfhost"
+        body["local_only"] = True
     r = _local_ai_call(d["base"], body, timeout=timeout)
     # 2026-10-18 记（**已知边界**，来自实弹 + V57 报告 2.3）：WorkBuddy 上游对"客户端身份"有风控，
     #   拿它的登录 token 从外部进程直接 chat 会被 400「请求被拦截，请重新发送」拦下；
@@ -690,12 +696,18 @@ def discover(deep: bool = False, **_kw) -> dict:
               ("llamacpp", "http://127.0.0.1:8080", "/v1/models"),
               ("gbt-gpu-lane",
                "http://127.0.0.1:%s" % (os.environ.get("GBT_GPU_PORT") or "8793"), "/health"))
+    # 超时 3 秒 → 0.4 秒（2026-11-04 实测优化）
+    # 血账：`surface_audit` 每次 22 秒，cProfile 显示其中 **12.3 秒** 卡在这里 ——
+    # 5 个回环端点 × timeout=3，而本机回环 HTTP 正常响应在 100ms 内。
+    # 探测的目的是「在不在」，不是「等它想清楚」；0.4 秒足够区分在跑 / 没在跑。
+    # 可用 GBT_PROBE_TIMEOUT 覆盖（弱机或调试时可放大）。
+    _pt = float(os.environ.get("GBT_PROBE_TIMEOUT") or 0.3)
     for name, base, path in _lanes:
         if _lb_open is None:
             lm.append({"name": name, "base": base, "ok": False, "kind": "not_probed",
                        "未读到": "net_guard 取不到 ⇒ 未探测"})
             continue
-        _r = _lb_open(base + path, timeout=3)
+        _r = _lb_open(base + path, timeout=_pt)
         item = {"name": name, "base": base, "ok": bool(_r.get("ok")), "kind": _r.get("kind")}
         if _r.get("status"):
             item["http"] = _r["status"]
@@ -870,12 +882,35 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
                 else:
                     q = Path(g["abs"])
                     q.parent.mkdir(parents=True, exist_ok=True)
+                    # 🔴 2026-11-06 血账（实测）：原来只认 `a["text"]` 一个字段名，
+                    #    调用方猜不中就写进空串，而下面 `ok: True` + `wrote_bytes: 0`
+                    #    **照样报成功** —— 主人在任务测试里看到「写入接口返回 wrote_bytes: 0」
+                    #    却拿不到失败信号，白试了两轮字段名。
+                    #    两处一起改：① 宽容接收 text/content/body；
+                    #                ② 真 0 字节就 `ok: False` 并说清缺什么。
+                    body = a.get("text")
+                    if body is None:
+                        body = a.get("content")
+                    if body is None:
+                        body = a.get("body")
+                    body = "" if body is None else str(body)
                     if action == "append":
                         with q.open("a", encoding="utf-8") as f:
-                            f.write(str(a.get("text") or ""))
+                            f.write(body)
                     else:
-                        q.write_text(str(a.get("text") or ""), encoding="utf-8")
-                    res.update({"ok": True, "wrote_bytes": q.stat().st_size})
+                        q.write_text(body, encoding="utf-8")
+                    size = q.stat().st_size
+                    if size <= 0:
+                        res.update({
+                            "ok": False, "wrote_bytes": 0,
+                            "reason": "写入 0 字节：payload 里没有内容"
+                                      "（text / content / body 全为空）",
+                            "hint": "file 插座写文件形如 "
+                                    "payload={op:'run', socket:'file', target:'<相对路径>', "
+                                    "action:'write', text:'<内容>'}",
+                        })
+                    else:
+                        res.update({"ok": True, "wrote_bytes": size})
             elif action == "exists":
                 res.update({"ok": True, "exists": p.exists()})
             else:
@@ -1352,7 +1387,75 @@ def selftest() -> dict:
             "说明": "插上是真探测（文件在/进程就绪/URL 合法）；驱动是真执行（过门）"}
 
 
-def run(op: str = "status", **kw) -> dict:
+def _ledger_path() -> Path:
+    """留痕路径 —— 与 `tools/impact_check._ledger_path()` **同一套解析**（两处必须一致）。
+
+    `GBT_IMPACT_LEDGER` 可覆盖：`state/*/` 被 .gitignore 忽略，但判据跑起来
+    照样往生产流水里写。实测那一天 `omni-impact.jsonl` 133 行里大半是测试造的
+    （`__绝对不存在的插座__`、连发三条 `status`）—— 真实动作被噪音淹掉。
+
+    每次调用都现解析（不缓存），这样 import 之后设环境变量也能生效。
+    """
+    env = (os.environ.get("GBT_IMPACT_LEDGER") or "").strip()
+    if env:
+        return Path(env)
+    return Path(__file__).resolve().parents[1] / "state" / "omni-impact.jsonl"
+
+
+_LEDGER = _ledger_path()        # 默认路径（兼容既有引用；写入时仍走 _ledger_path()）
+
+
+def _sync_impact(op: str, kw: dict, out: dict, t0: float) -> None:
+    """**多域监控 × 万能插的写入侧** —— `impact_check._op_recent` 读的就是这个文件。
+
+    2026-11-04 实测断点，比"没接线"更难看：
+      · `impact_check.py:353` 的 docstring 写着「写侧（`omni_plug._sync_impact`）只追加一行」，
+      · 而本位 92 KB 代码里**根本没有 `_sync_impact`** —— 只有那句话。
+      ⇒ 于是 `recent` 永远返回 `{"count": 0, "why": "...不存在"}`。
+    「文档里写了」被当成「代码里有」，这正是 `pulse_core.verify` 那条
+    「不接受文档当证据」要抓的东西。
+
+    字段按**读侧契约**写（`action` / `socket` / `target` / `ok` / `ms`），
+    并额外留一个 `op` 供人直接读文件时辨认。
+
+    写法：追加一行 + `fsync`（不会读到半行）；失败不挡主流程，但必须 stderr 留痕。
+
+    2026-11-06 实测修正：`op=status` 是纯读，target/socket 都为空。旧台账最后
+    10 行全被这种空记录占满，真实 impact 行被挤出 `recent`。只跳过 status；
+    历史空行由 `impact_check._op_recent` 读侧过滤，不删原流水。
+    """
+    if str(op or "").strip().lower() == "status":
+        return
+    try:
+        row = {
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "action": op,            # 读侧字段
+            "op": op,                # 人读字段（同一值，别让两边再漂一次）
+            "socket": str(kw.get("socket") or ""),
+            "target": str(kw.get("target") or kw.get("socket") or kw.get("do") or "")[:300],
+            "ok": bool(out.get("ok")),
+            "error": (str(out.get("error") or "")[:200] or None),
+            "ms": int((time.time() - t0) * 1000),
+        }
+        _p = _ledger_path()          # 现解析：环境变量改了也生效
+        _p.parent.mkdir(parents=True, exist_ok=True)
+        with open(_p, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+    except Exception as e:                                        # noqa: BLE001
+        try:
+            print("[omni_plug] 留痕失败：%s: %s" % (type(e).__name__, str(e)[:120]),
+                  file=sys.stderr)
+        except Exception:                                         # noqa: BLE001
+            pass
+
+
+# 兼容旧名（`_ledger` 是这次改动中途用过一版的名字，留别名防外部引用断掉）
+_ledger = _sync_impact
+
+
+def _dispatch(op: str = "status", **kw) -> dict:
     op = str(op or "status").lower()
     if op == "status":
         return {"ok": True, "op": "status", "名字": "万能插",
@@ -1449,7 +1552,8 @@ def run(op: str = "status", **kw) -> dict:
         return wb_chat(prompt=str(kw.get("prompt") or ""), messages=kw.get("messages"),
                        model=str(kw.get("model") or ""), base=str(kw.get("base") or ""),
                        timeout=float(kw.get("timeout") or 120.0),
-                       max_tokens=int(kw.get("max_tokens") or 1024))
+                       max_tokens=int(kw.get("max_tokens") or 1024),
+                       upstream=str(kw.get("upstream") or ""))
     if op in ("wb_models", "workbuddy_models"):
         return wb_models()
     if op in ("wb_discover", "workbuddy_discover"):
@@ -1474,7 +1578,7 @@ def run(op: str = "status", **kw) -> dict:
         if not kw.get("base") and str(kw.get("target") or "") in ("", "our", "weights", "selfhost"):
             import importlib.util as _iu4
             # 🔴 2026-11-03 修（同一处反斜杠病 · 第四个实例）：见 plug_and_run 里 ai 腿的注释。
-            _wp4 = _P(__file__).resolve().parent.parent / "tools" / "weights.py"
+            _wp4 = Path(__file__).resolve().parent.parent / "tools" / "weights.py"
             if not _wp4.is_file():
                 return {"ok": False, "socket": "ai", "reason": "tools/weights.py 不在盘上",
                         "looked": str(_wp4)}
@@ -1556,21 +1660,61 @@ def run(op: str = "status", **kw) -> dict:
                 "hits": len(hit), "sample": hit[:int(kw.get("limit") or 20)]}
 
     if op == "run":
+        # 🔴 2026-11-06 血账（任务测试当场撞上）：原来这里是 `args=kw.get("args")`
+        #    —— **只认嵌套的 args**。顶层传 text / content / body 会被静默丢弃，
+        #    于是「写文件」拿到 0 字节，而外层还报 ok。实测：
+        #        payload={op:run, socket:file, target:..., do:write, text:"HELLO"}
+        #        → wrote_bytes=0（text/content/body 三种写法全空）
+        #    调用方（Codex）照着 tool spec 写的 —— 而 spec 只教了读文件，
+        #    写文件那句"同上，do:write"**从没说过内容要放 args 里**。
+        #    现在：没有 args 时，把顶层的内容字段收成 args，两种写法都认。
+        _args = kw.get("args")
+        if not isinstance(_args, dict):
+            _args = {k: kw[k] for k in ("text", "content", "body") if k in kw}
         return dict({"op": "run"}, **plug_and_run(
             str(kw.get("target") or ""), kind=str(kw.get("socket") or "process"),
-            action=str(kw.get("do") or "run"), args=kw.get("args"),
+            action=str(kw.get("do") or "run"), args=_args or None,
             timeout=float(kw.get("timeout") or 30.0)))
     return {"ok": False, "error": "不认的 op：%s" % op,
             # 2026-10-28：这份自述原来只列了 14 个，而 run() 实际认 24 个（含 9 个别名）
             #   ⇒ 照自述调用的人**摸不到** scan_local / snapshot / counter / wb / 可插面 这些入口。
             #   判据在 tools/codex-scripts/omni-monitor.py --gap（AST 现读，不写死）。
+            # 2026-11-05 AST 对账修：实际认 42 个，这里原来只列 37 个，
+            #   漏了 page_route / page_stats / disk_find / disk_stats / 任意 ——
+            #   照自述调用的人摸不到这 5 个入口（L1666 的注释自己承认过同一问题，又漏了一次）。
+            #   判据见 .scratch/audit-op-truth.py（AST 现读，不写死）。
             "known": ["status", "sockets", "snapshot", "energy", "selftest", "plug", "run",
-                      "universal", "插",
+                      "universal", "插", "任意",
                       "surface_audit", "surface", "万能面", "full_sweep", "全量",
                       "page_index", "页索引", "pages", "page_run", "开页", "page",
+                      "page_route", "page_stats",
                       "discover", "scan_local", "可插面",
+                      "disk_find", "disk_stats",
                       "ai", "ai_chat", "ai_control",
                       "counter", "counter_plan", "counter_strike", "反控",
                       "wb", "wb_chat", "workbuddy_chat",
                       "wb_models", "workbuddy_models",
                       "wb_discover", "workbuddy_discover"]}
+
+
+def run(op: str = "status", **kw) -> dict:
+    """对外入口：转发 `_dispatch`，并**把每次动作写进留痕**（多域监控读它）。
+
+    为什么不把留痕插在各个 `return` 前面：`_dispatch` 有几十个 return 分支，
+    逐个插必然漏（本位历史上就是漏了整个留痕）。包一层是唯一不漏的写法 ——
+    新增 op 也自动被覆盖，不用回去补。
+
+    留痕失败不影响返回值（`_ledger` 自己吞异常并写 stderr）。
+    """
+    t0 = time.time()
+    try:
+        out = _dispatch(op, **kw)
+    except Exception as e:                                        # noqa: BLE001
+        _sync_impact(op, kw, {"ok": False,
+                              "error": "%s: %s" % (type(e).__name__, str(e)[:200])}, t0)
+        raise
+    if not isinstance(out, dict):
+        out = {"ok": False, "error": "返回值不是 dict：%s" % type(out).__name__}
+    _sync_impact(op, kw, out, t0)
+    return out
+

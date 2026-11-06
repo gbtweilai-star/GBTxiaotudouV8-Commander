@@ -282,7 +282,7 @@ def judge_persistence(p: dict) -> list:
 # S3 · 内容 IOC
 # ══════════════════════════════════════════════════════════════════
 def scan_iocs(prod_files) -> dict:
-    hits, tooling = [], []
+    hits, tooling, unread = [], [], []
     scanned = 0
     for path, size in prod_files:
         if path.suffix.lower() not in (".py", ".ps1", ".psm1", ".bat", ".cmd", ".vbs",
@@ -292,7 +292,8 @@ def scan_iocs(prod_files) -> dict:
             continue
         try:
             t = path.read_text(encoding="utf-8", errors="replace")
-        except OSError:
+        except OSError as _e:
+            unread.append({"file": str(path), "why": type(_e).__name__})
             continue
         scanned += 1
         rel = str(path)
@@ -305,7 +306,9 @@ def scan_iocs(prod_files) -> dict:
                    "snippet": re.sub(r"\s+", " ", m.group(0))[:90]}
             (tooling if SECURITY_TOOLING_HINT.search(rel) else hits).append(rec)
     return {"scanned": scanned, "hits": hits[:60], "hits_n": len(hits),
-            "security_tooling": tooling[:30], "security_tooling_n": len(tooling)}
+            "security_tooling": tooling[:30], "security_tooling_n": len(tooling),
+            "unread": unread[:20], "unread_n": len(unread),
+            "coverage_complete": not unread}
 
 
 def judge_iocs(io: dict) -> list:

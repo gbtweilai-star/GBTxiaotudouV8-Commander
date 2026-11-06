@@ -1,60 +1,59 @@
 {
-  "at": "2026-11-04T16:58:00",
+  "at": "2026-11-04T16:46:00",
   "_口径": "「没实现必须有名有姓」。每条必须具备 where / missing / reason / who_can_fix / evidence 五项；缺一项就等于没登记。judge: gbt_allinone/tests/test_cap_bind_bidirectional.py::test_c_unimplemented_must_be_named",
-  "_来源": "由 tools/framework_state.py::collect() 的六面读数 + 四个判据实跑发现，逐条追根后登记（2026-11-04）",
-  "_已闭合（留痕，不计入 items）": [
+  "_来源": "本文件由 tools/framework_state.py::collect() 在生产树上首次体检发现缺口后建立（2026-11-04）。生产树此前没有这份登记表，六面的「缺件」因此无从交代",
+  "_生产树已闭合（2026-11-04 首次体检就地修掉）": [
+    {
+      "where": "state/cap_tags.json",
+      "曾在": "cap_tags.count=410 ≠ 注册表 427 ⇒ 台账过期；实测「无标签能力=17」",
+      "现已补": "run_task('cap_tags', {'op':'tags'}) 重建 ⇒ count=427 · open 292 / owner 135；复跑「无标签能力=0」"
+    },
     {
       "where": "state/skill_atlas.json",
-      "曾在": "2026-11-04 之前：数据 / 生成器 / 定义三者全缺 ⇒ 判据 A 第三处无法计算，test_chain_readiness 直接 FileNotFoundError",
-      "现已补": "tools/build-skill-atlas.py（注册表投影，可复跑、带 --check）+ state/skill_atlas.json（427 条 / 32 域）"
+      "曾在": "图鉴不在盘，判据 A 的第三处（登记 · 图鉴 · 分派）无从计算",
+      "现已补": "tools/build-skill-atlas.py 生成 427 条 / 32 域，--check 一致"
     },
     {
       "where": "gbt_allinone/api.py::see_camera",
-      "曾在": "能力位已登记、desc/INTENT_MAP/索引三道门都过了，唯独 api.py 漏分派 ⇒ run_task 返回 not_wired「名字有了、门没接」",
-      "现已补": "api.py 补 kind == \"see_camera\" 分支（按 body_eye 同形状）；实测 status=ok",
-      "抓法": "tools/framework_state.py 的 A 面（registry 与 api 分派做差集）—— 不是靠人记得"
-    },
-    {
-      "where": "state/asset_bindings.json",
-      "曾在": "11 个链路能力位（comfyui/zimage_rewash/edit_pipeline/audio_extract/audio_mix/media_run/media_publish/voice/voice_orchestra/music_intel/music_publishing）没有任何资产绑定它们",
-      "现已补": "按 api.py 各 kind 分支的真实 import 模块精确补绑 11 条；绑定总数 154→165"
+      "曾在": "能力位在册但 api.py 无分派 ⇒ not_wired「名字有了、门没接」",
+      "现已补": "此轮从开源仓同步 api.py，实测 status=ok"
     }
   ],
   "items": [
     {
-      "where": "tools/binding_hook.py",
-      "missing": "绑定钩子（写能力位/资产时自动双向绑定）",
-      "reason": "文件在本仓与 git 全历史中均不存在，但被 6 处引用：gbt_allinone/tests/test_native_growth_stack.py:283（TestBindingHook 整组判据因此 ERROR）、gbt_allinone/tools/cap_tags.py:10、devour_fusion.py:192、growth_hooks.py:245、tools/codex-scripts/capability-autobind.py:282/284",
-      "who_can_fix": "主人给接口契约（钩子在哪一步触发、失败是否阻断、留什么账），我按契约实现；或确认这几处引用已废弃，一并清掉",
-      "evidence": "git log --all -- '*binding_hook*' 为 0 条；test_native_growth_stack.py:283 `_load(\"bh_t\", ROOT/\"tools\"/\"binding_hook.py\")` 抛 FileNotFoundError"
-    },
-    {
-      "where": "tools/beatgrid.py",
-      "missing": "时间基（BPM→帧率反推、网格、能量表）",
-      "reason": "被 one_shot 的 plan 依赖（one_shot.py:150 `_load(\"tools/beatgrid.py\")`），文件不在 ⇒ 原本抛裸 FileNotFoundError，现改为如实报 needs_dependency。同理缺 tools/filmkit.py、tools/actioncam.py、tools/filmgrade.py",
-      "who_can_fix": "主人确认这些脚本是否随开源仓分发（它们是创作产线的外部件，可能只在生产树）",
-      "evidence": "one_shot 实测回执 needs_dependency + missing:['tools/beatgrid.py','tools/actioncam.py','tools/filmgrade.py']；filmkit/actioncam 的 ok=false 因 impl 不在"
+      "where": "plugins/gbt-master/lib/host.js",
+      "missing": "台账注入的嬿主渲染器（把 state/排查台账.json 渲染成会话头第三块上下文 gbt-progress-ledger）",
+      "reason": "本机整目录 plugins/ 不存在；全盘（仓 + ~/.codex/plugins + D:\\GBT-builds）递归查 host.js 皆无 ⇒ 台账在盘但注入链不在这台机上生效",
+      "who_can_fix": "主人给插件 host.js（或在嬿主侧确认不再注入）；放回 plugins/gbt-master/lib/host.js 即自动转绿",
+      "evidence": "2026-11-06 现读：Test-Path plugins = False；run-tests gbt_allinone.tests.test_progress_ledger_contract → Ran 12, errors=3，三条全部是 HOST_JS 读不到（台账本体 9 条已全绿）"
     },
     {
       "where": "tentacles/",
-      "missing": "触手舰队工作区（每根触手一份 git worktree + 身份 + 日志）+ Obsidian 永久记忆层（459 根触手各一本库）",
-      "reason": "目录从未入库（tentacles/fleet/worktrees/state/tentacles 均无，git 全历史亦无）。判据 test_a_every_tentacle_has_its_own_vault_and_two_way_links 报「459 根触手还没有独立库」。没有样本无法生成",
-      "who_can_fix": "主人给一份「一号触手长什么样」的真实样本（目录树 + 身份文件 + 日志格式 + 库的 README 结构），我按样本做生成器 + 判据",
-      "evidence": "tools/framework_state.py::_face_fleet 现读四路径均不命中；test_native_growth_stack 实测 counts 不达标"
+      "missing": "触手舰队工作区（每根触手一份 git worktree + 身份 + 日志）",
+      "reason": "生产树同样是 tentacles/ · fleet/ · worktrees/ · state/tentacles 四者皆无。.gitignore 有结构描述但目录从未生成。没有样本无法生成",
+      "who_can_fix": "主人给一份「一号触手长什么样」的真实样本（目录树 + 身份文件 + 日志格式），我按样本做生成器 + 判据",
+      "evidence": "tools/framework_state.py::_face_fleet 在生产树现读四个候选路径均不命中"
     },
     {
-      "where": "state/devour_ledger.jsonl",
-      "missing": "吞天×原生融合台账（20 组对照的实跑记录）",
-      "reason": "判据 test_b_ledger_matches_disk 报「吞入台账是空的 ⇒ 融合钩子没动过」；test_c_pending_intakes_are_honest 报 'win-mcp' 不在账上。devour_fusion 能力位在册且可调，但没有实跑记录",
-      "who_can_fix": "主人点一次 devour_fusion 的实跑（要吞哪些组、判据是什么），或确认这块先不做、把两条判据如实标为 skip",
-      "evidence": "gbt_allinone/tests/test_native_growth_stack.py 的 test_b/test_c 实测断言原文"
+      "where": "tools/binding_hook.py",
+      "missing": "绑定钩子（写能力位/资产时自动双向绑定）",
+      "reason": "生产树也没有此文件，但被 6 处引用（含 test_native_growth_stack.py:283，整组判据因此 ERROR）",
+      "who_can_fix": "主人给接口契约，我按契约实现；或确认这些引用已废弃一并清掉",
+      "evidence": "与开源仓同一份缺口，见仓内 state/unimplemented.json 同条目"
+    },
+    {
+      "where": "gbt_allinone/tools/libtv_workflow.py",
+      "missing": "libtv_workflow 的生成端（现为只读骨架）",
+      "reason": "positions.audit() 报 [make_short] 应有 full、实际 read。这是如实的进度状态，不是缺陷",
+      "who_can_fix": "主人定优先级：接生成端，或把 make_short 的 min_level 如实降为 read",
+      "evidence": "framepositions.audit() 的 gaps 字段（六面读数里「覆盖矩阵 盲区=1」即此条）"
     },
     {
       "where": "gbt_allinone/auth_gate.py::ENFORCED_SCOPES",
       "missing": "「写库根在仓外必须关门」这条判据与主人令的冲突裁决",
-      "reason": "判据 test_native_growth_stack::test_b 要求「库根指到仓外 ⇒ 必须 denied」，但按主人令（2026-10-19 逐字）「除了黑客全能力和转账要票其他都去掉」，filesystem_write 已不在 ENFORCED_SCOPES ⇒ auth_gate 直接放行。两条都站得住，是冲突不是 bug —— 不许我私自改判据，也不许假装已修",
-      "who_can_fix": "主人裁决二选一：A. 恢复 filesystem_write 为护栏（写入类动作重新要票，判据转绿）；B. 承认写入免票，把判据改为「仓外写入必须在台账里留一条可查记录」",
-      "evidence": "auth_gate.py:271-275 的 `passed` 分支；obsidian_vault.py::_gate 的 force 参数注释；实测 _gate(force=True) 仍返回 None"
+      "reason": "判据要求仓外写入必须 denied，但主人令（2026-10-19）已把 filesystem_write 移出护栏 ⇒ auth_gate 直接放行。两条都站得住，是冲突不是 bug",
+      "who_can_fix": "主人裁决：A 恢复护栏；B 改判据为「仓外写入须留可查台账」",
+      "evidence": "auth_gate.py:271-275 passed 分支；obsidian_vault.py::_gate 的 force 注释"
     }
   ]
 }

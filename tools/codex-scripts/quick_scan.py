@@ -401,6 +401,7 @@ def scan_plane1_prod(prod):
     syn_err, unresolved, _, escapes = [], [], [], []
     bom, nonutf8, mojibake, mixed_eol, nul = [], [], [], [], []
     json_bad, yaml_bad, toml_bad = [], [], []
+    unread = []
     MOJI = re.compile(r"(â€|Ã[\x80-\xbf]|ï¿½|锟斤拷|\ufffd)")
  # 2026-09-24 修一条**引用型/自指型假红**（与 TEST_CALIBER_HIJACK 同一类：判据分不清"病"和"讲病的教材"）。
     #    实测：本仓 21 条 MOJIBAKE 命中**全部**属于下面两类，没有一条是真乱码 ——
@@ -429,7 +430,9 @@ def scan_plane1_prod(prod):
         checked += 1
         try:
             raw = p.read_bytes()
-        except OSError:
+        except OSError as _e:
+            unread.append({"path": _rel(p), "why": "%s: %s"
+                           % (type(_e).__name__, str(_e)[:60])})
             continue
         rel = _rel(p)
         if raw.startswith(b"\xef\xbb\xbf"):
@@ -498,6 +501,8 @@ def scan_plane1_prod(prod):
             "bom": bom, "non_utf8": nonutf8, "mojibake": mojibake,
             "mixed_eol": mixed_eol, "nul_like": nul,
             "json_bad": json_bad, "yaml_bad": yaml_bad, "toml_bad": toml_bad,
+            "unread": unread[:20], "unread_n": len(unread),
+            "coverage_complete": not unread,
             "_imports": unresolved, "_fp_mods": fp_mods, "_fp_dirs": fp_dirs}
 
 

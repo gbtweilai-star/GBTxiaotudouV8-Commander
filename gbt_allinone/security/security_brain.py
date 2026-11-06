@@ -123,6 +123,14 @@ _EXEC_CWE = ("CWE-78", "CWE-77", "CWE-94", "CWE-95", "CWE-89", "CWE-502",
             "CWE-396")
 # 泄露类 CWE：密钥/敏感信息 —— 这类**在字符串里正是要找的东西**，所以在注释/文档串里也照扫。
 _LEAK_CWE = ("CWE-532", "CWE-798", "CWE-256", "CWE-522")
+# 文本落盘/打印类调用：传给它们的字符串是**数据**，不是被执行的代码。
+# 典型误报：自检夹具把 `os.system(...)` 写进临时 .py 再扫自己 —— 那一行在字符串里，
+# 永远不会被执行，但逐行正则看不出来。只豁免这些调用实参里的字符串；
+# `os.system("...")` / `subprocess.run(..., input="...")` 不在此列，照扫。
+_TEXT_SINK_CALLS = frozenset({
+    "write_text", "write_bytes", "write", "writelines", "dump", "dumps",
+    "print", "append", "info", "debug", "warning", "error",
+})
 # 「不是硬编码、而是**当场生成**」的形态：`token = "gbtc_" + secrets.token_urlsafe(32)`。
 # 敏感信息正则要求字面量后面紧跟收尾引号，于是它只匹配到 `"gbtc_"` 这个**前缀**就报 high。
 # 收紧判据：必须是「收尾引号 + 加号 + 生成器/读取器」才算生成，避免误放真硬编码。
@@ -172,6 +180,7 @@ class HackerBrain:
         vectors = {"entry_points": 0, "file_operations": 0, "network": 0, "user_inputs": 0, "auth_boundaries": 0}
         details = []
         files_scanned = 0
+        unread = []
 
         # 2026-10-09 根因修复：原来 rglob 全仓 ⇒ 外部语料（_upstream 29032 个 .py）
         # 被当成自有代码面 ⇒ risk_score 恒 100/「高危」。改走 scan_scope 剪枝。
@@ -192,7 +201,9 @@ class HackerBrain:
                     vectors["user_inputs"] += 1; details.append({"file": rel, "type": "user_input"})
                 if re.search(r'@login_required|@jwt_required|authenticate|authorize|token|api_key|password', content):
                     vectors["auth_boundaries"] += 1
-            except Exception: pass  # 容错: 非关键路径
+            except Exception as _e:  # 读不到 = **未知**，不是「干净」
+                unread.append({"file": str(py_file),
+                               "why": "%s: %s" % (type(_e).__name__, str(_e)[:80])})
         total = sum(vectors.values())
         # 🔴 2026-10-09 二次根因：risk_score 原来是**原始计数**（min(100, 加权和)），
         #    任何过 30 个文件的仓都恒等 100 —— 报警永远响 = 报警等于不响
@@ -203,10 +214,19 @@ class HackerBrain:
         files_seen = max(1, files_scanned)
         density = round(weighted / files_seen, 2)
         level = "高危" if density >= 6 else ("中危" if density >= 3 else "低危")
+        # 闭合判据：读不到的文件必须出现在回执里；有 unread 就不许宣称「低危」
+        complete = not unread
+        if unread and level == "低危":
+            level = "未知（覆盖不全）"
         return {"ok": True, "attack_surface": vectors, "total_vectors": total,
                 "risk_score": min(100, weighted),
                 "risk_score_note": "原始加权计数（会随仓大小饱和到 100，仅作参考）",
                 "files_scanned": files_scanned,
+                "files_unread": len(unread),
+                "unread": unread[:20],
+                "coverage_complete": complete,
+                "coverage_note": ("全部候选文件都读到了" if complete else
+                                  "有 %d 个文件读不到 -> 结论只对读到的那部分成立" % len(unread)),
                 "risk_density": density,
                 "risk_level": level,
                 "risk_basis": "risk_level 按 risk_density（加权攻击面/文件数）判档，跨仓可比",
@@ -305,8 +325,8 @@ class HackerBrain:
                 #   这些白名单项本来就是目录名（sqli_tester / waf_bypass / pentest_kali …）。
                 _rel_parts = {p for p in str(_rel_l).replace("\\", "/").lower().split("/") if p}
                 is_security_tool = any(wd in _rel_parts for wd in whitelist_dirs)
-                # R-H295：文档串行号（真解析，不猜引号）。
-                # 只认「表达式语句就是一个字符串常量」—— 那是文档串/注释性字符串，永不执行。
+                # R-H295：文档串/文本落盘实参行号（真解析，不猜引号）。
+                # 文档串 = 表达式语句就是一个字符串常量；文本落盘/打印实参 = 数据，不是被执行的代码。
                 # **不能**把 f-string 实参也算进来：`os.system(f"...")` 的实参也是字符串，
                 # 而它正是要抓的真漏洞；一律豁免等于把扫描器弄瞎。
                 _doc_lines = set()
@@ -332,10 +352,25 @@ class HackerBrain:
                             "location": "%s:%s" % (rel, getattr(_w, "lineno", 0) or 0),
                             "warning": str(_w.message)[:120]})
                 if _tree is not None:
+                    _parents = {}
                     for _n in ast.walk(_tree):
-                        if (isinstance(_n, ast.Expr) and isinstance(_n.value, ast.Constant)
-                                and isinstance(_n.value.value, str)):
-                            _end = getattr(_n.value, "end_lineno", None) or _n.lineno
+                        for _ch in ast.iter_child_nodes(_n):
+                            _parents[_ch] = _n
+                    for _n in ast.walk(_tree):
+                        if not (isinstance(_n, ast.Constant) and isinstance(_n.value, str)):
+                            continue
+                        _par = _parents.get(_n)
+                        # ① 文档串：表达式语句就是一个字符串常量（永不执行）
+                        _is_doc = isinstance(_par, ast.Expr)
+                        # ② 文本落盘/打印实参：数据，不是被执行的代码
+                        _is_data = False
+                        if isinstance(_par, ast.Call):
+                            _fn = _par.func
+                            _fname = (_fn.attr if isinstance(_fn, ast.Attribute)
+                                      else (_fn.id if isinstance(_fn, ast.Name) else ""))
+                            _is_data = _fname in _TEXT_SINK_CALLS
+                        if _is_doc or _is_data:
+                            _end = getattr(_n, "end_lineno", None) or _n.lineno
                             _doc_lines.update(range(_n.lineno, _end + 1))
                 # 🔴 2026-10-09 根因修复（性能 O(行数²)）：原来**每行**都重跑一次
                 #    content.split(chr(10)) 去取前 5 行上下文 —— 单文件代价是行数的平方。

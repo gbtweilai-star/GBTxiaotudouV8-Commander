@@ -169,6 +169,19 @@ def _get_sct():
     return _MSS_SCT if _MSS_SCT else None
 
 
+def _mss_drop():
+    """丢掉复用的 mss 实例（DC 失效后必须重建，否则每次 grab 都失败）"""
+    global _MSS_SCT
+    _old = _MSS_SCT
+    _MSS_SCT = None
+    try:
+        if _old:
+            _old.close()
+    except Exception:
+        pass
+    return True
+
+
 def _get_dxcam():
     """获取 DXGI Desktop Duplication 采集器 (硬件级: 直读显卡帧缓冲)"""
     global _DXCAM, _DXCAM_FAIL_TS
@@ -226,6 +239,32 @@ def _native_lite_eye():
     return _NV_LITE if _NV_LITE else None
 
 
+def _capture_legs_status(no_frame: bool = True) -> list:
+    """逐条报三路采集后端的现状：缺件，还是装上了却没出帧。
+
+    🔴 2026-11-05 为什么把它从 `_screen_capture` 里抽出来：
+    ① 报错原来只拼 `_last_err`，而它**只有** mss/pyautogui 抛异常时才写；
+       dxcam 返回 None（没装）、mss 直接 None（没装）都不留痕 ⇒ 报出的是
+       「三级后端全灭：pyautogui: ModuleNotFoundError」，读起来像只缺 pyautogui，
+       实际三路全缺。诊断时被这句话带偏过一轮。
+    ② 抽成纯函数之后判据可以在**不真的抓帧**的情况下验它 --
+       留在 `_screen_capture` 里验的话，测试必须依赖「本机装没装 mss」，
+       换个解释器就假失败（实测：pyembed 里 pyautogui 是装着的，
+       只按 dxcam/mss 两条腿，它真能抓到帧，assertRaises 直接失败）。
+    """
+    legs = []
+    for mod, label in (("dxcam", "DXGI 硬采"),
+                       ("mss", "BitBlt"),
+                       ("pyautogui", "终极兜底")):
+        try:
+            __import__(mod)
+            legs.append("%s(%s) 已装%s"
+                        % (label, mod, "但没出帧" if no_frame else ""))
+        except Exception as imp_err:  # noqa: BLE001
+            legs.append("%s(%s) 缺件:%s" % (label, mod, type(imp_err).__name__))
+    return legs
+
+
 def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, incremental: bool = True):
     """屏幕采集 — 秒级传输优化 v2
     基线(PNG): 234ms / 1622KB b64
@@ -251,6 +290,7 @@ def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, i
     captured_ms = 0.0
     delta = False
     _last_err = ""
+    _mss_recovered = False
     t_start = __import__("time").time()
 
     # 方案1: DXGI 硬件级采集 (1.6-9.9ms, 直读显卡帧缓冲)
@@ -289,10 +329,16 @@ def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, i
         _DXCAM_BASE_TIME = __import__("time").time()
 
     # 方案2: mss 兜底 (BitBlt)
+    # 2026-11-06：复用的 mss 实例会随锁屏 / 换显示器 / DPI 变化而**DC 失效** ——
+    # 之后每次 grab 都 "BitBlt failed"，而且永远好不了（实测：长驻服务从 03:42 起
+    # 每次「看屏幕」都报 screen_grab_unavailable；同一时刻新进程同一路径 200ms
+    # 抓帧成功）。所以第一次失败就丢掉缓存实例、重建再试一次，成功则标 mss_recovered。
     if img is None:
-        try:
-            sct = _get_sct()
-            if sct is not None:
+        for _attempt in (0, 1):
+            try:
+                sct = _get_sct()
+                if sct is None:
+                    break
                 mon = sct.monitors[1]
                 if region:
                     shot = sct.grab({"left": mon["left"] + region["x"], "top": mon["top"] + region["y"],
@@ -301,8 +347,17 @@ def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, i
                     shot = sct.grab(mon)
                 img = _PILImage.frombytes("RGB", shot.size, shot.bgra, "raw", "BGRX")
                 captured_ms = (__import__("time").time() - t_start) * 1000
-        except Exception as _e:
-            _last_err = f"mss: {type(_e).__name__}: {_e}"[:160]
+                if _attempt:
+                    _mss_recovered = True
+                    _last_err = ""
+                break
+            except Exception as _e:
+                if _attempt == 0:
+                    _last_err = "mss(重建前): %s: %s" % (type(_e).__name__, str(_e)[:120])
+                    _mss_drop()
+                    continue
+                _last_err = ((_last_err + " | ") if _last_err else "") + \
+                    "mss: %s: %s" % (type(_e).__name__, str(_e)[:140])
     # 方案3: pyautogui 终极兜底
     if img is None:
         try:
@@ -316,7 +371,16 @@ def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, i
             _last_err = ((_last_err + " | ") if _last_err else "") + \
                 f"pyautogui: {type(_e).__name__}: {_e}"[:160]
     if img is None:
-        _detail = "三级后端全灭" + (f"：{_last_err}" if _last_err else "")
+        # 🔴 2026-11-05：这里原来只拼 `_last_err`，而它**只有** mss 抓取抛异常和
+        #    pyautogui 抛异常时才会写。最常见的情形是 dxcam 返回 None（没装）和
+        #    mss 直接 None（没装）—— 这两条都不留痕，于是报出的是
+        #    「三级后端全灭：pyautogui: ModuleNotFoundError」，
+        #    读起来像"只缺 pyautogui"，实际三路全缺。诊断被带偏过一轮。
+        # 现在逐腿探明（_capture_legs_status，抽出去是为了能单独验），
+        # 再附上采集期报错 —— 两者不同：一个是"没装"，一个是"装了但抓的时候炸"。
+        _detail = "三路采集后端都没有可用帧【%s】" % "；".join(_capture_legs_status())
+        if _last_err:
+            _detail += " | 采集期报错：%s" % _last_err
         _capture_notice("screen_grab_unavailable", _detail)
         raise CaptureUnavailable("screen_grab_unavailable", _detail)
 
@@ -328,12 +392,16 @@ def _screen_capture(region: dict = None, fmt: str = "jpeg", quality: int = 80, i
         img.save(buf, "PNG")
         fmt_out = "png"
     data = buf.getvalue()
+    if _mss_recovered:
+        _last_err = ""
     result = {"ok": True, "size": list(img.size), "fmt": fmt_out,
               "image_base64": _b64.b64encode(data).decode(),
               "image_kb": len(data) // 1024,
               "capture_ms": round(captured_ms, 1),
               "engine": "dxcam" if _DXCAM is not None else ("mss" if _MSS_SCT is not None else "pyautogui"),
               "delta": delta}
+    if _mss_recovered:
+        result["mss_recovered"] = True
     if delta:
         result["delta_region"] = region_out
     return result
@@ -625,4 +693,4 @@ def _uia_set_value_by_label(label, text):
 #  ⛔ 自动生成: omni_core 共享基础设施 (拆分自 omni_tentacle, 2026-08-10)
 #  所有 mixin 通过 `from omni_core import *` 获得模块级符号
 # ═══════════════════════════════════════════
-__all__ = ['sys', 'json', 'time', 'base64', 'io', 'Path', 'datetime', 'ROOT', '_MSS_SCT', '_DXCAM', '_DXCAM_FAIL_TS', '_DXCAM_BASE', '_DXCAM_BASE_TIME', '_NV_LITE', '_NV_LITE_TS', '_get_sct', '_get_dxcam', '_dxcam_frame', '_native_lite_eye', '_screen_capture', '_mouse_move', '_mouse_click', '_mouse_double_click', '_mouse_scroll', '_keyboard_type', '_keyboard_press', '_keyboard_hotkey', '_mouse_position', '_screen_size', '_enum_windows', 'window_title_matches', '_WINDOW_TITLE_MAP', '_find_window', '_get_active_window', '_focus_window', 'refusal', 'screen_capture_safe', '_uia_set_value_by_window', '_uia_set_value_by_label']
+__all__ = ['sys', 'json', 'time', 'base64', 'io', 'Path', 'datetime', 'ROOT', '_MSS_SCT', '_DXCAM', '_DXCAM_FAIL_TS', '_DXCAM_BASE', '_DXCAM_BASE_TIME', '_NV_LITE', '_NV_LITE_TS', '_get_sct', '_mss_drop', '_get_dxcam', '_dxcam_frame', '_native_lite_eye', '_screen_capture', '_mouse_move', '_mouse_click', '_mouse_double_click', '_mouse_scroll', '_keyboard_type', '_keyboard_press', '_keyboard_hotkey', '_mouse_position', '_screen_size', '_enum_windows', 'window_title_matches', '_WINDOW_TITLE_MAP', '_find_window', '_get_active_window', '_focus_window', 'refusal', 'screen_capture_safe', '_uia_set_value_by_window', '_uia_set_value_by_label']

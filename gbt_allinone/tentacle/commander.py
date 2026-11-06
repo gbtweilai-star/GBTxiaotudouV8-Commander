@@ -65,8 +65,25 @@ PREFERRED = (
     "gbt-v8-v82-q4_0-fixed.gguf",
 )
 
-DEFAULT_BASE = "http://127.0.0.1:8792"
-DEFAULT_CTX = 2048
+# ⛔ 2026-11-04 修真偏差：这一行原来写死 `http://127.0.0.1:8792`，而
+#    `state/weights/ACTIVE.json`（它自己声明是「唯一指针」）写的是 **8111**。
+#    后果是最难查的那种：引擎明明起来了，`local_llm status` 说 health ok，
+#    而本模块和 `pulse_core`（它也走这里的 `endpoint()`）说 engine down ——
+#    两个都不算错，因为它们看的是两个端口。**这种分裂比"没起"更难诊断。**
+#    现在统一从指针读；指针读不到才退回旧值，并在 `status()` 里如实标出。
+from .. import weights as _gbw                              # noqa: E402
+
+DEFAULT_BASE = _gbw.base() or "http://127.0.0.1:8792"
+# 2026-11-05 实测（本机 Ryzen 5 5600H / 16GB / 纯 CPU / NGL=0）：
+#   权重 gbt-v8-v82-q5_0.gguf 自己声明 context_length=32768；原先这里 2048（engine-up 里 4096）
+#   会让 6794 token 的请求直接被拒：400 exceed_context_size_error (n_ctx=4096)。
+#   KV 成本 2*28层*4KV头*128*2B = 57344 B/token：
+#       4096→224MiB · 8192→448MiB · 16384→896MiB · 32768→1792MiB
+#   实测 32768 能起（15s，空闲余 ~1.5GB）；要回收内存靠 DEFAULT_IDLE_S（闲置卸权重），
+#   不是靠砍窗口。需要临时换档：GBT_COMMANDER_CTX=8192。
+# 默认 32768（= 权重自己声明的 context_length）：实测 16384 档对话会退化成复读能力位文本（3/3 复现），
+# 32768 档回答正常；16GB 机器余量靠 DEFAULT_IDLE_S（闲置卸权重）兜。临时换档：GBT_COMMANDER_CTX=16384
+DEFAULT_CTX = int(os.environ.get("GBT_COMMANDER_CTX") or 32768)
 DEFAULT_IDLE_S = 600          # 按需激活：10 分钟没人用就睡（卸权重、让内存），下次请求再醒
 DEFAULT_THREADS = max(4, (os.cpu_count() or 8) - 4)   # 16 核 → 12：留 4 核给系统与触手，别把机器吃干
 
@@ -168,14 +185,48 @@ def alive(base: str | None = None, timeout: float = 1.5) -> dict:
 
 
 def _engine_bin() -> dict:
-    """找 llama-server：先环境变量，再 vendor/ 下递归找（llama.cpp 官方 Windows 包）。"""
+    """找 llama-server：先环境变量，再 tools/llama 与 vendor/ 下递归找。
+
+    为什么两处都扫（2026-11-06 实测）：开发仓把 exe 解在 vendor/llama/，打包版
+    把它放在 tools/llama/ —— 只扫 vendor 时打包版会报「没有 exe」而起不来，于是
+    tools/engine-up.py 被写成两套（一套自拼命令行、一套委派这里）。两处都扫之后
+    只剩一套：engine-up 一律委派本函数，两种布局都能起。
+    """
     env = os.environ.get("GBT_COMMANDER_ENGINE", "").strip()
     if env and pathlib.Path(env).is_file():
         return {"ok": True, "path": env, "kind": "llama-server", "source": "env"}
-    for cand in (ROOT / "vendor").glob("**/llama-server.exe") if (ROOT / "vendor").is_dir() else []:
-        return {"ok": True, "path": str(cand), "kind": "llama-server", "source": "vendor 扫描"}
-    return {"ok": False, "reason": "vendor/ 下没有 llama-server.exe",
-            "how": "下 llama.cpp 官方 win-cpu 包解到 vendor/，或设 GBT_COMMANDER_ENGINE=<exe>"}
+    for rel in ("tools/llama", "vendor"):
+        base = ROOT / rel
+        if base.is_dir():
+            for cand in sorted(base.glob("**/llama-server.exe")):
+                return {"ok": True, "path": str(cand), "kind": "llama-server",
+                        "source": rel + " 扫描"}
+    return {"ok": False, "reason": "tools/llama 与 vendor/ 下都没有 llama-server.exe",
+            "how": "把 llama.cpp 官方 win-cpu 包解到 tools/llama/ 或 vendor/，"
+                   "或设 GBT_COMMANDER_ENGINE=<exe>"}
+
+
+def _chat_template(engine_path: str | None = None) -> pathlib.Path | None:
+    """找「她自己的」聊天模板：先看引擎 exe 旁边，再看 tools/llama 与 vendor/llama。
+
+    为什么要找三处（2026-11-06 实测）：模板原先写死 ROOT/vendor/llama/ 一处，
+    打包版把 exe 放在 tools/llama/ 且**根本没带这个文件** ⇒ 引擎退回 GGUF 内置
+    Qwen 模板，普通对话里注入 "You are Qwen, created by Alibaba Cloud."，
+    她就顶着别人名字说话（问「你是谁」答「我叫 OpenClaw 人工智能9号」）。
+    先看 exe 旁边，是为了「引擎在哪，模板就跟到哪」，两种布局同一套逻辑。
+    """
+    cands = []
+    if engine_path:
+        cands.append(pathlib.Path(engine_path).parent / "gbt-user-assistant.jinja")
+    cands.append(ROOT / "tools" / "llama" / "gbt-user-assistant.jinja")
+    cands.append(ROOT / "vendor" / "llama" / "gbt-user-assistant.jinja")
+    for c in cands:
+        try:
+            if c.is_file():
+                return c
+        except OSError:
+            continue
+    return None
 
 
 def start(ctx: int = DEFAULT_CTX, threads: int = DEFAULT_THREADS,
@@ -202,6 +253,14 @@ def start(ctx: int = DEFAULT_CTX, threads: int = DEFAULT_THREADS,
     port = base.rsplit(":", 1)[-1]
     cmd = [eng["path"], "-m", w["path"], "--host", "127.0.0.1", "--port", port,
            "-c", str(int(ctx)), "-t", str(int(threads)), "-ngl", "0", "--no-webui"]
+    # 🔧 2026-11-05 合并自 tools/model-bridge/start-local-llm.py（那次实测必需）：
+    #    不带 --chat-template-file 时 llama-server 用 GGUF 内置 Qwen 模板，在**普通对话**里
+    #    注入 "You are Qwen, created by Alibaba Cloud." ⇒ 她顶着别人名字说话
+    #    （实测：问“你是谁”答“我叫 OpenClaw 人工智能9号”）。
+    _tpl = _chat_template(eng.get("path"))
+    if _tpl:
+        cmd += ["--alias", w["path"].replace("\\", "/").rsplit("/", 1)[-1].rsplit(".", 1)[0],
+                "--no-context-shift", "--chat-template-file", str(_tpl)]
     if idle_s and int(idle_s) > 0:
         cmd += ["--sleep-idle-seconds", str(int(idle_s))]
     log = open(LOG_FILE, "ab")                                   # noqa: SIM115
@@ -354,7 +413,16 @@ def _shortlist(intent: str, k: int = 10, space: str = "auto",
     if space in ("auto", "method"):
         table = (SR.method_table() or {}).get("items") or []
         if not table:                                # 退一步：直接读 bridge 的邻域表
-            table = [{"method": m, "neighborhood": dom, "hint": ""}
+            # 修正（2026-11-04）：这里原来写死 `"hint": ""` ——**把中文别名丢了**。
+            # 后果：`method_table()` 一旦返回空（冷启动/import 竞争时会发生），
+            # 候选池里所有 method 的 hint 变空，只剩英文名参与打分；而基准题的
+            # intent 是用**中文别名**造的 ⇒ 必然落榜。
+            # 实测血账：`act_window`（别名「操作窗口 窗口动作」）在 method 池里
+            # 本该排第 1，却在一次并发跑里 MISS 并被记成 watch_sequence，
+            # 时长 23.4 秒（正常 0.118 秒）—— 冷加载 + CPU 争抢把这条 fallback 打了出来。
+            # 缺件可以退，**退的时候不许把证据也退掉**。
+            table = [{"method": m, "neighborhood": dom,
+                      "hint": TB.INTENT_ALIASES.get(m, "")}
                      for dom, info in TB.TENTACLE_NEIGHBORHOOD_MAP.items()
                      for m in info["powered_by"]]
         for rec in table:

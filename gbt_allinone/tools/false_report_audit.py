@@ -558,13 +558,28 @@ def audit_text(txt: str, rel: str = "?") -> list:
     return out
 
 
+class AuditRows(list):
+    """审计结果列表 + **未读位**。
+
+    为什么要这个类：`audit()` 原先对 `OSError` 直接 `continue`，
+    于是「有 3 个文件读不到」和「这 3 个文件干净」在回执里**长得一模一样**。
+    现在未读件挂在 `.unread` 上，调用方可判「结论覆盖不全」。
+    """
+
+    def __init__(self, *a):
+        super().__init__(*a)
+        self.unread = []
+
+
 def audit(paths, root=ROOT):
-    rows = []
+    rows = AuditRows()
     del LEGIT_EXCLUDED[:]           # 每次审计都重置，避免累积假读数
     for p in paths:
         try:
             txt = p.read_text(encoding="utf-8-sig", errors="replace")
-        except OSError:
+        except OSError as _e:
+            rows.unread.append({"file": str(p),
+                                "why": "%s: %s" % (type(_e).__name__, str(_e)[:60])})
             continue
         rel = str(p.relative_to(root)).replace("\\", "/") if str(p).startswith(str(root)) else str(p)
         for f in audit_text(txt, rel):
@@ -947,6 +962,8 @@ def main(argv=None) -> int:                                     # pragma: no cov
     #      一个文件都没扫到时**必须喊出来**（"没扫" ≠ "干净"）。
     rep = {"ok": True, "readonly": True, "root": str(root),
            "scanned_files": len(targets),
+           "unread_files": len(getattr(rows, "unread", [])),
+           "unread": list(getattr(rows, "unread", []))[:20],
            "skipped_dirs": sorted(SKIP_DIRS),
            # 🔴 2026-09-22 第 46 轮加：**范围必须自报**。
            #    实测：默认只扫包内 345 个 .py，同口径下工作区有 716 个 ⇒

@@ -304,25 +304,25 @@ BENIGN_CAPS = {
     },
     "wf_define": {
         "domain": 'engine',
-        "desc": '万能插执行引擎：定义工作流（DAG，校验环/依赖/能力合法性）',
+        "desc": '工作流引擎：定义工作流（DAG，校验环/依赖/能力合法性）',
         "handler": 'wf_define',
         "safe": True,
     },
     "wf_run": {
         "domain": 'engine',
-        "desc": '万能插执行引擎：分层并行执行工作流，节点结果如实落盘',
+        "desc": '工作流引擎：分层并行执行工作流，节点结果如实落盘',
         "handler": 'wf_run',
         "safe": True,
     },
     "wf_status": {
         "domain": 'engine',
-        "desc": '万能插执行引擎：查运行记录（可按工作流名过滤）',
+        "desc": '工作流引擎：查运行记录（可按工作流名过滤）',
         "handler": 'wf_status',
         "safe": True,
     },
     "wf_resume": {
         "domain": 'engine',
-        "desc": '万能插执行引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的）',
+        "desc": '工作流引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的）',
         "handler": 'wf_resume',
         "safe": True,
     },
@@ -933,7 +933,7 @@ BENIGN_CAPS = {
     },
     "wf_cache_clear": {
         "domain": 'engine',
-        "desc": '万能插：清空传输缓存（同输入复用的节点结果缓存）',
+        "desc": '工作流引擎：清空传输缓存（同输入复用的节点结果缓存）',
         "handler": 'wf_cache_clear',
         "safe": True,
     },
@@ -1042,7 +1042,7 @@ BENIGN_CAPS = {
         "safe": False,
     },    "offense_ops": {
         "domain": "security",
-        "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域）。",
+        "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域） · **2026-11-06 补原生挖洞链**：op=hunt（一条命令跑全链：面测绘→OWASP/CWE 模式库→多阶段 SAST→LLM 面探针→污点候选，合并去重+覆盖账）· op=swarm（多触手并行跑同一条链，各出独立回执）· op=coverage（只回答覆盖到哪、哪里没覆盖）· op=knowledge（挖洞方法论/判据/CWE 表的机器可读版）。**全在本机跑：不引云、不装外挂扫描器、不出网**；要票的只有危险作用域与资金转账。常用说法：挖漏洞 / 找漏洞 / 漏洞排查 / 扫一遍有没有洞 / 全仓挖洞 / 渗透测试 / 打点 / 触手大军排查 / 多触手一起扫 / 安全体检 / 代码审计找洞 / 攻击面测绘",
         "handler": "offense_ops",
         "safe": False,
     },    "skill_forge": {
@@ -1096,7 +1096,7 @@ BENIGN_CAPS = {
     },
     "comfy_forge": {
         "domain": "creation",
-        "desc": "**创作融合台**（主人令 2026-10-15「借助秋叶版的节点来融合她的创作能力」）：把秋叶版 ComfyUI 已抓下的节点（**现读 1495 把**，带完整输入 schema；图鉴文案原写 962，以盘上快照为准）按**创作用途分族**，并说清每族饲哪些创作能力位（生图/控图预处理/视频/音频/3D/模型补丁）。读**盘上快照**（ComfyUI 本体未在跑也能用），并如实报采集时间与 mtime（快照≠现在连着）。不重造第四个控制器（已有 comfyui 全控 · comfy_native/GBT天真 · tentacle_comfy_bridge/1530）。只读、零作用域。op=families/map/find/evidence。",
+        "desc": "**创作融合台**（主人令 2026-10-15「借助秋叶版的节点来融合她的创作能力」）：把秋叶版 ComfyUI 已抓下的节点（**节点数以 op=evidence 现查为准**，带完整输入 schema；desc 不预存数量 —— 快照每抓一次就变）按**创作用途分族**，并说清每族饲哪些创作能力位（生图/控图预处理/视频/音频/3D/模型补丁）。读**盘上快照**（ComfyUI 本体未在跑也能用），并如实报采集时间与 mtime（快照≠现在连着）。不重造第四个控制器（已有 comfyui 全控 · comfy_native/GBT天真 · tentacle_comfy_bridge/1530）。只读、零作用域。op=families/map/find/evidence。",
         "handler": "comfy_forge",
         "safe": True,
     },
@@ -1222,7 +1222,7 @@ BENIGN_CAPS = {
     },
     "media_pipeline": {
         "domain": 'video',
-        "desc": 'AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布',
+        "desc": 'AI短视频/电影/音乐流水线：镜像房间编排、产物自审、版权/安全/品牌/质量检查、主人授权后发布；op=verify 是**成片验收**（2026-11-06：零外部依赖，自己解 MP4/ASS 容器，不 shell 出去调 ffprobe —— 本机没有 ffmpeg 也照样能验收）。常用说法：验收成片 / 成片过线了吗 / 检查成片 / 成片体检 / 这条片子合格吗 / 成片参数多少',
         "handler": 'media_pipeline',
         "safe": True,
     },
@@ -1619,7 +1619,7 @@ BENIGN_CAPS = {
                 '**多域监控** op=discover（别名 scan_local · 可插面）：只读枚举进程/窗口/监听端口/本地模型口/串口/本地DB/命令行软件；模型口按 not_listening / timeout / http_error **分档**（「没起服务」不许说成「不兼容」）。'
                 '**反调外部 AI** op=ai_control（别名 ai · ai_chat）：任意 **OpenAI 兼容 https** 端点，钥匙只回槽名不回明文。**反控扇面** op=counter_strike（别名 counter · 反控）并行同时打多个端点、只对攻击源发；op=counter_plan 只给链与边界，不自打。'
                 '**WorkBuddy 免费通道** op=wb_chat（别名 wb · workbuddy_chat）· op=wb_models（别名 workbuddy_models）· op=wb_discover（别名 workbuddy_discover）：只走回环插件口，不注册进 DSH。'
-                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 插上就能用时自身的能源。',
+                '本件**从 V8 自己的树里长出**（不 import V9）：抽插座照 V9 那套，**门留在 V8 这边** —— V9 的 run_plugged 里 process 直接 subprocess、file 直接写盘，没有作用域校验，正是它缺的一环。三条纪律：不攻击/不绕授权校验 · 凭据只从 env 取且绝不回显原文 · 每插每跑都落账。**全开**（别名 万能面 / 全量）：`op=surface_audit`（别名 surface / full_sweep）同步枚举全部可插面 → 逐个现场识别 → 三数对账、零静默；`op=discover`（别名 scan_local）只读枚举可插面。**没有 `op=all`** —— 2026-11-03 起只剩这两个真 op，旧写法会得到「不认的 op」。常用说法：万能插 / 任意接口自动识别 / 现场生成插座 / 插进去操控别的框架 / 反调外部大模型 / 反控扇面 / 万能插全开 / 全部能力全开 / 万能面 / 插上就能用时自身的能源。',
         "handler": 'omni_plug',
         "safe": False,
     },
@@ -1879,15 +1879,15 @@ BENIGN_CAPS = {
         "domain": 'system',
         "desc": '**影响面检查（多域监控的读数面）**（主人令 2026-10-19：「修改一个地方的时候要分出触手'
                 '关注跟这个修复的地方相连的所有地方，确保你修改其他地方不会被连带故障」）：读 '
-                '`state/model-pack/wiring.json` 邻接图（现读 **6301 节点 / 951536 有向边 / 单连通分量 '
-                '100%**），给一个目标（能力位名 / 代码路径 / 页面路径）就算出它 1~2 跳的影响面。'
+                '`state/model-pack/wiring.json` 邻接图（**规模与连通性一律用 op=status 现查**；desc 不'
+                '预存节点数/边数 —— 图每重建一次这些数就过期，写死的数字第二次就撒谎），给一个目标'
+                '（能力位名 / 代码路径 / 页面路径）就算出它 1~2 跳的影响面。'
                 '**不是 selfscan**（那是框架五维自检），本位只管刀口宽度。'
                 'op=status（图的规模·连通性·构建时间，取不到如实报 missing 不编 0）· op=impact（必填 '
                 'target 或 targets，depth≤3 ⇒ 影响面构成 + **1 跳必验清单**；目标不在图里**如实拒绝**，'
                 '绝不把空集当"没影响"）· op=risky（n ⇒ 按 1 跳邻居数排最危险的件，并如实标注"本图不分'
-                '强弱边"）· op=where。**全部纯读免门**：不写盘、不出网、不起进程。已知读数：'
-                '`code:gbt_allinone/api.py` 1 跳 = 337 个能力位 · depth=2 = 4859 节点 · '
-                '`cap:tentacle_arm` 2 跳 = 342 节点',
+                '强弱边"）· op=where。**全部纯读免门**：不写盘、不出网、不起进程。要看示例读数就直接跑'
+                'op=impact（如 target=`code:gbt_allinone/api.py`），desc 不背书任何具体规模',
         "handler": 'impact_check', "safe": True,
         # 留痕：`params` 是**位级**契约（caps_tables.required_params 不认 op），所以这里登记
         # target 只代表"主用法要它"；op=status/risky/where 实际免参 —— 权威判据在处理器层
@@ -2336,8 +2336,9 @@ BENIGN_CAPS = {
                   '另有 9 个是我们自己的（ImageLevels/ImageHueSaturation/ImageTranspose/MaskBlur/upscale_4k/t2i_qwen/copy/sha/info）。'
                   '新增只读 op：**contract**（契约面 + 原生覆盖率 + 未接原因分类）·'
                   '**validate**（用我们自己的契约离线校验任意图：未知节点/缺必填/成环）。'
-                  '未接如实分类（契约面现读 1495 把）：传统算法面 809（可原生，按需再长）· '
-                  '重生成/模型面 359 · 控图检测面 290 · 云端 API 19。'
+                  '未接如实分类（**数量与分布一律以 op=contract 现查为准**，desc 不预存 —— '
+                  '契约面每抓一次快照就变）：传统算法面（可原生，按需再长）· '
+                  '重生成/模型面 · 控图检测面 · 云端 API。'
                  'op=status/nodes/graph/gate/contract/validate（读面免门）/ run（写面过 filesystem_write）/ 单节点名直跑'),
         "handler": 'comfy_native',
         "safe": True,
@@ -3460,8 +3461,8 @@ BENIGN_CAPS = {
     "bits_kit": {
         "domain": 'creation',
         "desc": ('**动效组件图鉴的口**（人话 → react-bits 哪个组件 · 干什么 · **源码在哪 · 会不会联网 · 依赖什么**）。'
-                 '素材：`DavidHDev/react-bits`（**MIT + Commons Clause v1.0** · ★49005 · 216 组件 · 5 类：'
-                 'Animations 39 / Backgrounds 62 / Components 48 / Micro 34 / TextAnimations 33）落 `_upstream/react-bits`。'
+                 '素材：`DavidHDev/react-bits`（**MIT + Commons Clause v1.0** · 星标/组件数/分类分布一律以 op=build 现扫为准）'
+                 '落 `_upstream/react-bits`。'
                  '常用说法：动画 / 背景 / 文字动画 / 微交互 / 手风琴 / 画廊 / 卡片 / 光标跟随 / 粒子 / 网格 / 渐变 / '
                  '流光 / 毛玻璃 / 滚动 / 计数 / 故障 / 极光 / 波浪 / 液态 / 三维 / 音频 / 拖拽 / 轮播 / 开关 / 加载 / '
                  '翻牌 / 解密 / 描边 / 磁性。'
@@ -3712,12 +3713,6 @@ BENIGN_CAPS = {
         "params_hint": 'op 省略看现况；算数 = calc + expr；抽取 = extract + text + fields；'
                        '短问答 = ask + prompt。**不要拿它做分类/路由/逐页绑定**',
     },
-    "body_realtime": {
-        "domain": 'device',
-        "desc": '身体·眼手脑同拍：采集线程持续看屏，控制环读最新帧小步闭环移动；op=status/servo（target/seconds/gain/max_step/dry_run）。动作期间采集不停，不是 see 子进程后再 click。',
-        "handler": 'body_realtime',
-        "safe": True,
-    },
     "vision_arsenal": {
         "domain": 'vision',
         "desc": ('**视觉作战区 · 唯一区块**（主人令 2026-11-04「把开源排名前十的视觉能力吞噬一遍，'
@@ -3779,17 +3774,6 @@ BENIGN_CAPS = {
         "handler": 'semantic_match',
         "safe": True,
     },
-    "vision_grounding": {
-        "domain": 'vision',
-        "desc": ('**视觉/定位通道契约**（主人令 2026-10-11「视觉必须达到 VLX-Flow 水平，脑-手同步**不能使用传统截图**看来在操作」）：'
-                 '把「看」分层钉死 —— **L1 结构层**（UIA 控件树 domain_index/domain_read/domain_act/domain_type · CDP DOM browser op=native · HTTP/API 读数）优先；'
-                 '**L2 接地层**（像素 + 模型 grounding，VLX-Flow 级）**仅兜底**（自绘 UI/Canvas/游戏/无 a11y 窗口）；'
-                 '**L3 回读层**（每次动手后用 L1 再读一次确认）。'
-                 '铁律：**先结构后像素**（用 L2 而无 L1 尝试记录 ⇒ 记违规 struct_first）· **动完没回读 ⇒ unverified** · 不编（读不到就如实报控件不在 a11y 树里）。'
-                 'op=channels/record/audit'),
-        "handler": 'vision_grounding',
-        "safe": True,
-    },
     "uia_tree": {
         "domain": 'vision',
         "desc": ('**UIA 控件树**（Windows UI Automation · 原生结构通道 · 实测 1012ms / 6 窗口 / 14.5k 字）：'
@@ -3800,35 +3784,6 @@ BENIGN_CAPS = {
                  '铁律：读不到就如实报「不在 a11y 树里」，不编控件。'
                  '常用说法：控件 / 控件树 / 窗口列表 / 有哪些窗口 / 输入框在哪 / 菜单在哪 / 元素在哪 / 原生 / 软件界面。'),
         "handler": 'uia_tree',
-        "safe": True,
-    },
-    "vision_arsenal": {
-        "domain": 'vision',
-        "desc": ('**视觉作战区 · 唯一区块**（主人令 2026-11-04「把开源排名前十的视觉能力吞噬一遍，'
-                 '补齐缺失的视觉，全部整理到一个区块，让大脑执行层自动决策使用哪个视觉能力」）：'
-                 '19 个视觉能力位 / 4 组（读·懂·找·造），可用性**现算**不写死。'
-                 '开源基线（GitHub CV 榜 2026-09-27，已 devour 吞过）：transformers 166.7k / opencv 91.0k / '
-                 'stable-diffusion 73.5k / ultralytics 62.0k / yolov5 58.1k / segment-anything 54.9k / '
-                 'supervision 51.1k / timm 37.2k / detectron2 34.7k / diffusers 34.6k。'
-                 'op=decide（给意图→选一位，主选必为真能跑的位，缺依赖进 missing 如实报）· status（全量体检）· '
-                 'matrix（四组矩阵）· template_match（图标定位·opencv·回坐标不回图·带方差守卫）· '
-                 'region_scan（可点区块扫描·opencv 轮廓）。'
-                 '铁律：主选必须真能跑 · 图不进上下文 · 降级必须自曝。'
-                 '常用说法（人这么问就命得中）：视觉能力 / 视觉作战区 / 视觉矩阵 / 用哪个视觉 / 视觉体检 / 视觉选型。'),
-        "handler": 'vision_arsenal',
-        "safe": True,
-    },
-    "ocr": {
-        "domain": 'vision',
-        "desc": ('**看图读字**（2026-11-04 主人令「看图片用原生视觉，别走附件系统」）：'
-                 '给一张**本地图片路径**，把图上的字读成**纯文本**交给脑子 —— '
-                 '车道① Windows.Media.Ocr（系统内置 · 零安装 · 离线 · zh-Hans-CN）；'
-                 '车道② python winrt（装了 winrt-* 才走）；车道③ pytesseract（装了 tesseract.exe 才走）。'
-                 '铁律：**只吃本地路径**（URL 会先落本地再读）· **只回文本**（图片本身永不进上下文 ⇒ 不产生远程 URL ⇒ 不会 HTTP 471 ⇒ 不吃图片 token）· '
-                 '读不到就如实报「没读到字」，**绝不编字**。'
-                 '常用说法（人这么问就命得中）：读字 / 识别文字 / OCR / 图里写的什么 / 提取文本 / 截图转文字。'
-                 '参数 image（本地路径）。op=read/lanes'),
-        "handler": 'ocr',
         "safe": True,
     },
     "vision_detect": {

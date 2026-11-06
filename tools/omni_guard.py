@@ -42,14 +42,16 @@ LLM_EXEMPT = {"tools/weights.py", "tools/omni_adapter.py", "tools/llm_guard.py"}
 
 
 def _scan(banned, exempt):
-    hits = []
+    hits, unread = [], []
+    _scan.unread = unread
     for p in ROOT.rglob("*.py"):
         rel = str(p.relative_to(ROOT))
         if rel in exempt:
             continue
         try:
             text = p.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
+        except Exception as _e:
+            unread.append({"file": rel, "why": type(_e).__name__})
             continue
         for i, line in enumerate(text.splitlines(), 1):
             stripped = line.strip()
@@ -98,7 +100,10 @@ def require_weights(why=""):
 def main(argv):
     list_only = "--list" in argv
     v1 = scan_run()
+    u1 = list(getattr(_scan, "unread", []))
     v2 = scan_llm()
+    u2 = list(getattr(_scan, "unread", []))
+    unread = u1 + u2
     total = len(v1) + len(v2)
 
     if v1:
@@ -109,7 +114,11 @@ def main(argv):
         print("  LLM 纪律违犯 %d 处（绕过 weights.py）" % len(v2))
         for h in v2[:10]:
             print("    %s:%d  %s" % (h["file"], h["line"], h["why"]))
-    if not v1 and not v2:
+    if unread:
+        print("  ⚠️ %d 个文件读不到 -> 结论不覆盖它们" % len(unread))
+        for u in unread[:10]:
+            print("    %s  %s" % (u["file"], u["why"]))
+    if not v1 and not v2 and not unread:
         print("  执行纪律 + LLM 纪律 全部通过")
         return 0
 

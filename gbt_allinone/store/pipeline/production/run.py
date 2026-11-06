@@ -1,6 +1,6 @@
-# GBT cap: devoured_hypit-ai_hypit
+# GBT cap: devoured_mangiucugna_json_repair
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
-"""caps/devoured_hypit-ai_hypit/run.py — 吞噬知识胶囊: hypit-ai/hypit"""
+"""caps/devoured_mangiucugna_json_repair/run.py — 吞噬知识胶囊: mangiucugna/json_repair"""
 import json, sys
 from pathlib import Path
 
@@ -12,7 +12,7 @@ def do_knowledge(params=None):
     return {"ok": False, "error": "absorbed_knowledge.md 缺失"}
 
 def do_status(params=None):
-    return {"ok": True, "cap": "devoured_hypit-ai_hypit", "tier": "knowledge", "has_knowledge": ABS.exists()}
+    return {"ok": True, "cap": "devoured_mangiucugna_json_repair", "tier": "knowledge", "has_knowledge": ABS.exists()}
 
 HANDLERS = {"knowledge": do_knowledge, "run": do_knowledge, "status": do_status}
 

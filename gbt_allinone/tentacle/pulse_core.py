@@ -162,15 +162,33 @@ def pulse_all(fast: bool = True) -> dict:
     except Exception as e:  # noqa: BLE001
         out["body"] = {"error": "%s: %s" % (type(e).__name__, str(e)[:80])}
 
-    # ⑤ 判决进度（只数行，不解析全部）
+    # ⑤ 判决进度（**去重后按唯一项算**）
+    # 修正（2026-11-04）：这里原来写死 `"total": 481`，而基准真实是 **554 项**，
+    # 于是进度永远显示 "554/446" 这种不可能的数；而且只数行不判重，
+    # 追加写多次就会虚高。现在按 (space, name) 去重，并顺带给出真实命中率。
     try:
         rows_path = ROOT / "state" / "commander" / "coverage-rows.jsonl"
-        n = 0
+        n_lines = 0
+        last = {}
         if rows_path.exists():
-            with open(rows_path, "rb") as fh:
-                for _ in fh:
-                    n += 1
-        out["routing_bench"] = {"rows_done": n, "total": 481}
+            with open(rows_path, encoding="utf-8") as fh:
+                for line in fh:
+                    n_lines += 1
+                    try:
+                        r = json.loads(line)
+                    except Exception:                      # noqa: BLE001
+                        continue
+                    last[(r.get("space"), r.get("name"))] = r
+        n = len(last)
+        hit_n = sum(1 for r in last.values() if r.get("hit"))
+        out["routing_bench"] = {
+            "rows_done": n,
+            "rows_total": n,              # 全量就是全部唯一项，不再硬编码
+            "rows_lines": n_lines,        # 原始行数（含历史追加），用来看有没有重复写
+            "hit": hit_n,
+            "rate": (round(hit_n / n, 4) if n else None),
+            "note": "曾硬编码 total=481/446，与真实 554 不符；已改为按唯一项去重计算",
+        }
     except Exception:  # noqa: BLE001
         out["routing_bench"] = None
 

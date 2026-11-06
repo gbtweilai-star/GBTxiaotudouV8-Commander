@@ -647,6 +647,12 @@ class CodexAppServer:
 
 # ══════════════════════════════════════════════════════════════ GBT 动态工具
 
+# GBT 对外身份名 —— 面板 / CLI / 对话里都显示这个，而不是底层内核的型号名。
+# 主人令 2026-11-06：「大模型名字叫 GBT小土豆V8」。框架是主体，内核只是器官。
+# 真实型号**不隐藏也不篡改**：`status()` 的 `server.model` 仍是内核自报的原值，
+# 面板把它放进 tooltip —— 排障时要能溯源"究竟是哪个内核在答"。
+GBT_IDENTITY = "GBT小土豆V8"
+
 GBT_TOOL_CAPABILITY = "gbt_capability"
 GBT_TOOL_MIRROR = "gbt_mirror"
 GBT_TOOL_PREFLIGHT = "gbt_preflight"
@@ -658,6 +664,31 @@ GBT_TOOL_MIND = "gbt_mind"
 GBT_TOOL_LIFE = "gbt_life"
 GBT_TOOL_PROJECT_CONTEXT = "gbt_project_context"
 
+# `life` 能力位真正支持的 op（2026-11-05 现读它的 `operations` 字段得到）。
+# 为什么要这张表：它不在这里**校验**的话，未知 op 会被底层静默兜底成 status，
+# 调用方看到 `status: ok` 就以为成功了。详见 execute_gbt_tool 里的血账注释。
+_LIFE_OPS = ("status", "record", "timeline", "today", "daily", "recall",
+             "graph", "reflect", "chapter", "commitment", "habit",
+             "export", "ingest")
+
+
+def _gate_ratio() -> str:
+    """现算「免票 / 要票」的条数，写进工具描述。
+
+    为什么不写死：能力位会变（今天 427、明天可能 430），
+    写死的数字第二次就撒谎。`evaluate` 427 次实测 0.08s，够快。
+    失败就退回一句不带数字的话 —— 宁可少说，不许说错。
+    """
+    try:
+        from . import caps_registry as _cr
+        from .security import policy as _pol
+        caps = list((_cr.BENIGN_CAPS or {}).keys())
+        gated = sum(1 for n in caps if _pol.evaluate(n, {}).restricted)
+        return "%d/%d 个能力位免票，只有 %d 个（危险能力 + 资金转账）需要主人在终端发授权" % (
+            len(caps) - gated, len(caps), gated)
+    except Exception:                                             # noqa: BLE001
+        return "绝大多数能力位免票，只有危险能力与资金转账需要主人在终端发授权"
+
 
 def dynamic_tool_specs() -> list[dict]:
     """暴露给 Codex 的 GBT 工具契约（JSON Schema）。"""
@@ -667,10 +698,41 @@ def dynamic_tool_specs() -> list[dict]:
             "name": GBT_TOOL_CAPABILITY,
             "description": (
                 "调用 GBT-V8 框架的统一能力入口（真实执行并落审计）。"
-                "常用 kind：selfscan/cross_scan/truth_scan/inventory/health/"
-                "think_loop/root_fix/sec_surface/sec_scan/tentacle/vision/voice/"
-                "browser/bluetooth/tripo/llm_chat/lr_submit/deploy_queue/"
-                "pipeline_status/codex_status。"
+                + _gate_ratio() +
+                "。被拒时返回 status=denied + missing 列出的作用域 + 一条授权命令 —— 照它做即可。\n\n"
+                "**选 kind 的映射（按这个来，别猜）**：\n"
+                "· **读文件** → kind=`omni_plug`，"
+                "payload={\"op\":\"run\",\"socket\":\"file\",\"target\":\"<仓内相对路径>\",\"do\":\"read\"}"
+                " —— 这是**免票**的（socket=file 挂 filesystem_write，不在 HUMAN_GATES 里）。"
+                "**文件内容在返回的 `read` 字段**（不是 out/text）。"
+                "注意 `state/` 是受保护区、读不了（会返回 plug=failed）\n"
+                # 🔴 2026-11-06 说明书纠错（任务测试当场撞上）：
+                #   ① 写文件原来只写「同上，do:write」—— **没说内容放哪**。
+                #      真因是内容要走嵌套的 `args`，而调用方只能猜；猜不中就写 0 字节
+                #      （现在 omni_plug 已改成顶层 text/content/body 也认，但说明书
+                #      必须给一条能照抄的例子，否则下一个人还是得试错）。
+                #   ② 「健康读数 → health」是错的：`health` 只返回
+                #      {platform, python, time}（系统信息），**五维健康分在 `brain_health`**。
+                #      照这句调的人会拿不到 score，还以为系统没给。
+                "· **写文件** → kind=`omni_plug`，"
+                "payload={\"op\":\"run\",\"socket\":\"file\",\"target\":\"<仓内相对路径>\","
+                "\"do\":\"write\",\"text\":\"<要写的内容>\"}（也免票）。"
+                "`text` 可直接放顶层，也可放 `args.text`；**返回里 `wrote_bytes` 为 0 就是没写进去**，"
+                "别当成成功。· 改代码 → `code_patch`\n"
+                "· **git 面**（不是读文件！）→ `git_read`，op=status/diff/log/show/branch_list；"
+                "写面 `git_write`（免票）。`show` 看的是**提交**，不是文件内容\n"
+                "· 自检/体检 → `selfscan` · **五维健康分 → `brain_health`**"
+                "（`health` 只是系统信息：platform/python/time，没有 score）"
+                " · 仓库盘点 → `inventory`\n"
+                "· 看屏幕 → `body_eye` / `body_see` · 说话 → `body_say` · 打字 → `body_type`\n"
+                "· **跑命令/起进程** → kind=`omni_plug`，"
+                "payload={\"op\":\"run\",\"socket\":\"process\",\"target\":\"<命令>\"}。"
+                "它要 `process_execute`，**必然返回 denied** —— 这是正确结果，不是故障；"
+                "别换个 kind 再试（那样只会得到 `unknown capability`）\n"
+                "· 要并行编排 → 用 `gbt_universal_plug` 工具，不要塞进这里的 kind\n\n"
+                "⚠️ 两个最常踩的坑：① 想读文件却用 `git_read op=show` —— 那看的是提交，"
+                "`text` 会是空的；读文件走上面的 `omni_plug socket=file`。"
+                "② 把 `omni_plug` 当成只会跑命令 —— 它的 `socket=file` 读写都是免票的。"
             ),
             "inputSchema": {
                 "type": "object",
@@ -1065,8 +1127,11 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
         payload = args.get("payload")
         payload = dict(payload) if isinstance(payload, dict) else {}
         from . import preflight
-        with _policy.owner_session():
-            return preflight.observe(kind, payload)
+        # 🔴 2026-11-05：去掉 owner_session。`observe` 是**执行前感知** ——
+        # 它的用处就是让 Codex 提前知道「这一步会不会被门拦」。
+        # 伪装成主人 ⇒ 永远预测"能过" ⇒ 这个预检等于没有。
+        # 让它看到真实的门（只读预测本身不改任何状态，不需要票）。
+        return preflight.observe(kind, payload)
     elif name == GBT_TOOL_NEXUS:
         goal = str(args.get("goal") or "").strip()
         if not goal:
@@ -1086,10 +1151,36 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
             return _nexus_call("tentacle_status", {})
         if mode == "rehearse":
             # 镜像多维度空间：生产前排练闭环
-            return _nexus_call("mirror_rehearse", {
-                "name": args.get("name") or "default",
-                "execute": True,
-            })
+            # 🔴 2026-11-06 实测两次，两次都改了：
+            #   ① 原版裸调 mirror_rehearse → `error: 排练计划不存在`（票发对了也跑不动）
+            #   ② 我一度想「自动补一个最小计划」自举 —— **错**。`_normalize_plan` 要
+            #      求 goal / assumptions / architecture.components / steps 全套；更重要的
+            #      是 rehearse 会拿这份计划**真跑闭环命令**（execute=True），
+            #      塞假计划 = 用假前提驱动真执行，语义就歪了。
+            #   正解：票门优先（denied 原样带回），缺计划如实报 needs_input 并给指引。
+            #      这符合 AGENTS.md §2.1 —— 缺参数不许包装成 error。
+            _name = str(args.get("name") or "default")
+            _env = _nexus_call("mirror_rehearse", {"name": _name, "execute": True})
+            _body = (_env or {}).get("result") if isinstance(_env, dict) else None
+            _body = _body if isinstance(_body, dict) else {}
+            _msg = str(_body.get("message") or _body.get("error") or "")
+            # 只有「计划不存在」这一种 error 才转成 needs_input；
+            # denied（缺票）与其它真错误一律原样返回 —— 票的事比计划的事更根本。
+            if (_env or {}).get("status") == "error" and "计划不存在" in _msg:
+                return {
+                    "status": "needs_input",
+                    "kind": GBT_TOOL_NEXUS,
+                    "mode": "rehearse",
+                    "missing": ["plan:%s" % _name],
+                    "message": "排练计划不存在：%s" % _name,
+                    "how_to": (
+                        "排练要先有完整计划（goal / assumptions / architecture.components "
+                        "/ steps），用 gbt_capability kind=mirror_plan payload="
+                        "{\"name\":\"%s\",\"plan\":{...}} 定义后再调 mode=rehearse；"
+                        "或直接传已定义好的计划名。" % _name),
+                    "note": "缺计划是 needs_input（缺参数），不是 error —— 票门已通过才会走到这里",
+                }
+            return _env
         return {"status": "error", "message": f"未知 nexus 模式: {mode}"}
     elif name == GBT_TOOL_UNIVERSAL_PLUG:
         op = str(args.get("op") or "").strip().lower()
@@ -1107,22 +1198,24 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
             nodes = args.get("nodes")
             if not name:
                 return {"status": "error", "message": "万能插 run 需要 name"}
-            with _policy.owner_session():
-                if isinstance(nodes, list) and nodes:
-                    defined = api.run_task("wf_define", {
-                        "name": name,
-                        "nodes": nodes,
-                    })
-                    defined_body = (defined.get("gbt_result") or {}) \
-                        if isinstance(defined, dict) else {}
-                    if defined_body.get("status") != "ok":
-                        return defined
-                result = api.run_task("wf_run", {
+            # 🔴 2026-11-05：去掉 owner_session。`wf_run` 跑的是任意节点链
+            # （可能含 deploy / process / 写盘），替它开主人会话 =
+            # 整条编排链一次绕开 HUMAN_GATES。让每个节点走自己的门。
+            if isinstance(nodes, list) and nodes:
+                defined = api.run_task("wf_define", {
                     "name": name,
-                    "params": args.get("params") or {},
-                    "fail_fast": bool(args.get("fail_fast", True)),
-                    "max_node_retries": int(args.get("max_node_retries") or 0),
+                    "nodes": nodes,
                 })
+                defined_body = (defined.get("gbt_result") or {}) \
+                    if isinstance(defined, dict) else {}
+                if defined_body.get("status") != "ok":
+                    return defined
+            result = api.run_task("wf_run", {
+                "name": name,
+                "params": args.get("params") or {},
+                "fail_fast": bool(args.get("fail_fast", True)),
+                "max_node_retries": int(args.get("max_node_retries") or 0),
+            })
             return result
         elif op == "status":
             kind = "wf_status"
@@ -1144,11 +1237,14 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
             #   `devour_pulse` 在 security/policy.py:271 有**正式的门**
             #   （data_export + filesystem_write + external_llm）。
             #   直接调库等于绕门自授权 —— 不干。这里只借已授权的路。
-            # 为什么用 owner_session：这是本工具既有的纪律，与本文件另外 4 处
-            #   （L1068/1110/1193/1201）一致；它标记的是"主人本地可信会话"，
-            #   CLI/GUI/已鉴权本地服务才进得来。
-            with _policy.owner_session():
-                return api.run_task("devour_pulse", {})
+            # 🔴 2026-11-05：去掉 owner_session。
+            #   上一条注释自己写着「devour_pulse 在 security/policy.py 有**正式的门**
+            #   （data_export + filesystem_write + external_llm）…… 直接调库等于
+            #   绕门自授权 —— **不干**」。但用 owner_session 包着调 run_task
+            #   就是**同一件事**：`authorize()` 对主人会话直接返回 ok，
+            #   那三道门一道都没走过。注释与代码说的相反。
+            #   现在让它走真门：要跑就先在终端发对应授权票。
+            return api.run_task("devour_pulse", {})
         else:
             parallel = args.get("parallel")
             if not isinstance(parallel, list) or not parallel:
@@ -1188,6 +1284,16 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
         payload.update({k: v for k, v in args.items() if k != "op"})
     elif name == GBT_TOOL_LIFE:
         op = str(args.get("op") or "status").strip().lower()
+        # 🔴 2026-11-05 补校验（血账：静默降级）。
+        #   原先这里**不校验 op**，直接转发给 `life` 能力位；底层对不认识的 op
+        #   自己兜底成 `status` ⇒ 调用方看到 `status: ok` 就以为成功了。
+        #   实测：让 Codex 用 gbt_life 跑 `devour_pulse`（那是 omni_plug 的 op），
+        #   回执写着 ok 且 `ok_source: "status"` —— **假成功**，最坏的一种。
+        #   现在不认识的 op 直接报错并列出可用项。
+        if op not in _LIFE_OPS:
+            return {"status": "error",
+                    "message": "未知 life 操作: %s（可用：%s）"
+                               % (op, " / ".join(_LIFE_OPS))}
         kind = "life"
         payload = {"op": op}
         payload.update({k: v for k, v in args.items() if k != "op"})
@@ -1203,17 +1309,43 @@ def execute_gbt_tool(name: str, args: dict) -> dict:
     else:
         return {"status": "error", "message": f"未知 GBT 工具: {name}"}
 
-    # 面板内 Codex 属于主人本地会话；能力自身的授权与审计照常执行。
-    with _policy.owner_session():
-        return api.run_task(kind, payload)
+    # 🔴 2026-11-05 修（血账）—— 原实现是：
+    #        with _policy.owner_session():
+    #            return api.run_task(kind, payload)
+    #    上一条注释写着「能力自身的授权与审计照常执行」。**那句话是错的。**
+    #
+    #    错在哪：`policy.authorize()` 的第一行就是
+    #        if not decision.restricted or is_trusted():
+    #            return {"ok": True, ...}          # ← 直接放行，一行票都不查
+    #    而 `owner_session()` 把 `_TRUSTED_OWNER` 置 True ⇒ `is_trusted()` 为真
+    #    ⇒ **所有 HUMAN_GATES 全部失效**。注释与代码说的是相反的事。
+    #
+    #    实测（2026-11-05 · 真 Codex 通道，模型 gpt-6-luna）：
+    #      让 Codex 用 gbt_capability 执行 `echo gbt-ticket-test`，回执原文：
+    #        "回执显示 status: ok，授权范围为 process_execute，**没有消耗授权票据**。
+    #         命令返回 rc: 0"
+    #     即：「危险能力必须找主人拿票」被这条新入口整个绕开。
+    #
+    #    主人裁决（逐字）：「我的要求就是不限制能力不阉割能力，
+    #        危险能力和资金转账必须找我那票才行，其他的你按照专业规范推进」
+    #    ⇒ Codex 是 AI，不是主人本人。它跑危险动作必须过票门、必须留审计。
+    #    这里**不再**替它开主人会话 —— 让 `api.run_task` 走它自己的门。
+    #    免票的日常能力不受影响（`authorize` 对非 restricted 动作本来就放行）。
+    return api.run_task(kind, payload)
 
 
 def _nexus_call(kind: str, payload: dict) -> dict:
-    """王炸组合内部转发：始终走统一入口，保留审计与授权。"""
+    """王炸组合内部转发：始终走统一入口，保留审计与授权。
+
+    🔴 2026-11-05：去掉 owner_session。
+    这一行的原注释写着「保留审计与授权」，但用 `owner_session` 包着调
+    `run_task` 恰恰**不保留**：`authorize()` 见主人会话直接返回 ok，
+    一步 `denied` 审计都不会落。
+    王炸组合跑的是 mirror / universal_plug / tentacle / 五维脑 —— 全是重动作，
+    更不该有一条免票捷径。
+    """
     from . import api
-    from .security import policy as _policy
-    with _policy.owner_session():
-        return api.run_task(kind, payload)
+    return api.run_task(kind, payload)
 
 
 # ── 生命档案 · 常驻上下文段（Owner 2026-09-18《原生能力默认化方案》§2.3）──
@@ -1557,6 +1689,8 @@ def status() -> dict:
     path = find_codex()
     result = {
         "ok": bool(path),
+        # 对外身份名（主人令 2026-11-06）：面板显示它，不显示内核型号。
+        "identity": GBT_IDENTITY,
         "codex_path": path,
         "connected": bool(_shared is not None and _shared.alive),
         "protocol": "json-rpc/stdio app-server",

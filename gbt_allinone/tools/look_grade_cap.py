@@ -15,6 +15,8 @@ op：
 """
 from __future__ import annotations
 
+from ._opcall import call as _oc_call
+
 import importlib.util
 from pathlib import Path
 
@@ -54,7 +56,7 @@ def status(**_kw) -> dict:
 def run(op: str = "list", **kw) -> dict:
     op = (op or "list").lower()
     if op == "status":
-        return status(**kw)
+        return _oc_call(status, kw)
     try:
         fg = _fg()
     except Exception as e:  # noqa: BLE001
@@ -62,7 +64,7 @@ def run(op: str = "list", **kw) -> dict:
                 "detail": "tools/filmgrade.py 缺失：%s" % str(e)[:120],
                 "impl": str(_FG)}
     if op == "list":
-        return fg.looks_list()
+        return _oc_call(fg.looks_list, kw)
     if op == "pick":
         intent = str(kw.get("intent") or kw.get("say") or "")
         if not intent:

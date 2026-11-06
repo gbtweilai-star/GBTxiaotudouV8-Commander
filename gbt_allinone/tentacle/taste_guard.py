@@ -85,7 +85,7 @@ _PATTERNS = [
     ("no_tiny_caps", "FAIL", re.compile(r"text-transform\s*:\s*uppercase", re.I), "大写标签"),
     ("no_lorem", "FAIL", re.compile(r"lorem\s+ipsum|示例文本|TODO", re.I), "占位文本"),
     ("no_index", "FAIL", re.compile(r"(?:^|[>\s])(?:0[1-9]|\(00[1-9]\)|第\s*[一二三四五六七八九]\s*步)", re.M), "编号装饰"),
-    ("no_accent_word", "WARN", re.compile(r"<em[^>]*>|<i[^>]*>", re.I), "强调词"),
+    ("no_accent_word", "WARN", re.compile(r"<em\b[^>]*>|<i\b[^>]*>", re.I), "强调词"),
 ]
 
 _EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF]")
@@ -97,7 +97,7 @@ def _strip_code(html: str) -> str:
     return re.sub(r"<(pre|code)[\s\S]*?</\1>", " ", html, flags=re.I)
 
 
-def _scan(html: str) -> dict:
+def _scan(html: str, css: str = "") -> dict:
     raw = str(html or "")
     text = _strip_code(raw)
     low = text.lower()
@@ -139,7 +139,7 @@ def _scan(html: str) -> dict:
     if len(faces) > 2:
         add("max_two_faces", "WARN", "font-family 声明 %d 组" % len(faces))
     # 动效粗计
-    anim = len(re.findall(r"@keyframes|transition\s*:|animation\s*:", low))
+    anim = len(re.findall(r"@keyframes|transition\s*:|animation\s*:", low + "\n" + str(css or "").lower()))
     if anim < 3:
         add("motion_count", "WARN", "动效声明 %d 处" % anim)
 
@@ -163,7 +163,22 @@ def _audit(payload):
             return {"ok": False, "status": "read_failed", "error": "%s: %s" % (type(e).__name__, str(e)[:120])}
     if not str(html).strip():
         return {"ok": False, "status": "needs_input", "error": "给 html 片段或 path 指向 HTML 文件"}
-    r = _scan(html)
+    # 动效只能在 CSS 里（单扫 HTML 恒报 0 处 = 假红）。同目录 CSS 一并喂给 _scan，
+    # 并把「真读到了哪几份」写进回执 —— 读失败不靠猜，回执里看得见。
+    css, css_files, css_missed = "", [], []
+    if p:
+        parts = []
+        for f in sorted(Path(p).resolve().parent.glob("*.css")):
+            try:
+                parts.append(f.read_text(encoding="utf-8", errors="replace"))
+                css_files.append(f.name)
+            except OSError as e:
+                css_missed.append("%s(%s)" % (f.name, type(e).__name__))
+        css = "\n".join(parts)
+    r = _scan(html, css)
+    r["css_scanned"] = css_files
+    if css_missed:
+        r["css_missed"] = css_missed
     r["cap"] = "taste_guard"
     return r
 

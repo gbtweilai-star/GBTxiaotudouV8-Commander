@@ -14,6 +14,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+# 留痕隔离（2026-11-04）：本位每跑一次动作都会往 `state/omni-impact.jsonl` 写一行，
+# 判据跑一遍就往生产流水里灌一堆噪音。指到临时文件，全程不碰生产。
+import os as _os          # noqa: E402
+import tempfile as _tempfile  # noqa: E402
+_os.environ.setdefault(
+    "GBT_IMPACT_LEDGER",
+    str(Path(_tempfile.gettempdir()) / ("gbt-omni-plug-%d.jsonl" % _os.getpid())))
+
 from gbt_allinone import omni_plug as OP  # noqa: E402
 from gbt_allinone.security import policy  # noqa: E402
 
@@ -72,16 +80,30 @@ class OmniPlugTest(unittest.TestCase):
             ({"op": "status"}, set(), False),
             ({"op": "selftest"}, set(), False),
             ({"op": "plug", "socket": "file", "target": "x"}, set(), False),
-            # 🔴 2026-11-03 主人令（逐字）：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
-            # ⇒ 下面几条 **scopes 断言一个字都没动**（作用域必须如实记账：审计、risk 分级、
-            #    判据都靠它），只把 restricted 改成 False —— process_execute / filesystem_write /
-            #    external_llm / data_export 已明确免票；带 privacy_read 的那条仍然要票。
-            ({"op": "run", "socket": "process", "target": "py:print(1)"}, {"process_execute"}, False),
+            # 🔴 2026-11-04 主人重申（逐字）：「我的要求就是不限制能力不阉割能力，
+            #    危险能力和资金转账必须找我那票才行，其他的你按照专业规范推进」
+            #
+            # 前半句（2026-11-03 令）：「只有危险能力和转账需要票，其他的取消掉别影响工作效率」
+            #
+            # ⇒ 这条判据上一版把 process / api / 未知 socket 三条的 restricted 写成了 False，
+            #    与上面两句话**直接冲突**，所以它一直红着（红久了就没人看）。
+            #    按新人令的分界重判：
+            #
+            #      · process_execute —— 「执行任意代码」是**最典型的危险能力** ⇒ 要票 True
+            #      · external_llm / data_export —— 「把数据送出本体」属**资金/转账那一类**
+            #        （出去的都收不回）⇒ 要票 True
+            #      · 未知 socket —— 判不出就是 fail-closed，按最大危险保守要票 ⇒ True
+            #      · filesystem_write / desktop_control —— 不是危险能力、不是转账 ⇒ 免票 False
+            #        （「不限制能力不阉割能力」就落在这几条上：能干，只是不拦）
+            #
+            # 注意：scopes 断言**一个字都没动** —— 作用域是审计、risk 分级、判据的共同依据，
+            # 免不免票是上面那一层（HUMAN_GATES）的事，不能把作用域记录一起抹掉。
+            ({"op": "run", "socket": "process", "target": "py:print(1)"}, {"process_execute"}, True),
             ({"op": "run", "socket": "file", "target": "projects/a", "do": "write"}, {"filesystem_write"}, False),
             ({"op": "run", "socket": "file", "target": "projects/a", "do": "read"}, set(), False),
-            ({"op": "run", "socket": "api", "target": "https://e.com"}, {"external_llm", "data_export"}, False),
+            ({"op": "run", "socket": "api", "target": "https://e.com"}, {"external_llm", "data_export"}, True),
             ({"op": "run", "socket": "web", "target": "https://e.com"}, {"desktop_control", "privacy_read"}, True),
-            ({"op": "run", "socket": "??"}, {"process_execute", "filesystem_write"}, False),
+            ({"op": "run", "socket": "??"}, {"process_execute", "filesystem_write"}, True),
             ({"op": "weird_op"}, {"filesystem_write"}, False),
         ]
         for payload, want, restricted in cases:

@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from collections import deque
@@ -58,8 +59,10 @@ def _iter_files():
 
 
 def _rel(p: Path) -> str:
+    # 2026-11-06 实测：`p.resolve()` 在 Windows 上要逐段走盘，1373 个文件共 0.34s，
+    # 每次构建都交这笔钱。ROOT 本身已 resolve，纯字符串算相对路径就够，结果一致。
     try:
-        return p.resolve().relative_to(ROOT).as_posix()
+        return Path(os.path.relpath(str(p), str(ROOT))).as_posix()
     except Exception:  # noqa: BLE001
         return str(p)
 
@@ -114,7 +117,40 @@ def _resolve(base: Path, ref: str) -> Path | None:
     return cand if cand.is_file() else None
 
 
-def build_graph() -> dict:
+def _parse_file(p: Path, r: str, kind: str) -> dict:
+    """单文件解析：只抽「这本文件说了什么引用」，**不做全局解析**。
+
+    2026-11-06：拆出来是为了按 `(mtime, size)` 缓存 —— 原来每 120s 整表重解析
+    748 个文件（实测 2.56s），而其中绝大多数一个字都没改。
+    全局那半步（`by_name` 回退、`is_file()` 判定）依赖整棵树，必须留在
+    `build_graph` 里组装时做，否则加/删文件会用到旧结论。
+    """
+    out = {"abs": [], "rel": [], "js": [], "routes": []}
+    try:
+        text = p.read_text(encoding="utf-8", errors="replace")
+    except Exception:  # noqa: BLE001
+        return out
+    if p.suffix == ".py":
+        try:
+            abs_names, rel_names = _py_imports(text, r)
+        except Exception:  # noqa: BLE001
+            abs_names, rel_names = (), []
+        out["abs"] = sorted(abs_names)
+        out["rel"] = [[int(d), str(m), list(i)] for d, m, i in rel_names]
+        if p.name == "console-server.py":
+            try:
+                out["routes"] = _server_routes(text)
+            except Exception:  # noqa: BLE001
+                out["routes"] = []
+    if p.suffix in (".js", ".html"):
+        try:
+            out["js"] = [[str(t), str(rf)] for t, rf in _js_refs(text)]
+        except Exception:  # noqa: BLE001
+            out["js"] = []
+    return out
+
+
+def build_graph(incremental: bool = True) -> dict:
     files = _iter_files()
     rels = {_rel(p): p for p in files}
     by_name = {}
@@ -122,77 +158,99 @@ def build_graph() -> dict:
         by_name.setdefault(Path(r).name, []).append(r)
     nodes = {}
     edges = set()
+    cache = CACHE.setdefault("parsed", {})
+    seen = set()
+    # 2026-11-06 实测：增量命中后仍要 1.45s，剩下的时间全花在组装期反复 `is_file()`
+    # （每个文件的每个 import 候选都去磁盘问一次）。同一次构建里同一条路径只问一次。
+    _exists: dict = {}
+
+    def _isfile(path) -> bool:
+        k = str(path)
+        v = _exists.get(k)
+        if v is None:
+            v = Path(path).is_file()
+            _exists[k] = v
+        return v
 
     def node(name: str, kind: str, meta=None):
         nodes[name] = {"kind": kind, **(meta or {})}
         return name
 
     for r, p in rels.items():
+        seen.add(r)
         kind = "py" if p.suffix == ".py" else ("js" if p.suffix in (".js", ".mjs") else
                                               ("html" if p.suffix == ".html" else "asset"))
         node(r, kind)
         try:
-            text = p.read_text(encoding="utf-8", errors="replace")
+            st = p.stat()
+            sig = [round(st.st_mtime, 3), st.st_size]
         except Exception:  # noqa: BLE001
-            continue
+            sig = None
+        ent = cache.get(r)
+        if incremental and sig is not None and ent and ent.get("sig") == sig \
+                and ent.get("kind") == kind:
+            parsed = ent["parsed"]
+        else:
+            parsed = _parse_file(p, r, kind)
+            cache[r] = {"sig": sig, "kind": kind, "parsed": parsed}
+
         refs = set()
-        if p.suffix == ".py":
-            abs_names, rel_names = _py_imports(text, r)
-            for imp in abs_names:
-                parts = imp.split(".")
-                for i in range(len(parts), 0, -1):
-                    tail = "/".join(parts[:i]) + ".py"
-                    for cand in (ROOT / tail, ROOT / "gbt_allinone" / tail, ROOT / "tools" / tail):
-                        if cand.is_file():
-                            refs.add(("file", _rel(cand)))
-                            break
+        for imp in parsed["abs"]:
+            parts = imp.split(".")
+            for i in range(len(parts), 0, -1):
+                tail = "/".join(parts[:i]) + ".py"
+                for cand in (ROOT / tail, ROOT / "gbt_allinone" / tail, ROOT / "tools" / tail):
+                    if _isfile(cand):
+                        refs.add(("file", _rel(cand)))
+                        break
+            else:
+                leaf = parts[-1] + ".py"
+                for cand in by_name.get(leaf, [])[:2]:
+                    refs.add(("file", cand))
+        # 相对导入：from . import x / from .x import y
+        pkg = Path(r).parent.as_posix()
+        for dots, mod, imps in parsed["rel"]:
+            base = pkg
+            for _ in range(max(0, int(dots) - 1)):
+                base = str(Path(base).parent.as_posix())
+            cands = []
+            if mod:
+                cands.append(base + "/" + mod.replace(".", "/") + ".py")
+            for nm in imps:
+                if nm and nm != "*":
+                    cands.append(base + "/" + (mod.replace(".", "/") + "/" if mod else "") + nm + ".py")
+            for c in cands:
+                if _isfile(ROOT / c):
+                    refs.add(("file", c))
                 else:
-                    leaf = parts[-1] + ".py"
-                    for cand in by_name.get(leaf, [])[:2]:
-                        refs.add(("file", cand))
-            # 相对导入：from . import x / from .x import y
-            pkg = Path(r).parent.as_posix()
-            for dots, mod, imps in rel_names:
-                base = pkg
-                for _ in range(max(0, dots - 1)):
-                    base = str(Path(base).parent.as_posix())
-                cands = []
-                if mod:
-                    cands.append(base + "/" + mod.replace(".", "/") + ".py")
-                for nm in imps:
-                    if nm and nm != "*":
-                        cands.append(base + "/" + (mod.replace(".", "/") + "/" if mod else "") + nm + ".py")
-                for c in cands:
-                    if (ROOT / c).is_file():
-                        refs.add(("file", c))
-                    else:
-                        leaf = Path(c).name
-                        for cc in by_name.get(leaf, [])[:2]:
-                            refs.add(("file", cc))
-        if p.suffix in (".js", ".html"):
-            for typ, ref in _js_refs(text):
-                if typ == "route":
-                    rid = "route:" + ref
-                    if rid not in nodes:
-                        node(rid, "route")
-                    edges.add((r, rid))
-                else:
-                    tgt = _resolve(p, ref)
-                    if tgt is not None:
-                        tr = _rel(tgt)
-                        if tr in rels:
-                            edges.add((r, tr))
-        # 把 py import 解析出的文件真正接到图上（之前只收集没连边）
-        for typ, ref in refs:
-            if typ == "file" and ref in rels:
-                edges.add((r, ref))
-        if p.suffix == ".py" and p.name == "console-server.py":
-            for route in _server_routes(text):
-                rid = "route:" + route
+                    leaf = Path(c).name
+                    for cc in by_name.get(leaf, [])[:2]:
+                        refs.add(("file", cc))
+        for typ, ref in parsed["js"]:
+            if typ == "route":
+                rid = "route:" + ref
                 if rid not in nodes:
                     node(rid, "route")
                 edges.add((r, rid))
-    # 无向邻接
+            else:
+                tgt = _resolve(p, ref)
+                if tgt is not None:
+                    tr = _rel(tgt)
+                    if tr in rels:
+                        edges.add((r, tr))
+        # 被 py import 到的目标文件也挂到图上，之前只收集没连线
+        for typ, ref in refs:
+            if typ == "file" and ref in rels:
+                edges.add((r, ref))
+        for route in parsed["routes"]:
+            rid = "route:" + route
+            if rid not in nodes:
+                node(rid, "route")
+            edges.add((r, rid))
+    # 清掉已消失文件的缓存，防止无界增长
+    for gone in [k for k in cache if k not in seen]:
+        cache.pop(gone, None)
+    # 建邻接
     adj = {n: set() for n in nodes}
     for a, b in edges:
         if a in adj and b in adj:
@@ -203,11 +261,15 @@ def build_graph() -> dict:
             "roots": sorted([r for r in nodes if nodes[r]["kind"] in ("py", "js", "html")])}
 
 
-def _load_saved():
+def _load_saved_doc():
     try:
-        return json.loads(GRAPH_FILE.read_text(encoding="utf-8")).get("graph")
+        return json.loads(GRAPH_FILE.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         return None
+
+
+def _load_saved():
+    return (_load_saved_doc() or {}).get("graph")
 
 
 def _save(graph: dict):
@@ -254,8 +316,18 @@ def _closure(adj: dict, start: str, limit: int = 400) -> list:
 def ensure_graph(force: bool = False) -> dict:
     g = CACHE.get("graph")
     if g is None:
-        g = _load_saved()
+        doc = _load_saved_doc() or {}
+        g = doc.get("graph")
         CACHE["graph"] = g
+        # 2026-11-06 实测修正：从盘上读回来时 `at` 仍是 0 ⇒ age 从 1970 年算起，
+        # 「刚读到的图」被判定过期，当场再整表重建一次（实测 2.14s / 2928 文件）。
+        # 图的年龄应当跟着文件走：拿 mtime 当 `at`，只有盘上那份也过期才重建。
+        try:
+            CACHE["at"] = GRAPH_FILE.stat().st_mtime if g is not None else 0.0
+        except Exception:  # noqa: BLE001
+            CACHE["at"] = 0.0
+        if doc:
+            CACHE["last"] = {"events": doc.get("events") or []}
     age = time.time() - CACHE.get("at", 0)
     if force or g is None or age > 120:
         g = build_graph()
@@ -311,8 +383,10 @@ def sample(force_graph: bool = False) -> dict:
            "routes": sum(1 for k in g["nodes"] if g["nodes"][k]["kind"] == "route"),
            "changed": changed, "at": round(now, 3),
            "history": len(CACHE.get("last", {}).get("events", []))}
+    if not CACHE.get("last"):
+        CACHE["last"] = {"events": (_load_saved_doc() or {}).get("events") or []}
     if changed:
-        old = _load_saved() or {}
+        old = _load_saved_doc() or {}
         evs = old.get("events") or []
         evs.extend({"at": out["at"], "changed": changed})
         out["history"] = len(evs)
@@ -322,7 +396,9 @@ def sample(force_graph: bool = False) -> dict:
             GRAPH_FILE.write_text(json.dumps(old, ensure_ascii=False), encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
-    CACHE["last"] = {"events": (_load_saved() or {}).get("events") or []}
+        # 2026-11-06 实测修正：原来不管有没有变化，每次 sample 都重读 496 KB 的
+        # `omni-lines.json` 取 events —— 纯浪费。只在真有事件时才刷新这份缓存。
+        CACHE["last"] = {"events": old["events"]}
     return out
 
 

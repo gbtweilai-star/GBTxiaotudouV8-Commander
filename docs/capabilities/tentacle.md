@@ -1,4 +1,4 @@
-# 触手（手眼网耳） · `tentacle`（30 位）
+# 触手（手眼网耳） · `tentacle`（27 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -17,7 +17,7 @@
 | `mcp_connect` | 只读 | — | —（注册表：无必填） | `user_error` | 触手契约层：连接任意 MCP 工具服务器（学会契约协议=接入整个 MCP 生态） |
 | `mcp_tools` | 只读 | — | —（注册表：无必填） | `user_error` | 触手契约层：列出已连接服务器的工具契约清单（名称+参数 schema） |
 | `omarchy_bridge` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | **Omarchy 桥**（2026-10-15 主人拍 A 案：小土豆住进 Omarchy 当智能层）。接官方三根线：① `omarchy` CLI（含 `commands --json` 机读）；② `omarchy-shell` 的 UNIX-socket IPC（sock… |
-| `omni_open` | 只读 | — | —（注册表：无必填） | `user_error` | 万能插·全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉… |
+| `omni_open` | 只读 | — | —（注册表：无必填） | `user_error` | 全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉… |
 | `omni_web` | **需授权** | 是 | **未登记**（注册表要参数，必填名待补） | `denied: missing_scopes` / `user_error` | 万能触手·Web六态：看结构/读源码/读讲解/改文件/交给AI/跑项目；git+github+stackblitz一键触达 |
 | `pulse_core` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 触手四合一原生位：**脉冲提速**（一次拿全身状态）· **量化压缩**（主道 Q5_0，fp16 的 2.7×）· **按需激活**（引擎闲置卸权重、来请求再醒，起停过 process_execute 门）· **精准直达**（召回先兜住**全部能力位 + 全部触手方法**（条… |
 | `remote_confinement` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | **执行者隔离**（主人 2026-10-09 点破：「沙盒隔离的是被测试的靶标，没隔离执行的人」）：exec 中继若在宿主以主人账号跑，云端敲的命令就跑在真机上。op=assess/verdict 现读执行身份（whoami+是否提权）与三条隔离路（Docker 守护/WSL… |
@@ -188,7 +188,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：万能插·全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉价探针，不跑 26s 的全量 discover、不擅自起进程；「没探到」绝不说成「已打开」。
+- **它做什么**：全自动打开：用她任何一项能力之前，**六类插座（process/file/api/web/app/ai）自动过一遍**，每类只给三种如实结论——可插 / 缺依赖（缺什么写在案）/ 需票；op=status 六类现状（含依据、缓存年龄），op=ensure 立刻重算。只做廉价探针，不跑 26s 的全量 discover、不擅自起进程；「没探到」绝不说成「已打开」。
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap omni_open '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 

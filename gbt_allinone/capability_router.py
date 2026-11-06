@@ -434,11 +434,39 @@ def _dispatch(payload: dict) -> dict:
 
 
 def _why(receipt: dict) -> str:
-    for k in ("reason", "error", "why", "evidence", "message", "note", "status"):
-        v = receipt.get(k)
-        if v:
-            return str(v)[:240]
-    return "原因未报"
+    """回执 → 一句原因。
+
+    2026-11-06 修：信封 `ok` 只说明分派成功，**本体可能在里面说 ok:false**
+    （AGENTS §2.2）。原先只看第一层，于是「看屏幕」失败时把上游写好的
+    `看.why` / `看.rule` 全吐掉，主人只看到一句「原因未报」—— 如实报错变成了
+    如实报「不知道」。现在第一层没有就往下钻一层，并带上缺件清单。
+    """
+    keys = ("reason", "error", "why", "evidence", "message", "note", "rule", "status")
+
+    def _pick(d: dict) -> str:
+        for k in keys:
+            v = d.get(k)
+            if v:
+                return str(v)
+        return ""
+
+    hit = _pick(receipt)
+    if not hit:
+        for v in receipt.values():
+            if isinstance(v, dict) and v.get("ok") is False:
+                hit = _pick(v)
+                if hit:
+                    miss = v.get("missing") or []
+                    if miss:
+                        hit += "（缺：%s）" % " / ".join(map(str, miss[:6]))
+                    break
+    if not hit:
+        for v in receipt.values():
+            if isinstance(v, dict):
+                hit = _pick(v)
+                if hit:
+                    break
+    return hit[:240] if hit else "原因未报（回执里没有 reason/error/why 字段）"
 
 
 def _summarize(route: dict, receipt: dict) -> str:

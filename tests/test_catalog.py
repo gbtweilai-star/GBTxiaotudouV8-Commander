@@ -33,8 +33,18 @@ class TestCatalog(unittest.TestCase):
         self.assertEqual(len(self.cat), self.cat.meta.get("count"))
         self.assertGreaterEqual(len(self.cat), 341)
 
-    def test_domains_30(self):
-        self.assertEqual(len(self.cat.domains()), 30)
+    def test_domains_count(self):
+        """域数不许写死。
+
+        这是同一个坑的第二次：早先写死 341 位，能力面增长后测试自己变红（2026-11-01 修）；
+        域数写死 30，涨到 32 后又一次自己变红（2026-11-04 修）。
+        测试要钉的是**关系**，不是某个时刻的读数 —— 否则每次能力面扩张都得改测试。
+        """
+        doms = self.cat.domains()
+        self.assertEqual(len(doms), self.cat.stats()["domains"])      # 域列表与统计自洽
+        self.assertGreaterEqual(len(doms), 30)                        # 下限保护：域面不许萎缩
+        self.assertEqual(set(doms), {cap.domain for cap in self.cat})  # 域列表 === 实有位上的域
+        self.assertNotIn("", set(doms))                               # 不许有未归域的位
 
     def test_stats_add_up(self):
         s = self.cat.stats()

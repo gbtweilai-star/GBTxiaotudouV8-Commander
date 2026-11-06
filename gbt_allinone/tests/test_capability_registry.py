@@ -12,6 +12,7 @@
 写功能的人不挂出口、挂出口的人没有统一清单，于是"能力越堆越多、界面一动不动"。
 本契约把两表钉在一起；纯静态检查，不联网、不写盘。
 """
+import ast
 import re
 import unittest
 from pathlib import Path
@@ -23,6 +24,7 @@ MAIN_CJS = ROOT / "holo_pet_w3" / "shell" / "main.cjs"
 INDEX_HTML = ROOT / "holo_pet_w3" / "index.html"
 WINDOW_JS = ROOT / "holo_pet_w3" / "window.js"
 REGISTRY_PY = ROOT / "gbt_allinone" / "caps_registry.py"
+API_PY = ROOT / "gbt_allinone" / "api.py"
 
 # 静态 reason 允许留空、由运行时按实测填充的动作（面板 w3Tools 里的 draftReason）。
 RUNTIME_FILLED_REASONS = {("coze_mail", "draft")}
@@ -120,6 +122,191 @@ class TestHandlerMetadata(unittest.TestCase):
         """判别性负对照：合成一条 handler 漂移，校验器必须红。"""
         with self.assertRaises(AssertionError):
             _check_handler_convention({"probe": {"handler": "placeholder"}})
+
+
+def _dispatch_rows(api_py: Path):
+    """收集 `api.py` 里 `if kind ...` 的 (cap, If 节点)。
+
+    只认 **If 语句**：`... if kind == "x" else ...` 这类行内三元不是分支，
+    否则会把 `omission_detector` 这种正常写法误报成两条分支。
+    """
+    tree = ast.parse(api_py.read_text(encoding="utf-8"))
+    parent = {}
+    for node in ast.walk(tree):
+        for child in ast.iter_child_nodes(node):
+            parent[child] = node
+    rows = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.If):
+            continue
+        test = node.test
+        if not (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
+                and test.left.id == "kind"):
+            continue
+        kinds = []
+        for op, comp in zip(test.ops, test.comparators):
+            if isinstance(op, ast.Eq) and isinstance(comp, ast.Constant) \
+                    and isinstance(comp.value, str):
+                kinds.append(comp.value)
+            elif isinstance(op, ast.In) and isinstance(comp, (ast.Tuple, ast.List, ast.Set)):
+                kinds += [e.value for e in comp.elts
+                          if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+        for k in kinds:
+            rows.append((k, node))
+    return rows, parent
+
+
+def _duplicate_dispatch(api_py: Path):
+    """同一个 cap 落在两条**互不嵌套**的 if 上 ⇒ 两套实现，后一条是死代码。
+
+    合法的嵌套写法（外层 `if kind in (...)` 里再 `if kind == "x"`）不算重复；
+    被它抓的是 2026-11-06 那种整段粘贴：12 位红队分派在 api.py 里出现了两次。
+    """
+    rows, parent = _dispatch_rows(api_py)
+    by_kind = {}
+    for k, node in rows:
+        by_kind.setdefault(k, []).append(node)
+
+    def _is_ancestor(a, b) -> bool:
+        cur = b
+        while cur in parent:
+            cur = parent[cur]
+            if cur is a:
+                return True
+        return False
+
+    dups = {}
+    for k, nodes in by_kind.items():
+        for i, a in enumerate(nodes):
+            for b in nodes[i + 1:]:
+                if _is_ancestor(a, b) or _is_ancestor(b, a):
+                    continue
+                dups.setdefault(k, sorted({a.lineno, b.lineno}))
+    return dups
+
+
+def _duplicate_literal_keys(registry_py: Path):
+    """BENIGN_CAPS 字典**字面量**里重复出现的键 → {名字: [行号, 行号]}。
+
+    只数 ast.Dict.keys，不看 exec 后的结果：Python 对重复键静默取后者，
+    `len(ast keys)` 会大于 `len(dict)`，这正是"一个能力两处定义"的指纹。
+    """
+    tree = ast.parse(registry_py.read_bytes().decode("utf-8-sig"))
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+                getattr(t, "id", None) == "BENIGN_CAPS" for t in node.targets):
+            seen = {}
+            for k in node.value.keys:
+                if isinstance(k, ast.Constant) and isinstance(k.value, str):
+                    seen.setdefault(k.value, []).append(k.lineno)
+            return {n: lns for n, lns in seen.items() if len(lns) > 1}
+    raise AssertionError("caps_registry.py 里找不到 BENIGN_CAPS 字面量")
+
+
+class TestDispatchUniqueness(unittest.TestCase):
+    def test_one_cap_one_branch(self):
+        """一个能力位只许有一条分派分支。
+
+        血账（2026-11-06）：12 位授权红队分派被整段粘了两遍，前一条永远先命中、
+        后一条是死代码 —— 改错一条就"看起来有两个版本"，而且改的是不生效的那条。
+        """
+        dups = _duplicate_dispatch(API_PY)
+        self.assertFalse(dups, "同一能力位出现多条分派分支：%s" % dups)
+
+    def test_dispatch_uniqueness_has_teeth(self):
+        """判别性负对照：合成两条同 kind 的平级分支，校验器必须红。"""
+        import tempfile
+        import textwrap
+        src = textwrap.dedent("""
+            def run_task(kind):
+                if kind == "probe":
+                    return 1
+                if kind in ("probe", "other"):
+                    return 2
+                return 0
+        """)
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False,
+                                         encoding="utf-8") as fh:
+            fh.write(src)
+            tmp = Path(fh.name)
+        try:
+            dups = _duplicate_dispatch(tmp)
+        finally:
+            tmp.unlink()
+        self.assertEqual(dups, {"probe": [3, 5]})
+
+
+class TestRegistryNoDuplicateKeys(unittest.TestCase):
+    """BENIGN_CAPS 字面量里一个能力名只许出现一次。
+
+    血账（2026-11-06）：`caps_registry.py` 末尾又"补登"了 4 个能力位
+    （body_realtime / vision_grounding / vision_arsenal / ocr），与前面的定义
+    逐字相同。Python 字典字面量遇到重复键**静默取后者**，不报错也不警告：
+    文件里 ast 数出 431 个键，实际 dict 只有 427 个 —— 一个能力两处定义，
+    改前面那处等于没改，正好是"看起来只有一个能力、其实是两个版本"。
+    registry 是 427 位的唯一真源，重复键本身就说明有人"在末尾补一遍"
+    而不是去改原位。
+    """
+
+    def test_no_duplicate_keys_in_registry_literal(self):
+        dups = _duplicate_literal_keys(REGISTRY_PY)
+        self.assertFalse(
+            dups, "能力位在字典字面量里写了多遍（去改原位，别在末尾补）：%s" % dups)
+
+    def test_duplicate_key_checker_has_teeth(self):
+        """判别性负对照：合成一份带重复键的注册表，校验器必须红。"""
+        import tempfile
+        import textwrap
+        src = textwrap.dedent("""
+            BENIGN_CAPS = {
+                "alpha": {"domain": "x", "handler": "alpha"},
+                "beta": {"domain": "x", "handler": "beta"},
+                "alpha": {"domain": "x", "handler": "alpha"},
+            }
+        """)
+        with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False,
+                                         encoding="utf-8") as fh:
+            fh.write(src)
+            tmp = Path(fh.name)
+        try:
+            dups = _duplicate_literal_keys(tmp)
+        finally:
+            tmp.unlink()
+        self.assertEqual(dups, {"alpha": [3, 5]})
+
+    def test_registry_has_427_unique_caps(self):
+        """427 是契约：字面量键数必须等于去重后的能力数。"""
+        self.assertEqual(len(CR.BENIGN_CAPS), 427)
+        self.assertFalse(_duplicate_literal_keys(REGISTRY_PY))
+
+
+class TestNoVersionFragments(unittest.TestCase):
+    """活代码目录里不许留同一份源码的旧副本。
+
+    血账（2026-11-06）：`gbt_allinone/` 下 11 个模块各带 1~2 个 `.prev/.bak`，
+    外加 4 份能力清单快照 —— Python 不会 import 它们，所以**跑得通**；
+    但改的人会改到旧副本上，然后疑惑"为什么改了没生效"。已整体挪到
+    `.archive/versions/2026-11-06/`（只移动、不删除）。
+    """
+
+    LIVE_DIRS = ("gbt_allinone", "tools", "holo_pet_w3")
+    SKIP = {"__pycache__", "store", "node_modules", ".archive", "state", "outputs"}
+
+    def test_no_prev_or_bak_in_live_code(self):
+        bad = []
+        for d in self.LIVE_DIRS:
+            base = ROOT / d
+            if not base.is_dir():
+                continue
+            for p in base.rglob("*"):
+                if not p.is_file():
+                    continue
+                if set(p.relative_to(ROOT).parts) & self.SKIP:
+                    continue
+                n = p.name
+                if n.endswith((".prev", ".orig", ".rej")) or ".bak" in n:
+                    bad.append(p.relative_to(ROOT).as_posix())
+        self.assertFalse(bad, "活代码目录里还有旧版本残片（挪到 .archive 再改）：%s" % bad)
 
 
 class TestPanelExitList(unittest.TestCase):

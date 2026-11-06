@@ -23,7 +23,12 @@ DIR = ROOT / "state" / "proactive"
 TICKETS = DIR / "tickets.json"
 WORK = DIR / "work"
 GH = os.environ.get("GBT_GH") or str(ROOT / "tools" / "gh" / "bin" / "gh.exe")
-MODEL = os.environ.get("GBT_ENGINE_BASE", "http://127.0.0.1:8792") + "/v1/chat/completions"
+# ⛔ 2026-11-04：与 commander 同源修正 —— 原来默认写死 8792，而 ACTIVE.json 指 8111。
+#    主动执行（proactive）如果连错端口，它会在"引擎明明活着"的情况下以为自己不能干活。
+from . import weights as _gbw                               # noqa: E402
+
+MODEL = (os.environ.get("GBT_ENGINE_BASE") or _gbw.base()
+         or "http://127.0.0.1:8792") + "/v1/chat/completions"
 MODEL_NAME = os.environ.get("GBT_MODEL_NAME", "gbt-v8-v82-q5_0")
 LOCK = threading.RLock()
 STATE = {"thread": None, "stop": False, "last_poll": 0, "last_error": "", "source": "local"}

@@ -56,7 +56,7 @@ def print_command(cat: Catalog, question: str) -> None:
     if cap.requires_params and cap.params_hint:
         payload = '<按 params_hint 填：%s>' % cap.params_hint.replace("'", " ")
     print("③ 在这台机器上，它就是这么被调用的（唯一门，绕过它没有留痕）：")
-    print("   py -3.14 tools/codex-scripts/five-dim.py cap %s '%s'" % (cap.name, payload))
+    print("   ./pyembed/python.exe tools/codex-scripts/five-dim.py cap %s '%s'" % (cap.name, payload))
     print("   回执形状：{gate, kind, status, stamp, denied, result:{ok, ...}}")
     if cap.needs_ticket:
         print("   ⚠️ 这一位挂了作用域 %s ⇒ 门会先拒，等主人发票（AI 不能给自己发）。"

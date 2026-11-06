@@ -15,9 +15,9 @@
 4. 同时打印一份人读摘要。
 
 ## 用法
-    py -3.14 tools/codex-scripts/rig-audit.py                 # 默认 GLB + 写 .js
-    py -3.14 tools/codex-scripts/rig-audit.py --json          # 机器可读
-    py -3.14 tools/codex-scripts/rig-audit.py --check         # 只对账：.js 与 GLB 的 sha 是否一致
+    ./pyembed/python.exe tools/codex-scripts/rig-audit.py                 # 默认 GLB + 写 .js
+    ./pyembed/python.exe tools/codex-scripts/rig-audit.py --json          # 机器可读
+    ./pyembed/python.exe tools/codex-scripts/rig-audit.py --check         # 只对账：.js 与 GLB 的 sha 是否一致
 
 退出码：0 审计完成 · 1 Blender/GLB 不在或解析失败（**不假装成功**）
 
@@ -247,7 +247,7 @@ def main() -> int:
 
     if a.check:
         if not OUT_JS.is_file():
-            print("🔴 派生件不在：%s（先跑一次 py -3.14 tools/codex-scripts/rig-audit.py）" % OUT_JS.name)
+            print("🔴 派生件不在：%s（先跑一次 ./pyembed/python.exe tools/codex-scripts/rig-audit.py）" % OUT_JS.name)
             return 1
         t = OUT_JS.read_text(encoding="utf-8", errors="replace")
         if src_sha not in t:
@@ -269,7 +269,7 @@ def main() -> int:
     data["at"] = __import__("datetime").datetime.now().astimezone().isoformat(timespec="seconds")
 
     OUT_JS.parent.mkdir(parents=True, exist_ok=True)
-    OUT_JS.write_text("/* 自动生成，别手改 —— py -3.14 tools/codex-scripts/rig-audit.py\n"
+    OUT_JS.write_text("/* 自动生成，别手改 —— ./pyembed/python.exe tools/codex-scripts/rig-audit.py\n"
                       "   量具：本机 Blender（--background）· 源 %s sha256=%s */\n"
                       "window.GBT_RIG_AUDIT = %s;\n"
                       % (data["source"]["glb"], src_sha[:16], json.dumps(data, ensure_ascii=False, indent=1)),

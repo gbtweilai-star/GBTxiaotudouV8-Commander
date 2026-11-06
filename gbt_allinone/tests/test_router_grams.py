@@ -41,7 +41,16 @@ def _omni():
 
 
 def _score_kind(ig: set, cap: dict, kind: str) -> float:
-    return _omni().score_cap(ig, cap)[0]
+    """2026-11-05：先清记忆化缓存再算 —— 否则这条正控是**假判据**。
+
+    omni._cap_grams 按 kind 缓存 gram 集。本判据用 {**cap, "desc_tail": ""}
+    造「拿掉尾部」的对照，但缓存键只有 kind ⇒ 两次调用拿到同一份**带尾部**的
+    gram 集 ⇒ s_on == s_off ⇒ 判据永远红，报的却是「截断仍在吃尾部触发词」
+    （错误的结论，正确的位置）。清缓存后实测 0.584 > 0.0，尾词确实进了打分语料。
+    """
+    m = _omni()
+    m._CAP_GRAMS.clear()
+    return m.score_cap(ig, cap)[0]
 
 
 def _score_all(intent: str):

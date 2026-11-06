@@ -176,26 +176,17 @@ def _face_bind(red: list) -> dict:
     names = {c["name"] for c in caps if isinstance(c, dict) and c.get("name")}
     domains = {c.get("domain") for c in caps if isinstance(c, dict) and c.get("domain")}
 
-    # ══ 2026-11-04 语义修正：把「真断连」与「运行时产物缺失」分开 ══
-    # 血账：CI 上这条判据报 `断连_资产缺失 = 57`，而本地是 0。查明 57 条**全部**是
-    #   `gbt_allinone/store/devoured/**` —— devour 吞噬时生成的运行时产物
-    #   （.gbt_dir_marker / knowledge.json / run.py / absorbed_knowledge.md），
-    #   被 `.gitignore` 的 `store/` 规则排除，**本来就不入库**。
-    #   CI 是新克隆，当然没有这些文件。把它算成"绑定账里有资产已不在盘"是**错判**：
-    #   那不等于绑定坏了，只等于"这台机器还没跑过 devour"。
-    # 区分标准：路径落在运行时/产物区 ⇒ 单独计数，不进「断连」；
-    #   其余（源码 / 文档 / 页面）缺失 ⇒ 才是真断连，仍然判红。
-    RUNTIME_PREFIXES = ("gbt_allinone/store/", "store/", "outputs/", "state/", "vaults/",
-                        ".scratch/", "logs/", "dist/", "runtime/", "vendor/", "packs/")
+    # 绑定有两种层级，**不许混判**（踩过：把合法的域级标签当成"绑到不存在的能力位"）：
+    #   ① 能力位级 —— 名字必须在 427 个能力位里；
+    #   ② 域级 `domain:<域>` —— 域必须在注册表的域集合里（见 tools/tentacle_bind.py::_domains
+    #      的注释：「域级标签 `domain:<名>` 的合法取值来源」）。
+    # 只有"名字不在 427 里、且不是合法域级标签"才算断连。
     DOMAIN_TAG = "domain:"
-    missing_asset, missing_tentacle, runtime_missing = [], [], []
+    missing_asset, missing_tentacle = [], []
     domain_level = 0
     for rel, meta in (bindings or {}).items():
         if not (ROOT / rel).exists():
-            if str(rel).startswith(RUNTIME_PREFIXES):
-                runtime_missing.append(rel)
-            else:
-                missing_asset.append(rel)
+            missing_asset.append(rel)
         for t in (meta or {}).get("tentacles") or []:
             if isinstance(t, str) and t.startswith(DOMAIN_TAG):
                 d = t[len(DOMAIN_TAG):]
@@ -220,15 +211,10 @@ def _face_bind(red: list) -> dict:
         "断连_资产缺失": len(missing_asset),
         "断连_触手不在册": len(missing_tentacle),
         "域级绑定": domain_level,
-        "运行时产物未生成": len(runtime_missing),
         "能力位无触手标签": sorted(names - tagged) if tagged else [],
-        "样例": {"资产缺失": missing_asset[:5], "触手不在册": missing_tentacle[:5],
-                 "运行时产物": runtime_missing[:5]},
-        "口径": "两件事分开算：① 绑定层级：能力位级（名字须在 427 里）与域级 "
-                "`domain:<域>`（域须在注册表域集合里，见 tentacle_bind.py::_domains）；"
-                "② 资产缺失：**源码/文档/页面**缺失才是真断连（判红），"
-                "**运行时产物**（store/devoured、outputs 等被 gitignore 的）缺失只计数 —— "
-                "干净克隆里没跑过 devour 不等于绑定坏了",
+        "样例": {"资产缺失": missing_asset[:5], "触手不在册": missing_tentacle[:5]},
+        "口径": "两种绑定层级分开算：能力位级（名字须在 427 里）与域级 `domain:<域>`（域须在注册表域集合里）。"
+                "域级是设计上合法的粗粒度绑定，不算断连 —— 混判会造出假警报",
         "present": True,
     })
     return out

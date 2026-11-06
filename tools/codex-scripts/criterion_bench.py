@@ -33,7 +33,9 @@ from __future__ import annotations
 
 import argparse
 import ast
+import bisect
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -232,6 +234,8 @@ def _in_deciding_position(node, par) -> bool:
     cur = node
     while cur in par:
         p = par[cur]
+        if isinstance(p, ast.IfExp) and p.test is cur:
+            return False          # 三元表达式在**选值**，不是在定胜负（实测假阳：_q 的加引号）
         if isinstance(p, ast.Return):
             return True
         if isinstance(p, ast.Call):
@@ -255,36 +259,110 @@ def _call_name(n) -> str:
     return ""
 
 
-def d3_zero_masquerade(tree) -> list:
-    """**D3 用 0 冒充**：读一个**可能不存在**的源，却**通篇没有「未读到」出路** ⇒ 缺失时静默报 0。
+# D3 的「真读盘」：只认把**外部源**变成内存的调用。
+#    `json.loads` 之类是**解析**（数据已经在手里），把它算成"读源"是 D3 v1~v4 的假阳主因
+#    —— 实测 399 条里 57 条只因为 `json.loads` 挂了名。
+D3_READS = ("read_text", "read_bytes", "readlines")
+# 「未读位」：回执/变量/字典键里出现这些词 ⇒ 失败有独立出口，不是静默
+D3_UNREAD_RE = re.compile(r"(unread|failed|failures|errors|unparsed|skipped|missing|"
+                          r"denied|read_err|读不到|未读到|缺失)", re.I)
 
-    🔴 **判据收紧过一轮**（棘轮当场抓到我自己）：第一版只要求"有 `.get(默认空)`/`len(...)`
-    且没有「未读到」" ⇒ 全仓 **412 条**，而且**连纯汇报函数**（不读任何外部源、
-    「源缺失」对它们根本不存在）都被误报。现在**加了前提：函数必须真的在读某个可能不存在的东西**。
+
+def _d3_loop_reads(fn) -> bool:
+    """循环体里真的读了文件。"""
+    for n in ast.walk(fn):
+        if isinstance(n, (ast.For, ast.AsyncFor, ast.While)):
+            if any(isinstance(x, ast.Call) and _call_name(x) in D3_READS
+                   for x in ast.walk(n)):
+                return True
+    return False
+
+
+def _d3_silent_swallow(fn) -> list:
+    """读文件的 try 里，`except` 分支只是 `continue`/`pass`（不计失败、不进回执）的行号。"""
+    out = []
+    for n in ast.walk(fn):
+        if not isinstance(n, ast.Try):
+            continue
+        if not any(isinstance(x, ast.Call) and _call_name(x) in D3_READS
+                   for x in ast.walk(n)):
+            continue
+        for h in n.handlers:
+            silent = all(
+                isinstance(s, (ast.Continue, ast.Pass))
+                or (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant))
+                for s in h.body)
+            if silent:
+                out.append(h.lineno)
+    return out
+
+
+def _d3_has_unread_channel(fn) -> bool:
+    """回执里有没有「未读位」：变量名 / 属性 / 关键字 / 字符串键 / 中文出路句。
+
+    这一步刻意**宽**：只要有一条明路能让人看出「有东西没读到」，就不算冒充。
+    """
+    for n in ast.walk(fn):
+        if isinstance(n, ast.Name) and D3_UNREAD_RE.search(n.id):
+            return True
+        if isinstance(n, ast.Attribute) and D3_UNREAD_RE.search(n.attr):
+            return True
+        if isinstance(n, ast.keyword) and n.arg and D3_UNREAD_RE.search(n.arg):
+            return True
+        if isinstance(n, ast.Constant) and isinstance(n.value, str):
+            if any(k in n.value for k in UNREAD_KEYS):
+                return True
+            if D3_UNREAD_RE.fullmatch(n.value.strip()):
+                return True
+    return False
+
+
+def _d3_reports_count(fn) -> bool:
+    """返回里真的在报一个数字（`len(...)` / `.get(...)`）—— "用 0 冒充"的前提。"""
+    for n in ast.walk(fn):
+        if not isinstance(n, ast.Return) or n.value is None:
+            continue
+        for x in ast.walk(n.value):
+            if not isinstance(x, ast.Call):
+                continue
+            if _call_name(x) == "len":
+                return True
+            if isinstance(x.func, ast.Attribute) and x.func.attr == "get":
+                return True
+    return False
+
+
+def d3_zero_masquerade(tree) -> list:
+    """**D3 用 0 冒充（v5 · 2026-11-06 重写）**：**扫描器把「读不到」当成「干净」**。
+
+    🔴 三代判据的演进（每一代都是被真读数打回来的，不是拍脑袋）：
+      v1~v2「有 `.get(空)`/`len` 且没有『未读到』」-> 412 条，纯汇报函数全中招；
+      v3~v4 加"真读了外部源" -> 399 -> 58 -> 19，剩下的全是**循环里读文件**；
+      v5（本条）把「用 0 冒充」钉到它真正的形状上：
+
+          循环里逐个读文件 · `except` 只 `continue`/`pass` · 回执里**没有任何未读位**
+          -> **少读一个文件，报出来的仍然是「N 条 / 全干净」**
+
+      这就是会让挖洞扫描器漏报的那一类：**读不到 != 没问题**。
+      反过来，只要回执里有 `unread` / `failed` / `读不到` 这类位置，就不算冒充 ——
+      「已声明覆盖不全」是诚实，不是缺陷。
     """
     out = []
-    for fn in [x for x in ast.walk(tree) if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef))]:
-        nodes = list(ast.walk(fn))
- # **前提**：真的在读某个可能不存在的东西 —— 否则「源缺失」这件事不存在
-        if not any(isinstance(n, ast.Call) and _call_name(n) in READISH for n in nodes):
+    for fn in [x for x in ast.walk(tree)
+               if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+        if not _d3_loop_reads(fn):
             continue
- # 出路用 **AST 查字符串常量**，不查源码文本（查文本恰好是 D2/D6 要抓的坑）
-        if any(isinstance(n, ast.Constant) and isinstance(n.value, str)
-               and any(k in n.value for k in UNREAD_KEYS) for n in nodes):
+        silent = _d3_silent_swallow(fn)
+        if not silent:
             continue
-        risky = []
-        for n in nodes:
-            if not isinstance(n, ast.Call):
-                continue
-            if isinstance(n.func, ast.Attribute) and n.func.attr == "get":
-                if len(n.args) >= 2 and isinstance(n.args[1], (ast.Dict, ast.List)):
-                    risky.append((n.lineno, ".get(k, %s)" % ast.unparse(n.args[1])[:12]))
-            if _call_name(n) == "len":
-                risky.append((n.lineno, "len(...)"))
-        if len(risky) >= 2:
-            out.append((fn.lineno, "函数 `%s` **在读可能不存在的源**，却有 %d 处 "
-                                   "`.get(默认空)`/`len(...)` 且**通篇没有「未读到」出路** "
-                                   "⇒ 源缺失时会静默报 0" % (fn.name, len(risky))))
+        if _d3_has_unread_channel(fn):
+            continue
+        if not _d3_reports_count(fn):
+            continue
+        out.append((fn.lineno,
+                    "函数 `%s` 在循环里逐个读文件，`except` 只是 continue/pass（L%s），"
+                    "回执里**没有未读位** -> 少读一个文件仍然报「N 条/全干净」"
+                    % (fn.name, ",".join(str(x) for x in silent[:3]))))
     return out
 
 
@@ -351,6 +429,85 @@ def _src_bound_names(tree) -> set:
     return out
 
 
+def _assign_index(tree) -> dict:
+    """name -> [(行号, 赋值表达式节点)]，按行号升序。用于"这个变量在**这一行**是从哪来的"。"""
+    idx = {}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Assign):
+            for t in n.targets:
+                if isinstance(t, ast.Name):
+                    idx.setdefault(t.id, []).append((n.lineno, n.value))
+        elif (isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name)
+              and n.value is not None):
+            idx.setdefault(n.target.id, []).append((n.lineno, n.value))
+    for v in idx.values():
+        v.sort(key=lambda x: x[0])
+    return idx
+
+
+def _enclosing_func(node, par):
+    cur = node
+    while cur in par:
+        cur = par[cur]
+        if isinstance(cur, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            return cur
+    return None
+
+
+def _is_param(fn, name: str) -> bool:
+    if fn is None:
+        return False
+    a = fn.args
+    names = [x.arg for x in list(a.posonlyargs) + list(a.args) + list(a.kwonlyargs)]
+    if a.vararg:
+        names.append(a.vararg.arg)
+    if a.kwarg:
+        names.append(a.kwarg.arg)
+    return name in names
+
+
+def _has_name(node, name: str) -> bool:
+    return any(isinstance(x, ast.Name) and x.id == name for x in ast.walk(node))
+
+
+def _has_call(node, names) -> bool:
+    for x in ast.walk(node):
+        if not isinstance(x, ast.Call):
+            continue
+        f = x.func
+        nm = (f.attr if isinstance(f, ast.Attribute)
+              else (f.id if isinstance(f, ast.Name) else ""))
+        if nm in names:
+            return True
+    return False
+
+
+READ_CALLS = frozenset({"read_text", "read_bytes", "readlines", "read"})
+
+
+def _src_bound_at(idx: dict, par, node, name: str) -> bool:
+    """**按位置**判自指：只看这一行之前**最近一次**给 name 的赋值。
+
+    🔴 2026-11-06 修（实测 8/8 高危全是假阳）：原实现按"名字在整个文件里出现过
+    由 __file__ 读文件"判 —— 只要同文件别处有个 `out = ...read_text()`，任何
+    `"x" in out` 都会被判成自指。实测 `out`/`blob`/`s` 这三类通用名全中。
+
+    ⚠️ 本函数**只用 AST**，不许退化成字符串包含判断 —— 台架自己的自检会咬
+    （「台架自己不使用文本判据」那条）。
+    """
+    fn = _enclosing_func(node, par)
+    if _is_param(fn, name):            # 形参 = 调用方给的数据，不是自己的源码
+        return False
+    rows = idx.get(name) or []
+    if not rows:
+        return False
+    i = bisect.bisect_left([r[0] for r in rows], node.lineno) - 1
+    if i < 0:
+        return False
+    val = rows[i][1]
+    return _has_name(val, "__file__") and _has_call(val, READ_CALLS)
+
+
 def d6_self_reference(tree, src_text: str) -> list:
     """**D6 自指判据**：判据把要搜的字符串**列在自己源码里**，并拿它去搜**源码本身**。
 
@@ -360,14 +517,16 @@ def d6_self_reference(tree, src_text: str) -> list:
 
     形状②`any(t in X for t in ("A","B"))`（**本仓真踩过的那个**）· 形状①`"L" in X` 且 L 又是集合元素。
     """
-    src_bound = _src_bound_names(tree)
+    _par = _parents(tree)
+    _idx = _assign_index(tree)
     out = []
 
-    def _tag(rname: str) -> str:
-        return ("🔴 **高危·自指**" if rname in src_bound else
+    def _tag(rname: str, node) -> str:
+        hi = _src_bound_at(_idx, _par, node, rname)
+        return ("🔴 **高危·自指**" if hi else
                 "🟡 提示·表式文本判据") + "（被搜变量 `%s` %s）" % (
-                    rname, "由读文件绑定 ⇒ **就是在搜自己的源码**" if rname in src_bound
-                    else "不是读文件来的 ⇒ 多半是**输入数据/别的进程输出**，通常合法")
+                    rname, "**这一行之前最近一次赋值**是读自己的源码（__file__）"
+                    if hi else "最近一次赋值不是读自己的源码 ⇒ 多半是输入数据/别的进程输出")
 
     # ── 形状②：any/all(<Name> in <X> for <Name> in (<字面量表>)) ────────────────
     for n in ast.walk(tree):
@@ -387,7 +546,7 @@ def d6_self_reference(tree, src_text: str) -> list:
         if lits:
             out.append((n.lineno,
                         '%s：`… in %s for … in (%s…)` —— 字符串**列在自己源码里**（%d 个，如 `%s`）'
-                        % (_tag(rname), rname,
+                        % (_tag(rname, n), rname,
                            ", ".join('"%s"' % x[:14] for x in lits[:2]), len(lits), lits[0][:20])))
     # ── 形状①：`"L" in <X>`，且 L 又是同一文件里某个集合的元素 ───────────────────
     coll = _collection_strings(tree)
@@ -407,8 +566,10 @@ def d6_self_reference(tree, src_text: str) -> list:
             hits = [ln for ln in coll.get(left.value, []) if ln != n.lineno]
             if hits:
  # **同一处分档**：形状③也要按位置分档（否则会与形状④重复报高危）
-                dec = _in_deciding_position(n, par3)
-                tag = ("🔴 **高危·自指**" if dec else "🟡 提示·自指（不定胜负）")
+                # 「自指」= 搜的**是自己的源码**。只满足"定胜负"还不够（2026-11-06 实测：
+                # 7 条高危全是"在 check() 实参里"/"在返回的字段里"，被搜的是运行输出或媒体标签）。
+                dec = _in_deciding_position(n, par3) and _src_bound_at(_idx, par3, n, rname)
+                tag = ("🔴 **高危·自指**" if dec else "🟡 提示·表式文本判据（不是自指）")
                 out.append((n.lineno,
                             '%s：`"%s" in %s`，同一字面量又是集合元素（L%s）'
                             % (tag, left.value[:20], rname, hits[:3])))
@@ -435,8 +596,8 @@ def d6_self_reference(tree, src_text: str) -> list:
                 continue
             others = [ln for ln in lits_all.get(left.value, []) if ln != n.lineno]
             if others:
-                dec = _in_deciding_position(n, par3)
-                tag = ("🔴 **高危·自指**" if dec else "🟡 提示·自指（不定胜负）")
+                dec = _in_deciding_position(n, par3) and _src_bound_at(_idx, par3, n, rname)
+                tag = ("🔴 **高危·自指**" if dec else "🟡 提示·表式文本判据（不是自指）")
                 out.append((n.lineno,
                             '%s：`"%s" %s %s`，而**同一字符串常量**在本文件另见 L%s '
                             '⇒ 判据把要搜的字符串**列在自己源码里**'
@@ -448,33 +609,32 @@ def d6_self_reference(tree, src_text: str) -> list:
     #    ⇒ `L in src` **必然为真**（`not in` 必然为假）。**不需要出现两次，一次就够。**
     #    这条是实测逼出来的：我新写的 `"import edit_core" not in src` 就是它，
     #    形状①②③**都看不见**（字面量只出现一次、且不在集合里）。
-    if src_bound:
-        par = _parents(tree)
-        for n in ast.walk(tree):
-            if not isinstance(n, ast.Compare):
+    par = _parents(tree)
+    for n in ast.walk(tree):
+        if not isinstance(n, ast.Compare):
+            continue
+        for op, comp in zip(n.ops, n.comparators):
+            if not isinstance(op, (ast.In, ast.NotIn)):
                 continue
-            for op, comp in zip(n.ops, n.comparators):
-                if not isinstance(op, (ast.In, ast.NotIn)):
-                    continue
-                left, right = n.left, comp
-                if not (isinstance(left, ast.Constant) and isinstance(left.value, str)
-                        and left.value.strip()):
-                    continue
-                rname = right.id if isinstance(right, ast.Name) else ""
-                if rname not in src_bound:
-                    continue
- # **分档**：定胜负的位置 ⇒ 高危；前置筛/守卫 ⇒ 提示（优化失效）
-                dec = _in_deciding_position(n, par)
-                tag = ("🔴 **高危·自指（恒真）**" if dec else
-                       "🟡 提示·自指前置筛（恒真但不定胜负）")
-                out.append((n.lineno,
-                            '%s：`"%s" %s %s`，而 `%s` 是**本文件自己的文本**'
-                            ' —— 这个字面量就在文件里 ⇒ 条件**必然%s**；%s'
-                            % (tag, left.value[:20],
-                               "in" if isinstance(op, ast.In) else "not in",
-                               rname, rname, "为真" if isinstance(op, ast.In) else "为假",
-                               "**这条就是判据本身 ⇒ 判据是假的**" if dec else
-                               "但它只是**前置筛/守卫**，定胜负的是别处 ⇒ **优化失效**，结论未必错")))
+            left, right = n.left, comp
+            if not (isinstance(left, ast.Constant) and isinstance(left.value, str)
+                    and left.value.strip()):
+                continue
+            rname = right.id if isinstance(right, ast.Name) else ""
+            if not _src_bound_at(_idx, par, n, rname):
+                continue
+# **分档**：定胜负的位置 ⇒ 高危；前置筛/守卫 ⇒ 提示（优化失效）
+            dec = _in_deciding_position(n, par)
+            tag = ("🔴 **高危·自指（恒真）**" if dec else
+                   "🟡 提示·自指前置筛（恒真但不定胜负）")
+            out.append((n.lineno,
+                        '%s：`"%s" %s %s`，而 `%s` 是**本文件自己的文本**'
+                        ' —— 这个字面量就在文件里 ⇒ 条件**必然%s**；%s'
+                        % (tag, left.value[:20],
+                           "in" if isinstance(op, ast.In) else "not in",
+                           rname, rname, "为真" if isinstance(op, ast.In) else "为假",
+                           "**这条就是判据本身 ⇒ 判据是假的**" if dec else
+                           "但它只是**前置筛/守卫**，定胜负的是别处 ⇒ **优化失效**，结论未必错")))
     return out
 
 
@@ -603,10 +763,16 @@ def cmd_settle(a) -> int:
     f = scan(roots)
     t = tally(f)
     BASE.parent.mkdir(parents=True, exist_ok=True)
-    BASE.write_text(json.dumps({"at": __import__("time").strftime("%Y-%m-%dT%H:%M:%S"),
-                                "扫的根": list(roots), "计数": t,
-                                "这次为什么重立基线": a.note or "**未写原因**（下次要写）",
-                                "逐条": f}, ensure_ascii=False, indent=1), encoding="utf-8")
+    raw = json.dumps({"at": __import__("time").strftime("%Y-%m-%dT%H:%M:%S"),
+                      "扫的根": list(roots), "计数": t,
+                      "这次为什么重立基线": a.note or "**未写原因**（下次要写）",
+                      "逐条": f}, ensure_ascii=False, indent=1).encode("utf-8")
+    tmp = BASE.with_name(BASE.name + ".tmp-%d" % os.getpid())   # 原子：坏一次就再没有可信基线
+    with open(tmp, "wb") as fh:
+        fh.write(raw)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, BASE)
     print(json.dumps({"立基线": t, "原因": a.note or "**未写原因**",
                       "落盘": str(BASE.relative_to(ROOT))}, ensure_ascii=False, indent=1))
     print("🔴 棘轮：**以后只许变少，不许变多**（变多 = 新写的判据又坏了）")
@@ -684,11 +850,15 @@ PLANT = {
         ("def f():\n"
          "    src = Path(__file__).read_text()\n"
          "    return not any(t in src for t in (\"write_bytes(\", \"mkdir(\"))\n"),
-    "D3 用0冒充": ("def f(p):\n"
-                "    d = json.loads(p.read_text())\n"
-                "    a = d.get('x', {})\n"
-                "    b = len(a)\n"
-                "    return b\n"),
+    "D3 用0冒充": ("def scan(root):\n"
+                "    hits = []\n"
+                "    for p in root.rglob('*.py'):\n"
+                "        try:\n"
+                "            t = p.read_text()\n"
+                "        except OSError:\n"
+                "            continue\n"
+                "        hits.append(t)\n"
+                "    return {'n': len(hits)}\n"),
     "D4 死代码": "def f():\n    if False:\n        return 1\n    return 2\n",
     "D5 判据与自己比": "def f(y):\n    return y == y\n",
  # 2026-09-25：这条负控是**被自检逼出来的** ——
@@ -716,9 +886,30 @@ FP_OTHER = ('def f(sk):\n'
             '    return any(t in body for t in ("GBT小土豆", "自由的风"))\n')
 # D3 的**纯汇报函数**控制：不读任何外部源 ⇒ 「源缺失」不存在 ⇒ **不许报 D3**
 # 这条也是**实测发现的假阳性**：棘轮抓到我自己新写的 `cmd_gate`/`_checks` 被误报
+# D6 的**名字碰撞**控制：同文件别处有 `out = Path(__file__).read_text()`，
+# 但**这一行之前最近一次**给 out 的是子进程输出 ⇒ 不许按名字报成自指。
+# 实测：首轮 8 条「高危」全是这个形状（`out`/`blob`/`s` 被别的函数/别的位置绑过）。
+FP_SHADOW = ('def f():\n'
+             '    out = run_cmd()\n'
+             '    return any(t in out for t in ("OK", "DONE"))\n'
+             'def g():\n'
+             '    out = Path(__file__).read_text(encoding="utf-8")\n'
+             '    return out\n')
 FP_PURE = ('def report(items):\n'
            '    return {"n": len(items), "m": len([x for x in items]), '
            '"k": len(set(items))}\n')
+# D3 的**诚实声明**控制：同样形状，但回执里带 `unread` -> **不许报**
+#   「已声明覆盖不全」是诚实，不是缺陷；把诚实也报成缺陷，判据就会逼人删掉未读位。
+FP_D3_UNREAD = ('def scan(root):\n'
+                '    hits, unread = [], []\n'
+                '    for p in root.rglob("*.py"):\n'
+                '        try:\n'
+                '            t = p.read_text()\n'
+                '        except OSError as e:\n'
+                '            unread.append(str(e))\n'
+                '            continue\n'
+                '        hits.append(t)\n'
+                '    return {"n": len(hits), "unread": unread}\n')
 # D1 的**用到循环变量**控制：`any(k in r for k in ("静帧",))` 条件**依赖数据** ⇒ 不许报恒真/恒假
 # 实测假阳性：我第一版 D1 漏查"元素是否用到循环变量"，误告了 `media_run.py:398`
 FP_LOOPVAR = ('def f(r):\n'
@@ -836,12 +1027,24 @@ def _checks(pre_scan=None):
     ck("**D6 控制：读「别人的文件」不许报高危**（只能 🟡 提示）",
        bool(d6_fo) and all("🟡" in w for _, w in d6_fo) and not any("🔴" in w for _, w in d6_fo),
        (d6_fo[0][1][:72] if d6_fo else "**没报出来**（那也不行）"))
+ # ②d2 **D6 名字碰撞控制**：同文件别处有 __file__ 读取，不许污染这一行的判定
+    sh_tree = ast.parse(FP_SHADOW)
+    d6_sh = d6_self_reference(sh_tree, FP_SHADOW)
+    ck("**D6 名字碰撞控制：同文件别处读 __file__，不许把子进程输出判成自指**",
+       bool(d6_sh) and all("🟡" in w for _, w in d6_sh) and not any("🔴" in w for _, w in d6_sh),
+       (d6_sh[0][1][:72] if d6_sh else "**没报出来**（那也不行）"))
  # ②e **D3 纯汇报函数控制**：不读外部源 ⇒ 「源缺失」不存在 ⇒ 不许报 D3
     #     （这是棘轮抓到的我自己的假阳性：`cmd_gate`/`_checks`/`cmd_selftest`）
     fp2_tree = ast.parse(FP_PURE)
     d3_fp = d3_zero_masquerade(fp2_tree)
     ck("**D3 控制：纯汇报函数不许报「用 0 冒充」**（它不读任何外部源）",
        not d3_fp, "误报 %d 处：%s" % (len(d3_fp), d3_fp[:1]))
+ # ②e2 **D3 诚实声明控制**：回执里带 `unread` 的扫描器 ⇒ **不许报**
+    #      「已声明覆盖不全」是诚实；判据若连它都咬，就会逼人把未读位删掉 —— 那是反向优化。
+    fp4_tree = ast.parse(FP_D3_UNREAD)
+    d3_fp4 = d3_zero_masquerade(fp4_tree)
+    ck("**D3 控制：带 unread 位的扫描器不许报**（已声明覆盖不全 = 诚实）",
+       not d3_fp4, "误报 %d 处：%s" % (len(d3_fp4), d3_fp4[:1]))
  # ②f **D1 控制：元素用到循环变量 ⇒ 条件依赖数据 ⇒ 不许报恒真/恒假**
     #     （实测假阳性：误告 `media_run.py:398` 的 `any(k in r for k in ("静帧",))`）
     lv_tree = ast.parse(FP_LOOPVAR)

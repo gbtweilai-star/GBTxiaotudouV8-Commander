@@ -32,6 +32,7 @@ import math
 import os
 import re
 import time
+import warnings
 
 _INDEX_NAME = os.path.join("state", "codepage_index.json")
 _TIERS = (
@@ -69,6 +70,30 @@ def _expand(terms: set) -> set:
     return out
 
 
+# ── 索引收录范围（2026-11-04 扩展）──────────────────────────────────────────
+# 原来只收 `.py`，于是 .md / .html / .json / .js / .css 这 755+ 个页面
+# **一个符号都没进索引** —— 查它们只能现场 open 整页。
+# 主人令：「你没有做触手覆盖每一页整页脉冲推进，这样时间浪费在读取页面信息了」。
+_PAGE_EXT = (".py", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl",
+             ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".vue", ".css",
+             ".txt", ".yml", ".yaml")
+
+# 超过这个体积只做「页级」条目、不切段：edges.jsonl(8MB) / wiring.json(9MB)
+# 切段会产出上万条噪声，把索引撑爆、查询反而变慢。
+MAX_SEG_BYTES = 300_000
+
+# ── 索引排除区（按**路径前缀**，不是目录名）────────────────────────────────
+# 2026-11-04 实测：索引 5065 页里 mirror 副本 513(10.1%)、.scratch 427(8.4%)，
+# 真身只占 72.7%。同名冲突 392 个 basename —— `stage.json` 140 份、
+# `index.html` 64 份、`code_audit.py` 21 份（真身 + 20 个镜像）。
+# 后果：搜一个文件名会命中一堆副本，真身未必排第一；
+# 全部 14 条 `bad`（语法错）也全来自 mirror 里的测试夹具，真身一个语法错都没有。
+# 这就是「触手覆盖页面时出现的其他问题」。
+#
+# 用前缀而不是往 `_SKIP_DIRS` 里塞 "mirror"/"stage"：后者会误伤同名的真目录。
+_EXCLUDE_PREFIX = ("state/mirror/", ".scratch/")
+
+
 def _root() -> str:
     """payload 根：本文件在 `payload/gbt_allinone/` 下，上退两级。"""
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -96,6 +121,140 @@ def _doc_first(node) -> str:
         return ""
 
 
+def _scan_generic(rel: str, src: str, lines: int):
+    """非 Python 页面：**按结构切段**，不做语法解析。
+
+    主人令（2026-11-04）：「你没有做触手覆盖每一页整页脉冲推进，这样时间浪费在
+    读取页面信息了」。原来的 `_scan_file` 只走 `ast`，于是 .md / .html / .json /
+    .js / .css 这 755+ 个页面**一个符号都没进索引** —— 查它们只能现场 open 整页。
+
+    这里按各自的结构切：标题 / 段 / 键 / 函数 / 选择器。
+    只收「能找到、能跳到」的位置（symbol + 行号 + 首行摘要），不塞原文。
+    """
+    low = rel.lower()
+    segs = []
+
+    if low.endswith((".md", ".markdown")):
+        for i, ln in enumerate(src.splitlines(), 1):
+            m = re.match(r"^(#{1,6})\s+(.+?)\s*$", ln)
+            if m:
+                segs.append([m.group(2).strip()[:80], rel, i,
+                             "h%d" % len(m.group(1)), m.group(2).strip()[:120]])
+        if not segs:                      # 没标题就按空行分段
+            segs = _paragraph_segs(rel, src, "para")
+    elif low.endswith((".html", ".htm")):
+        for i, ln in enumerate(src.splitlines(), 1):
+            for m in re.finditer(r'<h([1-6])[^>]*>(.*?)</h\1\s*>', ln, re.I | re.S):
+                t = re.sub(r"<[^>]+>", "", m.group(2)).strip()
+                if t:
+                    segs.append([t[:80], rel, i, "h%s" % m.group(1), t[:120]])
+            for m in re.finditer(r'id=["\']([A-Za-z_][\w\-]{1,60})["\']', ln):
+                segs.append([m.group(1), rel, i, "id", ""])
+        if not segs:
+            segs = _paragraph_segs(rel, src, "para")
+    elif low.endswith(".jsonl"):
+        for i, ln in enumerate(src.splitlines(), 1):
+            s = ln.strip()
+            if s:
+                segs.append([s[:60], rel, i, "row", ""])
+    elif low.endswith(".json"):
+        # 顶层键 + 行号：不解析全树，只在**前 200KB** 里找形如  "key": 的行首
+        head = src[:200000]
+        for i, ln in enumerate(head.splitlines(), 1):
+            m = re.match(r'\s{0,4}"([^"]{1,60})"\s*:', ln)
+            if m:
+                segs.append([m.group(1), rel, i, "key", ""])
+    elif low.endswith((".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".vue")):
+        for i, ln in enumerate(src.splitlines(), 1):
+            m = (re.match(r"\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)", ln)
+                 or re.match(r"\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=", ln)
+                 or re.match(r"\s*(?:export\s+)?class\s+([A-Za-z_$][\w$]*)", ln)
+                 or re.match(r"\s*([A-Za-z_$][\w$]*)\s*:\s*(?:async\s*)?(?:function|\()", ln))
+            if m:
+                segs.append([m.group(1), rel, i, "fn", ln.strip()[:100]])
+        if not segs:
+            segs = _paragraph_segs(rel, src, "para")
+    elif low.endswith(".css"):
+        for i, ln in enumerate(src.splitlines(), 1):
+            m = re.match(r"^\s*([.#][\w\-.#:>\s]{1,70})\s*\{", ln)
+            if m:
+                segs.append([m.group(1).strip()[:80], rel, i, "rule", ""])
+    else:
+        segs = _paragraph_segs(rel, src, "para")
+
+    # 去重（同一 symbol 同行只留一条）+ 截断，防索引膨胀
+    seen, out = set(), []
+    for s in segs:
+        k = (s[0], s[2])
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append(s)
+        if len(out) >= 400:
+            break
+    return out
+
+
+def _paragraph_segs(rel: str, src: str, kind: str):
+    """按空行分段；每段用首行当 symbol。兜底用，保证任何页面都有可命中的段。"""
+    out, buf, start = [], [], 0
+    for i, ln in enumerate(src.splitlines(), 1):
+        if not buf and ln.strip():
+            start = i
+        if ln.strip():
+            buf.append(ln)
+        elif buf:
+            head = buf[0].strip()[:80]
+            out.append([head or "(空段)", rel, start, kind, " ".join(buf)[:120]])
+            buf = []
+    if buf:
+        head = buf[0].strip()[:80]
+        out.append([head or "(空段)", rel, start, kind, " ".join(buf)[:120]])
+    return out
+
+
+def _salvage_py(rel: str, src: str):
+    """语法解析失败时的**兜底抽取**：正则抓 def / class / import。
+
+    主人令（2026-11-04）：「把代码解析以及代码纠正抓取来融入触手，
+    这样触手在覆盖页面的时候就不会出现其他问题了」。
+
+    原来 `SyntaxError` 直接把文件丢进 `bad`，只留页级条目 —— 那一页就**没有段**，
+    等于触手在这一页上失明。但「解析失败」不等于「这一页没有结构」：
+    `def foo(` 这一行是不是函数，跟后面哪行错了没关系。
+
+    所以这里退到正则：只要有 `def/class/import` 形，就照样产出可直达的段。
+    段上标 `kind=def/class/import`，与正常解析一致，下游不用区分。
+    """
+    segs = []
+    for i, ln in enumerate(str(src or "").splitlines(), 1):
+        m = re.match(r"^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)", ln)
+        if m:
+            segs.append([m.group(1), rel, i, "def", ln.strip()[:100]])
+            continue
+        m = re.match(r"^\s*class\s+([A-Za-z_]\w*)", ln)
+        if m:
+            segs.append([m.group(1), rel, i, "class", ln.strip()[:100]])
+            continue
+        m = re.match(r"^\s*(?:from|import)\s+([\w.][\w.]*)", ln)
+        if m:
+            segs.append([m.group(1), rel, i, "import", ln.strip()[:100]])
+    return segs
+
+
+def _repair_py(src: str) -> str:
+    """解析前先做**有把握的纠正**；只改确定性损坏，不动语义。
+
+    已知会炸 `ast.parse` 的两种：
+      · BOM（`\\ufeff`）开头 —— 实测 `security_brain.py` 也踩过，会抛 U+FEFF 语法错
+      · 无效转义（如 `"\\d"`）—— 被 `-W error` 提成 error 时会抛
+    """
+    s = str(src or "")
+    if s.startswith("\ufeff"):
+        s = s.lstrip("\ufeff")
+    return s
+
+
 def _scan_file(path: str, rel: str):
     """一个文件的页条目 + 符号条目。解析失败如实记，不静默丢。"""
     try:
@@ -105,11 +264,32 @@ def _scan_file(path: str, rel: str):
         return None, [], "读失败: %s" % str(exc)[:80]
 
     lines = src.count("\n") + 1
+
+    # ── 非 Python 页面：走结构切段（2026-11-04 扩展，覆盖每一页）──
+    if not rel.lower().endswith(".py"):
+        head = src.strip().splitlines()
+        page = [rel, lines, len(src), _tier(rel),
+                (head[0].strip()[:200] if head else "")]
+        # 体积保护：>300KB 只做页级条目，不切段 —— 否则 edges.jsonl(8MB) /
+        # wiring.json(9MB) 这种会把索引撑爆，查询反而变慢
+        if len(src) > MAX_SEG_BYTES:
+            return page + ["big_page"], [], None
+        return page, _scan_generic(rel, src, lines), None
+
+    src = _repair_py(src)
     try:
-        tree = ast.parse(src)
-    except SyntaxError:
+        with warnings.catch_warnings():
+            # 被扫文件里的无效转义会发 SyntaxWarning（filename 显示 <unknown>）；
+            # 一旦外部把 warning 提成 error 就会炸进下面 —— 显式接管，不静默失效。
+            warnings.simplefilter("ignore", SyntaxWarning)
+            tree = ast.parse(src)
+    except (SyntaxError, ValueError):
+        # 纠正后仍解析不了 ⇒ **不丢页**：兜底抽 def/class/import，照常出段
         page = [rel, lines, len(src), _tier(rel), ""]
-        return page + ["syntax_error"], [], "语法错误"
+        segs = _salvage_py(rel, src)
+        note = "syntax_error_salvaged" if segs else "syntax_error_nothing"
+        return page + [note], segs, (
+            "语法错误（已兜底抽 %d 段）" % len(segs) if segs else "语法错误（无可抽符号）")
 
     # 模块级 docstring 必须收 —— 实测漏了它，「视觉入口」就找不到 vision_eye.py：
     # 那个文件的能力说明全写在模块头上，函数本身只有 parse/find 这种通用名。
@@ -164,8 +344,11 @@ def build(progress: bool = False) -> dict:
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in _SKIP_DIRS]
         for fn in filenames:
-            if fn.endswith(".py"):
-                all_rel.append(os.path.relpath(os.path.join(dirpath, fn), root))
+            if fn.lower().endswith(_PAGE_EXT):
+                r = os.path.relpath(os.path.join(dirpath, fn), root)
+                if any(r.replace("\\", "/").startswith(x) for x in _EXCLUDE_PREFIX):
+                    continue
+                all_rel.append(r)
     core_set = {r for r in all_rel if _tier(r) == "core"}
     skip = {r for r in all_rel
             if _tier(r) == "state" and _replica_base(r) in core_set}
@@ -297,6 +480,29 @@ def _score(entry_terms: set, q_terms: set, q_lens: int, extra_terms=None) -> flo
     return base
 
 
+def _path_prior(rel: str) -> float:
+    """路径先验：**真身优先于归档/数据/第三方**。
+
+    2026-11-04 实测问题：`find('code_audit')` 排在前面的是
+    `.archive/panels-20261101/brain/caps/code_audit.html`，
+    真身 `gbt_allinone/tools/code_audit.py` 进不了前三 ——
+    因为「喊名字直达」那支的分数写死 9.9/9.8，最后只按 `page` 字典序排，
+    而 `.archive` 的 `.`(46) 比 `g`(103) 小，归档永远压住真身。
+
+    名字一样准的时候，该由「这是不是真身」决定胜负，不该由字母表决定。
+    """
+    r = str(rel or "").replace("\\", "/")
+    for prefixes, w in (
+        (("gbt_allinone/", "tools/", "holo_pet_w3/", "holo_pet/", "arms/"), 1.0),
+        (("docs/", "examples/", "projects/", "skills/"), 0.75),
+        (("data/", "state/", "tests/"), 0.45),
+        ((".archive/", "store/", "vendor/", "_upstream/", "packs/"), 0.2),
+    ):
+        if r.startswith(prefixes):
+            return w
+    return 0.6
+
+
 def find(query: str, top: int = 8, tier: str = "") -> dict:
     """关键词 → 直达代码页。回 `文件:行号`，命中 core 优先。"""
     q = str(query or "").strip()
@@ -324,6 +530,9 @@ def find(query: str, top: int = 8, tier: str = "") -> dict:
                            "page": row[0], "file": row[0], "line": 1, "tier": row[3],
                            "doc": (row[4] if len(row) > 4 else "")})
     if direct:
+        # 名字准度相同的时候，由「是不是真身」决定胜负（见 `_path_prior` 的说明）
+        for r in direct:
+            r["score"] = round(r["score"] * _path_prior(r["file"]), 4)
         direct.sort(key=lambda r: (-r["score"], r["page"]))
         return {"ok": True, "query": q, "count": len(direct[:top]),
                 "total_hits": len(direct), "direct": True,
@@ -358,6 +567,7 @@ def find(query: str, top: int = 8, tier: str = "") -> dict:
             sc += 1.0                    # 名字里直接含查询词 —— 比文档里含重要得多
         if _tier(rel) == "core":
             sc += 0.25                   # 自己的代码优先于 vendor / 工作副本
+        sc *= _path_prior(rel)           # 归档/数据/第三方降权（真身优先）
         # 规模抑制：符号越多的页，单条命中的信息量越小
         n = sym_cnt.get(rel, 1)
         sc *= 1.0 / (1.0 + math.log(1.0 + n / 40.0))

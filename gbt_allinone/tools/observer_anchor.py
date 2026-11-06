@@ -99,14 +99,16 @@ def auditors() -> dict:
     判定口径与 `caps_called_audit` 同源：**在别的模块里被引用**才算被审。
     找不到独立引用方 ⇒ 报 orphan（免检观察者 = 死角）。
     """
-    cands = {}
+    cands, unread = {}, []
     for p in _sources():
         name = p.stem
         if any(h in name.lower() for h in _AUDITOR_HINTS):
             try:
                 cands[p.relative_to(_ROOT).as_posix()] = p.read_text(
                     encoding="utf-8", errors="replace")
-            except OSError:
+            except OSError as _e:
+                unread.append({"file": str(p),
+                               "why": "%s: %s" % (type(_e).__name__, str(_e)[:70])})
                 continue
     rows, orphans = [], []
     for rel, _text in sorted(cands.items()):
@@ -118,7 +120,9 @@ def auditors() -> dict:
             try:
                 if stem in other.read_text(encoding="utf-8", errors="replace"):
                     callers.append(other.relative_to(_ROOT).as_posix())
-            except OSError:
+            except OSError as _e:
+                unread.append({"file": str(other),
+                               "why": "%s: %s" % (type(_e).__name__, str(_e)[:70])})
                 continue
         row = {"auditor": rel, "audited_by": sorted(callers)[:6], "count": len(callers)}
         rows.append(row)
@@ -127,6 +131,8 @@ def auditors() -> dict:
     return {"ok": True, "readonly": True, "red": "auditor_must_be_audited",
             "auditors": rows, "total": len(rows), "orphans": orphans,
             "orphan_count": len(orphans),
+            "unread": unread[:20], "unread_n": len(unread),
+            "coverage_complete": not unread,
             "note": "免检的观察者 = 死角；orphan 必须登记或被接上独立复核方"}
 
 
@@ -138,12 +144,15 @@ _CAP_PAT = re.compile(r"^[A-Z_]*MAX[A-Z_]*DEPTH[A-Z_]*\s*=\s*(\d+)|"
 
 def depth_caps() -> dict:
     """扫出源码里所有递归/嵌套深度封顶（只读）。报得出才算封顶。"""
-    caps = []
+    caps, unread = [], []
     for p in _sources():
         try:
             text = p.read_text(encoding="utf-8", errors="replace")
-        except OSError:
+        except OSError as _e:
+            unread.append({"file": str(p), "why": "%s: %s" % (type(_e).__name__, str(_e)[:70])})
             continue
+        if not text.strip():
+            unread.append({"file": str(p), "why": "空文件（读到了但无内容，结论不覆盖）"})
         for m in _CAP_PAT.finditer(text):
             val = next((g for g in m.groups() if g), None)
             if val is None:
@@ -153,7 +162,9 @@ def depth_caps() -> dict:
                          "line": line_no, "cap": int(val)})
     return {"ok": True, "readonly": True, "red": "recursion_must_be_capped",
             "caps": caps, "total": len(caps),
-            "note": "有封顶才叫封顶；没有硬上限的递归 = 无终点"}
+            "unread": unread[:20], "unread_n": len(unread),
+            "coverage_complete": not unread,
+            "note": "有封顶才叫封顶；没有硬上限的递归 = 无终点；unread 非空时结论只覆盖读到的部分"}
 
 
 # ── 红线④ 终止点只能由人设 ──────────────────────────────────

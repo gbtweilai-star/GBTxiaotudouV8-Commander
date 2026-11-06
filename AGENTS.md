@@ -38,6 +38,51 @@ GBT小土豆V8 是一个**协议式认知体**：`gbt_allinone/` 里约 426 个*
 
 文件头带 `# ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除` 的，一律不动。
 
+## 2.4 三条默认（**不用提醒，每次自动**）
+
+> 主人令 2026-11-04：「把这三个调用设置成默认使用，别一直要我提醒你自己什么水平心里没点逼数吗？」
+
+这三条不是「建议」，是**做完的判据**。少一条就等于没做完。
+
+| 默认 | 什么时候必须自动跑 | 不跑会怎样 |
+|---|---|---|
+| **万能插 `omni_plug`** | 要碰触手以外的任何东西（文件 / 进程 / HTTP / 端口 / 页面 / GUI）**之前** | 自己写 `subprocess` / `urllib` / 裸 `open` 去干，等于绕开插座与作用域门 |
+| **多域监控 `impact_check`** | 改任何 `.py` / 配置 / 图的**之前**，以及万能插**每次动作之后** | 不知道会撞到谁就动手 = 拿运气换进度；`op=recent` 会告诉你这一动影响了多少个节点 |
+| **原子替换** | 写任何**别处会读**的文件（`wiring.json` / 索引 / 图 / 台账 / 指针） | `write_text` 直接覆盖：崩一次留坏档；且「旧权重配新边」**不报错**，只是悄悄算偏 |
+
+### 原子替换的唯一写法
+
+```python
+tmp = path.with_name("%s.tmp-%d" % (path.name, os.getpid()))
+with open(tmp, "w", encoding="utf-8", newline="") as fh:
+    fh.write(text)
+    fh.flush()
+    os.fsync(fh.fileno())      # 先落盘
+os.replace(tmp, path)          # 同卷原子
+```
+
+**而且必须**：写前校验内容、写后读回校验。
+
+> 血账：`np.savez_compressed(rows=None)` **不报错**，它把 150 KB 的好图
+> 替换成一个 323 字节的壳，`os.replace` 照样执行 ——
+> 原子性只保证「要么旧的、要么新的」，**保证不了「新的有意义」**。
+
+多文件产物还有顺序要求：**先数据、后标记**（图先写，`meta.json` 最后写），
+于是「meta 存在 ⇒ 全部就绪」成立，中途崩只会留下旧 meta 触发自动重建。
+
+### 一条命令验这三条
+
+```powershell
+.\pyembed\python.exe tools\codex-scripts\guard-three.py
+```
+
+现在这道闸有 **5 项**：万能插 / 多域监控 / 原子替换 / 探测超时 / **运行时**。
+
+最后那项是 2026-11-06 加的牙，专治本文档 §3.1 坑 C 那类事故：它当场回答
+「跑的是不是仓内 pyembed」「采集三路（dxcam/mss/pyautogui）齐不齐」「真能不能出一帧」。
+口径：跑错解释器 = **fail**（用错工具，不是缺件）；仓内没有 pyembed = `needs_dependency`
+（开发仓本来就不携带运行时，不许因此恒红）。
+
 ## 3. 路径规则（2026-11-04 全仓整治后）
 
 **禁止**写死 `C:\Users\<某个人>\...`。本机曾散落 146 处指向不存在用户的路径，全部失效。
@@ -86,6 +131,64 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 同理，读仓里的 UTF-8 文本文件时，PowerShell 侧要显式 `Get-Content -Encoding UTF8`，
 否则 `Select-String` 出来的都是乱码。
 
+### 坑 C · `pyembed` 是 **embeddable 包**，`-m` 与 `PYTHONPATH` 都失效
+
+`pyembed/` 根下有个 `python312._pth`（内容就三行：`python312.zip` / `.` / `Lib\site-packages`）。
+**只要 `._pth` 存在，解释器就进 isolated 模式**：
+
+| 做法 | 结果 |
+|---|---|
+| `.\pyembed\python.exe -m unittest ...` | ❌ `No module named 'gbt_allinone'` —— cwd 不进 `sys.path` |
+| 设 `$env:PYTHONPATH` | ❌ **被整个忽略**，报错一字不差（实测过，别浪费时间） |
+| `.\pyembed\python.exe xxx.py` | ✅ 但要脚本自己 `sys.path.insert(0, os.getcwd())`（`sys.path[0]` 是**脚本目录**，不是 cwd） |
+| `.\pyembed\python.exe -c "..."` | ✅ 但 PowerShell 会吃掉内容里的双引号 → `SyntaxError` |
+
+所以跑测试一律用壳：`.\pyembed\python.exe tools\codex-scripts\run-tests.py <模块名> ...`
+
+> `._pth` 里全是相对路径，因此整个 `pyembed/` 可以整包搬走。
+> 2026-11-05 就是这么把它从 `Documents\deepseek-harness\...\pyembed` 搬到本仓根下的
+> （1568 文件 / 84.3 MB / Python 3.12.10），搬完 `mss` / `uiautomation` / `pyautogui` /
+> `numpy` / `PIL` 全都在 —— **屏幕采集靠的就是这几个，别拿系统别的 Python 去跑本仓**。
+
+
+### 坑 D · `grep` / `readFile` 的输出经过转义，判断不了源码的引号结构
+
+`grepContent` 与 `readFile` 的文本结果都可能带 JSON 转义 —— 你在屏幕上看到的反斜杠数量
+**和源码里不一样**：
+
+| 屏幕上看到 | 源码里其实是 |
+|---|---|
+| `\"` | 一个 `"` |
+| `\\\"` | `\"`（反斜杠 + 引号） |
+| `\\n` | `\n`（反斜杠 + 字母 n，不是换行） |
+
+于是「这个 `"` 是字符串的边界，还是字符串内部的一个转义引号」—— 这件事在屏幕上**看不出来**。
+
+**血账（2026-11-05）**：改 `impact_check` 里「两种口径」的说明文字，把新句子和旧文本残片
+拼在了一起 —— `逐字对齐"` 提前闭合了字符串、`"强边"` 这个 key 直接丢了。`grep` 看了、
+`readFile` 也看了，屏幕上一切正常；文件其实 `SyntaxError`，**整个能力位 import 不了**，
+而且一整天没人发现（后来是靠 `ast.parse` 逮出来的）。
+
+**判据**：凡**动过源码里的字符串或注释文本**，收尾一律
+
+```python
+import ast, io
+ast.parse(io.open(p, encoding="utf-8").read(), filename=p)   # 一秒钟指到行号
+```
+
+`ast` 会精确指出第几行、哪个 token 出问题；`grep` 会安静地骗你。
+（本仓现成的机器判据：`gbt_allinone/tests/test_diag_kou_jing.py`。）
+
+**配套**：PowerShell 下 `python -c "..."` 的双引号会被吃掉（见坑 C），
+要验这类东西一律用 here-string 走 stdin：
+
+```powershell
+@'
+import ast, io
+ast.parse(io.open("x.py", encoding="utf-8").read(), filename="x.py")
+print("OK")
+'@ | .\pyembed\python.exe -
+```
 
 ## 4. 怎么调能力位
 
@@ -102,7 +205,8 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 | 位 | 干什么 |
 |---|---|
 | `impact_check` | **多域监控**＝影响面检查（改 X 会连带动到谁），读 `state/model-pack/wiring.json` |
-| `omni_plug` | 万能插：`op=universal` 现场认接口生成适配器；`op=all` 全开 |
+| `tentacle_cognition` | 触手认知包（五件 + 三问 + 五红线）。**`op=standards` 取工程规范**：8 工序 / 9 不变量 / 10 步证据阶梯 / 28 章宪章 / 5 红线 / AGENTS 三条硬口径 / docs 律系列，**按 `scene` 挑**（不给就 verify）。实现在 `gbt_allinone/tools/standards_pack.py`；**触手启动时已由 `tentacle/bridge.build_cognition()` 自动带上**，不用手动调 |
+| `omni_plug` | 万能插：`op=universal` 现场认接口生成适配器；**「全开」是 `op=surface_audit` + `op=full_sweep` + `op=discover`**（**没有 `op=all`** —— 曾写错在这里，照它调会得到 `不认的 op：all`） |
 | `body_eye` / `body_see` | 看**屏幕**（截屏 → 理解 → 回坐标） |
 | `vision_loop` | 眼→耳→嘴→手原生闭环（`look/hear/speak/think/act/verify/loop`） |
 | `look_grade` | 外观库（调色），实现在 `tools/filmgrade.py` |
@@ -152,7 +256,14 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 |---|---|
 | `dry-run`（只算不写、只看 diff） | **不要** |
 | 写主仓内的文件（开发改动） | 不要（那是 `code_patch` 的门在管） |
-| **写产品目录 `payload/`（= 拉取/发布源码）** | **要** |
+| **写产品目录 `payload/`：危险件 / 资金件** | **要** |
+| **写产品目录 `payload/`：普通件（文档/技能/素材/普通代码）** | 不要 —— GBT 自决，落 `auto_approve` 账 |
+
+> 2026-11-06 主人令（逐字）：「只有危险能力使用和资金转账需要终端 YES，其他的 GBT 自己决策不需要人工」。
+> 分级写在 `atomic-sync.py` 里，随时可查：`atomic-sync.py policy`（配 `--paths-file` 可试算一批）。
+> **判不准一律升 danger**；一批里只要有一件危险/资金 ⇒ **整批**要 LIKE。
+> 自改门也在危险白名单里（`api.py` / `auth_gate.py` / `security/` / `caps_registry.py` / 本工具自身）。
+> 想恢复旧的「逐件点赞」：`GBT_SYNC_STRICT=1`。
 
 ### 怎么点赞（必须在主仓终端由主人执行）
 
@@ -184,88 +295,14 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 
 
 
-## 4.3 修复纪律（主人令 2026-11-04，三条都是硬要求）
-
-> 「每次必须使用万能插和多域监控，以及修复必须走镜像多维度空间原子替换。」
-
-| 时机 | 必须做 | 不做的后果 |
-|---|---|---|
-| **动手前** | `omni_plug` 先认接口（`op=universal` 现场识别 target），不要猜它的类型 | 猜错就是把开放面当封闭面读（2026-11-04 把万能插说成「7 类插座」，被主人当面纠正） |
-| **改完** | `python tools/codex-scripts/multi-domain-monitor.py --diff` 跑整面复查 | 改一处坏一处没人知道；且「未通过」必须逐条点名，不许只说个数 |
-| **落地** | 走镜像维度原子替换：`mirror_shape` → `mirror_scan` → `mirror_simulate` → `mirror_parity` → `mirror_rehearse` → `mirror_release` | 直接写生产等于没有回滚点 |
-
-**镜像流程的两条铁律**（2026-11-04 实测）：
-
-1. `mirror_release` 返回 `blocked: true`（"生产前排练未全绿，禁止晋升"）时**停手**，不许绕过、不许调高判据。当轮它就拦住了一次不合格晋升——原因是产物页面缺「开发者：自由的风」署名。
-2. 产物页面必须自带署名。`console_pages.py` 的 `_shell()` 现在在 `<body>` 后写一行 HTML 注释钢印；新写任何生成器都要照做，否则 `mirror_scan` 的 `signature` 项会红。
-
-**本轮实测数据**：scan 5/5 · simulate 9/9 · parity ok · rehearse ok · release **version 16 / 23 文件**（dimension 从 11 文件扩到 23，把 `holo_pet/assets` 12 个页面纳入维度层）。
-
-## 4.4 部署面板严禁盲猜 + 动手前必须无死角（主人令 2026-11-04）
-
-> 「不管是你还是 GBT小土豆V8，在部署面板都是严禁盲猜。」
-> 「不管做什么，动手前必须看清全面、仔细点，不能偷懒，必须无死角看完再动手。」
-
-### 禁令：面板上的每一个数，只有两种合法来源
-
-| 合法 | 写法 |
-|---|---|
-| **现读** | 从 `caps_registry` / `policy.evaluate` / `state/*.json` / 台账实时取，且**带 `src` 字段**（如 `workbench` 的 `"src": "state/cap_tags.json"`） |
-| **如实说不知道** | `needs_state` / `unknown` / 「本表不含」，并说明缺什么 |
-
-**禁止**：写死常量、按经验猜、"看起来应该是"、拿旧快照当现役、拿别的维度的数顶替（例：把「监控测了 313 位」写成「注册表 313 位」）。
-
-### 动手前清单（缺一条就是偷懒）
-
-1. **先扫全再改**：`grep` / 扫描把所有命中的位置列全，不许看到第一处就动手。
-2. **先确认数据源字段完整**：不要拿缺字段的快照下判断（2026-11-04 用 `capabilities.json` 判「18 位漏测」，实际是导出时丢了 `requires_params`）。
-3. **先确认「这个数是什么」再报**：`gallery` 里 grep 到 `348` 报警，实际是 SVG 坐标 `x2='348' y2='173'`。
-4. **先读实现再下定义**：`omni_plug` 的 `status` 列了 7 个内置面，就断言「万能插是 7 类插座」—— 而代码里写着"不要固定的六类插座"，`omni_adapter.py` 写着"kind 不是枚举出来的封闭集合"。
-5. **先跑机检再用眼睛**：页面登记与实物的偏差，用 `console_hub op=scan` 拿（`broken`=待建 / `unregistered`=真盲区），不靠肉眼比对。
-
-### 本轮反例（我犯的，留档防复发）
-
-| 我做了什么 | 真相 | 教训 |
-|---|---|---|
-| 说「万能插是 7 类插座」 | 是**开放识别**，实测 5 个 target 得出 dir/http/tcp/scheme/unknown | 读字段名不能代替读实现 |
-| 判「18 位只读位漏测」 | 全部 `requires_params=True`，是 `capabilities.json` 丢了字段 | 尺子先校准再量东西 |
-| 报「gallery 残留 348」 | 是 SVG 坐标 | 命中不等于命中语义 |
-
-## 4.5 警报零放过（主人令 2026-11-04）
-
-> 「扫到警报不管是什么都要追踪根源、修复、优化；没警报扫到疑似，也要追踪根源查清楚。」
-
-### 规则
-
-| 情形 | 必须做 | 禁止 |
-|---|---|---|
-| **扫到警报**（warning / error / blocked / 红项 / 依赖漏洞 / CI 非绿） | ① 记录原话 ② 追到**根因那一行** ③ 修复 ④ 复跑证明不再出现 | 记一句「已知问题」就过；调高判据让它变绿；重跑一次碰运气 |
-| **扫到疑似**（数字对不上、字段缺失、命名不一致、孤文件、注释与实现矛盾） | 追到「它是什么 / 从哪来 / 该不该存在」，给出结论（是缺陷 / 是误报 / 是设计如此） | 放着不管；用"大概是"带过 |
-| **确实修不了** | 如实记 `needs_dependency` / `needs_state` + 缺什么 + 谁能补 | 包装成「已修复」 |
-
-### 判据：一次警报算闭合，必须同时满足
-
-1. 写清了根因（不是现象）；
-2. 有对应的修复动作（代码/文档/数据三选一以上）；
-3. 有复跑回执证明它不再出现；
-4. 修不了的，写明阻塞项与责任方。
-
-四条缺一条，就还是**未闭合**，不许在汇报里写成已完成。
-
-### 本轮已按此条闭合的（范例）
-
-| 警报 | 根因 | 闭合证据 |
-|---|---|---|
-| `mirror_release` blocked | 5 个产物页面缺署名（生成器 `_shell()` 不给页面盖钢印） | 补钢印 → scan 5/5 → release v16 |
-| `capabilities.json` 缺 `requires_params` | 导出走 `BENIGN_CAPS`（meta 无此键）而非 `all_caps()` | 改走 `all_caps()` → 427 条全带契约 |
-| 监控「31 域」与注册表 32 域冲突 | 把「有可测位的域数」当成「注册表域数」 | 主语改回 32，31 只作覆盖数 |
-| `worker.html` 是盲区 | 上游 symlink 被当文本恢复，内容是别的机器的绝对路径 | 删除 → `unregistered: []` |
-
 ## 5. 改完必须自查
 
 ```powershell
 # ① 全量语法
 .\pyembed\python.exe -c "import py_compile,pathlib;[py_compile.compile(str(p),doraise=True,cfile=None) for p in pathlib.Path('.').rglob('*.py') if not {'pyembed','__pycache__','state','outputs'} & set(p.parts)]"
+
+# ①.5 判据反推（每条结论都要能回到一条可复跑的证据）
+.\pyembed\python.exe tools\codex-scripts\claim-audit.py run
 
 # ② 导入冒烟（排除 store/ 这个第三方仓库快照目录）
 # ③ 受影响的位跑一次真 op，看错误有没有从「路径不存在」变成「真问题」
@@ -278,7 +315,7 @@ Path("x.ps1").write_text(src, encoding="utf-8-sig")
 
 | 路径 | 是什么 |
 |---|---|
-| `pyembed/` | 内置 Python 3.13，不用另装 |
+| `pyembed/` | 内置 Python **3.12.10**（embeddable 包），不用另装。**跑仓内一切 python 都用它** —— 系统别处的 Python 没有 `mss`/`uiautomation`/`pyautogui`，用它就等于"屏幕采集全灭" |
 | `gbt_allinone/` | 能力位本体 + 记忆链 |
 | `tools/` | 工具与 CLI（`filmgrade.py`、`control_loop.py`、`codex-scripts/`） |
 | `holo_pet_w3/` | 界面与 3D 视图 |

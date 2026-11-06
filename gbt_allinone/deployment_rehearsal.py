@@ -1452,7 +1452,7 @@ def release(name: str = "default", purpose: str = "",
                 "reason": "生产前排练未全绿，禁止晋升",
                 "rehearsal": rehearsal,
                 "如何放行": ("这不是技术层死限：主人在终端发**专用一次性钥匙** `deploy_force`"
-                          "（python -m gbt_allinone auth grant --scope deploy_force --ttl 600，"
+                          r"（.\pyembed\python.exe tools\codex-scripts\auth-grant.py --scope deploy_force --ttl 600，"
                           "提示符敲 YES），再带 owner_override=true 重调即可放行；"
                           "放行会写审计 mirror_release_overridden。"),
             }

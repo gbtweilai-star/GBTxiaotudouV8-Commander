@@ -250,4 +250,16 @@ def run(op="status", **params):
         return self_review(params.get("manifest") or {}, params.get("room_id", ""))
     if op == "publish":
         return publish(params.get("room_id", ""), authorization=params.get("authorization", ""))
+    if op == "verify":
+        # 成片验收（2026-11-06）：生产与验收分开。render 那边跑得通 ≠ 成片合格；
+        # 这里只报数、只判线，缺件说缺件，算不了的项如实 skipped。
+        from .film_gate import verify as _verify
+        film = str(params.get("film") or params.get("path") or "")
+        if not film:
+            return {"ok": False, "status": "needs_input", "missing": "film",
+                    "detail": "op=verify 需要 film（成片路径）；可另传 storyboard/segment/subs/spec"}
+        return _verify(film, spec=params.get("spec"), subs=params.get("subs"),
+                       storyboard=params.get("storyboard"),
+                       segment=str(params.get("segment") or ""),
+                       audio=params.get("audio"))
     return {"ok": False, "error": f"unknown op: {op}"}

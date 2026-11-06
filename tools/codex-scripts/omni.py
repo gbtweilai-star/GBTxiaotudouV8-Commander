@@ -51,6 +51,9 @@ SKILL_ROOTS = [
     (HOME / ".openclaw-autoclaw" / "skills", "agent-skill", "本仓 AGENTS.md 指定的托管目录"),
     (HOME / ".openclaw" / "skills", "agent-skill", "OpenClaw 侧"),
     (ROOT / "skills", "agent-skill", "本仓自有技能（真身）"),
+    # 2026-11-05 补：`gbt_allinone/skills/` 一直是 `tools/skills_sync.py` 的**第二个源**，
+    # 却从来没进过 SKILL_ROOTS ⇒ omni 看不见包内技能（shuohao 那 7 条只能靠枢纽副本被发现）。
+    (ROOT / "gbt_allinone" / "skills", "agent-skill", "包内技能（skills_sync 的第二个源）"),
     (ROOT / "审美相关skill" / "skills", "design-asset", "审美素材：形态技能（大部头，按类聚合）"),
     (ROOT / "审美相关skill" / "design-systems", "design-asset", "审美素材：品牌设计系统"),
     (ROOT / "审美相关skill" / "design-skeletons", "design-asset", "审美素材：设计骨架"),
@@ -65,6 +68,11 @@ SKILL_ROOTS = [
 SESSION_SKILL_ROOTS = [
     (ROOT / ".dsh" / "skills", "本会话（DSH）实测读取"),
     (HOME / ".agents" / "skills", "本会话（DSH）实测读取"),
+    # 2026-11-05 补：`audit-skill-roots.py:55` 的 `LOADED = {user-agents, dsh-project, proj-agents}`
+    # 明写本会话也读**项目内** `.agents/skills`（proj-agents）。这里漏了它 ⇒
+    # `omni ask` 把第三方技能（`superpowers` 那 20 条）标成「🔴 本会话加载不了」，
+    # 而审计说加载得了 —— 同一件事两个出口两个结论。以审计的实测清单为准。
+    (ROOT / ".agents" / "skills", "本会话（DSH）实测读取（项目内）"),
 ]
 
 # ── 第三通道：本地工具面（本机**真实存在**的扫描器/操作台）───────────────────
@@ -78,6 +86,12 @@ SESSION_SKILL_ROOTS = [
 #   而真正的扫描器 `quick_scan.py`（含安全面：反病毒可见性/持久化/远控/IOC/供应链）
 #   **不在任何一个通道里** ⇒ "扫"这类意图必然落空。
 #   ⇒ 补上这一通道，"无死角扫描"才有一句话能落到的落点。
+# ⚠ 这里的 `invoke` 是**印给人照抄**的（5 处 print 全用它），所以首 token 必须本机真能跑。
+# 2026-11-05 修：原先 10 条写的是 `py -3.14 …` —— 而本机 `py -0` 只有 3.15，
+# `py -3.14` 直接报 "No runtime installed that matches 3.14"。于是 `omni ask` 会印出：
+#     → py -3.14 tools/codex-scripts/quick_scan.py   ✅ 可达
+# **标着可达、命令却是死的**。第二十批只修了 `print(...)` 行，没发现死指令还藏在**数据**里。
+# 现在一律 `./pyembed/python.exe`（仓内解释器，带 mss/uiautomation/pyautogui）。
 LOCAL_TOOLS = [
     {
         "name": "quick_scan",
@@ -87,7 +101,7 @@ LOCAL_TOOLS = [
                 "＋自动进化层（台账·病因对账·负对照）",
         "triggers": "扫描 全维度 无死角 故障 排查 体检 速扫 病毒 木马 后门 恶意 远控 "
                     "持久化 自启 反病毒 杀毒 defender 排除项 IOC 供应链 收敛 进化",
-        "invoke": "py -3.14 tools/codex-scripts/quick_scan.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/quick_scan.py",
         "variants": {
             "--with-tests": "真跑 pytest --collect-only 拿 0 vs N 硬证据",
             "--with-host": "接入主机六层 L3-L5（进程/网络/可疑位置）",
@@ -107,21 +121,23 @@ LOCAL_TOOLS = [
         #    （另有 electron@43.0.0，所以**不装包也能跑**）。
         #    ⇒ 人话落不到，不是路由算法差，是**登记表缺一行**。
         "name": "desktop-shell",
-        "path": "holo_pet_w3/shell/preflight.cjs",
+        # 2026-11-05 修：原先写 `shell/preflight.cjs` —— **该文件不存在**（shell 里 23 个文件逐个核过）。
+        # 真正被 `package.json` 的 `main` 指向、且真实存在的是 `shell/main.cjs`。
+        "path": "holo_pet_w3/shell/main.cjs",
         "desc": "一体式桌面壳（7 扇窗：上帝视角 / 对话面 / AI 朋友圈 / 赏金台 / 执行台 / 代码台 / 神经工作台）"
                 "· 启动预检在**真 Electron 运行时**里 require 壳的纯模块并逐窗过 url 白名单判据，**不弹窗**"
                 "· 打包走 electron-builder（全局已装 26.15.3）",
         "triggers": "桌面壳 壳 装机包 打包 上线 发布 应用 APP 窗口 窗 七扇 启动 预检 复演 "
                     "打开 载入 加载 能不能开 能不能载入 开窗 窗口验证 界面 electron builder "
                     "安装包 分发 一体式 桌面应用",
-        "invoke": "electron holo_pet_w3/shell/preflight.cjs",
+        "invoke": "electron holo_pet_w3/shell/main.cjs",
         "variants": {
-            "--rehearse": "**真建窗口但不显示** → electron holo_pet_w3/shell/rehearse.cjs"
-                          "（逐窗验证页面能不能在 Electron 里载入 + 零出网；屏幕上什么都不出现）",
+            # `--rehearse` 已删：`shell/rehearse.cjs` 不存在（2026-11-05 核实，package.json 里的
+            # `rehearse` script 也一并标成了 UNIMPLEMENTED）。
             "--start": "真启动壳（**会开窗**）→ cd holo_pet_w3 && electron .",
             "--test": "壳的契约测试 → cd holo_pet_w3 && node --test tests/test_*.cjs",
-            "--guard": "「不破坏 DSH」守卫 → py -3.14 tools/codex-scripts/desktop-shell-guard.py",
-            "--pack": "打装机包（**闸二，须主人批准**）→ cd holo_pet_w3 && npm run pack",
+            "--guard": "「不破坏 DSH」守卫 → ./pyembed/python.exe tools/codex-scripts/desktop-shell-guard.py",
+            "--pack": "打装机包（**闸二，须主人批准**）→ cd holo_pet_w3 && npm run pack（📌 当前不可用：依赖 electron-builder，本机未装；该 script 已标 UNIMPLEMENTED）",
             "--icons": "壳窗口/皮肤取自 mission-control 专业皮肤层（skin-mission-control.css）",
         },
         "scopes": [],            # 预检/复演只读；真启动/打包另算（见 gate）
@@ -139,7 +155,7 @@ LOCAL_TOOLS = [
                 "`_intel` 六维固定文件名覆盖 · 本地格↔框架工序映射机检",
         "triggers": "短剧 短视频 AI短剧 电影 AI电影 音乐 AI音乐 全流程 流程 工序 抽屉 "
                     "分镜 剧本 歌词 混音 母带 成片 封面 发布 收敛 三方向 media pipeline",
-        "invoke": "py -3.14 tools/codex-scripts/media_flow.py status",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/media_flow.py status",
         "variants": {
             "status <方向>": "只看一个方向（short-video / film / music）",
             "gate": "只跑验收判据，退出码即门（0 全过 · 2 有问题 · 1 有 P0）",
@@ -154,41 +170,29 @@ LOCAL_TOOLS = [
         "path": "gbt_allinone/tools/host_security_scan.py",
         "desc": "主机安全扫描·六层（反病毒在位/持久化入口/进程与签名/网络连接/可疑位置/根因关联）",
         "triggers": "主机 进程 签名 网络 连接 监听 端口 持久化 启动项 计划任务 可疑位置 TEMP",
-        "invoke": "py -3.14 -m gbt_allinone.tools.host_security_scan",
+        "invoke": "./pyembed/python.exe -m gbt_allinone.tools.host_security_scan",
         "variants": {"--no-sign": "跳过签名校验（快很多）"},
         "scopes": [],
         "side_effect": False,
         "gate": "无需授权（只读）。注意：它的 L1 只查「在位」，不查「在不在看你」——"
                 "排除项遮蔽要看 quick_scan 的 AV_EXCLUSION_BLINDSPOT",
     },
-    {
-        "name": "deep_scan",
-        "path": ".scratch/scan-20260923/deep_scan.py",
-        "desc": "全树穿透扫描·内容面全量（L1–L8：库存/卫生/语法/引用/密钥/Git/一致性）—— 慢（约 12 分钟）",
-        "triggers": "深扫 全量 内容面 逐文件 重复 哈希 编码 BOM 乱码 断链",
-        "invoke": "py -3.14 .scratch/scan-20260923/deep_scan.py",
-        "variants": {},
-        "scopes": [],
-        "side_effect": False,
-        "gate": "无需授权（只读）。**它是临时件**（在 .scratch 里），不存在时如实报缺",
-    },
-    {
-        "name": "omni_max",
-        "path": ".scratch/scan-20260923/omni_max.py",
-        "desc": "万能插最大档：147 个能力位逐个过纪律筛（可跑的真跑，其余逐条说明为什么不能跑）",
-        "triggers": "万能插 最大档 全部能力位 逐个 能力 探针 体检能力位",
-        "invoke": "py -3.14 .scratch/scan-20260923/omni_max.py",
-        "variants": {},
-        "scopes": [],
-        "side_effect": False,
-        "gate": "无需授权。走**隔离 store**，生产主账本零足迹。**临时件**",
-    },
+    # 2026-11-05 删掉两条**已消失**的登记：`deep_scan` / `omni_max`。
+    # 它们的 path 是 `.scratch/scan-20260923/*.py` —— 整个目录已不存在，而 `.scratch` 按 AGENTS 定义
+    # 就是"临时产物（可删）"。登记着的后果：`omni ask "深扫一遍"` 会推一条**跑不了**的命令，
+    # 且 `.scratch` 一清就永久失效 —— 等于拿"临时件"冒充"本机工具面"。
+    # ⚠ **如实记下能力缺口，不许粉饰**：
+    #   · `omni_max`（能力位逐个过筛）的活现在由 `cap_probe_all` 干 —— 这个是真替代。
+    #   · `deep_scan`（全树穿透 L1–L8）**没有替代**：`quick_scan` 只到 **L1–L5**（七面+安全面），
+    #     L6–L8 那一层（重复/哈希/编码/BOM/断链）**随脚本一起没了**。
+    #     所以 `omni ask "深扫一遍"` 现在会如实回「没有一路命中」—— 这是**对的**：
+    #     与其推一条指向 `.scratch` 的死命令，不如承认这层能力缺着，等人补回正式件。
     {
         "name": "gbt-checkup",
         "path": "tools/codex-scripts/gbt-checkup.py",
         "desc": "技能蒸馏三关合一（队列 gaps + 内容 verify-distill + 结构 audit-regulations），退出码就是门",
         "triggers": "技能 蒸馏 验收 三关 覆盖 点名 编造 结构 红线 出处",
-        "invoke": "py -3.14 tools/codex-scripts/gbt-checkup.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/gbt-checkup.py",
         "variants": {},
         "scopes": [],
         "side_effect": False,
@@ -204,7 +208,7 @@ LOCAL_TOOLS = [
                 "归堆 ok/gated/needs_params_or_error/timeout/crash —— 覆盖必须 100%",
         "triggers": "能力位 能不能跑 探针 可达 僵尸能力 挂死 超时 全量 158 "
                     "缺作用域 授权门 登记未实现",
-        "invoke": "py -3.14 tools/codex-scripts/cap_probe_all.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/cap_probe_all.py",
         "variants": {
             "--timeout 300": "单条超时秒数（慢能力如 cross_scan 需 300+；快验用 5）",
             "--only <子串>": "只探名字含该子串的（如 --only mirror）",
@@ -223,7 +227,7 @@ LOCAL_TOOLS = [
         "desc": "出口清单登记指针自动对齐（main.cjs 的 `registered: caps_registry.py:NNN`）："
                 "默认只报差异、偏移一致时一句话说清；--check 当门禁，--write 只改那一个数字",
         "triggers": "出口清单 登记指针 行号 漂移 对不上 caps_registry main.cjs TOOLS_CAPS",
-        "invoke": "py -3.14 tools/codex-scripts/fix_exit_pointers.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/fix_exit_pointers.py",
         "variants": {
             "--check": "有差异 exit 1（给门禁/CI 用）",
             "--write": "真写盘（只动 registered 的数字，负对照验证过逐字节可还原）",
@@ -241,7 +245,7 @@ LOCAL_TOOLS = [
         "desc": "残骸清理器：**只进回收站**（不硬删）· 分六层（build/trash/backups/temp/scratch/tempscan）· "
                 "带**引用守卫**（文件名在仓内文本面出现过就一律留下并给理由）",
         "triggers": "清理 残骸 垃圾 回收站 磁盘 空间 __pycache__ 临时 .trash .backups .scratch 体积",
-        "invoke": "py -3.14 tools/codex-scripts/clean_residue.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/clean_residue.py",
         "variants": {
             "--go": "**真搬进回收站**（默认只出清单）",
             "--tier build,trash": "只处理指定层",
@@ -261,7 +265,7 @@ LOCAL_TOOLS = [
                 "可另生成**自包含页面**（无 script、无外链）",
         "triggers": "执行面 窗C 信封 覆盖 无脑操作 欠的活 欠着 没收 没接上 步账 未收步 悬空 悬空步 "
                     "三条主道 谁在干活 卡点 快照 无脑",
-        "invoke": "py -3.14 tools/codex-scripts/exec-deck.py",
+        "invoke": "./pyembed/python.exe tools/codex-scripts/exec-deck.py",
         "variants": {
             "--json <路径>": "落机器读的 JSON",
             "--html <路径>": "另生成自包含页面（窗 C 直接 loadFile）",
@@ -604,15 +608,50 @@ def read_front(path: Path) -> dict:
     return out
 
 
+SKILL_TRIGGERS_JSON = ROOT / "tools" / "codex-scripts" / "skill-triggers.json"
+
+
+def skill_triggers_overlay() -> dict:
+    """仓内**触发词覆盖层**：{技能名: [中文说法, ...]}。读不到返回 {}，不编。
+
+    为什么要有这一层（2026-11-05 实测）：图鉴能"看见"33 条技能了，但短 desc 的技能
+    字面撞不上中文意图 —— `brainstorming` 的 desc 写「创造性工作 / 探索意图」，
+    人问的是「发散思路」，同义不撞字，bigram 打分为 0，技能等于调不到。
+
+    为什么不直接改 SKILL.md：那 20 条是 **vendored（第三方）**，改了会与上游更新冲突，
+    并立刻制造「源 ≠ 装」分叉（`tools/skills_sync.py` 会报红）。
+    覆盖层是仓内派生配置，只在 build 时并进语料，不动源件。
+    """
+    try:
+        raw = json.loads(SKILL_TRIGGERS_JSON.read_text(encoding="utf-8"))
+    except Exception:                                   # noqa: BLE001
+        return {}
+    ov = raw.get("triggers")
+    return ov if isinstance(ov, dict) else {}
+
+
 def collect_skills() -> tuple[list[dict], list[dict]]:
     """返回 (逐条列出的技能, 按类聚合的大部头素材)。"""
     skills, bulk = [], []
+    overlay = skill_triggers_overlay()
     for root, channel, why in SKILL_ROOTS:
         if not root.is_dir():
             continue
-        for d in sorted(root.iterdir()):
-            if not d.is_dir():
-                continue
+        # 2026-11-05 修（血账）：原来只 `root.iterdir()` 走一层，于是「集合包」内层的技能**全丢** ——
+        #   `skills/superpowers/`（brainstorming / systematic-debugging / writing-plans … 20 条）
+        #   与 `shuohao/`（7 条）在图鉴里各只剩 **一条 desc=0 的空壳**，路由打分永远 0。
+        #   结果：盘上 183 个文件都拷了、技能"装上了"，运行时一条都调不到（F18 同型：
+        #   「盘上对」被念成「生效了」）。
+        # 口径统一到 `gbt_allinone/tentacle/skills_hub.py:56`（它本来就用 rglob 数技能）：
+        #   **每个 SKILL.md = 一个技能**。
+        # 不变量（2026-11-05 实测）：33 个 SKILL.md 中「父目录也带 SKILL.md」的 = 0、
+        #   缺 frontmatter name 的 = 0、重名 = 0 ⇒ 递归不会重复计数，也不需要例外规则。
+        # design-asset 仍走一层：那是「料」（品牌设计系统 / 骨架），递归会把上千个文件拽进图鉴。
+        if channel == "agent-skill":
+            dirs = sorted({sk.parent for sk in root.rglob("SKILL.md")})
+        else:
+            dirs = [d for d in sorted(root.iterdir()) if d.is_dir()]
+        for d in dirs:
             fx = read_front(d / "SKILL.md")
             row = {
                 "name": fx.get("name") or d.name,
@@ -637,6 +676,18 @@ def collect_skills() -> tuple[list[dict], list[dict]]:
                 "has_scripts": (d / "scripts").is_dir(),
                 "has_assets": (d / "assets").is_dir(),
             }
+            # 覆盖层：把仓内中文说法并进 triggers（不动第三方 SKILL.md）。
+            # 上限照 read_front 的 12 条，避免长尾把短词挤出语料。
+            _ov = overlay.get(row["name"]) or []
+            if _ov:
+                # 覆盖层**排前面**：`gbt-ai-101` 自带 12 条、`ref-to-3d` 自带 8 条，
+                # 若把新词追加在后面再截 12，等于加了等于没加（实测坑）。
+                # 上限提到 16，两边都留得住。
+                _seen_t = []
+                for _w in list(_ov) + list(row["triggers"]):
+                    if _w not in _seen_t:
+                        _seen_t.append(_w)
+                row["triggers"] = _seen_t[:16]
             # 大部头素材（设计系统/骨架）不逐条塞进图鉴：它们是"料"，不是"可调用的职业技能"
             if channel == "design-asset" and root.name in ("design-systems", "design-skeletons"):
                 bulk.append(row)
@@ -702,7 +753,7 @@ def collect_caps() -> tuple[list[dict], str]:
             # 旧字段 `disabled` 恒 False，留着会让人以为"名单还在、只是这次没命中"。
             "unimplemented": kind in UNIMPLEMENTED_CAPS,
             "channel": "omnipulg",
-            "invoke": 'python tools/codex-scripts/five-dim.py cap %s' % kind,
+            "invoke": './pyembed/python.exe tools/codex-scripts/five-dim.py cap %s' % kind,
         })
     return out, ""
 
@@ -791,6 +842,34 @@ def build(verbose: bool = True) -> dict:
 _ATLAS_SOURCE = {"how": "未加载", "path": None, "mtime": None}
 
 
+_ATLAS_CACHE: dict = {"key": None, "data": None}
+
+# 打分语料的 bigram 缓存（2026-11-05 补）。
+# 实测：203 句 × 427 位 = 8.6 万次 `grams(长 desc)` ⇒ 一次批量路由 25 秒。
+# 键用 `kind`，图鉴换代（`_ATLAS_CACHE["key"]` 变）时整表清空，不会串代。
+_CAP_GRAMS: dict = {}
+_DOM_GRAMS: dict = {}
+_CAP_NDESC: dict = {}
+_REACH_CACHE: dict = {}
+
+
+def _cap_ndesc(cap: dict) -> str:
+    """归一化后的描述文本（整句命中判断用）。缓存 —— 否则每次查询都要重做 400+ 字串处理。"""
+    v = _CAP_NDESC.get(cap["kind"])
+    if v is None:
+        v = _norm_text(cap["desc"] + (cap.get("desc_tail") or ""))
+        _CAP_NDESC[cap["kind"]] = v
+    return v
+
+
+def _cap_grams(cap: dict) -> set:
+    g = _CAP_GRAMS.get(cap["kind"])
+    if g is None:
+        g = grams(cap["desc"] + (cap.get("desc_tail") or ""))
+        _CAP_GRAMS[cap["kind"]] = g
+    return g
+
+
 def load_atlas() -> dict:
     """读图鉴；**不存在时**才现扫重建。
 
@@ -800,11 +879,23 @@ def load_atlas() -> dict:
     """
     import time as _t
     if ATLAS.exists():
+        _st = ATLAS.stat()
         _ATLAS_SOURCE.update({"how": "读取已有（本轮未重建）", "path": str(ATLAS),
-                              "mtime": _t.strftime(
-                                  "%Y-%m-%dT%H:%M:%S",
-                                  _t.localtime(ATLAS.stat().st_mtime))})
-        return json.loads(ATLAS.read_text(encoding="utf-8"))
+                              "mtime": _t.strftime("%Y-%m-%dT%H:%M:%S",
+                                                   _t.localtime(_st.st_mtime))})
+        # 进程内缓存（2026-11-05 补）：原来**每次 rank() 都重读+解析 400KB JSON** ——
+        # 实测 203 句批量路由跑了 28.8 秒（每次 ~140ms），`omni ask` 每次也白花这一下。
+        # 键含 mtime_ns + 大小 ⇒ 图鉴一重建就自动失效，不会读到旧数据。
+        # **调用方只许读**：`rank()` 里用的是 `{**cap, ...}` 副本，没有就地改写。
+        _key = (str(ATLAS), _st.st_mtime_ns, _st.st_size)
+        if _ATLAS_CACHE.get("key") == _key and _ATLAS_CACHE.get("data") is not None:
+            return _ATLAS_CACHE["data"]
+        _data = json.loads(ATLAS.read_text(encoding="utf-8"))
+        _ATLAS_CACHE.update({"key": _key, "data": _data})
+        _CAP_GRAMS.clear()          # 图鉴换代 ⇒ 打分语料的缓存一并作废
+        _DOM_GRAMS.clear()
+        _CAP_NDESC.clear()
+        return _data
     a = build(verbose=False)
     _ATLAS_SOURCE.update({"how": "**本轮现扫重建**（原文件不存在）", "path": str(ATLAS),
                           "mtime": _t.strftime("%Y-%m-%dT%H:%M:%S")})
@@ -815,31 +906,75 @@ def _hint_grams(domain: str) -> set:
     return grams(DOMAIN_HINTS.get(domain, ""))
 
 
-def score_cap(intent_g: set, cap: dict) -> tuple[float, list[str]]:
-    """能力位打分：意图 n-gram ×(能力位名+域中文提示+描述) 命中。
+def _norm_text(s) -> str:
+    """归一化：小写、`-`/`_` 折成空格、压空白。用于"整名/整句"命中判断。"""
+    return " ".join(str(s or "").lower().replace("-", " ").replace("_", " ").split())
 
-    为什么把**域中文提示**算进去：能力位名和描述基本是英文/术语（`codex_status`，
-    "官方 Codex 只读状态"），而人说的是"看一眼有多少能力位"。不借域提示词，人话就落不下来。
+
+def score_cap(intent_g: set, cap: dict) -> tuple[float, list[str]]:
+    """能力位打分（2026-11-05 重写）。
+
+    为什么改：原来 `名命中*3 + 说明命中*1.5 + 域词命中*1.0`，**三项都没按语料长度归一**。
+    实测后果 —— 无关句「今天天气不错适合出去走走」也能拿 **1.50**、
+    纯噪声「嗯嗯好的可以我想一下再说」能拿 **4.50**，与真查询的 3–6 分**完全重叠**，
+    cap 通道因此没有可用的阈值（`rank()` 的 min_hit 只对技能侧生效）。
+
+    新口径（与技能侧同一套道理）：
+      ① **整名命中**（用户直接点名 `body_eye`）—— 最强证据，6 分；
+      ② **整句出现在描述里** —— 短语级证据，5 分。bigram 汤里"卡片"能撞十几个位，
+         但整句「拿这个组件做张图」只会出现在一个位的描述里；
+      ③ **描述 bigram** —— 低权重，且按 **√长度归一**（长描述不再白占便宜）；
+      ④ **域提示** —— 又短又泛（"vision"/"llm"），权重压到最低并归一。
+
+    安全口径：本函数**只决定排序**。能不能自动执行由 `auto_run_verdict()` 单独判
+    （它看作用域/参数/侧效应），**不在这里**。改打分不改门的松紧。
     """
     why = []
-    name_g = grams(cap["kind"].replace("_", ""))
-    # 打分语料 = 显示用 desc **＋** 被截断的那一段（`desc_tail`）——
-    # 截断只影响显示、不影响路由（2026-10-13 修；详见 build 里 desc_tail 的注释）。
-    desc_g = grams(cap["desc"] + (cap.get("desc_tail") or ""))
-    dom_g = _hint_grams(cap["domain"])
+    kind = cap["kind"]
+    desc = cap["desc"] + (cap.get("desc_tail") or "")
+    desc_g = _cap_grams(cap)
+    dom_g = _DOM_GRAMS.get(cap["domain"]) or _DOM_GRAMS.setdefault(
+        cap["domain"], _hint_grams(cap["domain"]))
+    intent_n = _norm_text(cap.get("_intent_norm") or "")
+
     s = 0.0
-    hit_name = intent_g & name_g
+    if intent_n and _norm_text(kind) and _norm_text(kind) in intent_n:
+        s += 6.0
+        why.append("整名命中")
+
+    # **标题匹配**：描述里第一个冒号前那段就是用途标题（「万能插：…」「身体·看：…」）。
+    #
+    # 这一条有过一段曲折，记下来免得后人重踩：
+    #   第一次加它**零收益**（top-1/top-3 一点没变），因为当时 8 个位都自称「万能插」
+    #   （`wf_*` 的 desc 前缀全是「万能插执行引擎：」）⇒ 标题精确命中打成平手，等于没加。
+    #   2026-11-05 先把数据改准（`wf_*` → 「工作流引擎：」、`omni_open` → 「全自动打开：」，
+    #   **引述主人原话的两处一个字没动**），标题才恢复区分力：现在只有 `omni_plug` 的标题是「万能插」。
+    # ⇒ 教训：**启发式无效时先查数据，别急着调权重**。
+    _title = _cap_ndesc(cap).split("：")[0].split(":")[0].strip()[:40]
+    if intent_n and _title:
+        if intent_n == _title:
+            s += 7.0
+            why.append("标题精确命中（%s）" % _title[:12])
+        elif intent_n in _title:
+            s += 3.0
+            why.append("标题包含（%s）" % _title[:12])
+
+    # 整句出现在描述里 —— 短语级证据（bigram 汤里"卡片"能撞十几个位，
+    # 但整句「拿这个组件做张图」只会出现在一个位的描述里）。
+    if intent_n and intent_n in _cap_ndesc(cap):
+        s += 3.0
+        why.append("整句出现在描述里")
+
     hit_desc = intent_g & desc_g
-    hit_dom = intent_g & dom_g
-    if hit_name:
-        s += len(hit_name) * 3.0
-        why.append("名命中 %d" % len(hit_name))
     if hit_desc:
-        s += len(hit_desc) * 1.5
-        why.append("说明命中 %d" % len(hit_desc))
+        s += len(hit_desc) / max(1.0, len(desc_g) ** 0.5) * 10.0
+        why.append("说明命中 %d(已归一)" % len(hit_desc))
+
+    hit_dom = intent_g & dom_g
     if hit_dom:
-        s += len(hit_dom) * 1.0
+        s += len(hit_dom) / max(1.0, len(dom_g) ** 0.5) * 2.0
         why.append("域词命中 %d(%s)" % (len(hit_dom), cap["domain"]))
+
     if not cap["enabled"]:
         s *= 0.2                      # 禁用的排后面，但不隐藏
         why.append("已禁用")
@@ -859,6 +994,11 @@ def _py_parses(path: Path) -> tuple[bool, str]:
     **`🔴 不可达：语法错误 line 1`** —— 而那个文件在真 Electron 里刚跑过、PASS 10。
     **判据用错了对象** = 本会话反复栽的同一类错（文本级判据冒充结构级）。
     ⇒ 现在的规矩：`.py` 走 `ast`；`.js/.cjs/.mjs` 走 `node --check`；其余只判存在。
+
+    ⚠ **边界（别把这里的 True 读成"能跑完"）**：本函数只回答"文件在 + 语法能解析"。
+    运行期依赖**不在射程内** —— 例如 `.cjs` 里 `require('electron')` 而 `node_modules` 缺失，
+    `node --check` 照样通过，真跑却起不来（本机 `holo_pet_w3/node_modules` 现在就是缺的）。
+    "语法对"和"跑得起来"中间还隔着一层，别拿前者冒充后者。
     """
     suf = path.suffix.lower()
     try:
@@ -895,15 +1035,35 @@ def local_tools() -> list[dict]:
     out = []
     for t in LOCAL_TOOLS:
         p = ROOT / t["path"]
-        exists = p.is_file()
-        ok, note = _py_parses(p) if exists else (False, "实物不存在")
-        out.append({**t, "exists": exists, "reachable": bool(exists and ok),
+        # 2026-11-05 缓存：原来**每次 rank() 都把每个本地工具脚本重新 ast 解析一遍**。
+        # 实测 203 句批量路由 25 秒 ⇒ 4000 次 AST 解析全花在这上面。
+        # 键含 mtime_ns + 大小：文件一改就失效，可达性判断依旧现读。
+        try:
+            _st = p.stat()
+        except OSError:
+            out.append({**t, "exists": False, "reachable": False,
+                        "reach_note": "实物不存在", "abs": str(p)})
+            continue
+        _key = (str(p), _st.st_mtime_ns, _st.st_size)
+        _hit = _REACH_CACHE.get(_key)
+        if _hit is None:
+            _hit = _py_parses(p)
+            _REACH_CACHE[_key] = _hit
+        ok, note = _hit
+        out.append({**t, "exists": True, "reachable": bool(ok),
                     "reach_note": note, "abs": str(p)})
     return out
 
 
 def skill_reachable(sk: dict) -> tuple[bool, str]:
-    """本会话能不能**按名字加载**这条技能：只看本会话实测真读的两个根。"""
+    """本会话能不能**按名字加载**这条技能。
+
+    判据只有一条：`<根>/<技能名>/SKILL.md` 存不存在 —— 因为加载器就是这么找的
+    （`skills_hub.install` 写的是 `<target>/<name>/SKILL.md`，`pack` 打的 zip 根也是 `<name>/`）。
+
+    根清单是 `SESSION_SKILL_ROOTS`（**当前 3 个**：`.dsh/skills` · `~/.agents/skills` ·
+    `<仓>/.agents/skills`）。早先这里写"两个根"，加到第三个时没跟着改注释 —— 文档过期也是过期。
+    """
     for root, why in SESSION_SKILL_ROOTS:
         if (root / sk["name"] / "SKILL.md").exists():
             return True, "在 %s（%s）" % (root, why)
@@ -912,12 +1072,29 @@ def skill_reachable(sk: dict) -> tuple[bool, str]:
         ", ".join(roots[:3]) or "未知根")
 
 
-def cap_reachable(c: dict) -> tuple[bool, str]:
-    """能力位能不能直跑：复用**同一个判据** `auto_run_verdict`，不自造第二份。"""
+def cap_auto_runnable(c: dict) -> tuple[bool, str]:
+    """能力位**能不能免卡无参自动跑**（不是"可不可达"！）。
+
+    🔴 2026-11-05 正名：这个函数原名 `cap_reachable`，**名不副实**。
+    实测 427 位里 `False` 的 163 个，**没有一个是"实现缺失"** —— 全是门类原因：
+    注册表未标 safe(70) / 需参数(34) / 有侧效应(10) / 名字带写动作(9) / 要过授权门 / 有后果的域 …
+
+    最刺眼的例子：`see_camera`（打开摄像头）在这里是 `False`，因为"注册表未标 safe"——
+    可它**完全可用**，只是不能免卡自动跑。把这种 `False` 读成"能力位坏了"就会得出完全错误的结论。
+
+    所以：**"能不能自动跑" ≠ "可不可达" ≠ "实现在不在"**。三件事三个判据。
+    能不能跑由 `auto_run_verdict()` 判（唯一真相，这里只是转述它的文案）。
+    """
     ok, why_not = auto_run_verdict(c)
     if ok:
         return True, "只读无参且不需授权"
     return False, " / ".join(why_not[:3])
+
+
+def cap_reachable(c: dict) -> tuple[bool, str]:
+    """**历史别名，别再用。** 语义 = `cap_auto_runnable`（"能不能免卡自动跑"），
+    不是"可不可达"。留着只为不打断仓外调用方；新代码请用 `cap_auto_runnable`。"""
+    return cap_auto_runnable(c)
 
 
 def score_tool(intent_g: set, t: dict) -> tuple[float, list[str]]:
@@ -939,33 +1116,93 @@ def score_tool(intent_g: set, t: dict) -> tuple[float, list[str]]:
     return s, why
 
 
-def rank(intent: str, domain: str | None = None, top: int = 8) -> dict:
+def rank(intent: str, domain: str | None = None, top: int = 8,
+         min_hit: float = 1.0, min_hit_cap: float = 2.0) -> dict:
+    """人话 → 三通道候选。`min_hit` 把**弱匹配**从命中里摘出来。
+
+    为什么要有这个阈值（2026-11-05 实测噪声底）：技能侧真命中（整名/触发词）起点是 **3.0**，
+    而随机噪声（描述里撞上一个泛词 bigram、再按 √长度归一）**最高 0.19** —— 中间是空的，
+    1.0 能干净切开。切之前 `cmd_ask` 把 0.06 分和 10.8 分**排成一模一样**，
+    人以为"命中了"，其实只是噪声（负对照里「收到评审意见」掉到 novel-art 就是这么来的）。
+
+    **能力位（caps）不适用同一个阈值**：实测无关句也能拿到 1.50、纯噪声词能到 4.50，
+    与真查询的 3–6 分完全重叠 ⇒ cap 侧目前没有可用的分数阈值。
+    这一条**不许用一个好看的数字糊过去**，`cmd_ask` 会把它如实印出来。
+    """
     atlas = load_atlas()
     ig = grams(intent)
     caps, skills, tools = [], [], []
+    _inorm = _norm_text(intent)
     for cap in atlas["caps"]:
         if domain and cap["domain"] != domain:
             continue
-        s, why = score_cap(ig, cap)
+        s, why = score_cap(ig, {**cap, "_intent_norm": _inorm})
         if s > 0:
             caps.append({**cap, "score": round(s, 2), "why": why})
     caps.sort(key=lambda r: -r["score"])
+    # 2026-11-05：能力位打分重写后**分隔带出现了**，阈值这才有据可依 ——
+    # 实测 203 句仓内自带的「常用说法」：正确位分数中位 **6.32**、94% 在 5.0 以上、
+    # 只有 3/194 低于 2.0；而噪声句最高只有 **1.71**（改前是 4.50，与真命中完全重叠）。
+    # 2.0 是两者中间。**门槛只管"算不算命中"，不管"能不能自动执行"** —— 后者是 `auto_run_verdict`。
+    cap_hits = [c for c in caps if c["score"] >= min_hit_cap]
+    cap_weak = [c for c in caps if c["score"] < min_hit_cap]
     for sk in atlas["skills"]:
         # 技能侧同款：打分语料 = 显示用 desc **＋** 被截断的那段（`desc_tail`）——
         # 截断只影响显示、不影响路由（2026-10-13；实测 97/386 条技能描述超 400 字）。
-        blob = "%s %s %s %s %s" % (sk["name"], sk["displayName"], sk["desc"],
-                                   sk.get("desc_tail") or "", " ".join(sk["triggers"]))
-        hit = ig & grams(blob)
-        if hit:
-            skills.append({**sk, "score": round(len(hit) * 1.2, 2),
-                           "why": ["技能词命中 %d" % len(hit)]})
+        # 2026-11-05 重写：原来把全部字段拼成一个 blob、`score = len(hit) * 1.2`，
+        # **没按语料长度归一** ⇒ desc 越长越占便宜。
+        # 实测后果：`character-refs`(450 字) / `gbt-ai-101`(1162 字) 靠"泛词多"压过精准短描述，
+        # 「给小说配插画」被 character-refs 抢走、「小说改成剧本」被 novel-outline 抢走 ——
+        # 光加触发词从 44% 抬到 67% 就卡住了，说明瓶颈不在词表。
+        # 新口径：**人工策展字段高权重（名字 4 / 触发词 3），自由文本 desc 低权重且按 √长度归一**。
+        # 归一用 √ 而不是线性：描述长短差 10 倍时，线性惩罚会把长而有效的描述直接判死。
+        desc_g = grams("%s %s" % (sk["desc"], sk.get("desc_tail") or ""))
+
+        # 名字匹配：**整名出现在意图里才算**（不按 bigram 堆）。
+        # 血账：`gbt-ai-101` 的 bigram 含 "AI"，于是「前端不要AI味 要设计感」让它命中 1 次拿 4.0 分，
+        # 压过 design-taste-frontend 两条精确触发词的 6.0 —— 两个字母就把活抢走了；
+        # `ref-to-3d` 也因为 bigram 噪声抢到「小说分镜拆解」。
+        _norm = lambda s: " ".join(str(s or "").lower().replace("-", " ").replace("_", " ").split())
+        _intent_n = _norm(intent)
+        _nm = _norm(sk["name"])
+        hn = 1 if (_nm and _nm in _intent_n) else 0
+        _dn = _norm(sk.get("displayName"))
+        if _dn and _dn != _nm and _dn in _intent_n:
+            hn += 1
+        hd = ig & desc_g
+
+        # 触发词**按整词覆盖率**算，不按 bigram 数堆。
+        # 血账：`novel-outline` 的触发词里有 "小说转短剧"，它的 bigram 含泛词 `小说`；
+        # 于是「给小说配插画」让 novel-outline 也命中 1 次，与 novel-art 的精确词 `插画` **同分**，
+        # 最后靠描述里的 0.07 分反超 —— 谁都能抢谁的活。
+        # 现口径：一条触发词里 ≥60% 的 bigram 被意图覆盖才算命中，按覆盖率加权。
+        t_hits = 0.0
+        for _tr in (sk.get("triggers") or []):
+            _g = grams(str(_tr))
+            if not _g:
+                continue
+            _ov = len(ig & _g)
+            if not _ov:
+                continue
+            _ratio = _ov / len(_g)
+            if _ratio >= 0.6:
+                t_hits += _ratio
+        if not (hn or t_hits or hd):
+            continue
+        s = hn * 4.0 + t_hits * 3.0 + len(hd) / max(1.0, len(desc_g) ** 0.5)
+        skills.append({**sk, "score": round(s, 2),
+                       "why": ["整名 %d · 触发词 %.2f · 描述 %d(已归一)" % (hn, t_hits, len(hd))]})
     skills.sort(key=lambda r: -r["score"])
     for t in local_tools():
         s, why = score_tool(ig, t)
         if s > 0:
             tools.append({**t, "score": round(s, 2), "why": why})
     tools.sort(key=lambda r: -r["score"])
-    return {"intent": intent, "caps": caps[:top], "skills": skills[:top],
+    hits = [s for s in skills if s["score"] >= min_hit]
+    weak = [s for s in skills if s["score"] < min_hit]
+    return {"intent": intent, "caps": cap_hits[:top], "caps_weak": cap_weak[:3],
+            "skills": hits[:top], "skills_weak": weak[:3],
+            "min_hit": min_hit, "min_hit_cap": min_hit_cap,
             "tools": tools[:top], "atlas_built_at": atlas["built_at"]}
 
 
@@ -998,6 +1235,9 @@ def cmd_ask(intent: str, domain: str | None) -> int:
         return 1
     if r["caps"]:
         print("\n── 走万能插的能力位（框架本体 · 走 run_task 唯一门）──")
+        # 2026-11-05：打分重写后噪声从 4.50 降到 1.71，真命中中位 6.32 ⇒ 阈值 2.0 有据可依，
+        # 这一节不再是"分数不可信"，而是"过了门槛的候选"。低于门槛的另列在下面，标明是噪声。
+        pass
         for c in r["caps"]:
             ok_auto, why_not = auto_run_verdict(c)
             print("  [%.1f] %-28s %-14s %s" % (c["score"], c["kind"], c["domain"],
@@ -1007,6 +1247,15 @@ def cmd_ask(intent: str, domain: str | None) -> int:
                 print("        → %s   ✅ 只读无参，可直跑" % c["invoke"])
             else:
                 print("        → %s   🔒 不自动跑：%s" % (c["invoke"], " / ".join(why_not[:3])))
+    if r.get("caps_weak"):
+        print("\n── ⚠ 能力位弱匹配（分数 < %.1f，噪声级，别当命中）──" % r["min_hit_cap"])
+        for c in r["caps_weak"]:
+            print("  [%.2f] %-28s %-14s %s" % (c["score"], c["kind"], c["domain"],
+                                               " · ".join(c["why"])))
+    if r.get("skills_weak"):
+        print("\n── ⚠ 弱匹配（分数 < %.1f，**几乎肯定是噪声，别当命中**）──" % r["min_hit"])
+        for s in r["skills_weak"]:
+            print("  [%.2f] %-30s %s" % (s["score"], s["name"], " · ".join(s["why"])))
     if r["skills"]:
         print("\n── 走 agent 技能（由我按名字加载执行）──")
         for s in r["skills"]:

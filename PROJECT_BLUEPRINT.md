@@ -1998,3 +1998,274 @@ python3 exec       → (process_execute,)          要票
 ```
 
 **自审（有票）**：可用 16 · 需票 0 · 平台不支持 0 · **失败 0**
+
+---
+
+## 八、挂账变更（R-W1 · 接线图补两层真依赖 import/impl + 描述去数字 · 2026-11-05）
+
+**起因**：查「Codex 权重模型接好了没有」时发现 `cap:codex_tools` 强边只有 7、权重 11.71，是 7 个
+`cap:codex_*` 里唯一的薄位。顺线挖下去，挖到的不是单个位的问题，是**整张图缺两层真依赖**。
+
+**根因（两条，都取证过，不靠推断）**：
+
+1. **图从来没有 import 层**。`outputs/repo-pack/edges.jsonl` 的 `kind` 只有
+   `path` / `cap` / `cap_mention`（39830 / 34050 / 15079），**全是「某文件里出现过这个字符串」**。
+   所以 `api.py:2240` 明明写着 `from . import codex_bridge as _CB`，图里
+   `api.py ↔ codex_bridge.py` 却是 **0 条边**。全仓 `as` 别名写法 3627 处，但不是别名的问题 ——
+   是整个 import 关系从未被解析。
+2. **cap↔code 只靠「文件里出现能力名」**。而实现件往往**不含**自己的能力名 ——
+   `codex_bridge.py` 里没有 `codex_tools` 四个字（派发在 `api.py`）。于是这类位到本体永远 2 跳。
+
+**落刀（口径 v2 → v4，两次 bump 各有独立理由）**：
+
+| 层 | kind | KIND_BASE | 来源 | 实测 |
+|---|---|---:|---|---|
+| import | `import` | 1.0 | AST 解析图内 2272 个 `.py` | 2200 条 |
+| impl | `impl` | 1.2 | AST 解析 `api.py` 的 `if kind ==` 分支 | 417 条 / 覆盖 405 位 |
+
+**impl 的口径**：一条 import 只归属**它所在 if 链**上的能力名，不继承兄弟分支。否则
+`if kind in (A,B): import X` 后面跟一个 `if kind == "C": import Y`，会把 `Y` 也算给 A/B ——
+**权重虚高比漏连更糟**，它会让人误判「改 Y 必查 A」。
+
+**判据（全部机检，落在 `gbt_allinone/tests/test_wiring_v4_guard.py`，7 条）**：
+
+- **版本三方一致**：`wiring-build.WEIGHT_RULE_VERSION` == `wiring.json.weight_rule.version` ==
+  `tactile_tree.MY_WEIGHT_RULE`。不一致时读端**不报错**，只是悄悄「退回自建」—— 这类漂移没有声音，
+  所以必须有机检，不能靠人记。
+- `cap:codex_tools` 1 跳直达 `code:gbt_allinone/codex_bridge.py`，且必须是**强边**。
+- 能力位 desc 不许写死规模读数，且摘了数字必须指向 `op=status`（否则等于把信息一起删了）。
+- `data/capabilities.json` 与注册表逐字一致（该快照被 `cap_self` / `commander` / `pulse_core` /
+  `orchestration` / `catalog` / `model_bridge` / `static_check` **七个模块**读取）。
+
+**读数**（`op=status` 实测 · 2026-11-05 复核）：6306 节点 · 102428 有向边 · 21291 强边 · 分量 1 · 100% · 口径 v4 · `api.py` 强边 67 → 930。**本节原写「51197 无向边 / 21256 强边 / 400+」三项全错** —— 数字一律现查，不手抄。
+
+**风险与回滚**：
+- 备份在 `state/model-pack/`：`wiring.json.bak-20261105-031217`（v2 原始）、
+  `wiring.json.bak-v3-20261105-031758`（v3）。
+- 回滚必须**同时**改 `WEIGHT_RULE_VERSION` 与 `tactile_tree.MY_WEIGHT_RULE` ——
+  只改一个就是「旧权重配新边」，**不报错，只是悄悄算偏**。
+
+**已闭合（同日二次落地）**：
+- **22 个孤儿位 → 补回 10 个**。impl 只认 import 时挖不到它们，因为分支体里没有 import，
+  而是三种**动态派发**：`import_module("." + kind, __package__)`（模块名=能力名）·
+  `spec_from_file_location(name, Path/"x.py")`（路径在字面常量里）·
+  `_external_capability("quant_tech", kind)`（外部业务模块）。现按**参数形态**识别，不按函数名
+  （别名太多：`_im` / `_iu` / `_rg_ilu` 各不相同）。补回 vision ×5 · tentacle_bind ·
+  penetrating_cross_scan · asset_index · control_loop · i2v_agnes。
+  impl 边 88 → 105。**余 12 个里 4 个（echo / count_words / health / audit_query）实现就在
+  `api.py` 本身，2 跳是正确的，不该硬连。**
+- **路径匹配只认主件**：`tools/control_loop.py` 会同时匹配
+  `state/atomic-sync/backup/…` 下的同名副本，连到副本 = 「改主件时监控不提示」。已按主件优先排序并只取首个。
+- **三个位 desc 去数字**：`comfy_forge` / `comfy_native` / `bits_kit`「常用说法」段未动，
+  只摘会过期的环境读数，改指 `op=evidence` / `op=contract` / `op=build`。
+- **`system.md` 有了生成器**：`tools/codex-scripts/sync-capabilities-doc.py`（`--check` / `--apply`，
+  原子写 + 锚点数量守恒）。只同步「`- **它做什么**：` 与下一个 `- **`」之间，元数据行与
+  `- **怎么调**` 之后一律不碰。首跑即揪出 3 个无人知道的漂移（`cap_self` / `console_hub` /
+  `mirror_stage`），同步后 54 段全一致。
+
+**第三次落地：口径文本自己写坏 → 修复 + 机检（同日）**
+
+改「两种口径」的说明文字时，新句子和旧文本残片被拼在一起 —— `逐字对齐"` 提前闭合了字符串，
+`"强边"` 这个 key 也丢了。文件变成 `SyntaxError`，**整个 `impact_check` 位 import 不了**。
+
+**发现靠 `ast.parse`，靠人眼看 `grep` 不行**：grep 结果经 JSON 转义（`"` 显示成 `\"`），
+引号结构错在屏幕上和正确的**看不出区别** —— 这次就是这么漏过去的。
+
+修复两处：坏块 7 行重写（补回 `强边` key）· 230 行注释补齐 v4 口径（原文停在
+「只算 `path` + `cap` + 绑定账」，import/impl 两层根本没提，读者会被引到旧口径上）。
+
+判据新增 `gbt_allinone/tests/test_diag_kou_jing.py` 6 条，**全部静态**（不启动进程、
+不碰生产 store、不依赖图重建）：`ast.parse` 能过 · 「两种口径」三键齐 ·
+4 位以上数字须对得上图或属历史白名单 `{67}` · 文本指向的 `op=status.strong_edges`
+必须真存在（指错就是假指针）· `risky.caveat` 与 `impact.强边` 都必须含 import/impl/分派 ·
+不许有重复粘贴的残片。
+
+**这套测试用 5 个 mutant 验过**（内存改写源码、绝不落盘）：丢 key · 重复残片 ·
+引号提前闭合 · 数字对不上图 · 两处口径不同步 —— **5/5 全部被抓**。
+没被 mutant 验过的测试等于没有测试。
+
+**第四次落地：`risky` 榜分流派生物**
+
+`state/console-data.js` 强边 777，稳坐榜单第二 —— 但它是 `tools/gen-console-data.py`
+的产物，文件头写着「自动生成，勿手改」。**照着榜单去「修最危险的件」，改的就是它**：
+白改，下次跑生成器就没了。
+
+`_is_copy()` 早已处理历史副本；派生物是**同类干扰、不同成因**，所以另立 `derived`：
+
+| 类别 | 是什么 | 改完之后要做什么 | 字段 |
+|---|---|---|---|
+| 副本 | 同一份文件的历史快照 | 镜像要跟 | `copies` |
+| 派生物 | 源码生成出来的产物 | **重跑生成器** | `derived` |
+
+判据用**文件头标记**（生成器自己写的那行），不用路径白名单 —— 路径会变，标记不会。
+先过路径/扩展名两道闸再读盘：全图 2900 个 `code:` 节点里只有 2 个候选
+（`state/console-data.js` 与 mirror 下那份 `gsap.min.js`），代价约等于零。
+
+**效果**：`top` 第 2 从 **777**（`console-data.js`）降到 **286**（`policy.py`）——
+留下的才是「改它会波及别人、而且改了有意义」的件。
+
+**判据**：`gbt_allinone/tests/test_impact_ranking.py` 6 条（认得出派生物 / 不误伤源码 /
+端到端不进 top / api.py 仍第一 / 三类计数相加等于 scanned），并用 monkeypatch
+把 `_is_derived` 打回 `False` 验过 C 条会红 —— 红绿都验了。
+
+**顺带结案：`must_verify_1hop` 不排除副本。** 消费方
+`tools/codex-scripts/impact.py:121` 打印的就是「改完必须逐一验证」的清单，副本是要验的实体。
+两个 op 回答的**不是同一个问题**：`risky` 问「改哪最危险」（副本与派生物是噪音，要单列），
+`must_verify` 问「改完要验谁」（一个都不能少）。用途不同就不该硬拉齐口径。
+结论已写进 `impact_check._op_impact` 的注释。
+
+**第六次落地：服务全没开，查出三层**
+
+主人问「让你开的东西你都没开吗」。实测 8791 / 8766 / 8111 / 11434 / 1234 / 8080 / 8793 / 31720
+**全部 closed**，一个都没起。逐层查，原因有三层：
+
+| 层 | 病灶 | 后果 | 状态 |
+|---|---|---|---|
+| ① 启动脚本 | `启动-GBT.cmd` 用 `py -3.14`、`C:\Python312\python.exe`、`electron.cmd` | 本机三者**全无**，脚本写给另一个环境 | 未修（绕开） |
+| ② 缺模块 | `tools/model-bridge/server.py:49` 硬 `import lane_guard`，全仓 **0 命中** | 8791 起不来，启动链断在第一环 | **已重建** |
+| ③ 缺模块 | 同目录 `serving_policy.py` 也丢了（L642，`try:` 内 ⇒ 可选） | 降级不崩，策略门退回默认档 | 未补（可选） |
+
+**② 是最阴的**：`py_compile` 全绿 —— 语法没有错，错在**运行期 ImportError**。
+所以"全量语法 0 失败"根本不能证明服务起得来。
+
+**`lane_guard` 的重建依据全来自调用点，没靠想象**：
+`server.py:277/563/1104` 的 `with LG.open_url(url, req, timeout) as r:`、
+`568/570/1129/1138` 的 `LG.classify_exc(exc, url[, raw])`、
+`754/1132/1140/1152` 的 `LG.kind_text(kind)`、
+`1088` 的 `_fit = LG.precheck_fit(base, body, lane=)` 及其用到的
+`checked/over/tokens/max_tokens/n_ctx/over_by`。职责照 L44-46 原注释：
+**回环强制直连**（全局 HTTP_PROXY 会让车道没起时回 502，被误当"上游真错"）·
+**失败分档**（`limb_down` / `proxy_502` / `timeout` / `upstream_error` …）·
+**发之前判上下文**（GPU 车道原来要等推理跑起来才回 400，满窗口实测 46.5s）。
+
+**结果**：8791 `/health` 200 · 8766 `/api/state` 200（页面 49036 字节）·
+8111 引擎**没起** —— `commander.status()` 的 gate 明写 `op=start/stop ⇒ process_execute`，
+**需主人发票，agent 不自批**。权重 4.88 GB 已就位、`vendor/llama/llama-server.exe` 在位
+（9728 字节的 launcher + `llama-server-impl.dll` 10 MB，是 llama.cpp 官方 Windows 包的正常结构）。
+
+**判据**：`tests/test_model_bridge_imports.py` 3 条。关键是不写死「lane_guard 在不在」——
+那下次换个模块丢，一样红不了。改成**通用规则**：`server.py` 依赖的每个**必需**本地模块
+都必须能解析；`try:` 块内的 import 算**可选**（`psutil` 就没装，判成必需会变成误报源）。
+
+**第七次落地：把「发现了却留着」的两件补上**
+
+主人问「全部落地了吗」。实测核对 **15/19** —— 差的 4 项里有 2 项是**我查到病灶却没修**，
+留着让下一个人照样踩。补掉：
+
+**① `serving_policy.py` 重建（策略门）**
+
+`server.py:642` 和 `local_llm_server.py:170` 都 `import serving_policy`，全仓 0 命中。
+它不崩（两处都在 `try/except` 里），但 `server.py:633` 的注释说得很直白：
+
+    这补的是**真实缺口**：…… 而默认车道是 `selfhost_gpu` ⇒ **桥这层根本没有策略**。
+    也就是说「我们有内容策略开关」这个对外说法，在**默认路径上是空的**。
+
+文件一丢，那个补丁就等于没打过 —— **开关在、闸门不在**。
+
+重建按两个引用方的原注释实现（口径一个字没改）：`Policy.load()` / `.mode` / `.check(text)`
+返回 `{allow, mode, reason, hits}`，`--set-mode uncensored|filter-lite|strict` 落盘到
+`state/serving-policy.json`（原子写 + 读回校验）。**内置规则刻意只放无歧义的违法类** ——
+编一张大词表既会误伤，又会让人误以为「有安全保证」，而本层定位本来就是
+「档位声明 + 粗粒度拦截 + 可解释拒绝 + 审计」，不是安全保证。
+
+**② `启动-GBT.cmd` 修三处环境不符**
+
+| 原来 | 现在 |
+|---|---|
+| `start "" /min py -3.14 ...` | `start "" /min "%~dp0pyembed\python.exe" ...` |
+| `"C:\Python312\python.exe" doctor.py` | `"%~dp0pyembed\python.exe" doctor.py` |
+| `start "" ".\node_modules\.bin\electron.cmd" .` | 先 `if not exist` 判断，缺失就**明确跳过并给装法** |
+
+另加一行注记：`8792` 是 bridge 里的**车道名**（`server.py` 的 upstreams 表），
+引擎真身地址在 `gbt_allinone/weights.py`（当前 `8111`）—— 这两个数字不一样，
+以前只在别人的脑子里。
+
+**结果：15/19 → 17/19。** 剩 2 项都需主人：
+`8111` 引擎（`commander` 的 gate 明写 `op=start/stop ⇒ process_execute`，agent 不自批）·
+Electron 桌面壳（`holo_pet_w3` 缺 `node_modules`，需 `npm install`）。
+
+**第八次落地：万能插 / 多域监控「开到最大」，四个真 bug**
+
+先立规矩：**op 清单不许凭记忆**。用 AST 从源码数：`omni_plug._dispatch` 实认 **42** 个，
+`impact_check` 的 `OPS` **5** 个。再全跑。四个问题全部有实测铁证：
+
+| # | 问题 | 铁证 | 后果 |
+|---|---|---|---|
+| ① | `known` 自述漏 5 个 op | AST：实认 42 / 自述 37 | 照自述调用摸不到 `page_route`/`page_stats`/`disk_find`/`disk_stats`/`任意` |
+| ② | `risky` 是兜底 `return` | `run_op` 里 `risky` 无显式分支 | OPS 以后加 op 忘写分支 ⇒ **静默变成 risky**，口径全错且无报错 |
+| ③ | 本地文件被判成 URL | `classify("AGENTS.md")` → `https://AGENTS.md` | policy 挂 `external_llm`+`data_export`，**读本地文件被当成发外网** |
+| ④ | `page_lazy` 顶层 `import resource` | `ModuleNotFoundError: No module named 'resource'` | `resource` 是 Unix-only，Windows 上整份 import 不了，`op=page_stats` 直接失败 |
+
+**③ 的根因最值得记**：`classify` 只在**含 `/`** 时查盘上是否存在，而 `exists()` 为假时
+**没有 return**，直接穿到下面的「裸域名 ⇒ https」。所以 `AGENTS.md`（存在、无斜杠）
+和 `tools/impact_check.py`（含斜杠但不存在）双双掉进 URL 分支。
+修法两条 + 一个防回归：盘上存在就算 path · 带分隔符一律 path（不存在如实说）·
+加 `"://" not in t` 免得把 `http://` 也吃掉（这个副作用是我改第一版时引入的，复测 12 个用例才发现）。
+
+**顺带建了全盘索引**：1,227,540 文件 / 124,855 目录 / 107 秒 / 15.2 MB，
+`disk_stats` / `disk_find` 从「还没索引 ⇒ 先 build」转绿。
+
+**17 个只读 op 全部 ok=True**；有副作用的（`run` / `page_run` / `ai` / `counter` / `wb`）
+**刻意不跑**并逐条说明原因 —— 看清不等于乱驱动。
+
+**第九次落地：连「判据」本身都是假的**
+
+前四次都在查「自述 vs 实际」。这次查到更里面一层：**被点名的判据不存在**。
+
+`omni_plug.py:1668` 和 `caps_registry.py:1615` 都写着：
+
+    判据在 tools/codex-scripts/omni-monitor.py --gap（AST 三向对账）
+
+实测：
+- `tools/codex-scripts/omni-monitor.py` —— **不存在**
+- `gbt_allinone/omni_monitor.py` —— 存在，但**没有** `--gap` / `main()` / argparse，
+  它只是监控采样模块（落 `state/omni-monitor.jsonl`）
+
+也就是说：**「判据在 X」这句话本身没有判据**。而「`known` 自述漏 5 个 op」那类事，
+正是在「以为有人看着、其实没人看着」的状态下发生的。
+
+**补写** `tools/codex-scripts/omni-monitor.py`，`--gap` 做三向对账：
+
+| 方向 | 来源 | 实测 |
+|---|---|---|
+| ① 实现 | `_dispatch` 里 `op ==` / `op in` 字面量 | **42** |
+| ② 自述 | 同函数 not-known 分支的 `known` 列表 | **42** |
+| ③ 声明 | `caps_registry` 的 `desc` 里 `op=…`（支持 `op=a/b/c`） | **13**（举例性质，全在实现内） |
+
+任一方向有差集 → exit 1，可直接进 CI。
+
+**另记一条方法论结论**：本想扫「427 个位的 desc 提到的 op 是否都实现了」，
+跑完只有 **4** 个位能从 `api.py` 分支抽到 `op ==`（其余 op 分派在各自实现模块里）。
+**这说明方法失效，不能据此报「0 个 bug」** —— 差点又是一次「拿失效的量具读数」。
+
+**仍未闭合**（2026-11-05 复核后修正）：
+- ~~8 个孤儿位~~ → **实际只有 1 个真孤儿，已闭合**。
+  原结论按 `handler` 名去找同名文件，**方法本身错了**：
+
+  | 位 | 真实实现 | 旧判断 | 实际 |
+  |---|---|---|---|
+  | `hook_enforcer` | `tools/penetrating_cross_scan.py` | 孤儿 | **早已在强边里** |
+  | `omission_detector` | 同上（`api.py:1421` 三个 kind 共用引擎） | 孤儿 | **早已在强边里** |
+  | `review_gate` | `tools/codex-scripts/terminal-review.py` | 孤儿 | **真断线，已补** |
+
+  `review_gate` 断线的原因：它把路径**先存进变量**（`api.py:2705`
+  `_rg_path = Path(__file__).resolve().parents[1] / "tools" / "codex-scripts" / "terminal-review.py"`）
+  再传给 loader；而 impl 层只从**调用参数**里抽路径，拿到的是 `ast.Name`，
+  `_path_suffix` 返回空 ⇒ 0 条边。同批另两个位路径内联在调用里、② 形态能认，
+  它们本来就有强边 —— 「孤儿」这个结论错在没区分这两种写法。
+
+  修法：`wiring-build` 补第 ④ 种形态（`ast.Assign` 右值是 Path 拼接且以 `.py` 结尾），
+  并把重复的路径连接逻辑抽成 `_link_path`（**只认主件**，免得一处认主件、一处认副本）。
+  重建后 **impl 105→106 · 强边 21291→21292**：精确 +1，无连带副作用。
+  判据 `test_wiring_v4_guard.py::test_review_gate_reaches_terminal_review`（该文件现 8 条）。
+
+  `quant` 系列 5 位仍走 `quant_tech` 外部业务模块，`needs_dependency` 是**正确语义**，不该硬连。
+- ~~`docs/capabilities/system.md` 只覆盖 54 / 427 位~~ → **已闭合（2026-11-05）**。
+  不给 373 位补完整详情段：373 × 约 1.5 KB ≈ 560 KB，会肿成一个没人读的大字典；
+  这 373 位本来也没有手工精修的「要哪张票 / 必填载荷」，自动编只会编出套话。
+  改为 `sync-capabilities-doc.py --fill` 生成**一行一位的「全量速览」**：
+  54 个精修段原样保留，文末追加 373 行速览表，合计 **427 / 427 可查**。
+  82 KB → 260 KB · **幂等**（连跑两次 147920 字符不变）· **锚点守恒**
+  （`### \`` 数量 54→54，写入前校验，变了就拒写）。
+  完整参数与权限仍看 `op=contract` 或 `docs/capabilities-full.json`（机器可读版）。
+  顺带纠错：该脚本**没有 `--check` 参数**，不带参数即干跑。

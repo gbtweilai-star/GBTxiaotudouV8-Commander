@@ -152,13 +152,28 @@ def claim_done(readings: Optional[List[str]] = None) -> dict:
 
 
 def run(op="redlines", **params) -> dict:
-    """能力入口（只读骨架）：redlines / inject / selfcheck。不写盘、不出网、不执行。"""
+    """能力入口（只读骨架）：redlines / inject / selfcheck / standards。
+
+    不写盘、不出网、不执行。
+
+    `op=standards`（2026-11-04）：认知包原先只有「**该不该干**」（边界 / 红线 / 焦点），
+    没有「**该怎么干**」（8 工序 / 9 不变量 / 10 步证据阶梯 / 28 章宪章）。
+    工程规范一直散在 `coding_discipline` 等模块里，触手启动时一份也拿不到。
+    这里把它挂在本位下 —— **刻意不新增能力位**：那会动 427 这个口径
+    （需重跑逐位真调 + 重建 data + 同步 README 判据），该单独一刀做。
+    """
     op = str(op or "redlines")
     if op == "redlines":
         return {"ok": True, "readonly": True, "red_lines": list(RED_LINES),
                 "pack_fields": [{"key": k, "cn": PACK_CN[k]} for k in PACK_FIELDS],
                 "questions": [{"key": k, "cn": QUESTION_CN[k]} for k in THREE_QUESTIONS],
                 "max_depth": DEFAULT_MAX_DEPTH}
+    if op == "standards":
+        from . import standards_pack as _sp
+        scene = str(params.get("scene") or "").strip()
+        if scene:
+            return _sp.for_scene(scene, int(params.get("limit_lines") or 0))
+        return _sp.verify()
     if op == "inject":
         return inject(params.get("task_id", ""), params.get("goal", ""),
                       params.get("scene", ""), params.get("boundary", ""),
@@ -167,7 +182,7 @@ def run(op="redlines", **params) -> dict:
     if op == "selfcheck":
         return selfcheck(None, params.get("what", ""), params.get("why_allowed", ""),
                          params.get("rollback", ""))
-    raise ValueError("未知 op %r（可用：redlines/inject/selfcheck）" % (op,))
+    raise ValueError("未知 op %r（可用：redlines/inject/selfcheck/standards）" % (op,))
 
 
 HONEST_BOUNDARY = (

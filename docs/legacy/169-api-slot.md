@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/api_slot.py`](../../gbt_allinone/tools/api_slot.py) · `verify()` **23 项** |
+| 模块/契约 | [`gbt_allinone/tools/api_slot.py`](gbt_allinone/tools/api_slot.py) · `verify()` **23 项** |
 | 统一门 | 注册能力位 **`api_slot`**（`run_task`，zero-scope） |
 | API | `GET/POST /api/slots`：list/register/remove/call；注册表落 `state/api_slots.json`（trusted-owner 写） |
 | APP 接线 | console 右栏「动态 API 槽」：方法/名字/host/数量；标注执行器 `not_wired` |
-| 验收 | [`tests/test_api_slot.py`](../../tests/test_api_slot.py) |
+| 验收 | [`tests/test_api_slot.py`](tests/test_api_slot.py) |
 
 ## 二、验收判据
 

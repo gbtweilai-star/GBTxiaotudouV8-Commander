@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════════════════════════════
+   skin-hud-live.css · 会动的 HUD 层（2026-11-06）
+   动态四件：扫描线 / 漂移刻度 / 粒子尘 / 旋转环 + 脉动角标
+   静态两件：工程图底层（细线 + 定位十字 + 引线 + 舱内辉光）/ 暗角
+   纪律：只碰 opacity / transform / background-position（合成层，不触发布局）
+        prefers-reduced-motion 下全部停摆，静态也完整可读。
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes hud-scan { 0% { transform: translate3d(0,-12vh,0); opacity: 0; }
+  10% { opacity: .5; } 90% { opacity: .5; } 100% { transform: translate3d(0,112vh,0); opacity: 0; } }
+@keyframes hud-ticks-drift { from { background-position-x: 0, 0; } to { background-position-x: 96px, 480px; } }
+@keyframes hud-ticks-drift-y { from { background-position-y: 0, 0; } to { background-position-y: 96px, 480px; } }
+@keyframes hud-breathe { 0%,100% { opacity: .38; } 50% { opacity: .82; } }
+@keyframes hud-spin { to { transform: rotate(360deg); } }
+@keyframes hud-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes hud-blink { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+
+.hud-live { position: fixed; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+
+/* ① 扫描线：一条 2px 冷青，8 秒一趟 */
+.hud-scan { position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(88,200,224,.55) 18%, rgba(88,200,224,.9) 50%, rgba(88,200,224,.55) 82%, transparent);
+  box-shadow: 0 0 18px rgba(88,200,224,.35); animation: hud-scan 8s linear infinite; }
+
+/* ② 刻度带：四边都有，缓慢漂移（12px 细刻 / 96px 主刻） */
+.hud-ruler { position: absolute; opacity: .5;
+  background:
+    repeating-linear-gradient(90deg, rgba(140,170,200,.26) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(90deg, rgba(88,200,224,.45) 0 1px, transparent 1px 96px);
+  background-size: auto 4px, auto 8px; background-repeat: repeat-x;
+  animation: hud-ticks-drift 24s linear infinite; }
+.hud-ruler.top, .hud-ruler.bottom { left: 0; right: 0; height: 10px; }
+.hud-ruler.top { top: 14px; }
+.hud-ruler.bottom { bottom: 0; transform: scaleY(-1); }
+/* 左右竖尺：刻线朝内，和上下尺同节拍（不同轴，单独 keyframes） */
+.hud-ruler.left, .hud-ruler.right {
+  top: 0; bottom: 0; width: 10px; background-repeat: repeat-y; animation-name: hud-ticks-drift-y; }
+.hud-ruler.left { left: 0;
+  background:
+    repeating-linear-gradient(180deg, rgba(140,170,200,.20) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(180deg, rgba(88,200,224,.34) 0 1px, transparent 1px 96px);
+  background-size: 4px auto, 8px auto; }
+.hud-ruler.right { right: 0;
+  background:
+    repeating-linear-gradient(180deg, rgba(140,170,200,.20) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(180deg, rgba(88,200,224,.34) 0 1px, transparent 1px 96px);
+  background-size: 4px auto, 8px auto;
+  background-position-x: right; }
+
+/* ③ 粒子尘：canvas 铺满，极低透明度，像舱内浮尘 */
+.hud-dust { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55;
+  mix-blend-mode: screen; }
+
+/* ④ 旋转环：右下角罗盘位，两圈反向转（不挡品牌、不挡面板） */
+.hud-orbit { position: absolute; right: 22px; bottom: 20px; width: 54px; height: 54px; opacity: .8; }
+.hud-orbit .ring { position: absolute; inset: 0; border-radius: 50%;
+  border: 1px dashed rgba(88,200,224,.45); animation: hud-spin 14s linear infinite; }
+.hud-orbit .ring.b { inset: 6px; border-style: solid; border-color: rgba(88,200,224,.22);
+  border-top-color: rgba(88,200,224,.75); animation: hud-spin-rev 6s linear infinite; }
+
+/* ⑤ 侧边读数柱：竖排，数字等宽，轻微呼吸 */
+.hud-rail { position: absolute; top: 50%; transform: translateY(-50%);
+  display: flex; gap: 14px; font: 500 8px/1 var(--mono, monospace);
+  letter-spacing: .28em; color: rgba(140,170,200,.5);
+  writing-mode: vertical-rl; text-orientation: mixed;
+  animation: hud-breathe 6s ease-in-out infinite; }
+.hud-rail.l { left: 3px; }
+.hud-rail.r { right: 3px; }
+.hud-rail b { color: rgba(233,238,245,.75); font-weight: 500; letter-spacing: .06em; }
+.hud-rail .bar { width: 2px; height: 38px; background: rgba(88,200,224,.18); overflow: hidden; }
+.hud-rail .bar i { display: block; height: 100%; background: rgba(88,200,224,.75); width: 30%;
+  animation: hud-bar 3.2s ease-in-out infinite; }
+@keyframes hud-bar { 0%,100% { width: 12%; } 50% { width: 88%; } }
+.hud-rail .live { color: #58c8e0; animation: hud-blink 1.6s steps(2,end) infinite; }
+
+/* ⑥ 角标脉动：四角括号已经在 body::after 里，这里只加呼吸 */
+body::after { animation: hud-breathe 5s ease-in-out infinite; }
+
+/* ── ⑦ 工程图底层（z-index 2：在面板/卡片【之下】，只在留白里露出来）──
+   参考图的语言：不是方格纸，是图纸 —— 稀疏主格 + 定位十字 + 引线 + 标注列。
+   底纹在边缘最实、向中心让位，所以对话正文永远压在干净的黑上。 */
+.hud-ground { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+
+/* 稀疏主格：240px 一条，1px，只到 7% —— 是「图纸的格」，不是「表格的格」 */
+.hud-ground::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(140,170,200,.070) 0 1px, transparent 1px 240px),
+    linear-gradient(to bottom, rgba(140,170,200,.070) 0 1px, transparent 1px 240px);
+  background-size: 240px 240px;
+  -webkit-mask-image: radial-gradient(76% 62% at 50% 46%,
+    rgba(0,0,0,.12) 0 22%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.92) 82%, #000 100%);
+  mask-image: radial-gradient(76% 62% at 50% 46%,
+    rgba(0,0,0,.12) 0 22%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.92) 82%, #000 100%);
+}
+
+/* 舱内辉光 + 暗角：中心一团冷光（像舱窗），四角压黑把视线收回来 */
+.hud-ground::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(46% 34% at 50% 58%, rgba(88,200,224,.10), transparent 72%),
+    radial-gradient(34% 26% at 50% 88%, rgba(224,163,60,.045), transparent 76%),
+    radial-gradient(128% 112% at 50% 48%, transparent 46%, rgba(0,0,0,.34) 100%);
+}
+
+/* 图纸细部：弧/十字/引线都由 skin-hud-live.js 按视口尺寸生成 */
+.hud-sketch { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hud-sketch .d-ring { fill: none; stroke: rgba(88,200,224,.16); stroke-width: 1; }
+.hud-sketch .d-ring.dash { stroke-dasharray: 2 10; }
+.hud-sketch .d-ring.dash2 { stroke-dasharray: 24 16 2 10; stroke: rgba(88,200,224,.10); }
+.hud-sketch .d-cross { stroke: rgba(140,170,200,.22); stroke-width: 1; }
+.hud-sketch .d-lead { fill: none; stroke: rgba(88,200,224,.24); stroke-width: 1; }
+.hud-sketch .d-node { fill: rgba(88,200,224,.55); }
+.hud-sketch .d-tick { stroke: rgba(140,170,200,.26); stroke-width: 1; }
+
+/* 标注列：7px 等宽，全大写，像图纸边上的字段名（只写概念，不编数字） */
+.hud-callout { position: absolute; display: flex; flex-direction: column; gap: 3px;
+  padding-left: 10px; border-left: 1px solid rgba(88,200,224,.28);
+  font: 500 7px/1.35 var(--mono, monospace); letter-spacing: .22em;
+  color: rgba(140,170,200,.46); text-transform: uppercase; white-space: nowrap; }
+.hud-callout b { font-weight: 500; color: rgba(88,200,224,.55); letter-spacing: .26em; }
+.hud-callout::before { content: ""; position: absolute; left: -3px; top: 0; width: 5px; height: 1px;
+  background: rgba(88,200,224,.55); }
+
+@media (max-width: 1280px) {
+  .hud-callout { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-scan, .hud-ruler, .hud-orbit .ring, .hud-rail, body::after, .hud-rail .bar i {
+    animation: none !important;
+  }
+  .hud-dust { display: none; }
+}
+
+/* 右列标注：从右边缘往左排，竖线在文字右侧（图纸的双边标注） */
+.hud-callout.tr,
+.hud-callout.br {
+  transform: translateX(-100%);
+  padding-left: 0; padding-right: 10px;
+  border-left: 0; border-right: 1px solid rgba(88,200,224,.28);
+  text-align: right;
+}
+.hud-callout.tr::before,
+.hud-callout.br::before { left: auto; right: -3px; }

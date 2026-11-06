@@ -432,7 +432,7 @@ def ensure_selfhost(wait_s: int = 150) -> bool:
         flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
         cmd = [_OURS_PY, "-X", "utf8", _OURS_SCRIPT, "--model", _OURS_WEIGHTS,
                "--port", str(urlsplit(base).port or 8792), "--ctx",
-               os.environ.get("GBT_SELFHOST_CTX", "256"), "--threads",
+               os.environ.get("GBT_SELFHOST_CTX", "8192"), "--threads",
                os.environ.get("GBT_SELFHOST_THREADS", "8"), "--idle-exit", _OURS_IDLE]
         sys.stderr.write("[activate] 按需加载自有权重：%s\n" % " ".join(cmd[1:]))
         try:
@@ -684,6 +684,197 @@ class Handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
         self.wfile.write(body)
+
+    @staticmethod
+    def _responses_chat_messages(body: dict) -> list:
+        """Convert the text/tool subset of Responses input to Chat Completions."""
+        messages = []
+        instructions = body.get("instructions")
+        if instructions:
+            messages.append({"role": "system", "content": str(instructions)})
+        items = body.get("input") or ""
+        if isinstance(items, str):
+            items = [{"type": "message", "role": "user", "content": items}]
+        if not isinstance(items, list):
+            raise ValueError("input must be a string or an array")
+        call_names = {}
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            kind = item.get("type")
+            if kind == "message" or "role" in item:
+                role = str(item.get("role") or "user")
+                if role not in ("system", "developer", "user", "assistant"):
+                    raise ValueError("unsupported message role: %s" % role)
+                content = item.get("content") or ""
+                if isinstance(content, list):
+                    parts = []
+                    for part in content:
+                        if isinstance(part, str):
+                            parts.append(part)
+                        elif isinstance(part, dict) and part.get("type") in ("input_text", "output_text", "text"):
+                            parts.append(str(part.get("text") or ""))
+                        elif isinstance(part, dict) and part.get("type") in ("input_image", "image"):
+                            raise ValueError("this local text model does not support image input")
+                    content = "".join(parts)
+                messages.append({"role": role, "content": str(content)})
+            elif kind == "function_call":
+                call_id = str(item.get("call_id") or item.get("id") or "call_local")
+                name = str(item.get("name") or "")
+                call_names[call_id] = name
+                try:
+                    arguments = item.get("arguments") or "{}"
+                    json.loads(arguments) if isinstance(arguments, str) else arguments
+                except (TypeError, ValueError):
+                    arguments = "{}"
+                call = {"id": call_id, "type": "function",
+                        "function": {"name": name, "arguments": arguments if isinstance(arguments, str)
+                                     else json.dumps(arguments, ensure_ascii=False)}}
+                if messages and messages[-1].get("role") == "assistant" and messages[-1].get("tool_calls"):
+                    messages[-1]["tool_calls"].append(call)
+                else:
+                    messages.append({"role": "assistant", "content": None, "tool_calls": [call]})
+            elif kind == "function_call_output":
+                call_id = str(item.get("call_id") or "")
+                messages.append({"role": "tool", "tool_call_id": call_id,
+                                 "name": call_names.get(call_id, "tool"),
+                                 "content": str(item.get("output") or "")})
+        if not messages:
+            messages.append({"role": "user", "content": ""})
+        return messages
+
+    @staticmethod
+    def _responses_tools(body: dict) -> list:
+        tools = []
+        for item in body.get("tools") or []:
+            if not isinstance(item, dict) or item.get("type") != "function":
+                continue
+            fn = {k: item[k] for k in ("name", "description", "parameters", "strict") if k in item}
+            if fn.get("name"):
+                tools.append({"type": "function", "function": fn})
+        return tools
+
+    def _responses(self, body: dict) -> None:
+        """Serve Codex's Responses API over the existing selfhost-only chat lane."""
+        try:
+            messages = self._responses_chat_messages(body)
+            chat = {"upstream": "selfhost", "local_only": True,
+                    "model": "gbt-v8", "messages": messages,
+                    "max_tokens": int(body.get("max_output_tokens") or 128),
+                    "temperature": float(body.get("temperature") if body.get("temperature") is not None else 0.0),
+                    "stream": False}
+            tools = self._responses_tools(body)
+            if tools:
+                chat["tools"] = tools
+                chat["tool_choice"] = body.get("tool_choice", "auto")
+        except (TypeError, ValueError) as exc:
+            return self._json(400, {"error": {"message": str(exc), "type": "invalid_request_error"}})
+
+        # Use the bridge's ordinary route so it applies the same context gate and lazy model startup.
+        url = "http://127.0.0.1:%d/v1/chat/completions" % self.server.server_port
+        req = urllib.request.Request(url, data=json.dumps(chat, ensure_ascii=False).encode("utf-8"),
+                                     headers={"Content-Type": "application/json", "User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=240) as upstream:
+                status, raw = upstream.status, upstream.read()
+                lane = upstream.headers.get("x-gbt-lane", "selfhost")
+                ours = upstream.headers.get("x-gbt-weights-ours", "false") == "true"
+        except urllib.error.HTTPError as exc:
+            status, raw = exc.code, exc.read() or b"{}"
+            lane, ours = "selfhost", False
+        except Exception as exc:
+            return self._json(502, {"error": {"message": "本机权重桥不可用：%s" % type(exc).__name__,
+                                               "type": "server_error"}})
+        try:
+            source = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:
+            source = {}
+        if status != 200 or source.get("ok") is False or source.get("error") or not ours:
+            code = 413 if (source.get("error") or {}).get("reason") == "context_overflow" else 502
+            return self._json(code, {"error": {"message": str((source.get("error") or {}).get("message")
+                                                       or "自有权重没有完成本次推理"),
+                                               "type": "server_error",
+                                               "code": (source.get("error") or {}).get("reason") or "selfhost_failed"}})
+
+        choice = ((source.get("choices") or [{}])[0] or {})
+        message = choice.get("message") or {}
+        content = message.get("content") or ""
+        output = []
+        calls = message.get("tool_calls") or []
+        if calls:
+            for call in calls:
+                fn = call.get("function") or {}
+                output.append({"id": "fc_%s" % (call.get("id") or "local"),
+                               "type": "function_call", "status": "completed",
+                               "call_id": call.get("id") or "call_local",
+                               "name": fn.get("name") or "",
+                               "arguments": fn.get("arguments") or "{}"})
+        else:
+            output.append({"id": "msg_local", "type": "message", "status": "completed",
+                           "role": "assistant", "content": [{"type": "output_text",
+                           "text": str(content), "annotations": []}]})
+        usage = source.get("usage") or {}
+        response = {"id": "resp_local_%d" % int(time.time() * 1000), "object": "response",
+                    "created_at": int(time.time()), "status": "completed", "error": None,
+                    "incomplete_details": None, "model": "gbt-v8", "output": output,
+                    "parallel_tool_calls": True, "previous_response_id": body.get("previous_response_id"),
+                    "reasoning": body.get("reasoning"), "store": False,
+                    "temperature": chat["temperature"], "tool_choice": body.get("tool_choice", "auto"),
+                    "tools": body.get("tools") or [], "top_p": body.get("top_p"),
+                    "usage": {"input_tokens": int(usage.get("prompt_tokens") or 0),
+                              "output_tokens": int(usage.get("completion_tokens") or 0),
+                              "total_tokens": int(usage.get("total_tokens") or 0)},
+                    "gbt": {"lane": lane, "weights_ours": ours}}
+        if not body.get("stream"):
+            return self._json(200, response)
+
+        self.close_connection = True
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "close")
+        self.send_header("x-gbt-lane", lane)
+        self.send_header("x-gbt-weights-ours", "true")
+        self._cors()
+        self.end_headers()
+
+        def event(name: str, data: dict) -> None:
+            self.wfile.write(("event: %s\ndata: %s\n\n" %
+                              (name, json.dumps(data, ensure_ascii=False))).encode("utf-8"))
+            self.wfile.flush()
+
+        in_progress = dict(response, status="in_progress", output=[])
+        event("response.created", {"type": "response.created", "response": in_progress})
+        event("response.in_progress", {"type": "response.in_progress", "response": in_progress})
+        for index, item in enumerate(output):
+            event("response.output_item.added", {"type": "response.output_item.added",
+                                                   "output_index": index, "item": dict(item, status="in_progress")})
+            if item["type"] == "message":
+                part = {"type": "output_text", "text": "", "annotations": []}
+                event("response.content_part.added", {"type": "response.content_part.added",
+                                                       "item_id": item["id"], "output_index": index,
+                                                       "content_index": 0, "part": part})
+                text = item["content"][0]["text"]
+                if text:
+                    event("response.output_text.delta", {"type": "response.output_text.delta",
+                                                          "item_id": item["id"], "output_index": index,
+                                                          "content_index": 0, "delta": text})
+                event("response.output_text.done", {"type": "response.output_text.done",
+                                                     "item_id": item["id"], "output_index": index,
+                                                     "content_index": 0, "text": text})
+                event("response.content_part.done", {"type": "response.content_part.done",
+                                                      "item_id": item["id"], "output_index": index,
+                                                      "content_index": 0, "part": item["content"][0]})
+            else:
+                event("response.function_call_arguments.delta", {
+                    "type": "response.function_call_arguments.delta", "item_id": item["id"],
+                    "output_index": index, "delta": item["arguments"]})
+                event("response.function_call_arguments.done", {
+                    "type": "response.function_call_arguments.done", "item_id": item["id"],
+                    "output_index": index, "arguments": item["arguments"]})
+            event("response.output_item.done", {"type": "response.output_item.done",
+                                                 "output_index": index, "item": item})
+        event("response.completed", {"type": "response.completed", "response": response})
 
     def log_message(self, fmt, *args):                        # 只留一行最小读数
         sys.stderr.write("[bridge] %s\n" % (fmt % args))
@@ -946,7 +1137,7 @@ class Handler(BaseHTTPRequestHandler):
                 pass
             _res = unload_selfhost()
             return self._json(200, _res)
-        KNOWN = ("/v1/chat/completions", "/v1/route", "/v1/dispatch", "/v1/calc", "/v1/body/act")
+        KNOWN = ("/v1/chat/completions", "/v1/responses", "/v1/route", "/v1/dispatch", "/v1/calc", "/v1/body/act")
         if not any(self.path.startswith(k) for k in KNOWN):
             return self._json(404, {"error": {"message": "no route %s" % self.path}})
         try:
@@ -955,6 +1146,8 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:                              # noqa: BLE001
             return self._json(400, {"error": {"message": "请求体不是 JSON：%s" % exc}})
 
+        if self.path.startswith("/v1/responses"):
+            return self._responses(body)
         if self.path.startswith("/v1/body/act"):
             try:
                 out = subprocess.run(
@@ -985,6 +1178,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, _pol)
 
         name = str(body.pop("upstream", "") or DEFAULT)
+        local_only = bool(body.pop("local_only", False))
         if name not in UPSTREAMS:
             return self._json(400, {"error": {"message": "不认的上游：%s（可选 %s）"
                                               % (name, ",".join(UPSTREAMS))}})
@@ -1002,7 +1196,7 @@ class Handler(BaseHTTPRequestHandler):
         t0 = time.perf_counter()
 
         # 车道链：先打主人指定的那条（硬截止），不行再按 FALLBACK_ORDER 兜底。
-        chain = [name] + [n for n in LANE_CHAIN if n in UPSTREAMS and n != name]
+        chain = ([name] if local_only else [name] + [n for n in LANE_CHAIN if n in UPSTREAMS and n != name])
         resp = None
         prefetched = None          # 非流式：读到的整包（空 content 要换车道，所以提前读）
         attempts = []

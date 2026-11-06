@@ -110,8 +110,13 @@ def _sapi_tts(text: str, wav: Path) -> dict:
     ps = ("Add-Type -AssemblyName System.Speech;"
           "$s=New-Object System.Speech.Synthesis.SpeechSynthesizer;"
           "$vs=$s.GetInstalledVoices()|ForEach-Object{$_.VoiceInfo};"
+          # 主人定：台湾腔女声为默认。只认 zh-TW，**不**退 zh-CN。
+          # 【2026-11-04 补洞】原先第二跳是 `Culture -like 'zh-*'`，缺 zh-TW 时会落到
+          # zh-CN 的 Huihui（大陆腔）—— 正是主人明令禁止的「不许用大陆腔顶替」。
+          # 现在两跳都限 zh-TW；都选不到就 NO_ZH_TW 退出，由外层按 fail-closed 报错。
           "$pick=$vs|Where-Object{$_.Culture.Name -eq 'zh-TW' -and $_.Gender -eq 'Female'}|Select-Object -First 1;"
-          "if(-not $pick){$pick=$vs|Where-Object{$_.Culture.Name -like 'zh-*'}|Select-Object -First 1};"
+          "if(-not $pick){$pick=$vs|Where-Object{$_.Culture.Name -eq 'zh-TW'}|Select-Object -First 1};"
+          "if(-not $pick){Write-Error 'NO_ZH_TW';exit 3};"
           "if($pick){$s.SelectVoice($pick.Name)};"
           "$s.SetOutputToWaveFile('%s');$s.Speak([IO.File]::ReadAllText('%s'));"
           "$name=$s.Voice.Name;$s.Dispose();Write-Output $name"

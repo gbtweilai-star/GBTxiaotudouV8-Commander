@@ -833,12 +833,46 @@ def build_cognition(method: str = "", intent: str = "", actor: str = "tentacle")
             "ok": True, "readonly": True, "activated": [],
             "note": "本次没有点亮注册能力位：按名字调的是**触手方法**，属于另一套名字空间（见 requested）"
                     " —— 这里不是失败，也不是「激活了不存在的能力」"}
+
+        # ── 工程规范（2026-11-04 · Owner：「抓取工程规范让她吞噬，好指挥触手执行任务」）──
+        # 缺口取证：认知包此前只有「该不该干」（边界 / 红线 / 焦点），
+        # **没有「该怎么干」**（8 个工序 / 9 条不变量 / 10 步证据阶梯 / 28 章宪章）。
+        # 规范本身一直在代码里，只是散在各模块，触手启动时一份也拿不到。
+        # `standards_pack` 把它们抓成这一格，**只建索引与引用、不复制正文**
+        # （复制正文 = 造第二份真值，改一处忘一处就是漂移）。
+        #
+        # 🔴 两个刻意的选择：
+        #   ① 按**意图文本**分类，不按固定串。固定串永远是 general，等于没挑。
+        #   ② **不加缓存**。实测 harvest p50 1.32ms / p99 11.6ms —— 便宜到不必要；
+        #      而规范是「必须最新」的东西，缓存会造出「按旧规矩执行」的隐患，
+        #      那比慢 1 毫秒坏得多。
+        #
+        # 它不是五件之一：抓不到**不许**让整个认知包失败（五件校验在上面已过），
+        # 但也不许静默 —— 失败时带 standards_ok=False + why，让人看得见。
+        _scene_text = "%s %s" % (str(intent or "").strip(), str(method or "").strip())
+        try:
+            from ..tools import standards_pack as _sp
+            _std = _sp.for_scene(scene=_scene_text)
+            _standards = _std.get("standards")
+            _standards_ok = bool(_std.get("ok"))
+            _standards_why = "" if _standards_ok else (
+                "抓不到的源：%s" % (_std.get("sources_bad") or []))
+            _standards_scenes = _std.get("scenes") or []
+        except Exception as _e:                                   # noqa: BLE001
+            _standards, _standards_ok, _standards_scenes = None, False, []
+            _standards_why = "standards_pack 不可用：%s: %s" % (
+                type(_e).__name__, str(_e)[:100])
+
         return {"ok": True, "readonly": True,
                 "capabilities_total": len(full),      # 全息：总数
                 "activated": act,                     # 聚焦：这次点亮哪几个**注册能力位**
                 "requested": _requested,              # 这次按名字要的是什么（可能是方法名，不冒充能力位）
                 "focus": fc,
                 "pack": pack.get("pack"),
+                "standards": _standards,              # 「该怎么干」：按场景挑出的工程规范
+                "standards_ok": _standards_ok,
+                "standards_why": _standards_why,
+                "standards_scenes": _standards_scenes,
                 "redlines": (tc.run("redlines") or {}).get("redlines")
                             if hasattr(tc, "run") else None}
     except Exception as e:                            # noqa: BLE001
@@ -1216,15 +1250,57 @@ def capabilities() -> dict:
 
 
 def self_diagnose() -> dict:
-    """触手自诊断：硬件层就绪度 + 依赖分层 + 可用能力数。"""
+    """触手自诊断：硬件层就绪度 + 依赖分层 + **是谁在跑** + 可用能力数。
+
+    🔴 2026-11-05 两处补（同一个事故的两面：换个解释器跑本仓，屏幕全灭而无人察觉）
+      ① `deps` 原来只有 4 项，而采集链明明是三路 dxcam→mss→pyautogui，
+         这里**漏掉 pyautogui**。于是诊断与报错给出不同结论：
+         诊断看着像"只差 uiautomation"，报错却说"缺 pyautogui"。
+         同一个事实两个信息源打架 ⇒ 诊断失去价值。
+         现在按采集链顺序列全，并标出每一路是第几顺位。
+      ② 新增 `interpreter` 段。本机同时装着多个 Python：一个带
+         mss/uiautomation/pyautogui，另一个只有 numpy/PIL —— 后者跑本仓
+         就是"屏幕全灭"。原来 diagnose 一个字都不提"现在是谁在跑"，
+         看读数的人无从分辨"这是缺件，还是跑错了人"。
+
+    `ok` 的语义**不动**（仍是 `eye_ready()`，即"模块加载成功"）：它被多处读作
+    "触手可用"，改语义会牵连一片。而"能不能真看到"由
+    `brain_exec._vision_dim()` 真抓一帧回答 —— 两者分工，谁也不冒充谁。
+    """
     deps = {}
-    for mod, label in (("ctypes", "键鼠/窗口（标准库）"), ("mss", "截图（BitBlt 兜底）"),
-                       ("uiautomation", "读屏/UIA 穿透"), ("dxcam", "DXGI 硬采加速（可选）")):
+    for mod, label in (("ctypes", "键鼠/窗口（标准库）"),
+                       ("dxcam", "截屏①：DXGI 硬采加速（可选）"),
+                       ("mss", "截屏②：BitBlt 兜底"),
+                       ("pyautogui", "截屏③：终极兜底（含鼠标键盘）"),
+                       ("uiautomation", "读屏：UIA 穿透")):
         try:
             __import__(mod)
             deps[mod] = {"ok": True, "role": label}
         except Exception as ex:  # noqa: BLE001
             deps[mod] = {"ok": False, "role": label, "error": str(ex)[:80]}
+    # 三路采集里至少一路可用，屏幕才不算瞎（dxcam 只是加速，缺它不算瞎）
+    grab_ok = any(deps[m]["ok"] for m in ("dxcam", "mss", "pyautogui"))
+
+    repo_root = _TENTACLE_DIR.parents[1]
+    embedded = repo_root / "pyembed" / "python.exe"
+    exe = Path(sys.executable)
+    try:
+        is_embedded = bool(embedded.is_file() and exe.resolve() == embedded.resolve())
+    except Exception:  # noqa: BLE001
+        is_embedded = False
+    pth_files = sorted(p.name for p in (repo_root / "pyembed").glob("python*._pth")) \
+        if (repo_root / "pyembed").is_dir() else []
+    interpreter = {
+        "exe": str(exe),
+        "version": sys.version.split()[0],
+        "is_embedded": is_embedded,
+        "embedded_python": str(embedded) if embedded.is_file() else None,
+        "dot_pth": pth_files,
+        "note": ("" if is_embedded else
+                 "⚠️ 跑本仓的不是仓内 pyembed —— 系统别的 Python 没有采集依赖，"
+                 "在这个进程里屏幕等于全灭；用 .\\pyembed\\python.exe 重跑"),
+    }
+
     manifest = get_manifest()
     method_count = 0
     if "触手能力清单暂不可用" not in manifest:
@@ -1234,7 +1310,9 @@ def self_diagnose() -> dict:
     return {
         "ok": eye_ready(),
         "eye_error": _eye_error or None,
+        "grab_ok": grab_ok,
         "deps": deps,
+        "interpreter": interpreter,
         "manifest_methods": method_count,
         "neighborhoods": len(TENTACLE_NEIGHBORHOOD_MAP),
         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S"),

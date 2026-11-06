@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   skin-hud.css · GBT小土豆V8 控制台皮肤层（2026-11-06）
+   风格来源：design-taste-frontend「data-terminal」（暗色监控台）
+     移动件：选中态 = 与标签等宽的 1px 强调线；卡片比底色更暗；数字等宽带符号。
+   皮肤取自产品自身：一台机器的观测舱 —— 外框刻度、角标、冷青信号色。
+   载入顺序：必须在 app.css / settings-page.css 之后。
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 基底：机舱冷黑，卡片比底色更暗（data-terminal 的层级方向） */
+  --bg0: #0c0f14;
+  --bg1: #10141a;
+  --bg-deep: #080b0f;
+  --panel: rgba(11, 14, 19, 0.92);
+  --panel-raised: #141920;
+  --console-bg: rgba(9, 12, 16, 0.94);
+
+  --ink: #e9eef5;
+  --ink2: #a9b3c2;
+  --dim: #7d8797;
+
+  --line: rgba(120, 145, 175, 0.14);
+  --line-strong: rgba(126, 158, 190, 0.30);
+
+  /* 强调色：冷青。只做 1px 线与小记号，不做填充块 */
+  --cool: #58c8e0;
+  --warm: #e0a33c;
+  --ok: #4bb37f;
+  --warn: #d9a441;
+  --danger: #e5566f;
+
+  --glow-halo: rgba(88, 200, 224, 0.10);
+  --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-console: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  --mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --sans: "Public Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  /* 皮肤自己的刻度变量 */
+  --hud-inset: 10px;
+  --hud-mark: rgba(88, 200, 224, 0.55);
+  --hud-mark-dim: rgba(88, 200, 224, 0.16);
+  --hud-tick: rgba(140, 170, 200, 0.20);
+}
+
+/* ── ① 入场动画改成「失败也可见」 ────────────────────────────────────────
+   原来的 rise 用 fill-mode:both + from{opacity:0}：一旦动画被冻结
+   （减少动效、后台标签、无 GPU），元素永远停在 opacity:0，整栏隐形。
+   这里只动位移，透明度始终 1。 */
+@keyframes hud-rise { from { transform: translateY(6px); } }
+
+#panel-l1,
+#panel-l2,
+.console {
+  animation: hud-rise 0.42s cubic-bezier(0.22, 0.8, 0.3, 1) backwards;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #panel-l1, #panel-l2, .console { animation: none; transform: none; }
+}
+
+/* ── ② 外框：机舱刻度带 + 四角角标 ────────────────────────────────────── */
+body::before {
+  display: block;
+  content: "";
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 14px;
+  z-index: 55;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--hud-tick) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(90deg, var(--hud-mark-dim) 0 1px, transparent 1px 96px);
+  background-size: auto 5px, auto 9px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat-x;
+  opacity: 0.75;
+  border-bottom: 1px solid var(--hud-mark-dim);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: var(--hud-inset);
+  z-index: 56;
+  pointer-events: none;
+  /* 四角括号：每个角两段线 */
+  background:
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 0 0 / 18px 1px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 0 0 / 1px 18px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 100% 0 / 18px 1px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 100% 0 / 1px 18px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 0 100% / 18px 1px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 0 100% / 1px 18px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 100% 100% / 18px 1px no-repeat,
+    linear-gradient(var(--hud-mark), var(--hud-mark)) 100% 100% / 1px 18px no-repeat;
+  opacity: 0.6;
+}
+
+/* ── ③ 字体：正文 Public Sans，数字等宽 ─────────────────────────────── */
+body {
+  font-family: var(--sans);
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stat-value,
+.stat-value b,
+.kpi,
+#res-cpu, #res-mem, #res-disk,
+.action-row .t,
+.console-foot,
+.pill,
+.view-sub,
+.hb-count,
+#hb-count, #hb-last,
+.cap-table td,
+.kv td.mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 微标签：统一成 9.5px / 0.18em 大写等宽——机舱读数条的语言 */
+.eyebrow,
+.l2-module-kicker,
+.stream-subtitle {
+  font: 500 9.5px/1.2 var(--mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* 读数条上的值仍要读得清 */
+.stat-label { font: 500 9.5px/1.2 var(--mono); letter-spacing: 0.14em; color: var(--dim); }
+.stat-value { font: 500 12.5px/1.1 var(--mono); color: var(--ink); }
+.ev { font-size: 10.5px; line-height: 1.65; color: var(--ink2); }
+.legend .chip { font-size: 10px; }
+
+/* ── ④ 面板：一层色阶 + 发丝线，不用大阴影 ─────────────────────────── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+#panel-l1 .panel-identity { border-bottom-color: var(--line); }
+.brand-title { font-size: 16px; letter-spacing: 0.01em; }
+
+/* ── ⑤ 页签：药丸 → 等宽标签 + 选中 1px 强调线（data-terminal 的移动件） */
+.view-tabs {
+  gap: 0;
+  padding: 8px 10px 0;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+}
+.view-tabs::-webkit-scrollbar { display: none; }
+
+.view-tab {
+  flex: none;
+  min-height: 30px;
+  padding: 6px 10px 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--dim);
+  font: 500 10.5px/1 var(--mono);
+  letter-spacing: 0.06em;
+  position: relative;
+  white-space: nowrap;
+}
+.view-tab:hover { color: var(--ink2); background: transparent; }
+.view-tab.is-active {
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  box-shadow: inset 0 -1px 0 0 var(--cool);
+}
+.view-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 10px; right: 10px; bottom: 0;
+  height: 1px;
+  background: var(--cool);
+}
+.view-tab b { color: inherit; opacity: 0.7; font-weight: 400; }
+
+/* ── ⑥ 卡片：统一成机舱块（l2 模块 / 焦点 / 资源 / 提醒） ───────────── */
+.l2-module,
+.action-log-surface,
+.cognition-surface,
+.focus-surface,
+.body-surface,
+.inject-surface,
+.api-surface,
+.reminder-surface,
+.resource-surface,
+.pair-surface,
+.update-surface,
+.stream-voice-surface {
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.l2-module-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+/* 心跳：唯一保留一点光的元素——它是「活」的证明 */
+.heartbeat-wave { stroke: var(--cool); filter: drop-shadow(0 0 3px rgba(88, 200, 224, 0.35)); }
+.heartbeat-gridline { stroke: rgba(140, 170, 200, 0.10); }
+.heartbeat-state[data-state="live"] {
+  color: var(--cool);
+  border-color: color-mix(in srgb, var(--cool) 40%, transparent);
+  background: color-mix(in srgb, var(--cool) 7%, transparent);
+}
+.live-dot, .stat-value .live-dot {
+  background: var(--cool);
+  box-shadow: 0 0 6px rgba(88, 200, 224, 0.6);
+}
+
+/* 状态点：失败才红，正常走冷青，别满屏绿灯 */
+.ev.ok .dot { background: var(--cool); box-shadow: 0 0 5px rgba(88, 200, 224, 0.45); }
+.ev.bad .dot { background: var(--danger); box-shadow: none; }
+.ev.warn .dot { background: var(--warn); box-shadow: none; }
+
+/* ── ⑦ 中栏画布：星图给一层极淡的机舱网格，边框收到发丝线 ───────────── */
+.console:not([data-view="chat"]) {
+  background: var(--console-bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.console[data-view="plug"] .view-plug,
+.console[data-view="space"] .view-space,
+.console[data-view="brain"] .view-brain,
+.console[data-view="team"] .view-team,
+.console[data-view="mind"] .view-mind {
+  background-image:
+    linear-gradient(rgba(120, 150, 180, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 150, 180, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+  background-position: center;
+}
+
+/* ── ⑧ 输入区与页脚 ───────────────────────────────────────────────── */
+.dsh-composer {
+  background: color-mix(in srgb, var(--panel-raised) 82%, transparent);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+}
+.dsh-composer:focus-within { border-color: color-mix(in srgb, var(--cool) 45%, transparent); }
+.send-btn { background: var(--ink); color: #0b0e12; }
+.console-foot, .sign { color: var(--dim); opacity: 0.85; }
+
+/* ── ⑨ 设置中心跟着同一套皮肤走 ───────────────────────────────────── */
+#gs-root {
+  --gs-bg: #0b0e13;
+  --gs-rail: #0e1218;
+  --gs-panel: #141920;
+  --gs-panel-2: #10141a;
+  --gs-line: rgba(126, 158, 190, 0.16);
+  --gs-ink: #e9eef5;
+  --gs-ink2: #a9b3c2;
+  --gs-dim: #7d8797;
+  --gs-accent: #58c8e0;
+  font-family: var(--sans);
+}
+#gs-root .gs-item.on {
+  color: var(--gs-ink);
+  box-shadow: inset 1px 0 0 0 var(--gs-accent);
+}
+#gs-root .gs-grp {
+  font: 500 9.5px/1 var(--mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gs-dim);
+}
+#gs-root .kv td, #gs-root .kpi .n { font-variant-numeric: tabular-nums; }

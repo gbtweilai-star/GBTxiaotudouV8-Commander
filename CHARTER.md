@@ -110,7 +110,7 @@
 12. **闭环端到端接上** —— 常驻循环必须真调 `act()` 并记 `acted`。→ `rule12()`
 13. **自我描述自洽** —— 总纲/自我介绍里的数字必须是**现算值**，写死的当场抓。→ `rule13()`
 
-**复查**：`py -3.14 -X utf8 tools/codex-scripts/iron-rules-check.py [--json] [--selftest]`
+**复查**：`./pyembed/python.exe -X utf8 tools/codex-scripts/iron-rules-check.py [--json] [--selftest]`
 
 > 注意：`rule2()` 只扫**活跃代码/脚本**（.py/.ps1/.cmd/.bat），**不看 .md** ——
 > 文档里的反引号是示例不是调用，看了就是假红。

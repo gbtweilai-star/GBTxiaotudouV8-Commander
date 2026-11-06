@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/voice_settings.py`](../../gbt_allinone/tools/voice_settings.py) · `verify()` **16 项** · `schema/validate/resolve/verify` |
+| 模块/契约 | [`gbt_allinone/tools/voice_settings.py`](gbt_allinone/tools/voice_settings.py) · `verify()` **16 项** · `schema/validate/resolve/verify` |
 | 统一门 | 注册能力位 **`voice_settings`**（`run_task("voice_settings", …)`；纯校验/解析 zero-scope，`policy.py` 未改） |
 | API | `GET/POST /api/voice/settings`：读取设置 + schema；保存前走统一门 `validate`，以 trusted-owner 写 `state/voice-settings.json`，追加 `outputs/voice-settings/audit.jsonl` |
 | APP 接线 | 数字人页 ⚙「语音设置」弹窗：音色下拉（系统 zh 声库）/ 语速 / 音高 / ASR 后端 / 自动朗读；保存立即生效 |
-| 验收 | [`tests/test_voice_settings.py`](../../tests/test_voice_settings.py) |
+| 验收 | [`tests/test_voice_settings.py`](tests/test_voice_settings.py) |
 
 ## 二、实际行为
 

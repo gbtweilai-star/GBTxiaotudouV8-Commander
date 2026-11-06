@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
 import socket
 import sys
@@ -45,7 +46,23 @@ PORTS = [
 ]
 
 
-def _tcp(port: int, host="127.0.0.1", t=1.0) -> float | None:
+def _tcp(port: int, host="127.0.0.1", t=None) -> float | None:
+    """探一个端口通不通，返回到达毫秒数（不通返回 None）。
+
+    超时分档（2026-11-04 实测优化）：
+      · 回环（127.0.0.1 / localhost / ::1）：**0.15 秒**。
+        本机端口关闭会立刻回 RST（<1ms），端口开着也是立刻成功；
+        给它 1.0 秒只是在等一个不会来的响应 ——
+        实测 `surface_audit` 8 次探测 × 1.0 秒 = 8 秒，占总耗时 1/3。
+        真正会等满超时的只有被防火墙 DROP 的情况，那是少数。
+      · 非回环：保持 1.0 秒，跨网段 RTT 不可预测，砍了会误判。
+    """
+    if t is None:
+        # 回环：0.06 秒。本机端口关闭是亚毫秒级 RST，开着的也是立刻成功；
+        # 之所以不设 0，是为了给被防火墙 DROP 的少数情况留一点判定余量。
+        # 可用 GBT_TCP_TIMEOUT 覆盖（弱机/特殊网络）。
+        t = float(os.environ.get("GBT_TCP_TIMEOUT") or
+                  (0.06 if host in ("127.0.0.1", "localhost", "::1", "0.0.0.0") else 1.0))
     s = socket.socket()
     s.settimeout(t)
     t0 = time.time()

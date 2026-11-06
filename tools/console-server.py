@@ -588,6 +588,123 @@ def _openai_chat(text: str, m: dict) -> dict:
             "provider": m.get("provider") or "openai-compatible"}
 
 
+def _pulse_text(pl: dict, body: dict) -> str:
+    """把脉冲直达的结构化结果转成人话，前端可直接显示。
+
+    只挑真实存在的字段渲染（不同能力位返回字段不同），不硬编一套空模板 ——
+    返回里没有的项就不显示，免得出现"节点：None"这种假信息。
+    """
+    lines = ["⚡ **脉冲直达** · `%s` / `%s`  ·  图查询 %sms，未经模型生成"
+             % (pl.get("cap"), pl.get("op"), pl.get("route_ms"))]
+    tgt = (pl.get("params") or {}).get("target")
+    if tgt:
+        lines.append("目标：`%s`" % tgt)
+    for k, label in (("graph_nodes", "图节点"), ("nodes", "节点"),
+                     ("edges", "边"), ("strong_edges", "强边"),
+                     ("components", "连通分量"), ("largest_share", "最大分量(%)"),
+                     ("depth", "深度"), ("reached", "可达节点")):
+        v = body.get(k)
+        if v is not None:
+            lines.append("· %s：%s" % (label, v))
+    targets = body.get("targets") or body.get("top") or []
+    if targets:
+        lines.append("· 命中 %d 个，前几个：" % len(targets))
+        for t in targets[:8]:
+            if isinstance(t, dict):
+                t = t.get("node") or t.get("target") or json.dumps(t, ensure_ascii=False)[:80]
+            lines.append("  - `%s`" % t)
+    caps = body.get("caps") or []
+    if caps:
+        lines.append("· 涉及能力位：%s" % " / ".join(str(c) for c in list(caps)[:10]))
+    hint = body.get("hint") or body.get("why")
+    if hint:
+        lines.append("· %s" % str(hint)[:200])
+    return "\n".join(lines)
+
+
+def _method_slim(body: dict, depth: int = 0) -> dict:
+    """触手方法回执的**瘦身版** —— 图像 base64 绝不能原样进 JSON。
+
+    2026-11-05：`see` / `screenshot` 的返回里带 `image_base64`（实测一帧几百 KB），
+    直接塞进 /api/chat 的响应会把整条对话拖成几 MB。这里只留形状：大字符串截断、
+    列表和字典各留前 12 项，其余记成 `<>` 标记 —— 让她看得见"有东西"，但搬不动它。
+    """
+    if not isinstance(body, dict):
+        return {"value": str(body)[:200]}
+    out = {}
+    for k, v in body.items():
+        if isinstance(v, str):
+            out[k] = v if len(v) <= 300 else "<%d chars 已省略>" % len(v)
+        elif isinstance(v, (int, float, bool)) or v is None:
+            out[k] = v
+        elif isinstance(v, list):
+            out[k] = v[:12] if depth == 0 else "<%d 项>" % len(v)
+        elif isinstance(v, dict):
+            out[k] = _method_slim(v, depth + 1) if depth == 0 else "<%d 键>" % len(v)
+        else:
+            out[k] = str(v)[:200]
+    return out
+
+
+def _method_block_state(env: dict, body: dict) -> dict:
+    """触手方法"没成"时按**失败三态**归类 —— 缺票 / 缺件 / 真失败，不许混成一句。
+
+    2026-11-05 实测踩到（产品目录 D:\\GBT-builds）：`clipboard_read` 在产品 pyembed 里
+    缺 `pyperclip`，回执却写成「缺授权：pyperclip」。缺件被说成缺票，正是本仓明令
+    禁止的三态混装（§2.1）。真实字段见 `tentacle/omni_core.py: refusal()`：
+
+        denied=True / missing_scopes=[...]                        -> 缺授权
+        unavailable=True / rule=dependency_unavailable / missing=[...] -> 缺依赖
+        其余                                                       -> 真失败（交给模型）
+    """
+    scopes = list(env.get("missing_scopes") or body.get("missing_scopes") or [])
+    deps = list(body.get("missing") or env.get("missing") or [])
+    rule = str(body.get("rule") or env.get("rule") or "")
+    status = str(env.get("status") or "")
+    if scopes or status == "denied" or body.get("denied") is True:
+        return {"state": "denied", "missing_scopes": scopes, "missing": deps,
+                "line": "缺授权：%s" % (" / ".join(map(str, scopes)) or "（未点名作用域）")}
+    if deps or rule in ("dependency_unavailable", "unavailable") or body.get("unavailable"):
+        return {"state": "needs_dependency", "missing_scopes": scopes, "missing": deps,
+                "line": "缺依赖：%s（补上再试，不是授权问题）"
+                        % (" / ".join(map(str, deps)) or rule or "未点名")}
+    why = (body.get("why") or body.get("error") or env.get("reason")
+           or env.get("error") or status or "原因未报")
+    return {"state": "failed", "missing_scopes": scopes, "missing": deps,
+            "line": "原因：%s" % str(why)[:200]}
+
+
+def _method_text(method: str, body: dict, lane: dict, ms: float) -> str:
+    """触手方法直达的人话回执 —— 只渲染返回里**真有**的字段（不造空模板）。"""
+    lines = ["⚡ **触手直达** · `%s`  ·  本地路由 %.1fms，未经模型生成" % (method, ms)]
+    txt = body.get("text")
+    if isinstance(txt, str) and txt.strip():
+        lines.append("内容：%s" % txt.strip()[:800])
+    wins = body.get("windows")
+    if isinstance(wins, list):
+        lines.append("· 当前 %d 个窗口：" % len(wins))
+        for w in wins[:10]:
+            if isinstance(w, dict):
+                w = w.get("title") or w.get("name") or w.get("hwnd") or w
+            lines.append("  - %s" % str(w)[:80])
+    if body.get("dialog_detected") is not None:
+        if body.get("dialog_detected"):
+            lines.append("· 有弹窗，按钮：%s" % (body.get("button") or "?"))
+        else:
+            lines.append("· 没有检测到弹窗")
+    if body.get("size"):
+        kb = body.get("kb") or body.get("image_kb")
+        lines.append("· 取到一帧 %s%s（图像未在此展开）"
+                     % ("×".join(str(x) for x in body["size"]),
+                        "，%.1f KB" % kb if isinstance(kb, (int, float)) else ""))
+    if body.get("changed") is not None:
+        lines.append("· 画面%s变化" % ("有" if body.get("changed") else "没有"))
+    if not any(k in body for k in ("text", "windows", "dialog_detected", "size", "changed")):
+        lines.append("· 返回字段：%s" % " / ".join(sorted(body)[:10]))
+    lines.append("（只读白名单方法 · 零参数调用 · 走 api.run_task，授权与审计照旧）")
+    return "\n".join(lines)
+
+
 def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
           image=None, image_name: str = "", file=None, file_name: str = "",
           file_type: str = "") -> dict:
@@ -599,6 +716,37 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     开关：body 里 `capability:false` 或环境变量 `GBT_CAPABILITY_ROUTER=0`。
     """
     t0 = time.time()
+    # 2026-11-05：算子闸门的**观测位 + 候选提示**（只提示，不给执行权）。
+    # 她真实的对话入口是 /api/chat → _chat，此前从不经过 brain_exec.route，
+    # 所以命中率一直是 0 —— 那是没接上，不是没命中。
+    # 两件事分开：① 每次判定记账（观测）；② 稳妥命中时把「427 压到几个」
+    # 写进 prompt（GBT_OPERATOR_HINT=0 可关）。执行权仍在 capability_router /
+    # tactile pulse 的只读白名单里，这里一个字都不执行。
+    _operator = None
+    _g = None
+    if str(text or "").strip():
+        try:
+            from gbt_allinone import operator_index as _OI_obs
+            _g = _OI_obs.gate(text)
+            _OI_obs.log_gate(text, _g, None, src="route")
+            if os.environ.get("GBT_OPERATOR_HINT", "1") != "0":
+                _operator = _OI_obs.hint_note(text, gate_result=_g)
+        except Exception:
+            _operator = None
+    # 2026-11-06：交办单（人话里省掉的那几件事）。只解析 / 只提示 / 只记账，
+    # **没有动作面** —— 执行权仍只在 capability_router 与只读白名单那里。
+    # 它解决的是「20 秒的模型在替你猜他要什么」：把 goal/对象/规格/验收/退路
+    # 明摆出来，缺哪件就说缺哪件，模型只问那一件（空问率才是烦人度的第一指标）。
+    _commission = ""
+    if str(text or "").strip():
+        try:
+            from gbt_allinone import commission as _CM
+            _cm = _CM.parse(text)
+            _CM.record(_cm, gate=_g, outcome="chat")
+            if os.environ.get("GBT_COMMISSION_HINT", "1") != "0":
+                _commission = _CM.note(_cm)
+        except Exception:                                # noqa: BLE001
+            _commission = ""
     # 2026-11-02：聊天 + 附图 —— 先做本地视觉读数（零出网/零写盘），再决定回读数还是带图上下文对话
     _img = None
     _visual_note = ""
@@ -647,10 +795,17 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     if use_capabilities and _img is None and _file is None and os.environ.get("GBT_CAPABILITY_ROUTER", "1") != "0":
         try:
             from gbt_allinone import capability_router as _CR
+            _t_cr = time.perf_counter()
             cap = _CR.run(text, context=context)
+            _cr_ms = (time.perf_counter() - _t_cr) * 1000
             if cap.get("handled"):
                 cap.setdefault("context", {"mode": "capability-router", "name": context})
                 cap["elapsed_ms"] = int((time.time() - t0) * 1000)
+                # 2026-11-06 主人令「每一步细节都要能看得到」：把路由器总耗时与工具耗时
+                # 分开给，前端才能如实拆成「扫描指令 / 调用工具 / 执行回执」三段 ——
+                # 两个数都是实测，不是估算；缺一个就少一行，不补假值。
+                cap["ms_route"] = round(_cr_ms, 1)
+                cap["ms_run"] = (cap.get("capability") or {}).get("ms")
                 return cap
         except Exception as _cap_err:  # noqa: BLE001
             # 路由自己坏了绝不许挡正常对话：降级走模型，但**必须在 stderr 留痕**（不许静默）。
@@ -659,8 +814,174 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                                                           str(_cap_err)[:200]), file=sys.stderr)
             except Exception:  # noqa: BLE001
                 pass
+    # ⚡ 脉冲直达（2026-11-04 主人令：「运行不要按照原来的跑法，必须按照触手关联互通
+    # 来实现精准直达脉冲提速」）。
+    #
+    # 与下面那段"提示"的分工：
+    #   · 这一段**真的执行**，命中就返回结果，全程不过模型 —— 实测 296ms vs 21600ms。
+    #   · 下面那段只往 prompt 里塞候选，不执行。
+    #
+    # 为什么安全：拒绝条件在 `tactile_tree.pulse` 里三重卡死 ——
+    #   ① 置信度不足 → needs_input  ② 不在只读白名单 → denied
+    #   ③ op 需要的参数从原话里抽不到 → needs_input，**不猜**。
+    # 也就是说：只有"这句话明确在问某个只读能力位、且参数齐"才会直达；
+    # 摄像头 / 写盘 / 发消息那一类永远走不到这里。
+    # 开关：GBT_TACTILE_PULSE=0。
+    if (use_capabilities and _img is None and _file is None
+            and os.environ.get("GBT_TACTILE_PULSE", "1") != "0"):
+        try:
+            from gbt_allinone import tactile_tree as _TT
+            _pl = _TT.run("pulse", query=text)
+            if _pl.get("ok") and _pl.get("status") == "ready":
+                from gbt_allinone import api as _API
+                _par = {"op": _pl["op"]}
+                _par.update(_pl.get("params") or {})
+                _env = _API.run_task(_pl["cap"], _par)
+                _bod = _env.get("result") or {}
+                if isinstance(_bod.get("result"), dict):
+                    _bod = _bod["result"]
+                if _env.get("ok") and _bod.get("ok"):
+                    return {
+                        "ok": True,
+                        "text": _pulse_text(_pl, _bod),
+                        "via": "tactile-pulse",
+                        "capability": {"cap": _pl["cap"], "op": _pl["op"],
+                                       "params": _pl.get("params") or {},
+                                       "judge": _pl.get("judge")},
+                        "pulse": _bod,
+                        "elapsed_ms": int((time.time() - t0) * 1000),
+                        "context": {"mode": "tactile-pulse", "name": context},
+                    }
+            elif _pl.get("status") == "denied":
+                # 实测教训（2026-11-04）：pulse 正确拒绝了「打开摄像头拍一张」
+                # （不在只读白名单），但拒绝之后没人接 —— 句子继续往下掉进对话模型，
+                # 实测 **128.6 秒**才回一句，而它本来只需要说"这个要授权"。
+                # 所以拒绝也要秒回：告诉用户识别到了什么、为什么没执行、怎么手动执行。
+                return {
+                    "ok": True,
+                    "text": "\n".join([
+                        "⚡ 识别到你在说 `%s`（触手树图查询 %sms）。"
+                        % (_pl.get("candidate") or "?", _pl.get("latency_ms")),
+                        "它**不在自动执行白名单**，所以我没动手 —— %s"
+                        % (_pl.get("why") or ""),
+                        "要执行请明说，或在面板里手动调用；只读能力位（%s）可以直接问我。"
+                        % (" / ".join(_pl.get("whitelist") or []) or "无"),
+                    ]),
+                    "via": "tactile-deny",
+                    "capability": {"candidate": _pl.get("candidate"),
+                                   "why": _pl.get("why"),
+                                   "whitelist": _pl.get("whitelist") or []},
+                    "elapsed_ms": int((time.time() - t0) * 1000),
+                    "context": {"mode": "tactile-deny", "name": context},
+                }
+        except Exception as _pl_err:  # noqa: BLE001
+            # 直达自己坏了也不许挡对话：降级走原链路，但 stderr 留痕
+            try:
+                print("[tactile_pulse] 降级：%s: %s" % (type(_pl_err).__name__,
+                                                      str(_pl_err)[:200]), file=sys.stderr)
+            except Exception:  # noqa: BLE001
+                pass
+    # ⚡ 触手方法直达（2026-11-05 加）：`tactile pulse` 只覆盖 tactile_tree 的
+    # 2 个只读能力位；而触手方法空间里有一组**逐方法核过只读**的读法
+    # （`brain_exec._METHOD_FAST_SAFE`，16 条：取帧/读字/列窗口/读剪贴板/探测弹窗…）。
+    # 同样 7 句话，`_chat` 此前本地只答 2 条，`brain_route` 答 6 条 —— 差的就是这一段。
+    #
+    # 为什么安全：门是 `brain_exec._method_lane`，三重条件 ——
+    #   ① route_method 有把握 ② margin≥4 ③ 方法在白名单里（逐方法读过实现、全零参数）。
+    # 白名单**不含** domain_type / domain_act / clipboard_write / copy / cut /
+    # select_all / vision_stream_record / handle_any_dialog —— 2026-11-05 实测：
+    # 旧版按「观测类邻域」放行，这 5 句会被直接执行（血账见 brain_exec 白名单注释）。
+    # 派发仍走 `api.run_task`，缺票如实 denied，不包装成 failed。
+    # 开关：GBT_METHOD_LANE=0。
+    if (use_capabilities and _img is None and _file is None
+            and os.environ.get("GBT_METHOD_LANE", "1") != "0"):
+        try:
+            from gbt_allinone import brain_exec as _BE
+            _t_mf = time.perf_counter()
+            _mf = _BE._method_lane(text)
+            _mm = ((_mf or {}).get("best") or {}).get("method")
+            _mf_ms = (time.perf_counter() - _t_mf) * 1000
+            if _mm:
+                from gbt_allinone import api as _API2
+                _t_run = time.perf_counter()
+                _env2 = _API2.run_task("tentacle", {"method": _mm})
+                _run_ms = (time.perf_counter() - _t_run) * 1000
+                _bod2 = _env2.get("result") or {}
+                if isinstance(_bod2.get("result"), dict):
+                    _bod2 = _bod2["result"]
+                _miss2 = _method_block_state(
+                    _env2, _bod2 if isinstance(_bod2, dict) else {})
+                if _env2.get("status") == "ok" and isinstance(_bod2, dict) and _bod2.get("ok"):
+                    return {
+                        "ok": True,
+                        "text": _method_text(_mm, _bod2, _mf, _mf_ms),
+                        "via": "method-direct",
+                        "capability": {"cap": "tentacle", "method": _mm,
+                                       "gate": "read_only_whitelist",
+                                       "margin": ((_mf or {}).get("method_fast") or {}).get("margin")},
+                        "method_result": _method_slim(_bod2),
+                        "ms_route": round(_mf_ms, 1), "ms_run": round(_run_ms, 1),
+                        "elapsed_ms": int((time.time() - t0) * 1000),
+                        "context": {"mode": "method-direct", "name": context},
+                    }
+                if _miss2["state"] in ("denied", "needs_dependency"):
+                    # 2026-11-04 教训（pulse 分支实测 128.6 秒）：识别对了、只是没票或缺件，
+                    # 就别掉进模型 —— 那要 20 秒以上才说一句"要授权"。
+                    # 真失败（state=failed）**不在这里返回**：模型也许能救，交给后面。
+                    return {
+                        "ok": True,
+                        "text": "\n".join([
+                            "⚡ 识别到这是触手方法 `%s`（本地 %.1fms），但**没有执行**。" % (_mm, _mf_ms),
+                            _miss2["line"],
+                        ]),
+                        "via": "method-" + _miss2["state"],
+                        "block_state": _miss2["state"],
+                        "capability": {"cap": "tentacle", "method": _mm,
+                                       "missing_scopes": _miss2["missing_scopes"],
+                                       "missing": _miss2["missing"]},
+                        "elapsed_ms": int((time.time() - t0) * 1000),
+                        "context": {"mode": "method-" + _miss2["state"], "name": context},
+                    }
+        except Exception as _mf_err:  # noqa: BLE001
+            # 直达自己坏了绝不许挡对话：降级走原链路，但 stderr 留痕
+            try:
+                print("[method_lane] 降级：%s: %s" % (type(_mf_err).__name__,
+                                                    str(_mf_err)[:200]), file=sys.stderr)
+            except Exception:  # noqa: BLE001
+                pass
+    # 2026-11-04 主人令「以触手当权重，联通互通后秒级响应」：
+    # capability_router 只管四类（screen/web/file/image），四类之外一律交给对话模型。
+    # 但对话模型走本机权重是 21.6s / 1.16 tok/s —— 慢，且会编（实测会编品牌名）。
+    # 触手树是加权图传播（实测 p50 ~17ms，比 LLM 快 1300×），**不生成一个字、不执行任何动作**，
+    # 只回答一个问题：「这句话最可能落在哪几个能力位」。把它写进 prompt，让权重少编。
+    #
+    # 边界（写死）：`confident` 只用于「值不值得提示」，**不用于「能不能执行」**。
+    # 要真执行得先有只读白名单 + 授权设计，不许拿这个字段凑合。
+    # 开关：GBT_TACTILE_HINT=0。图没建 / 坏了 / 慢了一律静默降级，绝不许挡正常对话。
+    _tactile = None
+    if (use_capabilities and _img is None and _file is None
+            and os.environ.get("GBT_TACTILE_HINT", "1") != "0"):
+        try:
+            from gbt_allinone import tactile_tree as _TT
+            _h = _TT.run("hint", query=text, topk=5)
+            if _h.get("ok") and _h.get("confident"):
+                _tactile = _h
+        except Exception as _tt_err:  # noqa: BLE001
+            try:
+                print("[tactile_tree] 降级：%s: %s" % (type(_tt_err).__name__,
+                                                      str(_tt_err)[:200]), file=sys.stderr)
+            except Exception:  # noqa: BLE001
+                pass
     m = _settings_load().get("model") or {}
-    prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
+    _tactile_note = ""
+    if _tactile:
+        _cands = " / ".join(x["node"] for x in _tactile["top"][:4])
+        _tactile_note = ("（触手树判定这句话最可能落在这些能力位：%s。"
+                         "这只是一条提示，不确定就照常回答，不要硬套。）\n" % _cands)
+    # 候选提示二选一：算子闸门有策展词证据（更硬）就用它；它弃权才退回触手树。
+    # 两句同时塞进去只会互相打架，还会让本机 1.16 tok/s 的模型更慢。
+    _cand_note = (_operator or {}).get("note") or _tactile_note
+    prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + _commission + _cand_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
     # 2026-11-02 主人令：Agnes 只做“反向调用云端算力”，不是聊天模型；
     # 聊天永远先用我们自己的本机权重。除非显式 GBT_ALLOW_EXTERNAL_MODEL=1，否则不允许外部模型接聊天。
     if m.get("base_url") and m.get("name") and os.environ.get("GBT_ALLOW_EXTERNAL_MODEL") == "1":
@@ -695,6 +1016,12 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                        "window_chars": st.get("window_chars") or rc.window_chars}
     except Exception as e:  # noqa: BLE001
         out["ring"] = {"error": "%s: %s" % (type(e).__name__, str(e)[:100])}
+    if _tactile:
+        # 回执里带上候选，前端可以直接显示「系统读到的能力位」，也方便事后核对路由准不准
+        out["tactile"] = {"top": [{"node": x["node"], "share": x["share"]}
+                                  for x in _tactile["top"][:4]],
+                          "latency_ms": _tactile.get("latency_ms"),
+                          "seeds": _tactile.get("seeds")}
     out["elapsed_ms"] = int((time.time() - t0) * 1000)
     return out
 
@@ -938,9 +1265,9 @@ def _omni_monitor():
         "web": {"state": "ready" if ca_ok else "needs_ca", "note": "眼+手（desktop_control 已免票）"},
         "app": {"state": "ready" if win_count > 0 else "needs_window",
                 "note": ("可见窗口 %d 个" % win_count) if win_count >= 0 else "窗口枚举不可用"},
-        "ai": {"state": "ready" if (key_any or True) else "needs_key",
+        "ai": {"state": "ready",
                "note": ("钥匙槽已配 %d 个" % sum(1 for k in keys if k["configured"]))
-                       + "；无钥匙时走本机 energy_core"},
+                       + ("" if key_any else "；无钥匙时走本机 energy_core")},
         "dh": {"state": "ready" if dh_ok else "unregistered",
                "note": "进程内执行器 dh:rig" if dh_ok else "没注册（服务未加载数字人控制）"},
     }
@@ -1060,6 +1387,14 @@ def _omni_impact(target: str = "", n: int = 8) -> dict:
                 rows.append(json.loads(ln))
             except Exception:  # noqa: BLE001
                 continue
+    # 2026-11-06：旧版万能插把空 target 的 `status` 也写进动作流水。
+    # 读侧与 impact_check.recent 同一口径过滤，避免旧噪音重新出现在面板时间线。
+    def _empty_read(row):
+        act = str(row.get("action") or row.get("op") or "").strip().lower()
+        return (act in ("status", "where", "recent")
+                and not str(row.get("target") or "").strip()
+                and not str(row.get("socket") or "").strip())
+    rows = [r for r in rows if not _empty_read(r)]
     for r in rows[-12:][::-1]:
         node = IC._to_node(_abs(r.get("target")))
         recent.append({"ts": r.get("ts"), "action": r.get("action"),
@@ -1245,6 +1580,15 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s"
                                    % (type(e).__name__, str(e)[:200])}, 500)
+        if path == "/api/settings-center":
+            # 设置中心一次性聚合（19 个面板；每个面板独立失败，慢项带缓存）
+            try:
+                _cs = _load_by_path("console_settings", "tools/console_settings.py")
+                return self._json(_cs.build())
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
         if path == "/api/tianzhen":
             try:
                 from gbt_allinone.tools import comfy_native as CN
@@ -1631,8 +1975,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:160])}, 500)
         if path == "/api/state":
             d = _data()
+            # 2026-11-05：外壳要能分辨「这个端口上跑的是哪个仓的服务」。
+            # 只回 caps/skills 时，壳无法知道自己连上的是不是自己那份代码，
+            # 于是会静默沿用别的目录（如 D: 成品）里的旧服务 —— 见 console-service.cjs。
             return self._json({"ok": True, "caps": d["caps"]["total"],
                                "skills": d["skills"]["count"],
+                               "root": str(REPO), "pid": os.getpid(),
                                "engine": d["engine"], "guards": d["guards"]})
         if path in ("/api/team-mirror", "/team-mirror", "/team-mirror.html"):
             base = REPO if REPO.is_dir() else __import__("pathlib").Path(__file__).resolve().parents[1]
@@ -1679,6 +2027,16 @@ class Handler(BaseHTTPRequestHandler):
         if not f.is_file():
             # 目录 → 找它下面的 index.html（/blueprint3d/ 这种独立页）
             if f.is_dir() and (f / "index.html").is_file():
+                # 少个尾斜杠先 302 补上：否则页面里的 ./app.js 会被解析成 /app.js
+                # （2026-11-06 实测 /console 整页无样式无脚本，看着像「按钮全坏了」）
+                if not path.endswith("/"):
+                    _sp = self.path.split("?", 1)
+                    _loc = path + "/" + (("?" + _sp[1]) if len(_sp) > 1 else "")
+                    self.send_response(302)
+                    self.send_header("Location", _loc)
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    return
                 f = (f / "index.html").resolve()
             else:
                 return self._send(404, b"not found", "text/plain; charset=utf-8")
@@ -2111,6 +2469,16 @@ class Handler(BaseHTTPRequestHandler):
             return self._api_bounty(raw)
         if path == "/api/memory":
             return self._api_memory_post(body)
+        if path == "/api/settings-center/act":
+            # 设置中心的少数写动作：通知测试 / 清空回收站 / 存主题偏好
+            try:
+                _cs = _load_by_path("console_settings", "tools/console_settings.py")
+                r = _cs.act(body or {})
+                return self._json(r, 200 if r.get("ok") else 400)
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": "%s: %s"
+                                   % (type(e).__name__, str(e)[:200])}, 500)
+
         if path == "/api/tianzhen":
             try:
                 from gbt_allinone.tools import comfy_native as CN

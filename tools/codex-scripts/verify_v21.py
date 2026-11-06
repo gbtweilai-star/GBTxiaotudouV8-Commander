@@ -28,7 +28,7 @@ if not (PROTO.exists() and CANVAS.exists()):
     print("🔴 代际不符：本门验 V21 两件，而盘上现役是 %s" % ("、".join(_active) or "（没有 V*.html）"))
     print("   V21 两件现读：%s / %s ⇒ %s"
           % (PROTO.name, CANVAS.name, "在" if PROTO.exists() and CANVAS.exists() else "不在根上（应已归档）"))
-    print("   ⇒ 跑现役门：`py -3.14 tools/codex-scripts/verify_active.py`（自动派发到 verify_v22.py）")
+    print("   ⇒ 跑现役门：`./pyembed/python.exe tools/codex-scripts/verify_active.py`（自动派发到 verify_v22.py）")
     sys.exit(2)
 
 R = []

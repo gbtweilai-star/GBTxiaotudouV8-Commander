@@ -17,8 +17,8 @@
   - **未登记**：工作区有 `skills/gbt-*` 但 `omni.py` 的 `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS` 里都没有 ⇒ 报出来。
 
 用法：
-    py -3.14 tools/codex-scripts/audit-skill-roots.py            # 审计 + 写 state/skill_roots_audit.json
-    py -3.14 tools/codex-scripts/audit-skill-roots.py --fix      # 把 gbt-* 的旧副本**从源稿刷新**（不改第三方）
+    ./pyembed/python.exe tools/codex-scripts/audit-skill-roots.py            # 审计 + 写 state/skill_roots_audit.json
+    ./pyembed/python.exe tools/codex-scripts/audit-skill-roots.py --fix      # 把 gbt-* 的旧副本**从源稿刷新**（不改第三方）
 退出码：0 = gbt-* 无偏差；1 = 有 gbt-* 偏差（修完再跑应为 0）。
 """
 from __future__ import annotations
@@ -43,6 +43,10 @@ OUT = ROOT / "state" / "skill_roots_audit.json"
 
 ROOTS = [
     ("ws-source", ROOT / "skills"),
+    # 2026-11-05 补：`gbt_allinone/skills/` 是 `tools/skills_sync.py` 的**第二个源**，
+    # 却不在审计的根列表里 ⇒ 它在枢纽里的副本被当成「孤本」（源稿"丢了"）。
+    # 实测后果：shuohao 的 7 个子技能全被报 ⑤ 孤本，并建议「拷到 skills/ 抢救」—— 而源稿根本没丢。
+    ("pkg-source", ROOT / "gbt_allinone" / "skills"),
     ("openclaw-managed", Path.home() / ".openclaw-autoclaw" / "skills"),
     ("dsh-project", ROOT / ".dsh" / "skills"),
     ("proj-agents", ROOT / ".agents" / "skills"),          # DSH 的 project-agents 根（本会话也会读）
@@ -59,6 +63,32 @@ def sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest().upper()
 
 
+def _skill_name(sk: Path) -> str:
+    """技能的**真名**：frontmatter 的 `name:`，拿不到返回 ""（调用方退回目录名）。
+
+    为什么不用目录名：`skills/taste-skill/SKILL.md` 里写的是 `name: design-taste-frontend`，
+    目录名与技能名本来就可以不同。omni 用 frontmatter name 作图鉴键，`skills_hub.validate`
+    也按它判合规 —— 审计再按目录名建索引，三个出口就各说各话。
+    """
+    try:
+        head = sk.read_text(encoding="utf-8", errors="replace")[:2000]
+    except OSError:
+        return ""
+    m = re.search(r"(?m)^name:\s*(.+?)\s*$", head)
+    return (m.group(1).strip().strip("'\"") if m else "")
+
+
+def _skill_dirs(root: Path):
+    """**每个 SKILL.md = 一个技能**（2026-11-05 统一口径）。
+
+    一层 `iterdir()` 会把「集合包」内层技能全漏：`skills/superpowers/` 里 20 条
+    （brainstorming / systematic-debugging / writing-plans …）、`shuohao/` 里 7 条，
+    于是审计说"盘上有 3 个图鉴里没有"、omni 说"27 个幽灵"，两个出口正面打架。
+    不变量实测：33 个 SKILL.md 中「父目录也带 SKILL.md」的 = 0 ⇒ 递归不重复计数。
+    """
+    return sorted({sk.parent for sk in root.rglob("SKILL.md")})
+
+
 def load_map(name: str) -> dict:
     for node in ast.walk(ast.parse(OMNI.read_text(encoding="utf-8"))):
         if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", None) == name:
@@ -72,14 +102,10 @@ def main(argv: list[str]) -> int:
     for key, root in ROOTS:
         if not root.exists():
             continue
-        for d in sorted(root.iterdir()):
-            if not d.is_dir():
-                continue
+        for d in _skill_dirs(root):
             sk = d / "SKILL.md"
-            if not sk.exists():
-                continue
             st = sk.stat()
-            index.setdefault(d.name, {})[key] = {
+            index.setdefault(_skill_name(sk) or d.name, {})[key] = {
                 "sha": sha(sk), "bytes": st.st_size,
                 "mtime": datetime.fromtimestamp(st.st_mtime).strftime("%m-%d %H:%M"),
                 "dir": str(d),
@@ -87,12 +113,13 @@ def main(argv: list[str]) -> int:
 
     registered = set(load_map("DISTILLED_DOMAINS").values()) | set(load_map("DISTILLED_CLUSTERS").values())
     drift, fixed, orphans, unregistered, third_party = [], [], [], [], []
+    SOURCE_KEYS = {"ws-source", "pkg-source"}      # 两个源根（2026-11-05 起）
     for name, roots in sorted(index.items()):
         mine = name.startswith("gbt-")
         if mine and len(roots) > 1:
             shas = {k: v["sha"] for k, v in roots.items()}
             if len(set(shas.values())) > 1:
-                src = roots.get("ws-source")
+                src = roots.get("ws-source") or roots.get("pkg-source")
                 if src is None:
                     drift.append({"name": name, "detail": "无源稿可比", "roots": shas})
                     continue
@@ -121,9 +148,9 @@ def main(argv: list[str]) -> int:
             if len({v["sha"] for v in roots.values()}) > 1:
                 third_party.append({"name": name,
                                     "roots": {k: v["sha"][:10] for k, v in roots.items()}})
-        if mine and "ws-source" not in roots and "openclaw-managed" in roots:
+        if mine and not (set(roots) & SOURCE_KEYS) and "openclaw-managed" in roots:
             orphans.append(name)
-        if mine and "ws-source" in roots and name not in registered:
+        if mine and (set(roots) & SOURCE_KEYS) and name not in registered:
             unregistered.append(name)
 
     # ⑤ 我们自己的**单根件**：只存在于某一个根、且署名是我们（`GBT小土豆` / `自由的风` / `gbt_allinone`）。
@@ -147,7 +174,7 @@ def main(argv: list[str]) -> int:
             continue
         row = {"name": name, "root": only_key, "path": str(Path(roots[only_key]["dir"])),
                "bytes": roots[only_key]["bytes"]}
-        if only_key == "ws-source":
+        if only_key in SOURCE_KEYS:
             ours_uninstalled.append(row)
         else:
             ours_single.append(row)
@@ -173,19 +200,9 @@ def main(argv: list[str]) -> int:
         for root, _ch, _why in omni_mod.SKILL_ROOTS:
             if not root.is_dir() or str(root) in bulk_roots:
                 continue
-            for d in sorted(root.iterdir()):
-                if not d.is_dir():
-                    continue
+            for d in _skill_dirs(root):
                 sk = d / "SKILL.md"
-                nm = d.name
-                if sk.exists():
-                    try:
-                        head = sk.read_text(encoding="utf-8", errors="replace")[:2000]
-                        m = re.search(r"(?m)^name:\s*(.+?)\s*$", head)
-                        if m:
-                            nm = m.group(1).strip().strip("'\"") or d.name
-                    except OSError:
-                        pass
+                nm = _skill_name(sk) or d.name
                 if nm not in in_atlas and d.name not in in_atlas:
                     atlas_missing.append({"name": nm, "dir": str(d), "root": str(root)})
                 disk[nm] = str(d)
@@ -233,7 +250,7 @@ def main(argv: list[str]) -> int:
         print("   图鉴 built_at=%s · 收录 %s 条" % (atlas_meta.get("built_at"), atlas_meta.get("skills")))
         print("   盘上有、图鉴里没有：%d 个" % len(atlas_missing))
         for m in atlas_missing:
-            print("   🔴 %s（%s）⇒ 重扫：`py -3.14 tools/codex-scripts/omni.py build`" % (m["name"], m["dir"]))
+            print("   🔴 %s（%s）⇒ 重扫：`./pyembed/python.exe tools/codex-scripts/omni.py build`" % (m["name"], m["dir"]))
         if atlas_ghosts:
             print("   （图鉴里有、盘上没找到：%d 个 —— 只提示，可能是聚合料或镜像差：%s%s）"
                   % (len(atlas_ghosts), "、".join(atlas_ghosts[:6]),
@@ -260,7 +277,7 @@ def main(argv: list[str]) -> int:
             print("结论：**有我们自己的件没装机**（%d 个）—— 装到 `~/.openclaw-autoclaw/skills/<名字>/`，再复跑本器。"
                   % len(ours_uninstalled))
         if atlas_missing:
-            print("结论：**图鉴过期**（盘上 %d 个技能不在图鉴里）—— 跑 `py -3.14 tools/codex-scripts/omni.py build` 重扫，"
+            print("结论：**图鉴过期**（盘上 %d 个技能不在图鉴里）—— 跑 `./pyembed/python.exe tools/codex-scripts/omni.py build` 重扫，"
                   "再复跑体检（图鉴是①②③与账里「图鉴现读」的地基）。" % len(atlas_missing))
         return 1
     print("结论：gbt-* 在所有根上逐字节一致 ✅ · 自有件无孤本无漏装 ✅ · 图鉴与盘上一致 ✅（第三方差异 %d 个，见 ④）"

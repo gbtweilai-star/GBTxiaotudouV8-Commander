@@ -89,11 +89,12 @@ def _active_files():
 
 def rule2() -> dict:
     """必须带参：活跃脚本里的 wrangler 调用必须带 --name/--config/真 toml。"""
-    hits, bad = [], []
+    hits, bad, unread = [], [], []
     for p in _active_files():
         try:
             txt = p.read_text(encoding="utf-8", errors="replace")
-        except OSError:
+        except OSError as _e:
+            unread.append("%s (%s)" % (p, type(_e).__name__))
             continue
         for i, ln in enumerate(txt.splitlines(), 1):
             if not WRANGLER_CALL.search(ln) or ln.strip().startswith("#"):
@@ -112,8 +113,10 @@ def rule2() -> dict:
             if not HAS_NAME.search(ln):
                 bad.append(rec)
     return {"calls": len(hits), "violations": bad,
-            "ok": not bad,
-            "gap": ("%d 处 wrangler 调用没带 --name/--config" % len(bad)) if bad else ""}
+            "ok": not bad and not unread,
+            "unread": unread[:20], "unread_n": len(unread),
+            "gap": (("%d 处 wrangler 调用没带 --name/--config" % len(bad)) if bad else
+                    ("%d 个文件读不到 -> 结论不覆盖它们" % len(unread)) if unread else "")}
 
 
 def rule1() -> dict:

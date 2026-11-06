@@ -76,6 +76,7 @@ EXCLUDED_DIRS = {
     ".archive": "历史归档（已退役代码，仍在盘上）",
     "state": "运行时/证据区（findings、镜像备份、暂存稿、图快照）—— 扫它等于自己扫自己",
     "vendor": "第三方上游快照（与 skills/ 内容重复，扫了只会双报）",
+    "pyembed": "内置 Python 运行时 + 第三方包快照（产品自带，不是本仓源码；要扫它请显式 target=pyembed）",
 }
 SKIP_DIRS = set(EXCLUDED_DIRS)   # 单一来源：排除集合由理由表派生，不另写一份
 

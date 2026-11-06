@@ -107,7 +107,13 @@ def _rel_imports(src, issues=None):
     if issues is not None:
         for _w in _cw:
             if issubclass(_w.category, SyntaxWarning):
+                # 🔴 2026-11-06 实测提醒：这条**每行可能只报一处**。
+                #    同一行里出现过两个 `\p`（`.\pyembed` 与 `\python.exe`）时，
+                #    照这条改掉一处、编译仍在报警 —— 照着修的人和复核的人都会误判"修好了"。
+                #    所以文案里直接点名复查工具，别让人凭这条报错的数量当分母。
                 issues.append("第 %s 行无效转义（未来 Python 会报错）: %s"
+                              "｜每行可能只报一处，修完请用 "
+                              "`pyembed\\python.exe tools\\codex-scripts\\check-escapes.py` 复查"
                               % (getattr(_w, "lineno", 0) or 0, str(_w.message)[:70]))
     out = set()
 

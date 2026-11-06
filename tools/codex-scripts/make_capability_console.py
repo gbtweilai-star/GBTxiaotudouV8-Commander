@@ -1068,7 +1068,7 @@ def check() -> int:
         return 0
     print("🔴 产物与模板**不一致**：盘上 %d 字 vs 生成 %d 字" % (len(now), len(generated)))
     print("   ⇒ 有人只改了产物（没改生成器）：手补的东西下次重新生成会被冲掉。")
-    print("   ⇒ 修法：`py -3.14 tools/codex-scripts/make_capability_console.py` 重新生成；")
+    print("   ⇒ 修法：`./pyembed/python.exe tools/codex-scripts/make_capability_console.py` 重新生成；")
     print("     若手补的是**该留的**（例如 favicon / 现读重建那段），就把它挪进本模板（`JS` / `doc`）。")
     return 1
 

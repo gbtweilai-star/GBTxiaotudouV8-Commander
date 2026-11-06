@@ -7,10 +7,10 @@
       ④ 落 state/blueprints/<id>.json + <id>.html（活页）并打印「等主人确认」
       ⑤ **未确认不许推进**：check 会拒绝；确认由主人做（AI 不许自我批准）
 用法：
-  py -3.14 tools/codex-scripts/blueprint-first.py new --task "..." [--slug x]
-  py -3.14 tools/codex-scripts/blueprint-first.py show <id>
-  py -3.14 tools/codex-scripts/blueprint-first.py check <id>          # \u672a\u786e\u8ba4\u975e\u96f6\u9000\u51fa
-  py -3.14 tools/codex-scripts/blueprint-first.py approve <id> --by owner --yes   # \u4e3b\u4eba\u5728\u7ec8\u7aef\u786e\u8ba4
+  ./pyembed/python.exe tools/codex-scripts/blueprint-first.py new --task "..." [--slug x]
+  ./pyembed/python.exe tools/codex-scripts/blueprint-first.py show <id>
+  ./pyembed/python.exe tools/codex-scripts/blueprint-first.py check <id>          # \u672a\u786e\u8ba4\u975e\u96f6\u9000\u51fa
+  ./pyembed/python.exe tools/codex-scripts/blueprint-first.py approve <id> --by owner --yes   # \u4e3b\u4eba\u5728\u7ec8\u7aef\u786e\u8ba4
 """
 from __future__ import annotations
 import argparse, json, re, subprocess, sys, time
@@ -81,13 +81,13 @@ def new(task, slug):
             "<div class=card><b class=k>② 怎么看</b><br>先读「会动的实物」对应哪一步，再看「节点触手图」的边（数据契约），最后看六轴判据。</div>"
             "<div class=card><b class=w>③ 实时读数</b><br>大脑执行层 ok=" + str(ok1) + " · showcase_ops ok=" + str(ok2) + " · forge_mastery ok=" + str(ok3) + "</div>"
             "<div class=card><b class=k>④ 六轴判据</b><br>构图与镜头 · 光比与影调 · 材质与细节 · 物理与逻辑一致 · 风格锁定 · 交付规格</div>"
-            "<div class=card><b class=w>等主人确认</b><br>python -m gbt_allinone <i>确认后</i>：py -3.14 tools/codex-scripts/blueprint-first.py approve " + bid + " --by owner --yes</div>"
+            "<div class=card><b class=w>等主人确认</b><br>python -m gbt_allinone <i>确认后</i>：./pyembed/python.exe tools/codex-scripts/blueprint-first.py approve " + bid + " --by owner --yes</div>"
             "<div class=sig>" + SIG + "</div>")
     (BDIR / (bid + ".html")).write_text(html, encoding="utf-8")
     print("立体蓝图已出：" + bid)
     print("  大脑执行层=" + str(ok1) + " · 立体蓝图=\"会动的实物+四件齐\" · 节点触手图=\u516d轴判据+无限递归")
     print("  活页：" + str((BDIR / (bid + ".html")).relative_to(ROOT)))
-    print("  **等主人确认后才动手**：py -3.14 tools/codex-scripts/blueprint-first.py approve " + bid + " --by owner --yes")
+    print("  **等主人确认后才动手**：./pyembed/python.exe tools/codex-scripts/blueprint-first.py approve " + bid + " --by owner --yes")
     return 0
 
 

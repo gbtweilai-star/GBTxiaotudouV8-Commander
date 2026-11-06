@@ -1,5 +1,5 @@
 /* 万能插 · 多域监控（2026-11-02）
- * 每 2.5s 拉 /api/omni?op=monitor：7 插座 + 系统 + 记忆 + 触手 + 蓝图 + 文件 + 数字人；
+ * 每 2.5s 拉 /api/omni?op=monitor（触及手全域＝邻域/眼睛/文件主权）：7 插座 + 系统 + 记忆 + 触手 + 蓝图 + 文件 + 数字人；
  * 逐字段 diff（含 +0.1% CPU / 文件 mtime / 记忆版本 +1），变化高亮并进“最近变化”时间线。
  */
 (function () {
@@ -17,6 +17,16 @@
     var d = new Date(sec * 1000);
     function p(n) { return n < 10 ? "0" + n : "" + n; }
     return p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+  function fmtAgo(iso) {
+    if (!iso) return "—";
+    var t = new Date(iso).getTime();
+    if (!isFinite(t)) return "—";
+    var s = Math.max(0, Math.round((Date.now() - t) / 1000));
+    if (s < 90) return s + " 秒前";
+    if (s < 5400) return Math.round(s / 60) + " 分钟前";
+    if (s < 172800) return Math.round(s / 3600) + " 小时前";
+    return Math.round(s / 86400) + " 天前";
   }
   function dot(state) {
     var c = state === "ready" ? "#5ad19a" : (state === "needs_key" ? "#ffb02e" : "#e0715c");
@@ -67,6 +77,19 @@
       ["绑定对", te.pairs, ""],
       ["能力覆盖", (te.caps_bound == null ? "—" : te.caps_bound + "/" + te.caps_total),
        te.caps_missing ? "缺 " + te.caps_missing : "全连"],
+    ], changedPaths));
+    var tf = te.files || {};
+    cards.push(card("触手全域", te.error ? "needs_key" : (te.healthy ? "ready" : "needs_key"), [
+      ["邻域/动作", (te.domains == null ? "—" : te.domains) + " 域 · " +
+       (te.actions_covered || 0) + "/" + (te.actions_used || 0),
+       te.uncovered ? "漏 " + te.uncovered : "全覆盖"],
+      ["眼睛", te.grab_ok ? "能出帧" : "抓不到",
+       te.eye_error ? String(te.eye_error).slice(0, 16) : (te.eye_ready ? "eye_ready" : "")],
+      ["文件主权", (tf.orphan == null ? "—" : tf.orphan) + " 孤儿",
+       tf.total ? (tf.owned || 0) + " owned · " + tf.total + " 件" : ""],
+      ["能力位归属", (tf.caps_with_owner == null ? "—" : tf.caps_with_owner + "/" + tf.caps),
+       tf.scanned_at ? "扫描 " + fmtAgo(tf.scanned_at) + (tf.stale ? "（旧）" : "") : ""],
+      ["缺依赖", (te.deps_missing || []).join(" / ") || "无", "可选件缺了不影响兜底"],
     ], changedPaths));
     var bp = s.blueprint || {};
     cards.push(card("蓝图", bp.approved ? "ready" : "needs_key", [

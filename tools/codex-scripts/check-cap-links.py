@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """抽查：每个能力独立页的本地引用是否都真存在（防"看着对、点开 404"）。
 
-用法：py -3.14 tools/codex-scripts/check-cap-links.py [--all]
+用法：./pyembed/python.exe tools/codex-scripts/check-cap-links.py [--all]
 """
 import argparse
 import re
@@ -48,7 +48,7 @@ def main() -> int:
             print("      %s -> %s" % (n, m))
         return 1
     print("  ✅ 零断链")
-    print("  全量复跑：py -3.14 tools/codex-scripts/check-cap-links.py --all")
+    print("  全量复跑：./pyembed/python.exe tools/codex-scripts/check-cap-links.py --all")
     return 0
 
 

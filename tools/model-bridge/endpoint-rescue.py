@@ -6,7 +6,7 @@
 本件只做**一件事**：换 GPU 型号组试拉起 worker，每组观察 N 秒；全失败则 PATCH 回原组。
 每次 PATCH 前后都打读数（workersMin/Max/idle/GPU 组），**不打印任何密钥**。
 
-用法：py -3.14 tools/model-bridge/endpoint-rescue.py [--watch 90] [--apply]
+用法：./pyembed/python.exe tools/model-bridge/endpoint-rescue.py [--watch 90] [--apply]
 不带 --apply 只读（只 show + health），不 PATCH。
 """
 import argparse
@@ -132,7 +132,7 @@ def main():
         ok, h = watch(k, a.watch, "组")
         if ok:
             print("✅ 起来了：%s（GPU 组 %s 留在端点里）" % (h, g))
-            print("   下一步：py -3.14 tools/codex-scripts/lane-doctor.py check")
+            print("   下一步：./pyembed/python.exe tools/codex-scripts/lane-doctor.py check")
             return 0
         print("  ❌ %ds 内没起来（final=%s）" % (a.watch, h), flush=True)
 

@@ -40,9 +40,9 @@ Owner 令叫它「唯一进度真源」。2026-10-18 全量扫描现读出来的
 `gbt_allinone/tests/test_progress_ledger_contract.py` 会咬住这条（偏移必须是机器偏移或 UTC）。
 
 用法：
-    py -3.14 tools/codex-scripts/ledger-refresh.py            # 复算并落盘（写手）
-    py -3.14 tools/codex-scripts/ledger-refresh.py --check     # 只读判据（开机自检用，非零=红）
-    py -3.14 tools/codex-scripts/ledger-refresh.py --check --json
+    ./pyembed/python.exe tools/codex-scripts/ledger-refresh.py            # 复算并落盘（写手）
+    ./pyembed/python.exe tools/codex-scripts/ledger-refresh.py --check     # 只读判据（开机自检用，非零=红）
+    ./pyembed/python.exe tools/codex-scripts/ledger-refresh.py --check --json
 """
 from __future__ import annotations
 
@@ -261,7 +261,15 @@ def rotate(led: dict, logbook: list, at: datetime) -> tuple:
     # R2 人写的日期 vs 机器日志前进
     raw_ip = str(led.get("in_progress") or "")
     m = re.search(r"(\d{4})-(\d{2})-(\d{2})", raw_ip)
-    if m and logbook:
+    if not m:
+        rot.append({"rule": "R2", "field": "in_progress",
+                    "why": "`in_progress` 里没有 `YYYY-MM-DD` 日期，无法判新旧（时间点是 Owner 明确要的）"})
+    elif not logbook:
+        # 2026-11-06：logbook 不在盘时，旧写法会走到 else 报「in_progress 没写日期」——
+        # 那是「读不到当结论」（P33 一族）。读不到就说读不到。
+        rot.append({"rule": "R2", "field": "in_progress",
+                    "why": "`state/logbook.jsonl` 不在盘或为空 ⇒ 判不了「人写的日期之后机器日志前进多少笔」"})
+    else:
         try:
             written = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).astimezone()
         except ValueError:
@@ -274,9 +282,6 @@ def rotate(led: dict, logbook: list, at: datetime) -> tuple:
                             "why": "「现在在做」停在 %s（%.1f 小时前），而机器日志此后已前进 %d 笔"
                                    " ⇒ 注入给模型的不是现在，是那天的快照"
                                    % (m.group(0), age_h, advanced)})
-    else:
-        rot.append({"rule": "R2", "field": "in_progress",
-                    "why": "`in_progress` 里没有 `YYYY-MM-DD` 日期，无法判新旧（时间点是 Owner 明确要的）"})
 
     # R3 写手节缺失
     if not writer:
@@ -360,7 +365,7 @@ def main(argv=None) -> int:
                 print("--- 腐烂项 %d 条（这**不是提醒**）---" % len(rot))
                 for r in rot:
                     print("  [%s] %s: %s" % (r["rule"], r["field"], r["why"]))
-                print("⇒ 修：py -3.14 tools/codex-scripts/ledger-refresh.py")
+                print("⇒ 修：./pyembed/python.exe tools/codex-scripts/ledger-refresh.py")
             print("判据 PASS %d · FAIL %d ｜ 腐烂项 %d"
                   % (len(rows) - len(bad), len(bad), len(rot)))
         return 0 if (not bad and not rot) else 1
@@ -430,7 +435,7 @@ def main(argv=None) -> int:
             print("  [%s] %s: %s" % (r["rule"], r["field"], r["why"]))
         print("（R2 这类要人补：把「现在在做」改成今天的真实进度，写手不代笔）")
     else:
-        print("腐烂项 0 · 复跑判据：py -3.14 tools/codex-scripts/ledger-refresh.py --check")
+        print("腐烂项 0 · 复跑判据：./pyembed/python.exe tools/codex-scripts/ledger-refresh.py --check")
     return 0
 
 

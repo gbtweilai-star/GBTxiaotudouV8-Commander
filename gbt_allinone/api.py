@@ -2094,7 +2094,7 @@ def _run_benign(kind, payload, policy_decision=None):
         cmd = p.get("command")
         if not server or not cmd:
             raise ValueError("需要 server（会话名）与 command（启动命令数组，如 ['npx','-y','@modelcontextprotocol/server-everything']）")
-        _conn = MB.connect(server, cmd)
+        _conn = MB.connect(server, cmd, cwd=p.get("cwd"))
         # 🔴 2026-10-14 加（修「卡点二」）：`mcp_bridge._SESSIONS` 是**模块级**会话表 ⇒
         #   会话随**进程**生灭，而每次 `cap` 都是新进程（`multi` 的每个 job 还是子进程）
         #   ⇒ 实测「上一个进程 `mcp_connect` 成功，下一个进程 `mcp_tools` 必报 未连接」。
@@ -2657,19 +2657,6 @@ def _run_benign(kind, payload, policy_decision=None):
         # 门在模块内自闸（ask→external_llm，think/link/serve→process_execute），缺授权如实报缺。
         from . import thebrain_bridge
         return thebrain_bridge.run(payload)
-
-    # ── 授权红队内核（Owner 2026-09-25 令：黑客能力多维度全覆盖，使用需人工授权）──
-    # 这 12 位此前在 UNIMPLEMENTED_CAPS 里只有名字、没有实现（调用得到 unknown capability）。
-    # 实现层：security/redteam.py；作用域：security/policy.py 的 evaluate()。
-    # 接线三处必须同时在位（本表 + 本分支 + policy 作用域），少一处门就看不见它。
-    if kind in ("redteam_recon", "pentest", "keylogger", "screen_sniff",
-                "device_takeover", "remote_domain", "credential_steal",
-                "social_eng", "paywallbuster", "asset_vault_freeze",
-                "data_hijack", "onboarding_gate"):
-        from .security import redteam as _RT
-        return _RT.run(kind, payload or {})
-
-    # 真实性审计层（V8：零假执行铁律）
 
     if kind == "train_recipe":
         # 2026-09-28 蒸馏第二批：train-llm 七阶段配方 + 就绪闸

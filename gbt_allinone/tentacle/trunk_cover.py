@@ -36,8 +36,11 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT = ROOT / "state" / "trunk-cover.json"
 API = ROOT / "gbt_allinone" / "api.py"
+# 2026-11-06：`pyembed/` 是内置 Python 运行时，`store/` 是第三方仓库快照，
+# 都不是本框架代码，不该被算成“没有触手认领的孤儿”。排除后覆盖读数才对准项目本体。
 SKIP_DIRS = {"node_modules", ".pylibs", "vendor", "mirror_space", "__pycache__", ".git",
-             "dist", "_upstream", "archives", ".scratch", ".trash", "outputs"}
+             "dist", "_upstream", "archives", ".scratch", ".trash", "outputs",
+             "pyembed", "store"}
 CODE_EXT = {".py", ".js", ".cjs", ".mjs", ".ts", ".html", ".css"}
 SUFFIXES = ("_cap", "_ops", "_bridge", "_skill", "_watch", "_hub", "_gate", "_core", "_pages")
 

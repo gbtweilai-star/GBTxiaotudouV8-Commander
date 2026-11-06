@@ -153,6 +153,119 @@ def _vision_lane(intent: str):
         return None
 
 
+# 只读触手方法的**逐方法**白名单。
+#
+# 2026-11-05 血账（原按邻域放行 = 按邻域开门）：
+#   第一版闸门是 `_METHOD_FAST_DOMAINS = {感知域, 侦察域, 信息域, 媒体域, 安全域}`，
+#   实测这 5 句会被**直接派发**、完全不经模型（用系统自己公布的别名就能触发）：
+#     "往控件里输入" / "往控件里输入文字" → domain_type      —— 真往控件里打字
+#     "操作控件" / "触发控件"             → domain_act       —— 真触发控件
+#     "写剪贴板" / "复制进去"             → clipboard_write  —— pyperclip.copy 覆盖剪贴板
+#     "录一段视觉" / "录屏帧流"           → vision_stream_record —— 真写视频文件
+#   根因：邻域回答的是"这方法归哪个任务域"，不是"它动不动手"。
+#   侦察域有 domain_type/domain_act，信息域有 clipboard_write/copy/cut/select_all，
+#   媒体域有 vision_stream_record，安全域有 handle_any_dialog/monitor —— 全在门里。
+#
+# 增补一条必须同时满足（两条都是机器可查的，别凭印象）：
+#   ① 方法体不出现 pyperclip.copy / _keyboard_* / pyautogui 动作 / _mouse_* /
+#      subprocess / write_text|write_bytes / publish( / SetForegroundWindow；
+#   ② 全部形参都有默认值 —— 快车道派发只塞 `method`，不带 kwargs
+#      （见 execute(): payload.setdefault("method", ...)），带必填参的方法只会拿到 needs_input。
+#
+# 不要用 `dir()` 或能力位的 `safe` 标志自动生成：427 个位里 338 个 `safe=True`
+# 且"无需参数"，包含 auto_publish / one_key_deploy —— 拿它当白名单等于一句话发布上线。
+_METHOD_FAST_SAFE = frozenset({
+    # 感知域：取帧 / 读字，全部内存回传（screenshot 不传 filepath 时不落盘，已读实现）
+    "see", "see_active_window", "screenshot", "screenshot_diff",
+    "read_text", "read_text_fast", "vision_snapshot", "vision_diff",
+    "available_actions",
+    # 侦察域：只读界面结构（刻意排除 domain_type / domain_act）
+    "list_windows", "grab_table", "domain_index", "extract_ui_elements",
+    # 信息域：clipboard_read = pyperclip.paste()（刻意排除 write/copy/cut/select_all）
+    "clipboard_read", "read_console",
+    # 安全域：只探测，不处置（刻意排除 handle_any_dialog）
+    "detect_dialog",
+})
+_METHOD_FAST_MIN_MARGIN = 4
+
+
+def _method_lane(intent: str):
+    """只读触手方法的快车道：`route_method` 有把握 + 方法在白名单里 ⇒ 直达。
+
+    2026-11-05 实测（12 条验收种子）：有把握时 10 条对 9 条，唯一错判是 `type`
+    —— 一个**处置类**方法。把处置类挡在外面之后，观测类 5 条全对。
+    22.7 ms 对 8–38 s，省的就是这一截；处置类仍交给模型，不拿样本换自动执行权。
+
+    2026-11-05 晚再修：第一版按**邻域**挡，实测漏 5 条真动作（见
+    `_METHOD_FAST_SAFE` 上的血账）。邻域不是"动不动手"，现在按方法逐个放行。
+    """
+    try:
+        from .tentacle import bridge as TB
+        r = TB.route_method(intent)
+        if not r.get("confident"):
+            return None
+        margin = r.get("margin")
+        if not isinstance(margin, int) or margin < _METHOD_FAST_MIN_MARGIN:
+            return None
+        best = r.get("best") or {}
+        method = best.get("method")
+        if not method or method not in _METHOD_FAST_SAFE:
+            return None
+        return {
+            "ok": True, "intent": str(intent)[:120],
+            "best": {"kind": "tentacle", "method": method, "domain": "tentacle",
+                     "desc": "触手方法 %s" % method, "via": "method_fast"},
+            "alternatives": [{"kind": "tentacle", "method": a.get("method"),
+                              "domain": "tentacle"}
+                             for a in (r.get("alternatives") or [])[:4]],
+            "candidates": r.get("candidates"),
+            "path": "method_fast",
+            "degraded": False,
+            "method_fast": {"neighborhood": best.get("neighborhood"),
+                            "margin": margin, "confident": True,
+                            "gate": "read_only_whitelist"},
+            "elapsed_ms": 0.0,
+        }
+    except Exception:
+        return None
+
+
+def _operator_lane(intent: str):
+    """算子闸门：本地单遍打分，**只在稳妥命中时**直达；否则回 None 交回原主路。
+
+    2026-11-05：427 个能力位此前在算子层大多是空壳，路由只能整段交给语义模型。
+    本车道把「先把选项压到几个」放到本地（`operator_index.gate`）：
+    命中才返回；**弃权 / 索引陈旧 / 任何异常一律 None** —— 失败即放行，不改原语义。
+    """
+    try:
+        from . import operator_index as OI
+        from .caps_registry import BENIGN_CAPS
+        _t = time.perf_counter()
+        g = OI.gate(intent)
+        OI.log_gate(intent, g, (time.perf_counter() - _t) * 1000)
+        if not g.get("hit"):
+            return None
+        top = g.get("top") or []
+        if not top:
+            return None
+        pick = top[0]
+        info = BENIGN_CAPS.get(pick["cap"]) or {}
+        return {
+            "ok": True, "intent": str(intent)[:120],
+            "best": {"kind": pick["cap"], "domain": pick["domain"],
+                     "desc": str(info.get("desc") or "")[:50], "via": "operator"},
+            "alternatives": [{"kind": t["cap"], "domain": t["domain"]} for t in top[1:]],
+            "candidates": len(top),
+            "path": "operator",
+            "degraded": False,
+            "operator": {"score": pick["score"], "margin": g.get("margin"),
+                         "source": pick.get("source"), "why": g.get("why")},
+            "elapsed_ms": 0.0,
+        }
+    except Exception:
+        return None
+
+
 @_spanned
 def route(intent: str) -> dict:
     """意图动态路由 —— 主路 `semantic_route`，辅路本体能力启发式（降级必须自曝）。
@@ -184,6 +297,23 @@ def route(intent: str) -> dict:
     if _vis:
         _vis["elapsed_ms"] = round((time.time() - t0) * 1000, 1)
         return _vis
+
+    # ── ⓪' 只读触手方法快车道：有把握 + 观测类邻域 ⇒ 22 ms 直达 ──
+    # 2026-11-05：放在算子闸门**前面**。两边都只在稳妥时才开口，重叠只有 7/1042，
+    # 且 7 条语义完全一致（screenshot↔body_see、read_console↔cli_chat…）。
+    # 重叠时的口径：**能直接派单的方法优先于能力位名** —— 方法带参数、可直接执行，
+    # 能力位名还要再翻一层；实测「把这个表格读出来」被 genoffice 抢走后只做了文档、
+    # 没读表，而方法侧 grab_table 是对的。
+    _mf = _method_lane(intent)
+    if _mf:
+        _mf["elapsed_ms"] = round((time.time() - t0) * 1000, 1)
+        return _mf
+
+    # ── ⓪' 算子闸门（2026-11-05）：压不动就弃权，交回原主路 ──
+    _op = _operator_lane(intent)
+    if _op:
+        _op["elapsed_ms"] = round((time.time() - t0) * 1000, 1)
+        return _op
 
     scored = _heuristic_caps(intent)
     top = scored[:5]
@@ -451,6 +581,56 @@ def verify(expectation: str = "", window: str = None) -> dict:
             "counted_faces": [], "faces": 0,
             "elapsed_ms": round((time.time() - t0) * 1000, 1)}
 
+def _vision_dim() -> dict:
+    """视觉维判据：**真抓到一帧**才算就绪，抓不到就如实报不 ok 并带原话。
+
+    🔴 2026-11-05 血账（本函数为什么存在）——
+    这里原来在 health() 里直接写 `TB.eye_ready()`，而它的实现是
+        return not isinstance(get_eye(), _DummyEye)
+    也就是只测「omni_tentacle 模块能不能加载」，**不测后端能不能出帧**。
+    本机三级采集后端全灭（pyautogui / mss / dxcam 一个都没装）：
+        eye_ready() -> True
+        eye_error() -> ''            ← 空串，连原因都没有
+        vision_bus.snapshot(...) -> 抛 CaptureUnavailable: screen_grab_unavailable
+    于是 health 报 5/5 = 100 分，把「视觉完全不可用」盖成了满分绿。
+    这正是 AGENTS.md §2.1 明令禁止的假成功：上游没给，不许写成给了。
+
+    为什么不动 eye_ready() 本身：impact_check 显示它 1hop 牵连 4000+ 节点
+    （cloud_llm / cloud_pc / tentacle / tentacle_cognition / devour_pulse …），
+    改它的返回语义等于把「模块已加载」和「能看到」两件事搅在一起，
+    受伤面远大于收益。改在这里：调用方要的是「现在能不能看到」。
+    """
+    try:
+        from .tentacle import bridge as TB
+        from .tentacle import vision_bus as VB
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "detail": "触手模块导入失败：%s: %s"
+                                      % (type(e).__name__, str(e)[:100])}
+
+    try:
+        if not TB.eye_ready():
+            return {"ok": False, "detail": str(TB.eye_error())[:120] or "eye 未加载"}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "detail": "eye_ready 自身报错：%s" % str(e)[:100]}
+
+    try:
+        snap = VB.snapshot(TB.get_eye(), ttl=5)
+    except Exception as cap_err:  # noqa: BLE001
+        # 本机走的就是这条：CaptureUnavailable: screen_grab_unavailable:
+        # 三级后端全灭：pyautogui: ModuleNotFoundError ...
+        return {"ok": False,
+                "detail": "%s: %s" % (type(cap_err).__name__, str(cap_err)[:120])}
+
+    ok = bool(isinstance(snap, dict) and snap.get("ok"))
+    if ok:
+        return {"ok": True,
+                "detail": "抓到帧 %s" % (snap.get("size") or snap.get("fingerprint") or "")}
+    return {"ok": False,
+            "detail": "有模块但抓不到帧：%s"
+                      % (str((snap or {}).get("error"))[:120] if isinstance(snap, dict)
+                         else "snapshot 返回非 dict")}
+
+
 def health() -> dict:
     """五维各自健康度 + 总分（大脑执行层的体检）。"""
     from .api import run_task
@@ -483,12 +663,8 @@ def health() -> dict:
                              "detail": f"eye_error={diag.get('eye_error')}"}
     except Exception as e:  # noqa: BLE001
         dims["tentacle"] = {"ok": False, "detail": str(e)[:60]}
-    # 4) 视觉维
-    try:
-        from .tentacle import bridge as TB
-        dims["vision"] = {"ok": TB.eye_ready(), "detail": "eye_ready" if TB.eye_ready() else str(TB.eye_error())[:60]}
-    except Exception as e:  # noqa: BLE001
-        dims["vision"] = {"ok": False, "detail": str(e)[:60]}
+    # 4) 视觉维（判据本体在 _vision_dim —— 抽出去是为了能单独验，见同目录测试）
+    dims["vision"] = _vision_dim()
     # 5) 审计维
     try:
         from .store import log_count
@@ -590,8 +766,18 @@ def unify(goal: str, payload: dict = None, expectation: str = "") -> dict:
 
     # 3) 验证（触手肉眼）
     vf = verify(expectation or f"执行 {kind} 后的现实状态")
-    chain["verify"] = {"ok": vf.get("ok"),
-                        "checks": {k: v.get("ok") for k, v in vf.get("checks", {}).items()}}
+    _vc = vf.get("checks", {}) or {}
+    chain["verify"] = {
+        "ok": vf.get("ok"),
+        "verdict": vf.get("verdict"),
+        "checks": {k: v.get("ok") for k, v in _vc.items()},
+        # 🔴 2026-11-05：原来只留 bool，把「为什么没验成」整条吞掉 —— 本机
+        #    vision 检查是 `CaptureUnavailable: 三级后端全灭…`，压成 False 之后
+        #    读的人只会以为「验了一下，没过」，分不清是缺依赖、还是现实不符。
+        #    只透失败的细节（成功的留 bool 就够，免得噪音淹掉读数）。
+        "detail": {k: {kk: vv for kk, vv in (v or {}).items() if kk != "ok"}
+                   for k, v in _vc.items() if not v.get("ok")},
+    }
 
     # 4) 健康
     hl = health()

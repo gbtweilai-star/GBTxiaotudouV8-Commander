@@ -8,11 +8,11 @@
 
 | 件 | 落点 |
 |---|---|
-| 模块/契约 | [`gbt_allinone/tools/thought_stream.py`](../../gbt_allinone/tools/thought_stream.py) · `verify()` **14 项** |
+| 模块/契约 | [`gbt_allinone/tools/thought_stream.py`](gbt_allinone/tools/thought_stream.py) · `verify()` **14 项** |
 | 统一门 | 注册能力位 **`thought_stream`**（`run_task`，zero-scope） |
 | API | `GET/POST /api/stream`：真实读 `state/orchestration-ledger.jsonl`（+ 可选 `state/audit.jsonl`）→ 归一化五类事件 |
 | APP 接线 | console 新增「思考流」视图：kind/时间/actor/title/detail/result，100 条、轮询 5s、刷新按钮 |
-| 验收 | [`tests/test_thought_stream.py`](../../tests/test_thought_stream.py) |
+| 验收 | [`tests/test_thought_stream.py`](tests/test_thought_stream.py) |
 
 ## 二、五类事件
 

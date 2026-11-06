@@ -1,6 +1,6 @@
 /* GBT小土豆V8 · 认知界面逻辑
  * 数据：优先 /api/data（console-server 现读）；直开 file:// 时退回 window.GBT_CONSOLE。
- * 对话：/api/chat → energy_core.think(context="console-web")（无限上下文 + temperature=0 稳定输出）。
+ * 对话：/api/chat → energy_core.think(context="console-web")（有界窗口 n_ctx + 全量检索，temperature=0 稳定输出）。
  */
 (function () {
   "use strict";
@@ -50,6 +50,15 @@
       });
   }
 
+  /* 默认视图：万能插。多域监控仍按需手动展开，不自动轮询 */
+  var DEFAULT_VIEW = "chat";
+
+  /* 上下文窗口：只读引擎实报，不写死数值 */
+  function ctxOf(d) {
+    var n = d && d.engine && d.engine.n_ctx;
+    return n ? (n + " ctx") : "ctx —";
+  }
+
   /* ───────── 左栏 ───────── */
   function renderLeft(d) {
     $("pill-l1").textContent = MODE.online ? "实时" : "快照";
@@ -58,7 +67,7 @@
     if (ia) ia.setAttribute("data-state", alive0 ? "busy" : "idle");
     $("ai-activity-label").textContent = alive0 ? "在线 · 本机指挥官" : "离线";
     $("ai-activity-detail").textContent =
-      (d.engine && d.engine.weights ? d.engine.weights : "—") + " · ctx 无限";
+      (d.engine && d.engine.weights ? d.engine.weights : "—") + " · " + ctxOf(d);
 
     // 图例：域
     var lg = $("legend");
@@ -208,7 +217,7 @@
     var b2 = el("div");
     b2.appendChild(el("b", null, "engine"));
     b2.appendChild(document.createTextNode(" · " + ((d.engine && d.engine.weights) || "无") +
-      " · " + (alive ? "无限制上下文 · temperature=0 稳定输出" : "离线")));
+      " · " + (alive ? ("有界窗口 " + ctxOf(d) + " · 全量检索 · temperature=0") : "离线")));
     eng.appendChild(b2);
     si2.appendChild(eng);
     var cs = $("cog-state");
@@ -230,6 +239,319 @@
   }
 
   function addBot(text, meta) { return addMsg("bot", text, meta); }
+
+  /* ───────── AI 打印（Codex 对话面板同款逐字吐字） ─────────
+   * Codex 的回答不是「整段闪现」：边生成边吐字、末尾一根光标、
+   * 只有视图贴着底部时才自动跟随。本机 /api/chat 是整包返回
+   * （energy_core.think 非流式），所以吐字在前端按字推进，节奏随长度自适应。
+   * 判据：gbt_allinone/tests/test_console_chat_print.py
+   */
+  var PRINT_CPS = 90;
+  var PRINT_CARET = "\u258d";
+
+  function _reduced() {
+    try {
+      return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    } catch (e) { return false; }
+  }
+
+  /* 只在用户本来就贴着底部时才跟滚 —— 往上翻历史时别把他拽回来 */
+  function _stickBottom(force) {
+    var con = $("chat-history");
+    if (!con) return;
+    var gap = con.scrollHeight - con.scrollTop - con.clientHeight;
+    if (force || gap < 48) con.scrollTop = con.scrollHeight;
+  }
+
+  /* 收掉所有还在吐的：新消息进来时旧回答立即落定，不留半句 */
+  function finishPrinting() {
+    Array.prototype.forEach.call(document.querySelectorAll(".msg.printing"), function (n) {
+      if (n.__finishPrint) n.__finishPrint();
+      else if (n.__abort) n.__abort();
+    });
+  }
+
+  function printingNow() {
+    return !!document.querySelector(".msg.printing");
+  }
+
+  /* ── AI 步骤行（Codex 同款）：先给一条可折叠的过程行，再吐正式回答 ── */
+  function _msLabel(ms) {
+    if (ms == null || ms === "") return "";
+    var n = Number(ms);
+    if (!isFinite(n)) return "";
+    if (n >= 1000) return (Math.round(n / 100) / 10) + "s";
+    // 0ms 不等于「没耗时」：回执里的毫秒是 int 截断的，<1ms 如实写 <1ms
+    if (n < 1) return "<1ms";
+    return (Math.round(n * 10) / 10) + "ms";
+  }
+
+  /* 把 /api/chat 的回执折成「已使用 …」一个人能看懂的过程行；
+     详情折在下面，不默认展开 —— 与 Codex 的步骤行同一形状。 */
+  /* 把 /api/chat 回执折成「过程行」：她扫了什么、调了哪个工具、回执怎么说、
+     最后怎么组织回答。每一行都来自回执本身，不猜、不编。 */
+  function _short(v, n) {
+    var s = (v == null) ? "" : String(v);
+    return s.length > n ? s.slice(0, n) + "…" : s;
+  }
+
+  function buildSteps(j) {
+    j = j || {};
+    var cap = (j.capability && typeof j.capability === "object") ? j.capability : null;
+    var call = (j.call && typeof j.call === "object") ? j.call : null;
+    var rt = (j.route && typeof j.route === "object") ? j.route : null;
+    var steps = [];
+
+    if (rt) {
+      var rows = [];
+      if (rt.input) rows.push(["原话", _short(rt.input, 140)]);
+      if (rt.intent || rt.action) rows.push(["意图", String(rt.intent || "?") + " / " + String(rt.action || "?")]);
+      var tgt = rt.target_abs || rt.target;
+      if (tgt) rows.push(["对象", _short(tgt, 140)]);
+      if (rt.matched && rt.matched.length) rows.push(["命中词", rt.matched.join(" / ")]);
+      if (rt.missing && rt.missing.length) rows.push(["缺参数", rt.missing.join(" / ")]);
+      if (rt.confidence != null) rows.push(["置信度", String(rt.confidence)]);
+      if (rt.reason) rows.push(["说明", _short(rt.reason, 240)]);
+      if (rt.error) rows.push(["错误", _short(rt.error, 200)]);
+      var toolMs = (cap && cap.ms != null) ? Number(cap.ms) : 0;
+      var routeMs = (j.ms_route != null) ? Math.max(0, Math.round(Number(j.ms_route) - toolMs)) : null;
+      steps.push({
+        title: "扫描指令 · 命中 " + ((rt.matched || []).length) + " 个词",
+        ms: routeMs, rows: rows
+      });
+    }
+
+    if (call || (cap && (cap.cap || cap.method))) {
+      var kind = (call && call.kind) || (cap && cap.cap) || "tentacle";
+      var payload = (call && call.payload && typeof call.payload === "object") ? call.payload : null;
+      var opv = (payload && payload.op) || (cap && cap.op) || "";
+      var r2 = [["工具", String(kind) + (opv ? " · " + opv : "")]];
+      if (cap && cap.method) r2.push(["方法", String(cap.method)]);
+      if (payload) {
+        Object.keys(payload).forEach(function (k) {
+          var v = payload[k];
+          if (k === "op" || v === "" || v == null) return;   // op 已在标题里，不重复一行
+          r2.push([k, _short(typeof v === "string" ? v : JSON.stringify(v), 200)]);
+        });
+      }
+      if (cap && cap.params && Object.keys(cap.params).length) {
+        r2.push(["params", _short(JSON.stringify(cap.params), 220)]);
+      }
+      if (cap && cap.socket && !(payload && payload.socket)) r2.push(["表面", String(cap.socket)]);
+      if (cap && cap.target && !(payload && payload.target)) r2.push(["目标", _short(cap.target, 140)]);
+      if (cap && cap.energy) r2.push(["代价", _short(cap.energy, 220)]);
+      steps.push({ title: "调用工具 · " + kind + (opv ? "(" + opv + ")" : ""),
+                   ms: (cap ? cap.ms : null), rows: r2 });
+    }
+
+    // 回执的形状按能力位不同：屏幕/看图是 {ok,size,...}（键是中文动作词「看」），
+    // 读文件直接把正文挂在 cap.read 上（字符串）。所以按「非元数据键」认回执，
+    // 两种形状都如实摊开 —— 不为了对齐格式而丢掉她真读到的东西。
+    var rc = null, rcKey = "";
+    if (cap) {
+      var META = { op: 1, ok: 1, socket: 1, target: 1, action: 1, energy: 1, plug: 1, ms: 1,
+                   auth_consumed: 1, cap: 1, method: 1, params: 1, judge: 1, missing: 1,
+                   missing_scopes: 1, gate: 1, margin: 1, whitelist: 1, candidate: 1, why: 1,
+                   rule: 1, size: 1, fmt: 1, image_kb: 1, engine: 1, capture_ms: 1 };
+      var _ck = Object.keys(cap);
+      for (var _i = 0; _i < _ck.length; _i++) {
+        if (META[_ck[_i]]) continue;
+        var _v = cap[_ck[_i]];
+        if (_v == null || _v === "") continue;
+        rcKey = _ck[_i];
+        rc = (typeof _v === "object" && !Array.isArray(_v)) ? _v : { ok: cap.ok, note: _short(_v, 240) };
+        break;
+      }
+      if (!rc && (cap.rule || cap.why || cap.ok != null)) { rc = cap; rcKey = "capability"; }
+      if (!rc && cap.size) { rc = cap; rcKey = "capability"; }
+    }
+    if (rc) {
+      var r3 = [["结果", (rc.ok === true ? "ok" : (rc.ok === false ? "failed" : (rc.status || "—")))]];
+      if (rc.status) r3.push(["状态", String(rc.status)]);
+      if (rcKey && rcKey !== "capability") r3.push(["动作", rcKey]);
+      if (rc.note) r3.push(["内容", rc.note]);
+      if (rc.image_kb != null) r3.push(["载荷", rc.image_kb + "KB" + (rc.fmt ? " · " + rc.fmt : "")]);
+      if (rc.rule) r3.push(["判定", String(rc.rule)]);
+      if (rc.why) r3.push(["原因", _short(rc.why, 320)]);
+      if (rc.missing && rc.missing.length) r3.push(["缺", rc.missing.join(" / ")]);
+      if (rc.engine) r3.push(["采集", String(rc.engine) + (rc.capture_ms != null ? " · " + rc.capture_ms + "ms" : "")]);
+      if (rc.size && rc.size.length === 2) r3.push(["帧", rc.size.join("×") + (rc.delta ? " · 增量" : " · 整帧")]);
+      if (rc.mss_recovered) r3.push(["自愈", "mss 句柄失效 → 已重建"]);
+      // 标题如实反映回执的**实际状态**：ok=true 是成功；already_running / denied 这类
+      // 既不是成功也不是失败，直接写状态本身，别一律压成「失败」。
+      var rcTitle = (rc.ok === true) ? "成功"
+        : (rc.status ? String(rc.status) : (rc.rule ? String(rc.rule) : (rc.note ? _short(rc.note, 40) : "失败")));
+      steps.push({ title: "执行回执 · " + rcTitle, ms: null, rows: r3 });
+    }
+
+    var r4 = [];
+    if (j.via) r4.push(["通道", String(j.via)]);
+    if (j.label) r4.push(["命中", _short(j.label, 120)]);
+    if (j.usage && j.usage.completion_tokens != null) r4.push(["tokens", String(j.usage.completion_tokens) + " · temperature=0"]);
+    if (j.ring && j.ring.seq != null) r4.push(["记忆环", "seq " + j.ring.seq + " / 历史 " + (j.ring.db_turns != null ? j.ring.db_turns : "?") + " 轮"]);
+    if (j.elapsed_ms != null) r4.push(["总耗时", _msLabel(j.elapsed_ms)]);
+    if (j.error) r4.push(["错误", _short(j.error, 240)]);
+    if (r4.length) steps.push({ title: "组织回答 · " + (j.via || "本机"),
+                                ms: (j.elapsed_ms != null ? j.elapsed_ms : null), rows: r4 });
+
+    return steps;
+  }
+
+  function renderSteps(wrap, steps) {
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    if (!steps || !steps.length) return;
+    steps.forEach(function (s) {
+      var head = el("button", "step-head");
+      head.type = "button";
+      head.setAttribute("aria-expanded", "false");
+      head.appendChild(el("span", "step-chev", "›"));
+      head.appendChild(el("span", "step-title", s.title));
+      var ms = _msLabel(s.ms);
+      if (ms) head.appendChild(el("span", "step-ms", ms));
+      var body = el("div", "step-body");
+      body.hidden = true;
+      (s.rows || []).forEach(function (r) {
+        var row = el("div", "step-row");
+        row.appendChild(el("b", "", r[0]));
+        row.appendChild(el("span", "", r[1]));
+        body.appendChild(row);
+      });
+      head.addEventListener("click", function () {
+        var open = body.hidden;
+        body.hidden = !open;
+        head.setAttribute("aria-expanded", open ? "true" : "false");
+        head.classList.toggle("is-open", open);
+        wrap.classList.toggle("is-open", open);
+      });
+      wrap.appendChild(head);
+      wrap.appendChild(body);
+    });
+  }
+
+  function printBot(text, meta, steps, turn) {
+    var box = $("chat-messages");
+    if (!box) return null;
+    var m, body, caret, wrap;
+    if (turn && turn.node && turn.node.parentNode) {
+      turn.live = false;
+      turn.stop();
+      m = turn.node;
+      body = turn.bodyEl;
+      caret = turn.caret;
+      wrap = turn.wrap;
+      renderSteps(wrap, steps);
+    } else {
+      m = el("div", "msg bot printing");
+      wrap = el("div", "msg-steps");
+      m.appendChild(wrap);
+      renderSteps(wrap, steps);
+      if (!wrap.children.length) m.removeChild(wrap);
+      body = el("span", "msg-text");
+      caret = el("span", "tw-caret", PRINT_CARET);
+      m.appendChild(body);
+      m.appendChild(caret);
+      box.appendChild(m);
+    }
+    var con = document.getElementById("chat-area");
+    if (con) con.classList.add("has-msgs");
+    _stickBottom(true);
+
+
+    var s = String(text == null ? "" : text);
+    var i = 0;
+    var done = false;
+
+    function finish() {
+      if (done) return;
+      done = true;
+      body.textContent = s;
+      m.classList.remove("printing");
+      if (caret.parentNode) caret.parentNode.removeChild(caret);
+      if (meta) m.appendChild(el("div", "meta", meta));
+      _stickBottom(false);
+      if (typeof m.__onDone === "function") m.__onDone(m);
+    }
+    m.__finishPrint = finish;
+
+    if (!s.length || _reduced()) { finish(); return m; }
+
+    var step = Math.max(1, Math.round(s.length / 240));
+    var delay = Math.max(8, Math.round(1000 / PRINT_CPS));
+
+    (function tick() {
+      if (done) return;
+      i = Math.min(s.length, i + step);
+      body.textContent = s.slice(0, i);
+      _stickBottom(false);
+      if (i >= s.length) { finish(); return; }
+      window.setTimeout(tick, delay);
+    })();
+
+    return m;
+  }
+
+  /* 一轮对话的「进行中」骨架（Codex 同款：过程行先到，正文随后逐字）。
+     回执是单个 JSON、没有流式，所以这里只做诚实的事：
+     立刻显示一条带真实计时与当前阶段的过程行，回执到达后原地换成完整步骤。 */
+  function beginTurn() {
+    var box = $("chat-messages");
+    if (!box) return null;
+    var m = el("div", "msg bot printing");
+    var wrap = el("div", "msg-steps");
+    m.appendChild(wrap);
+    var body = el("span", "msg-text");
+    var caret = el("span", "tw-caret", PRINT_CARET);
+    m.appendChild(body);
+    m.appendChild(caret);
+    box.appendChild(m);
+    var con = document.getElementById("chat-area");
+    if (con) con.classList.add("has-msgs");
+    _stickBottom(true);
+
+    var t0 = Date.now();
+    var head = el("button", "step-head");
+    head.type = "button";
+    head.setAttribute("aria-expanded", "false");
+    head.appendChild(el("span", "step-chev", "›"));
+    var titleEl = el("span", "step-title", "接收指令 · 正在处理");
+    head.appendChild(titleEl);
+    var msEl = el("span", "step-ms live", "0.0s");
+    head.appendChild(msEl);
+    var stepBody = el("div", "step-body");
+    stepBody.hidden = true;
+    head.addEventListener("click", function () {
+      var open = stepBody.hidden;
+      stepBody.hidden = !open;
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+      head.classList.toggle("is-open", open);
+    });
+    wrap.appendChild(head);
+    wrap.appendChild(stepBody);
+
+    var timer = window.setInterval(function () {
+      msEl.textContent = _msLabel(Date.now() - t0);
+    }, 100);
+
+    var turn = {
+      node: m, wrap: wrap, bodyEl: body, caret: caret, t0: t0, live: true,
+      stop: function () { if (timer) { window.clearInterval(timer); timer = 0; } },
+      phase: function (txt) { titleEl.textContent = txt; _stickBottom(false); },
+      drop: function () { turn.stop(); if (m.parentNode) m.parentNode.removeChild(m); }
+    };
+    m.__abort = function () {
+      if (!turn.live) return;
+      turn.live = false;
+      turn.stop();
+      titleEl.textContent = "已中途中止";
+      msEl.textContent = _msLabel(Date.now() - t0);
+      msEl.classList.remove("live");
+      m.classList.remove("printing");
+      if (caret.parentNode) caret.parentNode.removeChild(caret);
+      _stickBottom(false);
+    };
+    return turn;
+  }
 
   function fmtSize(n) {
     n = Number(n) || 0;
@@ -300,19 +622,21 @@
   }
 
   function chatSubmit(text) {
+    finishPrinting();          // 上一轮还在吐字：先让它落定，再把新消息接上
     var _att = ATTACH;
     addUserMsg(text, _att);
     if (_att) clearAttachPreview();
     var btn = document.querySelector(".send-btn");
     btn.disabled = true;
-    var pending = addBot("…");
+    var turn = beginTurn();
     if (!MODE.online) {
-      pending.remove();
-      addBot("（演示模式：直开 file:// 不能调本机引擎。\n起服务后即可真对话：python tools/console-server.py，然后打开 http://127.0.0.1:8766/）\n\n本机模型：无限制上下文（有界窗口 + 全量可检索）· 稳定输出（temperature=0）。",
+      if (turn) turn.drop();
+      addBot("（演示模式：直开 file:// 不能调本机引擎。\n起服务后即可真对话：python tools/console-server.py，然后打开 http://127.0.0.1:8766/）\n\n本机模型：有界窗口 + 全量检索（数值按引擎实报，不写死）· 稳定输出（temperature=0）。",
         "file:// · 未连接");
       btn.disabled = false;
       return;
     }
+    if (turn) turn.phase("执行中 · 等待本机回执");
     fetch("/api/chat", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -324,7 +648,6 @@
         file_type: (_att && _att.kind === "file") ? (_att.type || "") : ""
       })
     }).then(function (r) { return r.json(); }).then(function (j) {
-      pending.remove();
       if (j && j.ok) {
         var meta;
         if (j.via === "capability_router") {
@@ -343,13 +666,12 @@
           meta += " · 上下文 seq " + (ring.seq != null ? ring.seq : "?") +
             " / 历史 " + (ring.db_turns != null ? ring.db_turns : "?") + " 轮";
         }
-        addBot(String(j.text || "").trim() || "(空回答)", meta);
+        printBot(String(j.text || "").trim() || "(空回答)", meta, buildSteps(j), turn);
       } else {
-        addBot("⚠ " + ((j && j.error) || "调用失败"), "如实报错");
+        printBot("⚠ " + ((j && j.error) || "调用失败"), "如实报错", buildSteps(j), turn);
       }
     }).catch(function (e) {
-      pending.remove();
-      addBot("⚠ 请求失败：" + e.message, "网络错误");
+      printBot("⚠ 请求失败：" + e.message, "网络错误", null, turn);
     }).then(function () { btn.disabled = false; });
   }
 
@@ -438,7 +760,7 @@
     var mc = $("model-chip");
     if (mc) {
       var eng = d.engine || {};
-      mc.textContent = "本机指挥官 · " + (eng.weights || "无权重") + " · 无限上下文";
+      mc.textContent = "本机指挥官 · " + (eng.weights || "无权重") + " · " + ctxOf(d);
     }
     renderLeft(d);
     renderRight(d);
@@ -448,7 +770,7 @@
     if (sub) {
       sub.textContent = "本机指挥官 · " +
         ((d.engine && d.engine.base) || "127.0.0.1:8792") +
-        " · 无限制上下文 · 稳定输出(temperature=0)" +
+        " · 有界窗口 " + ctxOf(d) + " · 稳定输出(temperature=0)" +
         (MODE.online ? " · 实时" : " · 快照");
     }
     renderCaps(d);
@@ -467,13 +789,13 @@
     // 开场欢迎（只一次）
     if (!$("chat-messages").childElementCount) {
       addBot("我是 GBT小土豆V8 的认知界面。左边是她的能力与流水，中间是对话，右边是心跳/行动/守卫。\n" +
-        "本机指挥官：无限制上下文（模型只看一屏、全量可检索）· 稳定输出（temperature=0）。",
+        "本机指挥官：有界窗口 " + ctxOf(d) + "（模型只看一屏、其余靠全量检索）· 稳定输出（temperature=0）。",
         MODE.online ? "online" : "snapshot");
     }
   }
 
 
-  /* ───────── 功能表（427 位，可搜可筛） ───────── */
+  /* ───────── 功能表（385 位，可搜可筛） ───────── */
   function renderCaps(d) {
     var items = (d.caps && d.caps.items) || [];
     var sel = $("cap-domain");
@@ -588,8 +910,9 @@
       [["var(--ok)", "只读 " + safe + "（" + pct + "%）"],
        ["var(--warn)", "需授权 " + (total - safe) + "（" + (100 - pct) + "%）"]].forEach(function (x) {
         var row = document.createElement("div");
-        var i = document.createElement("i"); i.style.background = x[0];
-        row.appendChild(i); row.appendChild(document.createTextNode(x[1]));
+        var dot = document.createElement("span"); dot.className = "legend-dot";
+        dot.style.background = x[0];
+        row.appendChild(dot); row.appendChild(document.createTextNode(x[1]));
         lg.appendChild(row);
       });
     }
@@ -1248,7 +1571,7 @@
   /* ───────── 视图切换（支持 #hash，便于截图/直达） ───────── */
   function switchView(name) {
     var con = $("chat-area"); if (!con) return;
-    var ok = ["chat", "caps", "skills", "space", "media", "video", "world", "browser", "brain", "plug", "team", "mind", "stream", "turns", "scan", "prof", "bounty", "dash", "moments", "teardown"];
+    var ok = ["chat", "caps", "skills", "space", "media", "video", "world", "browser", "brain", "plug", "team", "mind", "stream", "turns", "flow", "scan", "prof", "bounty", "dash", "moments", "teardown"];
     if (ok.indexOf(name) < 0) name = "chat";
     con.setAttribute("data-view", name);
     Array.prototype.forEach.call(document.querySelectorAll(".view-tab"), function (b) {
@@ -1295,6 +1618,24 @@
       wireBounty();
       ensureBounty();
     }
+    if (name === "flow") {
+      var fl = document.getElementById("flow-drawer");
+      if (fl) { fl.classList.remove("is-open"); fl.setAttribute("aria-hidden", "true"); }
+      // flow-map.js 在本文件之后加载：首屏直接进 #flow 时它还不在，等它到再起
+      var startFlow = function () {
+        if (!(window.gbtFlow && window.gbtFlow.start)) return false;
+        try { window.gbtFlow.start(); document.documentElement.dataset.flow = "started"; }
+        catch (e) { document.documentElement.dataset.flow = "start-err:" + String((e && e.message) || e).slice(0, 80); }
+        return true;
+      };
+      if (!startFlow()) {
+        window.addEventListener("load", function once() { window.removeEventListener("load", once); startFlow(); });
+        window.setTimeout(startFlow, 200);
+        window.setTimeout(function () {
+          if (!(window.gbtFlow && window.gbtFlow.start)) document.documentElement.dataset.flow = "module-missing";
+        }, 2500);
+      }
+    }
     if (name === "space") {
       ensure3d().then(function (m) { if (m && m.start) try { m.start(); } catch (e) {} });
     } else if (SPACE_P) {
@@ -1327,7 +1668,7 @@
       b.addEventListener("click", function () { switchView(b.getAttribute("data-view")); });
     });
     var h = (location.hash || "").replace("#", "");
-    switchView(h || "chat");
+    switchView(h || DEFAULT_VIEW);
   }
 
   window.addEventListener("resize", function () {

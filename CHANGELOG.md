@@ -1,32 +1,826 @@
 # 变更记录
 
-## 2026-11-04 · 第十七批：可视化面板全部重绘（旧账清零）
+## 2026-11-06 · 第三十八批：每一步都能看见 —— 扫描 / 工具 / 回执 / 回答 四段 · 屏幕采集自愈
 
-- **根因不在 PNG，在脚本**：`render-test-figures.py` 有三处结构性缺陷，导致「数据早已 427、图却永远是 341」——① 数据目录只找 `outputs/open-source-release/data/`，而并发/监控/天真三份实测账一直躺在仓库根 `data/`，找不到就**静默跳过**，那三张图于是永久冻结在旧文件上；② `rows` 被当成 dict 走 `.items()`，新探针落的是 **list**，一跑就崩；③ 直接 `json.loads(state/weights/ACTIVE.json)`，该文件不在版本控制里，缺失时整个渲染进程退出。现分别改为：`data_file()` 双路径回退、list/dict 双形状兼容、缺数据**如实跳过并打印原因**（绝不画一张 `0.00%` 的空图）。
-- **重绘 7 张**：`fig-caps`（**427 位 / 306 通过 / 88 需授权 / 30 缺参 / 2 被门拒 / 1 缺依赖**，五类全部上图，断言 306+88+30+2+1=427）· `fig-domains`（427 位 / 32 域，改为**全域绘制**——旧版只画前 16 域却标「共 N 域」，图与标题自相矛盾）· `fig-concurrency` · `fig-monitor` · `fig-tianzhen` · `fig-cable-all` · `fig-compute-vs-llm` · `fig-pure-compute`。
-- **旧数据全部重跑**（不是拿旧账重画）：并发压测 **512→4096 全档 100% 成功**（4096/4096，22.34s，183/s，内存平稳 ~7.0 GB）；天真 `comfy_native` **170 算子**、正例校验通过、反例抓 3 条错、写面真跑；多域监控 **31 域 / 313 只读位 / 304 通过 / 402.7s**，9 位未通过**逐条点名**（`hand_vision` 缺 cv2 · `bluetooth`/`bt_control` 被门拒 · `llm_chat`/`mcp_connect`/`mcp_call`/`voice` 服务未起 · `sec_scan`/`sec_chain` 60s+ 慢位触及 90s 看门狗）。
-- **如实记录 2 位回归**：monitor 第 2 轮相对第 1 轮出现 `sec_scan`、`sec_chain` 超时。判定为**并行跑其它任务造成的资源争用**（这两位单独跑约 66s，紧贴 90s 看门狗），不是代码回归；图上照实标红并点名，未调高看门狗来「消除」它。
-- **下架 2 张孤儿图**：`fig-dispatch-ok.png`（README 首屏展示，但**全仓找不到任何生成脚本、也没有对应数据源**）与 `fig-dispatch-denied.png`（零引用）—— 一并从 `assets/` 与 `MANIFEST.json` 删除。README 首屏四图位改为 **caps / concurrency / domains / monitor**，全部有脚本、有数据源、可一键复现。
-- **删掉「打补丁」式声明**：README 中文第 184 行「插图为 341 位时期历史快照……插画待下次重绘替换」与英文版同款 `Figure snapshot` 段落全部移除。数字过期就重跑脚本，不再靠正文免责。
-- **顺手清掉三处旧数字**：① `comfy_native` 算子 **118 → 170**（`README` 能力域表 + 实测读数表两处，旧数已与实测差 52）；② 并发 `~260/s` → **~150–190/s**（附 4096 档实测）；③ 多域监控 `29 域 / 236 位 · 221 ok · 0 regressions` → **31 域 / 313 位 · 304 ok / 9 未通过**（中英同步）。
-- **评测图按证据分层**：`fig-eval`（335 题 PASS45 99.10%）**无法重绘** —— `state/weights/ACTIVE.json` 与 `state/model-deploy/live-eval-v2.json` 均不在仓内；`fig-chain` 同样缺 `.scratch/chain_out.txt`。两者保留为历史回执，README 不再首屏展示，改为表内一行写明「建于 341 位快照期（2026-10-21）、**未在 427 位重跑**」并链到 `docs/04-evaluation.md`——不让历史读数冒充当前状态。
-- **校验**：`sync-readme-figures.py --check` 全绿（中英 README + badges 与 `data/capability-live-test.json` 一致）。
+- **主人令**（逐字）：「精细一点必须她扫描过哪里，在执行哪里，调用什么工具每一步细节都要能看得到」。
+  上一批只做到「一条过程行 + 正文」；这一批把那一行拆成**四段实测**，并把回执前的空省略号
+  换成带真实计时的进行中骨架。
+- **① 进行中骨架 `beginTurn()`**：发出即出现「接收指令 · 正在处理 / 执行中 · 等待本机回执」，
+  毫秒是 `Date.now()` 实时走秒；回执到达后**原地**换成完整步骤（不闪两条）。
+  连发时上一轮被 `__abort` 收成「已中途中止」，其真实回答到达时仍会补进同一条消息（不丢）。
+- **② 四段步骤行 `buildSteps()`**：
+  · `扫描指令` — 原话 / 意图·动作 / 对象 / **命中词** / 缺参数 / 置信度（= 她扫了哪里、凭什么命中）；
+  · `调用工具` — 工具名 · op / socket / target / do / params / 代价（= 她调了什么、在哪个面上动手）；
+  · `执行回执` — 结果 / 状态 / 判定 / 原因 / 缺件 / 采集引擎 / 帧尺寸 / 载荷（= 她执行到哪、成了没有）；
+  · `组织回答` — 通道 / tokens / 记忆环 seq / 总耗时。
+  每段毫秒都取自回执实测字段（`ms_route` / `cap.ms` / `elapsed_ms`），没有一处估算。
+- **③ 回执形状按「非元数据键」认**（本轮踩到的真差异）：屏幕/看图挂在 `capability["看"]`（dict，
+  键是中文动作词，不是 `action=see`），读文件直接把正文挂在 `capability.read`（字符串）。
+  两种都如实摊开；缺一个字段就少一行，不补假值。
+- **④ 异常状态不许压成「失败」**：连发第二次时回执是 `status=already_running`，
+  标题如实写「执行回执 · already_running」，正文仍是「同一动作已在执行，本次没有重复动手」。
+  失败分支（`ok:false` / 网络错误）也改走 `printBot` + 步骤行 —— 报错同样要能看见她做过什么。
+- **⑤ `/api/chat` 分开报阶段耗时**（`tools/console-server.py`）：`ms_route`（路由器总耗时，
+  `perf_counter` 实测）、`ms_run`（工具耗时）。前端「扫描指令」= `ms_route - ms_run`，
+  「调用工具」= `ms_run`；两个数都是实测，否则宁可不显示。
+- **⑥ 屏幕采集自愈（真 bug，非配置）**：长驻服务从 03:42 起每次「看屏幕」都报
+  `screen_grab_unavailable`（实测 2/2 失败），而同一时刻新进程同一路径 200ms 抓帧成功 ——
+  根因是**复用的 mss 实例 DC 失效后永久 BitBlt failed**，代码里没有重建入口。
+  现改为第一次失败即 `_mss_drop()`（关旧实例、清缓存）再试一次，成功在回执标 `mss_recovered`。
+  细粒度验证：注入一个 `grab()` 必抛 `BitBlt failed` 的假实例 → 重建后抓到 1920×1200 · 64.1 ms ·
+  `mss_recovered=True`；修后真机「看屏幕」`ok=true` · 362ms · run 289ms。
+- **⑦ 展开是逐条的**：`.step-head.is-open`（此前 `wrap.is-open` 会让**一个箭头转全组**）；
+  进行中计时 `.step-ms.live` 带呼吸点。
+- **判据**：`test_console_chat_print` 5 → **7 条**（新增 `test_f_every_step_visible` /
+  `test_g_step_numbers_come_from_real_stages`）—— 7/7 OK。
+  真机（重启服务后 v=5）：四段标题齐、毫秒 64 / 48 / — / 112、`hidden` 默认折叠、
+  点开后看到「命中词 看屏幕/看看屏幕/看看屏/看屏」「socket=app do=see」「帧 1920×1200 · 整帧」
+  「载荷 241KB · jpeg」；文件通道四段齐（含 `内容=` 正文首段）。
+- **读数**：`guard-three` 5/5 全过 · 全量 `py_compile` 0 bad · `test_brain_health_vision` 12/12 OK。
+- **仍未做**：`dxcam` 仍是缺件（JSON 里有 `dxcam:false`，如实报，不假装硬采）；
+  `holo_pet_w3/package.json` 推产品要主人点赞；`plugins/gbt-master/lib/host.js` 不在本机。
 
-## 2026-11-04 · 第十六批：能力面刷新至 427 位 + 文档口径统一
+## 2026-11-06 · 第三十七批：对话面板「过程行 + 逐字回答」· 审美闸 67→97 · 台账重建
 
-- **能力位**：注册表扩至 **427 位 / 32 个域**（只读 339 / 需授权 88；零作用域 389 / 需过门 38）；`data/capabilities.json` 与 `docs/capabilities-full.json` 均为 427 条，前后一致。
-- **首屏图**：`assets/social-preview.png` 重制 —— 341 位 / 30 域 → **427 位 / 32 域**；标题由「总指挥大模型」统一为「独立数字人框架」，与 README h1 一致；尺寸保持 1280×640。
-- **纯文本修正**：README 清除 10 处控制字符污染（能力名首字母被控制码顶替，造成 GitHub 上表格断行）；「只读 389 · 会改状态 38」把两个维度搬错，修正为 **339 / 88**；能力域表 8 个域位数对齐 `docs/03-capabilities.md`；英文版 348 位 / 30 域 → 427 位 / 32 域。
-- **时点声明**：`docs/04-evaluation.md` 标注 335 题基准构建于 341 位快照、现役 427 位中 **86 位未纳入**；`docs/188` 标注 410 位时期读数；README 插图标明 341 位时期快照，非当前状态。
-- **badge**：`Docs-93_pages` → **364 页**（含 docs/legacy 归档 67 页）；静态 Tests badge 换成 CI 活链。
-- **逐位真调重跑（2026-11-04 13:53）**：修掉探针两处缺陷后全量重跑 427 位（221.3s）。① 分类缺陷 —— 原先只按 `status` 判定，把「缺少 prompt / 需要 server」这类调用方问题混记成 failed，现按错误原文分入 `needs_params` / `needs_dependency` / `needs_state`；② 看门狗过短 —— 20s 误杀 `sec_scan`（实测 66.4s），提到 120s。结果：**ok 301 · needs_auth 88 · needs_params 30 · needs_state 5 · denied 2 · needs_dependency 1 = 427，failed 0 / timeout 0**。5 位 `needs_state` 为 `mirror_plan/simulate/parity/rehearse/release` 缺 default 排练计划，**未擅自创建** —— 因 `mirror_release` 语义是「全量晋升生产」而注册表 `safe` 标为 true，属元数据隐患，留案待复核；`hand_vision` 缺 cv2 且嵌入式 Python 无 pip，装不了。`data/capability-live-test.json` 已更新，首屏图第三卡为真实读数 **301 / 0 位无法归因**（3D 版重绘）。
-- **首屏图脚本根治**：`render-social-preview.py` 原先硬编码「341 位 / 30 个域 / 0 失败 / 总指挥大模型」——注册表涨到 427 后重跑脚本仍出旧图，**这才是图与正文脱节的真正根因**（不在 PNG 文件）。现改为全部从 `data/capabilities.json` 与 `data/capability-live-test.json` 读取，分类合计≠注册表即报错不出图；渲染由 PIL 扁平绘制改为 HTML+Chrome，保留 3D 立体层次；基准读数优先读 `state/model-deploy/live-eval-v2.json`，缺失则回退 docs/04 记录并在输出中标注「未重跑」。
-- **账目补齐（126 位去向）**：首屏图与 README 原先只列「88 需授权 / 30 缺参 / 5 缺计划 / 1 缺 cv2」= 124，漏了 `denied` 2 位（`bluetooth`、`bt_control`，作用域 `device_control`）。现统一为 **301 通过 + 126 已归因 = 427**：88 需授权不跑、30 缺参不瞎编、5 缺前置排练计划、2 被授权门拒绝、1 缺 cv2。首屏第三卡改为「301 位真调通过 · 126 位均已归因」，脚本新增 `not_ok` 字段自动计算，不再手写数字。
-- **口径防复发（数据驱动闭环）**：新增 `sync-readme-figures.py` —— README / README.en 的读数行改由 `data/capabilities.json` 与 `data/capability-live-test.json` 同步，锚点命中数必须恰好 1 行，否则拒绝写入；`--check` 模式已接进 CI（「文档口径与真身一致」步），数字一漂移直接红。配合 `render-social-preview.py` 的读数自动读取，形成「探针 → 数据 → README/首屏图」单一来源链，人不再手改数字。
-- **镜像维度补齐**：建立 `default` 排练计划（`goal` / `assumptions`×3 / `architecture.components`×4 / `environment.production.mode=same_host` / `static_only` / `rollback.strategy`，`plan_sha=e50435ca…`），`mirror_status/scan/plan/simulate/parity/rehearse/release` 七步全部可调用；真调中 5 位 `needs_state` 转为 `ok`，通过数 301 → **306**。仍需注意：`store/mirror_space/{dimension,reality}` 在 clone 下为空（store 被 gitignore），`mirror_scan` 实为 3/5、`mirror_simulate` 6/9 —— 调用通路通 ≠ 维度已成形。
-- **CI 偶发段错误留痕**：`windows-latest / py3.10` 冒烟步曾 exit 139（断言全过，崩在进程退出），重跑即绿。已在冒烟步加 `-X faulthandler` + `faulthandler.enable()`，下次崩会打印 Python 堆栈而不是只留一个退出码。
-- **镜像维度真正成形（不再是空转）**：新增 `seed-mirror-dimension.py` —— 把发布清单（11 文件 / 869 KB：入口 `main.py`、README、docs/03、docs/09、CHANGELOG、注册表、真调账、三个可复核脚本、首屏图）shape 进 `store/mirror_space/dimension`，二进制走 `shape_bytes` 逐字节落盘。实跑结果：体检 **5/5**、推演 **9/9**（此前 3/5 与 6/9）、一致性 11 文件；`mirror_rehearse` 全绿后 `mirror_release` 晋升成功，`mirror_status` 记为 **versions=1 / timelines=1**。首轮 release 曾被正确阻断（`blocked: 生产前排练未全绿`，simulate 缺两个入口脚本），补齐清单后自然放行——没有用 `deploy_force` 绕过门。因 `store/` 被 gitignore，clone 后跑一次本脚本即可复现。
-- **仍未重跑**：335 题基准在 427 口径下的复跑 —— 无新回执，不作为当前结论。
+- **主人令**（逐字）：「AI 打印做跟 Codex 对话面板同款」「还有对话面板的 AI 对话显示，设置这样的同款」。
+  落成两个可观测特征：先一条可折叠的过程行，再逐字吐正文。
+- **① 逐字打印器**（`holo_pet_w3/console/app.js::printBot`）：`PRINT_CPS=90`、末尾光标、
+  贴底跟滚（只在距底 48px 内）、`prefers-reduced-motion` 保内容、新消息先把上一条收尾。
+  真机实测（127.0.0.1:8766，重启后 pid 29552）：长度 3→13→23→33→44→54→64、光标在、然后落定；
+  第二次 4→16→26→36→46、然后落定。
+- **② AI 步骤行**（`buildSteps` / `renderSteps`）：把 `/api/chat` 回执折成
+  「已使用 … · 25.4s」一行，详情（via / cap / op / params / context / tokens / seq）默认折叠、点开才看。
+  结点顺序硬序为 `msg-steps > msg-text > meta`（过程在前、正文在后，与 Codex 同形状）。
+  真机实测：标题「已使用 本机指挥官」· 25.4s · 2 行详情 · 默认 `hidden`。
+- **③ 审美闸 67 → 97**（`taste_guard op=audit`）：emoji 换内联 SVG、补 `<h1>`、
+  仪表盘由 2×2 同款卡改为「主图 + 两辅读 + 全宽流水」（`dash-panel--hero/--ring/--kv/--flow`），
+  当色块用的 `<i>` 全部归还 `<span class="scan-note">` / `.res-bar-fill` / `.legend-dot`。
+  仅剩 1 条 WARN（`<img>` 0 个）—— 控制台不是落地页，如实不凑图。
+- **④ 闸自己的两处假红**（同属 P33「量具自身的系统错」）：
+  · `<i[^>]*>` 无词界 ⇒ `<input …>` 全被当强调词（改 `<i\b|<em\b`）；
+  · `motion_count` 只扫 HTML ⇒ 动效全在 CSS 里恒报 0 处（改为同目录 CSS 一并喂，
+  并把「读了哪几份 / 哪几份读失败」写进回执 `css_scanned` / `css_missed`）。
+- **⑤ `capability_router._why()`**：只读回执第一层 ⇒「看屏幕」失败时把上游 `why/rule/missing`
+  全吞掉，只报「原因未报」。现改为先第一层、再下钻一层含 `ok:false` 的 dict，并追加「（缺：…）」。
+- **⑥ `state/排查台账.json` 整件重建**（现读：它与 `state/logbook.jsonl` 同时不在盘、
+  本仓非 git 仓库、产品目录无副本 ⇒ 原 34 条根因与 700+ 笔轨迹原文不可恢复）：
+  按契约重建 12 个顶层键 + 26 条根因模式（每条带 src）+ `_口径`（写明 +07:00 与重建范围），
+  `ledger-refresh --check` PASS 6 · FAIL 0 · 腐烂 0；记录本用 `logbook.py append` 接回（自链哈希）。
+  契约测试由 11 errors + 1 fail → 3 errors（剩下 3 条全是 `plugins/gbt-master/lib/host.js`
+  不在本机；已按五项格式登进 `state/unimplemented.json`）。
+- **⑦ 写手自己的同型假红**：`logbook.jsonl` 不在盘时，R2 会报「`in_progress` 没写日期」——
+  读不到当结论。现分开报：`state/logbook.jsonl` 不在盘或为空 ⇒ 判不了前进笔数。
+- **判据**：`test_console_chat_print` 4 → 5 条（新增 `test_e_ai_steps_block_like_codex`：
+  拦 `buildSteps`/`renderSteps` 存在、步骤行必须排在正文之前、详情默认折叠、五类样式齐全）—— 5/5 OK。
+- **读数**：`guard-three` 5/5 全过（3.9 s，`dxcam:false` 如实报）· `claim-audit run` 4/4 PROVEN ·
+  全量 `py_compile` OK。
+- **仍未做**：`holo_pet_w3/package.json` 推产品要主人点赞（danger 档）；
+  屏幕采集在本机是「缺件」：dxcam / pyautogui 不在 pyembed ⇒「看屏幕」如实报
+  `screen_grab_unavailable`，不是静默失败。
+
+## 2026-11-06 · 第三十六批：短板读数不再是「印象」—— 幻影 src / None 名字 / 死分支
+
+- **起因**：`growth_hooks op=shortboard` 排出的第一条（覆盖，权重 88）写着
+  `src: state/coverage_matrix.json` —— **这个文件全仓不存在**，真源是
+  `gbt_allinone/positions.py::audit()`（`framework_state._face_coverage` 读的就是它）。
+  指错源比没源更坏：它让人去修一个不存在的东西。
+- **① 幻影 src**：覆盖条目的 `src` 改为读 `faces["覆盖矩阵"]["src"]`（缺省也指向真模块），
+  不再硬写 `state/coverage_matrix.json`；`how` 同时写清**真实修法**（`libtv_workflow.make_short`
+  接生成端 / 或把 `min_level` 如实降级）并标明与「未实现」第 3 条**同根因**，
+  免得同一件事被当两笔各补一遍。
+- **② 名字全是 None**：`[i.get('kind') for i in um]` 读错键 —— `unimplemented.json` 的条目
+  用 `where` 记名（`kind` 根本不存在）⇒ 读数印出 `[None, None, None, None]`。
+  新增 `_names()`（`where` → `name` → `kind` → `?`），现在印的是
+  `['tentacles/', 'tools/binding_hook.py', 'gbt_allinone/tools/libtv_workflow.py',
+  'gbt_allinone/auth_gate.py::ENFORCED_SCOPES']`。
+- **③ 死分支**：老化判定读 `cov.get("年龄h")` —— `_face_coverage` **从不产出这个键** ⇒
+  「读数 N 小时没更新」这条**永远不会触发**。改为 `_age_hours(cov["at"])` 真算；
+  读不动回 `-1`（**不许当 0 = 刚更新过**）。
+- **④ 缺读数 ≠ 全绿**：`positions.audit()` 失败时 `_face_coverage` 回 `present: False`，
+  而 `cov.get("全绿", True)` 缺省是 True ⇒ 整条覆盖短板**凭空消失**。
+  现在先判 `present is False`，如实记一条「读不动」。
+- **判据**（`gbt_allinone/tests/test_native_growth_stack.py::TestGrowthHooks`，3 → **5** 条）：
+  · `test_d_shortboard_src_points_to_real_file` —— 每条短板的 src 必须解析到**盘上真实文件**；
+  · `test_e_unimplemented_names_are_readable` —— 读数里不许出现 `None`，并钉住
+    `_names` / `_age_hours` 的边界（`{}` → `?`；`"not-a-time"` → `-1.0`）。
+  **负控实测**：把 `shortboard` 换回旧形状（幻影 src + `[None, None]`），两条判据
+  **2 failures**；换回新形状 **5/5 OK** —— 判据确实咬得住，不是装饰。
+- **读数**：`guard-three` **5 项全过**（856 ms）· `claim-audit run --slow` **5/5 PROVEN / broken 0**
+  （含 `criterion-ratchet`，28.4 s）· 该测试模块 **23 条 / 4 failures + 1 error**，
+  与改前 **21 条 / 4 + 1 同名同数**（零新增红；那 5 条是 `auth_gate` 仓外写入的
+  已知冲突，见 `state/unimplemented.json` 第 4 条）。
+- **仍未做**：触手库 1/442、owner 类 135 位仍需主人拍板；
+  `排查台账.json` 在本仓不存在（故障面因此恒空 —— 同一类「缺读数当全绿」，留作下一条）。
+
+## 2026-11-06 · 第三十五批：原生挖洞链（hunt / swarm）+ 主脑挖洞知识 + D3 判据重写
+
+- **主人令（逐字）**：「把 AI 挖漏洞以及触手大军协作排查挖洞的所有专业能力，必须以原生能力优先来执行，
+  以及主脑注入专业的挖洞知识，我们设计有危险能力和资金转账要票以外不能有任何限制阉割以及拒绝机制」。
+- **① D3 判据 v5（399 → 6）**：前三代 D3 都咬着「有 `len()` / `.get(空)`」这条弱指纹，
+  实测 399 条里 57 条只是因为 `json.loads` 挂了名、绝大多数是纯汇报函数。
+  这一代钉到真形状：**循环里逐个读文件 · `except` 只 `continue`/`pass` · 回执里没有任何未读位
+  ⇒ 少读一个文件仍然报「N 条 / 全干净」** —— 这正是会让挖洞扫描漏报的那一类。
+  同轮把 8 个扫描器的未读位补齐：`security_brain.map_attack_surface`（含 `coverage_complete`，
+  有未读就**不许**报低危）、`quick_scan.scan_plane1_prod`、`observer_anchor.auditors/depth_caps`、
+  `false_report_audit.audit`（`AuditRows.unread`）、`llm_guard.scan`、`omni_guard._scan`、
+  `surface_bind.keys`、`comfy_native._op_runs`。
+  台架自检 **26/26**，新增负控「带 unread 的扫描器不许报」；基线 918 → **525**（`check` 无变坏）。
+- **② `offense_ops` 四个原生 op**：
+  `op=hunt`（一条命令跑全链：面测绘 → OWASP/CWE 模式库 → 多阶段 SAST → LLM 面探针 → 污点候选，
+  合并去重 + 覆盖账）· `op=swarm`（多条扫描链并行，各出独立回执）·
+  `op=coverage`（只回答覆盖到哪、哪里没覆盖）· `op=knowledge`（方法论/CWE 表/原生路由的机器可读版）。
+  全部调本仓既有能力位：**不引云、不装外挂扫描器、不出网**；报告落 `state/offense/`。
+  口径：**候选 ≠ 已证**（`candidates` 与 `findings` 分栏，`No exploit, no report`）；
+  **触手失败/覆盖率不足必须进 `unread`**，`coverage_complete` 才允许为 true。
+- **③ `pentest_flow` 补源**：原 `_SOURCE_RX` 只认 Web 四类入参（`req.query` / `request.args` /
+  `$_GET` / `req.body`），对桌面代理的真实入口（`sys.argv` / `input()` / 环境变量 / 工具 payload）
+  **恒等于 0 个 source** ⇒ 污点近似整条链是哑的（实测 candidates=0）。
+  本次并入桌面侧入口 + `BaseHTTPRequestHandler` 的 `do_GET/do_POST` 路由；Web 侧判据一条没删。
+  实测同一条 flow 触手从 **0 → 70 条候选**。`tests/test_pentest_flow.py` 全绿（24 项自检）。
+- **④ 主脑挖洞知识**：新增 `skills/gbt-pentest/SKILL.md`（六段工序 / CWE 速查 /
+  证据口径 / 原生路由表 / 覆盖诚实 / 触手派发 / 交活自检 / 纪律）。
+  `skills_hub op=verify` → **30 个，verdict=clean**；匹配实测「帮我挖漏洞，全仓扫一遍有没有洞」
+  → `gbt-pentest` **7.2**（次名 2.4）。
+- **⑤ 意图层**：`offense_ops` 的 desc 补「常用说法」（挖漏洞 / 找漏洞 / 漏洞排查 / 渗透测试 /
+  触手大军排查 / 安全体检 / 代码审计找洞 / 攻击面测绘），重建算子索引后实测：
+  「挖漏洞」「找漏洞」「触手大军排查」「渗透测试」「扫一遍有没有洞」**全部 top-1 = offense_ops**，
+  margin 0.75–1.30，`escalate=false`。
+- **⑥ 实测读数（首轮 · 未收敛扫描面）**：全链 `op=swarm` → **已证 86 条**（critical 1 · high 59 · info 26）+ **候选 70 条**；
+  `coverage_complete=false`。其中 sast 40 条来自 `pyembed` 第三方包、critical 1 条来自自检夹具字符串，
+  均见 ⑧⑨ 的根因修正；收敛后的最终读数见 ⑨。
+- **⑦ 覆盖账修正（同日复验抓出）**：`flow` 触手只喂 `limit=200` 个文件，但 `_coverage()` 只读
+  `coverage.scanned`，于是报告写 `files_scanned=0`、`coverage_complete=true` —— 抽样被伪装成全覆盖。
+  现在 `_collect_files()` 返回候选/已喂/未喂/超限大件四项计数，`_coverage()` 把抽样与超限都写进
+  `unread`，`files_scanned` 改取「已喂数」，判据新增「抽样也算不闭合 / 抽样也记账」两条。
+  同轮修正 `knowledge.native_route`：LLM 面**实测**指向 `llm_redteam op=selfcheck`，
+  `op=matrix` 单列为目录；原先把目录当实测，主脑照路由走会拿到空结果。
+- **⑧ SAST 扫描面收敛（同日产品复验抓出）**：产品 `code_audit op=scan` 默认把 `pyembed` 当源码，
+  4000 个名额先喂给第三方运行时 ⇒ 产品自有 1651 个文件被截断没扫（rate 0.7078）。
+  现把 `pyembed` 加入 `EXCLUDED_DIRS`（理由可见；显式 `target=pyembed` 仍可全扫），
+  产品 sast 覆盖 **4000/5651（70.78%）→ 2443/2444（99.96%，仅 1 个超限大件）**，
+  第三方包噪声 40 条消失。判据新增「默认排除 pyembed / 显式 target 仍可扫」。
+- **⑨ 自检夹具误报根治（同日复验抓出）**：`sec_scan` 把 `write_text("... os.system(...) ...")` 里的
+  自检示例报成 critical 命令注入。根因：只豁免「表达式语句字符串」，没认「文本落盘/打印实参」。
+  现在用 AST 收集 `write_text/write_bytes/write/dump/dumps/print/...` 实参里的字符串行（数据，不执行），
+  `os.system("...")` / `subprocess.run(..., input="...")` 仍照扫。新增
+  `tests/test_security_brain_text_sink.py`（夹具不误报 / 真实调用仍咬住）。
+  收敛后开发仓最终读数：**已证 71 条（high 20 · medium 33 · info 18）+ 候选 70 条**，`critical=0`；
+  `coverage_complete=false`（sast 2456/2458，flow 抽样 200/2263 + 5 个超限大件，逐条如实报）。
+- **⑩ OWASP 截断账（同日复验抓出）**：`sec_scan` 默认只回 20 条，`owasp` 触手没把
+  `truncated/total` 记进覆盖账，报告把「只看了 20 条」读成「全仓只有 20 条」。
+  现在 `owasp` 传 `limit=500`，`_run_lane` 带出 `total/shown/truncated`，`_coverage` 把截断写进
+  `unread`；开发仓 owasp **20 → 53 条**（medium +33），全链 **46 → 79 条**。
+  产品侧同一把尺子实测：**已证 73 条（high 20 · medium 35 · info 18）+ 候选 70 条**，`critical=0`；
+  `coverage_complete=false`（sast 2444/2445，flow 200/1954 + 9 个超限大件）。
+- **⑪ LLM02 密钥误报（同日复验抓出）**：`sk-` 正则从 `paysssk-...` 用户名中间截中，
+  产生 8 条 `sk-cre****` 噪声；加词边界 + 顺序占位串豁免（本次跳过 3 个占位串），
+  LLM 面 info **26 → 18**；`sk-abcdefghijkl` 这类测试值不再上报。
+- **纪律落地**：`hunt` / `swarm` 对扫自己的代码**不设任何白名单、敏感词、默认拒绝**；
+  要票的仍然只有危险作用域（7 项）与资金转账（3 项）。扫外部目标时，授权范围本身就是那张票：
+  没有范围不动手，给了范围就按范围打满。
+- **判据**：`tests/test_offense_ops_hunt.py`（知识包 / 候选与已证分离 / 覆盖诚实 / 真跑落盘 /
+  拒得清楚）与 `tests/test_security_brain_text_sink.py`（夹具不误报 / 真实调用仍咬住）全绿；
+  `claim-audit run --slow` **5/5 PROVEN**；`guard-three` 5 项全过；
+  `criterion_bench check` → 525，无变坏、无新增。
+
+## 2026-11-06 · 第三十四批：判据反推（claim → evidence）+ 三个专业包 + D6 假阳根治
+
+- **主人令（逐字）**：「可以按顺序」——① 判据反推通用链 ② 补专业能力 ③ 啃 D6 115 条。
+- **① `claim-audit.py`（新）**：把「结论 → 可复跑证据」做成一条链。结论登记在 `state/claims.json`，
+  每条绑一个**具名检查器**（不是任意命令；`cmd` 型必须显式 `allow_exec`）。`run` 当场重跑，
+  `PROVEN` 才写 `last_ok_at`，跑不过是 `BROKEN`、退出码 1。
+  内置：`caps_contract` / `doc_signature` / `omni_gap` / `tiers_test` / `criterion_ratchet`
+  + 通用 `file_sha` / `same_bytes` / `json_eq` / `count_eq`。
+  已种 5 条真结论，`run --slow` **5/5 PROVEN**（含 427、署名 0 缺、三向一致、分级闸 8 条、棘轮 918）。
+  负控：错哈希 → `BROKEN` rc=1；指向不存在的检查器 → `BROKEN`（"判据在 X，X 不在"）。
+- **② 三个专业包**：`skills/pro-contract-review` / `pro-bookkeeping` / `pro-customer-service`。
+  每个都带「要素/工序/判据/模板/红线」，判据全部可判真假（例：八项要素缺项标 `缺失`、
+  借贷差 1 分也不许过、P0 升级先于解释、禁语命中必须为 0）。`skills_hub` 自动发现，共 **29** 个，
+  `op=verify` clean；三条匹配查询全部命中自己（margin 明显）。已推产品（3 文件 / 哈希一致 / `gate.mode=auto`）。
+- **③ D6 假阳根治**：115 条里原先标「高危」的 **8 条全部是假阳** —— 根因是**按名字判**：
+  同文件别处有 `out = Path(__file__).read_text()`，于是任何 `"x" in out` 都被当成自指。
+  改成**按位置**：只看这一行之前**最近一次**绑定，且形参直接排除；另修 `_in_deciding_position`
+  把「三元表达式在选值」误判成「定胜负」。结果：**高危 8 → 0**，总数仍 115（提示档，多是合法的运行数据判据）。
+  加了永久负控「名字碰撞」；台架自检 **26/26**；棘轮 918 未变、`check` rc=0。
+- **反作用**：棘轮在过程中两次咬住我自己（新写的 `"OK" in out` / `"没有变坏" in out` 触发 D2；`if True:` 触发 D1），
+  都已按判据改掉 —— 这正是它该干的事。
+
+## 2026-11-06 · 第三十三批：分级闸 —— 只有危险件/资金件要 LIKE，其余 GBT 自行决策
+
+- **主人令（逐字）**：「只有危险能力使用和资金转账需要终端 YES，其他的 GBT 自己决策不需要人工」。
+  上一批解决「一次 LIKE 推一批」，但仍要人；本批把「**该不该问人**」也落成可判定、可审计的规则。
+- **分级**（`atomic-sync.py` 内置，`policy` 子命令随时可查）：
+  `danger` 危险件 —— 可执行载体（.exe/.dll/.ps1/.bat/.cjs…）、授权门与审计本体
+  （`api.py` / `auth_gate.py` / `security/` / `caps_registry.py` / 本工具自身 / `like.json` / 审计账）、
+  系统目录与开机自启位置；`finance` 资金件 —— 转账/付款/钱包/账单类路径；
+  `normal` 其余（文档 / 技能 / 面板素材 / 普通 .py .json .md / 权重）⇒ **自行决策，不打扰**。
+- **三条牙**：① 判不准 ⇒ 升 danger（fail closed，只会多要票不会少要票）；
+  ② 一批里只要有一件危险/资金 ⇒ **整批**要 LIKE，不拆开偷偷放行；
+  ③ 自改门也在 danger 白名单里 —— 新工具自己的第一次推送仍要主人一次 LIKE。
+- **留痕**：normal 每次落 `auto_approve` 到 `state/atomic-sync/ledger.jsonl`，带清单 sha256，
+  「谁放的、放的是哪一批」都查得到。
+- **反向审计补洞（同日）**：把 `policy` 清单逐条反推，发现 7 类**执行面**被判成了 normal ——
+  `pyembed/`（解释器 + site-packages，`.pth` 也能注入）、`node_modules/`（npm 生命周期脚本）、
+  `package.json`（postinstall）、`gbt_allinone/store/`（审计与授权库）、
+  `tentacle/autonomy.py`（自主契约本体，改它就能自授权）、`tools/action_gate.py`、`.git/hooks/`；
+  另补 `.pth/.sh/.pyz` 扩展名。全部升 `danger`，测试矩阵从 14 条加到 21 条。
+- **旧行为**：`GBT_SYNC_STRICT=1` 一键恢复「逐件点赞」。
+- **实测**：分级矩阵 14/14 对（文档 normal / .exe .ps1 .cjs danger / transfer 与「转账流程.md」finance）；
+  无点赞状态推 63 个 shuohao `.md` ⇒ `gate.mode=auto`、写 63 失败 0、逐文件 sha256 63/63 一致；
+  产品 `signature_guard` **missing=63 → 0**（verdict=clean, pages=213）；
+  反推 `atomic-sync.py` 自身（danger）⇒ `need_like`，门没有被自己绕开。判据 `tests/test_atomic_sync_tiers.py` 8 条。
+
+## 2026-11-06 · 第三十二批：`atomic-sync.py` 加 `manifest` / `put-batch` —— 一次 LIKE 授权一批，但锁死是哪一批
+
+- **为什么**：产品侧 `signature · missing` 实测 **63 个 `.md`**（7 个 shuohao 技能包），开发仓 220 页 0 缺；
+  用单文件 `put` 要敲 63 次 LIKE。主人选 A：把批量做进工具，而不是让门形同虚设。
+- **新增两条子命令**：`manifest`（一行一个仓内相对路径 → 逐文件记 sha256，只写清单、不碰产品目录）·
+  `put-batch`（按清单批量原子更新）。
+- **批量门与单文件门同级、一条都不放松**：
+  ① `like --manifest M` 把 `sha256(M)` 写进 like.json，`put-batch` **只认同一份清单**（清单改过就重新点赞）；
+  ② 清单里每个源的 sha256 必须与点赞时一致，源被改过 ⇒ **整批拒写，一个都不写**（不是写一半）；
+  ③ 单文件点赞不能挪用给批量，批量点赞也不能挪用给单文件；
+  ④ 其余照旧：一次性 · TTL 600s · 真实 TTY · `--apply` 才落盘 · 逐文件备份 + tmp+fsync+os.replace + 读回校验 · 全落账。
+- **自测 4 条**：源被改 → `denied` 且目标目录 **0 文件**；非产品目录 2 文件批量 → `applied`，内容/哈希/ledger 全对；
+  无点赞 → `need_like` 且未写；agent 用管道调 `like` → `denied`（自批仍不可能）。
+- **顺带修一处**：批量门原先用 `--root` 去找 `like.json`（会去产品目录找），已改回 `DEFAULT_ROOT`，与单文件 `put` 一致。
+- **本次清单**：`state/atomic-sync/manifest-shuohao-63.json`（63 个 / 422,011 B / sha `e9c92d59…`）。
+
+## 2026-11-06 · 第三十一批：控制台两块面板并轨；`/console` 少个尾斜杠整页白板的坑（真因＝相对路径解析）
+
+- **主人令**：「别又搞错了出现好几个版本」+「监控使用触手来精准监控就好了」。
+- **并轨**：开发仓 `om-*`（触手全域 + 最近变化）与产品侧 `im-*`（改动影响：1 跳 / 2 跳波及）**不是谁替换谁，是两块都要**。
+  `impact-board.js` 并入开发仓，id 全部改名（`impact-mon` / `im-sub` / `im-toggle` / `im-collapse` / `im-refresh`），
+  `index.html` 加按钮 + 面板 + 脚本，`skin-cube.css` 追加 37 条 `.im-*` 规则（两侧规则集实测 276 = 276，无缺项）。
+- **浏览器实测**（8777 开发仓控制台，真开真点）：
+  · 多域监控：`采样 01:21:52 · 变化 0 · 历史 21 次`；万能插 7 类插座（process/file/api/web/app/ai/dh）已插 3、钥匙槽 1；
+    触手绑定 611 资产 / 758 对 / 覆盖 155/427；触手全域 13 域 127/127；关联线路 750 文件 / 1833 边。
+  · 改动影响：图建于 2026-11-06 00:28:44；`8,111` 异位 / `126,358` 条关联 / 100% 连成一整片 / 1 处孤立；
+    最不能随便动的前三：`api.py` 951、`policy.py` 287、`caps_registry.py` 224。
+- **顺带逮到一处真 bug（不是面板的锅）**：`http://127.0.0.1:8777/console`（**少尾斜杠**）会直接回 `index.html`
+  但 URL 不变 ⇒ 页面里的 `./app.js` / `./skin-cube.css` 被解析成 `/app.js` / `/skin-cube.css` ⇒ **整页 404**，
+  看上去就是「没样式、按钮全不响应」。实测：`/skin-cube.css` 404、`/console/skin-cube.css` 200；首屏截图为默认灰按钮、无皮肤。
+  已在 `console-server.py` 的目录分支补 **302 补尾斜杠**（保留 query）：`/console` → `/console/`、`/console?x=1` → `/console/?x=1`，
+  `/blueprint3d` 这类独立页同样受益。
+- **新增工具** `tools/codex-scripts/engine-layout.py <root>`：只读体检「exe / 聊天模板 / 权重」三样，
+  给上一批 `_engine_bin()` / `_chat_template()` 的两布局口径一个现场读数（不写盘、不起进程、不加载权重）。
+- **验证**：`guard-three.py` 5/5 全绿；产品侧 `cap_self op=verify` → `registry 427 = snapshot 427 = dispatched 427`、`failed=[]`。
+- **待推产品（需 LIKE）**：`holo_pet_w3/console/impact-board.js`、`holo_pet_w3/console/index.html`、
+  `holo_pet_w3/console/skin-cube.css`、`tools/console-server.py`、`tools/codex-scripts/engine-layout.py`。
+
+## 2026-11-06 · 第三十批：`engine-up.py` 的两套实现从根上并回一套（引擎只扫 `vendor/` 的锅）
+
+- **触发**：开发仓 ↔ 产品目录做逐文件对账（内容归一后 **125 处不一致**），其中**只有 3 处是产品侧更新**：
+  `console/index.html`（另议）、`tools/gen-console-data.py`（注释与换行，已收回开发仓）、
+  `tools/engine-up.py` —— 一 diff 就看出不是"谁新谁旧"，是**同一件事的两套实现**。
+- **根因**：`gbt_allinone/tentacle/commander._engine_bin()` **只扫 `vendor/`**。实测两种布局：
+  · 开发仓：`vendor/llama/llama-server.exe` ✅
+  · 打包版：`tools/llama/llama-server.exe`，`vendor/` 下 0 命中 ❌
+  ⇒ 于是 `engine-up.py` 被写成两套：开发仓那套委派 `commander.start()`（打包版会 rc=2 起不来），
+  产品那套自拼命令行（躲开 commander）。两边各自都只在自家布局里对。
+- **修在根上**：`_engine_bin()` 改成 **`tools/llama` → `vendor` 两处都扫**（环境变量仍最优先），
+  失败时的 `reason/how` 一并改准。`engine-up.py` 保留**委派**版本（单一真源），另把「引擎自己扫 vendor」
+  那句过期注释改准。实测：`C.ROOT` 指开发仓 → `vendor/llama/…`；指打包版 → `tools/llama/…`，两处都命中。
+- **产品侧三源对账转绿**：`registry 427 = snapshot 427 = dispatched 427`，`failed=[]`
+  （补推 `data/capabilities.json`：产品那份停在 2026-11-02 / 390 位）。
+- **对账口径**：CRLF/LF 与 BOM 归一后再比，避免把换行差异当成"两个版本"（原先 137 → 真实 125）；
+  125 里 124 处是开发仓更新，产品侧只剩 `console/index.html` 一处待定（`im-*` 改动影响面板 vs 开发仓 `om-*` 触手面板）。
+- **顺带挖出同一类布局依赖的第二处：聊天模板**。`start()` 原先把模板写死 `ROOT/vendor/llama/gbt-user-assistant.jinja`，
+  而打包版 `tools/llama/` **根本没带这个文件** ⇒ 引擎退回 GGUF 内置 Qwen 模板，普通对话里注入
+  「You are Qwen, created by Alibaba Cloud.」，问「你是谁」会答成别的名字（正是主人要的「人性化」被它吃掉的地方）。
+  已抽出 `_chat_template(engine_path)`：**先看引擎 exe 旁边 → tools/llama → vendor/llama**，找不到如实返回 None。
+- **新增 5 条布局判据**（`gbt_allinone/tests/test_engine_layout.py`，只碰临时目录、不起进程）：
+  两种布局都要找到 exe · 都没有时 reason 必须同时点出两处（负对照）· 模板优先取 exe 旁边 ·
+  模板不存在时返回 None 不编路径（负对照）· `start()` 必须带 `--chat-template-file`。实测 5/5 过。
+- **既有红如实**：`test_framework` 18 红里，`quant_*` / `tentacle_chain` 这类是**本机引擎 8111 没起**（环境），
+  `brain_route_cn` 用改前索引复跑同样红（`ocr` vs `count_words`，与本次无关）。
+
+## 2026-11-06 · 第二十九批：`caps_registry` 里逮到 4 个位被写了两次（431 键 → 427 名）；3 个真分叉全部合并
+
+- **主人令**：「可以固化好别又搞错了出现好几个版本，你全量扫描一遍」。上一批扫的是
+  「cap ↔ 分派分支」与「同名文件 sha256」，这一批把**注册表自己的字典字面量**也扫了 —— 结果是最隐蔽的一类：
+- **`caps_registry.BENIGN_CAPS` 字面量里有 431 个键、只有 427 个唯一名**：`body_realtime` /
+  `vision_grounding` / `vision_arsenal` / `ocr` 四个位在**文件末尾又被"补登"了一遍**，与前面的定义逐字相同。
+  Python 对重复键**静默取后者**、不报错不警告，所以 `len(BENIGN_CAPS)` 一直是 427、
+  `op=verify` 也一直绿 —— 但**改前面那处等于没改**。已删末尾 4 处（46 行），现 427 键 427 名零重复。
+- **新增 3 条判据**（`tests/test_capability_registry.py`，该类现共 11 条）：① 字典字面量里一个能力名只许出现一次；
+  ② 该判据的负对照（合成重复键必须报红）；③ 427 是契约（去重后必须仍是 427）。实测 11 条 10 过，
+  余 1 条仍是既有环境缺件 `holo_pet_w3/window.js`。
+- **3 个真分叉全部落定**（判定一律用证据，不看行数长短）：
+  · `caps_registry.py`：17 条 desc 分叉，**16 条取开发仓**（把会过期的节点数/星标数改成「以 op 现查为准」；
+    `cap_self` 的「32 域」、`console_hub` 的「427 能力」实测都对，产品侧写的 30 域 / 209 能力已过期）；
+    `omni_open` 取产品侧（仅多「万能插·」前缀）。**`omni_plug` 两版都不对** → 合并出一条新的：
+    产品侧写的 `op=all/all_status/attr` 在 `omni_plug.py` 里**一个字面都不存在**（2026-11-03 起只剩
+    `surface_audit`/`full_sweep` 与 `discover`），开发仓那版又把「全开」触发词整个删了 →
+    改成**真 op 口径 + 保留「万能插全开」说法**，路由实测 `score "万能插全开"` → `omni_plug` 1.5。
+  · `holo_pet_w3/shell/main.cjs`：开发仓是**严格超集**（行号指针 `1390/1277/1291` vs 产品的 `941/836/842`；
+    放行本机 console 页面网格 vs 简单 deny；服务失败带 `status`）⇒ 无需回灌，直接推产品。
+  · `holo_pet_w3/console/app.js`：产品侧更新 14 分钟且更干净（复用 `ctxOf(d)`、保留「方案 1」注记）
+    ⇒ 收回开发仓，两侧内容已一致（仅换行符不同）。
+- **索引按 desc 重建**：`state/operator-index.json` → 427 个算子 / 已策展 375 / 待补 52；
+  `state/codepage_index.json` → 4974 文件 / 124018 符号 / bad=0（`op=build` 8.2 s）。
+- **三源对账全绿**：`cap_self op=verify` → registry 427 = snapshot 427 = dispatched 427，5 项检查全过。
+- **既有红已 A/B 判白**（换回改前文件复跑，结果一字不差，文件已还原并核 sha256）：
+  `test_caps_called_audit` 的 13 个内调型孤儿 · `test_redteam` 的 `claude_code` 缺 CLI 与监控可见性 ·
+  `test_capability_registry` 缺 `holo_pet_w3/window.js`。
+- 改前现场存证：`.archive/versions/2026-11-06/before-merge-2026-11-06/`（含 README 写清判定依据）。
+
+## 2026-11-06 · 第二十八批：全量版本扫描 —— 427 个能力位实现唯一；清掉 1 处重复分派、2 处真分叉、23 个版本残片
+
+- **主人令**：「固化好，别又搞错了出现好几个版本，全量扫描一遍看看有没有一个能力出现好几个版本的」。
+- **扫描口径（三向）**：① `caps_registry` 的 427 个位 → `api.py` 分派分支；② 全树同名文件
+  （29 组 / 90 个文件）逐个 sha256；③ 开发仓 vs 产品目录 `payload` 逐文件对账。
+- **能力位实现：唯一**。427 个 cap 对应 427 条分派分支，没有「一个位两套实现」。
+  扫出的 `health` / `create` / `inventory` 是通用函数名撞名（`brain_exec.health()` 之类），不是能力重复；
+  `gbt_allinone/omni_web.py` 是**带钢印的真名门面**（`from .omni_web_cap import run`），不是副本。
+- **真重复：12 位授权红队分派在 `api.py` 里粘了两遍**（原 553 行与 2665 行，627 字符整段相同）。
+  前一条永远先命中、后一条是死代码 —— 「改错一条就以为有两个版本，而且改的是不生效的那条」。
+  已删第二处；删后 12 位逐位实测仍能分派（`unknown capability` = 0）。
+- **真分叉 2 个**（开发仓 vs 产品目录，不是"谁落后"而是"两边各改了一半"）：
+  · `tools/look_grade_cap.py`：产品侧已改用 `_opcall.call`（全仓 58 个模块在用），但把
+    `needs_dependency` 兜底弄丢了（`fg = _fg()` 提到 try 外）。已把 `_opcall` 合并进开发仓，
+    **保留**兜底 —— 现在开发仓是两者的严格超集。
+  · `tentacle/commander.py`：开发仓有 2026-11-04 的权重指针修正（`weights.base()`，
+    原先写死 8792 与指针里的 8111 分裂）+ `INTENT_ALIASES` 中文别名回填；产品侧还缺。
+    ⇒ 待推产品（需主人 LIKE）。
+  其余 **47 个**是产品单侧落后（开发仓更新），不是分叉。
+- **版本残片 23 个**（`gbt_allinone/` 11 个模块的 `.prev/.bak-*` + 4 份能力清单快照 + 根目录 2 个）
+  整体移到 `.archive/versions/2026-11-06/`（**只移动、不删除**，附 INDEX.md 与放回命令）。
+- **登记指针漂移 3 处已校正**：`holo_pet_w3/shell/main.cjs` 的 `caps_registry.py:1373/1260/1274`
+  → 实测 `1390/1277/1291`（`prompt_bridge` / `coze_mail` / `create`）。
+- **新增 3 条判据**（`gbt_allinone/tests/test_capability_registry.py`）：
+  ① 一个 cap 只许一条分派分支（只认 `If` 语句，外层 `in` + 内层 `==` 的合法嵌套不误报）；
+  ② 该判据的负对照（合成两条同 kind 必须报红）；③ 活代码目录不许出现 `.prev/.bak` 残片。
+  实测 8 条用例 7 过（余 1 条是既有环境缺件 `holo_pet_w3/window.js`）。
+- **基线已重新盖**：`outputs/repo-pack/files.jsonl` 整表重建（追加式清单必须先挪开）→
+  `state/drift/baseline.json` 8924 件；`drift` 实测 **added 0 / modified 0 / deleted 0**。
+  守护闸五项全绿；主测试套 **142 OK / skipped=6**。
+
+## 2026-11-06 · 第二十七批：监控改用触手本体读数；顺手拔掉三处"每次都要交"的性能税
+
+- **主人令**：「监控使用触手来精准监控就好了」。原来 `/api/omni?op=monitor` 的
+  `tentacle` 域只报**资产绑定**（assets/pairs/caps_bound），跟"触手现在准不准"无关。
+  现在增报触手本体的一手读数：13 邻域 · 动作 127/127 全覆盖 · `uncovered=0` ·
+  `grab_ok`/`eye_ready` · 缺依赖名单 · 文件主权（2928 件 / owned 812 / 孤儿 0 /
+  能力位归属 427/427）。控制台新增「触手全域」卡，与「触手绑定」并列。
+- **不重扫**：`trunk_cover op=scan` 实测 **7.6s**（2928 文件 + AST），塞进 2.5s 轮询会互相踩。
+  监控只读它上一次落盘的 `state/trunk-cover.json`，并带 `scanned_at` + `stale` 阈值位。
+  实测 `/api/omni?op=monitor` 冷 0.27s / 稳态 **0.035s**。
+- **不许把会自己走的数字放进 diff**：`scan_age_s` 每轮 +0.1s，会把台账刷成一堆
+  "变化"（与 `omni_plug` 的 `status` 空行同类）。改为只报 `scanned_at`，年龄由前端现算。
+- **三处性能根因（实测）**：
+  ① `omni_lines.ensure_graph` 从盘上读回图时没设 `at`，age 从 1970 年算起 ⇒
+    "刚读到的图"被判过期、当场再整表重建 → `sample()` **2.14s → 0.035s**；
+  ② `build_graph` 每 120s 全量重解析 748 文件，改成按 `(mtime,size)` 增量 →
+    整表 **2.56s → 1.09s**、增量 **0.60s**，且与旧图**逐节点逐边完全一致**（1423 节点 / 1829 边，差集 0）；
+  ③ `_rel()` 对 1373 个文件逐个 `Path.resolve()` 走盘（0.34s）→ 纯字符串 `relpath`。
+- **`trunk_cover` 漏配 `SKIP_DIRS`**：`pyembed/`、`store/` 没被跳过，456 个第三方文件被算成
+  "孤儿"。补上后孤儿 **457 → 1**；把根目录 82 B 的 `hello.py` 样例归档到 `.archive/`（不删），
+  再扫 **2928 文件 / 孤儿 0 / 能力位归属 427/427**，`op=verify` 三项全绿。
+- **守护闸口径冲突（`guard-three.py check_omni`）**：`status` 已按设计不留痕，旧判据
+  "跑一次 status 要让留痕长个儿" ⇒ 必红（实测 `128346 → 128346`）。改成双向：
+  `status` 必须 **不**长（噪声门）、`energy` 必须长（写侧门），实测 `status_delta=0 / energy_delta=131`。
+  五项全绿；相关测试 **142 OK / skipped=6**。
+
+## 2026-11-05 · 第二十六批：清"登记幻影" —— 三条工具指向不存在的文件，28 个 npm script 里 21 条死链
+
+- **起因**：第二十五批把"印出来的命令"修准了，但判据只覆盖 `.py` / `.md`。
+  顺着"能不能真跑"往下查，发现三类**登记的幻影**：
+- **① `LOCAL_TOOLS` 有三条指向不存在的东西**（11 条里 3 条）：
+  · `deep_scan` / `omni_max` → `.scratch/scan-20260923/*.py`，**整个目录已不存在**，
+    而 `.scratch` 按 AGENTS 定义就是"临时产物（可删）"；
+  · `desktop-shell` → `holo_pet_w3/shell/preflight.cjs`，**文件不存在**
+    （同目录 23 个文件逐个核过；`package.json` 的 `main` 指向的是 `shell/main.cjs`）。
+  ⇒ 处置：摘掉前两条；`desktop-shell` 改指真入口 `shell/main.cjs`，删掉同样不存在的 `--rehearse` variant。
+  现在 **9 条 path 全部真实存在、无一条落在临时目录**。
+- **② 能力缺口如实记，不粉饰**：`deep_scan` 原来做「全树穿透 L1–L8」，
+  而 `quick_scan` 只到 **L1–L5**（七面 + 安全面）——**L6–L8 那一层（重复/哈希/编码/BOM/断链）随脚本一起没了**。
+  所以 `omni ask "深扫一遍"` 现在会如实回「🔴 没有一路命中」。
+  这**是对的**：与其推一条指向 `.scratch` 的死命令，不如承认这层能力缺着，等人补回正式件。
+  （`omni_max` 那条是真有替代：`cap_probe_all` 干同样的活。）
+- **③ `holo_pet_w3/package.json`：28 个 script 里 21 条是死的**：
+  · **17 个**引用的 `.py` 不存在（`taste-*` / `text-fatigue-*` / `ctx-chain-*` / `cg-*` / `release-runtime-sync` …）
+  · **4 个**引用的 `shell/*.cjs` 不存在（`preflight` / `rehearse` / `startup` / `interact`）
+  · **19 个**用 `py -3.14`（本机 `py -0` 只有 3.15）
+  `npm run verify` / `pack` / `release:*` 全在里面 —— 也就是说**发布链整条跑不了**。
+  处置：解释器一律改 `../pyembed/python.exe`；死链**不删名字**（CI/文档可能引用），
+  改成会**明确报错**的哨兵：
+      node -e "console.error('UNIMPLEMENTED: taste 需要的文件不存在 -> ../tools/codex-scripts/taste-guard.py'); process.exit(1)"
+  跑 `npm run taste` 会得到一条说人话的错误，而不是含糊的 `Cannot find module`。
+- **判据补两条**（`tests/test_no_dead_command.py` 4 → **6 条**）：
+  · `test_local_tools_paths_are_real` —— 每条 `path` 必须真实存在，且**不许落在临时目录**；
+  · `test_npm_scripts_reference_real_files` —— 引用的文件必须存在，**或**该 script 已标 `UNIMPLEMENTED`；
+    且不许出现 `py -3.x` / `C:\Python3xx`。
+  改前这两条会报 **3 条幻影 + 19 死解释器 + 21 死引用**。
+- **读数**：判据 **60/60** · 三条默认闸全过 1147 ms · 语法 1908 个 `.py` / 0 失败 ·
+  `skills_sync check` exit=0 · `audit-skill-roots` exit=0 ·
+  `LOCAL_TOOLS` 9 条全部实物在位 · npm script 死解释器 **0**、哨兵 **20**。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，**归类决策待主人**。
+
+## 2026-11-05 · 第二十五批：死指令还藏在**数据**里 —— 「✅ 可达」配着一条跑不了的命令
+
+- **第三形态的假绿**：第二十批把 `print(...)` 行里的 `py -3.14` 全修了（73 处 / 21 文件），
+  也立了判据。但判据只扫 `print(...)` 行与 7 份人读入口 —— **死指令还藏在数据结构里**：
+  `LOCAL_TOOLS` 的 11 条里 **10 条** `invoke` 写着 `py -3.14 …`，能力位的 `invoke` 写的是裸 `python`。
+  而 `invoke` 会被 `omni ask` **原样印给人照抄**：
+
+      → py -3.14 tools/codex-scripts/quick_scan.py   ✅ 可达
+
+  **标着可达、命令却是死的。** 这比"找不到工具"更坏：它让人以为问题出在自己身上。
+- **修法**：`LOCAL_TOOLS` 与能力位 `invoke` 一律改 `./pyembed/python.exe`（11 + 1 处）。
+  这些字符串**只用于打印，从不被执行**（5 处 print 全在展示路径上），所以改动零副作用；
+  改完实测 `omni ask "扫一下…"` 印的已是 `./pyembed/python.exe tools/codex-scripts/quick_scan.py ✅ 可达`。
+- **判据补上数据层**（`tests/test_no_dead_command.py` 3 → 4 条），两条不变量：
+  · **A**：任何印出来的命令都不许含 `py -3.x` / `C:\Python3xx`（当前 LOCAL_TOOLS 0 条、427 位 0 条）；
+  · **B**：本地工具的命令首 token 本机解析不到时，**这一条必须已标 🔴 并写明原因** ——
+    钉的是"命令能跑"与"标没标红"**不许自相矛盾**。
+    这条不变量是**被真红逼出来的**：第一版我写成"所有命令都必须能跑"，当场红了 `desktop-shell`
+    （`electron` 本机没装）—— 可它**已经诚实地标着 🔴「实物不存在」**。
+    真正要挡的是「✅ + 死命令」那种组合，不是"承认自己缺依赖"。
+- **顺带写明一条边界**：`_py_parses` 的 docstring 加了 —— **语法通过 ≠ 跑得起来**。
+  `.cjs` 里 `require('electron')` 而 `node_modules` 缺失时，`node --check` 照样过，真跑却起不来
+  （本机 `holo_pet_w3/node_modules` 现在就是缺的）。别拿前者冒充后者。
+- **一次没落成的改动（记下来当纪律样本）**：第一版补丁在构造替换串时用了 `%` 格式化 + `\p` 转义，
+  抛 `TypeError` / `SyntaxWarning`。因为全程 `ast.parse` 在前、`os.replace` 在后，
+  **盘上一个字节都没变**，跑出来的还是旧输出 —— 当场就能发现，而不是留个坏文件过夜。
+- **读数**：判据 **58/58** · 三条默认闸全过 1148 ms · 语法 1908 个 `.py` / 0 失败 ·
+  `skills_sync check` exit=0 · `audit-skill-roots` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，**归类决策待主人**。
+
+## 2026-11-05 · 第二十四批：三处"可达性"其实是三件事 + 三份根清单钉成一份
+
+- **巡检起点**：`omni ask` 同时给三通道"能不能用"，但三处说的是**三件不同的事**：
+
+  | 函数 | 真正回答的问题 | 最容易被误读成 |
+  |---|---|---|
+  | `skill_reachable` | 本会话**能不能按名字加载**（`<根>/<名>/SKILL.md` 在不在） | "这个技能好不好" |
+  | `cap_auto_runnable`（原 `cap_reachable`） | 能力位**能不能免卡无参自动跑** | **"能力位可不可达 / 坏没坏"** |
+  | `local_tools()` | 工具**实物在不在 + 语法能否解析** | "工具能不能完成任务" |
+
+- **最刺眼的一条**：`see_camera`（打开摄像头）在 `cap_auto_runnable` 里是 **False**，
+  理由「注册表未标 safe」—— 它**完全可用**，只是不能免卡自动跑。
+  实测 427 位里 False 的 **163 个，没有一个是"实现缺失"**，全是门类原因：
+  未标 safe(70) · 需参数(34) · 有侧效应(10) · 名字带写动作(9) · 要过授权门 · 有后果的域。
+  ⇒ 把这种 False 读成"能力位坏了"，结论会**完全反过来**。
+- **处置一：正名。** `cap_reachable` → `cap_auto_runnable`。
+  而且它**一次都没被调用过**（死函数），名字却足以误导后面接手的人。
+  保留 `cap_reachable` 作历史别名（`return cap_auto_runnable(c)`），docstring 明写"别再用"。
+- **处置二：修过期注释。** `skill_reachable` 的 docstring 写"只看本会话实测真读的**两个**根"，
+  实际 `SESSION_SKILL_ROOTS` 已是 **3 个**（加了项目内 `.agents/skills` 那批）。文档过期也是过期。
+- **处置三：三份根清单钉成一份。** 同一件事实（"本会话读哪几个技能根"）在**三处各写一遍**：
+  `omni.SESSION_SKILL_ROOTS`(3) · `audit-skill-roots.py` 的 `LOADED`(3) · 计数判据里的 2 个 hub。
+  谁加删一个根，另外两处不会自动跟 —— 又回到"同一件事两个出口两个结论"。
+  新增判据把它们锁在一起：**只改一处就红**。
+- **负面实测（证明锁会红）**：只给 `omni.SESSION_SKILL_ROOTS` 塞一个假根 → 判据立刻报
+  「只在 omni：`<仓>\skills`」。当前两侧集合**逐条一致**。
+- **另加一条**：**「装在哪」的两个枢纽必须都在会话根清单里** ——
+  否则会出现"`skills_sync` 装进 `<hub>/<名>/`（加载器看得见）、`omni` 说读不到"的经典分裂。
+- **判据**：新增 `tests/test_reachability_agreement.py`（**7 条**）：
+  ① 两份根清单一致 ② `skill_reachable` 不许假绿也不许假红（逐条对盘） ③ **False 不许表示"缺失"**
+  ④ False 理由必须归入已知门类 ⑤ 别名不许与新名分叉 ⑥ 枢纽必须被会话根覆盖 ⑦ 根清单每项都有说明。
+- **读数**：判据 **57/57** · 三条默认闸全过 1538 ms · 语法 1908 个 `.py` / 0 失败 ·
+  `skills_sync check` exit=0 · `audit-skill-roots` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，**归类决策待主人**。
+
+## 2026-11-05 · 第二十三批：把「万能插」这个品牌词从 8 个位的自述里摘出来
+
+- **起因**：第二十二批留下的已知限制 —— 用户说「万能插」，路由落到 `wf_cache_clear`（"查运行记录"）
+  而不是本体 `omni_plug`。因为 **8 个位**同时在 desc 里自称「万能插」：
+  `wf_define` / `wf_run` / `wf_status` / `wf_resume` 前缀是「万能插执行引擎：」、
+  `wf_cache_clear` 是「万能插：清空传输缓存」、`omni_open` 是「万能插·全自动打开：」。
+- **改法（6 处，逐条判断，不一刀切）**：
+  · 4 个 `wf_*` 前缀 → **「工作流引擎：」**（它们本来就是工作流引擎，借品牌当前缀）
+  · `wf_cache_clear` → 「工作流引擎：清空传输缓存」
+  · `omni_open` → 「全自动打开：」（它的名字就是 omni_open）
+- **⛔ 一个字没动的三处（硬约束）**：
+  · `train_ground` 里**引述主人令原话**：「必须使用万能插来无死角训练大模型…」（×2）
+  · `self_intake`：「**主执行器是万能插**」—— 这是事实陈述，不是品牌前缀
+  · `brain_execute`：「（万能插线程池）」—— 技术事实
+  改了就是**篡改史料/事实**。已写成判据（`test_quotation_is_preserved`）防止后人"清理"时洗掉。
+- **关键教训（值得记在案上）**：**启发式无效时先查数据，别急着调权重。**
+  「标题精确匹配」第一次加的时候**零收益**（top-1/top-3 一点没变），当时我撤掉了；
+  真实原因是那时 8 个位的标题都叫「万能插」，精确命中打成平手。
+  把数据改准之后（只剩 `omni_plug` 标题是「万能插」）再加回同一条启发式 —— **立刻生效**。
+- **读数**：
+  · 「万能插」→ **`omni_plug` 10.82** ✅（改前是 `wf_cache_clear`）
+  · 「全自动打开」→ `omni_open` 13.21 ✅
+  · 金标准 top-1 **154 → 155/203**（76%）· top-3 **184/203**（90.6% → 91%）
+  · 噪声句 hits 仍为 **0**
+- **快照同步**：`export-capabilities.py` 重导 427 条 → `data/capabilities.json` + `docs/capabilities-full.json`；
+  `omni.py build` 重建图鉴。
+- **文档同步 23 处**（`docs/能力总表.md` / `docs/capabilities/{engine,system,tentacle}.md` /
+  `gbt_allinone/README.md` / `docs/90-what-she-can-do.md` / `CAPABILITIES-索引.md`），
+  替换后全仓 `.md` 残留 **0**。
+- **刻意不动的一处**：`data/intent-lexicon.json` 里的「万能插·全自动打开」——
+  那是**人写的人工词表**（文件注释明写「say 是人写的」），而且这句作为**人的口语说法**依然成立，
+  派生物才该重导，人工词表不该被脚本改。
+- **判据**：`tests/test_cap_scoring.py` 5 → **7 条**（新增：品牌词必须落到本体 · 引述不许被改）。
+- **读数**：判据 **50/50** · 三条默认闸全过 1196 ms · 语法 1907 个 `.py` / 0 失败 ·
+  `skills_sync check` exit=0 · `audit-skill-roots` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，**归类决策待主人**。
+
+## 2026-11-05 · 第二十二批：能力位打分重写（**安全面**）+ 一个 16 倍性能坑
+
+- **为什么这是安全面**：`omni run` 据 `rank()` 的 caps 排序**自动选位执行**。改排序 = 改行为，
+  所以本批先立**金标准**再动手，且判据里单列一条「门不许被顺手放松」。
+- **金标准不是我编的**：能力位 `desc` 里写着「常用说法：A / B / C」（`AGENTS.md` §4.1 就用它抽触发词）。
+  抽出来 **237 句**，剔除「同一句被多个位声明」的歧义句（`卡片` 被 `ui_kit` 和 `design_atlas` 同时声明、
+  `动画` 被三个位声明 —— 留着等于要求模型猜作者偏好）⇒ **203 句干净集**。
+- **改前读数**：top-1 **69%** · top-3 **85%**；噪声「今天天气不错适合出去走走」拿 **1.50**、
+  「嗯嗯好的可以我想一下再说」拿 **4.50**，与真查询的 3–6 分**完全重叠** ⇒ cap 通道当时没有可用阈值。
+- **改法（与技能侧同一套道理，三项都不再"裸乘"）**：
+  · **整名命中** 6 分（用户直接点名 `body_eye`）；
+  · **整句出现在描述里** 5 分（短语级证据：bigram 汤里"卡片"能撞十几个位，整句只出现在一个位）；
+  · **描述 bigram** 权重 10 但**按 √长度归一**（长 desc 不再白占便宜）；
+  · **域提示** 权重压到 2 并归一（"vision"/"llm" 又短又泛，原来是白送分）。
+- **改后读数**：top-1 **76%** · top-3 **90.6%** · 噪声最高 **1.71** · 正确位分数中位 **6.32**
+  （94% 在 5.0 以上，只有 3/194 低于 2.0）⇒ **分隔带出现了**，`min_hit_cap=2.0` 有据可依。
+  `cmd_ask` 因此撤掉那条「这一节的分数不能当命中判据」的警告，改成"过了门槛的候选"+
+  低于门槛的另列标明噪声。
+- **安全面复核**：`auto_run_verdict()` **一个字没动**（它才是"能不能自动执行"的判据）。
+  新判据钉死：凡需要参数或带侧效应的位，无论分多高都不许被判可自动执行；
+  另实测 `omni run "今天天气不错适合出去走走"` 现在返回 **🔴 没有落点，不猜（exit=1）** ——
+  改前它会拿噪声分随便选一个位。
+- **试过又撤掉的**：「标题精确匹配」（desc 第一个冒号前那段）。实测 top-1/top-3 **一点没变**，
+  且 `wf_cache_clear` 的标题字面上就叫「万能插」—— **8 个位都这么自称**，是**数据层歧义**，
+  不是打分能解决的。**没有实测收益的启发式不留**。
+  已知限制如实记下：「万能插」这 3 个字被 `omni_plug` + 7 个 `wf_*` + `omni_open` 同时自称，
+  所以它 top-1 落到 `wf_cache_clear`；要修得改那 8 条 desc 的措辞（编辑决策，不在打分这一层）。
+- **顺带挖出一个 16 倍的性能坑**：批量路由 203 句跑了 **28.8 秒**。逐层查：
+  ① `load_atlas()` **每次 rank 都重读+解析 400KB JSON**（无缓存）；
+  ② `score_cap` 每次都重算 `grams(长 desc)` —— 203×427 = **8.6 万次**；
+  ③ `local_tools()` 每次都把每个本地工具脚本重新 `ast` 解析 —— 4000 次。
+  三处都按 `(路径, mtime_ns, 大小)` 或图鉴代次缓存。**28.8s → 1.79s**。
+  缓存不改变结果：复测 top-1 76%、噪声 0 hit 与缓存前一致。
+- **判据**：新增 `tests/test_cap_scoring.py`（5 条）—— 金标准非空且覆盖 ≥15 位 ·
+  top-1/top-3 棘轮（只许升不许降）· **噪声必须 0 命中** · 真查询必须命中 ·
+  **门不许被放松**。中途我还把一处缩进写坏过（`_data` 落在 `return` 底下 → UnboundLocalError），
+  是判据当场逮出来的。
+- **读数**：判据 **48/48** · 三条默认闸全过 1239 ms · 语法 1907 个 `.py` / 0 失败 ·
+  `skills_sync check` exit=0 · `audit-skill-roots` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，**归类决策待主人**。
+
+## 2026-11-05 · 第二十一批：**布局装错了** —— 逐字节一致 ≠ 加载得了
+
+- **这条线终于到底了**：从"文件不存在" → "契约不认" → "看不见" → "调不到" →
+  最后发现真根因是**同步器装错了布局**。
+- **铁证（三处独立代码路径都说同一个规范）**：
+  · `omni.skill_reachable()` 查 `<root>/<技能名>/SKILL.md`
+  · `tentacle/skills_hub.install()` 写 `<target>/<name>/SKILL.md`
+  · `skills_hub.pack()` 打的 zip 根是 `<name>/SKILL.md`
+  而 `skills_sync` 把 `superpowers` **整包**拷成 `<hub>/superpowers/<子技能>/`，于是运行时按
+  `<hub>/<技能名>/` 找 —— **27 个子技能（superpowers 20 + shuohao 7）一个都加载不了**。
+  实测：枢纽顶层只有 5 个包名；按 `<root>/<名字>/SKILL.md` 查，只有 `gsap` 命中（包名刚好=技能名）。
+  **可 `check` 当时报"四条全过、逐字节一致"** —— 文件都在，布局错了。这是「盘上对」被念成「生效了」的最贵一版。
+- **`skills_sync` 重写为技能级（不再是包级）**：
+  · 目录**有**根 `SKILL.md` ⇒ 它自己是一个技能；
+  · 目录**没有** ⇒ 每个带 `SKILL.md` 的直接子目录各算一个技能，**平铺**安装到 `<hub>/<技能名>/`。
+  · 为什么不用 rglob 一把梭：`taste-skill` 有根 SKILL.md，内部子件是"按需加载的章节"不是独立技能。
+- **又抓到一处自欺**：`_hub_skills()` 原来按 **frontmatter 名**做键，于是枢纽里叫 `taste-skill/` 的目录
+  被当成技能 `design-taste-frontend` 并判"一致" —— 而加载器按 `design-taste-frontend/` 根本找不到。
+  改成**按目录名认**（加载器就是这么找的），立刻如实报出 `1 未安装 / 1 孤儿`。
+- **旧布局清理（先证后删）**：`taste-skill/`(1 件) 与 `superpowers/`(20 件) 逐字节比对与新平铺目录
+  **全部相同**，才移入 `state/skills-hub-backup/<时间戳>-layout-cleanup/`（不硬删）。
+- **新判据**：`tests/test_skill_count_agreement.py` 加 `test_every_skill_is_loadable_by_layout` ——
+  每个技能必须能按 `<枢纽>/<技能名>/SKILL.md` 解析到。**它就是钉死"逐字节一致 ≠ 装对了"的那颗钉子。**
+  同时把 `test_skills_install_sync.py` 的独立枚举从"顶层包数(8)"改成"技能级(33)"，两边才能对账。
+- **顺带抓出自己的假命中**：给技能打分加 `min_hit=1.0`（实测噪声底 ≤0.26、真命中 ≥3.0，中间是空的）。
+  一切分，`小说人物小传怎么写`(0.16)、`git 分支怎么规划`(0.26) 立刻露馅 ——
+  **它们此前是靠噪声分"通过"我自己的判据的**。没降阈值，补了能真命中的触发词（`人物小传` / `分支规划`）。
+  `cmd_ask` 同步改：弱匹配单列并标明"几乎肯定是噪声，别当命中"。
+- **能力位通道的诚实标注**：实测无关句也能拿 1.50、「嗯嗯好的可以我想一下再说」能拿 4.50，
+  与真查询的 3–6 分**完全重叠** ⇒ cap 侧目前**没有可用的分数阈值**。
+  不拿一个好看的数字糊过去：`cmd_ask` 在 cap 区直接印出这条警告。
+  （重写 cap 打分属于安全面改动 —— `omni run` 据此自动执行，留待单独一批。）
+- **补会话技能根**：`SESSION_SKILL_ROOTS` 漏了项目内 `.agents/skills`，而审计的
+  `LOADED = {user-agents, dsh-project, proj-agents}` 明写本会话读它 ⇒ 同一件事两个出口两个结论。已按审计为准。
+- **读数**：`skills_sync check` **33/33 一致 · 孤儿 0 · exit=0** ·
+  运行时 `<root>/<名>/SKILL.md` **33/33 可解析** · `brainstorming` 显示 **✅ 本会话可加载** ·
+  判据 **43/43** · 三条默认闸全过 1231 ms · `audit-skill-roots` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，属**归类决策**，待主人定。
+
+## 2026-11-05 · 第二十批：技能路由的三个打分失真（不是词不够，是尺子歪）
+
+- **起点**：第十九批补了 16 条短 desc 技能的触发词，8 句人话 8/8。
+  本批先量剩下 17 条的**基线**（自然白话、刻意避开各自 desc 原词）：**14/32 = 44%**。
+- **第一轮：补 15 条触发词** → **67%**。有进步，然后**卡住**了。
+  失败模式很整齐：**同族兄弟互抢**（`小说改成剧本`→`novel-outline`、`参考图转3D`→`character-refs`），
+  正解多半在 top-2。说明瓶颈不在词表。
+- **拆开分数才看见三处尺子歪了**（都在 `omni.py` 的 `rank()` 技能侧）：
+  1. **没按语料长度归一**：`score = len(hit) * 1.2`，desc 越长越占便宜 ——
+     `character-refs`(450 字) / `gbt-ai-101`(1162 字) 靠"泛词多"压过精准的短描述技能。
+     改：**人工策展字段高权重**（整名 4 / 触发词 3），**自由文本 desc 低权重且按 √长度归一**。
+  2. **触发词按 bigram 堆**：`novel-outline` 的触发词 `"小说转短剧"` 含泛词 `小说`，
+     于是「给小说配插画」让它与 `novel-art` 的精确词 `插画` **同分**（3.0 vs 3.0），
+     最后靠描述 0.07 分反超。
+     改：一条触发词里 **≥60% 的 bigram 被意图覆盖才算命中**，按覆盖率加权。
+  3. **名字按 bigram 命中**：`gbt-ai-101` 的 bigram 含 `AI`，于是「前端不要AI味 要设计感」
+     让它命中 1 次拿 **4.0 分**，压过 `design-taste-frontend` 两条精确触发词；
+     `ref-to-3d` 同因抢到「小说分镜拆解」。
+     改：**整名出现在意图里才算命中**（归一化后子串匹配），不再数 bigram。
+- **读数**：44% → 67%（只加词）→ **23/23**（改尺子后）。A 组 8 条**不许倒退**，改完仍 8/8。
+- **一条“失败”其实是歧义，我没改判据迁就自己**：`人物设定图怎么出` → `novel-characters`。
+  因为 **「人物设定」正是它的触发词原文**，拿第一站得住；是我的期望写窄了。
+  改用能区分的句子验 `character-refs`：`角色参考图怎么出` 3.24 ✅、`出张人设图` 3.0 ✅。
+  判据里对三处**公认歧义**（gsap/gsap-official、staging/storyboard、worktree/git-workflow）
+  显式写可接受集，其余一律单元素 —— 这是承认语料重叠，不是放宽标准。
+- **覆盖层**：16 → **31 条**（33 减去 2 条自述「不要自动触发」的 `chinese-*`，继续排除）。
+  合并逻辑改**覆盖层优先 + 上限 16** —— 否则 `gbt-ai-101` 自带的 12 条会把新词挤掉（实测坑）。
+- **判据**：`tests/test_skill_triggers_overlay.py` 用例 8 → **23** 条（A 组 8 不许倒退 + B 组 15）。
+- **读数**：语法 1906 个 `.py` / 0 失败 · 判据 **42/42** · 三条默认闸全过 1200 ms ·
+  `audit-skill-roots` exit=0 · `skills_sync check` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，属**归类决策**，待主人定。
+
+## 2026-11-05 · 第十九批：技能触发词覆盖层（看得见 ≠ 调得到）
+
+- **上一批留下的红**：第十八批把技能口径统一后，图鉴从 8 → 33 条，`superpowers` 那 20 条终于进了语料。
+  **但立刻发现它们仍然调不到**：
+  `ask "帮我把这个方案的发散思路打开一下"` → 0.4 `desktop-shell`；
+  `ask "这个 bug 老修不好 要走系统化调试"` → 1.4 `clean_residue`。全是打偏。
+- **先更正我自己的一个误判**：我上一轮说那 20 条 desc 是"英文短句" —— **错了**，
+  它们全是中文（22–56 个汉字）。我是按长度猜的，没看内容。真正的病是**词不撞**：
+  `brainstorming` 写「在任何创造性工作之前……探索用户意图、需求和设计」，人说的是「发散思路」；
+  `systematic-debugging` 写「遇到任何 bug、测试失败或异常行为」，人说的是「老修不好」。
+  语义同义、bigram 零交集 ⇒ 打分 0。唯一英文的是 `design-taste-frontend`（1155 字 / 0 汉字）。
+- **为什么不直接改 SKILL.md**：那 20 条是 **vendored（第三方）**。改了 ① 与上游更新冲突（下次拉包白改）
+  ② 立刻制造「源 ≠ 装」分叉 —— `skills_sync check` 会红，而且这个红是**我们自己造成的**。
+- **改法：仓内覆盖层** `tools/codex-scripts/skill-triggers.json`（16 条技能 / 121 个中文说法），
+  `omni.collect_skills()` 在 build 时并进 `row["triggers"]`，打分语料
+  （`name + displayName + desc + desc_tail + triggers`，`omni.py:971`）自动吃到。**源件一个字节不动。**
+- **两条陷阱（读原文才发现的）**：`chinese-code-review` / `chinese-documentation` 的 SKILL.md 明写
+  「仅在用户显式 /命令 时调用，**不要根据上下文自动触发**」⇒ 给它们加触发词等于我们违反技能自己的规则。
+  已列入 `_opt_out` 并由判据钉死。
+- **读数**：8 句人话 **首选命中 8/8**（改前 0/8）。
+  `发散思路 → brainstorming 4.8` · `老修不好 → systematic-debugging 10.8` ·
+  `设计感 → design-taste-frontend 8.4` · `收尾开PR → finishing-a-development-branch 6.0`。
+- **防回归**：新增 `tests/test_skill_triggers_overlay.py`（5 条）——
+  ①覆盖层必须自带「为什么」②每个键必须是真技能（打错字不许静静失效）
+  ③不许给 opt-out 的两条加词 ④**命中实证**（8 句必须首选命中）⑤触发词不许跨技能撞车。
+  **负对照实测**：临时清空 triggers → 重建 → 8 句全部打偏、判据红在正确原因；恢复后 8/8。
+- **读数**：语法 1905 个 `.py` / 0 失败 · 判据 **42/42** · 三条默认闸全过 1107 ms ·
+  `audit-skill-roots` exit=0 · `skills_sync check` exit=0。
+- **仍未关的红**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 有源稿但未登记进
+  `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，属**归类决策**，待主人定。
+
+## 2026-11-05 · 第十八批：技能"装了 ≠ 看得见" —— 三个读者三个口径，统一到一个
+
+- **症状**：`skills_sync check` 报"四条全过、8 个包逐字节一致"，`audit-skill-roots` 也绿 ——
+  但 `omni ask "给小说写个分章大纲"` 命中不了 `novel-outline`，`brainstorming` /
+  `systematic-debugging` 这些压根不在图鉴里。典型 F18：「盘上对」被念成「生效了」。
+- **根因（同一份盘，三个读者三个数）**：
+
+  | 读者 | 口径 | 数出 |
+  |---|---|---|
+  | `gbt_allinone/tentacle/skills_hub.py:56` | `rglob("SKILL.md")` | 26（漏 `gbt_allinone/skills` 的 7） |
+  | `tools/codex-scripts/omni.py:613` | `iterdir()` 一层 | 8（其中 **2 条 desc=0 空壳**） |
+  | `tools/codex-scripts/audit-skill-roots.py:75` | `iterdir()` 一层 | 6 / 4 / 2（与 omni 打架） |
+
+  `skills/superpowers/` 是**插件集合**：20 个子目录各带 `SKILL.md`
+  （brainstorming / systematic-debugging / test-driven-development / writing-plans …），
+  自身**没有根 SKILL.md**；`shuohao/` 同理 7 条。一层枚举把它们收成"一个包、desc 为空"，
+  **27 个子技能在图鉴里彻底隐形，路由打分永远 0**。
+- **先钉不变量再动手**（33 个 SKILL.md 实测）：父目录也带 SKILL.md 的 = **0**、
+  缺 frontmatter `name` 的 = **0**、重名 = **0** ⇒「每个 SKILL.md = 一个技能」成立，
+  递归不会重复计数，也不需要例外规则。（这条不变量已写进判据，谁破坏谁先红。）
+- **改法（两处，各 1 个函数）**：
+  - `omni.SKILL_ROOTS` 补 `gbt_allinone/skills`（`skills_sync` 的第二个源，从来没被 omni 扫过）；
+    `collect_skills()` 对 `agent-skill` 根改 `rglob`，`design-asset` 仍走一层（那是"料"，递归会炸）。
+  - `audit-skill-roots.py` 同步改 `rglob`，索引键改取 **frontmatter `name`**（原来按目录名，
+    于是 `skills/taste-skill` 的 `name: design-taste-frontend` 与 omni 对不上）；
+    补 `pkg-source` 根 + `SOURCE_KEYS`，否则 shuohao 的 7 条会被误报 **⑤ 孤本**
+    （工具建议「拷到 skills/ 抢救」，而源稿根本没丢）。
+- **读数**：图鉴 技能 **8 → 33**（去重前 42 · 多根 9）· **desc 为空 2 → 0** ·
+  `skills_hub.validate` count 26 · 审计 `ws-source 26 / pkg-source 7 / proj-agents 24 / user-agents 9`，
+  ①②④⑤⑥ 全 0，**exit=0**。
+- **路由实证**：`omni ask "给小说写个分章大纲"` → `[2.4] novel-outline agent-skill`（改前 100% 命中不了）。
+- **防回归**：新增 `tests/test_skill_count_agreement.py`（5 条）—— 独立枚举 vs omni 读者对账
+  （漏/幽灵双向）、图鉴无 desc 空壳、图鉴条数 == 盘上、嵌套不变量。
+  **负对照实测**：把口径退回一层 → 数出 8、判据报「漏 27 条」，红在正确原因上。
+- **读数**：语法 1905 个 `.py` / 0 失败 · 判据 **37/37** · 三条默认闸全过 1181 ms。
+- **仍红的（如实留着）**：
+  ① 审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 有源稿但没登记进 `DISTILLED_DOMAINS`/`DISTILLED_CLUSTERS`，
+     属**归类决策**，不替主人编。
+  ② 「可见 ≠ 可命中」—— `brainstorming`(58 字) / `systematic-debugging`(33 字) 的 desc 是英文短句，
+     中文意图打不中。这是**描述质量**问题，不是计数问题，下一批单独治。
+
+## 2026-11-05 · 第十七批：`skills_sync` 按**消费方契约**重建 + 死指令判据
+
+- **`tools/skills_sync.py` 重建（按契约，不是按我的想象）**：上一版写的 `status()` 两个消费方**都不认** ——
+  `gbt_allinone/tests/test_skills_install_sync.py` 要 `survey()`，`tools/tentacle_bind.py:627-633`
+  （运行时 autobind）要 `survey()` + `do_sync()`，且读 `r["own"]` / `r["status"]` /
+  `st["summary"]["ok"]` / `out["synced"][i]["skill"]` / `out["backup_root"]`。
+  现逐字对齐：`survey()` 返回 `rows / summary / home_hub / hubs / sources`；
+  `do_sync()` 覆盖前**自动备份**到 `state/skills-hub-backup/<时间戳>/<hub>/<skill>/`，
+  复制完**回读指纹比对**，不符即判失败（不谎报成功）。
+- **口径照 `LAYOUT.md:71/:86`，不另立一套**：源 = `skills/` + `gbt_allinone/skills/`（一个顶层目录 = 一个包）；
+  装 = `~/.agents/skills/`（自有）+ 仓内 `.agents/skills/`（第三方）。第三方按**显式名单**声明
+  （`gsap` / `gsap-official` / `ref-to-3d` / `superpowers` / `taste-skill`），不靠猜。
+- **首次真装**：两个枢纽根此前**都不存在**（技能从没装过）⇒ 8 个包 / 183 文件 / ≈5.3 MB 一次装上；
+  `check` 四条判据全过（一致 8 / 分叉 0 / 未安装 0 / 孤儿 0）。
+- **负向验证（证明它会红、不是只会说 OK）**：人为给枢纽里的 `gsap/SKILL.md` 追加 1 字节 ⇒
+  `⚠️ gsap 分叉（内容异 1）` exit=1 ⇒ `sync` 备份并修复 ⇒ 读回 `一致 8/8` 且**字节完全复原**。
+- **判据自身失真修掉**：`test_tool_present_and_ran` 原来硬断言 `len(rows) > 50`，而实测源根下
+  **8 个包 / 33 个 SKILL.md**（`superpowers` 20 子、`shuohao` 7 子），**任何口径都到不了 50** ⇒
+  这条永远红且永远修不好。换成**独立枚举对账**：不经被测工具自己数一遍包，要求
+  `rows == 独立包数 + 孤儿数`。源空了 / 工具漏报 / 口径漂了，三种都在这里红 —— 比魔数强。
+- **补回根目录 `LAYOUT.md` 镜像**：`MIRROR_PAIRS` 声明它必须有，实测**不存在**（9268 字节，指纹一致补回）。
+- **死指令判据（新）**：`audit-skill-roots.py` 结论里印的修法是 `py -3.14 tools/codex-scripts/omni.py build`，
+  而本机 `py -0` 只有 `-V:3.15[-64]`，跑 `py -3.14` 得到 `[ERROR] No runtime installed that matches 3.14`
+  —— 用户照着跑**就是废命令**，还把"修不好"归因成"你没照做"。
+  全仓扫「可执行指令层」：`print(...)` 行 **73 处 / 21 文件**全改 `./pyembed/python.exe`
+  （`capability-supervisor.py` 的 `_norm_cmd` 仍能归一化，spawn 路径不受影响），
+  README / CHARTER 各 1 处同批修；改前预判影响面 **1 跳 49 节点 / 强边 38**。
+  新增 `tests/test_no_dead_command.py`（3 条，含负对照：喂假行必须认出来），
+  口径刻意窄（只查 print 层 + 7 份人读入口），`CHANGELOG`/`PROJECT_BLUEPRINT` 作**历史档案豁免** ——
+  那里写的是"当初坏过"，改了就是篡改凭证。
+- **图鉴重建**：`state/skill_atlas.json` 此前 `built_at=None · 收录 0 条`（从没建过，盘上技能对它全隐形）。
+  用 `pyembed` 重扫：400.7 KB · 427 能力位 · 技能 8 条（去重前 10，跨目录 2）⇒ 审计 ⑥ 转绿。
+- **读数**：语法 1903 个 `.py` / 0 失败 · 判据 **32/32**（含新增 3 条）· 三条默认闸全过 1322 ms
+  （万能插留痕 310 行 / 多域 6306 节点 / 探测超时 63.6 ms / 运行时 pyembed 3.12.10 ✅）。
+- **仍红的（如实留着，不粉饰）**：审计 ③ —— `gbt-ai-101` / `gbt-selfgrowth` 在 `skills/` 有源稿，
+  但没登记进 `DISTILLED_DOMAINS` / `DISTILLED_CLUSTERS`。这是**归类决策**（该归哪个域/簇），不替主人编。
+
+## 2026-11-05 · 第十六批：接线图补两层真依赖（import / impl）+ 描述去数字
+
+- **权重口径 v2 → v4**（`tools/codex-scripts/wiring-build.py`）：
+  - **v3 `import` 层**（KB=1.0）：`edges.jsonl` 只有 `path` / `cap` / `cap_mention` 三类，**全是"文本提及"**，
+    从来不解析 Python import。结果 `api.py` 里明明写着 `from . import codex_bridge as _CB`，
+    图里 `api.py ↔ codex_bridge.py` 却是 **0 条边**。AST 解析 2272 个 `.py`，补 **2200 条**真依赖；
+    别名 `as _CB` 不影响结果（连的是模块，不是符号）。
+  - **v4 `impl` 层**（KB=1.2）：cap↔code 此前只靠"文件里出现能力名"建立，可实现件往往**不含**能力名
+    （`codex_bridge.py` 里没有 `codex_tools` 四个字，派发写在 `api.py`），于是 7 个 codex 位到本体永远 2 跳。
+    现从 `api.py` 的 `if kind == "x"` 分支静态挖实现模块，**405/427 位可解析**，417 条 cap→code 映射。
+    口径：一条 import 只归属**它所在 if 链**的能力名，不继承兄弟分支 —— 否则
+    `if kind in (A,B): import X` 会把后面的 `Y` 也算给 A/B，权重虚高比漏连更糟（它会让人以为改 Y 必查 A）。
+  - 触手树 `MY_WEIGHT_RULE` 同步 **2 → 4**。不同步它**不报错**，只会悄悄「退回自建」，那张图白算。
+- **读数**：节点 6305→6306（+1 是仓库新增 `state/commander/coverage.json`，与本次无关）·
+  无向边 48908→51197 · 强边 18768→21256 · 分量 1 · 100% · `api.py` 强边 400+ → 930。
+- **`cap:codex_tools` 打通 1 跳**：权重 11.71 → 12.55（增量 0.832 = `1.2×log1p(1)`，无重复计数）；
+  同批 `codex_chat` / `codex_models` / `codex_interrupt` / `codex_turn_send` 同步打通。
+- **desc 去数字**：`impact_check` 的 desc 原写「现读 **6301 节点 / 951536 有向边 / 337 个能力位 /
+  depth=2 = 4859 节点 / tentacle_arm 2 跳 = 342 节点**」—— 图重建三次它错了三次。现改指 `op=status`
+  现查；`gbt_allinone/tools/impact_check.py` 的 docstring 也写死过同一组数（且原文还写着"每次调用现场数，
+  不抄注释"），一并摘除并留血账。
+- **快照重导**：`data/capabilities.json` 被 `cap_self` / `commander` / `pulse_core` / `orchestration` /
+  `catalog` / `model_bridge` / `static_check` **七个模块**读取 —— 改注册表不重导出，读端拿到的还是旧 desc。
+  已用 `export-capabilities.py` 重导（427 条），`docs/capabilities-full.json` 同步；
+  `docs/capabilities/system.md` **无生成器**（手工产物），两处旧描述已脚本原子改写 + 读回校验。
+- **防回归**：新增 `gbt_allinone/tests/test_wiring_v4_guard.py`（7 条），钉死
+  ①口径版本三方一致（构建器 / 图 / 读端）②desc 不许写死规模读数且必须指向 `op=status`
+  ③生产快照与注册表逐字一致 ④`cap:codex_tools` 1 跳直达且进强边。
+- **顺带查明（文档漂移）**：AGENTS.md §4.1 的三道门在本树**已失效** —— `extract_intents.py`、
+  `intent_extracted.json`、`router.load_caps()` 全都不存在（`synapse.py` 只在 `.scratch/synapse/`），
+  `capability_router.py` **不读 desc**。改 desc 对路由零影响，无需重建索引。
+  另：AGENTS.md 写的 `run-tests.py` 也不存在，实为 `run-tests.ps1`。
+- **遗留**：`comfy_forge` / `comfy_native`（「现读 1495 把」）、`bits_kit`（「216 组件」）同样写死
+  外部环境读数，未清（性质与图规模不同：随用户环境变，不随本地构建变）。
+- **impl 层扩到动态派发**（同日追加）：原先 impl 只认 `if kind ==` 分支体里的 import，
+  而 22 个位的分支体里**没有 import** —— 它们是 `_im("." + kind, __package__)` /
+  `spec_from_file_location(name, Path/"x.py")` / `_external_capability("quant_tech", kind)`，
+  所以全部停在 2 跳。现按**参数形态**认这三种模式（不按函数名认，别名太多），补回 **10 个**：
+  vision ×5 · tentacle_bind · penetrating_cross_scan · asset_index · control_loop · i2v_agnes。
+  余下 12 个里，4 个（echo / count_words / health / audit_query）实现就在 `api.py` 本身，
+  **2 跳是正确的，不该硬连**；另 8 个目标文件不在图（omission_detector / hook_enforcer /
+  review_gate）或走外部业务模块（quant 系列 → `quant_tech`，`needs_dependency` 是正确语义）。
+  impl 边 88 → 105，无向边 51197 → 51214。
+- **路径匹配只认主件**：`tools/control_loop.py` 会同时匹配
+  `state/atomic-sync/backup/…/tools/control_loop.py`，连到备份副本等于「改主件时监控不提示」——
+  看着接上了，其实接错了。已按「主件优先、备份/镜像/归档靠后 + 同层取短路径」排序并只取首个命中。
+- **三个位 desc 去数字**：`comfy_forge`（现读 1495 把 · 原写 962）· `comfy_native`
+  （契约面 1495 把 / 809 / 359 / 290 / 19）· `bits_kit`（★49005 · 216 组件 · 五类分布）——
+  一律改指 `op=evidence` / `op=contract` / `op=build` 现查。**「常用说法」段一个字节没动**
+  （那是路由触发词来源，动了会掉命中）。快照已重导。
+- **补上 `docs/capabilities/system.md` 的生成器**：`tools/codex-scripts/sync-capabilities-doc.py`
+  （`--check` 报告 / `--apply` 写回；原子替换 + 锚点数量守恒校验）。它只同步
+  「`- **它做什么**：` 与下一个 `- **`」之间的正文 —— 元数据行与 `- **怎么调**` 之后一律不碰。
+  首次运行就揪出 **3 个此前无人知道的漂移**（`cap_self` / `console_hub` / `mirror_stage`），
+  同步后 54 段全一致。这份文档此前是全仓唯一「改了注册表也不会提醒你」的面。
+- **多域监控全档跑通 + `risky` 榜去噪**（同日三次）：
+  - 全档读数：`status` **6306 节点 / 102428 有向边 / 21291 强边 / 分量 1 / 100%**；
+    `risky(n=50)` · `where` · `impact(depth=3)`（打 `api.py` 得 5039 影响面）。
+  - **万能插全开**（**没有 `op=all`**；正名是 `surface_audit` + `discover` **两件**，
+    `full_sweep` / `surface` / `万能面` / `全量` 都是 `surface_audit` 的**别名**，
+    实现同一套，返回 `"op": "surface_audit"` 是**归一化到规范名**、不是静默兜底
+    —— 兜底指落到 default 分支且没有 alias 表，这里是显式 alias 表，性质不同。
+    AGENTS.md 把别名和正名并称"三件"，属精度问题，已记在此）：
+    `surface_audit` 17 面 / 可驱动 16 / 缺口 1（`%%%` 是测试残留）；
+    源码分支与声明表 **两栏都空** ⇒ 执行器真值表未漂移。`discover`：进程 93 · 监听端口 22。
+  - **`risky` 榜去噪**：口径收紧到"按强边排"后，榜首正确变成 `api.py`（强边 930），
+    但 Top15 里紧跟着 **8 个是历史副本**（`state/mirror/stage/…/security/policy.py`、
+    `state/atomic-sync/backup/…/api.py`、`.archive/panels-…/brain/*.js`）——
+    改主件时监控同时报一堆副本，**噪音盖过信号**，「最危险」变成「最吵」。
+    现加 `_is_copy()` 判定，`top` 只放本体、副本单列 `copies`：
+    **本体 2857 / 副本 470**，Top10 全是真代码（api.py 930 · security/policy.py 286 ·
+    caps_registry.py 215 · …）。
+- 三条闸全过（`guard-three.py`：万能插 / 多域监控 / 原子替换 / 探测超时 / 运行时），
+  多域监控已读到新图 **6306 节点**。
 
 ## 2026-11-01 · 第十五批：手部两枚原生位 + 双仓同步 + 巡检位
 
@@ -405,3 +1199,11 @@
 - **3D Bloom + 真实调用点亮（docs/104）**：内置 three 后处理（EffectComposer/RenderPass/ShaderPass/MaskPass/UnrealBloomPass/Pass + 两个 shader），3D 星图加辉光（strength .75/radius .65/threshold .55）；`gen-console-data.py` 读 audit.jsonl 最近 800 条聚合 pulse，3D 把**真实调用过的能力位**触手用暖金呼吸层点亮；标记 data-space3d=ok:385+30+15400+4（能力位/域/视觉触手/点亮数）。\n- **实时触手 SSE（docs/105）**：console-server 新增 `/api/events`（SSE，1.2s 轮询 audit.jsonl，从 EOF 开始不重放）；3D 星图用 EventSource 接收 → 对应能力位触手暖金点亮 6s 淡出，`data-space3d` 的点亮数实时变；实测：连上后调用 inventory，audit 增长 492 字节，SSE 立刻收到 {cap:inventory, verdict:clean}。\n- **鼠标转动她 + 中心头像（docs/106）**：OrbitControls 改绑整个 `.space3d-wrap`（整块可拖，rotateSpeed .75/滚轮缩放/禁用平移，grab 光标），中心放她的头像球（深底圆盘去白底，慢速自转）；`?selftest=1` 程序化拖拽自检 data-space3d-drag=ok:14.491；顺带修真 bug：http 打开时 /icons/avatar.png 404（静态根不含 icons/），已给 console-server 加 /icons/ 白名单路由。\n- **大脑执行层可视化（docs/107）**：按主人视频新增第 6 个视图「大脑执行层」——中心脑核（她的头像）+ 7 条对称闭环管道（映射 chain_kernel 七步 -1→5）+ 臂上橙色证据节点 + 末端同心审计环 + Bloom；整块可拖/滚轮缩放；标记 data-brain3d=ok:7臂+审计环，截图 assets/panels/console-brain.webp。\n- **万能插可视化（docs/108）**：按主人第二段视频新增第 7 视图「万能插」——数字覆盖的三叶结管道（数字纹理沿 U 滚动代表数据流动）+ 8 个能力域插口（同心环座/发光内面）+ 自动插合触手（尖端沿路径脉冲）+ 中心调度核 + Bloom；整块可拖/滚轮缩放；标记 data-plug3d=ok:8插口+数字结，截图 assets/panels/console-plug.webp。\n- **原生 APP 自启认知界面服务（docs/109）**：Electron 壳 `shell/console-service.cjs`（main.cjs 建窗前 ensureConsoleServer，pyembed detached 起 + 12s 等接管 + 失败不牵连）、Python 桌面壳 `gbt_allinone/console_service.py`（app.main 先 ensure_server）、`启动-GBT.cmd` 新增 [2/4] 确保 :8766；另给登录自启包装器 `tools/autostart/GBT-console.cmd` + 一键 `设置开机自启.cmd`；实测：停服后 ensure_server 981ms 拉起 pid 3028 caps 385，二次调用 already:true（幂等）；tests/test_console_service.py ALL OK。\n- **触手协作 + 思维导图任务指引（docs/110）**：新增第 8/9 视图——「触手协作」中心共享任务+8 协作角色（感知/规划/执行/验证/审计/固化/报告/协同）+16 条协作链+流动消息点+共享账本同心环，标记 ok:8臂+16协作链；「思维导图」任务指引中心+6 分支×3 叶共 18 条真实流程动作（读架构/七步链/run_task/真跑读数字/ledger/docs/CHANGELOG/给数字），标记 ok:6支+18叶。\n- **触手协作脉冲特效（docs/111）**：真实事件到达时角色尖端炸出扩散冲击波环（Sprite 环 1.2→10.2 淡出）+ 消息点拖尾飞向中心 + 共享任务核闪光 + 角色触手亮 6s；事件→角色为真实映射（守卫类→审计，run/denied→执行/协同，report→报告，recon→感知）；标记 data-team3d=ok:8臂+16协作链+脉冲N；实测 selftest 脉冲2、pulse=1 脉冲16（上限回收）。\n- **穿透式交叉扫描（docs/112）**：新增第 10 视图「穿透扫描」——385 个真实能力位做节点（绿=只读 300 / 红=需授权疑点 85）、交叉边成网、扫描线自上而下；遇疑点：大脑反思（红环）+ 手穿透（纵深束）+ 扫描放慢 0.8s，一轮扫完嘴巴报结论，每轮开始眼睛看；五感面板明写「眼睛=视觉全谱·不止 OCR」并列出 11 个真实视觉能力位（vision_loop/vision/vision_grounding/vision_print/body_see/gods_eye/screen_sniff/video_intel/image_scout/zimage_rewash/chart_html）；标记 data-scan3d=ok:385节点+85疑点 + 每项计数器可巡检。\n- **穿透扫描接真实结果（docs/113）**：`penetrating_cross_scan._report()` 新增 per-unit `unit_details`（agree/arbitrated/unhooked 原样带出）；新增 `tools/export-scan-data.py` 跑 bindings(1913)/registry(1)/tree:gbt_allinone(943) 写 state/scan-data.json；gen-console-data 并入 scan；scan3d 节点=真实 unit（绿=agree/琥珀=arbitrated/红=unhooked）、HUD 可切目标；实测 bindings ok:1913单元+0疑点，registry 切过去 ok:1单元+1疑点（amber=1）。\n- **无死角扫描（docs/114）**：扫描器补 `full_coverage` / `dead_spots` / `dead_spot_count`，补扫轮次 2→3；HUD 加覆盖/死角实时字段 + 漏扫计数（每帧写 data-scan3d-missed）；三者归零且覆盖 100% 才显示「无死角」；新增「现场重扫」按钮（真调 GET /api/scan，白名单 bindings/registry/tree:<dir>），coverage<1 自动补扫最多 3 轮；实测三目标 coverage=1.0 full=True；页面 ?rescan=1 → rescan ok:1913单元:10ms:补扫1轮:覆盖1。
 - **无死角自检抓出 70 个死角并修掉**：页面快扫复核发现扫描线只走到 ±9.4 而节点 y 到 ±10，上下边缘 70 个节点永远扫不到；边界改 ±10.6 后 data-scan3d-remaining/missed 均为 0、coverage=100、dead=0。\n- **触手职业表（docs/115）**：新增 `tools/gen-professions.py` 从 caps_registry 现读生成 `data/professions.json`（12 职业：编程/审查/测试/安全/运维/架构/数据/视觉/媒体/研究/文档/指挥），编程工程师为首席（47 能力位，工具=终端/编辑器/git/run_task 真跑/五处落位，KPI=改完即测·旧物清零·签名不丢）；认知界面新增第 11 视图「职业」（#prof，12 张真实卡 + CHIEF 徽标），标记 data-prof=ok:12职业+编程首席。
 - **职业表扩到 18 种（补媒体职业）**：短视频编导(79 位)、音乐制作(10)、影视/电影(22)、数字人/直播(76)、设计/美术(59)、游戏/3D(70)——都由 caps_registry 现读映射；职业合计 971（跨域重复）。\n- **全方位职业覆盖（docs/115）**：职业 18→21（补集成/连接、命令行/入口、生活/陪伴）；gen-professions 加覆盖率审计（orphans/uncovered_domains）+ flex 补位机制；实测 385/385 能力位、30/30 域、孤儿 0；职业视图标题/副标题直显覆盖率。\n- **职业路由（docs/116）**：新增 gbt_allinone/profession_router.py（关键词+标题/域/能力位/KPI 打分，代码动词+20 优先编程工程师，safe/gated 候选分栏，无命中走协同兜底）；POST /api/route 接口；职业视图加路由条（#prof）；实测 5 例全中（短视频/音乐/编程/数字人/影视），接口 ok 候选 8 需授权 8。\n- **派单闭环（docs/117）**：新增 gbt_allinone/profession_dispatch.py（只跑 safe 候选、默认 dry_run、confirm 才执行、逐条结果 + orchestration-ledger 留痕、无 safe 候如实拒绝）；POST /api/dispatch；职业视图加「派单（安全候选）」按钮；实测 asset_vault_freeze 真跑 ✓。\n- **落地清零 3 个历史失败**：重建 holo_pet_w3 落地首页（h1 + 4 张真图 + 入口 + 签名，修 experience 两条）；rules.json 女声口径改 local 并重生成测试；test_voice_defaults 口径同步（2026-11-01 本地优先决定）；全量 30 个测试文件全绿。\n- **方向转向：赏金工作台（docs/118）**：新增 gbt_allinone/bounty.py（授权闸：无 authorization_ref 拒建项；范围闸：scope/out_of_scope + IP/CIDR；范围外发现拒录；报告带证据 sha256；赔付只记账）+ POST /api/bounty + #bounty 视图（项目/范围检查/发现/报告）；实测 own-lab 范围内允许、example.com 拒绝、报告 sha256 一致；tests/test_bounty.py ALL OK。\n- **自训靶场端到端（docs/119）**：新增 tools/lab/vuln_lab.py（本机 127.0.0.1 自建靶场，故意 6 类问题：XSS/IDOR/穿越/调试泄漏/未授权管理/缺头）、lab_scan.py（只读扫描）、run_lab.py（靶场→扫描→授权闸→录单→报告→账本）；实测发现 6/录单 6/报告 6，外部域被拒；tests/test_lab.py ALL OK。
+- **诊断位口径写坏又修好（2026-11-05）**：改 `impact_check` 的「两种口径」时，新句子和旧文本残片被拼在一起 —— `逐字对齐"` 提前闭合字符串、`"强边"` 这个 key 直接丢了，整个能力位变成 `SyntaxError` 起不来。修复：坏块 7 行重写（补回 `强边`）+ 230 行注释补齐 v4 口径（原文还停在「只算 path + cap + 绑定账」，没提 import/impl）；顺手更正蓝图本节读数三项（51197 无向边 / 21256 强边 / 400+ → 102428 / 21291 / 67）。新增 `tests/test_diag_kou_jing.py` 6 条**静态**机检：`ast.parse` 能过 · 三键齐 · 4 位以上数字须对得上图或属历史白名单 {67} · 文本指向的 `op=status.strong_edges` 必须真存在 · `risky.caveat` 与 `impact.强边` 都必须含 import/impl/分派 · 不许有重复粘贴的残片。**这 6 条用 5 个 mutant 验过（内存改写源码、不落盘），5/5 全部抓到。** 教训：`grep` 结果经 JSON 转义（`"` 显示成 `\"`），引号结构错在屏幕上和正确的看不出区别 —— 这类文本必须过 `ast.parse`。
+- **risky 榜分流派生物（2026-11-05）**：`state/console-data.js` 强边 777 排第 2，可它是 `tools/gen-console-data.py` 的产物（文件头「自动生成，勿手改」）——照榜去「修最危险的件」改的就是它，白改。新增 `_is_derived()`：判据用**文件头标记**而不是路径白名单（路径会变、标记不会），先过路径/扩展名两道闸 —— 全图 2900 个 `code:` 节点只有 2 个候选，读盘代价约等于零。派生物与「副本」**分开单列**成 `derived`，因为跟进动作不同：副本是快照要跟、派生物是产物要重跑生成器。分流后 `top` 第 2 从 **777 降到 286**（`policy.py`），榜单量级干净一个数量级。判据 `tests/test_impact_ranking.py` 6 条，并用 monkeypatch mutant（`_is_derived→False`）验证 C 条会红。**另：`must_verify_1hop` 经取证确认不该改** —— 消费方 `tools/codex-scripts/impact.py:121` 打印的就是「改完必须逐一验证」，副本是要验的实体；理由已写进代码注释，免得下一个人再纠结一遍。
+- **孤儿位结案：只有 1 个真孤儿，已补上（2026-11-05）**：此前按 `handler` 名找同名文件，得出「8 个孤儿位」，**方法本身是错的**。取证结果：`hook_enforcer` / `omission_detector` 的实现是 `tools/penetrating_cross_scan.py`（`api.py:1421` 三个 kind 共用同一引擎），两者**早就在强边里**，从来不是孤儿；真正断线的只有 `review_gate` —— 它把路径**先存进变量**（`api.py:2705` `_rg_path = Path(...) / "tools" / "codex-scripts" / "terminal-review.py"`）再传给 loader，而 impl 层只从**调用参数**里抽路径，拿到 `ast.Name` 抽不出东西 ⇒ 0 条边。给 `wiring-build` 补第 ④ 种形态（`ast.Assign` 右值是 Path 拼接且以 `.py` 结尾），并把重复的路径连接逻辑抽成 `_link_path`（只认主件、不连备份副本）。重建后 **impl 105→106 · 强边 21291→21292**，精确 +1 无连带副作用；`review_gate` 强边 22→23 并含 `terminal-review.py`。判据 `test_wiring_v4_guard.py` 增至 8 条（新增 `test_review_gate_reaches_terminal_review`）。`quant` 系列 5 位仍走 `quant_tech` 外部业务模块，`needs_dependency` 是正确语义。
+- **system.md 从 54/427 补到 427/427（2026-11-05）**：`sync-capabilities-doc.py` 新增 `--fill` —— 为没有精修详情段的 373 位生成**一行一位的「全量速览」**表格，插在文末 `---` 之前；54 个精修段原样保留、一个字节不动。**没有**给它们补完整详情段：373 × 约 1.5 KB ≈ 560 KB 会肿成没人读的大字典，而且这 373 位本来没有手工精修的「要哪张票 / 必填载荷」，自动编只会编出「无必填」套话。实测 82 KB → 260 KB，**幂等**（连跑两次 147920 → 147920 字符不变），**锚点守恒**（`### \`` 数量 54→54 不变，写入前校验，变了就拒写）。完整参数与权限仍走 `op=contract` 或 `docs/capabilities-full.json`（机器可读版）。顺带纠正：该脚本**没有 `--check` 参数**（不带参数即干跑），此前文档口径有误。
+- **服务全没开：查出三层原因，修掉一层（2026-11-05）**：实测 8791/8766/8111/11434/1234/8080/8793/31720 **全部 closed**。逐层查：① `启动-GBT.cmd` 依赖 `py -3.14`、`C:\Python312\python.exe`、`electron.cmd` —— 本机**三个都没有**，脚本是写给另一个环境的（`py` 命令直接 not found）；② `tools/model-bridge/server.py:49` 硬 `import lane_guard`，而全仓（含所有备份/归档）**0 命中** —— 那是 2026-10-29 抽出来解决「回环代理 502 误判」的独立模块，文件丢了。`py_compile` **查不出**（语法没错，是运行期 ImportError），后果是 8791 起不来、启动链断在第一环；③ 同目录 `serving_policy.py` 也丢了（L642，在 `try:` 块内 ⇒ 可选，缺了降级不崩）。处置：按 `server.py` 的四个调用点（`open_url` / `classify_exc` / `kind_text` / `precheck_fit`）**重建 `lane_guard.py`**，实现它原注释交代的三件职责（回环强制直连 · 502 分档 · 发之前用 `/tokenize` 判上下文装不装得下）。然后用 pyembed 直起服务、绕开坏脚本：**8791 bridge `/health` 200 ✅ · 8766 认知界面 `/api/state` 200（页面 49036 字节）✅**。**8111 引擎没起**：`commander.status()` 的 gate 明写 `op=start/stop ⇒ process_execute`，需主人发票，agent 不自批。判据 `tests/test_model_bridge_imports.py` 3 条 —— 不写死「lane_guard 在不在」，而是**通用规则**：server.py 依赖的每个**必需**本地模块都必须能解析（`try:` 内算可选，避免把 `psutil` 这类判成缺失而误报）。
+- **补回两件「发现了却留着」的（2026-11-05）**：落地核对 15/19，差的 4 项里有 2 项是我查到病灶却没修，已补：① **`serving_policy.py` 重建** —— `server.py:642` 与 `local_llm_server.py:170` 都 import 它，全仓 0 命中。两个引用方的注释写明它是「档位声明 + 粗粒度拦截 + 可解释拒绝 + 审计，**不是安全保证**」，默认档 `uncensored`。文件一丢，`server.py:633` 说的「补在唯一出口、覆盖 selfhost/selfhost_gpu/云车道全部」那个补丁就等于没打过 —— **开关在、闸门不在**。重建 `Policy.load()/.mode/.check(text)` + `--set-mode` CLI，内置规则**刻意只放无歧义的违法类**（编大词表既误伤又营造假安全感），状态原子写到 `state/serving-policy.json`。② **`启动-GBT.cmd` 修三处环境不符** —— `py -3.14` → `%~dp0pyembed\python.exe`、`C:\Python312\python.exe` → 同样 pyembed、electron 缺失时**明确跳过并给装法**（原来直接 `start` 一个不存在的文件，静默失败）；另加注记：`8792` 是 bridge 里的**车道名**，引擎真身在 `weights.py`（当前 8111）。落地核对 **15/19 → 17/19**。剩 2 项需主人：8111 引擎（`process_execute` 票）·Electron 桌面壳（`holo_pet_w3` 缺 `node_modules`，要 `npm install`）。判据 `tests/test_model_bridge_imports.py` 增至 4 条（新增策略门：默认放行 / filter-lite 拦明显违规 /拒绝必须给 hits / 不许误伤正常话）。
+- **万能插 / 多域监控全量跑，抓出四个真 bug（2026-11-05）**：先把 op 清单用 AST 从源码数出来（`omni_plug` 实认 42 个、`impact_check` OPS 5 个），再全跑。四项都是实测铁证：① **`known` 自述漏 5 个 op**（`page_route`/`page_stats`/`disk_find`/`disk_stats`/`任意`）—— L1666 注释自己承认过同一问题，后又漏了一次，照自述调用的人摸不到入口；② **`impact_check` 的 `risky` 原来是兜底 `return`** ⇒ OPS 以后新增 op 忘写分支会**静默变成 risky**，返回值看着正常、口径全错；改成显式分支 + 未知 op 如实报 `op_in_OPS_but_no_branch`；③ **`omni_adapter.classify` 把盘上真实存在的 `AGENTS.md` 判成 `https://AGENTS.md`** ⇒ policy 挂 `external_llm`+`data_export`，回执写「把当前任务数据发送到外部大模型服务」——**读一个本地文件被当成外发**。根因：只在含 `/` 时查存在性，且 `exists()` 假时**不 return** 直接穿到「裸域名 ⇒ https」；修两条（盘上存在就算 path；带分隔符一律 path，不存在如实说不存在），并补 `"://" not in t` 防止把 `http://` 也吃掉（改完 12 个用例全对）；④ **`tools/page_lazy.py` 顶层 `import resource`** —— Unix-only，Windows 上整份 import 不了，连带 `op=page_stats` 直接 ModuleNotFoundError（api 层只包成 `status=error`，看着像「op 不支持」）。另建全盘索引：**1,227,540 文件 / 124,855 目录 / 107 秒 / 15.2 MB**，`disk_stats`/`disk_find` 转绿。判据新增 `tests/test_omni_truth.py` 6 条（自述==实际 / OPS 都有分支 / classify 12 用例 / page_lazy 可 import）。测试总数 30，全绿。
+- **补回「判据本身不存在」（2026-11-05）**：`omni_plug.py:1668` 与 `caps_registry.py:1615` 都写着「判据在 `tools/codex-scripts/omni-monitor.py --gap`（AST 三向对账）」——实测那个文件**不存在**，`gbt_allinone/omni_monitor.py` 也没有 `--gap`/`main()`/argparse（它只是监控采样模块）。**「判据在 X」这句话本身没有判据**，而「自述漏 5 个 op」那类事正是在「以为有人看着、其实没人看着」的状态下发生的。补写 `tools/codex-scripts/omni-monitor.py`：`--gap` 做**三向对账** —— ① `_dispatch` 实际分支 **42** / ② `known` 自述 **42** / ③ `desc` 里 `op=…` 声明 **13**，任一方向有差集则 exit 1（支持 `op=a/b/c` 斜杠列举）。实测三向一致。判据 `test_omni_truth.py` 增至 7 条（新增「被判据点名的工具必须存在且跑得通」），总数 **31 全绿**。另：扫「427 个位的 desc 提到的 op 是否都实现了」时发现**方法不适用** —— 只有 4 个位的分支体能抽到 `op ==` 字面量，其余 op 分派在各自实现模块里，不能据此报「0 个 bug」（这是方法失效，不是结论）。

@@ -23,10 +23,10 @@
   D5 升维有闸     ：只有 --escalate 才允许叫主模型；默认零出网
 
 用法：
-    py -3.14 tools/codex-scripts/decision-direct.py status
-    py -3.14 tools/codex-scripts/decision-direct.py route "把桌面截图读一下"
-    py -3.14 tools/codex-scripts/decision-direct.py bench [--n 20] [--escalate]
-    py -3.14 tools/codex-scripts/decision-direct.py decide --type choice --q "该走哪根触手" --criteria "{\"a\":\"读屏幕\",\"b\":\"发邮件\"}"
+    ./pyembed/python.exe tools/codex-scripts/decision-direct.py status
+    ./pyembed/python.exe tools/codex-scripts/decision-direct.py route "把桌面截图读一下"
+    ./pyembed/python.exe tools/codex-scripts/decision-direct.py bench [--n 20] [--escalate]
+    ./pyembed/python.exe tools/codex-scripts/decision-direct.py decide --type choice --q "该走哪根触手" --criteria "{\"a\":\"读屏幕\",\"b\":\"发邮件\"}"
 
 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
 """
@@ -163,7 +163,7 @@ def cmd_decide(a) -> int:
     crit, note = _parse_criteria(raw, a.type)
     if raw and crit is None:
         print("用法不对：%s" % note)
-        print('  例① py -3.14 tools/codex-scripts/decision-direct.py decide --type choice --q "这句话该不该叫主模型" --options "叫主模型,用本地快尺"')
+        print('  例① ./pyembed/python.exe tools/codex-scripts/decision-direct.py decide --type choice --q "这句话该不该叫主模型" --options "叫主模型,用本地快尺"')
         print("  例② … decide --type choice --q \"…\" --criteria '{\"叫主模型\":\"需要深推理\",\"用本地快尺\":\"常规路由\"}'")
         print('  例③ … decide --type noul --q "这条通知要不要现在发"      # 二值，不用 criteria')
         print('  例④ … decide --type score --q "这件事多急" --criteria "不急,一般,很急"')

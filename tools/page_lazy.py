@@ -14,7 +14,17 @@
   python3 tools/page_lazy.py bench          # 对比整包 vs 分片的内存占用
 """
 from __future__ import annotations
-import json, os, re, sys, time, hashlib, resource
+import json, os, re, sys, time, hashlib
+
+# 🔴 2026-11-05 修（实测铁证）：`resource` 是 **Unix-only** 模块，Windows 没有。
+#   原来写在顶层 import 里 ⇒ 本文件在 Windows 上**根本 import 不了**，
+#   连带 omni_plug 的 `op=page_stats` 直接 ModuleNotFoundError，
+#   而 api 层只把它包成 `status=error / ok=false`，看起来像"这个 op 不支持"。
+#   下游 `_rss()` 里的用法本来就包在 try/except 里 ⇒ 退化成 0.0 即可，不崩。
+try:
+    import resource
+except ImportError:          # Windows / 非 Unix：内存读数退化为 0.0
+    resource = None
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

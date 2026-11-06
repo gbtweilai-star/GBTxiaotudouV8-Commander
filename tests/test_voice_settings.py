@@ -60,20 +60,41 @@ def main() -> int:
     srv = (ROOT / "tools/console-server.py").read_text(encoding="utf-8")
     check("server 有 /api/voice/settings", '"/api/voice/settings"' in srv
           and "voice_settings" in srv)
-    dh = (ROOT / "holo_pet_w3/dh-live/index.html").read_text(encoding="utf-8")
-    check("数字人设置弹窗元素", all(k in dh for k in ('id="dh-gear"', 'id="dh-settings"',
-                                                    'id="vs-voice"', 'id="vs-rate"',
-                                                    'id="vs-asr"', 'id="vs-auto"')))
-    js = (ROOT / "holo_pet_w3/dh-live/dh-live.js").read_text(encoding="utf-8")
-    check("设置读写/应用到朗读", all(k in js for k in ("DH_SETTINGS", "loadVoiceSettings",
-                                                "saveVoiceSettings", "tts_rate")))
-    payload = (ROOT.parent / "GBT小土豆V8桌面版" / "payload")
-    if payload.is_dir():
+    dh_dir = ROOT / "holo_pet_w3/dh-live"
+    if (dh_dir / "index.html").is_file() and (dh_dir / "dh-live.js").is_file():
+        dh = (dh_dir / "index.html").read_text(encoding="utf-8")
+        check("数字人设置弹窗元素", all(k in dh for k in ('id="dh-gear"', 'id="dh-settings"',
+                                                        'id="vs-voice"', 'id="vs-rate"',
+                                                        'id="vs-asr"', 'id="vs-auto"')))
+        js = (dh_dir / "dh-live.js").read_text(encoding="utf-8")
+        check("设置读写/应用到朗读", all(k in js for k in ("DH_SETTINGS", "loadVoiceSettings",
+                                                    "saveVoiceSettings", "tts_rate")))
+    else:
+        # dh-live 面板随「旧 28 面板拆除」（2026-11-01）永久下线：主仓、.archive/panels-20261101、
+        # payload 三处都没有这两个文件。原来这里硬读不存在的路径 ⇒ 整个测试抛 FileNotFoundError
+        # 崩掉，读者只看到崩栈、看不到「面板已下线」这个事实。改为显式 skip 并写明去向（2026-11-04）。
+        print("  skip 数字人设置弹窗（dh-live 面板已下线，主仓/归档/payload 三处均无此文件）")
+    payload = None
+    for _cand in (ROOT.parent / "GBT小土豆V8桌面版" / "payload",
+                  ROOT.parent / "GBT-builds" / "GBT小土豆V8桌面版" / "payload",
+                  pathlib.Path("D:/GBT-builds/GBT小土豆V8桌面版/payload")):
+        if _cand.is_dir():
+            payload = _cand
+            break
+    if payload is not None:
         check("APP payload 已同步 voice_settings",
               (payload / "gbt_allinone/tools/voice_settings.py").is_file()
               and '"voice_settings": {' in (payload / "gbt_allinone/caps_registry.py").read_text(encoding="utf-8")
               and '"/api/voice/settings"' in (payload / "tools/console-server.py").read_text(encoding="utf-8"))
-    check("落地文档 docs/164 存在", (ROOT / "docs/164-voice-settings.md").is_file())
+    else:
+        # 2026-11-04：打包产物已从桌面迁至 D:/GBT-builds（主仓留桌面当唯一真源）。
+        # 找不到 payload 就明说跳过，而不是假装通过、也不是崩。
+        print("  skip APP payload 同步检查（未找到 payload 目录；产物已迁至 D:/GBT-builds）")
+    # 文档归类后搬进 docs/legacy/（2026-11-01 仓库整理），仍按「这两处任一处存在」判，
+    # 免得整理一次目录就红一次。
+    _doc164 = next((p for p in (ROOT / "docs/164-voice-settings.md",
+                                ROOT / "docs/legacy/164-voice-settings.md") if p.is_file()), None)
+    check("落地文档 docs/164 存在", _doc164 is not None, "docs/ 与 docs/legacy/ 都没找到")
 
     print()
     if FAIL:

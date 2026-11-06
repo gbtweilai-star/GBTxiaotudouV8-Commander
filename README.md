@@ -14,8 +14,8 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5_3.10-3776AB?logo=python&logoColor=white">
   <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
   <img alt="Caps" src="https://img.shields.io/badge/Capabilities-427-F5B041">
-  <a href="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/gbtweilai-star/GBTxiaotudouV8-Commander/actions/workflows/ci.yml/badge.svg"></a>
-  <img alt="Docs" src="https://img.shields.io/badge/Docs-264_pages-00E5FF">
+  <img alt="Tests" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
+  <img alt="Docs" src="https://img.shields.io/badge/Docs-93_pages-00E5FF">
   <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
   <img alt="Status" src="https://img.shields.io/badge/Status-active-7C4DFF">
 </p>
@@ -49,7 +49,7 @@
 <p align="center">
   <img src="assets/demo.gif" alt="30 秒 demo（真跑回放）" width="720">
   <br>
-  <sub>30 秒 demo：真跑回放，不是录屏剪的（2026-11-01 录制，位数为当时读数）</sub>
+  <sub>30 秒 demo：真跑回放，不是录屏剪的</sub>
 </p>
 
 ## 🚀 快速开始
@@ -79,14 +79,14 @@ Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd hol
 $ python demo.py "把这次发布推到生产"
 
 ① 这台机器的能力目录（机器可读，不是截图）
-   427 位能力 · 32 个域 · 只读 339 · 会改状态 88 · 挂作用域 38
+   427 位能力 · 32 个域 · 只读 389 · 会改状态 38 · 挂作用域 38
 
 ② 按你的那句话，落点候选（关键字打分，不是模型决策）：
    [1000.0] one_key_deploy   pipeline  会改状态  要票：deploy_publish,process_execute,filesystem_write
             一指定江山乾坤换位：抓取→镜像→验证→晋升，一条命令
 
 ③ 在这台机器上，它就是这么被调用的（唯一门，绕过它没有留痕）：
-   py -3.14 tools/codex-scripts/five-dim.py cap one_key_deploy '{}'
+   ./pyembed/python.exe tools/codex-scripts/five-dim.py cap one_key_deploy '{}'
    ⚠️ 这一位挂了作用域 ⇒ 门会先拒，等主人发票（AI 不能给自己发）
 ```
 
@@ -113,16 +113,18 @@ run_task(kind, payload)
 
 | 域 | 数量 | 代表能力 |
 |---|---:|---|
-| 创作（视频/图像/音乐/剧本） | 58 | viral_forge drama_forge shot_director |
-| 系统（自检/编排/修复） | 60 | selfscan orchestration root_fix |
-| 大模型（本机/云端/上下文） | 43 | codex_* context_guard energy_core |
-| 安全（测绘/扫描/防御） | 34 | sec_surface sec_scan sec_defenses |
-| 触手（总指挥/脉冲/覆盖） | 30 | tentacle pulse_core trunk_cover |
-| 心智（记忆/人格/情绪） | 27 | experience_forge brain_vault persona_kernel |
-| 情报（OSINT/研究/学习） | 18 | osint_scan research_intel topic_web |
+| 创作（视频/图像/音乐/剧本） | 57 | iral_forge drama_forge shot_director |
+| 系统（自检/编排/修复） | 54 | selfscan orchestration 
+oot_fix |
+| 大模型（本机/云端/上下文） | 42 | codex_* context_guard energy_core |
+| 安全（测绘/扫描/防御） | 29 | sec_surface sec_scan sec_defenses |
+| 触手（总指挥/脉冲/覆盖） | 27 | 	entacle pulse_core 	runk_cover |
+| 心智（记忆/人格/情绪） | 21 | experience_forge rain_vault persona_kernel |
+| 情报（OSINT/研究/学习） | 18 | osint_scan 
+esearch_intel 	opic_web |
 | 管线（镜像/部署/回滚） | 18 | one_key_deploy mirror_* deploy_queue |
-| 视频（生成/剪辑/混音） | 18 | hunyuan_video media_pipeline audio_mix |
-| 身体（看/说/按/敲） | 19 | body_see body_click body_type |
+| 视频（生成/剪辑/混音） | 16 | hunyuan_video media_pipeline udio_mix |
+| 身体（看/说/按/敲） | 12 | ody_see ody_click ody_type |
 
 完整 32 域 + 10 个可抄用法 + 边界说明：[**docs/90-what-she-can-do.md**](docs/90-what-she-can-do.md)
 
@@ -151,7 +153,7 @@ run_task(kind, payload)
 | 执行 | `tentacle` · `omni_*` · `body_*` | 看屏 / 点按 / 键入 / 窗口 / 进程 / 剪贴板（万能插即插即用） |
 | 自检 | `selfscan` · `trunk_cover` · `legacy_guard` | 路由对账 / 代码全覆盖 / 旧物六类 |
 | 编排 | `orchestration` · `blueprint` · `wf_*` | 编排账本 / 架构→蓝图→派遣→落地 / DAG 工作流 |
-| 图像 | `comfy_native` | 170 个纯 CPU 算子（图像/音频/文本），不装 ComfyUI 也跑它的节点契约 |
+| 图像 | `comfy_native` | 118 个纯 CPU 算子（音频/图像/文本），契约面覆盖 10.1% |
 | 安全 | `signature_guard` · `sec_*` | 署名守卫 / 攻击面测绘 / 漏洞扫描 / 防御验证 |
 
 完整清单：`gbt.run_task("caps_list")`，或看 [docs/capabilities](docs/capabilities/)。
@@ -163,33 +165,26 @@ run_task(kind, payload)
 | 指标 | 读数 | 复核命令 |
 |---|---|---|
 | 能力位 | **427** | `cap_self verify` |
-| 逐位真调 | **306 / 427 通过**（其余 121 位：88 需授权不跑、30 缺参数不瞎编、1 缺依赖、2 被授权门拒绝；**0 位无法归因、0 超时**） | `python tools/codex-scripts/probe-caps-live.py --timeout 120` |
 | 审计条数 | 现读 | `gbt.log_count()` |
 | 自检 | clean | `selfscan` |
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |
 | 脉冲直达 | ≈90% 请求 0 token 命中（≈4ms） | `pulse_core verify` |
-| 图像算子 | **170** 个（图像/音频/文本，纯 CPU） | `comfy_native status` |
-| 多域监控 | 注册表 **32 域**，其中 **31 域有可测位**（`automation` 两位均不可测：`browser` 要参数、`n8n_wf` safe=False）；共 313 位只读无参位：**306 通过 · 7 未通过 · 回归 0**（未通过为被门拒 / 缺依赖 / 服务未起，逐条点名）。**`safe=False` 的 88 位（含 `omni_plug`）不在本表**，其读数见上一行逐位真调 | `python tools/codex-scripts/multi-domain-monitor.py --diff` |
-| 评测（历史） | 335 题 PASS45 **99.10%** —— 建于 **341 位快照期（2026-10-21）**，**未在 427 位重跑** | 见 [docs/04-evaluation.md](docs/04-evaluation.md) |
+| 图像算子 | 118 个（纯 CPU） | `comfy_native status` |
 
 <table>
 <tr>
-  <td><img src="assets/fig-caps.png" alt="能力面 · 427 位逐位真调"></td>
-  <td><img src="assets/fig-concurrency.png" alt="并发实测 · 4096 路全通过"></td>
+  <td><img src="assets/fig-caps.png" alt="能力面"></td>
+  <td><img src="assets/fig-concurrency.png" alt="并发实测"></td>
 </tr>
 <tr>
-  <td><img src="assets/fig-domains.png" alt="能力位域分布 · 427 位 / 32 域"></td>
-  <td><img src="assets/fig-monitor.png" alt="多域监控 · 逐位真调与回归比对"></td>
+  <td><img src="assets/fig-eval.png" alt="评测"></td>
+  <td><img src="assets/fig-dispatch-ok.png" alt="真跑回执"></td>
 </tr>
 </table>
 
-> 四图都由脚本**现场读账渲染**，重跑一次即复现：`data/capability-live-test.json`（逐位真调）·
-> `data/concurrency-bench.json`（4096 路压测）· `data/multidomain-monitor-live.json`（多域监控）· 注册表现读（域分布）。
-> 图上一律带数据时点，**不写「示意」也不写「待重绘」** —— 数字过期就重跑脚本，不靠正文打补丁。
-
 ## 📚 文档
 
-索引：[docs/legacy/README.md](docs/legacy/README.md)（364 页，含 docs/legacy 归档 67 页，按编号）
+索引：[docs/legacy/README.md](docs/legacy/README.md)（93 页，按编号）
 
 - [模型卡](docs/01-model-card.md) · [架构](docs/02-architecture.md) · [能力面](docs/03-capabilities.md)
 - [部署](docs/05-deployment.md) · [并发实测](docs/08-concurrency.md) · [安全与控制](docs/14-security-and-control.md)

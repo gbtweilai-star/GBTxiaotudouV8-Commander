@@ -18,6 +18,19 @@ sys.path.insert(0, str(REPO))
 
 OUT = REPO / "state" / "console-data.js"
 
+def _engine_ctx(base):
+    """如实读引擎真实上下文窗口（/props 的 n_ctx）；读不到返回 None（界面显示 —），不编造。"""
+    if not base:
+        return None
+    try:
+        import urllib.request
+        with urllib.request.urlopen(str(base).rstrip("/") + "/props", timeout=2) as r:
+            j = json.loads(r.read().decode("utf-8", "replace"))
+        return ((j.get("default_generation_settings") or {}).get("n_ctx")) or None
+    except Exception:
+        return None
+
+
 
 def _cap(kind, payload=None):
     import gbt_allinone as g
@@ -164,7 +177,8 @@ def build() -> dict:
                    "names": skill_names, "items": skill_items},
         "engine": {"alive": bool(alive.get("ok")), "base": alive.get("base"),
                    "weights": w.get("name"), "size_gb": w.get("size_gb"),
-                   "models": alive.get("models"), "breaker": breaker.get("state")},
+                   "models": alive.get("models"), "breaker": breaker.get("state"),
+                   "n_ctx": _engine_ctx(alive.get("base"))},
         "meter": {k: meter.get(k) for k in ("calls", "calls_ok", "failed",
                                            "power_tok_s", "avg_ms")},
         "guards": {"selfscan": _cap("selfscan").get("verdict"),

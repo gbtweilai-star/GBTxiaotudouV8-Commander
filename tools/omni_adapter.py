@@ -75,12 +75,27 @@ def classify(target: str) -> dict:
                 return {"kind": "bin", "path": str(p), "why": "可执行文件（盘符路径）"}
             return {"kind": "path", "path": str(p), "why": "文件（盘符路径）"}
         return {"kind": "path", "path": str(p), "why": "路径（不存在）"}
-    if "/" in t or "\\" in t:
+    # 🔴 2026-11-05 修（实测铁证，不是推测）：
+    #   实测 `AGENTS.md` 盘上**存在**，却因为没有 `/` 一路掉到下面「裸域名 ⇒ https」，
+    #   被判成 `https://AGENTS.md`；`tools/impact_check.py`（不含 `/` 前缀判定但**不存在**）
+    #   同样掉下去，也被判 `https://tools/...`。两者都会在 policy.py:653 落进
+    #   `_sock == "api"` ⇒ 挂 `external_llm` + `data_export`，
+    #   回执写「把当前任务数据发送到外部大模型服务」—— **读本地文件被当成外发**。
+    #   原来只写了 `if p.exists(): return ...`，**不存在就没有 return**，直接穿到下面。
+    #   现在两条都收口：① 盘上存在就算 path（有没有斜杠都算）；
+    #                  ② 带路径分隔符的一律 path，不存在就如实说"不存在"，不再往下掉。
+    # ⚠️ `"://" not in t` 是必须的：原代码靠「exists() 假就不 return」放过 URL，
+    #   我加上 `return 路径(不存在)` 之后会把 `http://127.0.0.1:8791` 也吃进来
+    #   （它含 `/`）。带 `://` 的一律交给下面的 SCHEME_RE 判，不在这一步截。
+    if ("://" not in t) and ("/" in t or "\\" in t or pathlib.Path(t).exists()):
         p = pathlib.Path(t)
+        if p.is_dir():
+            return {"kind": "dir", "path": str(p), "why": "目录（相对路径）"}
         if p.exists():
-            if p.is_dir():
-                return {"kind": "dir", "path": str(p), "why": "目录（相对路径）"}
+            if p.is_file() and _is_executable(p):
+                return {"kind": "bin", "path": str(p), "why": "可执行文件（相对路径）"}
             return {"kind": "path", "path": str(p), "why": "文件（相对路径）"}
+        return {"kind": "path", "path": str(p), "why": "路径（不存在）"}
 
     m = SCHEME_RE.match(t)
     if m:

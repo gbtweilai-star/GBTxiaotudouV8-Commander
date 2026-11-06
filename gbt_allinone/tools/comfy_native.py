@@ -1078,18 +1078,20 @@ def _snapshot_run(wf: dict, out: dict) -> dict:
 def _op_runs(payload: dict) -> dict:
     """列出跑过的图（按时间倒序）：hash / 节点数 / 产物数 / 结论。"""
     limit = max(1, int(payload.get("limit") or 30))
-    rows = []
+    rows, unread = [], []
     if RUNS_DIR.is_dir():
         files = sorted(RUNS_DIR.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True)
         for f in files[:limit]:
             try:
                 d = json.loads(f.read_text(encoding="utf-8"))
-            except Exception:  # noqa: BLE001
+            except Exception as _e:  # noqa: BLE001
+                unread.append({"file": f.name, "why": type(_e).__name__})
                 continue
             rows.append({"hash": d.get("hash"), "at": d.get("at"), "ok": d.get("ok"),
                          "nodes": d.get("nodes"), "products": len(d.get("products") or []),
                          "seconds": d.get("seconds")})
     return {"ok": True, "op": "runs", "count": len(rows), "runs": rows,
+            "unread": unread[:20], "unread_n": len(unread),
             "dir": str(RUNS_DIR)}
 
 

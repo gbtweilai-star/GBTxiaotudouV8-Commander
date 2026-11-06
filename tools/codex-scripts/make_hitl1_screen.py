@@ -808,7 +808,7 @@ def check() -> int:
         return 0
     print("🔴 产物与模板**不一致**：盘上 %d 字 vs 生成 %d 字" % (len(now), len(html)))
     print("   ⇒ 要么盘上读数变了（重新生成即可），要么有人只改了产物（手补的会被冲掉）。")
-    print("   ⇒ 修法：`py -3.14 tools/codex-scripts/make_hitl1_screen.py`")
+    print("   ⇒ 修法：`./pyembed/python.exe tools/codex-scripts/make_hitl1_screen.py`")
     return 1
 
 

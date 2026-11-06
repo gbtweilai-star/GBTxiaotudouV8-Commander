@@ -126,7 +126,11 @@ def _slots() -> int:
     try:
         import json as _j
         import urllib.request as _u
-        with _u.urlopen("http://127.0.0.1:8792/props", timeout=2) as r:
+        from . import weights as _gbw                       # 2026-11-04：不再写死 8792
+        _b = _gbw.base()
+        if not _b:
+            return 4                                        # 没有引擎 ⇒ 按默认 4 个取电口
+        with _u.urlopen(_b + "/props", timeout=2) as r:
             n = int((_j.loads(r.read().decode()) or {}).get("total_slots") or 4)
         return max(1, min(8, n))
     except Exception:  # noqa: BLE001

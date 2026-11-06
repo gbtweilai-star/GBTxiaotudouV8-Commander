@@ -26,8 +26,8 @@
 
 ## 用法
 
-    py -3.14 tools/codex-scripts/cap-pages.py
-    py -3.14 tools/codex-scripts/cap-pages.py --check    # 只报差异，不写
+    ./pyembed/python.exe tools/codex-scripts/cap-pages.py
+    ./pyembed/python.exe tools/codex-scripts/cap-pages.py --check    # 只报差异，不写
 """
 import argparse
 import json
@@ -45,7 +45,7 @@ HEAD = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<!-- 自动生成，别手改。重建：py -3.14 tools/codex-scripts/cap-pages.py
+<!-- 自动生成，别手改。重建：./pyembed/python.exe tools/codex-scripts/cap-pages.py
      版式与渲染只有一份（cap.css / cap.js）；本页只负责带一个 id。 -->
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'" />
@@ -149,7 +149,7 @@ INDEX = """<!DOCTYPE html>
 <html lang="zh-CN" data-page-id="cap-index">
 <head>
 <meta charset="utf-8" />
-<!-- 自动生成。重建：py -3.14 tools/codex-scripts/cap-pages.py -->
+<!-- 自动生成。重建：./pyembed/python.exe tools/codex-scripts/cap-pages.py -->
 <title>全部能力页 · GBT小土豆V8</title>
 <link rel="stylesheet" href="../../window.css" />
 <link rel="stylesheet" href="../../deck3d.css" />
@@ -257,7 +257,7 @@ def main() -> int:
         if len(orphans) > 8:
             print("       … 另 %d 个" % (len(orphans) - 8))
     print("  总目录：caps/index.html")
-    print("  重建：py -3.14 tools/codex-scripts/cap-pages.py")
+    print("  重建：./pyembed/python.exe tools/codex-scripts/cap-pages.py")
     if a.check:
         # 🔴 原来这里无条件 return 0 —— 挂进闸就是假绿（有差异也报成功）。
         bad = wrote + (1 if ix_stale else 0) + len(orphans)

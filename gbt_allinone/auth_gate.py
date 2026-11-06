@@ -341,7 +341,14 @@ def check_and_consume_many(scopes, detail: str = "") -> dict:
             "error": f"需要人工授权（{missing[0]}）：{SCOPES[missing[0]]}",
             "mode": _mode,
             "how_to_grant": [
-                f"终端运行: python -m gbt_allinone auth grant --scope {missing[0]} --ttl 600",
+                # 🔴 2026-11-06 血账：原来写的是 `.\pyembed\python.exe tools\codex-scripts\auth-grant.py ...`，
+                #    而本仓自带的 pyembed 是 embeddable 包（`._pth` ⇒ isolated），
+                #    `-m` 在它下面必然报 `No module named 'gbt_allinone'`。
+                #    主人照这条指引敲，当场撞上；也就是说产品自带的运行时跑不了
+                #    产品自带的授权命令 ⇒ 人发不出票 ⇒ 票门从"守门"变成"锁死"。
+                #    现在指向能在 pyembed 下走通的壳（详见 AGENTS.md §3.1 坑 C）。
+                f"终端运行: .\\pyembed\\python.exe tools\\codex-scripts\\auth-grant.py "
+                f"--scope {missing[0]} --ttl 600",
                 "或主人手写 store/auth_grants.jsonl 追加一行（格式见 auth_gate.SCOPES 与 README）",
                 ("该作用域是**时段授权**：一张在 TTL 内可反复用"
                  if _mode == "window" else

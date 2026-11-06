@@ -86,7 +86,10 @@ body.graph-on .grid-overlay { display: block; }
   font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--dim); font-family: var(--mono);
 }
-.brand-title { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.brand-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+/* 图标改成内联 SVG（审美闸 no_emoji）：颜色跟着按钮走，尺寸不抢字 */
+.icon-btn svg { display: block; }
+.proactive-toggle { display: inline-flex; align-items: center; gap: 5px; }
 .icon-btn {
   width: 26px; height: 26px; border-radius: 8px; flex: none; cursor: pointer;
   border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 70%, transparent);
@@ -314,6 +317,38 @@ body.graph-on .grid-overlay { display: block; }
 }
 .msg.bot { align-self: flex-start; border: 0; background: transparent; color: var(--ink); padding-left: 2px; }
 .msg .meta { margin-top: 6px; font: 400 9px/1.4 var(--mono); color: var(--dim); }
+/* AI 打印（Codex 对话面板同款）：末尾竖块光标 + 吐字时轻提亮，收尾即撑光标 */
+.msg .msg-text { white-space: pre-wrap; }
+.tw-caret { display: inline-block; width: .52em; color: var(--warm); animation: tw-blink 1.05s steps(1, end) infinite; }
+.msg.printing .msg-text { text-shadow: 0 0 14px rgba(255, 159, 28, .10); }
+/* AI 步骤行（Codex 同款：先过程，后回答） */
+.msg-steps { margin: 0 0 6px; }
+.step-head {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  background: none; border: 0; padding: 1px 0; cursor: pointer;
+  font: 400 11px/1.5 var(--mono); color: var(--dim); text-align: left;
+}
+.step-head:hover .step-title { color: var(--ink2); }
+.step-chev { font-size: 12px; color: var(--dim); transition: transform .15s ease; }
+.msg-steps.is-open .step-chev { transform: rotate(90deg); }
+.step-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step-ms { color: var(--dim); opacity: .75; }
+.step-body {
+  margin: 3px 0 4px 14px; padding: 6px 10px; border-radius: 8px;
+  background: color-mix(in srgb, var(--panel-raised) 45%, transparent);
+  font: 400 10px/1.6 var(--mono); color: var(--dim);
+}
+.step-row { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; }
+.step-row b { color: var(--warm); font-weight: 500; }
+.step-row span { color: var(--text2); word-break: break-all; }
+/* 2026-11-06 · 多步骤（扫描→工具→回执→回答）的补充样式 */
+.step-head.is-open .step-chev { transform: rotate(90deg); }
+.step-ms.live { color: var(--warm); opacity: .95; }
+.step-ms.live::before { content: "\25CF"; margin-right: 4px; font-size: 8px; vertical-align: 1px; }
+.step-body { max-height: 240px; overflow: auto; }
+.msg-steps .step-head + .step-body + .step-head { margin-top: 2px; }
+@keyframes tw-blink { 0%, 55% { opacity: 1; } 55.01%, 100% { opacity: .14; } }
+@media (prefers-reduced-motion: reduce) { .tw-caret { animation: none; } }
 
 .chat-composer {
   width: min(calc(100% - 16px), 952px);
@@ -361,6 +396,9 @@ body.graph-on .grid-overlay { display: block; }
 .send-btn:hover { transform: translateY(-1px); }
 .send-btn:disabled { background: #2c2c2e; color: #81858c; cursor: wait; transform: none; }
 .composer-hint { text-align: center; font: 400 9px/1.4 var(--mono); color: var(--dim); opacity: .75; }
+/* 对话页脚：引擎/窗口一行 + 数据生成时刻一行（app.js 写入；空则整行不占位） */
+.console-foot { display: flex; justify-content: space-between; gap: 12px; padding: 0 10px 6px; font: 400 9px/1.4 var(--mono); color: var(--dim); opacity: .8; }
+.console-foot span:empty { display: none; }
 
 /* 动效（纯 CSS，截图/离线都看得到终态） */
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -472,15 +510,28 @@ body.graph-on .grid-overlay { display: block; }
 .skill-pill { font: 500 8px/1 var(--mono); color: var(--dim); border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; }
 .skill-pill.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
 
-/* 仪表盘 */
+/* 仪表盘：一块主图 + 两块辅读 + 一条全宽流水（主次分明，不是一排同款卡） */
 .dash-grid {
   flex: 1; min-height: 0; overflow: auto; padding: 14px 16px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start;
-  scrollbar-width: none;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 18px;
+  align-content: start; scrollbar-width: none;
 }
 .dash-grid::-webkit-scrollbar { display: none; }
-.dash-card { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: color-mix(in srgb, var(--panel-raised) 40%, transparent); }
-.dash-bars { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.dash-panel { min-width: 0; padding: 2px 0 6px; }
+.dash-panel--hero { grid-column: 1 / -1; padding-top: 0; }
+.dash-panel--hero .bar-track { height: 11px; }
+.dash-panel--hero .bar-name { font-size: 10px; }
+.dash-panel--ring { display: flex; flex-direction: column; }
+.dash-panel--kv {
+  padding: 10px 14px; border-radius: 12px;
+  background: color-mix(in srgb, var(--panel-raised) 38%, transparent);
+}
+.dash-panel--flow {
+  grid-column: 1 / -1; padding-left: 12px;
+  border-left: 3px solid color-mix(in srgb, var(--warm) 42%, transparent);
+}
+.dash-panel--flow .dash-flow { max-height: 132px; }
+.dash-bars { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
 .bar-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 34px; gap: 8px; align-items: center; }
 .bar-name { font: 400 9px/1.2 var(--mono); color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-track { height: 8px; border-radius: 999px; background: color-mix(in srgb, #fff 5%, transparent); overflow: hidden; }
@@ -489,7 +540,7 @@ body.graph-on .grid-overlay { display: block; }
 .dash-donut-wrap { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
 .dash-donut { width: 120px; height: 120px; border-radius: 50%; flex: none; }
 .dash-legend { display: flex; flex-direction: column; gap: 8px; font: 400 10px/1.4 var(--mono); color: var(--dim); }
-.dash-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.dash-legend .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
 .dash-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-top: 10px; font: 400 10px/1.6 var(--mono); color: var(--dim); }
 .dash-kv b { color: var(--ink); font-weight: 600; }
 .dash-flow { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; max-height: 150px; overflow: auto; }
@@ -620,11 +671,11 @@ body.graph-on .grid-overlay { display: block; }
 }
 .scan-sense b { color: var(--warm); font-weight: 600; letter-spacing: .04em; }
 .scan-sense span { color: var(--text2); }
-.scan-sense i {
+.scan-sense .scan-note {
   grid-column: 2; font-style: normal; color: #7f8ea6; font-size: 9px; line-height: 1.45;
   max-height: 0; overflow: hidden; transition: max-height .2s ease;
 }
-.scan-sense[data-sense="eye"] i { max-height: 44px; }
+.scan-sense[data-sense="eye"] .scan-note { max-height: 44px; }
 .scan-sense.is-lit { border-color: rgba(255, 159, 28, .55); }
 .scan-sense.is-lit b { color: #ffd166; }
 .scan-hud .scan-state { color: var(--ok); }
@@ -996,7 +1047,7 @@ body.graph-on .grid-overlay { display: block; }
   color: var(--dim); font: 400 9.5px/1.2 var(--mono); }
 .res-row > span { width: 26px; }
 .res-bar { flex: 1; height: 4px; background: rgba(255,255,255,.07); border-radius: 3px; overflow: hidden; }
-.res-bar i { display: block; height: 100%; width: 0; background: var(--warm); opacity: .75; }
+.res-bar-fill { display: block; height: 100%; width: 0; background: var(--warm); opacity: .75; }
 .res-row b { width: 92px; text-align: right; color: var(--ink); font-weight: 400;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .res-note { margin-top: 7px; color: var(--dim); font: 400 9px/1.5 var(--mono); opacity: .7; }
@@ -1207,3 +1258,118 @@ body.graph-on .grid-overlay { display: block; }
 #page-mesh-hud { display: flex; align-items: center; gap: 6px; }
 #mesh-open { pointer-events: auto; border: 1px solid var(--line); background: transparent; color: var(--warm); border-radius: 6px; padding: 1px 5px; cursor: pointer; font: 400 8px/1.2 var(--mono); }
 #mesh-open:hover { border-color: var(--warm); }
+
+/* ── 2026-11-06 全链路视图（agent-graph 设计模型：泳道 / 状态 / 会话侧栏） ── */
+.console[data-view="flow"] { top: 20px; bottom: 20px; background: #070b12; }
+.console[data-view="flow"] .view-flow { display: flex; flex-direction: column; min-height: 0; }
+.console[data-view="chat"] { height: calc(100vh - 84px); }
+.console[data-view="chat"] .chat-history { max-height: none; }
+
+.flow-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 14px 18px 4px; flex: none; }
+.flow-stat { padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--panel-raised) 40%, transparent); }
+.flow-stat-n { font: 600 22px/1.1 var(--sans); color: var(--ink); }
+.flow-stat-k { margin-top: 5px; font: 400 11px/1.4 var(--mono); color: var(--dim); }
+
+.flow-now { flex: none; margin: 10px 18px 0; padding: 10px 12px 12px; border-radius: 14px; border: 1px solid color-mix(in srgb, #f0a23c 30%, transparent); background: color-mix(in srgb, #f0a23c 8%, transparent); }
+.flow-now.is-empty { background: transparent; border-style: dashed; border-color: var(--line); }
+.flow-now-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.flow-now-title { font: 600 12px/1.4 var(--sans); color: #f3b25a; letter-spacing: .04em; }
+.flow-now-sub { font: 400 11px/1.4 var(--mono); color: var(--dim); }
+.flow-now-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+.flow-now-empty { font: 400 12px/1.6 var(--sans); color: var(--dim); padding: 4px 2px; }
+.flow-task { flex: none; display: flex; align-items: center; gap: 10px; min-width: 230px; max-width: 330px; padding: 8px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, #f0a23c 34%, transparent); background: color-mix(in srgb, #f0a23c 10%, transparent); color: var(--ink); cursor: pointer; text-align: left; }
+.flow-task-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: #f3b25a; animation: flow-pulse 1.6s ease-out infinite; }
+.flow-task-main { min-width: 0; flex: 1; }
+.flow-task-name { font: 600 12px/1.35 var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-task-sub { font: 400 10px/1.4 var(--mono); color: var(--dim); }
+.flow-task-age { font: 400 10px/1.3 var(--mono); color: #f3b25a; }
+
+.flow-board { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 12px 18px 0; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--bg-deep) 55%, transparent); overflow: hidden; }
+.flow-board-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); flex: none; }
+.flow-tools { display: flex; align-items: center; gap: 12px; }
+.flow-legend { display: flex; gap: 12px; }
+.flow-legend span { display: inline-flex; align-items: center; gap: 6px; font: 400 10px/1 var(--mono); color: var(--dim); }
+.flow-legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #7f8ea6; }
+.flow-legend b { font-weight: 400; }
+.flow-btn { padding: 5px 12px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: var(--ink2); font: 400 11px/1.2 var(--sans); cursor: pointer; }
+.flow-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+.flow-board-body { position: relative; flex: 1; min-height: 0; display: flex; }
+.flow-cols { position: relative; flex: 1; display: flex; gap: 18px; align-items: flex-start; overflow: auto; padding: 16px 18px 22px; }
+.flow-edge-svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.flow-edge { fill: none; stroke: #7f8ea6; opacity: .3; }
+.flow-edge.is-on { stroke: #f3b25a; opacity: .85; }
+
+.flow-col { flex: none; width: 300px; display: flex; flex-direction: column; gap: 8px; }
+.flow-col-head { padding: 10px 12px 12px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel-raised) 46%, transparent); }
+.flow-col-title { font: 600 12px/1.4 var(--sans); color: var(--ink); }
+.flow-col-sub { margin-top: 3px; font: 400 10px/1.5 var(--mono); color: var(--dim); }
+.flow-col-pills { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+.flow-card { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg1) 62%, transparent); color: var(--ink); text-align: left; cursor: pointer; transition: border-color .15s ease; }
+.flow-card:hover { border-color: var(--line-strong); }
+.flow-card.is-on { border-color: #f3b25a; box-shadow: 0 0 0 1px color-mix(in srgb, #f3b25a 40%, transparent); }
+.flow-bead { width: 9px; height: 9px; border-radius: 50%; flex: none; background: #6b7687; }
+.flow-card.st-running .flow-bead { background: #f3b25a; animation: flow-pulse 1.6s ease-out infinite; }
+.flow-card.st-ok .flow-bead { background: #59c3ff; }
+.flow-card-main { min-width: 0; flex: 1; }
+.flow-card-title { display: flex; align-items: center; gap: 8px; }
+.flow-card-name { font: 600 12px/1.4 var(--sans); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-card-sub { margin-top: 2px; font: 400 10px/1.5 var(--mono); color: var(--dim); }
+.flow-card-n { font: 500 11px/1 var(--mono); color: var(--ink2); }
+.flow-more { justify-content: center; color: var(--dim); font: 400 11px/1 var(--mono); }
+
+.flow-pill { padding: 1px 7px; border-radius: 999px; font: 500 9px/1.6 var(--mono); border: 1px solid currentColor; }
+.flow-pill.st-running { color: #f3b25a; }
+.flow-pill.st-ok { color: #59c3ff; }
+.flow-pill.st-idle { color: #7f8ea6; }
+.flow-pill.st-done { color: #5fd08a; }
+
+.flow-drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(560px, 46%); transform: translateX(102%); transition: transform .22s cubic-bezier(.22,.8,.3,1); display: flex; flex-direction: column; background: color-mix(in srgb, var(--bg-deep) 92%, #0b1119); border-left: 1px solid var(--line-strong); box-shadow: -18px 0 40px rgba(0,0,0,.45); z-index: 5; }
+.flow-drawer.is-open { transform: translateX(0); }
+.flow-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex: none; }
+.flow-drawer-title { font: 600 14px/1.4 var(--sans); color: var(--ink); }
+.flow-drawer-body { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 18px; }
+.flow-kv { display: flex; flex-direction: column; gap: 6px; }
+.flow-kv-row { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; font: 400 11px/1.6 var(--mono); }
+.flow-kv-row b { color: var(--warm); font-weight: 500; }
+.flow-kv-row span { color: var(--text2); word-break: break-all; }
+.flow-h { margin: 14px 0 6px; font: 600 11px/1.4 var(--sans); color: var(--ink2); }
+.flow-assets { display: flex; flex-direction: column; gap: 2px; max-height: 44vh; overflow: auto; }
+.flow-asset { font: 400 10px/1.7 var(--mono); color: var(--dim); word-break: break-all; border-bottom: 1px dashed color-mix(in srgb, var(--line) 70%, transparent); padding: 2px 0; }
+.flow-note { margin-top: 10px; font: 400 11px/1.7 var(--sans); color: var(--dim); }
+.flow-acts { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.flow-act { padding: 7px 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); font: 400 11px/1.2 var(--sans); cursor: pointer; }
+.flow-act:hover { border-color: var(--warm); color: var(--warm); }
+
+.flow-pages { flex: none; margin: 12px 18px 16px; }
+.flow-pages-head { display: flex; align-items: center; gap: 16px; justify-content: space-between; margin-bottom: 10px; }
+.flow-pages-bar { display: flex; flex: 1; max-width: 520px; height: 8px; gap: 3px; border-radius: 999px; overflow: hidden; }
+.flow-bar-seg { background: color-mix(in srgb, #59c3ff 55%, transparent); border-radius: 999px; }
+.flow-bar-seg:nth-child(2) { background: color-mix(in srgb, #f3b25a 60%, transparent); }
+.flow-bar-seg:nth-child(3) { background: color-mix(in srgb, #5fd08a 55%, transparent); }
+.flow-bar-seg:nth-child(4) { background: color-mix(in srgb, #c58bff 55%, transparent); }
+.flow-bar-seg:nth-child(5) { background: color-mix(in srgb, #ff8a8a 55%, transparent); }
+.flow-bar-seg:nth-child(6) { background: color-mix(in srgb, #7f8ea6 60%, transparent); }
+.flow-page-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.flow-page-card { padding: 12px 14px 14px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg1) 48%, transparent); }
+.flow-page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.flow-page-name { font: 600 12px/1.4 var(--sans); color: var(--ink); }
+.flow-page-pct { font: 600 12px/1.2 var(--mono); color: var(--warm); }
+.flow-page-desc { margin-top: 3px; font: 400 10px/1.5 var(--mono); color: var(--dim); }
+.flow-page-meter { margin: 8px 0 10px; height: 5px; border-radius: 999px; background: color-mix(in srgb, var(--line) 70%, transparent); overflow: hidden; }
+.flow-page-fill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #59c3ff, #f3b25a); }
+.flow-page-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.flow-chip { padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink2); font: 400 10px/1.3 var(--sans); cursor: pointer; }
+.flow-chip:hover { color: var(--ink); border-color: var(--line-strong); }
+@keyframes flow-pulse { 0% { box-shadow: 0 0 0 0 rgba(243,178,90,.6); } 100% { box-shadow: 0 0 0 9px rgba(243,178,90,0); } }
+@media (prefers-reduced-motion: reduce) { .flow-card.st-running .flow-bead, .flow-task-dot { animation: none; } .flow-drawer { transition: none; } }
+/* ── 2026-11-06 全链路 · 排版修正（窄窗口/高屏两用） ── */
+.console[data-view="flow"] .view-flow { overflow-y: auto; overflow-x: hidden; }
+.flow-stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; padding: 12px 18px 2px; }
+.flow-stat { padding: 9px 12px; }
+.flow-stat-n { font-size: 20px; }
+.flow-stat-k { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-board { flex: none; height: min(54vh, 560px); min-height: 340px; }
+.flow-board-body { min-height: 0; }
+.flow-cols { align-items: flex-start; }
+.flow-pages { margin-bottom: 18px; }
