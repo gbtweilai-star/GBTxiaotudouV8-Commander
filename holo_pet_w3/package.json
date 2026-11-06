@@ -37,10 +37,10 @@
     "release:sync": "node -e \"console.error('UNIMPLEMENTED: release:sync 需要的文件不存在 -> ../tools/codex-scripts/release-runtime-sync.py'); process.exit(1)\""
   },
   "devDependencies": {
-    "electron": "43.0.0",
+    "electron": "43.8.7",
     "electron-builder": "^26.15.3"
   },
-  "comment_deps": "壳只 require `electron` 一个外部包（其余是 node 内建 + 本地 ./xxx.cjs）。本机已有全局 electron v43.0.0 可用；`npm install` 只有在要**锁定版本、离线打包**时才需要 —— 装包属于闸二，须先问主人。",
+  "comment_deps": "壳只 require `electron` 一个外部包（其余是 node 内建 + 本地 ./xxx.cjs）。🔴 2026-11-06 安全修复：electron 43.0.0 → **43.8.7**（Dependabot 12 条告警全指它，最高门槛要求 43.8.1）。2026-11-06 复测：本机 electron **不在 PATH**，`holo_pet_w3/node_modules/.bin/electron.cmd` 也不存在 ⇒ 桌面壳当前是跳过的，APP 走网页版 console；`npm install` 只有在要**锁定版本、离线打包**时才需要 —— 装包属于闸二，须先问主人。",
   "comment_taste_rules": "审美闸三道硬规则（2026-10-26）：emoji（界面里不许用 emoji 当记号）· gradient-text（不许渐变文字）· gradient（不许拿渐变造层次）。第三条是**清零之后**才采纳的 —— 先改页面、再上闸，顺序不能反：反过来就是拿闸当鞭子抽一批还没修的页，闸会长期红着，红久了就没人看了。例外见 state/taste-exceptions.json（逐处带理由、不许通配；**处数与条数不写死**，以该文件为准）。",
   "comment_text_fatigue": "语言疲劳闸（2026-10-28 立，同日二改）：来源是 NYU + UT Austin 对 14 个模型的对照研究 —— 前沿模型**系统性**过度使用六种人类难解析的模式，根因是代码与数学语料只奖励正确性、不奖励清晰度。**六型现在全机检**：anthropo / noun-as-verb / bare-ref / collocation（可判定的搭配病：羡余、框架杂糅）/ dep-distance（定语跨度）/ long-clause（单分句长度）/ de-chain（「的」链）。只有「真·名词串（无「的」直接拼接）」明写不判 —— 不是不知道怎么做，是三种实现都实测过：功能字切段 186 命中几乎全误报、jieba 词性 10 命中 6 误报、只有「的」链 0 误报，所以只采纳能站住的那个形态。🔴 判据条数与全部阈值不写在这里：见 `docs/判据总账.md` 的 GBT-CLAIM 断言块，由 `claim-block-audit.py` 与代码现读值对账（改工具不改文档 ⇒ 闸红）。要放开某条：从 --adopt 里去掉它即可（会退回 PENDING，不是 PASS）。",
   "comment_probe_env": "跑 electron 探针（interact / shots / startup / rehearse / preflight）前必须知道的三件事，2026-10-26 实测：① 本机环境里有 `ELECTRON_RUN_AS_NODE=1`，它会让 electron.exe **降级成纯 Node** —— 报出来的错是 `Cannot read properties of undefined (reading 'getPath')`，指向完全错的方向（看起来像 main.cjs 坏了）；跑前先 `env -u ELECTRON_RUN_AS_NODE`。② 本机 GPU 进程起不来（`GPU process isn't usable. Goodbye.`），要加 `--disable-gpu --use-gl=swiftshader --disable-dev-shm-usage`；**别加** `--disable-software-rasterizer`（那等于把退路也关了）。③ `dsh web` 在本机起不来（宿主 safe-delete shim ETIMEDOUT → `dsh web 退出（code=1）`），探针会一直等它 —— 这也是守卫 B1d 只能 PENDING、只能由主人真接一次对话面才能关闭的原因。",
@@ -51,13 +51,13 @@
   "comment_build_extraResources": "补上 `files` 里的通配覆盖不到的顶层件（预检/守卫要用到的）：本壳**不打包 holo_pet/**（那是面板服务，属于本机运行态，不是壳的产物）。",
   "comment_build_asar": "**不开 asar**：壳的预检/守卫要靠 `require` 与 `fs` 直接读壳内文件（`windows.json`、各个 `*.html`），打成 asar 后这些路径语义会变。宁可包大一点，换取「打包后行为与开发态一致」。",
   "comment_build_win": "先出 **portable 单文件**（免安装、免签名）：本机没有代码签名证书，出 nsis 安装包会被 SmartScreen 拦。签名是**主人的事**，不是我能补的。",
-  "comment_build_electronDist": "🔴 离线打包用：本机**没有** electron-builder 的下载缓存（`%LOCALAPPDATA%\\electron-builder\\Cache` 不存在），而它默认要从 GitHub 下 `electron-v43.0.0-win32-x64.zip`。全局 electron 的 `dist/` 已在盘上（224.8 MB）⇒ 只要 node_modules/electron/dist 在，相对路径指过去就能离线出包。2026-11-06 扫描实测：本机两个候选（%APPDATA% 下的全局 npm 目录、旧值里那个 ADMIN 目录）**都不在盘** ⇒ 当前是「缺依赖」，不是路径写错；旧值写死了别人家的用户名（AGENTS §3 禁止），已改相对路径。",
-  "comment_build_electronVersion": "🔴 2026-09-23 第 40 轮实测第二坑：electron-builder **拒收版本区间** —— `\"electron\": \"^43.0.0\"` 会报「Electron version \"^43.0.0\" is a range, not a fixed version … a range cannot be resolved without electron installed in node_modules」。本壳**故意不装 node_modules**（走全局 electron）⇒ 必须显式给 `electronVersion`。写 `43.0.0` 的依据是现读：`electron --version` → `v43.0.0`。区间与定值**两处必须一致**，否则将来 `npm install` 拉到的 43.x 与打包用的不是同一个。",
+  "comment_build_electronDist": "🔴 离线打包用：本机**没有** electron-builder 的下载缓存（`%LOCALAPPDATA%\\electron-builder\\Cache` 不存在），而它默认要从 GitHub 下 `electron-v43.8.7-win32-x64.zip`。全局 electron 的 `dist/` 已在盘上（224.8 MB）⇒ 只要 node_modules/electron/dist 在，相对路径指过去就能离线出包。2026-11-06 扫描实测：本机两个候选（%APPDATA% 下的全局 npm 目录、旧值里那个 ADMIN 目录）**都不在盘** ⇒ 当前是「缺依赖」，不是路径写错；旧值写死了别人家的用户名（AGENTS §3 禁止），已改相对路径。",
+  "comment_build_electronVersion": "🔴 2026-09-23 第 40 轮实测第二坑：electron-builder **拒收版本区间** —— `\"electron\": \"^43.0.0\"` 会报「Electron version \"^43.0.0\" is a range, not a fixed version … a range cannot be resolved without electron installed in node_modules」。本壳**故意不装 node_modules**（走全局 electron）⇒ 必须显式给 `electronVersion`。**2026-11-06 更新**：原写 `43.0.0` 的依据是当时 `electron --version` → `v43.0.0`；本轮因 Dependabot 12 条告警（最高门槛 43.8.1）升到 `43.8.7`（43.x 线最新）。⚠️ 本机现已无全局 electron（不在 PATH，node_modules 也未装）⇒ 这个值是**声明层**，真正跑桌面壳前要先按 43.8.7 装好，否则 `npm run pack` 会去下 43.8.7 的 zip。区间与定值**两处必须一致**，否则将来 `npm install` 拉到的 43.x 与打包用的不是同一个。",
   "build": {
     "appId": "com.gbtxiaotudou.desktop.v8",
     "productName": "GBT小土豆V8",
     "copyright": "开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属",
-    "electronVersion": "43.0.0",
+    "electronVersion": "43.8.7",
     "electronDist": "../node_modules/electron/dist",
     "directories": {
       "output": "../dist"

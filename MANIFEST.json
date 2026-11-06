@@ -1,6 +1,6 @@
 {
  "schema": "gbt-manifest-fixed/v1",
- "generated_at": "2026-11-06T09:48:42+0700",
+ "generated_at": "2026-11-06T10:00:16+0700",
  "target": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
  "note": "交付清单：逐文件 size + sha256。清单不登记自己；排除口径见 exclusions。",
  "self_excluded": true,
@@ -37,8 +37,8 @@
   {
    "rule": "state_tree",
    "why": "state/ 整树：运行时数据（记忆/日志/绑定/锁），非交付源码",
-   "files": 1718,
-   "bytes": 6060753830
+   "files": 1720,
+   "bytes": 6060837297
   },
   {
    "rule": "scratch_tree",
@@ -50,13 +50,13 @@
    "rule": "self_manifest",
    "why": "MANIFEST.json 自身：清单不登记自己",
    "files": 1,
-   "bytes": 709557
+   "bytes": 709691
   },
   {
    "rule": "store_tree",
    "why": "gbt_allinone/store/ 整树：运行时数据仓",
    "files": 1503,
-   "bytes": 90258305
+   "bytes": 90259065
   },
   {
    "rule": "secrets_tree",
@@ -67,8 +67,8 @@
   {
    "rule": "git_tree",
    "why": "任何含 .git 的路径：版本库内部",
-   "files": 448,
-   "bytes": 225754544
+   "files": 453,
+   "bytes": 226017293
   },
   {
    "rule": "pyembed_runtime",
@@ -97,16 +97,16 @@
  ],
  "totals": {
   "files": 4211,
-  "bytes": 436974960,
+  "bytes": 436976766,
   "mb": 416.73,
   "py_ok": 1980,
   "py_fail": 0,
   "exact_dup_groups": 111,
   "exact_dup_files": 265,
   "bom_py_files": 0,
-  "excluded_files": 9006,
-  "excluded_bytes": 7587032609,
-  "content_digest": "4e9699456a09ed52b56f44e7e1eb692e8d6e8f2eab938ad365fc1a856fc8deef",
+  "excluded_files": 9013,
+  "excluded_bytes": 7587379719,
+  "content_digest": "52d98645286b5c98f5f61e2d5cacf49e09da5b0077e7a99d6aba14add970b4a6",
   "patch_rehashed_files": 4211
  },
  "by_extension": {
@@ -12876,8 +12876,8 @@
   },
   {
    "path": "holo_pet_w3/package.json",
-   "size": 12624,
-   "sha256": "cb2c944ee3d94d3c0d4ebeea7fe439fa487445316934d1cf35dc9d6a54990fe0"
+   "size": 13210,
+   "sha256": "ae64e04cac7036efaa255b3a8af9f63a94ba155c6d73a2a11c1996f0bcd68ca7"
   },
   {
    "path": "holo_pet_w3/page-skins.css",
@@ -22076,8 +22076,8 @@
   },
   {
    "path": "启动-GBT.cmd",
-   "size": 2422,
-   "sha256": "36de1a39b97bb970bc0c963580e658f29b864376bd62b0d46812aa5a71ec225c"
+   "size": 3642,
+   "sha256": "bc7d9cdb34564e440b4526e4ef089e55c444519d8a439a1fc53eec7321a12f9d"
   },
   {
    "path": "整理报告/taste-guard-修复.md",
