@@ -7,7 +7,7 @@ echo ==========================================
 
 call :probe 8791
 if "%UP%"=="1" goto br_up
-echo [1/5] starting bridge on :8791 ...
+echo [1/6] starting bridge on :8791 ...
 set GBT_ENABLE_SELFHOST_LANE=1
 REM 8792 是 bridge 里 selfhost 车道名；引擎真身地址见 gbt_allinone/weights.py（当前 8111）
 set GBT_OURS_BASE_URL=http://127.0.0.1:8792/v1
@@ -16,10 +16,10 @@ start "" /min "%~dp0pyembed\python.exe" -X utf8 "tools\model-bridge\server.py" -
 call :wait 8791 30
 goto br_done
 :br_up
-echo [1/5] bridge :8791 already up (weights stay cold until first message)
+echo [1/6] bridge :8791 already up (weights stay cold until first message)
 :br_done
 
-echo [2/5] ensuring cognitive console :8766 ...
+echo [2/6] ensuring cognitive console :8766 ...
 call :probe2 8766
 if "%UP2%"=="1" goto cs_up
 start "" /min "pyembed\python.exe" -X utf8 "tools\console-server.py" --port 8766
@@ -29,7 +29,7 @@ if "%UP2%"=="1" echo   cognitive console ready: http://127.0.0.1:8766/console/in
 if "%UP2%"=="0" echo   cognitive console not ready (shell still starts)
 
 REM ==== omni-plug gateway :7788 (2026-11-06 主人令：必须跟 APP 同步启，不许手起) ====
-echo [3/5] ensuring omni-plug gateway :7788 ...
+echo [3/6] ensuring omni-plug gateway :7788 ...
 set "YBK_HOME=%~dp0..\超级万能插"
 call :probe3 7788
 if "%UP3%"=="1" goto ybk_up
@@ -51,12 +51,25 @@ echo   omni-plug gateway :7788 already up
 if "%UP3%"=="1" echo   omni-plug ready: http://127.0.0.1:7788/health
 if "%UP3%"=="0" echo   omni-plug not ready (GBT still works without it)
 
-echo [4/5] doctor ...
+echo [4/6] ensuring free model lane :18900 ...
+if not exist "%~dp0..\our-free-model\packages\standalone\cli.mjs" goto free_skip
+call :probe3 18900
+if "%UP3%"=="1" goto free_up
+start "" /min node "%~dp0..\our-free-model\packages\standalone\cli.mjs" --port 18900
+call :wait3 18900 20
+goto free_done
+:free_up
+echo [4/6] free model lane already up (kilo free pool)
+goto free_done
+:free_skip
+echo   [skip] free model lane not installed: %~dp0..\our-free-model
+:free_done
+echo [5/6] doctor ...
 "%~dp0pyembed\python.exe" "tools\model-bridge\doctor.py"
 echo.
 
 if "%~1"=="--no-shell" goto no_shell
-echo [5/5] starting desktop shell ...
+echo [6/6] starting desktop shell ...
 if not exist "holo_pet_w3\node_modules\.bin\electron.cmd" (
   echo   [skip] electron 没装：holo_pet_w3\node_modules\.bin\electron.cmd 不存在
   echo          装法：cd holo_pet_w3 ^&^& npm install
@@ -68,7 +81,7 @@ start "" ".\node_modules\.bin\electron.cmd" .
 popd
 goto end
 :no_shell
-echo [5/5] shell skipped (--no-shell)
+echo [6/6] shell skipped (--no-shell)
 :end
 echo.
 echo done. weights load on the FIRST chat message, then idle-exit after 900s.

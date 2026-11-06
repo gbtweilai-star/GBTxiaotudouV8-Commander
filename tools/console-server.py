@@ -520,9 +520,85 @@ def _deep_merge(base: dict, upd: dict) -> dict:
     return out
 
 
+# ═══════════ 车道：云端（付费）优先 → 挂了自动切本机 ══════════════════════════
+# 2026-11-06 主人令：「付费的停了就自动切回本地算力驱动」。
+#
+# 口径（照本仓三条纪律）：
+#   · **云真失败才切**：401/402/429/5xx/超时/空回包 ⇒ 切；**慢不算失败**
+#     （慢可能只是长文，切了等于把好模型换掉）。
+#   · **切了必须标明**：回执带 `via` 与 `lane.fallback`，前端与日志都能看见，
+#     **绝不冒充是自有权重的产物**。
+#   · **熔断**：失败后冷却 GBT_CLOUD_COOLDOWN_S 秒（默认 90），冷却期内直接走本机，
+#     不再白等云端超时（否则每次提问都要先卡满 timeout 才落到本地）。
+#   · 只记**失败原因**，不记 api_key（钥匙不进日志、不进 state）。
+CLOUD_LANE_PATH = REPO / "state" / "cloud-lane.json"
+CLOUD_COOLDOWN_S = int(os.environ.get("GBT_CLOUD_COOLDOWN_S") or 90)
+
+
+def _cloud_lane_read() -> dict:
+    try:
+        d = json.loads(CLOUD_LANE_PATH.read_text(encoding="utf-8"))
+        return d if isinstance(d, dict) else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _cloud_lane_write(d: dict) -> None:
+    """原子写：tmp + fsync + os.replace（崩了也只留旧档，不留半截）。"""
+    try:
+        CLOUD_LANE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        tmp = CLOUD_LANE_PATH.with_suffix(".json.tmp")
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(d, ensure_ascii=False, indent=1))
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, CLOUD_LANE_PATH)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _cloud_cooling() -> dict:
+    """冷却中？{cooling, until, left_s, why}。读不出/已过期一律当没冷却。"""
+    d = _cloud_lane_read()
+    until = str(d.get("cooldown_until") or "")
+    if not until:
+        return {"cooling": False}
+    try:
+        ts = time.mktime(time.strptime(until, "%Y-%m-%dT%H:%M:%S"))
+    except Exception:  # noqa: BLE001
+        return {"cooling": False}
+    left = int(ts - time.time())
+    if left <= 0:
+        return {"cooling": False}
+    return {"cooling": True, "until": until, "left_s": left,
+            "why": str(d.get("last_error") or "")[:160]}
+
+
+def _cloud_note(ok: bool, reason: str = "", model: str = "") -> dict:
+    """记一次云端结果：成功清冷却，失败开冷却并累加 streak。"""
+    now = time.time()
+    if ok:
+        d = {"last_ok_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(now)),
+             "cooldown_until": "", "last_error": "", "fail_streak": 0,
+             "model": str(model)[:80]}
+    else:
+        prev = _cloud_lane_read()
+        streak = int(prev.get("fail_streak") or 0) + 1
+        d = {"last_fail_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(now)),
+             "last_error": str(reason)[:200], "fail_streak": streak,
+             "cooldown_until": time.strftime("%Y-%m-%dT%H:%M:%S",
+                                             time.localtime(now + CLOUD_COOLDOWN_S)),
+             "cooldown_s": CLOUD_COOLDOWN_S, "model": str(model)[:80]}
+    _cloud_lane_write(d)
+    return d
+
+
 def _settings_load() -> dict:
     try:
-        data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+        # utf-8-sig：用户用记事本/PS5.1 存过 BOM 也能读（2026-11-06 实测：
+        # Set-Content -Encoding UTF8 会写 EF BB BF，而 json.loads 直接拒收 BOM，
+        # 导致整份设置被静默丢弃 —— 表现为「配了像没配」，最难查的一种）。
+        data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8-sig"))
     except Exception:  # noqa: BLE001
         data = {}
     return _deep_merge(DEFAULT_SETTINGS, data if isinstance(data, dict) else {})
@@ -984,16 +1060,69 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + _commission + _cand_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
     # 2026-11-02 主人令：Agnes 只做“反向调用云端算力”，不是聊天模型；
     # 聊天永远先用我们自己的本机权重。除非显式 GBT_ALLOW_EXTERNAL_MODEL=1，否则不允许外部模型接聊天。
+    # 2026-11-06 主人令（改）：付费云端为主，**停了自动切本机**；切了必须标明，不许冒充。
+    # ── 免费车道（本地 OpenAI 兼容代理，如 our-free-model :18900）─────────────
+    # 2026-11-06 主人令：「那些免费使用的装上来」⇒ **免费优先于付费**。
+    # 口径与云端一致（本仓三条纪律）：
+    #   · 真失败才降级：401/402/429/5xx/超时/空回包 ⇒ 降；**慢不算失败**。
+    #   · 降级必须标明：回执带 `via` 与 `lane.fallback`，绝不冒充。
+    # 开关：GBT_ALLOW_FREE_MODEL=0 整条停用；配置在 settings.free。
+    _free = _settings_load().get("free") or {}
+    if (_free.get("enabled") and _free.get("base_url") and _free.get("name")
+            and os.environ.get("GBT_ALLOW_FREE_MODEL", "1") != "0"):
+        try:
+            _fr = _openai_chat(prompt_text, _free)
+        except Exception as e:  # noqa: BLE001
+            _fr = {"ok": False,
+                   "error": "free_error: %s: %s" % (type(e).__name__, str(e)[:160])}
+        if _fr.get("ok"):
+            _fr["via"] = "free:" + str(_free.get("name") or "")
+            _fr["lane"] = {"active": "free", "model": _free.get("name"),
+                           "endpoint": _model_url(_free.get("base_url"))}
+            _fr.setdefault("context", {"mode": "user-model", "name": context})
+            _fr["elapsed_ms"] = int((time.time() - t0) * 1000)
+            return _fr
+        _free_fail = str(_fr.get("error") or "")[:200]
+        _lane = {"active": "local",
+                 "why": "免费车道失败，继续尝试云端/本机：%s" % _free_fail[:120],
+                 "fallback": {"from": "free", "model": _free.get("name"),
+                              "reason": _free_fail}}
+    else:
+        _lane = {"active": "local", "why": "云端未启用（GBT_ALLOW_EXTERNAL_MODEL≠1 或未配模型）"}
     if m.get("base_url") and m.get("name") and os.environ.get("GBT_ALLOW_EXTERNAL_MODEL") == "1":
-        r = _openai_chat(prompt_text, m)
-        r.setdefault("context", {"mode": "user-model", "name": context})
-        r["elapsed_ms"] = int((time.time() - t0) * 1000)
-        return r
+        _cool = _cloud_cooling()
+        if _cool.get("cooling"):
+            _lane = {"active": "local",
+                     "why": "云端冷却中（%ss 后重试），直接走本机" % _cool.get("left_s"),
+                     "cooling": _cool}
+        else:
+            try:
+                _cr = _openai_chat(prompt_text, m)
+            except Exception as e:  # noqa: BLE001
+                _cr = {"ok": False,
+                       "error": "model_error: %s: %s" % (type(e).__name__, str(e)[:160])}
+            if _cr.get("ok"):
+                _cloud_note(True, model=str(m.get("name") or ""))
+                _cr["via"] = "cloud:" + str(m.get("name") or "")
+                _cr["lane"] = {"active": "cloud", "model": m.get("name")}
+                _cr.setdefault("context", {"mode": "user-model", "name": context})
+                _cr["elapsed_ms"] = int((time.time() - t0) * 1000)
+                return _cr
+            _fail = _cloud_note(False, reason=str(_cr.get("error") or "")[:160],
+                                model=str(m.get("name") or ""))
+            _lane = {"active": "local",
+                     "why": "云端失败，已自动切本机：%s" % str(_cr.get("error") or "")[:120],
+                     "fallback": {"from": "cloud", "model": m.get("name"),
+                                  "reason": str(_cr.get("error") or "")[:200],
+                                  "cooldown_until": _fail.get("cooldown_until"),
+                                  "cooldown_s": CLOUD_COOLDOWN_S}}
+    _via = "local:fallback" if _lane.get("fallback") else "local"
     try:
         from gbt_allinone import omni_plug as _OP
         _or = _OP.plug_and_run("engine", kind="ai", args={"prompt": prompt_text, "max_tokens": 512}, timeout=300)
         if _or.get("ok") and _or.get("text"):
-            return {"ok": True, "text": _or.get("text"), "via": "omni_plug:ai:engine",
+            return {"ok": True, "text": _or.get("text"), "via": _via + ":omni",
+                    "lane": _lane,
                     "ms": int((time.time() - t0) * 1000), "context": {"mode": "omni-ai-engine", "name": context}}
     except Exception:  # noqa: BLE001
         pass
@@ -1004,6 +1133,7 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     out = {"ok": bool(r.get("ok")), "text": r.get("text"),
            "error": r.get("error"), "ms": r.get("ms"),
            "usage": r.get("usage"), "context": r.get("context"),
+           "via": _via + ":energy_core", "lane": _lane,
            "policy": {"temperature": 0.0, "max_tokens": 512,
                       "unlimited_context": True,
                       "note": "模型只看有界窗口；全量历史落 sqlite 可 recall"}}

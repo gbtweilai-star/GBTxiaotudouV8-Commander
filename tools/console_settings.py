@@ -30,6 +30,8 @@ PROJECT_SKILLS = REPO / ".agents" / "skills"
 CODEX_SKILLS = Path.home() / ".codex" / "skills"
 TENTACLE = "http://127.0.0.1:7788"
 LLAMA = "http://127.0.0.1:8794"
+# 免费车道：our-free-model 独立服务（OpenAI 兼容）。见 启动-GBT.cmd [4/6]。
+OFM = "http://127.0.0.1:18900"
 
 _CACHE: dict = {}
 
@@ -41,6 +43,42 @@ def _cached(key: str, ttl: float, fn):
     val = fn()
     _CACHE[key] = (time.time(), val)
     return val
+
+
+def _free_cfg() -> dict:
+    """免费车道配置：state/app-settings.json 的 free 段。读不到返回空 dict。"""
+    try:
+        d = json.loads((STATE / "app-settings.json").read_text(encoding="utf-8-sig"))
+        f = (d or {}).get("free") or {}
+        return f if isinstance(f, dict) else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _free_json(path: str, timeout: float = 2.0):
+    """带 Bearer 调免费池（OpenAI 兼容）。不通就抛，由调用方如实标注，不补假读数。"""
+    cfg = _free_cfg()
+    key = str(cfg.get("api_key") or "")
+    headers = {"content-type": "application/json"}
+    if key:
+        headers["authorization"] = "Bearer " + key
+    req = urllib.request.Request(OFM + path, headers=headers)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8", "replace"))
+
+
+def _free_health() -> dict:
+    """免费池探活（带 5s 缓存，避免每开一次设置页就多打一次上游）。"""
+    def probe():
+        cfg = _free_cfg()
+        if not cfg.get("enabled"):
+            return {"up": False, "why": "未启用（app-settings.json 的 free.enabled=false）"}
+        try:
+            h = _free_json("/health", 1.5)
+            return {"up": bool(h.get("ok")), "detail": h}
+        except Exception as e:  # noqa: BLE001
+            return {"up": False, "error": "%s: %s" % (type(e).__name__, str(e)[:80])}
+    return _cached("free_h", 5, probe)
 
 
 def _safe(fn, default=None):
@@ -276,17 +314,32 @@ def sec_providers():
             "cloud": [{"name": "Abliteration", "env": "ABLITERATION_API_KEY",
                        "configured": bool(os.environ.get("ABLITERATION_API_KEY"))},
                       {"name": "GBT / DeepSeek", "env": "GBT_LLM_API_KEY",
-                       "configured": bool(os.environ.get("GBT_LLM_API_KEY"))}],
-            "note": "钥匙只看『槽位在不在』，不回显明文"}
+                       "configured": bool(os.environ.get("GBT_LLM_API_KEY"))},
+                      # 免费车道（2026-11-06）：不需要钥匙，靠本机 18900 代理；
+                      # 到没到用**探活**说话，不是看有没有配 key。
+                      {"name": "免费池 · " + str(_free_cfg().get("name") or "kilo-auto/free"),
+                       "env": OFM,
+                       "configured": bool(_free_health().get("up"))}],
+            "note": "钥匙只看『槽位在不在』，不回显明文；免费池看探活"}
 
 
 def sec_models():
     def load():
+        out, errs = [], []
         try:
             j = _http_json(LLAMA + "/v1/models", 1.2)
-            return {"ok": True, "models": [m.get("id") for m in (j.get("data") or [])]}
+            out += [m.get("id") for m in (j.get("data") or [])]
         except Exception as e:  # noqa: BLE001
-            return {"ok": False, "models": [], "error": str(e)[:100]}
+            errs.append("本机: " + str(e)[:80])
+        # 免费池：统一加 "free · " 前缀，让「这条模型走哪个车道」一眼可辨
+        try:
+            j2 = _free_json("/v1/models", 2.0)
+            out += ["free · " + str(m.get("id"))
+                    for m in (j2.get("data") or []) if m.get("id")]
+        except Exception as e:  # noqa: BLE001
+            errs.append("免费池: " + str(e)[:80])
+        return {"ok": bool(out), "models": out,
+                "error": "; ".join(errs) if errs else ""}
 
     return _cached("models", 20, load)
 
