@@ -1,6 +1,6 @@
 {
  "schema": "gbt-manifest-fixed/v1",
- "generated_at": "2026-11-06T09:39:39+0700",
+ "generated_at": "2026-11-06T09:41:02+0700",
  "target": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8",
  "note": "交付清单：逐文件 size + sha256。清单不登记自己；排除口径见 exclusions。",
  "self_excluded": true,
@@ -11,7 +11,8 @@
   "why": "旧清单生成于 07:24:39，漏 153 件交付内容，且 22 个文件读数与盘面不符"
  },
  "recipe": {
-  "tool": "manifest-rebuild.py（口径锚定 MANIFEST-fixed.json v2）",
+  "tool": "tools/manifest-rebuild.py（口径锚定 MANIFEST-fixed.json v2）",
+  "verify": "python tools/manifest-rebuild.py --verify  # 复算并比对，MATCH 才算数",
   "python": "3.12.10",
   "hash": "sha256",
   "path_form": "相对 target，分隔符统一为 '/'",
@@ -49,7 +50,7 @@
    "rule": "self_manifest",
    "why": "MANIFEST.json 自身：清单不登记自己",
    "files": 1,
-   "bytes": 690636
+   "bytes": 687045
   },
   {
    "rule": "store_tree",
@@ -66,8 +67,8 @@
   {
    "rule": "git_tree",
    "why": "任何含 .git 的路径：版本库内部",
-   "files": 358,
-   "bytes": 221771975
+   "files": 364,
+   "bytes": 222156722
   },
   {
    "rule": "pyembed_runtime",
@@ -90,26 +91,26 @@
   {
    "rule": "backup_file",
    "why": "*.bak / *.bak-* / *.orig / *.rej：临时备份件（.gitignore 全仓规则；基线里此类条目为 0）",
-   "files": 29,
-   "bytes": 48569686
+   "files": 28,
+   "bytes": 47961970
   }
  ],
  "totals": {
-  "files": 4097,
-  "bytes": 426944964,
-  "mb": 407.17,
-  "py_ok": 1955,
+  "files": 4099,
+  "bytes": 427563741,
+  "mb": 407.76,
+  "py_ok": 1956,
   "py_fail": 0,
   "exact_dup_groups": 86,
   "exact_dup_files": 215,
   "bom_py_files": 0,
-  "excluded_files": 8884,
-  "excluded_bytes": 7657272684,
-  "content_digest": "db91abf3fafef667fae6099b83060c213cf9e2b4842c234911f951ebd1bae31a",
-  "patch_rehashed_files": 4097
+  "excluded_files": 8889,
+  "excluded_bytes": 7657046124,
+  "content_digest": "e523c93551e002c539ce3b87a751d38714e13ead346ecd605f97d23b1304ccc6",
+  "patch_rehashed_files": 4099
  },
  "by_extension": {
-  ".py": 1955,
+  ".py": 1956,
   ".md": 704,
   ".html": 444,
   ".js": 163,
@@ -145,6 +146,7 @@
   ".ass": 2,
   ".cff": 1,
   ".toml": 1,
+  ".old-20261103": 1,
   ".before-rescan": 1,
   ".before-rescan-2": 1,
   ".before-rescan-3": 1,
@@ -3626,6 +3628,11 @@
    "path": ".archive/panels-20261101/wgpu/worker.html",
    "size": 4196,
    "sha256": "8d2fdb4f9c5d1762ee17cd2d91d3d2ba9a0e992a2f63d21ad213c64065895c5a"
+  },
+  {
+   "path": ".archive/stale-20261106/MANIFEST.json.old-20261103",
+   "size": 607716,
+   "sha256": "7d7a6b48900601308c2a965903ed22ab0fb68c75fd329c8a3afb17759305bbfb"
   },
   {
    "path": ".archive/stale-20261106/intent_extracted.json",
@@ -19463,6 +19470,11 @@
    "sha256": "ada3deeb743f0d3f5c10948056083faebee599250019382fe0f32f1096be4cd3"
   },
   {
+   "path": "tools/manifest-rebuild.py",
+   "size": 11061,
+   "sha256": "82e043d26989698270785d862345757c197c9ca7e55ce60929ff34496345e2ce"
+  },
+  {
    "path": "tools/mcp-demo-server.py",
    "size": 2833,
    "sha256": "bfd72f745871769f53f682f79655a53d983304437bd40a5622398e643439379c"
@@ -21428,7 +21440,7 @@
  "generated_at_note": "清单生成期间交付树不应被外部写入；需要刷新请重跑本脚本并复算 MATCH。",
  "diff_vs_fixed": {
   "base": "MANIFEST-fixed.json",
-  "added": 262,
+  "added": 264,
   "removed": 6,
   "base_files": 3841
  }
