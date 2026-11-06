@@ -55,6 +55,7 @@ echo [4/6] ensuring free model lane :18900 ...
 if not exist "%~dp0..\our-free-model\packages\standalone\cli.mjs" goto free_skip
 call :probe3 18900
 if "%UP3%"=="1" goto free_up
+if exist "%APPDATA%\npm\node_modules\bun\bin\bun.exe" set "OUR_FREE_MODEL_BUN=%APPDATA%\npm\node_modules\bun\bin\bun.exe"
 start "" /min node "%~dp0..\our-free-model\packages\standalone\cli.mjs" --port 18900
 call :wait3 18900 20
 goto free_done
