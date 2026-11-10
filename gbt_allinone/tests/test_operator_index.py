@@ -3,7 +3,7 @@
 
 这一层此前只有手跑脚本，改一个权重没人拦得住。这里钉住的是**口径**，不是数字：
 
-  ① 形状：427 个能力位、每个都有 tokens/graph，索引不能悄悄少一半；
+  ① 形状：428 个能力位、每个都有 tokens/graph，索引不能悄悄少一半；
   ② 已知正确：16 条主人原话必须命中且命中对那个位；
   ③ 必须弃权：凭二元组覆盖「看着像」的一律不许发火（这条防的是假绿）；
   ④ 否决：摘掉一个说法后，那个位不再认它，接手的是别人或没人；
@@ -32,6 +32,8 @@ KNOWN = [
     ("看屏幕", "body_see"),
     ("截个屏", "body_see"),
     ("截图", "body_see"),
+    ("全量扫描一遍看看还有哪些没接好", "page_scan"),
+    ("扫描页面", "page_scan"),
     ("打开摄像头", "see_camera"),
     ("体检一下系统", "selfscan"),
     ("自检", "selfscan"),
@@ -45,9 +47,10 @@ KNOWN = [
     ("识别图片", "vision"),
     ("本地算力", "local_llm"),
     ("提醒我明天九点开会", "reminder"),
+    ("生图", "t2i_agnes"),
 ]
 
-ABSTAIN = ["生图", "视频", "权限", "看一眼桌面"]
+ABSTAIN = ["视频", "权限", "看一眼桌面"]
 
 
 def _top1(g):
@@ -162,7 +165,7 @@ class TestHeldout(unittest.TestCase):
 class TestHintNote(unittest.TestCase):
     """候选提示：只提示、不给执行权；弃权时一个字都不许塞。
 
-    这是「427 压到几个」真正进对话的地方 —— 提示错了不会执行任何东西，
+    这是「428 压到几个」真正进对话的地方 —— 提示错了不会执行任何东西，
     但会把本机模型往错的方向带，所以判据比 gate 本身更严：只认 hit。
     """
 
@@ -171,12 +174,12 @@ class TestHintNote(unittest.TestCase):
         n = OI.hint_note("看屏幕", gate_result=g)
         self.assertTrue(n["hit"])
         self.assertIn("body_see", n["note"])
-        self.assertIn("427", n["note"])
+        self.assertIn("428", n["note"])
         self.assertLessEqual(len(n["note"]), 200)
 
     def test_abstain_gives_empty_note(self):
         # 负对照：闸门弃权时必须空 —— 提示里塞候选等于绕过弃权
-        for q in ("生图", "视频", "权限"):
+        for q in ("视频", "权限", "看一眼桌面"):
             g = OI.gate(q)
             self.assertFalse(g["hit"], q + " 本该弃权")
             n = OI.hint_note(q, gate_result=g)

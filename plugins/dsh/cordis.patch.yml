@@ -1,0 +1,7 @@
+# @gbt/dsh-cap-bridge self-mount bundle patch.
+# One insert mounts the plugin with default config; the row name points at this
+# package itself, so installing the bundle composes the plugin.
+- insert:
+    - id: gbt-cap-bridge
+      name: '@gbt/dsh-cap-bridge'
+      config: {}

@@ -625,8 +625,93 @@ def _model_url(base: str) -> str:
     return b + "/v1/chat/completions"
 
 
-def _openai_chat(text: str, m: dict) -> dict:
-    """用户自带模型：OpenAI 兼容 /chat/completions。"""
+def _image_data_url(path, max_bytes: int = 6 * 1024 * 1024) -> str:
+    """Read a native frame and turn it into an OpenAI-compatible data URL.
+
+    2026-11-07: the chat layer must let the model *see* the frame, not just
+    read a text description. Returns "" when the file is missing/too large.
+    """
+    import base64
+    try:
+        p = pathlib.Path(str(path or ""))
+        if not p.is_file():
+            return ""
+        raw = p.read_bytes()
+        if not raw or len(raw) > max_bytes:
+            return ""
+        # 帧不一定是 PNG（部分采集器出 JPEG/BMP）：按魔数给对 MIME，
+        # 否则严格的多模态端点会 400，帧等于没送。
+        if raw.startswith(b"\x89PNG\r\n\x1a\n"):
+            _mime = "image/png"
+        elif raw[:3] == b"\xff\xd8\xff":
+            _mime = "image/jpeg"
+        elif raw[:2] == b"BM":
+            _mime = "image/bmp"
+        elif raw[:6] in (b"GIF87a", b"GIF89a"):
+            _mime = "image/gif"
+        elif raw[:4] == b"RIFF" and raw[8:12] == b"WEBP":
+            _mime = "image/webp"
+        else:
+            _mime = "image/png"
+        return "data:%s;base64,%s" % (_mime, base64.b64encode(raw).decode("ascii"))
+    except Exception:                                            # noqa: BLE001
+        return ""
+
+
+def _frames_data_urls(paths, max_frames: int = 4, max_total_bytes: int = 6 * 1024 * 1024) -> list:
+    """把一串帧（视频抽帧 / 连拍）按顺序编成 data URL 列表。
+
+    2026-11-07 主人令「直接看图片视频」：视频不靠文字转述，按时间序抽帧原样给模型。
+    约束：最多 `max_frames` 帧、合计不超过 `max_total_bytes`，超了按顺序截断
+    —— 截断是**降级**，调用方回执里要标，不许当成整段视频已看完。
+    """
+    out = []
+    total = 0
+    seen = set()
+    for raw in (paths or []):
+        s = str(raw or "")
+        if not s or s in seen or len(out) >= max_frames:
+            continue
+        seen.add(s)
+        url = _image_data_url(s)
+        if not url:
+            continue
+        # base64 膨胀 4/3：用源文件大小近似控制总量
+        try:
+            n = os.path.getsize(s)
+        except OSError:
+            n = len(url) * 3 // 4
+        if total + n > max_total_bytes:
+            break
+        total += n
+        out.append(url)
+    return out
+
+
+def _mark_frame_degraded(res: dict, meta: dict, why: str) -> dict:
+    """帧没进模型就不许冒充「模型看见了」：回执打 degraded，并保留帧路径。"""
+    if not meta:
+        return res
+    res.setdefault("frame", meta)
+    _sent_n = int(res.get("images_sent") or 0)
+    if not res.get("image_sent") and _sent_n <= 0:
+        res["degraded"] = True
+        res.setdefault("why_degraded", why)
+        return res
+    _total = int(meta.get("frames_total") or 0)
+    _sent = _sent_n
+    if _total > _sent > 0:
+        res["degraded"] = True
+        res.setdefault("why_degraded",
+                       "只送了前 %d/%d 帧（多帧上限 4 或合计 6MB），不是整段" % (_sent, _total))
+    return res
+
+
+def _openai_chat(text: str, m: dict, image_path: str = "", image_paths=None) -> dict:
+    """用户自带模型：OpenAI 兼容 /chat/completions。
+
+    `image_path` 单帧；`image_paths` 多帧（视频按时间序抽帧），按顺序原样送模型。
+    """
     import urllib.request
     url = _model_url(m.get("base_url"))
     if not url or not m.get("name"):
@@ -636,31 +721,74 @@ def _openai_chat(text: str, m: dict) -> dict:
         msgs.append({"role": "system", "content": str(m["system_prompt"])})
     else:
         msgs.insert(0, {"role": "system", "content": GBT_PERSONA})
-    msgs.append({"role": "user", "content": str(text)})
-    payload = {
-        "model": str(m["name"]),
-        "messages": msgs,
-        "temperature": float(m.get("temperature") or 0.0),
-        "max_tokens": int(m.get("max_tokens") or 1024),
-        "stream": False,
-    }
-    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
-                                 headers={"Content-Type": "application/json",
-                                          "Authorization": "Bearer " + str(m.get("api_key") or "")})
+    _paths = ([image_path] if image_path else []) + [str(x) for x in (image_paths or [])]
+    _frame_urls = _frames_data_urls(_paths)
+    _frame_url = _frame_urls[0] if _frame_urls else ""
+    if _frame_urls:
+        _content = [{"type": "text", "text": str(text)}]
+        for _u in _frame_urls:
+            _content.append({"type": "image_url", "image_url": {"url": _u}})
+        msgs.append({"role": "user", "content": _content})
+    else:
+        msgs.append({"role": "user", "content": str(text)})
     t0 = time.time()
-    try:
+    _base_tokens = int(m.get("max_tokens") or 1024)
+
+    def _post(_max_tokens):
+        payload = {
+            "model": str(m["name"]),
+            "messages": msgs,
+            "temperature": float(m.get("temperature") or 0.0),
+            "max_tokens": _max_tokens,
+            "stream": False,
+        }
+        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
+                                     headers={"Content-Type": "application/json",
+                                              "Authorization": "Bearer " + str(m.get("api_key") or "")})
         with urllib.request.urlopen(req, timeout=min(int(m.get("timeout") or 300), 600)) as r:
-            data = json.loads(r.read().decode("utf-8", "replace"))
+            return json.loads(r.read().decode("utf-8", "replace"))
+
+    try:
+        data = _post(_base_tokens)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": "model_error: %s: %s" % (type(e).__name__, str(e)[:200]),
                 "ms": int((time.time() - t0) * 1000)}
-    txt = ""
-    try:
-        txt = (data.get("choices") or [{}])[0].get("message", {}).get("content") or ""
-    except Exception:  # noqa: BLE001
-        txt = ""
+
+    def _read(_d):
+        _ch = (_d.get("choices") or [{}])[0]
+        _t = (_ch.get("message") or {}).get("content") or ""
+        if isinstance(_t, list):     # 少数端点回 content 分片
+            _t = "".join(str(x.get("text") or "") for x in _t if isinstance(x, dict))
+        _rt = (((_d.get("usage") or {}).get("completion_tokens_details") or {})
+               .get("reasoning_tokens"))
+        return str(_t), _ch.get("finish_reason"), _rt
+
+    txt, _finish, _reasoning = _read(data)
+    if not txt and _finish == "length":
+        # 2026-11-07 实测：推理型模型会把预算全花在思考上（content=null，reasoning_tokens≈535）。
+        # 只重试一次、只加预算，不无限刷；仍无正文就如实报错，不许把思考当回答。
+        try:
+            _data2 = _post(max(_base_tokens * 2, 2048))
+            _t2, _f2, _r2 = _read(_data2)
+            if _t2:
+                data, txt, _finish, _reasoning = _data2, _t2, _f2, _r2
+            else:
+                data, _finish, _reasoning = _data2, _f2, _r2
+        except Exception:  # noqa: BLE001
+            pass
+    if not txt and _finish == "length":
+        return {"ok": False,
+                "error": ("model_error: 模型把 token 全花在思考上"
+                          "（finish_reason=length, reasoning_tokens=%s），没有正文；"
+                          "请换多模态模型或调大 max_tokens" % (_reasoning,)),
+                "ms": int((time.time() - t0) * 1000),
+                "usage": data.get("usage"), "model": m.get("name"),
+                "image_sent": bool(_frame_url), "images_sent": len(_frame_urls)}
     return {"ok": bool(txt), "text": txt, "ms": int((time.time() - t0) * 1000),
             "usage": data.get("usage"), "model": m.get("name"),
+            "finish_reason": _finish, "reasoning_tokens": _reasoning,
+            "image_sent": bool(_frame_url), "image_path": image_path or "",
+            "images_sent": len(_frame_urls),
             "provider": m.get("provider") or "openai-compatible"}
 
 
@@ -781,9 +909,51 @@ def _method_text(method: str, body: dict, lane: dict, ms: float) -> str:
     return "\n".join(lines)
 
 
+class _ChatSteps:
+    """对话执行过程的逐步回执（2026-11-07 主人令）。
+
+    主人原话：「她开始执行任务每一步都要能看到她在干嘛执行到哪里每一个步骤都要精细显示出来」。
+    这里只做一件事：每当 `_chat` 跨过一个阶段，就把一条**实测**记录交给 on_step。
+    没有 on_step（普通 /api/chat）时是空操作 —— 原 JSON 行为与耗时一字不改。
+    """
+
+    def __init__(self, on_step=None):
+        self.t0 = time.time()
+        self.seq = 0
+        self.on_step = on_step
+        self.last = {}
+
+    def step(self, title, rows=None, ms=None, state="done"):
+        self.seq += 1
+        rec = {"seq": self.seq, "title": str(title),
+               "rows": [[str(a), str(b)] for a, b in (rows or [])],
+               "ms": round(float(ms), 1) if isinstance(ms, (int, float)) else None,
+               "state": str(state or "done"),
+               "at_ms": int((time.time() - self.t0) * 1000)}
+        self.last = rec
+        if self.on_step:
+            try:
+                self.on_step(rec)
+            except Exception:  # noqa: BLE001
+                pass
+        return rec
+
+
+def _prog_final(prog, res, label="交付回执"):
+    """统一收尾行：结果 / 通道 / 错误 / 总耗时都来自回执本体。"""
+    res = res if isinstance(res, dict) else {}
+    rows = [["结果", "ok" if res.get("ok") else ("denied" if res.get("status") == "denied" else "failed")],
+            ["通道", str(res.get("via") or "—")]]
+    if res.get("error"):
+        rows.append(["错误", str(res.get("error"))[:200]])
+    if res.get("elapsed_ms") is not None:
+        rows.append(["总耗时", "%sms" % res.get("elapsed_ms")])
+    return prog.step(label + " · " + ("完成" if res.get("ok") else "未完成"), rows)
+
+
 def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
           image=None, image_name: str = "", file=None, file_name: str = "",
-          file_type: str = "") -> dict:
+          file_type: str = "", on_step=None) -> dict:
     """无限上下文 + 稳定输出：temperature=0，context 走 ring_context。
 
     2026-11-02 主人令：先过 `capability_router` ——「看屏幕 / 开网页 / 读写文件 / 看图」四类
@@ -792,6 +962,13 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     开关：body 里 `capability:false` 或环境变量 `GBT_CAPABILITY_ROUTER=0`。
     """
     t0 = time.time()
+    prog = _ChatSteps(on_step)
+    prog.step("接收指令 · 已收到", [
+        ["原话", (str(text or "")[:140] or "（只有附件）")],
+        ["上下文", context],
+        ["能力路由", "开" if use_capabilities else "关"],
+        ["附件", ("图 " if image else "") + ("文件" if file else "") or "无"],
+    ])
     # 2026-11-05：算子闸门的**观测位 + 候选提示**（只提示，不给执行权）。
     # 她真实的对话入口是 /api/chat → _chat，此前从不经过 brain_exec.route，
     # 所以命中率一直是 0 —— 那是没接上，不是没命中。
@@ -800,7 +977,9 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     # tactile pulse 的只读白名单里，这里一个字都不执行。
     _operator = None
     _g = None
+    _op_ms = None
     if str(text or "").strip():
+        _t_op = time.perf_counter()
         try:
             from gbt_allinone import operator_index as _OI_obs
             _g = _OI_obs.gate(text)
@@ -809,12 +988,24 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                 _operator = _OI_obs.hint_note(text, gate_result=_g)
         except Exception:
             _operator = None
+        _op_ms = (time.perf_counter() - _t_op) * 1000
+        _gtop = [x for x in ((_g or {}).get("top") or [])[:4]
+                 if isinstance(x, dict) and x.get("cap")]
+        prog.step("扫描能力位 · %d 个候选" % len(_gtop), [
+            ["判定", "命中" if (_g or {}).get("hit") else "未命中（交回上层）"],
+            ["候选", " / ".join("%s(%.1f)" % (x.get("cap"), float(x.get("score") or 0))
+                                for x in _gtop) or "—"],
+            ["说明", str((_g or {}).get("why") or "—")[:180]],
+        ], ms=_op_ms)
     # 2026-11-06：交办单（人话里省掉的那几件事）。只解析 / 只提示 / 只记账，
     # **没有动作面** —— 执行权仍只在 capability_router 与只读白名单那里。
     # 它解决的是「20 秒的模型在替你猜他要什么」：把 goal/对象/规格/验收/退路
     # 明摆出来，缺哪件就说缺哪件，模型只问那一件（空问率才是烦人度的第一指标）。
     _commission = ""
+    _cm = None
+    _cm_ms = None
     if str(text or "").strip():
+        _t_cm = time.perf_counter()
         try:
             from gbt_allinone import commission as _CM
             _cm = _CM.parse(text)
@@ -823,37 +1014,61 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                 _commission = _CM.note(_cm)
         except Exception:                                # noqa: BLE001
             _commission = ""
+        _cm_ms = (time.perf_counter() - _t_cm) * 1000
+        if isinstance(_cm, dict):
+            prog.step("拆交办单 · " + ("任务" if _cm.get("kind") == "task" else "提问"), [
+                ["目标", str(_cm.get("goal") or "—")[:120]],
+                ["对象", str(_cm.get("object") or "—")[:80]],
+                ["规格", " / ".join(str(x) for x in (_cm.get("constraints") or []))[:120] or "—"],
+                ["缺件", " / ".join(str(x) for x in (_cm.get("missing") or [])) or "无"],
+            ], ms=_cm_ms)
     # 2026-11-02：聊天 + 附图 —— 先做本地视觉读数（零出网/零写盘），再决定回读数还是带图上下文对话
     _img = None
     _visual_note = ""
     _ci = None
+    _img_ms = None
     if image:
+        _t_iv = time.perf_counter()
         try:
             from gbt_allinone import chat_image as _ci
             _img = _ci.analyze(image)
         except Exception as _cie:  # noqa: BLE001
             _img = {"ok": False, "error": "%s: %s" % (type(_cie).__name__, str(_cie)[:160])}
+        _img_ms = (time.perf_counter() - _t_iv) * 1000
+        prog.step("读取附图 · " + ("本地视觉 ok" if _img.get("ok") else "本地视觉失败"), [
+            ["读数", str(_img.get("brief") or _img.get("error") or "—")[:220]],
+            ["尺寸", str(_img.get("size") or "—")],
+        ], ms=_img_ms)
     if _img is not None:
         _ask = bool(_ci is not None and _ci.looks_image_question(str(text or "")))
         if not str(text or "").strip() or _ask:
-            return {"ok": bool(_img.get("ok")),
+            _out = {"ok": bool(_img.get("ok")),
                     "text": (_img.get("brief") if _img.get("ok")
                              else "附图读取失败：" + str(_img.get("error"))[:160]),
                     "via": "vision:local", "capability": _img,
                     "elapsed_ms": int((time.time() - t0) * 1000),
                     "context": {"mode": "local-vision", "name": context}}
+            _prog_final(prog, _out)
+            return _out
         _visual_note = "（用户附了一张图，本地视觉读数：%s）\n" % (
             _img.get("brief") if _img.get("ok") else "读取失败：" + str(_img.get("error"))[:120])
     # 2026-11-02：聊天「发送文件」—— 文本/代码读前 N 字，图片转视觉读数，二进制只报元数据（不假装解析）
     _file = None
     _file_note = ""
     _cf = None
+    _file_ms = None
     if file:
+        _t_cf = time.perf_counter()
         try:
             from gbt_allinone import chat_file as _cf
             _file = _cf.analyze(file_name or "附件", file, file_type)
         except Exception as _fe:  # noqa: BLE001
             _file = {"ok": False, "error": "%s: %s" % (type(_fe).__name__, str(_fe)[:160])}
+        _file_ms = (time.perf_counter() - _t_cf) * 1000
+        prog.step("读取附件 · " + str(_file.get("kind") or "file"), [
+            ["读数", str(_file.get("brief") or _file.get("error") or "—")[:220]],
+            ["大小", str(_file.get("bytes") or _file.get("size") or "—")],
+        ], ms=_file_ms)
     if _file is not None:
         _fask = bool(_cf is not None and _cf.looks_file_question(str(text or "")))
         if not str(text or "").strip() or _fask:
@@ -862,18 +1077,34 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
             if _file.get("kind") == "text" and _file.get("preview"):
                 _brief = _brief + "\n\n--- 文件前 %d 字 ---\n%s" % (
                     min(len(_file["preview"]), 3000), _file["preview"][:3000])
-            return {"ok": bool(_file.get("ok")), "text": _brief,
+            _out = {"ok": bool(_file.get("ok")), "text": _brief,
                     "via": "file:" + str(_file.get("kind") or "file"),
                     "capability": _file,
                     "elapsed_ms": int((time.time() - t0) * 1000),
                     "context": {"mode": "local-file", "name": context}}
+            _prog_final(prog, _out)
+            return _out
         _file_note = "（用户附了一个文件，本地读数：%s）\n" % (_file.get("brief") or "读取失败")
+    _screen_path = ""
+    _screen_frames = []
+    _screen_note = ""
+    _screen_meta = {}
     if use_capabilities and _img is None and _file is None and os.environ.get("GBT_CAPABILITY_ROUTER", "1") != "0":
         try:
             from gbt_allinone import capability_router as _CR
             _t_cr = time.perf_counter()
             cap = _CR.run(text, context=context)
             _cr_ms = (time.perf_counter() - _t_cr) * 1000
+            _intent = str(cap.get("intent") or "")
+            prog.step("路由任务 · " + ((_intent + ("/" + str(cap.get("action") or "")))
+                                       if _intent else "四类之外，交下一层"), [
+                # 下一层先是「指挥官安全派发」，派不中才交对话模型；
+                # 旧文案直接写「交给对话模型」会让用户看到「交模型」紧接着又「派发」而困惑。
+                ["判定", "命中能力位，准备真执行" if cap.get("handled") else "不抢话，交下一层（安全派发 / 对话模型）"],
+                ["目标", str(cap.get("target_abs") or cap.get("target") or "—")[:140]],
+                ["说明", (str(cap.get("reason") or "—")
+                          + ("" if cap.get("handled") else "（对话层会先尝试安全派发）"))[:220]],
+            ], ms=_cr_ms)
             if cap.get("handled"):
                 cap.setdefault("context", {"mode": "capability-router", "name": context})
                 cap["elapsed_ms"] = int((time.time() - t0) * 1000)
@@ -882,12 +1113,83 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                 # 两个数都是实测，不是估算；缺一个就少一行，不补假值。
                 cap["ms_route"] = round(_cr_ms, 1)
                 cap["ms_run"] = (cap.get("capability") or {}).get("ms")
-                return cap
+                if cap.get("intent") == "screen" and cap.get("ok"):
+                    _look = (cap.get("capability") or {}).get("看") or {}
+                    _screen_path = str(_look.get("path") or "")
+                    # 视频/连拍：万能插若给了帧序列（frames/paths），按时间序一并送模型
+                    _screen_frames = [str(x) for x in (_look.get("frames") or _look.get("paths") or [])
+                                      if x]
+                    _screen_meta = {"path": _screen_path, "window": _look.get("window"),
+                                    "size": _look.get("size"), "lane": cap.get("lane")}
+                    _n_frames = len(_screen_frames) if _screen_frames else (
+                        1 if _screen_path and pathlib.Path(_screen_path).is_file() else 0)
+                    if _n_frames:
+                        _screen_meta["frames"] = _n_frames
+                        _screen_meta["frames_total"] = max(_n_frames, len(_screen_frames))
+                        _screen_note = ("（刚刚用原生取帧看了屏幕：window=%s，size=%s，共 %d 帧，按时间序。"
+                                        "下面是这些帧的真实像素，请直接看图后再回答；"
+                                        "不要要求用户再描述画面。）\n"
+                                        % (str(_look.get("window"))[:40], _look.get("size"), _n_frames))
+                    else:
+                        # 取屏说成功但帧不在盘上：不许对模型说「下面是真实像素」
+                        _screen_meta["missing"] = True
+                        _screen_note = "（这次没有可用的屏幕帧，模型看不到画面。）\n"
+                    prog.step("原生取帧 · " + ("%d 帧" % _n_frames if _n_frames else "没有可用帧"), [
+                        ["窗口", str(_look.get("window") or "—")[:60]],
+                        ["尺寸", str(_look.get("size") or "—")],
+                        ["帧", ("%d 帧（含连拍）" % _n_frames) if _n_frames else "缺帧，模型看不到画面"],
+                        ["首帧", str(_screen_path or "—")[:160]],
+                    ], ms=cap.get("ms_run"))
+                else:
+                    _prog_final(prog, cap, "交付回执")
+                    return cap
         except Exception as _cap_err:  # noqa: BLE001
             # 路由自己坏了绝不许挡正常对话：降级走模型，但**必须在 stderr 留痕**（不许静默）。
             try:
                 print("[capability_router] 降级：%s: %s" % (type(_cap_err).__name__,
                                                           str(_cap_err)[:200]), file=sys.stderr)
+            except Exception:  # noqa: BLE001
+                pass
+    # ⚡ 指挥官派发（2026-11-07 主人令：「她是指挥官大模型，指挥触手干活为什么还是这样」）。
+    # 此前算子闸门只把候选写进 prompt，模型没有执行权；于是「全量扫描」只会得到一句
+    # 「我会去扫描」。这一段把**安全命令目录**里命中且像命令的句子，直接派出到同一道
+    # `api.run_task` 门，执行回执原样回传；未命中 / 不像命令才继续往下走。
+    # 开关：GBT_COMMANDER_DISPATCH=0。
+    if (use_capabilities and _img is None and _file is None and not _screen_meta
+            and os.environ.get("GBT_COMMANDER_DISPATCH", "1") != "0"):
+        try:
+            from gbt_allinone.tools import commander_dispatch as _CD
+            _t_cd = time.perf_counter()
+            _cd = _CD.resolve(text, gate_result=_g)
+            _cd_ms = (time.perf_counter() - _t_cd) * 1000
+            prog.step("指挥官派发 · " + (("命中 " + _cd["cap"])
+                                       if _cd.get("hit") else "无安全命令"), [
+                ["能力位", str(_cd.get("cap") or "—")],
+                ["op", str(_cd.get("op") or "(默认)")],
+                ["依据", str(_cd.get("why") or "—")[:180]],
+            ], ms=_cd_ms)
+            if _cd.get("hit"):
+                _par = _cd.get("params") or {}
+                prog.step("执行能力位 · " + str(_cd["cap"]), [
+                    ["op", str(_cd.get("op") or "—")],
+                    ["入参", json.dumps(_par, ensure_ascii=False)[:160]],
+                    ["门", "api.run_task（唯一门）"],
+                ], state="running")
+                _ex = _CD.execute(_cd)
+                prog.step("执行能力位 · " + str(_cd["cap"])
+                          + ("完成" if _ex.get("ok") else "未完成"), [
+                    ["结果", "ok" if _ex.get("ok") else "failed"],
+                    ["耗时", "%.1fms" % float(_ex.get("ms") or 0)],
+                ], ms=_ex.get("ms"))
+                _out = _CD.receipt(_cd, _ex, context=context,
+                                   elapsed_ms=int((time.time() - t0) * 1000))
+                _prog_final(prog, _out, "交付回执")
+                return _out
+        except Exception as _cd_err:  # noqa: BLE001
+            # 派发层自己坏了绝不许挡正常对话：降级走原链路，但 stderr 留痕。
+            try:
+                print("[commander_dispatch] 降级：%s: %s"
+                      % (type(_cd_err).__name__, str(_cd_err)[:200]), file=sys.stderr)
             except Exception:  # noqa: BLE001
                 pass
     # ⚡ 脉冲直达（2026-11-04 主人令：「运行不要按照原来的跑法，必须按照触手关联互通
@@ -903,21 +1205,40 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     # 也就是说：只有"这句话明确在问某个只读能力位、且参数齐"才会直达；
     # 摄像头 / 写盘 / 发消息那一类永远走不到这里。
     # 开关：GBT_TACTILE_PULSE=0。
-    if (use_capabilities and _img is None and _file is None
+    # 2026-11-07：看屏已经在上面真取到帧（_screen_meta 非空）时**跳过**这两段只读直达 ——
+    # 否则 `tactile pulse` 会把「看看屏幕」判成 body_eye（不在只读白名单）而回一句 denied，
+    # 帧就永远到不了模型。已经执行过的动作不重复决策。
+    if (use_capabilities and _img is None and _file is None and not _screen_meta
             and os.environ.get("GBT_TACTILE_PULSE", "1") != "0"):
         try:
             from gbt_allinone import tactile_tree as _TT
+            _t_pl = time.perf_counter()
             _pl = _TT.run("pulse", query=text)
+            _pl_ms = (time.perf_counter() - _t_pl) * 1000
+            _pl_cap = str(_pl.get("cap") or _pl.get("candidate") or "—")
+            prog.step("触手直达 · " + ("命中 " + _pl_cap if _pl.get("status") == "ready"
+                                     else "未执行（" + str(_pl.get("status") or "无命中") + "）"), [
+                ["候选", _pl_cap],
+                ["参数", str(_pl.get("params") or "—")[:160]],
+                ["说明", str(_pl.get("why") or "—")[:180]],
+            ], ms=_pl_ms)
             if _pl.get("ok") and _pl.get("status") == "ready":
                 from gbt_allinone import api as _API
                 _par = {"op": _pl["op"]}
                 _par.update(_pl.get("params") or {})
+                _t_plr = time.perf_counter()
                 _env = _API.run_task(_pl["cap"], _par)
+                _plr_ms = (time.perf_counter() - _t_plr) * 1000
                 _bod = _env.get("result") or {}
                 if isinstance(_bod.get("result"), dict):
                     _bod = _bod["result"]
+                prog.step("执行触手位 · " + _pl_cap, [
+                    ["op", str(_pl.get("op") or "—")],
+                    ["门", str(_env.get("status") or "—")],
+                    ["结果", "ok" if _bod.get("ok") else "failed"],
+                ], ms=_plr_ms)
                 if _env.get("ok") and _bod.get("ok"):
-                    return {
+                    _out = {
                         "ok": True,
                         "text": _pulse_text(_pl, _bod),
                         "via": "tactile-pulse",
@@ -928,12 +1249,14 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                         "elapsed_ms": int((time.time() - t0) * 1000),
                         "context": {"mode": "tactile-pulse", "name": context},
                     }
+                    _prog_final(prog, _out)
+                    return _out
             elif _pl.get("status") == "denied":
                 # 实测教训（2026-11-04）：pulse 正确拒绝了「打开摄像头拍一张」
                 # （不在只读白名单），但拒绝之后没人接 —— 句子继续往下掉进对话模型，
                 # 实测 **128.6 秒**才回一句，而它本来只需要说"这个要授权"。
                 # 所以拒绝也要秒回：告诉用户识别到了什么、为什么没执行、怎么手动执行。
-                return {
+                _out = {
                     "ok": True,
                     "text": "\n".join([
                         "⚡ 识别到你在说 `%s`（触手树图查询 %sms）。"
@@ -950,6 +1273,8 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                     "elapsed_ms": int((time.time() - t0) * 1000),
                     "context": {"mode": "tactile-deny", "name": context},
                 }
+                _prog_final(prog, _out, "交付回执")
+                return _out
         except Exception as _pl_err:  # noqa: BLE001
             # 直达自己坏了也不许挡对话：降级走原链路，但 stderr 留痕
             try:
@@ -969,7 +1294,7 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     # 旧版按「观测类邻域」放行，这 5 句会被直接执行（血账见 brain_exec 白名单注释）。
     # 派发仍走 `api.run_task`，缺票如实 denied，不包装成 failed。
     # 开关：GBT_METHOD_LANE=0。
-    if (use_capabilities and _img is None and _file is None
+    if (use_capabilities and _img is None and _file is None and not _screen_meta
             and os.environ.get("GBT_METHOD_LANE", "1") != "0"):
         try:
             from gbt_allinone import brain_exec as _BE
@@ -977,6 +1302,12 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
             _mf = _BE._method_lane(text)
             _mm = ((_mf or {}).get("best") or {}).get("method")
             _mf_ms = (time.perf_counter() - _t_mf) * 1000
+            _margin = ((_mf or {}).get("method_fast") or {}).get("margin")
+            prog.step("方法直达 · " + (str(_mm) if _mm else "未命中（交对话模型）"), [
+                ["方法", str(_mm or "—")],
+                ["余量", str(_margin if _margin is not None else "—")],
+                ["门", "只读白名单（全零参数）"],
+            ], ms=_mf_ms)
             if _mm:
                 from gbt_allinone import api as _API2
                 _t_run = time.perf_counter()
@@ -987,24 +1318,30 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                     _bod2 = _bod2["result"]
                 _miss2 = _method_block_state(
                     _env2, _bod2 if isinstance(_bod2, dict) else {})
+                prog.step("执行触手方法 · " + str(_mm), [
+                    ["门", str(_env2.get("status") or "—")],
+                    ["结果", "ok" if (isinstance(_bod2, dict) and _bod2.get("ok")) else _miss2["state"]],
+                ], ms=_run_ms)
                 if _env2.get("status") == "ok" and isinstance(_bod2, dict) and _bod2.get("ok"):
-                    return {
+                    _out = {
                         "ok": True,
                         "text": _method_text(_mm, _bod2, _mf, _mf_ms),
                         "via": "method-direct",
                         "capability": {"cap": "tentacle", "method": _mm,
                                        "gate": "read_only_whitelist",
-                                       "margin": ((_mf or {}).get("method_fast") or {}).get("margin")},
+                                       "margin": _margin},
                         "method_result": _method_slim(_bod2),
                         "ms_route": round(_mf_ms, 1), "ms_run": round(_run_ms, 1),
                         "elapsed_ms": int((time.time() - t0) * 1000),
                         "context": {"mode": "method-direct", "name": context},
                     }
+                    _prog_final(prog, _out)
+                    return _out
                 if _miss2["state"] in ("denied", "needs_dependency"):
                     # 2026-11-04 教训（pulse 分支实测 128.6 秒）：识别对了、只是没票或缺件，
                     # 就别掉进模型 —— 那要 20 秒以上才说一句"要授权"。
                     # 真失败（state=failed）**不在这里返回**：模型也许能救，交给后面。
-                    return {
+                    _out = {
                         "ok": True,
                         "text": "\n".join([
                             "⚡ 识别到这是触手方法 `%s`（本地 %.1fms），但**没有执行**。" % (_mm, _mf_ms),
@@ -1018,6 +1355,8 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                         "elapsed_ms": int((time.time() - t0) * 1000),
                         "context": {"mode": "method-" + _miss2["state"], "name": context},
                     }
+                    _prog_final(prog, _out, "交付回执")
+                    return _out
         except Exception as _mf_err:  # noqa: BLE001
             # 直达自己坏了绝不许挡对话：降级走原链路，但 stderr 留痕
             try:
@@ -1035,8 +1374,10 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     # 要真执行得先有只读白名单 + 授权设计，不许拿这个字段凑合。
     # 开关：GBT_TACTILE_HINT=0。图没建 / 坏了 / 慢了一律静默降级，绝不许挡正常对话。
     _tactile = None
+    _th_ms = None
     if (use_capabilities and _img is None and _file is None
             and os.environ.get("GBT_TACTILE_HINT", "1") != "0"):
+        _t_th = time.perf_counter()
         try:
             from gbt_allinone import tactile_tree as _TT
             _h = _TT.run("hint", query=text, topk=5)
@@ -1048,6 +1389,13 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                                                       str(_tt_err)[:200]), file=sys.stderr)
             except Exception:  # noqa: BLE001
                 pass
+        _th_ms = (time.perf_counter() - _t_th) * 1000
+        _th_top = [x for x in ((_tactile or {}).get("top") or [])[:4]
+                   if isinstance(x, dict) and x.get("node")]
+        prog.step("触手提示 · " + ("命中 %d 位" % len(_th_top) if _th_top else "无稳妥候选"), [
+            ["候选", " / ".join(str(x.get("node")) for x in _th_top) or "—"],
+            ["置信", "confident" if _tactile else "弃权（不硬套）"],
+        ], ms=_th_ms)
     m = _settings_load().get("model") or {}
     _tactile_note = ""
     if _tactile:
@@ -1057,7 +1405,16 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     # 候选提示二选一：算子闸门有策展词证据（更硬）就用它；它弃权才退回触手树。
     # 两句同时塞进去只会互相打架，还会让本机 1.16 tok/s 的模型更慢。
     _cand_note = (_operator or {}).get("note") or _tactile_note
-    prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + _commission + _cand_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
+    _t_pp = time.perf_counter()
+    prompt_text = GBT_PERSONA + "\n\n" + _visual_note + _file_note + _commission + _screen_note + _cand_note + "用户说：" + str(text) + "\n\n（请始终以小土豆的身份回答，不要自称其他模型。）"
+    _pp_ms = (time.perf_counter() - _t_pp) * 1000
+    prog.step("组装提示词 · %d 字" % len(prompt_text), [
+        ["人设", "GBT_PERSONA"],
+        ["附图读数", "有" if _visual_note else "无"],
+        ["附件读数", "有" if _file_note else "无"],
+        ["屏幕帧", str(_screen_meta.get("frames") or 0) + " 帧" if _screen_meta else "无"],
+        ["候选提示", (_cand_note[:60] + "…") if _cand_note else "无"],
+    ], ms=_pp_ms)
     # 2026-11-02 主人令：Agnes 只做“反向调用云端算力”，不是聊天模型；
     # 聊天永远先用我们自己的本机权重。除非显式 GBT_ALLOW_EXTERNAL_MODEL=1，否则不允许外部模型接聊天。
     # 2026-11-06 主人令（改）：付费云端为主，**停了自动切本机**；切了必须标明，不许冒充。
@@ -1070,17 +1427,37 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
     _free = _settings_load().get("free") or {}
     if (_free.get("enabled") and _free.get("base_url") and _free.get("name")
             and os.environ.get("GBT_ALLOW_FREE_MODEL", "1") != "0"):
+        prog.step("免费车道 · 调用 " + str(_free.get("name") or "free"), [
+            ["端点", _model_url(_free.get("base_url"))],
+            ["帧", ("%d 帧" % len(_screen_frames)) if _screen_frames else
+                   ("单帧" if _screen_path else "纯文字")],
+        ], state="running")
+        _t_fr = time.perf_counter()
         try:
-            _fr = _openai_chat(prompt_text, _free)
+            _fr = _openai_chat(prompt_text, _free, image_path=_screen_path,
+                               image_paths=_screen_frames)
         except Exception as e:  # noqa: BLE001
             _fr = {"ok": False,
                    "error": "free_error: %s: %s" % (type(e).__name__, str(e)[:160])}
+        _fr_ms = (time.perf_counter() - _t_fr) * 1000
+        prog.step("免费车道 · " + ("返回 " + str((_fr.get("usage") or {}).get("completion_tokens") or "?") + " tok"
+                                   if _fr.get("ok") else "失败，转下一车道"), [
+            ["结果", "ok" if _fr.get("ok") else "failed"],
+            ["说明", str(_fr.get("error") or "已收到回包")[:180]],
+        ], ms=_fr_ms)
         if _fr.get("ok"):
-            _fr["via"] = "free:" + str(_free.get("name") or "")
+            _fr = _mark_frame_degraded(_fr, _screen_meta,
+                                       "帧没送上免费车道（文件缺失或超过 6MB），模型只看到文字")
+            _fr["via"] = ("free:" + str(_free.get("name") or "")
+                          + ("+frames" if (_fr.get("images_sent") or 0) > 1 else
+                             "+frame" if _fr.get("image_sent") else ""))
+            if _screen_meta:
+                _fr["frame"] = _screen_meta
             _fr["lane"] = {"active": "free", "model": _free.get("name"),
                            "endpoint": _model_url(_free.get("base_url"))}
             _fr.setdefault("context", {"mode": "user-model", "name": context})
             _fr["elapsed_ms"] = int((time.time() - t0) * 1000)
+            _prog_final(prog, _fr)
             return _fr
         _free_fail = str(_fr.get("error") or "")[:200]
         _lane = {"active": "local",
@@ -1096,17 +1473,37 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                      "why": "云端冷却中（%ss 后重试），直接走本机" % _cool.get("left_s"),
                      "cooling": _cool}
         else:
+            prog.step("云端车道 · 调用 " + str(m.get("name") or "cloud"), [
+                ["端点", _model_url(m.get("base_url"))],
+                ["帧", ("%d 帧" % len(_screen_frames)) if _screen_frames else
+                       ("单帧" if _screen_path else "纯文字")],
+            ], state="running")
+            _t_cr2 = time.perf_counter()
             try:
-                _cr = _openai_chat(prompt_text, m)
+                _cr = _openai_chat(prompt_text, m, image_path=_screen_path,
+                                   image_paths=_screen_frames)
             except Exception as e:  # noqa: BLE001
                 _cr = {"ok": False,
                        "error": "model_error: %s: %s" % (type(e).__name__, str(e)[:160])}
+            _cr2_ms = (time.perf_counter() - _t_cr2) * 1000
+            prog.step("云端车道 · " + ("返回 %s tok" % ((_cr.get("usage") or {}).get("completion_tokens") or "?")
+                                       if _cr.get("ok") else "失败，转本机"), [
+                ["结果", "ok" if _cr.get("ok") else "failed"],
+                ["说明", str(_cr.get("error") or "已收到回包")[:180]],
+            ], ms=_cr2_ms)
             if _cr.get("ok"):
+                _cr = _mark_frame_degraded(_cr, _screen_meta,
+                                           "帧没送上云端（文件缺失或超过 6MB），模型只看到文字")
                 _cloud_note(True, model=str(m.get("name") or ""))
-                _cr["via"] = "cloud:" + str(m.get("name") or "")
+                _cr["via"] = ("cloud:" + str(m.get("name") or "")
+                              + ("+frames" if (_cr.get("images_sent") or 0) > 1 else
+                                 "+frame" if _cr.get("image_sent") else ""))
+                if _screen_meta:
+                    _cr["frame"] = _screen_meta
                 _cr["lane"] = {"active": "cloud", "model": m.get("name")}
                 _cr.setdefault("context", {"mode": "user-model", "name": context})
                 _cr["elapsed_ms"] = int((time.time() - t0) * 1000)
+                _prog_final(prog, _cr)
                 return _cr
             _fail = _cloud_note(False, reason=str(_cr.get("error") or "")[:160],
                                 model=str(m.get("name") or ""))
@@ -1117,19 +1514,52 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                                   "cooldown_until": _fail.get("cooldown_until"),
                                   "cooldown_s": CLOUD_COOLDOWN_S}}
     _via = "local:fallback" if _lane.get("fallback") else "local"
+    prog.step("本机 omni 引擎 · 生成中", [
+        ["车道", _via + ":omni"],
+        ["说明", str(_lane.get("why") or "本机权重优先")[:160]],
+    ], state="running")
+    _t_om = time.perf_counter()
     try:
         from gbt_allinone import omni_plug as _OP
         _or = _OP.plug_and_run("engine", kind="ai", args={"prompt": prompt_text, "max_tokens": 512}, timeout=300)
         if _or.get("ok") and _or.get("text"):
-            return {"ok": True, "text": _or.get("text"), "via": _via + ":omni",
+            _om_ms = (time.perf_counter() - _t_om) * 1000
+            prog.step("本机 omni 引擎 · 返回", [
+                ["结果", "ok"],
+                ["说明", "本机 ai 引擎只吃文字，屏幕帧未送进模型" if _screen_meta else "已返回正文"],
+            ], ms=_om_ms)
+            _out = {"ok": True, "text": _or.get("text"), "via": _via + ":omni",
                     "lane": _lane,
-                    "ms": int((time.time() - t0) * 1000), "context": {"mode": "omni-ai-engine", "name": context}}
+                    "ms": int((time.time() - t0) * 1000),
+                    "context": {"mode": "omni-ai-engine", "name": context}}
+            _out = _mark_frame_degraded(_out, _screen_meta,
+                                        "本机 omni ai 引擎只吃文字，帧没有送进模型")
+            _prog_final(prog, _out)
+            return _out
+        prog.step("本机 omni 引擎 · 不可用，转 energy_core", [
+            ["结果", "failed"],
+            ["说明", str(_or.get("error") or "空回包")[:180]],
+        ], ms=(time.perf_counter() - _t_om) * 1000)
     except Exception:  # noqa: BLE001
-        pass
+        prog.step("本机 omni 引擎 · 不可用，转 energy_core", [
+            ["结果", "failed"], ["说明", "插件调用异常，已降级"],
+        ], ms=(time.perf_counter() - _t_om) * 1000)
     from gbt_allinone import energy_core as E
+    prog.step("本机权重 · 生成中", [
+        ["车道", _via + ":energy_core"],
+        ["策略", "temperature=0 · max_tokens=512 · 有界窗口"],
+    ], state="running")
+    _t_ec = time.perf_counter()
     r = E.think([{"role": "system", "content": GBT_PERSONA},
                  {"role": "user", "content": prompt_text}], temperature=0.0,
                 max_tokens=512, timeout=300, context=context, label="console-web")
+    _ec_ms = (time.perf_counter() - _t_ec) * 1000
+    _ec_tok = (r.get("usage") or {}).get("completion_tokens")
+    prog.step("本机权重 · " + ("返回 " + str(_ec_tok) + " tok" if r.get("ok") else "失败"), [
+        ["结果", "ok" if r.get("ok") else "failed"],
+        ["tokens", str(_ec_tok if _ec_tok is not None else "—")],
+        ["说明", str(r.get("error") or "temperature=0 · 稳定输出")[:180]],
+    ], ms=_ec_ms)
     out = {"ok": bool(r.get("ok")), "text": r.get("text"),
            "error": r.get("error"), "ms": r.get("ms"),
            "usage": r.get("usage"), "context": r.get("context"),
@@ -1137,6 +1567,10 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
            "policy": {"temperature": 0.0, "max_tokens": 512,
                       "unlimited_context": True,
                       "note": "模型只看有界窗口；全量历史落 sqlite 可 recall"}}
+    if _screen_meta and "frame" not in out:
+        _mark_frame_degraded(out, _screen_meta,
+                             "模型车道没有收下这一帧（不支持图片或全部失败）；"
+                             "帧路径已留，不假装模型看见")
     try:
         from gbt_allinone.llm import ring_context as RC
         rc = RC.RingContext(name=context)
@@ -1153,6 +1587,7 @@ def _chat(text: str, context: str = CONTEXT_NAME, use_capabilities: bool = True,
                           "latency_ms": _tactile.get("latency_ms"),
                           "seeds": _tactile.get("seeds")}
     out["elapsed_ms"] = int((time.time() - t0) * 1000)
+    _prog_final(prog, out)
     return out
 
 
@@ -2583,6 +3018,61 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:  # noqa: BLE001
             return
 
+    def _chat_stream(self, **kw):
+        """POST /api/chat 的 SSE 版：每跨一个阶段就推一条 step，最后推 final。
+
+        2026-11-07 主人令：「她开始执行任务每一步都要能看到她在干嘛执行到哪里」。
+        为什么不用 WebSocket：请求体已读完，SSE 在 ThreadingHTTPServer 上够用；
+        断线只中止这一轮，不影响下一条消息。
+        """
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("Connection", "close")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.close_connection = True
+        q = queue.Queue()
+        seen = []
+
+        def emit(rec):
+            seen.append(rec)
+            q.put({"type": "step", **rec})
+
+        def work():
+            try:
+                res = _chat(on_step=emit, **kw)
+            except Exception as e:  # noqa: BLE001
+                res = {"ok": False,
+                       "error": "%s: %s" % (type(e).__name__, str(e)[:200])}
+            if isinstance(res, dict):
+                res = dict(res)
+                res.setdefault("steps", seen)
+            q.put({"type": "final", "result": res})
+
+        threading.Thread(target=work, daemon=True).start()
+        while True:
+            try:
+                item = q.get(timeout=10)
+            except queue.Empty:
+                item = None
+            if item is None:
+                try:
+                    self.wfile.write(b": ping\n\n")
+                    self.wfile.flush()
+                except (BrokenPipeError, ConnectionResetError, OSError):
+                    return
+                continue
+            try:
+                payload = json.dumps(item, ensure_ascii=False)
+                self.wfile.write(("data: " + payload + "\n\n").encode("utf-8"))
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError, OSError):
+                return
+            if item.get("type") == "final":
+                return
+
     def do_POST(self):  # noqa: N802
         path = urllib.parse.urlparse(self.path).path
         n = int(self.headers.get("Content-Length") or 0)
@@ -3321,14 +3811,17 @@ class Handler(BaseHTTPRequestHandler):
             text = str(body.get("text") or "").strip()
             if not text and not body.get("image") and not body.get("file"):
                 return self._json({"ok": False, "error": "user_error: 需要 text / image / file"}, 400)
+            _kw = dict(text=text, context=str(body.get("context") or CONTEXT_NAME),
+                       use_capabilities=body.get("capability") is not False,
+                       image=body.get("image"),
+                       image_name=str(body.get("image_name") or ""),
+                       file=body.get("file"),
+                       file_name=str(body.get("file_name") or ""),
+                       file_type=str(body.get("file_type") or ""))
+            if body.get("stream") is True:
+                return self._chat_stream(**_kw)
             try:
-                return self._json(_chat(text, str(body.get("context") or CONTEXT_NAME),
-                                        use_capabilities=body.get("capability") is not False,
-                                        image=body.get("image"),
-                                        image_name=str(body.get("image_name") or ""),
-                                        file=body.get("file"),
-                                        file_name=str(body.get("file_name") or ""),
-                                        file_type=str(body.get("file_type") or "")))
+                return self._json(_chat(**_kw))
             except Exception as e:  # noqa: BLE001
                 return self._json({"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:160])}, 500)
         return self._json({"ok": False, "error": "not found"}, 404)

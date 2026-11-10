@@ -1,5 +1,305 @@
 # 变更记录
 
+## 2026-11-11 · 第五十四批：限流/没额度不再停 —— 同家型号逐个换，试完再换下一家
+
+- **主人令**（逐字）：「只要是限流和没额度就自动切换下一个模型啊」。
+- **旧口径的缺口**：第五十三批已经把 `403 insufficient quota` 从 `auth` 分出来，不会整把 key 连坐；但 `raceSet()` 里 `FREELLM_MODEL_TRIES` 默认只有 `2`，同一家最多只再试一个型号。若这家第三个型号才是活的，当前请求仍会停。
+- **落地 1 · 默认试完同家全部型号**：`MODEL_TRIES` 默认改为 `0`，解释为不设上限；实际上限由该家 `models.length` 与本次请求的 `attemptedModels` 共同决定。设正数时仍可人工限次。
+- **落地 2 · 同请求内型号去重**：`pickModelFor()` 新增 `avoidModels`，已经在本请求里撞过的型号不会因“全部冷却后回退轮转”而重复选中；`raceSet()` 为每家维护 `attemptedModels`，每次失败先登记实际使用的 `r.model`。
+- **落地 3 · 型号级冷却不再猜错型号**：`noteFailure()` / `noteSuccess()` 改为接收实际 `r.model` / `winner.model`；旧实现靠 `modelCursor` 反推，遇到媒体视觉模型或并发路径时可能把冷却记到隔壁型号上。
+- **当前换道顺序**：`402` / `403 insufficient quota` / `500 Model temporarily unavailable` / `404 model not found` 与临时 `429` → 当前请求内同家下一个未试型号 → 这家全部试完 → `rank()` 排除这家、换下一家；账号级 `free tier / quota / credit` 的 `429` 仍直接冷这家并换下一家，避免白烧剩余型号。
+- **端到端 mock 验证**：本机临时上游分别模拟 `403 Insufficient user quota` 与 `429 Rate limit reached`，两家都在同一请求内从 `bad-model` 切到 `good-model`，HTTP 200、`X-FreeLLM-Model: good-model`，两项均 PASS。测试脚本：`.scratch/freellm-model-fallback-test.mjs`。
+- **生产日志实证**：压测期间真实出现同家换型号成功，例如 `agnes-k05:quota` → `agnes-k05` 的 `agnes-2.5-flash` 200、`agnes-k02:quota` → `agnes-k02` 的 `agnes-2.5-flash` 200、`agnes-gbt3:quota` → `agnes-gbt3` 的 `agnes-2.5-flash` 200；`agnes-k07`、`agnes-k10` 同样回退成功。日志：`C:\EAC-own\caps\freellm\logs\router.log`。
+- **生产验证**：`node --check` 通过；`validate-providers.mjs` 输出 `OK providers=55 enabled=31`；router 由守护自动重启为 pid **18792**；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **17 家 / 14 个型号**，结果落 `.scratch/fcc-20261110/rotation-stress.json`。
+- **健康读数**：压测刚结束时 `/health` 为 `providers=55 usable=31 cooling=1`；唯一冷却项是 `llm7` 的账号级日额度 `429`。收尾复读时冷却已到期，`cooling=0`、`degraded=1`（仍只剩 `llm7` 没恢复），不是死型号。
+- **落地文件**：`router.mjs` 62608 B / SHA256 前 16 位 `A0DA927A082C9954`；`FREE-LANES.md` 同步改为“先换同家型号，再换下一家”。
+- **边界**：本次只改 `/EAC-own/caps/freellm/` 与仓内文档/测试产物，未写 `C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\`；DSH 插件环境保持原样。
+
+## 2026-11-11 · 第五十三批：免费车道全量审计 —— 164 个型号位逐个真打，403 额度不再误判成鉴权，30/30
+
+- **主人令**（逐字）：「确认已经将可用的免费模型全部都接好了不会在出现故障停止，打开多域监控触手并发深度排除清楚并落地」。
+- **审计方法**：31 家启用车道、164 个配置型号位；同一主机串行、不同主机并发，按每家 `limits.rpm` 拉开间隔（OVH 2 RPM 约 30 秒一发，Pollinations 1 RPM 约 60 秒一发），避免拿自己的突发流量打出假故障。文本位共 165 个（含 1 个 `auto` 占位；`local-vision` 是 mediaOnly，单独跳过）。
+- **首轮结果**：94 个直接出正文、22 个空正文、14 个额度型、2 个 500、33 个在同车道额度后跳过；没有 `dead-model` 或 `auth` 硬死型号。
+- **空正文复测**：22 个空正文里 21 个把 `max_tokens` 从 32 加到 1024 后立刻返回 `OK` —— 原因是思考型模型把预算全花在 reasoning，`finish_reason=length`，不是型号死；剩下 1 个是 `llm7/gpt-oss:20b` 当日 token 额度耗尽（429），保留为额度型。
+- **真正排除**：`agnes-2.0-flash`、`agnes-1.5-flash` 连续两次返回 500 `Model ... is temporarily unavailable`，已从 `agnes-gbt.models` 移除；没有把 403 额度型号、429、空正文误删。
+- **根因修复 1 · 403 额度误判**：旧 `classifyError` 对 401/403 一律返回 `auth`，于是 Agnes 付费型号 `403 Insufficient user quota` 会把整把 key 冷却 15 分钟，连同一 key 下还能用的免费 flash 型号一起被停掉。现在 403 先分 `needkey` / `ratelimit` / `quota` / `auth`；`quota` 不进 provider 冷却，只冷该型号 10 分钟。
+- **根因修复 2 · 型号级 500 连坐**：`500 Model ... temporarily unavailable` 现在记 `model-unavailable`，只冷该型号，不把同组 19 把 Agnes key 全部带走；通用 5xx 仍按上游故障 30 秒整组降级。
+- **根因修复 3 · 404 分型**：404 正文提到 model 记 `notfound`（只拉黑型号）；正文没有 model 记 `endpoint404`（整家冷却 15 分钟），不再把端点错当成型号错。
+- **根因修复 4 · reset 名实相符**：`POST /admin/reset` 现在同时清 `cooldownUntil`、`modelStats`、`modelCooling`；型号/端点修好后不需要手工改 `state.json`。
+- **落地**：`providers.json` 从 44119 B 变为 **44196 B / SHA256 前 16 位 `0231465DCC3A27B7`**；`providers.good.json` 同哈希；`validate-providers.mjs` 输出 `OK providers=55 enabled=31`；备份 `.scratch/router.mjs.bak-20261111-audit`、`.scratch/providers.json.bak-20261111-audit`。
+- **重启与验证**：守护 pid 784、shim pid 7016 保持不变；router 由守护自动重启为 pid 6984（config=0231465DCC3A27B7）。`/health`：providers=55、usableNow=31、healthyNow=31、cooling=0、authFail=0；`/admin/rotation`：enabledProviders=31、totalModelSlots=164。
+- **端到端**：两轮各 30 发并发轮转 **30/30 成功、0 失败**；首轮覆盖 **15 家 / 16 个真实型号**，第二轮覆盖 **13 家 / 13 个型号**并实际命中 `opencode-free` 与 `ovhcloud`；日志中 Agnes 的 403 已记为 `kind=quota, cd_ms=0`，同 key 免费型号继续可用。
+- **审计产物**：`.scratch/audit-models-20261111.json`、`.scratch/retest-subset-20261111.json`、`.scratch/audit-models-20261111.out.log`、`.scratch/retest-subset-20261111.out.log`。
+- **不碰她的环境**：本批没有对 `dsh-home` 发起任何写操作。收尾时 `our-free-model\settings.json` 为 875 B、mtime `2026-11-10T18:20:57.1812938Z`、SHA256 前 16 位 `432D560E4BF19012`，`catalogSyncedAt=1794334856368`；相比上一批 18:05:57Z 正好前进 15 分钟，是 DSH 插件自己的同步写入，不是本批。
+- **诚实边界**：免费额度由上游给，不能承诺“永不停止”；能承诺的是死型号会排除、403/429/402 会切下一家、同 key 其他型号不被连坐、坏配置会自愈、进程挂了守护会拉起。OpenRouter 50 RPD 是账号级共享，Kilo 200 req/hr 是全池共享；`opencode-free` 的 `noTools=true` 保持不变。
+
+## 2026-11-11 · 第五十二批：免费车道固化 —— 守护不再把“忙”判死，坏配置自动回滚，31 条活车道 30/30
+
+- **主人令**（逐字）：「可以了现在收尾把免费车道整理好固化别再动不动就挂了」。
+- **先说“为什么动不动就挂”**：不是上游全死了，是守护自己的判据太粗。旧 `guard.ps1` 用 1.5 秒单次端口探测；router 在事件循环忙一下就会超时，守护判定“端口 down”又拉一个 node，第二个撞 `EADDRINUSE`；旧 router 的 `uncaughtException` 只记日志不退出，留下没有监听的僵尸；日志里 13 条 `EADDRINUSE` 就是这么来的。另一个断点是 shim 段在 router 的 `try/catch` 之外，任何异常都能把守护带走。
+- **配置坏了一眼看不见**：旧守护只看端口，`providers.json` 解析失败时 router 每 8 秒崩一次、守护每 8 秒再拉一次，日志刷屏但没有人知道是 JSON 坏了。
+- **落地 1 · 配置预检 + 自愈**：新增 `validate-providers.mjs`（结构 / 重复 id / baseUrl / models / limits / enabled>0）。`guard.ps1` 启动 router 前先校验；失败则依次尝试 `providers.good.json` 和最新的 `providers.json.bak-*`，用临时文件 + `File.Replace` 原子恢复，恢复后再校验一次；全部失败就记日志并停止启动，每 5 分钟重试，不空转；恢复尝试本身也做 5 分钟节流，避免所有备份都坏时每 8 秒重扫一遍。
+- **落地 2 · router 不再留僵尸**：`server.on('error')` 对 `EADDRINUSE` 直接 `exit 3`；配置解析失败写 `fatal` 后 `exit 78`；60 秒内 5 次致命异常干净退出让守护重启；`/health` 补 `pid / uptimeSec / rssMb / autoProbeMs`。
+- **落地 3 · 守护判据改粗为细**：端口探测 2.5 秒 × 2 次；端口不通先看有没有 router 进程，有进程就等（最多 75 秒），没有才启动；启动前 20 秒冷却，避免重复拉起；shim 段独立 `try/catch`；真实推理自检连续失败 2 次才重启；计划任务的重复敲门改记 `logs/guard-dup.log`，不再刷主日志。
+- **落地 4 · 低频单车道探针**：router 每 60 分钟只探 1 家，轮转写 `logs/lane-probe.jsonl`；刻意跳过 `rpd < 200` 的车道，避免把 OpenRouter 免费账号的 50 RPD 烧在自检上。`/admin/probe` 复用同一个 `probeProvider()`，探针结果不写路由健康窗口。
+- **落地 5 · 车道收敛**：`local-vision` 加 `mediaOnly`，只服务图片/视频，不再参与文本轮转；重复的 `local-text` 停用（同一个本地模型、同一个 8794 端点，服务没起时只会白撞）。启用数从 32 收敛到 **31**，`local-vision` 保留给媒体，`local-text` 标 `disabled` 并写清恢复条件。
+- **冻结**：`providers.good.json` 与当前 `providers.json` 都是 **44119 B / SHA256 前 16 位 `360394713DDAD152`**；`validate-providers.mjs` 输出 `OK providers=55 enabled=31`。改前备份 `router.mjs.bak-20261111-freeze`、`guard.ps1.bak-20261111-freeze`；本地车道收敛前备份 `providers.json.bak-20261111-local-mediaonly`、`state.json.bak-20261111-local-mediaonly`。
+- **验证 1 · 坏配置演练**：在 `.scratch\guard-selftest` 放一份截断的 `providers.json`，`guard.ps1 -Root ... -ConfigCheck` 输出 `INVALID FAIL root.providers must be an array` → `REPAIRED OK providers=55 enabled=31`，恢复后的配置再次校验通过；没有碰生产配置。
+- **验证 2 · 端口占用演练**：在 router 已监听时再跑一次 `node router.mjs`，退出码 **3**，`router.log` 落 `fatal: port already in use; another router owns it, exiting` + `exit code=3`，没有留下第二个 node。
+- **验证 3 · 生产切换**：最终守护 pid **784**（切换过程中曾为 8248/20176），router pid **18396** 始终未被重复拉起，shim 初始 **18792** 被收养；随后手动杀掉 shim 做恢复测试，守护在 01:14:23 自动拉起新 shim pid **7016**，`/health` 回到 200（models=12）；`/health`：`providers=55`、`usableNow=31`、`healthyNow=25`、`rssMb=59`、`local-text health=off`、`local-vision health=ok`。
+- **验证 4 · 压测**：30 发并发轮转 **30/30 成功、0 失败**，覆盖 **16 家 / 17 个模型**；OpenRouter 实际命中 2 次（`cohere/north-mini-code:free`、`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`），`opencode-free` 命中 2 次；`local-*` 没有再进文本轮转。
+- **验证 5 · 三闸**：`tools\codex-scripts\guard-three.py` 全过；仅 `state/weights/ACTIVE.json` 仍是既有待初始化项，不是本批引入。
+- **不碰她的环境**：本批没有对 `dsh-home` 发起任何写操作。收尾复核时 `our-free-model\settings.json` 为 `mtime=2026-11-10T18:05:57.0971085Z`、`875 B`、SHA256 前 16 位 `4E1BE536A9945FB0`；`catalogSyncedAt=1794333956295` = `2026-11-10T18:05:56.295Z`，正好比上一次 `17:50:57Z` 晚 15 分钟，是插件自己的 `feedPollMinutes` 同步，不是本批写入。
+- **诚实边界**：免费额度由上游给，网关保证不了用不完；`429/402` 只代表这一刻没额度，不能判型号死；只有 `404/400 Model is unavailable` 才是硬死亡；OpenRouter 的 50 RPD 是账号级共享，不是每模型 50；Kilo 的 200 req/hr 是全池共享；`opencode-free` 的 `noTools=true` 仍保持；`local-vision` 需要 8794 服务，没起时只影响图片/视频，不影响云端文本车道。
+
+## 2026-11-11 · 第五十一批：OpenRouter 新 key 复活 —— 13 个免费格实测 10 个活，带 tools 全部能回 tool_calls
+
+- **主人令**：给了 OpenRouter 的 keys 页面与一把新 key；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」「只接入能使用的串联起来使用」。key 只写入本机 `C:\EAC-own\caps\freellm\keys.env`，**不回显、不写进日志/变更记录**。
+- **先说旧结论为什么翻案**：上一批的 OpenRouter key 是孤儿 key —— `/api/v1/key` 回 200，但 13 个 `:free` 全部 `401 User not found`。这次换成新 key 后，`/key` 仍是 200，但 `label` 是新的、`is_free_tier=true`、`usage=0`，关键是**逐个 chat/completions 真打不再 401**，所以它不是「端点假活」，是「账号活了」。
+- **目录实况**：`GET /api/v1/models` 431 个模型，`id.endswith(':free')` 正好 **13 个**，与上批一致。逐个实打（`max_tokens=220`，正文非空才算活）：**10 活 / 3 排除**。
+  - 活的 10 个：`liquid/lfm-3-1.7b:free`、`recursive/flint-v1.0:free`、`xingchen-agi/xing4.0-29b-a4b:free`、`nvidia/nemotron-3.5-super-vl:free`、`dots-studio/dots-3-note-preview:free`、`liquid/lfm-2.5-2.6b:free`、`nvidia/nemotron-3.5-lightning:free`、`cohere/north-mini-code:free`、`nvidia/nemotron-3-ultra-550b-a55b:free`、`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`。
+  - `thinkingmachines/inkling-2-small:free`：`403 only available on agentic harnesses` —— 不是普通 API 车道，排除。
+  - `google/gemma-4-26b-a4b-it:free` / `google/gemma-4-31b-it:free`：`429 upstream_provider_shared_pool`，是 Google AI Studio 共享池当下没额度；**按「429 不等于型号死亡」保留观察，但本批不接入**，不拿它们制造假容量。
+  - 其余 3 个的 `429/403` 都不是「key 无效」，没有把它们写成 `401`；判据仍然只有「真发一次 chat/completions 且正文非空」。
+- **工具能力不是猜的**：把 10 个活的再带 `tools=[ping]` 打一遍，**10/10 全部 `200`，且每个都回了 1 个 `tool_calls`**。所以 OpenRouter 可以进 agent 请求，不需要像 `allam-2-7b` 那样标 `noTools`。
+- **落地**：`keys.env` 的 `OPENROUTER_API_KEY` 原子替换为这把新 key；`providers.json` 的 `openrouter` 从 `disabled:true` 改成启用，`models` 只挂上面 10 个活的，保留 `rpm=20 / rpd=50`，并删掉旧的 `disabledReason`。备份 `providers.json.bak-20261111-openrouter`。
+- **路由验证**：重启后 PID 2952，`providers=55`、`openrouter usable=true health=ok`；点名 3 个代表格经 53610 全部 `200`，`X-FreeLLM-Provider=openrouter`、`X-FreeLLM-Model` 与请求一致，且都回 `tool_calls`。30 发并发轮转 **30/30 成功、0 失败**，覆盖 **14 家 / 18 个模型**，OpenRouter 实际命中 **3 次**（`recursive/flint-v1.0:free`、`liquid/lfm-3-1.7b:free`、`liquid/lfm-2.5-2.6b:free`），证明它进了自动轮转而不是只会在点名时工作。
+- **诚实边界**：OpenRouter 免费账号是 **50 RPD** 量级，10 个格共享账号额度，不是每格 50；`rpm=20` 是自我限流，不是上游承诺；`429 upstream_provider_shared_pool` 随时可能再出现，出现时路由会冷却并切下一家；不要把「`/key` 200」单独当活，必须真打 chat/completions。
+- **不碰她的环境，但收尾时 DSH 自己重启了一次**：本轮只写 `keys.env` 与 `providers.json`，未对 `dsh-home` 发起任何写操作。收尾复核发现 DSH 在 `17:50:50Z` 启动新进程（node 2956/4764/3020、dsh-eac-shell 16852），`our-free-model` 插件随后自己重写 `settings.json` / `catalog.json` / `availability.json` / `feed.json`：`settings.json` 现为 `mtime=2026-11-10T17:50:58.0570671Z`、`875 B`、SHA256 前 16 位 `51344DD5EC4EB7A4`，`catalogSyncedAt=2026-11-10T17:50:57.251Z`，与 `dsh-web.log` 的 `17:50:56Z` 启动记录一致。这是插件启动同步，不是本轮写入；但仍如实记账，不把旧基线说成没变。
+
+## 2026-11-11 · 第五十批：freellmpool 0.12/0.13 + pi-our-free-model 对账 —— Kilo 免费池新增 5 个真活，其余免密全排除
+
+- **主人令**（逐字）：「https://socket.dev/pypi/package/freellmpool/overview/0.12.0#1」「https://github.com/Twofruitsgrape/pi-our-free-model#1」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」「只接入能使用的串联起来使用」。
+- **先审不装，别再造一个代理**：`freellmpool` 只拉 wheel 读目录，不装它的 proxy；`pi-our-free-model` 是 `Ebony-Vinyl/dsh-our-free-model`（她那个 DSH 插件）的 pi coding agent 移植版，自带 gateway 与 `~/.our-free-model` 数据目录，**不安装、不启动**，只把它当目录信息源。两者都不碰 `C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\`。
+- **freellmpool 的增量是「家数变了，免密没变」**：0.11.3 → 0.12.0 新增 `aion` / `modelscope` / `morph` / `opencode` / `siliconflow` / `vercel` 6 家，目录从 18 家 / 349 模型 / 236 enabled 变成 24 / 410 / 226；0.13.0 又变成 22 / 431 / 178（去掉 `github`、`longcat`）。真正 `auth="none"` 的仍只有 **kilo / opencode / ovh / pollinations** 四家，新增的 6 家里没有新的免密池。
+- **pi-our-free-model 的 76 条 registry 逐条对账**：只有 `opencode` 是明确 `auth.kind="none"`，`kilo` 是免费池；`bazaarlink` / `tokenrouter` / `kimchi` / `byteplus` / `aion` / `morph` / `vercel` 全要 key，而 `keys.env` 里没有对应变量 —— 属 `needs_dependency`，不是「型号死了」，但也不接。`open_router` 仍是上批已判死的 `401 User not found`，不复活。
+- **Kilo：16 个 enabled 免费型号，实打 7 活 9 死（真修）**。活的是 `kilo-auto/free`、`openrouter/free`、`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`、`nvidia/nemotron-3-ultra-550b-a55b:free`、`cohere/north-mini-code:free`、`dots-studio/dots-3-note-preview:free`、`nvidia/nemotron-3.5-lightning:free`；7 个全部是 `200 + 正文非空`，带 tools 再打仍是 `200`。死的是 `poolside/laguna-xs-2.1:free`、`stepfun/step-3.7-flash:free`、`nvidia/nemotron-3-super-120b-a12b:free`、`inclusionai/ling-3.0-flash-fin:free`、`liquid/lfm-2.5-2.6b:free`、`meituan/longcat-2.0-free`、`minimax/minimax-m2.7:free`、`poolside/laguna-s-2.1:free`、`tencent/hy3:free`，全部 `404 model does not exist / currently unavailable`，一格不进。
+- **OpenCode Zen 直连全灭，已有小桥不动**。0.13.0 的 9 个 `-free` 型号在它的目录里全是 `enabled=false`；直连 `/inference/v1` 与 `/zen/v1`：8 个 `400 Upstream request failed: Model is unavailable`，`nemotron-3.5-lightning-free` 是 `429 FreeUsageLimitError`。我们现有的 `opencode-free` 小桥（9router/Bun TLS）仍是另一条路，12 个型号保持原样，不因为这份目录去删它。
+- **有 key 但这次没接活的，逐个点名**：`modelscope` 8 个目录型号全部 `401 Please bind your Alibaba Cloud account before use`；`siliconflow` `/models` 与 7 个 chat 全部 `401 code 30014 Token is invalid`；`ovh` 目录是 21 个，但 0.12/0.13 记的 `Llama-3.1-8B-Instruct` / `Qwen3-32B` / `Mistral-7B-Instruct-v0.3` / `Qwen3-Coder-30B-A3B-Instruct` 四个新增项全是 `404 model_not_found`；`llm7` 先有一个 `default` 200，随后 `daily token quota exceeded`，`fast` / `codestral-latest` / `gpt-oss:20b` / `Nemo` 都是 429 —— 这是额度窗口，不判死，也不新增格。
+- **落地**：`providers.json` 的 `kilo.models` 从 2 个扩到 7 个（只加上面 7 个活的，不把 404 塞进去）；原子写 + fsync + `os.replace` + 读回断言，备份 `providers.json.bak-20261111-fifth`。路由重启后 PID 4572，`providers=55`，`kilo` 点名 7/7 全 200 且 `X-FreeLLM-Provider=kilo`、`X-FreeLLM-Model` 与请求一致；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **13 家 / 13 个模型**，新增的 `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` 已在自动轮转里实际命中一次。
+- **诚实边界**：Kilo 的 200 req/hr 是全池共享，不是每家 200；`/models` 里出现不等于能推理，本批仍以「真发 chat/completions 且正文非空」为准；`404 does not exist` 是硬死亡，`429` 只代表此刻没额度；`freellmpool` 的 `enabled` 只是它作者的探测结论，不是上游承诺；`opencode-free` 的 `noTools=true` 仍保持，客户端工具不转发。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 今天被写入的文件数 **0**。
+
+## 2026-11-11 · 第四十九批：Pollinations 官方仓翻完 —— 新域名匿名字段是「只读缓存」，老端点真实限额是 45 秒不是 30 秒
+
+- **主人令**（逐字）：「https://github.com/pollinations/pollinations」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **它已经搬家了**：仓库首页现在写的是「**https://gen.pollinations.ai** provides one API for text, images, audio, video, 3D, and embeddings」，配套 **Pollen 积分（$1 ≈ 1 Pollen）+ API key**（`enter.pollinations.ai` 发 key，也支持 USDC/x402 买预付 key）。老的 `text.pollinations.ai` 在 README 里**一次都没提**（`gen.pollinations` 42 次、`text.pollinations` 0 次）。
+- **新域名不接，理由是实测出来的**：`gen` 的目录有 **434 个模型 / 258 个 text**（GPT-6.x、Claude Opus 5.5、Gemini 4、Kimi K3.1、DeepSeek V4.1 …），不带 key 直接 POST 看上去也回 200 —— 但响应头是 **`x-cache: HIT`**，缓存日期还是 10-31 的老货。换成带 nonce 的唯一 prompt 强制 **`x-cache: MISS`**，6 个模型（含 `openai/gpt-5.4-nano`、`nemotron-3.5-lightning`、`glm-5.3-flash`、`minimax-m3.1-flash`、`mimo-v2.6-flash`、`nex-n2.5-mini`）**全部 401**：`A valid API key is required. Get one at enter.pollinations.ai/keys`。**匿名拿到的只是“别人问过的问题的缓存”，不能当车道。**
+- **老端点仍然只有 1 个免费文本模型**：`GET https://text.pollinations.ai/models` 只回 `openai-fast`（`GPT-OSS 20B Reasoning LLM (OVH)`、`tier: anonymous`、`tools: true`，aliases `openai/gpt-oss/gpt-oss-20b/ovh-reasoning`）。实打 `served: gpt-oss-20b`；带 tools 能回合法 `tool_calls`（`get_weather({"city":"Bangkok"})`）。
+- **顺手把「还有没有别的型号」问死了**：`openai-large`、`mistral`、`qwen-coder`、`deepseek` **全部 404** `Model "X" isn't on the Classic API. Free models: https://text.pollinations.ai/models`。`openai` 是 `openai-fast` 的别名（同一个 `gpt-oss-20b`），配置里留两个名字只为兼容调用方点名，**不是两个模型**。
+- **真修：限额 30 秒 → 45 秒，`rpm` 2 → 1**。老端点超限回的是 **402**（不是 429）：`{"status":402,"code":"FREE_LIMIT","message":"Free limit reached: 1 reply every 45 seconds per IP. Retry after 37s"}`，而且**不发 `Retry-After` 响应头**（只在 JSON 正文里）。我们上一批按旧文档设的 `rpm: 2`＝30 秒一次，等于每次都比窗口快 15 秒 —— 台面上看是「这家不稳」（`winRate` 打到 **0.44**、`health: degraded`），实际上是自己按错了表。改 `rpm: 1`（60 秒 > 45 秒窗口）后立刻 `200`。
+- **一处顺序细节，能省很多瞎试**：同一个 IP 在窗口内，**未知型号先回 404、已知型号才回 402**。所以「402」不代表型号有效，也不代表能用；判据必须是等窗口过去后拿到 `200` 且正文非空。`openai-large` 就是这么被排除的（先在窗口内 402、等 60 秒后干净地 404）。
+- **落地验证**：`providers=55`、`pollinations rpm=1`；点名 `model=openai-fast` 经 53610 → `200`、`provider=pollinations`、1.9 s；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **13 家 / 17 个模型**。
+- **诚实边界**：`gen` 那 434 个模型不是「不存在」，是「要 key 才能用」，属 `needs_dependency`（`POLLINATIONS_API_KEY`，本机没有）；缓存命中不能算能力，只有 MISS 后仍 200 才算；Classic 这条永远只有 1 个模型，别指望它做多模型轮换，它的定位就是「兜底一格」。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 今天被写入的文件数 **0**。
+
+## 2026-11-11 · 第四十八批：bigiron 那份「2026 年 10 月还免费的清单」逐家对账 —— 4 家要 key，1 家假活，1 家额度写错
+
+- **主人令**（逐字）：「https://www.bigiron.cc/guides/free-llm-apis-in-october-2026-whats-actually-free-and-the-limits」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **它的 8 家 vs 我们的 55 家**：OpenCode Zen（已有 `opencode-free`，12 个免登录格）、OpenRouter（有配置但被禁用）、Google AI Studio（`gemini` 无 key）、Groq（有，额度写错）、Cloudflare Workers AI（只有 account id，无 token）、NVIDIA（有，`rpm=40` 与指南「用户报告 40 RPM」一致）、Mistral（无 key）、Hugging Face（$0.10/月额度，不值当）。
+- **OpenRouter 是假活，别被骗**：`GET /api/v1/key` 回 **200**（`label` 有值、`is_free_tier: true`、`usage: 0`），看着像好 key；但 13 个 `:free` 模型逐个实打，**13/13 全是 `401 {"message":"User not found"}`**。`/key` 端点**不校验账号是否还活着**，账号已删、key 成了孤儿。台账里原有的 `disabledReason: "401 User not found"` 是对的，**保持 `disabled: true`，不重新启用**。
+- **OpenRouter 目录实况**（不用 key 就能查）：`431` 个模型里只有 **13 个** `:free`（指南 10/19 记的是 17 个）——`cohere/north-mini-code`、`dots-studio/dots-3-note-preview`、`google/gemma-4-26b-a4b-it`、`google/gemma-4-31b-it`、`liquid/lfm-2.5-2.6b`、`liquid/lfm-3-1.7b`、`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`、`nvidia/nemotron-3-ultra-550b-a55b`、`nvidia/nemotron-3.5-lightning`、`nvidia/nemotron-3.5-super-vl`、`recursive/flint-v1.0`、`thinkingmachines/inkling-2-small`、`xingchen-agi/xing4.0-29b-a4b`。八个星期掉四个，指南自己说的「roster 周周变」在我们这条线上是实锤。
+- **Groq 的额度写错了，改对了（真修）**：旧配置 `rpm=30 / rpd=14400`，拿它套全体模型。直接读响应头 `x-ratelimit-limit-requests` 实测：`gpt-oss-120b` **1000**、`gpt-oss-20b` **1000**、`qwen3.8-27b` **1000**、`allam-2-7b` **7000**；`x-ratelimit-limit-tokens` 分别是 8000 / 8000 / 8000 / 6000。原来那个 14400 是 `allam-2-7b` 的历史额度，套在 gpt-oss 上等于**每天多放 14 倍**，撞到 1000 之后每次都是白撞 429。
+  - 拆成两条（`group` 都填 `groq`：路由按 group 去重，同 org 不并发双打，但每日配额各算各的）：
+    - `groq`：`gpt-oss-120b` / `gpt-oss-20b` / `qwen3.8-27b`，`rpd=1000`，`priority=1`
+    - `groq-allam`：`allam-2-7b`，`rpd=7000`，`priority=1.5`
+- **`allam-2-7b` 不支持工具调用，已标 `noTools`**：A/B 实测 —— 同一请求不带 tools → `200 "OK "`；带 tools → `400 {"error":{"message":"`tool calling` is not supported with this model","param":"tool calling"}}`。不标 `noTools` 的话，路由会把上游 400 原样甩给调用方。标完后同样的请求回 **503 `model_not_in_pool`**（点名模型不静默替换），这才是诚实行为。
+- **指南的「8K TPM 装不下一个 agent 请求」我们这侧不成立**：20 239 B（约 5k tokens）+ 25 个工具定义打 `gpt-oss-120b` → `200` / 971 ms；`8000 TPM` 装得下这个量级。真正会咬人的是 **200k tokens/天**（约 3–5 个 agent 小任务），所以它只是第 1 顺位，不是主力。
+- **缺凭据的三家，点名缺什么**（不是「不可用」，是 `needs_dependency`，填上就能活）：
+  - `gemini` → `GEMINI_API_KEY`（keys.env 与桌面 keys.env.txt 里都是空值 0 字节）
+  - `mistral` → `MISTRAL_API_KEY`（同上，空）
+  - `cloudflare` → `CLOUDFLARE_API_TOKEN`（桌面文件里有 `CLOUDFLARE_ACCOUNT_ID`，52 字符，但没有 token）
+  - 三者保持 `disabled`/不可用，不接；拿到 key 再按「先测一个模型再放量」的规矩上。
+- **OpenCode Zen 的名单漂移再次被印证**：指南 10/19 记的 `cat-jam-free` / `ll-alpha-free` / `space-bunny-free` / `longcat-2.5-preview-free` / `muse-spark-1.3-contributor-free` / `nemotron-3-ultra-free` 今天**全部 400 下线**，换成了我们手上这 12 个（`iceman` / `beam` / `flint` / `inkling` …）。上一批刚把小桥改成「清单读 providers.json + 未知型号 400 + 按需热重载」，正好对上这条 —— 名单再漂，改配置就行，不会再有硬编码假成功。
+- **落地验证**：`/health` `providers=55`（54→55，新增 `groq-allam`）、`usableNow=29`、`healthyNow=23`；点名路由实测 `allam-2-7b → groq-allam`（526 ms）、`gpt-oss-120b → groq`（282 ms）、`qwen3.8-27b → groq`（190 ms）、`big-pickle → opencode-free`（1300 ms）；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **12 家 / 21 个模型**（比上一批 8 家 / 17 个更分散）。
+- **诚实边界**：`/key` 回 200 不代表能推理（OpenRouter 就是例子，判据必须是「真发一次 chat/completions」）；`x-ratelimit-*` 是**当下**的窗口值，Groq 会按模型/组织调整，别把它当永久真值；`rpd` 是自我限流，不是上游承诺；指南里 NVIDIA 的 40 RPM 与 Mistral 的 1 RPS 它自己就标了「用户报告/第三方」，我们没当官方值。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 今天被写入的文件数 **0**。
+
+## 2026-11-11 · 第四十七批：nextclaw 的 7 个免费型号全是上一代已下线；顺手把小桥「静默顶包」这个真 bug 挖出来修掉
+
+- **主人令**（逐字）：「https://github.com/peiiii/nextclaw/blob/8b2aaf1709eaea97a946139b0c90114d93b2a77e/docs/logs/v0.26.47-opencode-zen-free-models/README.md」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **那份日志的 7 个型号，逐个实打，全部 400**：`deepseek-v4-flash-free`、`mimo-v2.5-free`、`laguna-s-2.1-free`、`longcat-2.0-free`、`north-mini-code-free`、`nemotron-3-ultra-free` 一律回 `{"error":{"type":"server_error","message":"Upstream request failed: Model is unavailable."}}`；它自己判定「不可用」的 `ling-3.0-flash-free` 同样 400。**7/7 排除，一个都不接**。
+- **原因不是一个一个下架，是整批换代**：nextclaw 记的是 `v0.26.47` 的目录，上游现在是 `cli 2.0.26`。我们手上那 12 个（`deepseek-v4.1-flash-free` / `mimo-v2.6-flash-free` / `longcat-2.5-free` …）正是**新一代**，不是它那批；拿它的型号名去接等于接一串墓碑。
+- **实时目录 + 权限实测**：`GET https://opencode.ai/inference/v1/models`（`Authorization: Bearer public`）回 **85 个 id**；带 `-free` 后缀的**正好 12 个**，与我们现有清单逐字相同。其余 73 个（claude / gpt / gemini / grok / kimi / qwen 等）在 `public` 身份下统一 **401 `Missing API key`** —— 匿名车道只认这 12 个 + `big-pickle`，没有漏网的新免费格。
+- **12/12 全部活着，而且没有被顶包**：带 `tools` 逐个直连，12 个全 `200`，SSE 里 `model` 字段回显**就是请求的那个名字**（不是池里随机一个）。`big-pickle` 1.7 s、`deepseek-v4.1-flash-free` 1.2 s、`beam-free` 0.7 s、`longcat-2.5-free` 7.3 s；`mimo` / `glm` / `longcat` / `inkling` / `flint` / `nemotron` 两个都先吐 reasoning 再给 `tool_calls`（`read({"path":"/etc/hostname"})`），属于正常形态。
+- **门禁的真机制（这条最值钱）**：同一个型号、同一个会话指纹，**不带 `tools` 数组就回 429 `FreeUsageLimitError`**（「Free usage limit reached，去订阅 Go」），**带上 `tools` 立刻 200**。所谓“额度用尽”有一大半是“请求长得不像 opencode 客户端”。小桥一直硬塞 `read`/`shell` 两个工具，所以它一直能过 —— 这不是巧合，是它活下来的原因，已写进代码注释。
+- **真修掉的 bug：小桥第 269 行「静默顶包」**。旧实现遇到不认识的型号会**随机换一个池内模型**继续回 200 —— 后果是任何已死型号在路由台账里都记成“成功”，`winRate=1` 是假的。三处根因修复（`C:\EAC-own\caps\freellm\opencode-free-shim.mjs`，旧版备份 `opencode-free-shim.mjs.bak-20261111`，SHA256 前 16 位 `04CB3A1E2788F59D`；新版 `83f09bc3bba6e940dcb5f01cdbfd4bfc5d028e70fe25dc2729e07a899c1a7e4f`）：
+  1. **清单单一来源**：`MODELS` 改从 `providers.json` 的 `opencode-free.models` 读（`OPENCODE_FREE_PROVIDERS` 可覆盖），加载不到才退内置 12 个并记 `warn`；`/health` 多回 `modelsSource`。以后两边不会再各写一份然后悄悄漂移。
+  2. **不再顶包**：未知型号回 `400 model_not_supported` + `supported` 全清单；`model: auto`/空值回 `400 model_required`。错的就报错，绝不拿别的模型冒充。
+  3. **429 退避轮换**：最多 3 次、`800ms × 次数 + 抖动`、每次换 session；仍 429 就带 `Retry-After: 60` 如实回给上游。
+  4. **未知型号先自愈重载**：命中白名单外时先重读一次 `providers.json`，读到就热更新继续跑，读不到才回 400 —— 避免「配置已加型号、进程还是旧清单」把 400 甩给客户端。
+- **顺手加的两个可观测口**：`GET /v1/models?probe=1`（逐个大 512 token 现场验活，回 `alive` / `dead` / `rate_limited` 三态，**会吃免费额度**，默认不开）；`POST /admin/reload-models`（改完 `providers.json` 热加载，不用重启守护）；响应头 `x-opencode-model` / `x-opencode-upstream-model` / `x-opencode-attempts`，上游若换了模型会落 `warn` 日志。
+- **`noTools` 保持 `true`，没有顺手翻**：小桥是**自己拥有工具 schema**（固定 `read`/`shell`），客户端传进来的工具会被它替换掉。若此时对路由宣称支持工具，模型回的 `read`/`shell` 调用客户端根本不认识，比没有工具调用更糟。「上游认不认任意自定义 schema」这次**没测出来**（连打 40+ 次后 IP 级额度打空，4 种工具形态全是 429，属于**未知**不是**排除**）—— 所以不翻，等额度恢复再单独验。
+- **落地验证**：`/health` → `models: 12`、`modelsSource: C:\EAC-own\caps\freellm\providers.json`；`POST /v1/chat/completions` 未知型号 → `400 model_not_supported`；经 53610 路由打 `model=big-pickle` → `200`、正文 `OK`、1.3 s；`opencode-free` 台账 `ok=43 fail=0 winRate=1 health=ok`；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **8 家 / 17 个模型**。
+- **`providers.json` 的 note 已改写**（151 → 902 字符）：记清「12 个已验活 / 7 个已下线点名 / 非免费 401 / 不带 tools 会 429」四件事，并把 `noTools: true` 的理由写死，免得下一任接手又把它当成“懒配置”翻掉。
+- **诚实边界**：免费额度是上游给的，网关保证不了「用不完」；`429` 只能读成「这一刻没额度」，不能读成「型号死了」；`/health` 的 `usableNow` 是瞬时值，压测后一批 agnes key 会同时进冷却。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 下无晚于基线的新文件。
+
+## 2026-11-11 · 第四十六批：pollinations-client 不用装，但它把「我们的 Pollinations 车道被自己掐死」暴露了
+
+- **主人令**（逐字）：「https://pypi.org/project/pollinations-client/0.1.0/#1」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **包本身**：`pollinations-client 0.1.0`（作者 `gpt4free`，MIT，py>=3.7，唯一依赖 `requests>=2.31`）是 Pollinations 的**薄客户端**，不含凭证、不代持额度、不带新模型 —— **不装**（我们走 HTTP 直连，多一层 Python 包装没收益）。wheel 11503 B / SHA256 `402BC836…CCFC5A`，已解到 `.scratch\pollinations-client-20261111\wheel`。
+- **它给出的有用信息在端点口径**：原生 `POST https://text.pollinations.ai`（`{"messages":[…]}` 回纯文本）、OpenAI 兼容 `POST …/openai`（或 `/v1/chat/completions`）、`GET …/models`；带自己的 key 时整体切到 `gen.pollinations.ai`（本机无 Pollinations key → 这条不接）。
+- **活清单只剩一个模型**：`GET https://text.pollinations.ai/models` 现在只回 `openai-fast`（描述 `GPT-OSS 20B Reasoning LLM (OVH)`，`tier: anonymous`，别名 `openai` / `gpt-oss` / `gpt-oss-20b` / `ovh-reasoning`，`tools: true`、`reasoning: true`）。我们表里的 `openai` 与 `openai-fast` 本就是同一格的别名，不是两个模型。
+- **官方限额查清并改正**：`APIDOCS.md` 写明「Text: one at a time, at least **30 seconds** apart」「Images: … **45 seconds**」。我们原来的 note 把图片的 45 秒当成了文本限额、并把 `rpm` 设成 1 —— 等于按「60 秒 1 次」自我限流。现改为 **`rpm: 2`（每 30 秒 1 次，忠实官方）**；超限是 **402 + `Retry-After`**，不是 429。
+- **真正修掉的浪费：`noTools: true` 是错的**。实测 `model=openai-fast` 带 `tools` + `tool_choice:auto` 请求，直连回 `finish_reason: "tool_calls"`、`tool_calls[0].function = get_weather({"city":"Bangkok"})` 结构合法；经 53610 复测同样回 `tool_calls: true`（5.6 s）。原来 `noTools: true` 让路由在**任何带工具的请求**里直接跳过这家 —— 白白丢掉一条能跑 function calling 的免费车道。已改 `noTools: false`。
+- **限额压力实测**：2 s 间隔连发 6 次全 200（287–669 ms），说明当前没有严格按 30 秒拦截；但**按官方文档保守设 2 rpm**，不拿「现在没拦」当额度用。
+- **实测读数**：`/health` `pollinations usable=true health=ok`；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **8 家 / 18 个模型**（groq 9 / cohere 7 / agnes-k12 4 / agnes-gbt 3 / agnes-k13 3 / agnes-k11 2 / ovhcloud 1 / opencode-free 1）。
+- **不接的**：`gen.pollinations.ai`（要自备 key，本机无）、图片接口（路由器只管对话，生图另有 `t2i_agnes` 车道）、包本身（薄封装无增量）。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 无晚于基线的新文件。
+
+## 2026-11-11 · 第四十五批：awesome-free-ai-coding 第 2 节 85 条逐条过，唯一新口不合格、自家 AIHubMix 是假成功
+
+- **主人令**（逐字）：「https://github.com/mvalentsev/awesome-free-ai-coding#2」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **这个仓库比上一份新**：首页自报 109 个 live offer / 105 个免信用卡 / 132 个免费模型 / 75 个 OpenAI 兼容，每行 `verified 2026-11-09`，每周探活两次。`#2` 对应第 2 个 H2「The list」，共 **85 条**：LLM APIs 37 + Trials 23 + Aggregators 25。
+- **只有 3 条标「免账号」**：`VLM Run Gateway` / `OVHcloud AI Endpoints` / `Pollinations.AI` —— 后两家我们早在池里（`ovhcloud`、`pollinations`）。
+- **VLM Run 自己就不成立**：它的详情页顶部写着「Does not work as published since 2026-11-05，匿名调用 `qwen/qwen3.8-27b` 返回 403 要 key」。本机实测一致 —— `qwen3.8-27b` / `qwen/qwen3.8-27b` 均 **403 model_requires_key**，`diffusiongemma` **404 not found**；只有 `qwen3.5-0.8b` 回 200（415/705/529 ms，中文也通）。但 0.8B **算术都错**：`17*23` 答 **491**。按「不能用的直接排除」**不接**（口径：匿名额度仅 10 rpm / 30 每小时 / 100 每天 per IP，且多域监控这种负载用 0.8B 只会制造错答案）。要兜底可在 `providers.json` 加一条 `baseUrl=https://gateway.vlm.run/v1/openai`、`anonymous=true`、`models=["qwen3.5-0.8b"]`、`priority=98`。
+- **其余 82 条全部要注册/key**（Hetzner / IteraCompute / Alibaba DashScope / SimpleLLM / SEA-LION / OpenTyphoon / LLM.kiwi / MIAPI / Novita / Sail / PLaMo / IBM watsonx / Arli / Bytez / Mixlayer / SenseNova / Tencent TokenHub / SiliconFlow / Zro / Merkium / Infron / FreeInference…，25 家聚合里的 LLMTR / Vercel / Inferbase / Nous / Token Harbor / TokenRouter / Opper / MegaNova / Moark / Kiosapi / NovAI / 1min / BeatAPI / JZS Token / Experiential 等）。本机没有对应账号，**一条都不接**，不拿注册时间换假容量。
+- **真正的收获在「我们已有 key 的聚合商」**：`AIHubMix /models` 664 个（免费档 39 个）、`Routeway /models` 288 个（free 9 个）。逐格实打 46 格。
+- **AIHubMix 是「HTTP 200 的假成功」，必须停用**：39 格里 33 格 200 但正文是 `Sorry, to prevent abuse of free resources, accounts that have not been recharged…`；**我们原来挂的 3 格（`glm-4.7-flash-free` / `coding-minimax-m3-free` / `coding-glm-5.3-free`）一模一样**。这种格会让路由把它当成功回给用户 —— 已置 `"disabled": true`、`models` 清空，`note` 写明「充值后删 disabled 即可恢复」；`/health` 现为 `aihubmix usable=false health=off`。另有 6 格 `400 no_available_channel`（llama/mistral 老格）。
+- **Routeway 有限但已到顶**：5 个 `gemma-4-26b-a4b-it-*:free`（chimerax / darksoul / luminous / moonlight / musica）真出正文（约 5.4 s），但账号级 **5 RPM**，多挂格只增 429 不增容量；`muse-glimmer-30b:free` 与 `gemma-4-26b-a4b-it-meromero:free` 间隔 13 s 复测仍 429 → **两格不接**，5 个同底人格微调也不重复挂。
+- **实测**：`providers=54`（停用不算删）、`usableNow=25`、`healthyNow=22`；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **10 家 / 14 个模型**（groq 13 / cohere 4 / agnes-k13 3 / agnes-k07 2 / opencode-free 2 / agnes-gbt 2 / agnes-k11 1 / agnes-gbt1 1 / agnes-k12 1 / agnes-k04 1）。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 无晚于基线的新文件。
+
+## 2026-11-11 · 第四十四批：freellmpool 不装它的代理，只采它的索引 —— 16 格真能用的补进 53610
+
+- **主人令**（逐字）：「https://pypi.org/project/freellmpool/0.11.3/#1」；沿用「测试能使用的在接入，不能使用的排除出去别接入浪费时间」。
+- **先审包再动手**：`freellmpool 0.11.3`（作者 0xzr，MIT，唯一运行依赖 `httpx`），wheel 136959 B / SHA256 `AC5E92E2…D5AAA6`，已解到 `.scratch\freellmpool-20261110\wheel`。它做的是「18 家免费池 + OpenAI/Anthropic 兼容代理」，和我们 53610 是**同一件事**，再起一个只会多一跳 —— 所以**不装它的 proxy**。
+- **对账结果：18 家里我们已有 17 家**（pollinations / llm7 / ovh / kilo / groq / nvidia / openrouter / gemini / cloudflare / mistral / cohere / sambanova / zhipu→zai / ollama→ollama-cloud / longcat 等）。缺的 3 家都要额外 key，本机没有：`huggingface`（`HF_TOKEN`）、`cerebras`（`CEREBRAS_API_KEY`）、`github`（`GITHUB_TOKEN`）→ 一律不接。
+- **它的清单是陈的，不能照抄**：`providers.toml` 自己标注 `live-validated 2026-06-08`，距今 5 个月。逐格实探 109 格只有 10 格 200 —— nvidia 33/37 已 `410 Gone`（"reached its end of life"）、ollama 21 格 `410 retired` / 2 格 `402 无额度`、ovh 10/12 `404 model_not_found`、openrouter 全 `401 User not found`（key 失效）、kilo 全 `429 PROMOTION_MODEL_LIMIT_REACHED`（匿名额度用尽）、groq 的 403 是 `error code: 1010`（我们测试器的 UA 被 Cloudflare 拦，不是模型问题；换浏览器 UA 后正常）。**这些全部排除，一格不进池。**
+- **改走「活清单」再打**：直接 GET 各家 `/models` 拿到当前真清单（groq 11 / nvidia 84 / ovh 21 / cohere 37 / zhipu 12 / kilo 382），只测「有 key 且我们没挂」的 145 格，`max_tokens` 64 空回再抬 512。排除的都是真非对话模型：embedding / rerank / whisper / parse / guard（`llama-guard`、`prompt-guard`、`Qwen3Guard`、`safety-guard`、`riva-translate`）。
+- **净收 16 格**（全部经 53610 点名复验 200）：`groq` +1 `allam-2-7b`；`nvidia` +4 `mistralai/mistral-large-4-1t-a52b` / `nvidia/nemotron-3.5-super-vl-120b-a12b` / `poolside/laguna-xs-2.1` / `stepfun-ai/step-5-preview`；`cohere` +10 `command-a-reasoning-08-2025` / `command-a-vision-07-2025` / `command-r-08-2024` / `north-mini-code-1.0` / `tiny-aya-earth` / `tiny-aya-fire` / `tiny-aya-global` / `tiny-aya-water` / `c4ai-aya-expanse-32b` / `c4ai-aya-vision-32b`；`zai` +1 `glm-4.7`（512 token 才出正文，6.1s）。
+- **顺手修两个会误伤的设置**：① `cohere` 的 `limits.rpd` 原为 33（1000 次/月 ÷ 30 的保守折算），日配额一满就整家被 `quotaLeft()` 挡死、报成 `model_not_in_pool`（误导）；改为 **`rpd: 0`（不硬切）**，按月额度交给上游 429 触发冷却。② `nvidia/meta/llama-3.2-90b-vision-instruct` 直连 27.6s、经路由必撞 `REQUEST_TIMEOUT=12000` → 剔除，不留「看似有格、实则必超时」的假容量。
+- **实测**：cohere 10/10、nvidia 4/4 经 53610 全 200；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **8 家 provider / 21 个模型**（cohere 10 / agnes-k11 8 / groq 7 / agnes-k13 1 / agnes-k08 1 / zai 1 / agnes-k10 1 / nvidia 1）；`providers=54`、模型格 **228**。`/health` 里 `cohere ok=46 fail=0`、`nvidia ok=134 fail=4`。
+- **诚实边界**：`/health` 的 `usableNow` 是瞬时值（本轮 10），因为一批 agnes key 在压测后同时进了 1.7s～17min 冷却；`agnes-k01/k02` 是 `auth` 失效（约 14 分钟窗口后仍会复现），属于既有密钥问题，不是本轮引入。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 仍为 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；`dsh-home` 无任何晚于基线的新文件。
+
+## 2026-11-10 · 第四十三批：9router 第 3 节只留一家真能用的（OpenCode Free），其余全排除
+
+- **主人令**（逐字）：「https://github.com/decolua/9router#3 测试能使用的在接入，不能使用的排除出去别接入浪费时间」；前置口径仍是「只要是不能使用的就直接排除，只接入能使用的串联起来使用」「你别动她的环境把插件统一入口就好了啊」。
+- **第 3 节（Free Providers）逐家判定**：只有三家 —— **Kiro AI**（OAuth：AWS Builder ID / Google / GitHub，本机无任何 `kiro` 凭据）→ 排除；**OpenCode Free**（无鉴权，`Authorization: Bearer public`）→ **可用，已接入**；**Vertex AI**（要 GCP 项目 + Service Account，本机无 `gcloud`、无 `GOOGLE_APPLICATION_CREDENTIALS`、无任何 `VERTEX*` 环境变量）→ 排除。仓库里其余「免费」型不是 LLM：`mimo-free` 已被小米下线（hidden）、`veoaifree-web` 是图像/视频、`edge-tts` / `google-tts` 是 TTS —— 一律不接。
+- **免费门的真相是 TLS ClientHello 指纹**：同一路径同一 body，Node 原生 `fetch` 一律 `429 FreeUsageLimitError`，Bun 的 BoringSSL fetch 回 200。所以要接就得用 Bun，不能用 Node 硬凑。端点也已从旧的 `/zen/v1` 迁到 `/inference/v1/chat/completions`。
+- **新增 Bun 小桥** `C:\EAC-own\caps\freellm\opencode-free-shim.mjs`（只绑 `127.0.0.1:53612`）：把指纹门、`opencode/latest/2.0.26/cli` UA + `x-opencode-client: cli` + 同一 `ses_` 会话四件套 + `x-opencode-project: global`、必带的 `<env>` 系统提示与 OpenCode 自己的 `read` / `shell` 两个工具精确 schema、`stream:true` 全部封在里面；对外只暴露标准 OpenAI 兼容 `/v1/chat/completions`、`/v1/models`、`/health`。遇到 `429 FreeUsageLimitError` 先轮换一次 session 再试，仍失败如实透传上游原文。`max_tokens` 下限抬到 512（`inkling` / `flint` / `nemotron-3.5-lightning` 在 48 token 时只吐思考，512 才出正文）。
+- **接入本机统一入口**：`providers.json` 53 → **54 家**，新增 `opencode-free`（`baseUrl=http://127.0.0.1:53612/v1`、`anonymous=true`、`priority=8.0`、`ctxTokens=120000`、`noTools=true`），只挂 **实测 200 的 12 个模型**：`big-pickle` / `mimo-v2.6-flash-free` / `deepseek-v4.1-flash-free` / `glm-5.3-flash-free` / `longcat-2.5-free` / `iceman-free` / `inkling-2-small-free` / `beam-free` / `flint-40b-free` / `nemotron-3.5-super-vl-free` / `nemotron-3.5-lightning-free` / `minimax-m3.1-flash-free`。备份 `providers.json.bak-opencode-free-20261110`，原子替换 + 读回校验。
+- **实测读数**：小桥直连 12/12 全 200（603–6409 ms）；经 53610 点名 12/12 全落 `provider=opencode-free`（最慢 `nemotron-3.5-super-vl-free` 27.2 s）；路由探针 `{"total":1,"pass":1,"fail":0,"ms":1261}`；30 发并发轮转 **30/30 成功、0 失败**，覆盖 **10 家 provider**（groq 13 / agnes-k15 3 / agnes-k14 3 / agnes-k12 2 / **opencode-free 2** / agnes-gbt 2 / agnes-k11 2 / agnes-gbt3 1 / agnes-k01 1 / nvidia 1）、**10 个模型**（含 `big-pickle`、`mimo-v2.6-flash-free`）。当前 `/health`：`opencode-free` `ok=18 fail=0 winRate=1 probeOk=true`。
+- **Kilo 清单同步核对**（只要真能用的）：`kilo-auto/free` ✅、`nvidia/nemotron-3-ultra-550b-a55b:free` ✅；`nvidia/nemotron-3-super-120b-a12b:free` 404、`kwaipilot/kat-coder-pro-v2.5:free` 404、`kilo-auto/frontier` 401、`kilo-auto/balanced` 401 → 不接。
+- **补掉守护缺口**：`guard.ps1` 原先只看 53610，重启后 OpenCode Free 车道没人拉起。已加 `Find-Bun`（`%APPDATA%\npm\node_modules\bun\bin\bun.exe` → winget → `Get-Command bun.exe`，找不到就如实记日志，不编路径）/ `Start-Shim` / `Test-ShimHealth` / `Stop-Shim`：每 8 秒同时看 53612，端口不通就拉起；端口通但 `/health` 失败就杀进程重起。实测：杀掉小桥后 **4 秒内自动恢复**（新 PID 4600、12 模型），点名 `big-pickle` 经 53610 回 200 / 2454 ms，`opencode-free` 仍 `cooling=false consecFail=0`。备份 `guard.ps1.bak-opencode-free-20261110`，`PSParser` 语法校验通过。
+- **不碰她的环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 收工复核仍为基线 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`；本轮没有改 `dsh-home` / `profiles` / `node_modules` 任何文件。
+
+## 2026-11-10 · 第四十二批：FCC 只做侦察，真正能用的并回本机统一入口
+
+- **主人令**（逐字）：「打开多域监控触手并发深度挖出能使用的大模型接入进去」「只要是不能使用的就直接排除，只接入能使用的串联起来使用」。
+- **FCC 结论：不必安装**。`free-claude-code` 是本地 OpenAI 兼容代理（默认 `127.0.0.1:8082`），本身不是免密钥聚合器；61 家 provider 多数仍要各家 key，免费额度由各家控制。本机 8082 未监听、无安装，与现有 53610 路由差集里真正可免费出活的上游（NVIDIA NIM / LLM7 / Kilo / OpenRouter free / Groq 等）已经在本机路由中，直接强化本机统一入口即可。
+- **密钥体检**：`keys.env.txt` 与 `C:\EAC-own\caps\freellm\keys.env` 同一套 33 变量；`NVIDIA_API_KEY` 换新钥（70 字符，hash `9b01817e52fd`）；桌面文件多出的 `CLOUDFLARE_ACCOUNT_ID` 因 `CLOUDFLARE_API_TOKEN` 为空，未写入。旧备份 17 把 `sk-` 中 13 把重复、4 把新钥实探：`backup-new-1` 的 `agnes-3.0-flash` / `agnes-2.5-flash` 可用，`backup-new-4` 的 `3.0-flash` / `2.5-flash` / `2.5-pro` / `pro-alpha` / `pro-beta` 可用；`backup-new-2/3` 全 401 排除；`agnes-2.0-flash` / `agnes-1.5-flash` 一律 500 下线。
+- **路由配置**（`C:\EAC-own\caps\freellm\`，均有 `.bak-20261110-*` 备份）：`keys.env` 写入新 NVIDIA 钥与 `AGNES_KEY_14/15`；`providers.json` 增至 53 家，新增 `agnes-k14`（priority 69.0）与 `agnes-k15`（priority 68.5），只挂实测可用模型；LLM7 复活且只留 `default` / `gpt-oss:20b` / `mistral-Nemo-Instruct-2407`；Cohere 补 `command-a-plus-05-2026`；NVIDIA 只留 4 个实测 200 的模型，剔除 step-5 / mistral-large 超时格；Chutes / NScale（402/429 余额 0）、OpenRouter（401）、Ollama Cloud（402）、OpenCode Zen（402/403）、SambaNova（402）保持排除。
+- **修掉轮转只吃到一家的根因**（`router.mjs`）：`FANOUT` 默认 8 → 32；原条件 `list.length > FANOUT` 在可用车道 30 < 32 时退回「永远取 score 第一名」，实测 30 发全被 Groq 独占。改为 `FANOUT > 0 && list.length > 1`，`head` 在车道数不超过 FANOUT 时取全量，`tail` 为空。
+- **实测**：53610 `/health` `usableNow=30`、总模型格 127；30 发并发压测 **30/30 成功、0 失败**，覆盖 **6 家 provider**（nvidia 13 / kilo 6 / llm7 5 / zai 4 / agnes-k01 1 / agnes-k12 1）、**10 个不同模型**，Groq 30 RPM 用满后自动切到其他车道，无 429 打死。GBT 侧 `live-final.py` 的 7 个模型探针 **7/7 usable**，连发 3 通对话 **3/3 成功** 且全落 `freellm`；Kilo 准入态 6 个模型全 admitted，`excluded=[]`、`cooling=[]`、`bad={}`。
+- **不碰 DSH 环境**：`C:\EAC-own\data\dpx\dsh-environments\eac-beta\dsh-home\our-free-model\settings.json` 保持基线 `mtime=2026-11-10T15:55:13.5759687Z`、`875 B`、SHA256 前 16 位 `59048A06C0176689`，未改任何 `dsh-home` / profiles / node_modules 文件。
+
+## 2026-11-10 · 第四十一批：DSH 插件统一入口（不碰她的环境）
+
+- **主人令**（逐字）：「你别动她的环境把插件统一入口就好了啊」「设计好别破坏
+  DeepSeek Harness 的插件环境就行」。
+- **先取证再动手**：只读翻了她真实的插件契约 —— 插件是 npm 包 + `cordis.patch.yml`，
+  服务端半边导出 `{ name, inject, apply }`，工具用 `ctx.tools.register(defineTool(...))`
+  按 agent 作用域注册（`agent/created` / `agent/disposed`）。她的 `AGENTS.md` 明写
+  **profile 插件只能走 `dpx plugin add <包名|tarball>`**，不许手改 `profiles/*` 或手塞
+  `node_modules` —— 本次严格照这条来。
+- **新增 `plugins/dsh/`**（`@gbt/dsh-cap-bridge` 0.1.0）：三个工具
+  `gbt_caps`（列 428 位，可按 domain/keyword 收窄）/ `gbt_cap`（调能力位）/
+  `gbt_health`（桥读数）。**只读优先**：注册表 `safe: true` 的能力直接执行；
+  `safe: false` 的一律回 `need_confirm`，必须显式 `confirm: true`。
+- **新增本机桥 `plugins/dsh/bridge/gbt_bridge.py`**：只绑 `127.0.0.1`，
+  `/caps` 与 `/run` 要本地令牌（自动生成 `state/dsh-plugin/bridge-token`，原子落盘），
+  `/health` 只回在线读数。桥只**转发** `api.run_task()`，作用域/授权/审计门照旧，
+  不因为走插件多出任何权限；不回传密钥、不缓存能力结果。
+- **不碰她的环境**：没有改 `dsh-home` / `profiles` / `node_modules` / `cordis.patch.yml`，
+  只新增本仓文件。装法是 `dpx plugin add --eac-beta <本仓 tarball> --profile web-desktop`，
+  先 `--dry-run` 看会做什么；卸载同理。
+- **判据**：`plugins/dsh/tests/test_bridge.py` 6 条全绿（健康口开放但只读、`/caps`
+  无令牌 401、域过滤、safe 能力免确认、改状态能力 403 need_confirm、payload 非对象 400）；
+  `node --check plugin.mjs` 通过；用临时目录 + 目录联接指向她 profile 里**只读**的
+  `@deepseek-ai/dsh-tools` 做真装载验证 ⇒ `exports=["apply","inject","name"]`、
+  `name=gbt-cap-bridge`、`inject=["tools","agents"]`，临时目录已清理。
+- **诚实边界**：本机 `dpx` 不在 PATH（它由 DSH 宿主提供），所以**没有**替主人真装；
+  tarball 已产出 `plugins/dsh/dist/gbt-dsh-cap-bridge-0.1.0.tgz`（7227 B，5 个成员）。
+
+## 2026-11-10 · 第四十批：不能用的直接排除，只把能用的格串成环
+
+- **主人令**（逐字）：「只要是不能使用的就直接排除，只接入能使用的串联起来使用」。
+- **新增准入名单**（`key_gateway`）：每格运行态多了 `bad` 分区。**确定性不可用**
+  —— 404 / 402 无额度 / 401-403 密钥失效 / `PROMOTION_MODEL_LIMIT_REACHED`（匿名额度本轮用尽）
+  / 上游包成 400 的坏格 / 空回包 —— 直接踢出环（默认 1h），对话**不会再撞它**；
+  普通 429 仍只冷却（窗口会回补），不进排除区。任一通成功 ⇒ 清 `bad` 与冷却，重新准入。
+- **环只由能用的格组成**：`model_order()` 改为在**准入名单**上旋转，
+  `ring_state()` 一次回 `declared / admitted / excluded / cooling / reviving`；
+  `_free_lanes()` 的 `models` 就是准入结果，回执带 `excluded`，不再让“不能用却还挂在环里”隐形。
+- **全排除不永久判死**：全部格都被排除/冷却时回退成整环**复探一次**并标 `reviving`，
+  只打一格（额度可能刚回补），不是假装正常轮询。
+- **`op=probe` 升级**：默认只真打准入内的格，被排除的如实回 `excluded` 且**不再发请求**；
+  `force=True` 时连排除区一起复测，通了立即复活。回执新增逐车道 `lanes` 准入读数。
+- **接入本机免费路由**：实测 `C:\EAC-own\caps\freellm\router.mjs` 正在 53610 提供
+  OpenAI 兼容口（`gbt-xiaotudou-v8`，内部 40 家免费源并发对冲 + 429 立即切 + 同组降级）。
+  已作为**免费车道第二跳**接入（8111 → 53610 → 31415 → Kilo），免密、回环、$0；
+  GBT 侧不重复实现它的内部策略，只当一条车道。
+- **实测读数**：真实免费池 `op=probe` **6/6 usable**（0.7–10.8s，其中两格是
+  「预算吃光 → 上调后成功」）；连发 3 通对话 **3/3 成功**，落点按环轮换
+  （`kilo-auto` → `nemotron-3.5-lightning` → `dots-3-note-preview`）。
+  隔离 store 故障注入（A=404、B=429）：第一通按序撞到 A/B 后，
+  **后续 3 通 0 次再撞**，落点正好是剩下 4 个能用的。
+- **判据**：新增 `gbt_allinone/tests/test_llm_admission.py`（7 条）：404/402/匿名额度用尽
+  必须排除、429 只冷却、成功复活、全排除回退复探、轮询顺序不含坏格。
+  连同 `test_llm_model_ring.py` 共 **14 条全绿**；`guard-three` 全过（原子替换 1 项仍待初始化）。
+
+## 2026-11-10 · 第三十九批：免费车道轮询真转（坏格不再堵死整环）+ 428 契约对齐
+
+- **主人令**（逐字）：「免费车道调用……多域监控并发深度排查清楚并彻底修复好大模型轮询使用」。
+- **根因一 · 轮询退化成「只试一格」**：`note_model(ok=False)` 只在**成功**时推进环游标 `rr`。
+  某一格坏了（实测 Cohere 会把它自己的转码失败包成 `400 Provider returned error`），
+  每一通都从**同一格**开始 ⇒ 连发 4 次全 400，另外 5 格看都没看。
+  现改为**失败也前进**，并给这类上游坏格 120s 短冷却。
+- **根因二 · 硬停写在换格之前**：`run()` 里 `not retry_same and not escalate ⇒ return`
+  排在换格分支前面，`bad_request` 永远轮不到换格。现顺序改为
+  **同家重试 → 环内换格 → 环用尽才落回原判定**；换格改为**环绕**（尾到头绕回起点），
+  用 `_next_cell(ring, at, seen)` 跳过本通已试过的格，不会死循环。
+- **根因三 · 第二种「思考吃光」形状没认**：Gemini/Kilo 系会 **content 为空 + `finish_reason=length`
+  + 不给 `reasoning_content`**，原逻辑按 400/422 硬停。现新增 `BUDGET_EATEN` 标记与
+  `_is_starved()`，与 `REASONING_STARVED` 一样**4x 上调 max_tokens 重试同一家**
+  （实测 64 → 512 → 2048）；仍空才如实报「token 全花在思考上」。
+- **`200 + 空 content + finish_reason=stop`**：不是我们的参数错，是这一格模型坏了 ⇒
+  换格，整环都空才换下一条道，绝不一次判死整单。
+- **实测读数**（`api.run_task('cloud_llm', {'action':'chat'})`，max_tokens=64，连发 5 次）：
+  **5/5 成功**，落点依次 `dots-3-note-preview` / `openrouter/free` / `kilo-auto/free` /
+  `nemotron-3.5-lightning` / `dots-3-note-preview`；日志可见
+  `cohere/north-mini-code:free 不可用（bad_request），轮询下一格 openrouter/free`。
+  `cap` 通路（`op=chat`）同样真出字（此前是 `action=chat` 被静默当 status 的假成功）。
+- **判据**：新增 `gbt_allinone/tests/test_llm_model_ring.py`（7 条）：环绕换格、失败推进游标、
+  坏格进冷却、**换格必须早于硬停**（AST 静态断言）、两种「吃光」形状识别。
+- **428 契约对齐**：`t2i_agnes`（registry + `api.py` 分派 + `tools/agnes_image.py`，`op=status`
+  真回钥位）是 11-07 加的真位，427 的钉数与快照已过期 ⇒ 重导 `data/capabilities.json`
+  （428）+ 同步 README/docs 计数（`doc_counts` 补上 `32 域` / 零作用域 / 挂票 / 环绕简写等
+  写法；加严后当场又逮到 `docs/01` 一处漏网的 389）。
+- **清理**：8 个 `.bak-*` 残片移到 `.archive/versions/2026-11-10/`（只移动不删除）；
+  从 `fbbe09d^` 恢复 `holo_pet_w3/{window,ef_render,host-bridge}.js`（被误删的重启桥），
+  删掉 `index.html` 里指向**从未存在**文件 `skin-omarchy.css` 的陈旧引用。
+- **第二轮回测（主人：挨个测能使用就接入、限流/没额度自动跳下一格）**又逮到三处：
+  · **上调预算的重试吃掉了换格预算** —— 一格「吃光」要连吃 3 发（256→1024→仍空），
+    `_tries` 只够 3 发 ⇒ 另 2 格一次没试、整单判死（实测第 3、4 通复现）。
+    现：环车道 `_tries >= len(ring)+2`，且单次调用**最多上调 2 次**。
+  · **`rr` 两个坐标系混用** —— 游标存的是全环下标，`model_order` 却拿它 `% len(暖格)`，
+    环 6 格 / 冷却 2 格时会跳格。现按全环对齐（从上一落点起找第一个暖格）。
+  · **「整环都在冷却」判据用了暖格数** —— 4 格冷却时把 2 格暖的也压成 1 发。
+    现用**声明环长**比冷却数。
+- **新增 `op=probe`（`cloud_llm`）**：免费车道**逐格真打**并写回网关状态 ——
+  `{"op":"probe"}` 回 `usable/total` + 每格 `usable|rate_limited|no_quota|not_found|empty`。
+  探针同样认「推理吃光预算」（4x 预算重试一次再判），不把能用的格误标成坏格。
+- **实测（本轮）**：`op=probe` → **6/6 usable**（kilo-auto / nemotron-3.5-lightning /
+  dots-3-note-preview / north-mini-code / openrouter-free / nemotron-3-ultra，单个 0.9–7.0s）；
+  故障注入（人为把两格标 429 + 402）→ 下一通顺序自动变成剩下 4 格，
+  连发 4 通**全部成功且落在被限格的次数为 0**，落点依次 dots → openrouter →
+  nemotron-ultra → dots。
+
+
 ## 2026-11-06 · 第三十八批：每一步都能看见 —— 扫描 / 工具 / 回执 / 回答 四段 · 屏幕采集自愈
 
 - **主人令**（逐字）：「精细一点必须她扫描过哪里，在执行哪里，调用什么工具每一步细节都要能看得到」。

@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 from gbt_allinone.profession_router import plan as route_plan  # noqa: E402
 
 
-def dispatch(task: str, dry_run: bool = True, confirm: bool = False, max_caps: int = 3) -> dict:
+def dispatch(task: str, dry_run: bool = False, confirm: bool = True, max_caps: int = 3) -> dict:
     """按职业路由派单（只跑 safe 能力位）。"""
     task = (task or "").strip()
     if not task:
@@ -42,11 +42,32 @@ def dispatch(task: str, dry_run: bool = True, confirm: bool = False, max_caps: i
         base.update({"ok": False, "executed": False,
                      "reason": "该职业没有 safe 候选能力位（候选全部需授权）——不自动执行，需人工/要票"})
         return base
-    if dry_run or not confirm:
+    if dry_run:
         base.update({"ok": True, "executed": False,
                      "reason": "dry_run（默认）；真执行需 confirm=True" if dry_run else
                                "未确认：需 confirm=True 才执行"})
         return base
+
+    # 🔒 安全策略闸：黑客全能力需主人终端确认；转账永远拦
+    try:
+        from gbt_allinone import security_policy as _sp
+    except Exception:  # noqa: BLE001
+        _sp = None
+    if _sp is not None:
+        allowed, blocked = [], []
+        for c in caps:
+            dec = _sp.check(c)
+            if dec.get("decision") in ("blocked_transfer", "need_terminal_confirm"):
+                blocked.append({"cap": c, "decision": dec.get("decision"),
+                                "reason": dec.get("reason")})
+            else:
+                allowed.append(c)
+        caps = allowed
+        base["blocked_by_policy"] = blocked
+        if not caps:
+            base.update({"ok": False, "executed": False,
+                         "reason": "候选能力位全部被安全策略拦下"})
+            return base
 
     # 真执行：逐条派单，逐条留结果
     from gbt_allinone.api import run_task  # 延迟导入，避免循环

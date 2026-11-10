@@ -11,6 +11,29 @@
     var n = document.createElement(tag); if (cls) n.className = cls;
     if (text != null) n.textContent = text; return n;
   }
+  /* 账里存的是 Python repr（{'op': 'catalog'}），直接显示给用户没法读；这里转成 op=catalog 这种 */
+  function prettyDetail(raw) {
+    var s = String(raw == null ? "" : raw).trim();
+    if (s.charAt(0) !== "{" || s.indexOf(":") < 0) return s;
+    var out = [];
+    var re = /['"]?([A-Za-z0-9_\u4e00-\u9fff.\-]+)['"]?\s*:\s*('([^']*)'|"([^"]*)"|([^,}]*))/g;
+    var m;
+    while ((m = re.exec(s)) !== null) {
+      var k = m[1];
+      var v = (m[3] != null ? m[3] : (m[4] != null ? m[4] : (m[5] || ""))).trim();
+      if (!k) continue;
+      if (v === "None" || v === "none" || v === "null") v = "";
+      else if (v === "True") v = "是";
+      else if (v === "False") v = "否";
+      else if (v.charAt(0) === "[") v = v.slice(0, 28) + "…";
+      else if (v.length > 48) v = v.slice(0, 46) + "…";
+      out.push(v ? k + "=" + v : k);
+      if (out.length >= 8) break;
+    }
+    if (!out.length) return s;
+    return out.join(" · ") + (s.length >= 150 ? " …" : "");
+  }
+
   function renderDetail(t) {
     if (!detail) return;
     detail.innerHTML = "";
@@ -32,7 +55,7 @@
       row.appendChild(el("span", "tt-act", (s.action || s.actor || "?")));
       row.appendChild(el("span", "tt-target", s.target || ""));
       var body = el("div", "tt-body");
-      body.appendChild(el("div", "tt-detail-text", s.detail || ""));
+      body.appendChild(el("div", "tt-detail-text", prettyDetail(s.detail)));
       if (s.evidence) body.appendChild(el("div", "tt-evidence", "证据：" + s.evidence));
       row.appendChild(body);
       row.appendChild(el("span", "tt-result", s.result || "ok"));
@@ -59,7 +82,11 @@
       };
       list.appendChild(row);
     });
-    if (countEl) countEl.textContent = (j && j.count != null ? j.count : traces.length) + " 轮 · 总 " + ((j && j.total) || 0);
+    if (countEl) {
+      var shownN = (j && j.count != null ? j.count : traces.length);
+      var totalN = (j && j.total) || 0;
+      countEl.textContent = (totalN > shownN) ? ("显示 " + shownN + " / 共 " + totalN + " 轮") : (shownN + " 轮");
+    }
     if (traces.length) { list.firstChild.classList.add("is-active"); renderDetail(traces[0]); }
   }
   function refresh() {

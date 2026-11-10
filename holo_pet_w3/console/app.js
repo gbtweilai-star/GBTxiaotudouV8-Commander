@@ -6,6 +6,7 @@
   "use strict";
 
   var MODE = { online: false, data: null };
+  var LAST_GOOD = null;   // 上一次真数据（刷新失败时继续用，不把整页打回“离线”）
   var ATTACH = null;   // 对话 + 号附图（dataURL/name/bytes）
   var $ = function (id) { return document.getElementById(id); };
   var el = function (tag, cls, text) {
@@ -39,11 +40,23 @@
     fetch("/api/data", { cache: "no-store" })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j && j.ok && j.data) { MODE.online = true; MODE.data = j.data; render(j.data); }
-        else throw new Error((j && j.error) || "无数据");
+        if (j && j.ok && j.data) {
+          LAST_GOOD = j.data;
+          window.GBT_CONSOLE = j.data;   // 3D 模块（星图/扫描/世界…）读的是这个全局
+          MODE.online = true; MODE.data = j.data; render(j.data);
+        } else throw new Error((j && j.error) || "无数据");
       })
       .catch(function (e) {
         if (silent && MODE.online) return;      // 静默刷新失败：保留当前实时数据，不污染界面
+        if (LAST_GOOD) {                        // 有过真数据：继续显示，只标“这轮没刷上”
+          window.GBT_CONSOLE = LAST_GOOD;
+          MODE.data = LAST_GOOD;
+          MODE.online = true;
+          render(LAST_GOOD);
+          var st = $("conn-state");
+          if (st) st.textContent = "本机 · 刷新失败，显示上次数据";
+          return;
+        }
         MODE.data = fallback();
         render(MODE.data);
         addBot("⚠ 读不到实时数据（" + e.message + "），显示的是内联快照。起服务：python tools/console-server.py");
@@ -82,13 +95,33 @@
     var guards = d.guards || {};
     Object.keys(guards).forEach(function (k) {
       var v = String(guards[k] || "?").toLowerCase();
-      var cls = v === "clean" ? "ok" : (v ? "bad" : "warn");
+      var cls = (v === "clean" || v === "quiet") ? "ok" : (v ? "bad" : "warn");
       var row = el("div", "ev " + cls);
       row.appendChild(el("span", "dot"));
       var body = el("div", null, "");
       var b = el("b", null, k);
       body.appendChild(b);
       body.appendChild(document.createTextNode(" · " + (guards[k] || "未读")));
+      var det = (d.guard_details || {})[k];
+      var extra = "";
+      if (det && k === "signature") {
+        extra = " · " + (det.pages_checked || "?") + " 页 / 缺 " + (det.missing_count || 0);
+      } else if (det && k === "inventory") {
+        extra = " · 异物 " + ((det.foreign || []).length) +
+                " / 运行态 " + ((det.runtime || []).length);
+      } else if (det && k === "legacy") {
+        var bf = (((det.categories || {})["backup-files"] || {}).files) || 0;
+        var dc = (((det.notes || {})["doc-number-collisions"] || {}).groups) || 0;
+        extra = " · 散落备份 " + bf + " / 编号撞车 " + dc;
+      } else if (det && k === "alerts") {
+        extra = " · runtime " + (det.runtime_faults == null ? "?" : det.runtime_faults) +
+                " / 异常 " + (det.anomalies == null ? "?" : det.anomalies);
+      } else if (det && k === "selfscan") {
+        var rt = det.routing || {}, md = det.modules || {};
+        extra = " · 路由 " + (rt.routed || 0) + "/" + (rt.registered || 0) +
+                " / 模块查 " + (md.checked || 0) + " 坏 " + ((md.failed || []).length);
+      }
+      if (extra) body.appendChild(document.createTextNode(extra));
       row.appendChild(body);
       si.appendChild(row);
     });
@@ -151,7 +184,8 @@
     var caps = d.caps || {};
     var gs = d.guards || {};
     var cleanN = Object.keys(gs).filter(function (k) {
-      return String(gs[k] || "").toLowerCase().indexOf("clean") >= 0;
+      var v = String(gs[k] || "").toLowerCase();
+      return v.indexOf("clean") >= 0 || v === "quiet";
     }).length;
     $("stat-caps").textContent = caps.total || "—";
     $("stat-skills").textContent = (d.skills && d.skills.count) || "—";
@@ -297,6 +331,13 @@
 
   function buildSteps(j) {
     j = j || {};
+    /* 2026-11-07：服务端 SSE 会把这一轮真实走过的步骤随最终回执带回。
+       有它就原样用 —— 收尾时别再拿粗粒度折行把她真走过的过程覆盖掉。 */
+    if (Array.isArray(j.steps) && j.steps.length) {
+      return j.steps.map(function (s) {
+        return { title: s.title, ms: (s.ms != null ? s.ms : s.at_ms), rows: s.rows || [] };
+      });
+    }
     var cap = (j.capability && typeof j.capability === "object") ? j.capability : null;
     var call = (j.call && typeof j.call === "object") ? j.call : null;
     var rt = (j.route && typeof j.route === "object") ? j.route : null;
@@ -397,35 +438,44 @@
     return steps;
   }
 
+  /* 单个步骤行（Codex 同款：标题 + 耗时，详情默认折叠）。
+     `state:"running"` 的行显示「执行中」并带一个活计时，回执到了就换成实测耗时。 */
+  function _stepEl(s) {
+    s = s || {};
+    var head = el("button", "step-head");
+    head.type = "button";
+    head.setAttribute("aria-expanded", "false");
+    head.appendChild(el("span", "step-chev", "›"));
+    head.appendChild(el("span", "step-title", s.title || ""));
+    var running = s.state === "running";
+    var msTxt = running ? "执行中" : _msLabel(s.ms);
+    var msEl = el("span", "step-ms" + (running ? " live" : ""), msTxt);
+    if (msTxt) head.appendChild(msEl);
+    var body = el("div", "step-body");
+    body.hidden = true;
+    (s.rows || []).forEach(function (r) {
+      var row = el("div", "step-row");
+      row.appendChild(el("b", "", r[0]));
+      row.appendChild(el("span", "", r[1]));
+      body.appendChild(row);
+    });
+    head.addEventListener("click", function () {
+      var open = body.hidden;
+      body.hidden = !open;
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+      head.classList.toggle("is-open", open);
+    });
+    return { head: head, body: body, msEl: msEl };
+  }
+
   function renderSteps(wrap, steps) {
     if (!wrap) return;
     wrap.innerHTML = "";
     if (!steps || !steps.length) return;
     steps.forEach(function (s) {
-      var head = el("button", "step-head");
-      head.type = "button";
-      head.setAttribute("aria-expanded", "false");
-      head.appendChild(el("span", "step-chev", "›"));
-      head.appendChild(el("span", "step-title", s.title));
-      var ms = _msLabel(s.ms);
-      if (ms) head.appendChild(el("span", "step-ms", ms));
-      var body = el("div", "step-body");
-      body.hidden = true;
-      (s.rows || []).forEach(function (r) {
-        var row = el("div", "step-row");
-        row.appendChild(el("b", "", r[0]));
-        row.appendChild(el("span", "", r[1]));
-        body.appendChild(row);
-      });
-      head.addEventListener("click", function () {
-        var open = body.hidden;
-        body.hidden = !open;
-        head.setAttribute("aria-expanded", open ? "true" : "false");
-        head.classList.toggle("is-open", open);
-        wrap.classList.toggle("is-open", open);
-      });
-      wrap.appendChild(head);
-      wrap.appendChild(body);
+      var n = _stepEl(s);
+      wrap.appendChild(n.head);
+      wrap.appendChild(n.body);
     });
   }
 
@@ -440,7 +490,8 @@
       body = turn.bodyEl;
       caret = turn.caret;
       wrap = turn.wrap;
-      renderSteps(wrap, steps);
+      /* 流式步骤已经有内容时，最终回执若没折出步骤就别清空她真实走过的过程。 */
+      if (steps && steps.length) renderSteps(wrap, steps);
     } else {
       m = el("div", "msg bot printing");
       wrap = el("div", "msg-steps");
@@ -492,8 +543,9 @@
   }
 
   /* 一轮对话的「进行中」骨架（Codex 同款：过程行先到，正文随后逐字）。
-     回执是单个 JSON、没有流式，所以这里只做诚实的事：
-     立刻显示一条带真实计时与当前阶段的过程行，回执到达后原地换成完整步骤。 */
+     2026-11-07 主人令：「她开始执行任务每一步都要能看到她在干嘛执行到哪里」。
+     服务端用 SSE 把每个阶段 push 过来，这里**到达一条就追加一行**：
+     进行中的自动展开、前一条收起；最终回执到达后再换成完整步骤 + 逐字正文。 */
   function beginTurn() {
     var box = $("chat-messages");
     if (!box) return null;
@@ -510,42 +562,78 @@
     _stickBottom(true);
 
     var t0 = Date.now();
-    var head = el("button", "step-head");
-    head.type = "button";
-    head.setAttribute("aria-expanded", "false");
-    head.appendChild(el("span", "step-chev", "›"));
-    var titleEl = el("span", "step-title", "接收指令 · 正在处理");
-    head.appendChild(titleEl);
-    var msEl = el("span", "step-ms live", "0.0s");
-    head.appendChild(msEl);
-    var stepBody = el("div", "step-body");
-    stepBody.hidden = true;
-    head.addEventListener("click", function () {
-      var open = stepBody.hidden;
-      stepBody.hidden = !open;
-      head.setAttribute("aria-expanded", open ? "true" : "false");
-      head.classList.toggle("is-open", open);
-    });
-    wrap.appendChild(head);
-    wrap.appendChild(stepBody);
+    var timer = 0;
+    var lastSeq = 0;
+    var placeholder = null;
+    var runningMsEl = null, runningBase = 0, runningAt = 0;
 
-    var timer = window.setInterval(function () {
-      msEl.textContent = _msLabel(Date.now() - t0);
+    /* 未收到任何流式步骤前的占位行：真实计时，不许假装在跑。 */
+    placeholder = _stepEl({ title: "接收指令 · 正在处理", rows: [], state: "running" });
+    wrap.appendChild(placeholder.head);
+    wrap.appendChild(placeholder.body);
+
+    timer = window.setInterval(function () {
+      if (runningMsEl) {
+        runningMsEl.textContent = _msLabel(Date.now() - runningAt + runningBase);
+        return;
+      }
+      if (placeholder) placeholder.msEl.textContent = _msLabel(Date.now() - t0);
     }, 100);
 
     var turn = {
       node: m, wrap: wrap, bodyEl: body, caret: caret, t0: t0, live: true,
       stop: function () { if (timer) { window.clearInterval(timer); timer = 0; } },
-      phase: function (txt) { titleEl.textContent = txt; _stickBottom(false); },
+      step: function (rec) {
+        if (!rec || !turn.live) return;
+        if (rec.seq != null && rec.seq <= lastSeq) return;
+        if (rec.seq != null) lastSeq = rec.seq;
+        /* 第一条真步骤到达：撤掉占位行，之后只追加，不再清空 —— 过程是长出来的。 */
+        if (placeholder) { wrap.innerHTML = ""; placeholder = null; }
+        var running = rec.state === "running";
+        var n = _stepEl({ title: rec.title, rows: rec.rows, ms: rec.ms,
+                          state: running ? "running" : "done" });
+        /* 只展开「当前这一步」，历史步骤自动收起 —— 与 Codex 的执行面同一读法。 */
+        Array.prototype.forEach.call(wrap.querySelectorAll(".step-body"), function (b) { b.hidden = true; });
+        Array.prototype.forEach.call(wrap.querySelectorAll(".step-head"), function (h) {
+          h.classList.remove("is-open"); h.setAttribute("aria-expanded", "false");
+        });
+        wrap.appendChild(n.head);
+        wrap.appendChild(n.body);
+        if (running && n.body.children.length) {
+          n.body.hidden = false;
+          n.head.classList.add("is-open");
+          n.head.setAttribute("aria-expanded", "true");
+        }
+        if (running) {
+          runningMsEl = n.msEl;
+          runningBase = Number(rec.at_ms) || 0;
+          runningAt = Date.now();
+        } else {
+          runningMsEl = null;
+          if (rec.ms == null && rec.at_ms != null) n.msEl.textContent = _msLabel(rec.at_ms);
+        }
+        _stickBottom(false);
+      },
+      phase: function (txt) {
+        if (placeholder) placeholder.head.querySelector(".step-title").textContent = txt;
+        _stickBottom(false);
+      },
       drop: function () { turn.stop(); if (m.parentNode) m.parentNode.removeChild(m); }
     };
     m.__abort = function () {
       if (!turn.live) return;
       turn.live = false;
       turn.stop();
-      titleEl.textContent = "已中途中止";
-      msEl.textContent = _msLabel(Date.now() - t0);
-      msEl.classList.remove("live");
+      if (placeholder) {
+        placeholder.msEl.textContent = _msLabel(Date.now() - t0);
+        placeholder.msEl.classList.remove("live");
+        placeholder.head.querySelector(".step-title").textContent = "已中途中止";
+      } else {
+        var stop = _stepEl({ title: "已中途中止", ms: Date.now() - t0,
+                             rows: [["说明", "用户中止，后续步骤未执行"]] });
+        wrap.appendChild(stop.head);
+        wrap.appendChild(stop.body);
+      }
       m.classList.remove("printing");
       if (caret.parentNode) caret.parentNode.removeChild(caret);
       _stickBottom(false);
@@ -621,6 +709,73 @@
     return m;
   }
 
+  /* 回执 → 底部元信息（保持原有口径：通道 / tokens / 记忆环都来自回执本体）。 */
+  function _chatMeta(j) {
+    var meta;
+    if (j.via === "capability_router") {
+      meta = "万能插 · " + (j.label || j.intent || "能力") +
+        (j.ms != null ? " · " + j.ms + "ms" : "") + " · 已落审计";
+    } else if (j.via && (j.via.indexOf("file:") === 0 || j.via === "vision:local")) {
+      var vLabel = j.via === "vision:local" ? "附图视觉读数"
+        : (j.via === "file:text" ? "文本附件" : (j.via === "file:binary" ? "二进制附件" : "本地附件"));
+      meta = "本地附件 · " + vLabel + (j.ms != null ? " · " + j.ms + "ms" : "") + " · 不借云端";
+    } else {
+      meta = (j.usage ? j.usage.completion_tokens + " tok · " : "") +
+        (j.ms != null ? j.ms + "ms · " : "") + "temperature=0";
+      var ring = j.ring || {};
+      meta += " · 上下文 seq " + (ring.seq != null ? ring.seq : "?") +
+        " / 历史 " + (ring.db_turns != null ? ring.db_turns : "?") + " 轮";
+    }
+    return meta;
+  }
+
+  /* 读 POST /api/chat 的 SSE 流：
+     `step` 立刻交给 turn.step 追加，`final` 作为最终回执返回。
+     流断在半路没有 final ⇒ 如实报「没有收到最终回执」，不拿半截冒充成功。 */
+  function _readChatStream(resp, turn) {
+    var reader = resp.body.getReader();
+    var dec = new TextDecoder("utf-8");
+    var buf = "";
+    var final = null;
+
+    function pump() {
+      return reader.read().then(function (r) {
+        if (r.done) return final || { ok: false, error: "流已断开，没有收到最终回执" };
+        buf += dec.decode(r.value, { stream: true });
+        var idx;
+        while ((idx = buf.indexOf("\n\n")) >= 0) {
+          var block = buf.slice(0, idx);
+          buf = buf.slice(idx + 2);
+          var data = [];
+          block.split("\n").forEach(function (ln) {
+            if (ln.indexOf("data:") === 0) data.push(ln.slice(5).replace(/^ /, ""));
+          });
+          if (!data.length) continue;
+          var ev = null;
+          try { ev = JSON.parse(data.join("\n")); } catch (e) { ev = null; }
+          if (!ev) continue;
+          if (ev.type === "step") { if (turn && turn.step) turn.step(ev); }
+          else if (ev.type === "final") { final = ev.result || {}; }
+        }
+        if (final) return final;
+        return pump();
+      });
+    }
+    return pump().then(function (j) {
+      try { reader.cancel(); } catch (e) { /* 已断开 */ }
+      return j;
+    });
+  }
+
+  function _finishChat(j, turn, btn) {
+    if (j && j.ok) {
+      printBot(String(j.text || "").trim() || "(空回答)", _chatMeta(j), buildSteps(j), turn);
+    } else {
+      printBot("⚠ " + ((j && j.error) || "调用失败"), "如实报错", buildSteps(j), turn);
+    }
+    if (btn) btn.disabled = false;
+  }
+
   function chatSubmit(text) {
     finishPrinting();          // 上一轮还在吐字：先让它落定，再把新消息接上
     var _att = ATTACH;
@@ -641,38 +796,26 @@
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: text, context: "console-web",
+        stream: true,
         image: (_att && _att.kind === "image") ? _att.dataUrl : "",
         image_name: (_att && _att.kind === "image") ? (_att.name || "") : "",
         file: (_att && _att.kind === "file") ? _att.dataUrl : "",
         file_name: (_att && _att.kind === "file") ? (_att.name || "") : "",
         file_type: (_att && _att.kind === "file") ? (_att.type || "") : ""
       })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.ok) {
-        var meta;
-        if (j.via === "capability_router") {
-          // 2026-11-02：四类能力（看屏幕/开网页/读写文件/看图）走万能插真执行，回执如实标出来
-          meta = "万能插 · " + (j.label || j.intent || "能力") +
-            (j.ms != null ? " · " + j.ms + "ms" : "") + " · 已落审计";
-        } else if (j.via && (j.via.indexOf("file:") === 0 || j.via === "vision:local")) {
-          // 2026-11-02：对话附图 / 文件发送 —— 本地解析，不借云端
-          var vLabel = j.via === "vision:local" ? "附图视觉读数"
-            : (j.via === "file:text" ? "文本附件" : (j.via === "file:binary" ? "二进制附件" : "本地附件"));
-          meta = "本地附件 · " + vLabel + (j.ms != null ? " · " + j.ms + "ms" : "") + " · 不借云端";
-        } else {
-          meta = (j.usage ? j.usage.completion_tokens + " tok · " : "") +
-            (j.ms != null ? j.ms + "ms · " : "") + "temperature=0";
-          var ring = j.ring || {};
-          meta += " · 上下文 seq " + (ring.seq != null ? ring.seq : "?") +
-            " / 历史 " + (ring.db_turns != null ? ring.db_turns : "?") + " 轮";
-        }
-        printBot(String(j.text || "").trim() || "(空回答)", meta, buildSteps(j), turn);
-      } else {
-        printBot("⚠ " + ((j && j.error) || "调用失败"), "如实报错", buildSteps(j), turn);
+    }).then(function (r) {
+      var ct = (r.headers.get("content-type") || "").toLowerCase();
+      if (ct.indexOf("text/event-stream") >= 0 && r.body && r.body.getReader) {
+        return _readChatStream(r, turn);
       }
+      /* 老服务 / 代理剥了流：退回整包 JSON，但步骤仍照常折出来。 */
+      return r.json();
+    }).then(function (j) {
+      _finishChat(j, turn, btn);
     }).catch(function (e) {
       printBot("⚠ 请求失败：" + e.message, "网络错误", null, turn);
-    }).then(function () { btn.disabled = false; });
+      btn.disabled = false;
+    });
   }
 
   function wire() {
@@ -781,7 +924,22 @@
     renderDash(d);
     var cs = $("caps-sub"), ss = $("skills-sub");
     if (cs) cs.textContent = (d.caps && d.caps.total) + " 位 · " + ((d.domains && d.domains.length) || 0) + " 域";
-    if (ss) ss.textContent = (d.skills && d.skills.count) + " 个 · " + ((d.skills && d.skills.validate) || "?");
+    if (ss) {
+      var sk = d.skills || {};
+      var errs = sk.errors || [];
+      var verdict = sk.validate || "?";
+      var label = verdict === "ok" ? "全部合规"
+        : (errs.length ? (errs.length + " 项待修")
+          : (sk.warnings ? (sk.warnings + " 条提示") : verdict));
+      ss.textContent = (sk.count || 0) + " 个 · " + label;
+      ss.title = errs.map(function (e) {
+        var msgs = e.errors;
+        var txt = (Object.prototype.toString.call(msgs) === "[object Array]")
+          ? msgs.join("；") : (msgs || "").toString();
+        return (e.skill || e.path || "?") + "：" + (txt || "待修");
+      }).join("\n") || "";
+      document.documentElement.dataset.skills = verdict + ":" + errs.length;
+    }
     var cn = $("tab-caps-n"), sn = $("tab-skills-n");
     if (cn) cn.textContent = (d.caps && d.caps.total) || "";
     if (sn) sn.textContent = (d.skills && d.skills.count) || "";
@@ -966,6 +1124,15 @@
     }
     if (!wrap) return;
     wrap.innerHTML = "";
+    if (!items.length) {
+      document.documentElement.dataset.prof = "empty:no-data";
+      var emptyEl = document.createElement("div");
+      emptyEl.className = "prof-empty";
+      emptyEl.textContent = "职业表没加载：data/professions.json 缺失或读不出。"
+        + "跑 tools/gen-professions.py 生成后再刷新（不会凭空编职业）。";
+      wrap.appendChild(emptyEl);
+      return;
+    }
     items.forEach(function (p) {
       var card = document.createElement("section");
       card.className = "prof-card" + (p.chief ? " is-chief" : "");
@@ -1118,6 +1285,8 @@
   function renderBounty(d) {
     var strip = $("bounty-summary");
     if (!strip) return;
+    var emptyEl = $("bounty-empty");
+    if (emptyEl) emptyEl.hidden = !!((d && d.programs) || 0);
     strip.innerHTML = "";
     function kpi(label, val) {
       var el = document.createElement("div");
@@ -1209,6 +1378,38 @@
   function wireBounty() {
     var checkBtn = $("bounty-check");
     var demoBtn = $("bounty-add-demo");
+
+    var createBtn = $("bounty-create");
+    if (createBtn) {
+      createBtn.addEventListener("click", function () {
+        var name = (($("bounty-name") || {}).value || "").trim();
+        var scopeRaw = (($("bounty-scope") || {}).value || "").trim();
+        var authref = (($("bounty-authref") || {}).value || "").trim() || "本机自建靶场";
+        var out = $("bounty-new-result");
+        if (!name || !scopeRaw) { if (out) out.textContent = "名称和授权范围都要填"; return; }
+        var scope = scopeRaw.split(/[,，\s]+/).filter(Boolean);
+        if (out) out.textContent = "创建中…";
+        createBtn.disabled = true;
+        bountyApi("add_program", { name: name, scope: scope, authorization_ref: authref })
+          .then(function (r) {
+            if (!out) return;
+            if (r && r.ok) {
+              out.textContent = "已建：" + ((r.program && r.program.id) || name) + " · 现在可以做范围检查了";
+              document.documentElement.dataset.bountyCreate = "ok";
+              ensureBounty();
+            } else {
+              out.textContent = "拒绝：" + ((r && (r.reason || r.error)) || "未知");
+              document.documentElement.dataset.bountyCreate = "fail";
+            }
+          })
+          .catch(function (e) {
+            if (out) out.textContent = "创建失败：" + ((e && e.message) || e);
+            document.documentElement.dataset.bountyCreate = "error";
+          })
+          .then(function () { createBtn.disabled = false; });
+      });
+    }
+
     if (!checkBtn) return;
     checkBtn.addEventListener("click", function () {
       var prog = ($("bounty-program") || {}).value || "";
@@ -1293,6 +1494,37 @@
   function bwNativeState(text) {
     var el = $("bw-native-state");
     if (el) el.textContent = text || "—";
+  }
+
+  var BW_PROBED = false;
+  /* 检测本机 Chrome 调试口；进页面自动跑一次，按钮可强制重跑 */
+  function bwNativeProbe(force) {
+    if (BW_PROBED && !force) return null;
+    BW_PROBED = true;
+    var hint = $("bw-native-hint");
+    bwNativeState("检测中…");
+    return bwNative("status").then(function (j) {
+      var r = (j && j.result) || {};
+      if (r.ok) {
+        bwNativeState("已连接（" + (r.base || "127.0.0.1:9222") + "）");
+        if (hint) hint.textContent = "已连上 Chrome 调试口：可「在 Chrome 打开当前页」或「AI 读当前页」把正文取回来。";
+        document.documentElement.dataset.bwNative = "ok";
+      } else if (r.status === "needs_browser_debug") {
+        bwNativeState("未启动（Chrome 调试口未开）");
+        if (hint) hint.textContent = "Chrome 没开调试口：点「启动 Chrome」（自动带 --remote-debugging-port=9222）；"
+          + "或在已开的 Chrome 快捷方式目标后加这个参数、重启后再点「检测」。";
+        document.documentElement.dataset.bwNative = "needs_browser_debug";
+      } else {
+        bwNativeState(r.status || j.error || "不可用");
+        if (hint) hint.textContent = "原生浏览器不可用：" + (r.error || r.status || j.error || "未知")
+          + "；上面的内置页签仍可正常浏览。";
+        document.documentElement.dataset.bwNative = "fail";
+      }
+    }).catch(function (e) {
+      bwNativeState("接口不可用：" + e.message);
+      if (hint) hint.textContent = "调不到 /api/browser：" + e.message;
+      document.documentElement.dataset.bwNative = "error";
+    });
   }
 
 
@@ -1455,15 +1687,7 @@
         }
       }
     });
-    var chk = $("bw-native-check"); if (chk) chk.addEventListener("click", function () {
-      bwNativeState("检测中…");
-      bwNative("status").then(function (j) {
-        var r = (j && j.result) || {};
-        bwNativeState(r.ok ? "已连接（" + (r.base || "127.0.0.1:9222") + "）"
-          : (r.status === "needs_browser_debug" ? "未启动（Chrome 调试口未开）" : (r.status || j.error || "不可用")) +
-            (r.browser_executable ? " · " + r.browser_executable : ""));
-      }).catch(function (e) { bwNativeState("接口不可用：" + e.message); });
-    });
+    var chk = $("bw-native-check"); if (chk) chk.addEventListener("click", function () { bwNativeProbe(true); });
     var launch = $("bw-native-launch"); if (launch) launch.addEventListener("click", function () {
       bwNativeState("启动中…");
       bwNative("launch", { url: (url && bwNormUrl(url.value)) || "" }).then(function (j) {
@@ -1584,6 +1808,7 @@
     if (name === "browser") {
       ensureBrowser();
       if (BROWSER_HOST) hostShow();
+      try { bwNativeProbe(); } catch (e) {}
     }
     if (name === "stream" && typeof window.__streamRefresh === "function") {
       window.__streamRefresh();

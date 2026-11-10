@@ -282,13 +282,28 @@ class HardenedOmniTentacle:
         return screen
     
     def _verify(self, action_name):
-        """操作后验证 — 必须确认效果"""
-        after = self._raw.see()
-        # 保存前后对比
-        import base64, os
-        os.makedirs('.gbt/steps', exist_ok=True)
-        step_dir = f'.gbt/steps/step_{self._step_count:04d}_{action_name}'
-        return {'before': self._last_screen, 'after': after, 'step': self._step_count}
+        """操作后验证 — 必须确认效果。
+
+        写盘失败**不得**把已成功的动作结果改写成失败：本方法永不抛异常，
+        取景/落盘失败只如实放进 `verifyError`，动作结果（ok）与校验错误并列上报。
+        落盘目录锚定 GBT 仓根（__file__ 推导），不依赖 cwd —— 相对 '.gbt' 曾在
+        pyembed 以「万能插」目录为 cwd 时落到无权位置，抛 PermissionError 冲掉动作结果。
+        """
+        verify_error = None
+        after = None
+        try:
+            after = self._raw.see()
+        except Exception as exc:  # noqa: BLE001
+            verify_error = "取景失败: %s: %s" % (type(exc).__name__, str(exc)[:160])
+        if after is not None:
+            try:
+                from pathlib import Path as _P
+                # omni_tentacle.py 位于 <仓根>/gbt_allinone/tentacle/，parents[2] 即仓根
+                (_P(__file__).resolve().parents[2] / ".gbt" / "steps").mkdir(parents=True, exist_ok=True)
+            except Exception as exc:  # noqa: BLE001
+                verify_error = "落盘失败: %s: %s" % (type(exc).__name__, str(exc)[:160])
+        return {'before': self._last_screen, 'after': after,
+                'step': self._step_count, 'verifyError': verify_error}
     
     def __getattr__(self, name):
         raw_attr = getattr(self._raw, name)
@@ -312,7 +327,15 @@ class HardenedOmniTentacle:
                 result = raw_attr(*args, **kwargs)
                 if isinstance(result, dict):
                     result.setdefault('saw_first', True)  # ⛔ 先看凭据透传
-                self._verify(name)
+                verify = self._verify(name)
+                # ⛔ 写盘失败不得把已成功的动作结果改写成失败：
+                #    动作结果（ok）与校验错误（verifyError）并列上报。
+                if verify.get('verifyError'):
+                    if isinstance(result, dict):
+                        result['verifyError'] = verify['verifyError']
+                    else:
+                        result = {'ok': True, 'result': result,
+                                  'verifyError': verify['verifyError']}
                 return result
             return guarded
         

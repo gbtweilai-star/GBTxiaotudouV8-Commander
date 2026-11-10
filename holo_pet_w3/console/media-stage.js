@@ -14,7 +14,9 @@
   }
   function humanSize(mb) {
     var n = Number(mb) || 0;
-    return n >= 1024 ? (n / 1024).toFixed(1) + " GB" : n.toFixed(1) + " MB";
+    if (n >= 1024) return (n / 1024).toFixed(1) + " GB";
+    if (n >= 1) return n.toFixed(1) + " MB";
+    return Math.max(1, Math.round(n * 1024)) + " KB";
   }
   function srcFor(path) { return "/api/media/file?path=" + encodeURIComponent(path); }
   function openPreview(it) {
@@ -39,7 +41,13 @@
   function render(j) {
     var rows = (j && j.items) || [];
     grid.innerHTML = "";
-    if (!rows.length) grid.appendChild(el("div", "ms-empty", "这个分类暂无产物"));
+    if (!rows.length) {
+      var empt = el("div", "ms-empty", kind ? "当前分类暂无产物。" : "还没有媒体产物。");
+      empt.appendChild(el("em", null, kind
+        ? "切回「全部」看看其它类型；仍为空说明 outputs/ 里还没落这一类文件。"
+        : "产物来自产品目录 outputs/（语音互通 / 创作 / 视频）。跑一次对应任务后会自动出现在这里，也可以点右上「刷新」。"));
+      grid.appendChild(empt);
+    }
     rows.forEach(function (it) {
       var card = el("div", "ms-card");
       var icon = it.kind === "video" ? "▶" : (it.kind === "audio" ? "♪" : "▣");
@@ -49,8 +57,13 @@
       card.onclick = function () { openPreview(it); };
       grid.appendChild(card);
     });
-    if (countEl) countEl.textContent = (j && j.count != null ? j.count : rows.length) + " 件 · " +
-      JSON.stringify((j && j.counts) || {});
+    if (countEl) {
+      var cn = (j && j.counts) || {};
+      var label = { video: "视频", image: "图片", audio: "音频" };
+      var parts = Object.keys(cn).map(function (k) { return (label[k] || k) + " " + cn[k]; });
+      countEl.textContent = (j && j.count != null ? j.count : rows.length) + " 件" +
+        (parts.length ? " · " + parts.join(" · ") : "");
+    }
     if (histEl) {
       var h = (j && j.history) || [];
       histEl.innerHTML = "";

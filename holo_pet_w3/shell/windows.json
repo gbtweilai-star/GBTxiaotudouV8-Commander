@@ -39,6 +39,24 @@
     "visible": false
    },
    "note": "壳自带的连接/对话页（不在被拆的 28 页里）。"
+  },
+  {
+   "id": "desktop-humanoid",
+   "title": "GBT小土豆V8 · 桌面数字人指挥官",
+   "role": "child",
+   "file": "../desktop-humanoid/renderer/index.html",
+   "alwaysOnTop": true,
+   "transparent": true,
+   "frame": false,
+   "resizable": false,
+   "default": {
+    "x": null,
+    "y": null,
+    "w": 420,
+    "h": 560,
+    "visible": true
+   },
+   "note": "桌面常驻 3D 数字人（dh-v7-detail.glb），无边框透明置顶，双击休/醒，能力位绑定桥 127.0.0.1:8799"
   }
  ]
 }

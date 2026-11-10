@@ -1,0 +1,52 @@
+﻿<!doctype html>
+<html><head><meta charset="utf-8"><title>probe</title>
+<style>html,body{margin:0}iframe{width:1400px;height:900px;border:0}pre{position:fixed;left:0;top:0;background:#000;color:#0f0;z-index:9}</style>
+</head><body>
+<iframe id="f" src="/console/index.html"></iframe>
+<pre id="out">pending</pre>
+<script>
+(function(){
+  var errs = [];
+  window.addEventListener("error", function(e){ errs.push("parent-error: " + (e.message||"")); }, true);
+  function collect(){
+    var f = document.getElementById("f");
+    var w = f.contentWindow, d = f.contentDocument;
+    var res = { href: w.location.href, title: d.title, ready: d.readyState, errors: errs.slice(0,10) };
+    function q(sel){ var el = d.querySelector(sel); return el ? {found:true, tag:el.tagName, display:getComputedStyle(el).display, text:(el.textContent||"").trim().slice(0,60)} : {found:false}; }
+    res.els = {
+      avatar: q("#gbt-avatar-roam"), avatarFx: q("#gbt-avatar-roam-fx"),
+      avatarCanvas: q("#gbt-avatar-roam-fx canvas"),
+      commander: q("#gbt-commander"), commanderIn: q("#gbt-commander-in"),
+      vsStart: q("#vs-start"), vsStop: q("#vs-stop"), vsText: q("#vs-text"), vsTime: q("#vs-time"), vsState: q("#vs-state"),
+      uiCards: q("#ui-cards")
+    };
+    res.globals = {
+      avatar: !!w.__GBT_AVATAR_ROAM__, avatarState: w.__gbtAvatarState ? w.__gbtAvatarState() : null,
+      commander: !!w.__gbtCommanderExecute, tutorial: !!w.__gbtTutorial,
+      gbtW3: !!w.gbtW3, bridge: (w.gbtW3 && w.gbtW3.bridge) || null,
+      THREE: !!w.THREE, GLTFLoader: !!(w.THREE && w.THREE.GLTFLoader)
+    };
+    try {
+      d.dispatchEvent(new w.KeyboardEvent("keydown", {key:"k", code:"KeyK", ctrlKey:true, bubbles:true}));
+      res.commanderAfterCtrlK = getComputedStyle(d.getElementById("gbt-commander")).display;
+    } catch(e) { res.commanderAfterCtrlK = "ERR " + e.message; }
+    res.resources = w.performance.getEntriesByType("resource").map(function(e){
+      return { name: e.name.replace(w.location.origin, ""), status: e.responseStatus || 0, dur: Math.round(e.duration), size: e.transferSize };
+    }).filter(function(e){ return /\.(js|css|glb|png|svg)(\?|$)/.test(e.name); });
+    res.scripts = Array.prototype.map.call(d.scripts, function(s){ return s.src ? s.src.replace(w.location.origin,"") : "(inline)"; });
+    document.getElementById("out").textContent = "PROBE_JSON:" + JSON.stringify(res);
+  }
+  var f = document.getElementById("f");
+  f.addEventListener("load", function(){
+    var tries = 0;
+    var iv = setInterval(function(){
+      tries++;
+      var w = f.contentWindow;
+      var st = (w && w.__gbtAvatarState) ? w.__gbtAvatarState() : null;
+      var done = st && (st.glb || (st.three && st.three !== "ok"));
+      if (done || tries > 40) { clearInterval(iv); setTimeout(collect, 1500); }
+    }, 1000);
+  });
+})();
+</script>
+</body></html>

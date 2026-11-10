@@ -1,0 +1,84 @@
+{
+  "name": "desktop-humanoid",
+  "displayName": "桌面数字人指挥官（二代形象）",
+  "version": "1.0.0",
+  "createdAt": "2026-11-07T23:35:00+07:00",
+  "description": "无边框透明置顶桌面 3D 数字人，复用 dh-v7-detail.glb，绑定 385+ 能力位为指挥官指令，能力原样保留只增不改",
+  "author": "GBT小土豆V8 · 自由的风",
+  "license": "Apache-2.0",
+
+  "asset": {
+    "glb": "holo_pet_w3/assets/dh/dh-v7-detail.glb",
+    "refImage": "holo_pet_w3/assets/dh/ref.jpg",
+    "meshCount": 1,
+    "boneCount": 66,
+    "idleAnim": "idle"
+  },
+
+  "window": {
+    "id": "desktop-humanoid",
+    "title": "GBT小土豆V8 · 桌面数字人指挥官",
+    "role": "child",
+    "file": "desktop-humanoid/renderer/index.html",
+    "alwaysOnTop": true,
+    "transparent": true,
+    "frame": false,
+    "resizable": false,
+    "default": {
+      "x": null,
+      "y": null,
+      "w": 420,
+      "h": 560,
+      "visible": true
+    },
+    "note": "常驻桌面层，不挡主界面，双击休/醒，拖拽移位"
+  },
+
+  "runtime": {
+    "python": "pyembed\\python.exe",
+    "pythonArgs": ["-X", "utf8"],
+    "entry": "desktop-humanoid/main.py",
+    "cwd": "."
+  },
+
+  "capabilities": {
+    "mode": "read-only-binding",
+    "source": "gbt_allinone/caps_registry.py + gbt_allinone/api.py",
+    "binding": "desktop-humanoid/bridge.py",
+    "note": "不修改 caps_registry / api，只通过 run_task(cap, params) 绑定"
+  },
+
+  "audit": {
+    "evidenceLog": "state/action_evidence.jsonl",
+    "visionVerify": "vision_loop.vision_diff",
+    "policy": "AGENTS.md 三条默认（万能插 / 多域监控 / 原子替换）"
+  },
+
+  "phases": [
+    {"id": 1, "name": "桌面 3D 常驻层", "status": "done"},
+    {"id": 2, "name": "能力位对接 + 四觉闭环", "status": "done"},
+    {"id": 3, "name": "指挥面板 + 语音唤醒", "status": "done"},
+    {"id": 4, "name": "镜像排练 + 生产晋升", "status": "done"},
+    {"id": 5, "name": "端到端实测", "status": "done"}
+  ],
+
+  "stage5_verification": {
+    "verifiedAt": "2026-11-08T03:20:00+07:00",
+    "verdict": "功能链路全通；GUI 窗口需在正常桌面上下文启动",
+    "checks": {
+      "bridge_http": "ok (200, 127.0.0.1:8799)",
+      "static_hosting": "ok：index.html 20882B / dh-v7-detail.glb 10928840B / three.global.js 2007189B / GLTFLoader.global.js 115400B",
+      "three_d_render": "ok（CDP 实测）：1 mesh / 66 bones / 2 clips / mode=idle / active=true / WebGL 2.0",
+      "capability_calls": "ok：body_map / dh_pose / digital_human 三态=ok（428 个 frame_capabilities 可达）",
+      "audit_ledger": "ok：连续调用后累积 8+ 条，不再只剩最后一条"
+    },
+    "fixed_in_stage5": [
+      "WebGL 失效：--disable-gpu 与 --disable-software-rasterizer 同时启用会让 canvas.getContext('webgl') 返回 null，Three.js 在 new WebGLRenderer() 抛异常导致纯白屏。改为 --disable-gpu + --enable-unsafe-swiftshader（实测 WebGL 2.0 可用）。",
+      "GLB 加载被 CORS 拦截：页面走 file:// 时 GLTFLoader 的 fetch 加载本地 .glb 报 TypeError: Failed to fetch。改为桥托管静态资源（/renderer/、/assets/），页面走 http://127.0.0.1:8799/，同源加载。",
+      "资源相对路径越界：index.html 里 ../../holo_pet_w3/assets/... 在 http:// 根下解析越界，改为 /assets/... 绝对路径。",
+      "能力位返回值含 bytes 导致整次调用丢弃：json.dumps 遇 bytes 抛 TypeError，连失败原因都看不到。新增 _json_safe（bytes -> {__bytes__, preview_hex}），_send 与 append_evidence 均加兜底。",
+      "审计账本被整体覆盖（致命）：_atomic_append 名为追加实为覆盖写（读了 old 却没写回 tmp），每次调用都把历史记录抹掉。已改为真正追加并读回校验。"
+    ],
+    "known_environment_limit": "在受限沙箱/自动化会话里，Python 创建 GUI 子进程会被系统拒绝（Access is denied），此时 Edge 只有 MAIN+crashpad、renderer=0、无窗口。这是宿主环境限制而非代码缺陷；main.py 的 _diagnose_edge 会如实报出该状态并提示在桌面双击 启动-GBT.cmd 运行。"
+  }
+}

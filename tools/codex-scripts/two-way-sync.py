@@ -35,18 +35,33 @@ EXCLUDE_DIRS = {
     "holo_pet_w3/_archive-20261021", "tools/_retired", "holo_pet_w3/wgpu/_retired",
     "holo_pet/assets/digital-human/raw", "holo_pet_w3/eye/frames",
     "gbt_allinone/archived_logs", ".sync-backup", "sync-backup",
+    # 2026-11-10 补：运行时 / 虚拟环境。
+    # 交付树带完整运行时是为了「解压即可跑」，这些从不进 live 仓；
+    # 不排除会让 only_delivery 虚增 2.6 万条（实测 33577 -> 约 6400）。
+    ".venv-sadtalker", ".venv", "venv", "site-packages",
+    "pyembed", "py311", "third_party",
+    # 2026-11-10 补：Electron/Chrome 用户数据目录（Autofill / Crashpad / component_crx_cache），纯缓存
+    "desktop-humanoid/profile",
+    # 2026-11-10 补：归档与临时区，本就不参与对账（只有一边有也会被算成漂移）
+    ".archive", ".scratch", ".dsh",
 }
 EXCLUDE_FILES = {
     "arms/omni_arm.py",
     "holo_pet/assets/digital-human/standard/tex/source-copy.png",
     "holo_pet_w3/kaleido/v2.html", "holo_pet_w3/kaleido/v3c.html",
     "holo_pet_w3/kaleido/v9c.html", "holo_pet_w3/kaleido/v12.html",
-    # 2026-11-04：ninfer_verify.ps1 已删 —— 它在 git 全历史里只有 1 个提交且 size=0
-    # （从没写过任何内容），属于误提交的占位文件。排除清单里留着它没有意义。
+    "tools/codex-scripts/ninfer_verify.ps1",
 }
+# 2026-11-10 补：敏感文件与一次性备份/日志噪音。
+# .env 带真实密钥，绝不该参与对账（也不该被 push）；
+# *.bak-<时间戳> / *.old / *.prev 是改动前的手工快照，属噪音。
+SENSITIVE_NAMES = {".env", ".env.local", ".env.production"}
+NOISE_NAME_MARKERS = (".bak-", ".bak.", ".old", ".prev", ".orig", ".rej")
 # 交付档案：只属于交付树，绝不推 live
+# 2026-11-10 补：设计系统/模板资源库是交付内容（品牌库 airbnb/apple/ant…），
+# live 仓本就不持有，属正常状态而非漂移，因此不计入 only_delivery。
 DELIVERY_ONLY_FILES = {"MANIFEST.json", "整理说明.md"}
-DELIVERY_ONLY_PREFIX = ("整理报告/",)
+DELIVERY_ONLY_PREFIX = ("整理报告/", "skills/design-systems/", "skills/design-templates/")
 # 拉取时不让 live 覆盖的交付成果（push 时仍会推给 live）
 KEEP_PULL = {
     "gbt_allinone/tools/edit_core.py",
@@ -73,6 +88,12 @@ def sha(p: Path) -> str:
 
 def rel_skip(rel: str) -> bool:
     if rel in EXCLUDE_FILES:
+        return True
+    # 敏感文件 / 备份噪音（按文件名判断，任意层级）
+    name = rel.rsplit("/", 1)[-1]
+    if name in SENSITIVE_NAMES:
+        return True
+    if any(m in name for m in NOISE_NAME_MARKERS):
         return True
     parts = rel.split("/")
     if any(part in EXCLUDE_DIRS for part in parts):

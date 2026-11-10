@@ -437,21 +437,263 @@ def _mouse_position():
 def _screen_size():
     import pyautogui; size = pyautogui.size(); return {"width": size.width, "height": size.height}
 
-def _enum_windows(max_count=50):
+# ═══════════════════════════════════════════════════════════════════
+#  win32 窗口后端 — ctypes 实现（零 pywin32 依赖）
+#  pyembed 是 embeddable 包且不带 pip/pywin32；旧实现 `import win32gui` 的
+#  ImportError 被吞成 `return None/[]`，上层再误读成 window_not_found ——
+#  这就是「触手遮挡点击」被挡住的真因。这里用 user32/kernel32 的 ctypes 直连：
+#  枚举窗口 / 按标题子串 + 进程名 + class 找窗 / 激活 / PostMessage 后台点击。
+#  后端真不可用（非 Windows / 直连失败）时**抛 WindowBackendUnavailable**，
+#  绝不静默返回 None 冒充「找不到窗口」。
+# ═══════════════════════════════════════════════════════════════════
+
+class WindowBackendUnavailable(RuntimeError):
+    """win32 窗口后端不可用（非缺窗口，是缺直连能力）。"""
+
+
+_WIN32 = None
+_WIN32_ERR = None
+
+# Win32 消息常量（后台点击用）
+_WM_MOUSEMOVE = 0x0200
+_WM_LBUTTONDOWN = 0x0201
+_WM_LBUTTONUP = 0x0202
+_WM_RBUTTONDOWN = 0x0204
+_WM_RBUTTONUP = 0x0205
+_MK_LBUTTON = 0x0001
+_MK_RBUTTON = 0x0002
+
+
+def _win32():
+    """惰性初始化 ctypes win32 后端；成功返回 dict，失败返回 None 并在 _WIN32_ERR 留因。"""
+    global _WIN32, _WIN32_ERR
+    if _WIN32 is not None or _WIN32_ERR is not None:
+        return _WIN32
     try:
-        import win32gui, win32process
-    except ImportError:
-        return []
+        import ctypes
+        from ctypes import wintypes as _w
+        # DPI 感知（关键）：pyembed 进程默认 DPI-unaware，本机 150% 缩放下
+        # GetWindowRect/ScreenToClient 返回被压缩的逻辑坐标（物理 1920x1200 → 逻辑 1280x800），
+        # 而 WinUI/Notepad 按物理像素解 WM_LBUTTONDOWN 的 lParam —— 不设感知会 1.5x 打偏。
+        try:
+            _dpi = ctypes.WinDLL("user32", use_last_error=True)
+            _aw = getattr(_dpi, "SetProcessDpiAwarenessContext", None)
+            if _aw is not None:
+                _aw.argtypes = [ctypes.c_void_p]
+                _aw.restype = ctypes.c_bool
+                _aw(ctypes.c_void_p(-4))  # DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+            else:
+                _dpi.SetProcessDPIAware()
+        except Exception:
+            pass
+        u32 = ctypes.WinDLL("user32", use_last_error=True)
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        WNDENUMPROC = ctypes.WINFUNCTYPE(_w.BOOL, _w.HWND, _w.LPARAM)
+
+        u32.EnumWindows.argtypes = [WNDENUMPROC, _w.LPARAM]
+        u32.EnumWindows.restype = _w.BOOL
+        u32.IsWindowVisible.argtypes = [_w.HWND]
+        u32.IsWindowVisible.restype = _w.BOOL
+        u32.GetWindowTextLengthW.argtypes = [_w.HWND]
+        u32.GetWindowTextLengthW.restype = ctypes.c_int
+        u32.GetWindowTextW.argtypes = [_w.HWND, _w.LPWSTR, ctypes.c_int]
+        u32.GetWindowTextW.restype = ctypes.c_int
+        u32.GetClassNameW.argtypes = [_w.HWND, _w.LPWSTR, ctypes.c_int]
+        u32.GetClassNameW.restype = ctypes.c_int
+        u32.GetWindowRect.argtypes = [_w.HWND, ctypes.POINTER(_w.RECT)]
+        u32.GetWindowRect.restype = _w.BOOL
+        u32.GetClientRect.argtypes = [_w.HWND, ctypes.POINTER(_w.RECT)]
+        u32.GetClientRect.restype = _w.BOOL
+        u32.WindowFromPoint.argtypes = [_w.POINT]
+        u32.WindowFromPoint.restype = _w.HWND
+        u32.GetForegroundWindow.argtypes = []
+        u32.GetForegroundWindow.restype = _w.HWND
+        u32.GetWindowThreadProcessId.argtypes = [_w.HWND, ctypes.POINTER(_w.DWORD)]
+        u32.GetWindowThreadProcessId.restype = _w.DWORD
+        u32.ShowWindow.argtypes = [_w.HWND, ctypes.c_int]
+        u32.ShowWindow.restype = _w.BOOL
+        u32.SetForegroundWindow.argtypes = [_w.HWND]
+        u32.SetForegroundWindow.restype = _w.BOOL
+        u32.BringWindowToTop.argtypes = [_w.HWND]
+        u32.BringWindowToTop.restype = _w.BOOL
+        u32.PostMessageW.argtypes = [_w.HWND, ctypes.c_uint, _w.WPARAM, _w.LPARAM]
+        u32.PostMessageW.restype = _w.BOOL
+        u32.SendMessageW.argtypes = [_w.HWND, ctypes.c_uint, _w.WPARAM, _w.LPARAM]
+        u32.SendMessageW.restype = ctypes.c_ssize_t
+        u32.ScreenToClient.argtypes = [_w.HWND, ctypes.POINTER(_w.POINT)]
+        u32.ScreenToClient.restype = _w.BOOL
+        u32.ClientToScreen.argtypes = [_w.HWND, ctypes.POINTER(_w.POINT)]
+        u32.ClientToScreen.restype = _w.BOOL
+        u32.ChildWindowFromPointEx.argtypes = [_w.HWND, _w.POINT, ctypes.c_uint]
+        u32.ChildWindowFromPointEx.restype = _w.HWND
+        u32.keybd_event.argtypes = [ctypes.c_ubyte, ctypes.c_ubyte, ctypes.c_uint, ctypes.c_void_p]
+        u32.keybd_event.restype = None
+        u32.GetSystemMetrics.argtypes = [ctypes.c_int]
+        u32.GetSystemMetrics.restype = ctypes.c_int
+
+        k32.GetCurrentThreadId.argtypes = []
+        k32.GetCurrentThreadId.restype = _w.DWORD
+        k32.OpenProcess.argtypes = [_w.DWORD, _w.BOOL, _w.DWORD]
+        k32.OpenProcess.restype = _w.HANDLE
+        k32.QueryFullProcessImageNameW.argtypes = [_w.HANDLE, _w.DWORD, _w.LPWSTR, ctypes.POINTER(_w.DWORD)]
+        k32.QueryFullProcessImageNameW.restype = _w.BOOL
+        k32.CloseHandle.argtypes = [_w.HANDLE]
+        k32.CloseHandle.restype = _w.BOOL
+
+        _WIN32 = {"u32": u32, "k32": k32, "ctypes": ctypes, "w": _w, "WNDENUMPROC": WNDENUMPROC}
+    except Exception as _e:  # noqa: BLE001
+        _WIN32_ERR = "%s: %s" % (type(_e).__name__, str(_e)[:160])
+        _WIN32 = None
+    return _WIN32
+
+
+def _win32_backend_status() -> dict:
+    """窗口后端可用性三态（不吞错）：ok / needs_dependency（带真实异常原文）。"""
+    b = _win32()
+    if b is not None:
+        return {"ok": True, "backend": "ctypes"}
+    return {"ok": False, "needs_dependency": True, "backend": "ctypes",
+            "why": "win32 ctypes 后端不可用: %s" % (_WIN32_ERR or "未知原因")}
+
+
+def _require_win32():
+    """取后端；不可用就抛 WindowBackendUnavailable（带真实异常），绝不返回 None 冒充找不到。"""
+    b = _win32()
+    if b is None:
+        raise WindowBackendUnavailable(
+            "win32 ctypes 后端不可用: %s" % (_WIN32_ERR or "未知原因"))
+    return b
+
+
+def _ct_window_text(hwnd):
+    b = _win32()
+    if not b:
+        return ""
+    ln = b["u32"].GetWindowTextLengthW(hwnd)
+    if ln <= 0:
+        return ""
+    buf = b["ctypes"].create_unicode_buffer(ln + 1)
+    b["u32"].GetWindowTextW(hwnd, buf, ln + 1)
+    return buf.value or ""
+
+
+def _ct_window_class(hwnd):
+    b = _win32()
+    if not b:
+        return ""
+    buf = b["ctypes"].create_unicode_buffer(256)
+    b["u32"].GetClassNameW(hwnd, buf, 256)
+    return buf.value or ""
+
+
+def _ct_window_rect(hwnd):
+    b = _win32()
+    if not b:
+        return None
+    r = b["w"].RECT()
+    if not b["u32"].GetWindowRect(hwnd, b["ctypes"].byref(r)):
+        return None
+    return {"left": int(r.left), "top": int(r.top), "right": int(r.right), "bottom": int(r.bottom)}
+
+
+def _ct_window_from_point(x, y):
+    """屏幕坐标 → 窗口句柄（按屏幕 Z 序，取该点最上层窗口；含子窗口，失败返回 0）。
+
+    与 _background_click 里的 ChildWindowFromPointEx 不同：这里就是要「谁在最上面」，
+    对应旧 pywin32 的 win32gui.WindowFromPoint((x, y))。后端不可用返回 0（不抛）。
+    """
+    b = _win32()
+    if not b:
+        return 0
+    try:
+        hwnd = b["u32"].WindowFromPoint(b["w"].POINT(int(x), int(y)))
+        return int(hwnd or 0)
+    except Exception:
+        return 0
+
+
+def _ct_window_pid(hwnd):
+    b = _win32()
+    if not b:
+        return None
+    pid = b["w"].DWORD()
+    b["u32"].GetWindowThreadProcessId(hwnd, b["ctypes"].byref(pid))
+    return int(pid.value)
+
+
+def _ct_window_thread(hwnd):
+    b = _win32()
+    if not b or not hwnd:
+        return 0
+    pid = b["w"].DWORD()
+    return int(b["u32"].GetWindowThreadProcessId(int(hwnd), b["ctypes"].byref(pid)))
+
+
+def _ct_process_name(pid):
+    """由 PID 取进程名（如 notepad.exe）；失败返回空串，不抛。"""
+    b = _win32()
+    if not b or not pid:
+        return ""
+    c = b["ctypes"]
+    w = b["w"]
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    try:
+        h = b["k32"].OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, int(pid))
+        if not h:
+            return ""
+        try:
+            size = w.DWORD(1024)
+            buf = c.create_unicode_buffer(1024)
+            if b["k32"].QueryFullProcessImageNameW(h, 0, buf, c.byref(size)):
+                return os.path.basename(buf.value)
+        finally:
+            b["k32"].CloseHandle(h)
+    except Exception:
+        pass
+    return ""
+
+
+def _window_snapshot(hwnd):
+    """由 hwnd 构造统一窗口描述 dict（字段与旧 win32gui 版对齐，另补 class/process）。"""
+    title = _ct_window_text(hwnd)
+    rect = _ct_window_rect(hwnd) or {"left": 0, "top": 0, "right": 0, "bottom": 0}
+    pid = _ct_window_pid(hwnd)
+    cls = _ct_window_class(hwnd)
+    snap = {
+        "title": (title or "")[:100],
+        "pid": pid,
+        "hwnd": int(hwnd or 0),
+        "class": cls,
+        "rect": rect,
+        "size": "%dx%d" % (rect["right"] - rect["left"], rect["bottom"] - rect["top"]),
+        "pos": "(%d,%d)" % (rect["left"], rect["top"]),
+    }
+    pname = _ct_process_name(pid) if pid else ""
+    if pname:
+        snap["process"] = pname
+    return snap
+
+
+def _enum_windows(max_count=50):
+    b = _require_win32()
     windows = []
-    def _cb(hwnd, _):
-        if len(windows) >= max_count: return
-        if not win32gui.IsWindowVisible(hwnd): return
-        title = win32gui.GetWindowText(hwnd)
-        if not title or len(title.strip()) < 1: return
-        rect = win32gui.GetWindowRect(hwnd)
-        _, pid = win32process.GetWindowThreadProcessId(hwnd)
-        windows.append({"title": title[:100], "pid": pid, "hwnd": hwnd, "rect": {"left": rect[0], "top": rect[1], "right": rect[2], "bottom": rect[3]}, "size": f"{rect[2]-rect[0]}x{rect[3]-rect[1]}", "pos": f"({rect[0]},{rect[1]})"})
-    win32gui.EnumWindows(_cb, None)
+    def _cb(hwnd, _lparam):
+        if len(windows) >= max_count:
+            return True
+        try:
+            if not b["u32"].IsWindowVisible(hwnd):
+                return True
+            title = _ct_window_text(hwnd)
+            if not title or not title.strip():
+                return True
+            snap = _window_snapshot(hwnd)
+            if snap["rect"]["right"] - snap["rect"]["left"] <= 0:
+                return True
+            windows.append(snap)
+        except Exception:
+            pass
+        return True
+    b["u32"].EnumWindows(b["WNDENUMPROC"](_cb), 0)
     return windows
 
 # 中文应用名 → 窗口标题关键词映射 (中文匹配不到时用英文)
@@ -497,78 +739,352 @@ def window_title_matches(target, title):
     return all(any(tok in nt or nt in tok for nt in n_toks) for tok in t_toks)
 
 def _find_window(target):
-    try:
-        import win32gui, win32process
-    except ImportError:
+    """按名字找窗口：标题子串（双向/token）→ class → 进程名 匹配，任一命中即返回。
+
+    后端不可用时抛 WindowBackendUnavailable（**不吞成 None**）；真找不到才返回 None。
+    """
+    b = _require_win32()
+    t = str(target or "").strip()
+    if not t:
         return None
+    tl = t.lower()
     # 中文→英文映射: 同时尝试原始关键词和映射关键词
-    candidates = [target.lower()]
+    candidates = [tl]
     for cn, en in _WINDOW_TITLE_MAP.items():
-        if cn in target:
+        if cn in t:
             candidates.append(en)
             candidates.append(f"{cn} - {en.capitalize()}")
-    found = None
-    def _cb(hwnd, _):
-        nonlocal found
-        if found: return
+    hit = {"snap": None}
+    def _cb(hwnd, _lparam):
+        if hit["snap"]:
+            return True
         try:
-            title = win32gui.GetWindowText(hwnd)
-            tl = title.lower()
-            if win32gui.IsWindowVisible(hwnd) and (window_title_matches(target, title) or any(c in tl for c in candidates if c)):
-                rect = win32gui.GetWindowRect(hwnd)
-                _, pid = win32process.GetWindowThreadProcessId(hwnd)
-                found = {"title": title, "hwnd": hwnd, "pid": pid, "rect": {"left": rect[0], "top": rect[1], "right": rect[2], "bottom": rect[3]}, "size": f"{rect[2]-rect[0]}x{rect[3]-rect[1]}"}
+            if not b["u32"].IsWindowVisible(hwnd):
+                return True
+            title = _ct_window_text(hwnd)
+            tlow = title.lower()
+            # ① 标题子串 / token 级 AND
+            if window_title_matches(t, title) or any(c in tlow for c in candidates if c):
+                hit["snap"] = _window_snapshot(hwnd)
+                return True
+            # ② class 匹配（如 "Notepad" / "Chrome_WidgetWin_1"）
+            cls = _ct_window_class(hwnd)
+            if cls:
+                cl = cls.lower()
+                if tl in cl or cl in tl:
+                    hit["snap"] = _window_snapshot(hwnd)
+                    return True
+            # ③ 进程名匹配（target 可为 "notepad.exe" / "notepad"）
+            pid = _ct_window_pid(hwnd)
+            if pid:
+                pname = _ct_process_name(pid).lower()
+                if pname:
+                    pbase = pname.rsplit(".", 1)[0]
+                    if tl in (pname, pbase) or tl in pname or pname in tl:
+                        hit["snap"] = _window_snapshot(hwnd)
+                        return True
         except Exception as _e:
             _record_swallow(_e, "omni_core")
-    win32gui.EnumWindows(_cb, None)
-    return found
+        return True
+    b["u32"].EnumWindows(b["WNDENUMPROC"](_cb), 0)
+    return hit["snap"]
 
 def _get_active_window():
-    try:
-        import win32gui, win32process
-        hwnd = win32gui.GetForegroundWindow()
-        title = win32gui.GetWindowText(hwnd)
-        rect = win32gui.GetWindowRect(hwnd)
-        _, pid = win32process.GetWindowThreadProcessId(hwnd)
-        return {"title": title, "hwnd": hwnd, "pid": pid, "rect": {"left": rect[0], "top": rect[1], "right": rect[2], "bottom": rect[3]}, "size": f"{rect[2]-rect[0]}x{rect[3]-rect[1]}"}
-    except ImportError:
+    b = _require_win32()
+    hwnd = b["u32"].GetForegroundWindow()
+    if not hwnd:
         return None
+    return _window_snapshot(hwnd)
 
 def _focus_window(hwnd):
-    """强激活窗口 — 绕过Windows前台锁 (SetForegroundWindow对后台进程限制)"""
+    """激活窗口 — ctypes 版：ShowWindow(SW_RESTORE) + SetForegroundWindow + ALT 脉冲绕过前台锁。"""
+    b = _require_win32()
+    u32 = b["u32"]
+    SW_RESTORE = 9
+    hwnd = int(hwnd or 0)
     try:
-        import win32gui, win32con, win32process, win32api
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        u32.ShowWindow(hwnd, SW_RESTORE)
         try:
-            cur = win32api.GetCurrentThreadId()
-            fg = win32gui.GetForegroundWindow()
-            fg_t = win32process.GetWindowThreadProcessId(fg)[0]
-            if fg_t != cur:
-                win32process.AttachThreadInput(cur, fg_t, True)
-                try:
-                    win32gui.SetForegroundWindow(hwnd)
-                finally:
-                    win32process.AttachThreadInput(cur, fg_t, False)
-        except Exception:
+            cur = b["k32"].GetCurrentThreadId()
+            fg = u32.GetForegroundWindow()
+            fg_tid = _ct_window_thread(fg) if fg else 0
+            if fg_tid and fg_tid != cur:
+                u32.keybd_event(0x12, 0, 0, 0)
+                u32.keybd_event(0x12, 0, 2, 0)
+            u32.SetForegroundWindow(hwnd)
+        except Exception as _e:
+            _record_swallow(_e, "omni_core")
+        try:
+            u32.BringWindowToTop(hwnd)
+        except Exception as _e:
+            _record_swallow(_e, "omni_core")
+        if u32.GetForegroundWindow() != hwnd:
             try:
-                win32gui.SetForegroundWindow(hwnd)
+                u32.keybd_event(0x12, 0, 0, 0)
+                u32.keybd_event(0x12, 0, 2, 0)
+                u32.SetForegroundWindow(hwnd)
             except Exception as _e:
                 _record_swallow(_e, "omni_core")
-        try:
-            win32gui.BringWindowToTop(hwnd)
-        except Exception as _e:
-            _record_swallow(_e, "omni_core")
-        try:
-            if win32gui.GetForegroundWindow() != hwnd:
-                import ctypes
-                ctypes.windll.user32.keybd_event(0x12, 0, 0, 0)
-                ctypes.windll.user32.keybd_event(0x12, 0, 2, 0)
-                win32gui.SetForegroundWindow(hwnd)
-        except Exception as _e:
-            _record_swallow(_e, "omni_core")
-        return win32gui.GetForegroundWindow() == hwnd
+        return bool(u32.GetForegroundWindow() == hwnd)
     except Exception:
         return False
+
+
+def _ct_integrity():
+    """当前进程完整性级别（诊断 UIPI 用，报 Low/Medium/High，不回显敏感信息）。"""
+    try:
+        import ctypes
+        from ctypes import wintypes as _wi
+        a32 = ctypes.WinDLL("advapi32", use_last_error=True)
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        a32.OpenProcessToken.argtypes = [_wi.HANDLE, _wi.DWORD, ctypes.POINTER(_wi.HANDLE)]
+        a32.OpenProcessToken.restype = _wi.BOOL
+        a32.GetTokenInformation.argtypes = [_wi.HANDLE, ctypes.c_int, ctypes.c_void_p, _wi.DWORD, ctypes.POINTER(_wi.DWORD)]
+        a32.GetTokenInformation.restype = _wi.BOOL
+        k32.GetCurrentProcess.argtypes = []
+        k32.GetCurrentProcess.restype = _wi.HANDLE
+        k32.CloseHandle.argtypes = [_wi.HANDLE]
+        k32.CloseHandle.restype = _wi.BOOL
+        t = _wi.HANDLE()
+        if not a32.OpenProcessToken(k32.GetCurrentProcess(), 0x0008, ctypes.byref(t)):
+            return "tokenerr"
+        try:
+            n = _wi.DWORD()
+            a32.GetTokenInformation(t, 25, None, 0, ctypes.byref(n))  # TokenIntegrityLevel
+            buf = ctypes.create_string_buffer(n.value or 64)
+            a32.GetTokenInformation(t, 25, buf, n.value or 64, ctypes.byref(n))
+            sid_ptr = ctypes.cast(buf, ctypes.POINTER(ctypes.c_void_p))[0]
+            sub = ctypes.cast(sid_ptr, ctypes.POINTER(ctypes.c_ubyte))[1]
+            rid = ctypes.cast(sid_ptr, ctypes.POINTER(ctypes.c_uint32))[(8 + (sub - 1) * 4) // 4]
+            names = {0x0000: "Untrusted", 0x1000: "Low", 0x2000: "Medium",
+                     0x2100: "Medium+", 0x3000: "High", 0x4000: "System", 0x5000: "Protected"}
+            return names.get(rid, "0x%04x" % rid)
+        finally:
+            k32.CloseHandle(t)
+    except Exception:
+        return "?"
+
+
+def _background_click(hwnd, x, y, button="left", mode="post"):
+    """后台点击 — PostMessage/SendMessage 发鼠标消息，不移动真实鼠标、不抢焦点。
+
+    (x, y) 是**窗口左上角相对坐标**（含标题栏，与旧 click_window_occluded 的
+    x_offset/y_offset 语义一致）。内部换算：
+      屏幕点   = window rect 左上 + (x, y)
+      客户区点 = ScreenToClient(target, 屏幕点)
+      子控件   = ChildWindowFromPointEx(target, 客户区点)
+                 —— 只在本窗口内命中测试、不看 Z 序，正是「被遮挡仍能点中」的关键
+                    （这里**不能用** WindowFromPoint，它按屏幕 Z 序会返回遮挡物）。
+    然后把 WM_LBUTTONDOWN/UP（左键）或 WM_RBUTTONDOWN/UP（右键）发到子控件或本窗。
+
+    mode: "post" 用 PostMessage（异步入队，默认，最不侵入）；"send" 用 SendMessage（同步）。
+    """
+    b = _require_win32()
+    u32 = b["u32"]
+    hwnd = int(hwnd or 0)
+    rect = _ct_window_rect(hwnd) or {"left": 0, "top": 0}
+    sx = rect["left"] + int(x)
+    sy = rect["top"] + int(y)
+    # 屏幕点 → 本窗口客户区坐标（纯坐标换算，与遮挡无关）
+    pt = b["w"].POINT(sx, sy)
+    u32.ScreenToClient(hwnd, b["ctypes"].byref(pt))
+    cx, cy = int(pt.x), int(pt.y)
+    # 命中本窗口内的子控件（跳过不可见/禁用，不随 Z 序跑偏）
+    CWP_SKIPINVISIBLE = 0x0001
+    CWP_SKIPDISABLED = 0x0002
+    target_hwnd = hwnd
+    try:
+        child = u32.ChildWindowFromPointEx(hwnd, b["w"].POINT(cx, cy),
+                                           CWP_SKIPINVISIBLE | CWP_SKIPDISABLED)
+        if child and int(child) not in (0, hwnd):
+            target_hwnd = int(child)
+            pt2 = b["w"].POINT(sx, sy)
+            if u32.ScreenToClient(target_hwnd, b["ctypes"].byref(pt2)):
+                cx, cy = int(pt2.x), int(pt2.y)
+    except Exception as _e:
+        _record_swallow(_e, "omni_core")
+    if button == "right":
+        down, up, wdown, wup = _WM_RBUTTONDOWN, _WM_RBUTTONUP, _MK_RBUTTON, 0
+    else:
+        down, up, wdown, wup = _WM_LBUTTONDOWN, _WM_LBUTTONUP, _MK_LBUTTON, 0
+    lp = ((cy & 0xFFFF) << 16) | (cx & 0xFFFF)
+    sender = u32.SendMessageW if mode == "send" else u32.PostMessageW
+    ctypes_mod = b["ctypes"]
+    def _send(msg, wp):
+        ctypes_mod.set_last_error(0)
+        ok = bool(sender(target_hwnd, msg, wp, lp))
+        return ok, ctypes_mod.get_last_error()
+    r_move, e_move = _send(_WM_MOUSEMOVE, 0)
+    r_down, e_down = _send(down, wdown)
+    r_up, e_up = _send(up, wup)
+    return {"ok": bool(r_down and r_up), "hwnd": target_hwnd, "top_hwnd": hwnd,
+            "screen": (sx, sy), "client": (cx, cy), "mode": mode,
+            "integrity": _ct_integrity(),
+            "messages": {"mousemove": r_move, "down": r_down, "up": r_up},
+            "last_errors": {"mousemove": e_move, "down": e_down, "up": e_up}}
+
+
+def _uia_element_at_window_point(hwnd, sx, sy):
+    """在指定窗口内做命中测试 — 不随屏幕 Z 序跑偏（窗口被遮挡也点得中）。
+
+    模块级 ControlFromPoint 走 ElementFromPoint（屏幕 Z 序），被遮挡时返回的是
+    遮挡物；这里改用 ControlFromHandle（按句柄，与遮挡无关）拿到窗口元素，再递归找
+    BoundingRectangle 包含 (sx, sy) 的**最深**后代（面积最小者）。
+    返回 Control 或 None（UIA 不可用 / 查不到时，不抛、不吞成别的错）。
+    """
+    try:
+        import uiautomation as _uia
+    except Exception:
+        return None
+    try:
+        with _uia.UIAutomationInitializerInThread():
+            win_ctl = _uia.ControlFromHandle(int(hwnd))
+            if win_ctl is None:
+                return None
+            best = [None, None]  # [control, area]
+
+            def _hit(c, d=0):
+                if d > 18 or c is None:
+                    return
+                try:
+                    r = c.BoundingRectangle
+                except Exception:
+                    r = None
+                if r is not None:
+                    try:
+                        if r.left <= sx <= r.right and r.top <= sy <= r.bottom:
+                            area = (r.right - r.left) * (r.bottom - r.top)
+                            if best[1] is None or area < best[1]:
+                                best[0] = c
+                                best[1] = area
+                    except Exception:
+                        pass
+                try:
+                    children = c.GetChildren()
+                except Exception:
+                    children = []
+                for ch in children:
+                    _hit(ch, d + 1)
+
+            _hit(win_ctl)
+            return best[0]
+    except Exception as _e:
+        _record_swallow(_e, "omni_core")
+        return None
+
+
+def _occluded_state_signature(hwnd, sx, sy):
+    """点击"是否真生效"的可观测状态签名 — **不依赖 PostMessage 返回值**。
+
+    记两样：① 窗口标题（tab 切换 / 对话框变化会改标题）；② 点击点处控件的选择状态
+    （若支持 SelectionItemPattern，记 IsSelected + 名字）。UIA 查不到时退化为仅标题
+    签名（best-effort，不报错）。用于点击前后对比判断 PostMessage 是否真把点击送到。
+    """
+    sig = {"title": _ct_window_text(hwnd)}
+    ctl = _uia_element_at_window_point(hwnd, sx, sy)
+    if ctl is not None:
+        try:
+            sig["control"] = (ctl.Name or "")[:80]
+            sig["control_type"] = ctl.ControlTypeName or ""
+        except Exception:
+            pass
+        node = ctl
+        for _ in range(5):
+            if node is None:
+                break
+            try:
+                pat = node.GetSelectionItemPattern()
+                if pat is not None:
+                    try:
+                        sig["selection_item"] = {
+                            "name": (node.Name or "")[:80],
+                            "is_selected": bool(pat.IsSelected),
+                        }
+                    except Exception:
+                        pass
+                    break
+            except Exception:
+                pass
+            try:
+                node = node.GetParentControl()
+            except Exception:
+                break
+    return sig
+
+
+def _occluded_state_changed(before, after):
+    """比较两份状态签名：标题变了 或 选择状态变了 → True。"""
+    if (before.get("title") or "") != (after.get("title") or ""):
+        return True
+    b = before.get("selection_item")
+    a = after.get("selection_item")
+    if b is not None and a is not None:
+        if b.get("is_selected") != a.get("is_selected"):
+            return True
+    return False
+
+
+def _uia_occluded_click(hwnd, sx, sy):
+    """UIA 兜底点击 — 命中窗口内点击点处的控件，按序试三模式，逐条记尝试。
+
+    顺序：SelectionItemPattern.Select() → InvokePattern.Invoke()
+          → LegacyIAccessiblePattern.DoDefaultAction()
+    每个模式在点击点元素及其祖先链（≤6 层）上找支持者；找到就调用一次，成功即返。
+    返回 {"mode", "attempts", "side_effects"}；**不在此处下"是否生效"结论**，
+    由调用方用 _occluded_state_signature 复核（UIA 返回值同样不作数）。
+    """
+    attempts = []
+    side_effects = ["brings_window_to_front"]  # UIA 触发会把窗口带到前台（实测）
+    out = {"mode": "none", "attempts": attempts, "side_effects": side_effects}
+    ctl = _uia_element_at_window_point(hwnd, sx, sy)
+    if ctl is None:
+        attempts.append({"pattern": "control_not_found",
+                         "point": [int(sx), int(sy)]})
+        return out
+    patterns = (
+        ("selection_item", "GetSelectionItemPattern", "Select", "post+uia_select"),
+        ("invoke", "GetInvokePattern", "Invoke", "post+uia_invoke"),
+        ("legacy", "GetLegacyIAccessiblePattern", "DoDefaultAction", "post+uia_legacy"),
+    )
+    for pname, getter, invoker, mode in patterns:
+        probe = ctl
+        supported = False
+        for _depth in range(6):
+            if probe is None:
+                break
+            cname = ""
+            try:
+                cname = (probe.Name or "")[:60]
+            except Exception:
+                pass
+            try:
+                pat = getattr(probe, getter)()
+            except Exception as _e:
+                attempts.append({"pattern": pname, "control": cname,
+                                 "error": "%s: %s" % (type(_e).__name__, str(_e)[:100])})
+                break
+            if pat is not None:
+                supported = True
+                try:
+                    ok = bool(getattr(pat, invoker)())
+                    attempts.append({"pattern": pname, "control": cname,
+                                     "called": True, "succeeded": ok})
+                except Exception as _e:
+                    attempts.append({"pattern": pname, "control": cname,
+                                     "called": False,
+                                     "error": "%s: %s" % (type(_e).__name__, str(_e)[:100])})
+                    break
+                if ok:
+                    out["mode"] = mode
+                    return out
+                break
+            try:
+                probe = probe.GetParentControl()
+            except Exception:
+                break
+        if not supported:
+            attempts.append({"pattern": pname, "available": False})
+    return out
 
 
 def _uia_set_value_by_window(window_title, text):
@@ -693,4 +1209,4 @@ def _uia_set_value_by_label(label, text):
 #  ⛔ 自动生成: omni_core 共享基础设施 (拆分自 omni_tentacle, 2026-08-10)
 #  所有 mixin 通过 `from omni_core import *` 获得模块级符号
 # ═══════════════════════════════════════════
-__all__ = ['sys', 'json', 'time', 'base64', 'io', 'Path', 'datetime', 'ROOT', '_MSS_SCT', '_DXCAM', '_DXCAM_FAIL_TS', '_DXCAM_BASE', '_DXCAM_BASE_TIME', '_NV_LITE', '_NV_LITE_TS', '_get_sct', '_mss_drop', '_get_dxcam', '_dxcam_frame', '_native_lite_eye', '_screen_capture', '_mouse_move', '_mouse_click', '_mouse_double_click', '_mouse_scroll', '_keyboard_type', '_keyboard_press', '_keyboard_hotkey', '_mouse_position', '_screen_size', '_enum_windows', 'window_title_matches', '_WINDOW_TITLE_MAP', '_find_window', '_get_active_window', '_focus_window', 'refusal', 'screen_capture_safe', '_uia_set_value_by_window', '_uia_set_value_by_label']
+__all__ = ['sys', 'json', 'time', 'base64', 'io', 'Path', 'datetime', 'ROOT', '_MSS_SCT', '_DXCAM', '_DXCAM_FAIL_TS', '_DXCAM_BASE', '_DXCAM_BASE_TIME', '_NV_LITE', '_NV_LITE_TS', '_get_sct', '_mss_drop', '_get_dxcam', '_dxcam_frame', '_native_lite_eye', '_screen_capture', '_mouse_move', '_mouse_click', '_mouse_double_click', '_mouse_scroll', '_keyboard_type', '_keyboard_press', '_keyboard_hotkey', '_mouse_position', '_screen_size', '_enum_windows', 'window_title_matches', '_WINDOW_TITLE_MAP', '_find_window', '_get_active_window', '_focus_window', '_background_click', '_win32', '_win32_backend_status', '_require_win32', 'WindowBackendUnavailable', '_ct_window_text', '_ct_window_class', '_ct_window_rect', '_ct_window_from_point', '_ct_window_pid', '_ct_window_thread', '_ct_process_name', '_window_snapshot', 'refusal', 'screen_capture_safe', '_uia_set_value_by_window', '_uia_set_value_by_label', '_uia_element_at_window_point', '_occluded_state_signature', '_occluded_state_changed', '_uia_occluded_click']

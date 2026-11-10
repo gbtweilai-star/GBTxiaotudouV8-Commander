@@ -13,7 +13,7 @@
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5_3.10-3776AB?logo=python&logoColor=white">
   <img alt="Core" src="https://img.shields.io/badge/Core-stdlib_only-22C55E">
-  <img alt="Caps" src="https://img.shields.io/badge/Capabilities-427-F5B041">
+  <img alt="Caps" src="https://img.shields.io/badge/Capabilities-428-F5B041">
   <img alt="Tests" src="https://img.shields.io/badge/Tests-27_suites-3F4759">
   <img alt="Docs" src="https://img.shields.io/badge/Docs-93_pages-00E5FF">
   <img alt="License" src="https://img.shields.io/badge/License-Apache--2.0-blue">
@@ -41,7 +41,7 @@
 一个**本地优先的独立数字人框架**：大脑（大模型）+ 触手（操作系统能力）+ 审计账（每次调用可追），
 所有能力通过**唯一入口** `run_task(kind, payload)` 调度，写盘 / 花钱 / 出网一律过授权门。
 
-- **不是聊天壳**：427 个能力位落在 32 个域，本机真跑、真留痕。其中 **389 位零作用域可直接调**、**38 位挂了票要先授权**；按 `safe` 字段另算则是 **339 位不改状态 / 88 位会写盘或出网**——两套口径都写在 `docs/03-capabilities.md`，不混着说。
+- **不是聊天壳**：428 个能力位落在 32 个域，本机真跑、真留痕。其中 **390 位零作用域可直接调**、**38 位挂了票要先授权**；按 `safe` 字段另算则是 **340 位不改状态 / 88 位会写盘或出网**——两套口径都写在 `docs/03-capabilities.md`，不混着说。
 - **不是玩具**：每次调用落 `audit.jsonl`（call / ok / error / denied），可查、可计数。
 - **不依赖云**：核心只用标准库；大模型可换本机 GGUF，也可以接任意 OpenAI 兼容端点。
 - **可自检**：`selfscan` 五维扫描、`trunk_cover` 代码全覆盖、`legacy_guard` 旧物六类扫描。
@@ -50,6 +50,20 @@
   <img src="assets/demo.gif" alt="30 秒 demo（真跑回放）" width="720">
   <br>
   <sub>30 秒 demo：真跑回放，不是录屏剪的</sub>
+</p>
+
+### 现役桌面壳（最新版）
+
+<p align="center">
+  <img src="assets/app-new-session.png" alt="现役桌面壳：新会话首页" width="880">
+  <br>
+  <sub>现役桌面壳 · 新会话首页：左侧工作区 / 历史会话，底部人格卡「万能插 · 多域监控 · 脑眼手」</sub>
+</p>
+
+<p align="center">
+  <img src="assets/app-commander-debug.jpg" alt="同一会话内的工具调用与自修复链路" width="880">
+  <br>
+  <sub>同一会话内：工具调用 → 失败回读 → 改走另一条通道重试，全过程留在轨迹里</sub>
 </p>
 
 ## 🚀 快速开始
@@ -63,7 +77,7 @@ cd GBTxiaotudouV8-Commander
 import sys; sys.path.insert(0, ".")
 import gbt_allinone as gbt
 
-print(len(gbt.list_capabilities()))                 # 427
+print(len(gbt.list_capabilities()))                 # 428
 print(gbt.run_task("health"))                       # 环境自检
 print(gbt.run_task("cap_self", {"op": "brief"}))    # 她自己的自述（现读）
 print(gbt.run_task("selfscan"))                     # 五维自检
@@ -79,7 +93,7 @@ Windows 一键启动：双击 `启动-GBT.cmd`；桌面壳（现役）：`cd hol
 $ python demo.py "把这次发布推到生产"
 
 ① 这台机器的能力目录（机器可读，不是截图）
-   427 位能力 · 32 个域 · 只读 389 · 会改状态 38 · 挂作用域 38
+   428 位能力 · 32 个域 · 只读 340 · 会改状态 88 · 挂作用域 38
 
 ② 按你的那句话，落点候选（关键字打分，不是模型决策）：
    [1000.0] one_key_deploy   pipeline  会改状态  要票：deploy_publish,process_execute,filesystem_write
@@ -102,12 +116,12 @@ $ python demo.py "把这次发布推到生产"
 run_task(kind, payload)
    │
    ├─ 授权门 security/policy.py（15 个作用域：付款/隐私/生产写入/远控/发声/出网…）
-   ├─ 能力位 caps_registry.py（427 个，32 域）
+   ├─ 能力位 caps_registry.py（428 个，32 域）
    ├─ 触手层 tentacle/（识别 / 执行 / 自检 / 编排 / 蓝图 / 脉冲直达）
    └─ 审计 store/audit.jsonl（call / ok / error / denied 全程落盘）
 ```
 
-## 🧠 她能干嘛（32 域 · 427 位）
+## 🧠 她能干嘛（32 域 · 428 位）
 
 **给她一句话，她自己选能力位、过授权门、真跑、留审计、出结果。**
 
@@ -164,7 +178,7 @@ esearch_intel 	opic_web |
 
 | 指标 | 读数 | 复核命令 |
 |---|---|---|
-| 能力位 | **427** | `cap_self verify` |
+| 能力位 | **428** | `cap_self verify` |
 | 审计条数 | 现读 | `gbt.log_count()` |
 | 自检 | clean | `selfscan` |
 | 代码覆盖 | orphan = 0 | `trunk_cover status` |

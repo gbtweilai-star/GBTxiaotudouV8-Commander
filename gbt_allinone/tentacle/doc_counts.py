@@ -42,9 +42,11 @@ TOTAL_PATTERNS = [
     re.compile(r"# (?P<n>\d{2,4})\s*$"),                            # print(...)  # 385
     re.compile(r"\| 能力位 \| \*\*(?P<n>\d{2,4})\*\* \|"),           # 实测读数表
     re.compile(r"（(?P<n>\d{2,4}) 位）"),                            # （385 位）
-    re.compile(r"30 域 · (?P<n>\d{2,4}) 位"),                       # 30 域 · 385 位
+    re.compile(r"\d+ 域 · (?P<n>\d{2,4}) 位"),                       # 30/32 域 · 385 位
     re.compile(r"能力位 caps_registry\.py（(?P<n>\d{2,4}) 个"),      # 架构图注释
-    re.compile(r"共 (?P<n>\d{2,4}) 位 / 30 个域"),                  # docs/03 标题
+    re.compile(r"共 (?P<n>\d{2,4}) 位 / \d+ 个域"),                 # docs/03 标题
+    re.compile(r"├── (?P<n>\d{2,4}) 位 × \d+ 域"),                 # 架构图 ASCII
+    re.compile(r"注册表现读\*\*[：:](?P<n>\d{2,4}) 位"),            # docs/03 首条
 ]
 
 # 子集写法：只读 / 写口 / 改状态出网（按 safe 字段重算）
@@ -55,6 +57,14 @@ SUBSET_PATTERNS = [
     (re.compile(r"`safe=false`（(?P<n>\d{2,4}) 位）"), "unsafe"),
     (re.compile(r"改状态/出网 (?P<n>\d{2,4}) 位"), "unsafe"),
     (re.compile(r"写口位（(?P<n>\d{2,4}) 位）"), "unsafe"),
+    (re.compile(r"只读 (?P<n>\d{2,4}) ·"), "safe"),                # 一行混写简写
+    (re.compile(r"会改状态 (?P<n>\d{2,4})"), "unsafe"),
+    (re.compile(r"\*\*(?P<n>\d{2,4}) 位零作用域"), "zero_scope"),
+    (re.compile(r"零作用域 (?P<n>\d{2,4}) 位"), "zero_scope"),
+    (re.compile(r"\*\*(?P<n>\d{2,4}) 位挂了票"), "need_scope"),
+    (re.compile(r"挂作用域 (?P<n>\d{2,4})"), "need_scope"),
+    (re.compile(r"\*\*(?P<n>\d{2,4}) 位不改状态"), "safe"),
+    (re.compile(r"\*\*(?P<n>\d{2,4}) 位会写盘或出网"), "unsafe"),
 ]
 
 # docs/03 逐域表格行
@@ -76,12 +86,35 @@ def split_counts() -> tuple:
     return safe, len(caps) - safe
 
 
+def scope_counts() -> tuple:
+    """零作用域 / 需过门。**与 safe 不是一回事**（零作用域 ≠ 只读）。"""
+    from ..security import policy as P
+    zero = 0
+    for name in _caps():
+        try:
+            scopes = list(P.evaluate(name, {}).scopes)
+        except Exception:  # noqa: BLE001
+            scopes = []
+        if not scopes:
+            zero += 1
+    return zero, len(_caps()) - zero
+
+
 def _is_history(line: str) -> bool:
     return any(m in line for m in HISTORY_MARKERS)
 
 
-def _sub_n(line: str, pat, want: int, changed: list) -> str:
+def _spans(line: str, pats: list) -> list:
+    out = []
+    for pat in pats:
+        out.extend(m.span() for m in pat.finditer(line))
+    return out
+
+
+def _sub_n(line: str, pat, want: int, changed: list, blocked=()) -> str:
     def _f(m):
+        if any(not (m.end() <= a or m.start() >= b) for a, b in blocked):
+            return m.group(0)          # 与子集写法重叠 ⇒ 不是总数，别动
         old = int(m.group("n"))
         if old == want or 1900 <= old <= 2100:
             return m.group(0)
@@ -133,6 +166,7 @@ def _sync_doc03_table(lines: list) -> tuple:
 def check(apply: bool = False) -> dict:
     total = current_count()
     safe, unsafe = split_counts()
+    zero, need = scope_counts()
     stale, fixed_files = [], []
 
     for rel in TARGETS:
@@ -147,18 +181,14 @@ def check(apply: bool = False) -> dict:
                 continue
             olds = []
             new = line
-            subset_hit = False
             for pat, kind in SUBSET_PATTERNS:
-                want = safe if kind == "safe" else unsafe
-                m = pat.search(new)
-                if m:
-                    subset_hit = True          # 只要这一行是子集写法，就不让"总数"再改写它
-                    if int(m.group("n")) != want:
-                        olds.append(int(m.group("n")))
-                new = _sub_n(new, pat, want, [])
-            if not subset_hit:          # 子集行不再被"总数"二次改写
-                for pat in TOTAL_PATTERNS:
-                    new = _sub_n(new, pat, total, olds)
+                want = {"safe": safe, "unsafe": unsafe,
+                        "zero_scope": zero, "need_scope": need}[kind]
+                new = _sub_n(new, pat, want, olds)
+            # 只屏蔽"子集命中区段"，其余区段照常校验总数
+            blocked = _spans(new, [p for p, _ in SUBSET_PATTERNS])
+            for pat in TOTAL_PATTERNS:
+                new = _sub_n(new, pat, total, olds, blocked)
             if olds:
                 stale.append({"file": rel, "line": i + 1, "old": sorted(set(olds)),
                               "text": line.strip()[:90]})
@@ -176,6 +206,7 @@ def check(apply: bool = False) -> dict:
                 p.write_text("\n".join(out), encoding="utf-8")
 
     return {"ok": True, "current": total, "safe": safe, "unsafe": unsafe,
+            "zero_scope": zero, "need_scope": need,
             "stale": stale, "count": len(stale),
             "files": sorted({s["file"] for s in stale}),
             "applied": bool(apply), "changed_files": fixed_files if apply else [],

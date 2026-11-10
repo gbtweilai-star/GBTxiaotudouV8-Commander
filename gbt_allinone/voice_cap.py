@@ -275,6 +275,10 @@ def tts(text, voice=None, rate=0, out=None, backend=None, engine=None,
     # SAPI 回退
     try:
         import comtypes.client
+        try:
+            comtypes.CoInitialize()
+        except Exception:
+            pass  # 已初始化过，无需重复
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "status": "needs_dependency",
                 "missing": "comtypes（.pylibs 已带；当前解释器未加载）",

@@ -1,0 +1,33 @@
+{
+  "name": "@gbt/dsh-cap-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH plugin exposed by GBT小土豆V8: one unified entry (gbt_caps / gbt_cap / gbt_health) over 428 capability slots; read-only first, confirm for state changes",
+  "type": "module",
+  "main": "./plugin.mjs",
+  "exports": {
+    ".": {
+      "default": "./plugin.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "plugin",
+    "gbt",
+    "capability",
+    "bridge"
+  ]
+}

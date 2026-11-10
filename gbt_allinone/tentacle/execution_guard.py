@@ -35,7 +35,9 @@ def _load(limit: int = 200, entries=None) -> list:
         return list(entries)[-limit:]
     rows = []
     if LEDGER.is_file():
-        with LEDGER.open(encoding="utf-8") as fh:
+        # 账本是追加日志，历史里可能残留坏字节；严格解码会整本读不了（2026-11-07 实测）。
+        # `errors="replace"` 只影响坏行本身：json.loads 失败后照旧 continue，其余行不受影响。
+        with LEDGER.open(encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 try:
                     rows.append(json.loads(line))

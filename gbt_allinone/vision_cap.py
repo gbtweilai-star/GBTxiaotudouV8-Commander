@@ -181,10 +181,20 @@ def resolve_vision_backend():
     if not (base and model):
         try:
             from .llm import cloud_llm as _cl
-            base = base or _cl.BASE_URL or ""
-            model = model or _cl.MODEL or ""
-            provider = _cl.PROVIDER or provider
-            via = "unified"
+            from .llm import key_gateway as _kg
+            # 🔴 2026-11-10：**只借「自己有钥匙」的统一车道**。
+            #   2026-11-10 起自动路落在免费链上，落点常是**免密的 Kilo**；
+            #   旧写法无条件借 BASE_URL/MODEL ⇒ vision 会拿保险箱里 agnes 那把钥匙
+            #   去打 api.kilo.ai —— 等于把凭据送给第三方。
+            #   这里只判「这条车道在不在位有钥匙」（沿用 key_gateway 的唯一真源），
+            #   **不读、不传、不落任何明文**；免密车道一律回落到下面的 `_KEY_CHAIN`，
+            #   让地址与钥匙按 profile 天然对齐。
+            _lane = str(getattr(_cl, "PROVIDER", "") or "")
+            if _lane and _kg.key_for(_lane)[0]:
+                base = base or _cl.BASE_URL or ""
+                model = model or _cl.MODEL or ""
+                provider = _lane
+                via = "unified"
         except Exception:  # noqa: BLE001
             pass
     # ══════════════════════════════════════════════════════════════════════

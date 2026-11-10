@@ -6,6 +6,7 @@
   var countEl = document.getElementById("ts-count");
   if (!list) return;
   var LABEL = { thought: "想", action: "做", result: "果", guard: "闸", system: "系" };
+  var FULL = { thought: "思考", action: "行动", result: "结果", guard: "闸门", system: "系统" };
   function el(tag, cls, text) {
     var n = document.createElement(tag); if (cls) n.className = cls;
     if (text != null) n.textContent = text; return n;
@@ -13,7 +14,11 @@
   function render(j) {
     var entries = (j && j.entries) || [];
     list.innerHTML = "";
-    if (!entries.length) list.appendChild(el("div", "ts-empty", "暂无事件"));
+    if (!entries.length) {
+      var empt = el("div", "ts-empty", "还没有事件。");
+      empt.appendChild(el("em", null, "对话或执行一次任务后，这里会出现 想 / 做 / 果 / 闸 / 系 五类记录；本页每 5 秒自动刷新，也可点右上「刷新」。"));
+      list.appendChild(empt);
+    }
     entries.forEach(function (e) {
       var row = el("div", "ts-item");
       row.setAttribute("data-kind", e.kind || "system");
@@ -27,8 +32,13 @@
       if (e.result) row.appendChild(el("span", "ts-result", e.result));
       list.appendChild(row);
     });
-    if (countEl) countEl.textContent = (j && j.count != null ? j.count : 0) + " 条 · " +
-      JSON.stringify((j && j.counts) || {});
+    if (countEl) {
+      var cs = (j && j.counts) || {};
+      var parts = Object.keys(cs).filter(function (k) { return cs[k]; })
+        .map(function (k) { return (FULL[k] || k) + " " + cs[k]; });
+      countEl.textContent = (j && j.count != null ? j.count : 0) + " 条" +
+        (parts.length ? " · " + parts.join(" · ") : "");
+    }
   }
   function refresh() {
     fetch("/api/stream?limit=100", { cache: "no-store" })

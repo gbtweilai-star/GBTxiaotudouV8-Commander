@@ -35,6 +35,53 @@ _FRAMEWORK_ROOT = {"README.md", "requirements.txt", "gbt_allinone"}
 #   home    ：保持旧口径不动（旧机器的读数一个数都不变）。
 _CHECKOUT = (_HOME / "pyproject.toml").exists() and (_HOME / "gbt_allinone").is_dir()
 _REPO_TOP: set = set()
+_GIT_TOPS: tuple | None = None
+
+
+def _git_tops() -> tuple:
+    """checkout 形态下让 git 当归属裁判：``(tracked, ignored)`` 两个顶层名集合。
+
+    病根（2026-11-07 实测）：旧 ``_repo_top()`` 只认 ``repo-layout.json``（MANIFEST 顶层），
+    MANIFEST 没声明的 ``brain.html`` / ``capabilities.html`` / ``media-console.html`` /
+    ``skin-preview.html`` 明明是 **git 已跟踪的仓库文件**，却被判成「异物」；
+    而 ``pyembed`` / ``store`` / ``vaults`` / ``work`` / ``__pycache__`` 这些
+    **git 明确忽略的本机运行态**也被判成「要处置的异物」。于是 APP 左侧永远红。
+
+    这里只读 git 自己的账：``ls-files``（仓库认识的文件）与
+    ``status --ignored=matching``（仓库声明不理的本机物）。两个都是仓库自己写的，
+    不是手写白名单。git 不可用时返回空集，分类退回原口径（不静默改判）。
+    """
+    global _GIT_TOPS
+    if _GIT_TOPS is not None:
+        return _GIT_TOPS
+    tracked: set = set()
+    ignored: set = set()
+    try:
+        import subprocess
+
+        def _run(args):
+            return subprocess.run(["git", "-C", str(_HOME)] + args,
+                                  capture_output=True, timeout=25)
+
+        r = _run(["ls-files", "-z"])
+        if r.returncode == 0:
+            for raw in r.stdout.split(b"\0"):
+                if raw:
+                    top = raw.decode("utf-8", "replace").split("/")[0]
+                    if top:
+                        tracked.add(top)
+        r = _run(["status", "--porcelain=v1", "--ignored=matching", "-z"])
+        if r.returncode == 0:
+            for raw in r.stdout.split(b"\0"):
+                if not raw.startswith(b"!! "):
+                    continue
+                top = raw[3:].decode("utf-8", "replace").strip().rstrip("/").split("/")[0]
+                if top:
+                    ignored.add(top)
+    except Exception:                                    # noqa: BLE001
+        pass
+    _GIT_TOPS = (tracked, ignored)
+    return _GIT_TOPS
 
 
 def _repo_top() -> set:
@@ -147,6 +194,28 @@ def _classify(p: Path) -> str:
     # 2026-11-01 主人令：**交付产物**（根下 交付* / outputs/**）归 data，不是异物
     if name.startswith("交付") or rel.startswith("outputs/"):
         return "data"
+    # checkout 形态：git 已跟踪 = 仓库本体（哪怕是 MANIFEST 没声明的页面/目录）
+    if _CHECKOUT:
+        tracked, ignored = _git_tops()
+        if name in tracked:
+            return "framework"
+        # git 明确忽略 = 本机运行态（运行时/产物/数据/缓存），不是「要处置的异物」
+        if name in ignored or name == "__pycache__" or name.endswith((".bak", ".old", ".orig")):
+            return "runtime"
+    # 空目录：没有内容可处置，不是异物（典型 `render/` 这类产物占位）
+    try:
+        if p.is_dir() and not any(p.iterdir()):
+            return "runtime"
+    except OSError:
+        pass
+    # 运行时目录的结构判据（不依赖 git）：目录里真有 python.exe / python3.dll。
+    # 产品副本（payload）不是 git 仓库，`_git_tops()` 为空；只靠 git 会把 pyembed 判成异物。
+    try:
+        if p.is_dir() and any((p / f).exists()
+                              for f in ("python.exe", "pythonw.exe", "python3.dll")):
+            return "runtime"
+    except OSError:
+        pass
     # 其他皆异物
     return "foreign"
 
@@ -170,7 +239,8 @@ def scan(fix: bool = False) -> dict:
             "items": {}, "scanned": False,
             "note": "盘点不了 ⇒ 没验成，不报『零游离物』。",
         }
-    items = {"framework": [], "environment": [], "data": [], "archive": [], "transient": [], "foreign": []}
+    items = {"framework": [], "environment": [], "data": [], "archive": [],
+             "transient": [], "runtime": [], "foreign": []}
     try:
         entries = sorted(_HOME.iterdir())
     except OSError as exc:
@@ -229,6 +299,7 @@ def scan(fix: bool = False) -> dict:
             "你看到的（家根总项）": total,
             "框架管辖（framework）": len(items["framework"]),
             "环境托管（environment）": len(items["environment"]),
+            "运行态（runtime，本机可再生）": len(items["runtime"]),
             "异物（foreign）": len(items["foreign"]),
         },
         "items": {k: [i["name"] for i in v] for k, v in items.items()},
@@ -238,7 +309,11 @@ def scan(fix: bool = False) -> dict:
         "mode": "checkout" if _CHECKOUT else "home",
         "assumption": ("checkout：根即仓库，仓库声明过的顶层项算 framework" if _CHECKOUT
                         else "home：家根是收过的目录，仓库包在子目录里"),
-        "law": "framework=她的本体 environment=桌面端的家 data=她记得的 foreign=要处置的",
+        "law": ("framework=她的本体 environment=桌面端的家 data=她记得的 "
+                "runtime=本机运行态/可再生（git 已忽略，不是异物） foreign=要处置的"),
+        "runtime_note": ("runtime 是本机运行所需（pyembed/store/vaults/work/render/__pycache__ 等），"
+                         "git 已声明忽略；它不参与『异物』判定，也不该染红。"
+                         "真要处置时看 items.runtime，不要盲删。"),
         "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "elapsed_ms": round((time.time() - t0) * 1000, 1),
     }

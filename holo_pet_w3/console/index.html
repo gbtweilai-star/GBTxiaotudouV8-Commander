@@ -448,6 +448,7 @@
           <button class="bw-mini" id="bw-native-open" type="button">在 Chrome 打开当前页</button>
           <button class="bw-mini" id="bw-native-read" type="button">AI 读当前页</button>
         </div>
+        <div class="bw-native-hint" id="bw-native-hint">进入本页会自动检测一次 Chrome 调试口；没开就点「启动 Chrome」（会自动带 --remote-debugging-port=9222）。</div>
         <pre class="gbt-browser-ai" id="bw-ai-read" hidden></pre>
         <div class="gbt-browser-body">
           <webview id="gbt-webview" src="about:blank" partition="persist:gbt-browser"
@@ -479,7 +480,7 @@
           <span class="vh-title">视频舱 · 全部视频能力融合</span>
           <span class="vh-count" id="vh-count">—</span>
           <button class="vh-refresh" id="vh-refresh" type="button">刷新</button>
-          <button class="vh-run" id="vh-run" type="button">六段联跑（只读探针）</button>
+          <button class="vh-run" id="vh-run" type="button" title="只读探针：生成 / 编辑成片 / 音频 / 钢印许可 / 情报外观 / 库舞台 六段联跑">全段联跑（只读探针）</button>
         </div>
         <div class="vh-run-result" id="vh-run-result">只跑只读探针；不生成视频、不伪造</div>
         <div class="vh-stages" id="vh-stages"><div class="vh-empty">读取视频能力编目…</div></div>
@@ -690,12 +691,27 @@
         <span class="view-sub" id="bounty-sub">项目 / 发现 / 报告 / 赔付（本模块不扫网络，扫描走安全能力位且必须过范围闸）</span>
       </div>
       <div class="bounty-strip" id="bounty-summary"></div>
+      <div class="bounty-empty" id="bounty-empty" hidden>
+        <b>还没有授权项目（合规第一：没授权不动手）</b>
+        <ol>
+          <li>在下面填「靶场名称 + 授权范围」，点「建自有靶场」；例：名称 本机靶场，范围 127.0.0.1,localhost</li>
+          <li>回到上面选中该项目，填目标，点「范围检查」；显示允许才继续</li>
+          <li>范围通过后再「录入示例发现」→ 卡片上「生成报告」；本模块不扫网络，扫描走安全能力位</li>
+        </ol>
+      </div>
       <div class="bounty-gate">
         <select id="bounty-program"></select>
         <input id="bounty-target" type="text" placeholder="目标域名或 IP（例：example.com）" />
         <button id="bounty-check" type="button">范围检查</button>
         <button id="bounty-add-demo" type="button">录入示例发现</button>
         <span id="bounty-gate-result"></span>
+      </div>
+      <div class="bounty-new">
+        <input id="bounty-name" type="text" placeholder="靶场名称（例：本机靶场）" />
+        <input id="bounty-scope" type="text" placeholder="授权范围，逗号分隔（例：127.0.0.1,localhost）" />
+        <input id="bounty-authref" type="text" placeholder="授权依据（例：本机自建）" />
+        <button id="bounty-create" type="button">建自有靶场</button>
+        <span id="bounty-new-result"></span>
       </div>
       <div class="bounty-list" id="bounty-findings"></div>
     </div>
@@ -975,6 +991,7 @@ window.addEventListener("error", function (e) {
 <script src="../../state/console-data.js"></script>
 <script src="./skin-cube.js"></script>
 <script src="../../assets/gsap.min.js"></script>
+<script src="../avatar-roam.js"></script>
 <div class="ui-cards" id="ui-cards" aria-live="polite"></div>
 <script src="./app.js"></script>
 <script src="./ui-cards.js"></script>
@@ -989,6 +1006,8 @@ window.addEventListener("error", function (e) {
 <script src="./pairing-panel.js"></script>
 <script src="./update-panel.js"></script>
 <script src="./voice-stream-panel.js"></script>
+<script src="./commander-mode.js"></script>
+<script src="./tutorial-voice.js"></script>
 <script src="./api-slot-panel.js"></script>
 <script src="./reminder-panel.js"></script>
 <script src="./resource-panel.js"></script>

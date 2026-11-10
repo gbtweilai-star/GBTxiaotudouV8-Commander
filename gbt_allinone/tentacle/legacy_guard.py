@@ -35,6 +35,23 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 HOME = ROOT.parent  # 工作区根（.scratch 在这里）
 
+# 这些目录本身就是「备份/暂存/运行时」：里面的 .bak/.old/.orig 是备份的备份，
+# 不是散落在项目里的旧副本。2026-11-07 实测：11 个 .bak 有 8 个就住在这里，
+# 却让 APP 左侧 legacy 永远红。排除的是**位置**，不是文件名。
+_BACKUP_ZONES = (
+    ".archive", ".scratch", ".backups", "state/backup",
+    "pyembed",                   # embeddable 运行时自带 python312.pth.bak
+    "vendor", "assets/vendor",   # 第三方依赖快照
+)
+
+
+def _in_backup_zone(p: pathlib.Path) -> bool:
+    try:
+        rel = p.relative_to(ROOT).as_posix()
+    except ValueError:
+        return False
+    return any(rel == z or rel.startswith(z + "/") for z in _BACKUP_ZONES)
+
 
 def _count(files) -> dict:
     n = 0
@@ -72,9 +89,13 @@ def scan(include_doc_dups: bool = True) -> dict:
     f_arch = [x for d in arch for x in d.rglob("*") if x.is_file()]
     cats["old-panel-archive"] = _count(f_arch)
 
-    # ④ 备份文件
-    baks = [p for p in ROOT.rglob("*") if p.is_file() and p.suffix.lower() in (".bak", ".old", ".orig")]
+    # ④ 备份文件：只算散落在项目里的；备份区内的不进红（见 _BACKUP_ZONES）
+    baks_all = [p for p in ROOT.rglob("*") if p.is_file()
+                and p.suffix.lower() in (".bak", ".old", ".orig")]
+    baks = [p for p in baks_all if not _in_backup_zone(p)]
     cats["backup-files"] = _count(baks)
+    if len(baks_all) != len(baks):
+        cats["backup-files"]["inside_backup_zones"] = len(baks_all) - len(baks)
 
     # ⑤ 重复文档编号
     dup_docs = []
@@ -98,11 +119,19 @@ def scan(include_doc_dups: bool = True) -> dict:
              "dup-doc-numbers": dup_docs,
              "state-tmp": [str(ROOT / "state" / "tmp")] if tmp else []}
 
-    found = bool(snap or work or arch or baks or tmp or dup_docs)
+    # `dup-doc-numbers` 是「编号撞车」，不是「旧物」：58 组里每组都是不同标题的不同文档
+    # （100-gsap-skill vs 100-hand-pipeline-verdict）。把它算进 verdict 会让 legacy 永远红，
+    # 又没有任何东西该删。单独放 notes 里提示，verdict 只由**真旧物**决定。
+    found = bool(snap or work or arch or baks or tmp)
     return {"ok": True, "verdict": "legacy_found" if found else "clean",
             "categories": cats, "paths": paths,
+            "notes": {"doc-number-collisions": {
+                "groups": len(dup_docs),
+                "meaning": "编号相同但标题不同；是命名撞车，不是重复内容，未计入 verdict",
+                "sample": dup_docs[:8]}},
             "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "rule": "项目里不许有旧代码/旧面板/重复物；重复文档只报不删（要人看内容）"}
+            "rule": ("项目里不许有散落的旧代码/旧面板/备份文件；备份区内的备份不算。"
+                     "文档编号撞车只提示、不进红（不同标题不是重复内容）")}
 
 
 def clean(include_tmp: bool = True) -> dict:
@@ -159,7 +188,7 @@ def run(op: str = "status", **kw) -> dict:
     if op == "status":
         s = scan()
         return {"ok": True, "verdict": s["verdict"], "categories": s["categories"],
-                "rule": s["rule"]}
+                "notes": s.get("notes"), "rule": s["rule"]}
     if op == "scan":
         return scan()
     if op == "clean":

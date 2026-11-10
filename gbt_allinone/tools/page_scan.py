@@ -27,6 +27,7 @@ import concurrent.futures as cf
 import json
 import os
 import pathlib
+import threading
 import time
 
 _ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -38,6 +39,51 @@ CONFIRM_MARKS = ("CONFIRM_REQUIRED", "SAFE_DELETE_BULK", "确认")
 # 本能力位自己的名字。绑在 godview-page 上没错（那页要能触发扫描），
 # 但**扫描器不能探测自己** —— 会无限递归到栈溢出，见 scan() 里的说明。
 SELF_CAP = "page_scan"
+
+
+def _timeout_seconds() -> float:
+    """单个能力位的探针上限。环境变量 ``GBT_PAGE_SCAN_TIMEOUT`` 可调。"""
+    try:
+        v = float(os.environ.get("GBT_PAGE_SCAN_TIMEOUT") or 20)
+    except (TypeError, ValueError):
+        v = 20.0
+    return max(1.0, min(v, 180.0))
+
+
+def _budget_seconds() -> float:
+    """整批扫描的总预算。环境变量 ``GBT_PAGE_SCAN_BUDGET`` 可调。"""
+    try:
+        v = float(os.environ.get("GBT_PAGE_SCAN_BUDGET") or 120)
+    except (TypeError, ValueError):
+        v = 120.0
+    return max(5.0, min(v, 1800.0))
+
+
+def _call_cap(cap: str, timeout: float):
+    """在 daemon 线程里跑 ``api.run_task``；超时立即放行。
+
+    2026-11-07 根因：全量 410 位 / 256 并发 >150s 不返回。``ex.map`` 没有逐能力
+    超时，任何一个位内部阻塞（本机模型 / 网络 / 子进程）都会把整批拖死。
+    线程必须是 daemon：ThreadPoolExecutor 的 worker 是 non-daemon，
+    若阻塞线程永远不退，进程退出时的 atexit join 仍会卡住。
+    """
+    box = {}
+
+    def _target():
+        try:
+            from .. import api
+            box["value"] = api.run_task(cap, {}, probe=True)
+        except BaseException as exc:                         # noqa: BLE001
+            box["error"] = exc
+
+    th = threading.Thread(target=_target, name="page-scan:" + cap, daemon=True)
+    th.start()
+    th.join(timeout)
+    if th.is_alive():
+        return None, "timeout"
+    if "error" in box:
+        raise box["error"]
+    return box.get("value"), None
 
 
 def _store() -> pathlib.Path:
@@ -66,13 +112,20 @@ def _caps() -> dict:
         return {}
 
 
-def _classify(cap: str) -> dict:
+def _classify(cap: str, timeout: float | None = None) -> dict:
     t0 = time.time()
     try:
-        from .. import api
-        r = api.run_task(cap, {}, probe=True)
+        r, why = _call_cap(cap, timeout if timeout is not None else _timeout_seconds())
     except Exception as e:                                  # noqa: BLE001
         return {"cap": cap, "color": "red", "why": "%s: %s" % (type(e).__name__, str(e)[:80]),
+                "ms": int((time.time() - t0) * 1000)}
+    if why == "timeout":
+        return {"cap": cap, "color": "yellow",
+                "why": "超时（%gs 未返回，已放行不让它拖死整批）"
+                       % (timeout if timeout is not None else _timeout_seconds()),
+                "ms": int((time.time() - t0) * 1000), "timeout": True}
+    if not isinstance(r, dict):
+        return {"cap": cap, "color": "red", "why": "探针没有返回信封（%s）" % type(r).__name__,
                 "ms": int((time.time() - t0) * 1000)}
     res = r.get("result") if isinstance(r.get("result"), dict) else {}
     st = str(r.get("status"))
@@ -126,8 +179,38 @@ def scan(workers: int = 512, page: str = "", limit: int = 0, caps=None) -> dict:
         want = {str(x) for x in caps}
         uniq = [c for c in uniq if c in want]
     t0 = time.time()
-    with cf.ThreadPoolExecutor(max_workers=max(1, min(workers, len(uniq) or 1))) as ex:
-        res = list(ex.map(_classify, uniq)) if uniq else []
+    per_cap = _timeout_seconds()
+    budget = _budget_seconds()
+    deadline = t0 + budget
+    res, timeouts = [], []
+    ex = cf.ThreadPoolExecutor(max_workers=max(1, min(workers, len(uniq) or 1)))
+    try:
+        futs = {ex.submit(_classify, c, per_cap): c for c in uniq}
+        pending = set(futs)
+        while pending:
+            remain = deadline - time.time()
+            if remain <= 0:
+                break
+            done, pending = cf.wait(pending, timeout=min(remain, 1.0),
+                                    return_when=cf.FIRST_COMPLETED)
+            for f in done:
+                c = futs[f]
+                try:
+                    res.append(f.result())
+                except Exception as e:                       # noqa: BLE001
+                    res.append({"cap": c, "color": "red",
+                                "why": "%s: %s" % (type(e).__name__, str(e)[:80]),
+                                "ms": 0})
+        for f in pending:
+            c = futs[f]
+            f.cancel()
+            timeouts.append(c)
+            res.append({"cap": c, "color": "yellow",
+                        "why": ("未在总预算 %gs 内完成（已放行；"
+                                "GBT_PAGE_SCAN_BUDGET 可放宽）" % budget),
+                        "ms": int(budget * 1000), "timeout": True})
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
     wall = round(time.time() - t0, 1)
     by = {"green": [], "yellow": [], "red": []}
     for r in res:
@@ -142,11 +225,14 @@ def scan(workers: int = 512, page: str = "", limit: int = 0, caps=None) -> dict:
            "自引用已排除": (SELF_CAP + "（否则递归栈溢出，见 scan 注释）") if self_ref else "无 ✓",
            "不在册的声明": absent or "无 ✓",
            "并发度": min(workers, len(uniq)), "用时秒": wall,
+           "单页超时秒": per_cap, "总预算秒": budget,
            "绿": len(by["green"]), "黄": len(by["yellow"]), "红": len(by["red"]),
            "红名单": [{"cap": r["cap"], "why": r["why"], "ms": r["ms"]} for r in by["red"]],
            "黄名单": [{"cap": r["cap"], "why": r["why"]} for r in by["yellow"]],
+           "超时": len(timeouts), "超时名单": timeouts,
            "结论": ("全覆盖且零真故障 ✓" if (not missing_page and not absent and not nobind and not by["red"])
-                    else "有红/有缺口 ⇒ 见名单")}
+                    else "有红/有缺口 ⇒ 见名单")
+                   + (("；%d 个位超时未跑完（已放行，不是绿）" % len(timeouts)) if timeouts else "")}
     with (_store() / "ledger.jsonl").open("a", encoding="utf-8") as f:
         f.write(json.dumps({k: out[k] for k in ("at", "页数", "唯一能力位", "绿", "黄", "红", "用时秒")},
                            ensure_ascii=False) + chr(10))

@@ -312,13 +312,18 @@
     });
     load();
     setInterval(load, 20000);
-    // 数字人 iframe 懒加载
-    document.addEventListener("click", function (e) {
-      var b = e.target.closest && e.target.closest(".view-tab[data-view='dh']");
-      if (!b) return;
-      var f = $("dh-frame");
+    // 数字人 iframe 懒加载（2026-11-07：视图名/iframe id 已从 dh 改为 teardown，旧选择器导致整页空白）
+    function loadAvatarFrame() {
+      var f = $("teardown-frame") || $("dh-frame");
       if (f && !f.getAttribute("src")) f.src = f.getAttribute("data-src");
+    }
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest(".view-tab[data-view='teardown'], .view-tab[data-view='dh']");
+      if (b) loadAvatarFrame();
     }, true);
+    window.addEventListener("gbt:view", function (e) {
+      if (e.detail === "teardown" || e.detail === "dh") loadAvatarFrame();
+    });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);

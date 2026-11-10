@@ -238,22 +238,83 @@ def _n_info(inputs: dict, ctx: dict) -> dict:
 def _n_t2i_qwen(inputs: dict, ctx: dict) -> dict:
     """文生图节点（Qwen-Image-2.1-Turbo · **8 步计划**）—— 同源 Qwen 系 · 开放权重。
 
-    边界如实（照本件铁律"不编"）：
-      · **本机 AMD 无 CUDA**（4GB 显存）⇒ 一律返 `needs_dependency`，**不许假装出图**；
-      · 配了云端点（env `GBT_T2I_ENDPOINT`）⇒ 上云跑，**必须带回四项能源读数**
-        （**步数 / 秒 / 显存峰值 / 花费**）—— "最小能源"要能量出来，**报不出 = 没做完**。
+    走云端 HTTP，不依赖本地 torch/ComfyUI：
+    · 配了云端点（env GBT_T2I_ENDPOINT）⇒ 上云跑，必须带回四项能源读数
+      （步数 / 秒 / 显存峰值 / 花费）—— "最小能源"要能量出来，报不出 = 没做完。
+    · 未配云端点 ⇒ needs_dependency，**不许假装出图**。
     """
-    import os
+    import os, json, time, urllib.request, urllib.error, pathlib
+
     ep = os.environ.get("GBT_T2I_ENDPOINT") or ""
     if not ep:
         return {"ok": False, "status": "needs_dependency", "node": "t2i_qwen",
-                "缺失": ["云端点 GBT_T2I_ENDPOINT（本机 AMD 无 CUDA · 8G 显存不满足）",
+                "缺失": ["云端点 GBT_T2I_ENDPOINT（本机无 CUDA，不跑本地扩散模型）",
                          "Qwen-Image-2.1-Turbo 权重（开放权重，未下载）"],
                 "口径": "**不许假装出图**：缺什么写什么；配齐后由云上跑并回四项读数"}
-    return {"ok": False, "status": "needs_dependency", "node": "t2i_qwen",
-            "缺失": ["云端点已配，但本节点的上云实现尚未接线（下一步）"],
-            "能源读数": {"步数": 8, "秒": None, "显存峰值": None, "花费": None},
-            "口径": "读数没集齐 ⇒ 本节点视为**没做完**"}
+
+    prompt = inputs.get("prompt") or ""
+    out = inputs.get("out") or ""
+    steps = int(inputs.get("steps") or 8)
+    size = inputs.get("size") or "1024x1024"
+
+    if not prompt:
+        return {"ok": False, "error": "user_error: 缺少 prompt"}
+    if not out:
+        return {"ok": False, "error": "user_error: 缺少 out 路径"}
+
+    t0 = time.time()
+    payload = {"prompt": prompt, "steps": steps, "size": size, "n": 1}
+    data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    req = urllib.request.Request(ep, data=data,
+                                 headers={"Content-Type": "application/json"}, method="POST")
+
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            body = r.read()
+    except urllib.error.HTTPError as e:
+        return {"ok": False, "error": "云端返回 %d: %s" % (e.code, e.read()[:200])}
+    except Exception as e:
+        return {"ok": False, "error": "云端请求失败: %s" % e}
+
+    dt = time.time() - t0
+
+    # 解析响应：支持 {image_url}/{image_base64}，或直接返回图片二进制
+    image_url = None
+    image_b64 = None
+    try:
+        resp = json.loads(body.decode("utf-8"))
+        image_url = resp.get("image_url") or resp.get("url")
+        image_b64 = resp.get("image_base64") or resp.get("b64")
+    except Exception:
+        pass
+
+    if image_url:
+        try:
+            with urllib.request.urlopen(image_url, timeout=60) as ir:
+                img_data = ir.read()
+        except Exception as e:
+            return {"ok": False, "error": "下载图片失败: %s" % e}
+    elif image_b64:
+        import base64
+        img_data = base64.b64decode(image_b64)
+    elif body and (body[:4] == b"\x89PNG" or body[:4] == b"\xff\xd8\xff"):
+        img_data = body
+    else:
+        return {"ok": False, "error": "云端未返回可识别的图片数据", "raw": body[:200]}
+
+    # 落盘
+    dst = pathlib.Path(out)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_bytes(img_data)
+
+    return {
+        "ok": True,
+        "node": "t2i_qwen",
+        "out": str(dst),
+        "bytes": len(img_data),
+        "能源读数": {"步数": steps, "秒": round(dt, 2), "显存峰值": None, "花费": None},
+        "口径": "云端文生图（Qwen-Image-2.1-Turbo · 8 步计划），产物已落盘，等待 gate_image 验证"
+    }
 
 
 NODES = {

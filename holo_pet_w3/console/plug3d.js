@@ -116,7 +116,7 @@ function labelSprite(text, color) {
   const tex = new THREE.CanvasTexture(c);
   tex.minFilter = THREE.LinearFilter;
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-  sp.scale.set(2.6, 0.5, 1);
+  sp.scale.set(2.45, 0.47, 1);
   return sp;
 }
 
@@ -280,7 +280,7 @@ function build() {
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x02050a, 0.012);
     camera = new THREE.PerspectiveCamera(46, 1, 0.1, 400);
-    camera.position.set(0, 2.5, 20);
+    camera.position.set(0, 2.5, 21.8);
 
     // ── 数字结：三叶结管道 + 流动数字纹理 ──
     const pts = [];
@@ -511,11 +511,14 @@ export function start() {
     running = true;
     loop();
   });
-  setTimeout(function () {  // 看门狗：2.5s 还没到位就别让默认首页一片白
-    if (!inited) fail("万能插 3D 未就绪（8s 未完成）。原因：" +
-      (document.documentElement.dataset.plug3d || "未知") +
-      "\n插口数据仍可用；可先看「多域监控」或左侧能力面。");
-  }, 8000);
+  setTimeout(function () {  // 看门狗：15s 还没到位才提示（冷启动要编译着色器，8s 会误报）
+    if (inited) return;
+    var why = document.documentElement.dataset.plug3d || "";
+    if (why === "imported") why = "three.js 模块与 /api/data 还在加载（冷启动编译着色器较慢）";
+    else if (why.indexOf("error:") === 0) why = why.slice(6);
+    fail("万能插 3D 还没起来（15s 未完成）。原因：" + (why || "未知") +
+      "\n插口数据仍可用；可先看「多域监控」或左侧能力面。3D 一旦就绪会自动收起这段提示。");
+  }, 15000);
 }
 
 export function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }

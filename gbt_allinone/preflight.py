@@ -904,7 +904,11 @@ def _observe_signature_restore(payload: dict) -> dict:
         return {"checked": True, "matched": False, "reason": "read_only_audit"}
     try:
         from . import signature
-        result = signature.audit(restore=False)
+        # 口径必须跟随调用方：`scope=all` 会连 docs/ 一起查，默认 framework 不查。
+        # 旧实现固定用默认口径 ⇒ 调用方要恢复 docs/ 时，探针永远说「已完整」，
+        # api 层的幂等短路就直接返回 already_satisfied，restore 一次都没跑（2026-11-07 实测）。
+        result = signature.audit(restore=False,
+                                 scope=str(payload.get("scope") or "framework"))
     except Exception as exc:  # noqa: BLE001
         return {"checked": False, "matched": False,
                 "reason": "signature_state_error", "error": str(exc)[:120]}

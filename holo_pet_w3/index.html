@@ -34,7 +34,6 @@
 <!-- 专业皮肤层：必须在 window.css 之后 —— 它把壳的语义 token（--gbt-bg/panel/line/radius）
  映射到 mission-control 的值上，靠加载顺序生效。出处见该文件头。 -->
 <link rel="stylesheet" href="skin-mission-control.css" />
-<link rel="stylesheet" href="skin-omarchy.css" />
 <link rel="stylesheet" href="page-skins.css" />
 <link rel="stylesheet" href="taste-fix.css" />
 </head>
@@ -383,6 +382,8 @@
  才装一个同名方法面（走宿主 HTTP 只读端点），桥在的时候一个字都不动它。
  六窗因此不用改一行 —— 它们既有的"取不到就如实说取不到"照旧生效。 -->
 <script src="host-bridge.js"></script>
+<script src="./console/commander-mode.js"></script>
+<script src="./console/tutorial-voice.js"></script>
 <script src="window.js"></script>
 <!-- 2026-10-10 补：avatar-roam.js 是本仓的跨页穿梭层（数字人不属于任何一页）。
  它自己的红线写着「任何页只要引了它就'她在场'」—— 而我建完一个页都没引：

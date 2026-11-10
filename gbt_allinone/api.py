@@ -594,11 +594,17 @@ def _run_benign(kind, payload, policy_decision=None):
         from .llm import bridge as LB
         return LB.status()
     if kind == "cloud_llm":
-        from .llm import cloud_llm_cap as LCC
-        return LCC.run((payload or {}))
-
-        from .llm import bridge as LB
-        return LB.status()
+        # 🔴 2026-11-10 修（实测假成功）：这里原来分派给 `llm/cloud_llm_cap.py` ——
+        #   那是**另一份实现**，只认 `op` 不认 `action`，且 chat 要 provider 密钥齐全。
+        #   实测 `api.run_task("cloud_llm", {"action":"chat","prompt":…})` 回的是
+        #   `_handle_status` 的 providers 清单、`ok=true` —— **没有回复却报成功**。
+        #   真源是 `llm/cloud_llm.py`（`llm_chat` → unified → bridge 也走它），
+        #   免费车道排序与模型环轮询都在那边。两份并存 ⇒ 走 cap 的调用一辈子碰不到免费车道。
+        #   现在只留一份：`op` 与 `action` 都认（旧调用方的 `op` 写法不改也继续可用）。
+        from .llm import cloud_llm as _cl
+        p = dict(payload or {})
+        _act = str(p.get("action") or p.get("op") or "status").strip().lower() or "status"
+        return _cl.run(_act, **{k: v for k, v in p.items() if k not in ("action", "op")})
     # ── 2026-09-28 补接线（主人令：新增能力必须与触手双向绑定）──────────────
     # 三个模块此前在 `api.py` 里是**零引用**：没有分派 ⇒ 即便登记了名字也只在
     # "能力位三处齐"的 A 项缺一格（framework_state 读数 undispatched）。
@@ -1462,6 +1468,19 @@ def _run_benign(kind, payload, policy_decision=None):
         if op == "wire":
             return _ai.wire(dry=bool(p.get("dry", True)), limit=int(p.get("limit") or 0))
         return {"ok": False, "error": f"未知 op:{op}（build/wire/find/stats）", "fail_closed": True}
+    if kind == "t2i_agnes":
+        # Agnes 生图（agnes-image-2.5-flash）：接线与判据在 tools/agnes_image.py；
+        # 缺钥 fail-closed（不发空请求、不造假图）。
+        import importlib.util as _iu5
+        from pathlib import Path as _P5
+        _spec5 = _iu5.spec_from_file_location(
+            "agnes_image_mod",
+            _P5(__file__).resolve().parents[1] / "tools" / "agnes_image.py")
+        _t2i = _iu5.module_from_spec(_spec5)
+        _spec5.loader.exec_module(_t2i)
+        _p5 = payload or {}
+        return _t2i.run(str(_p5.get("op") or "status"),
+                        **{k: v for k, v in _p5.items() if k != "op"})
     if kind == "i2v_agnes":
         # 图生视频（agnes-video-2.5-flash）：接线与判据在 tools/i2v_agnes.py；
         # 缺钥 fail-closed（不发空请求、不造假产物）。

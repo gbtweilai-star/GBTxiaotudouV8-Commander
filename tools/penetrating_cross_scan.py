@@ -164,7 +164,11 @@ def decompose(target: str) -> tuple[str, list]:
         from gbt_allinone.caps_registry import BENIGN_CAPS
         return "caps", ["cap:" + k for k in sorted(BENIGN_CAPS.keys())]
     if target.startswith("tree:"):
-        d = ROOT / target[5:]
+        # 2026-11-07：tree: 目标支持**任意目录**——绝对路径直接当根，单位也用绝对路径；
+        # 相对路径行为**保持不变**（仍拼 ROOT，单位仍是相对 ROOT 的 posix 路径）。
+        _raw = target[5:]
+        _abs_root = Path(_raw).is_absolute()
+        d = Path(_raw) if _abs_root else ROOT / _raw
         if not d.is_dir():
             raise FileNotFoundError(f"目标目录不存在：{d}")
         # 跳过面**复用绑定系统的定义**（一处定义两处用：vendor/store/.pylibs/缓存/运行足迹都不扫）
@@ -177,10 +181,19 @@ def decompose(target: str) -> tuple[str, list]:
             skip = _tb._skippable
         except Exception:                                      # noqa: BLE001
             skip = None
+        def _skip_key(_p: Path) -> str:
+            """跳过判据只认**仓内相对路径**；仓外绝对单位没有相对形态，用绝对 posix。"""
+            try:
+                return _p.relative_to(ROOT).as_posix()
+            except ValueError:
+                return _p.as_posix()
+
         files = [p for p in sorted(d.rglob("*"))
                  if p.is_file() and p.suffix.lower() not in (".tmp", ".pyc")
                  and ".git" not in p.parts and "__pycache__" not in p.parts
-                 and (skip is None or not skip(p.relative_to(ROOT).as_posix()))]
+                 and (skip is None or not skip(_skip_key(p)))]
+        if _abs_root:
+            return "file", [p.as_posix() for p in files]
         return "file", [p.relative_to(ROOT).as_posix() for p in files]
     raise ValueError(f"未知 target：{target}（bindings|registry|tree:<目录>）")
 
@@ -188,7 +201,9 @@ def decompose(target: str) -> tuple[str, list]:
 # ── 触手集群（虚拟生成 + 有界并发）─────────────────────────────────────
 def _unit_payload(unit_type: str, unit: str):
     if unit_type == "file":
-        return ROOT / unit
+        _p = Path(unit)
+        # 绝对单位（tree: 绝对路径目标）原样返回；相对单位仍按 ROOT 拼（旧行为不变）。
+        return _p if _p.is_absolute() else ROOT / unit
     if unit_type == "caps":
         return unit.split("cap:", 1)[1]
     return None

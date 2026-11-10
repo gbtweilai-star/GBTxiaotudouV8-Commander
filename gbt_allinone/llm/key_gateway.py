@@ -187,7 +187,23 @@ PROVIDERS = [
     #   _call_once 不发 Authorization（Kilo 忽略它）。契合 Owner 2026-10-21 口径「自动循环用免费池」。
     dict(name="kilo", vault="", envs=[],
          url="https://api.kilo.ai/api/gateway", model="kilo-auto/free",
+         # 🔴 2026-11-10（并发探针实弹取证）：免费池是**模型粒度**限流的 ——
+         #    同一时刻 `liquid/lfm-3-1.7b:free` 回 429，而 `kilo-auto/free` /
+         #    `nemotron-3.5-lightning` / `dots-3-note-preview` / `north-mini-code` /
+         #    `openrouter/free` 全部 200 出字。⇒ 一个模型被限 ≠ 这条车道被限。
+         #    有 `models` 的车道由 `model_order()/note_model()` 按模型轮换 + 单独冷却；
+         #    没有的车道仍走整条车道冷却（原行为一字不变）。
+         models=["kilo-auto/free", "nvidia/nemotron-3.5-lightning:free",
+                 "dots-studio/dots-3-note-preview:free", "cohere/north-mini-code:free",
+                 "openrouter/free", "nvidia/nemotron-3-ultra-550b-a55b:free"],
          wire="openai", tier="standard", quota_tokens=0, weight=0.90, no_key=True),
+    # 本机免费路由（C:\EAC-own\caps\freellm\router.mjs → 53610）：
+    #   OpenAI 兼容、免密；它自己按「429 立刻切 / 同组降级 / 并发对冲」轮 40 家免费源。
+    #   GBT 这侧只把它当**一条免费车道**，不重复实现它的内部策略。
+    dict(name="freellm", vault="", envs=[],
+         url=os.environ.get("GBT_FREELLM_BASE_URL", "http://127.0.0.1:53610/v1"),
+         model=os.environ.get("GBT_FREELLM_MODEL", "gbt-xiaotudou-v8"),
+         wire="openai", tier="standard", quota_tokens=0, weight=0.88, no_key=True),
     # ── 深度推理备用（NVIDIA NIM · OpenAI 兼容 · 2026-09-27 实弹确认可达）
     #    实测读数：glm-5.3 冷启动 >240s；glm-5.3-flash 65s 可回。
     #    ⚠️ 推理模型坑：max_tokens 太小会被 reasoning 吃光 ⇒ content 空但 HTTP 200。
@@ -716,6 +732,198 @@ def note_result(provider: str, ok: bool = True, status=None, error: str = "",
             "cooldown_s": cd, "fails": st["fails"]}
 
 
+# ══════════════════════════════════════════════════════════════════════
+#  模型粒度的轮询（免费池专用）——「一个模型 429」不等于「这条车道坏了」
+# ══════════════════════════════════════════════════════════════════════
+# 血账（2026-11-10 并发探针：同一时刻一次打 6 个 Kilo 免费 id）：
+#   kilo-auto/free 200 · nemotron-3.5-lightning 200 · dots-3-note-preview 200
+#   north-mini-code 200 · openrouter/free 200 · **liquid/lfm-3-1.7b:free 429**
+# 旧处置只有**整条车道**一个格子：任意一个模型回 429 ⇒ `note_result` 把 `kilo`
+# 整体冷却 120s ⇒ 另外 5 个还能用的模型一起被埋掉，调用方要等两分钟才重来。
+# 现在：有 `models` 环的车道按**模型**记账、按**模型**冷却、按**环**轮询。
+MODEL_COOLDOWN_S = 120          # 单个模型被限后的冷却（与 DEFAULT_COOLDOWN_S 同口径）
+
+_MODELS_KEY = "__models__"      # 运行态里的独立分区（不占 provider 名，rank() 看不见）
+MODEL_BAD_TTL_S = 3600          # 确定性不可用（404/无额度/坏格）的排除时长
+# 这些分类属于「这一格就是不能用」，不是「暂时被限流」——直接踢出准入名单。
+_BAD_CLASSES = ("not_found", "quota_exhausted", "key_invalid")
+
+
+def model_ring(name: str) -> list:
+    """一条车道声明的模型环（去重保序）。没声明的车道回退成它自己的单模型。"""
+    p = _BY_NAME.get(name) or {}
+    ring, seen = [], set()
+    for m in (p.get("models") or []):
+        m = str(m).strip()
+        if m and m not in seen:
+            seen.add(m)
+            ring.append(m)
+    if not ring:
+        m = str(p.get("model") or "").strip()
+        if m:
+            ring = [m]
+    return ring
+
+
+def _model_slot(rt: dict, name: str) -> dict:
+    lane = rt.setdefault(_MODELS_KEY, {}).setdefault(name, {})
+    lane.setdefault("cool", {})
+    lane.setdefault("fails", {})
+    lane.setdefault("bad", {})      # 准入名单的排除区：model -> {verdict, until, ...}
+    lane.setdefault("rr", 0)
+    return lane
+
+
+def model_cooldowns(name: str) -> dict:
+    """{model: 剩余秒}，只回还没到期的（给回执/页面看，不改状态）。"""
+    lane = (_rload().get(_MODELS_KEY) or {}).get(name) or {}
+    now = time.time()
+    out = {}
+    for m, ts in (lane.get("cool") or {}).items():
+        left = int(float(ts or 0) - now)
+        if left > 0:
+            out[m] = left
+    return out
+
+
+def _bad_rows(lane: dict) -> dict:
+    """只回**还在排除期内**的坏格（过期的不算，允许自然复活）。"""
+    now = time.time()
+    return {m: row for m, row in (lane.get("bad") or {}).items()
+            if isinstance(row, dict) and float(row.get("until", 0) or 0) > now}
+
+
+def model_bad(name: str) -> dict:
+    """{model: {verdict, left_s, status, error}} —— 只在排除期内的。"""
+    lane = (_rload().get(_MODELS_KEY) or {}).get(name) or {}
+    now = time.time()
+    out = {}
+    for m, row in _bad_rows(lane).items():
+        out[m] = {"verdict": row.get("verdict") or "excluded",
+                  "left_s": int(float(row.get("until", 0) or 0) - now),
+                  "status": row.get("status"),
+                  "error": str(row.get("error") or "")[:160]}
+    return out
+
+
+def admitted_models(name: str) -> list:
+    """**只有能用的格**：声明环 − 排除期内的坏格 − 冷却中的格（保序）。"""
+    ring = model_ring(name)
+    if not ring:
+        return ring
+    bad = set(model_bad(name))
+    cool = model_cooldowns(name)
+    return [m for m in ring if m not in bad and m not in cool]
+
+
+def ring_state(name: str) -> dict:
+    """这一环此刻的准入读数：能用的 / 被排除的 / 冷却中的 / 是否在复探。"""
+    ring = model_ring(name)
+    bad = model_bad(name)
+    cool = model_cooldowns(name)
+    admitted = [m for m in ring if m not in bad and m not in cool]
+    return {"declared": ring, "admitted": admitted,
+            "excluded": [m for m in ring if m in bad],
+            "cooling": [m for m in ring if m in cool and m not in bad],
+            "bad": bad,
+            "reviving": bool(ring) and not admitted}
+
+
+def model_order(name: str) -> list:
+    """**本轮**该按什么顺序试这个环：只排准入名单，冷却/坏格不参与。
+
+    `rr` 是**全环下标**（note_model 里 ring.index+1），这里按全环旋转后再过滤，
+    两个坐标系不会混用（血账：`rr % len(warm)` 会跳格）。
+
+    全环都被排除/冷却时**不永久判死**：免费额度会回补，回退成整环复探一次；
+    回执里的 `ring_state(name)["reviving"]` 会如实标出这是复探，不是正常轮询。
+    """
+    ring = model_ring(name)
+    if len(ring) <= 1:
+        return ring
+    lane = (_rload().get(_MODELS_KEY) or {}).get(name) or {}
+    bad = set(model_bad(name))
+    cool = lane.get("cool") or {}
+    now = time.time()
+    warm = [m for m in ring
+            if m not in bad and float(cool.get(m, 0) or 0) <= now]
+    reviving = not warm
+    if reviving:
+        warm = list(ring)
+    rr = int(lane.get("rr", 0) or 0) % len(ring)
+    warm_set = set(warm)
+    order = [ring[(rr + k) % len(ring)] for k in range(len(ring))]
+    return [m for m in order if m in warm_set]
+
+
+def note_model(name: str, model: str, ok: bool = True, status=None,
+               error: str = "", cooldown_s=None) -> dict:
+    """按**模型**记账 —— 与 `note_result` 同形的决策，但**不牵连整条车道**。"""
+    if name not in _BY_NAME or not model:
+        return {"ok": False, "error": "未知车道/模型（%r / %r）" % (name, model)}
+    rt = _rload()
+    lane = _model_slot(rt, name)
+    if ok:
+        lane["fails"].pop(model, None)
+        lane["cool"].pop(model, None)
+        lane.setdefault("bad", {}).pop(model, None)   # 通了就重新准入
+        ring = model_ring(name)
+        if ring and model in ring:
+            lane["rr"] = (ring.index(model) + 1) % len(ring)   # 下一轮从它的下一格起
+        _rsave(rt)
+        _audit({"event": "model_ok", "provider": name, "model": model})
+        return {"ok": True, "err_class": "ok", "failover": False,
+                "action": "通过", "cooldown_s": 0}
+
+    cls = classify(status=status, error=error)
+    d = decide(cls)
+    lane["fails"][model] = int(lane["fails"].get(model, 0) or 0) + 1
+    # 🔴 2026-11-10：失败也前进 —— 否则坏格永远占环首，每通都撞同一格，
+    #    "轮询"实际退化成"只试一格"（实测 Cohere 那格连堵 4 通）。
+    _ring_fail = model_ring(name)
+    if _ring_fail and model in _ring_fail:
+        lane["rr"] = (_ring_fail.index(model) + 1) % len(_ring_fail)
+    cd = int(cooldown_s if cooldown_s is not None else MODEL_COOLDOWN_S)
+    if (cls in ("rate_limited", "quota_exhausted", "key_invalid", "not_found")
+            or d["exhaust"] or d["disable"]):
+        lane["cool"][model] = time.time() + cd
+    elif cls in ("upstream_error", "transient"):
+        lane["cool"][model] = max(float(lane["cool"].get(model, 0) or 0),
+                                  time.time() + min(cd, 30))
+    elif "promotion_model_limit_reached" in str(error or "").lower():
+        # 匿名免费额度**本轮**用尽（Kilo：PROMOTION_MODEL_LIMIT_REACHED，无 Retry-After）。
+        # 不是分钟级限流：120s 冷却只会每两分钟再撞一次 ⇒ 给 10 分钟，等窗口回补。
+        lane["cool"][model] = max(float(lane["cool"].get(model, 0) or 0),
+                                  time.time() + max(cd, 600))
+    elif "provider returned error" in str(error or "").lower():
+        # 上游网关把它自己的转换/上游故障包成 400（实测 Cohere 报
+        # text field must not be empty）。这不是我们的参数错，但也不该每通都去撞它。
+        lane["cool"][model] = max(float(lane["cool"].get(model, 0) or 0),
+                                  time.time() + min(cd, 120))
+    # 🔴 2026-11-10 主人令「只要是不能使用的就直接排除」：
+    #    这些不是「暂时被限流」，是这一格本身不能用 —— 直接踢出准入名单，
+    #    环里只留能用的格串联。429 仍只冷却（窗口会回补），不进 bad。
+    _low = str(error or "").lower()
+    _why = None
+    if cls in _BAD_CLASSES:
+        _why = cls
+    elif "promotion_model_limit_reached" in _low:
+        _why = "no_quota"
+    elif "provider returned error" in _low or "content 为空" in str(error or ""):
+        _why = "bad_cell"
+    if _why:
+        lane.setdefault("bad", {})[model] = {
+            "verdict": _why, "status": status, "err_class": cls,
+            "error": str(error or "")[:160], "ts": time.time(),
+            "until": time.time() + MODEL_BAD_TTL_S}
+    _rsave(rt)
+    _audit({"event": "model_fail", "provider": name, "model": model,
+            "err_class": cls, "status": status, "err": str(error or "")[:160]})
+    return {"ok": False, "brand": BRAND_TAG, "provider": name, "model": model,
+            "err_class": cls, "status": status, **d,
+            "cooldown_s": cd, "fails": lane["fails"][model]}
+
+
 def reset(provider: str = "") -> dict:
     """清运行态（冷却/禁用/耗尽/用量）。**只清运行态，不碰密钥。**"""
     rt = _rload()
@@ -724,6 +932,7 @@ def reset(provider: str = "") -> dict:
             return {"ok": False, "fail_closed": True,
                     "error": "未知 provider %r" % provider}
         rt.pop(provider, None)
+        (rt.get(_MODELS_KEY) or {}).pop(provider, None)   # 模型环的冷却一起清
         _rsave(rt)
         _audit({"event": "reset", "provider": provider})
         return {"ok": True, "brand": BRAND_TAG, "reset": provider}

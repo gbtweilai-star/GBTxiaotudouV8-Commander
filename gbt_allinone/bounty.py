@@ -1,13 +1,15 @@
 """GBT小土豆V8 · 赏金工作台（合规优先的漏洞 bounty 流程）
 
-主人 2026-11-02：「这套设计如果拿来正规挖洞赚钱呢？」——方向改成安全研究/赏金工作台。
+主人 2026-11-02：方向转为「正规挖洞」。本模块管：授权项目 / 范围闸 / 发现 / 报告 / 提交状态 / 赔付账本。
 
 合规红线（写死在代码里）：
-  1. **没有授权记录 = 一律拒绝**：program 必须带 authorization_ref（授权书/平台项目链接/书面确认）；
-  2. **scope 之外 = 硬拒绝**：域名用后缀匹配、IP/CIDR 用 ipaddress 判定，不在 scope 内直接 blocked；
-  3. **本模块不做任何网络动作**：只做范围判定、证据/报告/赔付的账本；真正的扫描仍走既有安全能力位（且要过 scope 闸）；
-  4. **证据可核**：报告里每个证据文件带 sha256，改过即对不上；
-  5. **赔付走人**：payout 只记账，不收钱、不转账（转账是主人的事）。
+  1. **没有授权记录 = 一律拒绝**：program 必须带 authorization_ref；
+  2. **scope 之外 = 硬拒绝**（域名后缀 / IP-CIDR）；
+  3. **本模块不做任何网络动作**，只做判定与账本；扫描走既有安全能力位且必须先过范围闸；
+  4. **证据可核**：报告里每个证据带 sha256；
+  5. **赔付只记账**，不收钱不转账。
+
+报告升级（2026-11-02 第二刀）：CVSS 3.1 评分与向量、CWE 映射与修复建议、复现命令、提交追踪状态机。
 
 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
 """
@@ -18,17 +20,18 @@ import hashlib
 import ipaddress
 import json
 import re
-import sys
 import time
 from pathlib import Path
+
+from gbt_allinone import bounty_core as core
 
 ROOT = Path(__file__).resolve().parent.parent
 STORE = ROOT / "state" / "bounty"
 PROGRAMS = STORE / "programs.json"
 FINDINGS = STORE / "findings.jsonl"
+STATUS_EVENTS = STORE / "status.jsonl"
 PAYOUTS = STORE / "payouts.jsonl"
 REPORTS = ROOT / "outputs" / "bounty"
-
 SEVERITIES = ("critical", "high", "medium", "low", "info")
 
 
@@ -57,8 +60,22 @@ def _sha256(p: Path) -> str:
     return h.hexdigest()
 
 
-# ── 程序（授权项目）────────────────────────────────────────────────────
+def _status_map() -> dict:
+    out = {}
+    if STATUS_EVENTS.is_file():
+        for ln in STATUS_EVENTS.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not ln.strip():
+                continue
+            try:
+                e = json.loads(ln)
+            except Exception:  # noqa: BLE001
+                continue
+            out[e.get("finding")] = {"status": e.get("to"), "at": e.get("at"),
+                                     "note": e.get("note")}
+    return out
 
+
+# ── 项目 ───────────────────────────────────────────────────────────────
 def add_program(name: str, scope: list, out_of_scope: list | None = None,
                 platform: str = "", url: str = "", authorization_ref: str = "",
                 reward_range: str = "", rules: str = "") -> dict:
@@ -88,7 +105,6 @@ def list_programs() -> dict:
 
 
 # ── 范围闸 ─────────────────────────────────────────────────────────────
-
 def _ip_in(cidr: str, target: str) -> bool:
     try:
         return ipaddress.ip_address(target) in ipaddress.ip_network(cidr, strict=False)
@@ -117,7 +133,6 @@ def in_scope(program: dict, target: str) -> bool:
 
 
 def check(program_id: str, target: str, action: str = "read-only-recon") -> dict:
-    """授权 + 范围判定。返回 ok/blocked；本函数不执行任何网络动作。"""
     progs = _read_json(PROGRAMS, [])
     prog = next((p for p in progs if p.get("id") == program_id), None)
     if not prog:
@@ -130,24 +145,39 @@ def check(program_id: str, target: str, action: str = "read-only-recon") -> dict
                 "target": target, "scope": prog.get("scope")}
     row = {"at": _now(), "program": program_id, "target": target, "action": action,
            "decision": "allowed", "authorization_ref": prog.get("authorization_ref")}
-    _append(ROOT / "state" / "bounty" / "scope-checks.jsonl", row)
+    _append(STORE / "scope-checks.jsonl", row)
     return {"ok": True, "blocked": False, "program": program_id, "target": target,
             "action": action, "authorization_ref": prog.get("authorization_ref")}
 
 
-# ── 发现（漏洞）与报告 ─────────────────────────────────────────────────
-
+# ── 发现 ───────────────────────────────────────────────────────────────
 def add_finding(program_id: str, title: str, severity: str, target: str,
                 cwe: str = "", cvss: str = "", steps: str = "",
-                impact: str = "", remediation: str = "",
-                evidence: list | None = None) -> dict:
-    sev = str(severity).lower()
-    if sev not in SEVERITIES:
-        return {"ok": False, "reason": "severity 只能是 %s" % (SEVERITIES,)}
+                impact: str = "", remediation: str = "", evidence: list | None = None,
+                vector: str = "", repro: list | None = None,
+                fix_diff: str = "", attachments: list | None = None) -> dict:
     g = check(program_id, target, action="record-finding")
     if not g.get("ok"):
         return {"ok": False, "blocked": True, "reason": g.get("reason"),
                 "detail": "发现必须先过授权/范围闸，否则不允许记录"}
+    # 有 CVSS 向量 → 以向量算出的分数/严重度为准；否则用传入 severity（并给默认向量）
+    vec = str(vector or "").strip()
+    score = None
+    if vec:
+        c = core.cvss3(vec)
+        if not c.get("ok"):
+            return {"ok": False, "reason": "CVSS 向量非法：" + str(c.get("reason"))}
+        score = c["base_score"]
+        sev = c["severity"]
+        vec = c["vector"]
+    else:
+        sev = str(severity).lower()
+        if sev not in SEVERITIES:
+            return {"ok": False, "reason": "severity 只能是 %s" % (SEVERITIES,)}
+        vec = core.default_vector(sev)
+        _c = core.cvss3(vec)
+        score = _c.get("base_score") if _c.get("ok") else None
+    info = core.cwe_info(cwe)
     fid = "F-" + time.strftime("%Y%m%d-%H%M%S") + "-" + hashlib.sha1(
         (title + target).encode()).hexdigest()[:6]
     ev = []
@@ -158,9 +188,26 @@ def add_finding(program_id: str, title: str, severity: str, target: str,
                        "sha256": _sha256(p), "bytes": p.stat().st_size})
         else:
             ev.append({"path": str(ep), "sha256": None, "missing": True})
+    # 附件：图片/文本，带 sha256（图片可在报告里直接预览）
+    atts = []
+    for ap_ in (attachments or []):
+        pp = Path(ap_)
+        if pp.is_file():
+            ext = pp.suffix.lower()
+            atts.append({"path": str(pp.relative_to(ROOT)) if pp.is_relative_to(ROOT) else str(pp),
+                         "sha256": _sha256(pp), "bytes": pp.stat().st_size,
+                         "kind": "image" if ext in (".png", ".jpg", ".jpeg", ".webp", ".gif")
+                                 else "file"})
+        else:
+            atts.append({"path": str(ap_), "sha256": None, "missing": True, "kind": "file"})
     row = {"id": fid, "at": _now(), "program": program_id, "title": title,
-           "severity": sev, "target": target, "cwe": cwe, "cvss": cvss,
-           "steps": steps, "impact": impact, "remediation": remediation,
+           "severity": sev, "target": target,
+           "cwe": cwe or (info.get("cwe") or ""), "cwe_name": info.get("name"),
+           "cvss_vector": vec, "cvss_score": score if score is not None else None,
+           "steps": steps, "impact": impact,
+           "remediation": remediation or info.get("fix") or "",
+           "repro": [str(x) for x in (repro or [])],
+           "fix_diff": str(fix_diff or ""), "attachments": atts,
            "evidence": ev, "status": "draft",
            "authorization_ref": g.get("authorization_ref")}
     _append(FINDINGS, row)
@@ -168,7 +215,7 @@ def add_finding(program_id: str, title: str, severity: str, target: str,
 
 
 def list_findings(program_id: str = "") -> dict:
-    rows = []
+    rows, sm = [], _status_map()
     if FINDINGS.is_file():
         for ln in FINDINGS.read_text(encoding="utf-8", errors="replace").splitlines():
             if not ln.strip():
@@ -179,10 +226,39 @@ def list_findings(program_id: str = "") -> dict:
                 continue
             if program_id and d.get("program") != program_id:
                 continue
+            cur = sm.get(d.get("id")) or {}
+            d["status"] = cur.get("status") or d.get("status") or "draft"
+            d["status_at"] = cur.get("at")
             rows.append(d)
     return {"ok": True, "count": len(rows), "findings": rows}
 
 
+# ── 提交追踪状态机 ─────────────────────────────────────────────────────
+def set_status(finding_id: str, to: str, note: str = "") -> dict:
+    rows = list_findings()["findings"]
+    f = next((x for x in rows if x.get("id") == finding_id), None)
+    if not f:
+        return {"ok": False, "reason": "没有这个 finding"}
+    cur = f.get("status") or "draft"
+    if to not in core.STATUSES:
+        return {"ok": False, "reason": "状态只能是 %s" % (core.STATUSES,)}
+    if not core.can_transition(cur, to):
+        return {"ok": False, "reason": "非法流转：%s → %s（允许：%s）"
+                % (cur, to, sorted(core.TRANSITIONS.get(cur, set())))}
+    e = {"at": _now(), "finding": finding_id, "from": cur, "to": to, "note": note}
+    _append(STATUS_EVENTS, e)
+    return {"ok": True, "finding": finding_id, "from": cur, "to": to, "event": e}
+
+
+def submit(finding_id: str, platform: str = "", url: str = "", note: str = "") -> dict:
+    r = set_status(finding_id, "submitted", note or ("提交到 %s %s" % (platform, url)))
+    if r.get("ok"):
+        r["platform"] = platform
+        r["url"] = url
+    return r
+
+
+# ── 报告 ───────────────────────────────────────────────────────────────
 def report(finding_id: str) -> dict:
     rows = list_findings()["findings"]
     f = next((x for x in rows if x.get("id") == finding_id), None)
@@ -196,41 +272,144 @@ def report(finding_id: str) -> dict:
     for e in f.get("evidence") or []:
         ev_lines.append("- `%s` sha256=`%s`%s" % (e.get("path"), e.get("sha256"),
                                                   "（缺失）" if e.get("missing") else ""))
-    body = """# %s
+    repro = f.get("repro") or []
+    if not repro:
+        tgt = f.get("target") or "<target>"
+        repro = ["curl -i 'http://%s/'  # 只读复现占位：把实际请求补到这里" % tgt]
+    score = f.get("cvss_score")
+    score_txt = ("%s（%s）" % (score, core.severity_of(score))) if score is not None else \
+        ("%s（按严重度映射）" % core.severity_of({"low": 2.6, "medium": 5.4, "high": 8.1,
+                                                "critical": 9.8}.get(f.get("severity"), 5.4)))
+    _c = core.cvss3(f.get("cvss_vector") or "")
+    temporal_txt = ("%s（%s）" % (_c.get("temporal_score"), _c.get("temporal_severity"))
+                    if _c.get("temporal_score") is not None else "未提供（E/RL/RC）")
+    env_txt = ("%s（%s）" % (_c.get("env_score"), _c.get("env_severity"))
+               if _c.get("env_score") is not None else "未提供（M*/CR/IR/AR）")
+    repro_txt = "\n".join(repro)
+    ev_txt = "\n".join(ev_lines) or "（无）"
+    att_lines = []
+    for a in (f.get("attachments") or []):
+        if a.get("kind") == "image" and a.get("sha256"):
+            att_lines.append("- ![%s](%s) sha256=`%s`" %
+                             (Path(a.get("path", "")).name, a.get("path"), a.get("sha256")))
+        else:
+            att_lines.append("- `%s` sha256=`%s`%s" %
+                             (a.get("path"), a.get("sha256"),
+                              "（缺失）" if a.get("missing") else ""))
+    att_txt = "\n".join(att_lines) or "（无）"
+    body = f"""# {f["title"]}
 
-- **项目**: %s (%s)
-- **目标**: %s
-- **严重度**: %s · CWE: %s · CVSS: %s
-- **授权依据**: %s
-- **发现时间**: %s
+## 摘要
+- **项目**: {prog.get("name", f.get("program"))}（{prog.get("platform", "")}）
+- **目标**: {f.get("target")}
+- **严重度**: {f.get("severity")} · CVSS: {f.get("cvss_vector") or "-"}
+- **CVSS Base**: {score_txt}
+- **CVSS Temporal**: {temporal_txt}
+- **CVSS Environmental**: {env_txt}
+- **CWE**: {f.get("cwe") or "-"}（{f.get("cwe_name") or "未收录"}）
+- **状态**: {f.get("status")}
+- **授权依据**: {f.get("authorization_ref")}
+- **发现时间**: {f.get("at")}
+
+## 复现命令
+```bash
+{repro_txt}
+```
 
 ## 复现步骤
-%s
+{f.get("steps") or "（待补）"}
 
 ## 影响
-%s
+{f.get("impact") or "（待补）"}
 
 ## 修复建议
-%s
+{f.get("remediation") or "（待补）"}
+
+## 修复 Diff
+```diff
+{f.get("fix_diff") or "（未提供补丁 diff：建议给出最小修复 diff，平台 triage 更快）"}
+```
 
 ## 证据（sha256 可核）
-%s
+{ev_txt}
+
+## 附件
+{att_txt}
+
+## 提交建议
+- 平台: {prog.get("platform") or "（未指定，自建项目）"}
+- 提交前确认：只在授权 scope 内、证据齐全、复现命令可逐条跑通
+- 报告 SHA256 与发现 JSON 一起提交（侧车文件 `{outp.stem}.json`）
+- 或直接用 `bounty.bundle(finding)` 生成可提交包（报告+JSON+证据+附件+ZIP）
 
 ---
 > 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属
-""" % (f["title"], prog.get("name", f.get("program")), prog.get("platform", ""),
-       f.get("target"), f.get("severity"), f.get("cwe") or "-", f.get("cvss") or "-",
-       f.get("authorization_ref"), f.get("at"),
-       f.get("steps") or "（待补）", f.get("impact") or "（待补）",
-       f.get("remediation") or "（待补）", "\n".join(ev_lines) or "（无）")
+"""
     outp.write_text(body, encoding="utf-8")
-    return {"ok": True, "report": str(outp), "sha256": _sha256(outp),
+    side = REPORTS / (finding_id + ".json")
+    side.write_text(json.dumps({"finding": f, "program": prog, "report_md": str(outp),
+                                "report_sha256": _sha256(outp)}, ensure_ascii=False, indent=1),
+                    encoding="utf-8")
+    return {"ok": True, "report": str(outp), "json": str(side), "sha256": _sha256(outp),
             "bytes": outp.stat().st_size}
 
 
+def bundle(finding_id: str) -> dict:
+    """生成可提交包：outputs/bounty/<finding>/（报告+JSON+证据+附件+manifest）+ ZIP。"""
+    import shutil as _sh
+    import zipfile
+    rows = list_findings()["findings"]
+    f = next((x for x in rows if x.get("id") == finding_id), None)
+    if not f:
+        return {"ok": False, "reason": "没有这个 finding"}
+    rep = report(finding_id)
+    if not rep.get("ok"):
+        return rep
+    outdir = REPORTS / finding_id
+    if outdir.is_dir():
+        _sh.rmtree(outdir, ignore_errors=True)
+    outdir.mkdir(parents=True, exist_ok=True)
+    files = []
+    # 报告 + 侧车 JSON
+    for src in (Path(rep["report"]), Path(rep["json"])):
+        dst = outdir / src.name
+        _sh.copy2(src, dst)
+        files.append(dst)
+    # 证据 + 附件
+    for item in (f.get("evidence") or []) + (f.get("attachments") or []):
+        rel = item.get("path")
+        if not rel:
+            continue
+        srcp = Path(rel) if Path(rel).is_absolute() else ROOT / rel
+        if srcp.is_file():
+            dst = outdir / ("ev-" + srcp.name)
+            _sh.copy2(srcp, dst)
+            files.append(dst)
+    manifest = {
+        "finding": f.get("id"), "title": f.get("title"),
+        "severity": f.get("severity"), "cvss_vector": f.get("cvss_vector"),
+        "cvss_score": f.get("cvss_score"), "target": f.get("target"),
+        "authorization_ref": f.get("authorization_ref"),
+        "files": [{"name": x.name, "sha256": _sha256(x), "bytes": x.stat().st_size}
+                  for x in files],
+        "built_at": _now(),
+        "notice": "仅授权范围内提交；不在 scope 的资产不要测、不要交。",
+    }
+    mf = outdir / "manifest.json"
+    mf.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    files.append(mf)
+    zpath = REPORTS / (finding_id + "-bundle.zip")
+    with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        for x in files:
+            z.write(x, x.name)
+    return {"ok": True, "dir": str(outdir), "manifest": str(mf), "zip": str(zpath),
+            "files": len(files), "zip_sha256": _sha256(zpath),
+            "zip_bytes": zpath.stat().st_size}
+
+
+# ── 赔付 ───────────────────────────────────────────────────────────────
 def payout(program_id: str, finding_id: str, amount: float, currency: str = "USD",
            status: str = "pending", note: str = "") -> dict:
-    """只记账，不收钱不转账（转账是主人的事）。"""
     row = {"at": _now(), "program": program_id, "finding": finding_id,
            "amount": amount, "currency": currency, "status": status, "note": note}
     _append(PAYOUTS, row)
@@ -249,30 +428,19 @@ def summary() -> dict:
                     pays.append(json.loads(ln))
                 except Exception:  # noqa: BLE001
                     pass
-    by_sev = {}
+    by_sev, by_status = {}, {}
+    scores = []
     for f in finds:
         by_sev[f.get("severity")] = by_sev.get(f.get("severity"), 0) + 1
+        by_status[f.get("status") or "draft"] = by_status.get(f.get("status") or "draft", 0) + 1
+        if isinstance(f.get("cvss_score"), (int, float)):
+            scores.append(float(f["cvss_score"]))
     total = {}
     for p in pays:
         c = p.get("currency") or "USD"
         total[c] = round(total.get(c, 0) + float(p.get("amount") or 0), 2)
     return {"ok": True, "programs": len(progs), "findings": len(finds),
-            "by_severity": by_sev, "payouts": len(pays), "payout_total": total,
+            "by_severity": by_sev, "by_status": by_status,
+            "avg_cvss": round(sum(scores) / len(scores), 2) if scores else None,
+            "payouts": len(pays), "payout_total": total,
             "reports_dir": str(REPORTS)}
-
-
-if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "summary"
-    if cmd == "summary":
-        print(json.dumps(summary(), ensure_ascii=False, indent=2))
-    elif cmd == "programs":
-        print(json.dumps(list_programs(), ensure_ascii=False, indent=2))
-    elif cmd == "findings":
-        print(json.dumps(list_findings(sys.argv[2] if len(sys.argv) > 2 else ""),
-                         ensure_ascii=False, indent=2))
-    elif cmd == "check" and len(sys.argv) >= 4:
-        print(json.dumps(check(sys.argv[2], sys.argv[3]), ensure_ascii=False))
-    elif cmd == "report" and len(sys.argv) >= 3:
-        print(json.dumps(report(sys.argv[2]), ensure_ascii=False))
-    else:
-        print("usage: bounty.py summary|programs|findings [program]|check <program> <target>|report <finding>")

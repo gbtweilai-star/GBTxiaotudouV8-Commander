@@ -187,8 +187,8 @@ class OmniMouseMixin:
         if not win:
             return refusal("window_not_found", f"未找到窗口: {target}", ("window",))
         # 记录当前前台
-        import win32gui as _wg
-        prev = _wg.GetForegroundWindow()
+        _prev_win = _get_active_window()
+        prev = _prev_win["hwnd"] if _prev_win else None
         # ⛔ 2026-08-13 打磨: UIA ValuePattern 直写兜底 (同 domain_type)
         try:
             _uia_r = _uia_set_value_by_window(win["title"], text)
@@ -211,68 +211,96 @@ class OmniMouseMixin:
         # 恢复原前台 (除非 activate=True 保持)
         if not activate and prev and prev != win["hwnd"]:
             try:
-                _wg.SetForegroundWindow(prev)
+                _focus_window(prev)
             except Exception as _e:
                 _record_swallow(_e, "omni_mouse")
         return {"ok": True, "window": win["title"], "text_len": len(text),
                 "method": "window_focus_input", "occluded_safe": True}
 
     def click_window_occluded(self, target, x_offset=100, y_offset=50):
-        """无视遮挡窗口点击 — 置前→点击→恢复 (增强版click_window)"""
-        win = _find_window(target)
+        """无视遮挡后台点击 — PostMessage 直发鼠标消息；**未生效则 UIA 兜底**。
+
+        流程（2026-11-08 加 UIA 兜底）：
+          1. PostMessage 先发（不置前、不移动真实鼠标、不抢焦点，对遮挡物透明）；
+          2. 变化检测（窗口标题 / TabItem SelectionItemPattern 状态，**不看 PostMessage
+             返回值**）——未生效 → 回退 UIA：SelectionItemPattern.Select()
+             → InvokePattern.Invoke() → LegacyIAccessiblePattern.DoDefaultAction()；
+          3. UIA 兜底会把窗口带到前台（记入 sideEffects，不隐瞒）。
+        回执 mode: "post" | "post+uia_select" | "post+uia_invoke" | "post+uia_legacy" | "none"。
+        (x_offset, y_offset) 是窗口左上角相对坐标（含标题栏）。
+        缺 win32 后端如实报 needs_dependency（带真实异常），不吞成 window_not_found。
+        """
+        try:
+            win = _find_window(target)
+        except WindowBackendUnavailable as exc:
+            return refusal("needs_dependency", str(exc), ("win32", "window_api"),
+                           "click_window_occluded", needs_dependency=True,
+                           backend=_win32_backend_status())
         if not win:
             return refusal("window_not_found", f"未找到窗口: {target}", ("window",))
-        import win32gui as _wg
-        prev = _wg.GetForegroundWindow()
-        ok = _focus_window(win["hwnd"])
-        if not ok:
-            # ⛔ 2026-08-13 打磨: 物理激活失败(前台被高完整性窗口锁定) → UIA invoke 窗口内首个可点击控件
-            try:
-                import uiautomation as _uia
-                with _uia.UIAutomationInitializerInThread():
-                    root = _uia.GetRootControl()
-                    for w in root.GetChildren():
-                        n = w.Name or ""
-                        if win["title"].lower() not in n.lower():
-                            continue
-                        def _find_invokable(h, d=0):
-                            if d > 8:
-                                return None
-                            try:
-                                for c in h.GetChildren():
-                                    try:
-                                        pat = c.GetInvokePattern()
-                                        if pat:
-                                            pat.Invoke()
-                                            return {"ok": True, "method": "uia_invoke",
-                                                    "control": (c.Name or "")[:50]}
-                                    except Exception as _e:
-                                        _record_swallow(_e, "omni_mouse")
-                                    rr = _find_invokable(c, d + 1)
-                                    if rr:
-                                        return rr
-                            except Exception as _e:
-                                _record_swallow(_e, "omni_mouse")
-                            return None
-                        rr = _find_invokable(w)
-                        if rr:
-                            return {"ok": True, "window": win["title"], "method": rr["method"],
-                                    "control": rr["control"], "occluded_safe": True}
-            except Exception as _e:
-                _record_swallow(_e, "omni_mouse")
-            return refusal("action_failed", f"无法激活窗口: {target}", ())
-        time.sleep(0.15)
-        r = win["rect"]
-        _mouse_move(r["left"] + x_offset, r["top"] + y_offset)
-        time.sleep(0.1)
-        _mouse_click()
+        hwnd = win["hwnd"]
+        rect = win["rect"]
+        sx = rect["left"] + int(x_offset)
+        sy = rect["top"] + int(y_offset)
         try:
-            if prev and prev != win["hwnd"]:
-                _wg.SetForegroundWindow(prev)
-        except Exception as _e:
-            _record_swallow(_e, "omni_mouse")
-        return {"ok": True, "window": win["title"], "clicked_at": (r["left"]+x_offset, r["top"]+y_offset),
-                "method": "focus_click_restore", "occluded_safe": True}
+            r = _background_click(hwnd, x_offset, y_offset)
+        except WindowBackendUnavailable as exc:
+            return refusal("needs_dependency", str(exc), ("win32", "window_api"),
+                           "click_window_occluded", needs_dependency=True,
+                           backend=_win32_backend_status())
+        except Exception as exc:
+            return refusal("action_failed", "%s: %s" % (type(exc).__name__, str(exc)[:160]), ())
+        last_errors = r.get("last_errors", {})
+        if not r.get("ok"):
+            msgs = r.get("messages", {})
+            return refusal("action_failed",
+                           "后台点击消息未送达 (down=%s up=%s, last_errors=%s, integrity=%s)"
+                           % (msgs.get("down"), msgs.get("up"), last_errors, r.get("integrity")),
+                           (), detail=r)
+        # ── 变化检测：不看 PostMessage 返回值，只看可观测状态 ──
+        before = _occluded_state_signature(hwnd, sx, sy)
+        time.sleep(0.3)  # 给目标窗口消息循环一点处理时间（PostMessage 异步入队）
+        after = _occluded_state_signature(hwnd, sx, sy)
+        base = {
+            "window": win["title"],
+            "clicked_at": r["screen"], "client": r["client"],
+            "last_errors": last_errors,
+            "occluded_safe": True,
+            "no_mouse_move": True,
+        }
+        if _occluded_state_changed(before, after):
+            base.update({"ok": True, "mode": "post", "sideEffects": [],
+                         "no_focus_steal": True,
+                         "method": "postmessage_background",
+                         "state": {"before": before, "after": after}})
+            return base
+        # ── 未生效 → UIA 兜底（三模式依次试）──
+        uia = _uia_occluded_click(hwnd, sx, sy)
+        time.sleep(0.3)
+        after2 = _occluded_state_signature(hwnd, sx, sy)
+        if _occluded_state_changed(before, after2):
+            base.update({"ok": True, "mode": uia.get("mode", "none"),
+                         "sideEffects": uia.get("side_effects", ["brings_window_to_front"]),
+                         "no_focus_steal": False,
+                         "method": "postmessage_background+" + uia.get("mode", "none"),
+                         "uia_attempts": uia.get("attempts", []),
+                         "state": {"before": before, "after": after2}})
+            return base
+        # ── 都未生效 → 诚实报 no effect（不报 ok:true 半截数据）──
+        attempted = [a.get("pattern") for a in uia.get("attempts", [])]
+        invoked = [a.get("pattern") for a in uia.get("attempts", []) if a.get("called")]
+        if invoked:
+            why = ("后台点击无可见效果，且 UIA 模式调用后仍无可见效果 (mode=none, tried=%s)"
+                   % (attempted or []))
+        else:
+            why = ("后台点击无可见效果，且 UIA 三模式均不可用 (mode=none, tried=%s)"
+                   % (attempted or []))
+        return refusal("occluded_click_no_effect", why, (),
+                       mode="none", last_errors=last_errors,
+                       uia_attempts=uia.get("attempts", []),
+                       sideEffects=uia.get("side_effects", []),
+                       state_before=before, state_after=after2,
+                       detail={"post": r, "uia": uia})
 
     def drag(self, x1: int, y1: int, x2: int, y2: int, duration: float = 0.5):
         """从 (x1,y1) 拖到 (x2,y2)"""

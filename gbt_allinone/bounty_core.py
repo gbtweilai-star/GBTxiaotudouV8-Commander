@@ -155,6 +155,16 @@ CWE = {
                 "fix": "同站 cookie + CSRF token + 校验 Origin/Referer。"},
     "CWE-918": {"name": "SSRF",
                 "fix": "URL 白名单/内网地址黑名单；DNS 解析后校验 IP；禁用重定向跟随。"},
+    "CWE-502": {"name": "不安全反序列化",
+               "fix": "禁止对不可信数据用 pickle/yaml.load；改 JSON/受限 schema；必须反序列化时签名校验 + 最小权限。"},
+    "CWE-798": {"name": "硬编码凭据",
+               "fix": "删除并轮换凭据；改用环境变量/密钥管理（DPAPI/KeyVault）；CI 加 secret 扫描。"},
+    "CWE-942": {"name": "宽松 CORS（任意 Origin + 凭据）",
+               "fix": "CORS 只回显白名单 Origin；禁止任意 Origin 反射；需要 credentials 时更严格。"},
+    "CWE-1004": {"name": "Cookie 缺 HttpOnly",
+                "fix": "会话 Cookie 加 HttpOnly；配合 CSP 降低 XSS 面。"},
+    "CWE-614": {"name": "Cookie 缺 Secure",
+               "fix": "会话 Cookie 加 Secure；全站 HTTPS + HSTS。"},
 }
 
 

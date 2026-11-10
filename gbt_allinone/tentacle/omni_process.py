@@ -185,7 +185,7 @@ class OmniProcessMixin:
         except ImportError:
             win = _find_window(name); return {"ok": True, "running": win is not None}
 
-    def diagnose(self):
+    def diagnose(self, *_a, **_kw):  # 2026-11-09 宽容签名：上层曾多传 1 个位置参数
         """触手自诊断 — 穿透式交叉扫描 (L0+L1 + 交叉验证)"""
         try:
             mod = _load_penetration_scan()
@@ -210,7 +210,7 @@ class OmniProcessMixin:
         except Exception as e:
             return refusal("action_failed", str(e)[:200], ())
 
-    def deep_diagnose(self):
+    def deep_diagnose(self, *_a, **_kw):  # 2026-11-09 宽容签名
         """深度诊断 — 穿透式交叉扫描 (全层 + N触手网格 + 共识评分)"""
         results = {}
         try:
@@ -233,7 +233,15 @@ class OmniProcessMixin:
             results["full_scan"] = {"error": str(e)[:200]}
         return {"ok": True, "results": results, "mode": "penetration_cross_deep"}
 
-    def task_guide_load(self, mind_map: dict) -> dict:
+    def task_guide_load(self, mind_map: dict = None, *_a, **_kw) -> dict:
+        if isinstance(mind_map, str):  # 2026-11-09：上层可能塞 JSON 字符串
+            try:
+                import json as _json
+                mind_map = _json.loads(mind_map)
+            except Exception:
+                return refusal("action_failed", "task_guide_load: mind_map 需要 dict 或 JSON 字符串", ())
+        if not isinstance(mind_map, dict):
+            return refusal("action_failed", "task_guide_load: 缺少 mind_map", ())
         """加载大脑执行层生成的思维导图任务
         
         mind_map 格式:
@@ -260,7 +268,7 @@ class OmniProcessMixin:
             "current": self._task_guide["current_node"],
         }
 
-    def task_guide_check(self, action_description: str) -> dict:
+    def task_guide_check(self, action_description: str = "", *_a, **_kw) -> dict:
         """执行前校验: 当前动作是否对齐当前任务节点
         
         返回:
@@ -323,7 +331,8 @@ class OmniProcessMixin:
     def task_guide_complete(self, node_id: str = None, evidence: str = "") -> dict:
         """标记当前任务节点完成，自动推进到下一个"""
         if not hasattr(self, '_task_guide'):
-            return refusal("action_failed", "无活跃任务指引", ())
+            return {"ok": True, "active": False, "completed": None,
+                    "note": "无活跃任务指引（先 task_guide_load 载入 mind_map）"}
 
         node = self._task_guide.get("current_node") if not node_id else self._task_guide_find_node(node_id)
         if not node:
@@ -349,10 +358,12 @@ class OmniProcessMixin:
             "advanced": advanced,
         }
 
-    def task_guide_status(self) -> dict:
+    def task_guide_status(self, *_a, **_kw) -> dict:  # 2026-11-09 宽容签名
         """当前任务指引状态"""
         if not hasattr(self, '_task_guide'):
-            return refusal("action_failed", "无活跃任务指引", ())
+            # 2026-11-09：没有任务 ≠ 故障。ok 保持 true，用 active 表达"空"。
+            return {"ok": True, "active": False,
+                    "note": "无活跃任务指引（先 task_guide_load 载入 mind_map）"}
         
         guide = self._task_guide
         return {
@@ -365,10 +376,12 @@ class OmniProcessMixin:
             "recent_warnings": guide["drift_warnings"][-3:],
         }
 
-    def task_guide_next(self) -> dict:
+    def task_guide_next(self, *_a, **_kw) -> dict:  # 2026-11-09 宽容签名
         """获取下一个待执行任务（不推进状态）"""
         if not hasattr(self, '_task_guide'):
-            return refusal("action_failed", "无活跃任务指引", ())
+            # 2026-11-09：没有任务 ≠ 故障，与 task_guide_status 口径一致。
+            return {"ok": True, "active": False, "next": None,
+                    "note": "无活跃任务指引（先 task_guide_load 载入 mind_map）"}
         
         next_node = self._task_guide_find_next_pending(self._task_guide["nodes"])
         return {
@@ -377,7 +390,7 @@ class OmniProcessMixin:
             "current": self._task_guide.get("current_node"),
         }
 
-    def task_guide_drift_report(self) -> str:
+    def task_guide_drift_report(self, *_a, **_kw) -> str:  # 2026-11-09 宽容签名
         """偏航报告 — 人类可读"""
         if not hasattr(self, '_task_guide'):
             return "无活跃任务指引"
@@ -485,14 +498,16 @@ class OmniProcessMixin:
         
         # easyocr: 已随OCR清理移除
         
-        # win32
+        # win32（ctypes 后端，零 pywin32 依赖；见 omni_core._win32_backend_status）
         try:
-            import win32gui, win32process; deps["win32"] = {"status": "ok"}
-        except ImportError:
-            deps["win32"] = {"status": "missing"}
-            report["weaknesses"].append({"area": "windows", "issue": "pywin32 missing - list_windows/trace_source partially dead", "fix": "pip install pywin32", "severity": "medium"})
+            _wb = _win32_backend_status()
+            if _wb.get("ok"):
+                deps["win32"] = {"status": "ok", "backend": "ctypes"}
+            else:
+                deps["win32"] = {"status": "missing", "error": _wb.get("why", "")}
+                report["weaknesses"].append({"area": "windows", "issue": "win32 ctypes 后端不可用 - list_windows/trace_source dead", "fix": "需在 Windows 上运行（ctypes 直连 user32/kernel32）", "severity": "medium"})
         except Exception as e:
-            deps["win32"] = {"status": "error"}
+            deps["win32"] = {"status": "error", "error": str(e)[:80]}
         
         # numpy
         try:

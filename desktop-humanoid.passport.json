@@ -1,0 +1,85 @@
+{
+  "gbt_stamp": {
+    "framework": "GBT小土豆V8",
+    "version": "1.0.0",
+    "mark": "GBT",
+    "developer": "自由的风",
+    "ownership": "independent-personal",
+    "note": "桌面数字人指挥官（二代形象）阶段 5 验收 passport"
+  },
+  "project": {
+    "name": "desktop-humanoid",
+    "displayName": "桌面数字人指挥官（二代形象）",
+    "entry": "desktop-humanoid/main.py",
+    "windowLauncher": "启动-GBT.cmd",
+    "asset": "@{glb=holo_pet_w3/assets/dh/dh-v7-detail.glb; meshCount=1; boneCount=66; idleAnim=idle}"
+  },
+  "stage5": {
+    "id": 5,
+    "name": "端到端实测",
+    "status": "功能链路全通；GUI 窗口待桌面确认",
+    "verifiedAt": "2026-11-08T03:20:00+07:00",
+    "environmentLimit": "受限沙箱/自动化会话里，Python 创建 GUI 子进程会被系统拒绝（Access is denied），Edge 只有 MAIN+crashpad、renderer=0、无窗口。宿主环境限制，非代码缺陷。正常桌面双击 启动-GBT.cmd 运行即可出窗口。",
+    "guiWindowConfirmed": false,
+    "guiWindowConfirmationNote": "需主人在正常桌面双击 启动-GBT.cmd 后确认窗口正常弹出，本人自动化会话无法验证 GUI"
+  },
+  "bugs_fixed": [
+    {
+      "id": 1,
+      "title": "纯白屏 / WebGL null",
+      "rootCause": "--disable-gpu 与 --disable-software-rasterizer 同时开，canvas.getContext('webgl') 返回 null",
+      "fix": "改用 --enable-unsafe-swiftshader，WebGL 2.0 正常",
+      "verified": "CDP 实测 WebGL 2.0，1 mesh / 66 bones / 2 clips / mode=idle"
+    },
+    {
+      "id": 2,
+      "title": "GLB 加载 CORS 拦截",
+      "rootCause": "file:// 协议下 GLTFLoader fetch 本地 .glb 报 TypeError: Failed to fetch",
+      "fix": "桥托管静态资源，页面走 http://127.0.0.1:8799/",
+      "verified": "GLB 加载成功，66 bones 渲染正常"
+    },
+    {
+      "id": 3,
+      "title": "资源路径越界",
+      "rootCause": "../../holo_pet_w3/assets/..." 在 http 根下越界",
+      "fix": "改为 /assets/... 绝对路径",
+      "verified": "所有资源按 /assets/vendor/ + /assets/dh/ 正常解析"
+    },
+    {
+      "id": 4,
+      "title": "能力位 bytes 导致调用丢弃",
+      "rootCause": "json.dumps 遇到 bytes 抛 TypeError，连失败原因都看不到",
+      "fix": "新增 _json_safe（bytes -> {__bytes__, preview_hex}），_send 与 append_evidence 兜底",
+      "verified": "能力位 body_map/dh_pose/digital_human 三态返回 ok"
+    },
+    {
+      "id": 5,
+      "title": "审计账本被整体覆盖",
+      "rootCause": "_atomic_append 读 old 却不写回 tmp，os.replace 后旧记录全丢，永远只剩最后一条",
+      "fix": "改为真正追加，写后读回校验",
+      "verified": "账本累积 8+ 条，不再覆盖"
+    }
+  ],
+  "freeLane": {
+    "rootCause": "combo 指向 opencode 裸 id 共享额度池，已耗尽（97-100% 429）",
+    "fix": "两个 combo 全部换成 kilo 车道（带 org/model:free 前缀），逐字比对一致",
+    "models": [
+      "dots-studio/dots-3-note-preview:free (512K，4% 失败率，最稳)",
+      "openrouter/free (200K，0% 失败率)",
+      "nvidia/nemotron-3.5-lightning:free (1M)",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free (256K)",
+      "nvidia/nemotron-3.5-super-vl:free (1M)",
+      "cohere/north-mini-code:free (256K)",
+      "reflection/beam-free (1,048,576)",
+      "nvidia/nemotron-3-ultra-550b-a55b:free (1M)",
+      "kilo-auto/free (256K)"
+    ],
+    "verifiedAt": "2026-11-08T04:28:00+07:00",
+    "testResult": "combo:big-window-free OK 1202ms，combo:recommended-free OK 1743ms"
+  },
+  "nextActions": [
+    "主人在正常桌面双击 启动-GBT.cmd，确认数字人窗口正常弹出",
+    "确认后把 guiWindowConfirmed 置为 true，阶段 5 收工",
+    "免费车道每 30 分钟定时探测继续观察（schedule-9b877aa4-9393-422c-b831-d2114c8d07f7）"
+  ]
+}

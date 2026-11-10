@@ -50,6 +50,50 @@ SOCKET_KINDS = ("process", "file", "api", "web", "app", "ai", "dh")
 # 数字人执行器插座：细节操控（骨骼/绑定/Blender 动作）走这里；
 # 由 gbt_allinone/dh_omni_loop.py 在启动时 register_actuator("dh:rig", ...)。
 ACTUATORS: dict = {}
+# 2026-11-07（主人令「帧直接给模型看」）：`see` 的帧原本只在 `image_base64` 里（内存回传），
+# 而按路径取帧的调用方（对话层 / 视觉链）拿不到地址。取帧时落一份**有界缓存**并回传 `path`，
+# 只留最近若干帧，不进台账、不回显 base64。
+FRAME_DIR = _ROOT / "state" / "vision" / "frames"
+
+
+def _prune_frames(keep: int = 200) -> None:
+    try:
+        files = sorted(FRAME_DIR.glob("obs-*"), key=lambda x: x.stat().st_mtime, reverse=True)
+        for f in files[keep:]:
+            f.unlink(missing_ok=True)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _persist_frame(cap: dict) -> dict:
+    """内存帧 → 盘上文件，给回执补 `path`（已有 path 就原样返回）。"""
+    if not isinstance(cap, dict) or cap.get("path") or not cap.get("image_base64"):
+        return cap
+    try:
+        import base64 as _b64
+        import hashlib as _hash
+        raw = _b64.b64decode(str(cap["image_base64"]))
+        if not raw:
+            return cap
+        fmt = str(cap.get("fmt") or cap.get("format") or "png").lower()
+        ext = {"jpeg": "jpg", "jpg": "jpg", "png": "png", "bmp": "bmp", "webp": "webp"}.get(fmt, "png")
+        FRAME_DIR.mkdir(parents=True, exist_ok=True)
+        name = "obs-%s-%s.%s" % (time.strftime("%Y%m%d_%H%M%S"),
+                                 _hash.sha256(raw).hexdigest()[:8], ext)
+        path = FRAME_DIR / name
+        if not path.exists():
+            tmp = path.with_name("%s.tmp-%d" % (name, os.getpid()))
+            with open(tmp, "wb") as fh:
+                fh.write(raw)
+                fh.flush()
+                os.fsync(fh.fileno())
+            os.replace(tmp, path)
+        cap["path"] = str(path)
+        cap["frame_bytes"] = len(raw)
+        _prune_frames()
+    except Exception:  # noqa: BLE001
+        pass
+    return cap
 
 
 def register_actuator(name: str, fn) -> None:
@@ -962,9 +1006,10 @@ def plug_and_run(target: str, *, kind: str = "process", action: str = "run",
                     r = om.see_window(target) if _match_window(target) else om.see_active_window()
                 else:
                     r = om.see()
+                r = _persist_frame(r)
                 res.update({"ok": bool(r.get("ok")), "看": {k: r.get(k) for k in
                             ("ok", "rule", "window", "path", "why", "missing", "size", "fmt",
-                             "format", "image_kb") if k in r}})
+                             "format", "image_kb", "frame_bytes") if k in r}})
             elif action == "launch":
                 r = om.launch(target, a.get("args"))
                 res.update({"ok": bool(r.get("ok")), "launch": r})

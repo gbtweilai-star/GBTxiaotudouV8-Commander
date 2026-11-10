@@ -1,0 +1,364 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>GBT小土豆V8 · 桌面数字人指挥官</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#050709;font-family:Inter,system-ui,"Microsoft YaHei",sans-serif}
+#c{position:fixed;inset:0;display:block;background:transparent;z-index:0}
+.overlay{position:fixed;inset:0;z-index:30;pointer-events:none}
+#status-light{position:fixed;left:14px;top:14px;width:13px;height:13px;border-radius:50%;background:#666;box-shadow:0 0 8px rgba(0,0,0,.8);pointer-events:auto;cursor:pointer;border:1px solid rgba(255,255,255,.3);z-index:40}
+#status-light.ok{background:#0f0;box-shadow:0 0 12px #0f0}
+#status-light.denied{background:#ffb02e;box-shadow:0 0 12px #ffb02e}
+#status-light.failed{background:#f44;box-shadow:0 0 12px #f44}
+#status-text{position:fixed;left:36px;top:14px;font:11px/1.4 ui-monospace,Consolas,monospace;color:#e9e7e1;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.8);z-index:40}
+#bubble{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);max-width:300px;padding:10px 14px;border-radius:14px;background:rgba(10,13,17,.88);color:#e9e7e1;font:13px/1.5 "Microsoft YaHei",sans-serif;border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 16px rgba(0,0,0,.6);pointer-events:none;z-index:40;opacity:0;transition:opacity .25s,transform .25s;transform:translate(-50%,12px)}
+#bubble.show{opacity:1;transform:translate(-50%,0)}
+#bubble::after{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);border:9px solid transparent;border-bottom-color:rgba(10,13,17,.88)}
+#hint{position:fixed;right:14px;bottom:14px;font:10px/1.5 ui-monospace,Consolas,monospace;color:#6b7280;text-align:right;pointer-events:none;z-index:40}
+
+/* 指挥面板（右侧） */
+#panel{position:fixed;right:0;top:0;bottom:0;width:340px;background:rgba(8,11,15,.92);border-left:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);z-index:35;pointer-events:auto;display:flex;flex-direction:color}
+#panel{display:flex;flex-direction:column}
+.panel-header{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.3)}
+.panel-header .title{font:700 13px/1.3 "Microsoft YaHei",sans-serif;color:#fff;letter-spacing:.06em}
+.panel-header .sub{font:10px/1.4 ui-monospace,Consolas,monospace;color:#8b93a0;margin-top:2px}
+.panel-body{flex:1;overflow-y:auto;padding:10px 12px}
+.section{margin-bottom:12px}
+.section .sec-title{font:10px/1.3 ui-monospace,Consolas,monospace;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-left:2px}
+.btn-row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.btn-row button{flex:1;min-width:74px;padding:6px 8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#d8d7d2;border-radius:6px;font:10px/1.3 "Microsoft YaHei",sans-serif;cursor:pointer;transition:all .15s}
+.btn-row button:hover{border-color:#c96442;color:#ffb02e;background:rgba(201,100,66,.08)}
+.btn-row button.on{border-color:#c96442;color:#ffb02e;background:rgba(201,100,66,.15)}
+.btn-row button.secondary{background:rgba(255,255,255,.02);color:#9aa3ad}
+.btn-row button.secondary:hover{border-color:#4b5563;color:#d1d5db}
+
+/* 指令输入 */
+.cmd-wrap{position:sticky;top:0;background:rgba(8,11,15,.96);padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);z-index:36}
+.cmd-input{width:100%;padding:7px 10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#e9e7e1;border-radius:6px;font:12px/1.4 "Microsoft YaHei",sans-serif;box-sizing:border-box}
+.cmd-input:focus{outline:none;border-color:#c96442}
+.cmd-row{margin-top:6px;display:flex;gap:6px}
+
+/* 任务列表 */
+.task{font:11px/1.4 ui-monospace,Consolas,monospace;padding:6px 8px;border-radius:6px;margin-bottom:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.task .t-id{color:#8b93a0}
+.task .t-status{float:right;font-weight:700}
+.task .t-status.ok{color:#0f0}
+.task .t-status.failed{color:#f44}
+.task .t-status.pending{color:#ffb02e}
+.task .t-status.in_progress{color:#60a5fa}
+.task .t-text{margin-top:2px;color:#e9e7e1;word-break:break-all}
+.task .t-error{color:#fca5a5;font-size:10px;margin-top:2px}
+
+/* 审计账本 */
+.audit-item{font:10px/1.4 ui-monospace,Consolas,monospace;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:#b8b8b4}
+.audit-item .a-kind{color:#93c5fd}
+.audit-item .a-状态{float:right}
+.audit-item .a-状态.ok{color:#0f0}
+.audit-item .a-状态.failed{color:#f44}
+.audit-item .a-状态.denied{color:#ffb02e}
+
+/* 能力栏标签 */
+.cap-tag{display:inline-block;padding:3px 7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#cbd5e1;border-radius:999px;font:10px/1.4 "Microsoft YaHei",sans-serif;margin:2px 4px 0 0;cursor:pointer}
+.cap-tag:hover{border-color:#c96442;color:#ffb02e}
+
+/* 加载 */
+#load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,7,9,.95);color:#b8b8b4;font:400 13px/1.6 ui-monospace,monospace;z-index:50;-webkit-app-region:no-drag}
+#load.gone{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s}
+</style></head><body>
+<canvas id="c"></canvas>
+
+<!-- 顶部状态 -->
+<div id="status-light" title="能力状态：灰=就绪 绿=成功 琥珀=缺授权 红=失败"></div>
+<div id="status-text">启动中…</div>
+<div id="bubble">……</div>
+<div id="hint">拖拽3D画布移位 · 右侧为指挥面板 · 唤醒词：小土豆 / 土豆 / 指挥官 / 她 / 喂</div>
+
+<!-- 指挥面板 -->
+<div id="panel">
+  <div class="panel-header">
+    <div class="title">指挥面板</div>
+    <div class="sub">GBT小土豆V8 · 二代数字人形象 · 385+ 能力位绑定</div>
+  </div>
+  <div class="cmd-wrap">
+    <input id="cmd-input" class="cmd-input" placeholder="下达指令（如：看屏幕、打开记事本、数字人状态）">
+    <div class="cmd-row">
+      <button class="btn-row" onclick="sendCmd()">执行</button>
+      <button class="btn-row secondary" onclick="clearCmd()">清空</button>
+      <button class="btn-row secondary" onclick="toggleWake()">语音唤醒切换</button>
+    </div>
+    <div id="wake-status" style="font:10px/1.4 ui-monospace;color:#6b7280;margin-top:4px">语音：未启动</div>
+  </div>
+
+  <div class="panel-body">
+    <div class="section">
+      <div class="sec-title">能力快捷</div>
+      <div id="cap-bar" class="btn-row"></div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">任务队列</div>
+      <div id="task-list"></div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn-row secondary" onclick="refreshTasks()">刷新</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">审计账本（最近）</div>
+      <div id="audit-log"></div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn-row secondary" onclick="refreshAudit()">刷新</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="load">载入数字人 DH-V7…</div>
+
+<script src="/assets/vendor/three.global.js"></script>
+<script src="/assets/vendor/GLTFLoader.global.js"></script>
+<script>
+(function(){
+  "use strict";
+  var T=window.THREE;
+  var errBox=document.getElementById("load");
+  var statusLight=document.getElementById("status-light");
+  var statusText=document.getElementById("status-text");
+  var bubble=document.getElementById("bubble");
+  var capBar=document.getElementById("cap-bar");
+  var taskListEl=document.getElementById("task-list");
+  var auditLogEl=document.getElementById("audit-log");
+  var wakeStatusEl=document.getElementById("wake-status");
+  var cmdInput=document.getElementById("cmd-input");
+
+  if(!T){ errBox.textContent="Three.js 未加载"; return; }
+
+  var scene=new T.Scene();
+  scene.background=null;
+  var camera=new T.PerspectiveCamera(32,innerWidth/innerHeight,.05,60);
+  camera.position.set(0,1.15,3.5); camera.lookAt(0,.95,0);
+  var ren=new T.WebGLRenderer({canvas:document.getElementById("c"),antialias:true,alpha:true,premultipliedAlpha:false});
+  ren.setSize(innerWidth,innerHeight); ren.setPixelRatio(Math.min(2,devicePixelRatio||1));
+  ren.setClearColor(0x000000,0);
+  scene.add(new T.HemisphereLight(0xdfeaff,0x1a1410,1.3));
+  var key=new T.DirectionalLight(0xfff1e0,2.2); key.position.set(2.5,4,3); scene.add(key);
+  var rim=new T.PointLight(0xff9a3c,2.2,8); rim.position.set(-2.4,2,-2.4); scene.add(rim);
+
+  var root=new T.Group(); scene.add(root);
+  var model=null, mixer=null, clips=[], bones=[], meshes=[], skelHelper=null;
+  var state={mode:"idle", opacity:1, explode:0, meshes:0, bones:0, clips:0, active:false};
+  window.__dh3d={state:state, root:root, get model(){return model;}};
+
+  var BRIDGE="http://127.0.0.1:8799";
+  var bridgeBusy=false;
+
+  function setStatus(kind,t){ statusText.textContent=t||kind; setLight(kind||"idle"); }
+  function setLight(kind){ statusLight.className=""; statusLight.classList.add(kind||"idle"); }
+  function setBubble(t,show){ bubble.textContent=t||"……"; if(show!==false){ bubble.classList.add("show"); setTimeout(function(){ bubble.classList.remove("show"); },3500);} else { bubble.classList.remove("show"); } }
+
+  function collect(){
+    meshes=[]; bones=[];
+    if(!model) return;
+    model.traverse(function(o){ if(o.isMesh||o.isSkinnedMesh) meshes.push(o); if(o.isBone) bones.push(o); });
+    state.meshes=meshes.length; state.bones=bones.length;
+    if(bones.length){ skelHelper=new T.SkeletonHelper(model); skelHelper.visible=false; scene.add(skelHelper); }
+    window.__dh3d.meshes=meshes; window.__dh3d.bones=bones;
+  }
+  function applyOpacity(v){ state.opacity=v; meshes.forEach(function(m){ if(m.material){ m.material.transparent=true; m.material.opacity=v; } }); }
+
+  var loader=new T.GLTFLoader();
+  loader.load("/assets/dh/dh-v7-detail.glb", function(gltf){
+    model=gltf.scene||(gltf.scenes&&gltf.scenes[0]);
+    if(!model){ errBox.textContent="模型为空"; return; }
+    root.add(model);
+    var box=new T.Box3().setFromObject(model); var size=new T.Vector3(); box.getSize(size);
+    var k=1.78/(size.y||1); model.scale.multiplyScalar(k); box.setFromObject(model);
+    var c=new T.Vector3(); box.getCenter(c); model.position.x-=c.x; model.position.z-=c.z; model.position.y-=box.min.y;
+    model.traverse(function(o){ if(o.isMesh||o.isSkinnedMesh){ o.frustumCulled=false; o.castShadow=true; if(o.material){ o.material.transparent=true; o.material.opacity=1; } } });
+    collect();
+    clips=gltf.animations||[]; state.clips=clips.length;
+    if(clips.length){ mixer=new T.AnimationMixer(model); var idle=clips.find(function(c){return /idle|breath|stand/i.test(c.name)})||clips[0]; var a=mixer.clipAction(idle); a.reset(); a.setLoop(T.LoopRepeat,Infinity); a.play(); state.mode=idle.name; setStatus("ok","就绪 · "+idle.name); }
+    setStatus("ok","在线 · meshes="+state.meshes+" bones="+state.bones);
+    errBox.classList.add("gone");
+    state.active=true;
+    renderCaps();
+  }, function(x){ errBox.textContent="加载 "+(x.total?Math.round(x.loaded/x.total*100):0)+"%"; }, function(e){
+    errBox.textContent="模型加载失败："+e; setLight("failed"); setStatus("failed","资产缺失");
+  });
+
+  /* ── 能力栏渲染 ── */
+  function renderCaps(){
+    fetch(BRIDGE+"/cap/list").then(function(r){ return r.json(); }).then(function(d){
+      if(!d.ok){ capBar.innerHTML='<span style="color:#f44">能力列表加载失败</span>'; return; }
+      capBar.innerHTML="";
+      d.caps.forEach(function(cap){
+        cap.别名.forEach(function(alias){
+          var tag=document.createElement("span");
+          tag.className="cap-tag";
+          tag.textContent=alias;
+          tag.title=cap.kind;
+          tag.onclick=function(){ cmdInput.value=alias; cmdInput.focus(); };
+          capBar.appendChild(tag);
+        });
+      });
+    }).catch(function(){ capBar.innerHTML='<span style="color:#f44">桥未就绪</span>'; });
+  }
+
+  /* ── HTTP 调用 ── */
+  async function bridgeCall(op, body){
+    if(bridgeBusy){ return {ok:false, error:"桥忙"}; }
+    bridgeBusy=true;
+    try{
+      var r=await fetch(BRIDGE+"/"+op, {method:"POST", headers:{"Content-Type":"application/json; charset=utf-8"}, body:JSON.stringify(body||{})});
+      if(!r.ok){ return {ok:false, error:"HTTP "+r.status}; }
+      return await r.json();
+    }catch(e){ return {ok:false, error:String(e)}; }
+    finally{ bridgeBusy=false; }
+  }
+
+  function doSetStatus(kind,t){ setStatus(kind,t); }
+
+  window.__dhCommander={
+    speak:function(t){
+      setBubble(t,true);
+      bridgeCall("speak",{text:t}).then(function(r){ if(!r.ok){ doSetStatus("failed","TTS: "+(r.error||"")); } });
+    },
+    setStatus:function(kind,t){ setStatus(kind,t); },
+    act:function(name){
+      if(sleeping){ setBubble("休眠中，无法执行动作。",true); return; }
+      state.mode=name; setStatus("ok","动作 · "+name);
+      var found=null; clips.forEach(function(c){ if(String(c.name).toLowerCase().indexOf(name)>=0) found=c; });
+      if(!found&&clips.length) found=clips[0];
+      if(found){ mixer.stopAllAction(); var a=mixer.clipAction(found); a.reset(); a.setLoop(T.LoopRepeat,Infinity); a.play(); }
+      bridgeCall("run_cap",{kind:"dh_pose",payload:{op:"act",name:name}}).then(function(r){
+        if(!r.ok){ setStatus("failed","动作: "+(r.error||"")); }
+      });
+    },
+    setOpacity:function(v){ applyOpacity(parseFloat(v)/100); },
+    sleep:function(){ if(!sleeping){ document.dispatchEvent(new MouseEvent("dblclick")); } },
+    wake:function(){ if(sleeping){ document.dispatchEvent(new MouseEvent("dblclick")); } },
+    getState:function(){ return {active:state.active,mode:state.mode,sleeping:sleeping,meshes:state.meshes,bones:state.bones}; },
+    runCap:function(kind,payload){
+      return bridgeCall("run_cap",{kind:kind,payload:payload||{}}).then(function(r){
+        var s=r.三态||(r.ok?"ok":"failed");
+        setStatus(r.ok?"ok":(s==="denied"?"denied":"failed"), r.ok?"成功":(s==="denied"?"缺授权":(r.error||"")));
+        setLight(r.ok?"ok":(s==="denied"?"denied":"failed"));
+        setBubble(r.ok?("已执行：" + kind):("指令未完成：" + (r.error||"")), true);
+        return r;
+      });
+    },
+    loop:function(goal,expect){
+      if(sleeping){ setBubble("休眠中，无法执行闭环。",true); return Promise.resolve({ok:false,why:"休眠中"}); }
+      setStatus("ok","闭环 · "+goal);
+      return bridgeCall("loop",{goal:goal,expect:expect||"",dry:false}).then(function(r){
+        setLight(r.ok?"ok":"failed");
+        setBubble(r.结论||(r.ok?"闭环完成":"闭环停在 "+(r.停在第||"未知")), true);
+        return r;
+      });
+    },
+    routeIntent:function(intent,text){
+      return bridgeCall("route",{intent:intent,text:text||""}).then(function(r){
+        setLight(r.ok?"ok":(r.三态==="denied"?"denied":"failed"));
+        setBubble(r.error||(r.ok?"已执行："+intent:"指令未识别"), true);
+        return r;
+      });
+    }
+  };
+
+  /* ── 指令执行 ── */
+  function sendCmd(){
+    var text=cmdInput.value.trim();
+    if(!text) return;
+    var tid="ui-"+Date.now();
+    addTask(tid,text,"pending");
+    bridgeCall("route",{intent:text,text:text}).then(function(r){
+      updateTask(tid, r.ok?"completed":"failed", r.error||null, r);
+      if(r.ok){ setBubble("已执行：" + text, true); }
+      else if(r.三态==="needs_dependency"){ setBubble("需要您确认才能执行：" + text, true); }
+      else { setBubble("执行遇到问题：" + (r.error||""), true); }
+      cmdInput.value="";
+      refreshTasks();
+    });
+    refreshTasks();
+  }
+  function clearCmd(){ cmdInput.value=""; }
+  cmdInput.addEventListener("keydown",function(e){ if(e.key==="Enter"){ sendCmd(); } });
+
+  /* ── 任务队列 ── */
+  function addTask(id,text,status){
+    var el=document.createElement("div");
+    el.className="task";
+    el.id="task-"+id;
+    el.innerHTML='<span class="t-id">'+id+'</span><span class="t-status '+status+'">'+status+'</span><div class="t-text">'+escapeHtml(text)+'</div>';
+    taskListEl.insertBefore(el, taskListEl.firstChild);
+  }
+  function updateTask(id,status,error,result){
+    var el=document.getElementById("task-"+id);
+    if(!el) return;
+    var span=el.querySelector(".t-status");
+    if(span){ span.className="t-status "+status; span.textContent=status; }
+    if(error){ var eDiv=document.createElement("div"); eDiv.className="t-error"; eDiv.textContent=error; el.appendChild(eDiv); }
+  }
+  function refreshTasks(){
+    fetch(BRIDGE+"/task/list").then(function(r){ return r.json(); }).then(function(d){
+      if(!d.ok) return;
+      taskListEl.innerHTML="";
+      (d.tasks||[]).forEach(function(t){
+        var el=document.createElement("div");
+        el.className="task";
+        el.innerHTML='<span class="t-id">'+(t.id||t.task_id)+'</span><span class="t-status '+(t.status||"")+'">'+(t.status||"")+'</span><div class="t-text">'+escapeHtml(t.text||t.intent||"")+'</div>';
+        if(t.error){ var eDiv=document.createElement("div"); eDiv.className="t-error"; eDiv.textContent=t.error; el.appendChild(eDiv); }
+        taskListEl.appendChild(el);
+      });
+    }).catch(function(){});
+  }
+
+  /* ── 审计账本 ── */
+  function refreshAudit(){
+    fetch(BRIDGE+"/audit/recent?limit=20").then(function(r){ return r.json(); }).then(function(d){
+      auditLogEl.innerHTML="";
+      if(!d.ok){ auditLogEl.innerHTML='<div class="audit-item" style="color:#f44">审计读取失败：'+escapeHtml(d.error||"")+'</div>'; return; }
+      (d.items||[]).reverse().forEach(function(it){
+        var kind=escapeHtml((it.kind||it.op||"")), 三态=escapeHtml(it.三态||(it.ok?"ok":"failed"));
+        var cls="a-状态 "+(it.ok?"ok":(it.三态==="denied"?"denied":"failed"));
+        var html='<div class="audit-item"><span class="a-kind">'+kind+'</span><span class="'+cls+'">'+(it.ok?"ok":(it.三态||""))+'</span><div>'+escapeHtml((it.error||"")||"已执行")+'</div></div>';
+        auditLogEl.insertAdjacentHTML("beforeend", html);
+      });
+      if(!(d.items||[]).length){ auditLogEl.innerHTML='<div class="audit-item">（暂无审计记录）</div>'; }
+    }).catch(function(){ auditLogEl.innerHTML='<div class="audit-item" style="color:#f44">桥未就绪，审计不可读</div>'; });
+  }
+
+  /* ── 语音唤醒 ── */
+  function toggleWake(){
+    var op = wakeStatusEl.textContent.indexOf("运行")>=0 ? "voice_wake_stop" : "voice_wake_start";
+    bridgeCall(op, {}).then(function(r){
+      wakeStatusEl.textContent = r.ok ? "语音：运行中（唤醒词：小土豆/土豆/指挥官/她/喂）" : "语音：未启动";
+      setBubble(r.ok?"语音唤醒已开启":"语音唤醒未能启动", true);
+    });
+  }
+  refreshTasks();
+  refreshAudit();
+  setInterval(refreshTasks, 5000);
+  setInterval(refreshAudit, 10000);
+
+  /* ── 3D 交互 ── */
+  var drag=false,lx=0,ly=0,rotY=0,rotX=0,zoom=1,sleeping=false;
+  ren.domElement.addEventListener("pointerdown",function(e){ if(e.button!==0) return; drag=true; lx=e.clientX; ly=e.clientY; });
+  addEventListener("pointerup",function(){ drag=false; });
+  addEventListener("pointermove",function(e){ if(!drag||sleeping)return; rotY+=(e.clientX-lx)*.006; rotX+=(e.clientY-ly)*.004; rotX=Math.max(-.45,Math.min(.45,rotX)); lx=e.clientX; ly=e.clientY; });
+  addEventListener("wheel",function(e){ if(sleeping)return; e.preventDefault(); zoom+=e.deltaY*.0008; zoom=Math.max(.6,Math.min(1.8,zoom)); },{passive:false});
+  addEventListener("resize",function(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); ren.setSize(innerWidth,innerHeight); });
+  addEventListener("dblclick",function(){ sleeping=!sleeping; if(sleeping){ if(mixer) mixer.stopAllAction(); setStatus("idle","休眠"); setLight("idle"); setBubble("休息中……",true); } else { setStatus("ok","唤醒"); setLight("ok"); setBubble("在线，请下指令。",true); if(clips.length&&mixer){ var idle=clips.find(function(c){return /idle|breath|stand/i.test(c.name)})||clips[0]; var a=mixer.clipAction(idle); a.reset(); a.setLoop(T.LoopRepeat,Infinity); a.play(); } } });
+
+  var clock=new T.Clock(), phase=0;
+  function frame(){
+    requestAnimationFrame(frame);
+    if(sleeping){ ren.render(scene,camera); return; }
+    var dt=Math.min(.05,clock.getDelta()); phase+=dt;
+    if(mixer) mixer.update(dt);
+    if(!model) root.position.y=Math.sin(phase)*.005;
+    else { root.position.y=Math.sin(phase*.9)*.008; root.rotation.y=rotY; root.rotation.x=rotX; }
+    camera.position.set(0,1.15*zoom,3.5*zoom); camera.lookAt(0,.95,0);
+    ren.render(scene,camera);
+  }
+  frame();
+
+  function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+})();
+</script></body></html>

@@ -77,18 +77,28 @@ def _kind_of(surface: str, item) -> tuple:
 
 
 def _target_of(surface: str, item) -> str:
+    # 🔴 2026-11-09 根因修复（红黄警报 socket.alert 永远清不掉）：
+    #   discover 的 sample 是**混合类型** —— 实测「窗口」列表里混着字符串元素，
+    #   而这里一律按 dict 调 item.get(...) ⇒ AttributeError: 'str' object has no attribute 'get'
+    #   ⇒ scan() 在 _rows_from_discover 处整轮崩掉（第 141 行不在 try 内）
+    #   ⇒ state/omni_open.json 的快照停在旧一轮 ⇒ alerts 的 socket.alert 永久为真。
+    #   口径：能认 dict 就按字段取，认不出就如实把它当字符串目标。
     if surface == "监听端口":
+        if not isinstance(item, dict):
+            return str(item)
         addr = str(item.get("addr") or "127.0.0.1")
         if addr in ("0.0.0.0", "::", "[::]", ""):
             addr = "127.0.0.1"          # 通配地址不能当客户端目标
         return "%s:%s" % (addr, item.get("port"))
     if surface == "本地模型口":
-        return str(item.get("base") or "")
+        return str(item.get("base") or "") if isinstance(item, dict) else str(item)
     if surface == "本地DB":
         return str(item)
     if surface == "命令行软件":
         return str(item)
     if surface == "窗口":
+        if not isinstance(item, dict):
+            return str(item)
         return str(item.get("title") or item.get("hwnd") or item)
     return str(item)
 

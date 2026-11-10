@@ -1,0 +1,21 @@
+{
+  "name": "intent_route",
+  "version": "1.0.0",
+  "description": "意图路由 · 能力位导航：给一句人话，在 410 个能力位里找出最该用的 TOP N（规则优先 + 2-gram 兜底）。补的是『410 个能力位不参与 tentacle 意图路由』这个缺口——以前喊「逆向分析」会被路由到 click_text，现在能直达 rea_reverse。常用说法：该用哪个能力 / 找能力 / 有什么能做 / 我怎么用 / 路由一下 / 这个需求用啥。action=route（默认）/domains/kinds/stats",
+  "entry": {
+    "program": "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8桌面版\\payload\\pyembed\\python.exe",
+    "args": [
+      "-X",
+      "utf8",
+      "C:\\Users\\Lenovo E14 Gen 5\\Desktop\\GBT小土豆V8桌面版\\payload\\packs\\intent_route\\main.py"
+    ]
+  },
+  "actions": [
+    "route",
+    "domains",
+    "kinds",
+    "stats"
+  ],
+  "auto_exec": true,
+  "timeout_s": 30
+}

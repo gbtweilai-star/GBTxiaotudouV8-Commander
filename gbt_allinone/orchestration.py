@@ -36,11 +36,18 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import threading
 import time
 
 # 本文件在 gbt_allinone/orchestration.py ⇒ parents[0]=gbt_allinone，parents[1]=仓库根
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "state" / "orchestration-ledger.jsonl"
+
+# 同进程多线程并发追加时，`open("a")` 的 buffered write 可能交错成残片
+# （2026-11-07 实测账本里出现两段同样的坏字节，位置 38694 / 40155）。
+# 锁只防同进程；写入用一次 `os.write`（而不是 buffered 多段 write），
+# 跨进程时 NTFS 的 O_APPEND 也尽量保持单次写。读侧另有 errors="replace" 兜底。
+_WRITE_LOCK = threading.Lock()
 SEEN = ROOT / "state" / "orchestration-seen.json"
 ACTIONS = ("scan", "add", "edit", "deploy", "fix", "run")
 
@@ -77,16 +84,21 @@ def record(action: str, target: str, detail: str = "", result: str = "ok",
            "actor": actor[:40], "action": action, "target": target[:200],
            "detail": str(detail)[:400], "result": str(result)[:60],
            "evidence": str(evidence)[:300]}
+    line = (json.dumps(rec, ensure_ascii=False) + "\n").encode("utf-8")
     LEDGER.parent.mkdir(parents=True, exist_ok=True)
-    with LEDGER.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    with _WRITE_LOCK:
+        fd = os.open(str(LEDGER), os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
+        try:
+            os.write(fd, line)
+        finally:
+            os.close(fd)
     return {"ok": True, "recorded": rec}
 
 
 def _rows() -> list:
     out = []
     if LEDGER.exists():
-        with LEDGER.open(encoding="utf-8") as fh:
+        with LEDGER.open(encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 try:
                     out.append(json.loads(line))

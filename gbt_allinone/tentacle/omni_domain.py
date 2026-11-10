@@ -212,8 +212,8 @@ class OmniDomainMixin:
         win = _find_window(window)
         if not win:
             return refusal("window_not_found", f"未找到窗口: {window}", ("window",))
-        import win32gui as _wg
-        prev = _wg.GetForegroundWindow()
+        _b = _require_win32()
+        prev = int(_b["u32"].GetForegroundWindow() or 0)
         # ⛔ 2026-08-13 打磨: UIA ValuePattern 直写兜底 — 前台被高完整性窗口锁定时
         #    物理输入无法落地, UIA 直写可编辑控件不依赖焦点
         try:
@@ -236,7 +236,7 @@ class OmniDomainMixin:
         _keyboard_type(text)
         if not activate and prev and prev != win["hwnd"]:
             try:
-                _wg.SetForegroundWindow(prev)
+                _b["u32"].SetForegroundWindow(prev)
             except Exception as _e:
                 _record_swallow(_e, "omni_domain")
         return {"ok": True, "window": win["title"], "text_len": len(text),
@@ -383,16 +383,24 @@ class OmniDomainMixin:
 
     def trace_source(self, x: int, y: int):
         try:
-            import win32gui, win32process
-            hwnd = win32gui.WindowFromPoint((x, y))
-            if not hwnd: return refusal("action_failed", "无法定位窗口", ())
-            title = win32gui.GetWindowText(hwnd); _, pid = win32process.GetWindowThreadProcessId(hwnd)
-            rect = win32gui.GetWindowRect(hwnd)
-            try: import psutil; proc_name = psutil.Process(pid).name()
-            except Exception: proc_name = f"pid={pid}"  # 容错: psutil 进程信息不可用降级
-            cap = _screen_capture({"x": max(0,x-50), "y": max(0,y-15), "w": 100, "h": 30})
-            return {"ok": True, "x": x, "y": y, "window": {"title": title[:100], "pid": pid, "process": proc_name, "rect": {"left": rect[0], "top": rect[1], "right": rect[2], "bottom": rect[3]}}, "surrounding_kb": cap.get("image_kb", 0)}
-        except ImportError: return refusal("action_failed", "win32 API 不可用", ())
+            _b = _require_win32()
+        except WindowBackendUnavailable as _e:
+            return refusal("dependency_unavailable", f"win32 ctypes 后端不可用: {_e}", ("win32",))
+        hwnd = _ct_window_from_point(x, y)
+        if not hwnd:
+            return refusal("action_failed", "无法定位窗口", ())
+        title = _ct_window_text(hwnd)
+        pid = _ct_window_pid(hwnd)
+        rect = _ct_window_rect(hwnd) or {"left": 0, "top": 0, "right": 0, "bottom": 0}
+        proc_name = _ct_process_name(pid) or ""
+        if not proc_name:
+            try:
+                import psutil
+                proc_name = psutil.Process(pid).name()
+            except Exception:
+                proc_name = f"pid={pid}"  # 容错: 进程信息不可用降级
+        cap = _screen_capture({"x": max(0, x - 50), "y": max(0, y - 15), "w": 100, "h": 30})
+        return {"ok": True, "x": x, "y": y, "window": {"title": title[:100], "pid": pid, "process": proc_name, "rect": {"left": rect["left"], "top": rect["top"], "right": rect["right"], "bottom": rect["bottom"]}}, "surrounding_kb": cap.get("image_kb", 0)}
 
     def trace_text(self, text: str):
         r = self.find_text(text)

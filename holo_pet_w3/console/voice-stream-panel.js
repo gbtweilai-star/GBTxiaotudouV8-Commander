@@ -68,7 +68,7 @@
           if (r && r.ok) {
             var dur = Number(r.duration || 0);
             if (timeEl) timeEl.textContent = dur.toFixed(1) + "s";
-            if (r.partial && textEl) textEl.textContent = ((r.acoustic_wake && r.acoustic_wake.wake) || (r.wake && r.wake.wake) ? "声学唤醒 · " : "局部：") + r.partial;
+            if (r.partial && textEl) textEl.textContent = ((r.acoustic_wake && r.acoustic_wake.wake) || (r.wake && r.wake.wake) ? "声学唤醒 · " : "局部：") + r.partial; emitFinal(r.partial);
           }
         }).catch(function () {});
       };
@@ -86,10 +86,15 @@
   function finish() {
     if (!session) { stopStream(); return; }
     send("end").then(function (r) {
-      if (textEl) textEl.textContent = (r && r.ok) ? ((((r.acoustic_wake && r.acoustic_wake.wake) || (r.wake && r.wake.wake)) ? "声学唤醒 · " : "") + "最终：" + (r.text || "（静音/未识别）")) : ("结束失败：" + ((r && r.error) || "未知"));
+      if (r && r.text) emitFinal(r.text);
       stopStream();
     }).catch(function () { stopStream(); });
   }
+  /* 事件钩子：最终转写出来时广播给教程 / 命令台（只认 voice_intercom 五态机同口径的最终句） */
+  function emitFinal(query) {
+    try { window.dispatchEvent(new CustomEvent("gbt-voice-final", { detail: { query: query } })); } catch (e) { }
+  }
+  window.__gbtVoiceFinal = emitFinal;
   startBtn.addEventListener("click", begin);
   if (stopBtn) stopBtn.addEventListener("click", finish);
   window.__voiceStreamStop = finish;

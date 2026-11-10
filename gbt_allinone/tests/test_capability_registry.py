@@ -274,9 +274,16 @@ class TestRegistryNoDuplicateKeys(unittest.TestCase):
             tmp.unlink()
         self.assertEqual(dups, {"alpha": [3, 5]})
 
-    def test_registry_has_427_unique_caps(self):
-        """427 是契约：字面量键数必须等于去重后的能力数。"""
-        self.assertEqual(len(CR.BENIGN_CAPS), 427)
+    def test_registry_keys_unique_and_count_is_pinned(self):
+        """键数钉在**现读真源**上：加/删能力位就必须同步改这个钉数。
+
+        这条判据的真价值是第二句 —— 字面量键数必须等于**去重后**的能力数
+        （Python 对重复键静默取后者，2026-11-06 就靠它逮到 431 键 / 427 名）。
+        钉数本身只是"有没有人悄悄动了注册表"的护栏：
+        2026-11-10 加 `t2i_agnes`（registry + `api.py` 分派 + `tools/agnes_image.py`
+        三处齐、`op=status` 真回钥位）后，真值从 427 → 428。
+        """
+        self.assertEqual(len(CR.BENIGN_CAPS), 428)
         self.assertFalse(_duplicate_literal_keys(REGISTRY_PY))
 
 

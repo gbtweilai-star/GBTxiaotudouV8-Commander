@@ -3,6 +3,28 @@
 > 本文件是**入口**。真源是 `PROJECT_BLUEPRINT.md`（进度/依赖/风险，162 KB 全量蓝图）。
 > 两者冲突时以 `PROJECT_BLUEPRINT.md` + 代码为准，本文只写「上手就要知道的硬口径」。
 
+## 0. 原生视觉实时链路（默认主流 · 2026-11-07 主人令）
+
+**默认只有一个跑法：眼在手前、脑在手里、验在动后，全程同一拍。**
+
+持续帧流 → 原生观察（UIA + Windows OCR + 视觉块）→ **帧/视频原样交大模型看** → 万能插下发动作 → **下一帧帧差校验**。
+
+- **禁止**把「截图 → 转文字 → 盲操作」当默认；单帧只在原生层不可用时兜底，回执必须标 `degraded=true`。
+- **禁止**把单帧观察说成「实时」；实时 = 动作期间采集不停 + 每步由新帧反馈驱动。
+- 新鲜度硬口径：**400 ms**；超过就不许动手（`vision_loop.STALE_MS`）。
+- 动作后必须验：画面没变 = **没动成**；变了但非预期 = **变了但非预期**；只有「按预期生效」才算成。
+- 入口：`omni_observe / vision_scene / vision_blocks / omni_locate / omni_ocr` 看；`input_*` 动；`vision_diff` 验；闭环 `vision_loop`；连续伺服 `body_realtime`。
+- 机器判据：`state/vision-policy.json` 是唯一策略源；`.\pyembed\python.exe tools\codex-scripts\native-vision-policy-check.py` 必须 PASS。
+- 执行器或能力不可用 → 停下说清缺哪一环，**不许静默退回截图串行**。
+- **取帧必须落地址**：`see` 的帧在内存 `image_base64` 里；万能插取帧时落一份有界缓存
+  （`state/vision/frames/obs-*`，最近 200 帧）并回传 `path`。没有 `path` 就等于没帧 ——
+  别拿 `fmt/size` 充数，也别让调用方自己去猜图在哪。
+- **已取到帧就不再让 pulse / method lane 重复决策**：否则「看看屏幕」会被判成 `body_eye`
+  （不在只读白名单）回 denied，帧永远到不了模型。推理型模型 `content=null` +
+  `finish_reason=length` 时加一次预算重试；仍空就如实报「token 全花在思考上」，不许把思考当回答。
+
+详细口径见 `docs/原生视觉实时链路.md`。
+
 ## 1. 这是什么
 
 GBT小土豆V8 是一个**协议式认知体**：`gbt_allinone/` 里约 426 个**能力位**（capability slot），
@@ -328,5 +350,6 @@ print("OK")
 - **语音**：`edge-tts` → `zh-TW-HsiaoChenNeural` @ `+15%`（主人 2026-10-04 定）。
   打不开时退 `SAPI zh-TW (Microsoft Hanhan)`，**仍不行就不出声并报原因** ——
   **不许**用大陆腔顶替（`Microsoft Huihui`）。
-- **视觉**：屏幕走 `body_eye`；**摄像头**走 `see_camera`；两者都不许「凭想象描述」，
-  拿不到帧就如实 `needs_camera`。
+- **视觉**：屏幕默认走 §0 的原生实时链路（持续帧 + UIA/OCR/视觉块 + 帧差校验）；
+  单帧 `body_eye` 只作兜底并标 `degraded=true`；**摄像头**走 `see_camera`；
+  两者都不许「凭想象描述」，拿不到帧就如实 `needs_camera`。

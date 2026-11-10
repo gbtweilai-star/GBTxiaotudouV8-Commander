@@ -32,12 +32,39 @@ def _parse(path: pathlib.Path) -> dict:
     if not m:
         return meta
     fm = m.group(1)
-    for line in fm.splitlines():
-        if ":" not in line:
+    # 🔴 2026-11-09 修（块标量让 160 个 skill 的描述集体变成 "|"）：
+    #   原实现逐行 `split(":", 1)`，遇到 `description: |` 取到的值就是字面量 "|"，
+    #   紧跟其后的缩进正文（YAML 块标量）被整段丢掉 ⇒ desc 空 ⇒ match 只能靠文件名猜。
+    #   实测吞噬 nexu-io/open-design 后 198 个 skill 里大量 desc == "|"。
+    #   这里按 YAML 规则解析 `|` / `>`（含 |-、|+、>- 修饰符）：块内容是其后所有**缩进**行。
+    _lines = fm.splitlines()
+    _i = 0
+    while _i < len(_lines):
+        line = _lines[_i]
+        if ":" not in line or line.lstrip().startswith("#"):
+            _i += 1
             continue
         k, v = line.split(":", 1)
         k = k.strip()
-        v = v.strip().strip('"').strip("'")
+        v = v.strip()
+        if re.fullmatch(r"[|>][+-]?", v):
+            _block = []
+            _i += 1
+            while _i < len(_lines):
+                nxt = _lines[_i]
+                if nxt.strip() == "":
+                    _block.append("")
+                    _i += 1
+                    continue
+                if nxt[:1] in (" ", "\t"):
+                    _block.append(nxt.strip())
+                    _i += 1
+                else:
+                    break
+            v = " ".join(x for x in _block if x).strip()
+        else:
+            v = v.strip('"').strip("'")
+            _i += 1
         if k == "name":
             meta["name"] = v or meta["name"]
         elif k == "description":
@@ -59,6 +86,49 @@ def _all() -> list:
             except Exception:
                 continue
     return out
+
+
+# 🔴 2026-11-09 补（中文查询搜不到英文 skill）：
+#   吞噬 nexu-io/open-design 的 160 个 skill 后，它们的 description 全是英文，
+#   而 _score 的分词只有「空格切词 + 中文 bigram」两种。中文提问「杂志风编辑排版演示」
+#   一个 bigram 都落不到英文 desc 上 ⇒ 正主（after-hours-editorial-template /
+#   deck-guizang-editorial）得 0 分，反而把 body 里恰好有中文的 web-clone 顶上来。
+#   这里只加一层「中文概念 → 英文关键词」的桥，不改任何 skill 原文。
+_ZH_EN = {
+    "杂志": ("editorial", "magazine"), "编辑": ("editorial",), "排版": ("typography", "layout"),
+    "字体": ("typography", "font"), "配色": ("palette", "color"), "颜色": ("color",),
+    "演示": ("deck", "slide", "presentation"), "幻灯片": ("slide", "deck"), "简报": ("brief", "deck"),
+    "汇报": ("report", "review"), "报告": ("report",), "一页纸": ("one-pager",),
+    "动效": ("motion", "animation"), "动画": ("animation", "animate"), "过渡": ("transition",),
+    "滚动": ("scroll", "scrolltrigger"), "交互": ("interaction", "interactive"),
+    "三维": ("threejs", "3d"), "着色器": ("shader",), "粒子": ("particle",),
+    "图表": ("chart", "d3"), "可视化": ("visualization", "d3"), "数据": ("data",),
+    "仪表盘": ("dashboard",), "看板": ("dashboard", "kanban"),
+    "品牌": ("brand",), "标识": ("logo",), "海报": ("poster",), "封面": ("cover",),
+    "卡片": ("card",), "社交": ("social",), "小红书": ("xiaohongshu",),
+    "网页": ("web", "website", "frontend"), "网站": ("web", "website"), "落地页": ("landing",),
+    "前端": ("frontend",), "组件": ("component", "shadcn"), "界面": ("ui", "interface"),
+    "配色方案": ("palette",), "设计体系": ("design-system", "design system"),
+    "设计评审": ("design-review", "review"), "评审": ("review",), "打磨": ("polish",),
+    "复刻": ("clone",), "克隆": ("clone",), "仿站": ("clone",),
+    "视频": ("video", "remotion"), "剪辑": ("video", "clip"), "字幕": ("caption",),
+    "图片": ("image", "imagegen"), "生成图": ("imagegen", "image"), "修图": ("image-edit",),
+    "简历": ("resume",), "线框": ("wireframe",), "流程图": ("flowchart",),
+    "文档": ("doc", "docx"), "表格": ("sheet", "table"), "发票": ("invoice",),
+    "品控": ("qa", "review", "gate"), "质感": ("taste", "premium"),
+    "高级感": ("premium", "high-end"), "极简": ("minimalist",), "粗野": ("brutalist",),
+    "瑞士": ("swiss",), "暗色": ("dark",), "油画": ("oil",), "手绘": ("hand-drawn",),
+    "表情": ("sticker", "gif"), "音乐": ("music", "audio"), "配音": ("speech", "voice"),
+}
+
+
+def _expand(q: str) -> list:
+    """中文概念 → 英文关键词（只用于补分，不改原查询）。"""
+    out = []
+    for zh, ens in _ZH_EN.items():
+        if zh in q:
+            out.extend(ens)
+    return sorted(set(out))
 
 
 def _score(skill: dict, query: str) -> float:
@@ -88,6 +158,14 @@ def _score(skill: dict, query: str) -> float:
                 score += 0.8
             elif bg in body:
                 score += 0.2
+    # 中文→英文桥（英文描述的 skill 也能被中文问到）
+    for w in _expand(q):
+        if w in name:
+            score += 2.6
+        if w in desc:
+            score += 1.6
+        if w in body:
+            score += 0.3
     return round(score, 2)
 
 

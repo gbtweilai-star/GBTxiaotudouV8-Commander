@@ -81,6 +81,13 @@ def main() -> int:
     r = CR.classify("你会看屏幕吗？")
     check("提问句不擅自动手", r.get("intent") == "" and r.get("question") is True,
           (r.get("intent"), r.get("question")))
+    # 2026-11-07：问「屏幕上有什么」是要一帧给模型看（只读）；问「你会不会看」仍不动手
+    r = CR.classify("屏幕上有什么？")
+    check("问屏幕内容 ⇒ 只读取帧", r.get("intent") == "screen" and r.get("question") is True,
+          (r.get("intent"), r.get("question"), r.get("reason")))
+    r = CR.classify("你能看屏幕吗")
+    check("问能力 ⇒ 不取帧", r.get("intent") == "",
+          (r.get("intent"), r.get("reason")))
     r = CR.classify("开网页")
     check("开网页缺网址 ⇒ user_error", r.get("intent") == "web" and "url" in (r.get("missing") or [])
           and "user_error" in (r.get("error") or ""), r.get("error"))
@@ -285,12 +292,20 @@ def main() -> int:
     from gbt_allinone import omni_plug as _OP
     from gbt_allinone import energy_core as _EC
     _orig_plug, _orig_think = _OP.plug_and_run, _EC.think
+    # 2026-11-07：免费车道（:18900）会把这条用例截走，测试桩就永远轮不到 ——
+    # 这里关掉它（顺带保证测试不联网），才真的在验「关路由 ⇒ 回对话模型」。
+    _old_free = os.environ.get("GBT_ALLOW_FREE_MODEL")
+    os.environ["GBT_ALLOW_FREE_MODEL"] = "0"
     try:
         _OP.plug_and_run = lambda *a, **k: {"ok": False, "error": "test-stub"}
         _EC.think = lambda *a, **k: {"ok": True, "text": "（测试桩：走对话模型）", "ms": 1}
         r2 = mod._chat("读文件 outputs/router-accept/demo.txt", use_capabilities=False)
     finally:
         _OP.plug_and_run, _EC.think = _orig_plug, _orig_think
+        if _old_free is None:
+            os.environ.pop("GBT_ALLOW_FREE_MODEL", None)
+        else:
+            os.environ["GBT_ALLOW_FREE_MODEL"] = _old_free
     check("关掉路由 ⇒ 不返回 capability_router（回到对话模型）",
           r2.get("via") != "capability_router" and "测试桩" in str(r2.get("text")),
           {k: r2.get(k) for k in ("via", "text", "error")})

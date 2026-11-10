@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal enableextensions
 cd /d "%~dp0"
 echo ==========================================
@@ -70,6 +70,8 @@ echo [5/6] doctor ...
 echo.
 
 if "%~1"=="--no-shell" goto no_shell
+echo [5.5/6] starting desktop-humanoid (桌面数字人指挥官) ...
+start "" /min "%~dp0pyembed\python.exe" -X utf8 "desktop-humanoid\main.py"
 echo [6/6] starting desktop shell ...
 if not exist "holo_pet_w3\node_modules\.bin\electron.cmd" (
   echo   [skip] electron 没装：holo_pet_w3\node_modules\.bin\electron.cmd 不存在

@@ -417,10 +417,12 @@ def alerts(last=500):
             return {"quiet": False,
                     "quiet_means": "审计窗口内无异常，但**插口变了**（拔掉/断线）⇒ 仍需人看",
                     "any_signal": True, "needs_a_look": True, "anomalies": 0,
+                    "runtime_faults": 0,
                     "sockets": _sk,
                     "note": "插口变化来自 omni_open 的增量对比（拔掉/翻转会 alert）"}
         return {"quiet": True, "quiet_means": "窗口内确实什么都没有",
                 "any_signal": False, "needs_a_look": False, "anomalies": 0,
+                "runtime_faults": 0,
                 "sockets": _sk,
                 "note": "窗口期内无异常事件"}
     top = sorted(a["errors_by_kind"].items(),
@@ -441,9 +443,21 @@ def alerts(last=500):
         _names = set(_REG.keys())
     except Exception:                                        # noqa: BLE001
         _names = set()
-    _reg_hits, _stray = {}, {}
+    _reg_hits, _stray, _recovered_only = {}, {}, {}
     for _k, _v in (a.get("errors_by_kind") or {}).items():
-        (_reg_hits if _k in _names else _stray)[_k] = _v
+        # 🔴 2026-11-09 根因修复（红黄警报「清了不灭」）：
+        #   原实现只判「名字在不在册」，**不看信号类型** ⇒ 在册能力位上只有 recovered
+        #   的历史痕迹也被算成「必须人看」。实测 i2v_agnes: {runtime:0, recovered:3}，
+        #   那 3 条是「故障后同能力已有成功调用」（check_audit 第 343 行判的 recovered），
+        #   属于已恢复记录、永远不会自己消失 ⇒ needs_a_look 永久为真，警报挂死没人能清。
+        #   口径以 check_audit 的 reading_scope.why 为准：**只有 runtime 才是要追的病**；
+        #   recovered 不点亮，只如实列进 recovered_only。
+        if int(_v.get("runtime", 0) or 0) > 0:
+            (_reg_hits if _k in _names else _stray)[_k] = _v
+        elif _k in _names:
+            _recovered_only[_k] = _v
+        else:
+            _stray[_k] = _v
     _guard = int((a.get("by_signal") or {}).get("guard", 0) or 0)
     _look = bool(runtime_faults or _guard or _reg_hits or _sk.get("alert"))
     return {"quiet": runtime_faults == 0,
@@ -456,6 +470,7 @@ def alerts(last=500):
             "sockets": _sk,
             "registered_anomalies": len(_reg_hits),
             "unregistered_footprints": sorted(_stray)[:8],
+            "recovered_only": sorted(_recovered_only)[:8],
             "anomalies": a["anomalies"],
             "runtime_faults": runtime_faults,
             "by_signal": a["by_signal"],

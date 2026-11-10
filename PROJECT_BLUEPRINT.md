@@ -2269,3 +2269,90 @@ Electron 桌面壳（`holo_pet_w3` 缺 `node_modules`，需 `npm install`）。
   （`### \`` 数量 54→54，写入前校验，变了就拒写）。
   完整参数与权限仍看 `op=contract` 或 `docs/capabilities-full.json`（机器可读版）。
   顺带纠错：该脚本**没有 `--check` 参数**，不带参数即干跑。
+
+## 2026-11-07 · 原生视觉实时链路定为默认主流（主人令固化）
+
+- 口径：持续帧流 → 原生观察（UIA + Windows OCR + 视觉块）→ 帧/视频原样交大模型看 → 万能插动作 → 下一帧帧差校验。
+- 禁止：截图 → 转文字 → 盲操作当默认；单帧仅兜底且必须 `degraded=true`；单帧不许叫实时。
+- 策略源：`state/vision-policy.json`；硬口径写进 `AGENTS.md §0`；详细见 `docs/原生视觉实时链路.md`。
+- 判据：`tools/codex-scripts/native-vision-policy-check.py`（17 项全绿）＋ `tests/test_native_vision_policy.py`。
+- 运行期标记：`capability_router` 的 `screen` 单帧路径回执带 `lane=single_frame_fallback` / `degraded=true`，不再冒充实时链路。
+- 对话层已接线（2026-11-07）：`/api/chat` 命中看屏后取帧路径，`_openai_chat` 以 `image_url` 把该帧原样送模型
+  （`via=…+frame`，回执带 `frame`）；帧缺失 / 超 6MB / 本机文字车道 → `degraded=true` + `why_degraded`，不假装模型看见。
+  单测 `tests/test_chat_frame_wiring.py`（7 条）；判据脚本会核对代码证据，`chat_layer=done` 不能只改状态不接线。
+- 多帧/视频（2026-11-07）：`_frames_data_urls` 按时间序最多 **4 帧 / 合计 6 MB** 原样送模型，`via` 用 `+frames`；被截断 → `degraded=true` + 「前 N/M 帧」，不许说整段都看过。
+- 端到端实测（2026-11-07）：`POST /api/chat {"text":"看看屏幕"}` → `via=free:kilo-auto/free+frame`，
+  模型准确说出当前屏幕内容。打通靠三处：
+  ① `omni_plug._persist_frame` 把内存帧落一份有界缓存（`state/vision/frames`，最近 200 帧）并回传 `path`
+  —— 原先 `看` 回执把 `image_base64` 过滤掉，对话层只拿到 `fmt/size`，等于没帧；
+  ② 看屏成功后 `_chat` 跳过 `tactile pulse` / `method lane`，否则「看看屏幕」被判成 `body_eye` denied；
+  ③ 推理型模型 `content=null` + `finish_reason=length`（reasoning_tokens≈535）→ 加一次预算重试，仍空则如实报错。
+
+## 2026-11-07 · 对话步骤实时可见（Codex 同款执行面）
+
+- 主人原话：「我要的是跟 Codex 一样的显示，而不是直接显示出来……她开始执行任务每一步都要能看到她在干嘛执行到哪里每一个步骤都要精细显示出来。」
+- 服务端：`POST /api/chat` 加 `"stream": true` ⇒ `text/event-stream`；`_chat(..., on_step=)` 每跨一个阶段推一条
+  `{seq,title,rows,ms,state,at_ms}`，最后 `{type:"final",result:…}`，`result.steps` 原样回带本轮全部步骤。
+- 实测口径：`ms` 来自 `time.perf_counter()` 或回执自带 `ms`；没测到就是 `null`，不补 0。
+- 前端：`beginTurn().step` 到达一条追加一行；当前 `running` 行自动展开、历史行自动收起；
+  收尾优先用 `j.steps`，不再拿粗粒度折行覆盖真实过程。
+- 兼容：不带 `stream` 仍返回单个 JSON（原行为一字不变）；`tests/test_capability_router.py` 直调 `_chat` 照旧。
+- 判据：`tests/test_chat_live_steps.py`（真起 `ThreadingHTTPServer`：3 step 按序 / 单 final 收尾 / steps 回带 / 非流式回退）；
+  既有 `gbt_allinone.tests.test_console_chat_print` 等 22 条全绿。
+- 文档：`docs/194-chat-live-steps.md`。
+
+### 2026-11-07 · 对话区文字可选中（复制）
+
+- 主人原话：「为什么我不能负责对话框里面的文字」——对话区框选不了、`Ctrl+C` 复制不到。
+- 根因：`holo_pet_w3/console/app.css:45` 的 `body { user-select: none }` 被所有子元素继承（本意是标题栏/按钮防误拖）。
+- 修法：全局那条一个字没动，只在对话区开白名单（`#chat-messages` 子树 + `.msg/.msg-text/.meta/.step-*` + 输入框 `textarea`）。
+  标题栏 `-webkit-app-region: drag` 区域不进白名单。
+- 判据：对话区 `Ctrl+A` + `Ctrl+C` 实测复制到 115 字正文；`tests/test_chat_live_steps.py` 23 条与既有 22 条全绿。
+
+### 2026-11-07 · APP 全页面能力对齐体检（21 页）
+
+- 方法：同一份 payload 在 Chrome 无头里 CDP 逐页点 21 个页签（每页 5s），统计异常/失败请求/data 状态位。结果 0 异常、0 4xx/5xx，问题集中在“数据没接上”。
+- 修掉 4 处断点：① 职业页 `/api/data.professions=None`（产品副本缺 `data/professions.json`）→ 补文件 + 空态明示；② 穿透扫描只读静态快照 → 没快照时自动 `/api/scan` 现补（1395 单元 / 100% 覆盖）；③ 3D 星图读 `window.GBT_CONSOLE` 但取数后从未写回 → 补一行，`0+0+0+0` → `427+32+17080+2`；④ 技能栏只显示 `broken` → 显示“1 项待修”+具体文件原因。
+- 附带：单次刷新失败不再把整页清成“离线”，保留上次真数据并标注刷新失败。
+- 判据：`node .scratch/audit2.mjs`、`node .scratch/probe-visual.mjs`；`test_console_chat_print` 7 条 + `test_chat_live_steps` 23 条全绿。
+- 文档：`docs/195-app-page-audit.md`。
+
+### 2026-11-07 · 赏金 / 浏览器「有引导空态」
+
+- 赏金页 `programs=0` 时显示三步空态（建项目 → 范围检查 → 录发现/出报告），并在发现列表上方给出
+  「靶场名称 / 授权范围 / 授权依据 + 建自有靶场」输入行；走 `POST /api/bounty {op:"add_program"}`，
+  授权依据留空默认「本机自建靶场」（后端要求非空），结果落 `dataset.bountyCreate`。
+- 浏览器页进页面自动 `bwNative("status")` 探一次调试口，按 `ok / needs_browser_debug / 其它`
+  写状态行、提示行与 `dataset.bwNative`；「检测」按钮改为强制重探。
+- 判据：CDP 实测空态可见、四个节点齐全、拦截后的 add_program payload 正确（`dataset.bountyCreate=ok`）、
+  浏览器页 `dataset.bwNative=needs_browser_debug` 且提示行给出 --remote-debugging-port=9222 的补救路径；
+  `test_console_chat_print` 7 条 + `test_chat_live_steps` 全绿。
+- 文档：`docs/196-bounty-browser-guided-empty.md`。
+
+### 2026-11-07 · 媒体舞台 / 视频舱：计数、工具栏与空态
+
+- 媒体页计数不再 `JSON.stringify(counts)`，改 `28 件 · 视频 11 · 图片 10 · 音频 7`；`humanSize` 补 KB 档（<1 MB 不再显示 0.0 MB）。
+- 视频页计数跟真实阶段走（`33 件 · 7 组阶段（六段可联跑）`），联跑摘要改成 `6/6 段通 · 未生成视频`；按钮「六段联跑」→「全段联跑」，六段名字进 `title`。
+- 两页工具栏 `.ms-bar` / `.vh-bar` 加 `padding-right: 96px`：原先 `.page-pulse` 角标压住「刷新」/「全段联跑」共 81px / 72px，现已让位（按钮右缘 1087 < 角标左缘 1102）。
+- 两页补有引导空态：媒体页说明产物来自 `outputs/`、跑一次任务后自动出现、可点刷新，分类为空时提示切回「全部」；视频页说明重试与 `/api/video` 后端排查。
+- 判据：`.scratch/probe-mv2.mjs`（有数据态）+ `.scratch/probe-empty.mjs`（CDP Fetch 域改写成空响应，非破坏性）双态实测；`audit2.mjs` 21 页 `errors:[]`、`net:[]`；`test_console_chat_print` 7 条 + `test_chat_live_steps` 全绿。
+- 文档：`docs/197-media-video-alignment.md`。
+
+### 2026-11-07 · 3D 四页首屏：角标遮挡 / 按钮重合 / 标签裁切
+
+- 体检口径：`probe-views.mjs` 逐页比 `getBoundingClientRect()` 与视图矩形（无越界）+ `probe-pulse.mjs` 把 `.page-pulse` 与页内所有可交互元素求交。
+- 修 6 处遮挡：万能插 `#om-toggle`/`#im-toggle` 原坐标完全重合（1097,120，前者永远点不到）→ 34/74 两行、`#proactive-toggle` 114、面板 154；功能表 / 技能栏 `.view-head { padding-right: 92px }`；世界 `.world3d-tools` 12→34px；浏览器 `.gbt-browser-bar` 与思考流 `.ts-bar` 各留 96px。改后 21 页复扫零相交。
+- 万能插 3D 标签裁切：相机 z 20→21.8、标签 scale 2.6→2.45（半宽 8.19 → 8.94，环 7.4+1.3 原来必出界）；`creation-58 / system-58 / recon-18` 现已完整。
+- 看门狗误报：8s → 15s，原因字段不再直接印 `imported`（改人话），3D 就绪自动收起。
+- 思考流标题不再吐 JSON：`100 条 · 行动 100`；空态补引导（想/做/果/闸/系 五类 + 5 秒轮询说明）。
+- 判据：`probe-views.mjs`（overflowN=0、canvas 794×823、ds 全 ok）、`probe-pulse.mjs`（`{}`）、`probe-plug-time.mjs`（0.5~0.6s）、`probe-stream.mjs`（双态）、`audit2.mjs`（21 页 errors/net 全空）；`test_console_chat_print` 7 条 + `test_chat_live_steps` 全绿。
+- 文档：`docs/198-3d-views-pulse-overlap.md`。
+
+### 2026-11-07 · 数字人 3D 空白 / 轮次追踪显示 Python 字典
+
+- 数字人 3D 两处叠 bug：① `moments.js` 懒加载监听仍是旧的 `data-view='dh'` + `dh-frame`，`/teardown/` 从没被请求；② 改名时丢了显示规则（只有 `.view-dh{display:flex}`，`.view` 默认 `display:none`），即使有 src 也量出 0×0。改：懒加载认 `teardown-frame || dh-frame` + `gbt:view` 监听；补 `.console[data-view="teardown"]` 的显示与撑高规则。
+- 实测：iframe `src="/teardown/"`、`rect=794×823`、子页标题含 `DH-V7`，页内「在线 / 网格 1 / 骨骼 66 / 动画 idle / 拆解层 / 参考图」全部可见。
+- 轮次追踪不再印 Python repr：`turn-trace.js` 加 `prettyDetail()`，`{'op':'catalog'}` → `op=catalog`，`None`→空、`True/False`→是/否、列表值截 28 字；标题栏冗余的「N 轮 · 总 N」也一并改成「N 轮」/「显示 N / 共 M 轮」。
+- 判据：`probe-six.mjs`（六页首屏扫描）、`probe-tt2.mjs`（iframe 尺寸 + detail 文本）、`probe-pulse.mjs`（21 页零遮挡）、`audit2.mjs`（errors/net 全空）；`test_console_chat_print` 7 条 + `test_chat_live_steps` 全绿。
+- 未动（如实记）：全链路三列固定 300px 会横向滚动；思维导图根节点标签贴边轻微裁切；账本仍写 Python repr（改 `api.py` 属危险件，未碰）。
+- 文档：`docs/199-avatar-3d-and-turn-trace.md`。

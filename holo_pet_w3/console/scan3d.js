@@ -350,6 +350,13 @@ async function rescan(target) {
 
 function init() {
   if (inited) return true;
+  // 先取数、再建 WebGL：没有数据就别白占一个渲染上下文
+  // 注意：只有空的时候才读静态快照，否则会把 hydrateFromApi 补进来的实时数据清掉
+  if (!scans.length) loadData();
+  if (!scans.length) {
+    document.documentElement.dataset.scan3d = "no-scan-data";
+    return false;
+  }
   const canvas = document.getElementById("scan3d-canvas");
   try {
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true,
@@ -360,12 +367,6 @@ function init() {
     camera = new THREE.PerspectiveCamera(46, 1, 0.1, 400);
     camera.position.set(0, 2, 27);
     camera.lookAt(0, 0, 0);
-
-    loadData();
-    if (!scans.length) {
-      document.documentElement.dataset.scan3d = "no-scan-data";
-      return false;
-    }
 
     // 五感
     SENSES.forEach(function (s, i) {
@@ -507,7 +508,40 @@ function loop() {
   draw();
 }
 
-export function start() { if (!init()) return; if (running) return; running = true; last = performance.now(); loop(); }
+let hydrating = false;
+/* 没有静态快照时，用 /api/scan 现场补一份（同一套 unit_details 口径），
+ * 不再让「穿透扫描」页因为缺 state/scan-data.json 就永远空着。 */
+function hydrateFromApi() {
+  if (hydrating) return;
+  hydrating = true;
+  fetch("/api/scan?target=bindings", { cache: "no-store" })
+    .then(function (r) { return r.json(); })
+    .then(function (s) {
+      if (!s || !s.ok) throw new Error((s && s.error) || "scan 无回执");
+      scans = [{
+        target: s.target || "bindings",
+        units: s.units || 0,
+        coverage: (typeof s.coverage === "number") ? s.coverage : null,
+        dead_spots: s.dead_spots || s.missing || [],
+        unit_details: s.unit_details || [],
+      }];
+      document.documentElement.dataset.scan3dSource = "api";
+      if (init() && !running) { running = true; last = performance.now(); loop(); }
+    })
+    .catch(function (e) {
+      document.documentElement.dataset.scan3d =
+        "no-scan-data:" + String((e && e.message) || e).slice(0, 80);
+      const st = document.getElementById("scan-state");
+      if (st) st.textContent = "无数据（快照和 /api/scan 都没回）";
+    })
+    .then(function () { hydrating = false; }, function () { hydrating = false; });
+}
+
+export function start() {
+  if (!init()) { hydrateFromApi(); return; }
+  if (running) return;
+  running = true; last = performance.now(); loop();
+}
 export function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
 
 window.__scan3d = {

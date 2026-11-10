@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""operator_index —— 31 个域 427 个能力位的**算子层**（闸门 + 索引）。
+"""operator_index —— 31 个域 428 个能力位的**算子层**（闸门 + 索引）。
 
 它解决的问题
 ------------
 路由此前只有两条路：语义模型（一次生成，慢）或字符 2-gram（快但瞎猜）。
-中间那层「先把 427 个选项压到几个」一直缺着 —— 因为大多数能力位在算子层
+中间那层「先把 428 个选项压到几个」一直缺着 —— 因为大多数能力位在算子层
 是空壳，没有可打分的触发词。
 
 本模块把每个能力位配成一条算子记录：
@@ -177,7 +177,10 @@ def _usage() -> dict:
     used = {}
     if not LEDGER.exists():
         return used
-    with LEDGER.open(encoding="utf-8") as fh:
+    # 账本是追加写的，历史上出现过非 UTF-8 残片（PowerShell/旧写入器）。
+    # 这里只读 usage 权重：坏行替换掉、跳过，**不改账本本身**；否则一次坏字节
+    # 会让整个算子索引建不出来（2026-11-07 实测：position 3757 的 0x83）。
+    with LEDGER.open(encoding="utf-8", errors="replace") as fh:
         for line in fh:
             line = line.strip()
             if not line:
@@ -195,7 +198,7 @@ def _usage() -> dict:
 def _siblings(adj: dict) -> dict:
     """同族能力位：{cap: {另一 cap: 共享实现文件数}}。
 
-    `wiring.json` 里**没有 cap→cap 边**（实测 427 个 cap 节点，互连 0 条），
+    `wiring.json` 里**没有 cap→cap 边**（实测 428 个 cap 节点，互连 0 条），
     所以 `adj["cap:x"]` 的点全是 `code:`/`page:` —— 直接取邻居只会得到空列表。
     但两个能力位若由同一批代码实现，它们就是同族；用「共享 code: 节点」补出这层关系。
 
@@ -476,7 +479,7 @@ def log_gate(text: str, g: dict, ms=None, src: str = "route") -> None:
 
 def hint_note(text: str, topk: int = 2, gate_result=None,
               max_chars: int = 200, min_score: float = 1.0) -> dict:
-    """把「427 个能力位」压成一行候选，交给对话模型 —— 只提示，不给执行权。
+    """把「428 个能力位」压成一行候选，交给对话模型 —— 只提示，不给执行权。
 
     为什么单独一个函数：gate 的返回是给人和台账看的（带分数、来源、why），
     整段塞进 prompt 太吵，而且本机 1.16 tok/s —— 多一个字都是钱。

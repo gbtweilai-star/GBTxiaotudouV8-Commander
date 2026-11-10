@@ -2493,12 +2493,27 @@ BENIGN_CAPS = {
         "handler": 'memory_manager',
         "safe": True,
     },
+    "t2i_agnes": {
+        "domain": 'creation',
+        "desc": 'Agnes 生图（**agnes-image-2.5-flash**）：一句画面描述 → 一张 PNG，**带产物判据** '
+                '（≥8KB / PNG·JPEG 魔数 / PIL 能开且宽高>0）。与图生视频共用同一把钥匙与同一域名口径； '
+                '缺钥 fail-closed，绝不造假图。实测口径：apihub.agnes-ai.com 回 200，'
+                'api.agnes-ai.cn 对现用钥匙回 401（见 tools/agnes_image.py 顶部读数）。 '
+                'op=status/dryrun/submit/verify。常用说法：生图 / 画个图 / 出图 / 画一张 / 生成图片 / '
+                '画只猫 / agnes 生图 / 用 agnes 画 / 文本生图。',
+        "handler": 't2i_agnes',
+        "safe": True,
+    },
     "i2v_agnes": {
         "domain": 'video',
         "desc": '图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** '
                 '（HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 '
-                'op=status/dryrun/submit/verify。**缺钥 fail-closed** 并说清缺哪把（AGNES_API_KEY）， '
-                '绝不发空请求、绝不生成假产物。',
+                '官方 OpenAI Videos 兼容口径（2026-11-07 校准）：POST /v1/videos '
+                '（mode=text|keyframe|reference，seconds 字符串 4–12，size 固定 720P，aspect_ratio）， '
+                '轮询 GET /agnesapi?video_id=…&model_name=agnes-video-2.5-flash，completed 取顶层 url。 '
+                '与生图 t2i_agnes 共用同一把钥匙与同一域名口径（apihub 200 / .cn 401）。 '
+                'op=status/create/poll/download/run/dryrun/verify。**缺钥 fail-closed** 并说清缺哪把； '
+                '官方要求媒体是公网 URL，本机文件先试 data: URI，被拒如实报 needs_public_url，绝不造假产物。',
         "handler": 'i2v_agnes',
         "safe": True,
     },

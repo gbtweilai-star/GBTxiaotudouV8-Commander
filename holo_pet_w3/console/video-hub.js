@@ -12,7 +12,11 @@
   function render(j) {
     box.innerHTML = "";
     var stages = (j && j.stages) || [];
-    if (!stages.length) box.appendChild(el("div", "vh-empty", "没有视频编目"));
+    if (!stages.length) {
+      var empt = el("div", "vh-empty", "没有读到视频编目。");
+      empt.appendChild(el("em", null, "点「刷新」重试；仍为空说明 /api/video 没返回任何能力位，先查后端再联跑。"));
+      box.appendChild(empt);
+    }
     stages.forEach(function (st) {
       var col = el("div", "vh-stage");
       var head = el("div", "vh-stage-head");
@@ -31,7 +35,8 @@
       col.appendChild(list);
       box.appendChild(col);
     });
-    if (countEl) countEl.textContent = (j && j.count != null ? j.count : 0) + " 件 · 六段";
+    if (countEl) countEl.textContent = (j && j.count != null ? j.count : 0) + " 件" +
+      (stages.length ? " · " + stages.length + " 组阶段（六段可联跑）" : "");
   }
   function refresh() {
     fetch("/api/video", { cache: "no-store" }).then(function (r) { return r.json(); })
@@ -52,8 +57,9 @@
         out.appendChild(row);
       });
       var sum = document.createElement("span");
+      var okN = rows.filter(function (s) { return s.ok; }).length;
       sum.className = "vh-run-sum";
-      sum.textContent = (j.ok ? "六段全通" : "有段未通") + " · 未生成视频";
+      sum.textContent = okN + "/" + rows.length + " 段通" + (j.ok ? "" : "（有段未通）") + " · 未生成视频";
       out.appendChild(sum);
     }).catch(function () { if (out) out.textContent = "联跑失败"; });
   }

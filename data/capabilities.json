@@ -1,6 +1,6 @@
 {
- "count": 427,
- "at": "2026-11-06T01:07:35",
+ "count": 428,
+ "at": "2026-11-10T22:29:09",
  "capabilities": [
   {
    "name": "a1art_skill",
@@ -2305,7 +2305,7 @@
   {
    "name": "i2v_agnes",
    "domain": "video",
-   "desc": "图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** （HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 op=status/dryrun/submit/verify。**缺钥 fail-closed** 并说清缺哪把（AGNES_API_KEY）， 绝不发空请求、绝不生成假产物。",
+   "desc": "图生视频（**agnes-video-2.5-flash**）：一张图 + 一句提示词 → mp4，**带产物判据** （HTTP 200 / ≥100KB / **ffprobe 时长>0（硬判据，坏编码直接报错）** / 落盘可读）。 官方 OpenAI Videos 兼容口径（2026-11-07 校准）：POST /v1/videos （mode=text|keyframe|reference，seconds 字符串 4–12，size 固定 720P，aspect_ratio）， 轮询 GET /agnesapi?video_id=…&model_name=agnes-video-2.5-flash，completed 取顶层 url。 与生图 t2i_agnes 共用同一把钥匙与同一域名口径（apihub 200 / .cn 401）。 op=status/create/poll/download/run/dryrun/verify。**缺钥 fail-closed** 并说清缺哪把； 官方要求媒体是公网 URL，本机文件先试 data: URI，被拒如实报 needs_public_url，绝不造假产物。",
    "safe": true,
    "requires_params": false,
    "params": [],
@@ -3168,7 +3168,7 @@
   {
    "name": "offense_ops",
    "domain": "security",
-   "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域）。",
+   "desc": "**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域） · **2026-11-06 补原生挖洞链**：op=hunt（一条命令跑全链：面测绘→OWASP/CWE 模式库→多阶段 SAST→LLM 面探针→污点候选，合并去重+覆盖账）· op=swarm（多触手并行跑同一条链，各出独立回执）· op=coverage（只回答覆盖到哪、哪里没覆盖）· op=knowledge（挖洞方法论/判据/CWE 表的机器可读版）。**全在本机跑：不引云、不装外挂扫描器、不出网**；要票的只有危险作用域与资金转账。常用说法：挖漏洞 / 找漏洞 / 漏洞排查 / 扫一遍有没有洞 / 全仓挖洞 / 渗透测试 / 打点 / 触手大军排查 / 多触手一起扫 / 安全体检 / 代码审计找洞 / 攻击面测绘",
    "safe": false,
    "requires_params": false,
    "params": [],
@@ -4361,6 +4361,18 @@
    "name": "sync_guard",
    "domain": "project",
    "desc": "双仓同步巡检（2026-11-01）：交付树 ↔ live 工作仓 的 sha1 对账——status（只报差异）/ verify（判 ALIGNED：only_live=0 · 非档案 only_delivery=0 · differ=0 · 两边 cap 计数相等）/ patrol（verify + 可选写 state/sync_guard.jsonl 台账；notify=true 时 DRIFT 写审计 error、ALIGNED 写 ok，alerts 能读到；DRIFT 时按 env 优先推 webhook/飞书/n8n，未配置则桌面 toast（零依赖））/ where。DRIFT 时出 alerts（sync_drift / caps_mismatch）并给修复命令；**只读，不自动 pull/push**，修复由 tools/two-way-sync.ps1 执行。交付树路径默认 ~/Desktop/GBT小土豆V8，可用 delivery 参数或 GBT_DELIVERY 覆盖",
+   "safe": true,
+   "requires_params": false,
+   "params": [],
+   "params_hint": "",
+   "readonly": true,
+   "scopes_static": [],
+   "risk": "low"
+  },
+  {
+   "name": "t2i_agnes",
+   "domain": "creation",
+   "desc": "Agnes 生图（**agnes-image-2.5-flash**）：一句画面描述 → 一张 PNG，**带产物判据** （≥8KB / PNG·JPEG 魔数 / PIL 能开且宽高>0）。与图生视频共用同一把钥匙与同一域名口径； 缺钥 fail-closed，绝不造假图。实测口径：apihub.agnes-ai.com 回 200，api.agnes-ai.cn 对现用钥匙回 401（见 tools/agnes_image.py 顶部读数）。 op=status/dryrun/submit/verify。常用说法：生图 / 画个图 / 出图 / 画一张 / 生成图片 / 画只猫 / agnes 生图 / 用 agnes 画 / 文本生图。",
    "safe": true,
    "requires_params": false,
    "params": [],

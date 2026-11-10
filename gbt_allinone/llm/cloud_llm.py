@@ -97,45 +97,101 @@ def _port_open(host: str, port: int, timeout: float = 0.2) -> bool:
             pass
 
 
+# 端口探测结果缓存（0.4s/次 × 每次调用 ⇒ 太亏；5 秒内复用同一个读数）。
+_FREE_PORTS_CACHE = {"at": 0.0, "alive": {}}
+
+
+def _port_alive(port: int) -> bool:
+    now = time.time()
+    if now - float(_FREE_PORTS_CACHE.get("at") or 0) > 5.0:
+        _FREE_PORTS_CACHE["at"] = now
+        _FREE_PORTS_CACHE["alive"] = {}
+    hit = _FREE_PORTS_CACHE["alive"]
+    if port not in hit:
+        hit[port] = _port_open("127.0.0.1", port)
+    return bool(hit[port])
+
+
+def _free_lanes() -> list:
+    """**免费车道全序**（Owner 2026-10-21：「自动循环用免费池，端点只留给『她要本人回答』」）。
+
+    与 `_auto_lane()` 同一口径，唯一区别：返回**整条免费链**而不是第一条。
+
+    为什么必须有这一版（2026-11-10 实测病案）：
+      旧代码只在**模块导入时**跑一次 `_auto_lane()`，取到的 dict 被丢进两个没人读的
+      全局（`AUTO_LANE_WHY/AUTO_LANE_FREE`），`run()` 真正走的是 `key_gateway.plan()`
+      的**权重序** —— deepseek 0.76 > kilo 0.60 ⇒ 默认调用落在**按 token 计费**的
+      deepseek 上，「自动循环只用免费池」这条口径**从来没生效过**。
+      而且「第一条」这个形态本身不够：上一条 429/超时就没有下一格可接，只能断连。
+
+    顺序：① 本机她自己的口 8111（$0）→ ② 本机免费路由 53610（多源自动切换）→ ③ 本机免费池 31415 → ④ 云端稳定免费池 Kilo
+    （`model_order()` 已经按模型环排好，被限的模型排在后面）。
+    """
+    lanes = []
+    try:
+        from . import key_gateway as _kg
+    except Exception:                                                 # noqa: BLE001
+        return lanes
+
+    if _port_alive(8111):
+        _k, _s = _kg.key_for("potato")
+        lanes.append({"provider": "potato", "url": "http://127.0.0.1:8111/v1",
+                      "model": os.environ.get("GBT_POTATO_MODEL", "gbt-potato-v8"),
+                      "key": _k, "free": True, "local": True,
+                      "why": "本机她自己的口 8111（自训模型，$0）"})
+    # ② 本机免费路由 53610（OpenAI 兼容；内部多源并发对冲 + 429 自动切）
+    if _port_alive(53610):
+        _k, _s = _kg.key_for("freellm")
+        lanes.append({"provider": "freellm",
+                      "url": os.environ.get("GBT_FREELLM_BASE_URL",
+                                          "http://127.0.0.1:53610/v1"),
+                      "model": os.environ.get("GBT_FREELLM_MODEL", "gbt-xiaotudou-v8"),
+                      "key": _k, "free": True, "local": True,
+                      "why": "本机免费路由 53610（多源自动切换）"})
+    if _port_alive(31415):
+        _k, _s = _kg.key_for("freellmapi")
+        lanes.append({"provider": "freellmapi", "url": "http://127.0.0.1:31415/v1",
+                      "model": "", "key": _k, "free": True, "local": True,
+                      "why": "本机免费池 31415（FreeLLMAPI）"})
+    # ③ 云端免费池（Kilo AI · 免密）：免 key、免付费，不消耗任何按量额度。
+    #   ⚠️ Kilo 免责：prompts 可能被上游记录用于改进，别发敏感内容。
+    _kilo = _kg._BY_NAME.get("kilo") or {}
+    if _kilo.get("url") and _kilo.get("model"):
+        _k, _s = _kg.key_for("kilo")
+        # 🔴 2026-11-10 主人令：只把**验证能用**的格串进环；不可用的直接排除。
+        #    `model_order()` 已按准入名单过滤（坏格/冷却格不在里面）；
+        #    全被排除时它会回退成整环复探一次，`reviving` 如实标出。
+        ring = _kg.model_order("kilo") or [_kilo.get("model")]
+        _state = _kg.ring_state("kilo")
+        lanes.append({"provider": "kilo", "url": _kilo.get("url"), "model": ring[0],
+                      "models": ring, "key": _k, "free": True,
+                      "excluded": _state.get("excluded") or [],
+                      "cooling": _state.get("cooling") or [],
+                      "reviving": bool(_state.get("reviving")),
+                      "why": "云端免费池 Kilo（免密，$0）"})
+    return lanes
+
+
 def _auto_lane() -> dict:
     """**自动路选道 —— 只认免费**（Owner 2026-10-21：「就是要免费的，要不然我们的大模型训练来干嘛」）。
 
     顺序写死，而且**每一档都先量"服务真在跑"**（钥匙在位 ≠ 服务在跑）：
       ① 本机**她自己的口** `127.0.0.1:8111`（自训模型 gbt-v8，跑在本机 ⇒ 边际成本 $0）；
-      ② 本机**免费池** `127.0.0.1:31415`（FreeLLMAPI，34 家免费供应商）；
+      ② 本机**免费路由** `127.0.0.1:53610`（40 家免费源并发对冲 + 429 切换）；
+       ③ 本机**免费池** `127.0.0.1:31415`（FreeLLMAPI，34 家免费供应商）；
       ③ 都没有 ⇒ **如实返回"没有免费车道"**，绝不静默切到按量付费/租卡端点。
 
     要允许按量付费（agnes/deepseek 这些按 token 计费的），必须主人自己开
     `GBT_ALLOW_PAID=1` —— **默认关闭**，且开了会在回执里写明"这条不免费"。
     """
+    lanes = _free_lanes()
+    if lanes:
+        return lanes[0]
     try:
         from . import key_gateway as _kg
     except Exception:                                                 # noqa: BLE001
         return {"why": "key_gateway 导不进来 ⇒ 自动路判不了"}
     allow_paid = str(os.environ.get("GBT_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes", "on")
-
-    # ① 本机她（自训模型，免费）
-    if _port_open("127.0.0.1", 8111):
-        _own = _kg._BY_NAME.get("potato") or {}
-        _k, _s = _kg.key_for("potato")
-        return {"provider": "potato", "url": "http://127.0.0.1:8111/v1",
-                "model": os.environ.get("GBT_POTATO_MODEL", "gbt-potato-v8"),
-                "key": _k, "free": True, "why": "本机她自己的口 8111（自训模型，$0）"}
-    # ② 本机免费池
-    if _port_open("127.0.0.1", 31415):
-        _k, _s = _kg.key_for("freellmapi")
-        return {"provider": "freellmapi", "url": "http://127.0.0.1:31415/v1", "model": "",
-                "key": _k, "free": True, "why": "本机免费池 31415（FreeLLMAPI）"}
-    # ③ 云端免费池（Kilo AI · 免密 · 2026-10-29 接入 · 实测出字）
-    #   免 key、免付费，是「真免费」的云端车道 —— 不消耗任何按量额度，故无需 GBT_ALLOW_PAID。
-    #   no_key=True 恒在位（key_gateway 已支持）；上游可达性由调用时 net_guard 兜，
-    #   真连不上会如实冒上来（由 rank 的健康态在下一轮处置），不在这里假装"一定通"。
-    #   ⚠️ Kilo 免责：prompts 可能被上游记录用于改进，别发敏感内容。
-    _kilo = _kg._BY_NAME.get("kilo") or {}
-    if _kilo.get("url") and _kilo.get("model"):
-        _k, _s = _kg.key_for("kilo")
-        return {"provider": "kilo", "url": _kilo.get("url"), "model": _kilo.get("model"),
-                "key": _k, "free": True, "why": "云端免费池 Kilo（免密，$0）"}
     # ④ 没有免费路：默认如实报缺（不花钱），主人显式授权才退到按量车道
     if not allow_paid:
         return {"why": "没有免费车道：本机 8111/31415 都没在跑、云端免费池 Kilo 未配；"
@@ -1094,7 +1150,17 @@ class _HttpError(RuntimeError):
 # 推理模型的「推理吃光预算」标记（agents / NVIDIA 都会踩，见 _call_once）。
 # 调用方据此**自适上调 max_tokens 后重试同一家** —— 同一家重试 ≠ 换道。
 REASONING_STARVED = "content 为空但 reasoning_content 非空 —— max_tokens 被推理吃光"
+# 第二种形状（2026-11-10 实测 Kilo/Gemini 系）：**不给 reasoning 字段**，
+# 只回 `finish_reason=length` + 空 content —— 同样是预算被思考吃光，同样该上调重试。
+BUDGET_EATEN = "content 为空且 finish_reason=length —— token 全花在思考上"
+# 第三种形状：200 + 空 content + finish_reason=stop/缺失 —— 不是参数错，是这一格坏了。
+EMPTY_COMPLETION = "上游 200 但 content 为空"
 _REASONING_ESCALATE_CAP = 8192
+
+
+def _is_starved(err: str) -> bool:
+    """两种「思考吃光预算」形状都算 —— 只上调预算重试同一家，不换道。"""
+    return REASONING_STARVED in (err or "") or BUDGET_EATEN in (err or "")
 
 def _private_egress_allowed() -> bool:
     """非标准端口 / 内网出站的放行判据：**可信会话** 或 **手上有 `network_private` 时段票**。
@@ -1229,7 +1295,9 @@ def _call_once(wire, base_url, model, api_key, body, system, prompt, timeout, pr
     _body["model"] = model
     data = _safe_json(base_url.rstrip("/") + "/chat/completions", _body, _hdrs, timeout,
                       audit_provider=provider or PROVIDER, audit_model=model)
-    _msg = (data.get("choices") or [{}])[0].get("message") or {}
+    _choice = (data.get("choices") or [{}])[0] or {}
+    _msg = _choice.get("message") or {}
+    _finish = str(_choice.get("finish_reason") or "")
     _txt = _msg.get("content")
     if not _txt:
         # 🔴 推理模型的坑（2026-09-27 实弹取证，agnes 与 NVIDIA 都会踩）：
@@ -1241,9 +1309,150 @@ def _call_once(wire, base_url, model, api_key, body, system, prompt, timeout, pr
         if _msg.get("reasoning_content"):
             raise _HttpError(422, "HTTP 422: %s（provider=%s）"
                              % (REASONING_STARVED, provider or PROVIDER))
-        raise _HttpError(422, "HTTP 422: 上游 200 但 content 为空（provider=%s）"
-                              % (provider or PROVIDER))
+        if _finish == "length":
+            # 没吐 reasoning 字段不代表没思考：预算就是被吃光了（第二种形状）
+            raise _HttpError(422, "HTTP 422: %s（provider=%s, finish=%s）"
+                             % (BUDGET_EATEN, provider or PROVIDER, _finish))
+        raise _HttpError(422, "HTTP 422: %s（provider=%s）"
+                              % (EMPTY_COMPLETION, provider or PROVIDER))
     return _txt
+
+
+def _next_cell(ring: list, at: int, seen: set):
+    """环内下一个**本通还没试过**的格；尾到头绕回起点；全试过 ⇒ None。"""
+    n = len(ring)
+    if n <= 1:
+        return None
+    for _k in range(1, n):
+        _i = (at + _k) % n
+        if ring[_i] not in seen:
+            return _i
+    return None
+
+
+def _probe_verdict(err: str, status) -> str:
+    """把一次真打的失败归类成「能不能用」，口径与选路一致。"""
+    low = str(err or "").lower()
+    if status == 429 or "rate limit" in low or "too many" in low:
+        return "rate_limited"
+    if status == 402 or any(k in low for k in ("quota", "balance", "credit", "额度", "余额")):
+        return "no_quota"
+    if status == 404 or "not found" in low or "no such model" in low:
+        return "not_found"
+    if "content 为空" in str(err or ""):
+        return "empty"
+    return "bad_request" if status == 400 else "error"
+
+
+def probe_models(params=None) -> dict:
+    """**挨个模型真打一遍**：能用的标 usable，限流/没额度/坏格如实标，并写回网关状态。
+
+    为什么要这一位（主人 2026-11-10）：「直接挨个测试能使用就接入，限流和没额度就自动
+    跳到下一个，以此轮询」—— 选路该基于**真读数**，不是基于声明。这一位就是那个真读数
+    入口；`note_model()` 记账后，限流/坏格的格子在下一通会自动排到后面。
+
+    只打**免费车道**（免费口径不破）；每格一发、max_tokens 很小、只问「收到」。
+    """
+    import time as _t
+    from . import key_gateway as _KG
+    params = params or {}
+    _cap_tokens = int(params.get("max_tokens", 256))
+    _timeout = int(params.get("timeout", 60))
+    # force=True：连「已被排除」的格也真打一遍（复测）；默认只测准入内的格。
+    _force = bool(params.get("force"))
+    rows, usable = [], 0
+    for lane in _free_lanes():
+        _prov = lane.get("provider")
+        try:
+            _mat = _KG.materialize(_prov)
+        except Exception as e:                                   # noqa: BLE001
+            rows.append({"provider": _prov, "model": lane.get("model"),
+                         "verdict": "needs_dependency", "detail": str(e)[:120]})
+            continue
+        _url = lane.get("url") or _mat.get("url")
+        _key = _mat.get("key") or ""
+        _wire = _mat.get("wire") or "openai"
+        # 声明环是复测/排除判定的基准：`lane["models"]` 已经只剩能用的，
+        # 拿它当基准就永远看不见「哪些被排除了、要不要复活」。
+        _ring = _KG.model_ring(_prov) or [lane.get("model") or ""]
+        _cool = _KG.model_cooldowns(_prov)
+        _bad = _KG.model_bad(_prov)
+        for _m in _ring:
+            _left = int(_cool.get(_m, 0) or 0)
+            if not _force and _m in _bad:
+                rows.append({"provider": _prov, "model": _m, "verdict": "excluded",
+                             "status": (_bad.get(_m) or {}).get("status"), "ms": 0,
+                             "cool_left_s": 0, "reply": "",
+                             "detail": "已排除（%s），%ds 后过期或用 force 复测"
+                                       % ((_bad.get(_m) or {}).get("verdict"),
+                                          (_bad.get(_m) or {}).get("left_s", 0))})
+                continue
+            if not _force and _left > 60:
+                # 还在冷却里：别再拿同一个窗口去撞，如实报"冷却中"与剩余秒数
+                rows.append({"provider": _prov, "model": _m, "verdict": "cooling",
+                             "status": None, "ms": 0, "cool_left_s": _left,
+                             "reply": "", "detail": "冷却中，%ds 后再试" % _left})
+                continue
+            _t0 = _t.time()
+            _body = {"model": _m,
+                     "messages": [{"role": "system", "content": "你是助手。"},
+                                  {"role": "user", "content": "只回两个字：收到"}],
+                     "temperature": 0.0, "max_tokens": _cap_tokens}
+            verdict, detail, _st = "usable", "", None
+            try:
+                _txt = _call_once(_wire, _url, _m, _key, _body, "你是助手。",
+                                  "只回两个字：收到", _timeout, _prov)
+                detail = str(_txt or "").strip()[:40]
+                if not detail:
+                    verdict = "empty"
+                _KG.note_model(_prov, _m, ok=(verdict == "usable"))
+            except Exception as e:                               # noqa: BLE001
+                _st = getattr(e, "status", None)
+                verdict = _probe_verdict(str(e), _st)
+                detail = str(e).replace("\n", " ")[:120]
+                # 「预算被思考吃光」不是坏格：给它一次 4x 预算再判（与主路同一口径）
+                if verdict == "empty" and _is_starved(str(e)):
+                    _body2 = dict(_body)
+                    _body2["max_tokens"] = min(max(_cap_tokens * 4, 1024),
+                                               _REASONING_ESCALATE_CAP)
+                    try:
+                        _txt = _call_once(_wire, _url, _m, _key, _body2, "你是助手。",
+                                          "只回两个字：收到", _timeout, _prov)
+                        detail = str(_txt or "").strip()[:40]
+                        verdict = "usable" if detail else "empty"
+                    except Exception as e2:                      # noqa: BLE001
+                        _st = getattr(e2, "status", None)
+                        verdict = _probe_verdict(str(e2), _st)
+                        detail = str(e2).replace("\n", " ")[:120]
+                try:
+                    _KG.note_model(_prov, _m, ok=(verdict == "usable"),
+                                   status=(None if verdict == "usable" else _st),
+                                   error="" if verdict == "usable" else detail)
+                except Exception:                                # noqa: BLE001
+                    pass
+            if verdict == "usable":
+                usable += 1
+            rows.append({"provider": _prov, "model": _m, "verdict": verdict,
+                         "status": _st, "ms": int((_t.time() - _t0) * 1000),
+                         "reply": detail if verdict == "usable" else "",
+                         "detail": "" if verdict == "usable" else detail})
+    total = len(rows)
+    # 逐车道回准入读数：哪些在用、哪些被排除 —— 主人要的「不能用的直接排除」。
+    lanes_state = []
+    for lane in _free_lanes():
+        _p = lane.get("provider")
+        _st = _KG.ring_state(_p)
+        lanes_state.append({"provider": _p,
+                            "admitted": _st.get("admitted") or [],
+                            "excluded": _st.get("excluded") or [],
+                            "cooling": _st.get("cooling") or [],
+                            "reviving": bool(_st.get("reviving"))})
+    return {"ok": bool(rows) and usable > 0, "usable": usable, "total": total,
+            "verdict": "all_usable" if usable == total and total else
+                       ("partial" if usable else "none_usable"),
+            "rows": rows, "lanes": lanes_state,
+            "note": "只打免费车道；能用的串进环，不能用的直接排除（force=True 可复测复活）",
+            "brand": _KG.BRAND_TAG}
 
 
 def run(action=None, **params):
@@ -1258,6 +1467,8 @@ def run(action=None, **params):
         # ⛔ 兼容 L4 干跑 handler({}) 传 dict: 提取 action, 空则视为 status(静态, 不调LLM)
         if isinstance(action, dict):
             action = action.get("action") or next(iter(action), None)
+        if action in ("probe", "probe_models", "models"):
+            return probe_models(params)
         if action in ("status", "health", "list", "info") or (action is None and not _is_tentacle_call):
             _out = {
                 "ok": True, "cap": "cloud_llm", "status": "ready",
@@ -1432,13 +1643,32 @@ def run(action=None, **params):
                 raise _HttpError(503, "所有触手 key 均不可用: " + json.dumps(_tried_before, ensure_ascii=False))
         # 无触手 key 或无匹配：走原有 key_gateway 选路
         _prefer = str(params.get("provider") or os.environ.get("GBT_LLM_PROVIDER") or "")
-        _pl = _KG.plan(need_tokens=int(params.get("need_tokens", 0) or 0), prefer=_prefer)
-        if not _pl.get("ok"):
-            return {"ok": False, "error": _pl.get("error"), "fail_closed": True,
-                    "brand": _KG.BRAND_TAG, "candidates": _pl.get("candidates"),
-                    "how_to_fix": _pl.get("how_to_fix"),
-                    "hint": "补密钥：deepseek_key set --profile <名>；或 op=reset 清运行态"}
-        _order = [o["provider"] for o in (_pl.get("order") or []) if o.get("alive")]
+        # 🔴 2026-11-10 修（实测：默认调用落在 `deepseek`，那是**按 token 计费**的车道）：
+        #    不点名 ⇒ 先排**免费车道**（`_free_lanes()` 给整条链，不再只给第一条）；
+        #    免费链为空且主人没开 `GBT_ALLOW_PAID=1` ⇒ fail-closed 如实报缺，**不静默花钱**；
+        #    点了名 ⇒ 仍然只走那一条（点名不换道，`_KG.plan(prefer=…)` 原样）。
+        _lanes = [] if _prefer else _free_lanes()
+        if _lanes:
+            _pl = {"ok": True, "auto_switched": False,
+                   "order": [{"provider": l["provider"], "alive": True} for l in _lanes]}
+            _order = [l["provider"] for l in _lanes]
+        elif not _prefer and not ALLOW_PAID:
+            return {"ok": False, "fail_closed": True, "brand": _KG.BRAND_TAG,
+                    "error": "没有免费车道：本机 8111 / 31415 都没在跑，云端免费池 Kilo 也没配上。"
+                             "按量付费（agnes/deepseek 这些按 token 计费）须主人显式开 "
+                             "GBT_ALLOW_PAID=1 —— 默认绝不静默花钱。",
+                    "free_lanes": [],
+                    "how_to_fix": "拉起 FreeLLMAPI(31415) / 本机 8111；或确认 Kilo 车道可达；"
+                                  "要按量付费则 GBT_ALLOW_PAID=1",
+                    "hint": "点名某条车道不算免费：params.provider=<名> 才走它"}
+        else:
+            _pl = _KG.plan(need_tokens=int(params.get("need_tokens", 0) or 0), prefer=_prefer)
+            if not _pl.get("ok"):
+                return {"ok": False, "error": _pl.get("error"), "fail_closed": True,
+                        "brand": _KG.BRAND_TAG, "candidates": _pl.get("candidates"),
+                        "how_to_fix": _pl.get("how_to_fix"),
+                        "hint": "补密钥：deepseek_key set --profile <名>；或 op=reset 清运行态"}
+            _order = [o["provider"] for o in (_pl.get("order") or []) if o.get("alive")]
         # 🔴 2026-10-11（主人令「不许拿托管模型冒充」）：**显式点名时不许静默换道**。
         #    点名 potato 就只走 potato；她不可用 ⇒ 如实报错，**绝不让 agnes 顶着她的名字回答**。
         if _prefer:
@@ -1453,10 +1683,16 @@ def run(action=None, **params):
         _max_retries = int(params.get("retries", 2))  # ⛔ 生产打磨: 瞬时错误重试2次+退避
         _tried = []
         for _prov in _order:
+            _lane = next((l for l in _lanes if l.get("provider") == _prov), None)
             _mat = _KG.materialize(_prov)
             if not _mat.get("ok"):
                 _tried.append({"provider": _prov, "skipped": _mat.get("error")})
                 continue
+            if _lane:
+                # 免费车道的**地址/模型可能不在 PROVIDERS 声明里**（就像本机 8111 那个口）：
+                # 以车道描述为准 —— 这不是「静默换道」，是同一条道指到真在跑的那个口。
+                _mat["url"] = _lane.get("url") or _mat["url"]
+                _mat["model"] = _lane.get("model") or _mat["model"]
             # 推理模型要够大的 max_tokens，否则 content 会被 reasoning 吃光
             # （HTTP 200 也算失败）——网关在声明层给了 min_max_tokens 下限。
             _body = dict(body)
@@ -1471,18 +1707,51 @@ def run(action=None, **params):
             _lane_spec = (_KG._BY_NAME.get(_prov) or {}) if hasattr(_KG, "_BY_NAME") else {}
             _lane_timeout = max(_timeout, int(_lane_spec.get("timeout_s") or 0))
             _lane_retries = max(_max_retries, int(_lane_spec.get("retries") or 0))
-            for _attempt in range(_lane_retries + 1):
+            # 🔴 2026-11-10：**模型粒度轮询** —— 一条免费车道里可能挂着多个免费模型；
+            #   其中一个被上游 429（实测 `liquid/lfm-3-1.7b:free`）不等于整条车道坏了。
+            #   有 `models` 环的车道按环走；没有的仍是「一条车道一个模型」（原行为）。
+            #   调用方显式给了 `model` ⇒ 本车道只走一格、不轮询 —— 注意那一格仍是
+            #   车道声明的模型：`_call_once` 一直用车道声明的 model（既有口径，本次不改）。
+            _ring = [] if params.get("model") else list((_lane or {}).get("models") or [])
+            if not _ring:
+                _ring = [m for m in [_mat.get("model")] if m] or [""]
+            _tries = max(_lane_retries, len(_ring) - 1) + 1
+            # ⚠️ 2026-11-10：判「整环冷却」要用**声明环长**（`_ring` 只是暖格，
+            #    被限的格已经不在里面）—— 否则 4 格冷却时会把 2 格暖的也压成 1 发。
+            _declared = len(_ring)
+            if len(_ring) > 1:
+                # 给"吃光预算后上调重试"留余量，否则一格能吃掉 3 发、把换格预算耗干
+                _tries = max(_tries, len(_ring) + 2)
+            if (_lane or {}).get("reviving"):
+                # 整环都被排除/冷却：只探**一格**（额度可能刚回补），别把全环一发打光。
+                _tries = 1
+            _ring_at = 0
+            _seen_cells = set()
+            _esc_used = 0
+            for _attempt in range(_tries):
+                _model_now = _ring[min(_ring_at, len(_ring) - 1)]
+                _seen_cells.add(_model_now)
+                if _model_now:
+                    _body["model"] = _model_now
                 try:
-                    _reply = _call_once(_mat["wire"], _mat["url"], _mat["model"],
+                    _reply = _call_once(_mat["wire"], _mat["url"],
+                                        _model_now or _mat["model"],
                                         _mat["key"], _body, system, prompt,
                                         _lane_timeout, _prov)
+                    if len(_ring) > 1:
+                        _KG.note_model(_prov, _model_now, ok=True)
                     _KG.note_result(_prov, ok=True)
                     return {"ok": True, "reply": _reply, "provider": _prov,
-                            "model": _mat["model"], "key_masked": _mat["masked"],
+                            "model": _model_now or _mat["model"],
+                            "lane_free": bool((_lane or {}).get("free")),
+                            "key_masked": _mat["masked"],
                             "brand": _KG.BRAND_TAG,
                             "auto_switched": bool(_pl.get("auto_switched")),
                             "switched_from": _pl.get("switched_from"),
-                            "tried_before": [t["provider"] for t in _tried]}
+                            "tried_before": list(dict.fromkeys(
+                                t["provider"] for t in _tried)),
+                            "tried_models": ["%s/%s" % (t["provider"], t.get("model") or "")
+                                             for t in _tried]}
                 except Exception as _e:                  # noqa: BLE001
                     _err = str(_e)[:300]
                     _st = getattr(_e, "status", None)
@@ -1493,39 +1762,89 @@ def run(action=None, **params):
                     #    **502/503/504**。这不是"这条道坏了"，是"它正在起来"——原逻辑当场判死
                     #    ⇒ 她那条道被永久禁用。⇒ 5xx 一律**退避重试**，不记车道失败。
                     # 冷启动要耐心：车道可声明 retries（她要从网络卷加载 15G）——用车道预算，10s 起退避
-                    if _st in (502, 503, 504) and _attempt < _lane_retries:
+                    if _st in (502, 503, 504) and _attempt < _tries - 1:
                         time.sleep(10 * (_attempt + 1))
                         continue
-                    if REASONING_STARVED in _err and _attempt < _max_retries:
+                    if (_is_starved(_err) and _attempt < _tries - 1
+                            and _esc_used < 2):
                         _new = min(max(_body["max_tokens"] * 4, 512),
                                    _REASONING_ESCALATE_CAP)
                         if _new > _body["max_tokens"]:
+                            _esc_used += 1
                             print("[key_gateway] 推理吃光预算：%s max_tokens %d → %d 后重试"
                                   % (_prov, _body["max_tokens"], _new), file=sys.stderr)
                             _body["max_tokens"] = _new
                             continue
-                    _d = _KG.note_result(_prov, ok=False, status=_st, error=_err)
+                    _d = (_KG.note_model(_prov, _model_now, ok=False, status=_st, error=_err)
+                          if len(_ring) > 1
+                          else _KG.note_result(_prov, ok=False, status=_st, error=_err))
+                    # 🔴 空回包（200 + content 空）不是"我们参数错了"，是**这一格模型坏了**：
+                    #    能换格就换格，环尾/单格就换下一条道 —— 不许一次就把整次调用判死。
+                    if EMPTY_COMPLETION in _err:
+                        _nxt = _next_cell(_ring, _ring_at, _seen_cells)
+                        if _nxt is not None:
+                            _tried.append({"provider": _prov, "model": _model_now,
+                                           "err_class": "empty_completion",
+                                           "status": _st, "error": _err, "rotated": True})
+                            _ring_at = _nxt
+                            print("[key_gateway] %s 的 %s 空回包，轮询下一格 %s"
+                                  % (_prov, _model_now, _ring[_ring_at]), file=sys.stderr)
+                            continue
+                        break        # 整环都空 ⇒ 如实换下一条道
                     # 决策拆两维（血账：早先把这两件事挤在一个 `failover` 里，
                     # 结果 transient 在 `not failover` 处**立即 return**，
                     # 重试分支成死代码 ⇒ 一次网络抖动 = 硬断连）：
                     #   ① 同家再试一次？  ② 试不动了要不要往下走？
+                    if _d.get("retry_same") and _attempt < _tries - 1:
+                        time.sleep(1 + _attempt * 2)     # 退避: 1s/3s
+                        continue
+                    # 🔴 2026-11-10 顺序修正：**先换格，再谈硬停**。
+                    #    环里每一格都是**不同上游**，某一格 400（如 Cohere 把它自己的
+                    #    转码失败包成 400）只说明这一格不行，不该把另外 5 格一起判死。
+                    #    原顺序把「硬停」放在换格之前 ⇒ bad_request 永远轮不到换格。
+                    #    `disable`（票/密钥失效）除外：换格救不了。
+                    _nxt = (None if _d.get("disable")
+                            else _next_cell(_ring, _ring_at, _seen_cells))
+                    if _nxt is not None:
+                        _tried.append({"provider": _prov, "model": _model_now,
+                                       "err_class": _d.get("err_class"),
+                                       "status": _st, "error": _err, "rotated": True})
+                        _ring_at = _nxt
+                        print("[key_gateway] %s 的 %s 不可用（%s），轮询下一格 %s"
+                              % (_prov, _model_now, _d.get("err_class"), _ring[_ring_at]),
+                              file=sys.stderr)
+                        continue
                     if not _d.get("retry_same") and not _d.get("escalate"):
-                        # bad_request / unknown ⇒ **硬停**：我们自己错了，换谁都没用
+                        # bad_request / unknown 且**整环都试完** ⇒ 硬停并带上游原话
                         return {"ok": False, "error": _err, "provider": _prov,
                                 "err_class": _d.get("err_class"), "failover": False,
                                 "why_no_failover": _d.get("action"),
+                                "tried_models": ["%s/%s" % (t["provider"], t.get("model") or "")
+                                                 for t in _tried],
                                 "brand": _KG.BRAND_TAG}
-                    if _d.get("retry_same") and _attempt < _max_retries:
-                        time.sleep(1 + _attempt * 2)     # 退避: 1s/3s
-                        continue
                     break                                # 本家到此为止 → 下一家
-            _tried.append({"provider": _prov, "err_class": (_d or {}).get("err_class"),
+            _tried.append({"provider": _prov, "model": _model_now,
+                           "err_class": (_d or {}).get("err_class"),
                            "status": _st, "error": _err})
+        _throttled = [t for t in _tried if t.get("err_class") == "rate_limited"]
+        _all_throttled = bool(_tried) and len(_throttled) == len(_tried)
+        _errmsg = ("全部 %d 条通道都试过且都失败 —— 如实报错，不静默降级"
+                   % len(_order))
+        if _all_throttled:
+            _errmsg = ("免费池本轮额度已用尽（%d 格全部 429）—— 上游原话见 last_error；"
+                       "窗口回补后可再用，或主人开 GBT_ALLOW_PAID=1 走付费车道"
+                       % len(_tried))
+        _excluded = []
+        for _l in _lanes:
+            _excluded.extend(_l.get("excluded") or [])
         return {"ok": False, "fail_closed": True, "brand": _KG.BRAND_TAG,
-                "error": "全部 %d 条通道都试过且都失败 —— 如实报错，不静默降级"
-                         % len(_order),
+                "error": _errmsg,
+                "last_error": _err,
+                "all_throttled": _all_throttled,
+                "excluded": sorted(set(_excluded)),
                 "tried": _tried,
-                "how_to_fix": "补密钥 / op=reset 清运行态 / 等冷却到期"}
+                "how_to_fix": "等免费池窗口回补 / 补密钥 / op=reset 清运行态 / "
+                              "GBT_ALLOW_PAID=1 才走付费"}
     except Exception as e:
         return {"ok": False, "error": str(e)[:300]}
 if __name__ == "__main__":

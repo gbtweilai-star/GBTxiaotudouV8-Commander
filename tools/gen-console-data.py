@@ -167,6 +167,42 @@ def build() -> dict:
         except Exception:  # noqa: BLE001
             pulse = []
 
+    # ── 守卫：verdict 只给结论；details 给「为什么」（2026-11-07 红黄追踪）──
+    # 原来只取 verdict，APP 上看到 signature · missing / inventory · foreign_found /
+    # legacy · legacy_found 三条红，却看不到缺的是哪几页、异物是什么、旧物在哪。
+    # 这里把能力位已经算出来的明细原样带出去（不二次解释、不改 verdict）。
+    g_self = _cap("selfscan")
+    g_sig = _cap("signature_guard", {"scope": "all"})
+    g_inv = _cap("inventory")
+    g_leg = _cap("legacy_guard", {"op": "status"})
+    g_alr = _cap("alerts", {"op": "recent"})
+    _sigs = (g_sig.get("missing") or [])[:12]
+    _inv_items = g_inv.get("items") or {}
+    _leg_cats = g_leg.get("categories") or {}
+    guard_details = {
+        "selfscan": {
+            "verdict": g_self.get("verdict"),
+            "routing": ((g_self.get("sections") or {}).get("routing") or {}),
+            "modules": ((g_self.get("sections") or {}).get("modules") or {}),
+            "audit_runtime_faults": (((g_self.get("sections") or {}).get("audit") or {})
+                                     .get("runtime_faults")),
+        },
+        "signature": {"pages_checked": g_sig.get("pages_checked"),
+                      "missing_count": len(g_sig.get("missing") or []),
+                      "missing": _sigs,
+                      "restored_count": len(g_sig.get("restored") or [])},
+        "inventory": {"foreign": _inv_items.get("foreign") or [],
+                      "runtime": _inv_items.get("runtime") or [],
+                      "dual_view": g_inv.get("dual_view") or {}},
+        "legacy": {"categories": _leg_cats,
+                   "notes": g_leg.get("notes") or {}},
+        "alerts": {"quiet": g_alr.get("quiet"),
+                   "runtime_faults": g_alr.get("runtime_faults"),
+                   "anomalies": g_alr.get("anomalies"),
+                   "needs_a_look": g_alr.get("needs_a_look"),
+                   "unregistered_footprints": (g_alr.get("unregistered_footprints") or [])[:12]},
+    }
+
     return {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "caps": {"total": len(caps), "safe": safe, "unsafe": len(caps) - safe,
@@ -174,6 +210,8 @@ def build() -> dict:
                  "check": _cap("cap_self", {"op": "verify"}).get("counts") or {},
                  "docs": docs.get("verdict")},
         "skills": {"count": skills.get("count"), "validate": validate.get("verdict"),
+                   "errors": (validate.get("errors") or [])[:8],
+                   "warnings": len(validate.get("warnings") or []),
                    "names": skill_names, "items": skill_items},
         "engine": {"alive": bool(alive.get("ok")), "base": alive.get("base"),
                    "weights": w.get("name"), "size_gb": w.get("size_gb"),
@@ -181,10 +219,13 @@ def build() -> dict:
                    "n_ctx": _engine_ctx(alive.get("base"))},
         "meter": {k: meter.get(k) for k in ("calls", "calls_ok", "failed",
                                            "power_tok_s", "avg_ms")},
-        "guards": {"selfscan": _cap("selfscan").get("verdict"),
-                   "signature": _cap("signature_guard", {"scope": "all"}).get("verdict"),
-                   "inventory": _cap("inventory").get("verdict"),
-                   "legacy": _cap("legacy_guard", {"op": "status"}).get("verdict")},
+        "guards": {"selfscan": g_self.get("verdict"),
+                   "signature": g_sig.get("verdict"),
+                   "inventory": g_inv.get("verdict"),
+                   "legacy": g_leg.get("verdict"),
+                   "alerts": ("quiet" if g_alr.get("quiet")
+                              else ("needs_look" if g_alr.get("any_signal") else "unknown"))},
+        "guard_details": guard_details,
         "domains": all_domains, "domains_top": domains,
         "pulse": pulse, "pulse_total": sum(x["n"] for x in pulse),
         "scan": scan,

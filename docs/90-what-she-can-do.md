@@ -1,4 +1,4 @@
-# 90 · 她能干嘛：30 域 410 位能力（现读版）
+# 90 · 她能干嘛：30 域 428 位能力（现读版）
 
 > 本文由 `gbt_allinone/caps_registry.py` **实时生成**（不是手写宣传语）。
 > 想知道某一位到底能干什么，看命令 `gbt.run_task('<名字>', {'op':'status'})`。
@@ -139,7 +139,7 @@ print(r.get('gbt_result', {}).get('result'))
 ## 五、怎么自己核
 
 ```bash
-python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 410
+python -c "import sys;sys.path.insert(0,'.');import gbt_allinone as g;print(len(g.list_capabilities()))"   # 428
 python -m gbt_allinone list                                                                          # 逐位列出
 ```
 

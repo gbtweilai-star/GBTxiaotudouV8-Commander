@@ -107,6 +107,13 @@ _REL_PATH_RE = re.compile(
 _QUOTED_RE = re.compile(r"[\"'“”「」『』]([^\"'“”「」『』]{1,260})[\"'“”「」『』]")
 
 
+# 2026-11-07（主人令「帧直接给模型看」）：问「屏幕上有什么」= 要一帧给模型看；
+# 问「你会看屏幕吗」= 在问能力，**不许**当成指令。两者只靠词面分开，不做语义猜测。
+_ASK_SCREEN_RX = re.compile(r"(屏幕|桌面|界面|画面)(?:上|中|里)?[^，。；？?]{0,8}"
+                            r"(有什么|有啥|是什么|是啥|显示(?:的)?(?:是)?什么|显示(?:的)?啥|谁|哪里|哪个)")
+_ASK_ABILITY_RX = re.compile(r"(会不会|能不能|可不可以|能否|支持|你会|会看|可以看|能用|行不行)")
+
+
 # ── 纯文本工具 ─────────────────────────────────────────────────────────────
 def _hits(text: str, words) -> list:
     return [w for w in words if w in text]
@@ -284,6 +291,11 @@ def classify(text: str) -> dict:
         elif ext in PATH_EXTS and re.search(r"(读|写|保存|存|打开|查看|创建|新建|追加|覆盖|看看)", low):
             hits["file"] = ["路径"]
 
+    # 「屏幕上有什么」本身就是一个看屏意图（只读取帧）；只在四类都没命中时才抬，
+    # 不去抢已经有动作词的句子（读文件 / 写文件 / 开网页照旧优先）。
+    if not any(hits.values()) and _ASK_SCREEN_RX.search(low) and not _ASK_ABILITY_RX.search(low):
+        hits["screen"] = ["屏幕内容问句"]
+
     # 判类优先级：screen > image > web > file（同分时按此顺序；「看屏幕」最具体）
     order = ("screen", "image", "web", "file")
     best = sorted(order, key=lambda k: (-len(hits[k]), order.index(k)))[0]
@@ -293,8 +305,13 @@ def classify(text: str) -> dict:
 
     out["question"] = _looks_like_question(raw)
     if out["question"]:
-        out["reason"] = "看着像提问（带问句、无祈使词）⇒ 不擅自动手，交给对话模型"
-        return out
+        _ask_screen = (best == "screen" and _ASK_SCREEN_RX.search(raw)
+                       and not _ASK_ABILITY_RX.search(raw))
+        if not _ask_screen:
+            out["reason"] = "看着像提问（带问句、无祈使词）⇒ 不擅自动手，交给对话模型"
+            return out
+        # 只开给「屏幕内容」这一类：动作仍是 see（只读取帧，隐私门照旧）
+        out["reason"] = "问句但在问屏幕内容 ⇒ 只读取一帧交给模型看"
 
     out["intent"] = best
     out["matched"] = hits[best][:8]
@@ -558,6 +575,12 @@ def execute(route: dict) -> dict:
         "via": ROUTER_ID,
         "ms": int((time.time() - t0) * 1000),
     }
+    if intent == "screen":
+        # 2026-11-07: single frame is fallback only; default lane is native realtime
+        # (state/vision-policy.json). Never present this as the realtime chain.
+        out["lane"] = "single_frame_fallback"
+        out["degraded"] = True
+        out["policy"] = "state/vision-policy.json"
     if not ok:
         out["error"] = str(envelope.get("error") or _why(receipt))[:300]
         for k in ("denied", "missing", "how_to_grant"):

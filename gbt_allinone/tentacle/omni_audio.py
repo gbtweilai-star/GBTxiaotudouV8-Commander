@@ -233,9 +233,14 @@ class OmniAudioMixin:
             return {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:140])}
 
     def audio_voices(self) -> dict:
-        """列出本机 SAPI 装了哪些发音人（决定能不能换音色）。"""
+        """列出本机 SAPI 装了哪些发音人（决定能不能换音色）。
+
+        2026-11-09 修：pyembed 里 win32com 可导入但 pywintypes 缺失，一路
+        `No module named 'pywintypes'` —— 改为 win32com 优先、pyttsx3 兜底（已装）。
+        """
         if not _IS_WIN:
             return {"ok": False, "error": "SAPI 是 Windows 的"}
+        errors = []
         try:
             import win32com.client as _w32  # type: ignore
             v = _w32.Dispatch("SAPI.SpVoice")
@@ -243,9 +248,65 @@ class OmniAudioMixin:
             for i in range(int(v.GetVoices().Count)):
                 tok = v.GetVoices().Item(i)
                 out.append({"id": i, "desc": str(tok.GetDescription())})
-            return {"ok": True, "count": len(out), "voices": out}
+            return {"ok": True, "count": len(out), "voices": out, "engine": "win32com"}
         except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": "%s: %s" % (type(e).__name__, str(e)[:140])}
+            errors.append("%s: %s" % (type(e).__name__, str(e)[:120]))
+        # 2026-11-09：pyembed 缺 pywintypes，win32com 与 pyttsx3 的 SAPI 驱动都走不通。
+        # 注册表是 SAPI 自己登记发音人的地方 —— 零依赖，最接近"本机装了什么"。
+        try:
+            import winreg
+            roots = [
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Speech_OneCore\Voices\Tokens"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Speech\Voices\Tokens"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Speech\Voices\Tokens"),
+                (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Speech\Voices\Tokens"),
+            ]
+            out, seen = [], set()
+            for hive, path in roots:
+                try:
+                    with winreg.OpenKey(hive, path) as k:
+                        for i in range(winreg.QueryInfoKey(k)[0]):
+                            try:
+                                sub = winreg.EnumKey(k, i)
+                            except OSError:
+                                break
+                            try:
+                                with winreg.OpenKey(k, sub) as sk:
+                                    name = winreg.QueryValueEx(sk, "Name")[0]
+                            except Exception:
+                                name = sub
+                            name = str(name)
+                            if name in seen:
+                                continue
+                            seen.add(name)
+                            out.append({"id": len(out), "desc": name, "source": path})
+                except FileNotFoundError:
+                    continue
+                except OSError:
+                    continue
+            if out:
+                return {"ok": True, "count": len(out), "voices": out, "engine": "registry",
+                        "note": "win32com 不可用（%s），已从 SAPI 注册表枚举" % errors[0]}
+            errors.append("registry: 四个根键都没有发音人")
+        except Exception as e:  # noqa: BLE001
+            errors.append("registry %s: %s" % (type(e).__name__, str(e)[:100]))
+        try:
+            import pyttsx3
+            eng = pyttsx3.init()
+            out = []
+            for i, vv in enumerate(eng.getProperty("voices") or []):
+                desc = getattr(vv, "name", None) or getattr(vv, "id", "") or str(vv)
+                out.append({"id": i, "desc": str(desc)})
+            try:
+                eng.stop()
+            except Exception:
+                pass
+            if out:
+                return {"ok": True, "count": len(out), "voices": out, "engine": "pyttsx3",
+                        "note": "win32com/注册表都不可用，已用 pyttsx3 枚举"}
+        except Exception as e:  # noqa: BLE001
+            errors.append("%s: %s" % (type(e).__name__, str(e)[:120]))
+        return {"ok": False, "error": "发音人枚举失败: " + " | ".join(errors)}
 
     # ── 4. 音频基础件：WAV 头解析（流式流水线要先知道这些）──
     def audio_wav_info(self, path: str) -> dict:

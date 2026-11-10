@@ -446,3 +446,26 @@ tools/get-pip.py
 pyembed/
 # render 根下的 png 是 HUD 渲染产物（hud-base / hud-draft* / crop-*），非源码
 render/*.png
+# ============================================================================
+# 2026-11-11 推送清理 —— 只挡临时产物，不动源码与图片
+# ============================================================================
+# 依赖整包含并包（1.43 GB，走 Release 分发，不进仓库）
+_deps.tar
+_deps.tar.*
+# 本地 Python 3.11 运行时（可整包替换，非自有源码）
+py311/
+# 一次性临时目录
+tmpg5mmjayv/
+# 截图/渲染残留与空壳
+current_screen.png
+worker.html
+# 编译缓存
+__pycache__/
+*.pyc# Edge 用户数据目录（缓存 / Crashpad 转储 / 扩展 / 模型），只保留 renderer 与 manifest
+desktop-humanoid/profile/
+# 进程与崩溃转储
+*.dmp
+*.pma
+# 一次性占用文件
+*.32_*# 运行日志
+desktop-humanoid/bridge.err
