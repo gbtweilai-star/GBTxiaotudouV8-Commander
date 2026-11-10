@@ -299,8 +299,7 @@
    "sha256": "28033e449a31ebcc396e5be8b13b63152bf03094288fb5867034321927bce087",
    "size": 72214,
    "paths": [
-    "assets/gsap.min.js",
-    "holo_pet_w3/assets/gsap.min.js"
+    "assets/gsap.min.js"
    ]
   },
   {
@@ -12493,11 +12492,6 @@
    "path": "holo_pet_w3/assets/dh/ref.jpg",
    "size": 60571,
    "sha256": "da1db4df7028a5b68089482a7d7dca58162d352030f994ac4b3065ab5b5a569e"
-  },
-  {
-   "path": "holo_pet_w3/assets/gsap.min.js",
-   "size": 72214,
-   "sha256": "28033e449a31ebcc396e5be8b13b63152bf03094288fb5867034321927bce087"
   },
   {
    "path": "holo_pet_w3/assets/panel-anim.js",

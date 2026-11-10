@@ -10,7 +10,7 @@
 
 | 文件 | 作用 |
 |---|---|
-| `holo_pet_w3/assets/gsap.min.js` | GSAP 3.12.5（72,214 B，官方 dist，**离线内置，不挂 CDN**） |
+| `assets/gsap.min.js` | GSAP 3.12.5（72,214 B，官方 dist，**离线内置，不挂 CDN**） |
 | `holo_pet_w3/assets/panel-anim.js` | 入场动效：`[data-anim]` 优先，否则取 `main/.wrap/.grid` 直接子元素；timeline 交错 y+opacity |
 | `panel/` `capabilities/` `welcome/` 三页 `</body>` 前 | 引上面两个脚本（各一行） |
 

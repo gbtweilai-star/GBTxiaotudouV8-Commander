@@ -29,7 +29,8 @@ def main() -> int:
     check("尊重 reduced-motion", "prefers-reduced-motion" in css)
 
     print("[2] 旧动效资产保留（归档页/将来可复用）")
-    gsap = ROOT / "holo_pet_w3" / "assets" / "gsap.min.js"
+    # gsap.min.js 已从 holo_pet_w3/assets 移至仓库根 assets/（2026-11-11 清理重复副本）
+    gsap = ROOT / "assets" / "gsap.min.js"
     anim = ROOT / "holo_pet_w3" / "assets" / "panel-anim.js"
     check("gsap.min.js 在位且 >60KB", gsap.is_file() and gsap.stat().st_size > 60000,
           gsap.stat().st_size if gsap.is_file() else 0)

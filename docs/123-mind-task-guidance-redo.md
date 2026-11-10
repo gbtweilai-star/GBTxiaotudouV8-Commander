@@ -9,7 +9,7 @@
 | tasteskill v2（anti-slop 前端） | github.com/Leonxlnx/taste-skill（MIT） | `skills/taste-skill/`：SKILL.md + 13 篇 references + 10 个 library json + 6 个 scripts |
 | GSAP 官方 8 个 Agent Skills | github.com/greensock/gsap-skills（MIT © GreenSock） | `skills/gsap-official/official/*.md`（原样）+ `skills/gsap-official/SKILL.md`（索引） |
 
-没有往 App 里加任何 npm 依赖：页面用的是仓库里早就 vendor 的 `holo_pet_w3/assets/gsap.min.js`（72 KB），只在 index.html 多一行 `<script>`。
+没有往 App 里加任何 npm 依赖：页面用的是仓库里早就 vendor 的 `assets/gsap.min.js`（72 KB），只在 index.html 多一行 `<script>`。
 
 ## 按 taste skill 改了什么（app screen 口径）
 - **颜色收成一个强调色**：琥珀 `#ffb02e` 只给"已执行/正在执行"；未执行=灰 `#46536a`；卡点=红 `#d2453f`。去掉原来的绿/青/金三套状态色。

@@ -24,7 +24,7 @@ metadata:
 | `official/gsap-utils.md` | gsap.utils 工具箱 |
 
 ## 本项目里的既有资产
-- 仓库里已 vendor：`holo_pet_w3/assets/gsap.min.js`（原生页面可直接 `<script>` 引）；
+- 仓库里已 vendor：`assets/gsap.min.js`（原生页面可直接 `<script>` 引）；
 - 已有蒸馏版 `skills/gsap/SKILL.md`（本仓自用速查）—— 两者不冲突：速查看蒸馏版，细节看 official/。
 
 ## 用之前先问三件事
