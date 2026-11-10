@@ -5,3 +5,6 @@
     - id: gbt-cap-bridge
       name: '@gbt/dsh-cap-bridge'
       config: {}
+    - id: media-desk
+      name: 'dsh-media-desk'
+      config: {}
