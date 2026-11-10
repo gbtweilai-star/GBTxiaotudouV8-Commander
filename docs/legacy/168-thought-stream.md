@@ -30,7 +30,7 @@
 
 `GET /api/stream?limit=30` → `ok=true · count=30 · skipped=1`；真实编排账里的事件全部归为 action（actor=gate，target=world_forge/focus_stack/context_inject…）；「思考流」视图显示 100 条、`counts={thought:0, action:100, …}`，右侧行动日志同步有 `run context_inject / body_control / thought_stream` 等记录。
 
-![思考流 / 行动流（APP 真机：真实编排账归一化）](../assets/app-thought-stream.png)
+![思考流 / 行动流（APP 真机：真实编排账归一化）](../../assets/app-thought-stream.png)
 
 ## 四、边界（说死）
 

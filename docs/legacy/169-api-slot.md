@@ -33,7 +33,7 @@
 | remove | `ok=true · count=0` |
 | 右栏面板 | `GET weather_api api.example.com · 1/20 · 执行器 not_wired` |
 
-![动态 API 槽（APP 真机右栏：只登记，executor not_wired）](../assets/app-api-slot.png)
+![动态 API 槽（APP 真机右栏：只登记，executor not_wired）](../../assets/app-api-slot.png)
 
 ## 四、边界（说死）
 

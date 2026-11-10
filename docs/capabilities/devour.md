@@ -7,7 +7,7 @@
 | `devour_auto` | 只读 | — | —（注册表：无必填） | `user_error` | 自主吞食：op=tick 自主跑一轮——扫本地可食源（docs/tools/examples/skills），与**她自己的缺口**（无实现文件的能力位/依赖仓外模块的位）做相关度打分，score≥2 才吞；吞=摘 digest 进 state/devour-digest.md；… |
 | `devour_fusion` | 只读 | — | —（注册表：无必填） | `user_error` | 吞天 × 原生能力 融合台账（主人令「把蒸馏提炼出契合自己的原生能力和吞天融合到一起…以及记入能力」）：吞进来的东西**三件齐才算融合** —— ①原生位三处齐（注册/分派/图鉴）②有效触手标签 ③触手库永久记忆页；`status=已融合` 而三件不齐**当场拒**（假账拦下）。… |
 | `devour_github` | 只读 | 是 | `repo` | `user_error` | 吞天：吞噬 GitHub 仓库为知识胶囊（自我进化的核心——吸收外部能力） |
-| `devour_pulse` | 只读 | — | —（注册表：无必填） | `user_error` | 吞天：完整认知循环（吞噬→反思→消化→重组→进化） |
+| `devour_pulse` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 吞天：完整认知循环（吞噬→反思→消化→重组→进化） |
 | `devour_reflect` | 只读 | — | —（注册表：无必填） | `user_error` | 吞天：反思（回顾吞噬历史学习模式，发现弱能力与重组机会） |
 | `devour_scan` | 只读 | — | —（注册表：无必填） | `user_error` | 【吞天·缺口扫描】吞天：能力缺口扫描（域覆盖对照+进化方向） |
 
@@ -53,10 +53,10 @@
 ### `devour_pulse`
 
 - **域**：`devour`（吞天（自我进化））
-- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
 - **要哪张票（静态）**：`external_llm`
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`
+- **常见错误**：缺票 → `denied`，回执点名 `missing_scopes`（本行静态票：`external_llm`）；参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
 - **它做什么**：吞天：完整认知循环（吞噬→反思→消化→重组→进化）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap devour_pulse '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -86,7 +86,3 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

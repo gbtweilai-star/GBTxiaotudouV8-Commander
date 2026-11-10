@@ -4,7 +4,7 @@
 
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
-| `ui_card` | 只读 | — | —（注册表：无必填） | `user_error` | **ACUI 卡片协议**（吞噬上游参考项目 Scene Protocol/ACUI 蒸出的我们自己的版本，2026-11-02 主人令）：op=schema/validate/create/close/action/snapshot/events/clear/verify… |
+| `ui_card` | 只读 | — | —（注册表：无必填） | `user_error` | **ACUI 卡片协议**（吞噬上游参考项目 Scene Protocol/ACUI 蒸出的我们自己的版本，2026-11-02 主人令）：op=schema/validate/create/close/action/snapshot/events/clear/verify。卡片… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
 
@@ -26,7 +26,3 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

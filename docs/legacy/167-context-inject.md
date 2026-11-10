@@ -33,7 +33,7 @@
 | UI | 右栏显示 focus 项「盯构建」+ tool_result「run」，预算 `6/3000`，候选/丢因行 |
 | 能力数 | 395 |
 
-![上下文注入预览（APP 真机右栏）](../assets/app-context-inject.png)
+![上下文注入预览（APP 真机右栏）](../../assets/app-context-inject.png)
 
 ## 四、边界（说死）
 

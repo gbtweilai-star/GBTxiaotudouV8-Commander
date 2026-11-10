@@ -27,7 +27,7 @@
 
 `GET /api/resources` → `ok=true · host=DESKTOP-H9L6OL9 · Windows 11 · cpu 36.8% · mem 80.6%（12944/16057MB）· disk 52.6%（134.22/255.13GB）· uptime 43937s · process_count=290`（APP pyembed 有 psutil；仓库 py312 没有则 null）。右栏 UI 同步显示 CPU/内存/磁盘条与 `uptime 12.2h · 进程 292 · Windows 11`。
 
-![本机资源快照（APP 真机右栏）](../assets/app-resource.png)
+![本机资源快照（APP 真机右栏）](../../assets/app-resource.png)
 
 ## 四、边界（说死）
 

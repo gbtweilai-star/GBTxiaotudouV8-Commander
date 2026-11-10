@@ -31,7 +31,7 @@
 | 历史行 | 最近产物（夜灯/顶替新娘/ComfyUI/分镜…） |
 | 路径穿越 | `/api/media/file?path=../secret.txt` → 404 |
 
-![媒体舞台（APP 真机：分类/卡片/最近产物/预览）](../assets/app-media-stage.png)
+![媒体舞台（APP 真机：分类/卡片/最近产物/预览）](../../assets/app-media-stage.png)
 
 ## 四、边界（说死）
 

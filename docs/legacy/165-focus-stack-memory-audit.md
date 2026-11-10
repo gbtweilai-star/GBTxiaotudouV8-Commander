@@ -35,7 +35,7 @@
 | UI | 右栏焦点栈：分数/标题/kind/×；审计行「干净 · 记录0 · 源 …」 |
 | 能力数 | 394（含 body_control） |
 
-![焦点栈 + body_control 状态（APP 真机右栏）](../assets/app-focus-body.png)
+![焦点栈 + body_control 状态（APP 真机右栏）](../../assets/app-focus-body.png)
 
 ## 四、边界（说死）
 

@@ -5,63 +5,63 @@
     .vl { font-family:Consolas,monospace; font-size:12px; fill:#57606a; }
     .lg { font-family:"Microsoft YaHei","PingFang SC",sans-serif; font-size:12px; fill:#57606a; }
   </style>
-  <text x="12" y="26" class="ti">能力位域分布（共 375 位 / 30 域 · 绿=只读 · 橙=需授权）</text>
-  <text x="12" y="69" class="lb">创作</text>
-<rect x="150" y="57" width="292" height="16" rx="4" fill="#2ea043"/>
-<rect x="442" y="57" width="198" height="16" rx="4" fill="#d29922"/>
-<text x="648" y="70" class="vl">57（只读 34）</text>
-<text x="12" y="95" class="lb">系统</text>
-<rect x="150" y="83" width="412" height="16" rx="4" fill="#2ea043"/>
-<rect x="562" y="83" width="52" height="16" rx="4" fill="#d29922"/>
-<text x="622" y="96" class="vl">54（只读 48）</text>
+  <text x="12" y="26" class="ti">能力位域分布（共 428 位 / 32 域 · 绿=只读 · 橙=需授权）</text>
+  <text x="12" y="69" class="lb">系统</text>
+<rect x="150" y="57" width="490" height="16" rx="4" fill="#2ea043"/>
+<rect x="640" y="57" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="648" y="70" class="vl">60（只读 60）</text>
+<text x="12" y="95" class="lb">创作</text>
+<rect x="150" y="83" width="472" height="16" rx="4" fill="#2ea043"/>
+<rect x="622" y="83" width="9" height="16" rx="4" fill="#d29922"/>
+<text x="639" y="96" class="vl">59（只读 58）</text>
 <text x="12" y="121" class="lb">大模型与大脑</text>
-<rect x="150" y="109" width="292" height="16" rx="4" fill="#2ea043"/>
-<rect x="442" y="109" width="69" height="16" rx="4" fill="#d29922"/>
-<text x="519" y="122" class="vl">42（只读 34）</text>
+<rect x="150" y="109" width="285" height="16" rx="4" fill="#2ea043"/>
+<rect x="435" y="109" width="66" height="16" rx="4" fill="#d29922"/>
+<text x="509" y="122" class="vl">43（只读 35）</text>
 <text x="12" y="147" class="lb">安全</text>
-<rect x="150" y="135" width="171" height="16" rx="4" fill="#2ea043"/>
-<rect x="321" y="135" width="78" height="16" rx="4" fill="#d29922"/>
-<text x="407" y="148" class="vl">29（只读 20）</text>
+<rect x="150" y="135" width="236" height="16" rx="4" fill="#2ea043"/>
+<rect x="386" y="135" width="41" height="16" rx="4" fill="#d29922"/>
+<text x="435" y="148" class="vl">34（只读 29）</text>
 <text x="12" y="173" class="lb">触手（手眼网耳）</text>
-<rect x="150" y="161" width="163" height="16" rx="4" fill="#2ea043"/>
-<rect x="313" y="161" width="69" height="16" rx="4" fill="#d29922"/>
-<text x="390" y="174" class="vl">27（只读 19）</text>
+<rect x="150" y="161" width="204" height="16" rx="4" fill="#2ea043"/>
+<rect x="354" y="161" width="41" height="16" rx="4" fill="#d29922"/>
+<text x="403" y="174" class="vl">30（只读 25）</text>
 <text x="12" y="199" class="lb">心智</text>
-<rect x="150" y="187" width="171" height="16" rx="4" fill="#2ea043"/>
-<rect x="321" y="187" width="9" height="16" rx="4" fill="#d29922"/>
-<text x="338" y="200" class="vl">21（只读 20）</text>
-<text x="12" y="225" class="lb">流水线与发布</text>
-<rect x="150" y="213" width="154" height="16" rx="4" fill="#2ea043"/>
-<rect x="304" y="213" width="0" height="16" rx="4" fill="#d29922"/>
-<text x="312" y="226" class="vl">18（只读 18）</text>
-<text x="12" y="251" class="lb">只读侦察</text>
-<rect x="150" y="239" width="102" height="16" rx="4" fill="#2ea043"/>
-<rect x="252" y="239" width="52" height="16" rx="4" fill="#d29922"/>
-<text x="312" y="252" class="vl">18（只读 12）</text>
-<text x="12" y="277" class="lb">视频</text>
-<rect x="150" y="265" width="59" height="16" rx="4" fill="#2ea043"/>
-<rect x="209" y="265" width="78" height="16" rx="4" fill="#d29922"/>
-<text x="295" y="278" class="vl">16（只读 7）</text>
-<text x="12" y="303" class="lb">数据</text>
-<rect x="150" y="291" width="77" height="16" rx="4" fill="#2ea043"/>
-<rect x="227" y="291" width="26" height="16" rx="4" fill="#d29922"/>
-<text x="261" y="304" class="vl">12（只读 9）</text>
-<text x="12" y="329" class="lb">设备</text>
-<rect x="150" y="317" width="94" height="16" rx="4" fill="#2ea043"/>
-<rect x="244" y="317" width="9" height="16" rx="4" fill="#d29922"/>
-<text x="261" y="330" class="vl">12（只读 11）</text>
-<text x="12" y="355" class="lb">引擎（工作流/定时）</text>
-<rect x="150" y="343" width="85" height="16" rx="4" fill="#2ea043"/>
-<rect x="235" y="343" width="9" height="16" rx="4" fill="#d29922"/>
-<text x="252" y="356" class="vl">11（只读 10）</text>
-<text x="12" y="381" class="lb">工具与改代码</text>
-<rect x="150" y="369" width="59" height="16" rx="4" fill="#2ea043"/>
-<rect x="209" y="369" width="18" height="16" rx="4" fill="#d29922"/>
-<text x="235" y="382" class="vl">9（只读 7）</text>
+<rect x="150" y="187" width="220" height="16" rx="4" fill="#2ea043"/>
+<rect x="370" y="187" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="378" y="200" class="vl">27（只读 27）</text>
+<text x="12" y="225" class="lb">设备</text>
+<rect x="150" y="213" width="130" height="16" rx="4" fill="#2ea043"/>
+<rect x="280" y="213" width="25" height="16" rx="4" fill="#d29922"/>
+<text x="313" y="226" class="vl">19（只读 16）</text>
+<text x="12" y="251" class="lb">流水线与发布</text>
+<rect x="150" y="239" width="73" height="16" rx="4" fill="#2ea043"/>
+<rect x="223" y="239" width="74" height="16" rx="4" fill="#d29922"/>
+<text x="305" y="252" class="vl">18（只读 9）</text>
+<text x="12" y="277" class="lb">只读侦察</text>
+<rect x="150" y="265" width="147" height="16" rx="4" fill="#2ea043"/>
+<rect x="297" y="265" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="305" y="278" class="vl">18（只读 18）</text>
+<text x="12" y="303" class="lb">视频</text>
+<rect x="150" y="291" width="147" height="16" rx="4" fill="#2ea043"/>
+<rect x="297" y="291" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="305" y="304" class="vl">18（只读 18）</text>
+<text x="12" y="329" class="lb">视觉</text>
+<rect x="150" y="317" width="106" height="16" rx="4" fill="#2ea043"/>
+<rect x="256" y="317" width="0" height="16" rx="4" fill="#d29922"/>
+<text x="264" y="330" class="vl">13（只读 13）</text>
+<text x="12" y="355" class="lb">数据</text>
+<rect x="150" y="343" width="89" height="16" rx="4" fill="#2ea043"/>
+<rect x="239" y="343" width="9" height="16" rx="4" fill="#d29922"/>
+<text x="256" y="356" class="vl">12（只读 11）</text>
+<text x="12" y="381" class="lb">引擎（工作流/定时）</text>
+<rect x="150" y="369" width="89" height="16" rx="4" fill="#2ea043"/>
+<rect x="239" y="369" width="9" height="16" rx="4" fill="#d29922"/>
+<text x="256" y="382" class="vl">12（只读 11）</text>
 <text x="12" y="407" class="lb">集成（飞书/Notion/CLI）</text>
-<rect x="150" y="395" width="25" height="16" rx="4" fill="#2ea043"/>
-<rect x="175" y="395" width="35" height="16" rx="4" fill="#d29922"/>
-<text x="218" y="408" class="vl">7（只读 3）</text>
+<rect x="150" y="395" width="64" height="16" rx="4" fill="#2ea043"/>
+<rect x="214" y="395" width="25" height="16" rx="4" fill="#d29922"/>
+<text x="247" y="408" class="vl">11（只读 8）</text>
   <rect x="12" y="432" width="12" height="12" rx="3" fill="#2ea043"/><text x="30" y="440" class="lg">只读（不改状态/不出网）</text>
   <rect x="210" y="432" width="12" height="12" rx="3" fill="#d29922"/><text x="228" y="440" class="lg">需授权（写盘/花钱/出网）</text>
 </svg>

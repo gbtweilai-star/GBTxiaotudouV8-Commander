@@ -1,4 +1,4 @@
-# 引擎（工作流/定时） · `engine`（11 位）
+# 引擎（工作流/定时） · `engine`（12 位）
 
 > 自动生成，数据源 `gbt_allinone/caps_registry.py`。只读 = 不改状态、不出网；其余调用前需人工授权（作用域门）。参数以 `requires_params` 标出；**必填载荷**与**常见错误**两列只写注册表登记过的（没登记就写「无必填」/通用三态），不猜。
 
@@ -8,13 +8,14 @@
 | `sched_define` | 只读 | 是 | `name`、`workflow`、`every_seconds` | `user_error` | 定时触发器：定义调度（工作流 + 间隔），无人值守自动执行 |
 | `sched_status` | 只读 | — | —（注册表：无必填） | `user_error` | 定时触发器：查调度状态（上次执行/结果） |
 | `sched_tick` | 只读 | — | —（注册表：无必填） | `user_error` | 定时触发器：扫描到期调度并执行（可由循环/计划任务驱动） |
-| `transfer` | 只读 | — | —（注册表：无必填） | `user_error` | 数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子 |
-| `wf_cache_clear` | 只读 | — | —（注册表：无必填） | `user_error` | 万能插：清空传输缓存（同输入复用的节点结果缓存） |
+| `transfer` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子 |
+| `wf_cache_clear` | 只读 | — | —（注册表：无必填） | `user_error` | 工作流引擎：清空传输缓存（同输入复用的节点结果缓存） |
 | `wf_define` | 只读 | 是 | `name`、`nodes` | `user_error` | 工作流引擎：定义工作流（DAG，校验环/依赖/能力合法性） |
 | `wf_resume` | 只读 | 是 | `run_id` | `user_error` | 工作流引擎：从运行记录断点续跑（复用已完成节点，只重跑未完成的） |
 | `wf_run` | 只读 | 是 | `name` | `user_error` | 工作流引擎：分层并行执行工作流，节点结果如实落盘 |
 | `wf_status` | 只读 | — | —（注册表：无必填） | `user_error` | 工作流引擎：查运行记录（可按工作流名过滤） |
-| `workflow_forge` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语… |
+| `workflow_forge` | 只读 | — | —（注册表：无必填） | `user_error` | **工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语… |
+| `world_forge` | 只读 | — | —（注册表：无必填） | `user_error` | **世界锻造内核**（吞噬 AEON/WorldX/Temporal God 蒸出的第 0 步，2026-11-02 主人令）：op=schema/spec/gen/step/focus/person/god/rewind/branch/encode/decode/view3d/… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
 
@@ -69,10 +70,10 @@
 ### `transfer`
 
 - **域**：`engine`（引擎（工作流/定时））
-- **类型**：只读（不改状态、不出网） · **需参数**：否
-- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **要哪张票（静态）**：`transfer`
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`
+- **常见错误**：缺票 → `denied`，回执点名 `missing_scopes`（本行静态票：`transfer`）；参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
 - **它做什么**：数据传输算子（核心传输工具）：map/filter/merge/unique/sort/pluck/collect 等 14 个纯变换算子
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap transfer '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -84,7 +85,7 @@
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
 - **常见错误**：参数非法 → `user_error`
-- **它做什么**：万能插：清空传输缓存（同输入复用的节点结果缓存）
+- **它做什么**：工作流引擎：清空传输缓存（同输入复用的节点结果缓存）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap wf_cache_clear '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -135,18 +136,25 @@
 ### `workflow_forge`
 
 - **域**：`engine`（引擎（工作流/定时））
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：**工作流十式**（主人令 2026-10-16：skills.sh 累计安装 TOP10 蒸馏）：① **find_skill**（先现读名册再看外部，不重造）② **grill**（连续追问厘清目标/范围/判据/边界，上限 8 轮）③ **grill_docs**（追问+术语表与决策记录）④ **arch_review**（结构体检与重构机会，不动手）⑤ **browser_ops**（点/填/抽，先看后动）⑥ **tdd_loop**（红-绿-重构，没先红不算 TDD）⑦ **setup_rules**（状态/标签/文档规则一次定死）⑧ **style**（先定视觉契约）⑨ **handoff**（现状+资料位置+下一步）⑩ **triage**（四档分类与状态推进，不下模棱两可）。**不重造**：真执行走既有位（browser/code_audit/aesthetic）；**先看后动**（第 37 条）。op=grill/grill_docs/find_skill/arch_review/browser_ops/tdd_loop/setup_rules/style/handoff/triage/check/route（**全只读·零作用域）。
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap workflow_forge '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `world_forge`
+
+- **域**：`engine`（引擎（工作流/定时））
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**世界锻造内核**（吞噬 AEON/WorldX/Temporal God 蒸出的第 0 步，2026-11-02 主人令）：op=schema/spec/gen/step/focus/person/god/rewind/branch/encode/decode/view3d/view/summary/verify。**纯函数·零作用域**：不出网/不起进程/不写盘；同 seed+spec ⇒ 同世界；命名 RNG 流；世界之灵只发被夹紧的 Directive（不许直接改人口）；rewind=重放+hash 对账；branch=多时间线；encode/decode 存档编解码（真落盘由调用方走 filesystem_write 门）。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap world_forge '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

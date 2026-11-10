@@ -31,7 +31,7 @@
 | 设置弹窗 | 打开后 7 个音色选项；选中 `Huihui`、语速 1.10；`__DH.speak` 拦截到 `voice=Huihui · rate=1.1` |
 | 统一门 | `run_task("voice_settings", {"op":"verify"})` 可达；能力数 392 |
 
-![数字人语音设置（APP 真机：音色/语速/音高/ASR 后端/自动朗读）](../assets/app-voice-settings.png)
+![数字人语音设置（APP 真机：音色/语速/音高/ASR 后端/自动朗读）](../../assets/app-voice-settings.png)
 
 ## 四、边界（说死）
 

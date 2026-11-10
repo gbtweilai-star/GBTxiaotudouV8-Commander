@@ -32,7 +32,7 @@ DOMAIN_CN = {
     "project": "项目测绘", "automation": "浏览器自动化", "device": "设备", "brain": "梦境/闭环",
     "collab": "协作（信息素场地）", "desktop": "桌面智能体", "infra": "基础设施（云电脑）",
     "social": "社交发布", "comms": "通信", "life": "生命档案", "image_video": "图像/视频生成",
-    "framework": "框架自省",
+    "framework": "框架自省", "body_control": "身体控制", "ui": "界面",
 }
 
 MAX_CELL = 140     # 表格单元格里说明的最大字数（全文仍留在 data/capabilities.json）
@@ -133,13 +133,27 @@ def main() -> int:
     (out / "data").mkdir(parents=True, exist_ok=True)
     (out / "docs" / "capabilities").mkdir(parents=True, exist_ok=True)
 
+    def is_readonly(name: str) -> bool:
+        """口径钉死：readonly = 空 payload 下 policy 算不出任何作用域（零作用域可直接调）。
+
+        🔴 2026-11-11 修正：此前写成 `bool(c["safe"])`，把 safe 冒充 readonly ——
+        safe 是「不改状态/不危险」（340/88），readonly 是「零作用域不用票」（390/38），
+        两套口径不是同一个数。README 写的 390/38 就是 readonly 这套，混用会让
+        域页的「类型」列与徽章对不上。
+        """
+        try:
+            return not list(getattr(P.evaluate(name, {}), "scopes", None) or [])
+        except Exception:                                    # noqa: BLE001
+            return False
+
     rows = []
     for c in caps:
         rows.append({
             "name": c["name"],
             "domain": c.get("domain") or "other",
             "desc": (c.get("desc") or "").strip(),
-            "readonly": bool(c.get("safe")),
+            "readonly": is_readonly(c["name"]),
+            "safe": bool(c.get("safe")),
             "requires_params": bool(c.get("requires_params")),
             "params_hint": (c.get("params_hint") or ""),
             "scopes_static": static_scopes(c["name"]),
@@ -209,17 +223,20 @@ def main() -> int:
 
     # 总表
     total_ro = sum(1 for r in rows if r["readonly"])
+    total_safe = sum(1 for r in rows if r["safe"])
     lines = [
         "# 能力总表 · 共 %d 位 / %d 个域" % (len(rows), len(by_dom)),
         "",
         "> 自动生成，数据源 `gbt_allinone/caps_registry.py`。机器可读版：[`data/capabilities.json`](../data/capabilities.json)。",
         "",
-        "- **口径（两套数，不是一个数）**：本表 = **注册表现读**（%d 位）；其中 7 位 `body_*`"
-        "（`device` 域身体桥：see/say/open/click/type/map/volume，2026-10-24 之后补）**不在 2026-10-21 "
-        "权重发布快照的 341 位之内**。README 与海报里的 **341 指那次发布**；两边不是打架，是时点不同。" % len(rows),
+        "- **口径**：本表 = 注册表现读（%d 位 / %d 域）。`data/capabilities.json`、`docs/capabilities/*.md` "
+        "与 README 徽章同源同数 —— 全部由本脚本从 `caps_registry.py` 现读生成，不手抄。"
+        % (len(rows), len(by_dom)),
         "",
-        "- **只读 %d 位**：不改状态、不出网，可直接调用。" % total_ro,
-        "- **改状态/出网 %d 位**：会写盘、花钱或把数据发到外部服务 —— 必须先过人给的授权门。" % (len(rows) - total_ro),
+        "- **零作用域 %d 位**（本表「只读」列）：空 payload 下不需要任何票，可直接调用。" % total_ro,
+        "- **挂作用域 %d 位**：会写盘 / 花钱 / 出网，调用前必须先过主人给的授权门。" % (len(rows) - total_ro),
+        "- **另一套口径（按 `safe`）**：不改状态 %d 位 / 会改状态 %d 位 —— 与上面的零作用域**不是同一个数**，别混着报。"
+        % (total_safe, len(rows) - total_safe),
         "",
         "| 域 | 中文 | 位数 | 只读 | 需授权 | 详解 |",
         "|---|---|---|---|---|---|",
@@ -228,7 +245,7 @@ def main() -> int:
         ro = sum(1 for x in items if x["readonly"])
         lines.append("| `%s` | %s | %d | %d | %d | [打开](capabilities/%s.md) |"
                      % (dom, DOMAIN_CN.get(dom, dom), len(items), ro, len(items) - ro, dom))
-    lines += ["", "---", "", "回到 [README](../../README.md)", ""]
+    lines += ["", "---", "", "回到 [README](../README.md)", ""]
     (out / "docs" / "03-capabilities.md").write_text("\n".join(lines), encoding="utf-8")
 
     # 域分布图（真数据画出来的横条图，给 README 当视觉锚点）

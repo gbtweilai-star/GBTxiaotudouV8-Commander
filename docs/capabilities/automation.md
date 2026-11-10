@@ -5,7 +5,7 @@
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
 | `browser` | 只读 | 是 | `url` | `user_error` | 浏览器自动化入口（良性子集）。op=open/search/fetch/automate 走 browser_cap 三级后端；op=native（别名 deep/controller/cdp）走原生浏览器窗口 native_browser.py（Chrome DevTools… |
-| `n8n_wf` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | n8n 工作流控制（我们自己的自托管 n8n 2.30·数据在 ~/.n8n）：status/list 只读直连；export/import/active/hook 过 filesystem_write 门；hook 可 POST /webhook/gbt 触发 n8n 工作流—… |
+| `n8n_wf` | 只读 | — | —（注册表：无必填） | `user_error` | n8n 工作流控制（我们自己的自托管 n8n 2.30·数据在 ~/.n8n）：status/list 只读直连；export/import/active/hook 过 filesystem_write 门；hook 可 POST /webhook/gbt 触发 n8n 工作流—… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
 
@@ -27,10 +27,10 @@
 ### `n8n_wf`
 
 - **域**：`automation`（浏览器自动化）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：n8n 工作流控制（我们自己的自托管 n8n 2.30·数据在 ~/.n8n）：status/list 只读直连；export/import/active/hook 过 filesystem_write 门；hook 可 POST /webhook/gbt 触发 n8n 工作流——「N8N 有的我们都有」的双向桥（n8n→能力网关 已导桥接工作流，框架→n8n 由本能力位负责）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap n8n_wf '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -38,7 +38,3 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

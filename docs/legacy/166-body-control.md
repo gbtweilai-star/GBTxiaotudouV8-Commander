@@ -31,7 +31,7 @@
 
 `GET /api/body` → `status=not_supported · wired=false · executor=not_wired`；缺感觉 5 项、缺执行器 4 项；右栏显示同一读数。`POST /api/body {"op":"move","action":"wave"}` → `ok=false · executed=false · reason=body_control 未接线…`。
 
-![body_control 如实 not_supported（APP 真机右栏）](../assets/app-focus-body.png)
+![body_control 如实 not_supported（APP 真机右栏）](../../assets/app-focus-body.png)
 
 ## 四、边界（说死）
 

@@ -5,8 +5,11 @@
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
 | `hf_voice` | 只读 | — | —（注册表：无必填） | `user_error` | Hugging Face 歌声/语音（**3 臂轮询**，主人令 2026-09-28「把插件连接好部署语音…安装 3 个这个插件轮询使用避免卡壳」）：本机零算力跑不动歌声合成（语音中枢 v2.0 一手实测）⇒ 真唱走云。**3 臂（hf-1/2/3）按轮询 + 冷却换道**用（… |
+| `kws` | 只读 | — | —（注册表：无必填） | `user_error` | **声学关键词唤醒 KWS**（主人 P2-14，2026-11-03）：op=schema/status/detect/detect_wav/verify。本机 sherpa-onnx + 中文 zipformer 3.3M 模型（Apache-2.0，约 13MB）+ 拼音关… |
 | `voice` | 只读 | — | —（注册表：无必填） | `user_error` | 本机语音入口（良性子集）：空 payload 默认落到 TTS，真让本机发声 ⇒ 要 `audio_output`；另有 ASR 入口。本机实测口径：WASAPI 活动渲染端点 1 个、活动录音端点 0 个 ⇒「能出声」已验证，「能听」当前不可用（不是没有麦克风，是录音端点没起来… |
 | `voice_orchestra` | 只读 | — | —（注册表：无必填） | `user_error` | 语音技能中枢（多维度场景编排，只读）：技能原子检索 / 场景 Pipeline / 本机可跑性；今日挂 tools tab，升格条件见模块 docstring |
+| `voice_settings` | 只读 | — | —（注册表：无必填） | `user_error` | **语音设置契约**（主人 P1，2026-11-02）：op=schema/validate/resolve/verify。TTS 音色/语速/音高/音量 + ASR 后端（auto/whisper/windows）+ 语言 + 自动朗读；纯校验/解析，**零作用域**（不写盘… |
+| `voice_stream` | 只读 | — | —（注册表：无必填） | `user_error` | **流式语音（P2-14 可做面）**：op=schema/start/chunk/reset/end/verify。收 PCM16 16k base64 分片 → 内存缓冲（≤60s）→ 显式 partial 且 ≥2s 时本地 Whisper 局部转写，end 时最终转写；临… |
 | `voice_studio` | 只读 | — | —（注册表：无必填） | `user_error` | VoiceStudio（debpalash · AGPL-3.0 · 只蒸馏思想不搬代码）**两层面**。① **桥接面**（要上游后端在线）：status/capabilities/transcribe/plan/mcp_info/where —— 上游 Local API 现… |
 
 > 表格里是**摘要**（超过 140 字截断）；下面每位还有**逐位详解**（完整原文 / 要哪张票 / 真调用命令 / 缺什么会怎么报）。
@@ -24,6 +27,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：Hugging Face 歌声/语音（**3 臂轮询**，主人令 2026-09-28「把插件连接好部署语音…安装 3 个这个插件轮询使用避免卡壳」）：本机零算力跑不动歌声合成（语音中枢 v2.0 一手实测）⇒ 真唱走云。**3 臂（hf-1/2/3）按轮询 + 冷却换道**用（与 key_gateway 同一纪律）：单臂连续失败 3 次冷却 300s、自动投下一臂 ⇒ 避免单点卡壳。**出网硬钉**：只 https + 主机白名单（HF 三个官方域）+ 显式拒私有/环回/保留地址 + 拒重定向；**只回掩码**，密钥只走 env:/vault: 引用。`sing` 过 external_llm 门；模型表全部**未验**（本机无 token）。op=status/arms/models/sing/rotate/verify/where
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap hf_voice '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `kws`
+
+- **域**：`voice`（语音）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**声学关键词唤醒 KWS**（主人 P2-14，2026-11-03）：op=schema/status/detect/detect_wav/verify。本机 sherpa-onnx + 中文 zipformer 3.3M 模型（Apache-2.0，约 13MB）+ 拼音关键词 `x iǎo t ǔ d òu @小土豆`；CPU、无网络、无密钥。没装 sherpa/模型时 available=false，不假装能唤醒。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap kws '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `voice`
@@ -48,6 +62,28 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap voice_orchestra '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `voice_settings`
+
+- **域**：`voice`（语音）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**语音设置契约**（主人 P1，2026-11-02）：op=schema/validate/resolve/verify。TTS 音色/语速/音高/音量 + ASR 后端（auto/whisper/windows）+ 语言 + 自动朗读；纯校验/解析，**零作用域**（不写盘/不出网）；持久化由 console-server 以 trusted-owner 写 state/voice-settings.json，与现有设置同一条本地写面。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap voice_settings '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `voice_stream`
+
+- **域**：`voice`（语音）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**流式语音（P2-14 可做面）**：op=schema/start/chunk/reset/end/verify。收 PCM16 16k base64 分片 → 内存缓冲（≤60s）→ 显式 partial 且 ≥2s 时本地 Whisper 局部转写，end 时最终转写；临时 WAV 即用即删。**不是真 KWS**（无 sherpa-onnx 唤醒模型），识别文本按外部内容纪律处理；不执行指令。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap voice_stream '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `voice_studio`
 
 - **域**：`voice`（语音）
@@ -62,7 +98,3 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

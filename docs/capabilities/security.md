@@ -5,30 +5,35 @@
 | 能力位 | 类型 | 需参数 | 必填载荷 | 常见错误 | 它做什么 |
 |---|---|---|---|---|---|
 | `asset_vault_freeze` | 只读 | — | —（注册表：无必填） | `user_error` | 资产单点损失**体检**（防御侧）：卷影副本/防篡改开关/BitLocker/关键资产清单，不加密不冻结 |
+| `bounty_ops` | 只读 | — | —（注册表：无必填） | `user_error` | 安全众测闭环（2026-11-04 主人令：把 2026-11-02 写完却没接线的 6 件**收成一个入口**）。来历：这 6 件当时就已经写好，但**从没注册能力位、从没被任何地方 import**，一直躺在 `state/proactive/work/g-1/`（一份失败工… |
 | `code_audit` | 只读 | — | —（注册表：无必填） | `user_error` | 代码安全审计：**多阶段 + 机器可读 findings + 独立验证 + 可复现**（蒸馏自 GitHub 周榜 #03 security-audit-skill，只取架构）：五条规则（凭证面/注入面/破坏面/判据面）· findings 契约含 severity/证据/复现命… |
 | `credential_steal` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 凭据**暴露面**审计（防御侧）：只报位置/体积/权限与风险，**绝不读取或导出文件内容** |
 | `data_hijack` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 会话/数据**完整性**检测（防御侧）：本地会话 + 浏览器凭据库落点 + 文件树指纹漂移 |
-| `device_takeover` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 本机设备接管定位与校验：只在本机 PnP 清单里找目标，接管指令交回既有 device_control 底座（不并存第二条接管路径） |
+| `device_takeover` | 只读 | — | —（注册表：无必填） | `user_error` | 本机设备接管定位与校验：只在本机 PnP 清单里找目标，接管指令交回既有 device_control 底座（不并存第二条接管路径） |
+| `dual_gate` | 只读 | — | —（注册表：无必填） | `user_error` | 双脑确认：危险动作之前，推理脑（作用域该不该要票 / 金额上限 / 收款人必填 / force 与 dry_run 互斥）+ 编程脑（能力位存在 / 必填参数齐 / 落点路径存在）各自出一份裁决，**两脑都点头才执行**，任一否决即 rejected。op=check {"kin… |
 | `event_ledger` | 只读 | — | —（注册表：无必填） | `user_error` | 签名事件账（蒸馏自 2026-09-28 主人给的周榜卡 buzz block/buzz 34,934★，只取**账本纪律**「每条消息都是签名记录」，不引 Nostr 中继/网络面——出网归门与它自己的闸；人机同室协作已有 collab_gateway）：哈希链 + HMAC… |
 | `hook_enforcer` | 只读 | — | —（注册表：无必填） | `user_error` | 钩子强制器：对指定目标跑同一套交叉钩子，逐单元回报「已钩住/未钩住」与多路读法的指纹一致性——只回答『钩子有没有真触发』，不做覆盖率结论（那是 omission_detector 的活） |
 | `install_selfcheck` | 只读 | — | —（注册表：无必填） | `user_error` | **装机自检 · 查病毒木马/后门**（主人 2026-10-17 令「安装上我们的大模型就自动自检一遍排除病毒木马等」）：按 **OS 结构**做只读检查 —— Windows(Run/RunOnce 自启键·计划任务·服务·Winlogon·监听端口·PE 头) · Linu… |
 | `keylogger` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 本机输入活动记录：只写本地 jsonl、有 pid 可停、可列可取走，模块内无任何出网路径 |
+| `lan_pairing` | 只读 | — | —（注册表：无必填） | `user_error` | **局域网配对监听/自签证书**（主人 2026-11-03 批准）：op=schema/start/stop/status/cert/verify。只绑一个私有 LAN IPv4（或 loopback），拒 0.0.0.0/公网；端口 8767..8770；TLS 自签（cer… |
 | `llm_redteam` | 只读 | — | —（注册表：无必填） | `user_error` | LLM 红队矩阵（蒸馏自安全精英课程 + 黑客实验室）：OWASP LLM Top-10 十类 × 检测判据；**只测自己**（提示注入面 / 凭据内插 / 过度代理 / 检索边界 / 预算闸），对第三方攻击载荷一概不做 |
-| `offense_ops` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | **自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工… |
+| `offense_ops` | 只读 | — | —（注册表：无必填） | `user_error` | **自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工… |
 | `omission_detector` | 只读 | — | —（注册表：无必填） | `user_error` | 遗漏检测器：覆盖率 = 已钩住/总数；<100% 触发有界补扫；仍钩不住**如实报 missing**（不许折叠成绿）——零遗漏的唯一裁判 |
 | `onboarding_gate` | 只读 | — | —（注册表：无必填） | `user_error` | 未接线能力上手指引门：如实报「登记了但没实现」的缺口，并给出三处接线配方 |
+| `pairing` | 只读 | — | —（注册表：无必填） | `user_error` | **局域网配对/证书安全原语**（主人 P2-12 已点头：先本机/局域网安全设计）：op=schema/code/claim/devices/revoke/cert/cert_verify/verify。6 位一次性配对码 TTL 300s/最多 3 次尝试；设备白名单 + 一… |
 | `paywallbuster` | 只读 | — | —（注册表：无必填） | `user_error` | 内容门**检测**（防御侧）：离线判定页面是否被付费墙/同意门挡住，只判不绕（不伪装 UA、不伪造 cookie） |
 | `penetrating_cross_scan` | 只读 | — | —（注册表：无必填） | `user_error` | 穿透式交叉扫描引擎（增强版）：触手到位**必须**调用钩子（未触发=失败）· 步骤锁（跳步当场拒）· 每单元 ≥2 路独立读交叉互扫（不一致→第三路仲裁）· 遗漏检测（覆盖率<100% 有界补扫）· 全程留痕 source_kind=cross_scan；三种目标 binding… |
-| `pentest` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 授权渗透验证：只对**已登记授权**的目标做非破坏性检查（TCP 可达/TLS 握手/安全响应头），未登记目标一律拒 |
+| `pentest` | 只读 | — | —（注册表：无必填） | `user_error` | 授权渗透验证：只对**已登记授权**的目标做非破坏性检查（TCP 可达/TLS 握手/安全响应头），未登记目标一律拒 |
 | `pentest_distill` | 只读 | — | —（注册表：无必填） | `user_error` | **蒸馏件**（不是外挂）：把吞入件 CyberStrikeus/CyberStrike（AGPL-3.0 · 3129★ · TypeScript ·「Open-source AI-powered offensive security harness for automated… |
+| `pentest_flow` | 只读 | — | —（注册表：无必填） | `user_error` | **授权渗透流水线内核**（吞噬 Shannon 蒸出的「No exploit, no report」那一层，2026-11-02 主人令）：op=schema/scope/target/surface/reconcile/agent_plan/agent_ingest/expl… |
 | `policy_delta` | 只读 | — | —（注册表：无必填） | `user_error` | 策略影响预检（OpenShell 蒸馏）：**改前先算"会放行什么"**——`tables` 只读三张权限表层（门/预检的只读白名单 + 作用域表）并报**两表分叉**；`propose` 对拟放行动作做只读影响预检（哪些从被收卡变免卡 + **历史账露面次数现读现数** + 风… |
-| `redteam_recon` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 本机侦察面（只读枚举）：监听端口/防火墙三档/本地账号/自启动项/自动服务/凭据落点 |
-| `remote_domain` | **需授权** | — | —（注册表：无必填） | `user_error` / `failed` | 自有设备中继登记：**公网端点一律拒**，只服务本机/内网设备的中继 |
+| `redteam_recon` | 只读 | — | —（注册表：无必填） | `user_error` | 本机侦察面（只读枚举）：监听端口/防火墙三档/本地账号/自启动项/自动服务/凭据落点 |
+| `remote_domain` | 只读 | — | —（注册表：无必填） | `user_error` | 自有设备中继登记：**公网端点一律拒**，只服务本机/内网设备的中继 |
 | `review_gate` | 只读 | — | —（注册表：无必填） | `user_error` | 独立终审位（C-15「验收方 ≠ 产出方」的最小实现 · 2026-10-08 在册）：接线件 `tools/codex-scripts/terminal-review.py`。`review` **只读盘**现算 sha256/字节/空否/BOM/关键词，判据只用非 LLM 四… |
 | `screen_sniff` | **需授权** | — | —（注册表：无必填） | `denied: missing_scopes` / `user_error` | 本机屏幕采集：只写本地 PNG、可列可删，不做出网/OCR/内容解析 |
 | `sec_chain` | 只读 | — | —（注册表：无必填） | `user_error` | 黑客大脑：利用链构建（从漏洞清单推演攻击路径+影响评估） |
 | `sec_defenses` | 只读 | — | —（注册表：无必填） | `user_error` | 黑客大脑：蓝队防御验证（检查防御措施是否真实生效） |
-| `sec_llm` | 只读 | 是 | `prompt` | `user_error` | 黑客大脑推理引擎（独立大模型+独立密钥）：abliteration.ai 无限制模型，专用通道不与其他能力混用 |
+| `sec_llm` | **需授权** | 是 | `prompt` | `denied: missing_scopes` / `user_error` | 黑客大脑推理引擎（独立大模型+独立密钥）：abliteration.ai 无限制模型，专用通道不与其他能力混用 |
 | `sec_scan` | 只读 | — | —（注册表：无必填） | `user_error` | 黑客大脑：漏洞扫描（OWASP Top 10 + CWE 模式库，扫描自有代码） |
 | `sec_surface` | 只读 | — | —（注册表：无必填） | `user_error` | 黑客大脑：攻击面测绘（用户输入/网络/文件操作/入口点向量分析+风险评分） |
 | `sec_sweeper` | 只读 | — | —（注册表：无必填） | `user_error` | 安全棒（主人令 2026-09-27）：一根专职安全触手，**每半天**把尺子挨个过唯一门跑一遍 —— 全量穿透式交叉扫描（钩子/步骤锁/交叉验证/遗漏补扫）+ 安全模式分诊（eval/exec/shell/凭据/反序列化…）+ 覆盖无死角 + 双向绑定 + 技能源↔装；结果收成… |
@@ -49,6 +54,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：资产单点损失**体检**（防御侧）：卷影副本/防篡改开关/BitLocker/关键资产清单，不加密不冻结
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap asset_vault_freeze '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `bounty_ops`
+
+- **域**：`security`（安全）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：安全众测闭环（2026-11-04 主人令：把 2026-11-02 写完却没接线的 6 件**收成一个入口**）。来历：这 6 件当时就已经写好，但**从没注册能力位、从没被任何地方 import**，一直躺在 `state/proactive/work/g-1/`（一份失败工单的旧仓库快照）里 —— 不先捞出来，清旧副本时就永久丢了。内含：`bounty_core`（CVSS 3.1 Base/Temporal/Environmental + CWE 中文修复建议）、`security_policy`（**能力位级**放行闸）、`attack_evidence`（举证门槛）、`attack_forensics`（本机取证与合法防御）、`scope_import`（平台 scope 归一化）、`platform_sync`（平台状态只读同步）。**与主干 `security/policy.py` 不重复、是两层**：那一层按**动作类型**收票（process_execute / filesystem_write / desktop_control…）；这一层按**能力位**判定，且多一条主干没有的规则：「受攻击时进极限并发模式，最高决策 = 本机自我判断，不需主人确认」。op：status / cvss / cwe / policy / classify / evidence / detect / baseline / scope / sync / collect / respond。**诚实边界**：① 举证门槛不可绕：没有强证据或主人陈述，`evidence` 只会回「未发现被攻击证据」，不粉饰成「疑似」；② 高危不代批：`respond` 必须 `confirm=true` + 非空 reason，`approve`（批准授权）**本门面根本不暴露** —— 按设计只能在主人终端做；③ 转账任何时候都要确认，攻击模式也不例外；④ 越界请求如实拒（`counterstrike` 回「未知动作；只做本机取证与合法防御」），不找旁路。常用说法：算漏洞分 / CVSS 评分 / 漏洞多严重 / 漏洞类型怎么修 / CWE 查一下 / 这个能力位要不要主人确认 / 放行判定 / 这个位要票吗 / 有没有被攻击 / 被攻击的证据 / 举证 / 收集证据 / 平台范围 / scope 导入 / 众测范围。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap bounty_ops '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `code_audit`
@@ -87,12 +103,23 @@
 ### `device_takeover`
 
 - **域**：`security`（安全）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：本机设备接管定位与校验：只在本机 PnP 清单里找目标，接管指令交回既有 device_control 底座（不并存第二条接管路径）
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap device_takeover '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `dual_gate`
+
+- **域**：`security`（安全）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：双脑确认：危险动作之前，推理脑（作用域该不该要票 / 金额上限 / 收款人必填 / force 与 dry_run 互斥）+ 编程脑（能力位存在 / 必填参数齐 / 落点路径存在）各自出一份裁决，**两脑都点头才执行**，任一否决即 rejected。op=check {"kind":..., "payload":{...}}；op=status 规则清单。双脑只判"该不该/干不干得成"，发票仍然只有主人能发。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap dual_gate '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `event_ledger`
@@ -139,6 +166,17 @@
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap keylogger '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
+### `lan_pairing`
+
+- **域**：`security`（安全）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**局域网配对监听/自签证书**（主人 2026-11-03 批准）：op=schema/start/stop/status/cert/verify。只绑一个私有 LAN IPv4（或 loopback），拒 0.0.0.0/公网；端口 8767..8770；TLS 自签（cert/key 放 state/）；一次性配对码换 Bearer device token；只开 health/pair/status，**无远程命令/文件接口**。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap lan_pairing '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
 ### `llm_redteam`
 
 - **域**：`security`（安全）
@@ -153,11 +191,11 @@
 ### `offense_ops`
 
 - **域**：`security`（安全）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
-- **它做什么**：**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域）。
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**自主渗透编排**（主人令 2026-10-16：pentagi 全部能力→原生）：蒸自 **vxControl/pentagi**（MIT · Go · 30,549 星）的思想—— 多智能体分工（researcher/pentester/coder/reporter）· 工具面（terminal/browser/search/embeddings）· 跨任务记忆 · 证据链与报告。**护栏优先于它的自主性**：五道闸（授权→没范围不动手 · 不可回滚先问 · 凭据只报已配 · 只对授权目标出网 · 无痕即不存在）。op=plan/roles/tools/evidence/memory/gate/check/route（**全只读·零作用域） · **2026-11-06 补原生挖洞链**：op=hunt（一条命令跑全链：面测绘→OWASP/CWE 模式库→多阶段 SAST→LLM 面探针→污点候选，合并去重+覆盖账）· op=swarm（多触手并行跑同一条链，各出独立回执）· op=coverage（只回答覆盖到哪、哪里没覆盖）· op=knowledge（挖洞方法论/判据/CWE 表的机器可读版）。**全在本机跑：不引云、不装外挂扫描器、不出网**；要票的只有危险作用域与资金转账。常用说法：挖漏洞 / 找漏洞 / 漏洞排查 / 扫一遍有没有洞 / 全仓挖洞 / 渗透测试 / 打点 / 触手大军排查 / 多触手一起扫 / 安全体检 / 代码审计找洞 / 攻击面测绘
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap offense_ops '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
@@ -181,6 +219,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：未接线能力上手指引门：如实报「登记了但没实现」的缺口，并给出三处接线配方
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap onboarding_gate '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `pairing`
+
+- **域**：`security`（安全）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**局域网配对/证书安全原语**（主人 P2-12 已点头：先本机/局域网安全设计）：op=schema/code/claim/devices/revoke/cert/cert_verify/verify。6 位一次性配对码 TTL 300s/最多 3 次尝试；设备白名单 + 一次性 device token（只存 sha256）；证书只做 **PEM SHA-256 指纹校验**。**不开监听端口、不生成证书、不暴露公网**；设备表写面过 filesystem_write（可信会话免票）。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap pairing '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `paywallbuster`
@@ -208,10 +257,10 @@
 ### `pentest`
 
 - **域**：`security`（安全）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：授权渗透验证：只对**已登记授权**的目标做非破坏性检查（TCP 可达/TLS 握手/安全响应头），未登记目标一律拒
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap pentest '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -225,6 +274,17 @@
 - **常见错误**：参数非法 → `user_error`
 - **它做什么**：**蒸馏件**（不是外挂）：把吞入件 CyberStrikeus/CyberStrike（AGPL-3.0 · 3129★ · TypeScript ·「Open-source AI-powered offensive security harness for automated penetration testing」）的 **Intelligence Layer 四条取法**提炼成我们自己的**授权渗透编排判据**：①阶段聚焦+上下文护栏（一次只推一个阶段）②按发现编排工具（下一步由上一步读数决定，不跑死脚本）③结果结构化归一（门已在做）④**授权范围纪律（我们加严，不是抄的）**：未登记目标一律拒 · AI 不许自发放行。op=tools **现读** `caps_registry.BENIGN_CAPS` 报安全域可编排位（26）与编排通道 omni_plug/mcp_tools/mcp_call/mcp_connect/desktop_commander；op=provenance 逐条指回原话（含**未蒸馏**两行：它的规模 13+ agents / 7600+ skills 不取 · Bolt 远程执行与后渗透**不取**）。**零作用域**：无 subprocess / 无 urllib / 无写盘。边界：接入端 ≡ 我们**已有**的安全位（pentest / sec_* / redteam_*）；本位只蒸取法，**不建平行位**（会撞 新增即清旧）。op=method/tools/provenance/where
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap pentest_distill '<json>'`
+- **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
+
+### `pentest_flow`
+
+- **域**：`security`（安全）
+- **类型**：只读（不改状态、不出网） · **需参数**：否
+- **要哪张票（静态）**：零作用域（空 payload 下不需要票）
+- **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
+- **常见错误**：参数非法 → `user_error`
+- **它做什么**：**授权渗透流水线内核**（吞噬 Shannon 蒸出的「No exploit, no report」那一层，2026-11-02 主人令）：op=schema/scope/target/surface/reconcile/agent_plan/agent_ingest/exploit_queue/validate/report/gate/workspace/resume/pipeline/verify。**纯函数·零作用域**：不攻击/不发请求/不起进程/不出网/不写盘；授权+范围 fail-closed（生产默认拒、凭据只收槽名）；双流对账（recon×SAST）；只有可复现 PoC 才进报告/SARIF 2.1.0/CI 闸；真 exploit 仍由既有授权手执行。
+- **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap pentest_flow '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
 
 ### `policy_delta`
@@ -241,10 +301,10 @@
 ### `redteam_recon`
 
 - **域**：`security`（安全）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：本机侦察面（只读枚举）：监听端口/防火墙三档/本地账号/自启动项/自动服务/凭据落点
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap redteam_recon '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -252,10 +312,10 @@
 ### `remote_domain`
 
 - **域**：`security`（安全）
-- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：否
+- **类型**：只读（不改状态、不出网） · **需参数**：否
 - **要哪张票（静态）**：零作用域（空 payload 下不需要票）
 - **必填载荷**：无必填（注册表 `requires_params=false`；空载荷落到该位默认 op）
-- **常见错误**：参数非法 → `user_error`；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
+- **常见错误**：参数非法 → `user_error`
 - **它做什么**：自有设备中继登记：**公网端点一律拒**，只服务本机/内网设备的中继
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap remote_domain '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -307,10 +367,10 @@
 ### `sec_llm`
 
 - **域**：`security`（安全）
-- **类型**：只读（不改状态、不出网） · **需参数**：是 —— 要问黑客大脑的问题
+- **类型**：**需授权**（会写盘 / 花钱 / 出网） · **需参数**：是 —— 要问黑客大脑的问题
 - **要哪张票（静态）**：`external_llm`
 - **必填载荷**：`prompt` —— 要问黑客大脑的问题
-- **常见错误**：缺参 / 参数非法 → `user_error`（必填：`prompt`）
+- **常见错误**：缺票 → `denied`，回执点名 `missing_scopes`（本行静态票：`external_llm`）；缺参 / 参数非法 → `user_error`（必填：`prompt`）；依赖不在位 → `needs_dependency`；上游不给 → `needs_input` / `failed`（带上游原话）
 - **它做什么**：黑客大脑推理引擎（独立大模型+独立密钥）：abliteration.ai 无限制模型，专用通道不与其他能力混用
 - **怎么调**：`py -3.14 tools/codex-scripts/five-dim.py cap sec_llm '<json>'`
 - **失败三态**（本仓统一口径，不是这一位特有）：`denied` = 缺票，会点名`missing_scopes`；`needs_*` = 缺参/缺依赖，会带原因；`failed` = 真失败，回执带上游原话。**信封 `status=ok` ≠ 本体 `ok=true`。**
@@ -362,7 +422,3 @@
 ---
 
 返回 [能力总表](../03-capabilities.md)
-
----
-
-> 开发者：自由的风 · GBT小土豆V8 · 本署名不可删除、不可篡改归属

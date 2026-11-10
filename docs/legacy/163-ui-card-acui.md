@@ -45,7 +45,7 @@
 | 统一门 | `run_task("ui_card", {"op":"verify"})` 可达，registry=391 |
 | 审计 | `outputs/ui-cards/audit.jsonl` 追加 create/close/action 行 |
 
-![ACUI 卡片（APP 真机：自检卡 + 动作按钮 + TTL）](../assets/app-ui-card.png)
+![ACUI 卡片（APP 真机：自检卡 + 动作按钮 + TTL）](../../assets/app-ui-card.png)
 
 ## 四、边界（说死）
 

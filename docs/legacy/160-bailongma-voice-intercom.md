@@ -34,7 +34,7 @@
 | 默认声 | 修复前 `Microsoft David(en-US)`；修复后 `Microsoft Hanhan(zh-TW)`（中文女声） |
 | UI | 数字人页 = 3D 身体 + 对话面板：状态灯、对话气泡、快捷指令、MIC、文字输入、发送键（截图 `assets/app-digital-human.png`） |
 
-![数字人语音对讲（真机：3D 数字人 + 对话面板 + MIC）](../assets/app-digital-human.png)
+![数字人语音对讲（真机：3D 数字人 + 对话面板 + MIC）](../../assets/app-digital-human.png)
 
 ## 四、边界（不装）
 

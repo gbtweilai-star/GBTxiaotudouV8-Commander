@@ -41,7 +41,7 @@ console 页面（/console/index.html「浏览器」页）
 | URL 安全 | `navigate('javascript:alert(1)')` → `{ok:false, error:"scheme_not_allowed"}`，页面不动 |
 | 截图 | 宿主内嵌 example.com + 标签条 + 地址栏（`assets/app-native-browser.png`） |
 
-![我们自己的原生浏览器（APP 内 WebContentsView 宿主，真机）](../assets/app-native-browser.png)
+![我们自己的原生浏览器（APP 内 WebContentsView 宿主，真机）](../../assets/app-native-browser.png)
 
 ## 四、边界（说死）
 
