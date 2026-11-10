@@ -469,3 +469,14 @@ desktop-humanoid/profile/
 # 一次性占用文件
 *.32_*# 运行日志
 desktop-humanoid/bridge.err
+
+# ============================================================================
+# 2026-11-11 修正 —— 上一条 vendor/ 与 *.mp4 误伤了运行时与测试依赖
+# 证据：avatar-roam.js:84-88 直接 loadScript("assets/vendor/three.global.js")
+#       test_console.py:81-91 断言 three.core.min.js / UnrealBloomPass / EffectComposer 必须存在
+#       tests/ 下 8 条测试读 fixtures/hand-motion*.mp4
+# ============================================================================
+!holo_pet_w3/assets/vendor
+!holo_pet_w3/assets/vendor/**
+!tests/fixtures/*.mp4
+!holo_pet_w3/assets/taste/teaser.mp4
