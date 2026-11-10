@@ -1,0 +1,6 @@
+{
+ "host": "127.0.0.1",
+ "port": 1234,
+ "key": "gbt",
+ "note": "A19 LM Pocket 端点（量化权重 gbt-v8-v82-q5_0）"
+}

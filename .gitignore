@@ -479,4 +479,10 @@ desktop-humanoid/bridge.err
 !holo_pet_w3/assets/vendor
 !holo_pet_w3/assets/vendor/**
 !tests/fixtures/*.mp4
-!holo_pet_w3/assets/taste/teaser.mp4
+!holo_pet_w3/assets/taste/teaser.mp4# runtime/ 与 vendor/ 是两回事：这里是项目自己的运行时源码
+# （runtime/README.md：真源码，可逐行审阅；docs 里 10+ 处引用 runtime/static_check.py、runtime/model_bridge.py）
+# 前导斜杠锚定仓库根，不影响 pyembed/ 等被整体忽略的第三方运行时
+!/runtime/
+!/runtime/**# 取反规则排在后面会覆盖前面的 *.pyc —— 这里补回来（只在 runtime/ 内）
+runtime/**/__pycache__/
+*runtime*/*.pyc
