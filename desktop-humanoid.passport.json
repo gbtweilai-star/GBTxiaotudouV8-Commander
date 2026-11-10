@@ -41,7 +41,7 @@
     {
       "id": 3,
       "title": "资源路径越界",
-      "rootCause": "../../holo_pet_w3/assets/..." 在 http 根下越界",
+      "rootCause": "\"../../holo_pet_w3/assets/...\" 在 http 根下越界",
       "fix": "改为 /assets/... 绝对路径",
       "verified": "所有资源按 /assets/vendor/ + /assets/dh/ 正常解析"
     },
