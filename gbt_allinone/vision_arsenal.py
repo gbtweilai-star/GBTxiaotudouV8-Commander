@@ -411,12 +411,24 @@ def _score(intent: str) -> list:
     return rows
 
 
+# 🔴 2026-11-26 根因修复：OCR 的「文字/文本」关键词太泛，把明确的**文本统计**意图
+# （统计一段文字的词数 / 数一下这段文本多少字）劫持进视觉车道，路由成 ocr 而非 count_words。
+# 这些是本体能力位（count_words）的活儿，没有图、不需要读屏。反向门禁：命中此类
+# 文本处理动词时，即便撞上「文字/文本」也不进视觉车道，交回通用主路的本体能力启发式。
+_NONVISUAL_TEXT_OPS = ("词数", "字数", "统计一段文字", "数一下", "多少个词", "多少个字",
+                        "统计词", "统计字", "计算词", "计算字", "words count")
+
+
 def matched(intent: str) -> bool:
     """意图是否真的落在视觉作战区的词汇表里。
 
     给大脑车道做门禁：宁可漏判（交回通用主路），也不要用外挂提示词误劫持
     —— 实测「帮我写个 python 脚本读 csv」会被裸「读」误命中。
     """
+    q = (intent or "").lower()
+    # 明确的文本统计/处理意图 ⇒ 不是视觉活，交回本体能力主路（如 count_words）
+    if any(op in q for op in _NONVISUAL_TEXT_OPS):
+        return False
     return bool(_score(intent))
 
 

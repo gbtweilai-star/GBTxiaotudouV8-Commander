@@ -75,7 +75,7 @@ def see(image=None, capture=False, region=None, do_text=True, do_pixel=True, do_
     sem_ok = os.environ.get("GBT_VISION_SEMANTIC") == "1"
     lane["semantic"] = ({"ok": True, "note": "理解通道已启用"} if sem_ok else
                         {"ok": False, "reason": "未读到（缺图像理解通道：teamorouter 401 / 本地 8111 未监听）"
-                                               "—— 像素与文字已给，语义不编"})
+                                                "—— 像素与文字已给，语义不编"})
     ok = bool(lane.get("pixel", {}).get("ok")) or bool(lane.get("text", {}).get("ok"))
     return {"ok": ok, "op": "see", "lanes": lane,
             "readout": {"像素": lane.get("pixel", {}).get("ok"), "文字": lane.get("text", {}).get("ok"),

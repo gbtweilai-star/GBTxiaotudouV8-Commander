@@ -394,6 +394,10 @@ DISTILLED_DOMAINS = {
     "infra": "gbt-infra",             # cloud_pc：PROVISION 花钱+不可逆、RELEASE 不可逆，零作用域
     "social": "gbt-social",           # auto_publish：发布/提现/改价要人；零作用域、门在模块里
     "collab": "gbt-collab",           # stigmergy：唯一写 op=deposit 真写盘；零作用域
+    # ── 2026-11-26 补三个在队域（主人令「按顺序追踪修复补齐」）──
+    "desktop": "gbt-desktop",         # 2 位：ul_tars_desktop（读零/起进程挂两作用域）+ control_loop（快慢双脑，只决策不动手）
+    "body_control": "gbt-body_control",  # 1 位：身体状态口，零作用域，move 永远拒（如实报缺）
+    "ui": "gbt-ui_card",              # 1 位：ACUI 卡片协议，纯函数零作用域，动作只回发事件
 }
 DISTILLED_CLUSTERS = {
     "arkcli": "gbt-arkcli",           # 外部 CLI：用法规程（前缀/两道闸/路由表/纪律）
@@ -418,6 +422,9 @@ DISTILLED_CLUSTERS = {
     "remotion": "gbt-remotion",       # 12 条：React 造视频（⚠️ 裸名 `remotion` 是另一条簇，不在本簇口径内）
     "hyperframes": "gbt-hyperframes",  # 8 条：HTML 合成做视频（上游技能在 `~/.agents/skills/` 共享目录）
     "chengfeng": "gbt-chengfeng",     # 7 条：中文口播工具链；⚠️ Runtime 与 Studio 现读**未装**，脚本被平铺丢了插件外壳
+    "novel": "gbt-novel",             # 7 条：小说→短剧端到端流水线（outline→characters→art→script→staging→storyboard→成片）
+    "pro": "gbt-pro",                 # 3 条：专业工序包（记账/合同/客服），产出工序结果不替代专业资质
+    "chinese": "gbt-chinese",         # 4 条：中文工程化与研发协作规范（代码审查/Commit规范/文档排版/国内Git）
 }
 # 我们自己的技能簇 —— 它们**就是**蒸馏件，不该被列成"待蒸的外来技能"
 SELF_CLUSTERS = {"gbt"}

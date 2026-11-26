@@ -1,6 +1,6 @@
-# GBT cap: devoured_mangiucugna_json_repair
+# GBT cap: slugify-test
 # ⛔ 开发者：自由的风 · 永久钢印 · 禁止删除
-"""caps/devoured_mangiucugna_json_repair/run.py — 吞噬知识胶囊: mangiucugna/json_repair"""
+"""caps/slugify-test/run.py — 吞噬知识胶囊: sindresorhus/slugify"""
 import json, sys
 from pathlib import Path
 
@@ -12,7 +12,7 @@ def do_knowledge(params=None):
     return {"ok": False, "error": "absorbed_knowledge.md 缺失"}
 
 def do_status(params=None):
-    return {"ok": True, "cap": "devoured_mangiucugna_json_repair", "tier": "knowledge", "has_knowledge": ABS.exists()}
+    return {"ok": True, "cap": "slugify-test", "tier": "knowledge", "has_knowledge": ABS.exists()}
 
 HANDLERS = {"knowledge": do_knowledge, "run": do_knowledge, "status": do_status}
 

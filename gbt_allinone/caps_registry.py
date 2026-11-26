@@ -3855,6 +3855,22 @@ BENIGN_CAPS = {
         "handler": 'vision_track',
         "safe": True,
     },
+    # 🔴 2026-11-26 主人令「把能力全部整合融入触手、改名GBT万能插、没有固定插座」：
+    #   GBT万能插 = 动态接口融合层 —— 给任意连接点（路径/URL/命令/端点），自动识别
+    #   （omni_adapter.classify）→ 自动生成接口描述符（ops 签名）→ 落盘插上 → 触手可调。
+    #   所有真执行转 run_task("omni_plug", op=universal)，门由 policy 现场判类（本层不绕门）。
+    "gbt_universal_plug": {
+        "domain": 'llm',
+        "desc": ('GBT万能插（动态接口融合层）：**没有固定插座**——给任意连接点就自动识别、自动生成接口、自动插上并可调。'
+                 'op=schema（契约，读类）· plug（登记连接点：classify→生成 ops 接口描述符→落盘持久化）· '
+                 'unplug · ports/list（列出已插连接点及接口签名）· describe · '
+                 'autoconnect（扫可插面，认得出的都插上）· verify（判据自检）；'
+                 '**op=invoke 是调用出口：只转 run_task("omni_plug",op=universal)，门由 policy 现场判类，本层绝不绕门**。'
+                 '认得出但执行器未接的（ws/mcp/remote）如实标 not_wired，不冒充可用。'
+                 '常用说法：GBT万能插 / 万能插 / 没有固定插座 / 自动识别接口 / 生成接口插入 / 插上就能调用 / 融入触手。'),
+        "handler": 'gbt_universal_plug',
+        "safe": True,   # 读类/登记/生成接口是零副作用；invoke 的真执行在下游 omni_plug 门里判
+    },
 }
 
 

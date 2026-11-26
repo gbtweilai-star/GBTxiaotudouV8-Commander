@@ -509,6 +509,21 @@ def scan(autofix: bool = False, full: bool = False) -> dict:
     routing = check_routing()
     modules = check_modules()
     store_sec = check_store(full=full)
+    # 🔴 2026-11-26 根因修复（主人令「追踪根因修复好」）：
+    #   此前 `cap selfscan` 每次报 P0「缺目录」却永不补建 —— 补建只挂在
+    #   `_autofix`（autofix=True）里，而 api 层默认 autofix=False ⇒ 只报不修，
+    #   缺失状态永久挂起。根因是「存储骨架无初始化逻辑，且自愈不默认触发」。
+    #   修复：把「补建缺失目录」从 autofix 写盘动作里拆出来，作为体检本职在
+    #   scan() 内直接做 —— 补目录是纯增量、幂等、不覆盖任何数据，不是改状态
+    #   的高风险动作；损坏 JSON 的「备份后重置」仍只在 autofix=True 时做（那才改状态）。
+    #   补建后立即复验，store_sec 用复验结果，P0 不再因已补的目录误报。
+    _skeleton_fixed = []
+    if store_sec.get("missing_dirs"):
+        _store = __import__("gbt_allinone._paths", fromlist=["STORE_DIR"]).STORE_DIR
+        for _d in store_sec["missing_dirs"]:
+            (_store / _d).mkdir(parents=True, exist_ok=True)
+            _skeleton_fixed.append("store/" + _d)
+        store_sec = check_store(full=full)
     audit_sec = check_audit()
     stubs = sorted(_routed_kinds()[2])
 
@@ -531,6 +546,8 @@ def scan(autofix: bool = False, full: bool = False) -> dict:
     if any(f.startswith("P0") for f in findings):
         verdict = "P0"
 
+    if _skeleton_fixed:
+        findings.append("已补建存储骨架: " + ", ".join(_skeleton_fixed))
     fixed = _autofix(store_sec) if autofix else []
     if fixed:
         store_sec = check_store()  # 复验

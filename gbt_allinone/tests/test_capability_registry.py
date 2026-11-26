@@ -282,8 +282,10 @@ class TestRegistryNoDuplicateKeys(unittest.TestCase):
         钉数本身只是"有没有人悄悄动了注册表"的护栏：
         2026-11-10 加 `t2i_agnes`（registry + `api.py` 分派 + `tools/agnes_image.py`
         三处齐、`op=status` 真回钥位）后，真值从 427 → 428。
+        2026-11-26 加 `gbt_universal_plug`（GBT万能插动态接口融合层：registry +
+        `api.py` 分派 + `universal_plug.py` + 9 条判据测试三处齐）后，真值 428 → 429。
         """
-        self.assertEqual(len(CR.BENIGN_CAPS), 428)
+        self.assertEqual(len(CR.BENIGN_CAPS), 429)
         self.assertFalse(_duplicate_literal_keys(REGISTRY_PY))
 
 

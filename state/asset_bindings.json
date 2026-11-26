@@ -119,7 +119,8 @@
    "look_grade",
    "mcp_register",
    "t2i_agnes",
-   "cloud_llm"
+   "cloud_llm",
+   "gbt_universal_plug"
   ],
   "note": "autobind",
   "bound_at": "2026-11-02T23:53:37"
@@ -158,7 +159,8 @@
    "codepage",
    "skills_hub",
    "t2i_agnes",
-   "i2v_agnes"
+   "i2v_agnes",
+   "gbt_universal_plug"
   ],
   "note": "autobind",
   "bound_at": "2026-11-02T23:53:37"
@@ -677,13 +679,6 @@
   ],
   "note": "autobind",
   "bound_at": "2026-11-03T05:54:35"
- },
- "gbt_allinone/secrets/event_ledger_key.dpapi": {
-  "tentacles": [
-   "ui_kit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-03T05:57:12"
  },
  "gbt_allinone/tools/look_grade_cap.py": {
   "tentacles": [
@@ -3737,117 +3732,11 @@
    "omni_plug",
    "git_read",
    "tentacle_status",
-   "selfscan"
+   "selfscan",
+   "gbt_universal_plug"
   ],
   "note": "autobind",
   "bound_at": "2026-11-05T00:46:36"
- },
- "gbt_allinone/store/life_vault/.gbt-life-manifest.json": {
-  "tentacles": [
-   "filmkit"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/README.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Timeline.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Projects/Index.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/People/Index.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Lessons/Index.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Chapters/Index.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Capabilities/Index.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/Attachments/.keep": {
-  "tentacles": [
-   "omni_plug"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/00_Meta/Commitments.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/00_Meta/Habits.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/00_Meta/Identity.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life_vault/00_Meta/Values.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life/state.json": {
-  "tentacles": [
-   "omni_plug",
-   "tentacle_status",
-   "selfscan"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
- },
- "gbt_allinone/store/life/state.json.lock": {
-  "tentacles": [
-   "omni_plug"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T00:58:02"
  },
  "gbt_allinone/tests/test_brain_health_vision.py": {
   "tentacles": [
@@ -3861,7 +3750,11 @@
   "tentacles": [
    "selfscan",
    "brain_vault",
-   "omni_plug"
+   "omni_plug",
+   "quant_params",
+   "devour_github",
+   "tentacle",
+   "brain_route"
   ],
   "note": "autobind",
   "bound_at": "2026-11-05T01:21:27"
@@ -3917,27 +3810,6 @@
   ],
   "note": "autobind",
   "bound_at": "2026-11-05T01:51:01"
- },
- "gbt_allinone/store/life/events.jsonl": {
-  "tentacles": [
-   "selfscan"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T02:15:50"
- },
- "gbt_allinone/store/life/events.jsonl.lock": {
-  "tentacles": [
-   "selfscan"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T02:15:50"
- },
- "gbt_allinone/store/life/life.lock": {
-  "tentacles": [
-   "selfscan"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T02:15:50"
  },
  "docs/capabilities/system.md": {
   "tentacles": [
@@ -4157,7 +4029,8 @@
  "tools/codex-scripts/omni.py": {
   "tentacles": [
    "impact_check",
-   "omni_plug"
+   "omni_plug",
+   "alerts"
   ],
   "note": "autobind",
   "bound_at": "2026-11-05T05:10:33"
@@ -4211,27 +4084,6 @@
   ],
   "note": "autobind",
   "bound_at": "2026-11-05T06:41:20"
- },
- "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/absorbed_knowledge.md": {
-  "tentacles": [
-   "project_context"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T07:34:20"
- },
- "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/knowledge.json": {
-  "tentacles": [
-   "impact_check"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T07:34:20"
- },
- "gbt_allinone/store/devoured/devoured_mangiucugna_json_repair/run.py": {
-  "tentacles": [
-   "impact_check"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-05T07:34:20"
  },
  "gbt_allinone/tools/responses_bridge.py": {
   "tentacles": [
@@ -4425,7 +4277,8 @@
    "trunk_cover",
    "impact_check",
    "codepage",
-   "cap_self"
+   "cap_self",
+   "mcp_servers"
   ],
   "note": "autobind",
   "bound_at": "2026-11-06T00:45:16"
@@ -4556,13 +4409,6 @@
   ],
   "note": "autobind",
   "bound_at": "2026-11-06T02:20:59"
- },
- "gbt_allinone/.env": {
-  "tentacles": [
-   "pentest_flow"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-06T02:25:01"
  },
  "gbt_allinone/tools/pentest_flow.py": {
   "tentacles": [
@@ -5981,22 +5827,6 @@
   "note": "autobind",
   "bound_at": "2026-11-07T13:39:23"
  },
- "tools/rtservo/daemon.log": {
-  "tentacles": [
-   "echo",
-   "tentacle",
-   "voice_studio",
-   "cap_self",
-   "commander",
-   "digital_human",
-   "record_grid",
-   "tentacle_status",
-   "impact_check",
-   "cloud_llm"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-07T16:43:15"
- },
  "tools/rtservo/daemon.pid": {
   "tentacles": [
    "echo",
@@ -6035,13 +5865,6 @@
   "bound_at": "2026-11-07T16:43:15"
  },
  "tools/rtservo/RtServo.exe": {
-  "tentacles": [
-   "echo"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-07T16:43:15"
- },
- "tools/rtservo/rtservo.log": {
   "tentacles": [
    "echo"
   ],
@@ -9267,20 +9090,6 @@
   "note": "autobind",
   "bound_at": "2026-11-09T13:23:16"
  },
- "gbt_allinone/store/vision/20261109-132044.json": {
-  "tentacles": [
-   "skills_hub"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T13:23:16"
- },
- "gbt_allinone/store/vision/20261109-132130.json": {
-  "tentacles": [
-   "skills_hub"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T13:23:16"
- },
  "gbt_allinone/tentacle/skills_hub.py": {
   "tentacles": [
    "skills_hub"
@@ -10923,126 +10732,6 @@
   "bound_at": "2026-11-09T14:22:22"
  },
  "skills/design-templates/last30days/scripts/lib/__init__.py": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/bird-search.mjs": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/LICENSE": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/package.json": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/cookies.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/features.json": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/paginate-cursor.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/query-ids.json": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/runtime-features.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/runtime-query-ids.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-base.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-constants.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-features.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-search.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-types.js": {
-  "tentacles": [
-   "skills_hub",
-   "focus_stack"
-  ],
-  "note": "autobind",
-  "bound_at": "2026-11-09T14:22:22"
- },
- "skills/design-templates/last30days/scripts/lib/vendor/bird-search/lib/twitter-client-utils.js": {
   "tentacles": [
    "skills_hub",
    "focus_stack"
@@ -43193,5 +42882,127 @@
   ],
   "note": "autobind",
   "bound_at": "2026-11-10T23:01:20"
+ },
+ "skills/gbt-ui_card/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T07:07:15"
+ },
+ "skills/gbt-pro/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T07:07:15"
+ },
+ "skills/gbt-novel/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T07:07:15"
+ },
+ "skills/gbt-chinese/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T07:07:15"
+ },
+ "skills/gbt-body_control/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T07:07:15"
+ },
+ "gbt_allinone/store/devoured/slugify-test/absorbed_knowledge.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:10:29"
+ },
+ "gbt_allinone/store/devoured/slugify-test/knowledge.json": {
+  "tentacles": [
+   "devour_github"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:10:29"
+ },
+ "gbt_allinone/store/devoured/slugify-test/run.py": {
+  "tentacles": [
+   "devour_github"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:10:29"
+ },
+ "gbt_allinone/hygiene.py": {
+  "tentacles": [
+   "selfscan"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:13:59"
+ },
+ "gbt_allinone/universal_plug.py": {
+  "tentacles": [
+   "gbt_universal_plug",
+   "mcp_servers",
+   "omni_plug"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:29:18"
+ },
+ "gbt_allinone/tests/test_universal_plug.py": {
+  "tentacles": [
+   "mcp_servers"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:31:32"
+ },
+ "skills/gbt-universal-plug/SKILL.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T08:33:21"
+ },
+ "gbt_allinone/vision_unified.py": {
+  "tentacles": [
+   "tentacle_manifest"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T09:02:02"
+ },
+ "gbt_allinone/native_browser.py": {
+  "tentacles": [
+   "gbt_universal_plug",
+   "vision"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T09:54:42"
+ },
+ "docs/万能插与触手-落地用法速查.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T11:23:32"
+ },
+ "skills/gbt-universal-plug/references/落地用法速查.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T11:23:32"
+ },
+ "skills/gbt-tentacle/references/落地用法速查.md": {
+  "tentacles": [
+   "project_context"
+  ],
+  "note": "autobind",
+  "bound_at": "2026-11-26T11:23:32"
  }
 }

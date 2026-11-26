@@ -105,6 +105,39 @@ os.replace(tmp, path)          # 同卷原子
 口径：跑错解释器 = **fail**（用错工具，不是缺件）；仓内没有 pyembed = `needs_dependency`
 （开发仓本来就不携带运行时，不许因此恒红）。
 
+## 2.5 四条操作纪律（**所有对话窗口默认生效 · 2026-11-26 主人令**）
+
+> 主人原话：「现在把所有对话窗口，以GBT万能插为主执行器，操作的时候必须默认打开的能力脑、眼、手，
+> 同步执行以及排查故障的时候必须使用触手把故障区块关联的所有链路都监控主避免修一处坏一处，
+> 修复和部署还是走镜像多维度空间避免把生产环境面板污染了」。
+
+这四条是**每次操作的默认动作**，不是提醒项；新会话/任何对话窗口都照此执行，与 §0 视觉链路、§2.4 三条默认叠加生效。
+
+| # | 纪律 | 必须怎么做（现成落点，不另起炉灶） | 违反的后果 |
+|---|---|---|---|
+| **D1 主执行器 = GBT万能插** | 凡要碰触手以外的东西（文件 / 进程 / HTTP / 端口 / 页面 / GUI / 新连接点）| 默认走 `gbt_universal_plug`（动态接口融合层）→ 其 `invoke` 转 `omni_plug` 唯一门；老 `omni_plug` 能力一个没丢，两者并存 | 自己写 `subprocess`/`urllib`/裸 `open` = 绕开插座与作用域门（§2.4 同款） |
+| **D2 脑·眼·手默认同开、同步执行** | 任何"看+判+动手"的操作 | 默认打开并一次同拍跑：`vision_loop.loop(goal, dry=False, expect=...)` —— ①眼 `look()` ②脑 `think()` ③手 `act()` ④验 `verify()`；眼没看到/脑 BLOCKED 就停下，**绝不盲动** | 截图转文字盲操作、单帧当实时、动手后不验 —— §0 明令禁止 |
+| **D3 排查故障 = 触手监控全部关联链路** | 改任何代码/配置前，以及排查故障时 | 先用触手把故障区块**关联的所有链路**都纳入监控：`impact_check op=impact {"targets":[...],"depth":N}`（改前查 1 跳必验 + 强依赖面；`wiring.json` 邻接图）→ 动后 `op=recent` 看万能插这动撞到谁 → `cross_scan`/`truth_scan`（跨维一致性）→ `shadow_check`（影子/非限定引用）；**看得全才动手**，避免修一处坏一处 | 只看单点就改 = 拿运气换进度；影子模块被误引用 = 静默解析错位 |
+| **D4 修复与部署走镜像多维空间** | 任何"改完要部署/晋升"的动作 | 全程在镜像隔离带做：`mirror_space` 的 `dimension/reality` 任意改 + `mirror_plan`→`mirror_rehearse`（排练验证）→ 通过后才 `mirror_release`（内部 `deployment_rehearsal.release()` → `mirror_space.ascend()` **唯一生产写入**）；复杂改动先用 `room_space` 开隔离房间排练（房间不碰全局 reality）；`qiankun` 走完整镜像→验证→晋升链。**绝不绕过 rehearsal 直接 ascend/release** | 跳过排练直写生产 = 污染面板；`ascend` 是唯一生产写入口，门在 policy.py:520-544（deploy_publish / deploy_force，owner_override 不自带授权） |
+
+**四条的执行顺序（每次操作固定）**：
+```
+D2 开脑眼手（看现状） → D3 触手扫全关联链路（看会撞到谁）
+  → D1 经 GBT万能插执行（唯一门+作用域） → D3 动后 impact_check 复看波及
+  → D4 镜像 rehearsal 验证 →（通过才）release 晋升
+```
+
+**机器判据**（不靠记忆，逐条可验）：
+```powershell
+.\pyembed\python.exe tools\codex-scripts\guard-three.py          # 三条默认闸（§2.4）
+.\pyembed\python.exe tools\codex-scripts\five-dim.py cap gbt_universal_plug '{"op":"verify"}'   # D1
+.\pyembed\python.exe tools\codex-scripts\five-dim.py cap vision_loop '{"op":"status"}'          # D2
+.\pyembed\python.exe tools\codex-scripts\five-dim.py cap impact_check '{"op":"impact","targets":["gbt_allinone/xxx.py"],"depth":1}'  # D3 改前查关联
+.\pyembed\python.exe tools\codex-scripts\five-dim.py cap impact_check '{"op":"recent"}'          # D3 动后看波及
+.\pyembed\python.exe tools\codex-scripts\five-dim.py cap mirror_status                           # D4 镜像/生产漂移
+```
+**硬边界**：D1/D4 不因"万能插方便"就绕门或跳过镜像；门（policy 作用域）与生产隔离照旧，纪律只加"默认打开"，不加"免检通道"。
+
 ## 3. 路径规则（2026-11-04 全仓整治后）
 
 **禁止**写死 `C:\Users\<某个人>\...`。本机曾散落 146 处指向不存在用户的路径，全部失效。

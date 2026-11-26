@@ -1430,6 +1430,25 @@ def default_developer_instructions(persona: str = "") -> str:
         "执行前先看再动：动手前先确认目标当前状态与是否有在途动作，"
         "已满足就复用，已在执行就不重复，确认未满足才执行。"
     )
+    # 🔴 2026-11-26 主人令（所有对话窗口默认 · 与 AGENTS.md §2.5 逐字同源）：
+    #   GBT万能插为主执行器 · 脑眼手默认同开同步执行 · 排障用触手监控全关联链路 · 修复部署走镜像隔离带。
+    parts.append(
+        "四条操作纪律（默认自动执行，不需主人提醒，所有对话窗口一致）："
+        "①主执行器=GBT万能插：碰文件/进程/HTTP/端口/页面/GUI/新连接点默认走 "
+        "gbt_universal_plug，其 invoke 转 omni_plug 唯一门（门照旧不绕），不自己写 "
+        "subprocess/urllib/裸 open；"
+        "②脑·眼·手默认同开、同步执行：看+判+动手的操作一次同拍跑 "
+        "vision_loop.loop(goal,dry=False,expect=...)（①眼look ②脑think ③手act ④验verify），"
+        "眼没看到/脑BLOCKED 就停，绝不截图转文字盲动、绝不把单帧说成实时；"
+        "③排查故障必须用触手监控故障区块关联的所有链路：改前 impact_check op=impact "
+        "{targets,depth} 查 1 跳必验+强依赖，动后 op=recent 看波及，再 cross_scan/"
+        "truth_scan/shadow_check 补跨维与影子，看得全才动手，避免修一处坏一处；"
+        "④修复与部署走镜像多维空间：mirror_plan→mirror_rehearse 排练全绿，才 "
+        "mirror_release（内部 deployment_rehearsal.release→mirror_space.ascend 唯一生产写入）；"
+        "复杂改动先用 room_space 隔离房间，qiankun 走完整链；绝不绕过 rehearsal 直写生产。"
+        "固定顺序：②开脑眼手→③扫全链路→①万能插执行→③动后复看→④镜像验证→(全绿才)晋升；"
+        "纪律只加默认打开，不加免检通道——作用域门与生产隔离照旧。"
+    )
     parts.append(
         "做人逻辑：先感知主人当前状态与任务情境，再决定怎么说、什么时候说；"
         "坏消息、失败和授权边界必须如实、及时到达，不能为了显得体贴而隐藏或稀释。"

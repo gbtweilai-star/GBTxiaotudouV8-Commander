@@ -1219,6 +1219,22 @@ def click_element(selector, tab_id=None, port=None,
         x, y = point
         via = "cdp-input"
         error = None
+        # 🔴 2026-11-26 实测抓出（六铁律⑤「每步亲眼验证」）：CDP Input 在**非活动 tab**
+        #   上会静默无效 —— mousePressed/mouseReleased 都派出去了，元素 box 坐标也对
+        #   （elementFromPoint 命中目标），但页面 click handler 根本不触发，函数却报
+        #   clicked:true。修法两层：① 点击前 Page.bringToFront 把 tab 激活；② 注入一次性
+        #   探针，派发后**读回验证**，没触发就自动降级 _pointer_sequence（真 JS 事件序列）。
+        try:
+            client.call("Page.bringToFront", {}, timeout=timeout)
+        except Exception:                                         # 激活失败不影响后续降级判断
+            pass
+        # 注入 click 探针（一次性、用完移除，不污染页面）
+        _probe = ("(() => {const e=document.querySelector(%s);if(!e)return 0;"
+                  "window.__gbt_click_probe=0;"
+                  "window.__gbt_click_fn=function(){window.__gbt_click_probe++;};"
+                  "e.addEventListener('click',window.__gbt_click_fn);return 1;})()"
+                  % json.dumps(str(selector)))
+        _eval_js(client, _probe, timeout=timeout)
         try:
             client.call("Input.dispatchMouseEvent",
                         {"type": "mouseMoved", "x": x, "y": y,
@@ -1232,10 +1248,24 @@ def click_element(selector, tab_id=None, port=None,
                         {"type": "mouseReleased", "x": x, "y": y, "button": "left",
                          "buttons": 0, "clickCount": 1, "pointerType": "mouse"},
                         timeout=timeout)
+            # 读回探针：CDP Input 到底有没有真的触发页面 click
+            fired = int(_eval_js(client, "window.__gbt_click_probe||0", timeout=timeout) or 0)
+            if fired <= 0:
+                error = "cdp-input 派发后 click 探针未触发（非活动 tab/渲染器未处理）⇒ 降级 JS 事件"
+                via = "js-pointer-sequence"
+                _pointer_sequence(client, selector, timeout)
         except Exception as exc:  # noqa: BLE001 —— 退路必须真的能退
             error = f"{type(exc).__name__}: {exc}"[:200]
             via = "js-pointer-sequence"
             _pointer_sequence(client, selector, timeout)
+        # 清理探针
+        try:
+            _eval_js(client, ("(() => {const e=document.querySelector(%s);"
+                              "if(e&&window.__gbt_click_fn)e.removeEventListener('click',window.__gbt_click_fn);"
+                              "delete window.__gbt_click_probe;delete window.__gbt_click_fn;return 1;})()"
+                              % json.dumps(str(selector))), timeout=timeout)
+        except Exception:
+            pass
         return {
             "ok": True,
             "tab_id": tab.get("id"),

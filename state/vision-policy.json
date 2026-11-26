@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "owner_order": "2026-11-07 · 原生视觉实时链路定为默认主流",
+  "default_lane": "native_realtime",
+  "chain": [
+    "continuous_capture",
+    "native_observe",
+    "model_sees_frames_directly",
+    "action_via_omni_plug",
+    "frame_diff_verify"
+  ],
+  "rules": {
+    "freshness_ms": 400,
+    "frames_go_to_model_directly": true,
+    "forbid_screenshot_then_text_then_blind_action": true,
+    "note": "万能插直接看帧/视频回传大模型看；原生能力脑眼手同步实时执行。帧直接给模型，禁止截图→转文字→盲操作的老链路默认化。"
+  },
+  "forbidden_defaults": [
+    "screenshot_then_text_then_blind_action"
+  ],
+  "wiring": {
+    "chat_layer": "pending",
+    "note": "对话层帧直送大模型为 pending：链路判据已固化，GUI 对话层接线状态如实标 pending，不冒充已打通。"
+  },
+  "evidence": {
+    "registry_caps": ["vision_loop", "body_realtime"],
+    "stale_ms": 400,
+    "doc": "docs/原生视觉实时链路.md",
+    "blueprint_mark": "2026-11-07 · 原生视觉实时链路定为默认主流"
+  }
+}

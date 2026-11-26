@@ -2085,6 +2085,13 @@ def _run_benign(kind, payload, policy_decision=None):
         from . import omni_plug as _op
         p = payload or {}
         return _op.run(p.get("op", "status"), **{k: v for k, v in p.items() if k != "op"})
+    if kind == "gbt_universal_plug":
+        # 🔴 2026-11-26 主人令「改名GBT万能插·没有固定插座·有连接点就自动识别生成接口插入调用·融入触手」：
+        #   动态接口融合层 —— 读类/登记/生成接口零作用域；invoke 只转交 omni_plug 唯一门，
+        #   由 policy 现场判类挂作用域（本层不绕门）。与 omni_plug 共用同一 classify 真源。
+        from . import universal_plug as _up
+        p = payload or {}
+        return _up.run(p.get("op", "schema"), **{k: v for k, v in p.items() if k != "op"})
     if kind == "media_stamp":
         # 音视频钢印：署名写进容器元数据 + ffprobe 回读校验（读类三 op 直连，stamp 过写门）
         from .tools import media_stamp as _ms

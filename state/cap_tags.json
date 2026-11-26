@@ -1,8 +1,8 @@
 {
- "at": "2026-11-09T13:27:19",
- "count": 428,
+ "at": "2026-11-26T11:21:45",
+ "count": 429,
  "by_permission": {
-  "open": 381,
+  "open": 382,
   "owner": 47
  },
  "duplicate_tags": {},
@@ -3119,6 +3119,13 @@
   "vision_track": {
    "tag": "GBT-VISION-VISION-TRACK",
    "domain": "vision",
+   "permission": "open",
+   "scopes": [],
+   "why": "policy 无作用域"
+  },
+  "gbt_universal_plug": {
+   "tag": "GBT-LLM-GBT-UNIVERSAL-PLUG",
+   "domain": "llm",
    "permission": "open",
    "scopes": [],
    "why": "policy 无作用域"

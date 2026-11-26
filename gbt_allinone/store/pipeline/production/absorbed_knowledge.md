@@ -1,181 +1,330 @@
-# mangiucugna/json_repair 吞噬记录 — devour_tentacle
-> 吞噬日期: 2026-11-05T07:31:15 | 来源: https://github.com/mangiucugna/json_repair
-> Stars: 5132 | 语言: Python | 许可: MIT
+# sindresorhus/slugify 吞噬记录 — devour_tentacle
+> 吞噬日期: 2026-11-26T08:10:29 | 来源: https://github.com/sindresorhus/slugify
+> Stars: 2713 | 语言: JavaScript | 许可: MIT
 
 ## 项目概览
-- 描述: Repair malformed JSON from LLMs, APIs, logs, and user input in Python.
-- 主题: cli, json, json-repair, json-schema, llm, llm-output, malformed-json, parser, pydantic, python
-- 分支: main | 最近推送: 2026-11-03
+- 描述: Slugify a string
+- 主题: browser, nodejs, npm-package, slug, slugify, transliteration, url-safe
+- 分支: main | 最近推送: 2026-11-08
 
 ## README 摘要
-[![PyPI](https://img.shields.io/pypi/v/json-repair)](https://pypi.org/project/json-repair/)
-![Python version](https://img.shields.io/badge/python-3.10+-important)
-[![PyPI downloads](https://img.shields.io/pypi/dm/json-repair)](https://pypi.org/project/json-repair/)
-[![PyPI Downloads](https://static.pepy.tech/badge/json-repair)](https://pepy.tech/projects/json-repair)
-[![Github Sponsors](https://img.shields.io/github/sponsors/mangiucugna)](https://github.com/sponsors/mangiucugna)
-[![GitHub Repo stars](https://img.shields.io/github/stars/mangiucugna/json_repair?style=flat)](https://github.com/mangiucugna/json_repair/stargazers)
+# slugify
 
-English | [中文](https://github.com/mangiucugna/json_repair/blob/main/README.zh.md)
+> Slugify a string
 
-# json_repair
+Useful for URLs, filenames, and IDs.
 
-Repair malformed JSON from LLMs, APIs, logs, and user input in Python.
+It handles most major languages, including [German (umlauts)](https://en.wikipedia.org/wiki/Germanic_umlaut), Vietnamese, Arabic, Russian, [and more](https://github.com/sindresorhus/transliterate#supported-languages).
 
-- Fix missing quotes, commas, brackets, comments, stray prose, and truncated values.
-- Use it as a drop-in fallback for `json.loads()` or as a schema-guided repair step.
-- Install with `pip install json-repair` or try the [live demo](https://mangiucugna.github.io/json_repair/).
+## Install
 
-![banner](https://raw.githubusercontent.com/mangiucugna/json_repair/main/banner.png)
-
----
-
-## Quick example
-
-```python
-import json_repair
-
-bad_json = '{"users":[{"name":"Ada","role":"admin",}],"ok":true'
-decoded_object = json_repair.loads(bad_json)
-
-# {'users': [{'name': 'Ada', 'role': 'admin'}], 'ok': True}
+```sh
+npm install @sindresorhus/slugify
 ```
 
-If `json_repair` saves you time, [star the repository](https://github.com/mangiucugna/json_repair) so more people can find it.
+## Usage
 
----
+```js
+import slugify from '@sindresorhus/slugify';
 
-# Demo
-If you are unsure whether this library will fix your specific problem, or simply want your JSON validated online, try one of these:
+slugify('I ♥ Dogs');
+//=> 'i-love-dogs'
 
-- Live demo: https://mangiucugna.github.io/json_repair/
-- Audio overview: [NotebookLM introduction](https://notebooklm.google.com/notebook/05312bb3-f6f3-4e49-a99b-bd51db64520b/audio)
+slugify('  Déjà Vu!  ');
+//=> 'deja-vu'
 
-## Premium sponsors
-- [Icana-AI](https://github.com/Icana-AI) Makers of CallCoach, the world's best Call Centre AI Coach. Visit [https://www.icana.ai/](https://www.icana.ai/)
-- [mjharte](https://github.com/mjharte)
+slugify('fooBar 123 $#%');
+//=> 'foo-bar-123'
 
----
+slugify('Conway’s Law');
+//=> 'conways-law'
 
-# Think about sponsoring this library!
-This library is free for everyone and is maintained as a side project, so if it helps your work, consider becoming a sponsor: https://github.com/sponsors/mangiucugna
-
----
-
-# Motivation
-Some LLMs are a bit iffy when it comes to returning well formed JSON data, sometimes they skip a parentheses and sometimes they add some words in it, because that's what an LLM does.
-Luckily, the mistakes LLMs make are simple enough to be fixed without destroying the content.
-
-I searched for a lightweight python package that was able to reliably fix this problem but couldn't find any.
-
-*So I wrote one*
-
-# Supported use cases
-
-### Fixing Syntax Errors in JSON
-
-- Missing quotes, misplaced commas, unescaped characters, and incomplete key-value pairs.
-- Missing quotation marks, improperly formatted values (true, false, null), and repairs corrupted key-value structures.
-- Python-style tuples: comma-separated parenthesized sequences become JSON arrays, while a single parenthesized value remains a scalar. Within arrays, objects, and tuples, `true`/`false`/`null` and `None` are recognized case-insensitively as JSON booleans or null.
-
-### Repairing Malformed JSON Arrays and Objects
-
-- Incomplete or broken arrays/objects by adding necessary elements (e.g., commas, brackets) or default values (null, "").
-- The library can process JSON that includes extra non-JSON characters like comments or improperly placed characters, cleaning them up while maintaining valid structure.
-
-### Auto-Completion for Missing JSON Values
-
-- Automatically completes missing values in JSON fields with reasonable defaults (like empty strings or null), ensuring validity.
-
-# How to use
-
-Install the library with pip
-
-    pip install json-repair
-
-then you can use use it in your code like this
-
-    from json_repair import repair_json
-
-    good_json_string = repair_json(bad_json_string)
-    # If the string was super broken this will return an empty string
-
-
-You can use this library to completely replace `json.loads()`:
-
-    import json_repair
-
-    decoded_object = json_repair.loads(json_string)
-
-or just
-
-    import json_repair
-
-    decoded_object = json_repair.repair_json(json_string, return_objects=True)
-
-### Avoid this antipattern
-Some users of this library adopt the following pattern:
-
-    obj = {}
-    try:
-        obj = json.loads(string)
-    except json.JSONDecodeError as e:
-        obj = json_repair.loads(string)
-        ...
-
-This is wasteful because `json_repair` already does that strict `json.loads()` check for you by default. The normal flow is:
-
-- try the built-in `json.loads()` / `json.load()` first
-- if that succeeds, return the decoded object
-- if that fails, run the repair parser
-
-Use the default call unless you explicitly want to skip that initial validation step:
-
-```python
-import json_repair
-
-decoded_object = json_repair.loads(json_string)
+slugify('я люблю единорогов');
+//=> 'ya-lyublyu-edinorogov'
 ```
 
-### Read json from a file or file descriptor
+## API
 
-JSON repair provides also a drop-in replacement for `json.load()`:
+### slugify(string, options?)
 
-    import json_repair
+#### string
 
-    try:
-        file_descriptor = open(fname, 'rb')
-    except OSError:
-        ...
+Type: `string`
 
-    with file_descriptor:
-        decoded_object = json_repair.load(file_descriptor)
+String to slugify.
 
-and another method to read from a file:
+#### options
 
-    import json_repair
+Type: `object`
 
-    try:
-        decoded_object = json_repair.from_file(json_file)
-    except OSError:
-        ...
-    except IOError:
-        ...
+##### separator
 
-Keep in mind that the library will not catch any IO-related exception and those will need to be managed by you
+Type: `string`\
+Default: `'-'`
 
-### Non-Latin characters
+```js
+import slugify from '@sindresorhus/slugify';
 
-When working with non-Latin characters (such as Chinese, Japanese, or Korean), you need to pass `ensure_ascii=False` to `repair_json()` in order to preserve the non-Latin characters in the output.
+slugify('BAR and baz');
+//=> 'bar-and-baz'
 
-Here's an example using Chinese characters:
+slugify('BAR and baz', {separator: '_'});
+//=> 'bar_and_baz'
 
-    repair_json("{'test_chinese_ascii':'统一码'}")
+slugify('BAR and baz', {separator: ''});
+//=> 'barandbaz'
+```
 
-will return
+##### lowercase
 
-    {"test_chinese_ascii": "\u7edf\u4e00\u7801"}
+Type: `boolean`\
+Default: `true`
 
-Instead passing `ensure_ascii=Fa
+Make the slug lowercase.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('Déjà Vu!');
+//=> 'deja-vu'
+
+slugify('Déjà Vu!', {lowercase: false});
+//=> 'Deja-Vu'
+```
+
+##### decamelize
+
+Type: `boolean`\
+Default: `true`
+
+Convert camelcase to separate words. Internally it does `fooBar` → `foo bar`.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('fooBar');
+//=> 'foo-bar'
+
+slugify('fooBar', {decamelize: false});
+//=> 'foobar'
+```
+
+##### customReplacements
+
+Type: `Array<string[]>`\
+Default: `[
+	['&', ' and '],
+	['🦄', ' unicorn '],
+	['♥', ' love ']
+]`
+
+Add your own custom replacements.
+
+The replacements are run on the original string before decamelization and transliteration.
+
+This only overrides a default replacement if you set an item with the same key, like `&`.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('Foo@unicorn', {
+	customReplacements: [
+		['@', 'at']
+	]
+});
+//=> 'fooatunicorn'
+```
+
+Add a leading and trailing space to the replacement to have it separated by dashes:
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('foo@unicorn', {
+	customReplacements: [
+		['@', ' at ']
+	]
+});
+//=> 'foo-at-unicorn'
+```
+
+Another example:
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('I love 🐶', {
+	customReplacements: [
+		['🐶', 'dogs']
+	]
+});
+//=> 'i-love-dogs'
+```
+
+##### preserveLeadingUnderscore
+
+Type: `boolean`\
+Default: `false`
+
+If your string starts with an underscore, it will be preserved in the slugified string.
+
+Sometimes leading underscores are intentional, for example, filenames representing hidden paths on a website.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('_foo_bar');
+//=> 'foo-bar'
+
+slugify('_foo_bar', {preserveLeadingUnderscore: true});
+//=> '_foo-bar'
+```
+
+##### preserveTrailingDash
+
+Type: `boolean`\
+Default: `false`
+
+If your string ends with a dash, it will be preserved in the slugified string.
+
+For example, using slugify on an input field would allow for validation while not preventing the user from writing a slug.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('foo-bar-');
+//=> 'foo-bar'
+
+slugify('foo-bar-', {preserveTrailingDash: true});
+//=> 'foo-bar-'
+```
+
+##### preserveCharacters
+
+Type: `string[]`\
+Default: `[]`
+
+Preserve certain characters.
+
+It cannot contain the `separator`.
+
+The apostrophe in a word-final `'s` or `'t` is still dropped, even if you preserve `'`.
+
+For example, if you want to slugify URLs, but preserve the HTML fragment `#` character.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('foo_bar#baz', {preserveCharacters: ['#']});
+//=> 'foo-bar#baz'
+```
+
+##### locale
+
+Type: `string`\
+Default: `undefined`
+
+The locale to use for language-specific transliteration.
+
+See the [`@sindresorhus/transliterate` package](https://github.com/sindresorhus/transliterate#locale) for more info.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('Räksmörgås');
+//=> 'raeksmoergas'
+
+slugify('Räksmörgås', {locale: 'sv'});
+//=> 'raksmorgas'
+```
+
+##### transliterate
+
+Type: `boolean`\
+Default: `true`
+
+Whether to transliterate Unicode characters to ASCII.
+
+When `false`, non-ASCII characters will be preserved instead of being transliterated. This can improve performance when you don't need transliteration.
+
+```js
+import slugify from '@sindresorhus/slugify';
+
+slugify('Déjà Vu');
+//=> 'deja-vu'
+
+slugify('Déjà Vu', {transliterate: false});
+//=> 'déjà-vu'
+```
+
+### slugifyWithCounter()
+
+Returns a new instance of `slugify(string, options?)` with a counter to handle multiple occurrences of the same string.
+
+#### Example
+
+```js
+import {slugifyWithCounter} from '@sindresorhus/slugify';
+
+const slugify = slugifyWithCounter();
+
+slugify('foo bar');
+//=> 'foo-bar'
+
+slugify('foo bar');
+//=> 'foo-bar-2'
+
+slugify.reset();
+
+slugify('foo bar');
+//=> 'foo-bar'
+```
+
+#### Use-case example of counter
+
+If, for example, you have a document with multiple sections where each subsection has an example.
+
+```md
+## Section 1
+
+### Example
+
+## Section 2
+
+### Example
+```
+
+You can then use `slugifyWithCounter()` to generate unique HTML `id`'s to ensure anchors will link to the right headline.
+
+### slugify.reset()
+
+Reset the counter
+
+#### Example
+
+```js
+import {slugifyWithCounter} from '@sindresorhus/slugify';
+
+const slugify = slugifyWithCounter();
+
+slugify('foo bar');
+//=> 'foo-bar'
+
+slugify('foo bar');
+//=> 'foo-bar-2'
+
+slugify.reset();
+
+slugify('foo bar');
+//=> 'foo-bar'
+```
+
+## Related
+
+- [slugify-cli](https://github.com/sindresorhus/slugify-cli) - CLI for this module
+- [transliterate](https://github.com/sindresorhus/transliterate) - Convert Unicode characters to Latin characters using transliteration
+- [filenamify](https://github.com/sindresorhus/filenamify) - Convert a string to a valid safe filename
+
 
 ## 对 GBT 的启示
 - 可吸收点: 结合仓库定位与 README 技术栈, 提炼可注入 GBT cap 的知识

@@ -36,6 +36,10 @@ SCOPE_DESCRIPTIONS = {
     "privacy_read": "读取屏幕、摄像头、麦克风或隐私载体",
     "audit_read": "读取审计、授权或运行历史",
     "audio_output": "让本机发声（TTS 合成/播放）或写入音频产物",
+    # 2026-11-26 根因修复：transfer 是 HUMAN_GATES 里的真要票作用域（转账），
+    # auth_gate.SCOPES 43 行早已注册，但本表漏列 ⇒ test_scope_description_tables_stay_in_sync
+    # 与 test_scopes_registered 两处判红；补上使两表逐字对齐（单一真源纪律）。
+    "transfer": "转账/付款 —— 钱不能让她自己拍（主人令：资金转账必须拿票）",
 }
 
 _READ_ONLY_TENTACLE = {
@@ -196,6 +200,38 @@ def _hacker_kinds() -> set:
         return set()
     return {k for k, v in (BENIGN_CAPS or {}).items()
             if (v or {}).get("domain") == "security"} - _DEFENSIVE_SECURITY
+
+
+# 🔴 2026-11-26 根因修复：`transfer` 撞名——万能插的**数据传输算子**（map/filter/merge/collect…
+# 纯变换、零副作用）与**资金转账**共用 kind 名。旧代码只看 kind ∈ MONEY_KINDS 就挂 transfer 票，
+# 结果 DAG 里任何 transfer 数据节点都被当"转账"拦死（test_transfer_ops KeyError:'data'、
+# test_wf_fanin_aggregation 节点 g='denied'）。修法：**按 payload 语义判定**：
+#   · 有 op 且属数据算子集 / 有 data 字段 ⇒ 数据变换，不挂资金票；
+#   · 有 to/amount/recipient 或 op 属转账动词 ⇒ 真资金转账，照旧要票。
+# 这样"钱不能让她自己拍"的护栏不松，数据总线也不再被误伤。
+_DATA_TRANSFER_OPS = frozenset({
+    "collect", "map", "pluck", "filter", "merge", "unique", "sort", "limit",
+    "flatten", "split", "join", "rename", "wrap", "stats",
+})
+_MONEY_TRANSFER_OPS = frozenset({"pay", "transfer", "send", "withdraw", "remittance"})
+
+
+def is_money_transfer(kind: str, payload: dict | None = None) -> bool:
+    """是不是**真资金转账**（而非同名的数据传输算子）。判定看 payload 语义，不只看 kind。"""
+    if kind not in MONEY_KINDS:
+        return False
+    p = dict(payload or {})
+    op = str(p.get("op") or p.get("action") or "").lower()
+    # 数据变换特征：明确的算子名 或 带 data 字段（传输总线的标准入参）
+    if op in _DATA_TRANSFER_OPS or "data" in p:
+        return False
+    # 资金转账特征：收款方/金额 或 转账动词
+    if any(p.get(k) for k in ("to", "amount", "recipient", "target_account")):
+        return True
+    if op in _MONEY_TRANSFER_OPS:
+        return True
+    # 空载荷的裸 `transfer` 按保守口径仍当作资金转账（要票），不因撞名放松护栏
+    return True
 
 
 def autonomous_exclusion(kind: str) -> str:
@@ -637,6 +673,9 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
             _sock = {"http": "api", "ws": "api", "tcp": "api",
                      "path": "file", "dir": "file", "bin": "process", "cmd": "process",
                      "scheme": "app", "unix": "process",
+                     # 🔴 2026-11-26：浏览器 CDP 端点 → browser 插座，挂 browser_control
+                     #   （人类级操控浏览器 = 点击/输入/脚本，不是起进程；判成 process 是错的）。
+                     "browser": "browser", "image": "file",
                      "mcp": "process", "remote": "process"}.get(_k, "process")
             _pop = "run"
         # 🔴 2026-11-03：`op=page_run` 是**真起子进程**跑包内页（python -m <module>），
@@ -652,6 +691,10 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
                     add("filesystem_write")
             elif _sock == "api":
                 add("external_llm", "data_export")
+            elif _sock == "browser":
+                # 人类级浏览器操控（CDP 点击/输入/脚本）⇒ browser_control。
+                # 这是主人自己的浏览器会话，与 desktop_control 同族，按意图给票即可。
+                add("browser_control")
             elif _sock == "web":
                 # iOS 上 web 不靠桌面控制：等价实现是 apple-open（系统浏览器），与 body_open 同风险 ⇒ 按意图放行
                 if str(p.get("via") or "").lower() == "desktop" or not _ios_native_available():
@@ -1256,7 +1299,9 @@ def evaluate(kind: str, payload: dict | None = None) -> PolicyDecision:
     # 2026-11-03 补漏：transfer 是 **kind** 不是 scope，上面各分支从不 add 它
     # ⇒ 非自主模式下 MONEY_KINDS 形同虚设（实测 evaluate("transfer") scopes 为空）。
     # 这里按 kind 补判一次，让"转账必票"真正生效。
-    if kind in MONEY_KINDS:
+    # 🔴 2026-11-26：改用 is_money_transfer() 按 payload 语义判——同名的数据传输算子
+    # （op=map/filter/merge + data）不再被误当转账拦死；真资金转账照旧挂票。
+    if is_money_transfer(kind, p):
         add("transfer")
 
     return PolicyDecision(kind=kind, risk=risk, scopes=tuple(scopes),

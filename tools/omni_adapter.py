@@ -97,6 +97,16 @@ def classify(target: str) -> dict:
             return {"kind": "path", "path": str(p), "why": "文件（相对路径）"}
         return {"kind": "path", "path": str(p), "why": "路径（不存在）"}
 
+    # 🔴 2026-11-26：浏览器 CDP 接管点 —— 必须**排在 scheme 分支之前**判，
+    #   否则 http:// 会被下面 SCHEME_RE 一律吞成普通 http（实测过，这是真顺序坑）。
+    #   只认 CDP 专用端口段，避免把普通本地 web 服务误判成浏览器。
+    if re.match(r"^https?://(127\.0\.0\.1|localhost):\d+(/.*)?$", t):
+        port_m = re.search(r":(\d+)", t)
+        if port_m and str(port_m.group(1)) in ("9222", "9223", "9224", "9444"):
+            return {"kind": "browser", "endpoint": t.rstrip("/")[:200],
+                    "why": "浏览器 CDP 调试端点（%s）⇒ 可接管标签页/点击/输入/脚本" % port_m.group(1)}
+        return {"kind": "http", "scheme": "http", "url": t, "why": "本地 http 端点"}
+
     m = SCHEME_RE.match(t)
     if m:
         sc = m.group(1).lower()
@@ -115,7 +125,22 @@ def classify(target: str) -> dict:
         # 其余的 scheme 一律当「App / 系统接口」（ios: lmpocket: maps: tel: …）
         return {"kind": "scheme", "scheme": sc, "why": "App/系统 scheme（%s）" % sc}
 
+    # 🔴 2026-11-26：浏览器 CDP 接管点 —— http://127.0.0.1:9222 这类是「可接管的浏览器」，
+    #   不是普通 http（普通 http 只能 get，浏览器能开标签页/点击/输入/执行脚本/读 DOM）。
+    #   只认 CDP 专用端口段，避免把普通本地 web 服务误判成浏览器。
+    if re.match(r"^https?://(127\.0\.0\.1|localhost):\d+(/.*)?$", t):
+        port_m = re.search(r":(\d+)", t)
+        if port_m and str(port_m.group(1)) in ("9222", "9223", "9224", "9444"):
+            return {"kind": "browser", "endpoint": t.rstrip("/")[:200],
+                    "why": "浏览器 CDP 调试端点（%s）⇒ 可接管标签页/点击/输入/脚本" % port_m.group(1)}
+        return {"kind": "http", "scheme": "http", "url": t, "why": "本地 http 端点"}
+
     if HOSTPORT_RE.match(t):
+        # 127.0.0.1:9222 这种裸 host:port 也认成浏览器 CDP
+        _pm = re.search(r":(\d+)$", t)
+        if _pm and str(_pm.group(1)) in ("9222", "9223", "9224", "9444"):
+            return {"kind": "browser", "endpoint": "http://" + t,
+                    "why": "浏览器 CDP 调试端点（裸 host:port）"}
         return {"kind": "tcp", "hostport": t, "why": "host:port"}
 
     if t.startswith("/") or t.startswith("./") or t.startswith("../") or t.startswith("~"):
@@ -219,6 +244,42 @@ def execute(target: str, verb: str = "", args: dict | None = None) -> dict:
                 return _vision_view(p)
             return {"ok": False, "kind": "image", "via": "omni:vision",
                     "evidence": "图片不存在或不是文件：%s（看图不做执行兜底）" % p}
+
+    if kind == "browser":
+        # 🔴 2026-11-26 主人令：万能插接管浏览器 = **人类级操作**，不是只读读数。
+        #   动词 → native_browser 真动作（CDP）。会改页面状态的动词由下游 policy 挂
+        #   browser_control 门；本层不绕门，只做「认得出 + 生成接口 + 转交执行」。
+        _verb_map = {
+            "open": "navigate", "click": "click_element", "type": "type_text",
+            "scroll": "execute_script", "key": "execute_script", "drag": "execute_script",
+            "wait": "wait_for", "script": "execute_script",
+        }
+        act = _verb_map.get(verb or "open", "status")
+        payload = dict(args or {})
+        if verb == "scroll":
+            dx = payload.pop("dx", 0); dy = payload.pop("dy", 500)
+            payload.setdefault("script", "window.scrollBy(%s,%s)" % (dx, dy))
+        elif verb == "key":
+            keys = payload.pop("keys", "Enter")
+            payload.setdefault("script",
+                "document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'%s',bubbles:true}))"
+                % keys)
+        # 🔴 2026-11-26 实测抓出：native_browser.execute_script 的形参是 `js`，不是 `script`。
+        #   外层统一收 `script`，转交前改键；否则底层报 unexpected keyword argument 'script'，
+        #   而万能插层还错报 ok=True（拿布尔掩盖底层失败）。一并修掉两处。
+        if act == "execute_script" and "script" in payload:
+            payload["js"] = payload.pop("script")
+        try:
+            from gbt_allinone import native_browser as _nb
+            r = _nb.run(act, **payload)
+        except Exception as exc:                                  # noqa: BLE001
+            return {"ok": False, "kind": "browser", "via": "omni:browser",
+                    "evidence": "浏览器执行腿不可用（%s）: %s"
+                                % (type(exc).__name__, str(exc)[:120])}
+        return {"ok": bool(r.get("ok")), "kind": "browser", "via": "omni:browser",
+                "verb": verb or "open", "action": act,
+                "evidence": "CDP %s → %s" % (act, str(r.get("status") or r.get("error") or "ok")[:120]),
+                "result": r}
 
     if kind == "http":
         url = info.get("url") or target

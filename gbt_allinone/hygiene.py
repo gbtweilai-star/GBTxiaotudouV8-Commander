@@ -30,8 +30,14 @@ def _home_allowed(p) -> bool:
         if _is_environment(name):
             return True
         from .inventory import _classify
-        # 2026-11-01：checkout 形态下仓库顶层项被判为 framework —— 那也是**本体的东西**，不是散件。
-        return _classify(p if hasattr(p, "name") else __import__("pathlib").Path(str(p))) in ("transient", "framework")
+        # 🔴 2026-11-26 根因修复：原放行集合硬编码 ("transient","framework")，
+        #    而 inventory._classify 后来扩了 data（2026-11-01 交付产物）、runtime、archive
+        #    等合法分类 ⇒ 家根 `交付成片/`（inventory 判 data）被 hygiene 误报 home_stray，
+        #    连带 cross_scan 的 X 维 finding 长期红。按注释的"唯一裁判"原则改为：
+        #    inventory 判为**非 foreign** 的一律放行；分类逻辑只在 inventory 一处维护，
+        #    hygiene 不再硬编码追着分类演跑。foreign 才是真要处置的异物。
+        cls = _classify(p if hasattr(p, "name") else __import__("pathlib").Path(str(p)))
+        return cls != "foreign"
     except Exception:
         return False
 PKG_MD_ALLOWED = {"README.md", "SOUL.md", "CODING_DISCIPLINE.md", "LAYOUT.md"}
